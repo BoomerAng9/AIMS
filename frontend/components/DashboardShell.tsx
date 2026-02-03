@@ -14,9 +14,9 @@ export function DashboardShell({ children }: Props) {
     <LogoWallBackground mode="dashboard">
       <div className="flex min-h-screen">
         {/* Left rail */}
-        <aside className="hidden w-64 border-r border-white/5 bg-black/40 px-3 py-4 backdrop-blur-xl lg:block">
+        <aside className="hidden w-64 border-r border-amber-50/8 bg-black/40/60 px-3 py-4 backdrop-blur-xl lg:block">
           <div className="mb-6 px-2">
-            <p className="text-[0.7rem] uppercase tracking-[0.22em] text-amber-200/70 font-display">
+            <p className="text-[0.7rem] uppercase tracking-[0.22em] text-amber-200/70">
               The Hybrid Business Architect
             </p>
             <p className="mt-1 text-xs text-amber-100/65">
@@ -26,7 +26,7 @@ export function DashboardShell({ children }: Props) {
 
           <DashboardNav />
 
-          <div className="mt-8 rounded-2xl border border-white/5 bg-gradient-to-br from-amber-500/10 via-black/60 to-black/90 px-3 py-3 text-[0.75rem] text-amber-100/80">
+          <div className="mt-8 rounded-2xl border border-amber-50/10 bg-gradient-to-br from-amber-500/10 via-black/60 to-black/90 px-3 py-3 text-[0.75rem] text-amber-100/80">
             <p className="text-[0.65rem] uppercase tracking-[0.18em] text-amber-200/70">
               Live status
             </p>
@@ -46,7 +46,7 @@ export function DashboardShell({ children }: Props) {
         {/* Main column */}
         <div className="flex min-h-screen flex-1 flex-col">
           {/* Top bar */}
-          <header className="flex items-center justify-between border-b border-white/5 bg-black/50 px-4 py-3 backdrop-blur-xl sticky top-0 z-30">
+          <header className="flex items-center justify-between border-b border-amber-50/8 bg-black/50 px-4 py-3 backdrop-blur-xl">
             <div className="flex flex-col">
               <span className="text-[0.7rem] uppercase tracking-[0.18em] text-amber-200/70">
                 Dashboard
@@ -57,13 +57,13 @@ export function DashboardShell({ children }: Props) {
             </div>
             <div className="flex items-center gap-4">
               {/* LUC pill */}
-              <div className="hidden items-center gap-2 rounded-full border border-white/10 bg-black/60 px-3 py-1.5 text-xs text-amber-100/80 sm:flex">
+              <div className="hidden items-center gap-2 rounded-full border border-amber-50/15 bg-black/60 px-3 py-1.5 text-xs text-amber-100/80 sm:flex">
                 <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(74,222,128,0.8)]" />
                 <span>LUC: live estimate</span>
                 <span className="text-amber-200 font-semibold">$0.00</span>
               </div>
               {/* User chip placeholder */}
-              <button className="flex items-center gap-2 rounded-full border border-white/10 bg-black/60 px-2.5 py-1.5 text-xs text-amber-100/85">
+              <button className="flex items-center gap-2 rounded-full border border-amber-50/15 bg-black/60 px-2.5 py-1.5 text-xs text-amber-100/85">
                 <span className="h-6 w-6 rounded-full bg-gradient-to-br from-amber-400 to-amber-700 shadow-[0_0_15px_rgba(251,191,36,0.9)]" />
                 <span>My account</span>
               </button>

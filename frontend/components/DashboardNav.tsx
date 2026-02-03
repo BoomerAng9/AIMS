@@ -36,11 +36,11 @@ export function DashboardNav() {
             className={clsx(
               "mx-1 flex items-center gap-2 rounded-full px-3 py-2 transition-colors",
               active
-                ? "bg-amber-300 text-black shadow-[0_0_20px_rgba(250,204,21,0.45)] font-medium"
-                : "text-amber-100/75 hover:bg-white/5 hover:text-amber-50"
+                ? "bg-amber-300 text-black shadow-[0_0_20px_rgba(250,204,21,0.45)]"
+                : "text-amber-100/75 hover:bg-amber-100/10 hover:text-amber-50"
             )}
           >
-            {active && <span className="h-1.5 w-1.5 rounded-full bg-black/60 animate-pulse" />}
+            <span className="h-1.5 w-1.5 rounded-full bg-amber-300/80" />
             <span>{item.label}</span>
           </Link>
         );
