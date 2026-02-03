@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cmd.exe /c \"where node\")",
+      "Bash(cmd.exe /c \"where npm\")",
+      "Bash(cmd.exe /c \"where node && where npm\")",
+      "Bash(PATH=\"/c/Program Files/nodejs:/c/Users/rishj/AppData/Roaming/npm:$PATH\")",
+      "Bash(node --version)",
+      "Bash(npm:*)",
+      "Bash(export PATH=\"/c/Program Files/nodejs:/c/Users/rishj/AppData/Roaming/npm:$PATH\")"
+    ]
+  }
+}
