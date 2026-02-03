@@ -1,4 +1,6 @@
 // frontend/app/dashboard/circuit-box/page.tsx
+import React from "react";
+
 export default function CircuitBoxPage() {
   return (
     <div className="space-y-6">

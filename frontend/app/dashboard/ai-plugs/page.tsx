@@ -48,7 +48,7 @@ export default function AiPlugsPage() {
         {/* Empty state / Build your own */}
         <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-white/10 bg-black/20 p-8 text-center text-amber-100/30">
           <div className="h-12 w-12 rounded-full border border-dashed border-white/20 flex items-center justify-center text-xl">+</div>
-          <p className="mt-4 text-sm">Need something custom?</p>
+          <p className="mt-4 text-sm font-handwriting text-lg text-amber-200/50">Need something custom?</p>
           <button className="mt-2 text-xs text-amber-300 hover:underline">Request a Custom Plug</button>
         </div>
       </div>

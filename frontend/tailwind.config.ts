@@ -15,8 +15,10 @@ module.exports = {
         }
       },
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
-        display: ['Doto', 'monospace'] # Conceptual font
+        sans: ['var(--font-inter)', 'sans-serif'],
+        display: ['var(--font-doto)', 'monospace'],
+        marker: ['var(--font-marker)', 'cursive'],
+        handwriting: ['var(--font-caveat)', 'cursive'],
       }
     },
   },
