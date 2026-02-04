@@ -4,6 +4,7 @@ import bodyParser from 'body-parser';
 import { v4 as uuidv4 } from 'uuid';
 import { ACPStandardizedRequest, ACPResponse } from './acp/types';
 import { LUCEngine } from './luc';
+import logger from './logger';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -36,7 +37,7 @@ app.post('/ingress/acp', async (req, res) => {
       channel: 'WEB'
     };
 
-    console.log(`[UEF] Received ACP Request: ${acpReq.reqId} - ${acpReq.intent}`);
+    logger.info(`[UEF] Received ACP Request: ${acpReq.reqId} - ${acpReq.intent}`);
 
     // 2. Routing Logic (SmelterOS Router Stub)
     // If it's a chat/estimate intent, run LUC and return quote.
@@ -66,7 +67,7 @@ app.post('/ingress/acp', async (req, res) => {
     res.json(response);
 
   } catch (error: any) {
-    console.error('ACP Ingress Error:', error);
+    logger.error({ err: error }, 'ACP Ingress Error');
     res.status(500).json({ status: 'ERROR', message: error.message });
   }
 });
@@ -75,6 +76,6 @@ app.post('/ingress/acp', async (req, res) => {
 // Start Server
 // --------------------------------------------------------------------------
 app.listen(PORT, () => {
-  console.log(`\n>>> UEF Gateway (Layer 2) running on port ${PORT}`);
-  console.log(`>>> ACP Ingress available at http://localhost:${PORT}/ingress/acp\n`);
+  logger.info(`UEF Gateway (Layer 2) running on port ${PORT}`);
+  logger.info(`ACP Ingress available at http://localhost:${PORT}/ingress/acp`);
 });
