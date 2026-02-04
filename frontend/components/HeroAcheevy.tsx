@@ -1,4 +1,6 @@
 /* frontend/components/HeroAcheevy.tsx */
+import Image from "next/image";
+
 export function HeroAcheevy() {
   return (
     <section className="mx-auto flex max-w-7xl flex-col gap-10 px-6 py-20 md:flex-row md:items-center">
@@ -28,9 +30,11 @@ export function HeroAcheevy() {
           {/* Subtle floor glow */}
           <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-48 h-10 bg-amber-400/20 blur-[60px] rounded-full group-hover:bg-amber-400/30 transition-all duration-700" />
           
-          <img
+          <Image
             src="/images/acheevy/acheevy-office-plug.png"
             alt="ACHEEVY holding an aiPlug cube"
+            width={680}
+            height={1024}
             className="w-full max-w-[480px] drop-shadow-[0_0_80px_rgba(0,0,0,0.8)] animate-float"
           />
         </div>

@@ -16,7 +16,7 @@ module.exports = {
       },
       fontFamily: {
         sans: ['var(--font-inter)', 'sans-serif'],
-        display: ['var(--font-doto)', 'monospace'],
+        display: ['var(--font-roboto-mono)', 'monospace'],
         marker: ['var(--font-marker)', 'cursive'],
         handwriting: ['var(--font-caveat)', 'cursive'],
       },
