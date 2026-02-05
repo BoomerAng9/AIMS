@@ -3,6 +3,8 @@
  * Heuristic pre-flight checks for ACP requests.
  */
 
+import logger from '../logger';
+
 export interface OracleResult {
   passed: boolean;
   score: number; // 0-100
@@ -103,7 +105,7 @@ const gates: GateCheck[] = [
 
 export class Oracle {
   static async runGates(spec: any, output: any): Promise<OracleResult> {
-    console.log('[ORACLE] Running 7 Gates Verification...');
+    logger.info('[ORACLE] Running 7 Gates Verification...');
 
     const failures: string[] = [];
     let earnedWeight = 0;
@@ -113,17 +115,17 @@ export class Oracle {
       const result = gate.run(spec, output);
       if (result.passed) {
         earnedWeight += gate.weight;
-        console.log(`  [GATE] ${gate.name}: PASS`);
+        logger.info(`  [GATE] ${gate.name}: PASS`);
       } else {
         failures.push(`${gate.name}: ${result.reason}`);
-        console.log(`  [GATE] ${gate.name}: FAIL — ${result.reason}`);
+        logger.info(`  [GATE] ${gate.name}: FAIL — ${result.reason}`);
       }
     }
 
     const score = Math.round((earnedWeight / totalWeight) * 100);
     const passed = failures.length === 0;
 
-    console.log(`[ORACLE] Final score: ${score}/100 | Passed: ${passed}`);
+    logger.info(`[ORACLE] Final score: ${score}/100 | Passed: ${passed}`);
 
     return { passed, score, gateFailures: failures };
   }
