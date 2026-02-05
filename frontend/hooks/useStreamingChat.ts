@@ -11,6 +11,7 @@ import type { ChatMessage } from '@/lib/chat/types';
 interface UseStreamingChatOptions {
   sessionId?: string;
   model?: string;
+  onMessageStart?: () => void;
   onMessageComplete?: (message: ChatMessage) => void;
   onError?: (error: string) => void;
 }
@@ -28,7 +29,7 @@ interface UseStreamingChatReturn {
 }
 
 export function useStreamingChat(options: UseStreamingChatOptions = {}): UseStreamingChatReturn {
-  const { sessionId, model = 'gemini-3-flash', onMessageComplete, onError } = options;
+  const { sessionId, model = 'gemini-3-flash', onMessageStart, onMessageComplete, onError } = options;
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isStreaming, setIsStreaming] = useState(false);
@@ -92,6 +93,7 @@ export function useStreamingChat(options: UseStreamingChatOptions = {}): UseStre
 
       setIsLoading(false);
       setIsStreaming(true);
+      onMessageStart?.();
 
       // Read the stream
       const reader = response.body?.getReader();
@@ -178,7 +180,7 @@ export function useStreamingChat(options: UseStreamingChatOptions = {}): UseStre
       setIsLoading(false);
       abortControllerRef.current = null;
     }
-  }, [messages, isStreaming, model, sessionId, onMessageComplete, onError]);
+  }, [messages, isStreaming, model, sessionId, onMessageStart, onMessageComplete, onError]);
 
   // ─────────────────────────────────────────────────────────
   // Regenerate Last Response

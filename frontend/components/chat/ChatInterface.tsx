@@ -2,7 +2,9 @@
 
 /**
  * ChatInterface Component
- * Modern chat UI with streaming, voice I/O, and markdown support
+ * Modern chat UI with streaming, voice I/O, markdown support,
+ * and Glass Box orchestration visibility
+ *
  * Inspired by Claude, ChatGPT, and Kimi interfaces
  */
 
@@ -13,6 +15,9 @@ import remarkGfm from 'remark-gfm';
 import { useStreamingChat } from '@/hooks/useStreamingChat';
 import { useVoiceInput } from '@/hooks/useVoiceInput';
 import { useVoiceOutput } from '@/hooks/useVoiceOutput';
+import { useOrchestration } from '@/hooks/useOrchestration';
+import { OperationsOverlay, OperationsPulse } from '@/components/orchestration/OperationsOverlay';
+import { DepartmentBoard } from '@/components/orchestration/DepartmentBoard';
 import type { ChatMessage } from '@/lib/chat/types';
 
 // ─────────────────────────────────────────────────────────────
@@ -60,6 +65,14 @@ const RegenerateIcon = ({ className }: { className?: string }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <polyline points="23 4 23 10 17 10" />
     <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+  </svg>
+);
+
+const BoardIcon = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <rect x="3" y="3" width="18" height="18" rx="2" />
+    <path d="M3 9h18" />
+    <path d="M9 21V9" />
   </svg>
 );
 
@@ -245,22 +258,41 @@ function VoiceInputButton({ isListening, isProcessing, audioLevel, onStart, onSt
 
 interface ChatInterfaceProps {
   sessionId?: string;
+  userId?: string;
+  userName?: string;
+  projectTitle?: string;
+  projectObjective?: string;
   model?: string;
   placeholder?: string;
   welcomeMessage?: string;
   autoPlayVoice?: boolean;
+  showOrchestration?: boolean;
 }
 
 export function ChatInterface({
   sessionId,
+  userId = 'user-1',
+  userName = 'User',
+  projectTitle,
+  projectObjective,
   model = 'gemini-3-flash',
   placeholder = 'Message ACHEEVY...',
   welcomeMessage,
   autoPlayVoice = true,
+  showOrchestration = true,
 }: ChatInterfaceProps) {
   const [inputValue, setInputValue] = useState('');
+  const [showBoard, setShowBoard] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Orchestration
+  const orchestration = useOrchestration({
+    userId,
+    userName,
+    projectTitle,
+    projectObjective,
+  });
 
   // Streaming chat
   const {
@@ -274,7 +306,54 @@ export function ChatInterface({
   } = useStreamingChat({
     sessionId,
     model,
+    onMessageStart: () => {
+      // Start orchestration when streaming begins
+      if (showOrchestration) {
+        orchestration.updatePhase('execute');
+
+        // Simulate agent assignment for demo
+        const deptId = selectDepartment(inputValue);
+        if (deptId) {
+          const manager = orchestration.assignManager(deptId);
+          if (manager) {
+            orchestration.addEvent(
+              'manager_assigned',
+              `Routing to ${manager.name} for {userName}`,
+              manager
+            );
+
+            // Assign an ang
+            setTimeout(() => {
+              const angId = selectAng(inputValue, deptId);
+              if (angId) {
+                const ang = orchestration.assignAng(angId);
+                if (ang) {
+                  orchestration.addEvent('ang_assigned', `${ang.name} assigned to task`, ang);
+                  orchestration.updateAngStatus(angId, 'working');
+                  orchestration.addDialogue(
+                    manager,
+                    `${ang.name}, please help {userName} with this request.`,
+                    'coordination',
+                    ang
+                  );
+                }
+              }
+            }, 500);
+          }
+        }
+      }
+    },
     onMessageComplete: (message) => {
+      // Complete orchestration
+      if (showOrchestration) {
+        orchestration.updatePhase('deliver');
+        orchestration.addEvent('delivering', `Presenting results to {userName}`);
+
+        setTimeout(() => {
+          orchestration.completeTask();
+        }, 1000);
+      }
+
       // Auto-play voice for assistant messages
       if (autoPlayVoice && message.role === 'assistant' && voiceOutput.autoPlayEnabled) {
         voiceOutput.speak(message.content);
@@ -297,6 +376,32 @@ export function ChatInterface({
   const voiceOutput = useVoiceOutput({
     config: { autoPlay: autoPlayVoice, provider: 'elevenlabs' },
   });
+
+  // ─────────────────────────────────────────────────────────
+  // Department/Ang Selection Helpers
+  // ─────────────────────────────────────────────────────────
+
+  function selectDepartment(prompt: string): string | null {
+    const lower = prompt.toLowerCase();
+    if (lower.includes('research') || lower.includes('analyze') || lower.includes('market')) return 'research';
+    if (lower.includes('code') || lower.includes('build') || lower.includes('develop')) return 'development';
+    if (lower.includes('write') || lower.includes('design') || lower.includes('content')) return 'content';
+    if (lower.includes('automate') || lower.includes('workflow') || lower.includes('integrate')) return 'automation';
+    if (lower.includes('test') || lower.includes('review') || lower.includes('quality')) return 'quality';
+    // Default to development
+    return 'development';
+  }
+
+  function selectAng(prompt: string, deptId: string): string | null {
+    const angMap: Record<string, string> = {
+      research: 'researcher_ang',
+      development: 'coder_ang',
+      content: 'writer_ang',
+      automation: 'workflow_ang',
+      quality: 'quality_ang',
+    };
+    return angMap[deptId] || null;
+  }
 
   // ─────────────────────────────────────────────────────────
   // Auto-scroll to bottom
@@ -325,6 +430,13 @@ export function ChatInterface({
     const messageText = text || inputValue;
     if (!messageText.trim() || isStreaming || isLoading) return;
 
+    // Start orchestration task
+    if (showOrchestration) {
+      orchestration.startTask(messageText);
+      orchestration.addEvent('task_received', `{userName} sent a new request`);
+      orchestration.updatePhase('route');
+    }
+
     sendMessage(messageText);
     setInputValue('');
 
@@ -332,7 +444,7 @@ export function ChatInterface({
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
     }
-  }, [inputValue, isStreaming, isLoading, sendMessage]);
+  }, [inputValue, isStreaming, isLoading, sendMessage, showOrchestration, orchestration]);
 
   // ─────────────────────────────────────────────────────────
   // Keyboard Handling
@@ -346,7 +458,7 @@ export function ChatInterface({
   };
 
   return (
-    <div className="flex flex-col h-full bg-gradient-to-b from-[#0A0A0A] to-[#111]">
+    <div className="relative flex flex-col h-full bg-gradient-to-b from-[#0A0A0A] to-[#111]">
       {/* Messages Area */}
       <div className="flex-1 overflow-y-auto px-4 py-6">
         <div className="max-w-3xl mx-auto space-y-6">
@@ -431,6 +543,17 @@ export function ChatInterface({
               className="flex-1 bg-transparent text-amber-50 placeholder:text-white/20 resize-none outline-none text-[15px] leading-relaxed max-h-[200px] py-2"
             />
 
+            {/* Department Board Toggle */}
+            {showOrchestration && (
+              <button
+                onClick={() => setShowBoard(true)}
+                className="p-3 rounded-xl bg-white/5 text-amber-100/60 hover:bg-white/10 hover:text-amber-100 transition-colors"
+                title="View Department Board"
+              >
+                <BoardIcon className="w-5 h-5" />
+              </button>
+            )}
+
             {/* Send / Stop Button */}
             {isStreaming ? (
               <button
@@ -488,6 +611,32 @@ export function ChatInterface({
           </p>
         </div>
       </div>
+
+      {/* Orchestration Overlay (Glass Box) */}
+      {showOrchestration && orchestration.shouldShowOverlay && (
+        <OperationsOverlay
+          state={orchestration.state}
+          onExpand={() => setShowBoard(true)}
+          onMinimize={() => orchestration.setOverlayMode('minimal')}
+        />
+      )}
+
+      {/* Operations Pulse (for quick tasks) */}
+      {showOrchestration &&
+        orchestration.state.phase !== 'idle' &&
+        !orchestration.shouldShowOverlay && (
+          <OperationsPulse
+            isActive={orchestration.state.phase !== 'idle'}
+            onClick={() => orchestration.setOverlayMode('minimal')}
+          />
+        )}
+
+      {/* Department Board Drawer */}
+      <DepartmentBoard
+        state={orchestration.state}
+        isOpen={showBoard}
+        onClose={() => setShowBoard(false)}
+      />
     </div>
   );
 }
