@@ -7,7 +7,7 @@ import { LUCCostEstimate, LUCComponentEstimate, UCPQuote } from '../ucp';
 
 export class LUCEngine {
   
-  static estimate(featureSpec: string, models: string[] = ['kimi-k2.5', 'gpt-4']): UCPQuote {
+  static estimate(featureSpec: string, models: string[] = ['kimi-k2.5', 'gemini-3-flash-thinking']): UCPQuote {
     // STUB: Real logic would analyze the featureSpec depth.
     // Here we use heuristic multiplier based on string length.
     
@@ -50,7 +50,7 @@ export class LUCEngine {
       };
 
       return {
-        name: isCheap ? 'Standard (Kimi)' : 'Premium (GPT-4)',
+        name: isCheap ? 'Standard (Kimi K2.5)' : 'Premium (Gemini 3 Flash Thinking)',
         estimate
       };
     });
