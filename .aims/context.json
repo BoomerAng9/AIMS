@@ -1,0 +1,9 @@
+{
+  "tenant_id": "tnt_123",
+  "user_id": "usr_456",
+  "job_id": "job_789",
+  "actor_id": "builder_ang",
+  "environment": "dev",
+  "budget_envelope_id": "be_001",
+  "risk_tier": "low"
+}

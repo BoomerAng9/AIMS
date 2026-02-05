@@ -43,15 +43,13 @@ export function AuthLayout() {
             </div>
             <div className="flex justify-center gap-x-10">
                 <Link
-                    to="https://www.ii.inc/web/terms-and-conditions"
-                    target="_blank"
+                    to="/terms"
                     className="dark:text-white text-sm font-semibold"
                 >
                     Terms of Use
                 </Link>
                 <Link
-                    to="https://www.ii.inc/web/privacy-policy"
-                    target="_blank"
+                    to="/privacy"
                     className="dark:text-white text-sm font-semibold"
                 >
                     Privacy Policy

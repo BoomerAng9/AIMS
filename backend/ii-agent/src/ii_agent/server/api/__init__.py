@@ -12,6 +12,7 @@ from ii_agent.server.wishlist.views import router as wishlist_router
 from ii_agent.server.billing import router as billing_router
 from ii_agent.server.chat.router import router as chat_router
 from .connectors import router as connectors_router
+from ii_agent.server.branding import branding_router
 
 __all__ = [
     "sessions_router",
@@ -24,4 +25,5 @@ __all__ = [
     "billing_router",
     "chat_router",
     "connectors_router",
+    "branding_router",
 ]

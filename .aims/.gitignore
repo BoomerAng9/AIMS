@@ -1,0 +1,7 @@
+# AIMS Governance - Ignore logs but keep structure
+logs/
+*.log
+iteration_count
+
+# Keep the context file template
+!context.json

@@ -16,9 +16,9 @@
       "icons/icon.ico"
     ]
   },
-  "productName": "ii-agent",
+  "productName": "acheevy",
   "version": "0.1.0",
-  "identifier": "ii.agent.app",
+  "identifier": "cloud.plugmein.acheevy",
   "plugins": {
     "process": {
       "active": true
@@ -30,7 +30,7 @@
     },
     "windows": [
       {
-        "title": "II Agent",
+        "title": "ACHEEVY",
         "width": 1000,
         "height": 600,
         "dragDropEnabled": false

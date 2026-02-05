@@ -17,7 +17,7 @@ export function TermsOfUsePage() {
                                 1. Agreement to Terms
                             </h2>
                             <p className="text-gray-700 dark:text-gray-300 mb-4">
-                                By accessing and using II-Agent, you accept and
+                                By accessing and using ACHEEVY, you accept and
                                 agree to be bound by the terms and provision of
                                 this agreement. If you do not agree to abide by
                                 the above, please do not use this service.
@@ -30,7 +30,7 @@ export function TermsOfUsePage() {
                             </h2>
                             <p className="text-gray-700 dark:text-gray-300 mb-4">
                                 Permission is granted to temporarily download
-                                one copy of II-Agent materials for personal,
+                                one copy of ACHEEVY materials for personal,
                                 non-commercial transitory viewing only. This is
                                 the grant of a license, not a transfer of title,
                                 and under this license you may not:
@@ -43,7 +43,7 @@ export function TermsOfUsePage() {
                                 </li>
                                 <li>
                                     attempt to reverse engineer any software
-                                    contained in II-Agent
+                                    contained in ACHEEVY
                                 </li>
                                 <li>
                                     remove any copyright or other proprietary
@@ -57,8 +57,8 @@ export function TermsOfUsePage() {
                                 3. Disclaimer
                             </h2>
                             <p className="text-gray-700 dark:text-gray-300 mb-4">
-                                {`The materials on II-Agent are provided on an 'as
-                                is' basis. II-Agent makes no warranties,
+                                {`The materials on ACHEEVY are provided on an 'as
+                                is' basis. ACHEEVY makes no warranties,
                                 expressed or implied, and hereby disclaims and
                                 negates all other warranties including without
                                 limitation, implied warranties or conditions of
@@ -73,12 +73,12 @@ export function TermsOfUsePage() {
                                 4. Limitations
                             </h2>
                             <p className="text-gray-700 dark:text-gray-300 mb-4">
-                                In no event shall II-Agent or its suppliers be
+                                In no event shall ACHEEVY or its suppliers be
                                 liable for any damages (including, without
                                 limitation, damages for loss of data or profit,
                                 or due to business interruption) arising out of
                                 the use or inability to use the materials on
-                                II-Agent, even if II-Agent or an II-Agent
+                                ACHEEVY, even if ACHEEVY or an ACHEEVY
                                 authorized representative has been notified
                                 orally or in writing of the possibility of such
                                 damage.
@@ -101,7 +101,7 @@ export function TermsOfUsePage() {
                                 6. Changes to Terms
                             </h2>
                             <p className="text-gray-700 dark:text-gray-300 mb-4">
-                                II-Agent may revise these terms of service at
+                                ACHEEVY may revise these terms of service at
                                 any time without notice. By using this
                                 application, you are agreeing to be bound by the
                                 then current version of these terms of service.

@@ -1,7 +1,7 @@
-from typing import Annotated
+from typing import Annotated, Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi import HTTPException, status, Depends
+from fastapi import HTTPException, status, Depends, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy import select
 
@@ -10,6 +10,7 @@ from ii_agent.server.auth.jwt_handler import jwt_handler
 from ii_agent.server.models.auth import TokenPayload
 
 security = HTTPBearer()
+security_optional = HTTPBearer(auto_error=False)
 
 
 async def get_db_session():
@@ -61,3 +62,32 @@ async def get_current_user(
 
 
 CurrentUser = Annotated[User, Depends(get_current_user)]
+
+
+async def get_current_user_optional(
+    db: DBSession,
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security_optional),
+) -> Optional[User]:
+    """Get the current authenticated user if token is provided, otherwise return None."""
+    if not credentials:
+        return None
+    
+    token = credentials.credentials
+
+    # Verify the access token
+    payload = jwt_handler.verify_access_token(token)
+    if not payload:
+        return None
+    
+    token_data = TokenPayload(**payload)
+    result = await db.execute(select(User).where(User.id == token_data.user_id))
+    user = result.scalar_one_or_none()
+
+    if not user or not user.is_active:
+        return None
+
+    return user
+
+
+# Alias for backwards compatibility
+get_db = get_db_session

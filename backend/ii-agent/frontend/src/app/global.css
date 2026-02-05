@@ -28,9 +28,24 @@
     --color-red-2: #f54260;
     --shadow-btn: 0 4px 24px rgba(0, 0, 0, 0.16);
 
-    --font-sans: "Doto", sans-serif;
+    /* ACHEEVY Font Stack */
+    --font-doto: "Doto", sans-serif;
     --font-permanent-marker: "Permanent Marker", cursive;
     --font-caveat: "Caveat", cursive;
+    --font-sans: "Doto", sans-serif;
+}
+
+/* Font utility classes */
+.font-doto {
+    font-family: "Doto", sans-serif;
+}
+
+.font-marker {
+    font-family: "Permanent Marker", cursive;
+}
+
+.font-caveat {
+    font-family: "Caveat", cursive;
 }
 
 @keyframes breathing-fill {

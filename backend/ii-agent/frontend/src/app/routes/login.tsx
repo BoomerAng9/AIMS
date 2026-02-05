@@ -1,5 +1,4 @@
-import { useGoogleLogin } from '@react-oauth/google'
-import { useCallback, useEffect, useMemo, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -17,6 +16,9 @@ import { setUser } from '@/state/slice/user'
 import { fetchWishlist } from '@/state/slice/favorites'
 import { toast } from 'sonner'
 
+// Check if Google OAuth is available
+const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || ''
+
 const FormSchema = z.object({
     email: z.email({ error: 'Invalid email address' }),
     password: z.string({ error: 'Password is required' }).min(6, {
@@ -31,10 +33,42 @@ type IiAuthPayload = {
     expires_in?: number
 }
 
+// Separate Google Login Button component - only rendered when Google OAuth is available
+function GoogleLoginButton({ onSuccess, onError }: { 
+    onSuccess: (code: string) => Promise<void>
+    onError: (error: unknown) => void 
+}) {
+    try {
+        const { useGoogleLogin } = require('@react-oauth/google')
+        
+        const googleLogin = useGoogleLogin({
+            flow: 'auth-code',
+            onSuccess: async (codeResponse: { code: string }) => {
+                await onSuccess(codeResponse.code)
+            },
+            onError: onError
+        })
+
+        return (
+            <Button
+                size="xl"
+                onClick={() => googleLogin()}
+                className="w-full bg-white/10 backdrop-blur-sm border border-amber-500/30 text-white font-semibold hover:bg-amber-500/20 transition-all duration-300"
+            >
+                <Icon name="google" className="size-[22px]" />
+                Continue with Google
+            </Button>
+        )
+    } catch {
+        return null
+    }
+}
+
 export function LoginPage() {
     const navigate = useNavigate()
     const { loginWithAuthCode } = useAuth()
     const dispatch = useAppDispatch()
+    const [showEmailForm, setShowEmailForm] = useState(false)
 
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
@@ -44,31 +78,29 @@ export function LoginPage() {
         }
     })
 
-    const googleLogin = useGoogleLogin({
-        flow: 'auth-code',
-        onSuccess: async (codeResponse) => {
-            try {
-                await loginWithAuthCode(codeResponse.code)
-                navigate('/')
-            } catch (error: unknown) {
-                const apiError = error as {
-                    response: { data: { detail: string } }
-                }
-                const errorMessage =
-                    typeof apiError?.response?.data?.detail === 'string'
-                        ? apiError.response.data.detail
-                        : 'Login failed. Please try again.'
-                if (errorMessage?.includes('beta')) {
-                    toast.info(errorMessage)
-                } else {
-                    toast.error(errorMessage)
-                }
+    const handleGoogleSuccess = useCallback(async (code: string) => {
+        try {
+            await loginWithAuthCode(code)
+            navigate('/')
+        } catch (error: unknown) {
+            const apiError = error as {
+                response: { data: { detail: string } }
             }
-        },
-        onError: (errorResponse) => {
-            console.log('Login Failed:', errorResponse)
+            const errorMessage =
+                typeof apiError?.response?.data?.detail === 'string'
+                    ? apiError.response.data.detail
+                    : 'Login failed. Please try again.'
+            if (errorMessage?.includes('beta')) {
+                toast.info(errorMessage)
+            } else {
+                toast.error(errorMessage)
+            }
         }
-    })
+    }, [loginWithAuthCode, navigate])
+
+    const handleGoogleError = useCallback((errorResponse: unknown) => {
+        console.log('Login Failed:', errorResponse)
+    }, [])
 
     const apiBaseUrl = useMemo(
         () => import.meta.env.VITE_API_URL || 'http://localhost:8000',
@@ -107,7 +139,7 @@ export function LoginPage() {
 
                 navigate('/')
             } catch (error) {
-                console.error('Failed to finalize II login:', error)
+                console.error('Failed to finalize login:', error)
                 authHandledRef.current = false
             }
         },
@@ -160,12 +192,12 @@ export function LoginPage() {
             ) as IiAuthPayload
             void handleAuthSuccess(payload)
         } catch (error) {
-            console.error('Failed to parse II auth payload from hash:', error)
+            console.error('Failed to parse auth payload from hash:', error)
             authHandledRef.current = false
         }
     }, [handleAuthSuccess])
 
-    const loginWithII = useCallback(() => {
+    const loginWithAcheevy = useCallback(() => {
         authHandledRef.current = false
 
         const url = new URL('/auth/oauth/ii/login', apiBaseUrl)
@@ -185,7 +217,7 @@ export function LoginPage() {
             'scrollbars=yes'
         ].join(',')
 
-        const popup = window.open(url.toString(), 'ii-login', features)
+        const popup = window.open(url.toString(), 'acheevy-login', features)
 
         if (!popup) {
             window.location.href = url.toString()
@@ -197,67 +229,156 @@ export function LoginPage() {
 
     const onSubmit = async (data: z.infer<typeof FormSchema>) => {
         console.log(data)
+        // TODO: Implement email/password login
     }
 
-    const hideSigninWithPassword = true
-
     return (
-        <div className="flex flex-col items-center justify-center w-full h-full">
-            <h1 className="text-[25px] md:text-[32px] font-semibold dark:text-sky-blue font-sans">
-                Welcome to ACHEEVY
-            </h1>
-            <p className="text-[20px] md:text-[28px] dark:text-sky-blue mb-12 font-caveat">
-                Helping you with your task today
-            </p>
+        <div className="min-h-screen w-full flex">
+            {/* Left Panel - Hero Image */}
+            <div className="hidden lg:flex lg:w-1/2 xl:w-3/5 relative overflow-hidden">
+                {/* Background Image */}
+                <div 
+                    className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+                    style={{ backgroundImage: "url('/images/acheevy-hero.png')" }}
+                />
+                
+                {/* Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-slate-950/90" />
+                
+                {/* Bottom Gradient */}
+                <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-slate-950 to-transparent" />
+                
+                {/* Floating Elements */}
+                <div className="absolute bottom-8 left-8 z-10">
+                    <p 
+                        className="text-amber-400 text-sm font-medium mb-1"
+                        style={{ fontFamily: '"Doto", sans-serif' }}
+                    >
+                        POWERED BY A.I.M.S.
+                    </p>
+                    <p 
+                        className="text-white/60 text-xs"
+                        style={{ fontFamily: '"Caveat", cursive' }}
+                    >
+                        AI-Managed Infrastructure Services
+                    </p>
+                </div>
+            </div>
 
-            <div className="flex flex-col w-full justify-center max-w-[510px]">
-                <div className={`${hideSigninWithPassword ? 'hidden' : ''}`}>
-                    <Form {...form}>
-                        <form
-                            onSubmit={form.handleSubmit(onSubmit)}
-                            className="flex flex-col gap-10"
+            {/* Right Panel - Login Form */}
+            <div className="w-full lg:w-1/2 xl:w-2/5 flex flex-col justify-center px-8 md:px-16 lg:px-12 xl:px-20 bg-slate-950 relative">
+                {/* Mobile Background */}
+                <div 
+                    className="lg:hidden absolute inset-0 bg-cover bg-center opacity-20"
+                    style={{ backgroundImage: "url('/images/acheevy-hero.png')" }}
+                />
+                <div className="lg:hidden absolute inset-0 bg-slate-950/80 backdrop-blur-sm" />
+
+                {/* Content */}
+                <div className="relative z-10 max-w-md mx-auto w-full">
+                    {/* Logo & Branding */}
+                    <div className="text-center mb-10">
+                        <div className="flex items-center justify-center gap-3 mb-6">
+                            <img
+                                src="/images/logo-only.png"
+                                className="size-14"
+                                alt="ACHEEVY Logo"
+                            />
+                        </div>
+                        <h1 
+                            className="text-4xl md:text-5xl font-bold text-white mb-3 tracking-tight"
+                            style={{ fontFamily: '"Permanent Marker", cursive' }}
                         >
-                            <div className="space-y-6">
-                                <FormField
-                                    control={form.control}
-                                    name="email"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormControl>
-                                                <div className="space-y-2 relative">
-                                                    <Icon
-                                                        name="email"
-                                                        className="absolute top-3 left-4 fill-black dark:fill-white"
-                                                    />
-                                                    <Input
-                                                        id="email"
-                                                        className="pl-[56px]"
-                                                        type="text"
-                                                        placeholder="Enter your email address"
-                                                        {...field}
-                                                    />
-                                                </div>
-                                            </FormControl>
-                                        </FormItem>
-                                    )}
-                                />
-                                <div className="space-y-4 text-right">
+                            ACHEEVY
+                        </h1>
+                        <p 
+                            className="text-amber-400/90 text-xl"
+                            style={{ fontFamily: '"Caveat", cursive' }}
+                        >
+                            Your AI-Powered Achievement Partner
+                        </p>
+                        <p 
+                            className="text-white/50 text-sm mt-2"
+                            style={{ fontFamily: '"Doto", sans-serif' }}
+                        >
+                            Transform ideas into reality with intelligent automation
+                        </p>
+                    </div>
+
+                    {/* Decorative Line */}
+                    <div className="flex items-center gap-4 mb-8">
+                        <div className="flex-1 h-px bg-gradient-to-r from-transparent via-amber-500/50 to-transparent" />
+                        <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                        <div className="flex-1 h-px bg-gradient-to-r from-transparent via-amber-500/50 to-transparent" />
+                    </div>
+
+                    {/* Login Buttons */}
+                    <div className="space-y-4">
+                        {/* Primary ACHEEVY Login */}
+                        <Button
+                            size="xl"
+                            onClick={loginWithAcheevy}
+                            className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-bold shadow-lg shadow-amber-500/25 transition-all duration-300 hover:shadow-amber-500/40 hover:scale-[1.02]"
+                        >
+                            <img
+                                src="/images/logo-charcoal.png"
+                                alt="ACHEEVY"
+                                className="size-6 mr-2"
+                            />
+                            Sign in with ACHEEVY
+                        </Button>
+
+                        {/* Divider */}
+                        <div className="flex items-center gap-4 my-6">
+                            <div className="flex-1 h-px bg-white/10" />
+                            <span className="text-white/40 text-xs uppercase tracking-wider">or continue with</span>
+                            <div className="flex-1 h-px bg-white/10" />
+                        </div>
+
+                        {/* Google OAuth - only if available */}
+                        {googleClientId && (
+                            <GoogleLoginButton 
+                                onSuccess={handleGoogleSuccess} 
+                                onError={handleGoogleError} 
+                            />
+                        )}
+
+                        {/* Email Login Toggle */}
+                        <Button
+                            size="xl"
+                            variant="outline"
+                            onClick={() => setShowEmailForm(!showEmailForm)}
+                            className="w-full bg-transparent border border-white/20 text-white/80 hover:bg-white/5 hover:border-white/30 transition-all duration-300"
+                        >
+                            <Icon name="email" className="size-5 mr-2" />
+                            Continue with Email
+                        </Button>
+                    </div>
+
+                    {/* Email/Password Form - Expandable */}
+                    {showEmailForm && (
+                        <div className="mt-6 p-6 rounded-xl bg-white/5 border border-white/10 animate-in slide-in-from-top-4 duration-300">
+                            <Form {...form}>
+                                <form
+                                    onSubmit={form.handleSubmit(onSubmit)}
+                                    className="flex flex-col gap-4"
+                                >
                                     <FormField
                                         control={form.control}
-                                        name="password"
+                                        name="email"
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormControl>
-                                                    <div className="space-y-2 relative">
+                                                    <div className="relative">
                                                         <Icon
-                                                            name="key"
-                                                            className="absolute top-3 left-4 fill-black dark:fill-white"
+                                                            name="email"
+                                                            className="absolute top-3 left-4 fill-white/50"
                                                         />
                                                         <Input
-                                                            id="password"
-                                                            className="pl-[56px]"
-                                                            type="password"
-                                                            placeholder="Enter your password"
+                                                            id="email"
+                                                            className="pl-12 bg-white/5 border-white/10 text-white placeholder:text-white/40"
+                                                            type="email"
+                                                            placeholder="Email address"
                                                             {...field}
                                                         />
                                                     </div>
@@ -265,63 +386,78 @@ export function LoginPage() {
                                             </FormItem>
                                         )}
                                     />
-                                    <Link
-                                        to="/forgot-password"
-                                        className="text-sm underline"
+                                    <FormField
+                                        control={form.control}
+                                        name="password"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormControl>
+                                                    <div className="relative">
+                                                        <Icon
+                                                            name="key"
+                                                            className="absolute top-3 left-4 fill-white/50"
+                                                        />
+                                                        <Input
+                                                            id="password"
+                                                            className="pl-12 bg-white/5 border-white/10 text-white placeholder:text-white/40"
+                                                            type="password"
+                                                            placeholder="Password"
+                                                            {...field}
+                                                        />
+                                                    </div>
+                                                </FormControl>
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <div className="flex justify-between items-center text-sm">
+                                        <Link
+                                            to="/forgot-password"
+                                            className="text-amber-400/80 hover:text-amber-400 transition-colors"
+                                        >
+                                            Forgot password?
+                                        </Link>
+                                    </div>
+                                    <Button
+                                        type="submit"
+                                        className="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold mt-2"
+                                        disabled={!form.formState.isValid}
                                     >
-                                        Forgot your password?
-                                    </Link>
-                                </div>
-                            </div>
-                            <div className="w-full flex justify-center">
-                                <Button
-                                    type="submit"
-                                    size="xl"
-                                    className="bg-firefly text-sky-blue-2 dark:bg-sky-blue dark:text-black font-semibold w-full max-w-[247px]"
-                                    disabled={!form.formState.isValid}
-                                >
-                                    Sign in
-                                </Button>
-                            </div>
-                        </form>
-                    </Form>
-                    <div className="flex justify-center items-center gap-2 dark:text-white text-sm mt-8">
-                        <span>You don&apos;t have account yet?</span>
+                                        Sign In
+                                    </Button>
+                                </form>
+                            </Form>
+                        </div>
+                    )}
+
+                    {/* Sign Up Link */}
+                    <div className="mt-8 text-center">
+                        <span className="text-white/50 text-sm">Don't have an account? </span>
                         <Link
                             to="/signup"
-                            className="dark:text-white text-sm font-semibold"
+                            className="text-amber-400 hover:text-amber-300 text-sm font-semibold transition-colors"
                         >
-                            Sign up
+                            Create one
                         </Link>
                     </div>
-                    <div className="flex w-full items-center gap-4 my-10">
-                        <p className="flex-1 dark:bg-white/[0.31] h-[1px]"></p>
-                        <span className="text-sm dark:text-white font-semibold">
-                            OR
-                        </span>
-                        <p className="flex-1 dark:bg-white/[0.31] h-[1px]"></p>
+
+                    {/* Footer */}
+                    <div className="mt-12 text-center">
+                        <p className="text-white/30 text-xs">
+                            By continuing, you agree to our{' '}
+                            <Link to="/terms" className="text-white/50 hover:text-amber-400 transition-colors">
+                                Terms of Service
+                            </Link>
+                            {' '}and{' '}
+                            <Link to="/privacy" className="text-white/50 hover:text-amber-400 transition-colors">
+                                Privacy Policy
+                            </Link>
+                        </p>
                     </div>
                 </div>
-                <Button
-                    size="xl"
-                    onClick={() => googleLogin()}
-                    className="w-full bg-white text-black font-semibold shadow-btn"
-                >
-                    <Icon name="google" className="size-[22px]" />
-                    Continue with Google Account
-                </Button>
-                <Button
-                    size="xl"
-                    onClick={loginWithII}
-                    className="w-full mt-4 md:mt-10 bg-white text-black font-semibold shadow-btn"
-                >
-                    <img
-                        src="/images/logo-charcoal.png"
-                        alt="logo"
-                        className="size-[22px]"
-                    />
-                    Continue with II Account
-                </Button>
+
+                {/* Decorative Elements */}
+                <div className="absolute top-8 right-8 w-32 h-32 bg-amber-500/5 rounded-full blur-3xl" />
+                <div className="absolute bottom-8 left-8 w-24 h-24 bg-amber-500/10 rounded-full blur-2xl" />
             </div>
         </div>
     )
