@@ -8,6 +8,7 @@ import cors from 'cors';
 import bodyParser from 'body-parser';
 import { v4 as uuidv4 } from 'uuid';
 import { processRequest, getSessionHistory } from './orchestrator';
+import { processDIYRequest } from './diy-handler';
 
 const app = express();
 const PORT = process.env.PORT || 3003;
@@ -55,10 +56,37 @@ app.get('/history/:sessionId', (req, res) => {
 });
 
 // --------------------------------------------------------------------------
+// DIY Mode — Voice + Vision enabled chat for hands-on projects
+// --------------------------------------------------------------------------
+app.post('/diy/chat', async (req, res) => {
+  try {
+    const { sessionId, projectId, message, imageBase64, mode } = req.body;
+
+    if (!message || typeof message !== 'string') {
+      return res.status(400).json({ error: 'message is required' });
+    }
+
+    const result = await processDIYRequest({
+      sessionId: sessionId || uuidv4(),
+      projectId: projectId || 'unknown',
+      message,
+      imageBase64,
+      mode: mode || 'console',
+    });
+
+    res.json(result);
+  } catch (err: any) {
+    console.error('[ACHEEVY/DIY] Error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// --------------------------------------------------------------------------
 // Start Server
 // --------------------------------------------------------------------------
 app.listen(PORT, () => {
   console.log(`\n>>> ACHEEVY Orchestrator running on port ${PORT}`);
   console.log(`>>> Chat API:    POST http://localhost:${PORT}/chat`);
+  console.log(`>>> DIY API:     POST http://localhost:${PORT}/diy/chat`);
   console.log(`>>> History API: GET  http://localhost:${PORT}/history/:sessionId\n`);
 });

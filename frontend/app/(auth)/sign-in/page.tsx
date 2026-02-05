@@ -6,13 +6,12 @@ export default function SignInPage() {
     <div className="space-y-8">
       {/* LED dot-matrix heading */}
       <header className="text-center">
-        <h1 className="text-[1.6rem] md:text-[2rem] font-bold tracking-[0.15em] leading-tight text-amber-50 font-display uppercase">
-          The Hybrid
-          <br />
-          Business
-          <br />
-          Architect
+        <h1 className="text-[2rem] md:text-[2.5rem] font-bold tracking-[0.2em] leading-tight text-amber-50 font-display uppercase">
+          A.I.M.S.
         </h1>
+        <p className="mt-2 text-[0.7rem] md:text-[0.8rem] tracking-[0.25em] text-amber-100/70 uppercase">
+          AI Managed Solutions
+        </p>
       </header>
 
       {/* Social auth tiles — glass squares with icons */}
