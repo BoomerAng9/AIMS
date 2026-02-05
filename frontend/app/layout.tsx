@@ -19,7 +19,7 @@ const caveat = Caveat({
 
 export const metadata: Metadata = {
   title: 'A.I.M.S. | Hybrid Business Architect',
-  description: 'AI Managed Systems powered by ACHEEVY',
+  description: 'AI Managed Solutions powered by ACHEEVY',
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
