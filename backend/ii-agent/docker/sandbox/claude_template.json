@@ -1,0 +1,31 @@
+{
+  "numStartups": 1,
+  "installMethod": "native",
+  "autoUpdates": true,
+  "promptQueueUseCount": 20,
+  "cachedStatsigGates": {
+    "tengu_disable_bypass_permissions_mode": false,
+    "tengu_use_file_checkpoints": true
+  },
+  "project": {},
+  "fallbackAvailableWarningThreshold": 0.2,
+  "userID": "c50062a267bd6bbd76e7d63f46522a8d0f5375aadd9ec674ec82b144561bf28b",
+  "subscriptionNoticeCount": 0,
+  "hasAvailableSubscription": false,
+  "changelogLastFetched": 1759230444259,
+  "firstStartTime": "2025-06-18T20:09:02.361Z",
+  "shiftEnterKeyBindingInstalled": true,
+  "hasCompletedOnboarding": true,
+  "lastOnboardingVersion": "1.0.30",
+  "lastReleaseNotesSeen": "2.0.1",
+  "isQualifiedForDataSharing": false,
+  "projects": {},
+  "s1mAccessCache": {},
+  "hasOpusPlanDefault": false,
+  "feedbackSurveyState": {
+    "lastShownTime": 1759463921635
+  },
+  "sonnet45MigrationComplete": true,
+  "lastPlanModeUse": 1759464889882,
+  "bypassPermissionsModeAccepted": true
+}

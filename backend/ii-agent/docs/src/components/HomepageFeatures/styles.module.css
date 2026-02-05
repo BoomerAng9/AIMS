@@ -1,0 +1,36 @@
+.features {
+  padding: 4rem 0 5rem;
+  width: 100%;
+  background: radial-gradient(circle at 50% 10%, rgba(186, 233, 244, 0.08), transparent 45%);
+}
+
+.featureGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+}
+
+.featureCard {
+  background: rgba(25, 30, 27, 0.85);
+  border: 1px solid rgba(186, 233, 244, 0.15);
+  border-radius: 18px;
+  padding: 1.75rem;
+  box-shadow: 0 15px 35px rgba(5, 10, 9, 0.7);
+}
+
+.featureCard h3 {
+  margin-top: 0.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.featureCard p {
+  color: var(--ii-hero-muted);
+}
+
+.caption {
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(186, 233, 244, 0.7);
+  margin-bottom: 0.5rem;
+}

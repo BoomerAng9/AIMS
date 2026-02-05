@@ -1,0 +1,7 @@
+frontend/node_modules
+workspace/
+.env
+.venv
+*.db
+*.json
+*.xml

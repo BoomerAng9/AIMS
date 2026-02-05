@@ -1,0 +1,135 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helper Functions ──────────────────────────────────────
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // ── LUC (Billing / Quotas) ────────────────────────────────
+    // Users can read their own LUC record. Only backend (admin SDK) can write.
+    match /luc/{userId} {
+      allow read: if isOwner(userId);
+      allow write: if false; // Admin SDK only
+    }
+
+    // ── Users ─────────────────────────────────────────────────
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow update: if isOwner(userId);
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+      allow delete: if false;
+
+      // Onboarding state
+      match /onboarding_state/{docId} {
+        allow read: if isOwner(userId);
+        allow write: if false; // Admin SDK only (hooks manage this)
+      }
+
+      // Conversations
+      match /conversations/{conversationId} {
+        allow read: if isOwner(userId);
+        allow write: if false; // Admin SDK only (hooks manage this)
+      }
+
+      // Generated templates
+      match /templates/{templateId} {
+        allow read: if isOwner(userId);
+        allow write: if false; // Admin SDK only
+      }
+
+      // Idea validations
+      match /validations/{validationId} {
+        allow read: if isOwner(userId);
+        allow write: if false; // Admin SDK only
+      }
+    }
+
+    // ── Industry Knowledge ────────────────────────────────────
+    // Public read, admin write only
+    match /industry_knowledge/{industryId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ── Invoices ──────────────────────────────────────────────
+    // Users can read their own invoices. Only backend can write.
+    match /invoices/{invoiceId} {
+      allow read: if isAuthenticated() &&
+        resource.data.user_id == request.auth.uid;
+      allow write: if false; // Admin SDK only
+    }
+
+    // ── Jobs ──────────────────────────────────────────────────
+    // Users can read their own jobs. Only backend can write.
+    match /jobs/{jobId} {
+      allow read: if isAuthenticated() &&
+        resource.data.user_id == request.auth.uid;
+      allow write: if false; // Admin SDK only
+    }
+
+    // ── Stripe Extension Collections ──────────────────────────
+    // Managed by firestore-stripe-payments extension
+    match /customers/{customerId} {
+      allow read: if isOwner(customerId);
+      allow write: if false;
+
+      match /checkout_sessions/{sessionId} {
+        allow read, write: if isOwner(customerId);
+      }
+
+      match /subscriptions/{subscriptionId} {
+        allow read: if isOwner(customerId);
+        allow write: if false;
+      }
+
+      match /payments/{paymentId} {
+        allow read: if isOwner(customerId);
+        allow write: if false;
+      }
+    }
+
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if false;
+
+      match /prices/{priceId} {
+        allow read: if true;
+        allow write: if false;
+      }
+
+      match /tax_rates/{taxRateId} {
+        allow read: if true;
+        allow write: if false;
+      }
+    }
+
+    // ── Email Extension ───────────────────────────────────────
+    // Only backend can create emails
+    match /mail/{mailId} {
+      allow read: if false;
+      allow write: if false; // Admin SDK only
+    }
+
+    // ── Admins ────────────────────────────────────────────────
+    match /admins/{adminId} {
+      allow read: if isOwner(adminId);
+      allow write: if false;
+    }
+
+    // ── Schema documents (ignore) ─────────────────────────────
+    // _SCHEMA docs are for documentation, not user-facing
+  }
+}

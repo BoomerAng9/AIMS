@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { OnboardingShell } from "@/components/onboarding/OnboardingShell";
 import { OnboardingStepper } from "@/components/onboarding/OnboardingStepper";
 import { LucEstimatePanel } from "@/components/luc/LucEstimatePanel";
-import { getLucEstimateStub, type LucEstimate } from "@/lib/luc/luc.stub";
+import { useLuc } from "@/lib/luc/use-luc";
 
 const STEPS = ["profile", "goal", "estimate", "finish"] as const;
 
@@ -14,28 +14,10 @@ export default function OnboardingStepPage() {
   const router = useRouter();
   const step = params.step as typeof STEPS[number];
 
-  // Hooks must be at the top level — not inside switch/case
-  const [realEstimate, setRealEstimate] = React.useState<LucEstimate | null>(null);
-  const [estimateLoading, setEstimateLoading] = React.useState(true);
-
-  React.useEffect(() => {
-    if (step !== "estimate") return;
-    let cancelled = false;
-    const loadEstimate = async () => {
-      try {
-        const { fetchRealLucQuote } = await import("@/lib/luc/luc-client");
-        const data = await fetchRealLucQuote("A.I.M.S. Initialization Strategy");
-        if (!cancelled) setRealEstimate(data);
-      } catch {
-        if (!cancelled) setRealEstimate(getLucEstimateStub());
-      } finally {
-        if (!cancelled) setEstimateLoading(false);
-      }
-    };
-    setEstimateLoading(true);
-    loadEstimate();
-    return () => { cancelled = true; };
-  }, [step]);
+  const { estimate: realEstimate, loading: estimateLoading } = useLuc({
+    message: "A.I.M.S. Initialization Strategy",
+    enabled: step === "estimate",
+  });
 
   if (!STEPS.includes(step)) {
     return <div>Invalid step</div>;

@@ -10,7 +10,7 @@ export interface ACPStandardizedRequest {
   timestamp: string;
   intent: 'ESTIMATE_ONLY' | 'BUILD_PLUG' | 'RESEARCH' | 'AGENTIC_WORKFLOW' | 'CHAT';
   naturalLanguage: string;
-  channel: 'WEB' | 'VOICE';
+  channel: 'WEB' | 'VOICE' | 'WHATSAPP' | 'TELEGRAM' | 'SLACK' | 'DISCORD' | 'OPENCLAW';
   budget?: {
     maxUsd: number;
     maxTokens: number;
@@ -45,7 +45,7 @@ export interface ACPAgentResult {
 
 export interface ACPResponse {
   reqId: string;
-  status: 'SUCCESS' | 'ERROR';
+  status: 'SUCCESS' | 'ERROR' | 'ORACLE_FAILED';
   message?: string;
   quote?: any; // To be refined with UCP type
   taskId?: string;
@@ -53,4 +53,16 @@ export interface ACPResponse {
     steps: string[];
     estimatedDuration: string;
   };
+  oracle?: {
+    passed: boolean;
+    score: number;
+    gates: Array<{
+      name: string;
+      passed: boolean;
+      score: number;
+      message: string;
+    }>;
+    failures: string[];
+  };
 }
+

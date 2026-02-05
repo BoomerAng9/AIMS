@@ -51,7 +51,7 @@ export default function OnboardingPage() {
                       <label className="text-xs font-medium uppercase tracking-wider text-zinc-400 flex items-center gap-2">
                         <Mail className="h-3 w-3" /> Email Link
                       </label>
-                      <Input placeholder="john@example.com" disabled value="admin@plugmein.com" className="opacity-50" />
+                      <Input placeholder="john@example.com" disabled value="admin@plugmein.cloud" className="opacity-50" />
                    </div>
                 </div>
 

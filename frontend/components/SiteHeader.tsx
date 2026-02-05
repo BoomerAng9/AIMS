@@ -17,8 +17,14 @@ export function SiteHeader() {
             <Link className="text-sm font-medium hover:text-amber-400 transition-colors text-white/70" href="/dashboard">
               Dashboard
             </Link>
+            <Link className="text-sm font-medium hover:text-amber-400 transition-colors text-white/70" href="/plugs">
+              Plugs
+            </Link>
              <Link className="text-sm font-medium hover:text-amber-400 transition-colors text-white/70" href="/chat">
               Chat
+            </Link>
+             <Link className="text-sm font-medium hover:text-amber-400 transition-colors text-white/70" href="/integrations">
+              Integrations
             </Link>
         </nav>
         <div className="ml-6 flex items-center gap-2">

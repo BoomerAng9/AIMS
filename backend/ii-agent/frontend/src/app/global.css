@@ -1,0 +1,270 @@
+@import 'tailwindcss';
+
+/* @import './satoshi.css'; */
+@import './github-markdown.css';
+@import './animations.css';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+    --color-mist: #e0d5c8;
+    --color-sky-blue: #f59e0b;
+    --color-sky-blue-2: #fbbf24;
+    --color-sky-blue-3: #f59e0b;
+    --color-sky-blue-4: #d97706;
+    --color-violet: #632af5;
+    --color-pewter: #919eae;
+    --color-slate: #78716c;
+    --color-charcoal: #1c1917;
+    --color-sidebar-border: rgba(229, 231, 235, 0.3);
+    --color-black: #212121;
+    --color-yellow: #ffde8a;
+    --color-green: #006600;
+    --color-grey: #e5e7eb;
+    --color-grey-2: #c7c7c7;
+    --color-grey-3: #fbfbfb;
+    --color-firefly: #292524;
+    --color-red: #ff6b75;
+    --color-red-2: #f54260;
+    --shadow-btn: 0 4px 24px rgba(0, 0, 0, 0.16);
+
+    --font-sans: "Doto", sans-serif;
+    --font-permanent-marker: "Permanent Marker", cursive;
+    --font-caveat: "Caveat", cursive;
+}
+
+@keyframes breathing-fill {
+    0%,
+    100% {
+        background-color: theme(--color-firefly);
+    }
+    50% {
+        background-color: theme(--color-firefly / 0.6);
+    }
+}
+
+@keyframes breathing-fill-dark {
+    0%,
+    100% {
+        background-color: theme(--color-sky-blue);
+    }
+    50% {
+        background-color: theme(--color-sky-blue / 0.6);
+    }
+}
+
+.animate-breathing-fill {
+    animation: breathing-fill 2s ease-in-out infinite;
+}
+
+.dark .animate-breathing-fill {
+    animation: breathing-fill-dark 2s ease-in-out infinite;
+}
+
+@layer base {
+    html {
+        @apply h-full overscroll-none;
+    }
+    body {
+        font-family:
+            -apple-system,
+            BlinkMacSystemFont,
+            Segoe UI Variable Display,
+            Segoe UI,
+            Helvetica,
+            Apple Color Emoji,
+            Arial,
+            sans-serif,
+            Segoe UI Emoji,
+            Segoe UI Symbol;
+    }
+    html.dark body {
+        @apply bg-charcoal;
+    }
+    html.light body {
+        @apply bg-white text-black;
+    }
+
+    html.light .monaco-editor {
+        --vscode-editorGutter-background: #e5e7eb !important;
+        --vscode-editor-background: #e5e7eb !important;
+        --vscode-editorStickyScroll-background: #e5e7eb !important;
+    }
+
+    /* Allow text selection in message content and code blocks */
+    .markdown-body,
+    .markdown-body *,
+    pre,
+    pre *,
+    code,
+    code *,
+    .select-text,
+    .select-text * {
+        @apply select-text;
+    }
+
+    .markdown-body pre > code {
+        @apply !whitespace-break-spaces md:whitespace-pre;
+    }
+
+    .markdown-body table {
+        @apply !w-[calc(100vw-72px)] md:w-full;
+    }
+
+    .markdown-body a {
+        @apply break-all;
+    }
+
+    /* Keep UI elements non-selectable */
+    button,
+    nav,
+    .sidebar,
+    .toolbar {
+        @apply select-none;
+    }
+
+    .bg-blue-gradient {
+        background: #f59e0b;
+        background: linear-gradient(
+            90deg,
+            rgba(217, 119, 6, 1) 0%,
+            rgba(245, 158, 11, 1) 50%
+        );
+    }
+
+    .bg-black-gradient {
+        background: linear-gradient(
+            180deg,
+            rgba(28, 25, 23, 0.8) 0%,
+            rgba(28, 25, 23, 0) 40%,
+            rgba(28, 25, 23, 0) 70%,
+            rgba(28, 25, 23, 0.8) 100%
+        );
+    }
+
+    .bg-white-gradient {
+        background: linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 0.8) 0%,
+            rgba(255, 255, 255, 0) 40%,
+            rgba(255, 255, 255, 0) 70%,
+            rgba(255, 255, 255, 0.8) 100%
+        );
+    }
+
+    html.dark .bg-white-gradient {
+        background: linear-gradient(
+            180deg,
+            rgba(28, 25, 23, 0.8) 0%,
+            rgba(28, 25, 23, 0) 40%,
+            rgba(28, 25, 23, 0) 70%,
+            rgba(28, 25, 23, 0.8) 100%
+        );
+    }
+
+    .terminal {
+        @apply h-full p-4;
+    }
+
+    .terminal .xterm-viewport {
+        @apply !h-[325px];
+    }
+
+    .animate-spin {
+        animation-duration: 800ms !important;
+    }
+
+    .xterm-screen {
+        @apply !w-full !h-full;
+    }
+
+    .xterm-rows div {
+        @apply !w-full;
+    }
+
+    [data-slide-id] {
+        width: 100% !important;
+    }
+}
+
+div[data-code-block-container] {
+    @apply w-full max-w-[calc(100vw-24px)];
+}
+
+.conversation > div {
+    @apply !h-[calc(100vh-197px)] md:!h-[calc(100vh-201px)] px-3 md:px-4;
+}
+
+.conversation.with-files > div {
+    @apply !h-[calc(100vh-272px)] md:!h-[calc(100vh-281px)];
+}
+
+.conversation.share-conversation > div {
+    @apply !h-full;
+}
+
+.katex-display {
+    @apply max-w-[calc(100vw-24px)] overflow-x-auto overflow-y-hidden;
+}
+
+div[data-streamdown='table-wrapper'] {
+    @apply w-full max-w-[calc(100vw-24px)];
+}
+
+div[data-code-block-container='true'],
+.code-block {
+    @apply max-w-[calc(100vw-24px)] !overflow-auto;
+}
+
+div[data-code-block-container='true'],
+.code-block pre {
+    @apply !bg-firefly/10 dark:!bg-sky-blue/10 !border-none !overflow-auto;
+}
+
+div[data-code-block-container='true'] pre {
+    @apply !bg-transparent !border-none;
+}
+
+div[data-code-block-container='true'] div[data-streamdown='code-block'] {
+    @apply !border-none md:!max-w-[calc(100vw-300px)];
+}
+
+table[data-streamdown='table'] {
+    @apply !border-none;
+}
+
+table[data-streamdown='table'] tr {
+    @apply !border-neutral-200 dark:!border-white/30;
+}
+
+table[data-streamdown='table'] tbody tr:last-child {
+    @apply !border-none;
+}
+
+hr[data-streamdown='horizontal-rule'] {
+    @apply !border-neutral-200 dark:!border-white/30;
+}
+
+ol[data-streamdown='ordered-list'] {
+    @apply list-decimal;
+}
+
+div[data-streamdown='mermaid-block'] {
+    @apply !bg-firefly/10 dark:!bg-sky-blue/10 !border-none;
+}
+
+div[data-streamdown='mermaid-block'] .messageText,
+div[data-streamdown='mermaid-block'] #arrowhead path {
+    @apply !fill-black dark:!fill-white;
+}
+
+div[data-streamdown='mermaid-block'] .loopText,
+div[data-streamdown='mermaid-block'] .loopText tspan {
+    @apply !fill-black dark:!fill-white;
+}
+
+div[data-streamdown='mermaid-block'] .messageLine0,
+.messageLine1,
+.flowchart-link {
+    @apply !stroke-black dark:!stroke-white;
+}

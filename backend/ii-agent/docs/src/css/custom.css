@@ -1,0 +1,135 @@
+/**
+ * Any CSS included here will be global. The classic template
+ * bundles Infima by default. Infima is a CSS framework designed to
+ * work well for content-centric websites.
+ */
+
+/* You can override the default Infima variables here. */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Nunito+Sans:wght@400;500;600&display=swap');
+
+:root {
+  --ii-color-bg: #050807;
+  --ii-color-surface: #191e1b;
+  --ii-color-card: #101412;
+  --ii-color-border: #2f3632;
+  --ii-hero-muted: rgba(246, 252, 255, 0.88);
+  --ii-border-strong: rgba(186, 233, 244, 0.3);
+  --ii-border-soft: rgba(186, 233, 244, 0.15);
+  --ii-panel-surface: rgba(16, 20, 18, 0.85);
+  --ii-panel-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+  --ii-card-shadow: 0 25px 60px rgba(6, 10, 9, 0.8);
+  --ii-kicker-color: rgba(186, 233, 244, 0.8);
+  --ii-primary-button-text: #051717;
+  --ii-secondary-cta-color: #bae9f4;
+  --ii-secondary-cta-bg: rgba(186, 233, 244, 0.08);
+  --ii-secondary-cta-hover-bg: rgba(186, 233, 244, 0.15);
+  --ii-body-background: radial-gradient(circle at 20% 20%, rgba(186, 233, 244, 0.08), transparent 40%),
+    radial-gradient(circle at 80% 0%, rgba(18, 134, 165, 0.15), transparent 45%),
+    var(--ii-color-bg);
+  --ifm-color-primary: #bae9f4;
+  --ifm-color-primary-dark: #9dd3de;
+  --ifm-color-primary-darker: #83c1ce;
+  --ifm-color-primary-darkest: #5d9dab;
+  --ifm-color-primary-light: #c7f1fb;
+  --ifm-color-primary-lighter: #d8f6fd;
+  --ifm-color-primary-lightest: #f1fdff;
+  --ifm-font-family-base: 'Nunito Sans', 'Inter', 'Segoe UI', system-ui, -apple-system,
+    BlinkMacSystemFont, sans-serif;
+  --ifm-heading-font-family: 'Montserrat', 'Nunito Sans', 'Inter', sans-serif;
+  --ifm-navbar-background-color: var(--ii-color-surface);
+  --ifm-navbar-shadow: 0 1px 0 rgba(186, 233, 244, 0.3);
+  --ifm-footer-background-color: #0c0f0d;
+  --ifm-background-color: var(--ii-color-bg);
+  --ifm-background-surface-color: var(--ii-color-surface);
+  --ifm-code-font-size: 95%;
+  --ifm-font-color-base: #f6fcff;
+  --docusaurus-highlighted-code-line-bg: rgba(186, 233, 244, 0.08);
+}
+
+[data-theme='light'] {
+  --ii-color-bg: #f3fbfd;
+  --ii-color-surface: #fdfefe;
+  --ii-color-card: #ffffff;
+  --ii-color-border: #d8ecf3;
+  --ii-hero-muted: rgba(5, 24, 32, 0.8);
+  --ii-border-strong: rgba(11, 61, 78, 0.2);
+  --ii-border-soft: rgba(11, 61, 78, 0.1);
+  --ii-panel-surface: rgba(255, 255, 255, 0.92);
+  --ii-panel-shadow: 0 15px 30px rgba(11, 61, 78, 0.08);
+  --ii-card-shadow: 0 20px 45px rgba(6, 41, 54, 0.12);
+  --ii-kicker-color: rgba(11, 61, 78, 0.65);
+  --ii-primary-button-text: #f3fbfd;
+  --ii-secondary-cta-color: #0b3d4e;
+  --ii-secondary-cta-bg: rgba(11, 61, 78, 0.08);
+  --ii-secondary-cta-hover-bg: rgba(11, 61, 78, 0.15);
+  --ii-body-background: radial-gradient(circle at 20% 20%, rgba(11, 61, 78, 0.1), transparent 38%),
+    radial-gradient(circle at 80% 0%, rgba(6, 95, 122, 0.08), transparent 45%),
+    var(--ii-color-bg);
+  --ifm-color-primary: #0b3d4e;
+  --ifm-color-primary-dark: #082e3b;
+  --ifm-color-primary-darker: #052129;
+  --ifm-color-primary-light: #144f64;
+  --ifm-color-primary-lighter: #1c6d8b;
+  --ifm-color-primary-lightest: #2a88a9;
+  --ifm-navbar-background-color: #ffffff;
+  --ifm-footer-background-color: #e6f2f7;
+  --ifm-font-color-base: #0d1f24;
+  --docusaurus-highlighted-code-line-bg: rgba(11, 61, 78, 0.1);
+}
+
+body {
+  font-family: var(--ifm-font-family-base);
+  background: var(--ii-body-background);
+  color: var(--ifm-font-color-base);
+}
+
+p {
+  color: var(--ifm-font-color-base);
+}
+
+.navbar {
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(186, 233, 244, 0.3);
+}
+
+.navbar__brand {
+  font-weight: 600;
+  color: #bae9f4;
+}
+
+.navbar__item,
+.navbar__link {
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+.navbar__link--active,
+.navbar__link:hover {
+  color: var(--ifm-color-primary);
+}
+
+.footer--dark {
+  background: linear-gradient(180deg, rgba(10, 14, 12, 0.9), #050807);
+  border-top: 1px solid rgba(186, 233, 244, 0.2);
+}
+
+.button.button--primary {
+  color: var(--ii-primary-button-text);
+  box-shadow: 0 10px 30px rgba(186, 233, 244, 0.25);
+}
+
+.button.button--secondary {
+  background: var(--ii-secondary-cta-bg);
+  color: var(--ii-secondary-cta-color);
+  border: 1px solid var(--ii-border-strong);
+}
+
+.button.button--secondary:hover {
+  background: var(--ii-secondary-cta-hover-bg);
+}
+
+.clean-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}

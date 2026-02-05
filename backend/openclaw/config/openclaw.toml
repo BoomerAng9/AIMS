@@ -1,0 +1,55 @@
+# OpenClaw Configuration for A.I.M.S.
+# See: https://docs.openclaw.ai/gateway
+
+[gateway]
+host = "0.0.0.0"
+port = 18789
+
+[gateway.auth]
+mode = "none"  # Use "password" in production
+
+# Model configuration
+# OpenClaw will use these for inference
+[models]
+default = "anthropic/claude-sonnet-4-20250514"
+fallback = ["groq/llama-3.1-70b-versatile", "openai/gpt-4o"]
+
+# DM Security - pairing mode requires approval
+[security]
+dmPolicy = "pairing"  # "pairing" | "open"
+
+# Webhook to forward messages to ACHEEVY
+[webhooks.acheevy]
+url = "http://uef-gateway:3001/api/channel/openclaw"
+events = ["message.received", "message.sent"]
+headers = { "X-Source" = "openclaw" }
+
+# Channel configurations (configure as needed)
+
+# [channels.telegram]
+# enabled = true
+# botToken = "${TELEGRAM_BOT_TOKEN}"
+# allowFrom = ["*"]  # Or specific user IDs
+
+# [channels.whatsapp]
+# enabled = true
+# sessionName = "${WHATSAPP_SESSION_NAME}"
+
+# [channels.slack]
+# enabled = true
+# botToken = "${SLACK_BOT_TOKEN}"
+
+# [channels.discord]
+# enabled = true
+# botToken = "${DISCORD_BOT_TOKEN}"
+
+# Skills and tools
+[skills]
+directory = "/app/workspace/skills"
+autoload = true
+
+# A.I.M.S. Integration skill
+[skills.acheevy]
+name = "acheevy-router"
+description = "Routes messages to ACHEEVY orchestrator"
+enabled = true

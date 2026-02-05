@@ -5,8 +5,16 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Send, Bot, Wrench, Search, Image, FileText, Layers, Copy, Container } from "lucide-react";
+import { Send, Bot, Search, Image, FileText, Layers, Copy, Container, Trophy, Wand2, Mic } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+// ACHEEVY Verb Pool for rotating signature
+const ACHEEVY_VERBS = [
+  'Deploy', 'Build', 'Create', 'Launch', 'Ship', 'Forge', 'Craft', 'Execute'
+] as const;
+
+// Default verb for SSR to avoid hydration mismatch
+const DEFAULT_VERB = 'Deploy';
 
 type Message = {
     role: 'user' | 'assistant';
@@ -17,6 +25,7 @@ type Message = {
 };
 
 const QUICK_INTENTS = [
+  { label: "Launch Perform", icon: Trophy, intent: "launch-perform" },
   { label: "Build a bot", icon: Bot, intent: "build-bot" },
   { label: "Deep research", icon: Search, intent: "deep-research" },
   { label: "Create images", icon: Image, intent: "create-images" },
@@ -24,15 +33,21 @@ const QUICK_INTENTS = [
   { label: "Vertical Stories", icon: Layers, intent: "vertical-stories" },
   { label: "Make it mine", icon: Copy, intent: "make-it-mine" },
   { label: "Deploy a tool", icon: Container, intent: "deploy-tool" },
+  { label: "Browse Skills", icon: Wand2, intent: "browse-skills" },
 ] as const;
 
 export default function ChatPage() {
   const [input, setInput] = React.useState('');
-  const [messages, setMessages] = React.useState<Message[]>([
-      { role: 'assistant', content: 'Welcome to A.I.M.S. Describe what you want to build, research, or deploy — I will coordinate the right tools for you.', timestamp: new Date() }
-  ]);
+  const [currentVerb, setCurrentVerb] = React.useState(DEFAULT_VERB);
+  const [messages, setMessages] = React.useState<Message[]>([]); // Start empty, load aiPlugs templates
   const [loading, setLoading] = React.useState(false);
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
+
+  // Set random verb after hydration to avoid mismatch
+  React.useEffect(() => {
+    const randomVerb = ACHEEVY_VERBS[Math.floor(Math.random() * ACHEEVY_VERBS.length)];
+    setCurrentVerb(randomVerb);
+  }, []);
 
   React.useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -98,8 +113,8 @@ export default function ChatPage() {
                           <img src="/images/acheevy/acheevy-helmet.png" alt="ACHEEVY" className="h-full w-full rounded-full object-cover bg-black" />
                       </div>
                       <div>
-                          <h1 className="font-display text-lg text-amber-50 tracking-wider">Chat with ACHEEVY</h1>
-                          <p className="text-xs text-amber-100/50">Describe what you want; ACHEEVY coordinates the tools.</p>
+                          <h1 className="font-marker text-xl text-frosty-white tracking-wider">Chat w/ACHEEVY</h1>
+                          <p className="text-xs text-amber-100/50">Think It. Prompt It. Let ACHEEVY {currentVerb} it!</p>
                       </div>
                   </div>
                </div>

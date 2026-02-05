@@ -11,7 +11,7 @@ interface Message {
   executionPlan?: { steps: string[]; estimatedDuration: string };
 }
 
-export default function AcheevyChat() {
+export function AcheevyChat() {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 'welcome',

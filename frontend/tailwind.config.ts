@@ -9,6 +9,8 @@ module.exports = {
       colors: {
         obsidian: '#0A0A0A',
         leather: '#1A1A1A',
+        'frosty-white': '#F5F5F5',
+        champagne: '#F6C453',
         gold: {
           DEFAULT: '#D4AF37',
           light: '#E8D48A'

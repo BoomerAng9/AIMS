@@ -25,7 +25,7 @@ export default function SignInPage() {
           <CardContent className="space-y-4">
              <div className="space-y-2">
                 <label className="text-xs font-medium uppercase tracking-wider text-zinc-400">Email Address</label>
-                <Input placeholder="admin@plugmein.com" type="email" />
+                <Input placeholder="admin@plugmein.cloud" type="email" />
              </div>
              <div className="space-y-2">
                 <div className="flex items-center justify-between">

@@ -1,0 +1,1 @@
+export const ACCESS_TOKEN = 'II_AGENT_ACCESS_TOKEN'

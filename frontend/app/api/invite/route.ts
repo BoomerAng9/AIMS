@@ -30,7 +30,7 @@ export async function POST(request: Request) {
              <li>n8n: Active</li>
              <li>PostgreSQL: Synced</li>
           </ul>
-          <p style="color: #06b6d4;">Welcome to plugmein.com</p>
+          <p style="color: #06b6d4;">Welcome to plugmein.cloud</p>
         </div>
       `,
     });

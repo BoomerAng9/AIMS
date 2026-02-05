@@ -1,0 +1,34 @@
+name: Build and Push Docker Images (Production)
+
+on:
+  workflow_dispatch: {}
+  push:
+    tags:
+      - 'release-*'
+
+permissions:
+  contents: read
+
+jobs:
+  extract-tag:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.extract.outputs.tag }}
+    steps:
+      - name: Extract tag name
+        id: extract
+        run: |
+          # Extract full tag name (refs/tags/release-0.1.0 -> release-0.1.0)
+          TAG=${GITHUB_REF#refs/tags/}
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "Using release tag: $TAG"
+
+  build-and-push-production:
+    needs: extract-tag
+    uses: ./.github/workflows/build-shared.yml
+    with:
+      environment: prod
+      image_tag: ${{ needs.extract-tag.outputs.tag }}
+    secrets:
+      GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+      FRONTEND_ENV: ${{ secrets.FRONTEND_PROD }}

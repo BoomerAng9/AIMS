@@ -1,0 +1,20 @@
+name: Build and Push Docker Images (Development)
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches:
+      - develop
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-push-development:
+    uses: ./.github/workflows/build-shared.yml
+    with:
+      environment: dev
+      image_tag: ${{ github.sha }}
+    secrets:
+      GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+      FRONTEND_ENV: ${{ secrets.FRONTEND_DEV }}

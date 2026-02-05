@@ -55,6 +55,18 @@ ui components/
 # MCP tool configs (contain API tokens)
 mcp-tools/
 
+# GCP / Firebase service account keys (CRITICAL)
+*-service-account-key.json
+*-key.json
+infra/gcp-*.json
+backend/ii-agent/docker/gcp-credentials.json
+
+# Firebase
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+
 # A.I.M.S. Specific
 infra/.env
 backend/uef-gateway/.env
