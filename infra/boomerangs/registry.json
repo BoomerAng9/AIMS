@@ -1,0 +1,234 @@
+{
+  "boomerangs": [
+    {
+      "id": "researcher_ang",
+      "name": "Researcher_Ang",
+      "source_repo": "intelligent-internet/researcher",
+      "description": "Deep research specialist using Brave Search + RAG",
+      "capabilities": [
+        "brave_web_search",
+        "academic_research",
+        "fact_verification",
+        "source_citation"
+      ],
+      "required_quotas": {
+        "brave_searches": 1,
+        "api_calls": 5
+      },
+      "endpoint": "http://researcher-ang:8100/execute",
+      "health_check": "http://researcher-ang:8100/health",
+      "status": "registered"
+    },
+    {
+      "id": "voice_ang",
+      "name": "Voice_Ang",
+      "source_repo": "intelligent-internet/voice-assistant",
+      "description": "ElevenLabs voice synthesis and transcription",
+      "capabilities": [
+        "text_to_speech",
+        "voice_cloning",
+        "audio_transcription",
+        "multilingual_tts"
+      ],
+      "required_quotas": {
+        "elevenlabs_chars": 1000
+      },
+      "endpoint": "http://voice-ang:8101/execute",
+      "health_check": "http://voice-ang:8101/health",
+      "status": "registered"
+    },
+    {
+      "id": "vision_ang",
+      "name": "Vision_Ang",
+      "source_repo": "intelligent-internet/video-processor",
+      "description": "Video/image processing and analysis",
+      "capabilities": [
+        "video_transcoding",
+        "image_analysis",
+        "ocr_extraction",
+        "scene_detection"
+      ],
+      "required_quotas": {
+        "container_hours": 0.5,
+        "storage_gb": 2
+      },
+      "endpoint": "http://vision-ang:7000/execute",
+      "health_check": "http://vision-ang:7000/health",
+      "status": "registered"
+    },
+    {
+      "id": "automation_ang",
+      "name": "Automation_Ang",
+      "source_repo": "intelligent-internet/automation-engine",
+      "description": "N8N workflow orchestration wrapper",
+      "capabilities": [
+        "workflow_creation",
+        "webhook_triggers",
+        "scheduled_tasks",
+        "api_integration"
+      ],
+      "required_quotas": {
+        "n8n_executions": 1
+      },
+      "endpoint": "http://n8n:5678/webhook/boomerang",
+      "health_check": "http://n8n:5678/healthz",
+      "status": "registered"
+    },
+    {
+      "id": "sitebuilder_ang",
+      "name": "SiteBuilder_Ang",
+      "source_repo": "payload-cms + grapesjs",
+      "description": "Website generation and management",
+      "capabilities": [
+        "page_creation",
+        "template_deployment",
+        "visual_editing",
+        "cms_management"
+      ],
+      "required_quotas": {
+        "api_calls": 10,
+        "storage_gb": 1
+      },
+      "endpoint": "http://sitebuilder-ang:3002/api/execute",
+      "health_check": "http://sitebuilder-ang:3002/api/health",
+      "status": "registered"
+    },
+    {
+      "id": "coder_ang",
+      "name": "Coder_Ang",
+      "source_repo": "openclaw/openclaw",
+      "description": "Real-time code generation and execution via OpenClaw sandbox",
+      "capabilities": [
+        "code_generation",
+        "sandbox_execution",
+        "debugging",
+        "refactoring"
+      ],
+      "required_quotas": {
+        "container_hours": 0.25,
+        "api_calls": 20
+      },
+      "endpoint": "http://openclaw:8001/execute",
+      "health_check": "http://openclaw:8001/health",
+      "status": "registered"
+    },
+    {
+      "id": "orchestrator_ang",
+      "name": "Orchestrator_Ang",
+      "source_repo": "agent-zero",
+      "description": "Multi-agent task coordination via Agent Zero",
+      "capabilities": [
+        "task_decomposition",
+        "agent_spawning",
+        "result_synthesis",
+        "parallel_execution"
+      ],
+      "required_quotas": {
+        "container_hours": 0.5,
+        "api_calls": 30
+      },
+      "endpoint": "http://agent-zero:8000/orchestrate",
+      "health_check": "http://agent-zero:8000/health",
+      "status": "registered"
+    },
+    {
+      "id": "marketer_ang",
+      "name": "Marketer_Ang",
+      "source_repo": "intelligent-internet/content-engine",
+      "description": "Growth, content, and campaign specialist",
+      "capabilities": [
+        "seo_audit",
+        "copy_generation",
+        "campaign_flows",
+        "social_scheduling"
+      ],
+      "required_quotas": {
+        "api_calls": 15
+      },
+      "endpoint": "http://marketer-ang:8102/execute",
+      "health_check": "http://marketer-ang:8102/health",
+      "status": "registered"
+    },
+    {
+      "id": "data_ang",
+      "name": "Data_Ang",
+      "source_repo": "intelligent-internet/data-pipeline",
+      "description": "ETL pipelines, analytics, and visualization",
+      "capabilities": [
+        "data_extraction",
+        "data_transformation",
+        "visualization",
+        "report_generation"
+      ],
+      "required_quotas": {
+        "container_hours": 0.25,
+        "api_calls": 10
+      },
+      "endpoint": "http://data-ang:8103/execute",
+      "health_check": "http://data-ang:8103/health",
+      "status": "registered"
+    },
+    {
+      "id": "quality_ang",
+      "name": "Quality_Ang",
+      "source_repo": "aims/oracle-verifier",
+      "description": "ORACLE 7-Gate verification and quality assurance",
+      "capabilities": [
+        "gate_verification",
+        "security_audit",
+        "code_review",
+        "compliance_check"
+      ],
+      "required_quotas": {
+        "api_calls": 5
+      },
+      "endpoint": "http://quality-ang:8104/execute",
+      "health_check": "http://quality-ang:8104/health",
+      "status": "registered"
+    }
+  ],
+  "capability_index": {
+    "brave_web_search": ["researcher_ang"],
+    "academic_research": ["researcher_ang"],
+    "fact_verification": ["researcher_ang", "quality_ang"],
+    "source_citation": ["researcher_ang"],
+    "text_to_speech": ["voice_ang"],
+    "voice_cloning": ["voice_ang"],
+    "audio_transcription": ["voice_ang"],
+    "multilingual_tts": ["voice_ang"],
+    "video_transcoding": ["vision_ang"],
+    "image_analysis": ["vision_ang"],
+    "ocr_extraction": ["vision_ang"],
+    "scene_detection": ["vision_ang"],
+    "workflow_creation": ["automation_ang"],
+    "webhook_triggers": ["automation_ang"],
+    "scheduled_tasks": ["automation_ang"],
+    "api_integration": ["automation_ang"],
+    "page_creation": ["sitebuilder_ang"],
+    "template_deployment": ["sitebuilder_ang"],
+    "visual_editing": ["sitebuilder_ang"],
+    "cms_management": ["sitebuilder_ang"],
+    "code_generation": ["coder_ang"],
+    "sandbox_execution": ["coder_ang"],
+    "debugging": ["coder_ang"],
+    "refactoring": ["coder_ang"],
+    "task_decomposition": ["orchestrator_ang"],
+    "agent_spawning": ["orchestrator_ang"],
+    "result_synthesis": ["orchestrator_ang"],
+    "parallel_execution": ["orchestrator_ang"],
+    "seo_audit": ["marketer_ang"],
+    "copy_generation": ["marketer_ang"],
+    "campaign_flows": ["marketer_ang"],
+    "social_scheduling": ["marketer_ang"],
+    "data_extraction": ["data_ang"],
+    "data_transformation": ["data_ang"],
+    "visualization": ["data_ang"],
+    "report_generation": ["data_ang"],
+    "gate_verification": ["quality_ang"],
+    "security_audit": ["quality_ang"],
+    "code_review": ["quality_ang", "coder_ang"],
+    "compliance_check": ["quality_ang"]
+  },
+  "version": "1.0.0",
+  "last_updated": "2026-02-05T00:00:00Z"
+}

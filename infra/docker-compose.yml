@@ -12,8 +12,13 @@ services:
       - "3000:3000"
     environment:
       - NEXT_PUBLIC_ACP_ENDPOINT=http://localhost:3000/api/acp
+      - UEF_GATEWAY_URL=http://uef-gateway:3001
+      - HOUSE_OF_ANG_URL=http://house-of-ang:3002
+      - ACHEEVY_URL=http://acheevy:3003
     depends_on:
       - uef-gateway
+      - house-of-ang
+      - acheevy
     networks:
       - aims-network
 
@@ -30,6 +35,8 @@ services:
       - .env
     environment:
       - PORT=3001
+      - HOUSE_OF_ANG_URL=http://house-of-ang:3002
+      - ACHEEVY_URL=http://acheevy:3003
     volumes:
       - ../backend/uef-gateway/src:/app/src
     healthcheck:
@@ -37,13 +44,59 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    depends_on:
+      - house-of-ang
     networks:
       - aims-network
 
   # ---------------------------------------------------------------------------
-  # Layer 3: Agents & Tools (STUBBED FOR BOOTSTRAP)
+  # Layer 2.5: House of Ang (BoomerAng Registry & Routing)
   # ---------------------------------------------------------------------------
-  
+  house-of-ang:
+    build:
+      context: ../backend/house-of-ang
+      dockerfile: Dockerfile
+    ports:
+      - "3002:3002"
+    environment:
+      - PORT=3002
+      - REGISTRY_PATH=/app/registry/registry.json
+    volumes:
+      - ../infra/boomerangs:/app/registry
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - aims-network
+
+  # ---------------------------------------------------------------------------
+  # Layer 2.5: ACHEEVY (Executive Orchestrator)
+  # ---------------------------------------------------------------------------
+  acheevy:
+    build:
+      context: ../backend/acheevy
+      dockerfile: Dockerfile
+    ports:
+      - "3003:3003"
+    environment:
+      - PORT=3003
+      - HOUSE_OF_ANG_URL=http://house-of-ang:3002
+    depends_on:
+      - house-of-ang
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3003/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - aims-network
+
+  # ---------------------------------------------------------------------------
+  # Layer 3: Agents & Tools (Deployed per-VPS)
+  # ---------------------------------------------------------------------------
+
   # agent-zero:
   #   image: agent-zero:latest
   #   environment:
@@ -53,6 +106,8 @@ services:
 
   # openclaw:
   #   image: openclaw:latest
+  #   ports:
+  #     - "8001:8001"
   #   networks:
   #     - aims-network
 
@@ -65,8 +120,17 @@ services:
   #   image: n8nio/n8n
   #   ports:
   #     - "5678:5678"
+  #   environment:
+  #     - N8N_BASIC_AUTH_ACTIVE=true
+  #     - N8N_BASIC_AUTH_USER=${N8N_USER}
+  #     - N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD}
+  #   volumes:
+  #     - n8n_data:/home/node/.n8n
   #   networks:
   #     - aims-network
+
+# volumes:
+#   n8n_data:
 
 networks:
   aims-network:

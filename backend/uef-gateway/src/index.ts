@@ -8,6 +8,8 @@ import { Oracle } from './oracle';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+const ACHEEVY_URL = process.env.ACHEEVY_URL || 'http://localhost:3003';
+const HOUSE_OF_ANG_URL = process.env.HOUSE_OF_ANG_URL || 'http://localhost:3002';
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -15,8 +17,32 @@ app.use(bodyParser.json());
 // --------------------------------------------------------------------------
 // Health Check
 // --------------------------------------------------------------------------
-app.get('/health', (req, res) => {
+app.get('/health', (_req, res) => {
   res.json({ status: 'UEF Gateway Online', layer: 2 });
+});
+
+// --------------------------------------------------------------------------
+// LUC Status Proxy (for frontend useLuc hook)
+// --------------------------------------------------------------------------
+app.get('/luc/status', (req, res) => {
+  const userId = (req.query.userId as string) || 'anon';
+  // Return default free-tier quotas (in production, read from Firestore via LUC ADK)
+  res.json({
+    userId,
+    tier: 'free',
+    billing_cycle_start: new Date().toISOString(),
+    billing_cycle_end: new Date(Date.now() + 30 * 86400000).toISOString(),
+    can_execute: true,
+    blocking_quotas: [],
+    usage_summary: {
+      api_calls:        { used: 0, limit: 50, pct: 0 },
+      brave_searches:   { used: 0, limit: 10, pct: 0 },
+      container_hours:  { used: 0, limit: 0.5, pct: 0 },
+      storage_gb:       { used: 0, limit: 1, pct: 0 },
+      elevenlabs_chars: { used: 0, limit: 5000, pct: 0 },
+      n8n_executions:   { used: 0, limit: 5, pct: 0 },
+    },
+  });
 });
 
 // --------------------------------------------------------------------------
@@ -125,13 +151,48 @@ app.post('/ingress/acp', async (req, res) => {
 
     console.log(`[UEF] Received ACP Request: ${acpReq.reqId} - ${acpReq.intent}`);
 
-    // 2. SmelterOS Routing — choose processing path by intent
+    // 2. For CHAT intent, forward to ACHEEVY orchestrator if available
+    if (acpReq.intent === 'CHAT') {
+      try {
+        const acheevyRes = await fetch(`${ACHEEVY_URL}/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: acpReq.userId,
+            sessionId: acpReq.sessionId,
+            message: acpReq.naturalLanguage,
+          }),
+          signal: AbortSignal.timeout(10000),
+        });
+        if (acheevyRes.ok) {
+          const acheevyData = await acheevyRes.json();
+          const response: ACPResponse = {
+            reqId: acpReq.reqId,
+            status: 'SUCCESS',
+            message: acheevyData.reply,
+            quote: LUCEngine.estimate(acpReq.naturalLanguage),
+            taskId: acheevyData.sessionId,
+            executionPlan: acheevyData.action_plan
+              ? {
+                  steps: acheevyData.action_plan.map((s: any) => s.description),
+                  estimatedDuration: `${acheevyData.action_plan.length} steps`,
+                }
+              : buildExecutionPlan('CHAT', acpReq.naturalLanguage),
+          };
+          return res.json(response);
+        }
+      } catch {
+        console.warn('[UEF] ACHEEVY unreachable, falling back to local processing');
+      }
+    }
+
+    // 3. SmelterOS Routing — choose processing path by intent
     const executionPlan = buildExecutionPlan(acpReq.intent, acpReq.naturalLanguage);
 
-    // 3. LUC Estimate
+    // 4. LUC Estimate
     const quote = LUCEngine.estimate(acpReq.naturalLanguage);
 
-    // 4. ORACLE 7-Gate Pre-flight
+    // 5. ORACLE 7-Gate Pre-flight
     const oracleResult = await Oracle.runGates(
       { intent: acpReq.intent, query: acpReq.naturalLanguage, budget: acpReq.budget },
       { quote }
@@ -139,7 +200,7 @@ app.post('/ingress/acp', async (req, res) => {
 
     console.log(`[UEF] ORACLE result: passed=${oracleResult.passed}, score=${oracleResult.score}`);
 
-    // 5. Construct Response
+    // 6. Construct Response
     const response: ACPResponse = {
       reqId: acpReq.reqId,
       status: oracleResult.passed ? 'SUCCESS' : 'ERROR',

@@ -31,6 +31,8 @@ yarn-error.log*
 .env.production.local
 *.env
 *.env.*
+!.env.example
+!infra/.env.example
 
 # Docker
 .docker/
