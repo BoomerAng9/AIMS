@@ -15,7 +15,8 @@ import { CircuitBoardPattern, AIMS_CIRCUIT_COLORS } from '@/components/ui/Circui
 // Types
 // ─────────────────────────────────────────────────────────────
 
-type ModelCategory = 'language' | 'vision' | 'audio' | 'code' | 'embedding' | 'multimodal';
+// User-friendly categories (what it does, not what it is)
+type ModelCategory = 'assistant' | 'researcher' | 'coder' | 'creative' | 'specialist' | 'agent-platform';
 type ToolCategory = 'search' | 'voice' | 'video' | 'payment' | 'storage' | 'analytics';
 type PricingTier = 'free' | 'pay-as-you-go' | 'provisioned' | 'enterprise';
 type ModelStatus = 'stable' | 'preview' | 'beta' | 'deprecated';
@@ -23,9 +24,11 @@ type ModelStatus = 'stable' | 'preview' | 'beta' | 'deprecated';
 interface AIModel {
   id: string;
   name: string;
+  friendlyName: string; // User-friendly name like "Smart Assistant"
   provider: string;
   category: ModelCategory;
   description: string;
+  useCase: string; // Plain English: "Best for..."
   capabilities: string[];
   pricing: PricingTier;
   status: ModelStatus;
@@ -61,13 +64,32 @@ interface ConsumptionModel {
 // ─────────────────────────────────────────────────────────────
 
 const AI_MODELS: AIModel[] = [
-  // Claude Models
+  // Agent Platforms - Full AI assistants that can do tasks
+  {
+    id: 'openclaw',
+    name: 'OpenClaw',
+    friendlyName: 'AI Agent Platform',
+    provider: 'A.I.M.S.',
+    category: 'agent-platform',
+    description: 'Multi-model agent platform with sandboxed tool execution',
+    useCase: 'Best for: Building AI agents that can browse, code, and complete tasks autonomously',
+    capabilities: ['Agent Mode', 'Tool Use', 'Sandboxed', 'Multi-Model'],
+    pricing: 'free',
+    status: 'stable',
+    contextWindow: 'Unlimited',
+    inputCost: 'Included',
+    outputCost: 'Included',
+    popular: true,
+  },
+  // Smart Assistants - General purpose helpers
   {
     id: 'claude-opus-4',
     name: 'Claude Opus 4.5',
+    friendlyName: 'Executive Assistant',
     provider: 'Anthropic',
-    category: 'language',
+    category: 'assistant',
     description: 'Most capable model for complex reasoning and analysis',
+    useCase: 'Best for: Complex business decisions, strategic planning, detailed analysis',
     capabilities: ['Reasoning', 'Analysis', 'Code', 'Vision', 'Long Context'],
     pricing: 'pay-as-you-go',
     status: 'stable',
@@ -79,9 +101,11 @@ const AI_MODELS: AIModel[] = [
   {
     id: 'claude-sonnet-4',
     name: 'Claude Sonnet 4',
+    friendlyName: 'Smart Assistant',
     provider: 'Anthropic',
-    category: 'language',
+    category: 'assistant',
     description: 'Balanced performance and cost for most tasks',
+    useCase: 'Best for: Everyday tasks, writing, answering questions, general help',
     capabilities: ['Reasoning', 'Code', 'Vision', 'Fast'],
     pricing: 'pay-as-you-go',
     status: 'stable',
@@ -93,9 +117,11 @@ const AI_MODELS: AIModel[] = [
   {
     id: 'claude-haiku',
     name: 'Claude 3.5 Haiku',
+    friendlyName: 'Quick Helper',
     provider: 'Anthropic',
-    category: 'language',
+    category: 'assistant',
     description: 'Fast and cost-effective for simple tasks',
+    useCase: 'Best for: Quick answers, simple tasks, high-volume operations',
     capabilities: ['Fast', 'Efficient', 'Code'],
     pricing: 'pay-as-you-go',
     status: 'stable',
@@ -103,13 +129,14 @@ const AI_MODELS: AIModel[] = [
     inputCost: '$0.80/M tokens',
     outputCost: '$4/M tokens',
   },
-  // GPT Models
   {
     id: 'gpt-4o',
     name: 'GPT-4o',
+    friendlyName: 'Multi-Talent Assistant',
     provider: 'OpenAI',
-    category: 'multimodal',
+    category: 'creative',
     description: 'Flagship multimodal model with vision and audio',
+    useCase: 'Best for: Working with images, audio, and creative projects',
     capabilities: ['Vision', 'Audio', 'Reasoning', 'Code'],
     pricing: 'pay-as-you-go',
     status: 'stable',
@@ -121,9 +148,11 @@ const AI_MODELS: AIModel[] = [
   {
     id: 'gpt-4o-mini',
     name: 'GPT-4o Mini',
+    friendlyName: 'Budget Assistant',
     provider: 'OpenAI',
-    category: 'language',
+    category: 'assistant',
     description: 'Cost-effective for simpler tasks',
+    useCase: 'Best for: Simple questions, basic tasks on a budget',
     capabilities: ['Fast', 'Efficient', 'Vision'],
     pricing: 'pay-as-you-go',
     status: 'stable',
@@ -131,13 +160,15 @@ const AI_MODELS: AIModel[] = [
     inputCost: '$0.15/M tokens',
     outputCost: '$0.60/M tokens',
   },
-  // Gemini Models
+  // Research & Analysis
   {
     id: 'gemini-2-flash',
     name: 'Gemini 2.0 Flash',
+    friendlyName: 'Research Assistant',
     provider: 'Google',
-    category: 'multimodal',
+    category: 'researcher',
     description: 'Fast thinking model with multimodal capabilities',
+    useCase: 'Best for: Quick research, fact-checking, analyzing images',
     capabilities: ['Fast', 'Vision', 'Reasoning', 'Code'],
     pricing: 'free',
     status: 'preview',
@@ -149,9 +180,11 @@ const AI_MODELS: AIModel[] = [
   {
     id: 'gemini-pro',
     name: 'Gemini Pro 1.5',
+    friendlyName: 'Document Analyst',
     provider: 'Google',
-    category: 'language',
+    category: 'researcher',
     description: 'Long context window for large documents',
+    useCase: 'Best for: Analyzing long documents, contracts, books',
     capabilities: ['Long Context', 'Vision', 'Code'],
     pricing: 'pay-as-you-go',
     status: 'stable',
@@ -159,13 +192,77 @@ const AI_MODELS: AIModel[] = [
     inputCost: '$1.25/M tokens',
     outputCost: '$5/M tokens',
   },
-  // Open Source
+  {
+    id: 'kimi-k2',
+    name: 'KIMI K2.5',
+    friendlyName: 'Deep Researcher',
+    provider: 'Moonshot',
+    category: 'researcher',
+    description: 'Long-form content analysis and research',
+    useCase: 'Best for: Deep research, complex analysis, Chinese language',
+    capabilities: ['Long Context', 'Research', 'Multilingual'],
+    pricing: 'pay-as-you-go',
+    status: 'stable',
+    contextWindow: '200K',
+    inputCost: '$0.50/M tokens',
+    outputCost: '$1.50/M tokens',
+  },
+  {
+    id: 'perplexity-online',
+    name: 'Perplexity Online',
+    friendlyName: 'Live Web Searcher',
+    provider: 'Perplexity',
+    category: 'researcher',
+    description: 'Real-time web search integrated with LLM',
+    useCase: 'Best for: Current events, real-time information, sourced answers',
+    capabilities: ['Web Search', 'Citations', 'Real-time'],
+    pricing: 'pay-as-you-go',
+    status: 'stable',
+    contextWindow: '128K',
+    inputCost: '$1/M tokens',
+    outputCost: '$1/M tokens',
+  },
+  // Coding & Development
+  {
+    id: 'deepseek-v3',
+    name: 'DeepSeek V3',
+    friendlyName: 'Code Writer',
+    provider: 'DeepSeek',
+    category: 'coder',
+    description: 'Specialized for code generation and reasoning',
+    useCase: 'Best for: Writing code, debugging, technical problem-solving',
+    capabilities: ['Code', 'Math', 'Reasoning'],
+    pricing: 'pay-as-you-go',
+    status: 'stable',
+    contextWindow: '64K',
+    inputCost: '$0.27/M tokens',
+    outputCost: '$1.10/M tokens',
+    popular: true,
+  },
+  {
+    id: 'codestral',
+    name: 'Codestral',
+    friendlyName: 'Code Completer',
+    provider: 'Mistral',
+    category: 'coder',
+    description: 'Optimized for code completion and generation',
+    useCase: 'Best for: Fast code completion, autocomplete, IDE integration',
+    capabilities: ['Code', 'Fast', 'Fill-in-Middle'],
+    pricing: 'pay-as-you-go',
+    status: 'stable',
+    contextWindow: '32K',
+    inputCost: '$0.20/M tokens',
+    outputCost: '$0.60/M tokens',
+  },
+  // Specialists
   {
     id: 'llama-3.1-70b',
     name: 'Llama 3.1 70B',
+    friendlyName: 'Open Source Helper',
     provider: 'Meta',
-    category: 'language',
+    category: 'specialist',
     description: 'Open-weight model for self-hosting',
+    useCase: 'Best for: Self-hosted deployments, privacy-focused applications',
     capabilities: ['Open Source', 'Code', 'Reasoning'],
     pricing: 'pay-as-you-go',
     status: 'stable',
@@ -174,57 +271,19 @@ const AI_MODELS: AIModel[] = [
     outputCost: '$0.79/M tokens',
   },
   {
-    id: 'deepseek-v3',
-    name: 'DeepSeek V3',
-    provider: 'DeepSeek',
-    category: 'code',
-    description: 'Specialized for code generation and reasoning',
-    capabilities: ['Code', 'Math', 'Reasoning'],
-    pricing: 'pay-as-you-go',
-    status: 'stable',
-    contextWindow: '64K',
-    inputCost: '$0.27/M tokens',
-    outputCost: '$1.10/M tokens',
-  },
-  {
     id: 'qwen-3',
     name: 'Qwen 3',
+    friendlyName: 'Multilingual Helper',
     provider: 'Alibaba',
-    category: 'language',
+    category: 'specialist',
     description: 'Multilingual model with strong performance',
+    useCase: 'Best for: Multi-language support, Asian languages, translation',
     capabilities: ['Multilingual', 'Code', 'Reasoning'],
     pricing: 'pay-as-you-go',
     status: 'stable',
     contextWindow: '32K',
     inputCost: '$0.30/M tokens',
     outputCost: '$0.90/M tokens',
-  },
-  // Specialized
-  {
-    id: 'codestral',
-    name: 'Codestral',
-    provider: 'Mistral',
-    category: 'code',
-    description: 'Optimized for code completion and generation',
-    capabilities: ['Code', 'Fast', 'Fill-in-Middle'],
-    pricing: 'pay-as-you-go',
-    status: 'stable',
-    contextWindow: '32K',
-    inputCost: '$0.20/M tokens',
-    outputCost: '$0.60/M tokens',
-  },
-  {
-    id: 'perplexity-online',
-    name: 'Perplexity Online',
-    provider: 'Perplexity',
-    category: 'language',
-    description: 'Real-time web search integrated with LLM',
-    capabilities: ['Web Search', 'Citations', 'Real-time'],
-    pricing: 'pay-as-you-go',
-    status: 'stable',
-    contextWindow: '128K',
-    inputCost: '$1/M tokens',
-    outputCost: '$1/M tokens',
   },
 ];
 
@@ -469,6 +528,16 @@ function PricingBadge({ tier }: { tier: PricingTier }) {
   );
 }
 
+// User-friendly category labels
+const CATEGORY_LABELS: Record<ModelCategory, string> = {
+  'agent-platform': 'AI Agents',
+  'assistant': 'Smart Assistants',
+  'researcher': 'Research & Analysis',
+  'coder': 'Code & Development',
+  'creative': 'Creative & Media',
+  'specialist': 'Specialists',
+};
+
 function ModelCard({
   model,
   enabled,
@@ -502,10 +571,11 @@ function ModelCard({
         </div>
       )}
 
-      <div className="flex items-start justify-between mb-3">
+      <div className="flex items-start justify-between mb-2">
         <div>
-          <h3 className="text-lg font-semibold text-white">{model.name}</h3>
-          <p className="text-sm text-gray-400">{model.provider}</p>
+          {/* User-friendly name first, technical name smaller */}
+          <h3 className="text-lg font-semibold text-white">{model.friendlyName}</h3>
+          <p className="text-xs text-gray-500">{model.name} • {model.provider}</p>
         </div>
         <button
           onClick={onToggle}
@@ -521,6 +591,8 @@ function ModelCard({
         </button>
       </div>
 
+      {/* Use case in plain English */}
+      <p className="text-sm text-amber-300/80 mb-2">{model.useCase}</p>
       <p className="text-sm text-gray-400 mb-3">{model.description}</p>
 
       <div className="flex flex-wrap gap-1 mb-3">
@@ -705,8 +777,14 @@ export default function ModelGardenPage() {
     return matchesSearch && matchesCategory;
   });
 
-  const modelCategories = ['all', ...new Set(AI_MODELS.map((m) => m.category))];
-  const toolCategories = ['all', ...new Set(TOOLS.map((t) => t.category))];
+  const modelCategories: string[] = ['all', ...new Set(AI_MODELS.map((m) => m.category))];
+  const toolCategories: string[] = ['all', ...new Set(TOOLS.map((t) => t.category))];
+
+  // Helper to get friendly category label
+  const getCategoryLabel = (cat: string) => {
+    if (cat === 'all') return 'All';
+    return CATEGORY_LABELS[cat as ModelCategory] || cat;
+  };
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#0a0f1a' }}>
@@ -730,7 +808,7 @@ export default function ModelGardenPage() {
                 Model Garden
               </h1>
               <p className="text-gray-400">
-                Browse and select AI models & tools to integrate into your app
+                Add AI capabilities to your business — just pick what you need
               </p>
             </div>
           </div>
@@ -806,20 +884,20 @@ export default function ModelGardenPage() {
               />
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <FilterIcon className="w-5 h-5 text-gray-500" />
               {(activeTab === 'models' ? modelCategories : toolCategories).map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setCategoryFilter(cat)}
-                  className="px-3 py-2 rounded-lg text-sm capitalize transition-all"
+                  className="px-3 py-2 rounded-lg text-sm transition-all whitespace-nowrap"
                   style={{
                     backgroundColor: categoryFilter === cat ? AIMS_CIRCUIT_COLORS.primary + '20' : '#1f2937',
                     color: categoryFilter === cat ? AIMS_CIRCUIT_COLORS.accent : '#9ca3af',
                     border: categoryFilter === cat ? `1px solid ${AIMS_CIRCUIT_COLORS.primary}60` : '1px solid #374151',
                   }}
                 >
-                  {cat}
+                  {getCategoryLabel(cat)}
                 </button>
               ))}
             </div>
