@@ -3,10 +3,10 @@ import type { ReactNode } from "react";
 import { LogoWallBackground } from "@/components/LogoWallBackground";
 import { SiteFooter } from "@/components/SiteFooter";
 import type { Metadata } from 'next';
-import { Inter, Doto, Permanent_Marker, Caveat } from 'next/font/google';
+import { Inter, Roboto_Mono, Permanent_Marker, Caveat } from 'next/font/google';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
-const doto = Doto({ subsets: ['latin'], variable: '--font-doto' });
+const doto = Roboto_Mono({ subsets: ['latin'], variable: '--font-doto' });
 const marker = Permanent_Marker({ 
   weight: '400',
   subsets: ['latin'], 
