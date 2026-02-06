@@ -5,6 +5,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { ACPStandardizedRequest, ACPResponse } from './acp/types';
 import { LUCEngine } from './luc';
 import { Oracle } from './oracle';
+import { routeToAgents } from './agents/router';
+import { registry } from './agents/registry';
 import logger from './logger';
 
 const app = express();
@@ -22,6 +24,13 @@ app.use(express.json());
 // --------------------------------------------------------------------------
 app.get('/health', (_req, res) => {
   res.json({ status: 'UEF Gateway Online', layer: 2, uptime: process.uptime() });
+});
+
+// --------------------------------------------------------------------------
+// Agent Registry — list available agents and their profiles
+// --------------------------------------------------------------------------
+app.get('/agents', (_req, res) => {
+  res.json({ agents: registry.list() });
 });
 
 // --------------------------------------------------------------------------
@@ -89,19 +98,20 @@ function buildExecutionPlan(intent: string, _query: string): { steps: string[]; 
 // --------------------------------------------------------------------------
 // Intent-specific response message
 // --------------------------------------------------------------------------
-function buildResponseMessage(intent: string, oraclePassed: boolean): string {
+function buildResponseMessage(intent: string, oraclePassed: boolean, agentExecuted: boolean): string {
   if (!oraclePassed) {
     return 'ORACLE pre-flight check flagged issues. Review gate failures before proceeding.';
   }
+  const suffix = agentExecuted ? ' Agents have executed the task.' : '';
   switch (intent) {
     case 'CHAT':
-      return 'ACHEEVY received your message. Here is the analysis and cost estimate for any actionable items detected.';
+      return `ACHEEVY received your message. Here is the analysis and cost estimate for any actionable items detected.${suffix}`;
     case 'BUILD_PLUG':
-      return 'Build request accepted. Execution plan generated and LUC quote attached. Approve to begin.';
+      return `Build request accepted. Execution plan generated and LUC quote attached.${suffix}`;
     case 'RESEARCH':
-      return 'Research request queued. AnalystAng will compile findings. LUC estimate attached.';
+      return `Research request queued. AnalystAng will compile findings. LUC estimate attached.${suffix}`;
     case 'AGENTIC_WORKFLOW':
-      return 'Workflow pipeline validated. Multi-stage execution plan ready. Approve the LUC quote to launch.';
+      return `Workflow pipeline validated. Multi-stage execution plan ready.${suffix}`;
     case 'ESTIMATE_ONLY':
     default:
       return 'UEF processed request. LUC Quote generated.';
@@ -129,9 +139,13 @@ app.post('/ingress/acp', async (req, res) => {
 
     logger.info({ reqId: acpReq.reqId, intent: acpReq.intent }, '[UEF] Received ACP Request');
 
+    // 1. Build execution plan
     const executionPlan = buildExecutionPlan(acpReq.intent, acpReq.naturalLanguage);
+
+    // 2. LUC cost estimate
     const quote = LUCEngine.estimate(acpReq.naturalLanguage);
 
+    // 3. ORACLE 7-Gate pre-flight
     const oracleResult = await Oracle.runGates(
       { intent: acpReq.intent, query: acpReq.naturalLanguage, budget: acpReq.budget },
       { quote }
@@ -139,15 +153,41 @@ app.post('/ingress/acp', async (req, res) => {
 
     logger.info({ passed: oracleResult.passed, score: oracleResult.score }, '[UEF] ORACLE result');
 
+    // 4. Agent dispatch (only if ORACLE passes)
+    let agentResult = { executed: false, agentOutputs: [] as Array<{ status: string; agentId: string; result: { summary: string; artifacts: string[] } }>, primaryAgent: null as string | null };
+    if (oracleResult.passed) {
+      agentResult = await routeToAgents(
+        acpReq.intent,
+        acpReq.naturalLanguage,
+        executionPlan.steps,
+        acpReq.reqId
+      );
+    }
+
+    // 5. Construct response
     const response: ACPResponse = {
       reqId: acpReq.reqId,
       status: oracleResult.passed ? 'SUCCESS' : 'ERROR',
-      message: buildResponseMessage(acpReq.intent, oracleResult.passed),
+      message: buildResponseMessage(acpReq.intent, oracleResult.passed, agentResult.executed),
       quote: quote,
-      executionPlan: executionPlan
+      executionPlan: executionPlan,
     };
 
-    res.json(response);
+    // Attach agent outputs if any executed
+    const payload: Record<string, unknown> = { ...response };
+    if (agentResult.executed) {
+      payload.agentResults = {
+        primaryAgent: agentResult.primaryAgent,
+        outputs: agentResult.agentOutputs.map(o => ({
+          agentId: o.agentId,
+          status: o.status,
+          summary: o.result.summary,
+          artifacts: o.result.artifacts,
+        })),
+      };
+    }
+
+    res.json(payload);
 
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Unknown error';
@@ -160,7 +200,9 @@ app.post('/ingress/acp', async (req, res) => {
 // Start Server
 // --------------------------------------------------------------------------
 export const server = app.listen(PORT, () => {
-  logger.info({ port: PORT }, 'UEF Gateway (Layer 2) running');
+  const agents = registry.list();
+  logger.info({ port: PORT, agents: agents.length }, 'UEF Gateway (Layer 2) running');
+  logger.info(`Agents online: ${agents.map(a => a.name).join(', ')}`);
   logger.info(`ACP Ingress available at http://localhost:${PORT}/ingress/acp`);
 });
 
