@@ -1,6 +1,5 @@
 import { pmoRegistry, PMO_OFFICES } from '../pmo/registry';
 import { houseOfAng } from '../pmo/house-of-ang';
-import { runProcurementPipeline } from '../workflows/ats-procurement';
 
 describe('PMO Registry', () => {
   it('has 6 PMO offices', () => {
@@ -161,59 +160,3 @@ describe('House of Ang', () => {
   });
 });
 
-describe('ATS Procurement Pipeline', () => {
-  it('runs a full procurement pipeline', async () => {
-    const pipeline = await runProcurementPipeline(
-      'Consolidate all vendor contracts across IT infrastructure, office supplies, and professional services to achieve cost reduction through volume-based pricing',
-      'test-proc-001'
-    );
-
-    expect(pipeline.pipelineId).toMatch(/^proc-/);
-    expect(pipeline.status).toBe('COMPLETE');
-    expect(pipeline.categories.length).toBeGreaterThan(0);
-    expect(pipeline.rfpTemplates.length).toBeGreaterThan(0);
-    expect(pipeline.bids.length).toBeGreaterThan(0);
-    expect(pipeline.projections.length).toBeGreaterThan(0);
-    expect(pipeline.totalProjectedSavings).toBeGreaterThan(0);
-    expect(pipeline.governedBy).toBe('Boomer_COO');
-    expect(pipeline.executedBy).toContain('analyst-ang');
-    expect(pipeline.executedBy).toContain('engineer-ang');
-  });
-
-  it('generates RFPs only for non-LOW consolidation categories', async () => {
-    const pipeline = await runProcurementPipeline(
-      'Optimize procurement across all spend categories and generate RFP templates for vendor consolidation',
-      'test-proc-002'
-    );
-
-    for (const tmpl of pipeline.rfpTemplates) {
-      const category = pipeline.categories.find(c => c.id === tmpl.categoryId);
-      expect(category).toBeDefined();
-      expect(category!.consolidationPotential).not.toBe('LOW');
-    }
-  });
-
-  it('produces 3 bids per RFP template', async () => {
-    const pipeline = await runProcurementPipeline(
-      'Run full procurement analysis with vendor bid collection',
-      'test-proc-003'
-    );
-
-    for (const tmpl of pipeline.rfpTemplates) {
-      const templateBids = pipeline.bids.filter(b => b.rfpTemplateId === tmpl.templateId);
-      expect(templateBids).toHaveLength(3);
-    }
-  });
-
-  it('savings projections have positive savings for consolidatable categories', async () => {
-    const pipeline = await runProcurementPipeline(
-      'Project cost savings from vendor consolidation across all departments',
-      'test-proc-004'
-    );
-
-    for (const proj of pipeline.projections) {
-      expect(proj.savingsUsd).toBeGreaterThanOrEqual(0);
-      expect(proj.projectedCost).toBeLessThanOrEqual(proj.currentCost);
-    }
-  });
-});

@@ -14,7 +14,7 @@ import { VISION_SQUAD_PROFILES } from './agents/lil-hawks/vision-scout-squad';
 import { PREP_SQUAD_PROFILES, runPrepSquad } from './agents/lil-hawks/prep-squad-alpha';
 import { pmoRegistry } from './pmo/registry';
 import { houseOfAng } from './pmo/house-of-ang';
-import { runProcurementPipeline } from './workflows/ats-procurement';
+
 import logger from './logger';
 
 const app = express();
@@ -119,24 +119,6 @@ app.post('/house-of-ang/spawn', (req, res) => {
   }
 });
 
-// --------------------------------------------------------------------------
-// Workflows — ATS Procurement Automation
-// --------------------------------------------------------------------------
-app.post('/workflows/procurement', async (req, res) => {
-  try {
-    const { description, reqId } = req.body;
-    if (!description) {
-      res.status(400).json({ error: 'Missing required field: description' });
-      return;
-    }
-    const pipeline = await runProcurementPipeline(description, reqId || uuidv4());
-    res.json(pipeline);
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Pipeline failed';
-    logger.error({ err: error }, 'Procurement pipeline error');
-    res.status(500).json({ error: message });
-  }
-});
 
 // --------------------------------------------------------------------------
 // Lil_Hawks — Squad profiles
