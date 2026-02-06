@@ -94,10 +94,16 @@
           "visual": "Boomer_Ang supervisor badges with status dots"
         },
         {
-          "id": "chicken_hawk_activity",
+          "id": "lil_hawk_activity",
           "type": "activity_feed",
-          "description": "Chicken_Hawk worker activity log - shows power level evolution",
-          "visual": "Chicken_Hawk icons at various power levels executing tasks"
+          "description": "Lil_Hawk worker activity log - shows Squad coordination and individual X_Lil_Hawk personas",
+          "visual": "Lil_Hawk icons with persona handles (X_Lil_Hawk) executing tasks"
+        },
+        {
+          "id": "squad_status",
+          "type": "group_indicator",
+          "description": "Current Squad status and member Lil_Hawks",
+          "visual": "Squad badge with member count and coordination status"
         },
         {
           "id": "wave_timeline",
@@ -181,35 +187,34 @@
     },
 
     "crewBadges": {
-      "description": "Identity markers for Boomer_Ang supervisors and Chicken_Hawk workers",
+      "description": "Identity markers for Boomer_Ang supervisors and Lil_Hawk workers",
       "supervisorFields": ["role", "moniker", "status"],
-      "chickenHawkFields": ["function", "powerLevel", "shiftId", "serial"],
-      "visual": "Boomer_Ang badges + Chicken_Hawk icons with power level indicators"
+      "lilHawkFields": ["personaHandle", "crewRole", "function", "shiftId", "serial"],
+      "visual": "Boomer_Ang badges + Lil_Hawk icons with X_Lil_Hawk persona handles"
     },
 
-    "chickenHawkEvolution": {
-      "description": "Visual representation of Chicken_Hawk power levels",
+    "lilHawkPersona": {
+      "description": "Visual representation of Lil_Hawk persona handles",
+      "pattern": "X_Lil_Hawk",
+      "displayFormat": "X_Lil_Hawk — <CrewRole> / <Function>",
+      "examples": [
+        {"handle": "Harbor_Lil_Hawk", "display": "Harbor_Lil_Hawk — CraneOps / Deploy"},
+        {"handle": "Cargo_Lil_Hawk", "display": "Cargo_Lil_Hawk — YardOps / Route"},
+        {"handle": "Dock_Lil_Hawk", "display": "Dock_Lil_Hawk — SafetyOps / Verify"}
+      ],
+      "visual": "Small chick icon with persona name badge"
+    },
+
+    "squadIndicator": {
+      "description": "Visual representation of Squad coordination",
+      "pattern": "Squad_<ShiftId>-<BatchSerial>",
+      "displayFormat": "Squad — <ShiftId> (N Lil_Hawks)",
       "states": {
-        "base": {
-          "name": "Chick",
-          "icon": "chicken_hawk_base",
-          "color": "#22C55E",
-          "description": "Small determined chick - atomic tasks"
-        },
-        "powered": {
-          "name": "Hawk",
-          "icon": "chicken_hawk_powered",
-          "color": "#3B82F6",
-          "description": "Wings spread with energy aura - parallel tasks"
-        },
-        "maxPower": {
-          "name": "Super_Hawk",
-          "icon": "chicken_hawk_max",
-          "color": "#F59E0B",
-          "description": "Full power-up form - complex operations"
-        }
-      },
-      "animation": "power_up_transition"
+        "forming": {"color": "#6B7280", "icon": "squad_forming"},
+        "active": {"color": "#22C55E", "icon": "squad_active"},
+        "completing": {"color": "#3B82F6", "icon": "squad_completing"},
+        "disbanded": {"color": "#9CA3AF", "icon": "squad_disbanded"}
+      }
     },
 
     "safetyBar": {

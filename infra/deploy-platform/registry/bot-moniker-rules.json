@@ -1,12 +1,14 @@
 {
   "$schema": "https://aims.dev/schemas/bot-moniker-rules.json",
   "name": "Deploy Bot Moniker Rules",
-  "version": "1.0.0",
-  "description": "Naming conventions for Chicken_Hawk bots - small but relentless workers that power up when needed",
+  "version": "2.0.0",
+  "description": "Naming conventions for Lil_Hawks - Chicken Hawk spawned workers organized in Squads",
 
   "mascot": {
     "name": "Chicken_Hawk",
-    "description": "Small but relentless workers - determined, tenacious, can power up when the task demands",
+    "description": "Deploy execution engine + mascot - small but relentless, powers up when needed",
+    "role": "Execution engine that spawns and coordinates Lil_Hawks",
+    "replaces": "OpenClaw (in user-facing + internal artifacts)",
     "evolution": {
       "base": "Small chick - handles atomic tasks",
       "powered": "Wings spread - handles parallel tasks",
@@ -15,170 +17,233 @@
     "traits": ["relentless", "determined", "scrappy", "powerful_when_needed"]
   },
 
-  "pattern": {
-    "canonical": "<Function>_Chicken_Hawk_<ShiftId>-<Serial>",
-    "regex": "^[A-Z][a-zA-Z]+_Chicken_Hawk_SFT-[0-9]{3}-CH[0-9]{3}$",
+  "terminology": {
+    "Chicken_Hawk": "Deploy execution engine + mascot",
+    "Lil_Hawks": "Spawned worker bots (atomic workers)",
+    "Squad": "Coordinated group of Lil_Hawks spawned for a single Shift/Manifest",
+    "X_Lil_Hawk": "Individual persona name format for any single Lil_Hawk"
+  },
+
+  "lil_hawk": {
+    "description": "Individual spawned worker bot",
+    "canonical_pattern": "<Function>_<CrewRole>_Lil_Hawk_<ShiftId>-<Serial>",
+    "regex": "^[A-Z][a-zA-Z]+_[A-Z][a-zA-Z]+Ops_Lil_Hawk_SFT-[0-9]{3}-LH[0-9]{3}$",
     "examples": [
-      "Deploy_Chicken_Hawk_SFT-221-CH041",
-      "Scale_Chicken_Hawk_SFT-221-CH117",
-      "Verify_Chicken_Hawk_SFT-221-CH203",
-      "Route_Chicken_Hawk_SFT-221-CH088",
-      "Rollback_Chicken_Hawk_SFT-221-CH009",
-      "Move_Chicken_Hawk_SFT-221-CH055",
-      "Dispatch_Chicken_Hawk_SFT-221-CH012",
-      "Health_Chicken_Hawk_SFT-221-CH099"
-    ]
+      "Deploy_CraneOps_Lil_Hawk_SFT-221-LH041",
+      "Scale_CraneOps_Lil_Hawk_SFT-221-LH117",
+      "Verify_SafetyOps_Lil_Hawk_SFT-221-LH203",
+      "Route_YardOps_Lil_Hawk_SFT-221-LH088",
+      "Rollback_SafetyOps_Lil_Hawk_SFT-221-LH009",
+      "Move_LoadOps_Lil_Hawk_SFT-221-LH055",
+      "Dispatch_DispatchOps_Lil_Hawk_SFT-221-LH012",
+      "Health_CraneOps_Lil_Hawk_SFT-221-LH099"
+    ],
+    "serial_format": "LH<3-digit-number>"
+  },
+
+  "squad": {
+    "description": "Coordinated group of Lil_Hawks spawned for a single Shift/Manifest",
+    "canonical_pattern": "Squad_<ShiftId>-<BatchSerial>",
+    "regex": "^Squad_SFT-[0-9]{3}-B[0-9]{2}$",
+    "examples": [
+      "Squad_SFT-221-B03",
+      "Squad_SFT-407-B01",
+      "Squad_SFT-118-B12"
+    ],
+    "mandatory_when": "N>1 spawn under the same Shift Order"
+  },
+
+  "persona_handle": {
+    "description": "Individual-facing persona name for a Lil_Hawk",
+    "pattern": "X_Lil_Hawk",
+    "note": "X is the synthetic persona name token (short, memorable, repeat-safe via canonical ID uniqueness)",
+    "examples": [
+      "Harbor_Lil_Hawk",
+      "Cargo_Lil_Hawk",
+      "Dock_Lil_Hawk",
+      "Anchor_Lil_Hawk",
+      "Crane_Lil_Hawk",
+      "Fleet_Lil_Hawk",
+      "Stern_Lil_Hawk",
+      "Bow_Lil_Hawk"
+    ],
+    "synthetic_naming_set": "port_authority_vocabulary"
+  },
+
+  "display_name": {
+    "individual": {
+      "pattern": "X_Lil_Hawk — <CrewRole> / <Function>",
+      "examples": [
+        "Harbor_Lil_Hawk — CraneOps / Deploy",
+        "Cargo_Lil_Hawk — YardOps / Route",
+        "Dock_Lil_Hawk — SafetyOps / Verify"
+      ]
+    },
+    "group": {
+      "pattern": "Squad — <ShiftId> (N Lil_Hawks)",
+      "examples": [
+        "Squad — SFT-221 (5 Lil_Hawks)",
+        "Squad — SFT-407 (3 Lil_Hawks)"
+      ]
+    }
   },
 
   "components": {
     "function": {
-      "description": "The primary action this Chicken_Hawk performs",
+      "description": "The primary action this Lil_Hawk performs",
       "allowed_values": [
-        "Deploy",
-        "Scale",
-        "Update",
-        "Swap",
-        "Canary",
-        "Rollback",
-        "Terminate",
-        "Health",
-        "Assign",
-        "Bind",
-        "Attach",
-        "Release",
-        "Quarantine",
-        "Rebalance",
-        "Dispatch",
-        "Split",
-        "Pause",
-        "Resume",
-        "Route",
-        "Guard",
-        "Limit",
-        "Kill",
-        "Incident",
-        "Cleanup",
-        "Rotate",
-        "Prewarm",
-        "Heal",
-        "Detect",
-        "Move",
-        "Verify",
-        "Check",
-        "Export",
-        "Import",
-        "Sync",
-        "Monitor"
+        "Deploy", "Scale", "Update", "Swap", "Canary", "Rollback", "Terminate", "Health",
+        "Assign", "Bind", "Attach", "Release", "Quarantine", "Rebalance",
+        "Dispatch", "Split", "Pause", "Resume", "Route",
+        "Guard", "Limit", "Kill", "Incident",
+        "Cleanup", "Rotate", "Prewarm", "Heal", "Detect",
+        "Move", "Verify", "Check", "Export", "Import", "Sync", "Monitor"
       ]
     },
-    "identifier": {
-      "description": "All bots are Chicken_Hawks - small but relentless workers",
-      "value": "Chicken_Hawk",
-      "required": true
-    },
-    "power_level": {
-      "description": "Evolution state based on task complexity",
-      "levels": {
-        "base": {
-          "name": "Chick",
-          "description": "Small form - handles atomic tasks",
-          "max_concurrent": 1,
-          "visual": "Small determined chick"
+    "crew_role": {
+      "description": "The operational crew this Lil_Hawk belongs to",
+      "allowed_values": ["CraneOps", "YardOps", "SafetyOps", "LoadOps", "DispatchOps"],
+      "mapping": {
+        "CraneOps": {
+          "description": "Chicken Hawk primary workers - lift/move/place",
+          "functions": ["Deploy", "Scale", "Update", "Swap", "Canary", "Rollback", "Terminate", "Health"]
         },
-        "powered": {
-          "name": "Hawk",
-          "description": "Wings spread - handles parallel tasks",
-          "max_concurrent": 3,
-          "visual": "Wings spread with energy aura"
+        "YardOps": {
+          "description": "Routing and placement workers",
+          "functions": ["Assign", "Bind", "Attach", "Release", "Quarantine", "Rebalance", "Route"]
         },
-        "max_power": {
-          "name": "Super_Hawk",
-          "description": "Full power-up - handles complex operations",
-          "max_concurrent": 5,
-          "visual": "Muscular form with energy lightning"
+        "SafetyOps": {
+          "description": "Budget, kill switch, and incident workers",
+          "functions": ["Guard", "Limit", "Kill", "Incident", "Rollback", "Verify"]
+        },
+        "LoadOps": {
+          "description": "Artifact hauling, logs, and exports workers",
+          "functions": ["Move", "Export", "Import", "Cleanup", "Rotate", "Prewarm", "Heal", "Detect"]
+        },
+        "DispatchOps": {
+          "description": "Sequencing and wave control workers",
+          "functions": ["Dispatch", "Split", "Pause", "Resume", "Sync", "Monitor"]
         }
       }
     },
     "shift_id": {
-      "description": "The deployment shift this Chicken_Hawk belongs to",
+      "description": "The deployment shift this Lil_Hawk belongs to",
       "format": "SFT-<3-digit-number>",
       "example": "SFT-221"
     },
     "serial": {
       "description": "Unique serial number within the shift",
-      "format": "CH<3-digit-number>",
-      "example": "CH041"
+      "format": "LH<3-digit-number>",
+      "example": "LH041"
     }
   },
 
   "rules": {
-    "always_chicken_hawk": {
-      "description": "Every bot moniker must include Chicken_Hawk identifier",
+    "all_workers_are_lil_hawks": {
+      "description": "All spawned workers are Lil_Hawks, not Boomer_Angs. Boomer_Angs remain supervisors.",
+      "enforced": true
+    },
+    "persona_handle_format": {
+      "description": "Persona handle must be X_Lil_Hawk format",
+      "enforced": true
+    },
+    "squad_naming_mandatory": {
+      "description": "Squad naming is mandatory when N>1 spawn under the same Shift Order",
+      "enforced": true
+    },
+    "kyb_registration_at_birth": {
+      "description": "KYB registration is mandatory at birth (serial id, charter/passport, flight recorder binding)",
+      "enforced": true
+    },
+    "no_direct_tool_execution": {
+      "description": "No Lil_Hawk executes tools directly - only registered Deploy Capability Registry calls via gateway + LUC authorization",
       "enforced": true
     },
     "tied_to_shift": {
-      "description": "Every Chicken_Hawk must be tied to a ShiftId",
-      "enforced": true
-    },
-    "kyb_identity_required": {
-      "description": "Each Chicken_Hawk gets a KYB identity + Flight Recorder entry",
-      "enforced": true
-    },
-    "no_bot_spawning": {
-      "description": "No Chicken_Hawk spawns another Chicken_Hawk unless registry explicitly permits it",
-      "enforced": true,
-      "exceptions": ["Dispatch_Chicken_Hawk"]
-    },
-    "power_level_matches_task": {
-      "description": "Chicken_Hawk power level must match task complexity",
+      "description": "Every Lil_Hawk must be tied to a ShiftId",
       "enforced": true
     },
     "logs_only_no_decisions": {
-      "description": "Chicken_Hawks report logs only - no autonomous decisions",
+      "description": "Lil_Hawks report logs only - no autonomous decisions",
       "enforced": true
+    }
+  },
+
+  "skill_spec": {
+    "name": "synthetic_user_naming",
+    "description": "Every Chicken Hawk–spawned bot is issued a governed identity at birth",
+    "applies_to": [
+      "chickenhawk.bot_spawn_requested",
+      "chickenhawk.squad_scale_up",
+      "chickenhawk.job_template_instantiated"
+    ],
+    "outputs": {
+      "bot_display_name": "Human-friendly display name",
+      "bot_canonical_id": "Stable machine ID",
+      "bot_persona_handle": "X_Lil_Hawk format",
+      "squad_id": "Squad ID if spawned as part of a Squad",
+      "kyb_serial_id": "KYB serial + passport pointer",
+      "audit_linkage": "Flight recorder stream id"
     }
   },
 
   "kyb_integration": {
     "required_fields": [
-      "chicken_hawk_moniker",
+      "lil_hawk_moniker",
+      "persona_handle",
       "shift_id",
-      "power_level",
+      "squad_id",
+      "crew_role",
       "function",
       "spawned_at",
       "spawned_by",
       "contract_ref",
       "capabilities"
     ],
-    "identity_format": "KYB-CH-<shift_id>-<serial>",
+    "identity_format": "KYB-LH-<shift_id>-<serial>",
     "flight_recorder": {
       "enabled": true,
       "retention_days": 90,
-      "fields": ["action", "input", "output", "duration", "status", "error", "power_level"]
+      "fields": ["action", "input", "output", "duration", "status", "error", "squad_id"]
+    }
+  },
+
+  "hooks": {
+    "before_chickenhawk_spawn": {
+      "description": "Triggers synthetic_user_naming, registers KYB identity, assigns X_Lil_Hawk",
+      "required": true
+    },
+    "before_capability_execute": {
+      "description": "LUC canExecute, KYB intent + budget entry",
+      "required": true
+    },
+    "after_capability_execute": {
+      "description": "LUC recordUsage, KYB outcome + hashes",
+      "required": true
+    },
+    "on_drift_or_repeat_failures": {
+      "description": "SafetyOps escalation to ACHEEVY and (if needed) switch lane to Guide Me",
+      "required": true
     }
   },
 
   "hierarchy": {
-    "description": "Boomer_Ang supervisors command Chicken_Hawk workers",
+    "description": "Boomer_Ang supervisors command Lil_Hawks via Chicken Hawk",
     "supervisors": {
+      "type": "Boomer_Ang",
       "pattern": "<Role>_Ang",
-      "examples": [
-        "CEO_Ang",
-        "CTO_Ang",
-        "COO_Ang",
-        "CFO_Ang",
-        "Orchestrator_Ang"
-      ],
+      "examples": ["CEO_Ang", "CTO_Ang", "COO_Ang", "CFO_Ang", "Orchestrator_Ang"],
       "note": "Supervisors are persistent Boomer_Angs, not tied to shifts"
     },
-    "workers": {
-      "pattern": "<Function>_Chicken_Hawk_<ShiftId>-<Serial>",
-      "examples": [
-        "Deploy_Chicken_Hawk_SFT-221-CH041",
-        "Scale_Chicken_Hawk_SFT-221-CH117"
-      ],
-      "note": "Chicken_Hawks are spawned per shift, supervised by Boomer_Angs"
+    "execution_engine": {
+      "type": "Chicken_Hawk",
+      "description": "Spawns and coordinates Lil_Hawks, executes manifests"
     },
-    "command_chain": "ACHEEVY → Boomer_Ang → Chicken_Hawk"
+    "workers": {
+      "type": "Lil_Hawk",
+      "pattern": "<Function>_<CrewRole>_Lil_Hawk_<ShiftId>-<Serial>",
+      "note": "Lil_Hawks are spawned per shift, organized in Squads when N>1"
+    },
+    "command_chain": "ACHEEVY → Boomer_Ang → Chicken_Hawk → Squad → Lil_Hawk"
   }
 }

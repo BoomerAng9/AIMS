@@ -1,9 +1,32 @@
 {
   "$schema": "https://aims.dev/schemas/deploy-capability-registry.json",
   "name": "Deploy Capability Registry",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Registry of all permitted operations in the Deploy Platform yard",
   "visual_metaphor": "Container yard with cranes, crew, and traffic control",
+
+  "execution_backend": {
+    "description": "Available execution backends for Deploy operations",
+    "enum": ["ChickenHawk", "AgentZero", "n8n"],
+    "default": "ChickenHawk",
+    "backends": {
+      "ChickenHawk": {
+        "description": "Chicken Hawk execution engine - spawns Lil_Hawks via Squads",
+        "type": "native",
+        "worker_type": "Lil_Hawk"
+      },
+      "AgentZero": {
+        "description": "Agent Zero autonomous execution",
+        "type": "external",
+        "worker_type": "agent"
+      },
+      "n8n": {
+        "description": "n8n workflow automation",
+        "type": "external",
+        "worker_type": "workflow"
+      }
+    }
+  },
 
   "categories": {
     "crane_ops": {

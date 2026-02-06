@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://aims.dev/schemas/deploy-shift-contract.json",
   "title": "Deploy Shift Contract",
-  "description": "Schema for contracts between ACHEEVY, Boomer_Ang supervisors, and OpenClaw execution",
+  "description": "Schema for contracts between ACHEEVY, Boomer_Ang supervisors, and Chicken Hawk execution via Lil_Hawks",
   "version": "1.0.0",
 
   "definitions": {
@@ -64,9 +64,9 @@
         },
         "limits": {
           "type": "object",
-          "required": ["maxBots", "maxDuration", "budget"],
+          "required": ["maxLilHawks", "maxDuration", "budget"],
           "properties": {
-            "maxBots": { "type": "integer", "minimum": 1 },
+            "maxLilHawks": { "type": "integer", "minimum": 1 },
             "maxDuration": { "type": "integer", "description": "Max duration in seconds" },
             "budget": {
               "type": "object",
@@ -216,7 +216,8 @@
             "stepsSucceeded": { "type": "integer" },
             "stepsFailed": { "type": "integer" },
             "wavesCompleted": { "type": "integer" },
-            "botsSpawned": { "type": "integer" },
+            "lilHawksSpawned": { "type": "integer" },
+            "squadId": { "type": "string" },
             "durationMs": { "type": "integer" }
           }
         },
@@ -319,13 +320,13 @@
       },
       {
         "step": 3,
-        "actor": "Deploy Crew (OpenClaw)",
+        "actor": "Chicken Hawk (via Squad)",
         "action": "Executes the manifest exactly",
         "output": "execution logs"
       },
       {
         "step": 4,
-        "actor": "Bots",
+        "actor": "Lil_Hawks",
         "action": "Run atomic tasks and emit logs",
         "output": "flight recorder entries"
       },

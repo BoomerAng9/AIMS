@@ -35,7 +35,7 @@
         },
         "crew": {
           "name": "Crew",
-          "description": "The Deploy team executing the manifest (OpenClaw + bots)"
+          "description": "The Deploy team executing the manifest (Chicken Hawk + Lil_Hawks)"
         },
         "shift": {
           "name": "Shift",
@@ -49,8 +49,9 @@
       "internal": {
         "acheevy": "Orchestrator",
         "boomerAngs": "Supervisors",
-        "openClaw": "Execution crew",
-        "bots": "Atomic workers",
+        "chickenHawk": "Execution engine + mascot",
+        "lilHawks": "Spawned worker bots (atomic workers)",
+        "squad": "Coordinated group of Lil_Hawks",
         "luc": "Locale Universal Calculator - metering + quotas + cost signals",
         "kyb": "Identity + audit trail"
       }
@@ -58,9 +59,9 @@
 
     "visualMapping": {
       "containerStacks": "Plugs / tenant workloads - each container = deployable unit with ID, owner, plan, state",
-      "craneArms": "OpenClaw (Deploy Crew) - mass movement + placement of workloads",
+      "craneArms": "Chicken Hawk (Deploy Crew) - mass movement + placement of workloads",
       "groundCrew": "Boomer_Angs (Supervisors + Specialists) - oversight, safety, verification, dispatch",
-      "smallVehicles": "Spawned bots (Boomer_Ang-classed workers) - atomic tasks: move, check, patch, restart",
+      "smallVehicles": "Lil_Hawks (Squad workers) - atomic tasks: move, check, patch, restart",
       "centralLanes": "Execution lanes - Deploy It and Guide Me",
       "sunrise": "Operational clarity - status lights, manifests, receipts, audit trails",
       "emblems": "KYB identity + trust marks - verified and governed badge"
@@ -91,7 +92,7 @@
   },
 
   "governance": {
-    "description": "Chain of command: ACHEEVY → Boomer_Ang → Contract → OpenClaw → Bots → ACHEEVY",
+    "description": "Chain of command: ACHEEVY → Boomer_Ang → Contract → Chicken_Hawk → Squad → Lil_Hawks → ACHEEVY",
     "workflow": {
       "1_approval": {
         "actor": "ACHEEVY",
@@ -108,19 +109,19 @@
       "3_contract": {
         "actor": "System",
         "action": "issues_contract",
-        "description": "Formal contract issued to OpenClaw with exact specifications",
+        "description": "Formal contract issued to Chicken Hawk with exact specifications",
         "required": true
       },
       "4_execution": {
-        "actor": "OpenClaw",
-        "action": "executes_exactly",
-        "description": "OpenClaw executes exactly what contract specifies - no more, no less",
+        "actor": "Chicken_Hawk",
+        "action": "executes_via_squad",
+        "description": "Chicken Hawk executes the manifest via Lil_Hawks (as Squad when needed)",
         "required": true
       },
       "5_reporting": {
-        "actor": "Chicken_Hawk",
+        "actor": "Lil_Hawk",
         "action": "report_logs_only",
-        "description": "Chicken_Hawks report execution logs only - small but relentless workers, no decisions, no deviations",
+        "description": "Lil_Hawks report execution logs only - small but relentless workers, no decisions, no deviations",
         "required": true
       },
       "6_closure": {
@@ -145,23 +146,30 @@
         "canTerminate": false,
         "description": "Scope validator - enforces boundaries and limits"
       },
-      "OpenClaw": {
+      "Chicken_Hawk": {
         "type": "executor",
-        "permissions": ["execute"],
+        "permissions": ["execute", "spawn_squad"],
         "canInitiate": false,
         "canTerminate": false,
-        "description": "Execution engine - follows contracts exactly"
+        "description": "Execution engine + mascot - spawns and coordinates Lil_Hawks via Squads"
       },
-      "Chicken_Hawk": {
+      "Squad": {
+        "type": "group",
+        "permissions": ["coordinate"],
+        "canInitiate": false,
+        "canTerminate": false,
+        "description": "Coordinated group of Lil_Hawks spawned for a single Shift/Manifest"
+      },
+      "Lil_Hawk": {
         "type": "worker",
         "permissions": ["log"],
         "canInitiate": false,
         "canTerminate": false,
-        "description": "Small but relentless workers - execute tasks and report logs only, can power up when needed",
-        "evolution": {
-          "base": "Chick - atomic tasks",
-          "powered": "Hawk - parallel tasks",
-          "maxPower": "Super_Hawk - complex operations"
+        "description": "Spawned worker bots - execute atomic tasks and report logs only",
+        "persona_format": "X_Lil_Hawk",
+        "naming": {
+          "canonical": "<Function>_<CrewRole>_Lil_Hawk_<ShiftId>-<Serial>",
+          "display": "X_Lil_Hawk — <CrewRole> / <Function>"
         }
       }
     },
@@ -291,7 +299,7 @@
       "fontFamily": "Permanent Marker"
     },
     "customization": {
-      "hideOpenClawBranding": false,
+      "hideChickenHawkBranding": false,
       "customResponsePrefix": "[A.I.M.S.]",
       "customWatermark": "A.I.M.S.",
       "customSignature": "Powered by A.I.M.S. Boomer_Angs - AI MANAGED SOLUTIONS",
@@ -444,10 +452,10 @@
     "format": "json",
     "includeTimestamp": true,
     "sanitize": true,
-    "chickenHawkLogs": {
+    "lilHawkLogs": {
       "required": true,
       "captureAll": true,
-      "fields": ["action", "input", "output", "contractRef", "timestamp", "powerLevel"],
+      "fields": ["action", "input", "output", "contractRef", "timestamp", "squadId", "personaHandle"],
       "noDecisions": true,
       "reportTo": "ACHEEVY"
     },
