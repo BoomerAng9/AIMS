@@ -11,6 +11,8 @@ const navItems = [
   { href: "/dashboard/plan", label: "Plan" },
   { href: "/dashboard/ai-plugs", label: "aiPlugs" },
   { href: "/dashboard/boomerangs", label: "BoomerAngs" },
+  { href: "/dashboard/house-of-ang", label: "House of Ang" },
+  { href: "/dashboard/project-management", label: "PMO Offices" },
   { href: "/dashboard/lab", label: "Lab" },
   { href: "/dashboard/luc", label: "LUC Usage" },
   { href: "/dashboard/circuit-box", label: "Circuit Box" },

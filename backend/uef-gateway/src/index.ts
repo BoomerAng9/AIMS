@@ -12,6 +12,9 @@ import { runAthletePageFactory } from './perform/pipeline/athlete-page-factory';
 import { SQUAD_PROFILES } from './agents/lil-hawks/workflow-smith-squad';
 import { VISION_SQUAD_PROFILES } from './agents/lil-hawks/vision-scout-squad';
 import { PREP_SQUAD_PROFILES, runPrepSquad } from './agents/lil-hawks/prep-squad-alpha';
+import { pmoRegistry } from './pmo/registry';
+import { houseOfAng } from './pmo/house-of-ang';
+import { runProcurementPipeline } from './workflows/ats-procurement';
 import logger from './logger';
 
 const app = express();
@@ -62,6 +65,76 @@ app.post('/perform/athlete', async (req, res) => {
     const message = error instanceof Error ? error.message : 'Unknown error';
     logger.error({ err: error }, 'Per|Form Pipeline Error');
     res.status(500).json({ status: 'ERROR', message });
+  }
+});
+
+// --------------------------------------------------------------------------
+// PMO Offices — Project Management Governance
+// --------------------------------------------------------------------------
+app.get('/pmo', (_req, res) => {
+  res.json({ offices: pmoRegistry.list(), directors: pmoRegistry.getDirectors() });
+});
+
+app.get('/pmo/:pmoId', (req, res) => {
+  const office = pmoRegistry.get(req.params.pmoId as Parameters<typeof pmoRegistry.get>[0]);
+  if (!office) {
+    res.status(404).json({ error: `PMO office "${req.params.pmoId}" not found` });
+    return;
+  }
+  res.json(office);
+});
+
+// --------------------------------------------------------------------------
+// House of Ang — Boomer_Ang Factory & Deployment Center
+// --------------------------------------------------------------------------
+app.get('/house-of-ang', (_req, res) => {
+  res.json({
+    roster: houseOfAng.list(),
+    stats: houseOfAng.getStats(),
+    spawnLog: houseOfAng.getSpawnLog(),
+  });
+});
+
+app.get('/house-of-ang/roster', (req, res) => {
+  const type = req.query?.type as string | undefined;
+  if (type === 'SUPERVISORY' || type === 'EXECUTION') {
+    res.json({ roster: houseOfAng.listByType(type) });
+  } else {
+    res.json({ roster: houseOfAng.list() });
+  }
+});
+
+app.post('/house-of-ang/spawn', (req, res) => {
+  try {
+    const { name, type, title, role, specialties } = req.body;
+    if (!name || !type || !title || !role) {
+      res.status(400).json({ error: 'Missing required fields: name, type, title, role' });
+      return;
+    }
+    const ang = houseOfAng.spawn(name, type, title, role, specialties || []);
+    res.status(201).json(ang);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Spawn failed';
+    res.status(409).json({ error: message });
+  }
+});
+
+// --------------------------------------------------------------------------
+// Workflows — ATS Procurement Automation
+// --------------------------------------------------------------------------
+app.post('/workflows/procurement', async (req, res) => {
+  try {
+    const { description, reqId } = req.body;
+    if (!description) {
+      res.status(400).json({ error: 'Missing required field: description' });
+      return;
+    }
+    const pipeline = await runProcurementPipeline(description, reqId || uuidv4());
+    res.json(pipeline);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Pipeline failed';
+    logger.error({ err: error }, 'Procurement pipeline error');
+    res.status(500).json({ error: message });
   }
 });
 
