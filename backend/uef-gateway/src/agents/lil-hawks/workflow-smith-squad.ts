@@ -194,7 +194,7 @@ function validateWorkflow(
 
 function huntFailures(
   workflowJson: Record<string, unknown>,
-  manifest: WorkflowManifest
+  _manifest: WorkflowManifest
 ): FailureCase[] {
   const failures: FailureCase[] = [];
   const nodes = (workflowJson.nodes as Array<Record<string, unknown>>) || [];

@@ -15,9 +15,8 @@
  *   4. Return consolidated result to UEF Gateway
  */
 
-import { v4 as uuidv4 } from 'uuid';
 import logger from '../logger';
-import { Agent, AgentId, AgentTaskInput, AgentTaskOutput, makeOutput, failOutput } from './types';
+import { Agent, AgentId, AgentTaskInput, AgentTaskOutput, failOutput } from './types';
 import { registry } from './registry';
 
 const profile = {
