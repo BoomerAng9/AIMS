@@ -1,6 +1,6 @@
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
-import bodyParser from 'body-parser';
 import { v4 as uuidv4 } from 'uuid';
 import { ACPStandardizedRequest, ACPResponse } from './acp/types';
 import { LUCEngine } from './luc';
@@ -10,20 +10,24 @@ import logger from './logger';
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-app.use(cors());
-app.use(bodyParser.json());
+const corsOrigin = process.env.CORS_ORIGIN || 'http://localhost:3000';
+app.use(cors({
+  origin: corsOrigin.split(',').map(o => o.trim()),
+  methods: ['GET', 'POST'],
+}));
+app.use(express.json());
 
 // --------------------------------------------------------------------------
 // Health Check
 // --------------------------------------------------------------------------
-app.get('/health', (req, res) => {
-  res.json({ status: 'UEF Gateway Online', layer: 2 });
+app.get('/health', (_req, res) => {
+  res.json({ status: 'UEF Gateway Online', layer: 2, uptime: process.uptime() });
 });
 
 // --------------------------------------------------------------------------
 // Intent-specific execution plan generation
 // --------------------------------------------------------------------------
-function buildExecutionPlan(intent: string, query: string): { steps: string[]; estimatedDuration: string } {
+function buildExecutionPlan(intent: string, _query: string): { steps: string[]; estimatedDuration: string } {
   switch (intent) {
     case 'CHAT':
       return {
@@ -111,7 +115,6 @@ app.post('/ingress/acp', async (req, res) => {
   try {
     const rawBody = req.body;
 
-    // 1. Normalize Request
     const acpReq: ACPStandardizedRequest = {
       reqId: uuidv4(),
       userId: rawBody.userId || 'anon',
@@ -124,23 +127,18 @@ app.post('/ingress/acp', async (req, res) => {
       metadata: rawBody.metadata
     };
 
-    logger.info(`[UEF] Received ACP Request: ${acpReq.reqId} - ${acpReq.intent}`);
+    logger.info({ reqId: acpReq.reqId, intent: acpReq.intent }, '[UEF] Received ACP Request');
 
-    // 2. SmelterOS Routing — choose processing path by intent
     const executionPlan = buildExecutionPlan(acpReq.intent, acpReq.naturalLanguage);
-
-    // 3. LUC Estimate
     const quote = LUCEngine.estimate(acpReq.naturalLanguage);
 
-    // 4. ORACLE 7-Gate Pre-flight
     const oracleResult = await Oracle.runGates(
       { intent: acpReq.intent, query: acpReq.naturalLanguage, budget: acpReq.budget },
       { quote }
     );
 
-    logger.info(`[UEF] ORACLE result: passed=${oracleResult.passed}, score=${oracleResult.score}`);
+    logger.info({ passed: oracleResult.passed, score: oracleResult.score }, '[UEF] ORACLE result');
 
-    // 5. Construct Response
     const response: ACPResponse = {
       reqId: acpReq.reqId,
       status: oracleResult.passed ? 'SUCCESS' : 'ERROR',
@@ -151,16 +149,19 @@ app.post('/ingress/acp', async (req, res) => {
 
     res.json(response);
 
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
     logger.error({ err: error }, 'ACP Ingress Error');
-    res.status(500).json({ status: 'ERROR', message: error.message });
+    res.status(500).json({ status: 'ERROR', message });
   }
 });
 
 // --------------------------------------------------------------------------
 // Start Server
 // --------------------------------------------------------------------------
-app.listen(PORT, () => {
-  logger.info(`UEF Gateway (Layer 2) running on port ${PORT}`);
+export const server = app.listen(PORT, () => {
+  logger.info({ port: PORT }, 'UEF Gateway (Layer 2) running');
   logger.info(`ACP Ingress available at http://localhost:${PORT}/ingress/acp`);
 });
+
+export default app;

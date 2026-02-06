@@ -12,8 +12,12 @@ services:
       - "3000:3000"
     environment:
       - NEXT_PUBLIC_ACP_ENDPOINT=http://localhost:3000/api/acp
+      - UEF_ENDPOINT=http://uef-gateway:3001
+      - NODE_ENV=production
     depends_on:
-      - uef-gateway
+      uef-gateway:
+        condition: service_healthy
+    restart: unless-stopped
     networks:
       - aims-network
 
@@ -30,20 +34,22 @@ services:
       - .env
     environment:
       - PORT=3001
-    volumes:
-      - ../backend/uef-gateway/src:/app/src
+      - NODE_ENV=production
+      - CORS_ORIGIN=http://localhost:3000,http://frontend:3000
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/health"]
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 15s
+    restart: unless-stopped
     networks:
       - aims-network
 
   # ---------------------------------------------------------------------------
   # Layer 3: Agents & Tools (STUBBED FOR BOOTSTRAP)
   # ---------------------------------------------------------------------------
-  
+
   # agent-zero:
   #   image: agent-zero:latest
   #   environment:
