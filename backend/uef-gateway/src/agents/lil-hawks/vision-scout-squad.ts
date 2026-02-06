@@ -1,13 +1,15 @@
 /**
- * VisionScout Squad — Video/Footage Assessment Specialists
+ * VISION_SCOUT_SQUAD — Video/Footage Assessment Specialists
  *
  * Three Lil_Hawks for evaluating athlete footage when it exists.
  *
- *   Lil_VisionScout_Hawk — extracts observable events from footage
- *   Lil_FrameJudge_Hawk  — converts observations into structured "film signals"
- *   Lil_WhoaThere_Hawk   — safety/compliance gate
+ *   VISION_LIL_HAWK     — extracts observable events from footage
+ *   SIGNAL_LIL_HAWK     — converts observations into structured "film signals"
+ *   COMPLIANCE_LIL_HAWK — safety/compliance gate
  *
  * If no footage exists, the squad skips and grades using stats + text only.
+ *
+ * Doctrine: "Activity breeds Activity — shipped beats perfect."
  */
 
 import logger from '../../logger';
@@ -16,27 +18,27 @@ import { Agent, AgentTaskInput, AgentTaskOutput, makeOutput, failOutput } from '
 import { LilHawkProfile } from './types';
 
 // ---------------------------------------------------------------------------
-// Squad profiles
+// Squad profiles — canonical NAME_LIL_HAWK convention
 // ---------------------------------------------------------------------------
 
 export const VISION_SQUAD_PROFILES: LilHawkProfile[] = [
   {
-    id: 'lil-visionscout-hawk',
-    name: 'Lil_VisionScout_Hawk',
+    id: 'VISION_LIL_HAWK',
+    name: 'VISION_LIL_HAWK',
     squad: 'vision-scout',
     role: 'Extracts observable events from footage (separation, tackles, throws, catches)',
     gate: false,
   },
   {
-    id: 'lil-framejudge-hawk',
-    name: 'Lil_FrameJudge_Hawk',
+    id: 'SIGNAL_LIL_HAWK',
+    name: 'SIGNAL_LIL_HAWK',
     squad: 'vision-scout',
     role: 'Converts observations into structured film signals with confidence scores',
     gate: false,
   },
   {
-    id: 'lil-whoathere-hawk',
-    name: 'Lil_WhoaThere_Hawk',
+    id: 'COMPLIANCE_LIL_HAWK',
+    name: 'COMPLIANCE_LIL_HAWK',
     squad: 'vision-scout',
     role: 'Safety/compliance gate — flags bad footage, wrong athlete, low confidence',
     gate: true,
@@ -48,17 +50,17 @@ export const VISION_SQUAD_PROFILES: LilHawkProfile[] = [
 // ---------------------------------------------------------------------------
 
 export interface FilmObservation {
-  eventType: string;           // "throw", "catch", "tackle", "separation", "route"
-  timestamp?: string;          // "1:23" in video
+  eventType: string;
+  timestamp?: string;
   description: string;
   quality: 'CLEAR' | 'PARTIAL' | 'OBSCURED';
 }
 
 export interface FilmSignal {
-  signalName: string;          // "arm_strength", "pocket_presence", "route_running"
-  value: number;               // 0-100
-  confidence: number;          // 0-100
-  observations: number;        // how many observations support this
+  signalName: string;
+  value: number;
+  confidence: number;
+  observations: number;
   notes: string;
 }
 
@@ -68,19 +70,18 @@ export interface VisionAssessment {
   observations: FilmObservation[];
   signals: FilmSignal[];
   complianceFlags: string[];
-  overallFilmGrade?: number;   // 0-100, only if footage analyzed
-  skipReason?: string;         // why footage was skipped
+  overallFilmGrade?: number;
+  skipReason?: string;
 }
 
 // ---------------------------------------------------------------------------
-// VisionScout — extract observations
+// VISION_LIL_HAWK — extract observations
 // ---------------------------------------------------------------------------
 
 function extractObservations(query: string): FilmObservation[] {
   const lower = query.toLowerCase();
   const observations: FilmObservation[] = [];
 
-  // Position-specific observation extraction
   if (lower.includes('qb') || lower.includes('quarterback') || lower.includes('passing')) {
     observations.push(
       { eventType: 'throw', description: 'Deep ball accuracy under pressure', quality: 'CLEAR' },
@@ -122,7 +123,7 @@ function extractObservations(query: string): FilmObservation[] {
 }
 
 // ---------------------------------------------------------------------------
-// FrameJudge — convert to signals
+// SIGNAL_LIL_HAWK — convert to signals
 // ---------------------------------------------------------------------------
 
 function convertToSignals(observations: FilmObservation[]): FilmSignal[] {
@@ -148,25 +149,17 @@ function convertToSignals(observations: FilmObservation[]): FilmSignal[] {
 
 function mapEventToSignal(eventType: string): string {
   const map: Record<string, string> = {
-    throw: 'arm_talent',
-    catch: 'hands',
-    route: 'route_running',
-    separation: 'separation_ability',
-    pocket_movement: 'pocket_presence',
-    decision: 'processing_speed',
-    run: 'vision',
-    tackle_break: 'contact_balance',
-    speed: 'explosiveness',
-    tackle: 'tackling',
-    pursuit: 'pursuit',
-    coverage: 'coverage_ability',
-    general: 'overall_athleticism',
+    throw: 'arm_talent', catch: 'hands', route: 'route_running',
+    separation: 'separation_ability', pocket_movement: 'pocket_presence',
+    decision: 'processing_speed', run: 'vision', tackle_break: 'contact_balance',
+    speed: 'explosiveness', tackle: 'tackling', pursuit: 'pursuit',
+    coverage: 'coverage_ability', general: 'overall_athleticism',
   };
   return map[eventType] || 'general_ability';
 }
 
 // ---------------------------------------------------------------------------
-// WhoaThere — compliance gate
+// COMPLIANCE_LIL_HAWK — compliance gate
 // ---------------------------------------------------------------------------
 
 function complianceGate(
@@ -176,39 +169,24 @@ function complianceGate(
 ): { passed: boolean; flags: string[] } {
   const flags: string[] = [];
 
-  // Check minimum observation count
-  if (observations.length < 2) {
-    flags.push('INSUFFICIENT_FOOTAGE: fewer than 2 observable events');
-  }
-
-  // Check confidence floor
+  if (observations.length < 2) flags.push('INSUFFICIENT_FOOTAGE: fewer than 2 observable events');
   const lowConfidence = signals.filter(s => s.confidence < 50);
-  if (lowConfidence.length > signals.length / 2) {
-    flags.push('LOW_CONFIDENCE: majority of signals have < 50% confidence');
-  }
-
-  // Check for obscured-only observations
+  if (lowConfidence.length > signals.length / 2) flags.push('LOW_CONFIDENCE: majority of signals have < 50% confidence');
   const obscuredOnly = observations.every(o => o.quality === 'OBSCURED');
-  if (obscuredOnly) {
-    flags.push('BAD_FOOTAGE: all observations obscured — cannot grade from film');
-  }
-
-  // Check for potential wrong athlete (very basic)
-  if (query.length < 5) {
-    flags.push('IDENTITY_RISK: query too vague to confirm athlete identity');
-  }
+  if (obscuredOnly) flags.push('BAD_FOOTAGE: all observations obscured — cannot grade from film');
+  if (query.length < 5) flags.push('IDENTITY_RISK: query too vague to confirm athlete identity');
 
   return { passed: flags.length === 0, flags };
 }
 
 // ---------------------------------------------------------------------------
-// Squad execute
+// Squad execute — VISION → SIGNAL → COMPLIANCE
 // ---------------------------------------------------------------------------
 
 const profile = {
   id: 'chicken-hawk' as const,
-  name: 'VisionScout Squad',
-  role: 'Video/Footage Assessment Squad (3 Lil_Hawks)',
+  name: 'VISION_SCOUT_SQUAD',
+  role: 'Video/Footage Assessment Squad (VISION → SIGNAL → COMPLIANCE)',
   capabilities: [
     { name: 'footage-extraction', weight: 1.0 },
     { name: 'film-signal-generation', weight: 0.95 },
@@ -218,42 +196,30 @@ const profile = {
 };
 
 async function execute(input: AgentTaskInput): Promise<AgentTaskOutput> {
-  logger.info({ taskId: input.taskId }, '[VisionScoutSquad] Squad activated');
+  logger.info({ taskId: input.taskId }, '[VISION_SCOUT_SQUAD] Squad activated');
   const logs: string[] = [];
 
   try {
     const hasFootage = input.context?.hasFootage !== false;
 
     if (!hasFootage) {
-      logs.push('[VisionScout] No footage available — skipping video assessment');
-      return makeOutput(
-        input.taskId,
-        'chicken-hawk',
-        'Video assessment skipped — no footage available. Grading will use stats + text only.',
-        [],
-        logs,
-        0,
-        0,
-      );
+      logs.push('[VISION_LIL_HAWK] No footage available — skipping video assessment');
+      return makeOutput(input.taskId, 'chicken-hawk', 'Video assessment skipped — no footage available. Grading will use stats + text only.', [], logs, 0, 0);
     }
 
-    // Phase 1: VisionScout extracts
-    logger.info({ taskId: input.taskId }, '[Lil_VisionScout] Extracting observations');
+    logger.info({ taskId: input.taskId }, '[VISION_LIL_HAWK] Extracting observations');
     const observations = extractObservations(input.query);
-    logs.push(`[VisionScout] Extracted ${observations.length} observations`);
+    logs.push(`[VISION_LIL_HAWK] Extracted ${observations.length} observations`);
 
-    // Phase 2: FrameJudge converts to signals
-    logger.info({ taskId: input.taskId }, '[Lil_FrameJudge] Converting to film signals');
+    logger.info({ taskId: input.taskId }, '[SIGNAL_LIL_HAWK] Converting to film signals');
     const signals = convertToSignals(observations);
-    logs.push(`[FrameJudge] Generated ${signals.length} film signals`);
+    logs.push(`[SIGNAL_LIL_HAWK] Generated ${signals.length} film signals`);
 
-    // VL-JEPA semantic check
     await VLJEPA.verifySemanticConsistency(input.intent, input.query);
 
-    // Phase 3: WhoaThere compliance gate
-    logger.info({ taskId: input.taskId }, '[Lil_WhoaThere] Running compliance gate');
+    logger.info({ taskId: input.taskId }, '[COMPLIANCE_LIL_HAWK] Running compliance gate');
     const compliance = complianceGate(observations, signals, input.query);
-    logs.push(`[WhoaThere] Compliance: ${compliance.passed ? 'PASS' : 'FLAGGED'} (${compliance.flags.length} flags)`);
+    logs.push(`[COMPLIANCE_LIL_HAWK] Compliance: ${compliance.passed ? 'PASS' : 'FLAGGED'} (${compliance.flags.length} flags)`);
 
     const overallFilmGrade = compliance.passed
       ? Math.round(signals.reduce((a, s) => a + s.value, 0) / signals.length)
@@ -262,8 +228,7 @@ async function execute(input: AgentTaskInput): Promise<AgentTaskOutput> {
     const assessment: VisionAssessment = {
       athleteId: input.context?.athleteId as string || 'unknown',
       footageAvailable: true,
-      observations,
-      signals,
+      observations, signals,
       complianceFlags: compliance.flags,
       overallFilmGrade,
     };
@@ -276,18 +241,7 @@ async function execute(input: AgentTaskInput): Promise<AgentTaskOutput> {
       compliance.flags.length > 0 ? `Flags: ${compliance.flags.join('; ')}` : 'No compliance flags',
     ].join('\n');
 
-    const tokens = observations.length * 150;
-    const usd = tokens * 0.00003;
-
-    return makeOutput(
-      input.taskId,
-      'chicken-hawk',
-      summary,
-      [`[assessment] ${JSON.stringify(assessment)}`],
-      logs,
-      tokens,
-      usd,
-    );
+    return makeOutput(input.taskId, 'chicken-hawk', summary, [`[assessment] ${JSON.stringify(assessment)}`], logs, observations.length * 150, observations.length * 150 * 0.00003);
   } catch (err) {
     return failOutput(input.taskId, 'chicken-hawk', err instanceof Error ? err.message : 'Unknown error');
   }

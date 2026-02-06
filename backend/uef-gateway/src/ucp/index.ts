@@ -7,7 +7,7 @@ export interface LUCComponentEstimate {
   componentName: string; // e.g., "Frontend", "Backend"
   tokens: number;
   usd: number;
-  model: string; // e.g., "kimi-k2.5", "gpt-4"
+  model: string; // e.g., "claude-sonnet-4.5", "claude-opus-4.6"
 }
 
 export interface LUCCostEstimate {

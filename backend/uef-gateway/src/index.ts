@@ -11,6 +11,7 @@ import { cardStyleRegistry } from './perform/registry/card-styles';
 import { runAthletePageFactory } from './perform/pipeline/athlete-page-factory';
 import { SQUAD_PROFILES } from './agents/lil-hawks/workflow-smith-squad';
 import { VISION_SQUAD_PROFILES } from './agents/lil-hawks/vision-scout-squad';
+import { PREP_SQUAD_PROFILES, runPrepSquad } from './agents/lil-hawks/prep-squad-alpha';
 import logger from './logger';
 
 const app = express();
@@ -70,6 +71,7 @@ app.post('/perform/athlete', async (req, res) => {
 app.get('/lil-hawks', (_req, res) => {
   res.json({
     squads: {
+      'prep-squad-alpha': PREP_SQUAD_PROFILES,
       'workflow-smith': SQUAD_PROFILES,
       'vision-scout': VISION_SQUAD_PROFILES,
     },
@@ -182,13 +184,16 @@ app.post('/ingress/acp', async (req, res) => {
 
     logger.info({ reqId: acpReq.reqId, intent: acpReq.intent }, '[UEF] Received ACP Request');
 
-    // 1. Build execution plan
+    // 1. PREP_SQUAD_ALPHA — Pre-execution intelligence pipeline
+    const prepPacket = await runPrepSquad(acpReq.naturalLanguage, acpReq.reqId);
+
+    // 2. Build execution plan (enriched by prep packet)
     const executionPlan = buildExecutionPlan(acpReq.intent, acpReq.naturalLanguage);
 
-    // 2. LUC cost estimate
+    // 3. LUC cost estimate
     const quote = LUCEngine.estimate(acpReq.naturalLanguage);
 
-    // 3. ORACLE 7-Gate pre-flight
+    // 4. ORACLE 7-Gate pre-flight
     const oracleResult = await Oracle.runGates(
       { intent: acpReq.intent, query: acpReq.naturalLanguage, budget: acpReq.budget },
       { quote }
@@ -196,9 +201,9 @@ app.post('/ingress/acp', async (req, res) => {
 
     logger.info({ passed: oracleResult.passed, score: oracleResult.score }, '[UEF] ORACLE result');
 
-    // 4. Agent dispatch (only if ORACLE passes)
+    // 5. Agent dispatch (only if ORACLE passes AND policy is cleared)
     let agentResult = { executed: false, agentOutputs: [] as Array<{ status: string; agentId: string; result: { summary: string; artifacts: string[] } }>, primaryAgent: null as string | null };
-    if (oracleResult.passed) {
+    if (oracleResult.passed && prepPacket.policyManifest.cleared) {
       agentResult = await routeToAgents(
         acpReq.intent,
         acpReq.naturalLanguage,
@@ -207,7 +212,7 @@ app.post('/ingress/acp', async (req, res) => {
       );
     }
 
-    // 5. Construct response
+    // 6. Construct response
     const response: ACPResponse = {
       reqId: acpReq.reqId,
       status: oracleResult.passed ? 'SUCCESS' : 'ERROR',
@@ -216,8 +221,19 @@ app.post('/ingress/acp', async (req, res) => {
       executionPlan: executionPlan,
     };
 
-    // Attach agent outputs if any executed
+    // Attach prep intelligence + agent outputs
     const payload: Record<string, unknown> = { ...response };
+    payload.prepIntelligence = {
+      packetId: prepPacket.packetId,
+      signals: prepPacket.normalizedIntent.signals,
+      taskCount: prepPacket.taskGraph.totalNodes,
+      riskLevel: prepPacket.policyManifest.riskLevel,
+      tokenClass: prepPacket.costEstimate.tokenClass,
+      engine: prepPacket.routingDecision.engine,
+      executionOwner: prepPacket.routingDecision.executionOwner,
+      cleared: prepPacket.policyManifest.cleared,
+    };
+
     if (agentResult.executed) {
       payload.agentResults = {
         primaryAgent: agentResult.primaryAgent,

@@ -2,6 +2,7 @@ import { cardStyleRegistry, BRYCE_YOUNG_CLASSIC } from '../perform/registry/card
 import { runAthletePageFactory } from '../perform/pipeline/athlete-page-factory';
 import { WorkflowSmithSquad } from '../agents/lil-hawks/workflow-smith-squad';
 import { VisionScoutSquad } from '../agents/lil-hawks/vision-scout-squad';
+import { runPrepSquad, PREP_SQUAD_PROFILES } from '../agents/lil-hawks/prep-squad-alpha';
 
 describe('CardStyleRegistry', () => {
   it('has BryceYoung_Classic as default style', () => {
@@ -103,10 +104,10 @@ describe('WorkflowSmith Squad', () => {
     expect(result.status).toBe('COMPLETED');
     expect(result.result.summary).toContain('Workflow');
     expect(result.result.logs.length).toBeGreaterThan(0);
-    expect(result.result.logs.some(l => l.includes('[WorkflowSmith]'))).toBe(true);
-    expect(result.result.logs.some(l => l.includes('[Checkmark]'))).toBe(true);
-    expect(result.result.logs.some(l => l.includes('[RedFlag]'))).toBe(true);
-    expect(result.result.logs.some(l => l.includes('[Lockstep]'))).toBe(true);
+    expect(result.result.logs.some(l => l.includes('[AUTHOR_LIL_HAWK]'))).toBe(true);
+    expect(result.result.logs.some(l => l.includes('[VALIDATE_LIL_HAWK]'))).toBe(true);
+    expect(result.result.logs.some(l => l.includes('[FAILURE_LIL_HAWK]'))).toBe(true);
+    expect(result.result.logs.some(l => l.includes('[GATE_LIL_HAWK]'))).toBe(true);
   });
 
   it('generates a complete workflow for search + render + publish', async () => {
@@ -141,9 +142,9 @@ describe('VisionScout Squad', () => {
     });
     expect(result.status).toBe('COMPLETED');
     expect(result.result.summary).toContain('Film Assessment');
-    expect(result.result.logs.some(l => l.includes('[VisionScout]'))).toBe(true);
-    expect(result.result.logs.some(l => l.includes('[FrameJudge]'))).toBe(true);
-    expect(result.result.logs.some(l => l.includes('[WhoaThere]'))).toBe(true);
+    expect(result.result.logs.some(l => l.includes('[VISION_LIL_HAWK]'))).toBe(true);
+    expect(result.result.logs.some(l => l.includes('[SIGNAL_LIL_HAWK]'))).toBe(true);
+    expect(result.result.logs.some(l => l.includes('[COMPLIANCE_LIL_HAWK]'))).toBe(true);
   });
 
   it('generates film signals for WR footage', async () => {
@@ -154,5 +155,82 @@ describe('VisionScout Squad', () => {
     });
     expect(result.status).toBe('COMPLETED');
     expect(result.result.summary).toContain('Signals');
+  });
+});
+
+describe('PREP_SQUAD_ALPHA', () => {
+  it('has 6 hawk profiles', () => {
+    expect(PREP_SQUAD_PROFILES).toHaveLength(6);
+    const ids = PREP_SQUAD_PROFILES.map(p => p.id);
+    expect(ids).toContain('INTAKE_LIL_HAWK');
+    expect(ids).toContain('DECOMP_LIL_HAWK');
+    expect(ids).toContain('CONTEXT_LIL_HAWK');
+    expect(ids).toContain('POLICY_LIL_HAWK');
+    expect(ids).toContain('COST_LIL_HAWK');
+    expect(ids).toContain('ROUTER_LIL_HAWK');
+  });
+
+  it('all hawks belong to prep-squad-alpha', () => {
+    for (const profile of PREP_SQUAD_PROFILES) {
+      expect(profile.squad).toBe('prep-squad-alpha');
+    }
+  });
+
+  it('POLICY and COST hawks are gates', () => {
+    const policy = PREP_SQUAD_PROFILES.find(p => p.id === 'POLICY_LIL_HAWK');
+    const cost = PREP_SQUAD_PROFILES.find(p => p.id === 'COST_LIL_HAWK');
+    expect(policy!.gate).toBe(true);
+    expect(cost!.gate).toBe(true);
+  });
+
+  it('produces an execution packet for a BUILD intent', async () => {
+    const packet = await runPrepSquad('Build a landing page with SEO', 'test-req-001');
+
+    expect(packet.packetId).toMatch(/^prep-/);
+    expect(packet.normalizedIntent.signals).toContain('BUILD');
+    expect(packet.taskGraph.totalNodes).toBeGreaterThan(0);
+    expect(packet.taskGraph.entryPoints.length).toBeGreaterThan(0);
+    expect(packet.contextBundle.domains.length).toBeGreaterThan(0);
+    expect(packet.policyManifest.cleared).toBe(true);
+    expect(packet.costEstimate.estimatedTokens).toBeGreaterThan(0);
+    expect(packet.routingDecision.engine).toBeDefined();
+    expect(packet.routingDecision.executionOwner).toBeDefined();
+    expect(packet.timestamp).toBeDefined();
+  });
+
+  it('detects RESEARCH intent and routes to analyst-ang', async () => {
+    const packet = await runPrepSquad('Research competitor pricing models in SaaS market', 'test-req-002');
+
+    expect(packet.normalizedIntent.signals).toContain('RESEARCH');
+    expect(packet.routingDecision.executionOwner).toBe('analyst-ang');
+  });
+
+  it('detects WORKFLOW intent and selects N8N engine', async () => {
+    const packet = await runPrepSquad('Automate n8n workflow for data ingestion pipeline', 'test-req-003');
+
+    expect(packet.normalizedIntent.signals).toContain('WORKFLOW');
+    expect(packet.routingDecision.engine).toBe('N8N');
+  });
+
+  it('flags ambiguity on vague input', async () => {
+    const packet = await runPrepSquad('hi', 'test-req-004');
+
+    expect(packet.normalizedIntent.ambiguities.length).toBeGreaterThan(0);
+    expect(packet.policyManifest.cleared).toBe(false);
+    expect(packet.policyManifest.blockers.length).toBeGreaterThan(0);
+  });
+
+  it('flags HIGH risk for destructive intents', async () => {
+    const packet = await runPrepSquad('Delete all user data and drop the database', 'test-req-005');
+
+    expect(packet.policyManifest.riskLevel).toBe('HIGH');
+    expect(packet.policyManifest.sandboxRequired).toBe(true);
+  });
+
+  it('computes critical path through task graph', async () => {
+    const packet = await runPrepSquad('Build and deploy a full-stack dashboard with API endpoints', 'test-req-006');
+
+    expect(packet.taskGraph.criticalPath.length).toBeGreaterThan(1);
+    expect(packet.taskGraph.criticalPath.length).toBeLessThanOrEqual(packet.taskGraph.totalNodes);
   });
 });

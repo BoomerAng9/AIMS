@@ -46,7 +46,7 @@ async function execute(input: AgentTaskInput): Promise<AgentTaskOutput> {
 
     // 5. Estimate cost
     const tokens = analysis.complexity * 500;
-    const usd = tokens * 0.00003; // GPT-4 rate
+    const usd = tokens * 0.00003; // Claude Opus 4.6 rate
 
     const summary = [
       `Build plan for: ${analysis.type}`,

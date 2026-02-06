@@ -1,15 +1,15 @@
 /**
- * WorkflowSmith Squad — n8n Workflow Integrity Specialists
+ * WORKFLOW_SMITH_SQUAD — n8n Workflow Integrity Specialists
  *
  * Four Lil_Hawks that ensure every n8n workflow is safe, tested,
  * and auditable before deployment.
  *
- *   Lil_WorkflowSmith_Hawk — authors n8n workflows (node graph + params)
- *   Lil_Checkmark_Hawk     — validates schema + node configs + required fields
- *   Lil_RedFlag_Hawk       — hunts failure paths, infinite loops, rate-limit bombs
- *   Lil_Lockstep_Hawk      — final gate: "no deploy unless deterministic + audited"
+ *   AUTHOR_LIL_HAWK    — authors n8n workflows (node graph + params)
+ *   VALIDATE_LIL_HAWK  — validates schema + node configs + required fields
+ *   FAILURE_LIL_HAWK   — hunts failure paths, infinite loops, rate-limit bombs
+ *   GATE_LIL_HAWK      — final gate: "no deploy unless deterministic + audited"
  *
- * All four operate under Chicken Hawk command.
+ * Doctrine: "Activity breeds Activity — shipped beats perfect."
  */
 
 import { v4 as uuidv4 } from 'uuid';
@@ -25,34 +25,34 @@ import {
 } from './types';
 
 // ---------------------------------------------------------------------------
-// Squad profiles
+// Squad profiles — canonical NAME_LIL_HAWK convention
 // ---------------------------------------------------------------------------
 
 export const SQUAD_PROFILES: LilHawkProfile[] = [
   {
-    id: 'lil-workflowsmith-hawk',
-    name: 'Lil_WorkflowSmith_Hawk',
+    id: 'AUTHOR_LIL_HAWK',
+    name: 'AUTHOR_LIL_HAWK',
     squad: 'workflow-smith',
     role: 'Workflow Author — designs n8n node graphs with params and connections',
     gate: false,
   },
   {
-    id: 'lil-checkmark-hawk',
-    name: 'Lil_Checkmark_Hawk',
+    id: 'VALIDATE_LIL_HAWK',
+    name: 'VALIDATE_LIL_HAWK',
     squad: 'workflow-smith',
     role: 'Schema Validator — checks node configs, required fields, type contracts',
     gate: true,
   },
   {
-    id: 'lil-redflag-hawk',
-    name: 'Lil_RedFlag_Hawk',
+    id: 'FAILURE_LIL_HAWK',
+    name: 'FAILURE_LIL_HAWK',
     squad: 'workflow-smith',
     role: 'Failure Hunter — finds infinite loops, rate-limit bombs, bad retries, unhandled errors',
     gate: true,
   },
   {
-    id: 'lil-lockstep-hawk',
-    name: 'Lil_Lockstep_Hawk',
+    id: 'GATE_LIL_HAWK',
+    name: 'GATE_LIL_HAWK',
     squad: 'workflow-smith',
     role: 'Final Gate — signs off only when deterministic + audited + versioned',
     gate: true,
@@ -60,17 +60,15 @@ export const SQUAD_PROFILES: LilHawkProfile[] = [
 ];
 
 // ---------------------------------------------------------------------------
-// WorkflowSmith — authors the workflow
+// AUTHOR_LIL_HAWK — authors the workflow
 // ---------------------------------------------------------------------------
 
 function authorWorkflow(query: string): { workflowJson: Record<string, unknown>; manifest: WorkflowManifest } {
   const lower = query.toLowerCase();
   const nodes: Array<{ type: string; name: string; params: Record<string, unknown> }> = [];
 
-  // Trigger
   nodes.push({ type: 'n8n-nodes-base.webhook', name: 'Webhook Trigger', params: { path: '/trigger', method: 'POST' } });
 
-  // Determine workflow shape from intent
   if (lower.includes('ingest') || lower.includes('data') || lower.includes('csv')) {
     nodes.push({ type: 'n8n-nodes-base.readBinaryFiles', name: 'Read CSV', params: { fileSelector: '*.csv' } });
     nodes.push({ type: 'n8n-nodes-base.spreadsheetFile', name: 'Parse CSV', params: { operation: 'fromFile' } });
@@ -90,7 +88,6 @@ function authorWorkflow(query: string): { workflowJson: Record<string, unknown>;
     nodes.push({ type: 'n8n-nodes-base.httpRequest', name: 'Publish to CDN', params: { url: '/api/publish', method: 'POST' } });
   }
 
-  // Always end with a response
   nodes.push({ type: 'n8n-nodes-base.respondToWebhook', name: 'Return Result', params: {} });
 
   const workflowId = `wf-${uuidv4().slice(0, 8)}`;
@@ -98,15 +95,8 @@ function authorWorkflow(query: string): { workflowJson: Record<string, unknown>;
   const workflowJson = {
     id: workflowId,
     name: `PerForm Pipeline - ${new Date().toISOString().slice(0, 10)}`,
-    nodes: nodes.map((n, i) => ({
-      ...n,
-      id: `node-${i}`,
-      position: [250 + i * 200, 300],
-    })),
-    connections: nodes.slice(0, -1).map((_, i) => ({
-      from: `node-${i}`,
-      to: `node-${i + 1}`,
-    })),
+    nodes: nodes.map((n, i) => ({ ...n, id: `node-${i}`, position: [250 + i * 200, 300] })),
+    connections: nodes.slice(0, -1).map((_, i) => ({ from: `node-${i}`, to: `node-${i + 1}` })),
     settings: { executionOrder: 'v1' },
   };
 
@@ -146,7 +136,7 @@ function detectSecrets(nodes: Array<{ name: string }>): string[] {
 }
 
 // ---------------------------------------------------------------------------
-// Checkmark — validates schema
+// VALIDATE_LIL_HAWK — validates schema
 // ---------------------------------------------------------------------------
 
 function validateWorkflow(
@@ -156,32 +146,15 @@ function validateWorkflow(
   const issues: string[] = [];
   const nodes = workflowJson.nodes as Array<Record<string, unknown>> | undefined;
 
-  if (!nodes || nodes.length === 0) {
-    issues.push('Workflow has no nodes');
-  }
+  if (!nodes || nodes.length === 0) issues.push('Workflow has no nodes');
+  if (manifest.nodeCount < 2) issues.push('Workflow must have at least trigger + response nodes');
+  if (!manifest.name || manifest.name.length < 3) issues.push('Workflow name is missing or too short');
+  if (manifest.inputs.length === 0) issues.push('No inputs defined — workflow has no entry contract');
+  if (manifest.outputs.length === 0) issues.push('No outputs defined — workflow produces nothing');
 
-  if (manifest.nodeCount < 2) {
-    issues.push('Workflow must have at least trigger + response nodes');
-  }
-
-  if (!manifest.name || manifest.name.length < 3) {
-    issues.push('Workflow name is missing or too short');
-  }
-
-  if (manifest.inputs.length === 0) {
-    issues.push('No inputs defined — workflow has no entry contract');
-  }
-
-  if (manifest.outputs.length === 0) {
-    issues.push('No outputs defined — workflow produces nothing');
-  }
-
-  // Check all required secrets are listed
   if (manifest.secretsRequired.length > 0) {
     for (const secret of manifest.secretsRequired) {
-      if (!secret || secret.length < 3) {
-        issues.push(`Secret "${secret}" has invalid name`);
-      }
+      if (!secret || secret.length < 3) issues.push(`Secret "${secret}" has invalid name`);
     }
   }
 
@@ -189,49 +162,24 @@ function validateWorkflow(
 }
 
 // ---------------------------------------------------------------------------
-// RedFlag — hunts failure paths
+// FAILURE_LIL_HAWK — hunts failure paths
 // ---------------------------------------------------------------------------
 
-function huntFailures(
-  workflowJson: Record<string, unknown>,
-  _manifest: WorkflowManifest
-): FailureCase[] {
+function huntFailures(workflowJson: Record<string, unknown>, _manifest: WorkflowManifest): FailureCase[] {
   const failures: FailureCase[] = [];
   const nodes = (workflowJson.nodes as Array<Record<string, unknown>>) || [];
 
-  // Check for HTTP nodes without error handling
   const httpNodes = nodes.filter(n => (n.type as string || '').includes('httpRequest'));
   for (const node of httpNodes) {
-    failures.push({
-      scenario: `${node.name} returns non-200`,
-      trigger: 'External API failure or timeout',
-      impact: 'HIGH',
-      mitigation: 'Add error branch with retry (max 3, exponential backoff)',
-      handled: false,
-    });
-
-    failures.push({
-      scenario: `${node.name} rate-limited (429)`,
-      trigger: 'Too many requests to external API',
-      impact: 'MEDIUM',
-      mitigation: 'Implement rate-limit backoff (wait + retry)',
-      handled: false,
-    });
+    failures.push({ scenario: `${node.name} returns non-200`, trigger: 'External API failure or timeout', impact: 'HIGH', mitigation: 'Add error branch with retry (max 3, exponential backoff)', handled: false });
+    failures.push({ scenario: `${node.name} rate-limited (429)`, trigger: 'Too many requests to external API', impact: 'MEDIUM', mitigation: 'Implement rate-limit backoff (wait + retry)', handled: false });
   }
 
-  // Check for DB nodes without error handling
   const dbNodes = nodes.filter(n => (n.type as string || '').includes('postgres'));
   for (const node of dbNodes) {
-    failures.push({
-      scenario: `${node.name} insert fails (duplicate key or constraint violation)`,
-      trigger: 'Data integrity violation',
-      impact: 'HIGH',
-      mitigation: 'Use upsert or check-before-insert pattern',
-      handled: false,
-    });
+    failures.push({ scenario: `${node.name} insert fails (duplicate key or constraint violation)`, trigger: 'Data integrity violation', impact: 'HIGH', mitigation: 'Use upsert or check-before-insert pattern', handled: false });
   }
 
-  // Check for infinite loop potential
   const connections = (workflowJson.connections as Array<Record<string, string>>) || [];
   const backEdges = connections.filter(c => {
     const fromIdx = parseInt((c.from as string).split('-')[1] || '0');
@@ -239,44 +187,24 @@ function huntFailures(
     return toIdx <= fromIdx;
   });
   if (backEdges.length > 0) {
-    failures.push({
-      scenario: 'Potential infinite loop detected (back-edge in connection graph)',
-      trigger: 'Cyclic workflow execution',
-      impact: 'CRITICAL',
-      mitigation: 'Add loop counter with max iterations (e.g., 100) and emergency break',
-      handled: false,
-    });
+    failures.push({ scenario: 'Potential infinite loop detected (back-edge in connection graph)', trigger: 'Cyclic workflow execution', impact: 'CRITICAL', mitigation: 'Add loop counter with max iterations (e.g., 100) and emergency break', handled: false });
   }
 
-  // Parse node could receive malformed data
   const parseNodes = nodes.filter(n => (n.name as string || '').toLowerCase().includes('parse'));
   for (const node of parseNodes) {
-    failures.push({
-      scenario: `${node.name} receives malformed input`,
-      trigger: 'Upstream node returns unexpected format',
-      impact: 'MEDIUM',
-      mitigation: 'Add schema validation before parse step',
-      handled: false,
-    });
+    failures.push({ scenario: `${node.name} receives malformed input`, trigger: 'Upstream node returns unexpected format', impact: 'MEDIUM', mitigation: 'Add schema validation before parse step', handled: false });
   }
 
-  // Empty result from search
   const searchNodes = nodes.filter(n => (n.name as string || '').toLowerCase().includes('search'));
   for (const node of searchNodes) {
-    failures.push({
-      scenario: `${node.name} returns 0 results`,
-      trigger: 'No matching data found',
-      impact: 'LOW',
-      mitigation: 'Branch: if empty → use fallback data or skip enrichment',
-      handled: false,
-    });
+    failures.push({ scenario: `${node.name} returns 0 results`, trigger: 'No matching data found', impact: 'LOW', mitigation: 'Branch: if empty → use fallback data or skip enrichment', handled: false });
   }
 
   return failures;
 }
 
 // ---------------------------------------------------------------------------
-// Lockstep — final gate
+// GATE_LIL_HAWK — final gate
 // ---------------------------------------------------------------------------
 
 function finalGate(
@@ -287,29 +215,17 @@ function finalGate(
 ): { approved: boolean; reasons: string[]; stamp: VersionStamp } {
   const reasons: string[] = [];
 
-  if (!validation.valid) {
-    reasons.push(`Schema validation failed: ${validation.issues.join('; ')}`);
-  }
-
+  if (!validation.valid) reasons.push(`Schema validation failed: ${validation.issues.join('; ')}`);
   const criticalUnhandled = failures.filter(f => f.impact === 'CRITICAL' && !f.handled);
-  if (criticalUnhandled.length > 0) {
-    reasons.push(`${criticalUnhandled.length} CRITICAL unhandled failure path(s)`);
-  }
-
-  if (testPack.cases.length === 0) {
-    reasons.push('No test cases defined — cannot verify correctness');
-  }
-
-  if (testPack.coveragePercent < 50) {
-    reasons.push(`Test coverage too low: ${testPack.coveragePercent}% (minimum: 50%)`);
-  }
+  if (criticalUnhandled.length > 0) reasons.push(`${criticalUnhandled.length} CRITICAL unhandled failure path(s)`);
+  if (testPack.cases.length === 0) reasons.push('No test cases defined — cannot verify correctness');
+  if (testPack.coveragePercent < 50) reasons.push(`Test coverage too low: ${testPack.coveragePercent}% (minimum: 50%)`);
 
   const approved = reasons.length === 0;
-
   const stamp: VersionStamp = {
     version: '1.0.0',
-    author: 'lil-workflowsmith-hawk',
-    reviewedBy: ['lil-checkmark-hawk', 'lil-redflag-hawk', 'lil-lockstep-hawk'],
+    author: 'AUTHOR_LIL_HAWK',
+    reviewedBy: ['VALIDATE_LIL_HAWK', 'FAILURE_LIL_HAWK', 'GATE_LIL_HAWK'],
     timestamp: new Date().toISOString(),
     changeSummary: `Workflow "${manifest.name}" — ${approved ? 'APPROVED' : 'BLOCKED'}`,
     checksum: `sha256-${uuidv4().replace(/-/g, '').slice(0, 16)}`,
@@ -319,13 +235,13 @@ function finalGate(
 }
 
 // ---------------------------------------------------------------------------
-// Squad execute — runs all 4 hawks in sequence
+// Squad execute — AUTHOR → VALIDATE → FAILURE → GATE
 // ---------------------------------------------------------------------------
 
 const profile = {
-  id: 'chicken-hawk' as const,  // Reports through Chicken Hawk
-  name: 'WorkflowSmith Squad',
-  role: 'n8n Workflow Integrity Squad (4 Lil_Hawks)',
+  id: 'chicken-hawk' as const,
+  name: 'WORKFLOW_SMITH_SQUAD',
+  role: 'n8n Workflow Integrity Squad (AUTHOR → VALIDATE → FAILURE → GATE)',
   capabilities: [
     { name: 'workflow-authoring', weight: 1.0 },
     { name: 'schema-validation', weight: 0.95 },
@@ -336,69 +252,42 @@ const profile = {
 };
 
 async function execute(input: AgentTaskInput): Promise<AgentTaskOutput> {
-  logger.info({ taskId: input.taskId }, '[WorkflowSmithSquad] Squad activated');
+  logger.info({ taskId: input.taskId }, '[WORKFLOW_SMITH_SQUAD] Squad activated');
   const logs: string[] = [];
 
   try {
-    // Phase 1: WorkflowSmith authors
-    logger.info({ taskId: input.taskId }, '[Lil_WorkflowSmith] Authoring workflow');
+    logger.info({ taskId: input.taskId }, '[AUTHOR_LIL_HAWK] Authoring workflow');
     const { workflowJson, manifest } = authorWorkflow(input.query);
-    logs.push(`[WorkflowSmith] Authored: ${manifest.name} (${manifest.nodeCount} nodes)`);
+    logs.push(`[AUTHOR_LIL_HAWK] Authored: ${manifest.name} (${manifest.nodeCount} nodes)`);
 
-    // Phase 2: Checkmark validates
-    logger.info({ taskId: input.taskId }, '[Lil_Checkmark] Validating schema');
+    logger.info({ taskId: input.taskId }, '[VALIDATE_LIL_HAWK] Validating schema');
     const validation = validateWorkflow(workflowJson, manifest);
-    logs.push(`[Checkmark] Validation: ${validation.valid ? 'PASS' : 'FAIL'} (${validation.issues.length} issues)`);
+    logs.push(`[VALIDATE_LIL_HAWK] Validation: ${validation.valid ? 'PASS' : 'FAIL'} (${validation.issues.length} issues)`);
 
-    // Phase 3: RedFlag hunts failures
-    logger.info({ taskId: input.taskId }, '[Lil_RedFlag] Hunting failure paths');
+    logger.info({ taskId: input.taskId }, '[FAILURE_LIL_HAWK] Hunting failure paths');
     const failures = huntFailures(workflowJson, manifest);
     const criticalCount = failures.filter(f => f.impact === 'CRITICAL').length;
-    logs.push(`[RedFlag] Found ${failures.length} failure paths (${criticalCount} CRITICAL)`);
+    logs.push(`[FAILURE_LIL_HAWK] Found ${failures.length} failure paths (${criticalCount} CRITICAL)`);
 
-    // Phase 4: Generate test pack
     const testPack: TestPack = {
       cases: [
-        {
-          name: 'Happy path — valid athlete',
-          input: { athleteName: 'Bryce Young', cardStyleId: 'bryce-young-classic' },
-          expectedOutput: { status: 'SUCCESS' },
-          expectSuccess: true,
-        },
-        {
-          name: 'Missing athlete name',
-          input: { athleteName: '' },
-          expectedOutput: { status: 'ERROR' },
-          expectSuccess: false,
-        },
-        {
-          name: 'Invalid card style',
-          input: { athleteName: 'Test', cardStyleId: 'nonexistent' },
-          expectedOutput: { status: 'SUCCESS' }, // should fall back to default
-          expectSuccess: true,
-        },
+        { name: 'Happy path — valid athlete', input: { athleteName: 'Bryce Young', cardStyleId: 'bryce-young-classic' }, expectedOutput: { status: 'SUCCESS' }, expectSuccess: true },
+        { name: 'Missing athlete name', input: { athleteName: '' }, expectedOutput: { status: 'ERROR' }, expectSuccess: false },
+        { name: 'Invalid card style', input: { athleteName: 'Test', cardStyleId: 'nonexistent' }, expectedOutput: { status: 'SUCCESS' }, expectSuccess: true },
       ],
       coveragePercent: 65,
     };
     logs.push(`[TestPack] ${testPack.cases.length} test cases, ${testPack.coveragePercent}% coverage`);
 
-    // Phase 5: Lockstep final gate
-    logger.info({ taskId: input.taskId }, '[Lil_Lockstep] Running final gate');
+    logger.info({ taskId: input.taskId }, '[GATE_LIL_HAWK] Running final gate');
     const gate = finalGate(validation, failures, manifest, testPack);
-    logs.push(`[Lockstep] ${gate.approved ? 'APPROVED' : 'BLOCKED'}: ${gate.reasons.length > 0 ? gate.reasons.join('; ') : 'All checks pass'}`);
+    logs.push(`[GATE_LIL_HAWK] ${gate.approved ? 'APPROVED' : 'BLOCKED'}: ${gate.reasons.length > 0 ? gate.reasons.join('; ') : 'All checks pass'}`);
     logs.push(`[VersionStamp] ${gate.stamp.version} @ ${gate.stamp.timestamp}`);
 
-    const artifacts: WorkflowArtifacts = {
-      workflowJson,
-      manifest,
-      testPack,
-      failureMatrix: failures,
-      versionStamp: gate.stamp,
-    };
+    const artifacts: WorkflowArtifacts = { workflowJson, manifest, testPack, failureMatrix: failures, versionStamp: gate.stamp };
 
     const summary = [
-      `Workflow: ${manifest.name}`,
-      `Nodes: ${manifest.nodeCount}`,
+      `Workflow: ${manifest.name}`, `Nodes: ${manifest.nodeCount}`,
       `Dependencies: ${manifest.dependencies.join(', ') || 'none'}`,
       `Secrets required: ${manifest.secretsRequired.join(', ') || 'none'}`,
       `Validation: ${validation.valid ? 'PASS' : 'FAIL'}`,
@@ -407,18 +296,7 @@ async function execute(input: AgentTaskInput): Promise<AgentTaskOutput> {
       `Gate: ${gate.approved ? 'APPROVED' : 'BLOCKED'}`,
     ].join('\n');
 
-    const tokens = manifest.nodeCount * 200;
-    const usd = tokens * 0.00003;
-
-    return makeOutput(
-      input.taskId,
-      'chicken-hawk',
-      summary,
-      [`[workflow] ${JSON.stringify(artifacts.manifest)}`, `[version] ${gate.stamp.version}`],
-      logs,
-      tokens,
-      usd,
-    );
+    return makeOutput(input.taskId, 'chicken-hawk', summary, [`[workflow] ${JSON.stringify(artifacts.manifest)}`, `[version] ${gate.stamp.version}`], logs, manifest.nodeCount * 200, manifest.nodeCount * 200 * 0.00003);
   } catch (err) {
     return failOutput(input.taskId, 'chicken-hawk', err instanceof Error ? err.message : 'Unknown error');
   }

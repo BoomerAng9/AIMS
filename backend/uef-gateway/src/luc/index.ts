@@ -7,15 +7,15 @@ import { LUCCostEstimate, LUCComponentEstimate, UCPQuote } from '../ucp';
 
 export class LUCEngine {
   
-  static estimate(featureSpec: string, models: string[] = ['kimi-k2.5', 'gpt-4']): UCPQuote {
+  static estimate(featureSpec: string, models: string[] = ['claude-sonnet-4.5', 'claude-opus-4.6']): UCPQuote {
     // STUB: Real logic would analyze the featureSpec depth.
     // Here we use heuristic multiplier based on string length.
-    
+
     const complexityBase = Math.min(featureSpec.length * 0.5, 5000); // simplistic token heuristic
-    
+
     const variants = models.map(model => {
-      const isCheap = model.includes('kimi');
-      const costPer1k = isCheap ? 0.002 : 0.03;
+      const isFast = model.includes('sonnet');
+      const costPer1k = isFast ? 0.003 : 0.015;
       
       const componentEstimates: LUCComponentEstimate[] = [
         {
@@ -50,7 +50,7 @@ export class LUCEngine {
       };
 
       return {
-        name: isCheap ? 'Standard (Kimi)' : 'Premium (GPT-4)',
+        name: isFast ? 'Fast (Sonnet 4.5)' : 'Premium (Opus 4.6)',
         estimate
       };
     });

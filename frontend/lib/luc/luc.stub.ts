@@ -25,9 +25,9 @@ export function getLucEstimateStub(query: string = "default"): LucEstimate {
       { label: "ByteRover Memory & Storage", usd: 1.75, tokens: 50000 },
     ],
     modelOptions: [
-      { name: "Gemini 1.5 Flash", description: "Default, fast, efficient", costMultiplier: 1 },
-      { name: "Kimi K2.5", description: "Complex business reasoning", costMultiplier: 1.5 },
-      { name: "Gemini 1.5 Pro", description: "High-precision strategy", costMultiplier: 3 },
+      { name: "Claude Sonnet 4.5", description: "Fast, efficient, default", costMultiplier: 1 },
+      { name: "Claude Opus 4.6", description: "Complex business reasoning", costMultiplier: 1.5 },
+      { name: "Gemini 2.5 Pro", description: "High-precision strategy", costMultiplier: 3 },
     ]
   };
 }
