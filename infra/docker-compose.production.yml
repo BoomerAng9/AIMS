@@ -276,8 +276,9 @@ services:
 
   # OpenClaw - AI Agent (Sandboxed)
   # SECURITY: Runs in isolated network with no payment access
+  # Version: 2026.2.3 (Released Feb 5, 2026)
   openclaw:
-    image: ghcr.io/openclaw/openclaw:latest
+    image: ghcr.io/openclaw/openclaw:2026.2.3
     container_name: aims-openclaw
     environment:
       - NODE_ENV=production
@@ -287,25 +288,38 @@ services:
       # Sandbox mode REQUIRED
       - AGENTS_DEFAULTS_SANDBOX_MODE=docker
       - AGENTS_DEFAULTS_SANDBOX_SCOPE=agent
+      - SANDBOX_IMAGE=openclaw-sandbox:bookworm-slim
       # DM security
       - DM_POLICY=pairing
       # Disable dangerous features
       - AGENTS_DEFAULTS_TOOLS_BROWSER=false
       - AGENTS_DEFAULTS_TOOLS_CAMERA=false
       - AGENTS_DEFAULTS_ELEVATED=false
-      # Model configuration (via AIMS Model Garden)
+      # Model configuration (via AIMS Model Garden + OpenRouter)
       - MODEL_PROVIDER=openrouter
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
-      # Default to KIMI K2.5 (Chinese model with strong reasoning)
+      # Default to KIMI K2.5 (strong reasoning, cost-effective)
       - DEFAULT_MODEL=moonshot/kimi-k2.5
-      - FALLBACK_MODEL=anthropic/claude-sonnet-4
+      - FALLBACK_MODEL=anthropic/claude-sonnet-4.5
+      # Cloudflare AI Gateway (v2026.2.3 feature)
+      - CLOUDFLARE_AI_GATEWAY_ENABLED=${CLOUDFLARE_AI_GATEWAY_ENABLED:-false}
+      - CLOUDFLARE_AI_GATEWAY_URL=${CLOUDFLARE_AI_GATEWAY_URL:-}
+      - CLOUDFLARE_AI_GATEWAY_TOKEN=${CLOUDFLARE_AI_GATEWAY_TOKEN:-}
+      # Agents Dashboard (v2026.2.3 feature)
+      - AGENTS_DASHBOARD_ENABLED=true
+      - AGENTS_DASHBOARD_PORT=8002
+      # Response prefix per-channel (v2026.2.3 feature)
+      - RESPONSE_PREFIX_DEFAULT=[A.I.M.S.]
       # Logging
       - LOG_LEVEL=warn
+      - LOG_FORMAT=json
     volumes:
       - openclaw-data:/home/node/.openclaw
       - openclaw-workspace:/home/node/workspace
       # Read-only shared workspace
       - shared-workspace:/shared:ro
+      # Mount Docker socket for sandbox containers
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
       # Only sandbox network - NO AIMS NETWORK ACCESS
       - sandbox-network
@@ -331,21 +345,26 @@ services:
           cpus: '0.5'
           memory: 1G
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8001/health"]
       interval: 60s
       timeout: 30s
       retries: 3
+      start_period: 30s
 
   # OpenClaw Sandbox Image (for tool execution)
+  # Compatible with OpenClaw v2026.2.3 - Node.js 24 based
   openclaw-sandbox:
     build:
       context: ./openclaw-sandbox
       dockerfile: Dockerfile
     image: openclaw-sandbox:bookworm-slim
     container_name: aims-openclaw-sandbox-build
-    command: ["echo", "Sandbox image built successfully"]
+    command: ["echo", "Sandbox image built successfully for OpenClaw v2026.2.3"]
     networks:
       - sandbox-network
+    # Build-only service - used as base image for OpenClaw agent sandboxes
+    profiles:
+      - build
 
   # Agent Gateway Bridge - Controlled access between networks
   agent-bridge:
