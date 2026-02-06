@@ -1,0 +1,260 @@
+{
+  "$schema": "https://aims.dev/schemas/chicken-hawk-dispatch.json",
+  "name": "Chicken_Hawk Dispatch Interface",
+  "version": "1.0.0",
+  "description": "API contract for Chicken_Hawk execution engine receiving commands from ACHEEVY",
+
+  "identity": {
+    "mascot": "Chicken_Hawk",
+    "role": "Deploy Execution Engine",
+    "governance_position": "Receives contracts from ACHEEVY/Boomer_Ang, spawns Squad/Lil_Hawks",
+    "canonical_id_pattern": "Chicken_Hawk_<EnvironmentId>",
+    "evolution_levels": ["base", "powered", "maxPower"]
+  },
+
+  "endpoints": {
+    "/shift/spawn": {
+      "method": "POST",
+      "description": "Create a new Shift with Squad and Lil_Hawks",
+      "request": {
+        "manifest": {"type": "object", "required": true},
+        "dsp": {"type": "object", "required": true, "description": "Deploy Security Packet"},
+        "squad_size": {"type": "integer", "default": 4},
+        "crew_specialties": {"type": "array", "items": {"type": "string"}}
+      },
+      "response": {
+        "shift_id": {"type": "string", "pattern": "^SH-[A-Z0-9]{8}$"},
+        "squad": {
+          "squad_id": {"type": "string", "pattern": "^Squad_SH-[A-Z0-9]{8}-[0-9]{3}$"},
+          "lil_hawks": {
+            "type": "array",
+            "items": {
+              "canonical_id": {"type": "string"},
+              "persona_handle": {"type": "string"},
+              "designation": {"type": "string"},
+              "career_level": {"type": "string"},
+              "assigned_capability": {"type": "string"}
+            }
+          }
+        },
+        "estimated_waves": {"type": "integer"},
+        "dsp_status": {"type": "string", "enum": ["active"]}
+      },
+      "side_effects": [
+        "Creates Squad record",
+        "Spawns Lil_Hawk instances",
+        "Activates DSP",
+        "Initializes KYB flight recorder stream"
+      ]
+    },
+
+    "/shift/{shiftId}/wave/execute": {
+      "method": "POST",
+      "description": "Execute a wave of operations",
+      "path_params": {
+        "shiftId": {"type": "string", "required": true}
+      },
+      "request": {
+        "wave_number": {"type": "integer", "required": true},
+        "steps": {
+          "type": "array",
+          "items": {
+            "capability_id": {"type": "string"},
+            "action": {"type": "string"},
+            "params": {"type": "object"},
+            "assigned_lil_hawk": {"type": "string"}
+          }
+        }
+      },
+      "response": {
+        "wave_result": {"type": "string", "enum": ["success", "partial", "failed"]},
+        "steps_completed": {"type": "integer"},
+        "steps_failed": {"type": "integer"},
+        "step_results": {
+          "type": "array",
+          "items": {
+            "step_index": {"type": "integer"},
+            "lil_hawk": {"type": "string"},
+            "status": {"type": "string"},
+            "output_summary": {"type": "string"},
+            "duration_ms": {"type": "integer"}
+          }
+        },
+        "anomalies": {"type": "array", "items": {"type": "object"}},
+        "captions_generated": {"type": "array", "items": {"type": "string"}}
+      },
+      "side_effects": [
+        "Executes capability operations",
+        "Updates Lil_Hawk performance records",
+        "Emits Live Ops Theater events",
+        "Records to KYB flight recorder"
+      ]
+    },
+
+    "/shift/{shiftId}/verify": {
+      "method": "POST",
+      "description": "Run verification phase",
+      "path_params": {
+        "shiftId": {"type": "string", "required": true}
+      },
+      "request": {
+        "verification_level": {"type": "string", "enum": ["standard", "deep", "oracle"], "default": "standard"}
+      },
+      "response": {
+        "verification_passed": {"type": "boolean"},
+        "checks_run": {"type": "integer"},
+        "checks_passed": {"type": "integer"},
+        "attestation_bundle": {
+          "type": "object",
+          "properties": {
+            "attestations": {"type": "array"},
+            "signatures": {"type": "array"},
+            "timestamp": {"type": "string", "format": "date-time"}
+          }
+        },
+        "discrepancies": {"type": "array", "items": {"type": "object"}}
+      }
+    },
+
+    "/shift/{shiftId}/seal": {
+      "method": "POST",
+      "description": "Finalize Shift and generate sealed receipt",
+      "path_params": {
+        "shiftId": {"type": "string", "required": true}
+      },
+      "response": {
+        "receipt_id": {"type": "string", "pattern": "^RCP-[A-Z0-9]{8}$"},
+        "receipt_hash": {"type": "string", "description": "SHA-256 hash"},
+        "kyb_flight_recorder_pointer": {"type": "string"},
+        "final_metrics": {
+          "type": "object",
+          "properties": {
+            "total_duration_ms": {"type": "integer"},
+            "waves_executed": {"type": "integer"},
+            "steps_completed": {"type": "integer"},
+            "lil_hawks_used": {"type": "integer"},
+            "anomalies_encountered": {"type": "integer"},
+            "rollbacks_performed": {"type": "integer"}
+          }
+        },
+        "shift_status": {"type": "string", "enum": ["completed", "completed_with_warnings", "failed"]}
+      },
+      "side_effects": [
+        "Seals KYB flight recorder",
+        "Updates Lil_Hawk career records",
+        "Archives DSP",
+        "Generates audit trail"
+      ]
+    },
+
+    "/shift/{shiftId}/status": {
+      "method": "GET",
+      "description": "Get current Shift status",
+      "path_params": {
+        "shiftId": {"type": "string", "required": true}
+      },
+      "query_params": {
+        "include_captions": {"type": "boolean", "default": true}
+      },
+      "response": {
+        "shift_id": {"type": "string"},
+        "phase": {"type": "string", "enum": ["clock_in", "execution", "verification", "debrief", "clock_out"]},
+        "progress_percent": {"type": "number", "minimum": 0, "maximum": 100},
+        "current_wave": {"type": "integer"},
+        "total_waves": {"type": "integer"},
+        "lil_hawk_statuses": {
+          "type": "array",
+          "items": {
+            "persona_handle": {"type": "string"},
+            "status": {"type": "string", "enum": ["idle", "working", "verifying", "complete"]},
+            "current_task": {"type": "string"}
+          }
+        },
+        "recent_captions": {"type": "array", "items": {"type": "string"}},
+        "security_indicators": {
+          "type": "object",
+          "properties": {
+            "mtls": {"type": "boolean"},
+            "allowlist_enforced": {"type": "boolean"},
+            "scans_passed": {"type": "boolean"},
+            "attestation_valid": {"type": "boolean"}
+          }
+        }
+      }
+    },
+
+    "/shift/{shiftId}/rollback": {
+      "method": "POST",
+      "description": "Initiate rollback",
+      "path_params": {
+        "shiftId": {"type": "string", "required": true}
+      },
+      "request": {
+        "reason": {"type": "string", "required": true},
+        "rollback_to": {"type": "string", "description": "Target state reference"},
+        "confirmation_token": {"type": "string", "required": true}
+      },
+      "response": {
+        "rollback_initiated": {"type": "boolean"},
+        "rollback_id": {"type": "string"},
+        "estimated_duration_ms": {"type": "integer"},
+        "affected_resources": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+
+    "/shift/{shiftId}/kill": {
+      "method": "POST",
+      "description": "Emergency kill switch - halt all operations",
+      "path_params": {
+        "shiftId": {"type": "string", "required": true}
+      },
+      "request": {
+        "reason": {"type": "string", "required": true},
+        "confirmation_token": {"type": "string", "required": true}
+      },
+      "response": {
+        "killed": {"type": "boolean"},
+        "lil_hawks_terminated": {"type": "integer"},
+        "state_preserved": {"type": "boolean"},
+        "incident_id": {"type": "string"}
+      },
+      "audit_required": true
+    }
+  },
+
+  "event_emissions": {
+    "description": "Events emitted to Live Ops Theater",
+    "events": [
+      {"event": "shift.started", "payload": ["shiftId", "squadId", "lilHawkCount", "projectName"]},
+      {"event": "shift.roll_call", "payload": ["shiftId", "lilHawkDesignations", "allPresent"]},
+      {"event": "wave.started", "payload": ["shiftId", "waveNumber", "stepCount"]},
+      {"event": "capability.executing", "payload": ["shiftId", "capabilityId", "lilHawkDesignation"]},
+      {"event": "capability.completed", "payload": ["shiftId", "capabilityId", "result", "durationMs"]},
+      {"event": "caption.generated", "payload": ["shiftId", "lilHawkDesignation", "captionType", "text"]},
+      {"event": "wave.completed", "payload": ["shiftId", "waveNumber", "successCount", "failCount"]},
+      {"event": "verification.started", "payload": ["shiftId", "checkCount"]},
+      {"event": "verification.completed", "payload": ["shiftId", "passed", "discrepancyCount"]},
+      {"event": "incident.detected", "payload": ["shiftId", "severity", "description"]},
+      {"event": "shift.completed", "payload": ["shiftId", "receiptId", "durationMs", "status"]}
+    ],
+    "redaction_applied": true,
+    "secrets_never_emitted": true
+  },
+
+  "lil_hawk_spawning": {
+    "description": "How Chicken_Hawk spawns Lil_Hawks for a Squad",
+    "spawn_rules": [
+      "Select Lil_Hawk types based on manifest capabilities",
+      "Assign persona handles from designation catalog",
+      "Load career record for returning Lil_Hawks",
+      "Initialize new Lil_Hawks at Hatchling level",
+      "Verify certifications against DSP requirements",
+      "Assign mentor for Hatchling-level Lil_Hawks"
+    ],
+    "spawn_limits": {
+      "max_per_squad": 12,
+      "max_concurrent_squads": 4,
+      "hatchling_ratio_max": 0.25
+    }
+  }
+}

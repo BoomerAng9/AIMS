@@ -1,0 +1,297 @@
+{
+  "$schema": "https://aims.dev/schemas/acheevy-tools.json",
+  "name": "ACHEEVY Tool Registry",
+  "version": "1.0.0",
+  "description": "Tools available to ACHEEVY for dispatching work to the Deploy Platform",
+
+  "governance_chain": {
+    "description": "Enforced command hierarchy for all tool executions",
+    "chain": ["ACHEEVY", "Boomer_Ang", "Chicken_Hawk", "Squad", "Lil_Hawks"],
+    "rules": [
+      "ACHEEVY approves plan and presents to user",
+      "Boomer_Ang validates scope against DSP limits",
+      "Contract issued to Chicken_Hawk with ShiftId",
+      "Chicken_Hawk spawns Squad with Lil_Hawks",
+      "Lil_Hawks execute and report to Chicken_Hawk",
+      "Chicken_Hawk reports to ACHEEVY",
+      "ACHEEVY verifies receipt and closes with user"
+    ]
+  },
+
+  "tools": {
+    "deploy_it": {
+      "name": "deploy_it",
+      "description": "Fast dispatch lane - pre-approved operations with low OEI",
+      "category": "deploy",
+      "parameters": {
+        "type": "object",
+        "required": ["project_id", "manifest"],
+        "properties": {
+          "project_id": {"type": "string", "description": "Target project identifier"},
+          "manifest": {"$ref": "#/definitions/manifest"},
+          "environment": {"type": "string", "enum": ["staging", "production"], "default": "staging"}
+        }
+      },
+      "requirements": {
+        "dsp_gates": "pre-approved",
+        "oei": "low",
+        "new_integrations": false,
+        "secrets_scope_expansion": false
+      },
+      "dispatch_to": "Chicken_Hawk",
+      "user_experience": "Watch the crew work, get receipt"
+    },
+
+    "guide_me": {
+      "name": "guide_me",
+      "description": "Consultative lane - requires manifest approval before execution",
+      "category": "deploy",
+      "parameters": {
+        "type": "object",
+        "required": ["project_id", "request_description"],
+        "properties": {
+          "project_id": {"type": "string"},
+          "request_description": {"type": "string"},
+          "uncertainty_factors": {"type": "array", "items": {"type": "string"}}
+        }
+      },
+      "triggers": [
+        "uncertainty_high",
+        "security_packet_requires_hold",
+        "new_integrations",
+        "production_impact",
+        "secrets_scope_expansion",
+        "anomaly_detected"
+      ],
+      "dispatch_to": "Chicken_Hawk",
+      "output": "Manifest for approval, then execution proceeds"
+    },
+
+    "spawn_shift": {
+      "name": "spawn_shift",
+      "description": "Create a new Shift with Squad and Lil_Hawks",
+      "category": "orchestration",
+      "parameters": {
+        "type": "object",
+        "required": ["manifest", "dsp"],
+        "properties": {
+          "manifest": {"$ref": "#/definitions/manifest"},
+          "dsp": {"$ref": "#/definitions/dsp_reference"},
+          "squad_size": {"type": "integer", "minimum": 1, "maximum": 12, "default": 4},
+          "crew_specialties": {"type": "array", "items": {"type": "string"}}
+        }
+      },
+      "dispatch_to": "Chicken_Hawk",
+      "returns": {
+        "shift_id": "string",
+        "squad_id": "string",
+        "lil_hawk_designations": "string[]",
+        "estimated_waves": "integer"
+      }
+    },
+
+    "execute_wave": {
+      "name": "execute_wave",
+      "description": "Execute a single wave of operations within a Shift",
+      "category": "execution",
+      "parameters": {
+        "type": "object",
+        "required": ["shift_id", "wave_number", "steps"],
+        "properties": {
+          "shift_id": {"type": "string"},
+          "wave_number": {"type": "integer"},
+          "steps": {"type": "array", "items": {"$ref": "#/definitions/wave_step"}}
+        }
+      },
+      "dispatch_to": "Chicken_Hawk",
+      "returns": {
+        "wave_result": "success | partial | failed",
+        "steps_completed": "integer",
+        "steps_failed": "integer",
+        "anomalies": "object[]"
+      }
+    },
+
+    "verify_shift": {
+      "name": "verify_shift",
+      "description": "Run verification phase for a completed Shift",
+      "category": "verification",
+      "parameters": {
+        "type": "object",
+        "required": ["shift_id"],
+        "properties": {
+          "shift_id": {"type": "string"},
+          "verification_level": {"type": "string", "enum": ["standard", "deep", "oracle"], "default": "standard"}
+        }
+      },
+      "dispatch_to": "Chicken_Hawk",
+      "returns": {
+        "verification_passed": "boolean",
+        "attestation_bundle": "object",
+        "discrepancies": "object[]"
+      }
+    },
+
+    "seal_receipt": {
+      "name": "seal_receipt",
+      "description": "Finalize Shift and generate sealed receipt",
+      "category": "audit",
+      "parameters": {
+        "type": "object",
+        "required": ["shift_id"],
+        "properties": {
+          "shift_id": {"type": "string"}
+        }
+      },
+      "dispatch_to": "Chicken_Hawk",
+      "returns": {
+        "receipt_id": "string",
+        "receipt_hash": "string",
+        "kyb_flight_recorder_pointer": "string",
+        "final_metrics": "object"
+      }
+    },
+
+    "get_shift_status": {
+      "name": "get_shift_status",
+      "description": "Get current status of an active Shift",
+      "category": "monitoring",
+      "parameters": {
+        "type": "object",
+        "required": ["shift_id"],
+        "properties": {
+          "shift_id": {"type": "string"},
+          "include_captions": {"type": "boolean", "default": true}
+        }
+      },
+      "dispatch_to": "Chicken_Hawk",
+      "returns": {
+        "phase": "string",
+        "progress_percent": "number",
+        "current_wave": "integer",
+        "lil_hawk_statuses": "object[]",
+        "recent_captions": "string[]"
+      }
+    },
+
+    "trigger_rollback": {
+      "name": "trigger_rollback",
+      "description": "Initiate rollback for a Shift",
+      "category": "safety",
+      "parameters": {
+        "type": "object",
+        "required": ["shift_id", "reason"],
+        "properties": {
+          "shift_id": {"type": "string"},
+          "reason": {"type": "string"},
+          "rollback_to": {"type": "string", "description": "Target state reference"}
+        }
+      },
+      "dispatch_to": "Chicken_Hawk",
+      "requires_confirmation": true,
+      "returns": {
+        "rollback_initiated": "boolean",
+        "estimated_duration_ms": "integer"
+      }
+    },
+
+    "emergency_kill_switch": {
+      "name": "emergency_kill_switch",
+      "description": "Immediately halt all Lil_Hawk operations in a Shift",
+      "category": "safety",
+      "parameters": {
+        "type": "object",
+        "required": ["shift_id", "reason"],
+        "properties": {
+          "shift_id": {"type": "string"},
+          "reason": {"type": "string"}
+        }
+      },
+      "dispatch_to": "Chicken_Hawk",
+      "requires_confirmation": true,
+      "audit_required": true,
+      "returns": {
+        "killed": "boolean",
+        "lil_hawks_terminated": "integer",
+        "state_preserved": "boolean"
+      }
+    }
+  },
+
+  "definitions": {
+    "manifest": {
+      "type": "object",
+      "required": ["name", "capabilities", "target"],
+      "properties": {
+        "name": {"type": "string"},
+        "description": {"type": "string"},
+        "capabilities": {"type": "array", "items": {"type": "string"}},
+        "target": {
+          "type": "object",
+          "properties": {
+            "environment": {"type": "string"},
+            "resource_group": {"type": "string"}
+          }
+        },
+        "waves": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/wave_definition"}
+        }
+      }
+    },
+    "wave_definition": {
+      "type": "object",
+      "properties": {
+        "wave_number": {"type": "integer"},
+        "steps": {"type": "array", "items": {"$ref": "#/definitions/wave_step"}},
+        "parallel": {"type": "boolean", "default": false}
+      }
+    },
+    "wave_step": {
+      "type": "object",
+      "required": ["capability_id", "action"],
+      "properties": {
+        "capability_id": {"type": "string"},
+        "action": {"type": "string"},
+        "params": {"type": "object"},
+        "assigned_lil_hawk": {"type": "string"}
+      }
+    },
+    "dsp_reference": {
+      "type": "object",
+      "required": ["packet_id"],
+      "properties": {
+        "packet_id": {"type": "string", "pattern": "^DSP-[A-Z0-9]{8}$"},
+        "status": {"type": "string", "enum": ["approved", "active"]}
+      }
+    }
+  },
+
+  "capability_to_crew_mapping": {
+    "description": "Which Lil_Hawk types handle which capabilities",
+    "crane_ops": {
+      "lil_hawks": ["Lil_Popeye_Hawk", "Lil_IronWing_Hawk", "Lil_StackMaster_Hawk", "Lil_Lifter_Hawk"],
+      "capabilities": ["infrastructure_deploy", "database_migration", "heavy_compute"]
+    },
+    "load_ops": {
+      "lil_hawks": ["Lil_Busy_Hawk", "Lil_Scurry_Hawk", "Lil_Parcel_Hawk", "Lil_Hauler_Hawk"],
+      "capabilities": ["file_operations", "data_transfer", "config_updates"]
+    },
+    "deploy_ops": {
+      "lil_hawks": ["Lil_Packer_Hawk", "Lil_ShipIt_Hawk", "Lil_Rollout_Hawk", "Lil_Seal_Hawk"],
+      "capabilities": ["container_build", "artifact_publish", "deployment_execute"]
+    },
+    "safety_ops": {
+      "lil_hawks": ["Lil_RedFlag_Hawk", "Lil_Seatbelt_Hawk", "Lil_WhoaThere_Hawk", "Lil_Guardian_Hawk"],
+      "capabilities": ["security_scan", "anomaly_detection", "compliance_check"]
+    },
+    "yard_ops": {
+      "lil_hawks": ["Lil_LaneBoss_Hawk", "Lil_Tetris_Hawk", "Lil_Pathfinder_Hawk", "Lil_Router_Hawk"],
+      "capabilities": ["routing", "load_balancing", "resource_allocation"]
+    },
+    "dispatch_ops": {
+      "lil_hawks": ["Lil_Dispatch_Hawk", "Lil_Wave_Hawk", "Lil_Sync_Hawk", "Lil_Tempo_Hawk"],
+      "capabilities": ["orchestration", "scheduling", "coordination"]
+    }
+  }
+}

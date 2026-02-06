@@ -1,0 +1,209 @@
+{
+  "$schema": "https://aims.dev/schemas/circuit-box-config.json",
+  "name": "Circuit Box Configuration",
+  "version": "1.0.0",
+  "description": "Central integration hub connecting ACHEEVY to the Deploy Platform",
+
+  "architecture": {
+    "diagram": "User → ACHEEVY → Circuit Box → Boomer_Ang → Chicken_Hawk → Squad → Lil_Hawks",
+    "layers": {
+      "user_layer": {
+        "description": "User interface and interaction",
+        "components": ["Chat Interface", "Live Ops Theater", "Dashboard"],
+        "protocols": ["HTTPS", "WebSocket"]
+      },
+      "orchestration_layer": {
+        "description": "ACHEEVY executive control",
+        "components": ["ACHEEVY", "Intent Analyzer", "Tool Router"],
+        "protocols": ["Internal RPC", "Message Queue"]
+      },
+      "validation_layer": {
+        "description": "Boomer_Ang scope validation",
+        "components": ["Boomer_Ang Validators", "DSP Enforcer", "Quota Manager"],
+        "protocols": ["Internal RPC"]
+      },
+      "execution_layer": {
+        "description": "Chicken_Hawk execution engine",
+        "components": ["Chicken_Hawk", "Squad Manager", "Lil_Hawk Pool"],
+        "protocols": ["Internal RPC", "Event Stream"]
+      },
+      "audit_layer": {
+        "description": "KYB flight recorder and evidence",
+        "components": ["Flight Recorder", "Attestation Service", "Receipt Generator"],
+        "protocols": ["Append-only Log", "Signed Events"]
+      }
+    }
+  },
+
+  "routing_table": {
+    "description": "How ACHEEVY routes tool calls through the circuit box",
+    "routes": [
+      {
+        "tool": "deploy_it",
+        "validation": ["dsp_gate_check", "oei_check", "quota_check"],
+        "dispatch_to": "Chicken_Hawk",
+        "response_path": "Chicken_Hawk → Circuit Box → ACHEEVY → User"
+      },
+      {
+        "tool": "guide_me",
+        "validation": ["uncertainty_check", "security_packet_check"],
+        "dispatch_to": "Chicken_Hawk",
+        "requires_approval": true,
+        "response_path": "Chicken_Hawk → Circuit Box → ACHEEVY (approval) → User → ACHEEVY → Chicken_Hawk"
+      },
+      {
+        "tool": "spawn_shift",
+        "validation": ["dsp_active", "squad_limits", "certification_check"],
+        "dispatch_to": "Chicken_Hawk",
+        "response_path": "Chicken_Hawk → Circuit Box → ACHEEVY"
+      },
+      {
+        "tool": "execute_wave",
+        "validation": ["shift_active", "wave_sequence", "lil_hawk_availability"],
+        "dispatch_to": "Chicken_Hawk",
+        "streaming": true,
+        "response_path": "Chicken_Hawk → Live Ops Theater (events) + Circuit Box → ACHEEVY"
+      },
+      {
+        "tool": "verify_shift",
+        "validation": ["shift_exists", "execution_complete"],
+        "dispatch_to": "Chicken_Hawk",
+        "response_path": "Chicken_Hawk → Circuit Box → ACHEEVY"
+      },
+      {
+        "tool": "seal_receipt",
+        "validation": ["verification_passed", "no_active_incidents"],
+        "dispatch_to": "Chicken_Hawk",
+        "response_path": "Chicken_Hawk → Circuit Box → ACHEEVY → User"
+      },
+      {
+        "tool": "get_shift_status",
+        "validation": ["shift_exists"],
+        "dispatch_to": "Chicken_Hawk",
+        "response_path": "Chicken_Hawk → Circuit Box → ACHEEVY"
+      },
+      {
+        "tool": "trigger_rollback",
+        "validation": ["shift_exists", "user_confirmation"],
+        "dispatch_to": "Chicken_Hawk",
+        "requires_confirmation": true,
+        "audit_required": true,
+        "response_path": "Chicken_Hawk → Circuit Box → ACHEEVY → User"
+      },
+      {
+        "tool": "emergency_kill_switch",
+        "validation": ["shift_exists", "user_confirmation"],
+        "dispatch_to": "Chicken_Hawk",
+        "requires_confirmation": true,
+        "audit_required": true,
+        "priority": "critical",
+        "response_path": "Chicken_Hawk → Circuit Box → ACHEEVY → User"
+      }
+    ]
+  },
+
+  "validation_gates": {
+    "description": "Pre-execution validation performed by Boomer_Ang",
+    "gates": {
+      "dsp_gate_check": {
+        "description": "Verify Deploy Security Packet is approved and active",
+        "checks": ["packet_exists", "packet_approved", "packet_not_expired", "scope_matches"]
+      },
+      "oei_check": {
+        "description": "Operational Exposure Index check",
+        "checks": ["oei_below_threshold", "no_new_attack_surface"],
+        "threshold": 0.3
+      },
+      "quota_check": {
+        "description": "User quota and rate limit check",
+        "checks": ["luc_balance_sufficient", "rate_limit_ok", "concurrent_shifts_ok"]
+      },
+      "uncertainty_check": {
+        "description": "Check if request has high uncertainty requiring Guide Me",
+        "triggers": ["new_capability", "ambiguous_intent", "missing_context"]
+      },
+      "security_packet_check": {
+        "description": "Deep security validation",
+        "checks": ["secrets_scope_ok", "network_allowlist_ok", "supply_chain_ok"]
+      },
+      "certification_check": {
+        "description": "Verify Lil_Hawks have required certifications",
+        "checks": ["y_iso_certs_current", "specialty_certs_valid"]
+      }
+    }
+  },
+
+  "event_streaming": {
+    "description": "Real-time event flow for Live Ops Theater",
+    "source": "Chicken_Hawk",
+    "transform": "Circuit Box (redaction + sanitization)",
+    "destination": "Live Ops Theater WebSocket",
+    "protocol": "Server-Sent Events / WebSocket",
+    "redaction_rules": [
+      {"pattern": "secret|token|key|password|credential", "action": "omit"},
+      {"pattern": "internal_endpoint", "action": "omit"},
+      {"pattern": "stack_trace", "action": "summarize"},
+      {"pattern": "debug_info", "action": "omit"}
+    ]
+  },
+
+  "error_handling": {
+    "strategies": {
+      "transient_failure": {
+        "action": "retry_with_backoff",
+        "max_retries": 3,
+        "backoff_ms": [1000, 2000, 4000]
+      },
+      "validation_failure": {
+        "action": "reject_with_reason",
+        "switch_to_guide_me": true
+      },
+      "execution_failure": {
+        "action": "halt_and_report",
+        "preserve_state": true,
+        "offer_rollback": true
+      },
+      "security_violation": {
+        "action": "kill_switch",
+        "quarantine": true,
+        "audit_alert": true
+      }
+    }
+  },
+
+  "metrics": {
+    "collected": [
+      "tool_calls_per_minute",
+      "average_shift_duration_ms",
+      "wave_success_rate",
+      "lil_hawk_utilization",
+      "validation_gate_pass_rate",
+      "rollback_frequency",
+      "user_satisfaction_score"
+    ],
+    "exported_to": "Circuit Metrics Service"
+  },
+
+  "integrations": {
+    "acheevy": {
+      "endpoint": "http://acheevy:3003",
+      "protocol": "REST + WebSocket",
+      "auth": "mTLS + Service Identity"
+    },
+    "chicken_hawk": {
+      "endpoint": "http://chicken-hawk:8001",
+      "protocol": "gRPC",
+      "auth": "mTLS + Service Identity"
+    },
+    "live_ops_theater": {
+      "endpoint": "ws://frontend:3000/api/live-ops",
+      "protocol": "WebSocket",
+      "auth": "Session Token"
+    },
+    "kyb_flight_recorder": {
+      "endpoint": "http://kyb-recorder:9001",
+      "protocol": "Append-only Log",
+      "auth": "mTLS + Signing Key"
+    }
+  }
+}
