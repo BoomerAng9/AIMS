@@ -7,6 +7,10 @@ import { LUCEngine } from './luc';
 import { Oracle } from './oracle';
 import { routeToAgents } from './agents/router';
 import { registry } from './agents/registry';
+import { cardStyleRegistry } from './perform/registry/card-styles';
+import { runAthletePageFactory } from './perform/pipeline/athlete-page-factory';
+import { SQUAD_PROFILES } from './agents/lil-hawks/workflow-smith-squad';
+import { VISION_SQUAD_PROFILES } from './agents/lil-hawks/vision-scout-squad';
 import logger from './logger';
 
 const app = express();
@@ -31,6 +35,45 @@ app.get('/health', (_req, res) => {
 // --------------------------------------------------------------------------
 app.get('/agents', (_req, res) => {
   res.json({ agents: registry.list() });
+});
+
+// --------------------------------------------------------------------------
+// Per|Form — Card Style Registry
+// --------------------------------------------------------------------------
+app.get('/perform/styles', (_req, res) => {
+  res.json({ styles: cardStyleRegistry.list() });
+});
+
+app.get('/perform/styles/:styleId', (req, res) => {
+  const style = cardStyleRegistry.get(req.params.styleId);
+  res.json(style);
+});
+
+// --------------------------------------------------------------------------
+// Per|Form — Athlete Page Factory (Closed-Loop v1)
+// --------------------------------------------------------------------------
+app.post('/perform/athlete', async (req, res) => {
+  try {
+    const { athleteName, athleteId, cardStyleId } = req.body;
+    const result = await runAthletePageFactory({ athleteName, athleteId, cardStyleId });
+    res.json(result);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    logger.error({ err: error }, 'Per|Form Pipeline Error');
+    res.status(500).json({ status: 'ERROR', message });
+  }
+});
+
+// --------------------------------------------------------------------------
+// Lil_Hawks — Squad profiles
+// --------------------------------------------------------------------------
+app.get('/lil-hawks', (_req, res) => {
+  res.json({
+    squads: {
+      'workflow-smith': SQUAD_PROFILES,
+      'vision-scout': VISION_SQUAD_PROFILES,
+    },
+  });
 });
 
 // --------------------------------------------------------------------------
