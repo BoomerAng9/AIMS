@@ -14,8 +14,8 @@ export default function SignInPage() {
         <h1 className="text-[2.5rem] md:text-[3rem] font-bold tracking-[0.2em] leading-tight text-amber-300 font-display uppercase">
           A.I.M.S.
         </h1>
-        <p className="mt-2 text-[1rem] md:text-[1.2rem] tracking-[0.1em] text-amber-100/80 font-marker">
-          AI Managed Solutions
+        <p className="mt-2 text-[1rem] md:text-[1.2rem] tracking-[0.15em] text-amber-100/80 font-marker uppercase">
+          AI MANAGED SOLUTIONS
         </p>
       </header>
 
