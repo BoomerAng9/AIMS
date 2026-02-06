@@ -153,6 +153,7 @@ export class CartBuilder {
     if (!cart) throw new Error(`Cart ${cartId} not found`);
 
     const qty = quantity || item.quantity;
+    const lineTotal = finding.product.price * qty;
     const cartItem: CartItem = {
       id: uuidv4(),
       itemId: item.id,
@@ -164,9 +165,14 @@ export class CartBuilder {
       retailerProductId: finding.product.id,
       pricePerUnit: finding.product.price,
       quantity: qty,
-      totalPrice: finding.product.price * qty,
+      totalPrice: lineTotal,
+      lineTotal: lineTotal,
       originalPrice: finding.product.originalPrice,
       savings: finding.product.originalPrice ? (finding.product.originalPrice - finding.product.price) * qty : undefined,
+      finding: {
+        productName: finding.product.name,
+        price: finding.product.price,
+      },
       availability: (finding.product.availability as 'in_stock' | 'limited' | 'backorder' | 'out_of_stock') || 'in_stock',
       shippingCost: 0, // To be calculated
       shippingEstimate: 'Standard shipping',
@@ -290,6 +296,7 @@ export class CartBuilder {
           if (mod.data?.finding) {
             const f = mod.data.finding;
             const qty = mod.data.quantity || 1;
+            const itemLineTotal = f.product.price * qty;
             cart.items.push({
               id: uuidv4(),
               itemId: mod.itemId,
@@ -301,7 +308,12 @@ export class CartBuilder {
               retailerProductId: f.product.id,
               pricePerUnit: f.product.price,
               quantity: qty,
-              totalPrice: f.product.price * qty,
+              totalPrice: itemLineTotal,
+              lineTotal: itemLineTotal,
+              finding: {
+                productName: f.product.name,
+                price: f.product.price,
+              },
               availability: (f.product.availability as 'in_stock' | 'limited' | 'backorder' | 'out_of_stock') || 'in_stock',
               shippingCost: 0,
               shippingEstimate: 'Standard shipping',

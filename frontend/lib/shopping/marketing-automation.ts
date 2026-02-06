@@ -245,7 +245,7 @@ export interface LaunchActivity {
 }
 
 export interface LaunchGoal {
-  metric: 'sales' | 'reviews' | 'ranking' | 'bsr';
+  metric: 'sales' | 'reviews' | 'ranking' | 'bsr' | 'revenue';
   target: number;
   achieved?: number;
 }
@@ -984,7 +984,7 @@ Offer expires in 24 hours.`,
         ],
         goals: [
           { metric: 'sales', target: 50 },
-          { metric: 'revenue', target: product.basePrice * 50 * 0.8 },
+          { metric: 'revenue', target: product.suggestedPrice * 50 * 0.8 },
         ],
       },
       {
@@ -1114,7 +1114,7 @@ Offer expires in 24 hours.`,
     marketplace: MarketplaceType,
     goal: string
   ): MarketingChannel[] {
-    const channelMap: Record<MarketplaceType, MarketingChannel[]> = {
+    const channelMap: Partial<Record<MarketplaceType, MarketingChannel[]>> = {
       amazon: ['amazon_ppc', 'amazon_dsp', 'email', 'social_organic'],
       shopify: ['shopify_google', 'shopify_facebook', 'email', 'social_organic', 'influencer'],
       etsy: ['etsy_ads', 'social_organic', 'email'],
@@ -1124,7 +1124,7 @@ Offer expires in 24 hours.`,
       tiktok: ['social_organic', 'influencer'],
     };
 
-    return channelMap[marketplace] || ['social_organic', 'email'];
+    return channelMap[marketplace] ?? ['social_organic', 'email'];
   }
 
   private generateTargeting(

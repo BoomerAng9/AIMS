@@ -145,9 +145,9 @@ export class ShoppingBudgetManager {
     if (this.lucEngine) {
       const summary = this.lucEngine.getSummary();
       return {
-        totalBudget: summary.remainingBudget,
-        monthlyLimit: summary.totalBudget,
-        maxPerItem: summary.totalBudget * 0.25, // Max 25% of budget per item
+        totalLimit: summary.remainingBudget,
+        perItemLimit: summary.totalBudget * 0.25, // Max 25% of budget per item
+        currency: 'USD',
       };
     }
 
@@ -157,18 +157,18 @@ export class ShoppingBudgetManager {
       if (category) {
         const remaining = category.budget - category.spent - category.pending;
         return {
-          totalBudget: remaining,
-          monthlyLimit: category.budget,
-          maxPerItem: category.budget * 0.5,
+          totalLimit: remaining,
+          perItemLimit: category.budget * 0.5,
+          currency: 'USD',
         };
       }
     }
 
     // Default constraints
     return {
-      totalBudget: 500,
-      monthlyLimit: 1000,
-      maxPerItem: 250,
+      totalLimit: 500,
+      perItemLimit: 250,
+      currency: 'USD',
     };
   }
 
@@ -178,18 +178,19 @@ export class ShoppingBudgetManager {
   checkSpend(cart: AggregatedCart, category?: string): SpendCheckResult {
     const constraints = this.getBudgetConstraints(category);
     const pendingForMission = this.pendingByMission.get(cart.missionId) || 0;
+    const cartTotal = cart.summary.grandTotal;
 
     // If LUC is connected, use it for the check
     if (this.lucEngine) {
       const serviceKey = category || 'shopping';
-      const canExecute = this.lucEngine.canExecute(serviceKey, cart.total);
-      const quote = this.lucEngine.quote(serviceKey, cart.total);
+      const canExecute = this.lucEngine.canExecute(serviceKey, cartTotal);
+      const quote = this.lucEngine.quote(serviceKey, cartTotal);
 
       return {
         allowed: canExecute.allowed,
         reason: canExecute.reason,
-        currentSpent: quote.estimatedCost - cart.total,
-        cartTotal: cart.total,
+        currentSpent: quote.estimatedCost - cartTotal,
+        cartTotal: cartTotal,
         projectedTotal: quote.estimatedCost,
         budgetRemaining: quote.remainingQuota,
         recommendations: canExecute.allowed
@@ -201,18 +202,18 @@ export class ShoppingBudgetManager {
     // Manual budget check
     const catData = category ? this.categories.get(category) : null;
     const currentSpent = catData ? catData.spent + catData.pending : 0;
-    const projectedTotal = currentSpent + cart.total - pendingForMission;
-    const budgetRemaining = constraints.totalBudget - projectedTotal;
+    const projectedTotal = currentSpent + cartTotal - pendingForMission;
+    const budgetRemaining = constraints.totalLimit - projectedTotal;
 
-    const allowed = cart.total <= constraints.totalBudget + pendingForMission;
+    const allowed = cartTotal <= constraints.totalLimit + pendingForMission;
 
     return {
       allowed,
       reason: allowed
         ? undefined
-        : `Cart total $${cart.total.toFixed(2)} exceeds available budget of $${(constraints.totalBudget + pendingForMission).toFixed(2)}`,
+        : `Cart total $${cartTotal.toFixed(2)} exceeds available budget of $${(constraints.totalLimit + pendingForMission).toFixed(2)}`,
       currentSpent,
-      cartTotal: cart.total,
+      cartTotal: cartTotal,
       projectedTotal,
       budgetRemaining: Math.max(0, budgetRemaining),
       recommendations: allowed ? undefined : this.getRecommendations(cart, constraints),
@@ -232,7 +233,7 @@ export class ShoppingBudgetManager {
     const currentPending = this.pendingByMission.get(missionId) || 0;
 
     // Check if reservation is possible
-    if (amount > constraints.totalBudget + currentPending) {
+    if (amount > constraints.totalLimit + currentPending) {
       return null;
     }
 
@@ -288,7 +289,7 @@ export class ShoppingBudgetManager {
     this.pendingByMission.delete(missionId);
 
     // Update allocation status
-    for (const [id, alloc] of this.allocations) {
+    for (const [id, alloc] of Array.from(this.allocations.entries())) {
       if (alloc.missionId === missionId && alloc.status === 'pending') {
         alloc.status = 'committed';
         // Keep for history, or delete: this.allocations.delete(id);
@@ -317,7 +318,7 @@ export class ShoppingBudgetManager {
     this.pendingByMission.delete(missionId);
 
     // Update allocation status
-    for (const [, alloc] of this.allocations) {
+    for (const [, alloc] of Array.from(this.allocations.entries())) {
       if (alloc.missionId === missionId && alloc.status === 'pending') {
         alloc.status = 'released';
       }
@@ -354,8 +355,8 @@ export class ShoppingBudgetManager {
     }
 
     const constraints = this.getBudgetConstraints();
-    const withinBudget = estimated <= constraints.totalBudget;
-    const budgetUtilization = (estimated / constraints.totalBudget) * 100;
+    const withinBudget = estimated <= constraints.totalLimit;
+    const budgetUtilization = (estimated / constraints.totalLimit) * 100;
 
     return {
       estimated,
@@ -380,7 +381,7 @@ export class ShoppingBudgetManager {
     let totalSpent = 0;
     let totalPending = 0;
 
-    for (const cat of this.categories.values()) {
+    for (const cat of Array.from(this.categories.values())) {
       totalBudget += cat.budget;
       totalSpent += cat.spent;
       totalPending += cat.pending;
@@ -402,7 +403,7 @@ export class ShoppingBudgetManager {
     let cleaned = 0;
     const now = new Date();
 
-    for (const [id, alloc] of this.allocations) {
+    for (const [id, alloc] of Array.from(this.allocations.entries())) {
       if (alloc.status === 'pending' && alloc.expiresAt < now) {
         this.releaseBudget(alloc.missionId, alloc.category);
         this.allocations.delete(id);
@@ -422,7 +423,8 @@ export class ShoppingBudgetManager {
     constraints: BudgetConstraints
   ): string[] {
     const recommendations: string[] = [];
-    const overage = cart.total - constraints.totalBudget;
+    const cartTotal = cart.summary.grandTotal;
+    const overage = cartTotal - constraints.totalLimit;
 
     if (overage > 0) {
       recommendations.push(
@@ -434,7 +436,7 @@ export class ShoppingBudgetManager {
     const sortedItems = [...cart.items].sort((a, b) => b.lineTotal - a.lineTotal);
     if (sortedItems.length > 0) {
       const mostExpensive = sortedItems[0];
-      if (mostExpensive.lineTotal > constraints.totalBudget * 0.5) {
+      if (mostExpensive.lineTotal > constraints.totalLimit * 0.5) {
         recommendations.push(
           `Consider a cheaper alternative for "${mostExpensive.finding.productName}" ($${mostExpensive.lineTotal.toFixed(2)})`
         );

@@ -309,7 +309,7 @@ export class PurchasingPMO {
     const items: any[] = [];
     let subtotal = 0;
 
-    for (const [_itemId, findings] of findingsByItem.entries()) {
+    for (const [_itemId, findings] of Array.from(findingsByItem.entries())) {
       const selected = selector(findings);
       if (!selected) continue;
 
@@ -458,7 +458,7 @@ export class PurchasingPMO {
    * Create teams for seller mission based on type
    */
   private createSellerTeams(missionId: string, type: SellerMissionType): SellerTeam[] {
-    const teamConfigs: Record<SellerMissionType, SellerTeamRole[]> = {
+    const teamConfigs: Partial<Record<SellerMissionType, SellerTeamRole[]>> = {
       market_research: ['researcher', 'analyst'],
       listing_optimization: ['optimizer', 'creator'],
       price_optimization: ['analyst', 'optimizer'],

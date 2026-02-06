@@ -13,6 +13,7 @@
  * - Competitive positioning
  */
 
+import { v4 as uuidv4 } from 'uuid';
 import type {
   MarketplaceType,
   SellerProduct,
@@ -412,7 +413,7 @@ export class SellerAnalytics {
       shipping: number;
     }
   ): ProductAnalytics['profitability'] {
-    const cost = product.cost * salesData.units;
+    const cost = product.baseCost * salesData.units;
     const grossProfit = salesData.revenue - cost;
     const totalExpenses =
       salesData.advertising + salesData.fees + salesData.returns + salesData.shipping;

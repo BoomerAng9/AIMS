@@ -116,7 +116,7 @@ export class ShoppingAgent {
         warnings.push({
           type: 'no_results',
           itemId: item.id,
-          message: `No results found for "${item.name}"`,
+          message: `No results found for "${item.name || item.description}"`,
           severity: 'high',
         });
         continue;
@@ -131,7 +131,7 @@ export class ShoppingAgent {
         warnings.push({
           type: 'price_exceeded',
           itemId: item.id,
-          message: `All options for "${item.name}" exceed max price of $${item.maxPrice}. Lowest found: $${Math.min(...itemFindings.map((f) => f.price))}`,
+          message: `All options for "${item.name || item.description}" exceed max price of $${item.maxPrice}. Lowest found: $${Math.min(...itemFindings.map((f) => f.price || 0))}`,
           severity: 'high',
         });
       }
@@ -178,7 +178,7 @@ export class ShoppingAgent {
           sortBy: 'price_asc',
         };
 
-        const results = await adapter.search(item.name, searchOptions);
+        const results = await adapter.search(item.name || item.description, searchOptions);
 
         // Enrich with availability and shipping
         const enrichedResults = await Promise.all(
@@ -285,9 +285,9 @@ export class ShoppingAgent {
 
     if (cartItems.length === 0) return null;
 
-    const subtotal = cartItems.reduce((sum, ci) => sum + ci.lineTotal, 0);
+    const subtotal = cartItems.reduce((sum, ci) => sum + (ci.lineTotal || 0), 0);
     const shipping = cartItems.reduce(
-      (sum, ci) => sum + (ci.finding.shippingEstimate || 0),
+      (sum, ci) => sum + ((ci.finding as ProductFinding)?.shippingEstimate || 0),
       0
     );
 
@@ -302,7 +302,7 @@ export class ShoppingAgent {
       estimatedTax: subtotal * 0.08, // Estimate 8% tax
       total: subtotal + shipping + subtotal * 0.08,
       estimatedDelivery: this.calculateDeliveryDate(cartItems),
-      retailers: [...new Set(cartItems.map((ci) => ci.finding.retailer))],
+      retailers: Array.from(new Set(cartItems.map((ci) => (ci.finding as ProductFinding)?.retailer).filter(Boolean))) as string[],
     };
   }
 
@@ -333,9 +333,9 @@ export class ShoppingAgent {
 
     if (cartItems.length === 0) return null;
 
-    const subtotal = cartItems.reduce((sum, ci) => sum + ci.lineTotal, 0);
+    const subtotal = cartItems.reduce((sum, ci) => sum + (ci.lineTotal || 0), 0);
     const shipping = cartItems.reduce(
-      (sum, ci) => sum + (ci.finding.shippingEstimate || 0),
+      (sum, ci) => sum + ((ci.finding as ProductFinding)?.shippingEstimate || 0),
       0
     );
 
@@ -350,7 +350,7 @@ export class ShoppingAgent {
       estimatedTax: subtotal * 0.08,
       total: subtotal + shipping + subtotal * 0.08,
       estimatedDelivery: this.calculateDeliveryDate(cartItems),
-      retailers: [...new Set(cartItems.map((ci) => ci.finding.retailer))],
+      retailers: Array.from(new Set(cartItems.map((ci) => (ci.finding as ProductFinding)?.retailer).filter(Boolean))) as string[],
     };
   }
 
@@ -380,9 +380,9 @@ export class ShoppingAgent {
 
     if (cartItems.length === 0) return null;
 
-    const subtotal = cartItems.reduce((sum, ci) => sum + ci.lineTotal, 0);
+    const subtotal = cartItems.reduce((sum, ci) => sum + (ci.lineTotal || 0), 0);
     const shipping = cartItems.reduce(
-      (sum, ci) => sum + (ci.finding.shippingEstimate || 0),
+      (sum, ci) => sum + ((ci.finding as ProductFinding)?.shippingEstimate || 0),
       0
     );
 
@@ -397,7 +397,7 @@ export class ShoppingAgent {
       estimatedTax: subtotal * 0.08,
       total: subtotal + shipping + subtotal * 0.08,
       estimatedDelivery: this.calculateDeliveryDate(cartItems),
-      retailers: [...new Set(cartItems.map((ci) => ci.finding.retailer))],
+      retailers: Array.from(new Set(cartItems.map((ci) => (ci.finding as ProductFinding)?.retailer).filter(Boolean))) as string[],
     };
   }
 
@@ -409,10 +409,10 @@ export class ShoppingAgent {
 
     // Get all retailers that have at least some items
     const retailerCoverage = new Map<string, number>();
-    for (const [, findings] of findingsByItem) {
-      const retailers = new Set(findings.map((f) => f.retailer));
+    for (const [, findings] of Array.from(findingsByItem.entries())) {
+      const retailers = Array.from(new Set(findings.map((f) => f.retailer)));
       for (const r of retailers) {
-        retailerCoverage.set(r, (retailerCoverage.get(r) || 0) + 1);
+        if (r) retailerCoverage.set(r, (retailerCoverage.get(r) || 0) + 1);
       }
     }
 
@@ -442,10 +442,10 @@ export class ShoppingAgent {
       }
 
       if (cartItems.length === items.length) {
-        const subtotal = cartItems.reduce((sum, ci) => sum + ci.lineTotal, 0);
+        const subtotal = cartItems.reduce((sum, ci) => sum + (ci.lineTotal || 0), 0);
         // Single retailer usually means combined shipping
         const shipping = Math.max(
-          ...cartItems.map((ci) => ci.finding.shippingEstimate || 0)
+          ...cartItems.map((ci) => (ci.finding as ProductFinding)?.shippingEstimate || 0)
         );
 
         options.push({
@@ -469,8 +469,8 @@ export class ShoppingAgent {
 
   private matchesItem(finding: ProductFinding, item: ShoppingItem): boolean {
     // Basic matching - in production this would use NLP/ML
-    const nameLower = item.name.toLowerCase();
-    const findingName = finding.productName.toLowerCase();
+    const nameLower = (item.name || item.description).toLowerCase();
+    const findingName = (finding.productName || '').toLowerCase();
 
     // Check if finding name contains item name keywords
     const keywords = nameLower.split(' ').filter((k) => k.length > 2);
@@ -481,7 +481,7 @@ export class ShoppingAgent {
 
   private calculateDeliveryDate(cartItems: CartItem[]): Date {
     const maxDays = Math.max(
-      ...cartItems.map((ci) => ci.finding.deliveryDays || 7)
+      ...cartItems.map((ci) => (ci.finding as ProductFinding)?.deliveryDays || 7)
     );
     const date = new Date();
     date.setDate(date.getDate() + maxDays);
@@ -493,7 +493,7 @@ export class ShoppingAgent {
     return options.filter((opt) => {
       // Create a signature based on items and retailers
       const sig = opt.items
-        .map((ci) => `${ci.finding.productId}:${ci.quantity}`)
+        .map((ci) => `${(ci.finding as ProductFinding)?.productId || ''}:${ci.quantity}`)
         .sort()
         .join('|');
 
@@ -509,7 +509,7 @@ export class ShoppingAgent {
   async comparePrices(productName: string): Promise<ProductFinding[]> {
     const findings: ProductFinding[] = [];
 
-    for (const [, adapter] of this.adapters) {
+    for (const [, adapter] of Array.from(this.adapters.entries())) {
       try {
         const results = await adapter.search(productName, { maxResults: 3 });
         findings.push(...results);
@@ -518,7 +518,7 @@ export class ShoppingAgent {
       }
     }
 
-    return findings.sort((a, b) => a.price - b.price);
+    return findings.sort((a, b) => (a.price || 0) - (b.price || 0));
   }
 
   /**
@@ -528,23 +528,23 @@ export class ShoppingAgent {
     const violations: string[] = [];
     const constraints = this.config.budgetConstraints;
 
-    if (cart.total > constraints.totalBudget) {
+    if (cart.total && cart.total > constraints.totalLimit) {
       violations.push(
-        `Total $${cart.total.toFixed(2)} exceeds budget of $${constraints.totalBudget}`
+        `Total $${cart.total.toFixed(2)} exceeds budget of $${constraints.totalLimit}`
       );
     }
 
-    if (constraints.maxPerItem) {
+    if (constraints.perItemLimit) {
       for (const item of cart.items) {
-        if (item.lineTotal > constraints.maxPerItem) {
+        if (item.lineTotal && item.lineTotal > constraints.perItemLimit) {
           violations.push(
-            `Item "${item.finding.productName}" at $${item.lineTotal.toFixed(2)} exceeds per-item limit of $${constraints.maxPerItem}`
+            `Item "${item.finding?.productName || 'Unknown'}" at $${item.lineTotal.toFixed(2)} exceeds per-item limit of $${constraints.perItemLimit}`
           );
         }
       }
     }
 
-    if (constraints.maxShipping && cart.estimatedShipping > constraints.maxShipping) {
+    if (constraints.maxShipping && cart.estimatedShipping && cart.estimatedShipping > constraints.maxShipping) {
       violations.push(
         `Shipping $${cart.estimatedShipping.toFixed(2)} exceeds limit of $${constraints.maxShipping}`
       );

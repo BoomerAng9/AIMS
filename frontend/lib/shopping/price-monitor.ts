@@ -142,11 +142,11 @@ export class PriceMonitor {
       id: uuidv4(),
       missionId: params.missionId,
       item: params.item,
-      targetPrice: params.targetPrice || params.item.maxPrice || params.finding.price * 0.9,
-      currentPrice: params.finding.price,
-      retailer: params.finding.retailer,
-      productId: params.finding.productId,
-      productUrl: params.finding.productUrl,
+      targetPrice: params.targetPrice || params.item.maxPrice || params.finding.product.price * 0.9,
+      currentPrice: params.finding.product.price,
+      retailer: params.finding.product.retailer,
+      productId: params.finding.product.id,
+      productUrl: params.finding.product.url,
       status: 'active',
       alertOnDrop: params.alertOnDrop ?? true,
       alertOnIncrease: params.alertOnIncrease ?? true,
@@ -299,7 +299,7 @@ export class PriceMonitor {
     const results: PriceCheckResult[] = [];
     const priceGetter = getCurrentPrice || this.mockPriceCheck.bind(this);
 
-    for (const [watchId] of this.watches) {
+    for (const [watchId] of Array.from(this.watches.entries())) {
       const result = await this.checkPrice(watchId, priceGetter);
       if (result) {
         results.push(result);
@@ -321,7 +321,7 @@ export class PriceMonitor {
 
     // If no retailer specified, find any history for this product
     if (!retailer) {
-      for (const [histKey, hist] of this.history) {
+      for (const [histKey, hist] of Array.from(this.history.entries())) {
         if (histKey.startsWith(productId)) {
           return hist;
         }
@@ -436,7 +436,10 @@ export class PriceMonitor {
       history = {
         productId,
         retailer,
+        prices: [],
         dataPoints: [],
+        lowestPrice: price,
+        highestPrice: price,
         allTimeLow: price,
         allTimeHigh: price,
         averagePrice: price,
@@ -445,14 +448,18 @@ export class PriceMonitor {
     }
 
     // Add data point
-    history.dataPoints.push({
+    const dataPoint = {
       price,
       timestamp: new Date(),
-    });
+    };
+    history.dataPoints.push(dataPoint);
+    history.prices.push(dataPoint);
 
     // Update statistics
     history.allTimeLow = Math.min(history.allTimeLow, price);
     history.allTimeHigh = Math.max(history.allTimeHigh, price);
+    history.lowestPrice = history.allTimeLow;
+    history.highestPrice = history.allTimeHigh;
     history.averagePrice =
       history.dataPoints.reduce((sum, dp) => sum + dp.price, 0) /
       history.dataPoints.length;
@@ -462,6 +469,7 @@ export class PriceMonitor {
       Date.now() - this.config.historyRetentionDays * 24 * 60 * 60 * 1000
     );
     history.dataPoints = history.dataPoints.filter((dp) => dp.timestamp > cutoff);
+    history.prices = history.prices.filter((dp) => dp.timestamp > cutoff);
   }
 
   private createAlert(
@@ -507,7 +515,7 @@ export class PriceMonitor {
   }
 
   private async emitAlert(alert: PriceAlert): Promise<void> {
-    for (const handler of this.alertHandlers) {
+    for (const handler of Array.from(this.alertHandlers)) {
       try {
         await handler(alert);
       } catch (error) {

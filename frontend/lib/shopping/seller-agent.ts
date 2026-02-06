@@ -923,7 +923,7 @@ export class SellerAgent {
   ): ListingIssue[] {
     const issues: ListingIssue[] = [];
 
-    if (listing.price < product.cost * 2) {
+    if (listing.price < product.baseCost * 2) {
       issues.push({
         type: 'warning',
         category: 'pricing',

@@ -128,7 +128,7 @@ export interface ABTestResults {
 // SEO Patterns and Rules
 // ─────────────────────────────────────────────────────────────
 
-const MARKETPLACE_SEO_RULES: Record<MarketplaceType, SEORules> = {
+const MARKETPLACE_SEO_RULES: Partial<Record<MarketplaceType, SEORules>> = {
   amazon: {
     titleMaxLength: 200,
     titleStructure: ['brand', 'product', 'key_feature', 'size', 'color'],
@@ -721,15 +721,18 @@ export class ListingOptimizer {
     const tagRules = rules.tags || rules.keywords;
 
     if (tagRules) {
-      if (keywords.length < tagRules.min) {
+      // Handle both 'min' (from tags) and 'count' (from keywords) properties
+      const minRequired = 'min' in tagRules ? tagRules.min : ('count' in tagRules ? tagRules.count : 0);
+
+      if (keywords.length < minRequired) {
         issues.push({
           type: 'critical',
           category: 'keywords',
-          message: `Only ${keywords.length} keywords, minimum is ${tagRules.min}`,
-          fix: `Add ${tagRules.min - keywords.length} more relevant keywords`,
+          message: `Only ${keywords.length} keywords, minimum is ${minRequired}`,
+          fix: `Add ${minRequired - keywords.length} more relevant keywords`,
         });
         deduction += 15;
-        suggestions.push(`Add more keywords (target: ${tagRules.min})`);
+        suggestions.push(`Add more keywords (target: ${minRequired})`);
       }
 
       if ('maxLength' in tagRules) {
@@ -842,7 +845,7 @@ export class ListingOptimizer {
     // Extract from brand
     if (product.brand) terms.push(product.brand);
 
-    return [...new Set(terms)];
+    return Array.from(new Set(terms));
   }
 
   private generateLongTailVariations(term: string, marketplace: MarketplaceType): KeywordResearch[] {

@@ -280,19 +280,17 @@ export class ShopifyAdapter extends BaseMarketplaceAdapter {
       id: `shopify_${Date.now()}`,
       productId: product.id,
       marketplace: 'shopify',
-      externalId: '',
+      listingId: '',
+      listingUrl: `https://${this.config.shop}/products/${this.slugify(product.name)}`,
       title: product.name,
       description: product.description || '',
-      price: product.basePrice,
-      compareAtPrice: product.compareAtPrice,
-      currency: 'USD',
-      inventory: product.inventory.totalQuantity,
-      status: 'draft',
-      images: product.images,
+      price: product.basePrice ?? product.suggestedPrice,
+      quantity: product.totalQuantity,
+      fulfillment: 'merchant',
+      status: 'pending',
+      images: product.images.map(img => img.url),
       keywords: product.tags,
-      url: `https://${this.config.shop}/products/${this.slugify(product.name)}`,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      lastSyncAt: new Date(),
     };
 
     // In production: POST to Shopify Admin API
@@ -313,7 +311,7 @@ export class ShopifyAdapter extends BaseMarketplaceAdapter {
     const updated: MarketplaceListing = {
       ...existing,
       ...updates,
-      updatedAt: new Date(),
+      lastSyncAt: new Date(),
     };
 
     // In production: PUT to Shopify Admin API
@@ -462,17 +460,17 @@ export class AmazonAdapter extends BaseMarketplaceAdapter {
       id: `amazon_${Date.now()}`,
       productId: product.id,
       marketplace: 'amazon',
-      externalId: '', // ASIN assigned by Amazon
+      listingId: '', // ASIN assigned by Amazon
+      listingUrl: '',
       title: this.formatAmazonTitle(product),
       description: product.description || '',
-      price: product.basePrice,
-      currency: 'USD',
-      inventory: product.inventory.totalQuantity,
+      price: product.basePrice ?? product.suggestedPrice,
+      quantity: product.totalQuantity,
+      fulfillment: 'merchant',
       status: 'pending', // Amazon reviews new listings
-      images: product.images,
+      images: product.images.map(img => img.url),
       keywords: product.tags,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      lastSyncAt: new Date(),
     };
 
     return listing;
@@ -486,7 +484,7 @@ export class AmazonAdapter extends BaseMarketplaceAdapter {
     const existing = await this.getListing(listingId);
     if (!existing) throw new Error(`Listing ${listingId} not found`);
 
-    return { ...existing, ...updates, updatedAt: new Date() };
+    return { ...existing, ...updates, lastSyncAt: new Date() };
   }
 
   async deleteListing(listingId: string): Promise<void> {
@@ -644,17 +642,17 @@ export class KDPAdapter extends BaseMarketplaceAdapter {
       id: `kdp_${Date.now()}`,
       productId: product.id,
       marketplace: 'kdp',
-      externalId: '', // ASIN assigned after publishing
+      listingId: '', // ASIN assigned after publishing
+      listingUrl: '',
       title: product.name,
       description: product.description || '',
-      price: this.calculateKDPPrice(product.basePrice),
-      currency: 'USD',
-      inventory: -1, // Digital products have unlimited inventory
-      status: 'draft',
-      images: product.images, // Cover image
+      price: this.calculateKDPPrice(product.basePrice ?? product.suggestedPrice),
+      quantity: -1, // Digital products have unlimited inventory
+      fulfillment: 'marketplace', // KDP handles fulfillment
+      status: 'pending',
+      images: product.images.map(img => img.url), // Cover image
       keywords: product.tags?.slice(0, 7), // KDP allows 7 keywords
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      lastSyncAt: new Date(),
     };
 
     return listing;
@@ -668,7 +666,7 @@ export class KDPAdapter extends BaseMarketplaceAdapter {
     const existing = await this.getListing(listingId);
     if (!existing) throw new Error(`Listing ${listingId} not found`);
 
-    return { ...existing, ...updates, updatedAt: new Date() };
+    return { ...existing, ...updates, lastSyncAt: new Date() };
   }
 
   async deleteListing(listingId: string): Promise<void> {
@@ -837,17 +835,17 @@ export class EtsyAdapter extends BaseMarketplaceAdapter {
       id: `etsy_${Date.now()}`,
       productId: product.id,
       marketplace: 'etsy',
-      externalId: '',
+      listingId: '',
+      listingUrl: '',
       title: product.name.slice(0, 140), // Etsy 140 char limit
       description: product.description || '',
-      price: product.basePrice,
-      currency: 'USD',
-      inventory: product.inventory.totalQuantity,
-      status: 'draft',
-      images: product.images.slice(0, 10), // Etsy allows 10 images
+      price: product.basePrice ?? product.suggestedPrice,
+      quantity: product.totalQuantity,
+      fulfillment: 'merchant',
+      status: 'pending',
+      images: product.images.slice(0, 10).map(img => img.url), // Etsy allows 10 images
       keywords: product.tags?.slice(0, 13), // Etsy allows 13 tags
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      lastSyncAt: new Date(),
     };
 
     return listing;
@@ -861,7 +859,7 @@ export class EtsyAdapter extends BaseMarketplaceAdapter {
     const existing = await this.getListing(listingId);
     if (!existing) throw new Error(`Listing ${listingId} not found`);
 
-    return { ...existing, ...updates, updatedAt: new Date() };
+    return { ...existing, ...updates, lastSyncAt: new Date() };
   }
 
   async deleteListing(listingId: string): Promise<void> {
@@ -1000,7 +998,7 @@ export class MarketplaceRegistry {
   }
 
   getByType(type: MarketplaceType): MarketplaceAdapter | undefined {
-    for (const adapter of this.adapters.values()) {
+    for (const adapter of Array.from(this.adapters.values())) {
       if (adapter.type === type) return adapter;
     }
     return undefined;
@@ -1015,7 +1013,7 @@ export class MarketplaceRegistry {
   }
 
   async disconnectAll(): Promise<void> {
-    for (const adapter of this.adapters.values()) {
+    for (const adapter of Array.from(this.adapters.values())) {
       if (adapter.isConnected()) {
         await adapter.disconnect();
       }

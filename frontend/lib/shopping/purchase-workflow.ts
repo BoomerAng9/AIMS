@@ -155,11 +155,24 @@ export class PurchaseWorkflow {
     };
   }): Promise<WorkflowState> {
     // Create shopping mission via PMO
+    // Assign IDs to items that don't have them
+    const itemsWithIds: ShoppingItem[] = params.items.map((item) => ({
+      ...item,
+      id: uuidv4(),
+    }));
+
     const mission = await this.pmo.createMission({
       userId: params.userId,
-      description: params.description,
-      items: params.items,
+      title: params.description,
+      items: itemsWithIds,
       budget: params.budget,
+      preferences: {
+        preferredRetailers: params.preferences?.preferredRetailers ?? [],
+        excludedRetailers: [],
+        shippingSpeed: 'standard',
+        maxDeliveryDays: params.preferences?.maxDeliveryDays,
+        qualityPreference: params.preferences?.qualityPreference ?? 'balanced',
+      },
     });
 
     // Initialize workflow state
@@ -268,34 +281,34 @@ export class PurchaseWorkflow {
     const mission = await this.pmo.getMission(missionId);
     if (!mission) throw new Error(`Mission ${missionId} not found`);
 
-    const budgetConstraints = mission.budgetConstraints;
+    const budget = mission.budget;
     const withinBudget = cartOptions.filter(
-      (opt) => opt.total <= budgetConstraints.totalBudget
+      (opt) => opt.summary.grandTotal <= budget.totalLimit
     );
 
     let selectedOption: CartOption;
 
     if (withinBudget.length > 0) {
       // Pick cheapest within budget
-      selectedOption = withinBudget.sort((a, b) => a.total - b.total)[0];
+      selectedOption = withinBudget.sort((a, b) => a.summary.grandTotal - b.summary.grandTotal)[0];
     } else {
       // All options exceed budget - pick cheapest and create change request
-      selectedOption = cartOptions.sort((a, b) => a.total - b.total)[0];
+      selectedOption = cartOptions.sort((a, b) => a.summary.grandTotal - b.summary.grandTotal)[0];
 
       const changeRequest: ShoppingChangeRequest = {
         id: uuidv4(),
         missionId,
         type: 'budget_exceeded',
         status: 'pending',
-        originalValue: budgetConstraints.totalBudget,
-        requestedValue: selectedOption.total,
-        reason: `Best available option ($${selectedOption.total.toFixed(2)}) exceeds budget ($${budgetConstraints.totalBudget.toFixed(2)})`,
+        originalValue: budget.totalLimit,
+        requestedValue: selectedOption.summary.grandTotal,
+        reason: `Best available option ($${selectedOption.summary.grandTotal.toFixed(2)}) exceeds budget ($${budget.totalLimit.toFixed(2)})`,
         createdAt: new Date(),
         createdBy: 'system',
         options: [
           {
             id: 'approve',
-            label: `Approve $${selectedOption.total.toFixed(2)}`,
+            label: `Approve $${selectedOption.summary.grandTotal.toFixed(2)}`,
             description: 'Proceed with the purchase at the higher price',
           },
           {
@@ -330,8 +343,8 @@ export class PurchaseWorkflow {
         missionId,
         type: 'budget_exceeded',
         status: 'pending',
-        originalValue: budgetConstraints.totalBudget,
-        requestedValue: cart.total,
+        originalValue: budget.totalLimit,
+        requestedValue: cart.summary.grandTotal,
         reason: budgetCheck.reason || 'Budget exceeded',
         createdAt: new Date(),
         createdBy: 'system',
@@ -345,15 +358,36 @@ export class PurchaseWorkflow {
     }
 
     // Reserve budget
-    this.budgetManager.reserveBudget(missionId, cart.total);
+    this.budgetManager.reserveBudget(missionId, cart.summary.grandTotal);
 
     // Set up price monitoring
     if (this.config.priceMonitoringEnabled) {
       for (const item of cart.items) {
+        // Create a synthetic ProductFinding from CartItem data
+        const syntheticFinding: ProductFinding = {
+          id: uuidv4(),
+          teamId: '',
+          itemId: item.itemId,
+          product: {
+            id: item.productId,
+            name: item.productName,
+            url: item.productUrl,
+            image: item.productImage,
+            price: item.pricePerUnit,
+            retailer: item.retailer,
+            availability: item.availability,
+            rating: item.rating,
+            reviewCount: item.reviewCount,
+          },
+          matchScore: 100,
+          priceScore: 100,
+          foundAt: new Date(),
+        };
+
         this.priceMonitor.createWatch({
           missionId,
-          item: { id: item.itemId, name: item.finding.productName, quantity: item.quantity },
-          finding: item.finding,
+          item: { id: item.itemId, name: item.finding.productName, description: item.finding.productName, quantity: item.quantity, required: true },
+          finding: syntheticFinding,
           alertOnDrop: true,
           alertOnIncrease: true,
           increaseThreshold: 10,
@@ -437,7 +471,7 @@ export class PurchaseWorkflow {
           // Update budget constraints
           const mission = await this.pmo.getMission(missionId);
           if (mission) {
-            mission.budgetConstraints.totalBudget = modifiedBudget;
+            mission.budget.totalLimit = modifiedBudget;
           }
         }
         state.phase = 'awaiting_review';
@@ -492,7 +526,7 @@ export class PurchaseWorkflow {
     await this.emitEvent('cart_approved', missionId, {
       cartId: state.cart.id,
       approvedBy,
-      total: state.cart.total,
+      total: state.cart.summary.grandTotal,
     });
 
     return state;
@@ -527,19 +561,17 @@ export class PurchaseWorkflow {
       if (result.success) {
         // Finalize cart
         this.cartBuilder.finalize(state.cart.id, result.orderIds);
-        state.cart.status = 'completed';
-        state.cart.orderIds = result.orderIds;
-        state.cart.finalizedAt = new Date();
+        state.cart.status = 'purchased';
 
         // Commit budget
-        this.budgetManager.commitBudget(missionId, state.cart.total);
+        this.budgetManager.commitBudget(missionId, state.cart.summary.grandTotal);
 
         state.phase = 'completed';
         state.status = 'completed';
 
         await this.emitEvent('payment_completed', missionId, {
           orderIds: result.orderIds,
-          total: state.cart.total,
+          total: state.cart.summary.grandTotal,
         });
 
         await this.emitEvent('mission_completed', missionId);
@@ -581,8 +613,11 @@ export class PurchaseWorkflow {
     // Release any budget reservation
     this.budgetManager.releaseBudget(missionId);
 
-    // Cancel mission in PMO
-    await this.pmo.cancelMission(missionId);
+    // Update mission status in PMO
+    const mission = await this.pmo.getMission(missionId);
+    if (mission) {
+      mission.status = 'cancelled';
+    }
 
     await this.emitEvent('mission_cancelled', missionId, { reason });
   }
@@ -610,7 +645,7 @@ export class PurchaseWorkflow {
       cart: state.cart
         ? {
             itemCount: state.cart.items.length,
-            total: state.cart.total,
+            total: state.cart.summary.grandTotal,
             retailers: state.cart.retailerBreakdown.map((r) => r.retailer),
           }
         : undefined,
@@ -635,7 +670,7 @@ export class PurchaseWorkflow {
       data,
     };
 
-    for (const handler of this.eventHandlers) {
+    for (const handler of Array.from(this.eventHandlers)) {
       try {
         await handler(event);
       } catch (error) {

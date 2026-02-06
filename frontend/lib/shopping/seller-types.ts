@@ -73,6 +73,7 @@ export type MarketplaceType =
   | 'mercadolibre'
   | 'rakuten'
   | 'kdp'
+  | 'tiktok'
   | 'custom';
 
 export interface MarketplaceSettings {
@@ -104,9 +105,12 @@ export interface SellerProduct {
   sellerId: string;
   sku: string;
   title: string;
+  name: string; // Alias for title (used across codebase)
   description: string;
   category: string;
   brand?: string;
+  features?: string[]; // Used in listing-optimizer
+  tags?: string[]; // Used in listing-optimizer for keyword generation
 
   // Media
   images: ProductImage[];
@@ -119,11 +123,14 @@ export interface SellerProduct {
   // Pricing
   baseCost: number; // Your cost
   suggestedPrice: number; // AI suggested
+  basePrice?: number; // Current selling price (used by marketplace adapters)
+  compareAtPrice?: number; // Original/compare price for sale display
   margin: number;
 
   // Inventory
   totalQuantity: number;
   lowStockThreshold: number;
+  inventory?: { totalQuantity: number }; // Nested accessor for compatibility
 
   // Marketplace listings
   listings: MarketplaceListing[];
@@ -158,6 +165,7 @@ export interface ProductVideo {
 export interface ProductVariant {
   id: string;
   sku: string;
+  name?: string; // Variant display name
   attributes: Record<string, string>; // size: "XL", color: "Blue"
   price: number;
   quantity: number;
@@ -174,6 +182,11 @@ export interface MarketplaceListing {
 
   // Marketplace-specific
   title: string;
+  description?: string;
+  bulletPoints?: string[];
+  backendKeywords?: string[];
+  keywords?: string[];
+  images?: string[];
   price: number;
   quantity: number;
   fulfillment: 'merchant' | 'marketplace'; // FBA, WFS, etc.
@@ -302,16 +315,21 @@ export interface ActionTaken {
 
 export interface Recommendation {
   id: string;
-  type: 'pricing' | 'listing' | 'inventory' | 'expansion' | 'marketing';
+  type: 'pricing' | 'listing' | 'inventory' | 'expansion' | 'marketing' | 'optimization' | 'growth' | 'automation' | 'operational' | 'financial' | 'strategic' | string;
   priority: 'low' | 'medium' | 'high' | 'critical';
   title: string;
   description: string;
-  impact: {
+  // Legacy properties (used in listing-optimizer and growth-orchestrator)
+  actionItems?: string[];
+  estimatedImpact?: string;
+  effort?: 'easy' | 'medium' | 'hard';
+  // Structured impact (preferred)
+  impact?: {
     metric: string;
     estimated: number;
     confidence: number;
   };
-  actions: string[];
+  actions?: string[];
   autoApply?: boolean;
 }
 
@@ -505,6 +523,7 @@ export interface SellerMetrics {
   // Legacy/convenience accessors (optional - for backward compatibility)
   monthlyRevenue?: number;
   totalProducts?: number;
+  orderCount?: number;
   marketplaces?: { length: number }[];
   totalReviews?: number;
   profitMargin?: number;

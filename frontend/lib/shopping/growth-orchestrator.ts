@@ -949,15 +949,18 @@ export class GrowthOrchestrator {
         id: uuidv4(),
         type: 'listing',
         priority: 'high',
-        title: `Add More Images: ${product.name}`,
+        title: `Add More Images: ${product.title}`,
         description: `Product has only ${product.images.length} images. 5-7 images significantly increase conversion.`,
-        actionItems: [
+        impact: {
+          metric: 'conversion',
+          estimated: 20,
+          confidence: 0.75,
+        },
+        actions: [
           'Add lifestyle/in-use images',
           'Add infographic with features',
           'Add scale/size reference image',
         ],
-        estimatedImpact: '+15-25% conversion',
-        effort: 'medium',
       });
     }
 
@@ -975,13 +978,16 @@ export class GrowthOrchestrator {
       priority: 'medium',
       title: 'Expand to New Marketplaces',
       description: `Currently on ${currentMarketplaces.length} marketplace(s). Consider expanding to diversify revenue.`,
-      actionItems: [
+      impact: {
+        metric: 'revenue',
+        estimated: 40,
+        confidence: 0.6,
+      },
+      actions: [
         `Evaluate ${newMarketplaces[0]} for your product category`,
         'Research marketplace-specific requirements',
         'Adapt listings for new platform',
       ],
-      estimatedImpact: '+30-50% revenue potential',
-      effort: 'hard',
     };
   }
 
@@ -1029,7 +1035,7 @@ export class GrowthOrchestrator {
       data,
     };
 
-    for (const handler of this.eventHandlers) {
+    for (const handler of Array.from(this.eventHandlers)) {
       try {
         await handler(event);
       } catch (error) {

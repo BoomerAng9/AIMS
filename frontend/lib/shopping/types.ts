@@ -14,6 +14,7 @@ export type MissionStatus =
   | 'scouting'        // Boomer_Angs searching
   | 'comparing'       // Comparing options
   | 'awaiting_approval' // Cart ready for user review
+  | 'approved'        // User approved cart
   | 'purchasing'      // Purchase in progress
   | 'completed'       // Successfully purchased
   | 'cancelled';      // User cancelled
@@ -54,13 +55,19 @@ export interface ShoppingMission {
 
 export interface ShoppingItem {
   id: string;
+  name?: string; // Display name
   description: string;
   quantity: number;
   maxPricePerUnit?: number;
+  minPrice?: number; // Minimum expected price
+  maxPrice?: number; // Maximum expected price
   category?: string;
   specifications?: Record<string, string>;
   alternatives?: string[]; // Acceptable alternative products
   required: boolean; // Must-have vs nice-to-have
+  // Additional search parameters
+  preferredRetailers?: string[];
+  brand?: string;
 }
 
 export interface BudgetConstraints {
@@ -68,13 +75,16 @@ export interface BudgetConstraints {
   perItemLimit?: number;
   currency: string;
   flexibilityPercent?: number; // Allow X% over for good deals
+  maxShipping?: number; // Maximum shipping cost allowed
 }
 
 export interface ShoppingPreferences {
   preferredRetailers?: string[];
   excludedRetailers?: string[];
   shippingSpeed: 'fastest' | 'standard' | 'cheapest';
-  bulkDiscountPriority: boolean;
+  bulkDiscountPriority?: boolean;
+  maxDeliveryDays?: number;
+  qualityPreference?: 'budget' | 'balanced' | 'premium';
   ecoFriendly?: boolean;
   domesticOnly?: boolean;
   primeOnly?: boolean; // Amazon Prime
@@ -89,9 +99,17 @@ export interface CartOption {
   name: string; // "Best Value", "Budget Pick", "Premium"
   description: string;
   items: CartItem[];
-  summary: CartSummary;
-  savings: number;
-  recommended: boolean;
+  summary?: CartSummary;
+  savings?: number;
+  recommended?: boolean;
+  // Additional properties for shopping-agent
+  strategy?: 'cheapest' | 'best_rated' | 'fastest' | 'single_retailer' | string;
+  subtotal?: number;
+  estimatedShipping?: number;
+  estimatedTax?: number;
+  total?: number;
+  estimatedDelivery?: Date;
+  retailers?: string[];
 }
 
 export interface AggregatedCart {
@@ -106,23 +124,31 @@ export interface AggregatedCart {
 }
 
 export interface CartItem {
-  id: string;
+  id?: string;
   itemId: string; // Reference to ShoppingItem
-  productId: string;
-  productName: string;
-  productUrl: string;
+  productId?: string;
+  productName?: string;
+  productUrl?: string;
   productImage?: string;
 
   // Retailer info
-  retailer: string;
-  retailerProductId: string;
+  retailer?: string;
+  retailerProductId?: string;
 
   // Pricing
-  pricePerUnit: number;
+  pricePerUnit?: number;
   quantity: number;
-  totalPrice: number;
+  totalPrice?: number;
+  lineTotal?: number; // Alias for totalPrice (used in some components)
   originalPrice?: number; // If on sale
   savings?: number;
+
+  // Finding reference (for recommendation display)
+  // Can be either a simplified reference or a full ProductFinding
+  finding?: ProductFinding | {
+    productName: string;
+    price: number;
+  };
 
   // Bulk discount
   bulkDiscount?: {
@@ -132,12 +158,12 @@ export interface CartItem {
   };
 
   // Availability
-  availability: 'in_stock' | 'limited' | 'backorder' | 'out_of_stock';
+  availability?: 'in_stock' | 'limited' | 'backorder' | 'out_of_stock';
   stockCount?: number;
 
   // Shipping
-  shippingCost: number;
-  shippingEstimate: string;
+  shippingCost?: number;
+  shippingEstimate?: string;
   freeShippingThreshold?: number;
 
   // Metadata
@@ -216,6 +242,8 @@ export interface ShoppingTask {
   error?: string;
   startedAt?: Date;
   completedAt?: Date;
+  // Items to search for (used by shopping-agent)
+  items?: ShoppingItem[];
 }
 
 export interface ProductFinding {
@@ -238,6 +266,18 @@ export interface ProductFinding {
   priceScore: number; // How good the price is (0-100)
   notes?: string;
   foundAt: Date;
+
+  // Flat accessors for shopping-agent compatibility
+  productId?: string;
+  productName?: string;
+  price?: number;
+  retailer?: string;
+  rating?: number;
+  reviewCount?: number;
+  inStock?: boolean;
+  stockQuantity?: number;
+  shippingEstimate?: number;
+  deliveryDays?: number;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -251,15 +291,27 @@ export interface ShoppingChangeRequest {
   status: 'pending' | 'approved' | 'rejected';
 
   // What triggered the change request
-  trigger: {
+  trigger?: {
     itemId: string;
     reason: string;
     originalValue: unknown;
     proposedValue: unknown;
   };
 
+  // Legacy/flat properties (used by purchase-workflow)
+  originalValue?: number;
+  requestedValue?: number;
+  reason?: string;
+  createdBy?: string;
+  options?: {
+    id: string;
+    label: string;
+    description: string;
+  }[];
+  recommendations?: string[];
+
   // Cost impact
-  impact: {
+  impact?: {
     priceDifference: number;
     percentChange: number;
   };
@@ -302,28 +354,46 @@ export interface ProgressEvent {
 
 export interface PriceAlert {
   id: string;
-  userId: string;
-  productUrl: string;
-  productName: string;
+  userId?: string;
+  missionId?: string;
+  watchId?: string;
+  type?: 'price_drop' | 'price_increase' | 'target_reached' | 'out_of_stock';
+  itemId?: string;
+  itemName?: string;
+  productUrl?: string;
+  productName?: string;
   retailer: string;
-  targetPrice: number;
+  targetPrice?: number;
+  previousPrice?: number;
   currentPrice: number;
-  status: 'active' | 'triggered' | 'expired' | 'cancelled';
-  notifyVia: ('email' | 'push' | 'sms')[];
+  percentChange?: number;
+  message?: string;
+  status?: 'active' | 'triggered' | 'expired' | 'cancelled';
+  notifyVia?: ('email' | 'push' | 'sms')[];
   createdAt: Date;
   triggeredAt?: Date;
   expiresAt?: Date;
+  read?: boolean;
 }
 
 export interface PriceHistory {
-  productUrl: string;
+  productUrl?: string;
+  productId?: string;
   retailer: string;
   prices: {
     price: number;
     timestamp: Date;
   }[];
+  // Aliases for prices array (for compatibility with price-monitor.ts)
+  dataPoints: {
+    price: number;
+    timestamp: Date;
+  }[];
   lowestPrice: number;
   highestPrice: number;
+  // Aliases for lowest/highest (for compatibility)
+  allTimeLow: number;
+  allTimeHigh: number;
   averagePrice: number;
 }
 
