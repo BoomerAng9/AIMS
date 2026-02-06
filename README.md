@@ -18,21 +18,71 @@ A.I.M.S. builds production-ready applications in minutes, not months. These apps
 
 ## What is A.I.M.S.?
 
-A.I.M.S. (AI Managed Solutions) is a professional support platform that uses specialized AI agents ("Boomer_Angs") orchestrated by **ACHEEVY** - your AI executive assistant.
+A.I.M.S. (AI Managed Solutions) is a professional support platform that uses specialized AI agents orchestrated by **ACHEEVY** - your AI executive assistant.
+
+### Governance Model
+
+```
+User → ACHEEVY → Boomer_Ang → Chicken_Hawk → Squad → Lil_Hawks
+```
+
+1. **ACHEEVY** approves plan and presents to user
+2. **Boomer_Ang** validates scope against DSP limits
+3. **Contract** issued to Chicken_Hawk with ShiftId
+4. **Chicken_Hawk** spawns Squad with Lil_Hawks
+5. **Lil_Hawks** execute and report (logs only)
+6. **ACHEEVY** verifies receipt and closes
 
 ### Key Features
 
-- **ACHEEVY**: Voice-first AI assistant that orchestrates complex tasks across departments
-- **Boomer_Ang Agents**: Specialized workers that handle research, coding, shopping, and more
+- **ACHEEVY**: Voice-first AI assistant that orchestrates complex tasks
+- **Deploy Platform**: "Boomer_Angs on the Port" - containerized execution with Chicken_Hawk engine
+- **Lil_Hawks**: Specialized worker bots with career progression (Hatchling → Chicken_Hawk)
+- **Live Ops Theater**: Watch-only view of operations in progress
+- **Circuit Box**: Central hub connecting ACHEEVY to execution layer
 - **LUC (Live Usage Calculator)**: Real-time quota tracking and cost management
 - **Model Garden**: 200+ AI models at your fingertips
-- **Circuit Box**: Clean system management dashboard
 
 ### Core Principles
 
 1. **Boomer_Angs NEVER have payment access** - they scout and recommend, ACHEEVY executes
 2. **Production-ready only** - no mockups, no demos, only real working applications
 3. **Fast delivery** - apps built in minutes to hours, not weeks or months
+4. **Y-ISO Standards** - Internal quality and safety standards (Y-ISO-01 through Y-ISO-07)
+
+---
+
+## Deploy Platform
+
+The Deploy Platform ("Boomer_Angs on the Port") is A.I.M.S.'s containerized execution system.
+
+### Visual Metaphor
+
+| Real-World | System |
+|------------|--------|
+| Container stacks | Versioned deploys |
+| Cranes | Heavy-lift infra tasks |
+| Ground crew | Lil_Hawk worker bots |
+| Manifest | Deploy instructions |
+| Receipt | Signed audit log |
+
+### Execution Lanes
+
+- **Deploy It**: Fast dispatch for pre-approved operations (low OEI)
+- **Guide Me**: Consultative lane requiring approval before execution
+
+### Workforce Structure
+
+| Level | Description |
+|-------|-------------|
+| Hatchling | New worker, needs mentorship |
+| Apprentice | Learning, limited solo tasks |
+| Journeyman | Trusted independent worker |
+| Foreman | Can mentor, high privilege |
+| Chicken_Hawk_Candidate | Promotion track |
+| Chicken_Hawk | Full engine authority |
+
+See [DEPLOY_PLATFORM.md](docs/DEPLOY_PLATFORM.md) for complete documentation.
 
 ---
 
@@ -41,7 +91,8 @@ A.I.M.S. (AI Managed Solutions) is a professional support platform that uses spe
 **Don't fork - use the cloud!**
 
 Visit [AIMS.PLUGMEIN.CLOUD](https://aims.plugmein.cloud) to:
-- Build custom applications with ACHEEVY
+- Chat with ACHEEVY and watch the Lil_Hawks work
+- Build custom applications
 - Access production-ready tools like LUC Calculator
 - Deploy your own AI-powered solutions
 
@@ -62,20 +113,28 @@ Visit [AIMS.PLUGMEIN.CLOUD](https://aims.plugmein.cloud) to:
 - **UCP** (Universal Commerce Protocol) - Commerce and payments
 - **LUC** (Live Usage Calculator) - Quota and cost management
 - **MCP** (Model Context Protocol) - Tool definitions
+- **DSP** (Deploy Security Packet) - Shift security contracts
 
 ### Project Structure
 
 ```
-frontend/           # Next.js application
-  app/              # App Router pages
-  components/       # React components
-  lib/              # Core libraries (LUC, shopping, etc.)
-backend/            # Backend services
-  uef-gateway/      # Universal Experience Framework
-  acheevy/          # ACHEEVY intent analyzer
-packages/           # Shared packages
-  luc-sdk/          # LUC SDK for integration
-infra/              # Docker and deployment config
+frontend/                    # Next.js application
+  app/
+    dashboard/acheevy/       # ACHEEVY chat interface
+  components/
+    deploy-platform/         # Live Ops Theater, etc.
+backend/                     # Backend services
+  uef-gateway/               # Universal Experience Framework
+  acheevy/                   # ACHEEVY intent analyzer
+packages/                    # Shared packages
+  luc-sdk/                   # LUC SDK for integration
+infra/
+  deploy-platform/           # Deploy Platform configuration
+    circuit-box/             # ACHEEVY tool calling
+    lore/                    # Workforce & Y-ISO standards
+    contracts/               # DSP schemas
+    registry/                # Capability registry
+  openclaw-sandbox/          # Chicken_Hawk sandbox config
 ```
 
 ### Local Development
@@ -112,12 +171,6 @@ Track API calls, storage, compute, and more with:
 4. **Enterprise** - Brand building
 5. **Global** - International markets
 
-Includes AI-powered best practices for:
-- Shopify store setup and optimization
-- Amazon FBA/FBM selling
-- KDP book publishing and marketing
-- Etsy handmade/vintage marketplace
-
 ---
 
 ## Contributing
@@ -132,4 +185,4 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 **A.I.M.S. - Build Your Future. Empower Your Vision.**
 
-*Powered by ACHEEVY and Boomer_Ang agents*
+*Powered by ACHEEVY, Chicken_Hawk, and Lil_Hawk workers*

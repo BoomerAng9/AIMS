@@ -2,40 +2,114 @@
 
 ```text
 /
-├── frontend/                  # Next.js 14 App (User Surface)
+├── frontend/                      # Next.js 14 App (User Surface)
 │   ├── app/
-│   │   ├── api/acp/route.ts   # Proxy route to UEF
-│   │   ├── layout.tsx         # Root layout
-│   │   └── page.tsx           # Acheevy Chat Interface
+│   │   ├── api/
+│   │   │   ├── acheevy/route.ts   # ACHEEVY API proxy
+│   │   │   ├── acp/route.ts       # ACP protocol route
+│   │   │   └── chat/route.ts      # Chat streaming route
+│   │   ├── dashboard/
+│   │   │   ├── acheevy/page.tsx   # ACHEEVY chat interface (NEW)
+│   │   │   ├── circuit-box/       # Circuit Box dashboard
+│   │   │   ├── chat/page.tsx      # Legacy chat
+│   │   │   └── ...
+│   │   ├── layout.tsx             # Root layout
+│   │   └── page.tsx               # Landing page
 │   ├── components/
-│   │   └── AcheevyChat.tsx    # Chat UI Component
+│   │   ├── chat/
+│   │   │   └── ChatInterface.tsx  # Chat UI component
+│   │   ├── deploy-platform/       # Deploy Platform components (NEW)
+│   │   │   └── LiveOpsTheater.tsx # Watch-only operations view
+│   │   ├── orchestration/         # Glass Box orchestration
+│   │   ├── ui/
+│   │   │   └── CircuitBoard.tsx   # A.I.M.S. branding components
+│   │   ├── DashboardNav.tsx       # Navigation
+│   │   └── DashboardShell.tsx     # Dashboard layout
 │   └── lib/
-│       └── acp-client.ts      # Frontend ACP Client
+│       ├── chat/                  # Chat utilities
+│       ├── luc/                   # LUC client
+│       └── acp-client.ts          # ACP client
+│
 ├── backend/
-│   └── uef-gateway/           # Node/TS Middleware (UEF)
-│       ├── src/
-│       │   ├── acp/           # Protocol definitions & handlers
-│       │   ├── ucp/           # Commerce & Quote logic
-│       │   ├── luc/           # Locale Usage Calculator engine
-│       │   ├── oracle/        # 7-Gate Verification Stubs
-│       │   ├── byterover/     # Memory Stubs
-│       │   ├── vl-jepa/       # Vision/Hallucination Stubs
-│       │   ├── agents/        # Downstream agent clients
-│       │   └── index.ts       # Server Entrypoint
-├── mcp-tools/                 # MCP Tool Definitions (JSON/TS)
-├── infra/                     # Infrastructure Config
-│   ├── docker-compose.yml     # Service Orchestration
-│   └── .env.example           # Environment Config
-└── docs/                      # Documentation
-    ├── AIMS_OVERVIEW.md
-    ├── PROTOCOLS_ACP_UCP_MCP.md
-    ├── ORACLE_CONCEPTUAL_FRAMEWORK.md
-    └── LUC_INTEGRATION_GUIDE.md
+│   ├── uef-gateway/               # Node/TS Middleware (UEF)
+│   │   ├── src/
+│   │   │   ├── acp/               # Protocol definitions
+│   │   │   ├── ucp/               # Commerce logic
+│   │   │   ├── luc/               # LUC engine
+│   │   │   ├── oracle/            # 7-Gate verification
+│   │   │   ├── byterover/         # Memory context
+│   │   │   ├── agents/            # Agent clients
+│   │   │   └── index.ts           # Server entrypoint
+│   └── acheevy/                   # ACHEEVY service
+│
+├── packages/
+│   └── luc-sdk/                   # LUC SDK for integration
+│
+├── infra/                         # Infrastructure Config
+│   ├── deploy-platform/           # Deploy Platform (NEW)
+│   │   ├── circuit-box/           # ACHEEVY tool calling
+│   │   │   ├── acheevy-tools.json       # Tool definitions
+│   │   │   ├── chicken-hawk-dispatch.json   # Chicken_Hawk API
+│   │   │   └── circuit-box-config.json      # Hub config
+│   │   ├── lore/                  # Workforce & standards
+│   │   │   ├── workforce-structure.json     # Career levels
+│   │   │   ├── y-iso-standards.json         # Y-ISO standards
+│   │   │   ├── lil-hawk-designations.json   # Worker types
+│   │   │   ├── live-ops-theater.json        # Theater config
+│   │   │   ├── evolution-bounds.json        # Safe tuning
+│   │   │   └── career-record-schema.json    # Career tracking
+│   │   ├── contracts/             # Security contracts
+│   │   │   ├── shift-contract-schema.json   # Shift contract
+│   │   │   └── deploy-security-packet.json  # DSP schema
+│   │   ├── registry/              # Capability registry
+│   │   │   ├── capability-registry.json     # Available ops
+│   │   │   └── bot-moniker-rules.json       # Naming rules
+│   │   └── stitch/                # UI configurations
+│   │       └── DEPLOY_PLATFORM_YARD_UI_V1.json
+│   ├── openclaw-sandbox/          # Chicken_Hawk sandbox
+│   │   └── openclaw.config.json   # Execution config
+│   ├── boomerangs/                # Boomer_Ang configs
+│   ├── agent-bridge/              # Agent integration
+│   ├── docker-compose.yml         # Dev orchestration
+│   ├── docker-compose.production.yml  # Prod orchestration
+│   └── .env.example               # Environment config
+│
+├── mcp-tools/                     # MCP Tool Definitions
+│
+├── docs/                          # Documentation
+│   ├── AIMS_OVERVIEW.md           # Architecture overview
+│   ├── DEPLOY_PLATFORM.md         # Deploy Platform guide (NEW)
+│   ├── LUC_INTEGRATION_GUIDE.md   # LUC integration
+│   └── ORACLE_CONCEPTUAL_FRAMEWORK.md  # Oracle framework
+│
+├── locale-skills/                 # Locale-specific skills
+│
+├── PROJECT_TREE.md                # This file
+└── README.md                      # Project README
 ```
 
-## Top-Level Folders Extraction
-- **frontend/**: The user-facing Next.js application where ACHEEVY lives.
-- **backend/uef-gateway/**: The central nervous system (UEF) handling protocol translation (ACP), commerce (UCP), and logic.
-- **mcp-tools/**: Definitions for Model Context Protocol tools.
-- **infra/**: Docker and environment configuration.
-- **docs/**: Architectural documentation.
+## Key Directories
+
+### Frontend (`frontend/`)
+The user-facing Next.js 14 application where ACHEEVY lives.
+- **app/dashboard/acheevy/**: New ACHEEVY chat interface with Deploy Platform integration
+- **components/deploy-platform/**: Live Ops Theater for watching operations
+
+### Backend (`backend/`)
+Server-side services handling protocol translation and orchestration.
+- **uef-gateway/**: Universal Experience Framework - the central nervous system
+- **acheevy/**: ACHEEVY intent analyzer service
+
+### Infrastructure (`infra/`)
+Configuration and deployment settings.
+- **deploy-platform/**: Complete Deploy Platform configuration
+  - **circuit-box/**: ACHEEVY tool definitions and routing
+  - **lore/**: Workforce structure, Y-ISO standards, career tracking
+  - **contracts/**: DSP and shift contract schemas
+  - **registry/**: Capability registry and naming rules
+- **openclaw-sandbox/**: Chicken_Hawk execution sandbox
+
+### Documentation (`docs/`)
+Architectural and integration documentation.
+- **AIMS_OVERVIEW.md**: System architecture with mermaid diagrams
+- **DEPLOY_PLATFORM.md**: Deploy Platform detailed guide
