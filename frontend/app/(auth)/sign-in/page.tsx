@@ -9,17 +9,14 @@ export default function SignInPage() {
 
   return (
     <div className="space-y-8">
-      {/* LED dot-matrix heading */}
+      {/* Branded heading */}
       <header className="text-center">
-        <h1 className="text-[1.6rem] md:text-[2rem] font-bold tracking-[0.12em] leading-tight text-amber-300 font-display uppercase">
-          THE HYBRID
+        <h1 className="text-[2.5rem] md:text-[3rem] font-bold tracking-[0.2em] leading-tight text-amber-300 font-display uppercase">
+          A.I.M.S.
         </h1>
-        <h1 className="text-[1.6rem] md:text-[2rem] font-bold tracking-[0.12em] leading-tight text-amber-300 font-display uppercase">
-          BUSINESS
-        </h1>
-        <h1 className="text-[1.6rem] md:text-[2rem] font-bold tracking-[0.12em] leading-tight text-amber-300 font-display uppercase">
-          ARCHITECT
-        </h1>
+        <p className="mt-2 text-[1rem] md:text-[1.2rem] tracking-[0.1em] text-amber-100/80 font-marker">
+          AI Managed Solutions
+        </p>
       </header>
 
       {!showEmailForm ? (
