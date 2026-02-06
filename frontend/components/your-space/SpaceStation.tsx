@@ -36,8 +36,8 @@ interface SpaceStationProps {
 // Icons
 // ─────────────────────────────────────────────────────────────
 
-const RocketIcon = ({ className }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+const RocketIcon = ({ className, style }: { className?: string; style?: React.CSSProperties }) => (
+  <svg className={className} style={style} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" />
     <path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" />
     <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0" />
@@ -45,38 +45,38 @@ const RocketIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-const PickaxeIcon = ({ className }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+const PickaxeIcon = ({ className, style }: { className?: string; style?: React.CSSProperties }) => (
+  <svg className={className} style={style} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <path d="M14.5 4.5L20 10M4 20l7-7" />
     <path d="M14.5 4.5l5.5 5.5-7 7L7.5 11.5l7-7z" />
   </svg>
 );
 
-const UsersIcon = ({ className }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+const UsersIcon = ({ className, style }: { className?: string; style?: React.CSSProperties }) => (
+  <svg className={className} style={style} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
     <circle cx="9" cy="7" r="4" />
     <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
   </svg>
 );
 
-const HammerIcon = ({ className }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+const HammerIcon = ({ className, style }: { className?: string; style?: React.CSSProperties }) => (
+  <svg className={className} style={style} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <path d="M15 12l-8.5 8.5c-.83.83-2.17.83-3 0 0 0 0 0 0 0a2.12 2.12 0 0 1 0-3L12 9" />
     <path d="M17.64 15L22 10.64a1.5 1.5 0 0 0 0-2.12L14.5 1.06a1 1 0 0 0-1.42 0L12 2.17l-.47-.47a1 1 0 0 0-1.42 0l-1.42 1.42a1 1 0 0 0 0 1.42l.47.47L7.59 6.58a1.5 1.5 0 0 0 0 2.12l.47.47L3.5 13.73a1 1 0 0 0 0 1.42l1.42 1.42a1 1 0 0 0 1.42 0l4.56-4.56.47.47a1.5 1.5 0 0 0 2.12 0L17.64 15z" />
   </svg>
 );
 
-const FuelIcon = ({ className }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+const FuelIcon = ({ className, style }: { className?: string; style?: React.CSSProperties }) => (
+  <svg className={className} style={style} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <path d="M3 22h12M4 9h10M6 22V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v18" />
     <path d="M14 15h4a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2h-1" />
     <path d="M14 9v6" />
   </svg>
 );
 
-const LinkIcon = ({ className }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+const LinkIcon = ({ className, style }: { className?: string; style?: React.CSSProperties }) => (
+  <svg className={className} style={style} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
     <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
   </svg>
