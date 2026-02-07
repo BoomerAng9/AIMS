@@ -278,6 +278,77 @@ function AdminPanel() {
         </div>
       </section>
 
+      {/* Verticals — II Agent, II Commons */}
+      <section className="rounded-3xl border border-white/10 bg-black/60 p-6 backdrop-blur-2xl">
+        <h2 className="text-sm font-semibold uppercase tracking-widest text-amber-200/90 font-display">
+          Verticals
+        </h2>
+        <p className="mt-1 text-[0.65rem] text-amber-100/40 uppercase tracking-wider">
+          II Agent &middot; II Commons — External tool integrations (Plugs)
+        </p>
+        <div className="mt-4 grid gap-4 md:grid-cols-2">
+          {/* Agent Verticals */}
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-amber-300/80 mb-3">Agent</p>
+            <div className="space-y-2">
+              {[
+                { id: "openclaw", name: "OpenClaw", desc: "Autonomous AI agent — 100+ AgentSkills, messaging UI", url: "https://openclaw.ai", cap: "execution, shell, web automation" },
+                { id: "agent-zero", name: "Agent Zero", desc: "Computer-as-tool framework — Docker sandbox, web UI", url: "https://agent-zero.ai", cap: "computer-use, multi-agent, code execution" },
+              ].map((v) => (
+                <div key={v.id} className="rounded-2xl border border-white/5 bg-black/40 p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs font-semibold text-amber-50">{v.name}</p>
+                      <p className="text-[10px] text-amber-100/40 mt-0.5">{v.desc}</p>
+                    </div>
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-400/10 border border-amber-300/20 px-2 py-0.5 text-[9px] font-semibold text-amber-300 uppercase">
+                      <span className="h-1 w-1 rounded-full bg-amber-400" />
+                      Available
+                    </span>
+                  </div>
+                  <div className="mt-2 flex flex-wrap gap-1">
+                    {v.cap.split(", ").map((c) => (
+                      <span key={c} className="rounded-full border border-white/5 bg-black/60 px-2 py-0.5 text-[8px] font-mono text-amber-100/50">{c}</span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          {/* Commons Verticals */}
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-400/80 mb-3">Commons</p>
+            <div className="space-y-2">
+              {[
+                { id: "claude-code", name: "Claude Code", desc: "Anthropic CLI — agentic coding, git, terminal", invoke: "claude", cap: "code-gen, file-ops, git" },
+                { id: "gemini-cli", name: "Gemini CLI", desc: "Google CLI — YOLO mode auto-approves all actions", invoke: "gemini -y", cap: "shell, web-search, automated-ops" },
+              ].map((v) => (
+                <div key={v.id} className="rounded-2xl border border-white/5 bg-black/40 p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs font-semibold text-amber-50">{v.name}</p>
+                      <p className="text-[10px] text-amber-100/40 mt-0.5">{v.desc}</p>
+                    </div>
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-400/10 border border-emerald-400/20 px-2 py-0.5 text-[9px] font-semibold text-emerald-400 uppercase">
+                      <span className="h-1 w-1 rounded-full bg-emerald-400" />
+                      Installed
+                    </span>
+                  </div>
+                  <div className="mt-2 flex items-center gap-2">
+                    <code className="rounded bg-black/60 border border-white/5 px-2 py-0.5 text-[9px] font-mono text-amber-200/60">$ {v.invoke}</code>
+                    <div className="flex flex-wrap gap-1">
+                      {v.cap.split(", ").map((c) => (
+                        <span key={c} className="rounded-full border border-white/5 bg-black/60 px-2 py-0.5 text-[8px] font-mono text-amber-100/50">{c}</span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       <div className="grid gap-6 md:grid-cols-2">
         {/* The Park — Model Selection */}
         <section className="rounded-3xl border border-white/10 bg-black/60 p-6 backdrop-blur-2xl">

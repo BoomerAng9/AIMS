@@ -18,6 +18,7 @@ import { pmoRegistry } from './pmo/registry';
 import { houseOfAng } from './pmo/house-of-ang';
 import { TIER_CONFIGS, TASK_MULTIPLIERS as BILLING_MULTIPLIERS, PILLAR_CONFIGS, checkAllowance, calculatePillarAddon, checkAgentLimit } from './billing';
 import { openrouter, MODELS as LLM_MODELS } from './llm';
+import { verticalRegistry } from './verticals';
 
 import logger from './logger';
 
@@ -241,6 +242,34 @@ app.get('/admin/models', (_req, res) => {
         inputPer1M: spec.inputPer1M,
         outputPer1M: spec.outputPer1M,
       },
+    })),
+  });
+});
+
+// --------------------------------------------------------------------------
+// Verticals — External Tool Integrations (II Agent, II Commons)
+// --------------------------------------------------------------------------
+app.get('/verticals', (_req, res) => {
+  res.json({
+    stats: verticalRegistry.getStats(),
+    verticals: verticalRegistry.list().map(v => ({
+      ...v,
+      keyed: verticalRegistry.isKeyed(v.id),
+    })),
+  });
+});
+
+app.get('/verticals/:category', (req, res) => {
+  const cat = req.params.category.toUpperCase();
+  if (cat !== 'AGENT' && cat !== 'COMMONS') {
+    res.status(400).json({ error: 'Category must be AGENT or COMMONS' });
+    return;
+  }
+  res.json({
+    category: cat,
+    verticals: verticalRegistry.listByCategory(cat).map(v => ({
+      ...v,
+      keyed: verticalRegistry.isKeyed(v.id),
     })),
   });
 });
