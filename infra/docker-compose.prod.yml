@@ -96,6 +96,8 @@ services:
       - NODE_ENV=production
       - CORS_ORIGIN=${CORS_ORIGIN}
       - LOG_LEVEL=${LOG_LEVEL:-info}
+    volumes:
+      - gateway-data:/app/data
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/health"]
       interval: 30s
@@ -112,6 +114,7 @@ volumes:
   certbot-certs:
   nginx-conf:
   nginx-logs:
+  gateway-data:
 
 networks:
   aims-network:
