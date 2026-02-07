@@ -39,11 +39,17 @@ describe('LUCEngine', () => {
     });
 
     it('applies ByteRover discount', () => {
-      const quote = LUCEngine.estimate('Some task');
+      const quote = LUCEngine.estimate('Build a full-stack SaaS application with authentication and payments');
 
       for (const variant of quote.variants) {
         expect(variant.estimate.byteRoverDiscountApplied).toBe(true);
         expect(variant.estimate.byteRoverSavingsUsd).toBeGreaterThan(0);
+        expect(variant.estimate.byteRover).toBeDefined();
+        expect(variant.estimate.byteRover.relevance).toBeGreaterThan(0);
+        expect(variant.estimate.byteRover.tokensSaved).toBeGreaterThan(0);
+        expect(variant.estimate.byteRover.preSavingsTokens).toBeGreaterThan(
+          variant.estimate.byteRover.postSavingsTokens
+        );
       }
     });
 

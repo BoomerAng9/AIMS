@@ -57,15 +57,43 @@ export default function PricingPage() {
     })
   );
 
-  // Competitive comparison data
-  const competitors = [
-    { name: "Zapier Pro", price: "$30/mo", agents: "N/A", tokens: "750 tasks", concurrent: "1", security: "Basic" },
-    { name: "Make.com Core", price: "$29/mo", agents: "N/A", tokens: "10K ops", concurrent: "1", security: "Basic" },
-    { name: "n8n Pro", price: "$60/mo", agents: "N/A", tokens: "10K exec", concurrent: "2", security: "Basic" },
-    { name: "CrewAI", price: "$99/mo", agents: "1 crew", tokens: "50 exec", concurrent: "1", security: "Basic" },
-    { name: "Lindy Pro", price: "$49/mo", agents: "Unlimited", tokens: "5K credits", concurrent: "1", security: "Basic" },
-    { name: "Bardeen", price: "$129/mo", agents: "Unlimited", tokens: "Credit-based", concurrent: "1", security: "SOC 2" },
+  // Competitive comparison — 3 clusters of agentic platforms
+  type Cluster = "coding" | "builder" | "workspace";
+  interface Competitor {
+    name: string; price: string; unit: string; allocation: string; agents: string; concurrent: string; security: string; cluster: Cluster;
+  }
+
+  const competitors: Competitor[] = [
+    // Cluster A — Coding Agents
+    { name: "Cursor Pro",       price: "$20/mo",     unit: "Usage",   allocation: "1x usage",      agents: "N/A",       concurrent: "1",  security: "Basic",  cluster: "coding" },
+    { name: "Windsurf Pro",     price: "$15/mo",     unit: "Credits", allocation: "500 credits",    agents: "N/A",       concurrent: "1",  security: "Basic",  cluster: "coding" },
+    { name: "Bolt.new Pro",     price: "$20/mo",     unit: "Tokens",  allocation: "10M tokens",     agents: "N/A",       concurrent: "1",  security: "Basic",  cluster: "coding" },
+    { name: "Factory.ai Pro",   price: "$20/mo",     unit: "Tokens",  allocation: "10M tokens",     agents: "N/A",       concurrent: "1",  security: "Basic",  cluster: "coding" },
+    { name: "Amp (Sourcegraph)", price: "$10/day",   unit: "Credits", allocation: "$300/mo grant",  agents: "N/A",       concurrent: "1",  security: "Basic",  cluster: "coding" },
+    // Cluster B — App Builders
+    { name: "v0 Premium",       price: "$20/mo",     unit: "Credits", allocation: "$20 credits",    agents: "N/A",       concurrent: "1",  security: "Basic",  cluster: "builder" },
+    { name: "Lovable Pro",      price: "$25/mo",     unit: "Credits", allocation: "100 credits",    agents: "N/A",       concurrent: "1",  security: "Basic",  cluster: "builder" },
+    { name: "Pythagora",        price: "Free",       unit: "Tokens",  allocation: "600K tokens",    agents: "N/A",       concurrent: "1",  security: "Basic",  cluster: "builder" },
+    { name: "Replit Core",      price: "$25/mo",     unit: "Credits", allocation: "$25 credits",    agents: "1",         concurrent: "1",  security: "Basic",  cluster: "builder" },
+    // Cluster C — Agentic Workspaces (primary competitor set)
+    { name: "Devin Core",       price: "$20+ PAYG",  unit: "ACUs",    allocation: "$2.25/ACU",      agents: "1",         concurrent: "1",  security: "Basic",  cluster: "workspace" },
+    { name: "Devin Team",       price: "$500/mo",    unit: "ACUs",    allocation: "250 ACUs",       agents: "Multiple",  concurrent: "10", security: "Basic",  cluster: "workspace" },
+    { name: "Manus",            price: "$39/mo",     unit: "Credits", allocation: "3,900 credits",  agents: "Multiple",  concurrent: "2",  security: "Basic",  cluster: "workspace" },
+    { name: "Genspark Team",    price: "$30/seat",   unit: "Credits", allocation: "12K credits",    agents: "Multiple",  concurrent: "N/A", security: "Basic", cluster: "workspace" },
+    { name: "CrewAI",           price: "$99/mo",     unit: "Exec",    allocation: "50 exec",        agents: "1 crew",    concurrent: "1",  security: "Basic",  cluster: "workspace" },
+    { name: "Lindy Pro",        price: "$49/mo",     unit: "Credits", allocation: "5K credits",     agents: "Unlimited", concurrent: "1",  security: "Basic",  cluster: "workspace" },
+    { name: "Bardeen Starter",  price: "$129/mo",    unit: "Credits", allocation: "Credit-based",   agents: "Unlimited", concurrent: "1",  security: "SOC 2",  cluster: "workspace" },
+    // Automation Platforms
+    { name: "Zapier Pro",       price: "$30/mo",     unit: "Tasks",   allocation: "750 tasks",      agents: "N/A",       concurrent: "1",  security: "Basic",  cluster: "workspace" },
+    { name: "Make.com Core",    price: "$29/mo",     unit: "Ops",     allocation: "10K ops",        agents: "N/A",       concurrent: "1",  security: "Basic",  cluster: "workspace" },
+    { name: "n8n Pro",          price: "$60/mo",     unit: "Exec",    allocation: "10K exec",       agents: "N/A",       concurrent: "2",  security: "Basic",  cluster: "workspace" },
   ];
+
+  const clusterLabels: Record<Cluster, string> = {
+    coding: "Coding Agents",
+    builder: "App Builders",
+    workspace: "Agentic Workspaces",
+  };
 
   return (
     <div className="min-h-screen bg-obsidian text-amber-50">
@@ -496,54 +524,81 @@ export default function PricingPage() {
           </div>
 
           <div className="overflow-x-auto rounded-3xl border border-white/10 bg-black/60 backdrop-blur-2xl">
-            <table className="w-full min-w-[700px]">
+            <table className="w-full min-w-[800px]">
               <thead>
                 <tr className="border-b border-white/5">
                   <th className="p-3 text-left text-[10px] uppercase tracking-widest text-amber-100/40">Platform</th>
                   <th className="p-3 text-center text-[10px] uppercase tracking-widest text-amber-100/40">Price</th>
-                  <th className="p-3 text-center text-[10px] uppercase tracking-widest text-amber-100/40">Agents</th>
+                  <th className="p-3 text-center text-[10px] uppercase tracking-widest text-amber-100/40">Unit</th>
                   <th className="p-3 text-center text-[10px] uppercase tracking-widest text-amber-100/40">Allocation</th>
+                  <th className="p-3 text-center text-[10px] uppercase tracking-widest text-amber-100/40">Agents</th>
                   <th className="p-3 text-center text-[10px] uppercase tracking-widest text-amber-100/40">Concurrent</th>
                   <th className="p-3 text-center text-[10px] uppercase tracking-widest text-amber-100/40">Security</th>
                 </tr>
               </thead>
               <tbody>
-                {competitors.map((c) => (
-                  <tr key={c.name} className="border-t border-white/5 text-amber-100/40">
-                    <td className="p-3 text-xs">{c.name}</td>
-                    <td className="p-3 text-xs text-center">{c.price}</td>
-                    <td className="p-3 text-xs text-center">{c.agents}</td>
-                    <td className="p-3 text-xs text-center">{c.tokens}</td>
-                    <td className="p-3 text-xs text-center">{c.concurrent}</td>
-                    <td className="p-3 text-xs text-center">{c.security}</td>
-                  </tr>
+                {(["workspace", "coding", "builder"] as Cluster[]).map((cluster) => (
+                  <React.Fragment key={cluster}>
+                    {/* Cluster header */}
+                    <tr className="border-t border-white/10 bg-white/[0.02]">
+                      <td colSpan={7} className="p-2 text-[9px] uppercase tracking-[0.3em] text-amber-200/40 font-semibold">
+                        {clusterLabels[cluster]}
+                      </td>
+                    </tr>
+                    {competitors.filter((c) => c.cluster === cluster).map((c) => (
+                      <tr key={c.name} className="border-t border-white/5 text-amber-100/40">
+                        <td className="p-2.5 text-xs">{c.name}</td>
+                        <td className="p-2.5 text-xs text-center">{c.price}</td>
+                        <td className="p-2.5 text-xs text-center">
+                          <span className="rounded-full bg-white/5 px-1.5 py-0.5 text-[9px]">{c.unit}</span>
+                        </td>
+                        <td className="p-2.5 text-xs text-center">{c.allocation}</td>
+                        <td className="p-2.5 text-xs text-center">{c.agents}</td>
+                        <td className="p-2.5 text-xs text-center">{c.concurrent}</td>
+                        <td className="p-2.5 text-xs text-center">{c.security}</td>
+                      </tr>
+                    ))}
+                  </React.Fragment>
                 ))}
                 {/* A.I.M.S. rows — highlighted */}
+                <tr className="border-t-2 border-amber-300/30 bg-amber-300/[0.02]">
+                  <td colSpan={7} className="p-2 text-[9px] uppercase tracking-[0.3em] text-amber-300/60 font-bold">
+                    A.I.M.S. — AI Managed Solutions
+                  </td>
+                </tr>
                 {subscriptionTiers.map((tier) => (
                   <tr key={tier.id} className="border-t border-amber-300/20 bg-amber-300/[0.03]">
-                    <td className="p-3 text-xs font-bold text-amber-300">
-                      A.I.M.S. {tier.name}
+                    <td className="p-2.5 text-xs font-bold text-amber-300">
+                      {tier.name}
                     </td>
-                    <td className="p-3 text-xs text-center font-semibold text-amber-50">
+                    <td className="p-2.5 text-xs text-center font-semibold text-amber-50">
                       ${tier.monthlyPrice}/mo
                     </td>
-                    <td className="p-3 text-xs text-center font-semibold text-emerald-400">
-                      {tier.agents}
+                    <td className="p-2.5 text-xs text-center">
+                      <span className="rounded-full bg-amber-300/10 px-1.5 py-0.5 text-[9px] text-amber-300 font-semibold">Tokens</span>
                     </td>
-                    <td className="p-3 text-xs text-center text-amber-50">
+                    <td className="p-2.5 text-xs text-center text-amber-50">
                       {(tier.tokensIncluded / 1000).toFixed(0)}K tokens
                     </td>
-                    <td className="p-3 text-xs text-center font-semibold text-emerald-400">
+                    <td className="p-2.5 text-xs text-center font-semibold text-emerald-400">
+                      {tier.agents}
+                    </td>
+                    <td className="p-2.5 text-xs text-center font-semibold text-emerald-400">
                       {tier.concurrent}
                     </td>
-                    <td className="p-3 text-xs text-center text-amber-50">
-                      3-Pillar
+                    <td className="p-2.5 text-xs text-center text-amber-50">
+                      3-Pillar + ByteRover
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
+
+          <p className="mt-3 text-[10px] text-amber-100/30 text-center">
+            A.I.M.S. anchors on <strong className="text-amber-100/50">tokens</strong> — transparent, measurable, and optimized by ByteRover pattern reuse (15–40% savings).
+            No opaque credits. No hidden ACUs. You see exactly what you consume.
+          </p>
         </section>
 
         {/* ═══════════════════════════════════════════════════════════════
