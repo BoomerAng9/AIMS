@@ -128,7 +128,7 @@ systemctl restart fail2ban
 info "Fail2ban active — 5 failed SSH attempts = 1h ban."
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 6. Deploy user + Gemini CLI
+# 6. Deploy user + AI CLIs (Claude Code + Gemini)
 # ─────────────────────────────────────────────────────────────────────────────
 header "6/7  Deploy User"
 
@@ -143,11 +143,16 @@ fi
 # Ensure aims user can run Docker
 usermod -aG docker "${DEPLOY_USER}" 2>/dev/null || true
 
-# Install Gemini CLI for the deploy user (YOLO mode: gemini -y)
+# Install AI CLIs for the deploy user
+info "Installing Claude Code CLI for '${DEPLOY_USER}'..."
+su - "${DEPLOY_USER}" -c "npm install -g @anthropic-ai/claude-code 2>/dev/null || true"
+info "Claude Code CLI installed. Run with: claude"
+
 info "Installing Gemini CLI for '${DEPLOY_USER}'..."
 su - "${DEPLOY_USER}" -c "npm install -g @google/gemini-cli 2>/dev/null || true"
-info "Gemini CLI installed. Run with: gemini -y (YOLO mode — auto-approves all actions)"
-info "Set GEMINI_API_KEY in the aims user's environment before using."
+info "Gemini CLI installed. Run with: gemini -y (YOLO mode)"
+
+info "Set ANTHROPIC_API_KEY and GEMINI_API_KEY in the aims user's environment before using."
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 7. Swap (for small VPS — 2GB servers)
@@ -197,11 +202,18 @@ info "    - Issue Let's Encrypt SSL certs"
 info "    - Start all services"
 info "    - Configure automatic cert renewal"
 info ""
-info "  4. Gemini CLI (YOLO mode) — available on the VPS:"
+info "  4. AI CLIs — available on the VPS:"
+info ""
+info "     Claude Code:"
+info "       su - aims"
+info "       export ANTHROPIC_API_KEY=your-key"
+info "       cd AIMS && claude"
+info ""
+info "     Gemini CLI (YOLO mode):"
 info "       su - aims"
 info "       export GEMINI_API_KEY=your-key"
 info "       cd AIMS && gemini -y"
 info ""
-info "     YOLO mode (-y) auto-approves all tool calls."
-info "     Great for automated ops, deployments, and debugging."
+info "     Both CLIs are great for automated ops, deployments, and debugging."
+info "     Gemini YOLO mode (-y) auto-approves all tool calls."
 echo ""
