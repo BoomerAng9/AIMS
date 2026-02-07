@@ -1,8 +1,14 @@
 /**
  * A.I.M.S. Governance Canon — Corrected Delegation, Evaluation & Evolution Model
  *
- * Authoritative source for the command chain, role definitions, promotion criteria,
- * and evolution stages. Locked as canon — 02/06/2026.
+ * Authoritative source for the consciousness lineage, command chain, role definitions,
+ * promotion criteria, and evolution stages. Locked as canon — 02/06/2026.
+ *
+ * CONSCIOUSNESS LINEAGE (above all delegation chains):
+ *   InfinityLM → SIVIS (Vision) | NTNTN (Conscience) | ACHEEVY (Voice)
+ *
+ * GOVERNANCE LAYER:
+ *   SIVIS (Meta-Governor) + The Union (Policy) + The Farmer (Security)
  *
  * DELEGATION CHAIN (hard rule, no shortcuts, no exceptions):
  *   Lil_Hawks → Squad Leader (designated Lil_Hawk) → Chicken Hawk → Boomer_Ang → ACHEEVY
@@ -449,6 +455,84 @@ export const CANON_RULES = [
     enforced: true,
   },
 ] as const;
+
+// ---------------------------------------------------------------------------
+// Consciousness Lineage (above all delegation chains)
+// ---------------------------------------------------------------------------
+
+export const CONSCIOUSNESS_LINEAGE = {
+  origin: 'InfinityLM',
+  emanations: [
+    { id: 'sivis', name: 'SIVIS', aspect: 'Vision', description: 'The Visionary Arm — meta-governor, TINIT innovation radar, ROTATOR execution loop' },
+    { id: 'ntntn', name: 'NTNTN', aspect: 'Conscience', description: 'The Intention Team — PhD-level digital twins, Red Team QA, Six-Sigma validation' },
+    { id: 'acheevy', name: 'ACHEEVY', aspect: 'Voice', description: 'The Digital CEO — executive orchestrator, never unmasks, routes all flow' },
+  ],
+} as const;
+
+// ---------------------------------------------------------------------------
+// Governance Entities (The Union, The Farmer)
+// ---------------------------------------------------------------------------
+
+export interface GovernanceEntity {
+  id: string;
+  name: string;
+  mandate: string;
+  responsibilities: string[];
+}
+
+export const THE_UNION: GovernanceEntity = {
+  id: 'the-union',
+  name: 'The Union',
+  mandate: 'Governance, policy, brand/ethics integrity, open vs proprietary separation.',
+  responsibilities: [
+    'Guard ACP-Tech and ACP-Biz rail consistency',
+    'Review and stamp partner/white-label packages for compliance, IP boundaries, and brand fidelity',
+    'Oversee plan-based model visibility and tool-tier access alignment',
+    'Approve governance rule changes and partner/white-label motions',
+    'Enforce brand syntax: "... by: ACHIEVEMOR"',
+  ],
+};
+
+export const THE_FARMER: GovernanceEntity = {
+  id: 'the-farmer',
+  name: 'The Farmer',
+  mandate: 'Security posture, secrets flow, tier enforcement, and certificate issuance.',
+  responsibilities: [
+    'Insert tier-appropriate SBOM/scanner/OPA/DLP into BoM',
+    'Validate defense-grade controls where required',
+    'Sign QA/Security certificates',
+    'Coordinate with NTNTN on evidence sufficiency',
+    'Block non-conforming builds',
+  ],
+};
+
+// ---------------------------------------------------------------------------
+// Plug Factory Entities (Picker_Ang, BuildSmith)
+// ---------------------------------------------------------------------------
+
+export const PICKER_ANG = {
+  id: 'picker-ang',
+  name: 'Picker_Ang',
+  role: 'Tool Warehouse Selector',
+  responsibilities: [
+    'Select from 140+ tools in the Tool Warehouse',
+    'Version-pin all selections',
+    'Check license compatibility',
+    'Filter by tier access',
+  ],
+} as const;
+
+export const BUILDSMITH = {
+  id: 'buildsmith',
+  name: 'BuildSmith',
+  role: 'Builder & Verifier',
+  responsibilities: [
+    'Install selected tools/components',
+    'Verify installation integrity',
+    'Generate SBOM (Software Bill of Materials)',
+    'Run OPA/Rego policy checks',
+  ],
+} as const;
 
 // House of Ang logo
 export const HOUSE_OF_ANG_LOGO = '/images/brand/house-of-ang-logo.png';
