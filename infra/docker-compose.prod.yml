@@ -32,7 +32,7 @@ services:
       uef-gateway:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://127.0.0.1:80/ || exit 1"]
+      test: ["CMD-SHELL", "curl -sf http://127.0.0.1:80/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -97,6 +97,9 @@ services:
       - NODE_ENV=production
       - CORS_ORIGIN=${CORS_ORIGIN}
       - LOG_LEVEL=${LOG_LEVEL:-info}
+      - OPENCLAW_URL=http://agent-bridge:3010
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-aims_redis_secret}@redis:6379
+      - DEBUG=false
     volumes:
       - gateway-data:/app/data
     healthcheck:
@@ -109,6 +112,145 @@ services:
     restart: always
     networks:
       - aims-network
+
+  # ---------------------------------------------------------------------------
+  # Redis — caching and session management
+  # ---------------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-aims_redis_secret}
+    volumes:
+      - redis-data:/data
+    networks:
+      - aims-network
+      - sandbox-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-aims_redis_secret}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  # ---------------------------------------------------------------------------
+  # LAYER 3: AGENT SANDBOX (ISOLATED NETWORK)
+  # sandbox-network is internal: true (no internet access).
+  # Only agent-bridge spans both networks. OpenClaw NEVER touches aims-network.
+  # ---------------------------------------------------------------------------
+
+  # Agent Bridge — Security Gateway between networks
+  # Blocks ALL payment operations, rate limits, sanitizes payloads
+  agent-bridge:
+    build:
+      context: ./agent-bridge
+      dockerfile: Dockerfile
+    expose:
+      - "3010"
+    environment:
+      - PORT=3010
+      - AIMS_GATEWAY_URL=http://uef-gateway:3001
+      - OPENCLAW_URL=http://openclaw:18789
+      - RATE_LIMIT_REQUESTS=100
+      - RATE_LIMIT_WINDOW=60000
+      - ALLOWED_OPS=search,analyze,summarize,generate,read,write,edit,code
+      - BLOCKED_OPS=payment,transfer,purchase,checkout,buy,order,credit_card,stripe,paypal,venmo,bank,wallet,invoice,billing,charge,refund,subscription
+    depends_on:
+      uef-gateway:
+        condition: service_healthy
+    networks:
+      - aims-network
+      - sandbox-network
+    restart: unless-stopped
+    user: "1000:1000"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:3010/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+
+  # OpenClaw — AI Multi-Channel Agent (SANDBOXED)
+  # Version: 2026.2.3 — Runs in isolated sandbox-network with NO internet.
+  # Security: read_only FS, no-new-privileges, all caps dropped, non-root, resource-limited
+  openclaw:
+    image: ghcr.io/openclaw/openclaw:2026.2.3
+    environment:
+      - NODE_ENV=production
+      - GATEWAY_PORT=8001
+      - GATEWAY_HOST=0.0.0.0
+      - OPENCLAW_GATEWAY_TOKEN=${OPENCLAW_GATEWAY_TOKEN}
+      - AGENTS_DEFAULTS_SANDBOX_MODE=docker
+      - AGENTS_DEFAULTS_SANDBOX_SCOPE=agent
+      - SANDBOX_IMAGE=openclaw-sandbox:bookworm-slim
+      - DM_POLICY=pairing
+      - AGENTS_DEFAULTS_TOOLS_BROWSER=false
+      - AGENTS_DEFAULTS_TOOLS_CAMERA=false
+      - AGENTS_DEFAULTS_ELEVATED=false
+      - MODEL_PROVIDER=openrouter
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - DEFAULT_MODEL=moonshot/kimi-k2.5
+      - FALLBACK_MODEL=anthropic/claude-sonnet-4.6
+      - CLOUDFLARE_AI_GATEWAY_ENABLED=${CLOUDFLARE_AI_GATEWAY_ENABLED:-false}
+      - AGENTS_DASHBOARD_ENABLED=true
+      - AGENTS_DASHBOARD_PORT=8002
+      - RESPONSE_PREFIX_DEFAULT=[A.I.M.S.]
+      - LOG_LEVEL=warn
+      - LOG_FORMAT=json
+    volumes:
+      - openclaw-data:/home/node/.openclaw
+      - openclaw-workspace:/home/node/workspace
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./openclaw-sandbox/openclaw.config.json:/home/node/.openclaw/config.json:ro
+      - ./boomerangs/personas.json:/app/registry/personas.json:ro
+    networks:
+      - sandbox-network
+    restart: unless-stopped
+    user: "1000:1000"
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /home/node/.cache
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://127.0.0.1:18789/health || exit 1"]
+      interval: 60s
+      timeout: 30s
+      retries: 3
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4G
+        reservations:
+          cpus: '0.5'
+          memory: 1G
+
+  # OpenClaw Sandbox Image Builder (build profile only)
+  openclaw-sandbox:
+    build:
+      context: ./openclaw-sandbox
+      dockerfile: Dockerfile
+    image: openclaw-sandbox:bookworm-slim
+    command: ["echo", "Sandbox image built for OpenClaw v2026.2.3"]
+    networks:
+      - sandbox-network
+    profiles:
+      - build
 
   # ---------------------------------------------------------------------------
   # Agent Zero — Autonomous AI Agent (II Agent Vertical)
@@ -130,7 +272,7 @@ services:
       start_period: 30s
     restart: unless-stopped
     networks:
-      - aims-network
+      - sandbox-network
     profiles:
       - ii-agents
 
@@ -150,6 +292,8 @@ services:
       - N8N_PORT=5678
       - N8N_PROTOCOL=http
       - WEBHOOK_URL=${N8N_WEBHOOK_URL:-http://n8n:5678}
+      - N8N_HIRING_BANNER_ENABLED=false
+      - N8N_DIAGNOSTICS_ENABLED=false
     volumes:
       - n8n-data:/home/node/.n8n
     healthcheck:
@@ -159,8 +303,14 @@ services:
       retries: 3
       start_period: 20s
     restart: unless-stopped
+    user: "1000:1000"
     networks:
-      - aims-network
+      - sandbox-network
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
     profiles:
       - n8n
 
@@ -170,9 +320,15 @@ volumes:
   nginx-conf:
   nginx-logs:
   gateway-data:
+  redis-data:
+  openclaw-data:
+  openclaw-workspace:
   agent-zero-data:
   n8n-data:
 
 networks:
   aims-network:
     driver: bridge
+  sandbox-network:
+    driver: bridge
+    internal: true
