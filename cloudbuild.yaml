@@ -4,15 +4,29 @@
 # Replaces GitHub Actions. Triggered on push to main via Cloud Build trigger.
 #
 # Free tier: 120 build-minutes/day (e2-standard-1 machine)
-# GCP Project: ai-managed-services
+# GCP Project:  AI Managed Solutions
+# Project ID:   ai-managed-services
+# Project No:   1008658271134
 #
 # Setup:
-#   1. gcloud builds triggers create github \
+#   1. gcloud services enable cloudbuild.googleapis.com secretmanager.googleapis.com \
+#        --project=ai-managed-services
+#
+#   2. echo -n "VPS_PASSWORD" | gcloud secrets create VPS_PASSWORD --data-file=- \
+#        --project=ai-managed-services
+#
+#   3. gcloud secrets add-iam-policy-binding VPS_PASSWORD \
+#        --member="serviceAccount:1008658271134@cloudbuild.gserviceaccount.com" \
+#        --role="roles/secretmanager.secretAccessor" \
+#        --project=ai-managed-services
+#
+#   4. gcloud builds triggers create github \
 #        --repo-name=AIMS --repo-owner=BoomerAng9 \
 #        --branch-pattern="^main$" \
-#        --build-config=cloudbuild.yaml
+#        --build-config=cloudbuild.yaml \
+#        --project=ai-managed-services
 #
-#   2. For PRs, add a second trigger with --pull-request-pattern="^main$"
+#   5. For PRs, add a second trigger with --pull-request-pattern="^main$"
 # =============================================================================
 
 options:

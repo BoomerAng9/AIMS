@@ -4,6 +4,10 @@ set -e
 # A.I.M.S. GCS Setup Script
 # Creates Google Cloud Storage buckets for ii-agent and configures credentials.
 #
+# Project:  AI Managed Solutions
+# ID:       ai-managed-services
+# Number:   1008658271134
+#
 # Prerequisites:
 #   - gcloud CLI installed and authenticated
 #   - GCP project set: gcloud config set project ai-managed-services

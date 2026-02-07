@@ -4,6 +4,10 @@ set -e
 # A.I.M.S. GCP API Activation Script
 # Enables all required Google Cloud APIs for the A.I.M.S. platform.
 #
+# Project:  AI Managed Solutions
+# ID:       ai-managed-services
+# Number:   1008658271134
+#
 # Prerequisites:
 #   - gcloud CLI installed (https://cloud.google.com/sdk/docs/install)
 #   - Authenticated: gcloud auth login

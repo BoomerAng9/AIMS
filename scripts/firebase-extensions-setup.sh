@@ -7,6 +7,10 @@ set -e
 #   2. Send Email (firestore-send-email)
 #   3. BigQuery Export (firestore-bigquery-export)
 #
+# Project:  AI Managed Solutions
+# ID:       ai-managed-services
+# Number:   1008658271134
+#
 # Prerequisites:
 #   - Firebase CLI installed (npm install -g firebase-tools)
 #   - Logged into Firebase (firebase login)
