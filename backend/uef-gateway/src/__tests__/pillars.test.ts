@@ -17,6 +17,9 @@ import { alertEngine, correlationManager, metricsExporter } from '../observabili
 import { releaseManager } from '../release';
 import { backupManager } from '../backup';
 import { incidentManager } from '../backup/incident-runbook';
+import * as fs from 'fs';
+import * as path from 'path';
+import Database from 'better-sqlite3';
 
 const RUN = Date.now().toString(36);
 
@@ -327,6 +330,42 @@ describe('Pillar 11: Release Engineering', () => {
 // Pillar 12 — Backup & Restore + Incidents
 // ---------------------------------------------------------------------------
 describe('Pillar 12: Backup & Restore', () => {
+  beforeAll(() => {
+    // Ensure the database file exists on disk for backup operations
+    // (backup manager copies the physical file, not in-memory db)
+    const dataDir = path.resolve(process.cwd(), 'data');
+    const dbPath = path.resolve(dataDir, 'aims.db');
+    if (!fs.existsSync(dataDir)) {
+      fs.mkdirSync(dataDir, { recursive: true });
+    }
+    if (!fs.existsSync(dbPath)) {
+      // Create a minimal SQLite db file for backup tests
+      const db = new Database(dbPath);
+      db.pragma('journal_mode = WAL');
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS projects (id TEXT PRIMARY KEY);
+        CREATE TABLE IF NOT EXISTS plugs (id TEXT PRIMARY KEY);
+        CREATE TABLE IF NOT EXISTS deployments (id TEXT PRIMARY KEY);
+        CREATE TABLE IF NOT EXISTS audit_log (id TEXT PRIMARY KEY);
+        CREATE TABLE IF NOT EXISTS evidence (id TEXT PRIMARY KEY);
+      `);
+      db.close();
+    }
+  });
+
+  afterAll(() => {
+    // Clean up test artifacts
+    const dataDir = path.resolve(process.cwd(), 'data');
+    const backupDir = path.resolve(dataDir, 'backups');
+    if (fs.existsSync(backupDir)) {
+      fs.readdirSync(backupDir).forEach(f => {
+        if (f.startsWith('aims-backup-')) {
+          fs.unlinkSync(path.resolve(backupDir, f));
+        }
+      });
+    }
+  });
+
   it('creates and lists backups', () => {
     const backup = backupManager.createBackup();
     expect(backup.id).toBeDefined();

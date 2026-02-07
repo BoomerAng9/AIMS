@@ -5,7 +5,7 @@
 
 import { Router, Request, Response } from 'express';
 import { v4 as uuid } from 'uuid';
-import { ACPStandardizedRequest, ACPResponse } from '../acp/types';
+import { ACPStandardizedRequest } from '../acp/types';
 
 export const openclawRouter = Router();
 
@@ -64,6 +64,7 @@ openclawRouter.post('/openclaw', async (req: Request, res: Response) => {
     };
 
     // Create ACP request from OpenClaw message
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const acpRequest: ACPStandardizedRequest = {
       reqId: uuid(),
       userId: message.sender.id,

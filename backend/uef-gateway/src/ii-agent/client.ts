@@ -251,12 +251,13 @@ export class IIAgentClient extends EventEmitter {
       const message = JSON.parse(data);
 
       switch (message.type) {
-        case 'task_response':
+        case 'task_response': {
           const resolver = this.pendingTasks.get(message.taskId);
           if (resolver) {
             resolver(message.response);
           }
           break;
+        }
 
         case 'task_event':
           this.emit('task_event', message);

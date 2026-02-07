@@ -41,6 +41,7 @@ export interface AcheevyExecuteResponse {
 
 // ── Skill definitions (mirrors frontend registry for backend routing) ──
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface SkillRoute {
   id: string;
   handler: (req: AcheevyExecuteRequest, iiAgent: IIAgentClient) => Promise<AcheevyExecuteResponse>;
