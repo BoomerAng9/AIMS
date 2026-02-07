@@ -184,7 +184,7 @@ function complianceGate(
 // ---------------------------------------------------------------------------
 
 const profile = {
-  id: 'chicken-hawk' as const,
+  id: 'vision-scout-squad' as const,
   name: 'VISION_SCOUT_SQUAD',
   role: 'Video/Footage Assessment Squad (VISION → SIGNAL → COMPLIANCE)',
   capabilities: [

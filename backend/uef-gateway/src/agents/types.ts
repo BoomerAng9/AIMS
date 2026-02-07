@@ -17,7 +17,9 @@ export type AgentId =
   | 'marketer-ang'
   | 'analyst-ang'
   | 'quality-ang'
-  | 'chicken-hawk';
+  | 'chicken-hawk'
+  | 'workflow-smith-squad'
+  | 'vision-scout-squad';
 
 export type AgentStatus = 'IDLE' | 'BUSY' | 'OFFLINE';
 

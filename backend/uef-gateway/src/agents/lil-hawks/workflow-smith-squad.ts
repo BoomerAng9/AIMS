@@ -239,7 +239,7 @@ function finalGate(
 // ---------------------------------------------------------------------------
 
 const profile = {
-  id: 'chicken-hawk' as const,
+  id: 'workflow-smith-squad' as const,
   name: 'WORKFLOW_SMITH_SQUAD',
   role: 'n8n Workflow Integrity Squad (AUTHOR → VALIDATE → FAILURE → GATE)',
   capabilities: [
