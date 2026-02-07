@@ -67,6 +67,7 @@ async function request(
 beforeAll((done) => {
   // The imported app already has a server listening — close it and start fresh
   // on a random port so smoke tests don't collide with dev server
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { server: existingServer } = require('../index');
   existingServer.close(() => {
     server = app.listen(TEST_PORT, () => done());

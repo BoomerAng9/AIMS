@@ -1,6 +1,10 @@
 import { openrouter, MODELS, DEFAULT_MODEL } from '../llm';
 import { AGENT_SYSTEM_PROMPTS } from '../llm/agent-prompts';
 import { agentChat } from '../llm/agent-llm';
+import { Engineer_Ang } from '../agents/boomerangs/engineer-ang';
+import { Marketer_Ang } from '../agents/boomerangs/marketer-ang';
+import { Analyst_Ang } from '../agents/boomerangs/analyst-ang';
+import { Quality_Ang } from '../agents/boomerangs/quality-ang';
 
 describe('OpenRouter LLM Module', () => {
   describe('Model Catalog', () => {
@@ -10,7 +14,7 @@ describe('OpenRouter LLM Module', () => {
     });
 
     it('each model has required pricing fields', () => {
-      for (const [key, spec] of Object.entries(MODELS)) {
+      for (const spec of Object.values(MODELS)) {
         expect(spec.id).toBeDefined();
         expect(spec.name).toBeDefined();
         expect(spec.provider).toBeDefined();
@@ -70,7 +74,7 @@ describe('OpenRouter LLM Module', () => {
     });
 
     it('prompts reference A.I.M.S. and ACHIEVEMOR', () => {
-      for (const [id, prompt] of Object.entries(AGENT_SYSTEM_PROMPTS)) {
+      for (const prompt of Object.values(AGENT_SYSTEM_PROMPTS)) {
         expect(prompt).toContain('A.I.M.S.');
         expect(prompt).toContain('ACHIEVEMOR');
       }
@@ -106,11 +110,6 @@ describe('OpenRouter LLM Module', () => {
 
   describe('Agents work in heuristic mode (no API key)', () => {
     // Existing agents must still work when OpenRouter is not configured
-    const { Engineer_Ang } = require('../agents/boomerangs/engineer-ang');
-    const { Marketer_Ang } = require('../agents/boomerangs/marketer-ang');
-    const { Analyst_Ang } = require('../agents/boomerangs/analyst-ang');
-    const { Quality_Ang } = require('../agents/boomerangs/quality-ang');
-
     const input = {
       taskId: 'openrouter-test-001',
       intent: 'BUILD_PLUG',

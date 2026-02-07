@@ -7,9 +7,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import crypto from 'crypto';
 import { execSync } from 'child_process';
-import { v4 as uuidv4 } from 'uuid';
 import logger from '../logger';
 
 // ---------------------------------------------------------------------------
@@ -266,12 +264,6 @@ export class SupplyChainManager {
         missingFromLock++;
       }
     }
-
-    // Simple hash comparison of dep sections
-    const pkgDepsHash = crypto
-      .createHash('sha256')
-      .update(JSON.stringify({ deps: pkg.dependencies, devDeps: pkg.devDependencies }))
-      .digest('hex');
 
     const lockNameMatch = lock.name === pkg.name;
     const hashMatch = missingFromLock === 0;

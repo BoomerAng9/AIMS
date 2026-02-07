@@ -6,7 +6,6 @@
  * resource limits, seccomp profiles, and posture assessments.
  */
 
-import { v4 as uuidv4 } from 'uuid';
 import logger from '../logger';
 
 // ---------------------------------------------------------------------------

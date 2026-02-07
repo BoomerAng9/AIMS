@@ -14,7 +14,7 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import logger from '../logger';
-import { templateLibrary, PlugTemplate } from '../templates';
+import { templateLibrary } from '../templates';
 import { ProjectSpec } from '../db';
 
 // ---------------------------------------------------------------------------

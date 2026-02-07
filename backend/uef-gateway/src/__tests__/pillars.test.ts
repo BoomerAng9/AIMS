@@ -6,7 +6,7 @@
  * observability, release engineering, backup, and incident management.
  */
 
-import { Store, auditStore, evidenceStore } from '../db';
+import { auditStore, evidenceStore } from '../db';
 import { riskAssessor, definitionOfDone, acceptanceCriteria } from '../intake/requirements';
 import { ownershipEnforcer } from '../auth';
 import { secrets } from '../secrets';
@@ -126,7 +126,7 @@ describe('Pillar 4: Persistence', () => {
 
   it('evidence store records and retrieves entries', () => {
     expect(evidenceStore).toBeDefined();
-    const rec = evidenceStore.create({
+    evidenceStore.create({
       id: `ev-${RUN}`,
       gateId: `gate-${RUN}`,
       projectId: `proj-${RUN}`,

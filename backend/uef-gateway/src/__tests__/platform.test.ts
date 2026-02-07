@@ -5,7 +5,7 @@
  * Tests the full plug-building platform infrastructure.
  */
 
-import { projectStore, plugStore, deploymentStore, Store, getDb } from '../db';
+import { projectStore, plugStore, deploymentStore, Store } from '../db';
 import { getQuestions, analyzeRequirements, generateProjectSpec, createProject } from '../intake';
 import { templateLibrary } from '../templates';
 import { scaffolder } from '../scaffolder';

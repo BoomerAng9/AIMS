@@ -29,7 +29,7 @@ import { deployer } from './deployer';
 import { integrationRegistry } from './integrations';
 import { analytics } from './analytics';
 import { makeItMine } from './make-it-mine';
-import { ownershipEnforcer, requirePermission } from './auth';
+import { ownershipEnforcer } from './auth';
 import { secrets } from './secrets';
 import { supplyChain } from './supply-chain';
 import { sandboxEnforcer } from './sandbox';

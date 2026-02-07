@@ -382,7 +382,6 @@ export class SecurityTestRunner {
 
     // Extract route handler blocks from the source
     const routePattern = /app\.(get|post|put|patch|delete)\s*\(\s*['"`]([^'"`]+)['"`]/g;
-    const lines = content.split('\n');
     let routesChecked = 0;
 
     let match: RegExpExecArray | null;
@@ -393,8 +392,6 @@ export class SecurityTestRunner {
 
       // Find the line number of this route
       const matchIndex = match.index;
-      const textBeforeMatch = content.substring(0, matchIndex);
-      const lineNumber = textBeforeMatch.split('\n').length;
 
       // Extract the route handler block (approximate: from match to next app. or end)
       const nextRouteMatch = /\napp\.(get|post|put|patch|delete)\s*\(/.exec(

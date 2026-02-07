@@ -167,7 +167,6 @@ export class BackupManager {
     }
 
     const id = uuidv4();
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     const filename = `aims-backup-${id}.db`;
     const destPath = path.join(BACKUP_DIR, filename);
 
