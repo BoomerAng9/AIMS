@@ -12,8 +12,12 @@ services:
       - "3000:3000"
     environment:
       - NEXT_PUBLIC_ACP_ENDPOINT=http://localhost:3000/api/acp
+      - UEF_ENDPOINT=http://uef-gateway:3001
+      - NODE_ENV=production
     depends_on:
-      - uef-gateway
+      uef-gateway:
+        condition: service_healthy
+    restart: unless-stopped
     networks:
       - aims-network
 
@@ -30,224 +34,46 @@ services:
       - .env
     environment:
       - PORT=3001
-      - II_AGENT_WS_URL=ws://ii-agent-backend:8000/ws
-      - II_AGENT_HTTP_URL=http://ii-agent-backend:8000
-    depends_on:
-      - ii-agent-backend
-    volumes:
-      - ../backend/uef-gateway/src:/app/src
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    networks:
-      - aims-network
-
-  # ---------------------------------------------------------------------------
-  # Layer 3: II-Agent (Autonomous Execution Engine)
-  # ---------------------------------------------------------------------------
-  ii-agent-postgres:
-    image: postgres:15
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: iiagent
-      POSTGRES_PASSWORD: iiagent
-      POSTGRES_DB: iiagentdev
-      SANDBOX_DB_NAME: ii_sandbox
-    ports:
-      - "5433:5432"
-    volumes:
-      - ii-agent-db-data:/var/lib/postgresql/data
-      - ../backend/ii-agent/docker/postgres-init/create-databases.sh:/docker-entrypoint-initdb.d/create-databases.sh:ro
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U iiagent -d iiagentdev"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - aims-network
-
-  ii-agent-redis:
-    image: redis:7-alpine
-    restart: unless-stopped
-    ports:
-      - "6380:6379"
-    command: ["redis-server", "--save", "60", "1", "--loglevel", "warning"]
-    volumes:
-      - ii-agent-redis-data:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - aims-network
-
-  ii-agent-sandbox:
-    build:
-      context: ../backend/ii-agent
-      dockerfile: docker/backend/Dockerfile
-    restart: unless-stopped
-    depends_on:
-      ii-agent-postgres:
-        condition: service_healthy
-      ii-agent-redis:
-        condition: service_healthy
-    env_file:
-      - ../backend/ii-agent/docker/.stack.env
-    environment:
-      SANDBOX_DATABASE_URL: postgresql+asyncpg://iiagent:iiagent@ii-agent-postgres:5432/ii_sandbox
-      SERVER_HOST: 0.0.0.0
-      SERVER_PORT: 8100
-      REDIS_URL: redis://ii-agent-redis:6379/0
-      MCP_PORT: 6060
-    entrypoint: ["/bin/bash", "/app/start_sandbox_server.sh"]
-    ports:
-      - "4100:8100"
-    healthcheck:
-      test: ["CMD-SHELL", "curl -fsS http://localhost:8100/health || exit 1"]
-      interval: 15s
-      timeout: 5s
-      retries: 5
-    networks:
-      - aims-network
-
-  ii-agent-tools:
-    build:
-      context: ../backend/ii-agent
-      dockerfile: docker/backend/Dockerfile
-    restart: unless-stopped
-    depends_on:
-      ii-agent-postgres:
-        condition: service_healthy
-    env_file:
-      - ../backend/ii-agent/docker/.stack.env
-    environment:
-      DATABASE_URL: postgresql+asyncpg://iiagent:iiagent@ii-agent-postgres:5432/iiagentdev
-    entrypoint: ["/bin/sh", "-c"]
-    command:
-      - >-
-        exec uvicorn ii_tool.integrations.app.main:app
-        --host 0.0.0.0
-        --port 1236
-    ports:
-      - "4036:1236"
-    healthcheck:
-      test: ["CMD-SHELL", "curl -fsS http://localhost:1236/health || exit 1"]
-      interval: 15s
-      timeout: 5s
-      retries: 5
-    networks:
-      - aims-network
-
-  ii-agent-backend:
-    build:
-      context: ../backend/ii-agent
-      dockerfile: docker/backend/Dockerfile
-    init: true
-    restart: unless-stopped
-    depends_on:
-      ii-agent-postgres:
-        condition: service_healthy
-      ii-agent-redis:
-        condition: service_healthy
-      ii-agent-sandbox:
-        condition: service_started
-      ii-agent-tools:
-        condition: service_started
-    env_file:
-      - ../backend/ii-agent/docker/.stack.env
-    environment:
-      DATABASE_URL: postgresql+asyncpg://iiagent:iiagent@ii-agent-postgres:5432/iiagentdev
-      SANDBOX_SERVER_URL: http://ii-agent-sandbox:8100
-      REDIS_SESSION_URL: redis://ii-agent-redis:6379/1
-    ports:
-      - "4001:8000"
-    healthcheck:
-      test: ["CMD-SHELL", "curl -fsS http://localhost:8000/health || exit 1"]
-      interval: 15s
-      timeout: 5s
-      retries: 5
-    networks:
-      - aims-network
-
-  # ---------------------------------------------------------------------------
-  # Layer 3: Other Agents (STUBBED FOR BOOTSTRAP)
-  # ---------------------------------------------------------------------------
-
-  # OpenClaw - Multi-channel AI Assistant (WhatsApp, Telegram, Slack, Discord)
-  openclaw:
-    build:
-      context: ../backend/openclaw
-      dockerfile: Dockerfile
-    restart: unless-stopped
-    ports:
-      - "18789:18789"
-    env_file:
-      - ../backend/openclaw/.env
-    environment:
-      - UEF_GATEWAY_URL=http://uef-gateway:3001
       - NODE_ENV=production
-    depends_on:
-      uef-gateway:
-        condition: service_healthy
-    volumes:
-      - openclaw-workspace:/app/workspace
-      - ../backend/openclaw/config:/app/config:ro
+      - CORS_ORIGIN=http://localhost:3000,http://frontend:3000
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:18789/health"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/health"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 30s
-    networks:
-      - aims-network
-
-  n8n:
-    image: n8nio/n8n:latest
+      start_period: 15s
     restart: unless-stopped
-    ports:
-      - "5678:5678"
-    environment:
-      - N8N_HOST=${N8N_HOST:-http://localhost:5678}
-      - N8N_PROTOCOL=http
-      - N8N_PORT=5678
-      - GENERIC_TIMEZONE=America/New_York
-    volumes:
-      - n8n-data:/home/node/.n8n
-    healthcheck:
-      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:5678/healthz || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
     networks:
       - aims-network
 
   # ---------------------------------------------------------------------------
-  # Layer 4: Storage
+  # Layer 3: Agents & Tools (STUBBED FOR BOOTSTRAP)
   # ---------------------------------------------------------------------------
-  postgres:
-    image: postgres:15-alpine
-    restart: always
-    environment:
-      - POSTGRES_USER=${DB_USER:-postgres}
-      - POSTGRES_PASSWORD=${DB_PASSWORD:-postgres}
-      - POSTGRES_DB=${DB_NAME:-aims}
-    ports:
-      - "5432:5432"
-    volumes:
-      - aims-db-data:/var/lib/postgresql/data
-    networks:
-      - aims-network
+
+  # agent-zero:
+  #   image: agent-zero:latest
+  #   environment:
+  #     - LLM_API_KEY=${LLM_API_KEY}
+  #   networks:
+  #     - aims-network
+
+  # openclaw:
+  #   image: openclaw:latest
+  #   networks:
+  #     - aims-network
+
+  # chicken-hawk:
+  #   image: chicken-hawk-service:latest
+  #   networks:
+  #     - aims-network
+
+  # n8n:
+  #   image: n8nio/n8n
+  #   ports:
+  #     - "5678:5678"
+  #   networks:
+  #     - aims-network
 
 networks:
   aims-network:
     driver: bridge
-
-volumes:
-  aims-db-data:
-  ii-agent-db-data:
-  ii-agent-redis-data:
-  openclaw-workspace:
-  n8n-data:

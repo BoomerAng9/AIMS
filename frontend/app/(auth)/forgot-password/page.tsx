@@ -12,7 +12,7 @@ export default function ForgotPasswordPage() {
           RESET PASSWORD
         </h1>
         <p className="mt-3 text-sm text-amber-100/80">
-          Enter your email and we'll send you instructions to reset your password.
+          Enter your email and we&apos;ll send you instructions to reset your password.
         </p>
       </header>
 

@@ -30,5 +30,5 @@ graph TD
 ## Core Components
 
 1.  **Frontend (ACHEEVY)**: A "thin" client. It does not contain complex business logic. It handles the NLP interface and displays ACP responses (Quotes, Status).
-2.  **UEF Gateway**: The brain. It enforces the "Hybrid Business Architect" protocols. It must Approve (KYB), Price (LUC), and Route (Router) every request.
+2.  **UEF Gateway**: The brain. It enforces the AI Managed Solutions protocols. It must Approve (KYB), Price (LUC), and Route (Router) every request.
 3.  **Agents**: Standalone containers (Agent Zero, OpenClaw) that receive high-level ACP tasks (`ACPAgentTask`) and return artifacts.

@@ -1,10 +1,10 @@
-# A.I.M.S. - AI Managed Systems
-### The Hybrid Business Architect Platform
+# A.I.M.S. - AI Managed Solutions
+### AI Managed Solutions Platform
 
 **PlugMeIn.com | ACHEEVY | AVVA NOON | Chicken Hawk**
 
 ## Overview
-A.I.M.S. is a professional support platform for experts and freelancers to get work done via specialized AI agents ("BoomerAngs"). It uses **ACHEEVY** as the primary executive orchestrator in a voice-first, NLP-driven interface.
+A.I.M.S. is a professional support platform for experts and freelancers to get work done via specialized AI agents ("Boomer_Angs"). It uses **ACHEEVY** as the primary executive orchestrator in a voice-first, NLP-driven interface.
 
 This repository contains the bootstrap implementation of the platform, featuring:
 - **Frontend**: Next.js 14 (App Router) with a clean, "Obsidian/Gold" SaaS UI.

@@ -1,0 +1,15 @@
+# A.I.M.S. Code Ownership
+# Each line is a file pattern followed by one or more owners.
+
+# Default owner for everything
+* @BoomerAng9
+
+# Frontend
+/frontend/ @BoomerAng9
+
+# Backend / UEF Gateway
+/backend/ @BoomerAng9
+
+# Infrastructure & Deployment
+/infra/ @BoomerAng9
+/.github/ @BoomerAng9

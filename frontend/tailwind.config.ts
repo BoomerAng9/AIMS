@@ -17,10 +17,10 @@ module.exports = {
         }
       },
       fontFamily: {
-        sans: ['var(--font-inter)', 'sans-serif'],
-        display: ['var(--font-doto)', 'monospace'],
-        marker: ['var(--font-marker)', 'cursive'],
-        handwriting: ['var(--font-caveat)', 'cursive'],
+        sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+        display: ['Doto', 'monospace'],
+        marker: ['Permanent Marker', 'cursive'],
+        handwriting: ['Caveat', 'cursive'],
       },
       keyframes: {
         float: {

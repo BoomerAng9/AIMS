@@ -1,0 +1,57 @@
+name: Deploy to VPS
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend/uef-gateway
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: backend/uef-gateway/package-lock.json
+      - run: npm ci
+      - run: npm run build
+      - run: npm test
+
+  deploy:
+    name: Deploy to Hostinger VPS
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: root
+          password: ${{ secrets.VPS_PASSWORD }}
+          script: |
+            set -e
+
+            # Clone or update repo
+            if [ -d /home/aims/AIMS ]; then
+              cd /home/aims/AIMS
+              git fetch origin main
+              git reset --hard origin/main
+            else
+              git clone https://github.com/BoomerAng9/AIMS.git /home/aims/AIMS
+              cd /home/aims/AIMS
+            fi
+
+            # Build and deploy
+            chmod +x deploy.sh
+            ./deploy.sh
+
+            echo "Deployment complete!"

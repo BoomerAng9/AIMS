@@ -4,10 +4,10 @@ export function HeroAcheevy() {
     <section className="mx-auto flex max-w-7xl flex-col gap-10 px-6 py-20 md:flex-row md:items-center">
       <div className="flex-1 rounded-[40px] border border-white/5 bg-black/40 p-8 backdrop-blur-xl md:p-12 space-y-4">
         <p className="text-[0.7rem] uppercase tracking-[0.25em] text-amber-200/70 font-display">
-          A.I.M.S. | AI MANAGED SERVICES
+          AI MANAGED SOLUTIONS
         </p>
         <h1 className="text-4xl font-semibold tracking-tight text-amber-50 md:text-5xl font-display leading-[1.1]">
-          Think it. Speak it.<br/><span className="text-amber-300">ACHEEVY</span> builds it.
+          Think it. Prompt it.<br/>Let <span className="text-amber-300">ACHEEVY</span> build it.
         </h1>
         <p className="max-w-xl text-sm leading-relaxed text-amber-100/80">
           Orchestrate Boomer_Ang agents, aiPlugs, and A.I.M.S. workflows from a

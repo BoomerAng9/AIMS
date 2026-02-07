@@ -1,0 +1,71 @@
+# =============================================================================
+# A.I.M.S. HTTPS Server Block
+# Activated by deploy.sh after Let's Encrypt certificates are provisioned.
+# Copied to /etc/nginx/conf.d/ssl.conf inside the nginx container.
+# =============================================================================
+
+server {
+    listen 443 ssl http2;
+    server_name DOMAIN_PLACEHOLDER;
+
+    # SSL certificates (managed by certbot)
+    ssl_certificate     /etc/letsencrypt/live/DOMAIN_PLACEHOLDER/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/DOMAIN_PLACEHOLDER/privkey.pem;
+    ssl_protocols       TLSv1.2 TLSv1.3;
+    ssl_ciphers         HIGH:!aNULL:!MD5;
+    ssl_prefer_server_ciphers on;
+    ssl_session_cache   shared:SSL:10m;
+    ssl_session_timeout 10m;
+
+    # -----------------------------------------------------------------
+    # Security headers
+    # -----------------------------------------------------------------
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Permissions-Policy "camera=(), microphone=(), geolocation=()" always;
+
+    # -----------------------------------------------------------------
+    # Health check
+    # -----------------------------------------------------------------
+    location = /health {
+        proxy_pass http://uef_gateway/health;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # -----------------------------------------------------------------
+    # API Gateway — /api/gateway/* -> uef-gateway:3001/*
+    # -----------------------------------------------------------------
+    location /api/gateway/ {
+        limit_req zone=api burst=10 nodelay;
+        rewrite ^/api/gateway/(.*)$ /$1 break;
+        proxy_pass http://uef_gateway;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 60s;
+        proxy_send_timeout 60s;
+    }
+
+    # -----------------------------------------------------------------
+    # Frontend — everything else -> frontend:3000
+    # -----------------------------------------------------------------
+    location / {
+        limit_req zone=general burst=20 nodelay;
+        proxy_pass http://frontend;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_read_timeout 60s;
+        proxy_send_timeout 60s;
+    }
+}

@@ -1,0 +1,121 @@
+version: "3.8"
+
+# =============================================================================
+# A.I.M.S. Production Stack
+# =============================================================================
+# Usage:
+#   ./deploy.sh                   — full build + launch
+#   docker compose -f infra/docker-compose.prod.yml logs -f
+#   docker compose -f infra/docker-compose.prod.yml down
+# =============================================================================
+
+services:
+  # ---------------------------------------------------------------------------
+  # Reverse Proxy (nginx)
+  # ---------------------------------------------------------------------------
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - certbot-webroot:/var/www/certbot:ro
+      - certbot-certs:/etc/letsencrypt:ro
+      - nginx-conf:/etc/nginx/conf.d
+      - nginx-logs:/var/log/nginx
+    depends_on:
+      frontend:
+        condition: service_healthy
+      uef-gateway:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: always
+    networks:
+      - aims-network
+
+  # ---------------------------------------------------------------------------
+  # Certbot (Let's Encrypt) — renewal loop (every 12h)
+  # Initial cert issuance is done by deploy.sh before starting this.
+  # ---------------------------------------------------------------------------
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - certbot-webroot:/var/www/certbot
+      - certbot-certs:/etc/letsencrypt
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do sleep 12h & wait $${!}; certbot renew --webroot -w /var/www/certbot --quiet; done'"
+    restart: unless-stopped
+    networks:
+      - aims-network
+
+  # ---------------------------------------------------------------------------
+  # Frontend (Next.js 14)
+  # ---------------------------------------------------------------------------
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    expose:
+      - "3000"
+    env_file:
+      - .env.production
+    environment:
+      - NODE_ENV=production
+      - NEXTAUTH_URL=${NEXTAUTH_URL}
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+      - UEF_ENDPOINT=http://uef-gateway:3001
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart: always
+    networks:
+      - aims-network
+
+  # ---------------------------------------------------------------------------
+  # UEF Gateway (Node/TS Orchestrator)
+  # ---------------------------------------------------------------------------
+  uef-gateway:
+    build:
+      context: ../backend/uef-gateway
+      dockerfile: Dockerfile
+    expose:
+      - "3001"
+    env_file:
+      - .env.production
+    environment:
+      - PORT=3001
+      - NODE_ENV=production
+      - CORS_ORIGIN=${CORS_ORIGIN}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+    volumes:
+      - gateway-data:/app/data
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    stop_grace_period: 15s
+    restart: always
+    networks:
+      - aims-network
+
+volumes:
+  certbot-webroot:
+  certbot-certs:
+  nginx-conf:
+  nginx-logs:
+  gateway-data:
+
+networks:
+  aims-network:
+    driver: bridge
