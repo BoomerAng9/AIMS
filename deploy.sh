@@ -8,6 +8,7 @@
 #   ./deploy.sh                                         # HTTP only (no SSL)
 #   ./deploy.sh --domain aims.example.com --email a@b   # Full SSL setup
 #   ./deploy.sh --ssl-renew                             # Force cert renewal
+#   ./deploy.sh --no-cache                              # Force fresh image rebuild
 # =============================================================================
 set -euo pipefail
 
@@ -33,14 +34,16 @@ header(){ printf "\n${CYAN}━━━ %s ━━━${NC}\n\n" "$1"; }
 DOMAIN=""
 EMAIL=""
 SSL_RENEW=false
+NO_CACHE=false
 
 while [[ $# -gt 0 ]]; do
     case $1 in
         --domain)  DOMAIN="$2"; shift 2 ;;
         --email)   EMAIL="$2"; shift 2 ;;
         --ssl-renew) SSL_RENEW=true; shift ;;
+        --no-cache) NO_CACHE=true; shift ;;
         -h|--help)
-            echo "Usage: ./deploy.sh [--domain DOMAIN --email EMAIL] [--ssl-renew]"
+            echo "Usage: ./deploy.sh [--domain DOMAIN --email EMAIL] [--ssl-renew] [--no-cache]"
             exit 0 ;;
         *) error "Unknown option: $1"; exit 1 ;;
     esac
@@ -90,7 +93,12 @@ fi
 # Build
 # =============================================================================
 header "Building Production Images"
-${COMPOSE_CMD} -f "${COMPOSE_FILE}" build
+BUILD_FLAGS=""
+if [ "${NO_CACHE}" = "true" ]; then
+    BUILD_FLAGS="--no-cache --pull"
+    info "Force rebuilding with --no-cache --pull (fresh images)..."
+fi
+${COMPOSE_CMD} -f "${COMPOSE_FILE}" build ${BUILD_FLAGS}
 info "Images built successfully."
 
 # =============================================================================
