@@ -197,6 +197,31 @@ app.post('/house-of-ang/spawn', (req, res) => {
 
 
 // --------------------------------------------------------------------------
+// Admin — API Key Status (OWNER-only, called via frontend proxy)
+// --------------------------------------------------------------------------
+app.get('/admin/api-keys', (_req, res) => {
+  const mask = (val: string | undefined): { configured: boolean; masked: string } => {
+    if (!val) return { configured: false, masked: '' };
+    if (val.length <= 8) return { configured: true, masked: '****' };
+    return { configured: true, masked: `${val.slice(0, 4)}${'*'.repeat(Math.min(val.length - 8, 20))}${val.slice(-4)}` };
+  };
+
+  res.json({
+    keys: [
+      { id: 'INTERNAL_API_KEY', label: 'Internal API Key', scope: 'Frontend ↔ Backend auth', ...mask(process.env.INTERNAL_API_KEY) },
+      { id: 'NEXTAUTH_SECRET', label: 'NextAuth Secret', scope: 'Session signing', ...mask(process.env.NEXTAUTH_SECRET) },
+      { id: 'GOOGLE_CLIENT_ID', label: 'Google OAuth Client ID', scope: 'Google sign-in', ...mask(process.env.GOOGLE_CLIENT_ID) },
+      { id: 'GOOGLE_CLIENT_SECRET', label: 'Google OAuth Secret', scope: 'Google sign-in', ...mask(process.env.GOOGLE_CLIENT_SECRET) },
+      { id: 'STRIPE_SECRET_KEY', label: 'Stripe Secret Key', scope: 'Payment processing', ...mask(process.env.STRIPE_SECRET_KEY) },
+      { id: 'STRIPE_PUBLISHABLE_KEY', label: 'Stripe Publishable Key', scope: 'Client-side payments', ...mask(process.env.STRIPE_PUBLISHABLE_KEY) },
+      { id: 'STRIPE_WEBHOOK_SECRET', label: 'Stripe Webhook Secret', scope: 'Webhook verification', ...mask(process.env.STRIPE_WEBHOOK_SECRET) },
+      { id: 'ANTHROPIC_API_KEY', label: 'Anthropic API Key', scope: 'Claude Code CLI', ...mask(process.env.ANTHROPIC_API_KEY) },
+      { id: 'GEMINI_API_KEY', label: 'Gemini API Key', scope: 'Gemini CLI (YOLO)', ...mask(process.env.GEMINI_API_KEY) },
+    ],
+  });
+});
+
+// --------------------------------------------------------------------------
 // Billing — 3-6-9 Pricing Model
 // --------------------------------------------------------------------------
 app.get('/billing/tiers', (_req, res) => {

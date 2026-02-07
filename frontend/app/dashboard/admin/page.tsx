@@ -1,7 +1,7 @@
 // frontend/app/dashboard/admin/page.tsx
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import OwnerGate from "@/components/OwnerGate";
 
 // ── Data ────────────────────────────────────────────────────────────────────
@@ -57,11 +57,41 @@ const BILLING_OVERVIEW = [
 
 // ── Component ───────────────────────────────────────────────────────────────
 
+interface ApiKeyInfo {
+  id: string;
+  label: string;
+  scope: string;
+  configured: boolean;
+  masked: string;
+}
+
 function AdminPanel() {
   const [primaryModel, setPrimaryModel] = useState("claude-opus-4.6");
   const [systemPrompt, setSystemPrompt] = useState(
     "You are ACHEEVY, the lead orchestrator for A.I.M.S. Your primary goal is to maintain business architecture integrity while delegating discrete tasks to Boomer_Angs. All tasks pass through PREP_SQUAD_ALPHA before execution. Activity breeds Activity."
   );
+  const [apiKeys, setApiKeys] = useState<ApiKeyInfo[]>([]);
+  const [keysLoading, setKeysLoading] = useState(true);
+  const [keysError, setKeysError] = useState<string | null>(null);
+
+  const fetchApiKeys = useCallback(async () => {
+    setKeysLoading(true);
+    setKeysError(null);
+    try {
+      const res = await fetch("/api/admin/api-keys");
+      if (!res.ok) throw new Error(`Failed to load keys (${res.status})`);
+      const data = await res.json();
+      setApiKeys(data.keys || []);
+    } catch (err) {
+      setKeysError(err instanceof Error ? err.message : "Failed to load keys");
+    } finally {
+      setKeysLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchApiKeys();
+  }, [fetchApiKeys]);
 
   return (
     <div className="space-y-6 animate-in fade-in duration-700">
@@ -100,6 +130,104 @@ function AdminPanel() {
               <p className="text-[9px] text-amber-100/30 mt-0.5">{m.note}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* API Key Manager */}
+      <section className="rounded-3xl border border-white/10 bg-black/60 p-6 backdrop-blur-2xl">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-sm font-semibold uppercase tracking-widest text-amber-200/90 font-display">
+              API Key Manager
+            </h2>
+            <p className="mt-1 text-[0.65rem] text-amber-100/40 uppercase tracking-wider">
+              Service credentials — masked for security
+            </p>
+          </div>
+          <button
+            onClick={fetchApiKeys}
+            disabled={keysLoading}
+            className="rounded-full border border-white/10 px-3 py-1.5 text-[10px] font-semibold text-amber-200 hover:bg-white/5 transition-colors disabled:opacity-40"
+          >
+            {keysLoading ? "Loading..." : "Refresh"}
+          </button>
+        </div>
+
+        <div className="mt-4">
+          {keysError ? (
+            <div className="rounded-2xl border border-red-500/20 bg-red-500/5 p-4">
+              <p className="text-xs text-red-400">{keysError}</p>
+              <p className="text-[10px] text-red-400/60 mt-1">
+                Ensure the UEF Gateway is running and INTERNAL_API_KEY is configured.
+              </p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-white/5">
+                    <th className="p-3 text-left text-[10px] uppercase tracking-widest text-amber-100/40">Service</th>
+                    <th className="p-3 text-left text-[10px] uppercase tracking-widest text-amber-100/40">Scope</th>
+                    <th className="p-3 text-left text-[10px] uppercase tracking-widest text-amber-100/40">Key</th>
+                    <th className="p-3 text-center text-[10px] uppercase tracking-widest text-amber-100/40">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {keysLoading ? (
+                    <tr>
+                      <td colSpan={4} className="p-6 text-center text-xs text-amber-100/40">
+                        Loading key status...
+                      </td>
+                    </tr>
+                  ) : apiKeys.length === 0 ? (
+                    <tr>
+                      <td colSpan={4} className="p-6 text-center text-xs text-amber-100/40">
+                        No keys returned. Backend may not support /admin/api-keys yet.
+                      </td>
+                    </tr>
+                  ) : (
+                    apiKeys.map((k) => (
+                      <tr key={k.id} className="border-t border-white/5 hover:bg-white/[0.02] transition-colors">
+                        <td className="p-3">
+                          <p className="text-xs font-semibold text-amber-50">{k.label}</p>
+                          <p className="text-[9px] font-mono text-amber-100/30 mt-0.5">{k.id}</p>
+                        </td>
+                        <td className="p-3 text-xs text-amber-100/60">{k.scope}</td>
+                        <td className="p-3">
+                          {k.configured ? (
+                            <code className="rounded bg-black/60 border border-white/5 px-2 py-1 text-[10px] font-mono text-amber-200/70">
+                              {k.masked}
+                            </code>
+                          ) : (
+                            <span className="text-[10px] text-amber-100/30 italic">Not set</span>
+                          )}
+                        </td>
+                        <td className="p-3 text-center">
+                          <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[9px] font-semibold uppercase ${
+                            k.configured
+                              ? "bg-emerald-400/10 border border-emerald-400/20 text-emerald-400"
+                              : "bg-red-400/10 border border-red-400/20 text-red-400"
+                          }`}>
+                            <span className={`h-1 w-1 rounded-full ${k.configured ? "bg-emerald-400" : "bg-red-400"}`} />
+                            {k.configured ? "Active" : "Missing"}
+                          </span>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+
+        <div className="mt-4 rounded-2xl border border-dashed border-amber-300/10 bg-amber-300/[0.02] p-4">
+          <p className="text-[10px] text-amber-100/40">
+            Keys are managed via environment variables on the VPS. Update them in{" "}
+            <code className="text-amber-200/60">infra/.env.production</code> (for Docker services) or{" "}
+            <code className="text-amber-200/60">~/.bashrc</code> (for CLI tools), then restart.
+            Keys are never stored in the database or transmitted in plaintext.
+          </p>
         </div>
       </section>
 
