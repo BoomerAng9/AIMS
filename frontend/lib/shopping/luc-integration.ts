@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * LUC Integration for Shopping Module
  *

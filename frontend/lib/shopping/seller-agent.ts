@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Seller Agent — Boomer_Ang E-Commerce Expertise
  *

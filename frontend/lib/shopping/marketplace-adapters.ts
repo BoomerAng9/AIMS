@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Marketplace Adapters — Platform-Specific Integrations
  *

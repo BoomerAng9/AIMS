@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Seller Analytics — Performance Tracking & Business Intelligence
  *

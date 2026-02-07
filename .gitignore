@@ -45,5 +45,5 @@ yarn-error.log*
 infra/.env
 backend/uef-gateway/dist/
 
-ui components/
+
 nul

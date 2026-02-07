@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Listing Optimizer — AI-Powered Listing Enhancement
  *

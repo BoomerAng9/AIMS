@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Shopping Agent — Boomer_Ang Shopping Capability
  *

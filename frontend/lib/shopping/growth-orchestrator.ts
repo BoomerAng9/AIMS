@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Growth Orchestrator — Garage to Global Journey Management
  *

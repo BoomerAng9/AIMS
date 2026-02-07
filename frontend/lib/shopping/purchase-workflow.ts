@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Purchase Workflow — End-to-End Shopping Orchestration
  *

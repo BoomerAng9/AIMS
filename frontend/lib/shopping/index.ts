@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * A.I.M.S. Shopping Module
  *

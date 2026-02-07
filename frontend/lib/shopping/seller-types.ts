@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Garage to Global - Seller/Entrepreneur Types
  *

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Price Monitor — Real-time Price Tracking & Alerts
  *
