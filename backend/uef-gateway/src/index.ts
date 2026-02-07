@@ -17,6 +17,7 @@ import { PREP_SQUAD_PROFILES, runPrepSquad } from './agents/lil-hawks/prep-squad
 import { pmoRegistry } from './pmo/registry';
 import { houseOfAng } from './pmo/house-of-ang';
 import { TIER_CONFIGS, TASK_MULTIPLIERS as BILLING_MULTIPLIERS, PILLAR_CONFIGS, checkAllowance, calculatePillarAddon, checkAgentLimit } from './billing';
+import { openrouter, MODELS as LLM_MODELS } from './llm';
 
 import logger from './logger';
 
@@ -215,9 +216,32 @@ app.get('/admin/api-keys', (_req, res) => {
       { id: 'STRIPE_SECRET_KEY', label: 'Stripe Secret Key', scope: 'Payment processing', ...mask(process.env.STRIPE_SECRET_KEY) },
       { id: 'STRIPE_PUBLISHABLE_KEY', label: 'Stripe Publishable Key', scope: 'Client-side payments', ...mask(process.env.STRIPE_PUBLISHABLE_KEY) },
       { id: 'STRIPE_WEBHOOK_SECRET', label: 'Stripe Webhook Secret', scope: 'Webhook verification', ...mask(process.env.STRIPE_WEBHOOK_SECRET) },
+      { id: 'OPENROUTER_API_KEY', label: 'OpenRouter API Key', scope: 'LLM power source (all agents)', ...mask(process.env.OPENROUTER_API_KEY) },
       { id: 'ANTHROPIC_API_KEY', label: 'Anthropic API Key', scope: 'Claude Code CLI', ...mask(process.env.ANTHROPIC_API_KEY) },
       { id: 'GEMINI_API_KEY', label: 'Gemini API Key', scope: 'Gemini CLI (YOLO)', ...mask(process.env.GEMINI_API_KEY) },
     ],
+  });
+});
+
+// --------------------------------------------------------------------------
+// Admin — LLM Models (The Park — model catalog from OpenRouter)
+// --------------------------------------------------------------------------
+app.get('/admin/models', (_req, res) => {
+  res.json({
+    provider: 'OpenRouter',
+    configured: openrouter.isConfigured(),
+    models: Object.entries(LLM_MODELS).map(([key, spec]) => ({
+      key,
+      id: spec.id,
+      name: spec.name,
+      provider: spec.provider,
+      tier: spec.tier,
+      contextWindow: spec.contextWindow,
+      pricing: {
+        inputPer1M: spec.inputPer1M,
+        outputPer1M: spec.outputPer1M,
+      },
+    })),
   });
 });
 

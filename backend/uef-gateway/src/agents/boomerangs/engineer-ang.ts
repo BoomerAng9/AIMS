@@ -7,6 +7,7 @@
 
 import logger from '../../logger';
 import { ByteRover } from '../../byterover';
+import { agentChat } from '../../llm';
 import { Agent, AgentTaskInput, AgentTaskOutput, makeOutput, failOutput } from '../types';
 
 const profile = {
@@ -33,20 +34,42 @@ async function execute(input: AgentTaskInput): Promise<AgentTaskOutput> {
       `Retrieved ${ctx.patterns.length} patterns (relevance: ${ctx.relevance})`,
     ];
 
-    // 2. Analyze the build request
+    // 2. Try LLM-powered analysis via OpenRouter
+    const llmResult = await agentChat({
+      agentId: 'engineer-ang',
+      query: input.query,
+      intent: input.intent,
+      context: ctx.patterns.length > 0 ? `Reusable patterns: ${ctx.patterns.join(', ')}` : undefined,
+    });
+
+    if (llmResult) {
+      // LLM-powered response — real AI analysis
+      logs.push(`LLM model: ${llmResult.model}`);
+      logs.push(`Tokens used: ${llmResult.tokens.total}`);
+
+      return makeOutput(
+        input.taskId,
+        'engineer-ang',
+        llmResult.content,
+        [`[llm-analysis] Build plan via ${llmResult.model}`],
+        logs,
+        llmResult.tokens.total,
+        llmResult.cost.usd,
+      );
+    }
+
+    // 3. Fallback: Heuristic analysis (no OpenRouter key)
+    logs.push('Mode: heuristic (configure OPENROUTER_API_KEY for LLM-powered responses)');
     const analysis = analyzeBuildRequest(input.query);
     logs.push(`Analyzed: ${analysis.components.length} components, complexity=${analysis.complexity}`);
 
-    // 3. Generate execution plan
     const plan = generateBuildPlan(analysis);
     logs.push(`Plan: ${plan.steps.length} steps generated`);
 
-    // 4. Simulate build execution
     const artifacts = plan.steps.map(step => `[artifact] ${step}`);
 
-    // 5. Estimate cost
     const tokens = analysis.complexity * 500;
-    const usd = tokens * 0.00003; // Claude Opus 4.6 rate
+    const usd = tokens * 0.00003;
 
     const summary = [
       `Build plan for: ${analysis.type}`,

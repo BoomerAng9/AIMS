@@ -7,6 +7,7 @@
 
 import logger from '../../logger';
 import { VLJEPA } from '../../vl-jepa';
+import { agentChat } from '../../llm';
 import { Agent, AgentTaskInput, AgentTaskOutput, makeOutput, failOutput } from '../types';
 
 const profile = {
@@ -33,9 +34,44 @@ async function execute(input: AgentTaskInput): Promise<AgentTaskOutput> {
     const consistency = await VLJEPA.verifySemanticConsistency(input.intent, input.query);
     logs.push(`Semantic drift: ${consistency.driftScore} (threshold: 0.15)`);
 
-    // 2. Run quality checks
+    // 2. Run heuristic quality checks (always — security baseline)
     const checks = runQualityChecks(input.query, input.intent);
     logs.push(...checks.logs);
+
+    // 3. Try LLM-powered deep review via OpenRouter
+    const llmResult = await agentChat({
+      agentId: 'quality-ang',
+      query: input.query,
+      intent: input.intent,
+      context: `Heuristic score: ${checks.score}/100. Findings: ${checks.findings.join('; ') || 'None'}. Semantic drift: ${consistency.driftScore}`,
+    });
+
+    if (llmResult) {
+      logs.push(`LLM model: ${llmResult.model}`);
+      logs.push(`Tokens used: ${llmResult.tokens.total}`);
+
+      const artifacts = [
+        `[report] Quality Assessment — Heuristic Score: ${checks.score}/100`,
+        `[llm-review] Deep quality review via ${llmResult.model}`,
+        ...checks.findings.map(f => `[finding] ${f}`),
+      ];
+
+      if (!checks.passed) {
+        artifacts.push('[action-required] Issues found — review findings before proceeding');
+      }
+
+      const summary = [
+        `Quality Assessment: ${checks.passed ? 'PASSED' : 'ISSUES FOUND'}`,
+        `Heuristic Score: ${checks.score}/100`,
+        `\n--- LLM Deep Review ---\n`,
+        llmResult.content,
+      ].join('\n');
+
+      return makeOutput(input.taskId, 'quality-ang', summary, artifacts, logs, llmResult.tokens.total, llmResult.cost.usd);
+    }
+
+    // Fallback: Heuristic only
+    logs.push('Mode: heuristic (configure OPENROUTER_API_KEY for LLM-powered reviews)');
 
     const artifacts = [
       `[report] Quality Assessment — Score: ${checks.score}/100`,

@@ -7,6 +7,7 @@
 
 import logger from '../../logger';
 import { ByteRover } from '../../byterover';
+import { agentChat } from '../../llm';
 import { Agent, AgentTaskInput, AgentTaskOutput, makeOutput, failOutput } from '../types';
 
 const profile = {
@@ -32,6 +33,31 @@ async function execute(input: AgentTaskInput): Promise<AgentTaskOutput> {
       `Retrieved ${ctx.patterns.length} brand patterns`,
     ];
 
+    // Try LLM-powered analysis via OpenRouter
+    const llmResult = await agentChat({
+      agentId: 'marketer-ang',
+      query: input.query,
+      intent: input.intent,
+      context: ctx.patterns.length > 0 ? `Brand patterns: ${ctx.patterns.join(', ')}` : undefined,
+    });
+
+    if (llmResult) {
+      logs.push(`LLM model: ${llmResult.model}`);
+      logs.push(`Tokens used: ${llmResult.tokens.total}`);
+
+      return makeOutput(
+        input.taskId,
+        'marketer-ang',
+        llmResult.content,
+        [`[llm-analysis] Marketing strategy via ${llmResult.model}`],
+        logs,
+        llmResult.tokens.total,
+        llmResult.cost.usd,
+      );
+    }
+
+    // Fallback: Heuristic analysis
+    logs.push('Mode: heuristic (configure OPENROUTER_API_KEY for LLM-powered responses)');
     const analysis = analyzeMarketingRequest(input.query);
     logs.push(`Type: ${analysis.type}, deliverables: ${analysis.deliverables.length}`);
 
