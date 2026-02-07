@@ -22,6 +22,7 @@ import logger from './logger';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY || '';
 
 // --------------------------------------------------------------------------
 // Security Middleware
@@ -55,11 +56,35 @@ const acpLimiter = rateLimit({
 });
 
 // --------------------------------------------------------------------------
-// Health Check
+// API Key Authentication — all routes except /health require X-API-Key
+// --------------------------------------------------------------------------
+function requireApiKey(req: express.Request, res: express.Response, next: express.NextFunction): void {
+  // In dev without a key configured, allow requests through
+  if (!INTERNAL_API_KEY && process.env.NODE_ENV !== 'production') {
+    next();
+    return;
+  }
+
+  const provided = req.headers['x-api-key'];
+  if (!provided || provided !== INTERNAL_API_KEY) {
+    logger.warn({ path: req.path, ip: req.ip }, '[UEF] Rejected: invalid or missing API key');
+    res.status(401).json({ error: 'Unauthorized — invalid or missing API key' });
+    return;
+  }
+  next();
+}
+
+// --------------------------------------------------------------------------
+// Health Check — open (no API key) for Docker probes and uptime monitors
 // --------------------------------------------------------------------------
 app.get('/health', (_req, res) => {
   res.json({ status: 'UEF Gateway Online', layer: 2, uptime: process.uptime() });
 });
+
+// --------------------------------------------------------------------------
+// Apply API key gate to ALL subsequent routes
+// --------------------------------------------------------------------------
+app.use(requireApiKey);
 
 // --------------------------------------------------------------------------
 // Agent Registry — list available agents and their profiles
@@ -86,6 +111,14 @@ app.get('/perform/styles/:styleId', (req, res) => {
 app.post('/perform/athlete', async (req, res) => {
   try {
     const { athleteName, athleteId, cardStyleId } = req.body;
+    if (!athleteName || typeof athleteName !== 'string' || athleteName.length > 200) {
+      res.status(400).json({ error: 'Invalid athleteName: required string, max 200 chars' });
+      return;
+    }
+    if (!athleteId || typeof athleteId !== 'string' || athleteId.length > 100) {
+      res.status(400).json({ error: 'Invalid athleteId: required string, max 100 chars' });
+      return;
+    }
     const result = await runAthletePageFactory({ athleteName, athleteId, cardStyleId });
     res.json(result);
   } catch (error: unknown) {
@@ -134,8 +167,24 @@ app.get('/house-of-ang/roster', (req, res) => {
 app.post('/house-of-ang/spawn', (req, res) => {
   try {
     const { name, type, title, role, specialties } = req.body;
-    if (!name || !type || !title || !role) {
-      res.status(400).json({ error: 'Missing required fields: name, type, title, role' });
+    if (!name || typeof name !== 'string' || name.length > 100) {
+      res.status(400).json({ error: 'Invalid name: required string, max 100 chars' });
+      return;
+    }
+    if (!type || !['SUPERVISORY', 'EXECUTION'].includes(type)) {
+      res.status(400).json({ error: 'Invalid type: must be SUPERVISORY or EXECUTION' });
+      return;
+    }
+    if (!title || typeof title !== 'string' || title.length > 200) {
+      res.status(400).json({ error: 'Invalid title: required string, max 200 chars' });
+      return;
+    }
+    if (!role || typeof role !== 'string' || role.length > 500) {
+      res.status(400).json({ error: 'Invalid role: required string, max 500 chars' });
+      return;
+    }
+    if (specialties && !Array.isArray(specialties)) {
+      res.status(400).json({ error: 'specialties must be an array' });
       return;
     }
     const ang = houseOfAng.spawn(name, type, title, role, specialties || []);
@@ -289,19 +338,42 @@ app.post('/ingress/acp', acpLimiter, async (req, res) => {
   try {
     const rawBody = req.body;
 
+    // Reject anonymous requests in production — frontend must supply authenticated userId
+    if (process.env.NODE_ENV === 'production' && (!rawBody.userId || rawBody.userId === 'anon')) {
+      res.status(401).json({ status: 'ERROR', message: 'Authenticated userId required' });
+      return;
+    }
+
+    // Validate message input
+    if (!rawBody.message || typeof rawBody.message !== 'string') {
+      res.status(400).json({ status: 'ERROR', message: 'Missing or invalid message field' });
+      return;
+    }
+    if (rawBody.message.length > 10000) {
+      res.status(400).json({ status: 'ERROR', message: 'Message exceeds 10,000 character limit' });
+      return;
+    }
+
+    const VALID_INTENTS = ['CHAT', 'BUILD_PLUG', 'RESEARCH', 'AGENTIC_WORKFLOW', 'ESTIMATE_ONLY'];
+    const intent = rawBody.intent || 'ESTIMATE_ONLY';
+    if (!VALID_INTENTS.includes(intent)) {
+      res.status(400).json({ status: 'ERROR', message: `Invalid intent: ${intent}` });
+      return;
+    }
+
     const acpReq: ACPStandardizedRequest = {
       reqId: uuidv4(),
       userId: rawBody.userId || 'anon',
       sessionId: rawBody.sessionId || 'sched-1',
       timestamp: new Date().toISOString(),
-      intent: rawBody.intent || 'ESTIMATE_ONLY',
-      naturalLanguage: rawBody.message || '',
+      intent,
+      naturalLanguage: rawBody.message,
       channel: 'WEB',
       budget: rawBody.budget,
       metadata: rawBody.metadata
     };
 
-    logger.info({ reqId: acpReq.reqId, intent: acpReq.intent }, '[UEF] Received ACP Request');
+    logger.info({ reqId: acpReq.reqId, intent: acpReq.intent, userId: acpReq.userId }, '[UEF] Received ACP Request');
 
     // 1. PREP_SQUAD_ALPHA — Pre-execution intelligence pipeline
     const prepPacket = await runPrepSquad(acpReq.naturalLanguage, acpReq.reqId);
