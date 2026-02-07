@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { DynamicTagline } from '@/components/DynamicTagline';
 
 export default function HomePage() {
@@ -61,9 +62,12 @@ export default function HomePage() {
           <div className="flex-1 flex justify-center">
             <div className="relative group">
               <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-64 h-16 bg-amber-400/15 blur-[80px] rounded-full group-hover:bg-amber-400/25 transition-all duration-700" />
-              <img
+              <Image
                 src="/images/acheevy/acheevy-office-plug.png"
                 alt="ACHEEVY holding an aiPlug cube"
+                width={680}
+                height={1024}
+                priority
                 className="w-full max-w-[420px] drop-shadow-[0_0_60px_rgba(0,0,0,0.9)]"
               />
             </div>
@@ -137,9 +141,11 @@ export default function HomePage() {
       <section className="px-6 md:px-12 py-20 border-t border-amber-400/5">
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center gap-12">
           <div className="flex-1">
-            <img
+            <Image
               src="/images/acheevy/acheevy-helmet.png"
               alt="ACHEEVY helmet with amber visor"
+              width={1024}
+              height={1024}
               className="w-full max-w-[280px] mx-auto drop-shadow-[0_0_40px_rgba(212,175,55,0.3)]"
             />
           </div>
