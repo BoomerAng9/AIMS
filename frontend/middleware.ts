@@ -225,10 +225,11 @@ export function middleware(request: NextRequest) {
   const userAgent = request.headers.get('user-agent') || '';
   const ip = getClientIP(request);
 
-  // Skip security checks for static files
+  // Skip security checks for static files and internal healthcheck
   if (
     pathname.startsWith('/_next') ||
     pathname.startsWith('/static') ||
+    pathname === '/api/health' ||
     pathname.match(/\.(ico|png|jpg|jpeg|gif|svg|woff|woff2|ttf|css|js)$/)
   ) {
     return NextResponse.next();
