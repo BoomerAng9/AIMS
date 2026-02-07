@@ -54,12 +54,23 @@ export const authOptions: NextAuthOptions = {
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
-        // TODO: Replace with real DB lookup when persistence layer is added
         if (!credentials?.email || !credentials?.password) return null;
 
-        // Placeholder: accept any email/password in dev, reject in prod
+        // Owner bypass — allows platform owner to sign in with any password
+        // until a real user DB is wired up
+        if (isOwnerEmail(credentials.email)) {
+          return {
+            id: 'owner-1',
+            name: 'ACHEEVY Operator',
+            email: credentials.email,
+            image: null,
+          };
+        }
+
+        // Non-owner credentials require a real DB (not yet wired)
+        // TODO: Replace with DB lookup when persistence layer is connected
         if (process.env.NODE_ENV === 'production') {
-          return null; // Force OAuth in production until DB is wired
+          return null;
         }
 
         return {

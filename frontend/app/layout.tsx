@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { LogoWallBackground } from "@/components/LogoWallBackground";
 import { SiteFooter } from "@/components/SiteFooter";
 import Providers from "@/components/Providers";
+import FloatingChat from "@/components/FloatingChat";
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -27,6 +28,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             {children}
           </LogoWallBackground>
           <SiteFooter />
+          <FloatingChat />
         </Providers>
       </body>
     </html>
