@@ -16,7 +16,7 @@ import { VISION_SQUAD_PROFILES } from './agents/lil-hawks/vision-scout-squad';
 import { PREP_SQUAD_PROFILES, runPrepSquad } from './agents/lil-hawks/prep-squad-alpha';
 import { pmoRegistry } from './pmo/registry';
 import { houseOfAng } from './pmo/house-of-ang';
-import { TIER_CONFIGS, TASK_MULTIPLIERS as BILLING_MULTIPLIERS, checkAllowance } from './billing';
+import { TIER_CONFIGS, TASK_MULTIPLIERS as BILLING_MULTIPLIERS, PILLAR_CONFIGS, checkAllowance, calculatePillarAddon, checkAgentLimit } from './billing';
 
 import logger from './logger';
 
@@ -151,7 +151,7 @@ app.post('/house-of-ang/spawn', (req, res) => {
 // Billing — 3-6-9 Pricing Model
 // --------------------------------------------------------------------------
 app.get('/billing/tiers', (_req, res) => {
-  res.json({ tiers: TIER_CONFIGS, taskMultipliers: BILLING_MULTIPLIERS });
+  res.json({ tiers: TIER_CONFIGS, taskMultipliers: BILLING_MULTIPLIERS, pillars: PILLAR_CONFIGS });
 });
 
 app.post('/billing/check-allowance', (req, res) => {
@@ -162,6 +162,26 @@ app.post('/billing/check-allowance', (req, res) => {
   }
   const allowance = checkAllowance(tierId, monthlyUsedTokens || 0);
   res.json(allowance);
+});
+
+app.post('/billing/pillar-addon', (req, res) => {
+  const { confidence, convenience, security } = req.body;
+  const addon = calculatePillarAddon(
+    confidence || 'standard',
+    convenience || 'standard',
+    security || 'standard',
+  );
+  res.json(addon);
+});
+
+app.post('/billing/check-agents', (req, res) => {
+  const { tierId, activeAgents } = req.body;
+  if (!tierId) {
+    res.status(400).json({ error: 'Missing tierId' });
+    return;
+  }
+  const result = checkAgentLimit(tierId, activeAgents || 0);
+  res.json(result);
 });
 
 // --------------------------------------------------------------------------

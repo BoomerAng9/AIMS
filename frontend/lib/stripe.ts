@@ -8,7 +8,9 @@
  *   P2P = Proud to Pay  — No commitment, appreciation-based metering
  *
  * Build-Your-Bill: No two users need identical bills.
- * 4 Dimensions: Base Frequency × Usage Modifiers × Group Structure × Task Multipliers
+ * 7 Dimensions:
+ *   Base Frequency × Group Structure × Task Multipliers × Usage Modifiers
+ *   × Agent Automation × Three Pillars (Confidence · Convenience · Security)
  *
  * "Activity breeds Activity."
  */
@@ -29,6 +31,8 @@ export interface BaseTier {
   overdraftBuffer: number;    // buffer before overage kicks in
   discount: string;           // human-readable discount
   models: string[];           // accessible model tiers
+  agents: number;             // active agent/bot limit (0 = unlimited)
+  concurrent: number;         // max concurrent agent executions
   stripePriceId: string;
 }
 
@@ -43,6 +47,8 @@ export const BASE_TIERS: BaseTier[] = [
     overdraftBuffer: 50_000,
     discount: '0% (baseline)',
     models: ['claude-sonnet-4.5', 'gemini-2.5-pro'],
+    agents: 3,
+    concurrent: 1,
     stripePriceId: process.env.STRIPE_PRICE_GARAGE || '',
   },
   {
@@ -55,6 +61,8 @@ export const BASE_TIERS: BaseTier[] = [
     overdraftBuffer: 150_000,
     discount: '10% off monthly',
     models: ['claude-sonnet-4.5', 'claude-opus-4.6', 'gemini-2.5-pro'],
+    agents: 10,
+    concurrent: 5,
     stripePriceId: process.env.STRIPE_PRICE_COMMUNITY || '',
   },
   {
@@ -67,6 +75,8 @@ export const BASE_TIERS: BaseTier[] = [
     overdraftBuffer: 500_000,
     discount: '33% off (pay 9 get 3 free)',
     models: ['claude-sonnet-4.5', 'claude-opus-4.6', 'gemini-2.5-pro', 'kimi-k2.5'],
+    agents: 50,
+    concurrent: 25,
     stripePriceId: process.env.STRIPE_PRICE_ENTERPRISE || '',
   },
   {
@@ -79,6 +89,8 @@ export const BASE_TIERS: BaseTier[] = [
     overdraftBuffer: 0,
     discount: 'Pay-as-you-go',
     models: ['claude-sonnet-4.5'],
+    agents: 0, // unlimited — pay per execution
+    concurrent: 1,
     stripePriceId: process.env.STRIPE_PRICE_P2P || '',
   },
 ];
@@ -119,7 +131,10 @@ export const GROUP_STRUCTURES: GroupStructure[] = [
 // Dimension 4: Task-Based Multipliers (Per-Action)
 // ---------------------------------------------------------------------------
 
-export type TaskTypeId = 'code_gen' | 'code_review' | 'architecture' | 'agent_swarm' | 'security_audit' | 'deployment';
+export type TaskTypeId =
+  | 'code_gen' | 'code_review' | 'architecture'
+  | 'agent_swarm' | 'security_audit' | 'deployment'
+  | 'workflow_auto' | 'biz_intel' | 'full_autonomous';
 
 export interface TaskMultiplier {
   id: TaskTypeId;
@@ -129,28 +144,197 @@ export interface TaskMultiplier {
 }
 
 export const TASK_MULTIPLIERS: TaskMultiplier[] = [
-  { id: 'code_gen', name: 'Code Generation', multiplier: 1.0, description: 'Standard token consumption' },
-  { id: 'code_review', name: 'Code Review', multiplier: 1.2, description: 'Slightly higher for context analysis' },
-  { id: 'architecture', name: 'Architecture Planning', multiplier: 1.5, description: 'Multi-file context required' },
-  { id: 'agent_swarm', name: 'Agent Swarm Execution', multiplier: 2.0, description: 'Parallel agent orchestration' },
-  { id: 'security_audit', name: 'Security Audit', multiplier: 1.45, description: 'Premium security multiplier' },
-  { id: 'deployment', name: 'Deployment Jobs', multiplier: 1.1, description: 'CI/CD pipeline execution' },
+  { id: 'code_gen', name: 'Code Generation', multiplier: 1.0, description: 'Standard token consumption — baseline' },
+  { id: 'code_review', name: 'Code Review', multiplier: 1.2, description: 'Contextual analysis + suggestions' },
+  { id: 'workflow_auto', name: 'Workflow Automation', multiplier: 1.3, description: 'Sequential bot pipelines + triggers' },
+  { id: 'security_audit', name: 'Security Audit', multiplier: 1.45, description: 'ORACLE-driven vulnerability scanning' },
+  { id: 'architecture', name: 'Architecture Planning', multiplier: 1.5, description: 'Multi-system design + blueprints' },
+  { id: 'biz_intel', name: 'Business Intelligence', multiplier: 1.6, description: 'Data analysis + market reports' },
+  { id: 'deployment', name: 'Deployment Jobs', multiplier: 1.1, description: 'CI/CD pipeline orchestration' },
+  { id: 'agent_swarm', name: 'Multi-Agent Orchestration', multiplier: 2.0, description: 'Parallel agent coordination' },
+  { id: 'full_autonomous', name: 'Full Autonomous', multiplier: 3.0, description: 'Self-healing recursive agent swarm' },
+];
+
+// ---------------------------------------------------------------------------
+// Dimension 5: Three Pillars — Confidence · Convenience · Security
+// ---------------------------------------------------------------------------
+
+export type PillarLevel = 'standard' | 'enhanced' | 'maximum';
+
+export interface PillarOption {
+  id: PillarLevel;
+  name: string;
+  addon: number;        // % addon (0 = included, 0.15 = +15%, etc.)
+  features: string[];
+}
+
+export interface Pillar {
+  id: 'confidence' | 'convenience' | 'security';
+  name: string;
+  icon: string;
+  tagline: string;
+  options: PillarOption[];
+}
+
+export const PILLARS: Pillar[] = [
+  {
+    id: 'confidence',
+    name: 'Confidence Shield',
+    icon: '◈',
+    tagline: 'How verified and reliable your agents are',
+    options: [
+      {
+        id: 'standard',
+        name: 'Standard',
+        addon: 0,
+        features: [
+          'Basic ORACLE pre-flight checks',
+          'Community support (48h response)',
+          'Standard execution monitoring',
+          'Basic error recovery',
+        ],
+      },
+      {
+        id: 'enhanced',
+        name: 'Verified',
+        addon: 0.15,
+        features: [
+          'Full 7-gate ORACLE verification',
+          'Priority support (4h response)',
+          '99.5% uptime SLA',
+          'Execution audit trail',
+          'Auto-rollback on failure',
+        ],
+      },
+      {
+        id: 'maximum',
+        name: 'Guaranteed',
+        addon: 0.35,
+        features: [
+          'Enhanced ORACLE + human review loop',
+          'Dedicated support (1h response)',
+          '99.9% uptime SLA',
+          'Execution insurance',
+          'Guaranteed rollback + recovery',
+          'Performance benchmarking',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'convenience',
+    name: 'Convenience Boost',
+    icon: '◉',
+    tagline: 'How fast and seamless your automation runs',
+    options: [
+      {
+        id: 'standard',
+        name: 'Standard',
+        addon: 0,
+        features: [
+          'Standard execution queue',
+          '15-minute scheduling interval',
+          'Self-service onboarding',
+          'Shared compute pool',
+        ],
+      },
+      {
+        id: 'enhanced',
+        name: 'Priority',
+        addon: 0.20,
+        features: [
+          'Priority execution queue',
+          '1-minute scheduling interval',
+          'Assisted onboarding',
+          'Faster model routing',
+          'Webhook + API triggers',
+        ],
+      },
+      {
+        id: 'maximum',
+        name: 'Instant',
+        addon: 0.45,
+        features: [
+          'Guaranteed sub-5s execution',
+          'Real-time scheduling',
+          'White-glove onboarding',
+          'Dedicated compute allocation',
+          'Custom integration support',
+          'Slack/Discord live alerts',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'security',
+    name: 'Security Vault',
+    icon: '◆',
+    tagline: 'How protected your data and operations are',
+    options: [
+      {
+        id: 'standard',
+        name: 'Essential',
+        addon: 0,
+        features: [
+          'Encryption at rest & in transit',
+          'Basic authentication',
+          'Rate limiting',
+          'Standard data handling',
+        ],
+      },
+      {
+        id: 'enhanced',
+        name: 'Professional',
+        addon: 0.25,
+        features: [
+          'ORACLE 7-gate verification',
+          'Role-based access control (RBAC)',
+          'Full audit logging',
+          'Data isolation per workspace',
+          'Monthly compliance reports',
+        ],
+      },
+      {
+        id: 'maximum',
+        name: 'Fortress',
+        addon: 0.50,
+        features: [
+          'Dedicated infrastructure',
+          'SOC 2 readiness package',
+          'Custom security policies',
+          'Zero-trust architecture',
+          'Penetration testing (quarterly)',
+          'GDPR / CCPA tooling',
+        ],
+      },
+    ],
+  },
 ];
 
 // ---------------------------------------------------------------------------
 // Bill Calculator
 // ---------------------------------------------------------------------------
 
+export interface PillarSelection {
+  confidence: PillarLevel;
+  convenience: PillarLevel;
+  security: PillarLevel;
+}
+
 export interface BillEstimate {
   baseTier: BaseTier;
   group: GroupStructure;
   taskMix: Array<{ task: TaskMultiplier; weight: number }>;
   effectiveMultiplier: number;
+  pillarAddons: { confidence: number; convenience: number; security: number; total: number };
   monthlyBase: number;
   monthlyWithGroup: number;
+  monthlyBeforePillars: number;
   monthlyEstimate: number;
   commitmentTotal: number;
   tokensPerMonth: number;
+  agents: number;
+  concurrent: number;
 }
 
 export function calculateBill(
@@ -158,6 +342,7 @@ export function calculateBill(
   groupId: GroupId,
   seatCount: number,
   taskWeights: Partial<Record<TaskTypeId, number>>,
+  pillars: PillarSelection = { confidence: 'standard', convenience: 'standard', security: 'standard' },
 ): BillEstimate {
   const tier = BASE_TIERS.find(t => t.id === tierId)!;
   const group = GROUP_STRUCTURES.find(g => g.id === groupId)!;
@@ -182,8 +367,25 @@ export function calculateBill(
     ? 0 // custom contract
     : (monthlyBase * group.multiplier) + (group.perSeatAddon * Math.max(seatCount - 1, 0));
 
-  // Apply task multiplier to estimate actual cost
-  const monthlyEstimate = Math.round(monthlyWithGroup * effectiveMultiplier * 100) / 100;
+  // Apply task multiplier
+  const monthlyBeforePillars = Math.round(monthlyWithGroup * effectiveMultiplier * 100) / 100;
+
+  // Calculate pillar addons
+  const getAddon = (pillarId: Pillar['id'], level: PillarLevel) => {
+    const pillar = PILLARS.find(p => p.id === pillarId)!;
+    return pillar.options.find(o => o.id === level)?.addon || 0;
+  };
+
+  const pillarAddons = {
+    confidence: getAddon('confidence', pillars.confidence),
+    convenience: getAddon('convenience', pillars.convenience),
+    security: getAddon('security', pillars.security),
+    total: 0,
+  };
+  pillarAddons.total = pillarAddons.confidence + pillarAddons.convenience + pillarAddons.security;
+
+  // Final monthly estimate with pillar addons
+  const monthlyEstimate = Math.round(monthlyBeforePillars * (1 + pillarAddons.total) * 100) / 100;
 
   // Commitment total
   const commitmentTotal = Math.round(monthlyEstimate * tier.commitmentMonths * 100) / 100;
@@ -193,10 +395,14 @@ export function calculateBill(
     group,
     taskMix,
     effectiveMultiplier: Math.round(effectiveMultiplier * 100) / 100,
+    pillarAddons,
     monthlyBase,
     monthlyWithGroup: Math.round(monthlyWithGroup * 100) / 100,
+    monthlyBeforePillars,
     monthlyEstimate,
     commitmentTotal,
     tokensPerMonth: tier.tokensIncluded,
+    agents: tier.agents,
+    concurrent: tier.concurrent,
   };
 }
