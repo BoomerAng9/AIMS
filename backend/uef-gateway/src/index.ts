@@ -19,6 +19,15 @@ import { houseOfAng } from './pmo/house-of-ang';
 import { TIER_CONFIGS, TASK_MULTIPLIERS as BILLING_MULTIPLIERS, PILLAR_CONFIGS, checkAllowance, calculatePillarAddon, checkAgentLimit } from './billing';
 import { openrouter, MODELS as LLM_MODELS } from './llm';
 import { verticalRegistry } from './verticals';
+import { projectStore, plugStore, deploymentStore } from './db';
+import { getQuestions, analyzeRequirements, generateProjectSpec, createProject } from './intake';
+import { templateLibrary } from './templates';
+import { scaffolder } from './scaffolder';
+import { pipeline } from './pipeline';
+import { deployer } from './deployer';
+import { integrationRegistry } from './integrations';
+import { analytics } from './analytics';
+import { makeItMine } from './make-it-mine';
 
 import logger from './logger';
 
@@ -275,6 +284,276 @@ app.get('/verticals/:category', (req, res) => {
 });
 
 // --------------------------------------------------------------------------
+// Templates — App Archetypes Library
+// --------------------------------------------------------------------------
+app.get('/templates', (_req, res) => {
+  res.json({
+    templates: templateLibrary.list(),
+    count: templateLibrary.list().length,
+  });
+});
+
+app.get('/templates/:id', (req, res) => {
+  const tmpl = templateLibrary.get(req.params.id);
+  if (!tmpl) {
+    res.status(404).json({ error: `Template "${req.params.id}" not found` });
+    return;
+  }
+  res.json(tmpl);
+});
+
+// --------------------------------------------------------------------------
+// Intake — Needs Analysis Engine
+// --------------------------------------------------------------------------
+app.get('/intake/questions', (req, res) => {
+  const archetype = req.query.archetype as string | undefined;
+  res.json({ questions: getQuestions(archetype) });
+});
+
+app.post('/intake/analyze', (req, res) => {
+  try {
+    const { responses, description } = req.body;
+    if (!description || typeof description !== 'string') {
+      res.status(400).json({ error: 'Missing description field' });
+      return;
+    }
+    const analysis = analyzeRequirements(responses || [], description);
+    const spec = generateProjectSpec(analysis);
+    res.json({ analysis, spec });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Analysis failed';
+    res.status(500).json({ error: msg });
+  }
+});
+
+// --------------------------------------------------------------------------
+// Projects — CRUD
+// --------------------------------------------------------------------------
+app.post('/projects', (req, res) => {
+  try {
+    const { userId, name, description, responses } = req.body;
+    if (!name || typeof name !== 'string' || name.length > 200) {
+      res.status(400).json({ error: 'Invalid name: required string, max 200 chars' });
+      return;
+    }
+    if (!description || typeof description !== 'string') {
+      res.status(400).json({ error: 'Missing description' });
+      return;
+    }
+    const analysis = analyzeRequirements(responses || [], description);
+    const spec = generateProjectSpec(analysis);
+    const project = createProject(userId || 'anon', name, description, spec);
+
+    // Auto-start pipeline
+    const pipelineState = pipeline.start(project.id);
+
+    res.status(201).json({ project, pipeline: pipelineState });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Project creation failed';
+    res.status(500).json({ error: msg });
+  }
+});
+
+app.get('/projects', (req, res) => {
+  const userId = req.query.userId as string | undefined;
+  const projects = userId
+    ? projectStore.findBy(p => p.userId === userId)
+    : projectStore.list();
+  res.json({ projects, count: projects.length });
+});
+
+app.get('/projects/:id', (req, res) => {
+  const project = projectStore.get(req.params.id);
+  if (!project) {
+    res.status(404).json({ error: 'Project not found' });
+    return;
+  }
+  const pipelineState = pipeline.getState(req.params.id);
+  res.json({ project, pipeline: pipelineState || null });
+});
+
+app.post('/projects/:id/advance', (req, res) => {
+  try {
+    const project = projectStore.get(req.params.id);
+    if (!project) {
+      res.status(404).json({ error: 'Project not found' });
+      return;
+    }
+    const result = pipeline.advanceStage(req.params.id);
+    res.json({ result, pipeline: pipeline.getState(req.params.id) });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Pipeline advance failed';
+    res.status(500).json({ error: msg });
+  }
+});
+
+// --------------------------------------------------------------------------
+// Plugs — Built Artifacts
+// --------------------------------------------------------------------------
+app.get('/plugs', (req, res) => {
+  const userId = req.query.userId as string | undefined;
+  const plugs = userId
+    ? plugStore.findBy(p => p.userId === userId)
+    : plugStore.list();
+  res.json({ plugs, count: plugs.length });
+});
+
+app.get('/plugs/:id', (req, res) => {
+  const plug = plugStore.get(req.params.id);
+  if (!plug) {
+    res.status(404).json({ error: 'Plug not found' });
+    return;
+  }
+  const metrics = analytics.getMetrics(req.params.id);
+  const deployment = plug.deploymentId ? deploymentStore.get(plug.deploymentId) : null;
+  res.json({ plug, metrics, deployment });
+});
+
+// --------------------------------------------------------------------------
+// Scaffolder — Generate Project Files
+// --------------------------------------------------------------------------
+app.post('/scaffold', (req, res) => {
+  try {
+    const { projectId } = req.body;
+    const project = projectStore.get(projectId);
+    if (!project || !project.spec) {
+      res.status(400).json({ error: 'Project not found or missing spec' });
+      return;
+    }
+    const result = scaffolder.scaffold(project.spec, project.name, {
+      primaryColor: project.branding?.primaryColor || '#f59e0b',
+    });
+    res.json({ scaffold: { projectName: result.projectName, totalFiles: result.totalFiles, fileList: result.files.map(f => ({ path: f.path, type: f.type, description: f.description })) } });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Scaffolding failed';
+    res.status(500).json({ error: msg });
+  }
+});
+
+// --------------------------------------------------------------------------
+// Deploy — Multi-Tenant Deployment
+// --------------------------------------------------------------------------
+app.post('/deploy', (req, res) => {
+  try {
+    const { plugId, projectName, domain, provider } = req.body;
+    if (!plugId || typeof plugId !== 'string') {
+      res.status(400).json({ error: 'Missing plugId' });
+      return;
+    }
+    const status = deployer.deploy({
+      plugId,
+      projectName: projectName || 'aims-plug',
+      provider: provider || 'docker',
+      domain,
+      port: 0, // auto-assigned
+      envVars: {},
+      sslEnabled: !!domain,
+    });
+    res.status(201).json(status);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Deployment failed';
+    res.status(500).json({ error: msg });
+  }
+});
+
+app.get('/deployments', (_req, res) => {
+  res.json({ deployments: deployer.listAll() });
+});
+
+app.get('/deployments/:id', (req, res) => {
+  const status = deployer.getStatus(req.params.id);
+  if (!status) {
+    res.status(404).json({ error: 'Deployment not found' });
+    return;
+  }
+  res.json(status);
+});
+
+app.post('/deployments/:id/stop', (req, res) => {
+  const status = deployer.stop(req.params.id);
+  if (!status) {
+    res.status(404).json({ error: 'Deployment not found' });
+    return;
+  }
+  res.json(status);
+});
+
+// --------------------------------------------------------------------------
+// Integrations — Third-Party Connectors
+// --------------------------------------------------------------------------
+app.get('/integrations', (req, res) => {
+  const category = req.query.category as string | undefined;
+  if (category) {
+    res.json({ integrations: integrationRegistry.getByCategory(category as Parameters<typeof integrationRegistry.getByCategory>[0]) });
+  } else {
+    res.json({ integrations: integrationRegistry.list(), stats: integrationRegistry.getStats() });
+  }
+});
+
+app.get('/integrations/:id', (req, res) => {
+  const integration = integrationRegistry.get(req.params.id);
+  if (!integration) {
+    res.status(404).json({ error: `Integration "${req.params.id}" not found` });
+    return;
+  }
+  res.json(integration);
+});
+
+// --------------------------------------------------------------------------
+// Analytics — Per-Plug Metrics
+// --------------------------------------------------------------------------
+app.get('/analytics/:plugId', (req, res) => {
+  const metrics = analytics.getMetrics(req.params.plugId);
+  res.json(metrics);
+});
+
+app.get('/analytics/:plugId/daily', (req, res) => {
+  const days = parseInt(req.query.days as string) || 7;
+  const stats = analytics.getDailyStats(req.params.plugId, days);
+  res.json({ plugId: req.params.plugId, days, stats });
+});
+
+// --------------------------------------------------------------------------
+// Make It Mine — Clone & Customize Engine
+// --------------------------------------------------------------------------
+app.post('/make-it-mine/clone', (req, res) => {
+  try {
+    const result = makeItMine.clone(req.body);
+    res.status(201).json(result);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Clone failed';
+    res.status(500).json({ error: msg });
+  }
+});
+
+app.get('/make-it-mine/suggest', (req, res) => {
+  const templateId = req.query.templateId as string;
+  const industry = req.query.industry as string;
+  if (!templateId || !industry) {
+    res.status(400).json({ error: 'templateId and industry query params required' });
+    return;
+  }
+  const suggestions = makeItMine.suggestCustomizations(templateId, industry);
+  res.json(suggestions);
+});
+
+// --------------------------------------------------------------------------
+// Pipeline — Active Build Pipelines
+// --------------------------------------------------------------------------
+app.get('/pipelines', (_req, res) => {
+  res.json({ active: pipeline.listActive() });
+});
+
+app.get('/pipelines/:projectId', (req, res) => {
+  const state = pipeline.getState(req.params.projectId);
+  if (!state) {
+    res.status(404).json({ error: 'Pipeline not found' });
+    return;
+  }
+  res.json(state);
+});
+
+// --------------------------------------------------------------------------
 // Billing — 3-6-9 Pricing Model
 // --------------------------------------------------------------------------
 app.get('/billing/tiers', (_req, res) => {
@@ -356,7 +635,7 @@ function buildExecutionPlan(intent: string, _query: string): { steps: string[]; 
         steps: [
           'Decompose research query',
           'Retrieve known context from ByteRover',
-          'Dispatch AnalystAng for data gathering',
+          'Dispatch Analyst_Ang for data gathering',
           'Compile findings and verify via ORACLE'
         ],
         estimatedDuration: '3 minutes'
@@ -400,7 +679,7 @@ function buildResponseMessage(intent: string, oraclePassed: boolean, agentExecut
     case 'BUILD_PLUG':
       return `Build request accepted. Execution plan generated and LUC quote attached.${suffix}`;
     case 'RESEARCH':
-      return `Research request queued. AnalystAng will compile findings. LUC estimate attached.${suffix}`;
+      return `Research request queued. Analyst_Ang will compile findings. LUC estimate attached.${suffix}`;
     case 'AGENTIC_WORKFLOW':
       return `Workflow pipeline validated. Multi-stage execution plan ready.${suffix}`;
     case 'ESTIMATE_ONLY':

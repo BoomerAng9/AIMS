@@ -398,7 +398,7 @@ export const SYSTEM_MAP = {
     pmo: {
       cSuite: ['Boomer_CTO', 'Boomer_CFO', 'Boomer_COO', 'Boomer_CMO', 'Boomer_CDO', 'Boomer_CPO'],
       departmental: ['DevOps Agent', 'Value Agent', 'Flow Boss Agent', 'Social Campaign Agent', 'Video Editing Agent', 'Social Agent'],
-      execution: ['EngineerAng', 'MarketerAng', 'AnalystAng', 'QualityAng', 'Chicken Hawk'],
+      execution: ['Engineer_Ang', 'Marketer_Ang', 'Analyst_Ang', 'Quality_Ang', 'Chicken Hawk'],
       squads: ['PREP_SQUAD_ALPHA', 'WORKFLOW_SMITH_SQUAD', 'VISION_SCOUT_SQUAD'],
     },
     qa: {

@@ -1,5 +1,5 @@
 /**
- * MarketerAng — Growth & Content Strategist
+ * Marketer_Ang — Growth & Content Strategist
  *
  * Handles content creation, SEO, campaign strategy, copywriting.
  * Specialties: SEO Audits, Copy Generation, Campaign Flows
@@ -12,7 +12,7 @@ import { Agent, AgentTaskInput, AgentTaskOutput, makeOutput, failOutput } from '
 
 const profile = {
   id: 'marketer-ang' as const,
-  name: 'MarketerAng',
+  name: 'Marketer_Ang',
   role: 'Growth & Content Strategist',
   capabilities: [
     { name: 'seo-audit', weight: 0.90 },
@@ -25,7 +25,7 @@ const profile = {
 };
 
 async function execute(input: AgentTaskInput): Promise<AgentTaskOutput> {
-  logger.info({ taskId: input.taskId }, '[MarketerAng] Starting task');
+  logger.info({ taskId: input.taskId }, '[Marketer_Ang] Starting task');
 
   try {
     const ctx = await ByteRover.retrieveContext(input.query);
@@ -73,7 +73,7 @@ async function execute(input: AgentTaskInput): Promise<AgentTaskOutput> {
       `Target: ${analysis.audience}`,
     ].join('\n');
 
-    logger.info({ taskId: input.taskId }, '[MarketerAng] Task complete');
+    logger.info({ taskId: input.taskId }, '[Marketer_Ang] Task complete');
     return makeOutput(input.taskId, 'marketer-ang', summary, artifacts, logs, tokens, usd);
   } catch (err) {
     return failOutput(input.taskId, 'marketer-ang', err instanceof Error ? err.message : 'Unknown error');
@@ -140,4 +140,4 @@ function analyzeMarketingRequest(query: string): MarketingAnalysis {
   return { type, deliverables, tone, audience };
 }
 
-export const MarketerAng: Agent = { profile, execute };
+export const Marketer_Ang: Agent = { profile, execute };

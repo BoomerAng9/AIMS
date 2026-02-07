@@ -7,10 +7,10 @@
  */
 
 import { Agent, AgentId, AgentProfile } from './types';
-import { EngineerAng } from './boomerangs/engineer-ang';
-import { MarketerAng } from './boomerangs/marketer-ang';
-import { AnalystAng } from './boomerangs/analyst-ang';
-import { QualityAng } from './boomerangs/quality-ang';
+import { Engineer_Ang } from './boomerangs/engineer-ang';
+import { Marketer_Ang } from './boomerangs/marketer-ang';
+import { Analyst_Ang } from './boomerangs/analyst-ang';
+import { Quality_Ang } from './boomerangs/quality-ang';
 import { ChickenHawk } from './chicken-hawk';
 
 class AgentRegistry {
@@ -36,8 +36,8 @@ class AgentRegistry {
 export const registry = new AgentRegistry();
 
 // Register all agents
-registry.register(EngineerAng);
-registry.register(MarketerAng);
-registry.register(AnalystAng);
-registry.register(QualityAng);
+registry.register(Engineer_Ang);
+registry.register(Marketer_Ang);
+registry.register(Analyst_Ang);
+registry.register(Quality_Ang);
 registry.register(ChickenHawk);

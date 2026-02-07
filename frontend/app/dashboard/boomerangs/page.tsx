@@ -19,7 +19,7 @@ import { Activity, Zap, Brain, Shield, Code, Megaphone, BarChart3 } from "lucide
 const boomerangs = [
   {
     id: "engineer-ang",
-    name: "EngineerAng",
+    name: "Engineer_Ang",
     role: "Full-Stack Builder",
     icon: Code,
     status: "Active" as const,
@@ -31,7 +31,7 @@ const boomerangs = [
   },
   {
     id: "marketer-ang",
-    name: "MarketerAng",
+    name: "Marketer_Ang",
     role: "Growth & Content Strategist",
     icon: Megaphone,
     status: "Active" as const,
@@ -43,7 +43,7 @@ const boomerangs = [
   },
   {
     id: "analyst-ang",
-    name: "AnalystAng",
+    name: "Analyst_Ang",
     role: "Data & Intelligence Officer",
     icon: BarChart3,
     status: "Standby" as const,
@@ -55,7 +55,7 @@ const boomerangs = [
   },
   {
     id: "quality-ang",
-    name: "QualityAng",
+    name: "Quality_Ang",
     role: "ORACLE Gate Verifier",
     icon: Shield,
     status: "Standby" as const,

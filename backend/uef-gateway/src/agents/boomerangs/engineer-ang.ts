@@ -1,5 +1,5 @@
 /**
- * EngineerAng — Full-Stack Builder
+ * Engineer_Ang — Full-Stack Builder
  *
  * Handles BUILD_PLUG intents, code generation tasks, infrastructure work.
  * Specialties: React / Next.js, Node.js APIs, Cloud Deploy
@@ -12,7 +12,7 @@ import { Agent, AgentTaskInput, AgentTaskOutput, makeOutput, failOutput } from '
 
 const profile = {
   id: 'engineer-ang' as const,
-  name: 'EngineerAng',
+  name: 'Engineer_Ang',
   role: 'Full-Stack Builder',
   capabilities: [
     { name: 'react-nextjs', weight: 0.95 },
@@ -25,7 +25,7 @@ const profile = {
 };
 
 async function execute(input: AgentTaskInput): Promise<AgentTaskOutput> {
-  logger.info({ taskId: input.taskId }, '[EngineerAng] Starting task');
+  logger.info({ taskId: input.taskId }, '[Engineer_Ang] Starting task');
 
   try {
     // 1. Retrieve context from ByteRover for pattern reuse
@@ -78,7 +78,7 @@ async function execute(input: AgentTaskInput): Promise<AgentTaskOutput> {
       `Patterns reused: ${ctx.patterns.length}`,
     ].join('\n');
 
-    logger.info({ taskId: input.taskId, steps: plan.steps.length }, '[EngineerAng] Task complete');
+    logger.info({ taskId: input.taskId, steps: plan.steps.length }, '[Engineer_Ang] Task complete');
     return makeOutput(input.taskId, 'engineer-ang', summary, artifacts, logs, tokens, usd);
   } catch (err) {
     return failOutput(input.taskId, 'engineer-ang', err instanceof Error ? err.message : 'Unknown error');
@@ -167,4 +167,4 @@ function generateBuildPlan(analysis: BuildAnalysis): { steps: string[] } {
   return { steps };
 }
 
-export const EngineerAng: Agent = { profile, execute };
+export const Engineer_Ang: Agent = { profile, execute };

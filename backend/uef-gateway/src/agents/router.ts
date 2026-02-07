@@ -4,9 +4,9 @@
  * Maps ACP intents to the right agent (or agent team) and runs the task.
  *
  * Routing strategy:
- *   CHAT             → MarketerAng (conversational) + QualityAng (verify)
- *   BUILD_PLUG       → ChickenHawk (pipeline) orchestrating EngineerAng
- *   RESEARCH         → AnalystAng (primary) + QualityAng (verify)
+ *   CHAT             → Marketer_Ang (conversational) + Quality_Ang (verify)
+ *   BUILD_PLUG       → ChickenHawk (pipeline) orchestrating Engineer_Ang
+ *   RESEARCH         → Analyst_Ang (primary) + Quality_Ang (verify)
  *   AGENTIC_WORKFLOW → ChickenHawk (full pipeline, multi-agent)
  *   ESTIMATE_ONLY    → No agent execution (LUC handles it)
  */
@@ -64,7 +64,7 @@ export async function routeToAgents(
         outputs.push(result);
       }
 
-      // Run QualityAng verification on the build output
+      // Run Quality_Ang verification on the build output
       const qa = registry.get('quality-ang');
       if (qa) {
         const qaResult = await qa.execute({
@@ -77,8 +77,8 @@ export async function routeToAgents(
     }
 
     case 'RESEARCH': {
-      // Research: AnalystAng does the heavy lifting
-      logger.info({ reqId }, '[Router] RESEARCH → AnalystAng');
+      // Research: Analyst_Ang does the heavy lifting
+      logger.info({ reqId }, '[Router] RESEARCH → Analyst_Ang');
       const analyst = registry.get('analyst-ang');
       if (analyst) {
         const result = await analyst.execute(baseInput);

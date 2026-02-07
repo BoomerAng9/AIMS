@@ -65,7 +65,7 @@ interface ExecutionAng {
 const EXECUTION_ROSTER: ExecutionAng[] = [
   {
     id: "engineer-ang",
-    name: "EngineerAng",
+    name: "Engineer_Ang",
     role: "Full-Stack Builder",
     icon: Code,
     status: "DEPLOYED",
@@ -75,7 +75,7 @@ const EXECUTION_ROSTER: ExecutionAng[] = [
   },
   {
     id: "marketer-ang",
-    name: "MarketerAng",
+    name: "Marketer_Ang",
     role: "Growth Strategist",
     icon: Megaphone,
     status: "DEPLOYED",
@@ -85,7 +85,7 @@ const EXECUTION_ROSTER: ExecutionAng[] = [
   },
   {
     id: "analyst-ang",
-    name: "AnalystAng",
+    name: "Analyst_Ang",
     role: "Data & Intelligence",
     icon: BarChart3,
     status: "STANDBY",
@@ -95,7 +95,7 @@ const EXECUTION_ROSTER: ExecutionAng[] = [
   },
   {
     id: "quality-ang",
-    name: "QualityAng",
+    name: "Quality_Ang",
     role: "ORACLE Verifier",
     icon: Shield,
     status: "STANDBY",

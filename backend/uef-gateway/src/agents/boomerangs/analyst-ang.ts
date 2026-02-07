@@ -1,5 +1,5 @@
 /**
- * AnalystAng — Data & Intelligence Officer
+ * Analyst_Ang — Data & Intelligence Officer
  *
  * Handles RESEARCH intents, data analysis, market intelligence.
  * Specialties: Market Research, Data Pipelines, Visualization
@@ -12,7 +12,7 @@ import { Agent, AgentTaskInput, AgentTaskOutput, makeOutput, failOutput } from '
 
 const profile = {
   id: 'analyst-ang' as const,
-  name: 'AnalystAng',
+  name: 'Analyst_Ang',
   role: 'Data & Intelligence Officer',
   capabilities: [
     { name: 'market-research', weight: 0.95 },
@@ -25,7 +25,7 @@ const profile = {
 };
 
 async function execute(input: AgentTaskInput): Promise<AgentTaskOutput> {
-  logger.info({ taskId: input.taskId }, '[AnalystAng] Starting task');
+  logger.info({ taskId: input.taskId }, '[Analyst_Ang] Starting task');
 
   try {
     const ctx = await ByteRover.retrieveContext(input.query);
@@ -79,7 +79,7 @@ async function execute(input: AgentTaskInput): Promise<AgentTaskOutput> {
       `Confidence: ${analysis.confidence}%`,
     ].join('\n');
 
-    logger.info({ taskId: input.taskId }, '[AnalystAng] Task complete');
+    logger.info({ taskId: input.taskId }, '[Analyst_Ang] Task complete');
     return makeOutput(input.taskId, 'analyst-ang', summary, artifacts, logs, tokens, usd);
   } catch (err) {
     return failOutput(input.taskId, 'analyst-ang', err instanceof Error ? err.message : 'Unknown error');
@@ -144,4 +144,4 @@ function analyzeResearchRequest(query: string): ResearchAnalysis {
   return { type, dimensions, sources, confidence };
 }
 
-export const AnalystAng: Agent = { profile, execute };
+export const Analyst_Ang: Agent = { profile, execute };

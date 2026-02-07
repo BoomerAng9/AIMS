@@ -1,5 +1,5 @@
 /**
- * QualityAng — ORACLE Gate Verifier
+ * Quality_Ang — ORACLE Gate Verifier
  *
  * Runs quality assurance, security audits, code review, ORACLE gate checks.
  * Specialties: 7-Gate Checks, Security Audits, Code Review
@@ -12,7 +12,7 @@ import { Agent, AgentTaskInput, AgentTaskOutput, makeOutput, failOutput } from '
 
 const profile = {
   id: 'quality-ang' as const,
-  name: 'QualityAng',
+  name: 'Quality_Ang',
   role: 'ORACLE Gate Verifier',
   capabilities: [
     { name: 'code-review', weight: 0.95 },
@@ -25,7 +25,7 @@ const profile = {
 };
 
 async function execute(input: AgentTaskInput): Promise<AgentTaskOutput> {
-  logger.info({ taskId: input.taskId }, '[QualityAng] Starting verification');
+  logger.info({ taskId: input.taskId }, '[Quality_Ang] Starting verification');
 
   try {
     const logs: string[] = [];
@@ -93,7 +93,7 @@ async function execute(input: AgentTaskInput): Promise<AgentTaskOutput> {
       `Semantic drift: ${consistency.driftScore}`,
     ].join('\n');
 
-    logger.info({ taskId: input.taskId, passed: checks.passed, score: checks.score }, '[QualityAng] Verification complete');
+    logger.info({ taskId: input.taskId, passed: checks.passed, score: checks.score }, '[Quality_Ang] Verification complete');
     return makeOutput(input.taskId, 'quality-ang', summary, artifacts, logs, tokens, usd);
   } catch (err) {
     return failOutput(input.taskId, 'quality-ang', err instanceof Error ? err.message : 'Unknown error');
@@ -163,4 +163,4 @@ function runQualityChecks(query: string, intent: string): QualityResult {
   return { passed, score, checksRun, findings, logs };
 }
 
-export const QualityAng: Agent = { profile, execute };
+export const Quality_Ang: Agent = { profile, execute };

@@ -1,8 +1,8 @@
 import { registry } from '../agents/registry';
-import { EngineerAng } from '../agents/boomerangs/engineer-ang';
-import { MarketerAng } from '../agents/boomerangs/marketer-ang';
-import { AnalystAng } from '../agents/boomerangs/analyst-ang';
-import { QualityAng } from '../agents/boomerangs/quality-ang';
+import { Engineer_Ang } from '../agents/boomerangs/engineer-ang';
+import { Marketer_Ang } from '../agents/boomerangs/marketer-ang';
+import { Analyst_Ang } from '../agents/boomerangs/analyst-ang';
+import { Quality_Ang } from '../agents/boomerangs/quality-ang';
 import { ChickenHawk } from '../agents/chicken-hawk';
 import { AgentTaskInput } from '../agents/types';
 
@@ -41,9 +41,9 @@ describe('Agent Registry', () => {
   });
 });
 
-describe('EngineerAng', () => {
+describe('Engineer_Ang', () => {
   it('executes BUILD_PLUG tasks successfully', async () => {
-    const result = await EngineerAng.execute(makeInput());
+    const result = await Engineer_Ang.execute(makeInput());
     expect(result.status).toBe('COMPLETED');
     expect(result.agentId).toBe('engineer-ang');
     expect(result.result.artifacts.length).toBeGreaterThan(0);
@@ -51,7 +51,7 @@ describe('EngineerAng', () => {
   });
 
   it('detects frontend and API components', async () => {
-    const result = await EngineerAng.execute(makeInput({
+    const result = await Engineer_Ang.execute(makeInput({
       query: 'Build a dashboard UI with API endpoints and database schema',
     }));
     expect(result.result.summary).toContain('Frontend UI');
@@ -60,9 +60,9 @@ describe('EngineerAng', () => {
   });
 });
 
-describe('MarketerAng', () => {
+describe('Marketer_Ang', () => {
   it('generates marketing deliverables', async () => {
-    const result = await MarketerAng.execute(makeInput({
+    const result = await Marketer_Ang.execute(makeInput({
       intent: 'CHAT',
       query: 'Create a landing page with SEO optimization and email outreach sequence',
     }));
@@ -72,9 +72,9 @@ describe('MarketerAng', () => {
   });
 });
 
-describe('AnalystAng', () => {
+describe('Analyst_Ang', () => {
   it('handles RESEARCH intent', async () => {
-    const result = await AnalystAng.execute(makeInput({
+    const result = await Analyst_Ang.execute(makeInput({
       intent: 'RESEARCH',
       query: 'Research competitor pricing models in the SaaS market',
     }));
@@ -84,9 +84,9 @@ describe('AnalystAng', () => {
   });
 });
 
-describe('QualityAng', () => {
+describe('Quality_Ang', () => {
   it('passes valid requests', async () => {
-    const result = await QualityAng.execute(makeInput({
+    const result = await Quality_Ang.execute(makeInput({
       query: 'Build a secure authentication system with proper validation',
     }));
     expect(result.status).toBe('COMPLETED');
@@ -94,7 +94,7 @@ describe('QualityAng', () => {
   });
 
   it('flags security issues', async () => {
-    const result = await QualityAng.execute(makeInput({
+    const result = await Quality_Ang.execute(makeInput({
       query: '<script>alert("xss")</script> DROP TABLE users;',
     }));
     expect(result.result.summary).toContain('ISSUES FOUND');

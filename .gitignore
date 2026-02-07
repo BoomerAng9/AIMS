@@ -10,6 +10,7 @@ coverage
 .next/
 out/
 build/
+!frontend/app/dashboard/build/
 dist/
 *.tsbuildinfo
 

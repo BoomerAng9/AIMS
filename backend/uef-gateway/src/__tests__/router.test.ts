@@ -19,7 +19,7 @@ describe('Agent Router', () => {
     expect(result.agentOutputs.length).toBeGreaterThan(0);
   });
 
-  it('dispatches BUILD_PLUG to ChickenHawk + QualityAng', async () => {
+  it('dispatches BUILD_PLUG to ChickenHawk + Quality_Ang', async () => {
     const result = await routeToAgents(
       'BUILD_PLUG',
       'Build a CRM plug with user management dashboard and API',
@@ -27,12 +27,12 @@ describe('Agent Router', () => {
       'req-003'
     );
     expect(result.executed).toBe(true);
-    // Should have ChickenHawk output + QualityAng verification
+    // Should have ChickenHawk output + Quality_Ang verification
     expect(result.agentOutputs.length).toBe(2);
     expect(result.primaryAgent).toBe('chicken-hawk');
   });
 
-  it('dispatches RESEARCH to AnalystAng + QualityAng', async () => {
+  it('dispatches RESEARCH to Analyst_Ang + Quality_Ang', async () => {
     const result = await routeToAgents(
       'RESEARCH',
       'Research competitor pricing in the SaaS market landscape',

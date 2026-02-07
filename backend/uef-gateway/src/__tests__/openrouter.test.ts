@@ -106,10 +106,10 @@ describe('OpenRouter LLM Module', () => {
 
   describe('Agents work in heuristic mode (no API key)', () => {
     // Existing agents must still work when OpenRouter is not configured
-    const { EngineerAng } = require('../agents/boomerangs/engineer-ang');
-    const { MarketerAng } = require('../agents/boomerangs/marketer-ang');
-    const { AnalystAng } = require('../agents/boomerangs/analyst-ang');
-    const { QualityAng } = require('../agents/boomerangs/quality-ang');
+    const { Engineer_Ang } = require('../agents/boomerangs/engineer-ang');
+    const { Marketer_Ang } = require('../agents/boomerangs/marketer-ang');
+    const { Analyst_Ang } = require('../agents/boomerangs/analyst-ang');
+    const { Quality_Ang } = require('../agents/boomerangs/quality-ang');
 
     const input = {
       taskId: 'openrouter-test-001',
@@ -117,8 +117,8 @@ describe('OpenRouter LLM Module', () => {
       query: 'Build a dashboard with analytics',
     };
 
-    it('EngineerAng falls back to heuristics', async () => {
-      const result = await EngineerAng.execute(input);
+    it('Engineer_Ang falls back to heuristics', async () => {
+      const result = await Engineer_Ang.execute(input);
       expect(result.status).toBe('COMPLETED');
       expect(result.result.summary).toBeDefined();
       expect(result.result.logs).toContainEqual(
@@ -126,8 +126,8 @@ describe('OpenRouter LLM Module', () => {
       );
     });
 
-    it('MarketerAng falls back to heuristics', async () => {
-      const result = await MarketerAng.execute({
+    it('Marketer_Ang falls back to heuristics', async () => {
+      const result = await Marketer_Ang.execute({
         ...input,
         intent: 'CHAT',
         query: 'Write landing page copy for our SaaS product',
@@ -138,8 +138,8 @@ describe('OpenRouter LLM Module', () => {
       );
     });
 
-    it('AnalystAng falls back to heuristics', async () => {
-      const result = await AnalystAng.execute({
+    it('Analyst_Ang falls back to heuristics', async () => {
+      const result = await Analyst_Ang.execute({
         ...input,
         intent: 'RESEARCH',
         query: 'Research the competitive market landscape',
@@ -150,8 +150,8 @@ describe('OpenRouter LLM Module', () => {
       );
     });
 
-    it('QualityAng falls back to heuristics', async () => {
-      const result = await QualityAng.execute(input);
+    it('Quality_Ang falls back to heuristics', async () => {
+      const result = await Quality_Ang.execute(input);
       expect(result.status).toBe('COMPLETED');
       expect(result.result.logs).toContainEqual(
         expect.stringContaining('heuristic')

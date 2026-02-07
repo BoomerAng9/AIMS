@@ -200,7 +200,7 @@ function seedExecutionAngs(): DeployedAng[] {
   return [
     makeExecution(
       'engineer-ang',
-      'EngineerAng',
+      'Engineer_Ang',
       'Full-Stack Builder',
       'Builds frontend, backend, and cloud infrastructure.',
       'DEPLOYED',
@@ -210,7 +210,7 @@ function seedExecutionAngs(): DeployedAng[] {
     ),
     makeExecution(
       'marketer-ang',
-      'MarketerAng',
+      'Marketer_Ang',
       'Growth & Content Strategist',
       'Creates copy, runs campaigns, and optimises organic reach.',
       'DEPLOYED',
@@ -220,7 +220,7 @@ function seedExecutionAngs(): DeployedAng[] {
     ),
     makeExecution(
       'analyst-ang',
-      'AnalystAng',
+      'Analyst_Ang',
       'Data & Intelligence Officer',
       'Gathers market intelligence, builds dashboards, and runs analysis.',
       'STANDBY',
@@ -230,7 +230,7 @@ function seedExecutionAngs(): DeployedAng[] {
     ),
     makeExecution(
       'quality-ang',
-      'QualityAng',
+      'Quality_Ang',
       'ORACLE Gate Verifier',
       'Runs 7-gate verification, security audits, and code reviews.',
       'STANDBY',

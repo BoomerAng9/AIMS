@@ -1,12 +1,15 @@
 // frontend/app/dashboard/page.tsx
 import React from "react";
 import Link from "next/link";
-import { 
-  MessageSquare, 
-  Layers, 
-  Settings, 
+import {
+  MessageSquare,
+  Layers,
+  Settings,
   CreditCard,
-  ArrowRight
+  ArrowRight,
+  Hammer,
+  Copy,
+  Plug,
 } from "lucide-react";
 
 export default function DashboardPage() {
@@ -31,6 +34,27 @@ export default function DashboardPage() {
       desc: "Deploy capability modules.", 
       status: "Active",
       href: "/dashboard/ai-plugs" 
+    },
+    {
+      title: "Build a Plug",
+      icon: Hammer,
+      desc: "Step-by-step plug builder.",
+      status: "Active",
+      href: "/dashboard/build"
+    },
+    {
+      title: "Your Plugs",
+      icon: Plug,
+      desc: "Manage deployed plugs.",
+      status: "Active",
+      href: "/dashboard/plugs"
+    },
+    {
+      title: "Make It Mine",
+      icon: Copy,
+      desc: "Clone and customize templates.",
+      status: "Active",
+      href: "/dashboard/make-it-mine"
     },
     {
       title: "Settings",

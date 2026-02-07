@@ -215,8 +215,8 @@ function shapeContext(intent: NormalizedIntent, taskGraph: TaskGraph): ContextBu
   // Domain detection
   const lower = intent.normalized.toLowerCase();
   if (lower.includes('athlete') || lower.includes('sport') || lower.includes('player')) { domains.push('sports-analytics'); sources.push('Per|Form'); }
-  if (lower.includes('market') || lower.includes('seo') || lower.includes('campaign')) { domains.push('marketing'); sources.push('MarketerAng'); }
-  if (lower.includes('api') || lower.includes('frontend') || lower.includes('backend')) { domains.push('engineering'); sources.push('EngineerAng'); }
+  if (lower.includes('market') || lower.includes('seo') || lower.includes('campaign')) { domains.push('marketing'); sources.push('Marketer_Ang'); }
+  if (lower.includes('api') || lower.includes('frontend') || lower.includes('backend')) { domains.push('engineering'); sources.push('Engineer_Ang'); }
   if (lower.includes('cost') || lower.includes('budget') || lower.includes('pricing')) { domains.push('finance'); sources.push('LUC-Engine'); }
   if (lower.includes('workflow') || lower.includes('n8n') || lower.includes('automate')) { domains.push('automation'); sources.push('WORKFLOW_SMITH_SQUAD'); }
 
@@ -264,10 +264,10 @@ function checkPolicy(intent: NormalizedIntent, taskGraph: TaskGraph, _context: C
   const sandboxRequired = riskLevel === 'HIGH' || riskLevel === 'CRITICAL';
 
   // Tool eligibility
-  if (intent.signals.includes('BUILD')) toolsEligible.push('ORACLE', 'EngineerAng', 'ChickenHawk');
-  if (intent.signals.includes('RESEARCH')) toolsEligible.push('AnalystAng', 'ByteRover');
+  if (intent.signals.includes('BUILD')) toolsEligible.push('ORACLE', 'Engineer_Ang', 'ChickenHawk');
+  if (intent.signals.includes('RESEARCH')) toolsEligible.push('Analyst_Ang', 'ByteRover');
   if (intent.signals.includes('WORKFLOW')) toolsEligible.push('N8N', 'WORKFLOW_SMITH_SQUAD');
-  if (intent.signals.includes('CHAT')) toolsEligible.push('MarketerAng', 'ACHEEVY');
+  if (intent.signals.includes('CHAT')) toolsEligible.push('Marketer_Ang', 'ACHEEVY');
   if (intent.signals.includes('ESTIMATE')) toolsEligible.push('LUC');
 
   // Blockers

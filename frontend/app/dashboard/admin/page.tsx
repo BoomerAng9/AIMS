@@ -27,10 +27,10 @@ const CSUITE = [
 ];
 
 const EXEC_AGENTS = [
-  { role: "EngineerAng", status: "Active", tasks: "Full-stack building, deployment" },
-  { role: "MarketerAng", status: "Active", tasks: "Growth strategy, content, SEO" },
-  { role: "AnalystAng", status: "Standby", tasks: "Market research, competitive intel" },
-  { role: "QualityAng", status: "Standby", tasks: "ORACLE verification gates" },
+  { role: "Engineer_Ang", status: "Active", tasks: "Full-stack building, deployment" },
+  { role: "Marketer_Ang", status: "Active", tasks: "Growth strategy, content, SEO" },
+  { role: "Analyst_Ang", status: "Standby", tasks: "Market research, competitive intel" },
+  { role: "Quality_Ang", status: "Standby", tasks: "ORACLE verification gates" },
   { role: "Chicken Hawk", status: "Active", tasks: "SOP enforcement, throughput regulation, escalation" },
 ];
 
