@@ -3,14 +3,15 @@ import { Oracle } from '../oracle';
 describe('Oracle', () => {
   describe('runGates', () => {
     it('passes all gates for a valid CHAT request', async () => {
-      const spec = { intent: 'CHAT', query: 'Hello, how are you?' };
-      const output = { quote: { quoteId: 'qt-1', variants: [] } };
+      const spec = { intent: 'CHAT', query: 'Hello, how are you today?', userId: 'user-1' };
+      const output = { quote: { quoteId: 'qt-1', variants: [{ model: 'test', estimate: { totalTokens: 100, totalUsd: 0.001 } }] } };
 
       const result = await Oracle.runGates(spec, output);
 
       expect(result.passed).toBe(true);
       expect(result.score).toBe(100);
       expect(result.gateFailures).toHaveLength(0);
+      expect(result.warnings).toBeDefined();
     });
 
     it('fails Technical gate for empty query', async () => {
@@ -56,13 +57,14 @@ describe('Oracle', () => {
     it('fails Effort gate when budget is exceeded', async () => {
       const spec = {
         intent: 'CHAT',
-        query: 'Build me something',
+        query: 'Build me something nice please',
+        userId: 'user-effort',
         budget: { maxUsd: 0.0001, maxTokens: 10 }
       };
       const output = {
         quote: {
           quoteId: 'qt-1',
-          variants: [{ name: 'Test', estimate: { totalUsd: 100 } }]
+          variants: [{ name: 'Test', estimate: { totalUsd: 100, totalTokens: 5000 } }]
         }
       };
 
@@ -73,8 +75,8 @@ describe('Oracle', () => {
     });
 
     it('fails Documentation gate for short BUILD_PLUG specs', async () => {
-      const spec = { intent: 'BUILD_PLUG', query: 'build it' };
-      const output = { quote: { quoteId: 'qt-1', variants: [] } };
+      const spec = { intent: 'BUILD_PLUG', query: 'build a quick api thing', userId: 'user-doc' };
+      const output = { quote: { quoteId: 'qt-1', variants: [{ model: 'test', estimate: { totalTokens: 100, totalUsd: 0.001 } }] } };
 
       const result = await Oracle.runGates(spec, output);
 
@@ -83,8 +85,8 @@ describe('Oracle', () => {
     });
 
     it('calculates score proportionally to passed gates', async () => {
-      const spec = { intent: 'CHAT', query: 'Hello, how are you?' };
-      const output = { quote: { quoteId: 'qt-1', variants: [] } };
+      const spec = { intent: 'CHAT', query: 'Hello, how are you today?', userId: 'user-score' };
+      const output = { quote: { quoteId: 'qt-1', variants: [{ model: 'test', estimate: { totalTokens: 100, totalUsd: 0.001 } }] } };
 
       const result = await Oracle.runGates(spec, output);
       expect(result.score).toBeGreaterThanOrEqual(0);

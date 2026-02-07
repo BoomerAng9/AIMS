@@ -2,14 +2,14 @@
  * A.I.M.S. Per-Plug Analytics Engine
  *
  * Tracks request, error, deploy, and health-check events for each
- * deployed Plug. Stores daily stat breakdowns and exposes user-level
- * overview aggregation.
+ * deployed Plug. Persists all data to SQLite via the analytics_events,
+ * analytics_daily, and analytics_summary tables (migration 003).
  *
- * All data is held in-memory Maps for now; a time-series DB (e.g.
- * TimescaleDB, InfluxDB) can slot in later.
+ * Public interface is unchanged from the in-memory version so all
+ * existing consumers continue to work without modification.
  */
 
-import { plugStore } from '../db';
+import { getDb } from '../db';
 import logger from '../logger';
 
 // ---------------------------------------------------------------------------
@@ -51,33 +51,11 @@ function todayKey(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
-/** Create a fresh empty metrics object for a given plug. */
-function emptyMetrics(plugId: string): PlugMetrics {
-  return {
-    plugId,
-    requests: 0,
-    errors: 0,
-    uptime: 100,
-    avgResponseMs: 0,
-    lastActive: new Date().toISOString(),
-    dailyStats: [],
-  };
-}
-
 // ---------------------------------------------------------------------------
-// Analytics Engine
+// Analytics Engine (SQLite-backed)
 // ---------------------------------------------------------------------------
 
 export class AnalyticsEngine {
-  /** plugId -> PlugMetrics */
-  private metricsMap: Map<string, PlugMetrics> = new Map();
-
-  /**
-   * Total response-time accumulator (used for running average).
-   * plugId -> { totalMs, count }
-   */
-  private responseTimes: Map<string, { totalMs: number; count: number }> = new Map();
-
   // -----------------------------------------------------------------------
   // Record
   // -----------------------------------------------------------------------
@@ -94,62 +72,135 @@ export class AnalyticsEngine {
     event: AnalyticsEventType,
     data?: Record<string, unknown>,
   ): void {
-    const metrics = this.ensureMetrics(plugId);
+    const db = getDb();
+    const now = new Date().toISOString();
     const day = todayKey();
-    const daily = this.ensureDailyStat(metrics, day);
+    const responseMs =
+      typeof data?.responseMs === 'number' ? data.responseMs : null;
 
+    // 1. Insert raw event
+    const insertEvent = db.prepare(`
+      INSERT INTO analytics_events (plugId, event, responseMs, detail, createdAt)
+      VALUES (?, ?, ?, ?, ?)
+    `);
+    insertEvent.run(plugId, event, responseMs, JSON.stringify(data ?? {}), now);
+
+    // 2. Ensure summary row exists
+    const ensureSummary = db.prepare(`
+      INSERT OR IGNORE INTO analytics_summary
+        (plugId, requests, errors, uptime, avgResponseMs, totalResponseMs, responseCount, lastActive)
+      VALUES (?, 0, 0, 100, 0, 0, 0, ?)
+    `);
+    ensureSummary.run(plugId, now);
+
+    // 3. Ensure daily row exists
+    const ensureDaily = db.prepare(`
+      INSERT OR IGNORE INTO analytics_daily
+        (plugId, date, requests, errors, avgResponseMs, totalResponseMs, responseCount)
+      VALUES (?, ?, 0, 0, 0, 0, 0)
+    `);
+    ensureDaily.run(plugId, day);
+
+    // 4. Apply event-specific mutations
     switch (event) {
       case 'request': {
-        metrics.requests += 1;
-        daily.requests += 1;
+        // Increment request counters
+        db.prepare(`
+          UPDATE analytics_summary
+          SET requests = requests + 1, lastActive = ?
+          WHERE plugId = ?
+        `).run(now, plugId);
+
+        db.prepare(`
+          UPDATE analytics_daily
+          SET requests = requests + 1
+          WHERE plugId = ? AND date = ?
+        `).run(plugId, day);
 
         // Track response time if provided
-        const responseMs = typeof data?.responseMs === 'number' ? data.responseMs : undefined;
-        if (responseMs !== undefined) {
-          const rt = this.ensureResponseTime(plugId);
-          rt.totalMs += responseMs;
-          rt.count += 1;
-          metrics.avgResponseMs = Math.round(rt.totalMs / rt.count);
-          daily.avgResponseMs = metrics.avgResponseMs;
+        if (responseMs !== null) {
+          db.prepare(`
+            UPDATE analytics_summary
+            SET totalResponseMs = totalResponseMs + ?,
+                responseCount   = responseCount + 1,
+                avgResponseMs   = CAST((totalResponseMs + ?) AS INTEGER) / (responseCount + 1)
+            WHERE plugId = ?
+          `).run(responseMs, responseMs, plugId);
+
+          // Re-read to get actual computed avg for the daily row
+          const summaryRow = db.prepare(`
+            SELECT avgResponseMs FROM analytics_summary WHERE plugId = ?
+          `).get(plugId) as { avgResponseMs: number } | undefined;
+
+          const currentAvg = summaryRow?.avgResponseMs ?? 0;
+
+          db.prepare(`
+            UPDATE analytics_daily
+            SET totalResponseMs = totalResponseMs + ?,
+                responseCount   = responseCount + 1,
+                avgResponseMs   = ?
+            WHERE plugId = ? AND date = ?
+          `).run(responseMs, currentAvg, plugId, day);
         }
         break;
       }
 
       case 'error': {
-        metrics.errors += 1;
-        daily.errors += 1;
+        db.prepare(`
+          UPDATE analytics_summary
+          SET errors = errors + 1,
+              uptime = MAX(0, uptime - 0.1),
+              lastActive = ?
+          WHERE plugId = ?
+        `).run(now, plugId);
 
-        // Degrade uptime slightly on every error (floor at 0)
-        metrics.uptime = Math.max(0, metrics.uptime - 0.1);
+        db.prepare(`
+          UPDATE analytics_daily
+          SET errors = errors + 1
+          WHERE plugId = ? AND date = ?
+        `).run(plugId, day);
         break;
       }
 
       case 'deploy': {
-        // Reset uptime to 100 on a fresh deploy
-        metrics.uptime = 100;
+        db.prepare(`
+          UPDATE analytics_summary
+          SET uptime = 100, lastActive = ?
+          WHERE plugId = ?
+        `).run(now, plugId);
+
         logger.info({ plugId }, '[Analytics] Deploy event recorded');
         break;
       }
 
       case 'health-check': {
-        const healthy = data?.healthy !== false; // default to healthy
+        const healthy = data?.healthy !== false;
         if (!healthy) {
-          metrics.uptime = Math.max(0, metrics.uptime - 1);
+          db.prepare(`
+            UPDATE analytics_summary
+            SET uptime = MAX(0, uptime - 1), lastActive = ?
+            WHERE plugId = ?
+          `).run(now, plugId);
+        } else {
+          db.prepare(`
+            UPDATE analytics_summary
+            SET lastActive = ?
+            WHERE plugId = ?
+          `).run(now, plugId);
         }
         break;
       }
 
       default: {
         logger.warn({ plugId, event }, '[Analytics] Unknown event type');
+        // Still update lastActive
+        db.prepare(`
+          UPDATE analytics_summary SET lastActive = ? WHERE plugId = ?
+        `).run(now, plugId);
       }
     }
 
-    metrics.lastActive = new Date().toISOString();
-
-    logger.debug(
-      { plugId, event, requests: metrics.requests, errors: metrics.errors },
-      '[Analytics] Event recorded',
-    );
+    logger.debug({ plugId, event }, '[Analytics] Event recorded');
   }
 
   // -----------------------------------------------------------------------
@@ -158,95 +209,107 @@ export class AnalyticsEngine {
 
   /** Get current metrics for a single plug. */
   getMetrics(plugId: string): PlugMetrics {
-    return this.ensureMetrics(plugId);
+    const db = getDb();
+
+    const summaryRow = db.prepare(`
+      SELECT * FROM analytics_summary WHERE plugId = ?
+    `).get(plugId) as {
+      plugId: string;
+      requests: number;
+      errors: number;
+      uptime: number;
+      avgResponseMs: number;
+      lastActive: string;
+    } | undefined;
+
+    const dailyRows = db.prepare(`
+      SELECT date, requests, errors, avgResponseMs
+      FROM analytics_daily
+      WHERE plugId = ?
+      ORDER BY date DESC
+      LIMIT 30
+    `).all(plugId) as DailyStat[];
+
+    if (!summaryRow) {
+      return {
+        plugId,
+        requests: 0,
+        errors: 0,
+        uptime: 100,
+        avgResponseMs: 0,
+        lastActive: new Date().toISOString(),
+        dailyStats: [],
+      };
+    }
+
+    return {
+      plugId: summaryRow.plugId,
+      requests: summaryRow.requests,
+      errors: summaryRow.errors,
+      uptime: summaryRow.uptime,
+      avgResponseMs: summaryRow.avgResponseMs,
+      lastActive: summaryRow.lastActive,
+      dailyStats: dailyRows,
+    };
   }
 
   /** Aggregate overview across all plugs belonging to a user. */
   getOverview(userId: string): PlugOverview {
-    // Find all plugs owned by this user
-    const userPlugs = plugStore.findBy(p => p.userId === userId);
+    const db = getDb();
 
-    if (userPlugs.length === 0) {
-      return { totalPlugs: 0, totalRequests: 0, totalErrors: 0, avgUptime: 100 };
-    }
-
-    let totalRequests = 0;
-    let totalErrors = 0;
-    let uptimeSum = 0;
-    let plugsWithMetrics = 0;
-
-    for (const plug of userPlugs) {
-      const m = this.metricsMap.get(plug.id);
-      if (m) {
-        totalRequests += m.requests;
-        totalErrors += m.errors;
-        uptimeSum += m.uptime;
-        plugsWithMetrics += 1;
-      }
-    }
-
-    const avgUptime =
-      plugsWithMetrics > 0
-        ? Math.round((uptimeSum / plugsWithMetrics) * 100) / 100
-        : 100;
+    // Join analytics_summary with plugs table to scope by userId
+    const row = db.prepare(`
+      SELECT
+        COUNT(p.id) AS totalPlugs,
+        COALESCE(SUM(s.requests), 0) AS totalRequests,
+        COALESCE(SUM(s.errors), 0) AS totalErrors,
+        CASE
+          WHEN COUNT(s.plugId) > 0
+            THEN ROUND(COALESCE(SUM(s.uptime), 0) / COUNT(s.plugId) * 100) / 100
+          ELSE 100
+        END AS avgUptime
+      FROM plugs p
+      LEFT JOIN analytics_summary s ON s.plugId = p.id
+      WHERE p.userId = ?
+    `).get(userId) as {
+      totalPlugs: number;
+      totalRequests: number;
+      totalErrors: number;
+      avgUptime: number;
+    };
 
     logger.info(
-      { userId, totalPlugs: userPlugs.length, totalRequests, totalErrors, avgUptime },
+      {
+        userId,
+        totalPlugs: row.totalPlugs,
+        totalRequests: row.totalRequests,
+        totalErrors: row.totalErrors,
+        avgUptime: row.avgUptime,
+      },
       '[Analytics] Overview generated',
     );
 
     return {
-      totalPlugs: userPlugs.length,
-      totalRequests,
-      totalErrors,
-      avgUptime,
+      totalPlugs: row.totalPlugs,
+      totalRequests: row.totalRequests,
+      totalErrors: row.totalErrors,
+      avgUptime: row.avgUptime,
     };
   }
 
   /** Return the most recent N days of daily stats for a plug. */
   getDailyStats(plugId: string, days: number = 30): DailyStat[] {
-    const metrics = this.ensureMetrics(plugId);
+    const db = getDb();
 
-    // Sort descending by date, then take the last `days` entries
-    const sorted = [...metrics.dailyStats].sort(
-      (a, b) => b.date.localeCompare(a.date),
-    );
+    const rows = db.prepare(`
+      SELECT date, requests, errors, avgResponseMs
+      FROM analytics_daily
+      WHERE plugId = ?
+      ORDER BY date DESC
+      LIMIT ?
+    `).all(plugId, days) as DailyStat[];
 
-    return sorted.slice(0, days);
-  }
-
-  // -----------------------------------------------------------------------
-  // Internal
-  // -----------------------------------------------------------------------
-
-  /** Retrieve or lazily initialise metrics for a plug. */
-  private ensureMetrics(plugId: string): PlugMetrics {
-    let m = this.metricsMap.get(plugId);
-    if (!m) {
-      m = emptyMetrics(plugId);
-      this.metricsMap.set(plugId, m);
-    }
-    return m;
-  }
-
-  /** Retrieve or lazily initialise today's daily stat entry. */
-  private ensureDailyStat(metrics: PlugMetrics, date: string): DailyStat {
-    let stat = metrics.dailyStats.find(s => s.date === date);
-    if (!stat) {
-      stat = { date, requests: 0, errors: 0, avgResponseMs: 0 };
-      metrics.dailyStats.push(stat);
-    }
-    return stat;
-  }
-
-  /** Retrieve or lazily initialise response-time accumulator. */
-  private ensureResponseTime(plugId: string): { totalMs: number; count: number } {
-    let rt = this.responseTimes.get(plugId);
-    if (!rt) {
-      rt = { totalMs: 0, count: 0 };
-      this.responseTimes.set(plugId, rt);
-    }
-    return rt;
+    return rows;
   }
 }
 
