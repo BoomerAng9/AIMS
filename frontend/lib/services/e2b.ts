@@ -3,7 +3,7 @@
  * Secure code execution in isolated containers
  */
 
-import { CodeInterpreter } from "@e2b/sdk";
+import CodeInterpreter from "@e2b/sdk";
 
 export interface CodeExecutionResult {
   stdout: string;
@@ -53,7 +53,7 @@ export class E2BService {
         error: error.message,
       };
     } finally {
-      await sandbox.close();
+      await (sandbox as any).kill?.() ?? (sandbox as any).close?.();
     }
   }
 
@@ -111,7 +111,7 @@ export class E2BService {
         error: error.message,
       };
     } finally {
-      await sandbox.close();
+      await (sandbox as any).kill?.() ?? (sandbox as any).close?.();
     }
   }
 }

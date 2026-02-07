@@ -88,7 +88,7 @@ export class IIAgentClient extends EventEmitter {
           this.attemptReconnect();
         });
 
-        this.ws.on('error', (error) => {
+        this.ws.on('error', (error: Error) => {
           console.error('[II-Agent] WebSocket error:', error.message);
           this.emit('error', error);
           reject(error);

@@ -17,7 +17,7 @@ export default function AutonomousDashboardPage() {
 
   // Simulate loop for demo purposes
   useEffect(() => {
-    let timeout: NodeJS.Timeout;
+    let timeout: NodeJS.Timeout | undefined;
 
     const runDemo = async () => {
         // Start
@@ -56,7 +56,7 @@ export default function AutonomousDashboardPage() {
 
     // runDemo(); // Uncomment to auto-run on load
     
-    return () => clearTimeout(timeout);
+    return () => { if (timeout) clearTimeout(timeout); };
   }, []);
 
   const addLog = (msg: string, type: 'info' | 'error' = 'info') => {

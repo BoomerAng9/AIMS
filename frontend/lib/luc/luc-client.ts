@@ -34,6 +34,8 @@ interface ACPResponse {
  * Fetches a live LUC estimate from the UEF Gateway.
  * Maps the UCP quote format to the frontend LucEstimate shape.
  */
+export { getLucEstimateLive as fetchRealLucQuote };
+
 export async function getLucEstimateLive(query: string): Promise<LucEstimate> {
   const res = await fetch("/api/acp", {
     method: "POST",

@@ -44,3 +44,6 @@ yarn-error.log*
 # A.I.M.S. Specific
 infra/.env
 backend/uef-gateway/dist/
+
+ui components/
+nul

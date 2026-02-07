@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
       // Fallback response if ACHEEVY is unavailable
       return NextResponse.json({
         sessionId,
-        reply: generateFallbackResponse(message, mode, !!imageBase64),
+        reply: generateFallbackResponse(message, mode || 'chat', !!imageBase64),
         suggestedActions: [
           'Try rephrasing your question',
           'Show me a different angle',
