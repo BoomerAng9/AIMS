@@ -4,11 +4,15 @@
  * The birthplace and command center for all Boomer_Angs.
  * Supervisory Angs govern through PMO offices.
  * Execution Angs build, research, market, audit, and orchestrate.
+ * Forged Angs are task-specific Boomer_Angs with personas and skill tiers.
  *
  * "Activity breeds Activity."
  */
 
 import logger from '../logger';
+import { angForge } from './ang-forge';
+import type { SpawnedAngProfile, AngSpawnResult } from './persona-types';
+import type { PmoId, DirectorId } from './types';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -257,6 +261,7 @@ function seedExecutionAngs(): DeployedAng[] {
 
 export class HouseOfAng {
   private readonly roster: Map<string, DeployedAng> = new Map();
+  private readonly forgedRoster: Map<string, SpawnedAngProfile> = new Map();
   private readonly spawnLog: SpawnEvent[] = [];
 
   constructor() {
@@ -422,6 +427,87 @@ export class HouseOfAng {
     );
 
     return ang;
+  }
+
+  // -----------------------------------------------------------------------
+  // AngForge — Task-specific Boomer_Ang creation with persona + skill tiers
+  // -----------------------------------------------------------------------
+
+  /**
+   * Forge a new task-specific Boomer_Ang with persona, backstory, and
+   * complexity-based skill tier.
+   *
+   * The forged Ang is registered in both the forged roster and the
+   * main roster (as an EXECUTION Ang).
+   */
+  forgeForTask(
+    message: string,
+    pmoOffice: PmoId,
+    director: DirectorId,
+    requestedBy = 'ACHEEVY',
+  ): AngSpawnResult {
+    const result = angForge.forgeFromMessage(message, pmoOffice, director, requestedBy);
+    const { ang } = result;
+
+    // Register in forged roster
+    this.forgedRoster.set(ang.id, ang);
+
+    // Also register in main roster as EXECUTION type
+    const deployed: DeployedAng = {
+      id: ang.id,
+      name: ang.name,
+      type: 'EXECUTION',
+      title: `${ang.persona.displayName} — ${result.tierLabel}`,
+      role: ang.persona.backstory.motivation,
+      assignedPmo: ang.assignedPmo,
+      status: 'DEPLOYED',
+      spawnedAt: ang.spawnedAt,
+      tasksCompleted: 0,
+      successRate: 100,
+      specialties: ang.specialties,
+    };
+    this.roster.set(ang.id, deployed);
+
+    // Log spawn event
+    this.spawnLog.push({
+      angId: ang.id,
+      angName: ang.name,
+      type: 'EXECUTION',
+      spawnedAt: ang.spawnedAt,
+      spawnedBy: requestedBy,
+    });
+
+    logger.info(
+      { angId: ang.id, name: ang.name, tier: ang.skillTier, pmo: pmoOffice },
+      'Boomer_Ang forged and registered in House of Ang',
+    );
+
+    return result;
+  }
+
+  /** Get a forged Ang's full profile (including persona + backstory). */
+  getForgedProfile(angId: string): SpawnedAngProfile | undefined {
+    return this.forgedRoster.get(angId);
+  }
+
+  /** List all forged (task-specific) Boomer_Angs. */
+  listForged(): SpawnedAngProfile[] {
+    return Array.from(this.forgedRoster.values());
+  }
+
+  /** List forged Boomer_Angs by PMO office. */
+  listForgedByPmo(pmoId: string): SpawnedAngProfile[] {
+    return this.listForged().filter(a => a.assignedPmo === pmoId);
+  }
+
+  /** Extended stats including forged Angs. */
+  getExtendedStats(): HouseStats & { forged: number; forgeLog: number } {
+    const base = this.getStats();
+    return {
+      ...base,
+      forged: this.forgedRoster.size,
+      forgeLog: angForge.getSpawnCount(),
+    };
   }
 }
 

@@ -14,6 +14,8 @@ import { v4 as uuidv4 } from 'uuid';
 import logger from '../logger';
 import { PmoId, DirectorId } from '../pmo/types';
 import { pmoRegistry } from '../pmo/registry';
+import { houseOfAng } from '../pmo/house-of-ang';
+import { scoreComplexity } from '../pmo/ang-forge';
 import {
   PmoClassification,
   BoomerDirective,
@@ -314,22 +316,42 @@ export function createPipelinePacket(payload: N8nTriggerPayload): PmoPipelinePac
   const requestId = payload.requestId || `REQ-${uuidv4().slice(0, 8).toUpperCase()}`;
   const now = new Date().toISOString();
 
-  // Step 1: ACHEEVY classifies
+  // Step 1: ACHEEVY classifies intent → PMO office
   const classification = classifyIntent(payload.message);
 
-  // Step 2: Boomer_Ang builds directive
+  // Step 2: Forge a task-specific Boomer_Ang with persona + skill tier
+  const complexity = scoreComplexity(payload.message);
+  const forgeResult = houseOfAng.forgeForTask(
+    payload.message,
+    classification.pmoOffice,
+    classification.director,
+    payload.userId || 'ACHEEVY',
+  );
+
+  logger.info(
+    {
+      requestId,
+      forgedAng: forgeResult.ang.name,
+      tier: forgeResult.ang.skillTier,
+      complexity: complexity.score,
+      persona: forgeResult.ang.persona.codename,
+    },
+    '[PMO Router] Boomer_Ang forged for task',
+  );
+
+  // Step 3: Forged Boomer_Ang builds execution directive
   const directive = buildDirective(classification, payload.message);
 
   const chain: ChainPosition = {
     step: 2,
     current: 'Boomer_Ang',
     next: 'Chicken_Hawk',
-    path: ['User', 'ACHEEVY', classification.director, 'Chicken_Hawk', 'Squad', 'Lil_Hawks', 'Receipt', 'ACHEEVY'],
+    path: ['User', 'ACHEEVY', forgeResult.ang.name, 'Chicken_Hawk', 'Squad', 'Lil_Hawks', 'Receipt', 'ACHEEVY'],
     startedAt: now,
   };
 
   logger.info(
-    { requestId, userId: payload.userId, office: classification.pmoOffice, director: classification.director },
+    { requestId, userId: payload.userId, office: classification.pmoOffice, director: classification.director, forgedAng: forgeResult.ang.id },
     '[PMO Router] Pipeline packet created — handing to Chicken_Hawk',
   );
 
