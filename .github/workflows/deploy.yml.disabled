@@ -50,7 +50,10 @@ jobs:
               cd /home/aims/AIMS
             fi
 
-            # Build and deploy
+            # Stop any old "locale" project containers (VPS was originally LOCALE)
+            docker compose -p locale down 2>/dev/null || true
+
+            # Build and deploy as "aims"
             chmod +x deploy.sh
             ./deploy.sh
 
