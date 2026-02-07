@@ -9,15 +9,31 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@deepgram/sdk": "^4.11.3",
+    "@e2b/sdk": "^0.12.5",
+    "@google/generative-ai": "^0.24.1",
+    "@mendable/firecrawl-js": "^4.12.0",
+    "@radix-ui/react-dialog": "^1.1.15",
+    "@radix-ui/react-slot": "^1.2.4",
+    "@remotion/player": "^4.0.419",
+    "apify-client": "^2.22.0",
+    "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "composio-core": "^0.5.39",
     "framer-motion": "^10.16.16",
+    "groq-sdk": "^0.37.0",
     "lucide-react": "^0.303.0",
     "next": "^14.2.25",
     "next-auth": "^4.24.11",
+    "openai": "^6.18.0",
     "react": "^18",
     "react-dom": "^18",
+    "remotion": "^4.0.419",
+    "resend": "^6.9.1",
     "stripe": "^20.3.1",
-    "uuid": "^9.0.1"
+    "tailwind-merge": "^3.4.0",
+    "uuid": "^9.0.1",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@types/node": "^20",
