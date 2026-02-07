@@ -1,262 +1,345 @@
 /**
- * PMO Router — ACHEEVY Intent Classifier + Boomer_Ang Directive Builder
+ * PMO Router — ACHEEVY → Boomer_Ang Delegation Engine
  *
- * Classifies user messages into PMO offices and builds directives
- * for Chicken_Hawk execution.
+ * Classifies incoming requests and routes them to the correct PMO office.
+ * Each Boomer_Ang director validates scope and produces an execution directive
+ * for Chicken_Hawk.
  *
- * Flow: User message → classify() → buildDirective() → PipelinePacket
+ * Chain: User → ACHEEVY → Boomer_Ang → Chicken_Hawk
+ *
+ * Doctrine: "Activity breeds Activity — shipped beats perfect."
  */
 
 import { v4 as uuidv4 } from 'uuid';
+import logger from '../logger';
 import { PmoId, DirectorId } from '../pmo/types';
+import { pmoRegistry } from '../pmo/registry';
 import {
   PmoClassification,
-  PmoDirective,
-  DirectiveStep,
-  PipelinePacket,
+  BoomerDirective,
   ExecutionLane,
+  CrewSpecialty,
+  N8nTriggerPayload,
+  ChainPosition,
+  PmoPipelinePacket,
 } from './types';
 
-// ── Keyword → PMO Office mapping ───────────────────────────
+// ---------------------------------------------------------------------------
+// PMO Keyword Routing Map
+// ---------------------------------------------------------------------------
 
-const PMO_KEYWORDS: Record<PmoId, string[]> = {
-  'tech-office': [
-    'deploy', 'build', 'code', 'api', 'docker', 'infrastructure', 'server',
-    'database', 'backend', 'frontend', 'pipeline', 'ci/cd', 'devops',
-    'debug', 'fix', 'test', 'refactor', 'architecture', 'vps', 'nginx',
-    'kubernetes', 'container', 'microservice', 'git', 'webhook',
-  ],
-  'finance-office': [
-    'budget', 'cost', 'price', 'billing', 'invoice', 'payment', 'stripe',
-    'subscription', 'luc', 'quota', 'revenue', 'roi', 'profit', 'expense',
-    'forecast', 'financial', 'accounting',
-  ],
-  'ops-office': [
-    'monitor', 'health', 'uptime', 'performance', 'sla', 'incident',
-    'alert', 'log', 'metric', 'scale', 'load', 'throughput', 'latency',
-    'backup', 'restore', 'maintenance', 'optimize',
-  ],
-  'marketing-office': [
-    'campaign', 'seo', 'content', 'social', 'brand', 'growth', 'user',
-    'acquisition', 'funnel', 'conversion', 'engagement', 'audience',
-    'analytics', 'advertising', 'promote', 'outreach',
-  ],
-  'design-office': [
-    'design', 'ui', 'ux', 'visual', 'video', 'image', 'animation',
-    'logo', 'brand', 'color', 'layout', 'wireframe', 'prototype',
-    'figma', 'mockup', 'illustration', 'thumbnail',
-  ],
-  'publishing-office': [
-    'publish', 'blog', 'article', 'documentation', 'readme', 'docs',
-    'newsletter', 'release', 'changelog', 'announcement', 'editorial',
-    'copywriting', 'post', 'distribution',
-  ],
+interface PmoKeywordConfig {
+  director: DirectorId;
+  agent: string;
+  keywords: string[];
+}
+
+const PMO_KEYWORDS: Record<PmoId, PmoKeywordConfig> = {
+  'tech-office': {
+    director: 'Boomer_CTO',
+    agent: 'DevOps Agent',
+    keywords: [
+      'deploy', 'infrastructure', 'docker', 'ci/cd', 'pipeline', 'build',
+      'server', 'vps', 'architecture', 'devops', 'container', 'kubernetes',
+      'api', 'backend', 'database', 'schema', 'migrate', 'nginx', 'ssl', 'dns',
+    ],
+  },
+  'finance-office': {
+    director: 'Boomer_CFO',
+    agent: 'Value Agent',
+    keywords: [
+      'budget', 'cost', 'token', 'luc', 'pricing', 'revenue', 'expense',
+      'roi', 'financial', 'billing', 'invoice', 'subscription', 'payment', 'stripe',
+    ],
+  },
+  'ops-office': {
+    director: 'Boomer_COO',
+    agent: 'Flow Boss Agent',
+    keywords: [
+      'workflow', 'automate', 'schedule', 'cron', 'sla', 'throughput', 'queue',
+      'monitor', 'health', 'uptime', 'performance', 'load', 'scaling', 'ops', 'operations',
+    ],
+  },
+  'marketing-office': {
+    director: 'Boomer_CMO',
+    agent: 'Social Campaign Agent',
+    keywords: [
+      'campaign', 'marketing', 'social', 'ad', 'seo', 'content', 'brand',
+      'growth', 'acquisition', 'funnel', 'conversion', 'twitter', 'linkedin',
+      'instagram', 'tiktok', 'outreach', 'email blast',
+    ],
+  },
+  'design-office': {
+    director: 'Boomer_CDO',
+    agent: 'Video Editing Agent',
+    keywords: [
+      'video', 'design', 'ui', 'ux', 'graphic', 'thumbnail', 'motion',
+      'animation', 'render', 'remotion', 'visual', 'creative', 'logo',
+      'brand identity', 'multimedia',
+    ],
+  },
+  'publishing-office': {
+    director: 'Boomer_CPO',
+    agent: 'Social Agent',
+    keywords: [
+      'publish', 'post', 'article', 'blog', 'content schedule', 'editorial',
+      'newsletter', 'distribution', 'audience', 'engagement', 'community',
+    ],
+  },
 };
 
-const DIRECTOR_MAP: Record<PmoId, DirectorId> = {
-  'tech-office': 'Boomer_CTO',
-  'finance-office': 'Boomer_CFO',
-  'ops-office': 'Boomer_COO',
-  'marketing-office': 'Boomer_CMO',
-  'design-office': 'Boomer_CDO',
-  'publishing-office': 'Boomer_CPO',
+// ---------------------------------------------------------------------------
+// Boomer_Ang Step Generation — per-office execution planning
+// ---------------------------------------------------------------------------
+
+interface StepPlan {
+  steps: string[];
+  crewSpecialties: CrewSpecialty[];
+}
+
+function planTechSteps(message: string): StepPlan {
+  const steps: string[] = [];
+  if (message.includes('deploy')) {
+    steps.push('Prepare deployment manifest', 'Validate Docker configuration', 'Execute deployment to target environment');
+  }
+  if (message.includes('build')) {
+    steps.push('Scaffold project structure', 'Generate component tree', 'Implement core logic');
+  }
+  if (message.includes('api')) {
+    steps.push('Design API schema', 'Implement endpoint handlers', 'Add authentication middleware');
+  }
+  if (message.includes('database') || message.includes('schema')) {
+    steps.push('Design database schema', 'Generate migration files', 'Apply migration');
+  }
+  if (message.includes('infrastructure') || message.includes('server') || message.includes('vps')) {
+    steps.push('Audit current infrastructure', 'Plan infrastructure changes', 'Apply infrastructure updates');
+  }
+  if (steps.length === 0) {
+    steps.push('Analyze technical requirements', 'Plan implementation', 'Execute technical task');
+  }
+  steps.push('Run ORACLE verification gates');
+  return { steps, crewSpecialties: ['crane-ops', 'deploy-ops', 'safety-ops'] };
+}
+
+function planFinanceSteps(message: string): StepPlan {
+  const steps: string[] = [];
+  if (message.includes('cost') || message.includes('budget')) {
+    steps.push('Audit current spending', 'Generate cost breakdown report');
+  }
+  if (message.includes('pricing') || message.includes('subscription')) {
+    steps.push('Analyze pricing tiers', 'Model revenue impact');
+  }
+  if (message.includes('token') || message.includes('luc')) {
+    steps.push('Calculate LUC token efficiency', 'Optimize token allocation');
+  }
+  if (message.includes('roi')) {
+    steps.push('Model return on investment', 'Generate ROI dashboard');
+  }
+  if (steps.length === 0) {
+    steps.push('Analyze financial requirements', 'Generate financial report');
+  }
+  steps.push('Run financial verification gates');
+  return { steps, crewSpecialties: ['load-ops', 'safety-ops'] };
+}
+
+function planOpsSteps(message: string): StepPlan {
+  const steps: string[] = [];
+  if (message.includes('workflow') || message.includes('automate')) {
+    steps.push('Map current workflow', 'Design automation pipeline', 'Implement workflow nodes');
+  }
+  if (message.includes('schedule') || message.includes('cron')) {
+    steps.push('Define schedule parameters', 'Configure cron triggers', 'Set up alerting');
+  }
+  if (message.includes('monitor') || message.includes('health')) {
+    steps.push('Audit system health', 'Configure monitoring dashboards', 'Set up alert thresholds');
+  }
+  if (message.includes('scaling') || message.includes('performance')) {
+    steps.push('Analyze current throughput', 'Identify bottlenecks', 'Implement scaling strategy');
+  }
+  if (steps.length === 0) {
+    steps.push('Analyze operational requirements', 'Design operational workflow', 'Implement operations task');
+  }
+  steps.push('Run SLA verification gates');
+  return { steps, crewSpecialties: ['yard-ops', 'dispatch-ops', 'safety-ops'] };
+}
+
+function planMarketingSteps(message: string): StepPlan {
+  const steps: string[] = [];
+  if (message.includes('campaign')) {
+    steps.push('Define campaign objectives', 'Create campaign assets', 'Schedule campaign distribution');
+  }
+  if (message.includes('seo')) {
+    steps.push('Run SEO audit', 'Generate keyword strategy', 'Implement on-page optimizations');
+  }
+  if (message.includes('social') || message.includes('twitter') || message.includes('linkedin')) {
+    steps.push('Analyze target audience', 'Create social content calendar', 'Draft social media posts');
+  }
+  if (message.includes('email') || message.includes('outreach')) {
+    steps.push('Build email list segments', 'Draft outreach templates', 'Configure send automation');
+  }
+  if (steps.length === 0) {
+    steps.push('Analyze marketing requirements', 'Create marketing strategy', 'Execute marketing campaign');
+  }
+  steps.push('Run campaign verification gates');
+  return { steps, crewSpecialties: ['load-ops', 'dispatch-ops'] };
+}
+
+function planDesignSteps(message: string): StepPlan {
+  const steps: string[] = [];
+  if (message.includes('video') || message.includes('remotion')) {
+    steps.push('Storyboard video concept', 'Generate video assets', 'Render final video');
+  }
+  if (message.includes('design') || message.includes('ui') || message.includes('ux')) {
+    steps.push('Audit current design system', 'Create design mockups', 'Implement design tokens');
+  }
+  if (message.includes('thumbnail') || message.includes('graphic')) {
+    steps.push('Define visual concept', 'Generate graphic assets', 'Optimize for platform specs');
+  }
+  if (message.includes('animation') || message.includes('motion')) {
+    steps.push('Design motion storyboard', 'Build animation keyframes', 'Render motion graphics');
+  }
+  if (steps.length === 0) {
+    steps.push('Analyze design requirements', 'Create design deliverables', 'Review visual consistency');
+  }
+  steps.push('Run design quality verification gates');
+  return { steps, crewSpecialties: ['crane-ops', 'load-ops'] };
+}
+
+function planPublishingSteps(message: string): StepPlan {
+  const steps: string[] = [];
+  if (message.includes('publish') || message.includes('post')) {
+    steps.push('Prepare content for publication', 'Format for target platform', 'Schedule publication');
+  }
+  if (message.includes('article') || message.includes('blog')) {
+    steps.push('Draft article outline', 'Write article content', 'Edit and proofread');
+  }
+  if (message.includes('newsletter')) {
+    steps.push('Curate newsletter content', 'Design newsletter layout', 'Schedule newsletter send');
+  }
+  if (message.includes('distribution') || message.includes('audience')) {
+    steps.push('Analyze audience segments', 'Plan distribution strategy', 'Execute distribution');
+  }
+  if (steps.length === 0) {
+    steps.push('Analyze publishing requirements', 'Create content deliverables', 'Execute publication workflow');
+  }
+  steps.push('Run editorial verification gates');
+  return { steps, crewSpecialties: ['load-ops', 'dispatch-ops'] };
+}
+
+const STEP_PLANNERS: Record<PmoId, (message: string) => StepPlan> = {
+  'tech-office': planTechSteps,
+  'finance-office': planFinanceSteps,
+  'ops-office': planOpsSteps,
+  'marketing-office': planMarketingSteps,
+  'design-office': planDesignSteps,
+  'publishing-office': planPublishingSteps,
 };
 
-// ── Classifier ─────────────────────────────────────────────
+// ---------------------------------------------------------------------------
+// ACHEEVY Classifier — intent → PMO office
+// ---------------------------------------------------------------------------
 
 export function classifyIntent(message: string): PmoClassification {
   const lower = message.toLowerCase();
-  const words = lower.split(/\s+/);
+  let matchedOffice: PmoId = 'ops-office'; // default fallback
+  let matchScore = 0;
+  let matchedKeywords: string[] = [];
 
-  const scores: Record<PmoId, { score: number; keywords: string[] }> = {
-    'tech-office': { score: 0, keywords: [] },
-    'finance-office': { score: 0, keywords: [] },
-    'ops-office': { score: 0, keywords: [] },
-    'marketing-office': { score: 0, keywords: [] },
-    'design-office': { score: 0, keywords: [] },
-    'publishing-office': { score: 0, keywords: [] },
-  };
-
-  for (const [office, keywords] of Object.entries(PMO_KEYWORDS)) {
-    for (const kw of keywords) {
+  for (const [officeId, config] of Object.entries(PMO_KEYWORDS) as [PmoId, PmoKeywordConfig][]) {
+    let score = 0;
+    const hits: string[] = [];
+    for (const kw of config.keywords) {
       if (lower.includes(kw)) {
-        scores[office as PmoId].score += 1;
-        scores[office as PmoId].keywords.push(kw);
+        score += kw.split(' ').length; // multi-word keywords score higher
+        hits.push(kw);
       }
     }
-  }
-
-  // Find the highest-scoring office
-  let bestOffice: PmoId = 'tech-office'; // default
-  let bestScore = 0;
-  for (const [office, data] of Object.entries(scores)) {
-    if (data.score > bestScore) {
-      bestScore = data.score;
-      bestOffice = office as PmoId;
+    if (score > matchScore) {
+      matchScore = score;
+      matchedOffice = officeId;
+      matchedKeywords = hits;
     }
   }
 
-  // Confidence = matched keywords / total words (capped at 1)
-  const confidence = Math.min(bestScore / Math.max(words.length, 1), 1);
+  const office = PMO_KEYWORDS[matchedOffice];
+  const isSimple = matchScore <= 2 && message.length < 200;
 
-  // Complexity scoring
-  const complexity = scoreComplexity(message);
-
-  // Execution lane
-  const executionLane: ExecutionLane = containsActionVerbs(lower) ? 'deploy_it' : 'guide_me';
+  logger.info(
+    { office: matchedOffice, director: office.director, confidence: Math.min(matchScore / 5, 1.0), keywords: matchedKeywords },
+    '[PMO Router] Intent classified',
+  );
 
   return {
-    pmoOffice: bestOffice,
-    director: DIRECTOR_MAP[bestOffice],
-    confidence,
-    keywords: scores[bestOffice].keywords,
-    executionLane,
-    complexity,
+    pmoOffice: matchedOffice,
+    director: office.director,
+    departmentalAgent: office.agent,
+    matchedKeywords,
+    confidence: Math.min(matchScore / 5, 1.0),
+    executionLane: isSimple ? 'deploy_it' : 'guide_me',
   };
 }
 
-function scoreComplexity(message: string): number {
-  let score = 0;
-  const lower = message.toLowerCase();
+// ---------------------------------------------------------------------------
+// Boomer_Ang Director — scope validation + step planning
+// ---------------------------------------------------------------------------
 
-  // Word count adds base complexity
-  const wordCount = message.split(/\s+/).length;
-  score += Math.min(wordCount * 1.5, 30);
+export function buildDirective(classification: PmoClassification, message: string): BoomerDirective {
+  const planner = STEP_PLANNERS[classification.pmoOffice];
+  const plan = planner(message.toLowerCase());
 
-  // Technical depth signals
-  const techSignals = ['api', 'docker', 'database', 'deploy', 'architecture', 'pipeline', 'webhook', 'oauth', 'ssl', 'kubernetes'];
-  for (const sig of techSignals) {
-    if (lower.includes(sig)) score += 5;
-  }
+  const office = pmoRegistry.get(classification.pmoOffice);
+  const authority = office?.director.authority ?? 'General PMO authority';
 
-  // Multi-step signals
-  const multiStep = ['and then', 'after that', 'next', 'first', 'second', 'finally', 'step'];
-  for (const sig of multiStep) {
-    if (lower.includes(sig)) score += 8;
-  }
-
-  // Integration signals (multiple systems)
-  const integrations = ['n8n', 'stripe', 'github', 'vercel', 'gcp', 'aws', 'firebase', 'postgres', 'redis'];
-  let integrationCount = 0;
-  for (const sig of integrations) {
-    if (lower.includes(sig)) integrationCount++;
-  }
-  score += integrationCount * 7;
-
-  // Risk signals
-  const riskSignals = ['production', 'deploy', 'migration', 'delete', 'security', 'credentials'];
-  for (const sig of riskSignals) {
-    if (lower.includes(sig)) score += 6;
-  }
-
-  return Math.min(Math.round(score), 100);
-}
-
-function containsActionVerbs(text: string): boolean {
-  const actionVerbs = ['deploy', 'build', 'create', 'implement', 'fix', 'update', 'run', 'execute', 'start', 'launch', 'install', 'configure', 'setup', 'migrate'];
-  return actionVerbs.some(v => text.includes(v));
-}
-
-// ── Directive Builder ──────────────────────────────────────
-
-export function buildDirective(classification: PmoClassification, message: string): PmoDirective {
-  const directiveId = `DIR-${uuidv4().slice(0, 8).toUpperCase()}`;
-
-  // Build steps based on the PMO office
-  const steps = buildSteps(classification, message);
-
-  // Extract capabilities needed
-  const requiredCapabilities = extractCapabilities(classification);
+  logger.info(
+    { director: classification.director, office: classification.pmoOffice, steps: plan.steps.length },
+    '[PMO Router] Boomer_Ang directive built',
+  );
 
   return {
-    directiveId,
     director: classification.director,
-    pmoOffice: classification.pmoOffice,
-    mission: message,
-    steps,
-    constraints: getConstraints(classification),
-    requiredCapabilities,
-    estimatedLucCost: estimateLucCost(steps),
+    office: classification.pmoOffice,
+    inScope: true,
+    authority,
+    executionSteps: plan.steps,
+    crewSpecialties: plan.crewSpecialties,
+    squadSize: Math.min(plan.steps.length, 6),
   };
 }
 
-function buildSteps(classification: PmoClassification, message: string): DirectiveStep[] {
-  const stepTemplates: Record<PmoId, DirectiveStep[]> = {
-    'tech-office': [
-      { order: 1, action: 'Analyze requirements and check feasibility', assignee: 'Lil_Dispatch_Hawk', requiredCapability: 'task_decomposition', timeout: 30000 },
-      { order: 2, action: 'Execute implementation', assignee: 'coder_ang', requiredCapability: 'code_generation', timeout: 120000 },
-      { order: 3, action: 'Run verification and tests', assignee: 'quality_ang', requiredCapability: 'verification', timeout: 60000 },
-    ],
-    'finance-office': [
-      { order: 1, action: 'Calculate cost estimates', assignee: 'data_ang', requiredCapability: 'data_processing', timeout: 30000 },
-      { order: 2, action: 'Generate financial report', assignee: 'Lil_Dispatch_Hawk', requiredCapability: 'reporting', timeout: 60000 },
-    ],
-    'ops-office': [
-      { order: 1, action: 'Check system health and metrics', assignee: 'orchestrator_ang', requiredCapability: 'monitoring', timeout: 30000 },
-      { order: 2, action: 'Execute operational action', assignee: 'automation_ang', requiredCapability: 'workflow_creation', timeout: 60000 },
-      { order: 3, action: 'Verify and seal results', assignee: 'quality_ang', requiredCapability: 'verification', timeout: 30000 },
-    ],
-    'marketing-office': [
-      { order: 1, action: 'Research and analyze target audience', assignee: 'researcher_ang', requiredCapability: 'web_search', timeout: 60000 },
-      { order: 2, action: 'Generate campaign content', assignee: 'marketer_ang', requiredCapability: 'content_generation', timeout: 60000 },
-    ],
-    'design-office': [
-      { order: 1, action: 'Analyze design requirements', assignee: 'vision_ang', requiredCapability: 'image_analysis', timeout: 30000 },
-      { order: 2, action: 'Create visual assets', assignee: 'vision_ang', requiredCapability: 'video_transcoding', timeout: 120000 },
-    ],
-    'publishing-office': [
-      { order: 1, action: 'Draft content', assignee: 'marketer_ang', requiredCapability: 'content_generation', timeout: 60000 },
-      { order: 2, action: 'Review and format for publication', assignee: 'quality_ang', requiredCapability: 'verification', timeout: 30000 },
-    ],
-  };
+// ---------------------------------------------------------------------------
+// Pipeline Entry — creates the initial PmoPipelinePacket
+// ---------------------------------------------------------------------------
 
-  return stepTemplates[classification.pmoOffice] || stepTemplates['tech-office'];
-}
-
-function extractCapabilities(classification: PmoClassification): string[] {
-  const capMap: Record<PmoId, string[]> = {
-    'tech-office': ['code_generation', 'code_execution', 'debugging', 'api_integration'],
-    'finance-office': ['data_processing', 'reporting', 'cost_estimation'],
-    'ops-office': ['monitoring', 'workflow_creation', 'scheduled_tasks'],
-    'marketing-office': ['web_search', 'content_generation', 'seo_analysis'],
-    'design-office': ['image_analysis', 'video_transcoding', 'ui_generation'],
-    'publishing-office': ['content_generation', 'editorial', 'distribution'],
-  };
-  return capMap[classification.pmoOffice] || [];
-}
-
-function getConstraints(classification: PmoClassification): string[] {
-  const base = ['Must pass ORACLE verification gate', 'LUC quota must be available'];
-  if (classification.executionLane === 'deploy_it') {
-    base.push('Requires human approval for production changes');
-  }
-  return base;
-}
-
-function estimateLucCost(steps: DirectiveStep[]): number {
-  return steps.reduce((sum, step) => sum + (step.timeout > 60000 ? 3 : 1), 0);
-}
-
-// ── Pipeline Packet Factory ────────────────────────────────
-
-export function createPipelinePacket(
-  userId: string,
-  message: string,
-): PipelinePacket {
-  const packetId = `PKT-${uuidv4().slice(0, 8).toUpperCase()}`;
-  const classification = classifyIntent(message);
-  const directive = buildDirective(classification, message);
+export function createPipelinePacket(payload: N8nTriggerPayload): PmoPipelinePacket {
+  const requestId = payload.requestId || `REQ-${uuidv4().slice(0, 8).toUpperCase()}`;
   const now = new Date().toISOString();
 
+  // Step 1: ACHEEVY classifies
+  const classification = classifyIntent(payload.message);
+
+  // Step 2: Boomer_Ang builds directive
+  const directive = buildDirective(classification, payload.message);
+
+  const chain: ChainPosition = {
+    step: 2,
+    current: 'Boomer_Ang',
+    next: 'Chicken_Hawk',
+    path: ['User', 'ACHEEVY', classification.director, 'Chicken_Hawk', 'Squad', 'Lil_Hawks', 'Receipt', 'ACHEEVY'],
+    startedAt: now,
+  };
+
+  logger.info(
+    { requestId, userId: payload.userId, office: classification.pmoOffice, director: classification.director },
+    '[PMO Router] Pipeline packet created — handing to Chicken_Hawk',
+  );
+
   return {
-    packetId,
-    userId,
-    originalMessage: message,
+    requestId,
+    userId: payload.userId,
+    message: payload.message,
+    timestamp: now,
     classification,
-    directive,
-    status: 'directed',
-    createdAt: now,
-    updatedAt: now,
-    chainOfCommand: ['ACHEEVY', classification.director, 'Chicken_Hawk'],
+    chainOfCommand: chain,
+    boomerDirective: directive,
   };
 }

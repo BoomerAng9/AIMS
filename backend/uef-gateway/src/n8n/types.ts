@@ -1,127 +1,258 @@
 /**
- * n8n Pipeline Types — Chain of Command
+ * n8n PMO Routing — Type Definitions
  *
- * Full type system for the AIMS PMO routing pipeline:
- * User → ACHEEVY → Boomer_Ang Director → Chicken_Hawk → Squad → Lil_Hawks → Receipt → ACHEEVY → User
+ * Types for the chain-of-command pipeline:
+ *   User → ACHEEVY → Boomer_Ang → Chicken_Hawk → Squad → Lil_Hawks → Receipt → ACHEEVY → User
+ *
+ * Doctrine: "Activity breeds Activity — shipped beats perfect."
  */
 
 import { PmoId, DirectorId } from '../pmo/types';
 
-// ── Intent Classification ───────────────────────────────────
+// ---------------------------------------------------------------------------
+// Chain of Command
+// ---------------------------------------------------------------------------
 
-export type ExecutionLane = 'deploy_it' | 'guide_me';
+export type ChainStep =
+  | 'User'
+  | 'ACHEEVY'
+  | 'Boomer_Ang'
+  | 'Chicken_Hawk'
+  | 'Squad'
+  | 'Lil_Hawks'
+  | 'Verification'
+  | 'Receipt';
 
-export interface PmoClassification {
-  pmoOffice: PmoId;
-  director: DirectorId;
-  confidence: number;          // 0-1
-  keywords: string[];          // matched keywords
-  executionLane: ExecutionLane;
-  complexity: number;          // 0-100
-}
+export const CHAIN_OF_COMMAND: ChainStep[] = [
+  'User',
+  'ACHEEVY',
+  'Boomer_Ang',
+  'Chicken_Hawk',
+  'Squad',
+  'Lil_Hawks',
+  'Verification',
+  'Receipt',
+];
 
-// ── Directive (Boomer_Ang Director output) ──────────────────
-
-export interface PmoDirective {
-  directiveId: string;
-  director: DirectorId;
-  pmoOffice: PmoId;
-  mission: string;
-  steps: DirectiveStep[];
-  constraints: string[];
-  requiredCapabilities: string[];
-  estimatedLucCost: number;
-}
-
-export interface DirectiveStep {
-  order: number;
-  action: string;
-  assignee: string;            // Lil_Hawk designation or Boomer_Ang ID
-  requiredCapability: string;
-  timeout: number;             // ms
-}
-
-// ── Shift (Chicken_Hawk execution unit) ────────────────────
-
-export interface ShiftManifest {
-  shiftId: string;
-  directive: PmoDirective;
-  squads: SquadAssignment[];
-  waves: WaveDefinition[];
-  status: 'spawned' | 'rolling' | 'verifying' | 'sealed' | 'failed';
+export interface ChainPosition {
+  step: number;
+  current: ChainStep;
+  next: ChainStep | 'User';
+  path: string[];
   startedAt: string;
   completedAt?: string;
 }
 
-export interface SquadAssignment {
-  squadId: string;
-  wave: number;
-  members: SquadMember[];
-  capability: string;
+// ---------------------------------------------------------------------------
+// Execution Lanes
+// ---------------------------------------------------------------------------
+
+export type ExecutionLane = 'deploy_it' | 'guide_me';
+
+// ---------------------------------------------------------------------------
+// ACHEEVY Classification
+// ---------------------------------------------------------------------------
+
+export interface PmoClassification {
+  pmoOffice: PmoId;
+  director: DirectorId;
+  departmentalAgent: string;
+  matchedKeywords: string[];
+  confidence: number;
+  executionLane: ExecutionLane;
+}
+
+// ---------------------------------------------------------------------------
+// Boomer_Ang Directive
+// ---------------------------------------------------------------------------
+
+export type CrewSpecialty =
+  | 'crane-ops'
+  | 'load-ops'
+  | 'deploy-ops'
+  | 'safety-ops'
+  | 'yard-ops'
+  | 'dispatch-ops';
+
+export interface BoomerDirective {
+  director: DirectorId;
+  office: PmoId;
+  inScope: boolean;
+  authority: string;
+  executionSteps: string[];
+  crewSpecialties: CrewSpecialty[];
+  squadSize: number;
+}
+
+// ---------------------------------------------------------------------------
+// Shift & Squad
+// ---------------------------------------------------------------------------
+
+export interface ShiftRecord {
+  shiftId: string;
+  phase: 'clock_in' | 'execution' | 'verification' | 'debrief' | 'clock_out';
+  spawnedAt: string;
+  director: DirectorId;
+  office: PmoId;
 }
 
 export interface SquadMember {
-  id: string;
-  designation: string;         // Lil_Hawk designation
-  role: string;
-  comedyArchetype?: string;
+  canonicalId: string;
+  personaHandle: string;
+  designation: CrewSpecialty;
+  careerLevel: 'Hatchling' | 'Apprentice' | 'Journeyman' | 'Foreman';
+  assignedCapability: string;
 }
 
-export interface WaveDefinition {
+export interface SquadRecord {
+  squadId: string;
+  members: SquadMember[];
+  size: number;
+}
+
+// ---------------------------------------------------------------------------
+// Step & Wave Execution
+// ---------------------------------------------------------------------------
+
+export type StepStatus = 'pending' | 'running' | 'completed' | 'failed';
+
+export interface AssignedStep {
+  stepIndex: number;
+  description: string;
+  assignedLilHawk: string;
+  status: StepStatus;
+}
+
+export interface StepResult {
+  stepIndex: number;
+  lilHawk: string;
+  description: string;
+  status: StepStatus;
+  outputSummary: string;
+  durationMs: number;
+}
+
+export interface WaveResult {
   waveNumber: number;
-  squads: string[];            // squadIds
-  parallel: boolean;
-  timeout: number;
+  result: 'success' | 'partial' | 'failed';
+  stepsCompleted: number;
+  stepsFailed: number;
+  stepResults: StepResult[];
+  durationMs: number;
 }
 
-// ── Verification & Receipt ─────────────────────────────────
+export interface ExecutionRecord {
+  steps: AssignedStep[];
+  totalSteps: number;
+  estimatedWaves: number;
+  currentWave: number;
+  lane: ExecutionLane;
+  completedSteps: number;
+  failedSteps: number;
+  waveResults: WaveResult[];
+  totalDurationMs: number;
+  logs: string[];
+}
 
-export interface VerificationResult {
+// ---------------------------------------------------------------------------
+// Verification
+// ---------------------------------------------------------------------------
+
+export interface VerificationCheck {
   gate: string;
   passed: boolean;
-  evidence: string[];
-  inspector: string;
+  detail: string;
 }
 
-export interface Receipt {
+export interface VerificationResult {
+  passed: boolean;
+  checksRun: number;
+  checksPassed: number;
+  checks: VerificationCheck[];
+  verifiedAt: string;
+}
+
+// ---------------------------------------------------------------------------
+// Receipt (Sealed Audit Trail)
+// ---------------------------------------------------------------------------
+
+export type ShiftStatus = 'completed' | 'completed_with_warnings' | 'failed';
+
+export interface ReceiptMetrics {
+  totalDurationMs: number;
+  wavesExecuted: number;
+  stepsCompleted: number;
+  stepsFailed: number;
+  lilHawksUsed: number;
+  verificationPassed: boolean;
+  checksRun: number;
+  checksPassed: number;
+}
+
+export interface ReceiptAuditTrail {
+  director: DirectorId;
+  office: PmoId;
+  executionLane: ExecutionLane;
+  squadId: string;
+  squadMembers: string[];
+}
+
+export interface ShiftReceipt {
   receiptId: string;
+  receiptHash: string;
   shiftId: string;
-  directive: PmoDirective;
-  verification: VerificationResult[];
-  allPassed: boolean;
   sealedAt: string;
-  sealedBy: string;            // Chicken_Hawk ID
-  summary: string;
+  shiftStatus: ShiftStatus;
+  finalMetrics: ReceiptMetrics;
+  auditTrail: ReceiptAuditTrail;
 }
 
-// ── Pipeline Packet (full journey) ─────────────────────────
+// ---------------------------------------------------------------------------
+// Full Pipeline Packet (flows through entire chain)
+// ---------------------------------------------------------------------------
 
-export interface PipelinePacket {
-  packetId: string;
-  userId: string;
-  originalMessage: string;
-  classification: PmoClassification;
-  directive?: PmoDirective;
-  shift?: ShiftManifest;
-  receipt?: Receipt;
-  status: 'classified' | 'directed' | 'dispatched' | 'executing' | 'verifying' | 'sealed' | 'delivered' | 'failed';
-  createdAt: string;
-  updatedAt: string;
-  chainOfCommand: string[];   // ordered list of who touched it
-}
-
-// ── n8n Webhook Payloads ───────────────────────────────────
-
-export interface N8nWebhookPayload {
-  packetId: string;
+export interface PmoPipelinePacket {
+  requestId: string;
   userId: string;
   message: string;
+  timestamp: string;
   classification: PmoClassification;
+  chainOfCommand: ChainPosition;
+  boomerDirective?: BoomerDirective;
+  shift?: ShiftRecord;
+  squad?: SquadRecord;
+  execution?: ExecutionRecord;
+  verification?: VerificationResult;
+  receipt?: ShiftReceipt;
 }
 
-export interface N8nWebhookResponse {
-  packetId: string;
-  status: string;
-  receipt?: Receipt;
+// ---------------------------------------------------------------------------
+// n8n Integration
+// ---------------------------------------------------------------------------
+
+export interface N8nTriggerPayload {
+  userId: string;
+  message: string;
+  requestId?: string;
+  context?: Record<string, unknown>;
+}
+
+export interface N8nPipelineResponse {
+  requestId: string;
+  userId: string;
+  status: ShiftStatus;
   summary: string;
+  receipt: {
+    receiptId: string;
+    hash: string;
+    shiftId: string;
+    shiftStatus: ShiftStatus;
+  };
+  classification: {
+    pmoOffice: PmoId;
+    director: DirectorId;
+    executionLane: ExecutionLane;
+  };
+  metrics: ReceiptMetrics;
+  chainOfCommand: ChainPosition;
 }

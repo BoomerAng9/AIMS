@@ -1,23 +1,20 @@
 /**
- * n8n Module — Barrel Export
+ * n8n PMO Routing — Module Barrel Export
  *
- * PMO routing pipeline with n8n workflow integration.
+ * Chain of Command Pipeline:
+ *   User → ACHEEVY → Boomer_Ang → Chicken_Hawk → Squad → Lil_Hawks → Receipt → ACHEEVY → User
  */
 
 export { classifyIntent, buildDirective, createPipelinePacket } from './pmo-router';
-export { getN8nClient, N8nClient } from './client';
-export { executePipelineLocally } from './chain-of-command';
+export { executeChainOfCommand, executeChainOfCommandFull } from './chain-of-command';
+export { triggerN8nPmoWorkflow, N8nClient } from './client';
 export type {
+  PmoPipelinePacket,
+  N8nTriggerPayload,
+  N8nPipelineResponse,
   PmoClassification,
-  PmoDirective,
-  DirectiveStep,
-  ShiftManifest,
-  SquadAssignment,
-  WaveDefinition,
-  VerificationResult,
-  Receipt,
-  PipelinePacket,
+  BoomerDirective,
+  ShiftReceipt,
+  ChainPosition,
   ExecutionLane,
-  N8nWebhookPayload,
-  N8nWebhookResponse,
 } from './types';
