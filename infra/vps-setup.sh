@@ -41,7 +41,7 @@ header "A.I.M.S. VPS Setup — AI Managed Solutions"
 # ─────────────────────────────────────────────────────────────────────────────
 # 1. System updates
 # ─────────────────────────────────────────────────────────────────────────────
-header "1/6  System Updates"
+header "1/7  System Updates"
 apt-get update -qq
 apt-get upgrade -y -qq
 apt-get install -y -qq \
@@ -58,9 +58,22 @@ apt-get install -y -qq \
 info "System packages updated."
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 2. Docker installation
+# 2. Node.js (required for Gemini CLI)
 # ─────────────────────────────────────────────────────────────────────────────
-header "2/6  Docker Engine"
+header "2/7  Node.js 20 LTS"
+
+if command -v node &> /dev/null; then
+    info "Node.js already installed: $(node --version)"
+else
+    curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+    apt-get install -y -qq nodejs
+    info "Node.js installed: $(node --version)"
+fi
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 3. Docker installation
+# ─────────────────────────────────────────────────────────────────────────────
+header "3/7  Docker Engine"
 
 if command -v docker &> /dev/null; then
     info "Docker already installed: $(docker --version)"
@@ -80,9 +93,9 @@ else
 fi
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 3. Firewall (UFW)
+# 4. Firewall (UFW)
 # ─────────────────────────────────────────────────────────────────────────────
-header "3/6  Firewall Configuration"
+header "4/7  Firewall Configuration"
 
 ufw --force reset > /dev/null 2>&1
 ufw default deny incoming
@@ -95,9 +108,9 @@ ufw --force enable
 info "UFW firewall active. Allowed: SSH (22), HTTP (80), HTTPS (443)."
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 4. Fail2ban (SSH brute-force protection)
+# 5. Fail2ban (SSH brute-force protection)
 # ─────────────────────────────────────────────────────────────────────────────
-header "4/6  Fail2ban"
+header "5/7  Fail2ban"
 
 cat > /etc/fail2ban/jail.local << 'JAIL'
 [sshd]
@@ -115,9 +128,9 @@ systemctl restart fail2ban
 info "Fail2ban active — 5 failed SSH attempts = 1h ban."
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 5. Deploy user (non-root)
+# 6. Deploy user + Gemini CLI
 # ─────────────────────────────────────────────────────────────────────────────
-header "5/6  Deploy User"
+header "6/7  Deploy User"
 
 DEPLOY_USER="aims"
 if id "${DEPLOY_USER}" &>/dev/null; then
@@ -130,10 +143,16 @@ fi
 # Ensure aims user can run Docker
 usermod -aG docker "${DEPLOY_USER}" 2>/dev/null || true
 
+# Install Gemini CLI for the deploy user (YOLO mode: gemini -y)
+info "Installing Gemini CLI for '${DEPLOY_USER}'..."
+su - "${DEPLOY_USER}" -c "npm install -g @google/gemini-cli 2>/dev/null || true"
+info "Gemini CLI installed. Run with: gemini -y (YOLO mode — auto-approves all actions)"
+info "Set GEMINI_API_KEY in the aims user's environment before using."
+
 # ─────────────────────────────────────────────────────────────────────────────
-# 6. Swap (for small VPS — 2GB servers)
+# 7. Swap (for small VPS — 2GB servers)
 # ─────────────────────────────────────────────────────────────────────────────
-header "6/6  Swap File"
+header "7/7  Swap File"
 
 if [ -f /swapfile ]; then
     info "Swap already configured."
@@ -177,4 +196,12 @@ info "    - Build Docker images"
 info "    - Issue Let's Encrypt SSL certs"
 info "    - Start all services"
 info "    - Configure automatic cert renewal"
+info ""
+info "  4. Gemini CLI (YOLO mode) — available on the VPS:"
+info "       su - aims"
+info "       export GEMINI_API_KEY=your-key"
+info "       cd AIMS && gemini -y"
+info ""
+info "     YOLO mode (-y) auto-approves all tool calls."
+info "     Great for automated ops, deployments, and debugging."
 echo ""
