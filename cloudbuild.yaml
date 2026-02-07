@@ -1,0 +1,123 @@
+# =============================================================================
+# A.I.M.S. — Google Cloud Build CI/CD Pipeline
+# =============================================================================
+# Replaces GitHub Actions. Triggered on push to main via Cloud Build trigger.
+#
+# Free tier: 120 build-minutes/day (e2-standard-1 machine)
+# GCP Project: ai-managed-services
+#
+# Setup:
+#   1. gcloud builds triggers create github \
+#        --repo-name=AIMS --repo-owner=BoomerAng9 \
+#        --branch-pattern="^main$" \
+#        --build-config=cloudbuild.yaml
+#
+#   2. For PRs, add a second trigger with --pull-request-pattern="^main$"
+# =============================================================================
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: E2_HIGHCPU_8
+
+substitutions:
+  _VPS_HOST: '31.97.138.45'
+  _DEPLOY_PATH: '/root/aims'
+
+# ── Steps ────────────────────────────────────────────────────
+
+steps:
+  # ── Step 1: Backend — Install, Lint, Build, Test ──────────
+  - id: 'backend-install'
+    name: 'node:20-alpine'
+    dir: 'backend/uef-gateway'
+    entrypoint: 'npm'
+    args: ['ci']
+
+  - id: 'backend-lint'
+    name: 'node:20-alpine'
+    dir: 'backend/uef-gateway'
+    entrypoint: 'npm'
+    args: ['run', 'lint']
+    waitFor: ['backend-install']
+
+  - id: 'backend-build'
+    name: 'node:20-alpine'
+    dir: 'backend/uef-gateway'
+    entrypoint: 'npm'
+    args: ['run', 'build']
+    waitFor: ['backend-install']
+
+  - id: 'backend-test'
+    name: 'node:20-alpine'
+    dir: 'backend/uef-gateway'
+    entrypoint: 'npm'
+    args: ['test']
+    waitFor: ['backend-build']
+
+  # ── Step 2: Frontend — Install, Lint, Build ───────────────
+  - id: 'frontend-install'
+    name: 'node:20-alpine'
+    dir: 'frontend'
+    entrypoint: 'npm'
+    args: ['ci']
+
+  - id: 'frontend-lint'
+    name: 'node:20-alpine'
+    dir: 'frontend'
+    entrypoint: 'npm'
+    args: ['run', 'lint']
+    waitFor: ['frontend-install']
+
+  - id: 'frontend-build'
+    name: 'node:20-alpine'
+    dir: 'frontend'
+    entrypoint: 'npm'
+    args: ['run', 'build']
+    waitFor: ['frontend-install']
+
+  # ── Step 3: Docker Compose Build (validate images) ────────
+  - id: 'docker-build'
+    name: 'docker/compose:latest'
+    args: ['-f', 'infra/docker-compose.yml', 'build']
+    env:
+      - 'DOCKER_BUILDKIT=1'
+    waitFor: ['backend-test', 'frontend-build']
+
+  # ── Step 4: Deploy to VPS (main branch only) ──────────────
+  - id: 'deploy-vps'
+    name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        # Only deploy on main branch pushes
+        if [ "$BRANCH_NAME" != "main" ]; then
+          echo "Skipping deploy — not main branch"
+          exit 0
+        fi
+
+        # Install SSH client
+        apt-get update -qq && apt-get install -y -qq openssh-client sshpass > /dev/null 2>&1
+
+        # Deploy via SSH using secret
+        sshpass -p "$$VPS_PASSWORD" ssh -o StrictHostKeyChecking=no \
+          root@${_VPS_HOST} << 'DEPLOY_EOF'
+          set -e
+          cd ${_DEPLOY_PATH}
+          git fetch origin main
+          git reset --hard origin/main
+          docker compose -f infra/docker-compose.prod.yml build --no-cache frontend uef-gateway
+          docker compose -f infra/docker-compose.prod.yml up -d
+          echo "✓ A.I.M.S. deployed successfully"
+        DEPLOY_EOF
+    secretEnv: ['VPS_PASSWORD']
+    waitFor: ['docker-build']
+
+# ── Secrets (stored in GCP Secret Manager) ──────────────────
+availableSecrets:
+  secretManager:
+    - versionName: projects/ai-managed-services/secrets/VPS_PASSWORD/versions/latest
+      env: 'VPS_PASSWORD'
+
+# ── Timeout ─────────────────────────────────────────────────
+timeout: '1200s'
