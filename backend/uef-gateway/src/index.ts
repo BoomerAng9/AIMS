@@ -1166,10 +1166,9 @@ app.post('/ingress/acp', acpLimiter, async (req, res) => {
   try {
     const rawBody = req.body;
 
-    // Reject anonymous requests in production — frontend must supply authenticated userId
-    if (process.env.NODE_ENV === 'production' && (!rawBody.userId || rawBody.userId === 'anon')) {
-      res.status(401).json({ status: 'ERROR', message: 'Authenticated userId required' });
-      return;
+    // Assign guest userId if none provided
+    if (!rawBody.userId || rawBody.userId === 'anon') {
+      rawBody.userId = 'guest';
     }
 
     // Validate message input

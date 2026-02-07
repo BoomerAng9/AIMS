@@ -6,17 +6,16 @@ const UEF_URL = process.env.UEF_ENDPOINT || 'http://uef-gateway:3001';
 const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY || '';
 
 export async function POST(request: Request) {
-  // Auth gate — reject unauthenticated requests
-  const session = await getServerSession(authOptions);
-  if (!session?.user) {
-    return NextResponse.json({ status: 'ERROR', message: 'Unauthorized' }, { status: 401 });
-  }
-
   try {
     const body = await request.json();
 
-    // Enforce authenticated userId — never trust client-supplied userId
-    body.userId = (session.user as Record<string, unknown>).id || session.user.email;
+    // Try to get authenticated user — but don't block if not signed in
+    const session = await getServerSession(authOptions);
+    if (session?.user) {
+      body.userId = (session.user as Record<string, unknown>).id || session.user.email;
+    } else {
+      body.userId = 'guest';
+    }
 
     const res = await fetch(`${UEF_URL}/ingress/acp`, {
       method: 'POST',

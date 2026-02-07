@@ -18,7 +18,6 @@ export default withAuth({
 export const config = {
   matcher: [
     '/dashboard/:path*',
-    '/api/acp/:path*',
     '/api/stripe/:path*',
   ],
 };
