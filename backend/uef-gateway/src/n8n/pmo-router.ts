@@ -5,6 +5,9 @@
  * Each Boomer_Ang director validates scope and produces an execution directive
  * for Chicken_Hawk.
  *
+ * The forge resolves a REAL Boomer_Ang from infra/boomerangs/registry.json
+ * and layers on persona + skill tier metadata.
+ *
  * Chain: User → ACHEEVY → Boomer_Ang → Chicken_Hawk
  *
  * Doctrine: "Activity breeds Activity — shipped beats perfect."
@@ -319,7 +322,7 @@ export function createPipelinePacket(payload: N8nTriggerPayload): PmoPipelinePac
   // Step 1: ACHEEVY classifies intent → PMO office
   const classification = classifyIntent(payload.message);
 
-  // Step 2: Forge a task-specific Boomer_Ang with persona + skill tier
+  // Step 2: Forge — resolve a real Boomer_Ang from registry + assign persona + tier
   const complexity = scoreComplexity(payload.message);
   const forgeResult = houseOfAng.forgeForTask(
     payload.message,
@@ -328,30 +331,35 @@ export function createPipelinePacket(payload: N8nTriggerPayload): PmoPipelinePac
     payload.userId || 'ACHEEVY',
   );
 
+  const { profile } = forgeResult;
+
   logger.info(
     {
       requestId,
-      forgedAng: forgeResult.ang.name,
-      tier: forgeResult.ang.skillTier,
+      resolvedAng: profile.definition.name,
+      angId: profile.definition.id,
+      endpoint: profile.definition.endpoint,
+      tier: profile.skillTier,
       complexity: complexity.score,
-      persona: forgeResult.ang.persona.codename,
+      persona: profile.persona.codename,
+      resolvedFromRegistry: profile.resolvedFromRegistry,
     },
-    '[PMO Router] Boomer_Ang forged for task',
+    '[PMO Router] Boomer_Ang resolved from registry',
   );
 
-  // Step 3: Forged Boomer_Ang builds execution directive
+  // Step 3: Resolved Boomer_Ang builds execution directive
   const directive = buildDirective(classification, payload.message);
 
   const chain: ChainPosition = {
     step: 2,
     current: 'Boomer_Ang',
     next: 'Chicken_Hawk',
-    path: ['User', 'ACHEEVY', forgeResult.ang.name, 'Chicken_Hawk', 'Squad', 'Lil_Hawks', 'Receipt', 'ACHEEVY'],
+    path: ['User', 'ACHEEVY', profile.definition.name, 'Chicken_Hawk', 'Squad', 'Lil_Hawks', 'Receipt', 'ACHEEVY'],
     startedAt: now,
   };
 
   logger.info(
-    { requestId, userId: payload.userId, office: classification.pmoOffice, director: classification.director, forgedAng: forgeResult.ang.id },
+    { requestId, userId: payload.userId, office: classification.pmoOffice, director: classification.director, angId: profile.definition.id },
     '[PMO Router] Pipeline packet created — handing to Chicken_Hawk',
   );
 

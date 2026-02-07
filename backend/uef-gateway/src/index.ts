@@ -210,34 +210,26 @@ app.get('/house-of-ang/roster', (req, res) => {
   }
 });
 
-app.post('/house-of-ang/spawn', (req, res) => {
+app.post('/house-of-ang/forge', (req, res) => {
   try {
-    const { name, type, title, role, specialties } = req.body;
-    if (!name || typeof name !== 'string' || name.length > 100) {
-      res.status(400).json({ error: 'Invalid name: required string, max 100 chars' });
+    const { message, pmoOffice, director, requestedBy } = req.body;
+    if (!message || typeof message !== 'string' || message.length > 2000) {
+      res.status(400).json({ error: 'Invalid message: required string, max 2000 chars' });
       return;
     }
-    if (!type || !['SUPERVISORY', 'EXECUTION'].includes(type)) {
-      res.status(400).json({ error: 'Invalid type: must be SUPERVISORY or EXECUTION' });
+    if (!pmoOffice || typeof pmoOffice !== 'string') {
+      res.status(400).json({ error: 'Invalid pmoOffice: required string' });
       return;
     }
-    if (!title || typeof title !== 'string' || title.length > 200) {
-      res.status(400).json({ error: 'Invalid title: required string, max 200 chars' });
+    if (!director || typeof director !== 'string') {
+      res.status(400).json({ error: 'Invalid director: required string' });
       return;
     }
-    if (!role || typeof role !== 'string' || role.length > 500) {
-      res.status(400).json({ error: 'Invalid role: required string, max 500 chars' });
-      return;
-    }
-    if (specialties && !Array.isArray(specialties)) {
-      res.status(400).json({ error: 'specialties must be an array' });
-      return;
-    }
-    const ang = houseOfAng.spawn(name, type, title, role, specialties || []);
-    res.status(201).json(ang);
+    const result = houseOfAng.forgeForTask(message, pmoOffice as any, director as any, requestedBy || 'API');
+    res.status(201).json(result);
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Spawn failed';
-    res.status(409).json({ error: message });
+    const errMessage = error instanceof Error ? error.message : 'Forge failed';
+    res.status(409).json({ error: errMessage });
   }
 });
 

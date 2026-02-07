@@ -1,35 +1,77 @@
 /**
- * AngForge — Boomer_Ang Creation & Persona Assignment Engine
+ * AngForge — Boomer_Ang Resolution & Persona Assignment Engine
  *
- * The forge where new Boomer_Angs are born. Every task that enters the
- * chain-of-command pipeline can spawn a task-specific Boomer_Ang with:
+ * The forge resolves tasks to REAL Boomer_Angs from the canonical registry
+ * (infra/boomerangs/registry.json) and layers on persona + skill tier metadata.
  *
- *   1. Persona — backstory, personality traits, communication style
- *   2. Skill Tier — CADET / VETERAN / ELITE / LEGENDARY based on complexity
- *   3. PMO Assignment — auto-assigned to the relevant C-Suite office
- *   4. Capabilities — weighted skill set matching the task domain
+ * Resolution flow:
+ *   1. Score task complexity → determine skill tier
+ *   2. Map PMO office → registry Boomer_Ang IDs (via PMO_ANG_ROSTER)
+ *   3. Pick the best-fit Boomer_Ang from the capability index
+ *   4. Assign persona from the catalog
+ *   5. Return ForgedAngProfile = BoomerAngDefinition + persona + tier
  *
- * The forge respects the naming conventions from the Deploy Platform lore
- * and fits into the chain of command:
- *   User → ACHEEVY → Boomer_Ang (forged here) → Chicken_Hawk → Squad → Lil_Hawks
+ * A Boomer_Ang IS a service. The forge never invents fictional endpoints.
+ * It either resolves to an existing registry entry or returns a
+ * "pending_provision" placeholder for services not yet deployed.
+ *
+ * Chain of Command:
+ *   User → ACHEEVY → Boomer_Ang (resolved here) → Chicken_Hawk → Squad → Lil_Hawks
  *
  * "Activity breeds Activity — shipped beats perfect."
  */
 
-import { v4 as uuidv4 } from 'uuid';
+import fs from 'fs';
+import path from 'path';
 import logger from '../logger';
-import { PmoId, DirectorId } from './types';
-import { pmoRegistry } from './registry';
+import type { PmoId, DirectorId } from './types';
 import {
   SkillTier,
   SkillTierConfig,
   SKILL_TIERS,
   AngPersona,
-  SpawnedAngProfile,
-  AngSpawnRequest,
-  AngSpawnResult,
+  BoomerAngDefinition,
+  BoomerAngRegistry,
+  ForgedAngProfile,
+  AngForgeRequest,
+  AngForgeResult,
 } from './persona-types';
-import { getPersonasForOffice } from './persona-catalog';
+import { getPersonaForAng, getAngIdsForOffice } from './persona-catalog';
+
+// ---------------------------------------------------------------------------
+// Registry Loader — reads infra/boomerangs/registry.json
+// ---------------------------------------------------------------------------
+
+const REGISTRY_PATH = process.env.BOOMERANG_REGISTRY_PATH
+  || path.resolve(__dirname, '../../../../infra/boomerangs/registry.json');
+
+let cachedRegistry: BoomerAngRegistry | null = null;
+
+function loadRegistry(): BoomerAngRegistry {
+  try {
+    const raw = fs.readFileSync(REGISTRY_PATH, 'utf-8');
+    const parsed: BoomerAngRegistry = JSON.parse(raw);
+    logger.info(
+      { version: parsed.version, count: parsed.boomerangs.length },
+      '[AngForge] Registry loaded from disk',
+    );
+    return parsed;
+  } catch (err) {
+    logger.warn({ path: REGISTRY_PATH, err }, '[AngForge] Failed to load registry — using empty fallback');
+    return { boomerangs: [], capability_index: {}, version: '0.0.0', last_updated: new Date().toISOString() };
+  }
+}
+
+function getRegistry(): BoomerAngRegistry {
+  if (!cachedRegistry) {
+    cachedRegistry = loadRegistry();
+  }
+  return cachedRegistry;
+}
+
+export function reloadRegistry(): void {
+  cachedRegistry = loadRegistry();
+}
 
 // ---------------------------------------------------------------------------
 // Complexity Scorer — analyzes task message to determine skill tier
@@ -37,32 +79,32 @@ import { getPersonasForOffice } from './persona-catalog';
 
 interface ComplexityFactors {
   wordCount: number;
-  technicalDepth: number;     // how many domain-specific terms
-  multiStepSignals: number;   // signals for multi-step work
-  integrationCount: number;   // external services/systems mentioned
-  riskSignals: number;        // security, production, financial risk terms
-  score: number;              // final 0-100 score
+  technicalDepth: number;
+  multiStepSignals: number;
+  integrationCount: number;
+  riskSignals: number;
+  score: number;
 }
 
 const COMPLEXITY_KEYWORDS: Record<string, number> = {
-  // High complexity signals (+8 each)
+  // High complexity (+8)
   'architecture': 8, 'migrate': 8, 'production': 8, 'enterprise': 8,
   'kubernetes': 8, 'distributed': 8, 'microservice': 8, 'multi-tenant': 8,
   'compliance': 8, 'audit': 8, 'security': 8,
 
-  // Medium-high complexity (+5 each)
+  // Medium-high (+5)
   'pipeline': 5, 'orchestrate': 5, 'integrate': 5, 'deploy': 5,
   'database': 5, 'schema': 5, 'api': 5, 'authentication': 5,
   'workflow': 5, 'automate': 5, 'campaign': 5, 'analytics': 5,
   'optimization': 5, 'scale': 5, 'performance': 5,
 
-  // Medium complexity (+3 each)
+  // Medium (+3)
   'build': 3, 'create': 3, 'implement': 3, 'design': 3,
   'test': 3, 'refactor': 3, 'update': 3, 'configure': 3,
   'publish': 3, 'schedule': 3, 'monitor': 3, 'report': 3,
   'video': 3, 'render': 3, 'content': 3,
 
-  // Low complexity (+1 each)
+  // Low (+1)
   'check': 1, 'list': 1, 'show': 1, 'get': 1,
   'status': 1, 'help': 1, 'info': 1,
 };
@@ -77,7 +119,7 @@ const INTEGRATION_SIGNALS = [
   'stripe', 'firebase', 'postgres', 'redis', 'docker',
   'n8n', 'github', 'slack', 'twitter', 'linkedin',
   'openrouter', 'brave', 'gemini', 'anthropic', 'openai',
-  'aws', 'gcp', 'vercel', 'cloudflare',
+  'aws', 'gcp', 'vercel', 'cloudflare', 'elevenlabs',
 ];
 
 const RISK_SIGNALS = [
@@ -90,54 +132,39 @@ export function scoreComplexity(message: string): ComplexityFactors {
   const lower = message.toLowerCase();
   const words = message.split(/\s+/);
 
-  // Factor 1: Word count (more words = more complex, up to a point)
   const wordCount = words.length;
-  const wordScore = Math.min(wordCount / 5, 15); // max 15 from word count
+  const wordScore = Math.min(wordCount / 5, 15);
 
-  // Factor 2: Technical depth (domain keywords)
   let technicalDepth = 0;
   for (const [keyword, weight] of Object.entries(COMPLEXITY_KEYWORDS)) {
-    if (lower.includes(keyword)) {
-      technicalDepth += weight;
-    }
+    if (lower.includes(keyword)) technicalDepth += weight;
   }
-  technicalDepth = Math.min(technicalDepth, 40); // cap at 40
+  technicalDepth = Math.min(technicalDepth, 40);
 
-  // Factor 3: Multi-step signals
   let multiStepSignals = 0;
   for (const signal of MULTI_STEP_SIGNALS) {
     if (lower.includes(signal)) multiStepSignals++;
   }
-  const multiStepScore = Math.min(multiStepSignals * 5, 20); // max 20
+  const multiStepScore = Math.min(multiStepSignals * 5, 20);
 
-  // Factor 4: Integration count
   let integrationCount = 0;
   for (const sig of INTEGRATION_SIGNALS) {
     if (lower.includes(sig)) integrationCount++;
   }
-  const integrationScore = Math.min(integrationCount * 4, 15); // max 15
+  const integrationScore = Math.min(integrationCount * 4, 15);
 
-  // Factor 5: Risk signals
   let riskSignals = 0;
   for (const sig of RISK_SIGNALS) {
     if (lower.includes(sig)) riskSignals++;
   }
-  const riskScore = Math.min(riskSignals * 3, 10); // max 10
+  const riskScore = Math.min(riskSignals * 3, 10);
 
-  // Total: max 100
   const score = Math.min(
     Math.round(wordScore + technicalDepth + multiStepScore + integrationScore + riskScore),
     100,
   );
 
-  return {
-    wordCount,
-    technicalDepth,
-    multiStepSignals,
-    integrationCount,
-    riskSignals,
-    score,
-  };
+  return { wordCount, technicalDepth, multiStepSignals, integrationCount, riskSignals, score };
 }
 
 // ---------------------------------------------------------------------------
@@ -150,218 +177,271 @@ export function resolveTier(complexityScore: number): SkillTierConfig {
       return tier;
     }
   }
-  // Default to VETERAN if somehow out of range
-  return SKILL_TIERS[1];
+  return SKILL_TIERS[1]; // default VETERAN
 }
 
 // ---------------------------------------------------------------------------
-// Persona Selector — picks the best-fit persona from the catalog
+// Capability Matcher — matches task keywords to registry capabilities
 // ---------------------------------------------------------------------------
 
-function selectPersona(pmoOffice: PmoId, message: string, tier: SkillTier): AngPersona {
-  const personas = getPersonasForOffice(pmoOffice);
+/**
+ * Maps task keywords to registry capability names.
+ * These align with the capability_index in infra/boomerangs/registry.json.
+ */
+const KEYWORD_CAPABILITY_MAP: Record<string, string[]> = {
+  // Research
+  'research': ['brave_web_search', 'academic_research'],
+  'search': ['brave_web_search'],
+  'investigate': ['brave_web_search', 'fact_verification'],
+  'verify': ['fact_verification', 'gate_verification'],
 
-  if (personas.length === 0) {
-    // Fallback: generic persona
-    return {
-      displayName: 'Operative_Ang',
-      codename: 'operative',
-      traits: ['disciplined', 'resourceful'],
-      communicationStyle: 'direct',
-      backstory: {
-        origin: 'A generalist born from pure necessity. When no specialist was available, Operative_Ang stepped up.',
-        motivation: 'Get it done. Get it done right. Get it done now.',
-        quirk: 'Never introduces themselves. Just starts working.',
-        catchphrase: 'Activity breeds Activity.',
-        mentoredBy: 'ACHEEVY',
-      },
-      avatar: 'gear',
-    };
-  }
+  // Voice / Audio
+  'voice': ['text_to_speech', 'audio_transcription'],
+  'speech': ['text_to_speech'],
+  'transcri': ['audio_transcription'],
+  'tts': ['text_to_speech'],
 
-  // Match persona traits to tier:
-  // LEGENDARY/ELITE → prefer strategic, bold, relentless
-  // VETERAN → prefer analytical, resourceful
-  // CADET → prefer disciplined, patient
-  const tierTraitPreference: Record<SkillTier, string[]> = {
-    LEGENDARY: ['strategic', 'bold', 'relentless', 'charismatic'],
-    ELITE: ['analytical', 'creative', 'resourceful', 'meticulous'],
-    VETERAN: ['disciplined', 'resourceful', 'analytical'],
-    CADET: ['patient', 'disciplined', 'empathetic'],
-  };
+  // Video / Vision
+  'video': ['video_transcoding', 'scene_detection'],
+  'image': ['image_analysis', 'ocr_extraction'],
+  'ocr': ['ocr_extraction'],
+  'thumbnail': ['image_analysis'],
 
-  const preferred = tierTraitPreference[tier];
+  // Automation / Workflows
+  'automate': ['workflow_creation', 'scheduled_tasks'],
+  'workflow': ['workflow_creation', 'webhook_triggers'],
+  'webhook': ['webhook_triggers'],
+  'schedule': ['scheduled_tasks'],
+  'cron': ['scheduled_tasks'],
+  'n8n': ['workflow_creation', 'webhook_triggers'],
 
-  // Score each persona by trait overlap with tier preference
-  let bestPersona = personas[0];
-  let bestScore = -1;
+  // Site Building
+  'website': ['page_creation', 'template_deployment'],
+  'landing': ['page_creation', 'visual_editing'],
+  'page': ['page_creation'],
+  'cms': ['cms_management'],
 
-  for (const persona of personas) {
-    const traitOverlap = persona.traits.filter(t => preferred.includes(t)).length;
-    // Add slight randomness so we do not always get the same one
-    const noise = Math.random() * 0.5;
-    const score = traitOverlap + noise;
-    if (score > bestScore) {
-      bestScore = score;
-      bestPersona = persona;
+  // Code / Development
+  'code': ['code_generation', 'sandbox_execution'],
+  'build': ['code_generation'],
+  'debug': ['debugging'],
+  'refactor': ['refactoring'],
+  'develop': ['code_generation', 'debugging'],
+
+  // Orchestration
+  'orchestrate': ['task_decomposition', 'parallel_execution'],
+  'multi-agent': ['agent_spawning', 'parallel_execution'],
+  'pipeline': ['task_decomposition'],
+
+  // Marketing
+  'seo': ['seo_audit', 'copy_generation'],
+  'campaign': ['campaign_flows', 'social_scheduling'],
+  'marketing': ['seo_audit', 'campaign_flows'],
+  'social': ['social_scheduling'],
+  'copy': ['copy_generation'],
+
+  // Data / Analytics
+  'data': ['data_extraction', 'data_transformation'],
+  'analytics': ['data_extraction', 'report_generation'],
+  'dashboard': ['visualization', 'report_generation'],
+  'report': ['report_generation'],
+  'etl': ['data_extraction', 'data_transformation'],
+
+  // Quality / Audit
+  'audit': ['security_audit', 'compliance_check'],
+  'quality': ['gate_verification', 'code_review'],
+  'security': ['security_audit'],
+  'review': ['code_review'],
+  'oracle': ['gate_verification'],
+};
+
+/**
+ * Extract matching capabilities from a task message.
+ */
+function extractCapabilities(message: string): string[] {
+  const lower = message.toLowerCase();
+  const caps = new Set<string>();
+
+  for (const [keyword, capabilities] of Object.entries(KEYWORD_CAPABILITY_MAP)) {
+    if (lower.includes(keyword)) {
+      for (const cap of capabilities) caps.add(cap);
     }
   }
 
-  return bestPersona;
+  return Array.from(caps);
+}
+
+/**
+ * Resolve registry Boomer_Angs from extracted capabilities.
+ */
+function resolveFromCapabilities(capabilities: string[]): BoomerAngDefinition[] {
+  const registry = getRegistry();
+  const matchedIds = new Set<string>();
+
+  for (const cap of capabilities) {
+    const ids = registry.capability_index[cap];
+    if (ids) {
+      for (const id of ids) matchedIds.add(id);
+    }
+  }
+
+  return registry.boomerangs.filter(b => matchedIds.has(b.id));
+}
+
+/**
+ * Resolve registry Boomer_Angs from the PMO office roster.
+ */
+function resolveFromPmo(pmoOffice: PmoId): BoomerAngDefinition[] {
+  const registry = getRegistry();
+  const ids = getAngIdsForOffice(pmoOffice);
+  return registry.boomerangs.filter(b => ids.includes(b.id));
 }
 
 // ---------------------------------------------------------------------------
-// Capability Generator — builds capabilities for the Boomer_Ang
+// Fallback Persona — when no catalog persona is available
 // ---------------------------------------------------------------------------
 
-interface CapabilitySet {
-  specialties: string[];
-  capabilities: Array<{ name: string; weight: number }>;
-}
-
-const PMO_CAPABILITIES: Record<PmoId, { specialties: string[]; capabilities: string[] }> = {
-  'tech-office': {
-    specialties: ['Infrastructure', 'CI/CD', 'Docker', 'API Design', 'Database', 'TypeScript', 'Cloud Deploy', 'Security'],
-    capabilities: ['infrastructure-mgmt', 'ci-cd-pipeline', 'container-orchestration', 'api-development', 'database-design', 'security-hardening', 'cloud-deploy', 'monitoring'],
-  },
-  'finance-office': {
-    specialties: ['Cost Analysis', 'Token Efficiency', 'Budget Planning', 'ROI Modeling', 'Revenue Optimization', 'LUC Governance'],
-    capabilities: ['cost-analysis', 'token-optimization', 'budget-planning', 'roi-modeling', 'revenue-forecasting', 'financial-reporting'],
-  },
-  'ops-office': {
-    specialties: ['Workflow Design', 'Automation', 'SLA Management', 'Queue Optimization', 'Monitoring', 'Scaling Strategy'],
-    capabilities: ['workflow-orchestration', 'process-automation', 'sla-management', 'queue-optimization', 'health-monitoring', 'capacity-scaling'],
-  },
-  'marketing-office': {
-    specialties: ['Campaign Strategy', 'SEO', 'Social Media', 'Copy Writing', 'A/B Testing', 'Audience Targeting'],
-    capabilities: ['campaign-management', 'seo-optimization', 'social-media-mgmt', 'copywriting', 'ab-testing', 'audience-analytics'],
-  },
-  'design-office': {
-    specialties: ['UI/UX Design', 'Video Production', 'Motion Graphics', 'Brand Identity', 'Thumbnail Design', 'Design Systems'],
-    capabilities: ['ui-design', 'video-production', 'motion-graphics', 'brand-design', 'asset-generation', 'design-system-mgmt'],
-  },
-  'publishing-office': {
-    specialties: ['Content Publishing', 'Editorial Review', 'Distribution Strategy', 'Community Engagement', 'Newsletter Design'],
-    capabilities: ['content-publishing', 'editorial-review', 'distribution-strategy', 'community-mgmt', 'newsletter-creation'],
-  },
-};
-
-function generateCapabilities(pmoOffice: PmoId, tierConfig: SkillTierConfig): CapabilitySet {
-  const pmoCaps = PMO_CAPABILITIES[pmoOffice];
-
-  // Limit specialties based on tier
-  const specialties = pmoCaps.specialties.slice(0, tierConfig.maxSpecialties);
-
-  // Generate capabilities with weights based on tier floor
-  const capabilities = pmoCaps.capabilities
-    .slice(0, tierConfig.maxSpecialties)
-    .map((name, i) => ({
-      name,
-      // First capability gets highest weight, descending
-      weight: Math.max(
-        tierConfig.capabilityWeightFloor,
-        1.0 - (i * 0.08),
-      ),
-    }));
-
-  return { specialties, capabilities };
+function fallbackPersona(angDef: BoomerAngDefinition): AngPersona {
+  return {
+    displayName: angDef.name,
+    codename: angDef.id.replace(/_ang$/, ''),
+    traits: ['disciplined', 'resourceful'],
+    communicationStyle: 'direct',
+    backstory: {
+      origin: `Registered as ${angDef.name} in the AIMS Boomer_Ang registry.`,
+      motivation: angDef.description,
+      quirk: 'Stays focused on the task. No small talk.',
+      catchphrase: 'Activity breeds Activity.',
+      mentoredBy: 'ACHEEVY',
+    },
+    avatar: 'bot',
+  };
 }
 
 // ---------------------------------------------------------------------------
-// AngForge — Main spawning engine
+// AngForge — Main engine
 // ---------------------------------------------------------------------------
 
 export class AngForge {
-  private spawnCount = 0;
+  private forgeCount = 0;
   private forgeLog: Array<{ angId: string; tier: SkillTier; pmo: PmoId; at: string }> = [];
 
   /**
-   * Forge a new Boomer_Ang for a specific task.
+   * Forge a Boomer_Ang assignment for a task.
    *
-   * Analyzes the task message to determine:
-   *   1. Complexity score → Skill tier
-   *   2. PMO office → Persona selection
-   *   3. Capabilities → Domain-specific skill set
+   * Resolution order:
+   *   1. Extract capabilities from message → match in registry
+   *   2. Fall back to PMO office roster
+   *   3. Assign persona from catalog (or fallback)
+   *   4. Determine skill tier from complexity
    */
-  forge(request: AngSpawnRequest): AngSpawnResult {
+  forge(request: AngForgeRequest): AngForgeResult {
     const { message, pmoOffice, director, complexityScore, requestedBy } = request;
 
-    // Resolve skill tier from complexity
+    // Resolve tier
     const tierConfig = resolveTier(complexityScore);
 
-    // Select persona from catalog
-    const persona = selectPersona(pmoOffice, message, tierConfig.tier);
+    // Step 1: Try capability-based resolution
+    const capabilities = extractCapabilities(message);
+    let matched = resolveFromCapabilities(capabilities);
 
-    // Generate capabilities
-    const capSet = generateCapabilities(pmoOffice, tierConfig);
+    // Step 2: Fall back to PMO roster
+    if (matched.length === 0) {
+      matched = resolveFromPmo(pmoOffice);
+    }
 
-    // Generate unique ID
-    this.spawnCount++;
-    const serial = String(this.spawnCount).padStart(3, '0');
-    const angId = `${persona.codename}-ang-${serial}`;
+    // Step 3: Pick best-fit (prefer first match; could be weighted later)
+    let resolvedFromRegistry = true;
+    let definition: BoomerAngDefinition;
+
+    if (matched.length > 0) {
+      // Prefer Angs that are in the PMO roster when multiple match
+      const pmoIds = new Set(getAngIdsForOffice(pmoOffice));
+      const pmoFiltered = matched.filter(m => pmoIds.has(m.id));
+      definition = pmoFiltered.length > 0 ? pmoFiltered[0] : matched[0];
+    } else {
+      // No registry match — create pending_provision placeholder
+      resolvedFromRegistry = false;
+      const placeholderId = `pending_${pmoOffice.replace('-office', '')}_ang`;
+      definition = {
+        id: placeholderId,
+        name: `Pending_${pmoOffice.replace('-office', '').charAt(0).toUpperCase() + pmoOffice.replace('-office', '').slice(1)}_Ang`,
+        source_repo: 'aims/pending-provision',
+        description: `Pending Boomer_Ang for ${pmoOffice} — awaiting service provisioning`,
+        capabilities,
+        required_quotas: { api_calls: 5 },
+        endpoint: `http://${placeholderId.replace(/_/g, '-')}:8200/execute`,
+        health_check: `http://${placeholderId.replace(/_/g, '-')}:8200/health`,
+        status: 'registered',
+      };
+      logger.warn(
+        { placeholderId, pmoOffice, capabilities },
+        '[AngForge] No registry match — created pending provision placeholder',
+      );
+    }
+
+    // Step 4: Assign persona
+    const catalogPersona = getPersonaForAng(definition.id);
+    const persona = catalogPersona ?? fallbackPersona(definition);
+
+    // Build profile
+    this.forgeCount++;
     const now = new Date().toISOString();
 
-    const ang: SpawnedAngProfile = {
-      id: angId,
-      name: `${persona.displayName}`,
+    const profile: ForgedAngProfile = {
+      definition,
       persona,
       skillTier: tierConfig.tier,
       tierConfig,
       assignedPmo: pmoOffice,
       director,
-      specialties: capSet.specialties,
-      capabilities: capSet.capabilities,
-      spawnedAt: now,
-      spawnedBy: requestedBy,
-      spawnReason: message.slice(0, 200),
+      forgedAt: now,
+      forgedBy: requestedBy,
+      forgeReason: message.slice(0, 200),
       complexityScore,
-      status: 'DEPLOYED',
-      tasksCompleted: 0,
-      successRate: 100,
+      resolvedFromRegistry,
     };
 
-    // Log the forge event
-    this.forgeLog.push({ angId, tier: tierConfig.tier, pmo: pmoOffice, at: now });
+    this.forgeLog.push({ angId: definition.id, tier: tierConfig.tier, pmo: pmoOffice, at: now });
 
     logger.info(
       {
-        angId,
-        name: ang.name,
+        angId: definition.id,
+        name: definition.name,
         persona: persona.codename,
         tier: tierConfig.tier,
         pmo: pmoOffice,
         director,
         complexity: complexityScore,
-        specialties: capSet.specialties.length,
+        resolvedFromRegistry,
+        capabilities: definition.capabilities.length,
       },
-      '[AngForge] New Boomer_Ang forged',
+      '[AngForge] Boomer_Ang resolved and persona assigned',
     );
 
     // Build summary
     const summary = [
       `--- Boomer_Ang Forged ---`,
-      `Name: ${ang.name} (${tierConfig.label})`,
-      `Codename: ${persona.codename}`,
+      `Service: ${definition.name} (${definition.id})`,
+      `Endpoint: ${definition.endpoint}`,
+      `Capabilities: ${definition.capabilities.join(', ')}`,
+      `Status: ${definition.status}`,
+      `Registry: ${resolvedFromRegistry ? 'RESOLVED' : 'PENDING_PROVISION'}`,
+      ``,
+      `--- Assignment ---`,
       `PMO: ${pmoOffice} | Director: ${director}`,
-      `Tier: ${tierConfig.tier} (complexity: ${complexityScore}/100)`,
+      `Tier: ${tierConfig.tier} (${tierConfig.label}) — complexity ${complexityScore}/100`,
+      `Concurrency: ${tierConfig.maxConcurrency}`,
+      ``,
+      `--- Persona ---`,
+      `Name: ${persona.displayName} (${persona.codename})`,
       `Traits: ${persona.traits.join(', ')}`,
       `Style: ${persona.communicationStyle}`,
-      `Specialties: ${capSet.specialties.join(', ')}`,
-      ``,
-      `--- Backstory ---`,
-      `Origin: ${persona.backstory.origin}`,
-      `Motivation: ${persona.backstory.motivation}`,
-      `Quirk: ${persona.backstory.quirk}`,
       `Catchphrase: "${persona.backstory.catchphrase}"`,
       `Mentored by: ${persona.backstory.mentoredBy}`,
-      ``,
-      `--- Capabilities ---`,
-      ...capSet.capabilities.map(c => `  ${c.name}: ${(c.weight * 100).toFixed(0)}%`),
-      ``,
-      `Concurrency: ${tierConfig.maxConcurrency} | Can mentor: ${tierConfig.canMentor} | Can lead squad: ${tierConfig.canLeadSquad}`,
     ].join('\n');
 
-    return { ang, tierLabel: tierConfig.label, summary };
+    return { profile, tierLabel: tierConfig.label, summary };
   }
 
   /**
@@ -372,9 +452,8 @@ export class AngForge {
     pmoOffice: PmoId,
     director: DirectorId,
     requestedBy = 'ACHEEVY',
-  ): AngSpawnResult {
+  ): AngForgeResult {
     const factors = scoreComplexity(message);
-
     return this.forge({
       message,
       pmoOffice,
@@ -384,18 +463,14 @@ export class AngForge {
     });
   }
 
-  /**
-   * Return the forge history.
-   */
+  /** Return the forge history. */
   getForgeLog() {
     return [...this.forgeLog];
   }
 
-  /**
-   * Get total count of forged Boomer_Angs.
-   */
+  /** Get total count of forge operations. */
   getSpawnCount(): number {
-    return this.spawnCount;
+    return this.forgeCount;
   }
 }
 

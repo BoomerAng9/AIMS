@@ -1,18 +1,46 @@
 /**
  * Boomer_Ang Persona & Skill Tier Types
  *
- * Every Boomer_Ang spawned in the House of Ang gets:
- *   1. A Persona — name, backstory, personality traits, communication style
- *   2. A Skill Tier — based on task complexity (Cadet → Veteran → Elite → Legendary)
- *   3. PMO Assignment — which C-Suite office they report to
+ * Aligned with the canonical BoomerAngDefinition from:
+ *   - backend/house-of-ang/src/types.ts
+ *   - infra/boomerangs/registry.json (source of truth)
+ *
+ * A Boomer_Ang IS a service: endpoint, capabilities, quotas, health_check.
+ * Persona is ADDITIVE metadata — backstory, traits, communication style.
+ * Skill tier reflects the complexity of the task assigned.
  *
  * "Activity breeds Activity — shipped beats perfect."
  */
 
-import { PmoId, DirectorId } from './types';
+import type { PmoId, DirectorId } from './types';
 
 // ---------------------------------------------------------------------------
-// Skill Tiers — based on task complexity
+// BoomerAngDefinition — mirrors backend/house-of-ang/src/types.ts
+// Kept in-sync structurally. The canonical registry lives at
+// infra/boomerangs/registry.json.
+// ---------------------------------------------------------------------------
+
+export interface BoomerAngDefinition {
+  id: string;
+  name: string;
+  source_repo: string;
+  description: string;
+  capabilities: string[];
+  required_quotas: Record<string, number>;
+  endpoint: string;
+  health_check: string;
+  status: 'registered' | 'active' | 'degraded' | 'offline';
+}
+
+export interface BoomerAngRegistry {
+  boomerangs: BoomerAngDefinition[];
+  capability_index: Record<string, string[]>;
+  version: string;
+  last_updated: string;
+}
+
+// ---------------------------------------------------------------------------
+// Skill Tiers — assigned based on task complexity score
 // ---------------------------------------------------------------------------
 
 export type SkillTier = 'CADET' | 'VETERAN' | 'ELITE' | 'LEGENDARY';
@@ -22,10 +50,6 @@ export interface SkillTierConfig {
   label: string;
   complexityRange: [number, number]; // min, max complexity score
   maxConcurrency: number;
-  capabilityWeightFloor: number;     // minimum capability weight
-  maxSpecialties: number;
-  canMentor: boolean;
-  canLeadSquad: boolean;
   description: string;
 }
 
@@ -35,49 +59,33 @@ export const SKILL_TIERS: SkillTierConfig[] = [
     label: 'Cadet Ang',
     complexityRange: [0, 25],
     maxConcurrency: 1,
-    capabilityWeightFloor: 0.4,
-    maxSpecialties: 2,
-    canMentor: false,
-    canLeadSquad: false,
-    description: 'Fresh from the forge. Handles simple, single-step tasks. Learning the ropes.',
+    description: 'Fresh from the forge. Handles simple, single-step tasks.',
   },
   {
     tier: 'VETERAN',
     label: 'Veteran Ang',
     complexityRange: [26, 55],
     maxConcurrency: 2,
-    capabilityWeightFloor: 0.6,
-    maxSpecialties: 4,
-    canMentor: false,
-    canLeadSquad: false,
-    description: 'Battle-tested. Handles multi-step tasks and can juggle two workstreams.',
+    description: 'Battle-tested. Handles multi-step tasks with confidence.',
   },
   {
     tier: 'ELITE',
     label: 'Elite Ang',
     complexityRange: [56, 80],
     maxConcurrency: 4,
-    capabilityWeightFloor: 0.8,
-    maxSpecialties: 6,
-    canMentor: true,
-    canLeadSquad: true,
-    description: 'Top performer. Orchestrates complex pipelines and mentors Cadets.',
+    description: 'Top performer. Orchestrates complex pipelines.',
   },
   {
     tier: 'LEGENDARY',
     label: 'Legendary Ang',
     complexityRange: [81, 100],
     maxConcurrency: 6,
-    capabilityWeightFloor: 0.9,
-    maxSpecialties: 10,
-    canMentor: true,
-    canLeadSquad: true,
-    description: 'The best of the best. Handles enterprise-grade operations with full autonomy.',
+    description: 'The best of the best. Enterprise-grade operations.',
   },
 ];
 
 // ---------------------------------------------------------------------------
-// Persona — personality, backstory, communication style
+// Persona — backstory, personality, communication style
 // ---------------------------------------------------------------------------
 
 export type PersonalityTrait =
@@ -95,55 +103,64 @@ export type PersonalityTrait =
   | 'stoic';
 
 export type CommunicationStyle =
-  | 'direct'       // short, punchy, no fluff
-  | 'narrative'    // tells stories, provides context
-  | 'technical'    // data-driven, precise language
-  | 'motivational' // uplifting, team-focused
-  | 'diplomatic'   // careful, balanced phrasing
-  | 'witty';       // clever, uses humor
+  | 'direct'
+  | 'narrative'
+  | 'technical'
+  | 'motivational'
+  | 'diplomatic'
+  | 'witty';
 
 export interface AngBackstory {
-  origin: string;        // where they "came from" in the AIMS lore
-  motivation: string;    // what drives them
-  quirk: string;         // a memorable personality quirk
-  catchphrase: string;   // their signature line
-  mentoredBy: string;    // who trained them in the House of Ang
+  origin: string;
+  motivation: string;
+  quirk: string;
+  catchphrase: string;
+  mentoredBy: string;
 }
 
 export interface AngPersona {
   displayName: string;
-  codename: string;                     // short internal handle
+  codename: string;
   traits: PersonalityTrait[];
   communicationStyle: CommunicationStyle;
   backstory: AngBackstory;
-  avatar: string;                       // emoji or icon reference
+  avatar: string;
 }
 
 // ---------------------------------------------------------------------------
-// Spawned Ang (extends DeployedAng with persona + skill tier)
+// ForgedAngProfile — BoomerAngDefinition + persona + tier (additive)
+//
+// This is the output of the AngForge. It wraps an existing (or newly created)
+// BoomerAngDefinition with persona metadata and a complexity-derived tier.
 // ---------------------------------------------------------------------------
 
-export interface SpawnedAngProfile {
-  id: string;
-  name: string;
+export interface ForgedAngProfile {
+  /** The canonical service definition from the registry. */
+  definition: BoomerAngDefinition;
+
+  /** Additive persona metadata. */
   persona: AngPersona;
+
+  /** Skill tier based on task complexity. */
   skillTier: SkillTier;
   tierConfig: SkillTierConfig;
+
+  /** PMO assignment for this forge. */
   assignedPmo: PmoId;
   director: DirectorId;
-  specialties: string[];
-  capabilities: Array<{ name: string; weight: number }>;
-  spawnedAt: string;
-  spawnedBy: string;
-  spawnReason: string;         // the task/message that triggered creation
+
+  /** Forge metadata. */
+  forgedAt: string;
+  forgedBy: string;
+  forgeReason: string;
   complexityScore: number;
-  status: 'SPAWNING' | 'DEPLOYED' | 'STANDBY' | 'OFFLINE';
-  tasksCompleted: number;
-  successRate: number;
+
+  /** Whether this resolved to an existing registry entry or created a new one. */
+  resolvedFromRegistry: boolean;
 }
 
 // ---------------------------------------------------------------------------
-// Persona Catalog — per-PMO persona templates
+// Persona Catalog Template
 // ---------------------------------------------------------------------------
 
 export interface PersonaTemplate {
@@ -151,21 +168,26 @@ export interface PersonaTemplate {
   personas: AngPersona[];
 }
 
-// ---------------------------------------------------------------------------
-// Spawn Request
-// ---------------------------------------------------------------------------
-
-export interface AngSpawnRequest {
-  message: string;                       // the user's task message
-  pmoOffice: PmoId;
-  director: DirectorId;
-  complexityScore: number;               // 0-100
-  requestedBy: string;                   // userId or 'ACHEEVY'
-  context?: Record<string, unknown>;
+/** Maps a registry Boomer_Ang ID to its assigned persona. */
+export interface RegistryPersonaBinding {
+  boomerAngId: string;
+  persona: AngPersona;
 }
 
-export interface AngSpawnResult {
-  ang: SpawnedAngProfile;
+// ---------------------------------------------------------------------------
+// Forge Request / Result
+// ---------------------------------------------------------------------------
+
+export interface AngForgeRequest {
+  message: string;
+  pmoOffice: PmoId;
+  director: DirectorId;
+  complexityScore: number;
+  requestedBy: string;
+}
+
+export interface AngForgeResult {
+  profile: ForgedAngProfile;
   tierLabel: string;
   summary: string;
 }
