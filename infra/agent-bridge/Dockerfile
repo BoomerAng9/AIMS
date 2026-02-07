@@ -2,26 +2,32 @@
 # Bridges AIMS network and sandboxed agents with strict security controls
 # Compatible with OpenClaw v2026.2.3
 
+FROM node:24-alpine AS builder
+
+WORKDIR /app
+
+# Install all dependencies (including dev for TypeScript build)
+COPY package.json package-lock.json* ./
+RUN npm ci && npm cache clean --force
+
+# Copy source and build
+COPY . .
+RUN npx tsc
+
+# Production stage
 FROM node:24-alpine
 
 WORKDIR /app
 
-# Security: Create non-root user
-RUN addgroup -g 1000 bridge && \
-    adduser -u 1000 -G bridge -s /bin/sh -D bridge
-
-# Install dependencies
+# Install production dependencies only
 COPY package.json package-lock.json* ./
 RUN npm ci --only=production && npm cache clean --force
 
-# Copy source
-COPY . .
-
-# Build TypeScript
-RUN npm run build || npx tsc
+# Copy compiled output
+COPY --from=builder /app/dist ./dist
 
 # Security: Switch to non-root user
-USER bridge
+USER node
 
 # Environment
 ENV NODE_ENV=production
