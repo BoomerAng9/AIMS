@@ -1,5 +1,4 @@
 
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -16,6 +15,7 @@ body {
   color: var(--foreground);
   background: var(--background);
   font-family: 'Inter', sans-serif;
+  overflow-x: hidden; /* Prevent horizontal scroll from glowing elements */
 }
 
 /* Custom Scrollbar for Obsidian feel */
@@ -50,3 +50,43 @@ body {
     0 0 0 1px rgba(0, 0, 0, 0.3);
 }
 
+
+/* --- A.I.M.S. Design System Utilities --- */
+
+@layer utilities {
+  .text-shadow-gold {
+    text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+  }
+  
+  .text-shadow-neon {
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.5), 0 0 20px rgba(212, 175, 55, 0.5);
+  }
+
+  .glass-panel {
+    @apply bg-white/5 backdrop-blur-xl border border-white/10 shadow-glass;
+  }
+
+  /* Deep, premium glass for main containers */
+  .glass-premium {
+    background: radial-gradient(
+      circle at top left,
+      rgba(212, 175, 55, 0.05),
+      rgba(0, 0, 0, 0) 60%
+    ), rgba(20, 20, 20, 0.6);
+    @apply backdrop-blur-3xl border border-gold/20 shadow-neon-gold;
+  }
+  
+  /* Subtle Tech Grid Background */
+  .bg-grid-pattern {
+    background-size: 40px 40px;
+    background-image: linear-gradient(to right, #1a1a1a 1px, transparent 1px),
+                      linear-gradient(to bottom, #1a1a1a 1px, transparent 1px);
+    mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
+    -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
+  }
+
+  /* Utility for glowing borders on hover */
+  .hover-glow-border {
+    @apply transition-all duration-300 hover:border-gold/50 hover:shadow-[0_0_15px_rgba(212,175,55,0.2)];
+  }
+}

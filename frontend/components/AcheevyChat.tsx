@@ -1,40 +1,21 @@
 'use client';
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { sendACPRequest } from '../lib/acp-client';
-import {
-  Bot, User, Send, CheckCircle2, ShieldCheck, DollarSign,
-  Cpu, Zap, Search, Hammer, BarChart3, Shield, Layers,
-  ChevronRight, Sparkles, ArrowRight,
-} from 'lucide-react';
 
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-interface Message {
-  id: string;
-  role: 'user' | 'assistant';
-  content: string;
-  quote?: Record<string, unknown>;
-  executionPlan?: { steps: string[]; estimatedDuration: string };
-  agentResults?: {
-    primaryAgent: string;
-    outputs: Array<{ agentId: string; status: string; summary: string; artifacts: string[] }>;
-  };
-}
+import { useChat } from 'ai/react';
+import { useState, useRef, useEffect } from 'react';
+import { Bot, User, Send, Zap, ChevronRight, Sparkles, Hammer, Search, Layers, Cpu } from 'lucide-react';
 
+// --- Design System Imports & Types ---
+// Ideally these would be imported, but we'll inline the relevant types/constants for standalone stability
 type Intent = 'CHAT' | 'BUILD_PLUG' | 'RESEARCH' | 'AGENTIC_WORKFLOW';
 
-interface ActiveAgent {
-  id: string;
-  name: string;
-  status: 'idle' | 'working' | 'done';
-  color: string;
-}
+const INTENT_OPTIONS = [
+  { value: 'CHAT', label: 'Chat', icon: Sparkles, desc: 'Ask anything' },
+  { value: 'BUILD_PLUG', label: 'Build', icon: Hammer, desc: 'Create a Plug' },
+  { value: 'RESEARCH', label: 'Research', icon: Search, desc: 'Market intel' },
+  { value: 'AGENTIC_WORKFLOW', label: 'Workflow', icon: Layers, desc: 'Multi-step pipeline' },
+];
 
-// ---------------------------------------------------------------------------
-// Constants
-// ---------------------------------------------------------------------------
-const BOOMER_ANGS: ActiveAgent[] = [
+const BOOMER_ANGS = [
   { id: 'engineer-ang', name: 'Engineer_Ang', status: 'idle', color: 'emerald' },
   { id: 'marketer-ang', name: 'Marketer_Ang', status: 'idle', color: 'blue' },
   { id: 'analyst-ang', name: 'Analyst_Ang', status: 'idle', color: 'violet' },
@@ -42,161 +23,102 @@ const BOOMER_ANGS: ActiveAgent[] = [
   { id: 'chicken-hawk', name: 'Chicken Hawk', status: 'idle', color: 'red' },
 ];
 
-const INTENT_OPTIONS: { value: Intent; label: string; icon: typeof Cpu; desc: string }[] = [
-  { value: 'CHAT', label: 'Chat', icon: Sparkles, desc: 'Ask anything' },
-  { value: 'BUILD_PLUG', label: 'Build', icon: Hammer, desc: 'Create a Plug' },
-  { value: 'RESEARCH', label: 'Research', icon: Search, desc: 'Market intel' },
-  { value: 'AGENTIC_WORKFLOW', label: 'Workflow', icon: Layers, desc: 'Multi-step pipeline' },
-];
-
-// ---------------------------------------------------------------------------
-// Component
-// ---------------------------------------------------------------------------
 export default function AcheevyChat() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: 'welcome',
-      role: 'assistant',
-      content: "Greetings. I am ACHEEVY — your AI orchestrator.\n\nDescribe what you want to build, and I will marshal the full Boomer_Ang team to make it real. From intake to deployment, end-to-end.",
-    },
-  ]);
-  const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [intent, setIntent] = useState<Intent>('BUILD_PLUG');
-  const [agents, setAgents] = useState<ActiveAgent[]>(BOOMER_ANGS);
+  const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
+    api: '/api/chat',
+    initialMessages: [
+      {
+        id: 'welcome',
+        role: 'assistant',
+        content: "Greetings. I am ACHEEVY — your AI orchestrator.\n\nDescribe what you want to build, and I will marshal the full Boomer_Ang team to make it real. From intake to deployment, end-to-end.",
+      }
+    ]
+  });
+
+  const [intent, setIntent] = useState<string>('CHAT');
   const [showIntentPicker, setShowIntentPicker] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, []);
-
+  
+  // Auto-scroll
   useEffect(() => {
-    scrollToBottom();
-  }, [messages, scrollToBottom]);
-
-  const animateAgents = useCallback((primaryAgent: string | null) => {
-    if (!primaryAgent) return;
-    setAgents(prev =>
-      prev.map(a => ({
-        ...a,
-        status: a.id === primaryAgent ? 'working' : a.status,
-      }))
-    );
-    setTimeout(() => {
-      setAgents(prev =>
-        prev.map(a => ({
-          ...a,
-          status: a.id === primaryAgent ? 'done' : a.status,
-        }))
-      );
-      setTimeout(() => {
-        setAgents(BOOMER_ANGS);
-      }, 3000);
-    }, 2000);
-  }, []);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || isLoading) return;
-
-    const userMsg: Message = {
-      id: Date.now().toString(),
-      role: 'user',
-      content: input,
-    };
-
-    setMessages(prev => [...prev, userMsg]);
-    setInput('');
-    setIsLoading(true);
-
-    try {
-      const response = await sendACPRequest(userMsg.content, intent);
-
-      const acheevyMsg: Message = {
-        id: response.reqId || `resp-${Date.now()}`,
-        role: 'assistant',
-        content: response.message || 'Request processed.',
-        quote: response.quote,
-        executionPlan: response.executionPlan,
-        agentResults: response.agentResults,
-      };
-
-      setMessages(prev => [...prev, acheevyMsg]);
-
-      if (response.agentResults?.primaryAgent) {
-        animateAgents(response.agentResults.primaryAgent);
-      }
-    } catch {
-      setMessages(prev => [
-        ...prev,
-        {
-          id: `error-${Date.now()}`,
-          role: 'assistant',
-          content: 'Connection to UEF Gateway failed. Ensure infrastructure is running.',
-        },
-      ]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   const selectedIntent = INTENT_OPTIONS.find(i => i.value === intent) || INTENT_OPTIONS[0];
 
   return (
-    <div className="flex flex-col h-full relative overflow-hidden">
-      {/* Dot Grid Background */}
-      <div
-        className="absolute inset-0 opacity-[0.03]"
-        style={{
-          backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)',
-          backgroundSize: '24px 24px',
-        }}
-      />
+    <div className="flex flex-col h-full relative overflow-hidden bg-obsidian text-white font-sans selection:bg-gold/30">
+      
+      {/* Background: Nano Banana Pro "Brick and Window" */}
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        {/* Nano Banana Pro "Brick Pattern" (CSS-only) */}
+        <div 
+          className="absolute inset-0 opacity-[0.03]" 
+          style={{ 
+            backgroundImage: `
+              linear-gradient(335deg, rgba(255,255,255,0.05) 23px, transparent 23px),
+              linear-gradient(155deg, rgba(255,255,255,0.05) 23px, transparent 23px),
+              linear-gradient(335deg, rgba(255,255,255,0.05) 23px, transparent 23px),
+              linear-gradient(155deg, rgba(255,255,255,0.05) 23px, transparent 23px)
+            `,
+            backgroundSize: '58px 58px',
+            backgroundPosition: '0px 2px, 4px 35px, 29px 31px, 34px 6px'
+          }}
+        />
+         {/* Subtle Gold Dot Grid Overlay */}
+        <div 
+          className="absolute inset-0 opacity-[0.05]"
+          style={{ backgroundImage: 'radial-gradient(circle, #D4AF37 1px, transparent 1px)', backgroundSize: '32px 32px' }}
+        />
+      </div>
 
-      {/* ---- HEADER: Combined Arsenal Bar ---- */}
-      <div className="relative z-10 border-b border-white/5 bg-black/80 backdrop-blur-xl">
+      {/* ---- HEADER: Arsenal Bar ---- */}
+      <div className="relative z-10 border-b border-white/10 bg-black/80 backdrop-blur-xl shadow-glass">
         <div className="flex items-center justify-between px-6 py-3">
+          
+          {/* ACHEEVY Identity */}
           <div className="flex items-center gap-3">
-            <div className="relative">
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-400/20 to-amber-600/10 flex items-center justify-center border border-amber-400/30 shadow-[0_0_20px_rgba(251,191,36,0.15)]">
-                <Bot className="text-amber-400 w-5 h-5" />
+            <div className="relative group">
+              <div className="w-10 h-10 rounded-xl bg-white/5 border border-gold/20 flex items-center justify-center shadow-neon-gold group-hover:border-gold/50 transition-all">
+                <Bot className="text-gold w-6 h-6" />
               </div>
-              <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-400 rounded-full border-2 border-black animate-pulse" />
+              <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-signal-green rounded-full border-2 border-black animate-pulse" />
             </div>
             <div>
-              <h2 className="font-bold text-base text-amber-50 tracking-wide">ACHEEVY</h2>
-              <div className="flex items-center gap-1.5 text-[10px] text-emerald-400/80 font-medium tracking-wider uppercase">
+              <h2 className="font-display font-medium text-lg text-white tracking-tight">ACHEEVY</h2>
+              <div className="flex items-center gap-1.5 text-[10px] text-signal-green/90 font-mono uppercase tracking-widest">
                 <Zap className="w-2.5 h-2.5" /> Online
               </div>
             </div>
           </div>
 
-          {/* Intent Selector */}
+          {/* Intent Selector (Glass Dropdown) */}
           <div className="relative">
             <button
               onClick={() => setShowIntentPicker(!showIntentPicker)}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 hover:border-amber-400/30 transition-all text-sm"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 border border-white/10 hover:border-gold/30 transition-all text-sm group"
             >
-              <selectedIntent.icon className="w-4 h-4 text-amber-400" />
-              <span className="text-amber-50 font-medium">{selectedIntent.label}</span>
-              <ChevronRight className={`w-3 h-3 text-amber-400/50 transition-transform ${showIntentPicker ? 'rotate-90' : ''}`} />
+              {/* @ts-ignore - Icon mapping */}
+              <selectedIntent.icon className="w-4 h-4 text-gold group-hover:shadow-[0_0_8px_rgba(212,175,55,0.4)]" />
+              <span className="text-white/90 font-medium">{selectedIntent.label}</span>
+              <ChevronRight className={`w-3 h-3 text-white/40 transition-transform ${showIntentPicker ? 'rotate-90' : ''}`} />
             </button>
+            
             {showIntentPicker && (
-              <div className="absolute right-0 top-full mt-2 w-56 bg-black/95 border border-white/10 rounded-2xl p-2 backdrop-blur-xl shadow-2xl z-50">
+              <div className="absolute right-0 top-full mt-2 w-64 bg-obsidian/95 border border-white/10 rounded-xl p-2 backdrop-blur-3xl shadow-2xl z-50">
                 {INTENT_OPTIONS.map(opt => (
                   <button
                     key={opt.value}
                     onClick={() => { setIntent(opt.value); setShowIntentPicker(false); }}
-                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all ${
-                      intent === opt.value ? 'bg-amber-400/10 border border-amber-400/20' : 'hover:bg-white/5 border border-transparent'
+                    className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg text-left transition-all mb-1 ${
+                      intent === opt.value ? 'bg-gold/10 border border-gold/20' : 'hover:bg-white/5 border border-transparent'
                     }`}
                   >
-                    <opt.icon className={`w-4 h-4 ${intent === opt.value ? 'text-amber-400' : 'text-white/40'}`} />
+                     {/* @ts-ignore */}
+                    <opt.icon className={`w-4 h-4 ${intent === opt.value ? 'text-gold' : 'text-white/40'}`} />
                     <div>
-                      <div className={`text-sm font-medium ${intent === opt.value ? 'text-amber-50' : 'text-white/70'}`}>{opt.label}</div>
-                      <div className="text-[10px] text-white/30">{opt.desc}</div>
+                      <div className={`text-sm font-medium ${intent === opt.value ? 'text-gold' : 'text-white/80'}`}>{opt.label}</div>
+                      <div className="text-[10px] text-white/30 font-mono">{opt.desc}</div>
                     </div>
                   </button>
                 ))}
@@ -205,220 +127,82 @@ export default function AcheevyChat() {
           </div>
         </div>
 
-        {/* Arsenal Shelf — Active Boomer_Angs */}
-        <div className="px-6 pb-3 flex gap-2 overflow-x-auto">
-          {agents.map(agent => {
-            const isWorking = agent.status === 'working';
-            const isDone = agent.status === 'done';
-            return (
-              <div
-                key={agent.id}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border backdrop-blur-sm transition-all flex-shrink-0 ${
-                  isWorking
-                    ? 'bg-emerald-400/10 border-emerald-400/40 shadow-[0_0_12px_rgba(52,211,153,0.15)]'
-                    : isDone
-                    ? 'bg-emerald-400/10 border-emerald-400/30'
-                    : 'bg-white/[0.02] border-white/[0.06] hover:border-white/10'
-                }`}
-              >
-                <div
-                  className={`w-1.5 h-1.5 rounded-full ${
-                    isWorking ? 'bg-emerald-400 animate-pulse' : isDone ? 'bg-emerald-400' : 'bg-white/20'
-                  }`}
-                />
-                <span className={`text-[10px] font-medium tracking-wide ${
-                  isWorking ? 'text-white/90' : isDone ? 'text-emerald-300' : 'text-white/30'
-                }`}>
-                  {agent.name}
-                </span>
-              </div>
-            );
-          })}
+        {/* Agent Shelf (Visual Only for now) */}
+        <div className="px-6 pb-3 flex gap-2 overflow-x-auto no-scrollbar">
+          {BOOMER_ANGS.map(agent => (
+            <div key={agent.id} className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-white/5 bg-white/[0.02] hover:bg-white/5 transition-colors cursor-default">
+              <div className={`w-1.5 h-1.5 rounded-full ${agent.status === 'idle' ? 'bg-white/20' : 'bg-emerald-400'}`} />
+              <span className="text-[10px] font-mono text-white/50 uppercase tracking-wider">{agent.name}</span>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* ---- MESSAGES ---- */}
-      <div className="relative z-10 flex-1 overflow-y-auto px-6 py-6 space-y-6">
-        {messages.map(msg => (
-          <div key={msg.id} className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            {msg.role === 'assistant' && (
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-400/10 to-transparent flex-shrink-0 flex items-center justify-center border border-amber-400/20 mt-1">
-                <Bot className="w-4 h-4 text-amber-400" />
-              </div>
+      {/* ---- Chat Area ---- */}
+      <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6 scroll-smooth">
+        {messages.map(m => (
+          <div key={m.id} className={`flex gap-4 ${m.role === 'user' ? 'justify-end' : 'justify-start max-w-3xl'}`}>
+            
+            {m.role === 'assistant' && (
+               <div className="w-8 h-8 rounded-lg bg-white/5 border border-gold/10 flex items-center justify-center flex-shrink-0 mt-1">
+                 <Bot className="w-4 h-4 text-gold/80" />
+               </div>
             )}
 
-            <div className="max-w-[80%] space-y-3">
-              <div
-                className={`px-4 py-3 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${
-                  msg.role === 'user'
-                    ? 'bg-amber-400/10 border border-amber-400/20 text-amber-50 rounded-tr-sm'
-                    : 'bg-white/[0.03] border border-white/[0.06] text-white/80 rounded-tl-sm'
-                }`}
-              >
-                {msg.content}
-              </div>
-
-              {/* Agent Results */}
-              {msg.agentResults ? (
-                <div className="bg-black/40 border border-white/10 rounded-2xl p-4 space-y-3">
-                  <div className="flex items-center gap-2">
-                    <Cpu className="w-3.5 h-3.5 text-emerald-400" />
-                    <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-emerald-400/80">
-                      Agent Dispatch
-                    </span>
-                  </div>
-                  {msg.agentResults.outputs.map((out, i) => (
-                    <div key={i} className="bg-white/[0.02] border border-white/5 rounded-xl p-3">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-medium text-amber-200">{out.agentId}</span>
-                        <span className={`text-[9px] uppercase font-bold tracking-wider ${
-                          out.status === 'COMPLETED' ? 'text-emerald-400' : 'text-red-400'
-                        }`}>
-                          {out.status}
-                        </span>
-                      </div>
-                      <p className="text-xs text-white/50 leading-relaxed">{out.summary}</p>
-                      {out.artifacts.length > 0 ? (
-                        <div className="mt-2 flex flex-wrap gap-1.5">
-                          {out.artifacts.slice(0, 4).map((a, j) => (
-                            <span key={j} className="text-[9px] bg-white/5 border border-white/10 px-2 py-0.5 rounded-full text-white/40">
-                              {a}
-                            </span>
-                          ))}
-                        </div>
-                      ) : null}
-                    </div>
-                  ))}
-                </div>
-              ) : null}
-
-              {/* LUC Quote */}
-              {msg.quote && (msg.quote as Record<string, unknown>).variants ? (
-                <div className="bg-black/60 border border-amber-400/20 rounded-2xl p-4 shadow-[0_0_20px_rgba(251,191,36,0.05)]">
-                  <div className="flex justify-between items-center mb-3">
-                    <h4 className="text-[10px] uppercase tracking-[0.2em] font-bold text-amber-400/80 flex items-center gap-2">
-                      <DollarSign className="w-3 h-3" /> LUC Estimate
-                    </h4>
-                    <span className="text-[9px] text-white/20">Valid: 1h</span>
-                  </div>
-                  <div className="space-y-1.5">
-                    {((msg.quote as Record<string, unknown>).variants as Array<Record<string, unknown>>).map((v: Record<string, unknown>, idx: number) => (
-                      <div key={idx} className="flex justify-between items-center bg-white/[0.03] p-2.5 rounded-xl text-xs">
-                        <span className="text-white/60">{v.name as string}</span>
-                        <div className="text-right">
-                          <div className="text-amber-400 font-mono font-medium">
-                            ${((v.estimate as Record<string, unknown>)?.totalUsd as number)?.toFixed(4)}
-                          </div>
-                          <div className="text-white/20 text-[9px]">
-                            {((v.estimate as Record<string, unknown>)?.totalTokens as number)} tokens
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : null}
-
-              {/* Execution Plan */}
-              {msg.executionPlan ? (
-                <div className="bg-white/[0.02] border border-white/[0.06] rounded-2xl p-4">
-                  <h4 className="text-[10px] uppercase tracking-[0.2em] font-bold text-white/40 mb-3 flex items-center gap-2">
-                    <ShieldCheck className="w-3 h-3" /> Execution Protocol
-                  </h4>
-                  <div className="space-y-2">
-                    {msg.executionPlan.steps.map((step: string, i: number) => (
-                      <div key={i} className="flex items-start gap-3">
-                        <div className="w-5 h-5 rounded-lg bg-amber-400/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                          <span className="text-[9px] font-bold text-amber-400">{i + 1}</span>
-                        </div>
-                        <span className="text-xs text-white/50">{step}</span>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="mt-3 pt-2 border-t border-white/5 flex items-center justify-between">
-                    <span className="text-[9px] text-white/20">
-                      Est. Duration: {msg.executionPlan.estimatedDuration}
-                    </span>
-                    <button className="flex items-center gap-1 text-[10px] text-amber-400 font-medium hover:text-amber-300 transition-colors">
-                      Execute <ArrowRight className="w-3 h-3" />
-                    </button>
-                  </div>
-                </div>
-              ) : null}
+            <div className={`relative px-5 py-4 rounded-2xl text-sm leading-relaxed ${
+              m.role === 'user' 
+                ? 'bg-gold text-black rounded-tr-sm shadow-[0_0_15px_rgba(212,175,55,0.2)] font-medium' 
+                : 'glass-panel text-white/90 rounded-tl-sm border border-white/5'
+            }`}>
+              {m.content}
             </div>
 
-            {msg.role === 'user' && (
-              <div className="w-8 h-8 rounded-xl bg-white/5 flex-shrink-0 flex items-center justify-center border border-white/10 mt-1">
+            {m.role === 'user' && (
+              <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0 mt-1">
                 <User className="w-4 h-4 text-white/50" />
               </div>
             )}
           </div>
         ))}
-
         {isLoading && (
-          <div className="flex gap-3">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-400/10 to-transparent flex-shrink-0 flex items-center justify-center border border-amber-400/20 animate-pulse">
-              <Bot className="w-4 h-4 text-amber-400" />
+          <div className="flex gap-4">
+            <div className="w-8 h-8 rounded-lg bg-white/5 border border-gold/10 flex items-center justify-center flex-shrink-0">
+               <Zap className="w-4 h-4 text-gold animate-pulse" />
             </div>
-            <div className="px-4 py-3 bg-white/[0.03] border border-white/[0.06] rounded-2xl rounded-tl-sm">
-              <div className="flex gap-1.5 h-5 items-center">
-                <div className="w-1.5 h-1.5 bg-amber-400/50 rounded-full animate-bounce [animation-delay:-0.3s]" />
-                <div className="w-1.5 h-1.5 bg-amber-400/50 rounded-full animate-bounce [animation-delay:-0.15s]" />
-                <div className="w-1.5 h-1.5 bg-amber-400/50 rounded-full animate-bounce" />
-              </div>
+            <div className="px-5 py-4 glass-panel rounded-2xl rounded-tl-sm flex items-center gap-2">
+              <div className="w-1.5 h-1.5 bg-gold/50 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+              <div className="w-1.5 h-1.5 bg-gold/50 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+              <div className="w-1.5 h-1.5 bg-gold/50 rounded-full animate-bounce"></div>
             </div>
           </div>
         )}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* ---- INPUT AREA ---- */}
-      <div className="relative z-10 border-t border-white/5 bg-black/80 backdrop-blur-xl p-4">
-        <form onSubmit={handleSubmit} className="relative">
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/5 border border-white/10">
-              <selectedIntent.icon className="w-3.5 h-3.5 text-amber-400" />
-              <span className="text-[10px] font-medium text-amber-200 uppercase tracking-wider">{selectedIntent.label}</span>
-            </div>
-
-            <div className="flex-1 relative">
-              <input
-                ref={inputRef}
-                type="text"
-                value={input}
-                onChange={e => setInput(e.target.value)}
-                placeholder={
-                  intent === 'BUILD_PLUG'
-                    ? "Describe the Plug you want to build..."
-                    : intent === 'RESEARCH'
-                    ? "What do you want to research?"
-                    : intent === 'AGENTIC_WORKFLOW'
-                    ? "Describe the workflow pipeline..."
-                    : "Ask ACHEEVY anything..."
-                }
-                className="w-full bg-white/[0.03] border border-white/10 rounded-xl pl-4 pr-12 py-3 text-sm text-white/90 focus:outline-none focus:border-amber-400/30 focus:shadow-[0_0_20px_rgba(251,191,36,0.1)] transition-all placeholder:text-white/20"
-                disabled={isLoading}
-              />
-              <button
-                type="submit"
-                disabled={!input.trim() || isLoading}
-                className="absolute right-1.5 top-1.5 p-2 bg-amber-400/10 hover:bg-amber-400/20 text-amber-400 rounded-lg transition-all disabled:opacity-30 disabled:cursor-not-allowed hover:shadow-[0_0_12px_rgba(251,191,36,0.2)]"
-              >
-                <Send className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
+      {/* ---- Input Area ---- */}
+      <div className="p-4 bg-black/80 backdrop-blur-xl border-t border-white/10 relative z-20">
+        <form onSubmit={handleSubmit} className="relative max-w-4xl mx-auto">
+          <input
+            value={input}
+            onChange={handleInputChange}
+            placeholder="Direct the swarm..."
+            className="w-full bg-white/5 hover:bg-white/10 focus:bg-black border border-white/10 focus:border-gold/50 rounded-xl py-4 pl-6 pr-14 text-white placeholder:text-white/20 transition-all outline-none shadow-inner"
+          />
+          <button 
+            type="submit"
+            disabled={isLoading || !input.trim()}
+            className="absolute right-2 top-2 p-2 bg-gold/10 hover:bg-gold text-gold hover:text-black rounded-lg transition-all disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-gold"
+          >
+            <Send className="w-5 h-5" />
+          </button>
         </form>
-        <div className="flex items-center justify-between mt-2 px-1">
-          <span className="text-[9px] text-white/15">
-            A.I.M.S. v1.0 | ACP-Secured | Monitored by ORACLE
-          </span>
-          <div className="flex items-center gap-1.5">
-            <BarChart3 className="w-2.5 h-2.5 text-white/10" />
-            <Shield className="w-2.5 h-2.5 text-white/10" />
-          </div>
+        <div className="text-center mt-3">
+          <p className="text-[10px] font-mono text-white/20 uppercase tracking-[0.2em]">
+            A.I.M.S. Neural Link v2.0 • {intent} Mode Active
+          </p>
         </div>
       </div>
+
     </div>
   );
 }
