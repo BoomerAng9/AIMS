@@ -1,119 +1,196 @@
 /**
- * n8n Client — HTTP integration with n8n workflow engine
+ * n8n Client — Triggers workflows on the VPS n8n instance
  *
- * Tries the VPS-hosted n8n webhook first. If unavailable, falls back
- * to local in-process pipeline execution (chain-of-command.ts).
+ * Provides both:
+ *  1. Direct pipeline execution (in-process, using pmo-router + chain-of-command)
+ *  2. n8n webhook trigger (sends to the n8n VPS for visual workflow execution)
+ *
+ * The n8n workflow at /webhook/pmo-intake mirrors the same logic as the
+ * in-process pipeline, but runs inside n8n for visual monitoring and debugging.
  */
 
-import { PipelinePacket, N8nWebhookResponse } from './types';
-import { executePipelineLocally } from './chain-of-command';
+import logger from '../logger';
+import { createPipelinePacket } from './pmo-router';
+import { executeChainOfCommand } from './chain-of-command';
+import { N8nTriggerPayload, N8nPipelineResponse } from './types';
 
-const N8N_BASE_URL = process.env.N8N_URL || 'http://n8n:5678';
+// ---------------------------------------------------------------------------
+// Configuration
+// ---------------------------------------------------------------------------
+
+const N8N_HOST = process.env.N8N_HOST || 'http://76.13.96.107:5678';
 const N8N_API_KEY = process.env.N8N_API_KEY || '';
-const N8N_WEBHOOK_PATH = '/webhook/pmo-intake';
+const PMO_WEBHOOK_PATH = '/webhook/pmo-intake';
+
+// ---------------------------------------------------------------------------
+// n8n HTTP Client
+// ---------------------------------------------------------------------------
 
 export class N8nClient {
-  private baseUrl: string;
+  private host: string;
   private apiKey: string;
 
-  constructor(baseUrl?: string, apiKey?: string) {
-    this.baseUrl = baseUrl || N8N_BASE_URL;
+  constructor(host?: string, apiKey?: string) {
+    this.host = host || N8N_HOST;
     this.apiKey = apiKey || N8N_API_KEY;
   }
 
   /**
-   * Execute a PMO pipeline packet via n8n webhook.
-   * Falls back to local execution if n8n is unavailable.
+   * Trigger the PMO routing workflow via n8n webhook.
+   * The workflow runs inside n8n on the VPS.
    */
-  async executePipeline(packet: PipelinePacket): Promise<N8nWebhookResponse> {
-    try {
-      return await this.triggerWebhook(packet);
-    } catch (error: any) {
-      console.warn(`[n8n] Webhook unavailable (${error.message}), falling back to local pipeline`);
-      return await executePipelineLocally(packet);
-    }
-  }
+  async triggerPmoWorkflow(payload: N8nTriggerPayload): Promise<N8nPipelineResponse> {
+    const url = `${this.host}${PMO_WEBHOOK_PATH}`;
 
-  /**
-   * Trigger the PMO intake webhook on n8n
-   */
-  private async triggerWebhook(packet: PipelinePacket): Promise<N8nWebhookResponse> {
-    const url = `${this.baseUrl}${N8N_WEBHOOK_PATH}`;
-
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30000);
+    logger.info(
+      { url, userId: payload.userId },
+      '[n8n Client] Triggering PMO workflow via webhook',
+    );
 
     try {
-      const response = await fetch(url, {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 30000);
+
+      const res = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           ...(this.apiKey ? { 'X-N8N-API-KEY': this.apiKey } : {}),
         },
-        body: JSON.stringify({
-          packetId: packet.packetId,
-          userId: packet.userId,
-          message: packet.originalMessage,
-          classification: packet.classification,
-          directive: packet.directive,
-        }),
+        body: JSON.stringify(payload),
         signal: controller.signal,
       });
 
-      clearTimeout(timeoutId);
+      clearTimeout(timeout);
 
-      if (!response.ok) {
-        throw new Error(`n8n returned ${response.status}: ${response.statusText}`);
+      if (!res.ok) {
+        const body = await res.text();
+        throw new Error(`n8n returned HTTP ${res.status}: ${body}`);
       }
 
-      return await response.json() as N8nWebhookResponse;
-    } finally {
-      clearTimeout(timeoutId);
+      const data = await res.json() as N8nPipelineResponse;
+      logger.info(
+        { requestId: data.requestId, status: data.status },
+        '[n8n Client] PMO workflow response received',
+      );
+      return data;
+    } catch (err) {
+      logger.warn(
+        { error: (err as Error).message },
+        '[n8n Client] n8n webhook unreachable — falling back to in-process pipeline',
+      );
+      // Fallback: run the pipeline in-process
+      return this.executePipelineLocal(payload);
     }
   }
 
   /**
-   * Check n8n health
+   * Execute the PMO pipeline in-process (no n8n dependency).
+   * Uses the same logic as the n8n workflow but runs locally.
    */
-  async healthCheck(): Promise<boolean> {
-    try {
-      const response = await fetch(`${this.baseUrl}/healthz`, {
-        signal: AbortSignal.timeout(5000),
-      });
-      return response.ok;
-    } catch {
-      return false;
-    }
+  executePipelineLocal(payload: N8nTriggerPayload): N8nPipelineResponse {
+    const packet = createPipelinePacket(payload);
+    return executeChainOfCommand(packet);
   }
 
   /**
-   * List active workflows
+   * Deploy the PMO routing workflow to n8n via API.
    */
-  async listWorkflows(): Promise<any[]> {
+  async deployWorkflow(workflowJson: Record<string, unknown>): Promise<{ id: string; active: boolean }> {
+    if (!this.apiKey) {
+      throw new Error('N8N_API_KEY required to deploy workflows');
+    }
+
+    const url = `${this.host}/api/v1/workflows`;
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-N8N-API-KEY': this.apiKey,
+      },
+      body: JSON.stringify(workflowJson),
+    });
+
+    if (!res.ok) {
+      const body = await res.text();
+      throw new Error(`Failed to deploy workflow: HTTP ${res.status} — ${body}`);
+    }
+
+    const data = await res.json() as { id: string; active: boolean };
+    logger.info({ workflowId: data.id }, '[n8n Client] Workflow deployed');
+    return data;
+  }
+
+  /**
+   * Activate a workflow on n8n.
+   */
+  async activateWorkflow(workflowId: string): Promise<void> {
+    if (!this.apiKey) {
+      throw new Error('N8N_API_KEY required to activate workflows');
+    }
+
+    const url = `${this.host}/api/v1/workflows/${workflowId}/activate`;
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'X-N8N-API-KEY': this.apiKey },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Failed to activate workflow ${workflowId}: HTTP ${res.status}`);
+    }
+
+    logger.info({ workflowId }, '[n8n Client] Workflow activated');
+  }
+
+  /**
+   * List existing workflows on n8n.
+   */
+  async listWorkflows(): Promise<Array<{ id: string; name: string; active: boolean }>> {
+    if (!this.apiKey) {
+      throw new Error('N8N_API_KEY required to list workflows');
+    }
+
+    const url = `${this.host}/api/v1/workflows`;
+    const res = await fetch(url, {
+      headers: { 'X-N8N-API-KEY': this.apiKey },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Failed to list workflows: HTTP ${res.status}`);
+    }
+
+    const data = await res.json() as { data: Array<{ id: string; name: string; active: boolean }> };
+    return data.data;
+  }
+
+  /**
+   * Health check for n8n instance.
+   */
+  async healthCheck(): Promise<{ ok: boolean; status?: number; error?: string }> {
     try {
-      const response = await fetch(`${this.baseUrl}/api/v1/workflows`, {
-        headers: {
-          ...(this.apiKey ? { 'X-N8N-API-KEY': this.apiKey } : {}),
-        },
-        signal: AbortSignal.timeout(5000),
-      });
-      if (response.ok) {
-        const data = await response.json();
-        return data.data || [];
-      }
-      return [];
-    } catch {
-      return [];
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 5000);
+      const res = await fetch(`${this.host}/healthz`, { signal: controller.signal });
+      clearTimeout(timeout);
+      return { ok: res.ok, status: res.status };
+    } catch (err) {
+      return { ok: false, error: (err as Error).message };
     }
   }
 }
 
-// Singleton
-let client: N8nClient | null = null;
+// ---------------------------------------------------------------------------
+// Convenience function
+// ---------------------------------------------------------------------------
 
-export function getN8nClient(): N8nClient {
-  if (!client) {
-    client = new N8nClient();
+let defaultClient: N8nClient | null = null;
+
+/**
+ * Trigger the PMO routing workflow (tries n8n first, falls back to local).
+ */
+export async function triggerN8nPmoWorkflow(payload: N8nTriggerPayload): Promise<N8nPipelineResponse> {
+  if (!defaultClient) {
+    defaultClient = new N8nClient();
   }
-  return client;
+  return defaultClient.triggerPmoWorkflow(payload);
 }

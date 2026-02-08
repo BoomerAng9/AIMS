@@ -79,11 +79,11 @@ describe('PMO Registry', () => {
 });
 
 describe('House of Ang', () => {
-  it('has 17 Angs in initial roster (12 supervisory + 5 execution)', () => {
+  it('has 12 supervisory Angs in initial roster', () => {
     const stats = houseOfAng.getStats();
-    expect(stats.total).toBe(17);
+    expect(stats.total).toBe(12);
     expect(stats.supervisory).toBe(12);
-    expect(stats.execution).toBe(5);
+    expect(stats.execution).toBe(0);
   });
 
   it('lists all supervisory Angs as DEPLOYED', () => {
@@ -116,47 +116,74 @@ describe('House of Ang', () => {
     expect(names).toContain('Social Agent');
   });
 
-  it('execution Angs have correct task counts', () => {
-    const engineer = houseOfAng.get('engineer-ang');
-    expect(engineer).toBeDefined();
-    expect(engineer!.tasksCompleted).toBe(12);
-    expect(engineer!.successRate).toBe(94);
-
-    const hawk = houseOfAng.get('chicken-hawk');
-    expect(hawk).toBeDefined();
-    expect(hawk!.tasksCompleted).toBe(28);
-  });
-
   it('can filter Angs by PMO office', () => {
     const techAngs = houseOfAng.listByPmo('tech-office');
     expect(techAngs.length).toBeGreaterThanOrEqual(2); // Boomer_CTO + DevOps Agent
   });
 
-  it('spawns a new Ang', () => {
+  it('forges a Boomer_Ang from registry for a tech task', () => {
     const before = houseOfAng.getStats().total;
-    const newAng = houseOfAng.spawn('TestAng', 'EXECUTION', 'Test Builder', 'Testing', ['Unit Tests']);
-    expect(newAng.status).toBe('SPAWNING');
-    expect(newAng.id).toBe('testang');
+    const result = houseOfAng.forgeForTask(
+      'Build a new API endpoint with database schema',
+      'tech-office',
+      'Boomer_CTO',
+      'test-user',
+    );
+    expect(result.profile).toBeDefined();
+    expect(result.profile.definition).toBeDefined();
+    expect(result.profile.definition.endpoint).toBeDefined();
+    expect(result.profile.definition.capabilities.length).toBeGreaterThan(0);
+    expect(result.profile.persona).toBeDefined();
+    expect(result.profile.benchLevel).toBeDefined();
+    expect(result.benchLabel).toBeDefined();
     expect(houseOfAng.getStats().total).toBe(before + 1);
   });
 
-  it('rejects duplicate spawn', () => {
-    expect(() => houseOfAng.spawn('TestAng', 'EXECUTION', 'Test', 'Test', [])).toThrow();
+  it('reuses roster entry when same Boomer_Ang is resolved again', () => {
+    // Forge same kind of task to resolve the same Boomer_Ang again
+    const before = houseOfAng.getStats().total;
+    const result = houseOfAng.forgeForTask(
+      'Build a new API endpoint with database schema migration',
+      'tech-office',
+      'Boomer_CTO',
+      'test-user',
+    );
+    // Should resolve to same registry entry (coder_ang), not create new roster entry
+    expect(result.profile.definition.id).toBeDefined();
+    expect(houseOfAng.getStats().total).toBe(before);
   });
 
   it('can assign Ang to PMO', () => {
-    const ang = houseOfAng.assignToPmo('testang', 'tech-office');
-    expect(ang.assignedPmo).toBe('tech-office');
+    const ang = houseOfAng.assignToPmo('Boomer_CTO', 'ops-office');
+    expect(ang.assignedPmo).toBe('ops-office');
+    // Reset
+    houseOfAng.assignToPmo('Boomer_CTO', 'tech-office');
   });
 
   it('can transition Ang status', () => {
-    const ang = houseOfAng.setStatus('testang', 'DEPLOYED');
-    expect(ang.status).toBe('DEPLOYED');
+    const ang = houseOfAng.setStatus('Boomer_CTO', 'STANDBY');
+    expect(ang.status).toBe('STANDBY');
+    // Reset
+    houseOfAng.setStatus('Boomer_CTO', 'DEPLOYED');
   });
 
   it('tracks spawn log', () => {
     const log = houseOfAng.getSpawnLog();
-    expect(log.length).toBeGreaterThanOrEqual(18); // 17 seed + 1 test spawn
+    expect(log.length).toBeGreaterThanOrEqual(12); // 12 supervisory seed
+  });
+
+  it('tracks forged profiles', () => {
+    const forged = houseOfAng.listForged();
+    expect(forged.length).toBeGreaterThan(0);
+    for (const p of forged) {
+      expect(p.definition.endpoint).toBeDefined();
+      expect(p.persona.codename).toBeDefined();
+    }
+  });
+
+  it('extended stats include forge counts', () => {
+    const stats = houseOfAng.getExtendedStats();
+    expect(stats.forged).toBeGreaterThan(0);
+    expect(stats.forgeLog).toBeGreaterThan(0);
   });
 });
-

@@ -11,7 +11,8 @@
 import { getIIAgentClient, IIAgentClient, IIAgentTask } from '../ii-agent/client';
 import { LUCEngine } from '../luc';
 import { v4 as uuidv4 } from 'uuid';
-import { createPipelinePacket, getN8nClient } from '../n8n';
+import { triggerN8nPmoWorkflow } from '../n8n';
+import type { N8nPipelineResponse } from '../n8n';
 
 // ── Types ────────────────────────────────────────────────────
 
@@ -88,6 +89,8 @@ export class AcheevyOrchestrator {
         return await this.handleOpenClaw(requestId, req);
       }
 
+      // PMO routing: routes task through chain-of-command pipeline
+      // User → ACHEEVY → Boomer_Ang → Chicken_Hawk → Squad → Lil_Hawks → Receipt → ACHEEVY → User
       if (routedTo === 'pmo-route' || routedTo.startsWith('pmo:')) {
         return await this.handlePmoRouting(requestId, req);
       }
@@ -296,48 +299,42 @@ export class AcheevyOrchestrator {
   }
 
   /**
-   * PMO routing: classifies intent, builds directive, executes via n8n pipeline
+   * PMO routing: chain-of-command pipeline via n8n
+   * User → ACHEEVY → Boomer_Ang → Chicken_Hawk → Squad → Lil_Hawks → Receipt → ACHEEVY → User
    */
   private async handlePmoRouting(
     requestId: string,
     req: AcheevyExecuteRequest
   ): Promise<AcheevyExecuteResponse> {
-    const packet = createPipelinePacket(req.userId, req.message);
-    const n8n = getN8nClient();
-
-    console.log(`[ACHEEVY] PMO routing → ${packet.classification.pmoOffice} (${packet.classification.director}), confidence: ${packet.classification.confidence.toFixed(2)}`);
-
     try {
-      const result = await n8n.executePipeline(packet);
+      const result: N8nPipelineResponse = await triggerN8nPmoWorkflow({
+        userId: req.userId,
+        message: req.message,
+        requestId,
+        context: req.context,
+      });
+
       return {
         requestId,
-        status: result.receipt?.allPassed ? 'completed' : 'queued',
-        reply: result.summary || `PMO directive routed to ${packet.classification.director}.`,
+        status: result.status === 'failed' ? 'error' : 'completed',
+        reply: result.summary,
         data: {
-          packetId: packet.packetId,
-          pmoOffice: packet.classification.pmoOffice,
-          director: packet.classification.director,
-          executionLane: packet.classification.executionLane,
-          complexity: packet.classification.complexity,
           receipt: result.receipt,
+          classification: result.classification,
+          metrics: result.metrics,
+          chainOfCommand: result.chainOfCommand,
         },
         lucUsage: {
           service: 'api_calls',
-          amount: packet.directive?.estimatedLucCost || 1,
+          amount: result.metrics.stepsCompleted + 1,
         },
-        taskId: packet.packetId,
       };
     } catch {
       return {
         requestId,
         status: 'queued',
-        reply: `Your request has been classified under ${packet.classification.pmoOffice} and assigned to ${packet.classification.director}. Processing will begin shortly.`,
-        data: {
-          packetId: packet.packetId,
-          pmoOffice: packet.classification.pmoOffice,
-          director: packet.classification.director,
-        },
-        taskId: `queued_${requestId}`,
+        reply: 'PMO routing request received. The chain-of-command pipeline will process it when the n8n workflow engine is available.',
+        taskId: `queued_pmo_${requestId}`,
       };
     }
   }
