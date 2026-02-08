@@ -8,7 +8,10 @@ import { NextRequest, NextResponse } from 'next/server';
  * Used by the Chat w/ACHEEVY UI to show pipeline routing in real-time.
  */
 
-type PmoId = 'tech-office' | 'finance-office' | 'ops-office' | 'marketing-office' | 'design-office' | 'publishing-office';
+type PmoId =
+  | 'tech-office' | 'finance-office' | 'ops-office'
+  | 'marketing-office' | 'design-office' | 'publishing-office'
+  | 'hr-office' | 'dtpmo-office';
 
 const PMO_KEYWORDS: Record<PmoId, string[]> = {
   'tech-office': [
@@ -42,6 +45,16 @@ const PMO_KEYWORDS: Record<PmoId, string[]> = {
     'newsletter', 'release', 'changelog', 'announcement', 'editorial',
     'copywriting', 'post', 'distribution',
   ],
+  'hr-office': [
+    'hire', 'onboard', 'role', 'assign', 'coach', 'training', 'progression',
+    'bench', 'team', 'workforce', 'performance review', 'gap', 'skill',
+    'mentor', 'rotation', 'evaluation', 'intern', 'promotion',
+  ],
+  'dtpmo-office': [
+    'governance', 'pattern', 'standard', 'verify', 'verification', 'audit',
+    'compliance', 'quality', 'gate', 'iso', 'risk', 'cost meter', 'workflow',
+    'priority', 'arbitration', 'template', 'blueprint', 'proof',
+  ],
 };
 
 const DIRECTOR_MAP: Record<PmoId, string> = {
@@ -51,6 +64,8 @@ const DIRECTOR_MAP: Record<PmoId, string> = {
   'marketing-office': 'Boomer_CMO',
   'design-office': 'Boomer_CDO',
   'publishing-office': 'Boomer_CPO',
+  'hr-office': 'Betty-Ann_Ang',
+  'dtpmo-office': 'Astra_Ang',
 };
 
 const OFFICE_LABELS: Record<PmoId, string> = {
@@ -60,6 +75,8 @@ const OFFICE_LABELS: Record<PmoId, string> = {
   'marketing-office': 'Marketing Office',
   'design-office': 'Design Office',
   'publishing-office': 'Publishing Office',
+  'hr-office': 'HR Office',
+  'dtpmo-office': 'DT-PMO Office',
 };
 
 const ACTION_VERBS = [
@@ -85,6 +102,8 @@ export async function POST(req: NextRequest) {
       'marketing-office': { score: 0, keywords: [] },
       'design-office': { score: 0, keywords: [] },
       'publishing-office': { score: 0, keywords: [] },
+      'hr-office': { score: 0, keywords: [] },
+      'dtpmo-office': { score: 0, keywords: [] },
     };
 
     for (const [office, keywords] of Object.entries(PMO_KEYWORDS)) {

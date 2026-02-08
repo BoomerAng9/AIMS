@@ -142,7 +142,7 @@ const SERVICES: ServiceStatus[] = [
 const INTEGRATIONS: Integration[] = [
   { id: 'claude', name: 'Claude Opus 4.5', provider: 'Anthropic', type: 'ai_model', status: 'active', apiKeySet: true, usageToday: 12500, costToday: 0.45 },
   { id: 'kimi', name: 'KIMI K2.5', provider: 'Moonshot', type: 'ai_model', status: 'active', apiKeySet: true, usageToday: 8200, costToday: 0.12 },
-  { id: 'deepseek', name: 'DeepSeek V3', provider: 'DeepSeek', type: 'ai_model', status: 'active', apiKeySet: true, usageToday: 5400, costToday: 0.08 },
+  { id: 'deepseek', name: 'DeepSeek V3.2', provider: 'DeepSeek', type: 'ai_model', status: 'active', apiKeySet: true, usageToday: 5400, costToday: 0.08 },
   { id: 'openrouter', name: 'OpenRouter', provider: 'OpenRouter', type: 'ai_model', status: 'active', apiKeySet: true },
   { id: 'brave', name: 'Brave Search', provider: 'Brave', type: 'search', status: 'active', apiKeySet: true, usageToday: 340 },
   { id: 'elevenlabs', name: 'ElevenLabs', provider: 'ElevenLabs', type: 'voice', status: 'inactive', apiKeySet: false },
@@ -152,8 +152,8 @@ const INTEGRATIONS: Integration[] = [
 const BOOMERANGS: BoomerAngConfig[] = [
   { id: 'engineer-ang', name: 'EngineerAng', role: 'Software Development', status: 'active', model: 'claude-opus-4.5', tasks: ['Code Generation', 'Refactoring', 'Bug Fixes'], permissions: ['read', 'write', 'execute'], sandboxed: true },
   { id: 'researcher-ang', name: 'ResearcherAng', role: 'Research & Analysis', status: 'active', model: 'kimi-k2.5', tasks: ['Web Search', 'Data Analysis', 'Summarization'], permissions: ['read', 'search'], sandboxed: true },
-  { id: 'marketer-ang', name: 'MarketerAng', role: 'Marketing & Content', status: 'standby', model: 'claude-sonnet-4', tasks: ['Content Generation', 'SEO', 'Social Media'], permissions: ['read', 'write'], sandboxed: true },
-  { id: 'seller-ang', name: 'SellerAng', role: 'E-commerce', status: 'active', model: 'deepseek-v3', tasks: ['Listing Optimization', 'Market Research', 'Pricing'], permissions: ['read', 'analyze'], sandboxed: true },
+  { id: 'marketer-ang', name: 'MarketerAng', role: 'Marketing & Content', status: 'standby', model: 'claude-sonnet-4.5', tasks: ['Content Generation', 'SEO', 'Social Media'], permissions: ['read', 'write'], sandboxed: true },
+  { id: 'seller-ang', name: 'SellerAng', role: 'E-commerce', status: 'active', model: 'deepseek-v3.2', tasks: ['Listing Optimization', 'Market Research', 'Pricing'], permissions: ['read', 'analyze'], sandboxed: true },
   { id: 'quality-ang', name: 'QualityAng', role: 'Quality Assurance', status: 'standby', model: 'claude-opus-4.5', tasks: ['ORACLE Verification', 'Testing', 'Code Review'], permissions: ['read', 'test'], sandboxed: true },
 ];
 

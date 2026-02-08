@@ -83,20 +83,36 @@ const AI_MODELS: AIModel[] = [
   },
   // Anthropic Claude Models (OpenRouter)
   {
+    id: 'anthropic/claude-opus-4.6',
+    name: 'Claude Opus 4.6',
+    friendlyName: 'Chief Strategist',
+    provider: 'Anthropic',
+    category: 'assistant',
+    description: 'Latest flagship — 1M context, advanced reasoning, tool orchestration',
+    useCase: 'Best for: Multi-agent orchestration, complex architecture, code-to-production',
+    capabilities: ['Reasoning', 'Analysis', 'Code', 'Vision', '1M Context', 'Agentic', 'Extended Thinking'],
+    pricing: 'pay-as-you-go',
+    status: 'stable',
+    contextWindow: '1M',
+    inputCost: '$5/M tokens',
+    outputCost: '$25/M tokens',
+    popular: true,
+  },
+  {
     id: 'anthropic/claude-opus-4.5',
     name: 'Claude Opus 4.5',
     friendlyName: 'Executive Assistant',
     provider: 'Anthropic',
     category: 'assistant',
-    description: 'Most capable model with 1M context beta, complex reasoning',
+    description: 'Premium reasoning with 200K context, complex analysis',
     useCase: 'Best for: Complex business decisions, strategic planning, detailed analysis',
-    capabilities: ['Reasoning', 'Analysis', 'Code', 'Vision', '1M Context', 'Agentic'],
+    capabilities: ['Reasoning', 'Analysis', 'Code', 'Vision', 'Agentic'],
     pricing: 'pay-as-you-go',
     status: 'stable',
-    contextWindow: '1M',
-    inputCost: '$15/M tokens',
-    outputCost: '$75/M tokens',
-    popular: true,
+    contextWindow: '200K',
+    inputCost: '$5/M tokens',
+    outputCost: '$25/M tokens',
+    popular: false,
   },
   {
     id: 'anthropic/claude-sonnet-4.5',
@@ -795,7 +811,7 @@ export default function ModelGardenPage() {
   const [activeTab, setActiveTab] = useState<'models' | 'tools' | 'consumption'>('models');
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
-  const [enabledModels, setEnabledModels] = useState<Set<string>>(new Set(['claude-opus-4', 'gpt-4o']));
+  const [enabledModels, setEnabledModels] = useState<Set<string>>(new Set(['claude-opus-4.6', 'claude-sonnet-4.5']));
   const [enabledTools, setEnabledTools] = useState<Set<string>>(new Set(['brave-search', 'elevenlabs']));
 
   const toggleModel = (id: string) => {

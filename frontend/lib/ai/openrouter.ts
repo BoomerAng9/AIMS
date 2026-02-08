@@ -27,31 +27,34 @@ const openrouter = createOpenAI({
 // ─────────────────────────────────────────────────────────────
 
 export const MODELS = {
-  // Claude Models
-  'claude-opus-4': 'anthropic/claude-opus-4',
-  'claude-sonnet-4': 'anthropic/claude-sonnet-4',
-  'claude-haiku': 'anthropic/claude-3.5-haiku',
+  // ── Claude (Anthropic) — 2025-2026 Lineup ──────────────────
+  'claude-opus-4.6': 'anthropic/claude-opus-4-6',
+  'claude-opus-4.5': 'anthropic/claude-opus-4-5-20250929',
+  'claude-sonnet-4.5': 'anthropic/claude-sonnet-4-5-20250929',
+  'claude-haiku-4.5': 'anthropic/claude-haiku-4-5-20251001',
 
-  // GPT Models
-  'gpt-4o': 'openai/gpt-4o',
-  'gpt-4-turbo': 'openai/gpt-4-turbo',
-  'gpt-4o-mini': 'openai/gpt-4o-mini',
+  // ── GPT (OpenAI) ──────────────────────────────────────────
+  'gpt-5.2': 'openai/gpt-5.2',
+  'gpt-5.1': 'openai/gpt-5.1',
+  'gpt-4.1': 'openai/gpt-4.1',
+  'gpt-4.1-mini': 'openai/gpt-4.1-mini',
 
-  // Gemini Models
-  'gemini-2-flash': 'google/gemini-2.0-flash-thinking-exp',
-  'gemini-pro': 'google/gemini-pro-1.5',
+  // ── Gemini (Google) ────────────────────────────────────────
+  'gemini-3-pro': 'google/gemini-3-pro-preview',
+  'gemini-2.5-flash': 'google/gemini-2.5-flash-preview',
+  'gemini-2.5-pro': 'google/gemini-2.5-pro-preview',
 
-  // Kimi (Moonshot)
-  'kimi-k2': 'moonshot/moonshot-v1-128k',
+  // ── Kimi (Moonshot) ────────────────────────────────────────
+  'kimi-k2.5': 'moonshot/kimi-k2.5',
 
-  // Open Source
-  'llama-3.1-70b': 'meta-llama/llama-3.1-70b-instruct',
-  'mixtral-8x7b': 'mistralai/mixtral-8x7b-instruct',
-  'deepseek-v3': 'deepseek/deepseek-chat',
+  // ── Open Source ────────────────────────────────────────────
+  'llama-4-maverick': 'meta-llama/llama-4-maverick',
+  'deepseek-v3.2': 'deepseek/deepseek-v3.2',
+  'deepseek-r1': 'deepseek/deepseek-r1',
 
-  // Specialized
+  // ── Specialized ────────────────────────────────────────────
   'codestral': 'mistralai/codestral-latest',
-  'perplexity-online': 'perplexity/llama-3.1-sonar-huge-128k-online',
+  'perplexity-online': 'perplexity/sonar-pro',
 } as const;
 
 export type ModelId = keyof typeof MODELS;
@@ -62,25 +65,28 @@ export type ModelId = keyof typeof MODELS;
 
 export const MODEL_FOR_USE_CASE = {
   // Default conversational
-  default: MODELS['claude-opus-4'],
+  default: MODELS['claude-sonnet-4.5'],
 
   // Fast responses
-  fast: MODELS['gemini-2-flash'],
+  fast: MODELS['gemini-2.5-flash'],
 
   // Vision / Image Analysis
-  vision: MODELS['claude-opus-4'],
+  vision: MODELS['claude-opus-4.6'],
 
   // Code generation
-  code: MODELS['claude-opus-4'],
+  code: MODELS['claude-opus-4.6'],
 
   // Research / Search
   research: MODELS['perplexity-online'],
 
-  // Long context
-  longContext: MODELS['kimi-k2'],
+  // Long context (1M+ tokens)
+  longContext: MODELS['gemini-2.5-pro'],
 
   // Cost-effective
-  budget: MODELS['gpt-4o-mini'],
+  budget: MODELS['claude-haiku-4.5'],
+
+  // Premium reasoning
+  premium: MODELS['claude-opus-4.6'],
 } as const;
 
 // ─────────────────────────────────────────────────────────────
@@ -100,7 +106,7 @@ export interface StreamChatOptions {
 
 export async function streamChat(options: StreamChatOptions) {
   const {
-    model = 'claude-opus-4',
+    model = 'claude-sonnet-4.5',
     messages,
     systemPrompt,
     temperature = 0.7,
@@ -137,7 +143,7 @@ export interface GenerateOptions {
 
 export async function generate(options: GenerateOptions) {
   const {
-    model = 'claude-opus-4',
+    model = 'claude-sonnet-4.5',
     prompt,
     systemPrompt,
     temperature = 0.7,
@@ -165,7 +171,7 @@ export async function generateStructured<T>(
   options: GenerateOptions & { schema: z.ZodSchema<T> }
 ): Promise<T> {
   const {
-    model = 'claude-opus-4',
+    model = 'claude-sonnet-4.5',
     prompt,
     systemPrompt,
     schema,
@@ -200,7 +206,7 @@ export interface VisionOptions {
 
 export async function analyzeImage(options: VisionOptions) {
   const {
-    model = 'claude-opus-4',
+    model = 'claude-sonnet-4.5',
     images,
     prompt,
     systemPrompt,
@@ -250,13 +256,22 @@ export function estimateTokens(text: string): number {
 // ─────────────────────────────────────────────────────────────
 
 const MODEL_COSTS: Record<string, { input: number; output: number }> = {
-  'anthropic/claude-opus-4': { input: 0.015, output: 0.075 },
-  'anthropic/claude-sonnet-4': { input: 0.003, output: 0.015 },
-  'anthropic/claude-3.5-haiku': { input: 0.0008, output: 0.004 },
-  'openai/gpt-4o': { input: 0.005, output: 0.015 },
-  'openai/gpt-4o-mini': { input: 0.00015, output: 0.0006 },
-  'google/gemini-2.0-flash-thinking-exp': { input: 0.0, output: 0.0 }, // Free during preview
-  'google/gemini-pro-1.5': { input: 0.00125, output: 0.005 },
+  // Claude 4.5/4.6 family (per 1K tokens)
+  'anthropic/claude-opus-4-6': { input: 0.005, output: 0.025 },
+  'anthropic/claude-opus-4-5-20250929': { input: 0.005, output: 0.025 },
+  'anthropic/claude-sonnet-4-5-20250929': { input: 0.003, output: 0.015 },
+  'anthropic/claude-haiku-4-5-20251001': { input: 0.0008, output: 0.004 },
+  // GPT-5.x family
+  'openai/gpt-5.2': { input: 0.005, output: 0.020 },
+  'openai/gpt-5.1': { input: 0.003, output: 0.012 },
+  'openai/gpt-4.1': { input: 0.002, output: 0.008 },
+  'openai/gpt-4.1-mini': { input: 0.0004, output: 0.0016 },
+  // Gemini
+  'google/gemini-3-pro-preview': { input: 0.00125, output: 0.010 },
+  'google/gemini-2.5-flash-preview': { input: 0.0003, output: 0.0025 },
+  'google/gemini-2.5-pro-preview': { input: 0.00125, output: 0.010 },
+  // Economy
+  'deepseek/deepseek-v3.2': { input: 0.0003, output: 0.00088 },
 };
 
 export function estimateCost(
