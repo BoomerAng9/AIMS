@@ -99,6 +99,7 @@ services:
       - LOG_LEVEL=${LOG_LEVEL:-info}
       - OPENCLAW_URL=http://agent-bridge:3010
       - REDIS_URL=redis://:${REDIS_PASSWORD:-aims_redis_secret}@redis:6379
+      - N8N_URL=http://n8n:5678
       - DEBUG=false
     volumes:
       - gateway-data:/app/data
@@ -305,6 +306,7 @@ services:
     restart: unless-stopped
     user: "1000:1000"
     networks:
+      - aims-network
       - sandbox-network
     deploy:
       resources:
