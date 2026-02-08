@@ -215,6 +215,25 @@ const REGISTRY_PERSONAS: RegistryPersonaBinding[] = [
       avatar: 'shield',
     },
   },
+
+  // --- n8n_exec_ang ---
+  {
+    boomerAngId: 'n8n_exec_ang',
+    persona: {
+      displayName: 'N8N_Exec_Ang',
+      codename: 'n8n-exec',
+      traits: ['strategic', 'meticulous', 'disciplined'],
+      communicationStyle: 'technical',
+      backstory: {
+        origin: 'Forged when the first PMO routing workflow ran 500 executions without a single schema violation. N8N_Exec_Ang is the spirit of autonomous workflow crafting.',
+        motivation: 'A workflow is a contract. Every node has a name, every path has a fallback, every run leaves a trace. Autonomy earned through rigor.',
+        quirk: 'Names every n8n node with a verb-first convention. Will reject any workflow where a node is called "Node1" or "HTTP Request".',
+        catchphrase: 'If it cannot run twice safely, it cannot run once.',
+        mentoredBy: 'Boomer_COO',
+      },
+      avatar: 'workflow',
+    },
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -228,7 +247,7 @@ const REGISTRY_PERSONAS: RegistryPersonaBinding[] = [
 export const PMO_ANG_ROSTER: Record<string, string[]> = {
   'tech-office':       ['coder_ang', 'sitebuilder_ang', 'automation_ang'],
   'finance-office':    ['data_ang'],
-  'ops-office':        ['orchestrator_ang', 'automation_ang'],
+  'ops-office':        ['orchestrator_ang', 'automation_ang', 'n8n_exec_ang'],
   'marketing-office':  ['marketer_ang', 'researcher_ang'],
   'design-office':     ['vision_ang'],
   'publishing-office': ['voice_ang', 'marketer_ang'],

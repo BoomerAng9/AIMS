@@ -185,6 +185,29 @@
       "endpoint": "http://quality-ang:8104/execute",
       "health_check": "http://quality-ang:8104/health",
       "status": "registered"
+    },
+    {
+      "id": "n8n_exec_ang",
+      "name": "N8N_Exec_Ang",
+      "source_repo": "aims/n8n-schema-forge",
+      "description": "ACHEEVY Executive Assistant for n8n JSON workflow crafting, schema enforcement, and elastic surge coordination",
+      "capabilities": [
+        "n8n_workflow_json",
+        "schema_validation",
+        "workflow_blueprint",
+        "idempotency_enforcement",
+        "credential_scoping",
+        "surge_coordination",
+        "workflow_creation",
+        "webhook_triggers"
+      ],
+      "required_quotas": {
+        "n8n_executions": 5,
+        "api_calls": 30
+      },
+      "endpoint": "http://n8n-exec-ang:8200/execute",
+      "health_check": "http://n8n-exec-ang:8200/health",
+      "status": "registered"
     }
   ],
   "capability_index": {
@@ -200,8 +223,8 @@
     "image_analysis": ["vision_ang"],
     "ocr_extraction": ["vision_ang"],
     "scene_detection": ["vision_ang"],
-    "workflow_creation": ["automation_ang"],
-    "webhook_triggers": ["automation_ang"],
+    "workflow_creation": ["automation_ang", "n8n_exec_ang"],
+    "webhook_triggers": ["automation_ang", "n8n_exec_ang"],
     "scheduled_tasks": ["automation_ang"],
     "api_integration": ["automation_ang"],
     "page_creation": ["sitebuilder_ang"],
@@ -227,8 +250,14 @@
     "gate_verification": ["quality_ang"],
     "security_audit": ["quality_ang"],
     "code_review": ["quality_ang", "coder_ang"],
-    "compliance_check": ["quality_ang"]
+    "compliance_check": ["quality_ang"],
+    "n8n_workflow_json": ["n8n_exec_ang"],
+    "schema_validation": ["n8n_exec_ang"],
+    "workflow_blueprint": ["n8n_exec_ang"],
+    "idempotency_enforcement": ["n8n_exec_ang"],
+    "credential_scoping": ["n8n_exec_ang"],
+    "surge_coordination": ["n8n_exec_ang"]
   },
-  "version": "1.0.0",
-  "last_updated": "2026-02-05T00:00:00Z"
+  "version": "1.1.0",
+  "last_updated": "2026-02-08T00:00:00Z"
 }
