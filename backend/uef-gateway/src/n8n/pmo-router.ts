@@ -91,6 +91,24 @@ const PMO_KEYWORDS: Record<PmoId, PmoKeywordConfig> = {
       'newsletter', 'distribution', 'audience', 'engagement', 'community',
     ],
   },
+  'hr-office': {
+    director: 'Betty-Ann_Ang',
+    agent: 'Betty-Ann_Ang',
+    keywords: [
+      'training', 'coaching', 'progression', 'performance', 'role card', 'onboarding',
+      'standards', 'conduct', 'bench level', 'evaluation', 'remediation', 'hr',
+      'competency', 'retraining', 'team health',
+    ],
+  },
+  'dtpmo-office': {
+    director: 'Astra_Ang',
+    agent: 'Astra_Ang',
+    keywords: [
+      'governance', 'compliance', 'audit', 'risk', 'kyb', 'pattern', 'architecture',
+      'reliability', 'uptime', 'cost efficiency', 'quality gate', 'verification',
+      'dt-pmo', 'digital transformation', 'automation office',
+    ],
+  },
 };
 
 // ---------------------------------------------------------------------------
@@ -231,6 +249,45 @@ function planPublishingSteps(message: string): StepPlan {
   return { steps, crewSpecialties: ['load-ops', 'dispatch-ops'] };
 }
 
+function planHrSteps(message: string): StepPlan {
+  const steps: string[] = [];
+  if (message.includes('training') || message.includes('coaching')) {
+    steps.push('Identify skill gaps', 'Design training plan', 'Schedule coaching sessions');
+  }
+  if (message.includes('performance') || message.includes('evaluation')) {
+    steps.push('Gather performance metrics', 'Run scoring rubric', 'Package evaluation report');
+  }
+  if (message.includes('onboarding') || message.includes('progression')) {
+    steps.push('Prepare role card', 'Set progression milestones', 'Assign mentor');
+  }
+  if (steps.length === 0) {
+    steps.push('Assess HR request', 'Route to appropriate HR specialist', 'Execute HR workflow');
+  }
+  steps.push('Run HR compliance gates');
+  return { steps, crewSpecialties: ['load-ops', 'dispatch-ops'] };
+}
+
+function planDtpmoSteps(message: string): StepPlan {
+  const steps: string[] = [];
+  if (message.includes('governance') || message.includes('compliance')) {
+    steps.push('Review governance requirements', 'Validate compliance status', 'Document findings');
+  }
+  if (message.includes('architecture') || message.includes('pattern')) {
+    steps.push('Review architecture proposal', 'Check pattern compliance', 'Approve or recommend changes');
+  }
+  if (message.includes('cost') || message.includes('efficiency')) {
+    steps.push('Analyze cost metrics', 'Identify optimization opportunities', 'Deliver efficiency report');
+  }
+  if (message.includes('automation') || message.includes('workflow')) {
+    steps.push('Evaluate workflow requirements', 'Route to Automation Systems Office', 'Monitor execution');
+  }
+  if (steps.length === 0) {
+    steps.push('Assess DT-PMO request', 'Route to appropriate office lead', 'Execute governance workflow');
+  }
+  steps.push('Run DT-PMO verification gates');
+  return { steps, crewSpecialties: ['load-ops', 'dispatch-ops'] };
+}
+
 const STEP_PLANNERS: Record<PmoId, (message: string) => StepPlan> = {
   'tech-office': planTechSteps,
   'finance-office': planFinanceSteps,
@@ -238,6 +295,8 @@ const STEP_PLANNERS: Record<PmoId, (message: string) => StepPlan> = {
   'marketing-office': planMarketingSteps,
   'design-office': planDesignSteps,
   'publishing-office': planPublishingSteps,
+  'hr-office': planHrSteps,
+  'dtpmo-office': planDtpmoSteps,
 };
 
 // ---------------------------------------------------------------------------

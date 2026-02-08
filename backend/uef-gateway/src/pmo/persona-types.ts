@@ -323,3 +323,288 @@ export interface AngForgeResult {
   benchLabel: string;
   summary: string;
 }
+
+// ---------------------------------------------------------------------------
+// ISO-Aligned Gate Set
+//
+// Referenced in every Role Card's gates_required field.
+// Internal labels: QMS-1, ISMS-1, RISK-1, ITSM-1
+// ---------------------------------------------------------------------------
+
+export type IsoGateId = 'QMS-1' | 'ISMS-1' | 'RISK-1' | 'ITSM-1';
+
+export interface IsoGate {
+  id: IsoGateId;
+  isoStandard: string;
+  name: string;
+  description: string;
+}
+
+export const ISO_GATES: Record<IsoGateId, IsoGate> = {
+  'QMS-1': {
+    id: 'QMS-1',
+    isoStandard: 'ISO 9001',
+    name: 'ISO-QMS Gate',
+    description: 'Output meets defined requirements; revision loop is controlled; defects tracked.',
+  },
+  'ISMS-1': {
+    id: 'ISMS-1',
+    isoStandard: 'ISO/IEC 27001',
+    name: 'ISO-ISMS Gate',
+    description: 'Data handling, access, and logging follow least-privilege and confidentiality.',
+  },
+  'RISK-1': {
+    id: 'RISK-1',
+    isoStandard: 'ISO 31000',
+    name: 'ISO-Risk Gate',
+    description: 'Risks identified; mitigations documented when risk > low.',
+  },
+  'ITSM-1': {
+    id: 'ITSM-1',
+    isoStandard: 'ISO/IEC 20000-1',
+    name: 'ISO-ITSM Gate',
+    description: 'Change control for production workflows; incident-ready runbooks for critical automations.',
+  },
+};
+
+// ---------------------------------------------------------------------------
+// Standardized Boomer_Ang Role Card Schema (v1.0)
+//
+// Single source of truth structure for every Boomer_Ang.
+// ---------------------------------------------------------------------------
+
+export type StatusVocab = 'Queued' | 'Working' | 'Blocked' | 'Waiting' | 'Complete';
+
+export interface RoleCardIdentity {
+  displayName: string;
+  kunya: string;
+  systemHandle: string;
+  benchLevel: BenchLevel;
+  pmoOffice: string;
+  reportsTo: string;
+  dottedLineReports?: string[];
+  rotationCycle?: string;
+}
+
+export interface RoleCardMission {
+  missionStatement: string;
+  primaryOutcomes: [string, string, string];
+  scopeBoundary: string;
+}
+
+export interface RoleCardAuthority {
+  allowedActions: string[];
+  disallowedActions: string[];
+  gatesRequired: IsoGateId[];
+  escalationTriggers: string[];
+}
+
+export interface RoleCardDelivery {
+  definitionOfDone: string;
+  qualityChecks: string[];
+  costDisciplineRules: string[];
+  securityAndPrivacyRules: string[];
+}
+
+export interface RoleCardCommunication {
+  communicationStyle: string;
+  sidebarNuggets: string[];
+  statusVocab: StatusVocab[];
+}
+
+export interface RoleCardPerformance {
+  kpis: string[];
+  benchMinimums: Record<string, number>;
+}
+
+export interface RoleCard {
+  identity: RoleCardIdentity;
+  mission: RoleCardMission;
+  authority: RoleCardAuthority;
+  delivery: RoleCardDelivery;
+  communication: RoleCardCommunication;
+  performance: RoleCardPerformance;
+}
+
+// ---------------------------------------------------------------------------
+// Bench-Level Scoring Rubric (v1.0)
+//
+// 8 categories with weights. Scale 1-5 per category.
+// Minimum passing profiles per bench level.
+// ---------------------------------------------------------------------------
+
+export type ScoringCategory =
+  | 'accuracy'
+  | 'standards_conformance'
+  | 'verification_discipline'
+  | 'cost_discipline'
+  | 'risk_data_handling'
+  | 'communication'
+  | 'iteration_efficiency'
+  | 'overlay_dialogue';
+
+export interface ScoringCategoryConfig {
+  id: ScoringCategory;
+  name: string;
+  weight: number; // 0-1, all weights sum to 1.0
+  description: string;
+}
+
+export const SCORING_CATEGORIES: ScoringCategoryConfig[] = [
+  { id: 'accuracy', name: 'Accuracy & Requirement Fit', weight: 0.25, description: 'Output matches requirements and intent' },
+  { id: 'standards_conformance', name: 'Standards Conformance (QMS)', weight: 0.15, description: 'Adherence to quality management standards' },
+  { id: 'verification_discipline', name: 'Verification Discipline', weight: 0.10, description: 'Rigor in verifying outputs before delivery' },
+  { id: 'cost_discipline', name: 'Cost Discipline', weight: 0.10, description: 'Minimizing waste, efficient resource usage' },
+  { id: 'risk_data_handling', name: 'Risk & Data Handling (ISMS/RISK)', weight: 0.15, description: 'Proper handling of risk identification and data security' },
+  { id: 'communication', name: 'Clarity of Communication', weight: 0.10, description: 'Clear, structured, professional communication' },
+  { id: 'iteration_efficiency', name: 'Iteration Efficiency', weight: 0.10, description: 'Speed and quality of revision cycles' },
+  { id: 'overlay_dialogue', name: 'Professional Overlay Dialogue', weight: 0.05, description: 'Overlay-safe, trust-building user-facing snippets' },
+];
+
+export type ScoreValue = 1 | 2 | 3 | 4 | 5;
+
+export interface BenchScoringProfile {
+  bench: BenchLevel;
+  minimums: Record<ScoringCategory, ScoreValue>;
+  failConditions: string[];
+  expertOnlyCategories?: { name: string; description: string }[];
+}
+
+export const BENCH_SCORING_PROFILES: BenchScoringProfile[] = [
+  {
+    bench: 'INTERN',
+    minimums: {
+      accuracy: 3,
+      standards_conformance: 3,
+      verification_discipline: 2,
+      cost_discipline: 2,
+      risk_data_handling: 3,
+      communication: 3,
+      iteration_efficiency: 3,
+      overlay_dialogue: 3,
+    },
+    failConditions: [
+      'Fabricated facts presented as certain',
+      'Repeated template nonconformance after feedback',
+      'Unsafe or unprofessional overlay lines',
+    ],
+  },
+  {
+    bench: 'INTERMEDIATE',
+    minimums: {
+      accuracy: 4,
+      standards_conformance: 4,
+      verification_discipline: 3,
+      cost_discipline: 3,
+      risk_data_handling: 4,
+      communication: 4,
+      iteration_efficiency: 3,
+      overlay_dialogue: 4,
+    },
+    failConditions: [
+      'Incomplete task packets (missing constraints/acceptance criteria)',
+      'Unsafe integration assumptions',
+      'Rework rate consistently > 20%',
+    ],
+  },
+  {
+    bench: 'EXPERT',
+    minimums: {
+      accuracy: 4,
+      standards_conformance: 5,
+      verification_discipline: 4,
+      cost_discipline: 4,
+      risk_data_handling: 5,
+      communication: 5,
+      iteration_efficiency: 4,
+      overlay_dialogue: 5,
+    },
+    failConditions: [
+      'Approving unverified high-risk work',
+      'Bypassing gates',
+      'Repeatedly unclear decision rationale',
+    ],
+    expertOnlyCategories: [
+      { name: 'Mentorship Impact', description: 'Lifts intermediate performance measurably' },
+      { name: 'Decision Traceability', description: 'Every major decision has rationale + gate mapping' },
+    ],
+  },
+];
+
+// ---------------------------------------------------------------------------
+// Overlay-Safe Snippets Policy (v1.0)
+// ---------------------------------------------------------------------------
+
+export interface SnippetPolicy {
+  minLength: number;
+  maxLength: number;
+  toneRules: string[];
+  prohibitions: string[];
+  frequencyByComplexity: Record<'quick' | 'medium' | 'large', { min: number; max: number; note: string }>;
+  personalizationRules: { allowed: string[]; forbidden: string[] };
+}
+
+export const SNIPPET_POLICY: SnippetPolicy = {
+  minLength: 8,
+  maxLength: 18,
+  toneRules: [
+    'Professional, calm, confident',
+    'Never jokey or flippant',
+    'Process-aware, value-oriented, user-safe',
+    'No slang, no memes, no roleplay',
+  ],
+  prohibitions: [
+    'Sarcasm, jokes at failure, edgy humor',
+    'References to internal scores, mistakes, or reprimands',
+    'Sensitive data or speculation',
+  ],
+  frequencyByComplexity: {
+    quick: { min: 0, max: 1, note: 'Complexity 0-20: 0-1 snippet max' },
+    medium: { min: 1, max: 3, note: 'Complexity 21-60: 1-3 snippets total' },
+    large: { min: 0, max: 1, note: 'Complexity 61-100: periodic, capped at 1 per phase' },
+  },
+  personalizationRules: {
+    allowed: ['User first name', 'Objective (1 line)'],
+    forbidden: [
+      'Repeat user name excessively',
+      'Reveal internal deliberation or uncertainty',
+      'Ask questions (only ACHEEVY asks users)',
+    ],
+  },
+};
+
+// ---------------------------------------------------------------------------
+// House of Ang Roster Layout Types (v1.0)
+// ---------------------------------------------------------------------------
+
+export interface UserFacingCard {
+  displayName: string;
+  kunya: string;
+  pmoOffice: string;
+  benchLevel: BenchLevel;
+  statusChip: StatusVocab;
+  missionOneLiner: string;
+  currentTaskLabel: string;
+  strengthTags: [string, string, string];
+  sidebarNuggets: string[];
+  communicationStyle: string;
+  standardsBadges: IsoGateId[];
+  experienceBand: string;
+}
+
+export interface InternalAngView {
+  systemHandle: string;
+  reportsTo: string;
+  dottedLineReports: string[];
+  rotationCycle: string | null;
+  allowedActions: string[];
+  disallowedActions: string[];
+  gatesRequired: IsoGateId[];
+  kpiDashboard: { period: string; metrics: Record<string, number> }[];
+  benchScores: Record<ScoringCategory, ScoreValue>;
+  coachingNotes: string[];
+  trainingStatus: string;
+  costDisciplineAdherence: number;
+  incidentAssociations: string[];
+  remediationActions: string[];
+}

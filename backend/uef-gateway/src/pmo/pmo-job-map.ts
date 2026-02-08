@@ -162,6 +162,62 @@ const PUBLISHING_OFFICE_JOBS: BenchJobList = {
 };
 
 // ---------------------------------------------------------------------------
+// PMO 7 — hr-office (HR PMO — People, Standards, and Progression)
+// ---------------------------------------------------------------------------
+
+const HR_OFFICE_JOBS: BenchJobList = {
+  intern: [
+    'Onboarding documentation assembly and formatting',
+    'Training material packaging from templates',
+    'Performance checklist formatting and distribution',
+  ],
+  intermediate: [
+    'Role card maintenance and training plan management',
+    'Performance checklist execution and coaching reminders',
+    'Team update packaging for Expert review',
+    'Standards reinforcement monitoring',
+  ],
+  expert: [
+    'Role assignment and progression approval',
+    'Behavior standards enforcement for overlay dialogue',
+    'Coaching, retraining, and performance hold decisions',
+    'Remediation requirements when gates fail repeatedly',
+    'Cross-team standards alignment and conduct oversight',
+  ],
+};
+
+// ---------------------------------------------------------------------------
+// PMO 8 — dtpmo-office (Digital Transformation PMO)
+// ---------------------------------------------------------------------------
+
+const DTPMO_OFFICE_JOBS: BenchJobList = {
+  intern: [
+    'Workflow documentation assembly and formatting',
+    'Naming convention validation across nodes',
+    'Test payload set generation and documentation',
+    'QA checklist execution and formatting consistency checks',
+  ],
+  intermediate: [
+    'Workflow building from established pattern packs',
+    'Integration wiring and routing logic assembly',
+    'Fallback branch and error handling creation',
+    'Service connection and data transform validation',
+    'Manager-ready summary production for approval',
+  ],
+  expert: [
+    'Execution priority setting and office boundary management',
+    'Governance update approval affecting multiple PMOs',
+    'Cost, speed, and quality conflict arbitration',
+    'Uptime and reliability target definition',
+    'Build pattern enforcement and architecture consistency',
+    'Governance compliance and audit trail maintenance',
+    'Cost visibility and waste elimination',
+    'Output verification and quality standard enforcement',
+    'Autonomous n8n workflow JSON crafting and surge coordination',
+  ],
+};
+
+// ---------------------------------------------------------------------------
 // Complete PMO Job Map
 // ---------------------------------------------------------------------------
 
@@ -172,6 +228,8 @@ export const PMO_JOB_MAP: PmoJobMapping[] = [
   { pmoOffice: 'marketing-office', officeName: 'Marketing, Brand & Growth PMO', jobs: MARKETING_OFFICE_JOBS },
   { pmoOffice: 'design-office', officeName: 'Creative & Visual PMO', jobs: DESIGN_OFFICE_JOBS },
   { pmoOffice: 'publishing-office', officeName: 'Publishing & Customer Success PMO', jobs: PUBLISHING_OFFICE_JOBS },
+  { pmoOffice: 'hr-office', officeName: 'HR PMO — People, Standards, and Progression', jobs: HR_OFFICE_JOBS },
+  { pmoOffice: 'dtpmo-office', officeName: 'Digital Transformation PMO', jobs: DTPMO_OFFICE_JOBS },
 ];
 
 // ---------------------------------------------------------------------------

@@ -1,19 +1,21 @@
 /**
  * n8n Schema Pool — Elastic Boomer_Ang Team for Workflow JSON Crafting
  *
- * Led by N8N_Exec_Ang (Expert), this pool produces autonomous, verifiable
- * n8n workflow JSON under the DT-PMO Automation Systems Office.
+ * Led by Juno_Ang (Expert, "Workflow Scribe"), this pool produces autonomous,
+ * verifiable n8n workflow JSON under the DT-PMO Automation Systems Office.
  *
  * Always-On Core:
- *   1 Expert:       N8N_Exec_Ang (owner, approver, safety gating)
- *   2 Intermediate: N8N_Builder_Ang_1, N8N_Builder_Ang_2 (workflow builders)
- *   2 Intern:       N8N_Packager_Ang_1, N8N_Packager_Ang_2 (docs, tests, variants)
+ *   1 Expert:       Juno_Ang    (n8n-juno)  — owner, approver, safety gating
+ *   2 Intermediate: Rio_Ang     (n8n-rio)   — workflow builder
+ *                   Koda_Ang    (n8n-koda)  — integration joiner
+ *   2 Intern:       Lumen_Ang   (n8n-lumen) — packaging, docs, naming
+ *                   Nova_Ang    (n8n-nova)  — QA checklists, formatting
  *
  * Surge Expansion (activated during elevated calls):
  *   +2 Intermediate (builders / integrators)
  *   +4 Intern (packaging / documentation / variants / testing scripts)
  *
- * Placement: ops-office (DT-PMO → Automation Systems Office)
+ * Placement: dtpmo-office (DT-PMO → Automation Systems Office)
  *
  * "If it cannot run twice safely, it cannot run once."
  */
@@ -86,7 +88,7 @@ export const SHIP_READY_CRITERIA = [
   'Credentials are scoped minimally (least privilege)',
   'Minimal audit fields are emitted per run',
   'Test payloads + expected outputs are provided',
-  'N8N_Exec_Ang approves the final artifact',
+  'Juno_Ang approves the final artifact',
 ] as const;
 
 // ---------------------------------------------------------------------------
@@ -127,42 +129,42 @@ export const SURGE_POLICY: SurgePolicy = {
 function coreMembers(): PoolMember[] {
   return [
     {
-      id: 'n8n_exec_ang',
-      name: 'N8N_Exec_Ang',
+      id: 'n8n-juno',
+      name: 'Juno_Ang',
       bench: 'EXPERT',
-      role: 'Pool lead: triage, pattern selection, approvals, safety gating',
+      role: 'Pool lead (Workflow Scribe): triage, pattern selection, approvals, safety gating',
       isCore: true,
       status: 'active',
     },
     {
-      id: 'n8n_builder_ang_1',
-      name: 'N8N_Builder_Ang_1',
+      id: 'n8n-rio',
+      name: 'Rio_Ang',
       bench: 'INTERMEDIATE',
-      role: 'Build complete workflows from established patterns, wire integrations, create fallback branches',
+      role: 'The Builder: build workflows from established packs, wire integrations, maintain clean failure paths',
       isCore: true,
       status: 'active',
     },
     {
-      id: 'n8n_builder_ang_2',
-      name: 'N8N_Builder_Ang_2',
+      id: 'n8n-koda',
+      name: 'Koda_Ang',
       bench: 'INTERMEDIATE',
-      role: 'Build complete workflows from established patterns, produce manager-ready summaries',
+      role: 'The Joiner: connect services and data transforms, keep contracts stable',
       isCore: true,
       status: 'active',
     },
     {
-      id: 'n8n_packager_ang_1',
-      name: 'N8N_Packager_Ang_1',
+      id: 'n8n-lumen',
+      name: 'Lumen_Ang',
       bench: 'INTERN',
-      role: 'Assemble workflow packs from templates, validate naming/format rules',
+      role: 'Polish: package workflows, documentation, naming checks, test payload sets, variant builds',
       isCore: true,
       status: 'active',
     },
     {
-      id: 'n8n_packager_ang_2',
-      name: 'N8N_Packager_Ang_2',
+      id: 'n8n-nova',
+      name: 'Nova_Ang',
       bench: 'INTERN',
-      role: 'Produce documentation blocks, quick-start notes, test payload sets',
+      role: 'Checklist: run QA checklists, verify formatting consistency before review',
       isCore: true,
       status: 'active',
     },
@@ -175,51 +177,51 @@ function coreMembers(): PoolMember[] {
 
 function surgeMembers(): PoolMember[] {
   return [
-    // +2 Intermediate
+    // +2 Intermediate (surge builders)
     {
-      id: 'n8n_builder_ang_3',
-      name: 'N8N_Builder_Ang_3',
+      id: 'n8n-surge-builder-1',
+      name: 'Surge_Builder_1',
       bench: 'INTERMEDIATE',
       role: 'Surge builder: parallel workflow construction, error handling branches',
       isCore: false,
       status: 'standby',
     },
     {
-      id: 'n8n_builder_ang_4',
-      name: 'N8N_Builder_Ang_4',
+      id: 'n8n-surge-builder-2',
+      name: 'Surge_Builder_2',
       bench: 'INTERMEDIATE',
       role: 'Surge builder: integration wiring, routing logic assembly',
       isCore: false,
       status: 'standby',
     },
-    // +4 Intern
+    // +4 Intern (surge packagers)
     {
-      id: 'n8n_packager_ang_3',
-      name: 'N8N_Packager_Ang_3',
+      id: 'n8n-surge-packager-1',
+      name: 'Surge_Packager_1',
       bench: 'INTERN',
       role: 'Surge packager: documentation assembly',
       isCore: false,
       status: 'standby',
     },
     {
-      id: 'n8n_packager_ang_4',
-      name: 'N8N_Packager_Ang_4',
+      id: 'n8n-surge-packager-2',
+      name: 'Surge_Packager_2',
       bench: 'INTERN',
       role: 'Surge packager: variant generation',
       isCore: false,
       status: 'standby',
     },
     {
-      id: 'n8n_packager_ang_5',
-      name: 'N8N_Packager_Ang_5',
+      id: 'n8n-surge-packager-3',
+      name: 'Surge_Packager_3',
       bench: 'INTERN',
       role: 'Surge packager: test script generation',
       isCore: false,
       status: 'standby',
     },
     {
-      id: 'n8n_packager_ang_6',
-      name: 'N8N_Packager_Ang_6',
+      id: 'n8n-surge-packager-4',
+      name: 'Surge_Packager_4',
       bench: 'INTERN',
       role: 'Surge packager: consistency checks and naming validation',
       isCore: false,
@@ -375,17 +377,17 @@ export class N8nSchemaPool {
   getOperatingModel(): string {
     if (this.mode === 'NORMAL') {
       return [
-        '1. N8N_Exec_Ang defines workflow approach + selects pattern pack',
-        '2. Intermediate builds the workflow JSON draft',
-        '3. Intern packages documentation + test payloads',
-        '4. N8N_Exec_Ang final reviews and approves',
+        '1. Juno_Ang defines workflow approach + selects pattern pack',
+        '2. Rio_Ang / Koda_Ang build the workflow JSON draft',
+        '3. Lumen_Ang / Nova_Ang package documentation + test payloads',
+        '4. Juno_Ang final reviews and approves',
       ].join('\n');
     }
     return [
       'HIGH LOAD MODE:',
-      '• N8N_Exec_Ang shifts to: triage, pattern selection, approvals, safety gating',
-      '• Intermediates execute builds in parallel',
-      '• Interns handle packaging and consistency checks',
+      '• Juno_Ang shifts to: triage, pattern selection, approvals, safety gating',
+      '• Rio_Ang, Koda_Ang + surge builders execute builds in parallel',
+      '• Lumen_Ang, Nova_Ang + surge packagers handle packaging and consistency checks',
     ].join('\n');
   }
 }
