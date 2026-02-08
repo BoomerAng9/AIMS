@@ -157,18 +157,13 @@ export default function YourSpacePage() {
                 : "border-amber-300/20 shadow-[0_0_40px_rgba(251,191,36,0.15)]"
             }`}
           >
-            {profileImage ? (
-              <Image
-                src={profileImage}
-                alt="Profile"
-                fill
-                className="object-cover"
-                unoptimized
-              />
-            ) : (
-              /* Placeholder gradient */
-              <div className="absolute inset-0 bg-gradient-to-b from-amber-400/20 via-amber-600/10 to-black" />
-            )}
+            <Image
+              src={profileImage || "/images/acheevy/acheevy-office-plug.png"}
+              alt={profileImage ? "Profile" : "ACHEEVY Office — Default Background"}
+              fill
+              className="object-cover"
+              unoptimized={!!profileImage}
+            />
 
             {/* Upload overlay */}
             <div

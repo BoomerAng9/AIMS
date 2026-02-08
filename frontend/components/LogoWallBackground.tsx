@@ -14,32 +14,28 @@ interface Props {
 }
 
 /**
- * Diagonal rounded-bar pattern that forms the structural "brick" surface.
- * UI elements are the "windows" cut into this wall.
- *
- * The SVG renders capsule-shaped bars at 45 degrees with a 3D embossed effect,
- * tiled across the entire viewport.
+ * Flowing wave pattern — brand signature from the Logox design.
+ * SVG renders smooth S-curve strokes rotated diagonally with a 3D embossed effect,
+ * tiled across the entire viewport. Replaces the old diagonal bar pattern.
  */
-function DiagonalBarPattern({ colorway }: { colorway: LogoColorway }) {
+function WavePattern({ colorway }: { colorway: LogoColorway }) {
   const color = colorway === "champagne"
-    ? { bar: "#B8962E", highlight: "#D4AF37", shadow: "#6B5B1F", glow: "rgba(212,175,55,0.15)" }
-    : { bar: "#0E7490", highlight: "#22D3EE", shadow: "#064E5C", glow: "rgba(34,211,238,0.12)" };
+    ? { stroke: "#B8962E", highlight: "#D4AF37", shadow: "#6B5B1F" }
+    : { stroke: "#0E7490", highlight: "#22D3EE", shadow: "#064E5C" };
 
-  // Each bar is a rounded rect rotated -45deg. We define several bars at
-  // varying lengths/positions to match the logo pattern.
-  const bars = [
-    { x: 20,  y: 10,  w: 80,  h: 18 },
-    { x: 110, y: 10,  w: 50,  h: 18 },
-    { x: 10,  y: 40,  w: 50,  h: 18 },
-    { x: 70,  y: 40,  w: 100, h: 18 },
-    { x: 30,  y: 70,  w: 70,  h: 18 },
-    { x: 115, y: 70,  w: 55,  h: 18 },
-    { x: 5,   y: 100, w: 90,  h: 18 },
-    { x: 105, y: 100, w: 65,  h: 18 },
-    { x: 45,  y: 130, w: 60,  h: 18 },
-    { x: 120, y: 130, w: 40,  h: 18 },
-    { x: 15,  y: 160, w: 55,  h: 18 },
-    { x: 80,  y: 160, w: 85,  h: 18 },
+  // S-curve that tiles seamlessly: starts and ends at same y with matching slopes
+  const waveD = "M0,0 C80,-28 160,28 240,0";
+
+  // Waves at varied spacing + widths for organic, premium feel
+  const waves = [
+    { y: 0,   w: 16 },
+    { y: 38,  w: 12 },
+    { y: 72,  w: 20 },
+    { y: 106, w: 14 },
+    { y: 144, w: 18 },
+    { y: 182, w: 12 },
+    { y: 220, w: 16 },
+    { y: 258, w: 14 },
   ];
 
   return (
@@ -50,43 +46,49 @@ function DiagonalBarPattern({ colorway }: { colorway: LogoColorway }) {
     >
       <defs>
         <pattern
-          id="diag-bars"
+          id="logo-waves"
           x="0" y="0"
-          width="180" height="180"
+          width="240" height="300"
           patternUnits="userSpaceOnUse"
-          patternTransform="rotate(-45)"
+          patternTransform="rotate(-38)"
         >
-          {bars.map((b, i) => (
+          {waves.map((wave, i) => (
             <React.Fragment key={i}>
-              {/* Shadow / depth */}
-              <rect
-                x={b.x + 1} y={b.y + 1}
-                width={b.w} height={b.h}
-                rx={b.h / 2}
-                fill={color.shadow}
-                opacity={0.6}
+              {/* Shadow — depth layer */}
+              <path
+                d={waveD}
+                fill="none"
+                stroke={color.shadow}
+                strokeWidth={wave.w + 2}
+                strokeLinecap="round"
+                opacity={0.5}
+                transform={`translate(1, ${wave.y + 2})`}
               />
-              {/* Main bar */}
-              <rect
-                x={b.x} y={b.y}
-                width={b.w} height={b.h}
-                rx={b.h / 2}
-                fill={color.bar}
-                opacity={0.9}
+              {/* Main stroke */}
+              <path
+                d={waveD}
+                fill="none"
+                stroke={color.stroke}
+                strokeWidth={wave.w}
+                strokeLinecap="round"
+                opacity={0.85}
+                transform={`translate(0, ${wave.y})`}
               />
               {/* Top-edge highlight */}
-              <rect
-                x={b.x + 2} y={b.y + 1}
-                width={b.w - 4} height={3}
-                rx={1.5}
-                fill={color.highlight}
-                opacity={0.4}
+              <path
+                d={waveD}
+                fill="none"
+                stroke={color.highlight}
+                strokeWidth={Math.max(2, wave.w * 0.25)}
+                strokeLinecap="round"
+                opacity={0.35}
+                transform={`translate(-0.5, ${wave.y - 1})`}
               />
             </React.Fragment>
           ))}
         </pattern>
       </defs>
-      <rect width="100%" height="100%" fill={`url(#diag-bars)`} />
+      <rect width="100%" height="100%" fill="url(#logo-waves)" />
     </svg>
   );
 }
@@ -108,12 +110,12 @@ export function LogoWallBackground({ mode = "hero", colorway = "champagne", chil
 
   return (
     <div className="relative min-h-screen bg-[#050507] text-amber-50 overflow-hidden">
-      {/* Layer 0: Diagonal bar pattern — the structural "brick" material */}
+      {/* Layer 0: Wave pattern — brand signature flowing curves */}
       <div
         className={clsx("pointer-events-none absolute inset-0 transition-opacity duration-1000", patternOpacity)}
         aria-hidden="true"
       >
-        <DiagonalBarPattern colorway={colorway} />
+        <WavePattern colorway={colorway} />
       </div>
 
       {/* Layer 1: Depth gradient — bars recede behind content */}

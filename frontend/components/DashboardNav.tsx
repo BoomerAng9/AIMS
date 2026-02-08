@@ -20,6 +20,7 @@ const navItems = [
   { href: "/dashboard/luc", label: "LUC Usage" },
   { href: "/dashboard/circuit-box", label: "Circuit Box" },
   { href: "/dashboard/build", label: "Build" },
+  { href: "/dashboard/workstreams", label: "Workstreams" },
   { href: "/dashboard/plugs", label: "Plugs" },
   { href: "/dashboard/make-it-mine", label: "Make It Mine" },
   { href: "/dashboard/gates", label: "Gates & Evidence" },
