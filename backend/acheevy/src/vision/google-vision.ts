@@ -145,7 +145,7 @@ export async function analyzeImage(imageBase64: string): Promise<VisionAnalysisR
       throw new Error(`Vision API error: ${response.status} - ${errorText}`);
     }
 
-    const data = await response.json();
+    const data: any = await response.json();
     const result = data.responses?.[0] || {};
 
     return {
