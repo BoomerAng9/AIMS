@@ -1,0 +1,39 @@
+{
+  "handle_rules": {
+    "ACHEEVY": { "pattern": "^ACHEEVY$" },
+    "Boomer_Ang": { "pattern": "^[A-Za-z0-9\\-]+_Ang$" },
+    "Chicken_Hawk": { "pattern": "^Chicken_Hawk$" },
+    "Lil_Hawk": { "pattern": "^Lil_([A-Z][a-z0-9]+)(_[A-Z][a-z0-9]+)*_Hawk$" }
+  },
+  "bench_levels": {
+    "Intern": {
+      "autonomy": "low",
+      "can_approve_gates": false,
+      "can_mentor": false,
+      "can_lead_multi_office": false
+    },
+    "Intermediate": {
+      "autonomy": "medium",
+      "can_approve_gates": true,
+      "can_mentor": false,
+      "can_lead_multi_office": false,
+      "gate_approval_scope": "low_risk_only"
+    },
+    "Expert": {
+      "autonomy": "high",
+      "can_approve_gates": true,
+      "can_mentor": true,
+      "can_lead_multi_office": true,
+      "gate_approval_scope": "all"
+    }
+  },
+  "squad_labels": [
+    "Squad_Intake",
+    "Squad_Proof",
+    "Squad_Workflow",
+    "Squad_Build",
+    "Squad_Deploy",
+    "Squad_Security",
+    "Squad_UI"
+  ]
+}

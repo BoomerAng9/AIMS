@@ -49,37 +49,37 @@ describe('OnboardingSopSkill', () => {
 
   describe('inputs', () => {
     it('should require user_id', () => {
-      expect(OnboardingSopSkill.inputs.user_id.required).toBe(true);
-      expect(OnboardingSopSkill.inputs.user_id.type).toBe('string');
+      expect(OnboardingSopSkill.inputs!.user_id.required).toBe(true);
+      expect(OnboardingSopSkill.inputs!.user_id.type).toBe('string');
     });
 
     it('should require trigger_event', () => {
-      expect(OnboardingSopSkill.inputs.trigger_event.required).toBe(true);
-      expect(OnboardingSopSkill.inputs.trigger_event.enum).toContain('first_login');
+      expect(OnboardingSopSkill.inputs!.trigger_event.required).toBe(true);
+      expect(OnboardingSopSkill.inputs!.trigger_event.enum).toContain('first_login');
     });
 
     it('should have optional existing_profile', () => {
-      expect(OnboardingSopSkill.inputs.existing_profile.required).toBe(false);
+      expect(OnboardingSopSkill.inputs!.existing_profile.required).toBe(false);
     });
   });
 
   describe('outputs', () => {
     it('should output personalized_template', () => {
-      expect(OnboardingSopSkill.outputs.personalized_template.type).toBe('OnboardingTemplate');
+      expect(OnboardingSopSkill.outputs!.personalized_template.type).toBe('OnboardingTemplate');
     });
 
     it('should output conversation_state', () => {
-      expect(OnboardingSopSkill.outputs.conversation_state.type).toBe('ConversationState');
+      expect(OnboardingSopSkill.outputs!.conversation_state.type).toBe('ConversationState');
     });
 
     it('should have optional action_plan', () => {
-      expect(OnboardingSopSkill.outputs.action_plan.required).toBe(false);
+      expect(OnboardingSopSkill.outputs!.action_plan.required).toBe(false);
     });
   });
 
   describe('behavior', () => {
     it('should have system_prompt with onboarding instructions', () => {
-      const prompt = OnboardingSopSkill.behavior.system_prompt;
+      const prompt = OnboardingSopSkill.behavior!.system_prompt;
       expect(prompt).toContain('ACHEEVY');
       expect(prompt).toContain('ONE QUESTION AT A TIME');
       expect(prompt).toContain('DISCOVERY PHASE');
@@ -87,13 +87,13 @@ describe('OnboardingSopSkill', () => {
     });
 
     it('should include mentor identification', () => {
-      const prompt = OnboardingSopSkill.behavior.system_prompt;
+      const prompt = OnboardingSopSkill.behavior!.system_prompt;
       expect(prompt).toContain('Mentor Identification');
       expect(prompt).toContain('EXPERTISE');
     });
 
     it('should include mindset diagnosis bonus', () => {
-      const prompt = OnboardingSopSkill.behavior.system_prompt;
+      const prompt = OnboardingSopSkill.behavior!.system_prompt;
       expect(prompt).toContain('Mindset Diagnosis');
       expect(prompt).toContain('2-WEEK PROOF SPRINT');
     });
@@ -101,7 +101,7 @@ describe('OnboardingSopSkill', () => {
 
   describe('test cases', () => {
     it('should have Real Estate Agent test case', () => {
-      const testCase = OnboardingSopSkill.testing.test_cases.find(
+      const testCase = OnboardingSopSkill.testing!.test_cases.find(
         t => t.name.includes('Real Estate')
       );
       expect(testCase).toBeDefined();
@@ -110,7 +110,7 @@ describe('OnboardingSopSkill', () => {
     });
 
     it('should have Marketing Agency test case', () => {
-      const testCase = OnboardingSopSkill.testing.test_cases.find(
+      const testCase = OnboardingSopSkill.testing!.test_cases.find(
         t => t.name.includes('Marketing')
       );
       expect(testCase).toBeDefined();

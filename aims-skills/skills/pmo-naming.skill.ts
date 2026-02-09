@@ -1,8 +1,9 @@
 /**
  * @skill pmo-naming
- * @version 1.0.0
+ * @version 1.1.0
  * @owner ACHEEVY
  * @description Enforces PMO Boomer_Ang naming conventions
+ * @see chain-of-command/policies/handle-rules.json for canonical handle patterns
  */
 
 import { SkillDefinition } from '../types/skills';
@@ -28,8 +29,9 @@ const PMO_LEVELS = PMO_MANAGERS.flatMap(manager => {
 
 // Whitelisted anomaly Boomer_Angs (intentional exceptions to naming rules)
 const ANOMALY_BOOMER_ANGS = [
-  'Bett-Ann_Ang',    // Finance PMO Manager / LUC specialist
+  'Betty-Ann_Ang',   // HR PMO Manager / LUC specialist
   'Buildsmith_Ang',  // Builder specialist
+  'AVVA-NOON_Ang',   // Holdings Operational Excellence rotator
 ] as const;
 
 // Blocked patterns - these should NEVER appear in PMO naming
