@@ -28,6 +28,7 @@
         "skills/**/*",
         "hooks/**/*",
         "luc/**/*",
+        "chain-of-command/**/*",
         "scripts/**/*",
         "tests/**/*"
     ],

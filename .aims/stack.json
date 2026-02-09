@@ -1,0 +1,112 @@
+{
+  "$schema": "https://aims.plugmein.cloud/schemas/stack.json",
+  "version": "1.0.0",
+  "project": {
+    "name": "A.I.M.S.",
+    "fullName": "AI Managed Solutions",
+    "repo": "https://github.com/BoomerAng9/AIMS"
+  },
+
+  "infrastructure": {
+    "compute": {
+      "provider": "Hostinger",
+      "plan": "VPS Cloud Startup",
+      "type": "KVM",
+      "ip": "76.13.96.107",
+      "ssh": "root@76.13.96.107",
+      "os": "Ubuntu 22.04"
+    },
+    "cicd": {
+      "provider": "GCP",
+      "service": "Cloud Build",
+      "projectId": "ai-managed-services",
+      "projectNumber": "1008658271134",
+      "region": "us-central1",
+      "trigger": "push to main"
+    },
+    "serverless": {
+      "provider": "GCP",
+      "service": "Cloud Run",
+      "region": "us-central1"
+    },
+    "frontend": {
+      "provider": "Vercel",
+      "reason": "Next.js optimized (ISR, Edge Functions, CDN)",
+      "fallback": "VPS Docker",
+      "vercelProject": "aims-frontend"
+    }
+  },
+
+  "firebase": {
+    "projectId": "ai-managed-services",
+    "services": ["Authentication", "Firestore", "Storage"],
+    "authProviders": ["Email/Password", "Google"],
+    "region": "us-central1"
+  },
+
+  "domains": {
+    "root": "plugmein.cloud",
+    "registrar": "Hostinger",
+    "subdomains": {
+      "aims.plugmein.cloud": {
+        "purpose": "Main A.I.M.S. Frontend",
+        "port": 3000
+      },
+      "api.aims.plugmein.cloud": {
+        "purpose": "Backend API Gateway",
+        "port": 8000
+      },
+      "luc.plugmein.cloud": {
+        "purpose": "LUC Billing Service",
+        "port": 3001
+      },
+      "www.plugmein.cloud": {
+        "purpose": "Marketing redirect"
+      }
+    }
+  },
+
+  "services": {
+    "frontend": {
+      "framework": "Next.js 14",
+      "port": 3000,
+      "path": "/frontend"
+    },
+    "backend": {
+      "framework": "Node.js/Express",
+      "port": 8000,
+      "path": "/backend"
+    },
+    "luc": {
+      "framework": "TypeScript SDK",
+      "port": 3001,
+      "path": "/packages/luc-sdk",
+      "npm": "@plugmein/luc-sdk"
+    },
+    "n8n": {
+      "purpose": "Workflow automation",
+      "port": 5678,
+      "internal": true
+    },
+    "iiAgent": {
+      "purpose": "ACHEEVY Desktop",
+      "path": "/backend/ii-agent"
+    }
+  },
+
+  "docker": {
+    "composeFile": "infra/docker-compose.production.yml",
+    "registry": "gcr.io/ai-managed-services"
+  },
+
+  "ssl": {
+    "provider": "Let's Encrypt",
+    "tool": "Certbot",
+    "certPath": "/etc/letsencrypt/live/plugmein.cloud"
+  },
+
+  "nginx": {
+    "configPath": "/etc/nginx/sites-available/aims",
+    "ports": [80, 443]
+  }
+}

@@ -92,7 +92,7 @@ describe('IdeaValidationSkill', () => {
 
   describe('test cases', () => {
     it('should have SaaS Product test case', () => {
-      const testCase = IdeaValidationSkill.testing.test_cases.find(
+      const testCase = IdeaValidationSkill.testing!.test_cases.find(
         t => t.name.includes('SaaS')
       );
       expect(testCase).toBeDefined();
@@ -102,7 +102,7 @@ describe('IdeaValidationSkill', () => {
     });
 
     it('should have Agency Service test case', () => {
-      const testCase = IdeaValidationSkill.testing.test_cases.find(
+      const testCase = IdeaValidationSkill.testing!.test_cases.find(
         t => t.name.includes('Agency')
       );
       expect(testCase).toBeDefined();

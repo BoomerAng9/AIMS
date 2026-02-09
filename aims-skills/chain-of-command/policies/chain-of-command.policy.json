@@ -1,0 +1,42 @@
+{
+  "policy_id": "aims_chain_of_command.v1",
+  "external_voice_rule": {
+    "only_user_facing_handle": "ACHEEVY",
+    "block_if_any_other_handle_attempts_user_message": true
+  },
+  "chain_bypass_prevention": {
+    "lil_hawk_can_message": ["Chicken_Hawk"],
+    "chicken_hawk_can_message": ["Boomer_Ang"],
+    "boomer_ang_can_message": ["ACHEEVY"],
+    "deny_rules": [
+      { "from_role": "Lil_Hawk", "to_handle": "ACHEEVY", "action": "MESSAGE", "result": "DENY" },
+      { "from_role": "Chicken_Hawk", "to_handle": "ACHEEVY", "action": "MESSAGE", "result": "DENY" },
+      { "from_role": "Boomer_Ang", "to_handle": "USER", "action": "MESSAGE", "result": "DENY" }
+    ]
+  },
+  "no_proof_no_done": {
+    "enabled": true,
+    "required_artifacts_by_stage": {
+      "INTAKE": ["TASK_PLAN"],
+      "SCOPE": ["SCOPE_SUMMARY", "RISK_FLAGS"],
+      "BUILD": ["BUILD_LOG", "TEST_RESULTS"],
+      "REVIEW": ["SECURITY_SCAN", "APPROVAL_RECORD"],
+      "DEPLOY": ["DEPLOY_ATTESTATION", "ROLLBACK_PLAN"]
+    }
+  },
+  "budget_governance": {
+    "luc_required_for": ["BUILD", "DEPLOY", "CERTIFY", "EXPORT_PACKAGE"],
+    "on_budget_exceed": "BLOCK_AND_ESCALATE_TO_ACHEEVY"
+  },
+  "safety_and_privacy": {
+    "disallow_in_overlay": [
+      "secrets",
+      "access_tokens",
+      "raw_system_prompts",
+      "internal_reasoning",
+      "customer_private_data_beyond_first_name"
+    ],
+    "enforce_least_privilege": true,
+    "log_all_access": true
+  }
+}

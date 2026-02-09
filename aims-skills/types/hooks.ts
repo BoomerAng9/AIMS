@@ -6,8 +6,9 @@
 export interface HookMetadata {
   name: string;
   version: string;
+  owner?: string;
   description: string;
-  attached_to: string[];
+  attached_to?: string[];
   priority: number;
 }
 
@@ -52,6 +53,13 @@ export interface HookDefinition {
   metadata: HookMetadata;
   lifecycle_points: HookLifecyclePoints;
   state_schema?: Record<string, any>;
+  testing?: {
+    test_cases: Array<{
+      name: string;
+      input: Record<string, any>;
+      expected: Record<string, any>;
+    }>;
+  };
 }
 
 export interface OnboardingState {

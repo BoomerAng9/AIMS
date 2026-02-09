@@ -25,6 +25,10 @@ export const ACHEEVY_SKILLS = [
   IdeaValidationSkill,
 ];
 
+// Chain of Command
+export { createRegistry, ALL_ROLE_CARDS, ENFORCEMENT_POLICY, OVERLAY_SNIPPET_POLICY } from './chain-of-command';
+export { ChainOfCommandHook } from './hooks/chain-of-command.hook';
+
 // Hook Registry  
 export const ACHEEVY_HOOKS = [
   OnboardingFlowHook,
