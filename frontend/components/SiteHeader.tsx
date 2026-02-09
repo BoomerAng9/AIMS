@@ -26,12 +26,12 @@ export function SiteHeader() {
             className="h-8 w-8 rounded-full border border-gold/30"
             alt="ACHEEVY"
           />
-          <div className="flex items-baseline gap-1.5">
+          <div className="flex flex-col">
             <span className="font-display text-lg uppercase tracking-wider text-amber-50">
               A.I.M.S.
             </span>
-            <span className="text-[0.6rem] uppercase tracking-[0.15em] text-white/40">
-              by ACHIEVEMOR
+            <span className="text-[0.5rem] uppercase tracking-[0.15em] text-white/40 -mt-1">
+              AI Managed Solutions
             </span>
           </div>
         </Link>

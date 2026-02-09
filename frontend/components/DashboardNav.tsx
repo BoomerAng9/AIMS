@@ -12,7 +12,7 @@ const navItems = [
   { href: "/dashboard/acheevy", label: "ACHEEVY", highlight: true },
   { href: "/dashboard/chat", label: "Chat w/ACHEEVY" },
   { href: "/dashboard/plan", label: "Plan" },
-  { href: "/dashboard/ai-plugs", label: "aiPlugs" },
+  { href: "/dashboard/plugs", label: "aiPlugs" },
   { href: "/dashboard/boomerangs", label: "Boomer_Angs" },
   { href: "/dashboard/house-of-ang", label: "House of Ang" },
   { href: "/dashboard/project-management", label: "PMO Offices" },
@@ -21,12 +21,13 @@ const navItems = [
   { href: "/dashboard/circuit-box", label: "Circuit Box" },
   { href: "/dashboard/build", label: "Build" },
   { href: "/dashboard/workstreams", label: "Workstreams" },
-  { href: "/dashboard/plugs", label: "Plugs" },
   { href: "/dashboard/make-it-mine", label: "Make It Mine" },
   { href: "/dashboard/gates", label: "Gates & Evidence" },
   { href: "/dashboard/environments", label: "Environments" },
   { href: "/dashboard/security", label: "Security Center" },
   { href: "/dashboard/operations", label: "Operations" },
+  { href: "/dashboard/model-garden", label: "Model Garden" },
+  { href: "/dashboard/sports-tracker", label: "Sports Tracker" },
   { href: "/dashboard/settings", label: "Settings" },
 ];
 

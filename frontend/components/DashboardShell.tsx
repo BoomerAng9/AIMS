@@ -142,12 +142,12 @@ export function DashboardShell({ children }: Props) {
         {/* Left rail — wireframe glass sidebar */}
         <aside className="hidden w-64 flex-shrink-0 flex-col border-r border-wireframe-stroke bg-black/60 backdrop-blur-xl lg:flex">
           <div className="px-4 py-5">
-            <div className="flex items-baseline gap-1.5">
+            <div className="flex flex-col">
               <span className="font-display text-sm uppercase tracking-wider text-amber-50">
                 A.I.M.S.
               </span>
-              <span className="text-[0.55rem] uppercase tracking-[0.12em] text-white/40">
-                by ACHIEVEMOR
+              <span className="text-[0.5rem] uppercase tracking-[0.12em] text-white/40 -mt-0.5">
+                AI Managed Solutions
               </span>
             </div>
             <p className="mt-1 text-[0.65rem] text-white/40">

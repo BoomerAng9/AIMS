@@ -112,7 +112,7 @@ const tiles = [
     title: "aiPlugs",
     icon: Layers,
     desc: "Deploy capability modules.",
-    href: "/dashboard/ai-plugs",
+    href: "/dashboard/plugs",
   },
   {
     title: "Build a Plug",
