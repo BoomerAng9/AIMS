@@ -9,6 +9,8 @@
     "branding": {
       "enabled": true,
       "logo": "/assets/aims-logo.png",
+      "mascot": "/images/chicken-hawk.png",
+      "mascotName": "Chicken Hawk",
       "theme": "dark"
     }
   },

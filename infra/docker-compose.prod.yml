@@ -328,6 +328,8 @@ services:
       - AGENTS_DASHBOARD_ENABLED=true
       - AGENTS_DASHBOARD_PORT=8002
       - RESPONSE_PREFIX_DEFAULT=[A.I.M.S.]
+      - ASSISTANT_NAME=Chicken Hawk
+      - ASSISTANT_AVATAR=/images/chicken-hawk.png
       - LOG_LEVEL=warn
       - LOG_FORMAT=json
     volumes:
