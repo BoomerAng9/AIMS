@@ -1,8 +1,21 @@
 # PlugMeIn.Cloud Integration Plan
 
-**Document Version:** 1.0
+**Document Version:** 1.1
 **Created:** 2026-02-09
 **Status:** Active
+
+---
+
+## Your Stack
+
+| Layer | Service |
+|-------|---------|
+| **Compute** | Hostinger VPS Cloud Startup (KVM @ 76.13.96.107) |
+| **CI/CD** | GCP Cloud Build → Cloud Run |
+| **Auth** | Firebase Authentication |
+| **Database** | Firebase Firestore |
+| **Storage** | Firebase Storage |
+| **Frontend** | Vercel (or VPS with Docker) |
 
 ---
 
@@ -10,266 +23,276 @@
 
 ```
 plugmein.cloud (Root Domain)
-├── aims.plugmein.cloud      → Main A.I.M.S. Frontend (Vercel)
-├── api.aims.plugmein.cloud  → API Gateway
+├── aims.plugmein.cloud      → Main A.I.M.S. Frontend
+├── api.aims.plugmein.cloud  → API Gateway (VPS)
 ├── luc.plugmein.cloud       → LUC Billing Service
 └── www.plugmein.cloud       → Marketing/Landing Page
 ```
 
 ---
 
-## Current Integration Points
+## 5-Phase Integration Plan (Your Stack)
 
-### 1. Frontend (Next.js on Vercel)
+### Phase 1: DNS & SSL on Hostinger
 
-| File | Purpose |
-|------|---------|
-| `vercel.json` | Sets `NEXT_PUBLIC_APP_URL=https://aims.plugmein.cloud` |
-| `middleware.ts` | CORS origins for all plugmein subdomains |
-| `lib/security/config.ts` | CSP headers allowing plugmein endpoints |
-| `app/layout.tsx` | `metadataBase` fallback to plugmein.cloud |
+**Configure in Hostinger DNS Manager:**
 
-### 2. LUC SDK (`@plugmein/luc-sdk`)
-
-**Package:** `packages/luc-sdk/`
-**npm:** `@plugmein/luc-sdk`
-**Homepage:** https://luc.plugmein.cloud
-
-Features:
-- Usage tracking & quota management
-- Cost estimation with 8 industry presets
-- Framework-agnostic (works with any JS/TS project)
-
-### 3. n8n Bridge
-
-**File:** `frontend/lib/n8n-bridge.ts`
-
-Connects AIMS to remote n8n workflow automation instance for:
-- PMO task routing
-- Boomer_Ang orchestration
-- Webhook integrations
-
-### 4. II-Agent (ACHEEVY Desktop)
-
-**File:** `backend/ii-agent/frontend/src-tauri/tauri.conf.json`
-
-```json
-"identifier": "cloud.plugmein.acheevy"
+```
+# A Records (point to VPS IP)
+A    @              76.13.96.107
+A    aims           76.13.96.107
+A    api.aims       76.13.96.107
+A    luc            76.13.96.107
+A    www            76.13.96.107
 ```
 
-Tauri desktop app for local ACHEEVY instance.
+**SSL with Certbot on VPS:**
 
-### 5. Remotion Video Compositions
+```bash
+# SSH to VPS
+ssh root@76.13.96.107
 
-**Files:**
-- `frontend/remotion/compositions/PlugMeIn.tsx`
-- `frontend/remotion/Root.tsx`
-- `frontend/components/landing/HeroPlayer.tsx`
+# Install certbot
+apt update && apt install -y certbot
 
-Animated hero video for marketing.
+# Get wildcard cert
+certbot certonly --manual --preferred-challenges=dns \
+  -d "plugmein.cloud" \
+  -d "*.plugmein.cloud" \
+  -d "*.aims.plugmein.cloud"
+
+# Or individual certs
+certbot certonly --standalone -d aims.plugmein.cloud
+certbot certonly --standalone -d api.aims.plugmein.cloud
+certbot certonly --standalone -d luc.plugmein.cloud
+```
 
 ---
 
-## Integration Plan
-
-### Phase 1: DNS & SSL Configuration
-
-**Status:** ⚠️ Needs Attention
-
-From `docs/real-app-forever/aims_project_sop.md`:
-> No SSL/TLS certificate on plugmein.cloud | P1 | HTTPS returns empty; certbot needs domain config
-
-**Actions:**
-1. [ ] Configure DNS A/CNAME records for all subdomains
-2. [ ] Set up SSL certificates via Certbot or Cloudflare
-3. [ ] Verify HTTPS works for all endpoints
-
-```bash
-# Expected DNS Configuration
-aims.plugmein.cloud      → Vercel CNAME (cname.vercel-dns.com)
-api.aims.plugmein.cloud  → Backend server IP or load balancer
-luc.plugmein.cloud       → LUC service endpoint
-www.plugmein.cloud       → Redirect to aims.plugmein.cloud
-```
-
 ### Phase 2: Environment Variables
 
-**Required `.env.local` for local development:**
+**On VPS (`/root/aims/.env`):**
 
 ```env
 # Domain
 NEXT_PUBLIC_APP_URL=https://aims.plugmein.cloud
 NEXTAUTH_URL=https://aims.plugmein.cloud
 
-# API Endpoints
-NEXT_PUBLIC_API_URL=https://api.aims.plugmein.cloud
-NEXT_PUBLIC_LUC_URL=https://luc.plugmein.cloud
+# Firebase (from Firebase Console → Project Settings)
+FIREBASE_PROJECT_ID=ai-managed-services
+FIREBASE_CLIENT_EMAIL=firebase-adminsdk-xxx@ai-managed-services.iam.gserviceaccount.com
+FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----"
 
-# n8n Integration
-N8N_WEBHOOK_URL=https://n8n.plugmein.cloud/webhook
-N8N_API_KEY=<your-n8n-api-key>
+# GCP
+GCP_PROJECT_ID=ai-managed-services
+GCP_PROJECT_NUMBER=1008658271134
+
+# n8n (on VPS)
+N8N_WEBHOOK_URL=http://localhost:5678/webhook
+N8N_API_KEY=<your-n8n-key>
 
 # Auth
-NEXTAUTH_SECRET=<generate-secret>
+NEXTAUTH_SECRET=<generate-with-openssl-rand-base64-32>
 ```
 
-### Phase 3: Security Headers
-
-**Current CSP in `middleware.ts`:**
-
-```typescript
-allowedOrigins: [
-  'https://aims.plugmein.cloud',
-  'https://www.aims.plugmein.cloud',
-  'https://api.aims.plugmein.cloud',
-  'https://luc.plugmein.cloud',
-]
-```
-
-**Recommended additions:**
-- Add `wss://` for WebSocket connections
-- Add n8n webhook URL if using external n8n
-
-### Phase 4: Service Deployment
-
-| Service | Platform | Status |
-|---------|----------|--------|
-| AIMS Frontend | Vercel | ✅ Ready |
-| LUC Service | TBD (Cloud Run/Vercel) | ⏳ Pending |
-| n8n Workflows | Self-hosted/n8n.cloud | ⏳ Pending |
-| II-Agent Backend | Docker/Cloud Run | ⏳ Pending |
-
-### Phase 5: LUC SDK Publishing
+**In GCP Secret Manager:**
 
 ```bash
-cd packages/luc-sdk
-npm run build
-npm run test
-npm publish --access public
-```
-
-**Registry:** npmjs.com as `@plugmein/luc-sdk`
-
----
-
-## Integration Checklist
-
-### DNS & Infrastructure
-- [ ] Configure `aims.plugmein.cloud` DNS
-- [ ] Configure `api.aims.plugmein.cloud` DNS
-- [ ] Configure `luc.plugmein.cloud` DNS
-- [ ] Set up SSL certificates
-- [ ] Verify all HTTPS endpoints respond
-
-### Frontend
-- [ ] Update `vercel.json` if domain changes
-- [ ] Verify CORS origins in `middleware.ts`
-- [ ] Test OAuth callbacks with production URL
-- [ ] Verify CSP headers don't block legitimate requests
-
-### Backend Services
-- [ ] Deploy LUC service
-- [ ] Configure n8n workflows
-- [ ] Set up API gateway routing
-- [ ] Configure rate limiting
-
-### SDK
-- [ ] Build and test `@plugmein/luc-sdk`
-- [ ] Publish to npm
-- [ ] Update documentation
-
----
-
-## Service Communication Flow
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    User Browser                              │
-└─────────────────────┬───────────────────────────────────────┘
-                      │
-                      ▼
-┌─────────────────────────────────────────────────────────────┐
-│              aims.plugmein.cloud (Vercel)                   │
-│                    Next.js Frontend                          │
-└─────────────────────┬───────────────────────────────────────┘
-                      │
-         ┌────────────┼────────────┬────────────┐
-         ▼            ▼            ▼            ▼
-┌─────────────┐ ┌──────────┐ ┌──────────┐ ┌──────────────┐
-│ api.aims.*  │ │ luc.*    │ │ n8n      │ │ External APIs│
-│ (API GW)    │ │ (Billing)│ │ (Workflows)│ │ (OpenRouter) │
-└─────────────┘ └──────────┘ └──────────┘ └──────────────┘
-         │
-         ▼
-┌─────────────────────────────────────────────────────────────┐
-│                    Boomer_Ang Agents                         │
-│              (Shopping, Research, Automation)                │
-└─────────────────────────────────────────────────────────────┘
+# Store secrets
+echo -n "your-secret-value" | gcloud secrets create NEXTAUTH_SECRET --data-file=-
+echo -n "your-firebase-key" | gcloud secrets create FIREBASE_PRIVATE_KEY --data-file=-
 ```
 
 ---
 
-## Quick Start for Local Development
+### Phase 3: Firebase Setup
+
+**Firebase Console → ai-managed-services:**
+
+1. **Authentication** → Enable Email/Password + Google Sign-In
+2. **Firestore** → Create database in production mode
+3. **Hosting** (optional) → Can use for static assets
+
+**Firestore Security Rules:**
+
+```javascript
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users can only access their own data
+    match /users/{userId}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // LUC accounts
+    match /luc_accounts/{accountId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == resource.data.ownerId;
+    }
+  }
+}
+```
+
+---
+
+### Phase 4: Deploy to Hostinger VPS
+
+**Docker Compose on VPS:**
 
 ```bash
-# 1. Clone and install
-git clone https://github.com/BoomerAng9/AIMS.git
-cd AIMS/frontend
-npm install
+ssh root@76.13.96.107
 
-# 2. Create .env.local
-cat > .env.local << 'EOF'
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-NEXTAUTH_URL=http://localhost:3000
-NEXTAUTH_SECRET=dev-secret-change-in-production
-EOF
+cd /root/aims
+git pull origin main
 
-# 3. Run development server
-npm run dev
+# Deploy all services
+docker compose -f infra/docker-compose.production.yml up -d
 
-# 4. Access at http://localhost:3000
+# Check status
+docker ps
+```
+
+**Nginx Config (`/etc/nginx/sites-available/aims`):**
+
+```nginx
+# aims.plugmein.cloud → Frontend
+server {
+    listen 443 ssl http2;
+    server_name aims.plugmein.cloud;
+
+    ssl_certificate /etc/letsencrypt/live/plugmein.cloud/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/plugmein.cloud/privkey.pem;
+
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+
+# api.aims.plugmein.cloud → Backend API
+server {
+    listen 443 ssl http2;
+    server_name api.aims.plugmein.cloud;
+
+    ssl_certificate /etc/letsencrypt/live/plugmein.cloud/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/plugmein.cloud/privkey.pem;
+
+    location / {
+        proxy_pass http://localhost:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}
+
+# luc.plugmein.cloud → LUC Service
+server {
+    listen 443 ssl http2;
+    server_name luc.plugmein.cloud;
+
+    ssl_certificate /etc/letsencrypt/live/plugmein.cloud/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/plugmein.cloud/privkey.pem;
+
+    location / {
+        proxy_pass http://localhost:3001;
+        proxy_set_header Host $host;
+    }
+}
+```
+
+```bash
+# Enable and reload
+ln -s /etc/nginx/sites-available/aims /etc/nginx/sites-enabled/
+nginx -t && systemctl reload nginx
 ```
 
 ---
 
-## Production Deployment
+### Phase 5: GCP Cloud Build Pipeline
 
-### Vercel (Recommended for Frontend)
+**`cloudbuild.yaml` triggers on push to main:**
 
-```bash
-# Install Vercel CLI
-npm i -g vercel
+```yaml
+steps:
+  # Build frontend
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/aims-frontend', './frontend']
 
-# Deploy
-cd frontend
-vercel --prod
+  # Push to GCR
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/aims-frontend']
 
-# Set environment variables in Vercel Dashboard:
-# - NEXT_PUBLIC_APP_URL
-# - NEXTAUTH_URL
-# - NEXTAUTH_SECRET
-# - All API keys
+  # Deploy to Cloud Run (or SSH to VPS)
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'aims-frontend'
+      - '--image=gcr.io/$PROJECT_ID/aims-frontend'
+      - '--region=us-central1'
+      - '--platform=managed'
 ```
 
-### Docker (Self-hosted)
+**Or deploy to VPS via SSH:**
 
-```bash
-# Build
-docker build -t aims-frontend:latest ./frontend
-
-# Run
-docker run -p 3000:3000 \
-  -e NEXT_PUBLIC_APP_URL=https://aims.plugmein.cloud \
-  aims-frontend:latest
+```yaml
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        gcloud compute ssh aims-vps --command="cd /root/aims && git pull && docker compose up -d --build"
 ```
 
 ---
 
-## Contacts
+## Quick Deploy Commands
 
-- **Domain Admin:** admin@plugmein.cloud
-- **Security:** security@plugmein.cloud
-- **Development:** dev@plugmein.cloud
+```bash
+# From local machine
+cd AIMS
+
+# Push to trigger Cloud Build
+git push origin main
+
+# Or manual VPS deploy
+ssh root@76.13.96.107 "cd /root/aims && git pull && docker compose -f infra/docker-compose.production.yml up -d --build"
+
+# Check logs
+ssh root@76.13.96.107 "docker logs aims-frontend --tail 100"
+```
+
+---
+
+## Service Ports on VPS
+
+| Service | Port | Domain |
+|---------|------|--------|
+| Frontend | 3000 | aims.plugmein.cloud |
+| Backend API | 8000 | api.aims.plugmein.cloud |
+| LUC | 3001 | luc.plugmein.cloud |
+| n8n | 5678 | (internal only) |
+| Nginx | 80, 443 | All domains |
+
+---
+
+## Verification Checklist
+
+```bash
+# Test SSL
+curl -I https://aims.plugmein.cloud
+curl -I https://api.aims.plugmein.cloud/api/health
+curl -I https://luc.plugmein.cloud
+
+# Test Firebase connection
+curl https://aims.plugmein.cloud/api/health
+
+# Check Docker services on VPS
+ssh root@76.13.96.107 "docker ps"
+```
 
 ---
 
