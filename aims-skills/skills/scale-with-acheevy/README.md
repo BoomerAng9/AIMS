@@ -1,4 +1,6 @@
-# IdeaForge — Business Builder Skills
+# Scale with ACHEEVY — Business Builder Skills
+
+**Your AI co-founder for launching and scaling businesses.**
 
 **Trigger:** ACHEEVY detects via NLP that user wants to start/build a business.
 
@@ -8,6 +10,7 @@
 - "I'm thinking of launching..."
 - "Business idea for..."
 - "How do I validate my idea"
+- "Scale my business"
 
 ---
 
@@ -45,11 +48,11 @@ After any skill runs, offer the 4-step refinement:
 
 ```typescript
 // In ACHEEVY chat handler
-import { detectBusinessIntent, runIdeaForgeSkill } from '@/aims-skills/skills/idea-forge';
+import { detectBusinessIntent, runScaleSkill } from '@/aims-skills/skills/scale-with-acheevy';
 
 if (detectBusinessIntent(userMessage)) {
   const skill = matchSkill(userMessage);
-  const result = await runIdeaForgeSkill(skill, context);
+  const result = await runScaleSkill(skill, context);
   return result;
 }
 ```

@@ -1,10 +1,16 @@
 /**
- * IdeaForge — Business Builder Skills for ACHEEVY
+ * Scale with ACHEEVY — Business Builder Skills
  *
+ * Your AI co-founder for launching and scaling businesses.
  * Triggered when NLP detects user wants to start/build a business.
+ *
+ * ACHEEVY orchestrates:
+ * - Boomer_Angs: Task execution agents
+ * - Chicken Hawk: Rapid deployment bot
+ * - Lil_Hawks: Specialized micro-agents
  */
 
-export interface IdeaForgeContext {
+export interface ScaleContext {
   userId: string;
   interests?: string[];
   industry?: string;
@@ -48,7 +54,7 @@ export function detectBusinessIntent(message: string): boolean {
 // Skill Matching
 // ─────────────────────────────────────────────────────────────
 
-export type IdeaForgeSkill =
+export type ScaleSkill =
   | 'idea-generator'
   | 'pain-points'
   | 'brand-name'
@@ -60,7 +66,7 @@ export type IdeaForgeSkill =
   | 'automation'
   | 'content-calendar';
 
-const SKILL_PATTERNS: Record<IdeaForgeSkill, RegExp[]> = {
+const SKILL_PATTERNS: Record<ScaleSkill, RegExp[]> = {
   'idea-generator': [/business\s*ideas?/i, /startup\s*ideas?/i, /what\s*should\s*i\s*build/i, /suggest.*ideas/i],
   'pain-points': [/pain\s*points?/i, /problems?\s*in/i, /market\s*gaps?/i, /customer\s*frustrations?/i],
   'brand-name': [/brand\s*name/i, /company\s*name/i, /what\s*to\s*call/i, /name.*business/i],
@@ -73,10 +79,10 @@ const SKILL_PATTERNS: Record<IdeaForgeSkill, RegExp[]> = {
   'content-calendar': [/content\s*plan/i, /posting\s*schedule/i, /content\s*calendar/i, /social\s*media\s*plan/i],
 };
 
-export function matchSkill(message: string): IdeaForgeSkill | null {
+export function matchSkill(message: string): ScaleSkill | null {
   for (const [skill, patterns] of Object.entries(SKILL_PATTERNS)) {
     if (patterns.some(pattern => pattern.test(message))) {
-      return skill as IdeaForgeSkill;
+      return skill as ScaleSkill;
     }
   }
   // Default to idea generator if business intent but no specific skill
@@ -90,7 +96,7 @@ export function matchSkill(message: string): IdeaForgeSkill | null {
 // Prompt Templates
 // ─────────────────────────────────────────────────────────────
 
-export const SKILL_PROMPTS: Record<IdeaForgeSkill, (ctx: IdeaForgeContext) => string> = {
+export const SKILL_PROMPTS: Record<ScaleSkill, (ctx: ScaleContext) => string> = {
   'idea-generator': (ctx) => `
 Suggest 5 business ideas based on my interests: ${ctx.interests?.join(', ') || '[user interests]'}.
 Make them modern, digital-first, and feasible for a solo founder.
@@ -206,7 +212,7 @@ export const REFINEMENT_PROMPTS = {
   expert: (field: string) => `What would the 0.01% top expert in ${field} do here?`,
 };
 
-export function getRefinementFlow(skill: IdeaForgeSkill, context: IdeaForgeContext): string[] {
+export function getRefinementFlow(skill: ScaleSkill, context: ScaleContext): string[] {
   return [
     `Great! Here's your ${skill.replace('-', ' ')} output.`,
     REFINEMENT_PROMPTS.clarify,
@@ -219,9 +225,9 @@ export function getRefinementFlow(skill: IdeaForgeSkill, context: IdeaForgeConte
 // Main Runner
 // ─────────────────────────────────────────────────────────────
 
-export async function runIdeaForgeSkill(
-  skill: IdeaForgeSkill,
-  context: IdeaForgeContext
+export async function runScaleSkill(
+  skill: ScaleSkill,
+  context: ScaleContext
 ): Promise<SkillResult> {
   const prompt = SKILL_PROMPTS[skill](context);
   const refinement = getRefinementFlow(skill, context);
@@ -241,7 +247,7 @@ export async function runIdeaForgeSkill(
 export default {
   detectBusinessIntent,
   matchSkill,
-  runIdeaForgeSkill,
+  runScaleSkill,
   SKILL_PROMPTS,
   REFINEMENT_PROMPTS,
 };
