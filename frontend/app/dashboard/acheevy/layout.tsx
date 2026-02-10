@@ -2,11 +2,11 @@ import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 
 export const metadata: Metadata = {
-  title: 'ACHEEVY Sandbox',
-  description: 'Chat with ACHEEVY — your AI executive orchestrator. Upload files, use voice, and watch agents collaborate in real-time through the Chain of Command.',
+  title: 'Chat w/ACHEEVY',
+  description: 'Chat w/ACHEEVY — your AI executive orchestrator. Build, research, deploy, and automate.',
   openGraph: {
-    title: 'ACHEEVY Sandbox | A.I.M.S.',
-    description: 'AI-powered sandbox with chat, voice, file upload, and live agent collaboration feed.',
+    title: 'Chat w/ACHEEVY | A.I.M.S.',
+    description: 'Chat w/ACHEEVY — build, research, deploy, and automate with AI Managed Solutions.',
   },
 };
 

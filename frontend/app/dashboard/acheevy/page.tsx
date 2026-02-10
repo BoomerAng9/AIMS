@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * Chat with ACHEEVY — Clean Bezel Interface
+ * Chat w/ACHEEVY — Clean Bezel Interface
  *
  * Real AI chat via OpenRouter (Vercel AI SDK).
  * Bezel-framed design with ACHEEVY helmet logo on edge.
@@ -145,7 +145,7 @@ export default function ChatWithAcheevy() {
                 textShadow: '0 1px 2px rgba(0,0,0,0.8), 0 0 10px rgba(212,168,67,0.1)',
               }}
             >
-              Chat with ACHEEVY
+              Chat w/ACHEEVY
             </h1>
             <p className="text-[11px] text-white/35 tracking-wide">
               Describe what you want; ACHEEVY coordinates the tools.
