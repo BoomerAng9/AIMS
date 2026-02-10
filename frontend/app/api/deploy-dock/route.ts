@@ -18,6 +18,25 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { v4 as uuidv4 } from "uuid";
+import { triggerDeployDockStage, getN8nClient } from "@/lib/n8n/client";
+import {
+  getEvidenceLockerClient,
+  createDeploymentManifest,
+  storeAgentLogs,
+  storeAttestation,
+  type EvidenceLocker,
+} from "@/lib/evidence-locker/client";
+import { getMeteringClient, type ServiceKey } from "@/lib/luc/metering";
+
+// Metering costs for deploy dock actions
+const DEPLOY_COSTS: Record<string, { service: ServiceKey; amount: number }> = {
+  create: { service: "DEPLOY", amount: 5 },
+  hatch: { service: "AGENTS", amount: 2 },
+  assign: { service: "WORKFLOWS", amount: 3 },
+  launch: { service: "DEPLOY", amount: 10 },
+  verify: { service: "DEPLOY", amount: 2 },
+  rollback: { service: "DEPLOY", amount: 5 },
+};
 
 // Mock data store (replace with Redis/Postgres in production)
 const deployments = new Map<string, any>();
@@ -69,18 +88,73 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json();
     const { action } = body;
+    const userId = session.user.email;
 
+    // Check and record metering for billable actions
+    if (action !== "acheevy" && DEPLOY_COSTS[action]) {
+      const meteringClient = getMeteringClient(userId);
+      const cost = DEPLOY_COSTS[action];
+
+      // Check quota
+      const canExecute = await meteringClient.canExecute(cost.service, cost.amount);
+      if (!canExecute.canExecute) {
+        return NextResponse.json(
+          {
+            error: "Quota exceeded",
+            message: canExecute.warning || "Insufficient quota for this action",
+            service: cost.service,
+            required: cost.amount,
+          },
+          { status: 402 }
+        );
+      }
+
+      // Record usage after action completes (async, don't block)
+      const recordUsage = () => {
+        meteringClient.recordUsage(cost.service, cost.amount, {
+          toolId: "deploy_dock",
+          deploymentId: body.deploymentId,
+          description: `Deploy Dock: ${action}`,
+        }).catch(console.error);
+      };
+
+      // Execute action and record on success
+      let result: NextResponse;
+      switch (action) {
+        case "create":
+          result = await handleCreateDeployment(body, userId);
+          break;
+        case "hatch":
+          result = await handleHatchAgent(body, userId);
+          break;
+        case "assign":
+          result = await handleAssignWorkflow(body, userId);
+          break;
+        case "launch":
+          result = await handleLaunchDeployment(body, userId);
+          break;
+        case "verify":
+          result = await handleVerifyDeployment(body, userId);
+          break;
+        case "rollback":
+          result = await handleRollbackDeployment(body, userId);
+          break;
+        default:
+          return NextResponse.json({ error: "Unknown action" }, { status: 400 });
+      }
+
+      // Record usage if successful
+      if (result.status === 200) {
+        recordUsage();
+      }
+
+      return result;
+    }
+
+    // Non-metered actions
     switch (action) {
-      case "create":
-        return handleCreateDeployment(body, session.user.email);
-      case "hatch":
-        return handleHatchAgent(body);
-      case "assign":
-        return handleAssignWorkflow(body);
-      case "launch":
-        return handleLaunchDeployment(body);
       case "acheevy":
-        return handleAcheevyIntent(body, session.user.email);
+        return handleAcheevyIntent(body, userId);
       default:
         return NextResponse.json({ error: "Unknown action" }, { status: 400 });
     }
@@ -203,6 +277,22 @@ async function handleCreateDeployment(body: any, userId: string) {
 
   deployments.set(deploymentId, deployment);
 
+  // Store initial manifest in Evidence Locker (async, don't block response)
+  createDeploymentManifest(deploymentId, {
+    id: deploymentId,
+    name,
+    description: description || `Deployment for: ${intent}`,
+    userId,
+    roster: roster.map((r) => ({ id: r.id, name: r.name, type: r.type, role: r.role })),
+    lucBudget,
+    quote,
+    createdAt: now.toISOString(),
+  }).then((result) => {
+    if (result.success && result.artifact) {
+      deployment.evidenceLocker.artifacts.push(result.artifact);
+    }
+  }).catch(console.error);
+
   return NextResponse.json({
     deployment,
     quote,
@@ -210,7 +300,7 @@ async function handleCreateDeployment(body: any, userId: string) {
   });
 }
 
-async function handleHatchAgent(body: any) {
+async function handleHatchAgent(body: any, userId: string) {
   const { deploymentId, agentId } = body;
 
   const deployment = deployments.get(deploymentId);
@@ -224,11 +314,20 @@ async function handleHatchAgent(body: any) {
     return NextResponse.json({ error: "Agent not found" }, { status: 404 });
   }
 
+  // Trigger n8n webhook for hatch stage
+  const n8nResult = await triggerDeployDockStage("hatch", {
+    deploymentId,
+    userId,
+    sessionId: deployment.id,
+    agents: [agentId],
+    jobPacket: { agentName: agent.name, agentRole: agent.role },
+  });
+
   agent.status = "active";
   deployment.phase = "hatch";
   deployment.updatedAt = new Date().toISOString();
 
-  // Add event
+  // Add event with n8n execution info
   deployment.events.push({
     id: `evt-${uuidv4().slice(0, 8)}`,
     deploymentId,
@@ -237,6 +336,7 @@ async function handleHatchAgent(body: any) {
     title: "Agent Hatched",
     description: `${agent.name} (${agent.role}) has been activated`,
     agent: "acheevy",
+    n8nExecutionId: n8nResult.executionId,
     proof: {
       type: "manifest",
       label: "Agent Manifest",
@@ -245,10 +345,15 @@ async function handleHatchAgent(body: any) {
     },
   });
 
-  return NextResponse.json({ success: true, agent, deployment });
+  return NextResponse.json({
+    success: true,
+    agent,
+    deployment,
+    n8n: { triggered: n8nResult.success, executionId: n8nResult.executionId },
+  });
 }
 
-async function handleAssignWorkflow(body: any) {
+async function handleAssignWorkflow(body: any, userId: string) {
   const { deploymentId, workflowId, jobPacketName } = body;
 
   const deployment = deployments.get(deploymentId);
@@ -277,11 +382,25 @@ async function handleAssignWorkflow(body: any) {
     artifacts: [],
   };
 
+  // Trigger n8n webhook for assign stage
+  const n8nResult = await triggerDeployDockStage("assign", {
+    deploymentId,
+    userId,
+    sessionId: deployment.id,
+    agents: deployment.roster.filter((a: any) => a.status === "active").map((a: any) => a.id),
+    jobPacket: {
+      id: jobPacket.id,
+      name: jobPacket.name,
+      workflowId,
+      gates: jobPacket.gates,
+    },
+  });
+
   deployment.jobPackets.push(jobPacket);
   deployment.phase = "assign";
   deployment.updatedAt = new Date().toISOString();
 
-  // Add event
+  // Add event with n8n execution info
   deployment.events.push({
     id: `evt-${uuidv4().slice(0, 8)}`,
     deploymentId,
@@ -290,6 +409,7 @@ async function handleAssignWorkflow(body: any) {
     title: "Workflow Bound",
     description: `Job packet created and bound to workflow: ${workflowId}`,
     agent: "acheevy",
+    n8nExecutionId: n8nResult.executionId,
     proof: {
       type: "artifact",
       label: "Job Packet ID",
@@ -298,10 +418,15 @@ async function handleAssignWorkflow(body: any) {
     },
   });
 
-  return NextResponse.json({ success: true, jobPacket, deployment });
+  return NextResponse.json({
+    success: true,
+    jobPacket,
+    deployment,
+    n8n: { triggered: n8nResult.success, executionId: n8nResult.executionId },
+  });
 }
 
-async function handleLaunchDeployment(body: any) {
+async function handleLaunchDeployment(body: any, userId: string) {
   const { deploymentId, confirmed } = body;
 
   if (!confirmed) {
@@ -313,10 +438,27 @@ async function handleLaunchDeployment(body: any) {
     return NextResponse.json({ error: "Deployment not found" }, { status: 404 });
   }
 
+  const executionId = `exec-${uuidv4().slice(0, 8)}`;
+
+  // Trigger n8n webhook for launch stage
+  const n8nResult = await triggerDeployDockStage("launch", {
+    deploymentId,
+    userId,
+    sessionId: deployment.id,
+    agents: deployment.roster.filter((a: any) => a.status === "active").map((a: any) => a.id),
+    jobPacket: {
+      executionId,
+      jobPackets: deployment.jobPackets,
+      lucBudget: deployment.lucBudget,
+    },
+  });
+
   deployment.phase = "launch";
   deployment.updatedAt = new Date().toISOString();
 
-  // Add launch event
+  const attestationId = `attest-${uuidv4().slice(0, 16)}`;
+
+  // Add launch event with n8n execution info
   deployment.events.push({
     id: `evt-${uuidv4().slice(0, 8)}`,
     deploymentId,
@@ -325,15 +467,61 @@ async function handleLaunchDeployment(body: any) {
     title: "Deployment Launched",
     description: "Execution sequence initiated via Port Authority gateway",
     agent: "acheevy",
+    n8nExecutionId: n8nResult.executionId,
     proof: {
       type: "attestation",
       label: "Launch Attestation",
-      value: `attest-${uuidv4().slice(0, 16)}`,
+      value: attestationId,
       timestamp: new Date().toISOString(),
     },
   });
 
-  // Simulate downstream agent events
+  // Store launch attestation in Evidence Locker
+  storeAttestation(deploymentId, {
+    type: "deployment-launch",
+    issuer: "acheevy",
+    subject: deploymentId,
+    claims: {
+      executionId,
+      phase: "launch",
+      activeAgents: deployment.roster.filter((a: any) => a.status === "active").length,
+      jobPacketCount: deployment.jobPackets.length,
+      n8nTriggered: n8nResult.success,
+      n8nExecutionId: n8nResult.executionId,
+    },
+  }).then((result) => {
+    if (result.success && result.artifact) {
+      deployment.evidenceLocker.artifacts.push(result.artifact);
+    }
+  }).catch(console.error);
+
+  // If n8n triggered successfully, poll for completion and add verify event
+  if (n8nResult.success && n8nResult.executionId) {
+    const n8nClient = getN8nClient();
+    // Don't block - poll in background
+    n8nClient.waitForExecution(n8nResult.executionId, 30000, 3000).then((execution) => {
+      if (execution?.finished && execution.status === "success") {
+        deployment.events.push({
+          id: `evt-${uuidv4().slice(0, 8)}`,
+          deploymentId,
+          timestamp: new Date().toISOString(),
+          stage: "verify",
+          title: "n8n Workflow Complete",
+          description: "Workflow execution completed successfully",
+          agent: "n8n",
+          n8nExecutionId: n8nResult.executionId,
+          proof: {
+            type: "scan",
+            label: "n8n Execution",
+            value: execution.status,
+            timestamp: new Date().toISOString(),
+          },
+        });
+      }
+    });
+  }
+
+  // Also add local verification event
   setTimeout(() => {
     deployment.events.push({
       id: `evt-${uuidv4().slice(0, 8)}`,
@@ -354,8 +542,113 @@ async function handleLaunchDeployment(body: any) {
 
   return NextResponse.json({
     success: true,
-    executionId: `exec-${uuidv4().slice(0, 8)}`,
+    executionId,
     deployment,
+    n8n: { triggered: n8nResult.success, executionId: n8nResult.executionId },
+  });
+}
+
+async function handleVerifyDeployment(body: any, userId: string) {
+  const { deploymentId } = body;
+
+  const deployment = deployments.get(deploymentId);
+  if (!deployment) {
+    return NextResponse.json({ error: "Deployment not found" }, { status: 404 });
+  }
+
+  // Trigger n8n webhook for verify stage
+  const n8nResult = await triggerDeployDockStage("verify", {
+    deploymentId,
+    userId,
+    sessionId: deployment.id,
+    agents: deployment.roster.filter((a: any) => a.status === "active").map((a: any) => a.id),
+    jobPacket: {
+      jobPackets: deployment.jobPackets,
+      phase: deployment.phase,
+    },
+  });
+
+  deployment.phase = "verify";
+  deployment.updatedAt = new Date().toISOString();
+
+  // Add verify event
+  deployment.events.push({
+    id: `evt-${uuidv4().slice(0, 8)}`,
+    deploymentId,
+    timestamp: new Date().toISOString(),
+    stage: "verify",
+    title: "Verification Initiated",
+    description: "Running post-deployment verification checks",
+    agent: "acheevy",
+    n8nExecutionId: n8nResult.executionId,
+    proof: {
+      type: "scan",
+      label: "Verification Started",
+      value: `verify-${uuidv4().slice(0, 8)}`,
+      timestamp: new Date().toISOString(),
+    },
+  });
+
+  return NextResponse.json({
+    success: true,
+    deployment,
+    n8n: { triggered: n8nResult.success, executionId: n8nResult.executionId },
+  });
+}
+
+async function handleRollbackDeployment(body: any, userId: string) {
+  const { deploymentId, reason } = body;
+
+  const deployment = deployments.get(deploymentId);
+  if (!deployment) {
+    return NextResponse.json({ error: "Deployment not found" }, { status: 404 });
+  }
+
+  // Trigger n8n webhook for rollback stage
+  const n8nResult = await triggerDeployDockStage("rollback", {
+    deploymentId,
+    userId,
+    sessionId: deployment.id,
+    agents: deployment.roster.filter((a: any) => a.status === "active").map((a: any) => a.id),
+    jobPacket: {
+      reason: reason || "User initiated rollback",
+      previousPhase: deployment.phase,
+      jobPackets: deployment.jobPackets,
+    },
+  });
+
+  const previousPhase = deployment.phase;
+  deployment.phase = "rollback";
+  deployment.status = "rolled_back";
+  deployment.updatedAt = new Date().toISOString();
+
+  // Deactivate all agents
+  deployment.roster.forEach((agent: any) => {
+    agent.status = "idle";
+  });
+
+  // Add rollback event
+  deployment.events.push({
+    id: `evt-${uuidv4().slice(0, 8)}`,
+    deploymentId,
+    timestamp: new Date().toISOString(),
+    stage: "rollback",
+    title: "Deployment Rolled Back",
+    description: reason || `Rolled back from ${previousPhase} phase`,
+    agent: "acheevy",
+    n8nExecutionId: n8nResult.executionId,
+    proof: {
+      type: "attestation",
+      label: "Rollback Attestation",
+      value: `rollback-${uuidv4().slice(0, 8)}`,
+      timestamp: new Date().toISOString(),
+    },
+  });
+
+  return NextResponse.json({
+    success: true,
+    deployment,
+    n8n: { triggered: n8nResult.success, executionId: n8nResult.executionId },
   });
 }
 
