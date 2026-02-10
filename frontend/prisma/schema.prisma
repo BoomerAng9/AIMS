@@ -21,8 +21,8 @@ model User {
   email         String    @unique
   name          String?
   passwordHash  String?
-  role          UserRole  @default(MEMBER)
-  status        UserStatus @default(ACTIVE)
+  role          String    @default("MEMBER")
+  status        String    @default("ACTIVE")
 
   // Workspace membership
   workspaces    WorkspaceMember[]
@@ -35,16 +35,7 @@ model User {
   updatedAt     DateTime  @updatedAt
 }
 
-enum UserRole {
-  ADMIN
-  MEMBER
-}
 
-enum UserStatus {
-  ACTIVE
-  SUSPENDED
-  PENDING
-}
 
 /// Workspace (tenant) - primary scope for LUC
 model Workspace {
@@ -76,7 +67,7 @@ model WorkspaceMember {
   id          String    @id @default(uuid())
   userId      String
   workspaceId String
-  role        WorkspaceRole @default(MEMBER)
+  role        String        @default("MEMBER")
 
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
@@ -86,12 +77,7 @@ model WorkspaceMember {
   @@unique([userId, workspaceId])
 }
 
-enum WorkspaceRole {
-  OWNER
-  ADMIN
-  MEMBER
-  VIEWER
-}
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // LUC Account and Quotas
@@ -105,7 +91,7 @@ model LucAccount {
 
   // Plan info
   planId        String    @default("free")
-  status        AccountStatus @default(ACTIVE)
+  status        String        @default("ACTIVE")
 
   // Quotas stored as JSON (flexible for service additions)
   quotas        String    // JSON: Record<ServiceKey, Quota>
@@ -125,12 +111,7 @@ model LucAccount {
   updatedAt     DateTime  @updatedAt
 }
 
-enum AccountStatus {
-  ACTIVE
-  SUSPENDED
-  TRIAL
-  OVERDUE
-}
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Usage Events (Append-Only)
@@ -147,7 +128,7 @@ model UsageEvent {
   serviceKey    String    // Service being metered
   units         Float     // Amount consumed
   cost          Float     // Calculated cost
-  eventType     EventType @default(USAGE)
+  eventType     String    @default("USAGE")
 
   // Tracing
   requestId     String?   // Request correlation ID
@@ -161,11 +142,7 @@ model UsageEvent {
   @@index([workspaceId, timestamp])
 }
 
-enum EventType {
-  USAGE       // Normal consumption
-  CREDIT      // Rollback/refund
-  ADJUSTMENT  // Manual adjustment
-}
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Policy Management
@@ -176,14 +153,14 @@ model PolicyVersion {
   id            String    @id @default(uuid())
 
   // Scope
-  scope         PolicyScope
+  scope         String
   scopeId       String?   // workspace/project/env ID (null for platform)
   workspaceId   String?
   workspace     Workspace? @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
   // Version control
   version       Int       @default(1)
-  status        PolicyStatus @default(DRAFT)
+  status        String       @default("DRAFT")
 
   // Policy content (JSON)
   policy        String    // JSON: The actual policy configuration
@@ -199,18 +176,7 @@ model PolicyVersion {
   @@index([workspaceId, status])
 }
 
-enum PolicyScope {
-  PLATFORM
-  WORKSPACE
-  PROJECT
-  ENVIRONMENT
-}
 
-enum PolicyStatus {
-  DRAFT
-  EFFECTIVE
-  SUPERSEDED
-}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Audit Log
@@ -257,7 +223,7 @@ model EvidenceRun {
 
   // Gate info
   gateName      String    // e.g., "lint", "test", "security-scan"
-  status        RunStatus
+  status        String
 
   // Timing
   startedAt     DateTime
@@ -278,12 +244,7 @@ model EvidenceRun {
   @@index([gateName, createdAt])
 }
 
-enum RunStatus {
-  RUNNING
-  PASSED
-  FAILED
-  SKIPPED
-}
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Presets (for Flip Secrets, etc.)

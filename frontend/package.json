@@ -16,6 +16,7 @@
     "@elevenlabs/client": "^0.14.0",
     "@elevenlabs/react": "^0.14.0",
     "@google/generative-ai": "^0.21.0",
+    "@prisma/client": "^5.22.0",
     "@radix-ui/react-dialog": "^1.0.5",
     "@radix-ui/react-slot": "^1.0.2",
     "@remotion/player": "^4.0.419",
@@ -49,6 +50,7 @@
     "eslint": "^8.56.0",
     "eslint-config-next": "14.0.4",
     "postcss": "^8",
+    "prisma": "^5.22.0",
     "tailwindcss": "^3.3.0",
     "typescript": "^5"
   }
