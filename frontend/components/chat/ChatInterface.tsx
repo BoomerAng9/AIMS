@@ -430,7 +430,11 @@ export function ChatInterface({
 
   // Voice output
   const voiceOutput = useVoiceOutput({
-    config: { autoPlay: autoPlayVoice, provider: 'elevenlabs' },
+    config: { 
+      autoPlay: autoPlayVoice, 
+      provider: 'elevenlabs',
+      voiceId: PERSONAS.find(p => p.id === selectedPersona)?.voiceId
+    },
   });
 
   // ─────────────────────────────────────────────────────────
