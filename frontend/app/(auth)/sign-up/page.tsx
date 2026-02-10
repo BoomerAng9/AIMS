@@ -128,7 +128,7 @@ export default function SignUpPage() {
                   type="text"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
-                  className="mt-1 h-11 w-full rounded-xl border border-white/10 bg-black/60 px-3 text-sm text-white outline-none focus:border-gold transition-all placeholder:text-white/15"
+                  className="mt-1 h-11 w-full rounded-xl border border-wireframe-stroke bg-black/60 px-3 text-sm text-white outline-none focus:border-gold transition-all placeholder:text-white/15"
                   placeholder="Jane"
                   required
                 />
@@ -139,7 +139,7 @@ export default function SignUpPage() {
                   type="text"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
-                  className="mt-1 h-11 w-full rounded-xl border border-white/10 bg-black/60 px-3 text-sm text-white outline-none focus:border-gold transition-all placeholder:text-white/15"
+                  className="mt-1 h-11 w-full rounded-xl border border-wireframe-stroke bg-black/60 px-3 text-sm text-white outline-none focus:border-gold transition-all placeholder:text-white/15"
                   placeholder="Doe"
                   required
                 />
@@ -151,7 +151,7 @@ export default function SignUpPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 h-11 w-full rounded-xl border border-white/10 bg-black/60 px-3 text-sm text-white outline-none focus:border-gold transition-all placeholder:text-white/15"
+                className="mt-1 h-11 w-full rounded-xl border border-wireframe-stroke bg-black/60 px-3 text-sm text-white outline-none focus:border-gold transition-all placeholder:text-white/15"
                 placeholder="you@example.com"
                 required
               />
@@ -162,7 +162,7 @@ export default function SignUpPage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 h-11 w-full rounded-xl border border-white/10 bg-black/60 px-3 text-sm text-white outline-none focus:border-gold transition-all placeholder:text-white/15"
+                className="mt-1 h-11 w-full rounded-xl border border-wireframe-stroke bg-black/60 px-3 text-sm text-white outline-none focus:border-gold transition-all placeholder:text-white/15"
                 placeholder="Create a password"
                 required
               />
@@ -194,7 +194,7 @@ export default function SignUpPage() {
               type="text"
               value={businessName}
               onChange={(e) => setBusinessName(e.target.value)}
-              className="mt-1 h-11 w-full rounded-xl border border-white/10 bg-black/60 px-3 text-sm text-white outline-none focus:border-gold transition-all placeholder:text-white/15"
+              className="mt-1 h-11 w-full rounded-xl border border-wireframe-stroke bg-black/60 px-3 text-sm text-white outline-none focus:border-gold transition-all placeholder:text-white/15"
               placeholder="Acme Corp"
               required
             />
@@ -205,7 +205,7 @@ export default function SignUpPage() {
             <select
               value={businessType}
               onChange={(e) => setBusinessType(e.target.value)}
-              className="mt-1 h-11 w-full rounded-xl border border-white/10 bg-black/60 px-3 text-sm text-white outline-none focus:border-gold transition-all"
+              className="mt-1 h-11 w-full rounded-xl border border-wireframe-stroke bg-black/60 px-3 text-sm text-white outline-none focus:border-gold transition-all"
             >
               <option value="" className="bg-black">Select a type...</option>
               <option value="startup" className="bg-black">Startup</option>
@@ -221,7 +221,7 @@ export default function SignUpPage() {
           <label className="block text-xs text-white/50">
             What best describes your role?
             <select
-              className="mt-1 h-11 w-full rounded-xl border border-white/10 bg-black/60 px-3 text-sm text-white outline-none focus:border-gold transition-all"
+              className="mt-1 h-11 w-full rounded-xl border border-wireframe-stroke bg-black/60 px-3 text-sm text-white outline-none focus:border-gold transition-all"
             >
               <option value="" className="bg-black">Select a role...</option>
               <option value="founder" className="bg-black">Founder / CEO</option>
@@ -294,7 +294,7 @@ export default function SignUpPage() {
 
           {/* Timezone display */}
           {country && (
-            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+            <div className="p-3 rounded-xl bg-white/5 border border-wireframe-stroke">
               <p className="text-xs text-white/50">
                 <span className="text-white/30">Timezone:</span>{' '}
                 <span className="text-white">{country.timezone}</span>

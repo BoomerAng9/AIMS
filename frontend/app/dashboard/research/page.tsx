@@ -72,7 +72,7 @@ function AudioPlayer({ src, title }: { src: string; title: string }) {
   const [playing, setPlaying] = useState(false);
 
   return (
-    <div className="flex items-center gap-4 rounded-2xl border border-white/10 bg-black/40 p-4 backdrop-blur-xl">
+    <div className="flex items-center gap-4 rounded-2xl border border-wireframe-stroke bg-black/40 p-4 backdrop-blur-xl">
       <button
         type="button"
         onClick={() => {
@@ -104,7 +104,7 @@ export default function ResearchHubPage() {
       className="space-y-8 animate-in fade-in duration-700"
     >
       {/* ── Hero: Video Section ───────────────────────────── */}
-      <motion.section variants={staggerItem} className="relative overflow-hidden rounded-3xl border border-white/10 bg-black/60 backdrop-blur-2xl">
+      <motion.section variants={staggerItem} className="relative overflow-hidden rounded-3xl border border-wireframe-stroke bg-black/60 backdrop-blur-2xl">
         <div className="relative aspect-video w-full">
           <video
             className="h-full w-full rounded-3xl object-cover"
@@ -129,7 +129,7 @@ export default function ResearchHubPage() {
       </motion.section>
 
       {/* ── PDF Slide Deck ────────────────────────────────── */}
-      <motion.section variants={staggerItem} className="rounded-3xl border border-white/10 bg-black/60 p-6 backdrop-blur-2xl">
+      <motion.section variants={staggerItem} className="rounded-3xl border border-wireframe-stroke bg-black/60 p-6 backdrop-blur-2xl">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-gold/20 bg-gold/10">
@@ -151,7 +151,7 @@ export default function ResearchHubPage() {
             Download PDF
           </a>
         </div>
-        <div className="overflow-hidden rounded-2xl border border-white/5">
+        <div className="overflow-hidden rounded-2xl border border-wireframe-stroke">
           <iframe
             src="/media/research/agentic-web-report.pdf"
             className="h-[600px] w-full bg-white/5"
@@ -166,7 +166,7 @@ export default function ResearchHubPage() {
           <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-gold/20 bg-gold/10">
             <Headphones size={14} className="text-gold" />
           </div>
-          <h2 className="text-sm font-semibold uppercase tracking-widest text-amber-200/90 font-display">
+          <h2 className="text-sm font-semibold uppercase tracking-widest text-white/80 font-display">
             Audio Deep-Dive
           </h2>
         </div>
@@ -178,7 +178,7 @@ export default function ResearchHubPage() {
 
       {/* ── Quick Nav Cards ───────────────────────────────── */}
       <motion.section variants={staggerItem}>
-        <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-amber-200/90 font-display">
+        <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-white/80 font-display">
           Explore Research Areas
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -186,10 +186,10 @@ export default function ResearchHubPage() {
             <Link key={page.href} href={page.href}>
               <motion.div
                 whileHover={{ y: -2, scale: 1.01 }}
-                className="group flex flex-col gap-3 rounded-2xl border border-white/10 bg-black/40 p-5 backdrop-blur-xl transition hover:border-gold/20 hover:bg-gold/5"
+                className="group flex flex-col gap-3 rounded-2xl border border-wireframe-stroke bg-black/40 p-5 backdrop-blur-xl transition hover:border-gold/20 hover:bg-gold/5"
               >
                 <div className="flex items-center justify-between">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 group-hover:border-gold/20 group-hover:bg-gold/10 transition">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-wireframe-stroke bg-white/5 group-hover:border-gold/20 group-hover:bg-gold/10 transition">
                     <page.icon size={18} className="text-white/60 group-hover:text-gold transition" />
                   </div>
                   <ArrowRight size={14} className="text-white/20 group-hover:text-gold/60 transition" />

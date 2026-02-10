@@ -67,7 +67,7 @@ const protocols = [
     description:
       "Google's open protocol for cross-platform agent interoperability. Designed for heterogeneous agent ecosystems where agents from different vendors need to collaborate.",
     status: "Research" as const,
-    statusColor: "bg-amber-500/20 text-amber-400 border-amber-500/30",
+    statusColor: "bg-gold/10 text-gold border-gold/30",
     agents: ["Future: Vertex AI agents", "ADK pipelines"],
     features: [
       "Cross-platform agent discovery",
@@ -130,7 +130,7 @@ export default function ProtocolsPage() {
       <motion.section variants={staggerItem}>
         <Link
           href="/dashboard/research"
-          className="mb-4 inline-flex items-center gap-2 text-sm text-amber-100/50 transition hover:text-gold"
+          className="mb-4 inline-flex items-center gap-2 text-sm text-white/40 transition hover:text-gold"
         >
           <ArrowLeft size={14} />
           Back to Research Hub
@@ -141,10 +141,10 @@ export default function ProtocolsPage() {
             <Network size={22} className="text-gold" />
           </div>
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-amber-50 font-display">
+            <h1 className="text-2xl font-semibold tracking-tight text-white font-display">
               Agentic Protocols
             </h1>
-            <p className="text-sm text-amber-100/70">
+            <p className="text-sm text-white/50">
               Communication standards powering the A.I.M.S. agent ecosystem
             </p>
           </div>
@@ -153,7 +153,7 @@ export default function ProtocolsPage() {
 
       {/* ── Protocol Cards Grid ────────────────────────────── */}
       <motion.section variants={staggerItem}>
-        <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-amber-200/90 font-display">
+        <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-white/80 font-display">
           Protocol Registry
         </h2>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -161,7 +161,7 @@ export default function ProtocolsPage() {
             <motion.div
               key={protocol.id}
               whileHover={{ y: -4 }}
-              className="rounded-3xl border border-white/10 bg-black/60 p-6 backdrop-blur-2xl"
+              className="rounded-3xl border border-wireframe-stroke bg-black/60 p-6 backdrop-blur-2xl"
             >
               {/* Icon + Name + Status */}
               <div className="mb-4 flex items-start justify-between">
@@ -173,7 +173,7 @@ export default function ProtocolsPage() {
                     <h3 className="text-lg font-semibold text-white font-display">
                       {protocol.name}
                     </h3>
-                    <p className="text-xs text-amber-100/50">{protocol.fullName}</p>
+                    <p className="text-xs text-white/40">{protocol.fullName}</p>
                   </div>
                 </div>
                 <span
@@ -191,14 +191,14 @@ export default function ProtocolsPage() {
 
               {/* Active Agents */}
               <div className="mb-4">
-                <p className="mb-2 text-xs font-medium uppercase tracking-wider text-amber-200/60">
+                <p className="mb-2 text-xs font-medium uppercase tracking-wider text-gold">
                   Used By
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {protocol.agents.map((agent) => (
                     <span
                       key={agent}
-                      className="rounded-lg border border-white/10 bg-white/5 px-2.5 py-1 text-xs text-white/70"
+                      className="rounded-lg border border-wireframe-stroke bg-white/5 px-2.5 py-1 text-xs text-white/70"
                     >
                       {agent}
                     </span>
@@ -208,7 +208,7 @@ export default function ProtocolsPage() {
 
               {/* Features */}
               <div>
-                <p className="mb-2 text-xs font-medium uppercase tracking-wider text-amber-200/60">
+                <p className="mb-2 text-xs font-medium uppercase tracking-wider text-gold">
                   Key Features
                 </p>
                 <ul className="space-y-1.5">
@@ -233,11 +233,11 @@ export default function ProtocolsPage() {
 
       {/* ── Protocol Stack ─────────────────────────────────── */}
       <motion.section variants={staggerItem}>
-        <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-amber-200/90 font-display">
+        <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-white/80 font-display">
           Protocol Stack
         </h2>
-        <div className="rounded-3xl border border-white/10 bg-black/60 p-6 backdrop-blur-2xl">
-          <p className="mb-6 text-sm text-amber-100/70">
+        <div className="rounded-3xl border border-wireframe-stroke bg-black/60 p-6 backdrop-blur-2xl">
+          <p className="mb-6 text-sm text-white/50">
             How the three protocols layer within the A.I.M.S. architecture, from
             application logic down to transport.
           </p>
@@ -290,7 +290,7 @@ export default function ProtocolsPage() {
           </div>
 
           {/* Legend */}
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-6 border-t border-white/5 pt-4">
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-6 border-t border-wireframe-stroke pt-4">
             <div className="flex items-center gap-2 text-xs text-white/40">
               <Shield size={12} className="text-gold" />
               <span>Security boundary at every layer</span>
@@ -300,7 +300,7 @@ export default function ProtocolsPage() {
               <span>Structured message passing</span>
             </div>
             <div className="flex items-center gap-2 text-xs text-white/40">
-              <RefreshCw size={12} className="text-amber-400" />
+              <RefreshCw size={12} className="text-gold" />
               <span>Retry & circuit-breaking at ACP layer</span>
             </div>
           </div>

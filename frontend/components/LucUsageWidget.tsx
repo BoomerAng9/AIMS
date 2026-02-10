@@ -35,7 +35,7 @@ function UsageBar({ label, used, quota, unit }: UsageBarProps) {
     pct >= 90
       ? "bg-red-400"
       : pct >= 70
-        ? "bg-amber-400"
+        ? "bg-gold"
         : "bg-emerald-400";
 
   return (

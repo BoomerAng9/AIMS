@@ -136,17 +136,17 @@ export default function PricingPage() {
             <div className="h-px flex-1 bg-gradient-to-l from-gold/20 to-transparent" />
           </div>
 
-          <div className="overflow-x-auto rounded-3xl border border-white/10 bg-black/60 backdrop-blur-2xl">
+          <div className="overflow-x-auto rounded-3xl border border-wireframe-stroke bg-black/60 backdrop-blur-2xl">
             <table className="w-full min-w-[750px]">
               <thead>
                 <tr>
-                  <th className="p-4 text-left text-[10px] uppercase tracking-widest text-white/30 border-b border-white/5">
+                  <th className="p-4 text-left text-[10px] uppercase tracking-widest text-white/30 border-b border-wireframe-stroke">
                     Group \ Frequency
                   </th>
                   {subscriptionTiers.map((tier) => (
                     <th
                       key={tier.id}
-                      className={`p-4 text-center border-b border-white/5 cursor-pointer transition-colors ${
+                      className={`p-4 text-center border-b border-wireframe-stroke cursor-pointer transition-colors ${
                         selectedTier === tier.id ? "bg-gold/5" : "hover:bg-white/[0.02]"
                       }`}
                       onClick={() => setSelectedTier(tier.id)}
@@ -194,7 +194,7 @@ export default function PricingPage() {
                       else setSeatCount(25);
                     }}
                   >
-                    <td className="p-4 border-t border-white/5">
+                    <td className="p-4 border-t border-wireframe-stroke">
                       <p className="text-sm font-semibold text-white">{group.name}</p>
                       <p className="text-[10px] text-white/30">{group.seats} seats</p>
                       {group.multiplier > 0 && (
@@ -211,7 +211,7 @@ export default function PricingPage() {
                       return (
                         <td
                           key={`${ti}-${gi}`}
-                          className={`p-4 text-center border-t border-white/5 transition-colors ${
+                          className={`p-4 text-center border-t border-wireframe-stroke transition-colors ${
                             isActive
                               ? "bg-gold/10 ring-1 ring-inset ring-gold/30"
                               : ""
@@ -237,14 +237,14 @@ export default function PricingPage() {
           </div>
 
           {/* P2P row */}
-          <div className="mt-3 rounded-2xl border border-white/10 bg-black/60 p-4 flex items-center justify-between flex-wrap gap-3">
+          <div className="mt-3 rounded-2xl border border-wireframe-stroke bg-black/60 p-4 flex items-center justify-between flex-wrap gap-3">
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setSelectedTier("p2p")}
                 className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-all ${
                   selectedTier === "p2p"
                     ? "bg-gold/10 border border-gold/30 text-gold"
-                    : "border border-white/10 text-white/50 hover:border-white/20"
+                    : "border border-wireframe-stroke text-white/50 hover:border-white/20"
                 }`}
               >
                 P2P (Proud to Pay)
@@ -277,9 +277,9 @@ export default function PricingPage() {
             {PILLARS.map((pillar) => {
               const currentLevel = pillars[pillar.id];
               return (
-                <div key={pillar.id} className="rounded-3xl border border-white/10 bg-black/60 backdrop-blur-2xl overflow-hidden">
+                <div key={pillar.id} className="rounded-3xl border border-wireframe-stroke bg-black/60 backdrop-blur-2xl overflow-hidden">
                   {/* Pillar Header */}
-                  <div className="p-5 border-b border-white/5 bg-gradient-to-r from-gold/5 to-transparent">
+                  <div className="p-5 border-b border-wireframe-stroke bg-gradient-to-r from-gold/5 to-transparent">
                     <div className="flex items-center gap-2">
                       <span className="text-lg">{pillar.icon}</span>
                       <h3 className="text-sm font-bold text-white">{pillar.name}</h3>
@@ -294,7 +294,7 @@ export default function PricingPage() {
                       <button
                         key={option.id}
                         onClick={() => updatePillar(pillar.id, option.id)}
-                        className={`w-full text-left p-4 border-t border-white/5 transition-all ${
+                        className={`w-full text-left p-4 border-t border-wireframe-stroke transition-all ${
                           isSelected
                             ? "bg-gold/10 border-l-2 border-l-gold"
                             : "hover:bg-white/[0.02] border-l-2 border-l-transparent"
@@ -369,10 +369,10 @@ export default function PricingPage() {
             <div className="h-px flex-1 bg-gradient-to-l from-gold/20 to-transparent" />
           </div>
 
-          <div className="overflow-x-auto rounded-3xl border border-white/10 bg-black/60 backdrop-blur-2xl">
+          <div className="overflow-x-auto rounded-3xl border border-wireframe-stroke bg-black/60 backdrop-blur-2xl">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-white/5">
+                <tr className="border-b border-wireframe-stroke">
                   <th className="p-4 text-left text-[10px] uppercase tracking-widest text-white/30">
                     Task / Automation Type
                   </th>
@@ -392,7 +392,7 @@ export default function PricingPage() {
                   const weight = taskWeights[task.id] || 0;
                   const isAutomation = ["workflow_auto", "agent_swarm", "full_autonomous", "biz_intel"].includes(task.id);
                   return (
-                    <tr key={task.id} className="border-t border-white/5 hover:bg-white/[0.015]">
+                    <tr key={task.id} className="border-t border-wireframe-stroke hover:bg-white/[0.015]">
                       <td className="p-4">
                         <div className="flex items-center gap-2">
                           <p className="text-sm font-semibold text-white">{task.name}</p>
@@ -468,7 +468,7 @@ export default function PricingPage() {
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="rounded-2xl border border-white/10 bg-black/60 p-5">
+            <div className="rounded-2xl border border-wireframe-stroke bg-black/60 p-5">
               <p className="text-[10px] uppercase tracking-widest text-white/30 mb-2">
                 Overage Rate
               </p>
@@ -480,7 +480,7 @@ export default function PricingPage() {
                 Beyond included + overdraft buffer
               </p>
             </div>
-            <div className="rounded-2xl border border-white/10 bg-black/60 p-5">
+            <div className="rounded-2xl border border-wireframe-stroke bg-black/60 p-5">
               <p className="text-[10px] uppercase tracking-widest text-white/30 mb-2">
                 P2P Rate
               </p>
@@ -490,7 +490,7 @@ export default function PricingPage() {
               </p>
               <p className="text-[10px] text-white/20 mt-1">Proud to Pay metering</p>
             </div>
-            <div className="rounded-2xl border border-white/10 bg-black/60 p-5">
+            <div className="rounded-2xl border border-wireframe-stroke bg-black/60 p-5">
               <p className="text-[10px] uppercase tracking-widest text-white/30 mb-2">
                 Real-Time LUC Top-Up
               </p>
@@ -524,10 +524,10 @@ export default function PricingPage() {
             <div className="h-px flex-1 bg-gradient-to-l from-gold/20 to-transparent" />
           </div>
 
-          <div className="overflow-x-auto rounded-3xl border border-white/10 bg-black/60 backdrop-blur-2xl">
+          <div className="overflow-x-auto rounded-3xl border border-wireframe-stroke bg-black/60 backdrop-blur-2xl">
             <table className="w-full min-w-[800px]">
               <thead>
-                <tr className="border-b border-white/5">
+                <tr className="border-b border-wireframe-stroke">
                   <th className="p-3 text-left text-[10px] uppercase tracking-widest text-white/30">Platform</th>
                   <th className="p-3 text-center text-[10px] uppercase tracking-widest text-white/30">Price</th>
                   <th className="p-3 text-center text-[10px] uppercase tracking-widest text-white/30">Unit</th>
@@ -541,13 +541,13 @@ export default function PricingPage() {
                 {(["workspace", "coding", "builder"] as Cluster[]).map((cluster) => (
                   <React.Fragment key={cluster}>
                     {/* Cluster header */}
-                    <tr className="border-t border-white/10 bg-white/[0.02]">
+                    <tr className="border-t border-wireframe-stroke bg-white/[0.02]">
                       <td colSpan={7} className="p-2 text-[9px] uppercase tracking-[0.3em] text-gold/50 font-semibold">
                         {clusterLabels[cluster]}
                       </td>
                     </tr>
                     {competitors.filter((c) => c.cluster === cluster).map((c) => (
-                      <tr key={c.name} className="border-t border-white/5 text-white/30">
+                      <tr key={c.name} className="border-t border-wireframe-stroke text-white/30">
                         <td className="p-2.5 text-xs">{c.name}</td>
                         <td className="p-2.5 text-xs text-center">{c.price}</td>
                         <td className="p-2.5 text-xs text-center">
@@ -627,7 +627,7 @@ export default function PricingPage() {
                 className={`relative rounded-3xl border p-6 backdrop-blur-2xl transition-all hover:scale-[1.01] ${
                   i === 2
                     ? "border-gold/30 bg-gradient-to-br from-gold/5 to-black/80 shadow-[0_0_40px_rgba(251,191,36,0.08)]"
-                    : "border-white/10 bg-black/60"
+                    : "border-wireframe-stroke bg-black/60"
                 }`}
               >
                 {i === 2 && (
@@ -690,7 +690,7 @@ export default function PricingPage() {
                   value={seatCount}
                   onChange={(e) => setSeatCount(Math.max(1, parseInt(e.target.value) || 1))}
                   min={1}
-                  className="w-16 rounded-lg border border-white/10 bg-black/60 px-2 py-1 text-sm text-white text-center outline-none focus:border-gold"
+                  className="w-16 rounded-lg border border-wireframe-stroke bg-black/60 px-2 py-1 text-sm text-white text-center outline-none focus:border-gold"
                 />
               </div>
             )}
@@ -698,7 +698,7 @@ export default function PricingPage() {
 
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7">
             {/* Frequency */}
-            <div className="rounded-2xl border border-white/5 bg-black/40 p-4">
+            <div className="rounded-2xl border border-wireframe-stroke bg-black/40 p-4">
               <p className="text-[10px] uppercase tracking-wider text-white/30">Frequency</p>
               <p className="text-lg font-bold text-white mt-1">{bill.baseTier.name}</p>
               <p className="text-[10px] text-white/20 mt-0.5">
@@ -709,7 +709,7 @@ export default function PricingPage() {
             </div>
 
             {/* Group */}
-            <div className="rounded-2xl border border-white/5 bg-black/40 p-4">
+            <div className="rounded-2xl border border-wireframe-stroke bg-black/40 p-4">
               <p className="text-[10px] uppercase tracking-wider text-white/30">Group</p>
               <p className="text-lg font-bold text-white mt-1">{bill.group.name}</p>
               <p className="text-[10px] text-white/20 mt-0.5">
@@ -729,14 +729,14 @@ export default function PricingPage() {
             </div>
 
             {/* Task Mix */}
-            <div className="rounded-2xl border border-white/5 bg-black/40 p-4">
+            <div className="rounded-2xl border border-wireframe-stroke bg-black/40 p-4">
               <p className="text-[10px] uppercase tracking-wider text-white/30">Task Mix</p>
               <p className="text-lg font-bold text-white mt-1">{bill.effectiveMultiplier}x</p>
               <p className="text-[10px] text-white/20 mt-0.5">Effective multiplier</p>
             </div>
 
             {/* Pillars */}
-            <div className="rounded-2xl border border-white/5 bg-black/40 p-4">
+            <div className="rounded-2xl border border-wireframe-stroke bg-black/40 p-4">
               <p className="text-[10px] uppercase tracking-wider text-white/30">Pillars</p>
               <p className="text-lg font-bold text-white mt-1">
                 {bill.pillarAddons.total > 0 ? `+${(bill.pillarAddons.total * 100).toFixed(0)}%` : "Base"}
@@ -758,7 +758,7 @@ export default function PricingPage() {
             </div>
 
             {/* Commitment Total */}
-            <div className="rounded-2xl border border-white/5 bg-black/40 p-4">
+            <div className="rounded-2xl border border-wireframe-stroke bg-black/40 p-4">
               <p className="text-[10px] uppercase tracking-wider text-white/30">Commitment</p>
               <p className="text-lg font-bold text-white mt-1">
                 {bill.commitmentTotal > 0 ? `$${bill.commitmentTotal}` : "\u2014"}

@@ -31,7 +31,7 @@ import { DEPARTMENTS, ACHEEVY } from '@/lib/orchestration/types';
 const STATUS_STYLES: Record<BoomerAngStatus, string> = {
   idle: 'bg-gray-500/20 text-gray-400 border-gray-500/30',
   queued: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-  working: 'bg-amber-500/20 text-gold border-amber-500/30 animate-pulse',
+  working: 'bg-gold/10 text-gold border-gold/30 animate-pulse',
   blocked: 'bg-red-500/20 text-red-400 border-red-500/30',
   waiting_on_user: 'bg-orange-500/20 text-orange-400 border-orange-500/30 animate-pulse',
   complete: 'bg-green-500/20 text-green-400 border-green-500/30',
@@ -79,7 +79,7 @@ function AgentNode({ agent, isActive, onClick }: {
         w-full p-3 rounded-xl border text-left transition-all
         ${isActive
           ? 'bg-gold/10 border-gold/30'
-          : 'bg-white/[0.02] border-white/5 hover:border-white/10'
+          : 'bg-white/[0.02] border-wireframe-stroke hover:border-wireframe-stroke'
         }
       `}
     >
@@ -87,7 +87,7 @@ function AgentNode({ agent, isActive, onClick }: {
         {/* Avatar */}
         <div className={`
           w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold
-          ${agent.role === 'acheevy' ? 'bg-gradient-to-br from-amber-400 to-amber-600 text-black' : ''}
+          ${agent.role === 'acheevy' ? 'bg-gradient-to-br from-gold to-amber-600 text-black' : ''}
           ${agent.role === 'manager' ? 'bg-gradient-to-br from-cyan-500 to-blue-600 text-white' : ''}
           ${agent.role === 'boomerang' ? 'bg-gradient-to-br from-purple-500 to-indigo-600 text-white' : ''}
         `}>
@@ -96,10 +96,10 @@ function AgentNode({ agent, isActive, onClick }: {
 
         {/* Info */}
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-amber-100 truncate">
+          <p className="text-sm font-medium text-white/50 truncate">
             {agent.name}
           </p>
-          <p className="text-xs text-amber-100/50 truncate">
+          <p className="text-xs text-white/40 truncate">
             {agent.specialty || ('department' in agent ? agent.department : '')}
           </p>
         </div>
@@ -114,13 +114,13 @@ function AgentNode({ agent, isActive, onClick }: {
           {agent.capabilities.slice(0, 3).map(cap => (
             <span
               key={cap}
-              className="px-1.5 py-0.5 text-[9px] bg-white/5 text-amber-100/40 rounded"
+              className="px-1.5 py-0.5 text-[9px] bg-white/5 text-white/30 rounded"
             >
               {cap}
             </span>
           ))}
           {agent.capabilities.length > 3 && (
-            <span className="px-1.5 py-0.5 text-[9px] text-amber-100/30">
+            <span className="px-1.5 py-0.5 text-[9px] text-white/20">
               +{agent.capabilities.length - 3}
             </span>
           )}
@@ -152,8 +152,8 @@ function DepartmentCard({
     <div className={`
       rounded-2xl border overflow-hidden transition-all
       ${isActive
-        ? 'bg-white/[0.03] border-amber-400/20'
-        : 'bg-white/[0.01] border-white/5'
+        ? 'bg-white/[0.03] border-gold/20'
+        : 'bg-white/[0.01] border-wireframe-stroke'
       }
     `}>
       {/* Header */}
@@ -164,22 +164,22 @@ function DepartmentCard({
         <div className="flex items-center gap-3">
           <div className={`
             w-8 h-8 rounded-lg flex items-center justify-center text-sm
-            ${isActive ? 'bg-amber-400/20' : 'bg-white/5'}
+            ${isActive ? 'bg-gold/10' : 'bg-white/5'}
           `}>
             {department.name[0]}
           </div>
           <div className="text-left">
-            <p className="text-sm font-medium text-amber-100">
+            <p className="text-sm font-medium text-white/50">
               {department.name}
             </p>
-            <p className="text-xs text-amber-100/40">
+            <p className="text-xs text-white/30">
               {department.angs.length} agents • {activeAngsCount} active
             </p>
           </div>
         </div>
         <motion.span
           animate={{ rotate: isExpanded ? 180 : 0 }}
-          className="text-amber-100/40"
+          className="text-white/30"
         >
           ▼
         </motion.span>
@@ -198,7 +198,7 @@ function DepartmentCard({
             <div className="px-4 pb-4 space-y-3">
               {/* Manager */}
               <div>
-                <p className="text-[10px] uppercase tracking-wider text-amber-100/30 mb-2">
+                <p className="text-[10px] uppercase tracking-wider text-white/20 mb-2">
                   Department Lead
                 </p>
                 <AgentNode agent={department.manager} isActive={isActive} />
@@ -206,7 +206,7 @@ function DepartmentCard({
 
               {/* Boomer_Angs */}
               <div>
-                <p className="text-[10px] uppercase tracking-wider text-amber-100/30 mb-2">
+                <p className="text-[10px] uppercase tracking-wider text-white/20 mb-2">
                   Team Members
                 </p>
                 <div className="space-y-2">
@@ -234,7 +234,7 @@ function DepartmentCard({
 function ChainOfCommand({ state }: { state: OrchestrationState }) {
   return (
     <div className="space-y-3">
-      <p className="text-[10px] uppercase tracking-wider text-amber-100/30">
+      <p className="text-[10px] uppercase tracking-wider text-white/20">
         Chain of Command
       </p>
 
@@ -246,7 +246,7 @@ function ChainOfCommand({ state }: { state: OrchestrationState }) {
               {state.userName?.[0] || 'U'}
             </span>
           </div>
-          <span className="text-[9px] text-amber-100/40 mt-1">
+          <span className="text-[9px] text-white/30 mt-1">
             {state.userName || 'User'}
           </span>
         </div>
@@ -259,17 +259,17 @@ function ChainOfCommand({ state }: { state: OrchestrationState }) {
 
         {/* ACHEEVY */}
         <div className="flex flex-col items-center">
-          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center">
+          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-gold to-amber-600 flex items-center justify-center">
             <span className="text-black font-bold">A</span>
           </div>
-          <span className="text-[9px] text-amber-100/40 mt-1">ACHEEVY</span>
+          <span className="text-[9px] text-white/30 mt-1">ACHEEVY</span>
         </div>
 
         {state.activeManager && (
           <>
             {/* Arrow */}
             <div className="flex items-center">
-              <div className="w-6 h-0.5 bg-gradient-to-r from-amber-400/50 to-cyan-500/50" />
+              <div className="w-6 h-0.5 bg-gradient-to-r from-gold/100 to-cyan-500/50" />
               <div className="w-0 h-0 border-t-[4px] border-t-transparent border-l-[6px] border-l-cyan-500/50 border-b-[4px] border-b-transparent" />
             </div>
 
@@ -280,7 +280,7 @@ function ChainOfCommand({ state }: { state: OrchestrationState }) {
                   {state.activeManager.name[0]}
                 </span>
               </div>
-              <span className="text-[9px] text-amber-100/40 mt-1 truncate max-w-[60px]">
+              <span className="text-[9px] text-white/30 mt-1 truncate max-w-[60px]">
                 {state.activeManager.name}
               </span>
             </div>
@@ -330,7 +330,7 @@ function ChainOfCommand({ state }: { state: OrchestrationState }) {
 function OperationsLog({ events }: { events: HandoffEvent[] }) {
   return (
     <div className="space-y-2">
-      <p className="text-[10px] uppercase tracking-wider text-amber-100/30">
+      <p className="text-[10px] uppercase tracking-wider text-white/20">
         Operations Log
       </p>
 
@@ -340,10 +340,10 @@ function OperationsLog({ events }: { events: HandoffEvent[] }) {
             key={event.id}
             className="flex items-start gap-2 p-2 rounded-lg bg-white/[0.02] hover:bg-white/[0.04] transition-colors"
           >
-            <span className="text-[10px] text-amber-100/30 whitespace-nowrap">
+            <span className="text-[10px] text-white/20 whitespace-nowrap">
               {new Date(event.timestamp).toLocaleTimeString()}
             </span>
-            <p className="text-xs text-amber-100/70 flex-1">
+            <p className="text-xs text-white/50 flex-1">
               {event.message}
             </p>
           </div>
@@ -386,21 +386,21 @@ export function DepartmentBoard({ state, isOpen, onClose }: DepartmentBoardProps
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-            className="fixed right-0 top-0 bottom-0 w-full max-w-lg bg-[#0A0A0A] border-l border-white/10 z-50 overflow-hidden"
+            className="fixed right-0 top-0 bottom-0 w-full max-w-lg bg-[#0A0A0A] border-l border-wireframe-stroke z-50 overflow-hidden"
           >
             {/* Header */}
-            <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between">
+            <div className="px-6 py-4 border-b border-wireframe-stroke flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-semibold text-amber-50">
+                <h2 className="text-lg font-semibold text-white">
                   Department Board
                 </h2>
-                <p className="text-xs text-amber-100/50">
+                <p className="text-xs text-white/40">
                   Full orchestration visibility
                 </p>
               </div>
               <button
                 onClick={onClose}
-                className="p-2 rounded-lg hover:bg-white/10 text-amber-100/50 hover:text-amber-100 transition-colors"
+                className="p-2 rounded-lg hover:bg-white/10 text-white/40 hover:text-white/50 transition-colors"
               >
                 ✕
               </button>
@@ -410,17 +410,17 @@ export function DepartmentBoard({ state, isOpen, onClose }: DepartmentBoardProps
             <div className="p-6 space-y-6 overflow-y-auto h-[calc(100vh-80px)]">
               {/* User Context */}
               {state.userName && (
-                <div className="p-4 rounded-xl bg-amber-400/5 border border-amber-400/20">
-                  <p className="text-sm text-amber-100">
-                    Working for: <span className="font-medium text-amber-300">{state.userName}</span>
+                <div className="p-4 rounded-xl bg-gold/10 border border-gold/20">
+                  <p className="text-sm text-white/50">
+                    Working for: <span className="font-medium text-gold">{state.userName}</span>
                   </p>
                   {state.projectTitle && (
-                    <p className="text-xs text-amber-100/60 mt-1">
+                    <p className="text-xs text-white/50 mt-1">
                       Project: {state.projectTitle}
                     </p>
                   )}
                   {state.projectObjective && (
-                    <p className="text-xs text-amber-100/50 mt-1">
+                    <p className="text-xs text-white/40 mt-1">
                       {state.projectObjective}
                     </p>
                   )}
@@ -432,7 +432,7 @@ export function DepartmentBoard({ state, isOpen, onClose }: DepartmentBoardProps
 
               {/* Departments */}
               <div className="space-y-3">
-                <p className="text-[10px] uppercase tracking-wider text-amber-100/30">
+                <p className="text-[10px] uppercase tracking-wider text-white/20">
                   Departments
                 </p>
                 {DEPARTMENTS.map(dept => (

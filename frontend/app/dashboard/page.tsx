@@ -57,7 +57,7 @@ function statusDotClass(status: HealthStatus): string {
     case "healthy":
       return "bg-emerald-400 animate-pulse";
     case "degraded":
-      return "bg-amber-400 animate-pulse";
+      return "bg-gold animate-pulse";
     case "unhealthy":
       return "bg-red-400 animate-pulse";
     default:
@@ -83,7 +83,7 @@ function statusTextColor(status: HealthStatus): string {
     case "healthy":
       return "text-emerald-400/80";
     case "degraded":
-      return "text-amber-400/80";
+      return "text-gold/80";
     case "unhealthy":
       return "text-red-400/80";
     default:

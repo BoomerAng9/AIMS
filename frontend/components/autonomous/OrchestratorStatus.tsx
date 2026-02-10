@@ -20,7 +20,7 @@ export const OrchestratorStatus = ({ status = 'idle', message = 'Ready for assig
       <div className="flex-1">
         <h2 className="text-3xl font-marker text-frosty-white mb-1">ACHEEVY</h2>
         <p className="text-champagne font-display text-sm tracking-wide uppercase mb-2">Orchestrator Agent</p>
-        <div className="bg-leather/50 p-3 rounded-lg border border-white/5">
+        <div className="bg-leather/50 p-3 rounded-lg border border-wireframe-stroke">
             <p className="text-gray-300 font-sans text-sm italic">"{message}"</p>
         </div>
       </div>

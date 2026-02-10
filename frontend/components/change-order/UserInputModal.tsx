@@ -435,7 +435,7 @@ function CodeInputPanel({ onCapture }: CodeInputPanelProps) {
         <select
           value={language}
           onChange={(e) => setLanguage(e.target.value)}
-          className="h-10 px-3 rounded-lg bg-black/40 border border-white/10 text-white text-sm focus:border-gold outline-none"
+          className="h-10 px-3 rounded-lg bg-black/40 border border-wireframe-stroke text-white text-sm focus:border-gold outline-none"
         >
           {LANGUAGES.map(lang => (
             <option key={lang} value={lang} className="bg-black">
@@ -449,7 +449,7 @@ function CodeInputPanel({ onCapture }: CodeInputPanelProps) {
           value={filename}
           onChange={(e) => setFilename(e.target.value)}
           placeholder="Filename (optional)"
-          className="flex-1 h-10 px-3 rounded-lg bg-black/40 border border-white/10 text-white text-sm placeholder:text-white/20 focus:border-gold outline-none"
+          className="flex-1 h-10 px-3 rounded-lg bg-black/40 border border-wireframe-stroke text-white text-sm placeholder:text-white/20 focus:border-gold outline-none"
         />
       </div>
 
@@ -457,7 +457,7 @@ function CodeInputPanel({ onCapture }: CodeInputPanelProps) {
         value={code}
         onChange={(e) => setCode(e.target.value)}
         placeholder="Paste or type your code here..."
-        className="w-full h-48 p-4 rounded-xl bg-black/60 border border-white/10 text-white font-mono text-sm placeholder:text-white/20 focus:border-gold outline-none resize-none"
+        className="w-full h-48 p-4 rounded-xl bg-black/60 border border-wireframe-stroke text-white font-mono text-sm placeholder:text-white/20 focus:border-gold outline-none resize-none"
       />
 
       <div className="flex justify-between items-center">
@@ -504,7 +504,7 @@ function TextInputPanel({ onCapture }: TextInputPanelProps) {
         value={text}
         onChange={(e) => setText(e.target.value)}
         placeholder="Type your clarification or additional information here..."
-        className="w-full h-40 p-4 rounded-xl bg-black/40 border border-white/10 text-white text-sm placeholder:text-white/20 focus:border-gold outline-none resize-none"
+        className="w-full h-40 p-4 rounded-xl bg-black/40 border border-wireframe-stroke text-white text-sm placeholder:text-white/20 focus:border-gold outline-none resize-none"
       />
 
       <div className="flex justify-between items-center">
@@ -549,7 +549,7 @@ function InputPreview({ input, onRemove }: { input: ChangeOrderInput; onRemove: 
   };
 
   return (
-    <div className="flex items-center gap-2 px-3 py-2 bg-white/5 rounded-lg border border-white/10">
+    <div className="flex items-center gap-2 px-3 py-2 bg-white/5 rounded-lg border border-wireframe-stroke">
       <span className="text-gold">{getIcon()}</span>
       <span className="flex-1 text-sm text-white truncate">{getLabel()}</span>
       <span className="text-xs text-white/30">
@@ -642,10 +642,10 @@ export function UserInputModal({
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-xl bg-[#0A0A0A] border border-white/10 rounded-2xl shadow-2xl z-50 overflow-hidden"
+            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-xl bg-[#0A0A0A] border border-wireframe-stroke rounded-2xl shadow-2xl z-50 overflow-hidden"
           >
             {/* Header */}
-            <div className="px-6 py-4 border-b border-white/5">
+            <div className="px-6 py-4 border-b border-wireframe-stroke">
               <div className="flex items-start justify-between">
                 <div>
                   <div className="flex items-center gap-2">
@@ -705,7 +705,7 @@ export function UserInputModal({
 
             {/* Collected Inputs */}
             {inputs.length > 0 && (
-              <div className="px-6 py-4 border-t border-white/5">
+              <div className="px-6 py-4 border-t border-wireframe-stroke">
                 <p className="text-xs text-white/30 mb-2">Collected Inputs ({inputs.length})</p>
                 <div className="space-y-2 max-h-32 overflow-y-auto">
                   {inputs.map((input, i) => (
@@ -720,7 +720,7 @@ export function UserInputModal({
             )}
 
             {/* Footer */}
-            <div className="px-6 py-4 border-t border-white/5 bg-white/[0.02]">
+            <div className="px-6 py-4 border-t border-wireframe-stroke bg-white/[0.02]">
               <div className="flex items-center justify-between">
                 <div className="text-xs text-white/40">
                   <span>Est. tokens: {totalTokens.toLocaleString()}</span>
@@ -731,7 +731,7 @@ export function UserInputModal({
                 <div className="flex gap-3">
                   <button
                     onClick={onClose}
-                    className="px-4 py-2 rounded-lg border border-white/10 text-white/70 hover:bg-white/5 transition-colors"
+                    className="px-4 py-2 rounded-lg border border-wireframe-stroke text-white/70 hover:bg-white/5 transition-colors"
                   >
                     Cancel
                   </button>

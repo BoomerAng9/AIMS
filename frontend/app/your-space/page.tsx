@@ -99,7 +99,7 @@ function NavigationHUD({ fuel, onOpenGalaxyMap }: { fuel: number; onOpenGalaxyMa
   return (
     <div className="absolute top-4 left-4 right-4 flex items-center justify-between pointer-events-none">
       {/* Left: Coordinates */}
-      <div className="pointer-events-auto bg-black/60 backdrop-blur-xl border border-white/10 rounded-xl px-4 py-2">
+      <div className="pointer-events-auto bg-black/60 backdrop-blur-xl border border-wireframe-stroke rounded-xl px-4 py-2">
         <p className="text-[10px] text-gray-500 uppercase tracking-wider">Location</p>
         <p className="text-sm text-gold font-mono">Sector 7-Alpha</p>
       </div>
@@ -113,7 +113,7 @@ function NavigationHUD({ fuel, onOpenGalaxyMap }: { fuel: number; onOpenGalaxyMa
       </button>
 
       {/* Right: Quick Stats */}
-      <div className="pointer-events-auto bg-black/60 backdrop-blur-xl border border-white/10 rounded-xl px-4 py-2 flex gap-6">
+      <div className="pointer-events-auto bg-black/60 backdrop-blur-xl border border-wireframe-stroke rounded-xl px-4 py-2 flex gap-6">
         <div>
           <p className="text-[10px] text-gray-500 uppercase tracking-wider">Fuel</p>
           <p className="text-sm text-gold font-mono">{fuel} LUC</p>
@@ -144,7 +144,7 @@ function PlanetDetail({ planet, onClose, onTravel }: { planet: Planet; onClose: 
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
-        className="bg-[#0a0a0a] border border-white/10 rounded-2xl p-6 max-w-md w-full"
+        className="bg-[#0a0a0a] border border-wireframe-stroke rounded-2xl p-6 max-w-md w-full"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Planet Visual */}
@@ -176,7 +176,7 @@ function PlanetDetail({ planet, onClose, onTravel }: { planet: Planet; onClose: 
             {planet.resources.map((resource) => (
               <span
                 key={resource}
-                className="px-3 py-1 text-sm bg-white/5 border border-white/10 rounded-full text-gray-300"
+                className="px-3 py-1 text-sm bg-white/5 border border-wireframe-stroke rounded-full text-gray-300"
               >
                 {resource}
               </span>
@@ -196,7 +196,7 @@ function PlanetDetail({ planet, onClose, onTravel }: { planet: Planet; onClose: 
         <div className="flex gap-3">
           <button
             onClick={onClose}
-            className="flex-1 py-3 rounded-xl bg-white/5 border border-white/10 text-gray-300 hover:bg-white/10 transition-colors"
+            className="flex-1 py-3 rounded-xl bg-white/5 border border-wireframe-stroke text-gray-300 hover:bg-white/10 transition-colors"
           >
             Cancel
           </button>

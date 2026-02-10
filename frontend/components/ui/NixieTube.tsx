@@ -194,7 +194,7 @@ export function NixieTubeDisplay({
   return (
     <div className="flex flex-col items-center gap-2">
       {label && (
-        <span className="text-xs uppercase tracking-wider text-amber-100/50 font-medium">
+        <span className="text-xs uppercase tracking-wider text-white/40 font-medium">
           {label}
         </span>
       )}

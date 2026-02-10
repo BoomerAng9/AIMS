@@ -9,7 +9,7 @@ interface Props {
 export function LucEstimatePanel({ estimate }: Props) {
   return (
     <div className="space-y-6">
-      <div className="flex items-end justify-between border-b border-white/5 pb-4">
+      <div className="flex items-end justify-between border-b border-wireframe-stroke pb-4">
         <div>
           <p className="text-[10px] uppercase tracking-widest text-white/30 font-display">Estimated Workflow Cost</p>
           <h2 className="text-3xl font-bold text-white font-display">${estimate.totalUsd.toFixed(2)}</h2>
@@ -36,7 +36,7 @@ export function LucEstimatePanel({ estimate }: Props) {
         <h4 className="text-[10px] font-bold uppercase tracking-widest text-gold mb-3">Orchestrator Selection</h4>
         <div className="grid gap-2">
           {estimate.modelOptions.map((opt) => (
-            <button key={opt.name} className="flex flex-col rounded-xl border border-white/5 bg-black/40 p-3 text-left transition-all hover:border-gold/30 group">
+            <button key={opt.name} className="flex flex-col rounded-xl border border-wireframe-stroke bg-black/40 p-3 text-left transition-all hover:border-gold/30 group">
               <div className="flex justify-between items-center">
                 <span className="text-xs font-semibold text-white group-hover:text-gold">{opt.name}</span>
                 <span className="text-[10px] text-white/30">x{opt.costMultiplier} cost</span>

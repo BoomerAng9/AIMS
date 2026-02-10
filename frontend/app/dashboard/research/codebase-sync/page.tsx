@@ -106,7 +106,7 @@ export default function CodebaseSyncPage() {
       <motion.section variants={staggerItem}>
         <Link
           href="/dashboard/research"
-          className="mb-4 inline-flex items-center gap-2 text-sm text-amber-100/50 transition hover:text-gold"
+          className="mb-4 inline-flex items-center gap-2 text-sm text-white/40 transition hover:text-gold"
         >
           <ArrowLeft size={14} />
           Back to Research Hub
@@ -117,10 +117,10 @@ export default function CodebaseSyncPage() {
             <GitBranch size={22} className="text-gold" />
           </div>
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-amber-50 font-display">
+            <h1 className="text-2xl font-semibold tracking-tight text-white font-display">
               Codebase Sync
             </h1>
-            <p className="text-sm text-amber-100/70">
+            <p className="text-sm text-white/50">
               GitHub integration, repository stats, and code activity
             </p>
           </div>
@@ -129,10 +129,10 @@ export default function CodebaseSyncPage() {
 
       {/* ── Connect GitHub CTA ─────────────────────────────── */}
       <motion.section variants={staggerItem}>
-        <div className="rounded-3xl border border-white/10 bg-black/60 p-6 backdrop-blur-2xl">
+        <div className="rounded-3xl border border-wireframe-stroke bg-black/60 p-6 backdrop-blur-2xl">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/5">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-wireframe-stroke bg-white/5">
                 <Github size={18} className="text-white/80" />
               </div>
               <div>
@@ -158,10 +158,10 @@ export default function CodebaseSyncPage() {
 
       {/* ── Repository Overview ─────────────────────────────── */}
       <motion.section variants={staggerItem}>
-        <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-amber-200/90 font-display">
+        <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-white/80 font-display">
           Repository Overview
         </h2>
-        <div className="rounded-3xl border border-white/10 bg-black/60 p-6 backdrop-blur-2xl">
+        <div className="rounded-3xl border border-wireframe-stroke bg-black/60 p-6 backdrop-blur-2xl">
           {/* Repo Header */}
           <div className="mb-5 flex items-center gap-3">
             <FolderTree size={18} className="text-gold/70" />
@@ -175,47 +175,47 @@ export default function CodebaseSyncPage() {
 
           {/* Stats Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-            <div className="rounded-xl border border-white/5 bg-white/5 px-3 py-2.5 text-center">
+            <div className="rounded-xl border border-wireframe-stroke bg-white/5 px-3 py-2.5 text-center">
               <GitCommit size={16} className="mx-auto mb-1 text-gold/60" />
               <p className="text-lg font-bold text-white">{repoStats.commits}</p>
-              <p className="text-[10px] uppercase tracking-wider text-amber-200/50">
+              <p className="text-[10px] uppercase tracking-wider text-gold/50">
                 Commits
               </p>
             </div>
-            <div className="rounded-xl border border-white/5 bg-white/5 px-3 py-2.5 text-center">
+            <div className="rounded-xl border border-wireframe-stroke bg-white/5 px-3 py-2.5 text-center">
               <GitBranch size={16} className="mx-auto mb-1 text-blue-400/60" />
               <p className="text-lg font-bold text-white">{repoStats.branches}</p>
-              <p className="text-[10px] uppercase tracking-wider text-amber-200/50">
+              <p className="text-[10px] uppercase tracking-wider text-gold/50">
                 Branches
               </p>
             </div>
-            <div className="rounded-xl border border-white/5 bg-white/5 px-3 py-2.5 text-center">
+            <div className="rounded-xl border border-wireframe-stroke bg-white/5 px-3 py-2.5 text-center">
               <Users size={16} className="mx-auto mb-1 text-purple-400/60" />
               <p className="text-lg font-bold text-white">{repoStats.contributors}</p>
-              <p className="text-[10px] uppercase tracking-wider text-amber-200/50">
+              <p className="text-[10px] uppercase tracking-wider text-gold/50">
                 Contributors
               </p>
             </div>
-            <div className="rounded-xl border border-white/5 bg-white/5 px-3 py-2.5 text-center">
+            <div className="rounded-xl border border-wireframe-stroke bg-white/5 px-3 py-2.5 text-center">
               <GitPullRequest size={16} className="mx-auto mb-1 text-emerald-400/60" />
               <p className="text-lg font-bold text-white">{repoStats.openPRs}</p>
-              <p className="text-[10px] uppercase tracking-wider text-amber-200/50">
+              <p className="text-[10px] uppercase tracking-wider text-gold/50">
                 Open PRs
               </p>
             </div>
-            <div className="rounded-xl border border-white/5 bg-white/5 px-3 py-2.5 text-center">
+            <div className="rounded-xl border border-wireframe-stroke bg-white/5 px-3 py-2.5 text-center">
               <Code2 size={16} className="mx-auto mb-1 text-cyan-400/60" />
               <p className="text-lg font-bold text-white">{repoStats.language}</p>
-              <p className="text-[10px] uppercase tracking-wider text-amber-200/50">
+              <p className="text-[10px] uppercase tracking-wider text-gold/50">
                 Language
               </p>
             </div>
-            <div className="rounded-xl border border-white/5 bg-white/5 px-3 py-2.5 text-center">
-              <Clock size={16} className="mx-auto mb-1 text-amber-400/60" />
+            <div className="rounded-xl border border-wireframe-stroke bg-white/5 px-3 py-2.5 text-center">
+              <Clock size={16} className="mx-auto mb-1 text-gold" />
               <p className="text-lg font-bold text-white">
                 {timeAgo(repoStats.lastPush)}
               </p>
-              <p className="text-[10px] uppercase tracking-wider text-amber-200/50">
+              <p className="text-[10px] uppercase tracking-wider text-gold/50">
                 Last Push
               </p>
             </div>
@@ -225,14 +225,14 @@ export default function CodebaseSyncPage() {
 
       {/* ── Recent Commits ─────────────────────────────────── */}
       <motion.section variants={staggerItem}>
-        <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-amber-200/90 font-display">
+        <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-white/80 font-display">
           Recent Commits
         </h2>
-        <div className="rounded-3xl border border-white/10 bg-black/60 backdrop-blur-2xl divide-y divide-white/5">
+        <div className="rounded-3xl border border-wireframe-stroke bg-black/60 backdrop-blur-2xl divide-y divide-white/5">
           {recentCommits.map((commit) => (
             <div key={commit.hash} className="flex items-start gap-4 px-6 py-4">
               {/* Commit Hash */}
-              <code className="mt-0.5 flex-shrink-0 rounded-lg border border-white/10 bg-white/5 px-2 py-0.5 text-xs font-mono text-gold/80">
+              <code className="mt-0.5 flex-shrink-0 rounded-lg border border-wireframe-stroke bg-white/5 px-2 py-0.5 text-xs font-mono text-gold/80">
                 {commit.hash}
               </code>
 
@@ -261,15 +261,15 @@ export default function CodebaseSyncPage() {
 
       {/* ── Branch Overview ────────────────────────────────── */}
       <motion.section variants={staggerItem}>
-        <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-amber-200/90 font-display">
+        <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-white/80 font-display">
           Branch Overview
         </h2>
-        <div className="rounded-3xl border border-white/10 bg-black/60 p-6 backdrop-blur-2xl">
+        <div className="rounded-3xl border border-wireframe-stroke bg-black/60 p-6 backdrop-blur-2xl">
           <div className="space-y-3">
             {branches.map((branch) => (
               <div
                 key={branch.name}
-                className="flex items-center justify-between rounded-2xl border border-white/5 bg-white/5 px-4 py-3"
+                className="flex items-center justify-between rounded-2xl border border-wireframe-stroke bg-white/5 px-4 py-3"
               >
                 <div className="flex items-center gap-3 min-w-0">
                   <GitBranch
@@ -311,10 +311,10 @@ export default function CodebaseSyncPage() {
 
       {/* ── Code Activity Chart Placeholder ────────────────── */}
       <motion.section variants={staggerItem}>
-        <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-amber-200/90 font-display">
+        <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-white/80 font-display">
           Code Activity
         </h2>
-        <div className="rounded-3xl border border-white/10 bg-black/60 p-6 backdrop-blur-2xl">
+        <div className="rounded-3xl border border-wireframe-stroke bg-black/60 p-6 backdrop-blur-2xl">
           <div className="flex items-center gap-3 mb-4">
             <BarChart3 size={16} className="text-gold/60" />
             <p className="text-sm text-white/60">
@@ -358,7 +358,7 @@ export default function CodebaseSyncPage() {
             )}
           </div>
 
-          <div className="mt-4 flex items-center gap-4 border-t border-white/5 pt-3">
+          <div className="mt-4 flex items-center gap-4 border-t border-wireframe-stroke pt-3">
             <Activity size={14} className="text-gold/60" />
             <p className="text-xs text-white/40">
               104 commits across 4 branches in the last 12 weeks

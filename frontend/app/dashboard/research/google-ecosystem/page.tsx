@@ -167,7 +167,7 @@ export default function GoogleEcosystemPage() {
       <motion.section variants={staggerItem}>
         <Link
           href="/dashboard/research"
-          className="mb-4 inline-flex items-center gap-2 text-sm text-amber-100/50 transition hover:text-gold"
+          className="mb-4 inline-flex items-center gap-2 text-sm text-white/40 transition hover:text-gold"
         >
           <ArrowLeft size={14} />
           Back to Research Hub
@@ -178,10 +178,10 @@ export default function GoogleEcosystemPage() {
             <Globe size={22} className="text-gold" />
           </div>
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-amber-50 font-display">
+            <h1 className="text-2xl font-semibold tracking-tight text-white font-display">
               Google Ecosystem
             </h1>
-            <p className="text-sm text-amber-100/70">
+            <p className="text-sm text-white/50">
               Google Cloud integrations powering the A.I.M.S. infrastructure
             </p>
           </div>
@@ -190,7 +190,7 @@ export default function GoogleEcosystemPage() {
 
       {/* ── Service Cards ──────────────────────────────────── */}
       <motion.section variants={staggerItem}>
-        <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-amber-200/90 font-display">
+        <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-white/80 font-display">
           Integrated Services
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -198,7 +198,7 @@ export default function GoogleEcosystemPage() {
             <motion.div
               key={service.id}
               whileHover={{ y: -4 }}
-              className="rounded-3xl border border-white/10 bg-black/60 p-6 backdrop-blur-2xl"
+              className="rounded-3xl border border-wireframe-stroke bg-black/60 p-6 backdrop-blur-2xl"
             >
               {/* Header */}
               <div className="mb-4 flex items-start justify-between">
@@ -228,9 +228,9 @@ export default function GoogleEcosystemPage() {
                 {service.metrics.map((metric) => (
                   <div
                     key={metric.label}
-                    className="rounded-xl border border-white/5 bg-white/5 px-3 py-2"
+                    className="rounded-xl border border-wireframe-stroke bg-white/5 px-3 py-2"
                   >
-                    <p className="text-[10px] font-medium uppercase tracking-wider text-amber-200/50">
+                    <p className="text-[10px] font-medium uppercase tracking-wider text-gold/50">
                       {metric.label}
                     </p>
                     <p className="text-sm font-semibold text-white">
@@ -262,11 +262,11 @@ export default function GoogleEcosystemPage() {
 
       {/* ── CI/CD Pipeline ─────────────────────────────────── */}
       <motion.section variants={staggerItem}>
-        <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-amber-200/90 font-display">
+        <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-white/80 font-display">
           A.I.M.S. CI/CD Pipeline
         </h2>
-        <div className="rounded-3xl border border-white/10 bg-black/60 p-6 backdrop-blur-2xl">
-          <p className="mb-6 text-sm text-amber-100/70">
+        <div className="rounded-3xl border border-wireframe-stroke bg-black/60 p-6 backdrop-blur-2xl">
+          <p className="mb-6 text-sm text-white/50">
             End-to-end deployment flow from code commit to live production on
             the A.I.M.S. VPS.
           </p>
@@ -320,7 +320,7 @@ export default function GoogleEcosystemPage() {
           </div>
 
           {/* Pipeline Details */}
-          <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-white/5 pt-4">
+          <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-wireframe-stroke pt-4">
             <div className="flex items-center gap-3 text-xs text-white/40">
               <Clock size={14} className="text-gold/60" />
               <span>Average pipeline: ~5 minutes end-to-end</span>

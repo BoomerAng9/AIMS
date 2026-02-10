@@ -105,13 +105,12 @@ export default function ChatWithAcheevy() {
   }, [gates.voiceStt, voiceInput]);
 
   return (
-    <div className="flex items-start justify-center w-full min-h-[calc(100vh-6rem)] py-4 px-4">
+    <div className="flex flex-col w-full h-full">
       {/* ── Bezel Container ── */}
-      <div className="relative w-full max-w-4xl flex flex-col rounded-[20px] overflow-hidden"
+      <div className="relative w-full flex-1 flex flex-col rounded-[20px] overflow-hidden"
         style={{
           background: 'linear-gradient(145deg, #1a1a1a 0%, #0d0d0d 50%, #1a1a1a 100%)',
           boxShadow: '0 0 0 2px rgba(212,168,67,0.15), 0 0 40px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.03)',
-          height: 'calc(100vh - 8rem)',
         }}
       >
         {/* ── Bezel Top Frame with logo + etched text ── */}
@@ -302,7 +301,7 @@ export default function ChatWithAcheevy() {
         )}
 
         {/* ── Input Bar ── */}
-        <div className="border-t border-gold/10 px-6 py-3"
+        <div className="border-t border-gold/10 px-6 py-5"
           style={{
             background: 'linear-gradient(0deg, rgba(30,30,30,0.95) 0%, rgba(15,15,15,0.98) 100%)',
           }}
@@ -371,8 +370,8 @@ export default function ChatWithAcheevy() {
               </div>
             </form>
 
-            {/* Status line */}
-            <div className="flex items-center gap-2 mt-2 px-1">
+            {/* Status line - Reserved height to fix "loading issue" layout shift */}
+            <div className="flex items-center gap-2 mt-2 px-1 min-h-[20px]">
               {isLoading && (
                 <div className="flex items-center gap-1.5">
                   <div className="w-1.5 h-1.5 rounded-full bg-gold animate-pulse" />

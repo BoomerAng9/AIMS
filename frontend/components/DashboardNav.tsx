@@ -52,7 +52,7 @@ function NavLink({ item, pathname }: { item: { href: string; label: string; high
           ? "border-gold/40 bg-gold/5 text-gold"
           : isHighlight
           ? "border-gold/20 bg-gold/5 text-gold/80 hover:bg-gold/10"
-          : "border-transparent text-white/60 hover:bg-white/5 hover:border-white/10 hover:text-white/80"
+          : "border-transparent text-white/60 hover:bg-white/5 hover:border-wireframe-stroke hover:text-white/80"
       )}
     >
       <span className={clsx(

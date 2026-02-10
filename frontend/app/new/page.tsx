@@ -22,7 +22,7 @@ export default function NewLandingPage() {
                  System Online
               </div>
               
-              <div className="relative w-full max-w-6xl aspect-[16/9] rounded-xl overflow-hidden shadow-2xl border border-white/10 mb-10">
+              <div className="relative w-full max-w-6xl aspect-[16/9] rounded-xl overflow-hidden shadow-2xl border border-wireframe-stroke mb-10">
                 <Image 
                   src="/assets/acheevy_showroom_v5.png" 
                   alt="ACHEEVY Showroom - AI Managed Services" 

@@ -240,7 +240,7 @@ export default function IntegrationsPage() {
             return (
               <Card
                 key={index}
-                className="bg-black/40 border-white/5 hover:border-gold/20 transition-colors"
+                className="bg-black/40 border-wireframe-stroke hover:border-gold/20 transition-colors"
               >
                 <CardHeader>
                   <div className="flex items-center justify-between">
@@ -290,7 +290,7 @@ export default function IntegrationsPage() {
         </div>
 
         {/* Environment Check */}
-        <Card className="mt-6 bg-black/40 border-white/5">
+        <Card className="mt-6 bg-black/40 border-wireframe-stroke">
           <CardHeader>
             <CardTitle className="text-white">Environment Variables</CardTitle>
             <CardDescription>

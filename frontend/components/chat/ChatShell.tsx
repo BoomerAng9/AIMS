@@ -10,7 +10,7 @@ export function ChatShell({ children }: Props) {
   return (
     <div className="flex flex-col h-[calc(100vh-160px)] md:h-[calc(100vh-120px)]">
       {/* Header */}
-      <header className="flex items-center justify-between border-b border-white/5 pb-4 px-6 md:px-8">
+      <header className="flex items-center justify-between border-b border-wireframe-stroke pb-4 px-6 md:px-8">
         <div className="flex items-center gap-4">
           <div className="h-10 w-10 rounded-full bg-gradient-to-br from-gold to-gold/60 flex items-center justify-center text-xl shadow-[0_0_15px_rgba(251,191,36,0.3)]">
             🛡️
@@ -49,7 +49,7 @@ export function ChatShell({ children }: Props) {
 
       {/* Input Area */}
       <footer className="p-4 md:p-6">
-        <div className="rounded-3xl border border-white/10 bg-black/40 p-2 backdrop-blur-2xl shadow-xl flex items-center gap-2 focus-within:border-gold/30 transition-all">
+        <div className="rounded-3xl border border-wireframe-stroke bg-black/40 p-2 backdrop-blur-2xl shadow-xl flex items-center gap-2 focus-within:border-gold/30 transition-all">
           <button disabled className="p-3 text-white/20 hover:text-white transition-colors">
             <Paperclip size={20} />
           </button>

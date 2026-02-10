@@ -27,7 +27,7 @@ export function SiteHeader() {
             alt="ACHEEVY"
           />
           <div className="flex flex-col">
-            <span className="font-display text-lg uppercase tracking-wider text-amber-50">
+            <span className="font-display text-lg uppercase tracking-wider text-white">
               A.I.M.S.
             </span>
             <span className="text-[0.5rem] uppercase tracking-[0.15em] text-white/40 -mt-1">

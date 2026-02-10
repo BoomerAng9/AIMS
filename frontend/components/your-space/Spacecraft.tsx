@@ -184,7 +184,7 @@ export function Spacecraft({
 
   return (
     <motion.div
-      className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl p-6"
+      className="bg-black/40 backdrop-blur-xl border border-wireframe-stroke rounded-2xl p-6"
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
     >
@@ -234,7 +234,7 @@ export function Spacecraft({
             </div>
             <div className="flex items-center justify-between text-sm">
               <span className="text-gray-400">🔋 Efficiency</span>
-              <span className="text-amber-400">{(config.fuelEfficiency * 100).toFixed(0)}%</span>
+              <span className="text-gold">{(config.fuelEfficiency * 100).toFixed(0)}%</span>
             </div>
           </div>
 
@@ -242,7 +242,7 @@ export function Spacecraft({
           {onCustomize && (
             <button
               onClick={onCustomize}
-              className="mt-4 w-full py-2 px-4 rounded-lg bg-white/5 border border-white/10 text-sm text-gray-300 hover:bg-white/10 hover:text-white transition-colors"
+              className="mt-4 w-full py-2 px-4 rounded-lg bg-white/5 border border-wireframe-stroke text-sm text-gray-300 hover:bg-white/10 hover:text-white transition-colors"
             >
               🔧 Customize with Claude Code
             </button>

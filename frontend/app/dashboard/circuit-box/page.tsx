@@ -202,7 +202,7 @@ function ServiceCard({ service }: { service: ServiceStatus }) {
           ))}
         </div>
       )}
-      <div className="flex items-center justify-between text-sm text-gray-500 pt-2 border-t border-white/5">
+      <div className="flex items-center justify-between text-sm text-gray-500 pt-2 border-t border-wireframe-stroke">
         <span>v{service.version}</span>
         <span className="capitalize font-medium">{service.status}</span>
       </div>

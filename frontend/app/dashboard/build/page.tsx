@@ -156,7 +156,7 @@ const PIPELINE_STAGES = ["INTAKE", "SCOPE", "BUILD", "REVIEW", "DEPLOY"];
 
 const COMPLEXITY_COLORS: Record<string, string> = {
   simple: "border-emerald-400/30 text-emerald-400 bg-emerald-400/10",
-  intermediate: "border-amber-400/30 text-amber-400 bg-gold/10",
+  intermediate: "border-gold/30 text-gold bg-gold/10",
   complex: "border-red-400/30 text-red-400 bg-red-400/10",
 };
 
@@ -257,7 +257,7 @@ export default function BuildWizardPage() {
                     ? "bg-gold text-black shadow-[0_0_20px_rgba(251,191,36,0.3)]"
                     : s < step
                       ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 cursor-pointer hover:bg-emerald-500/30"
-                      : "bg-white/5 text-white/20 border border-white/5"
+                      : "bg-white/5 text-white/20 border border-wireframe-stroke"
                 }`}
               >
                 {s < step ? <Check size={14} /> : s}
@@ -559,7 +559,7 @@ export default function BuildWizardPage() {
                 <p className="text-[10px] uppercase tracking-wider text-white/30 mb-4">
                   Preview
                 </p>
-                <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-6 space-y-4">
+                <div className="rounded-2xl border border-wireframe-stroke bg-white/[0.02] p-6 space-y-4">
                   <div className="flex items-center gap-3">
                     <div
                       className={`h-10 w-10 rounded-xl ${

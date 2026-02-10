@@ -292,13 +292,13 @@ export function OperationsOverlay({ state, onClose, onExpand, onMinimize }: Oper
       className={`
         fixed bottom-24 right-4 z-50
         ${isExpanded ? 'w-96' : 'w-72'}
-        bg-black/90 backdrop-blur-xl border border-white/10 rounded-2xl
+        bg-black/90 backdrop-blur-xl border border-wireframe-stroke rounded-2xl
         shadow-2xl shadow-black/50
         overflow-hidden transition-all duration-300
       `}
     >
       {/* Header */}
-      <div className="px-4 py-3 border-b border-white/5 flex items-center justify-between">
+      <div className="px-4 py-3 border-b border-wireframe-stroke flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className={`text-lg ${phaseConfig.color}`}>
             {phaseConfig.icon}
@@ -335,7 +335,7 @@ export function OperationsOverlay({ state, onClose, onExpand, onMinimize }: Oper
 
       {/* User Context Bar */}
       {state.userName && (
-        <div className="px-4 py-2 bg-gold/5 border-b border-white/5">
+        <div className="px-4 py-2 bg-gold/5 border-b border-wireframe-stroke">
           <p className="text-[10px] text-gold/80">
             Working on: <span className="font-medium text-gold">{state.userName}</span>
             {state.projectTitle && ` • ${state.projectTitle}`}
@@ -350,7 +350,7 @@ export function OperationsOverlay({ state, onClose, onExpand, onMinimize }: Oper
       >
         {/* Active Agents (expanded view) */}
         {isExpanded && state.activeAngs.length > 0 && (
-          <div className="p-3 border-b border-white/5">
+          <div className="p-3 border-b border-wireframe-stroke">
             <p className="text-[10px] uppercase tracking-wider text-white/30 mb-2">
               Active Agents
             </p>
@@ -376,7 +376,7 @@ export function OperationsOverlay({ state, onClose, onExpand, onMinimize }: Oper
 
         {/* Agent Dialogue (expanded view) */}
         {isExpanded && latestDialogues.length > 0 && (
-          <div className="p-3 border-t border-white/5">
+          <div className="p-3 border-t border-wireframe-stroke">
             <p className="text-[10px] uppercase tracking-wider text-white/30 mb-2">
               Team Discussion
             </p>
@@ -438,7 +438,7 @@ export function OperationsPulse({ phase, onClick }: {
       className={`
         fixed bottom-24 right-4 z-50
         flex items-center gap-2 px-3 py-2
-        bg-black/80 backdrop-blur-xl border border-white/10 rounded-full
+        bg-black/80 backdrop-blur-xl border border-wireframe-stroke rounded-full
         hover:bg-black/90 transition-colors
       `}
     >

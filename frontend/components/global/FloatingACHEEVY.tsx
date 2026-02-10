@@ -251,10 +251,10 @@ export function FloatingACHEEVY() {
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="fixed bottom-20 right-4 w-96 max-h-[500px] bg-[#0a0a0a] border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50"
+            className="fixed bottom-20 right-4 w-96 max-h-[500px] bg-[#0a0a0a] border border-wireframe-stroke rounded-2xl shadow-2xl overflow-hidden z-50"
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-black/50">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-wireframe-stroke bg-black/50">
               <div className="flex items-center gap-2">
                 <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-gold to-gold flex items-center justify-center">
                   <span className="text-xs font-bold text-black">A</span>
@@ -318,7 +318,7 @@ export function FloatingACHEEVY() {
           animate={{
             width: isFocused || inputValue ? 320 : 200,
           }}
-          className="flex items-center gap-2 bg-[#1a1a1a] border border-white/10 rounded-full px-4 py-2.5 shadow-lg hover:border-gold/30 transition-colors"
+          className="flex items-center gap-2 bg-[#1a1a1a] border border-wireframe-stroke rounded-full px-4 py-2.5 shadow-lg hover:border-gold/30 transition-colors"
         >
           <div className="w-5 h-5 rounded-md bg-gradient-to-br from-gold to-gold flex items-center justify-center flex-shrink-0">
             <span className="text-[10px] font-bold text-black">A</span>

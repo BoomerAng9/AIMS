@@ -255,7 +255,7 @@ export function AIMSNav({
 
               {/* User menu */}
               {user && (
-                <div className="hidden sm:flex items-center gap-3 pl-3 border-l border-white/10">
+                <div className="hidden sm:flex items-center gap-3 pl-3 border-l border-wireframe-stroke">
                   <div className="text-right">
                     <div
                       className="text-sm font-medium"

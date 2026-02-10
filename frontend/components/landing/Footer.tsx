@@ -86,7 +86,6 @@ const FOOTER_NAV = {
       { label: 'Privacy Policy', href: '/privacy' },
       { label: 'Security Policy', href: '/security' },
       { label: 'Cookie Policy', href: '/cookies' },
-      { label: 'License (MIT)', href: '/license' },
     ],
   },
 };
@@ -156,7 +155,7 @@ export function Footer() {
                 <input
                   type="email"
                   placeholder="Email"
-                  className="flex-1 px-4 py-2 rounded-lg bg-black/40 border border-white/10 text-white text-sm placeholder:text-gray-500 outline-none focus:border-gold/50"
+                  className="flex-1 px-4 py-2 rounded-lg bg-black/40 border border-wireframe-stroke text-white text-sm placeholder:text-gray-500 outline-none focus:border-gold/50"
                 />
                 <button
                   className="px-4 py-2 rounded-lg transition-colors"

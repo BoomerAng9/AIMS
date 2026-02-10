@@ -115,7 +115,7 @@ function AppCard({ app }: { app: AppShowcaseItem }) {
               ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
               : app.status === 'demo'
               ? 'bg-gold/10 text-gold border border-gold/20'
-              : 'bg-white/5 text-white/30 border border-white/10'
+              : 'bg-white/5 text-white/30 border border-wireframe-stroke'
           }`}>
             {app.status === 'live' ? 'LIVE' : app.status === 'demo' ? 'DEMO' : 'SOON'}
           </span>

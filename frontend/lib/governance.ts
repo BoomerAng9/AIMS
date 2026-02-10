@@ -228,7 +228,7 @@ export const EVOLUTION_STAGES: EvolutionStage[] = [
     name: 'Chicken Hawk Candidate',
     visual: 'Large muscular hawk with green energy aura',
     image: '/images/brand/hawks/lil-hawk-evolved.png',
-    color: 'text-amber-300',
+    color: 'text-gold',
     description: 'Ready for Chicken Hawk status — proven long-term consistency.',
     criteria: [
       'Long-term consistency proven',

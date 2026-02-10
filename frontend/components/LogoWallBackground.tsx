@@ -33,8 +33,11 @@ export function LogoWallBackground({ mode = "hero", children }: Props) {
   }[mode];
 
   return (
-    <div className={clsx("relative min-h-screen text-amber-50 overflow-hidden", bgClass, edgeClass)}>
-      {/* Subtle grid overlay for dashboard/form (lighter than aims-page-bg) */}
+    <div className={clsx(
+      "relative text-white",
+      mode === "dashboard" ? "h-screen overflow-hidden bg-[#0A0A0A]" : "min-h-screen aims-page-bg gold-edge-rail"
+    )}>
+      {/* Subtle grid overlay for dashboard/form */}
       {(mode === "dashboard" || mode === "form") && (
         <div
           className="pointer-events-none absolute inset-0 opacity-40 bg-grid-fine [background-size:48px_48px]"
@@ -42,7 +45,13 @@ export function LogoWallBackground({ mode = "hero", children }: Props) {
         />
       )}
 
-      {/* Corner logo stamp — bottom-right, very subtle */}
+      {/* Blue Vignette - Monitor Glow Effect */}
+      <div
+        className="pointer-events-none absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,transparent_0%,transparent_60%,rgba(0,10,40,0.8)_100%)] mix-blend-hard-light"
+        aria-hidden="true"
+      />
+
+      {/* Corner logo stamp */}
       {(mode === "hero" || mode === "auth") && (
         <div
           className="pointer-events-none absolute bottom-4 right-4 w-12 h-12 opacity-[0.05] bg-contain bg-no-repeat bg-center z-0 [background-image:url('/images/logos/achievemor-gold.png')]"
@@ -50,7 +59,7 @@ export function LogoWallBackground({ mode = "hero", children }: Props) {
         />
       )}
 
-      {/* Dashboard gold watermark — centered, ambient */}
+      {/* Dashboard gold watermark */}
       {mode === "dashboard" && (
         <div
           className="pointer-events-none absolute inset-0 flex items-center justify-center z-0"
@@ -65,12 +74,13 @@ export function LogoWallBackground({ mode = "hero", children }: Props) {
 
       {/* Content */}
       <main className={clsx(
-        "relative z-10 min-h-screen flex flex-col",
-        mode === "hero" || mode === "dashboard" ? "p-4 md:p-6 lg:p-8 xl:p-12" : "p-0"
+        "relative z-10 flex flex-col",
+        mode === "dashboard" ? "h-full" : "min-h-screen",
+        mode === "hero" ? "p-4 md:p-6 lg:p-8 xl:p-12" : "p-0"
       )}>
         <div className={clsx(
           "flex-1 flex flex-col w-full",
-          (mode === "hero" || mode === "dashboard") && "rounded-[24px] border border-wireframe-stroke bg-black/20 shadow-wireframe-inner"
+          mode === "hero" && "rounded-[24px] border border-wireframe-stroke bg-black/20 shadow-wireframe-inner"
         )}>
           {children}
         </div>

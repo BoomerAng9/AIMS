@@ -159,10 +159,10 @@ export default function ActivityFeedPage() {
             <Activity size={18} className="text-gold" />
           </div>
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-amber-50 font-display">
+            <h1 className="text-2xl font-semibold tracking-tight text-white font-display">
               Activity Feed
             </h1>
-            <p className="text-sm text-amber-100/70">
+            <p className="text-sm text-white/50">
               Track your posts and engagement across all connected platforms.
             </p>
           </div>
@@ -172,7 +172,7 @@ export default function ActivityFeedPage() {
       {/* Stats row */}
       <motion.div variants={staggerItem} className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {weeklyStats.map((stat) => (
-          <div key={stat.label} className="rounded-2xl border border-white/10 bg-black/40 p-4 backdrop-blur-xl">
+          <div key={stat.label} className="rounded-2xl border border-wireframe-stroke bg-black/40 p-4 backdrop-blur-xl">
             <div className="flex items-center gap-2 mb-2">
               <stat.icon size={14} className="text-gold/60" />
               <span className="text-[10px] uppercase tracking-wider text-white/30">{stat.label}</span>
@@ -184,16 +184,16 @@ export default function ActivityFeedPage() {
       </motion.div>
 
       {/* Platform breakdown */}
-      <motion.div variants={staggerItem} className="rounded-2xl border border-white/10 bg-black/40 p-4 backdrop-blur-xl">
+      <motion.div variants={staggerItem} className="rounded-2xl border border-wireframe-stroke bg-black/40 p-4 backdrop-blur-xl">
         <div className="flex items-center gap-2 mb-3">
           <BarChart3 size={14} className="text-gold/60" />
-          <span className="text-xs font-semibold uppercase tracking-widest text-amber-200/90 font-display">
+          <span className="text-xs font-semibold uppercase tracking-widest text-white/80 font-display">
             Platform Breakdown
           </span>
         </div>
         <div className="flex gap-2">
           {Object.entries(platformConfig).map(([id, cfg]) => (
-            <div key={id} className="flex-1 rounded-xl border border-white/5 bg-white/[0.03] p-3 text-center">
+            <div key={id} className="flex-1 rounded-xl border border-wireframe-stroke bg-white/[0.03] p-3 text-center">
               <cfg.icon size={16} className={`${cfg.color} mx-auto mb-1`} />
               <p className="text-sm font-bold text-white">
                 {sampleFeed.filter((e) => e.platform === id).length}
@@ -216,7 +216,7 @@ export default function ActivityFeedPage() {
             className={`rounded-full px-3 py-1 text-xs transition border ${
               filter === id
                 ? "border-gold/30 bg-gold/10 text-gold"
-                : "border-white/10 bg-white/5 text-white/40 hover:bg-white/10"
+                : "border-wireframe-stroke bg-white/5 text-white/40 hover:bg-white/10"
             }`}
           >
             {id === "all" ? "All" : platformConfig[id]?.label || id}
@@ -234,7 +234,7 @@ export default function ActivityFeedPage() {
               key={entry.id}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="rounded-2xl border border-white/10 bg-black/40 p-4 backdrop-blur-xl hover:border-white/15 transition"
+              className="rounded-2xl border border-wireframe-stroke bg-black/40 p-4 backdrop-blur-xl hover:border-white/15 transition"
             >
               <div className="flex items-start gap-4">
                 {/* Platform icon */}
@@ -278,7 +278,7 @@ export default function ActivityFeedPage() {
 
       {/* Empty state when filtered */}
       {filteredFeed.length === 0 && (
-        <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-12 text-center">
+        <div className="rounded-2xl border border-wireframe-stroke bg-white/[0.02] p-12 text-center">
           <Activity size={32} className="text-white/10 mx-auto mb-3" />
           <p className="text-sm text-white/30">No activity for this platform yet.</p>
           <Link href="/dashboard/research/connected-accounts" className="text-xs text-gold mt-2 inline-block hover:underline">

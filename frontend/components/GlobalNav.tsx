@@ -26,7 +26,7 @@ export function GlobalNav() {
         {/* Home Button */}
         <Link 
           href="/" 
-          className="flex items-center gap-2 px-4 py-2 rounded-full border border-white/5 bg-black/40 backdrop-blur-md text-white/70 hover:text-white hover:border-gold/30 transition-all text-xs font-semibold uppercase tracking-widest"
+          className="flex items-center gap-2 px-4 py-2 rounded-full border border-wireframe-stroke bg-black/40 backdrop-blur-md text-white/70 hover:text-white hover:border-gold/30 transition-all text-xs font-semibold uppercase tracking-widest"
         >
           <Home size={14} />
           <span>Home</span>
@@ -36,7 +36,7 @@ export function GlobalNav() {
         <button 
           onClick={() => router.back()}
           disabled={pathname === "/"}
-          className={`flex items-center gap-2 px-4 py-2 rounded-full border border-white/5 bg-black/40 backdrop-blur-md text-xs font-semibold uppercase tracking-widest transition-all ${
+          className={`flex items-center gap-2 px-4 py-2 rounded-full border border-wireframe-stroke bg-black/40 backdrop-blur-md text-xs font-semibold uppercase tracking-widest transition-all ${
             pathname === "/" 
               ? "opacity-50 cursor-not-allowed text-white/20" 
               : "text-white/70 hover:text-white hover:border-gold/30"

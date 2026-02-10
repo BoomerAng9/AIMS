@@ -1,9 +1,11 @@
 // frontend/components/DashboardShell.tsx
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import type { ReactNode } from "react";
-import { usePathname } from "next/navigation";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { ArrowLeft, Home } from "lucide-react";
 import { DashboardNav } from "./DashboardNav";
 import { DemoBanner } from "./DemoBanner";
 import { LogoWallBackground } from "./LogoWallBackground";
@@ -96,7 +98,7 @@ function statusDotClass(status: HealthStatus): string {
     case "healthy":
       return "bg-emerald-400 shadow-[0_0_8px_rgba(74,222,128,0.6)]";
     case "degraded":
-      return "bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.5)]";
+      return "bg-gold shadow-[0_0_8px_rgba(251,191,36,0.5)]";
     case "unhealthy":
       return "bg-red-400 shadow-[0_0_8px_rgba(248,113,113,0.5)]";
     default:
@@ -139,12 +141,13 @@ type Props = {
 export function DashboardShell({ children }: Props) {
   const health = useHealthCheck();
   const { balance } = useLucBalance();
-  const mainRef = useRef<HTMLElement>(null);
+  const router = useRouter();
   const pathname = usePathname();
+
 
   // Scroll to top when navigating between pages
   useEffect(() => {
-    mainRef.current?.scrollTo(0, 0);
+    window.scrollTo(0, 0);
   }, [pathname]);
 
   return (
@@ -152,12 +155,12 @@ export function DashboardShell({ children }: Props) {
       {/* Demo banner — only visible when NEXT_PUBLIC_DEMO_MODE=true */}
       <DemoBanner />
 
-      <div className={`flex max-h-screen overflow-hidden ${IS_DEMO ? "pt-9" : ""}`}>
+      <div className={`flex min-h-screen ${IS_DEMO ? "pt-9" : "pt-[env(safe-area-inset-top)]"}`}>
         {/* Left rail — wireframe glass sidebar */}
-        <aside className="hidden w-64 flex-shrink-0 flex-col border-r border-wireframe-stroke bg-black/60 backdrop-blur-xl lg:flex">
+        <aside className="hidden w-64 flex-shrink-0 flex-col border-r border-wireframe-stroke bg-black/60 backdrop-blur-xl lg:flex z-30 sticky top-0 h-screen">
           <div className="px-4 py-5">
             <div className="flex flex-col">
-              <span className="font-display text-sm uppercase tracking-wider text-amber-50">
+              <span className="font-display text-sm uppercase tracking-wider text-white">
                 A.I.M.S.
               </span>
               <span className="text-[0.5rem] uppercase tracking-[0.12em] text-white/40 -mt-0.5">
@@ -199,16 +202,38 @@ export function DashboardShell({ children }: Props) {
         </aside>
 
         {/* Main column */}
-        <div className="flex flex-1 flex-col max-h-screen overflow-hidden">
+        <div className="flex flex-1 flex-col min-h-screen relative z-10">
           {/* Top bar */}
-          <header className="flex items-center justify-between border-b border-wireframe-stroke bg-[#0A0A0A]/80 px-4 py-3 backdrop-blur-xl sm:px-6 lg:px-8 xl:px-12">
-            <div className="flex flex-col">
-              <span className="text-[0.65rem] uppercase tracking-[0.18em] text-gold/60 font-mono">
-                Dashboard
-              </span>
-              <span className="text-sm text-white/80">
-                Think it. Prompt it. Let ACHEEVY manage it.
-              </span>
+          <header className="sticky top-0 flex items-center justify-between border-b border-wireframe-stroke bg-[#0A0A0A]/80 px-4 py-3 backdrop-blur-xl sm:px-6 lg:px-8 xl:px-12 z-20 shadow-lg shadow-black/20">
+            <div className="flex items-center gap-5">
+              {/* Navigation Controls - Enhanced 'Pop' Style */}
+              <div className="flex items-center gap-2 -ml-2">
+                <button 
+                  onClick={() => router.back()}
+                  className="p-2.5 text-white/60 hover:text-gold hover:bg-gold/10 hover:shadow-[0_0_15px_rgba(212,175,55,0.2)] rounded-xl transition-all duration-300 border border-transparent hover:border-gold/20"
+                  title="Go Back"
+                >
+                  <ArrowLeft className="w-5 h-5" />
+                </button>
+                <Link 
+                  href="/"
+                  className="p-2.5 text-white/60 hover:text-gold hover:bg-gold/10 hover:shadow-[0_0_15px_rgba(212,175,55,0.2)] rounded-xl transition-all duration-300 border border-transparent hover:border-gold/20"
+                  title="Return Home"
+                >
+                  <Home className="w-5 h-5" />
+                </Link>
+                {/* Separator - Glowing Gold Line */}
+                <div className="w-px h-6 bg-gradient-to-b from-transparent via-gold/30 to-transparent mx-1" />
+              </div>
+
+              <div className="flex flex-col">
+                <span className="text-[0.65rem] uppercase tracking-[0.18em] text-gold/60 font-mono">
+                  Dashboard
+                </span>
+                <span className="text-xs text-white/50">
+                  Think it. Prompt it. Let ACHEEVY manage it.
+                </span>
+              </div>
             </div>
             <div className="flex items-center gap-3">
               {/* LUC pill */}
@@ -227,9 +252,9 @@ export function DashboardShell({ children }: Props) {
             </div>
           </header>
 
-          {/* Scrollable content */}
-          <main ref={mainRef} className="flex-1 overflow-y-auto px-4 py-4 sm:px-6 sm:py-6 lg:px-8 xl:px-12">
-            <div className="mx-auto max-w-6xl space-y-4 sm:space-y-6">
+          {/* Main content */}
+          <main className="flex-1 flex flex-col">
+            <div className="flex-1 w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 flex flex-col">
               {children}
             </div>
           </main>

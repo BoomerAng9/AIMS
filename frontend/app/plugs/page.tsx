@@ -55,7 +55,7 @@ export default function PlugCatalogPage() {
           {Object.entries(TIER_LABELS).map(([key, { label, price }]) => (
             <span
               key={key}
-              className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] uppercase tracking-[0.15em] text-zinc-400"
+              className="inline-flex items-center gap-2 rounded-full border border-wireframe-stroke bg-white/5 px-3 py-1 text-[10px] uppercase tracking-[0.15em] text-zinc-400"
             >
               {label} <span className="text-gold font-display">{price}</span>
             </span>
@@ -114,7 +114,7 @@ export default function PlugCatalogPage() {
                     {plug.features.slice(0, 3).map((f) => (
                       <span
                         key={f}
-                        className="text-[10px] bg-white/5 border border-white/5 text-zinc-500 rounded px-1.5 py-0.5"
+                        className="text-[10px] bg-white/5 border border-wireframe-stroke text-zinc-500 rounded px-1.5 py-0.5"
                       >
                         {f}
                       </span>

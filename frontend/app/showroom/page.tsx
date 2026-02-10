@@ -35,7 +35,7 @@ export default function ShowroomPage() {
 
         {/* 1. Color Palette */}
         <section className="space-y-6">
-          <h2 className="text-2xl font-light border-b border-white/10 pb-2">01. Chromatic Array</h2>
+          <h2 className="text-2xl font-light border-b border-wireframe-stroke pb-2">01. Chromatic Array</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <ColorCard name="Obsidian" hex="#0A0A0A" bg="bg-obsidian" text="text-white" />
             <ColorCard name="Gold (Primary)" hex="#D4AF37" bg="bg-gold" text="text-black" />
@@ -46,7 +46,7 @@ export default function ShowroomPage() {
 
         {/* 2. Typography */}
         <section className="space-y-6">
-          <h2 className="text-2xl font-light border-b border-white/10 pb-2">02. Typography</h2>
+          <h2 className="text-2xl font-light border-b border-wireframe-stroke pb-2">02. Typography</h2>
           <div className="grid md:grid-cols-2 gap-8">
             <div className="space-y-4">
               <p className="text-sm text-gold font-mono uppercase">Header / Display (Doto)</p>
@@ -70,7 +70,7 @@ export default function ShowroomPage() {
             </div>
             <div className="space-y-4">
               <p className="text-sm text-gold font-mono uppercase">Code / Data (Doto)</p>
-              <div className="font-mono text-sm bg-black/50 p-4 rounded border border-white/10 text-green-400">
+              <div className="font-mono text-sm bg-black/50 p-4 rounded border border-wireframe-stroke text-green-400">
                 {`> SYSTEM.INIT(CORE_V2)\n> CONNECTING TO NEURAL HUB... [OK]`}
               </div>
             </div>
@@ -79,7 +79,7 @@ export default function ShowroomPage() {
 
         {/* 3. Surface & Glass */}
         <section className="space-y-6">
-          <h2 className="text-2xl font-light border-b border-white/10 pb-2">03. Glass Surfaces</h2>
+          <h2 className="text-2xl font-light border-b border-wireframe-stroke pb-2">03. Glass Surfaces</h2>
           <div className="grid md:grid-cols-3 gap-6">
             
             {/* Standard Glass Panel */}
@@ -114,7 +114,7 @@ export default function ShowroomPage() {
                 <h3 className="text-xl font-medium mb-2">System Active</h3>
                 <p className="text-muted text-sm">Example of a state-driven card variant (Online/Active).</p>
               </div>
-              <button className="w-full py-2 bg-white/5 hover:bg-white/10 rounded text-xs uppercase tracking-wider transition-colors border border-white/10">
+              <button className="w-full py-2 bg-white/5 hover:bg-white/10 rounded text-xs uppercase tracking-wider transition-colors border border-wireframe-stroke">
                 View Logs
               </button>
             </div>
@@ -124,7 +124,7 @@ export default function ShowroomPage() {
 
         {/* 4. Controls */}
         <section className="space-y-6">
-          <h2 className="text-2xl font-light border-b border-white/10 pb-2">04. Interactive Controls</h2>
+          <h2 className="text-2xl font-light border-b border-wireframe-stroke pb-2">04. Interactive Controls</h2>
           <div className="glass-panel p-10 rounded-xl space-y-8">
             
             {/* Buttons */}

@@ -108,7 +108,7 @@ function AccountCard({ platform }: { platform: Platform }) {
   return (
     <motion.div
       variants={staggerItem}
-      className={`rounded-2xl border ${connected ? platform.borderColor : "border-white/10"} bg-black/40 p-5 backdrop-blur-xl transition`}
+      className={`rounded-2xl border ${connected ? platform.borderColor : "border-wireframe-stroke"} bg-black/40 p-5 backdrop-blur-xl transition`}
     >
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
@@ -127,7 +127,7 @@ function AccountCard({ platform }: { platform: Platform }) {
           <button
             type="button"
             onClick={handleSync}
-            className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white/60 transition hover:bg-white/10"
+            className="flex items-center gap-1.5 rounded-lg border border-wireframe-stroke bg-white/5 px-3 py-1.5 text-xs text-white/60 transition hover:bg-white/10"
           >
             <RefreshCw size={12} className={syncing ? "animate-spin" : ""} />
             Sync
@@ -140,7 +140,7 @@ function AccountCard({ platform }: { platform: Platform }) {
       {/* Features */}
       <div className="flex flex-wrap gap-1.5 mb-4">
         {platform.features.map((f) => (
-          <span key={f} className="rounded-full border border-white/5 bg-white/5 px-2.5 py-0.5 text-[10px] text-white/40">
+          <span key={f} className="rounded-full border border-wireframe-stroke bg-white/5 px-2.5 py-0.5 text-[10px] text-white/40">
             {f}
           </span>
         ))}
@@ -149,11 +149,11 @@ function AccountCard({ platform }: { platform: Platform }) {
       {/* Stats (when connected) */}
       {connected && (
         <div className="grid grid-cols-2 gap-2 mb-4">
-          <div className="rounded-lg border border-white/5 bg-white/5 p-2 text-center">
+          <div className="rounded-lg border border-wireframe-stroke bg-white/5 p-2 text-center">
             <p className="text-lg font-bold text-white">—</p>
             <p className="text-[10px] text-white/30">Posts</p>
           </div>
-          <div className="rounded-lg border border-white/5 bg-white/5 p-2 text-center">
+          <div className="rounded-lg border border-wireframe-stroke bg-white/5 p-2 text-center">
             <p className="text-lg font-bold text-white">—</p>
             <p className="text-[10px] text-white/30">Engagement</p>
           </div>
@@ -201,16 +201,16 @@ export default function ConnectedAccountsPage() {
 
       {/* Header */}
       <motion.header variants={staggerItem}>
-        <h1 className="text-2xl font-semibold tracking-tight text-amber-50 font-display">
+        <h1 className="text-2xl font-semibold tracking-tight text-white font-display">
           Connected Accounts
         </h1>
-        <p className="text-sm text-amber-100/70">
+        <p className="text-sm text-white/50">
           Link your social and developer accounts to track activity across platforms.
         </p>
       </motion.header>
 
       {/* Status bar */}
-      <motion.div variants={staggerItem} className="flex items-center gap-4 rounded-2xl border border-white/10 bg-black/40 p-4 backdrop-blur-xl">
+      <motion.div variants={staggerItem} className="flex items-center gap-4 rounded-2xl border border-wireframe-stroke bg-black/40 p-4 backdrop-blur-xl">
         <div className="flex items-center gap-2">
           <Check size={14} className="text-emerald-400" />
           <span className="text-xs text-white/60">0 of {platforms.length} accounts connected</span>
@@ -227,7 +227,7 @@ export default function ConnectedAccountsPage() {
       </motion.div>
 
       {/* Privacy note */}
-      <motion.div variants={staggerItem} className="rounded-2xl border border-white/5 bg-white/[0.02] p-4 text-center">
+      <motion.div variants={staggerItem} className="rounded-2xl border border-wireframe-stroke bg-white/[0.02] p-4 text-center">
         <p className="text-xs text-white/30">
           A.I.M.S. only reads public data from connected accounts. You can disconnect at any time.
           We never post on your behalf without explicit permission.

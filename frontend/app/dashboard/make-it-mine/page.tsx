@@ -58,7 +58,7 @@ export default function MakeItMinePage() {
               group relative overflow-hidden rounded-2xl border p-6
               transition-all duration-300
               ${project.comingSoon
-                ? 'border-white/5 bg-white/[0.02] cursor-not-allowed opacity-60'
+                ? 'border-wireframe-stroke bg-white/[0.02] cursor-not-allowed opacity-60'
                 : 'border-gold/20 bg-white/[0.03] hover:border-gold/20 hover:bg-white/[0.05]'
               }
             `}

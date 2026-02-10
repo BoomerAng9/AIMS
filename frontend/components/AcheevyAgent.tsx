@@ -224,7 +224,7 @@ export default function AcheevyAgent() {
   return (
     <div className="flex flex-col h-full bg-[#0a0a0a] text-white overflow-hidden">
       {/* Header */}
-      <div className="border-b border-white/10 bg-black/80 backdrop-blur-xl px-4 py-3">
+      <div className="border-b border-wireframe-stroke bg-black/80 backdrop-blur-xl px-4 py-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="relative">
@@ -301,7 +301,7 @@ export default function AcheevyAgent() {
             <div className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
               entry.role === 'user'
                 ? 'bg-gold/20 text-white rounded-tr-sm'
-                : 'bg-white/[0.03] text-white/90 rounded-tl-sm border border-white/5'
+                : 'bg-white/[0.03] text-white/90 rounded-tl-sm border border-wireframe-stroke'
             }`}>
               {entry.text}
             </div>
@@ -310,7 +310,7 @@ export default function AcheevyAgent() {
 
         {isConnected && conversation.isSpeaking && (
           <div className="flex gap-3">
-            <div className="px-4 py-2.5 bg-white/[0.03] rounded-2xl rounded-tl-sm border border-white/5 flex items-center gap-1.5">
+            <div className="px-4 py-2.5 bg-white/[0.03] rounded-2xl rounded-tl-sm border border-wireframe-stroke flex items-center gap-1.5">
               <div className="w-1.5 h-1.5 bg-gold/50 rounded-full animate-bounce [animation-delay:-0.3s]" />
               <div className="w-1.5 h-1.5 bg-gold/50 rounded-full animate-bounce [animation-delay:-0.15s]" />
               <div className="w-1.5 h-1.5 bg-gold/50 rounded-full animate-bounce" />
@@ -323,7 +323,7 @@ export default function AcheevyAgent() {
 
       {/* Audio Visualizer */}
       {isConnected && (
-        <div className="px-4 py-2 border-t border-white/5">
+        <div className="px-4 py-2 border-t border-wireframe-stroke">
           <div className="grid grid-cols-2 gap-2">
             <div>
               <p className="text-[9px] text-white/30 font-mono uppercase mb-1">You</p>
@@ -347,14 +347,14 @@ export default function AcheevyAgent() {
 
       {/* Text Input (when in text mode and connected) */}
       {textMode && isConnected && (
-        <div className="px-3 py-2 border-t border-white/5">
+        <div className="px-3 py-2 border-t border-wireframe-stroke">
           <div className="flex gap-2">
             <input
               value={textInput}
               onChange={e => setTextInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleSendText()}
               placeholder="Type a message..."
-              className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-white/20 outline-none focus:border-gold/30"
+              className="flex-1 bg-white/5 border border-wireframe-stroke rounded-lg px-3 py-2 text-sm text-white placeholder:text-white/20 outline-none focus:border-gold/30"
             />
             <button
               type="button"
@@ -370,7 +370,7 @@ export default function AcheevyAgent() {
       )}
 
       {/* Controls */}
-      <div className="px-4 py-4 bg-black/80 backdrop-blur-xl border-t border-white/10">
+      <div className="px-4 py-4 bg-black/80 backdrop-blur-xl border-t border-wireframe-stroke">
         <div className="flex items-center justify-center gap-4">
           {/* Mute */}
           {isConnected && (

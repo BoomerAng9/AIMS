@@ -669,7 +669,7 @@ function ModelCard({
       </div>
 
       {/* Use case in plain English */}
-      <p className="text-sm text-amber-300/80 mb-2">{model.useCase}</p>
+      <p className="text-sm text-gold mb-2">{model.useCase}</p>
       <p className="text-sm text-gray-400 mb-3">{model.description}</p>
 
       <div className="flex flex-wrap gap-1 mb-3">
@@ -957,7 +957,7 @@ export default function ModelGardenPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search models or providers..."
-                className="w-full pl-12 pr-4 py-3 rounded-lg bg-gray-800 border border-gray-700 text-white placeholder:text-gray-500 focus:border-amber-500 outline-none"
+                className="w-full pl-12 pr-4 py-3 rounded-lg bg-gray-800 border border-gray-700 text-white placeholder:text-gray-500 focus:border-gold/30 outline-none"
               />
             </div>
 

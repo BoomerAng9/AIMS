@@ -112,7 +112,7 @@ function YardAnimation({ phase, progress }: { phase: string; progress: number })
   ];
 
   return (
-    <div className="relative h-24 bg-black/30 rounded-lg overflow-hidden border border-white/5">
+    <div className="relative h-24 bg-black/30 rounded-lg overflow-hidden border border-wireframe-stroke">
       <svg className="w-full h-full" viewBox="0 0 100 80">
         {/* Ground */}
         <rect x="0" y="70" width="100" height="10" fill="#1a2234" />
@@ -188,7 +188,7 @@ function LilHawkCard({ hawk }: { hawk: LilHawkStatus }) {
   };
 
   return (
-    <div className="p-2 rounded-lg bg-black/30 border border-white/5 flex items-center gap-2">
+    <div className="p-2 rounded-lg bg-black/30 border border-wireframe-stroke flex items-center gap-2">
       <div className="w-8 h-8 rounded-full bg-gold/20 flex items-center justify-center">
         <BirdIcon className="w-4 h-4 text-gold" />
       </div>
@@ -381,7 +381,7 @@ export function LiveOpsTheater({ shiftId, isOpen, onClose, minimal = false }: Li
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-white/5">
+        <div className="flex items-center justify-between p-4 border-b border-wireframe-stroke">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-gold/20 flex items-center justify-center">
               <CraneIcon className="w-5 h-5 text-gold" />
@@ -471,7 +471,7 @@ export function LiveOpsTheater({ shiftId, isOpen, onClose, minimal = false }: Li
         </div>
 
         {/* Footer */}
-        <div className="px-4 py-3 border-t border-white/5 text-center">
+        <div className="px-4 py-3 border-t border-wireframe-stroke text-center">
           <p className="text-xs text-gray-500">
             Watch only \u2014 Chat with ACHEEVY to make changes
           </p>

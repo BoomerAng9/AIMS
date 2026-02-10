@@ -70,7 +70,7 @@ export function DelayedSignUpModal() {
               </div>
 
               {/* Heading */}
-              <h2 className="font-display text-xl uppercase tracking-wider text-amber-50 mb-2">
+              <h2 className="font-display text-xl uppercase tracking-wider text-white mb-2">
                 Join A.I.M.S.
               </h2>
               <p className="text-sm text-white/50 mb-8 leading-relaxed">

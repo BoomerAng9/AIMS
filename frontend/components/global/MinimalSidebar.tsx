@@ -130,7 +130,7 @@ export function MinimalSidebar() {
       {/* Mobile Menu Button */}
       <button
         onClick={() => setIsOpen(true)}
-        className="lg:hidden fixed top-4 left-4 z-40 p-2 rounded-lg bg-black/60 backdrop-blur-xl border border-white/10"
+        className="lg:hidden fixed top-4 left-4 z-40 p-2 rounded-lg bg-black/60 backdrop-blur-xl border border-wireframe-stroke"
       >
         <MenuIcon className="w-5 h-5 text-white" />
       </button>
@@ -154,10 +154,10 @@ export function MinimalSidebar() {
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-              className="lg:hidden fixed left-0 top-0 w-64 h-screen bg-[#0a0a0a] border-r border-white/10 z-50"
+              className="lg:hidden fixed left-0 top-0 w-64 h-screen bg-[#0a0a0a] border-r border-wireframe-stroke z-50"
             >
               {/* Header */}
-              <div className="flex items-center justify-between p-4 border-b border-white/10">
+              <div className="flex items-center justify-between p-4 border-b border-wireframe-stroke">
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-gold to-gold flex items-center justify-center">
                     <span className="text-sm font-bold text-black">A</span>

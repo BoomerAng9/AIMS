@@ -106,7 +106,7 @@ export default function AutonomousDashboardPage() {
             
             {/* Left: Controls */}
             <div className="lg:col-span-1 space-y-6">
-                <div className="bg-leather rounded-xl p-6 border border-white/5">
+                <div className="bg-leather rounded-xl p-6 border border-wireframe-stroke">
                     <h3 className="text-xl font-marker text-frosty-white mb-4">Manual Override</h3>
                     <div className="space-y-4">
                         <button 
@@ -122,15 +122,15 @@ export default function AutonomousDashboardPage() {
                     </div>
                 </div>
 
-                <div className="bg-leather rounded-xl p-6 border border-white/5">
+                <div className="bg-leather rounded-xl p-6 border border-wireframe-stroke">
                     <h3 className="text-xl font-marker text-frosty-white mb-4">Active SubAgents</h3>
                     <div className="space-y-3">
-                        <div className="flex items-center gap-3 p-3 bg-obsidian rounded-lg border border-white/5">
+                        <div className="flex items-center gap-3 p-3 bg-obsidian rounded-lg border border-wireframe-stroke">
                             <div className="w-2 h-2 rounded-full bg-green-500"></div>
                             <span className="font-mono text-sm">Reviewer_01</span>
                             <span className="ml-auto text-xs text-gray-500">Idle</span>
                         </div>
-                        <div className="flex items-center gap-3 p-3 bg-obsidian rounded-lg border border-white/5">
+                        <div className="flex items-center gap-3 p-3 bg-obsidian rounded-lg border border-wireframe-stroke">
                             <div className="w-2 h-2 rounded-full bg-gray-500"></div>
                             <span className="font-mono text-sm">Coder_X</span>
                             <span className="ml-auto text-xs text-gray-500">Offline</span>
@@ -141,13 +141,13 @@ export default function AutonomousDashboardPage() {
 
             {/* Right: Logs */}
             <div className="lg:col-span-2">
-                <div className="bg-leather rounded-xl p-6 border border-white/5 h-full min-h-[400px] flex flex-col">
+                <div className="bg-leather rounded-xl p-6 border border-wireframe-stroke h-full min-h-[400px] flex flex-col">
                     <div className="flex justify-between items-center mb-4">
                          <h3 className="text-xl font-marker text-frosty-white">System Logs</h3>
                          <span className="text-xs font-mono text-gray-500">Trace ID: #88392-AX</span>
                     </div>
                    
-                    <div className="flex-1 bg-obsidian rounded-lg p-4 font-mono text-sm text-gray-300 overflow-y-auto max-h-[400px] space-y-2 border border-white/5 shadow-inner">
+                    <div className="flex-1 bg-obsidian rounded-lg p-4 font-mono text-sm text-gray-300 overflow-y-auto max-h-[400px] space-y-2 border border-wireframe-stroke shadow-inner">
                         {logs.length === 0 && (
                             <div className="text-center text-gray-600 italic py-10">No active logs. System standby.</div>
                         )}

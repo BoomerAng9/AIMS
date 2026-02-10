@@ -21,7 +21,7 @@ export default function ForgotPasswordPage() {
           Email Address
           <input
             type="email"
-            className="mt-1 h-11 w-full rounded-xl border border-white/10 bg-black/60 px-3 text-sm text-white outline-none focus:border-gold transition-all placeholder:text-white/15"
+            className="mt-1 h-11 w-full rounded-xl border border-wireframe-stroke bg-black/60 px-3 text-sm text-white outline-none focus:border-gold transition-all placeholder:text-white/15"
             placeholder="you@example.com"
           />
         </label>
