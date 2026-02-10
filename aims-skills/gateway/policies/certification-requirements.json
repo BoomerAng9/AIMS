@@ -1,0 +1,89 @@
+{
+  "policy_id": "certification-requirements-v1",
+  "version": "1.0.0",
+  "description": "Marketplace certification gate requirements for Plugs (aiPLUGS)",
+
+  "required_checks": {
+    "build_metadata": {
+      "required": true,
+      "description": "Reproducible build metadata + versioning policy",
+      "artifact_type": "build_provenance",
+      "auto_scan": true
+    },
+    "dependency_scan": {
+      "required": true,
+      "description": "Dependency inventory + vulnerability scan evidence",
+      "artifact_type": "dependency_manifest",
+      "auto_scan": true,
+      "fail_on_severity": ["critical", "high"],
+      "warn_on_severity": ["medium"]
+    },
+    "permissions_manifest": {
+      "required": true,
+      "description": "Data access, external calls, environment needs",
+      "artifact_type": "permission_manifest",
+      "auto_scan": false,
+      "manual_review_required": true
+    },
+    "smoke_test": {
+      "required": true,
+      "description": "Containerized smoke test (baseline runtime)",
+      "artifact_type": "smoke_test_result",
+      "auto_scan": true,
+      "timeout_seconds": 300,
+      "sandbox_required": true
+    },
+    "rollback_readiness": {
+      "required": true,
+      "description": "Prior version restore path + migration notes",
+      "artifact_type": "rollback_plan",
+      "auto_scan": false
+    }
+  },
+
+  "badges": {
+    "certified": {
+      "requires": ["build_metadata", "dependency_scan", "permissions_manifest", "smoke_test", "rollback_readiness"],
+      "auto_revoke_on_failure": true
+    },
+    "verified_publisher": {
+      "requires": ["identity_verification", "operational_maturity"],
+      "identity_verification": {
+        "email_verified": true,
+        "domain_verified": true,
+        "min_published_plugs": 1
+      },
+      "operational_maturity": {
+        "min_days_active": 30,
+        "no_revoked_certifications": true
+      }
+    },
+    "managed_option": {
+      "requires": ["certified"],
+      "additional": {
+        "acheevy_directed_install": true,
+        "monitoring_configured": true,
+        "proof_requirements_met": true
+      }
+    }
+  },
+
+  "install_rules": {
+    "install_modes": ["one_click", "sandbox", "managed"],
+    "enforce_certification": true,
+    "exception_allowed": true,
+    "exception_requirements": {
+      "tenant_policy_approval": true,
+      "justification_required": true,
+      "scope_required": true,
+      "logged_and_auditable": true,
+      "expiration_required": true
+    }
+  },
+
+  "versioning": {
+    "policy": "semver",
+    "retain_prior_versions": true,
+    "max_retained_versions": 10
+  }
+}

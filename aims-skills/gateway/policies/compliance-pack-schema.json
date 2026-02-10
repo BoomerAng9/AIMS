@@ -1,0 +1,80 @@
+{
+  "policy_id": "compliance-pack-schema-v1",
+  "version": "1.0.0",
+  "description": "Governance rules for Compliance & Reporting Packs",
+
+  "pack_governance": {
+    "required_declarations": [
+      "required_fields",
+      "required_evidence_types",
+      "retention_requirements",
+      "delivery_method_constraints"
+    ],
+    "workflow_stages": ["draft", "review", "approve", "deliver"],
+    "workflow_rules": {
+      "draft_to_review": {
+        "all_required_fields_completed": true,
+        "all_required_evidence_attached": true
+      },
+      "review_to_approve": {
+        "reviewer_sign_off_required": true,
+        "evidence_verification_passed": true
+      },
+      "approve_to_deliver": {
+        "approver_sign_off_required": true,
+        "sdt_or_export_prepared": true,
+        "bundle_signed": true
+      }
+    }
+  },
+
+  "delivery_rules": {
+    "default_method": "partner_portal",
+    "portal_only_enforcement": {
+      "description": "Some packs restrict delivery to portal-only (no webhooks/push)",
+      "overridable_by_tenant_policy": false
+    },
+    "push_webhook_requirements": {
+      "endpoint_allowlisted": true,
+      "partner_approved": true,
+      "payload_signed": true,
+      "max_payload_size_bytes": 10485760
+    },
+    "signed_export_requirements": {
+      "bundle_formats": ["pdf", "csv", "json"],
+      "manifest_hash_required": true,
+      "chain_of_custody_required": true,
+      "timestamps_included": true
+    }
+  },
+
+  "retention_rules": {
+    "minimum_retention_days": 90,
+    "maximum_retention_days": 3650,
+    "default_retention_days": 365,
+    "auto_archive_after_delivery": true,
+    "deletion_requires_approval": true
+  },
+
+  "audit_export_rules": {
+    "signed_bundle_required": true,
+    "index_included": true,
+    "chain_of_custody_log_included": true,
+    "export_logged_in_event_bus": true
+  },
+
+  "template_library": {
+    "description": "Region/industry compliance pack templates",
+    "template_fields": [
+      "template_id",
+      "name",
+      "region",
+      "industry",
+      "version",
+      "required_fields",
+      "required_evidence_types",
+      "retention_period",
+      "delivery_constraints"
+    ]
+  }
+}
