@@ -307,7 +307,9 @@ services:
   # Version: 2026.2.3 — Runs in isolated sandbox-network with NO internet.
   # Security: read_only FS, no-new-privileges, all caps dropped, non-root, resource-limited
   openclaw:
-    image: ghcr.io/openclaw/openclaw:2026.2.3
+    build:
+      context: ../backend/openclaw
+      dockerfile: Dockerfile
     environment:
       - NODE_ENV=production
       - GATEWAY_PORT=8001
