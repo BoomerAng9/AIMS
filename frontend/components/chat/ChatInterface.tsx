@@ -301,7 +301,6 @@ export function ChatInterface({
   welcomeMessage,
   autoPlayVoice = true,
   showOrchestration = true,
-  showOrchestration = true,
 }: ChatInterfaceProps) {
   const [inputValue, setInputValue] = useState('');
   const [showBoard, setShowBoard] = useState(false);

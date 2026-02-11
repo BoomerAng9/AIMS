@@ -7,11 +7,57 @@
  * Uses Vercel AI SDK (useChat) with real-time PMO classification.
  */
 
-import { useChat } from 'ai/react';
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useChat, type Message } from 'ai/react';
+import { useState, useRef, useEffect, useCallback, memo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Bot, User, Send, Zap, Sparkles, Hammer, Search, Layers, Square } from 'lucide-react';
+
+// ── Sub-components ──
+
+const MemoizedMessage = memo(({ message, isLast, isLoading }: {
+  message: Message;
+  isLast: boolean;
+  isLoading: boolean;
+}) => (
+  <div className={`flex gap-3 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+    {message.role === 'assistant' && (
+      <div className="w-7 h-7 rounded-lg bg-white/5 border border-gold/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+        <Bot className="w-3.5 h-3.5 text-gold/80" />
+      </div>
+    )}
+    <div className={`relative px-4 py-3 rounded-2xl text-sm leading-relaxed max-w-[85%] ${
+      message.role === 'user'
+        ? 'bg-gold/10 text-white rounded-tr-sm border border-gold/20'
+        : 'wireframe-card text-white/90 rounded-tl-sm'
+    }`}>
+      {message.role === 'user' ? (
+        message.content
+      ) : (
+        <div className="prose prose-invert prose-sm max-w-none prose-code:text-gold prose-code:bg-black/40 prose-code:px-1 prose-code:rounded">
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.content}</ReactMarkdown>
+          {isLoading && isLast && (
+            <span className="inline-block w-1.5 h-4 bg-gold ml-0.5 animate-pulse" />
+          )}
+        </div>
+      )}
+    </div>
+    {message.role === 'user' && (
+      <div className="w-7 h-7 rounded-lg bg-white/5 border border-wireframe-stroke flex items-center justify-center flex-shrink-0 mt-0.5">
+        <User className="w-3.5 h-3.5 text-white/50" />
+      </div>
+    )}
+  </div>
+), (prev, next) => {
+  // Custom comparison to prevent re-renders of previous messages during streaming
+  return (
+    prev.message.content === next.message.content &&
+    prev.isLast === next.isLast &&
+    prev.isLoading === next.isLoading
+  );
+});
+
+MemoizedMessage.displayName = 'MemoizedMessage';
 
 // ── Types ──
 
@@ -171,34 +217,12 @@ export default function AcheevyChat() {
       {/* Messages */}
       <div className="relative z-10 flex-1 overflow-y-auto px-4 py-4 space-y-4 scroll-smooth">
         {messages.map((m, i) => (
-          <div key={m.id} className={`flex gap-3 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            {m.role === 'assistant' && (
-              <div className="w-7 h-7 rounded-lg bg-white/5 border border-gold/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <Bot className="w-3.5 h-3.5 text-gold/80" />
-              </div>
-            )}
-            <div className={`relative px-4 py-3 rounded-2xl text-sm leading-relaxed max-w-[85%] ${
-              m.role === 'user'
-                ? 'bg-gold/10 text-white rounded-tr-sm border border-gold/20'
-                : 'wireframe-card text-white/90 rounded-tl-sm'
-            }`}>
-              {m.role === 'user' ? (
-                m.content
-              ) : (
-                <div className="prose prose-invert prose-sm max-w-none prose-code:text-gold prose-code:bg-black/40 prose-code:px-1 prose-code:rounded">
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{m.content}</ReactMarkdown>
-                  {isLoading && i === messages.length - 1 && (
-                    <span className="inline-block w-1.5 h-4 bg-gold ml-0.5 animate-pulse" />
-                  )}
-                </div>
-              )}
-            </div>
-            {m.role === 'user' && (
-              <div className="w-7 h-7 rounded-lg bg-white/5 border border-wireframe-stroke flex items-center justify-center flex-shrink-0 mt-0.5">
-                <User className="w-3.5 h-3.5 text-white/50" />
-              </div>
-            )}
-          </div>
+          <MemoizedMessage
+            key={m.id}
+            message={m}
+            isLast={i === messages.length - 1}
+            isLoading={isLoading}
+          />
         ))}
         {isLoading && messages.length > 0 && messages[messages.length - 1].role === 'user' && (
           <div className="flex gap-3">
