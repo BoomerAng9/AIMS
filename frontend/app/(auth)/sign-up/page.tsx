@@ -4,12 +4,15 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 import { CountrySelect, StateSelect, CityInput, PostalCodeInput } from '@/components/form/RegionSelect';
 import type { Country } from '@/lib/region/types';
 
 export default function SignUpPage() {
   const router = useRouter();
   const [step, setStep] = useState<'account' | 'business' | 'region'>('account');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
   // Account details
   const [firstName, setFirstName] = useState('');
@@ -41,12 +44,59 @@ export default function SignUpPage() {
     }
   };
 
-  const handleRegionSubmit = (e: React.FormEvent) => {
+  const handleRegionSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (country) {
-      // Navigate to onboarding
+    if (!country) return;
+
+    setIsLoading(true);
+    setError('');
+
+    try {
+      // 1. Register User
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          firstName,
+          lastName,
+          email,
+          password,
+          businessName,
+          businessType,
+          country: country.code,
+          state,
+          city,
+          postalCode,
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Registration failed');
+      }
+
+      // 2. Sign In
+      const signInRes = await signIn('credentials', {
+        email,
+        password,
+        redirect: false,
+      });
+
+      if (signInRes?.error) {
+        throw new Error(signInRes.error);
+      }
+
+      // 3. Redirect
       router.push('/onboarding/welcome');
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || 'Something went wrong. Please try again.');
+      setIsLoading(false);
     }
+  };
+
+  const handleSocialSignIn = (provider: string) => {
+    signIn(provider, { callbackUrl: '/dashboard' });
   };
 
   const renderStepIndicator = () => (
@@ -94,22 +144,37 @@ export default function SignUpPage() {
 
       {renderStepIndicator()}
 
+      {error && (
+        <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-200 text-sm text-center">
+          {error}
+        </div>
+      )}
+
       {/* Step 1: Account Details */}
       {step === 'account' && (
         <>
           {/* Social auth tiles */}
           <div className="flex justify-center gap-4">
-            <button className="group flex flex-col items-center justify-center w-[88px] h-[88px] rounded-2xl border border-gold/20 bg-white/5 backdrop-blur-md transition-all hover:border-gold/30 hover:bg-white/10 hover:shadow-[0_0_20px_rgba(212,175,55,0.15)]">
+            <button 
+              onClick={() => handleSocialSignIn('google')}
+              className="group flex flex-col items-center justify-center w-[88px] h-[88px] rounded-2xl border border-gold/20 bg-white/5 backdrop-blur-md transition-all hover:border-gold/30 hover:bg-white/10 hover:shadow-[0_0_20px_rgba(212,175,55,0.15)]"
+            >
               <span className="text-2xl mb-1">G</span>
-              <span className="text-[10px] text-white/50 font-medium">Google</span>
+              <span className="text-[10px] text-white/50 font-medium group-hover:text-white transition-colors">Google</span>
             </button>
-            <button className="group flex flex-col items-center justify-center w-[88px] h-[88px] rounded-2xl border border-gold/20 bg-white/5 backdrop-blur-md transition-all hover:border-gold/30 hover:bg-white/10 hover:shadow-[0_0_20px_rgba(212,175,55,0.15)]">
-              <svg className="w-6 h-6 mb-1 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.03-1.99 1.27-5.62 3.72-.53.36-1.01.54-1.44.53-.47-.01-1.38-.27-2.06-.49-.83-.27-1.49-.42-1.43-.88.03-.24.37-.49 1.02-.75 3.98-1.73 6.64-2.87 7.97-3.44 3.8-1.6 4.59-1.88 5.1-1.89.11 0 .37.03.54.17.14.12.18.28.2.45-.01.06.01.24 0 .37z" /></svg>
-              <span className="text-[10px] text-white/50 font-medium">Telegram</span>
+            <button 
+              onClick={() => handleSocialSignIn('telegram')} // NextAuth doesn't support Telegram natively without config, handle gracefully or mock
+              className="group flex flex-col items-center justify-center w-[88px] h-[88px] rounded-2xl border border-gold/20 bg-white/5 backdrop-blur-md transition-all hover:border-gold/30 hover:bg-white/10 hover:shadow-[0_0_20px_rgba(212,175,55,0.15)]"
+            >
+              <svg className="w-6 h-6 mb-1 text-white opacity-50 group-hover:opacity-100 transition-opacity" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.03-1.99 1.27-5.62 3.72-.53.36-1.01.54-1.44.53-.47-.01-1.38-.27-2.06-.49-.83-.27-1.49-.42-1.43-.88.03-.24.37-.49 1.02-.75 3.98-1.73 6.64-2.87 7.97-3.44 3.8-1.6 4.59-1.88 5.1-1.89.11 0 .37.03.54.17.14.12.18.28.2.45-.01.06.01.24 0 .37z" /></svg>
+              <span className="text-[10px] text-white/50 font-medium group-hover:text-white transition-colors">Telegram</span>
             </button>
-            <button className="group flex flex-col items-center justify-center w-[88px] h-[88px] rounded-2xl border border-gold/20 bg-white/5 backdrop-blur-md transition-all hover:border-gold/30 hover:bg-white/10 hover:shadow-[0_0_20px_rgba(212,175,55,0.15)]">
-              <svg className="w-6 h-6 mb-1 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z" /></svg>
-              <span className="text-[10px] text-white/50 font-medium">Discord</span>
+            <button 
+              onClick={() => handleSocialSignIn('discord')}
+              className="group flex flex-col items-center justify-center w-[88px] h-[88px] rounded-2xl border border-gold/20 bg-white/5 backdrop-blur-md transition-all hover:border-gold/30 hover:bg-white/10 hover:shadow-[0_0_20px_rgba(212,175,55,0.15)]"
+            >
+              <svg className="w-6 h-6 mb-1 text-white opacity-50 group-hover:opacity-100 transition-opacity" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z" /></svg>
+              <span className="text-[10px] text-white/50 font-medium group-hover:text-white transition-colors">Discord</span>
             </button>
           </div>
 
@@ -310,16 +375,20 @@ export default function SignUpPage() {
             <button
               type="button"
               onClick={() => setStep('business')}
-              className="flex-1 h-12 rounded-full border border-gold/20 text-sm font-medium text-gold hover:bg-gold/10 transition-all"
+              disabled={isLoading}
+              className="flex-1 h-12 rounded-full border border-gold/20 text-sm font-medium text-gold hover:bg-gold/10 transition-all disabled:opacity-50"
             >
               Back
             </button>
             <button
               type="submit"
-              disabled={!country}
-              className="flex-1 h-12 rounded-full bg-gradient-to-r from-gold to-gold text-sm font-semibold text-black hover:shadow-[0_0_24px_rgba(251,191,36,0.5)] transition-shadow disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={!country || isLoading}
+              className="flex-1 h-12 rounded-full bg-gradient-to-r from-gold to-gold text-sm font-semibold text-black hover:shadow-[0_0_24px_rgba(251,191,36,0.5)] transition-shadow disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
-              Create Account
+              {isLoading && (
+                <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+              )}
+              {isLoading ? 'Creating...' : 'Create Account'}
             </button>
           </div>
         </form>
