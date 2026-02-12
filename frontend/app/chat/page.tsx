@@ -15,6 +15,7 @@
 
 import { useChat } from 'ai/react';
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -430,6 +431,7 @@ function MessageBubble({ role, content, isStreaming }: {
 // ─────────────────────────────────────────────────────────────
 
 export default function ChatPage() {
+  const searchParams = useSearchParams();
   const {
     messages,
     input,
@@ -447,12 +449,27 @@ export default function ChatPage() {
   const [currentVerb, setCurrentVerb] = useState('Deploy');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const prefillHandled = useRef(false);
 
   // Threads
   const [threads, setThreads] = useState<Thread[]>([]);
   const [activeThreadId, setActiveThreadId] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [mottoVisible, setMottoVisible] = useState(true);
+
+  // Pre-fill from ?q= query param (from FloatingACHEEVY launcher)
+  useEffect(() => {
+    const prefill = searchParams.get('q');
+    if (prefill && !prefillHandled.current) {
+      prefillHandled.current = true;
+      setInput(prefill);
+      // Auto-submit after a brief delay to let the component mount
+      setTimeout(() => {
+        const form = document.getElementById('chat-form') as HTMLFormElement;
+        form?.requestSubmit();
+      }, 100);
+    }
+  }, [searchParams, setInput]);
 
   // Load persisted state
   useEffect(() => {
