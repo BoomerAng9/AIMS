@@ -164,7 +164,7 @@ export function DashboardShell({ children }: Props) {
 
       <div className={`flex min-h-screen ${IS_DEMO ? "pt-9" : "pt-[env(safe-area-inset-top)]"}`}>
         {/* Left rail — wireframe glass sidebar */}
-        <aside className="hidden w-64 flex-shrink-0 flex-col border-r border-wireframe-stroke bg-black/60 backdrop-blur-xl lg:flex z-30 sticky top-0 h-screen">
+        <aside className="hidden w-64 flex-shrink-0 flex-col border-r border-wireframe-stroke bg-[#050505]/90 backdrop-blur-xl lg:flex z-30 sticky top-0 h-screen">
           <div className="px-4 py-5">
             <div className="flex flex-col">
               <span className="font-display text-sm uppercase tracking-wider text-white">
@@ -211,7 +211,7 @@ export function DashboardShell({ children }: Props) {
         {/* Main column */}
         <div className="flex flex-1 flex-col min-h-screen relative z-10">
           {/* Top bar */}
-          <header className="sticky top-0 flex items-center justify-between border-b border-wireframe-stroke bg-[#0A0A0A]/80 px-4 py-3 backdrop-blur-xl sm:px-6 lg:px-8 xl:px-12 z-20 shadow-lg shadow-black/20">
+          <header className="sticky top-0 flex items-center justify-between border-b border-wireframe-stroke bg-[#050505]/85 px-4 py-3 backdrop-blur-xl sm:px-6 lg:px-8 xl:px-12 z-20 shadow-lg shadow-black/20">
             <div className="flex items-center gap-5">
               {/* Navigation Controls - Enhanced 'Pop' Style */}
               <div className="flex items-center gap-2 -ml-2">

@@ -11,77 +11,95 @@ type Props = {
 };
 
 /**
- * LogoWallBackground — Edge-only gold treatment with technical
- * dot-matrix + grid pattern. Gold ACHIEVEMOR logo appears only
- * as a subtle corner stamp, never tiled across the page.
+ * LogoWallBackground — Dark cinematic background system
+ *
+ * Tron/Matrix/digital hangar aesthetic:
+ * - Dark base with subtle gold grid
+ * - Gold ACHIEVEMOR logo on edges only (never tiled across content)
+ * - Cinematic vignette depth
+ * - Content centered within margins, no clipping
  */
 export function LogoWallBackground({ mode = "hero", children }: Props) {
-  // Full dot-matrix + grid for hero/auth; lighter grid-only for dashboard/form
-  const bgClass = {
-    hero:      "aims-page-bg",
-    auth:      "aims-page-bg",
-    form:      "bg-[#0A0A0A]",
-    dashboard: "bg-[#0A0A0A]",
-  }[mode];
-
-  // Gold edge rail for hero/auth modes
-  const edgeClass = {
-    hero:      "gold-edge-rail",
-    auth:      "gold-edge-rail",
-    form:      "",
-    dashboard: "",
-  }[mode];
-
   return (
     <div className={clsx(
       "relative text-white",
-      mode === "dashboard" ? "h-screen overflow-hidden bg-[#0A0A0A]" : "min-h-screen aims-page-bg gold-edge-rail"
+      mode === "dashboard" ? "h-screen overflow-hidden bg-[#050505]" : "min-h-screen bg-[#050505]"
     )}>
-      {/* Subtle grid overlay for dashboard/form */}
-      {(mode === "dashboard" || mode === "form") && (
-        <div
-          className="pointer-events-none absolute inset-0 opacity-40 bg-grid-fine [background-size:48px_48px]"
-          aria-hidden="true"
-        />
-      )}
-
-      {/* Blue Vignette - Monitor Glow Effect */}
+      {/* Base: Fine gold grid — Tron aesthetic */}
       <div
-        className="pointer-events-none absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,transparent_0%,transparent_60%,rgba(0,10,40,0.8)_100%)] mix-blend-hard-light"
+        className="pointer-events-none absolute inset-0 z-0"
+        style={{
+          backgroundImage: `
+            linear-gradient(rgba(212,175,55,0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(212,175,55,0.03) 1px, transparent 1px)
+          `,
+          backgroundSize: '48px 48px',
+        }}
         aria-hidden="true"
       />
 
-      {/* Corner logo stamp */}
-      {(mode === "hero" || mode === "auth") && (
-        <div
-          className="pointer-events-none absolute bottom-4 right-4 w-12 h-12 opacity-[0.05] bg-contain bg-no-repeat bg-center z-0 [background-image:url('/images/logos/achievemor-gold.png')]"
-          aria-hidden="true"
-        />
-      )}
+      {/* Dot matrix overlay — subtle depth */}
+      <div
+        className="pointer-events-none absolute inset-0 z-0"
+        style={{
+          backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px)',
+          backgroundSize: '24px 24px',
+        }}
+        aria-hidden="true"
+      />
 
-      {/* Dashboard gold watermark */}
-      {mode === "dashboard" && (
-        <div
-          className="pointer-events-none absolute inset-0 flex items-center justify-center z-0"
-          aria-hidden="true"
-        >
-          <div
-            className="w-[400px] h-[400px] opacity-[0.03] bg-contain bg-no-repeat bg-center"
-            style={{ backgroundImage: "url('/images/logos/achievemor-gold.png')" }}
-          />
-        </div>
-      )}
+      {/* Cinematic vignette — dark edges */}
+      <div
+        className="pointer-events-none absolute inset-0 z-0"
+        style={{
+          background: 'radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.7) 100%)',
+        }}
+        aria-hidden="true"
+      />
+
+      {/* Gold ACHIEVEMOR logo — edges only, never tiled across content */}
+      <div
+        className="pointer-events-none absolute inset-0 z-0"
+        style={{
+          backgroundImage: "url('/images/logos/achievemor-gold.png')",
+          backgroundSize: '80px 80px',
+          backgroundRepeat: 'repeat',
+          opacity: 0.02,
+          maskImage: 'linear-gradient(135deg, black 0%, transparent 15%, transparent 85%, black 100%)',
+          WebkitMaskImage: 'linear-gradient(135deg, black 0%, transparent 15%, transparent 85%, black 100%)',
+        }}
+        aria-hidden="true"
+      />
+
+      {/* Gold edge glow — corner accents */}
+      <div
+        className="pointer-events-none absolute inset-0 z-0"
+        style={{
+          background: `
+            linear-gradient(135deg, rgba(212,175,55,0.04) 0%, transparent 15%),
+            linear-gradient(225deg, rgba(212,175,55,0.03) 0%, transparent 15%),
+            linear-gradient(315deg, rgba(212,175,55,0.04) 0%, transparent 15%),
+            linear-gradient(45deg, rgba(212,175,55,0.03) 0%, transparent 15%)
+          `,
+        }}
+        aria-hidden="true"
+      />
+
+      {/* Horizontal scan lines — cinematic Matrix effect */}
+      <div
+        className="pointer-events-none absolute inset-0 z-0 opacity-[0.01]"
+        style={{
+          backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.15) 2px, rgba(255,255,255,0.15) 4px)',
+        }}
+        aria-hidden="true"
+      />
 
       {/* Content */}
       <main className={clsx(
         "relative z-10 flex flex-col",
         mode === "dashboard" ? "h-full" : "min-h-screen",
-        mode === "hero" ? "p-4 md:p-6 lg:p-8 xl:p-12" : "p-0"
       )}>
-        <div className={clsx(
-          "flex-1 flex flex-col w-full",
-          mode === "hero" && "rounded-[24px] border border-wireframe-stroke bg-black/20 shadow-wireframe-inner"
-        )}>
+        <div className="flex-1 flex flex-col w-full">
           {children}
         </div>
       </main>

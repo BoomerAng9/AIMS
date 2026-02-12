@@ -4,7 +4,7 @@
 @tailwind utilities;
 
 :root {
-  --background: #0A0A0A;
+  --background: #050505;
   --foreground: #ededed;
   --font-doto: 'Doto', monospace;
   --font-marker: 'Permanent Marker', cursive;
@@ -15,7 +15,9 @@ body {
   color: var(--foreground);
   background: var(--background);
   font-family: 'Inter', sans-serif;
-  overflow-x: hidden; /* Prevent horizontal scroll from glowing elements */
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Custom Scrollbar for Obsidian feel */
@@ -107,13 +109,13 @@ body {
       0 4px 24px rgba(0, 0, 0, 0.3);
   }
 
-  /* ── A.I.M.S. Page Background — dot-matrix + fine grid ── */
+  /* ── A.I.M.S. Page Background — cinematic dark with gold grid ── */
   .aims-page-bg {
-    background-color: #0A0A0A;
+    background-color: #050505;
     background-image:
-      radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px),
-      linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+      radial-gradient(circle, rgba(212,175,55,0.03) 1px, transparent 1px),
+      linear-gradient(to right, rgba(212,175,55,0.02) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(212,175,55,0.02) 1px, transparent 1px);
     background-size: 24px 24px, 48px 48px, 48px 48px;
   }
 

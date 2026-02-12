@@ -1,11 +1,14 @@
 'use client';
 
 /**
- * AcheevyChat — Floating Chat Panel Component
+ * AcheevyChat — Chat w/ACHEEVY Production Interface
  *
- * Compact version of Chat w/ACHEEVY for the FloatingChat overlay.
- * Uses Vercel AI SDK (useChat) with real-time PMO classification,
- * voice I/O (Groq Whisper STT + ElevenLabs TTS), and file upload.
+ * Features:
+ * - Voice recording with live waveform + clear state indicators
+ * - Editable transcription before submission
+ * - Per-message TTS playback controls (play, pause, replay, mute)
+ * - PMO classification routing
+ * - File attachments
  */
 
 import { useChat } from 'ai/react';
@@ -16,6 +19,7 @@ import remarkGfm from 'remark-gfm';
 import {
   User, Send, Zap, Sparkles, Hammer, Search, Layers, Square,
   Mic, MicOff, Volume2, VolumeX, Paperclip, X, FileText, ImageIcon, Code2, Loader2,
+  Play, Pause, RotateCcw,
 } from 'lucide-react';
 import { useVoiceInput } from '@/hooks/useVoiceInput';
 import { useVoiceOutput } from '@/hooks/useVoiceOutput';
@@ -65,6 +69,69 @@ const FILE_CATEGORY_ICON: Record<string, typeof FileText> = {
   archive: FileText,
 };
 
+// ── Waveform Visualizer ──
+
+function VoiceWaveform({ audioLevel, state }: { audioLevel: number; state: 'idle' | 'listening' | 'processing' | 'error' }) {
+  const bars = 32;
+
+  if (state === 'processing') {
+    return (
+      <div className="flex items-center justify-center gap-1 h-12 px-4">
+        <div className="flex items-center gap-1.5">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div
+              key={i}
+              className="w-1.5 h-6 bg-gold/60 rounded-full animate-bounce"
+              style={{ animationDelay: `${i * 0.1}s`, animationDuration: '0.8s' }}
+            />
+          ))}
+        </div>
+        <span className="ml-3 text-xs text-gold/80 font-mono uppercase tracking-wider animate-pulse">
+          Transcribing
+        </span>
+      </div>
+    );
+  }
+
+  if (state !== 'listening') return null;
+
+  return (
+    <div className="flex items-end justify-center gap-[2px] h-12 px-4">
+      {Array.from({ length: bars }).map((_, i) => {
+        const position = Math.sin((i / bars) * Math.PI);
+        const height = Math.max(
+          3,
+          audioLevel * 48 * position * (0.7 + Math.random() * 0.3)
+        );
+        return (
+          <div
+            key={i}
+            className="w-1 rounded-full transition-all duration-75"
+            style={{
+              height: `${height}px`,
+              backgroundColor: `rgba(212, 175, 55, ${0.4 + audioLevel * 0.6})`,
+            }}
+          />
+        );
+      })}
+    </div>
+  );
+}
+
+// ── Playback Progress Bar ──
+
+function PlaybackBar({ progress, isPlaying }: { progress: number; isPlaying: boolean }) {
+  if (!isPlaying && progress === 0) return null;
+  return (
+    <div className="w-full h-0.5 bg-white/5 rounded-full overflow-hidden">
+      <div
+        className="h-full bg-gold/60 rounded-full transition-all duration-200"
+        style={{ width: `${progress * 100}%` }}
+      />
+    </div>
+  );
+}
+
 export default function AcheevyChat() {
   const {
     messages,
@@ -85,16 +152,17 @@ export default function AcheevyChat() {
     ]
   });
 
-  // ── Voice Input (Groq Whisper STT) ──
+  // ── Voice Input (Groq Whisper STT → Deepgram fallback) ──
   const voiceInput = useVoiceInput({
     onTranscript: (result) => {
       if (result.text) {
+        // Populate text field — user can edit before submitting
         setInput((prev: string) => prev ? `${prev} ${result.text}` : result.text);
       }
     },
   });
 
-  // ── Voice Output (ElevenLabs TTS) ──
+  // ── Voice Output (ElevenLabs → Deepgram TTS) ──
   const voiceOutput = useVoiceOutput({
     config: { provider: 'elevenlabs', autoPlay: true },
   });
@@ -105,6 +173,7 @@ export default function AcheevyChat() {
   const [showIntentPicker, setShowIntentPicker] = useState(false);
   const [attachments, setAttachments] = useState<UploadedFile[]>([]);
   const [isUploading, setIsUploading] = useState(false);
+  const [speakingMessageId, setSpeakingMessageId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const prevMessageCountRef = useRef(0);
@@ -114,7 +183,7 @@ export default function AcheevyChat() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // ── Auto-TTS: speak new assistant messages when streaming completes ──
+  // ── Auto-TTS: speak new assistant messages ──
   useEffect(() => {
     if (isLoading) return;
     if (messages.length <= prevMessageCountRef.current) {
@@ -125,18 +194,47 @@ export default function AcheevyChat() {
 
     const last = messages[messages.length - 1];
     if (last?.role === 'assistant' && last.id !== 'welcome' && voiceOutput.autoPlayEnabled) {
-      // Strip markdown for cleaner TTS
-      const clean = last.content
-        .replace(/```[\s\S]*?```/g, '') // remove code blocks
-        .replace(/[#*_`~\[\]()>|]/g, '') // remove markdown chars
-        .replace(/\n{2,}/g, '. ')
-        .replace(/\n/g, ' ')
-        .trim();
+      const clean = stripMarkdownForTTS(last.content);
       if (clean.length > 0 && clean.length <= 5000) {
+        setSpeakingMessageId(last.id);
         voiceOutput.speak(clean);
       }
     }
   }, [isLoading, messages, voiceOutput]);
+
+  // Track when speaking ends
+  useEffect(() => {
+    if (!voiceOutput.isPlaying && !voiceOutput.isLoading) {
+      setSpeakingMessageId(null);
+    }
+  }, [voiceOutput.isPlaying, voiceOutput.isLoading]);
+
+  // ── Helpers ──
+
+  function stripMarkdownForTTS(text: string): string {
+    return text
+      .replace(/```[\s\S]*?```/g, '')
+      .replace(/[#*_`~\[\]()>|]/g, '')
+      .replace(/\n{2,}/g, '. ')
+      .replace(/\n/g, ' ')
+      .trim();
+  }
+
+  const speakMessage = useCallback((messageId: string, content: string) => {
+    const clean = stripMarkdownForTTS(content);
+    if (clean.length > 0 && clean.length <= 5000) {
+      setSpeakingMessageId(messageId);
+      voiceOutput.speak(clean, true);
+    }
+  }, [voiceOutput]);
+
+  const togglePlayback = useCallback(() => {
+    if (voiceOutput.isPlaying) {
+      voiceOutput.pause();
+    } else if (voiceOutput.isPaused) {
+      voiceOutput.resume();
+    }
+  }, [voiceOutput]);
 
   // ── Classify on submit ──
   const classifyMessage = useCallback(async (message: string) => {
@@ -150,12 +248,11 @@ export default function AcheevyChat() {
     } catch { /* non-critical */ }
   }, []);
 
-  // ── Enhanced submit with attachments ──
+  // ── Enhanced submit ──
   const handleEnhancedSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if ((!input.trim() && attachments.length === 0) || isLoading) return;
 
-    // Build message with attachment context
     let fullMessage = input.trim();
     if (attachments.length > 0) {
       const fileList = attachments.map(f => `${f.name} (${f.category})`).join(', ');
@@ -164,10 +261,8 @@ export default function AcheevyChat() {
 
     classifyMessage(fullMessage);
 
-    // If we modified the message with attachments, update input before submit
     if (attachments.length > 0) {
       setInput(fullMessage);
-      // Small delay to let setInput propagate before submit
       setTimeout(() => {
         handleSubmit(e);
         setAttachments([]);
@@ -182,7 +277,7 @@ export default function AcheevyChat() {
     if (voiceInput.isListening) {
       await voiceInput.stopListening();
     } else {
-      voiceOutput.stop(); // stop any playing TTS before recording
+      voiceOutput.stop();
       await voiceInput.startListening();
     }
   }, [voiceInput, voiceOutput]);
@@ -220,9 +315,12 @@ export default function AcheevyChat() {
 
   const selectedIntent = INTENT_OPTIONS.find(i => i.value === intent) || INTENT_OPTIONS[0];
 
+  // Voice state for UI
+  const voiceState = voiceInput.isListening ? 'listening' : voiceInput.isProcessing ? 'processing' : 'idle';
+
   return (
     <div className="flex flex-col h-full relative overflow-hidden bg-[#0A0A0A] text-white font-sans">
-      {/* Branded background — helmet watermark + gold glow */}
+      {/* Branded background */}
       <div
         className="absolute inset-0 z-0 pointer-events-none"
         style={{
@@ -236,7 +334,6 @@ export default function AcheevyChat() {
           opacity: 0.04,
         }}
       />
-      {/* Dot grid overlay */}
       <div className="absolute inset-0 z-0 pointer-events-none aims-page-bg" />
 
       {/* Header */}
@@ -264,7 +361,7 @@ export default function AcheevyChat() {
           </div>
 
           <div className="flex items-center gap-1">
-            {/* Speaker toggle — auto-TTS on/off */}
+            {/* Speaker toggle */}
             <button
               type="button"
               onClick={() => voiceOutput.setAutoPlay(!voiceOutput.autoPlayEnabled)}
@@ -310,7 +407,7 @@ export default function AcheevyChat() {
           </div>
         </div>
 
-        {/* Team shelf (sanitized — no internal agent names exposed) */}
+        {/* Team shelf */}
         <div className="px-4 pb-2 flex gap-1.5 overflow-x-auto no-scrollbar">
           {TEAM_SLOTS.map(slot => (
             <div key={slot.id} className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border transition-colors cursor-default ${
@@ -335,13 +432,39 @@ export default function AcheevyChat() {
         </div>
       )}
 
+      {/* Global playback bar */}
+      {(voiceOutput.isPlaying || voiceOutput.isPaused) && (
+        <div className="relative z-10 mx-3 mt-2 flex items-center gap-2 px-3 py-2 rounded-lg bg-gold/5 border border-gold/15">
+          <button
+            type="button"
+            onClick={togglePlayback}
+            className="p-1 rounded-md bg-gold/10 text-gold hover:bg-gold/20 transition-colors"
+          >
+            {voiceOutput.isPlaying ? <Pause size={12} /> : <Play size={12} />}
+          </button>
+          <div className="flex-1">
+            <PlaybackBar progress={voiceOutput.progress} isPlaying={voiceOutput.isPlaying} />
+          </div>
+          <button
+            type="button"
+            onClick={() => voiceOutput.stop()}
+            className="p-1 rounded-md text-white/30 hover:text-red-400 transition-colors"
+          >
+            <X size={12} />
+          </button>
+          <span className="text-[9px] text-gold/60 font-mono uppercase">
+            {voiceOutput.isPlaying ? 'Speaking' : 'Paused'}
+          </span>
+        </div>
+      )}
+
       {/* Messages */}
       <div className="relative z-10 flex-1 overflow-y-auto px-4 py-4 space-y-4 scroll-smooth">
         {messages.map((m, i) => (
           <div key={m.id} className={`flex gap-3 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             {m.role === 'assistant' && (
               <div className={`w-7 h-7 rounded-lg bg-white/5 border border-gold/10 flex items-center justify-center flex-shrink-0 mt-0.5 overflow-hidden ${
-                voiceOutput.isPlaying && i === messages.length - 1 ? 'ring-2 ring-gold/40 animate-pulse' : ''
+                speakingMessageId === m.id ? 'ring-2 ring-gold/40 animate-pulse' : ''
               }`}>
                 <Image
                   src="/images/acheevy/acheevy-helmet.png"
@@ -352,7 +475,7 @@ export default function AcheevyChat() {
                 />
               </div>
             )}
-            <div className={`relative px-4 py-3 rounded-2xl text-sm leading-relaxed max-w-[85%] ${
+            <div className={`relative group px-4 py-3 rounded-2xl text-sm leading-relaxed max-w-[85%] ${
               m.role === 'user'
                 ? 'bg-gold/10 text-white rounded-tr-sm border border-gold/20'
                 : 'wireframe-card text-white/90 rounded-tl-sm'
@@ -365,6 +488,38 @@ export default function AcheevyChat() {
                   {isLoading && i === messages.length - 1 && (
                     <span className="inline-block w-1.5 h-4 bg-gold ml-0.5 animate-pulse" />
                   )}
+                </div>
+              )}
+              {/* Per-message playback controls for assistant messages */}
+              {m.role === 'assistant' && m.id !== 'welcome' && !isLoading && (
+                <div className="flex items-center gap-1 mt-2 pt-2 border-t border-wireframe-stroke opacity-0 group-hover:opacity-100 transition-opacity">
+                  {speakingMessageId === m.id && voiceOutput.isPlaying ? (
+                    <button
+                      type="button"
+                      onClick={() => voiceOutput.pause()}
+                      title="Pause"
+                      className="p-1 rounded text-gold/60 hover:text-gold hover:bg-gold/10 transition-colors"
+                    >
+                      <Pause size={12} />
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => speakMessage(m.id, m.content)}
+                      title="Speak this message"
+                      className="p-1 rounded text-white/30 hover:text-gold hover:bg-gold/10 transition-colors"
+                    >
+                      <Play size={12} />
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => speakMessage(m.id, m.content)}
+                    title="Replay"
+                    className="p-1 rounded text-white/30 hover:text-gold hover:bg-gold/10 transition-colors"
+                  >
+                    <RotateCcw size={12} />
+                  </button>
                 </div>
               )}
             </div>
@@ -421,27 +576,38 @@ export default function AcheevyChat() {
         </div>
       )}
 
-      {/* Voice recording indicator */}
-      {(voiceInput.isListening || voiceInput.isProcessing) && (
-        <div className="relative z-10 mx-3 mt-2 flex items-center gap-2 px-3 py-2 rounded-lg bg-red-500/5 border border-red-500/20">
-          <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-          <span className="text-xs text-red-400 font-mono">
-            {voiceInput.isListening ? 'Listening...' : 'Transcribing...'}
-          </span>
-          {voiceInput.isListening && (
-            <div className="flex-1 h-1 bg-white/5 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-red-500/50 rounded-full transition-all duration-100"
-                style={{ width: `${Math.min(voiceInput.audioLevel * 100, 100)}%` }}
-              />
+      {/* Voice recording panel — waveform + state indicators */}
+      {(voiceState === 'listening' || voiceState === 'processing') && (
+        <div className="relative z-10 mx-3 mt-2 rounded-xl overflow-hidden border border-gold/20 bg-black/60 backdrop-blur-md">
+          {/* State label */}
+          <div className="flex items-center justify-between px-4 pt-3">
+            <div className="flex items-center gap-2">
+              <div className={`w-2.5 h-2.5 rounded-full ${
+                voiceState === 'listening' ? 'bg-red-500 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.6)]' : 'bg-gold animate-pulse'
+              }`} />
+              <span className={`text-xs font-mono uppercase tracking-wider ${
+                voiceState === 'listening' ? 'text-red-400' : 'text-gold'
+              }`}>
+                {voiceState === 'listening' ? 'Recording' : 'Processing'}
+              </span>
             </div>
-          )}
+            {voiceState === 'listening' && (
+              <button
+                type="button"
+                onClick={() => voiceInput.cancelListening()}
+                className="text-[10px] text-white/30 hover:text-red-400 font-mono uppercase transition-colors"
+              >
+                Cancel
+              </button>
+            )}
+          </div>
+          {/* Waveform */}
+          <VoiceWaveform audioLevel={voiceInput.audioLevel} state={voiceState} />
         </div>
       )}
 
       {/* Input */}
       <div className="relative z-20 p-3 bg-[#0A0A0A]/80 backdrop-blur-xl border-t border-wireframe-stroke">
-        {/* Hidden file input */}
         <input
           ref={fileInputRef}
           type="file"
@@ -463,26 +629,31 @@ export default function AcheevyChat() {
             {isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Paperclip className="w-4 h-4" />}
           </button>
 
-          {/* Mic button */}
+          {/* Mic button — enhanced with state ring */}
           <button
             type="button"
             onClick={handleMicToggle}
             disabled={voiceInput.isProcessing}
             title={voiceInput.isListening ? 'Stop recording' : 'Start voice input'}
-            className={`p-2 rounded-lg transition-all ${
+            className={`relative p-2 rounded-lg transition-all ${
               voiceInput.isListening
-                ? 'bg-red-500/20 text-red-400 ring-2 ring-red-500/30'
+                ? 'bg-red-500/20 text-red-400 ring-2 ring-red-500/40 shadow-[0_0_12px_rgba(239,68,68,0.3)]'
+                : voiceInput.isProcessing
+                ? 'bg-gold/20 text-gold animate-pulse'
                 : 'text-white/30 hover:text-gold hover:bg-gold/10'
             } disabled:opacity-30`}
           >
             {voiceInput.isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+            {voiceInput.isListening && (
+              <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-red-500 animate-ping" />
+            )}
           </button>
 
           {/* Text input */}
           <input
             value={input}
             onChange={handleInputChange}
-            placeholder="Tell me what you need..."
+            placeholder={voiceInput.isProcessing ? 'Transcribing your voice...' : 'Tell me what you need...'}
             disabled={isLoading}
             className="flex-1 bg-white/5 hover:bg-white/10 focus:bg-black border border-wireframe-stroke focus:border-gold/40 rounded-xl py-3 pl-4 pr-12 text-white text-sm placeholder:text-white/20 transition-all outline-none"
           />

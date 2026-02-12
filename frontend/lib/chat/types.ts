@@ -36,13 +36,13 @@ export type VoiceInputState = 'idle' | 'listening' | 'processing' | 'error';
 export type VoiceOutputState = 'idle' | 'loading' | 'playing' | 'paused' | 'error';
 
 export interface VoiceInputConfig {
-  provider: 'groq' | 'openai' | 'browser';
+  provider: 'groq' | 'deepgram' | 'openai' | 'browser';
   language?: string;
   continuous?: boolean;
 }
 
 export interface VoiceOutputConfig {
-  provider: 'elevenlabs' | 'browser';
+  provider: 'elevenlabs' | 'deepgram' | 'browser';
   voiceId?: string;
   autoPlay: boolean;
   speed?: number;
