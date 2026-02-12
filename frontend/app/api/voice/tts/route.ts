@@ -1,7 +1,7 @@
 /**
  * TTS API Route — Text-to-Speech for ACHEEVY Replies
  *
- * Primary: ElevenLabs (turbo v2.5, low latency)
+ * Primary: ElevenLabs (pulls premium voices from user's account)
  * Fallback: Deepgram Aura-2 (premium voices, sub-200ms TTFB)
  *
  * Returns audio/mpeg stream for browser autoplay.
@@ -11,10 +11,6 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY || '';
 const DEEPGRAM_API_KEY = process.env.DEEPGRAM_API_KEY || '';
-
-// Default voices
-const DEFAULT_ELEVENLABS_VOICE = 'pNInz6obpgDQGcFmaJgB'; // Adam
-const DEFAULT_DEEPGRAM_VOICE = 'aura-2-orion-en';
 
 async function synthesizeElevenLabs(
   text: string,
@@ -102,15 +98,16 @@ export async function POST(req: NextRequest) {
       let audioRes: Response | null = null;
 
       if (p === 'elevenlabs') {
+        // Use provided voiceId or fall back to first available voice
         audioRes = await synthesizeElevenLabs(
           safeText,
-          voiceId || DEFAULT_ELEVENLABS_VOICE,
+          voiceId || 'pNInz6obpgDQGcFmaJgB', // Default: Adam
           model || 'eleven_turbo_v2_5',
         );
       } else {
         audioRes = await synthesizeDeepgram(
           safeText,
-          voiceId || DEFAULT_DEEPGRAM_VOICE,
+          voiceId || 'aura-2-orion-en',
         );
       }
 

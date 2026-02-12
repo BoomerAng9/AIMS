@@ -103,7 +103,7 @@ const tiles = [
     title: "Chat w/ACHEEVY",
     icon: MessageSquare,
     desc: "Executive Orchestrator. Start here.",
-    href: "/dashboard/chat",
+    href: "/dashboard",
     highlight: true,
   },
   {
@@ -116,13 +116,13 @@ const tiles = [
     title: "AVVA NOON",
     icon: BrainCircuit,
     desc: "Strategy & Deep Reasoning.",
-    href: "/dashboard/chat?mode=strategy",
+    href: "/dashboard/circuit-box?tab=plan",
   },
   {
     title: "Boomer_Angs",
     icon: Bot,
     desc: "Specialist Agent Team.",
-    href: "/dashboard/chat?mode=specialist",
+    href: "/dashboard/circuit-box?tab=boomerangs",
   },
   {
     title: "Deployed Tools",
@@ -134,13 +134,13 @@ const tiles = [
     title: "LUC",
     icon: CreditCard,
     desc: "Usage & Cost.",
-    href: "/dashboard/luc",
+    href: "/dashboard/circuit-box?tab=luc",
   },
   {
     title: "Settings",
     icon: Settings,
     desc: "System Config.",
-    href: "/dashboard/settings",
+    href: "/dashboard/circuit-box?tab=settings",
   },
 ];
 

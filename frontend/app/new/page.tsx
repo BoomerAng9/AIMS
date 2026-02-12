@@ -3,7 +3,7 @@
 import { LogoWallBackground } from "@/components/LogoWallBackground";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Button } from "@/components/ui/button";
-import { Bot, Play } from "lucide-react";
+import { Play } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -35,7 +35,7 @@ export default function NewLandingPage() {
               <div className="flex flex-col gap-4 min-[400px]:flex-row z-20">
                  <Link href="/chat">
                     <Button variant="acheevy" size="lg" className="h-12 px-8">
-                       Chat with ACHEEVY <Bot className="ml-2 h-5 w-5" />
+                       Chat with ACHEEVY <Image src="/images/acheevy/acheevy-helmet.png" alt="ACHEEVY" width={20} height={20} className="ml-2 h-5 w-5 rounded-full object-cover" />
                     </Button>
                  </Link>
               </div>

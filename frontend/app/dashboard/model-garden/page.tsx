@@ -630,10 +630,10 @@ function ModelCard({
       animate={{ opacity: 1, y: 0 }}
       className="relative p-4 rounded-xl transition-all"
       style={{
-        backgroundColor: enabled ? AIMS_CIRCUIT_COLORS.primary + '10' : '#1a2234',
+        backgroundColor: enabled ? AIMS_CIRCUIT_COLORS.primary + '10' : 'rgba(255,255,255,0.03)',
         border: enabled
           ? `2px solid ${AIMS_CIRCUIT_COLORS.primary}`
-          : '1px solid #2d3a4d',
+          : '1px solid rgba(255,255,255,0.08)',
       }}
     >
       {model.popular && (
@@ -719,10 +719,10 @@ function ToolCard({
       animate={{ opacity: 1, y: 0 }}
       className="p-4 rounded-xl transition-all"
       style={{
-        backgroundColor: enabled ? AIMS_CIRCUIT_COLORS.primary + '10' : '#1a2234',
+        backgroundColor: enabled ? AIMS_CIRCUIT_COLORS.primary + '10' : 'rgba(255,255,255,0.03)',
         border: enabled
           ? `2px solid ${AIMS_CIRCUIT_COLORS.primary}`
-          : '1px solid #2d3a4d',
+          : '1px solid rgba(255,255,255,0.08)',
       }}
     >
       <div className="flex items-start justify-between mb-3">
@@ -771,8 +771,8 @@ function ConsumptionCard({ model }: { model: ConsumptionModel }) {
     <div
       className={`relative p-4 rounded-xl ${model.recommended ? 'ring-2' : ''}`}
       style={{
-        backgroundColor: '#1a2234',
-        border: '1px solid #2d3a4d',
+        backgroundColor: 'rgba(255,255,255,0.03)',
+        border: '1px solid rgba(255,255,255,0.08)',
         '--tw-ring-color': model.recommended ? AIMS_CIRCUIT_COLORS.accent : undefined,
       } as React.CSSProperties}
     >
@@ -864,7 +864,7 @@ export default function ModelGardenPage() {
   };
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#0a0f1a' }}>
+    <div className="min-h-screen aims-page-bg">
       <CircuitBoardPattern density="sparse" animated={false} glowIntensity={0.1} />
 
       <div className="relative max-w-7xl mx-auto px-6 py-8">
@@ -894,7 +894,7 @@ export default function ModelGardenPage() {
           <div className="flex items-center gap-6 mt-6">
             <div
               className="px-6 py-4 rounded-xl"
-              style={{ backgroundColor: '#1a2234', border: '1px solid #2d3a4d' }}
+              style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}
             >
               <div className="text-3xl font-bold" style={{ color: AIMS_CIRCUIT_COLORS.accent }}>
                 {AI_MODELS.length}+
@@ -903,7 +903,7 @@ export default function ModelGardenPage() {
             </div>
             <div
               className="px-6 py-4 rounded-xl"
-              style={{ backgroundColor: '#1a2234', border: '1px solid #2d3a4d' }}
+              style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}
             >
               <div className="text-3xl font-bold" style={{ color: AIMS_CIRCUIT_COLORS.accent }}>
                 {TOOLS.length}+
@@ -912,7 +912,7 @@ export default function ModelGardenPage() {
             </div>
             <div
               className="px-6 py-4 rounded-xl"
-              style={{ backgroundColor: '#1a2234', border: '1px solid #2d3a4d' }}
+              style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}
             >
               <div className="text-3xl font-bold text-green-500">
                 {enabledModels.size + enabledTools.size}
@@ -1051,7 +1051,7 @@ export default function ModelGardenPage() {
 
                 <div
                   className="p-6 rounded-2xl"
-                  style={{ backgroundColor: '#1a2234', border: '1px solid #2d3a4d' }}
+                  style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}
                 >
                   {/* AI Applications Layer */}
                   <div className="mb-6">
@@ -1074,7 +1074,7 @@ export default function ModelGardenPage() {
                   {/* A.I.M.S. Core */}
                   <div
                     className="p-4 rounded-xl mb-6"
-                    style={{ backgroundColor: '#0f172a', border: '1px solid #2d3a4d' }}
+                    style={{ backgroundColor: '#0f172a', border: '1px solid rgba(255,255,255,0.08)' }}
                   >
                     <div className="text-center mb-4" style={{ color: AIMS_CIRCUIT_COLORS.accent }}>
                       A.I.M.S. <span className="text-gray-400">for all your model and agent needs</span>
@@ -1142,7 +1142,7 @@ export default function ModelGardenPage() {
                   {/* Infrastructure */}
                   <div
                     className="p-4 rounded-xl text-center"
-                    style={{ backgroundColor: '#0f172a', border: '1px solid #2d3a4d' }}
+                    style={{ backgroundColor: '#0f172a', border: '1px solid rgba(255,255,255,0.08)' }}
                   >
                     <div className="text-lg font-medium text-white">Infrastructure</div>
                     <div className="text-sm text-gray-400">
@@ -1160,7 +1160,7 @@ export default function ModelGardenPage() {
           <div
             className="inline-flex flex-col items-center gap-4 px-8 py-6 rounded-2xl"
             style={{
-              backgroundColor: '#1a2234',
+              backgroundColor: 'rgba(255,255,255,0.03)',
               border: `1px solid ${AIMS_CIRCUIT_COLORS.primary}40`,
             }}
           >

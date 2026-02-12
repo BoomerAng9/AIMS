@@ -35,7 +35,7 @@ export function LogoWallBackground({ mode = "hero", children }: Props) {
   return (
     <div className={clsx(
       "relative text-white",
-      mode === "dashboard" ? "h-screen overflow-hidden bg-[#0A0A0A]" : "min-h-screen aims-page-bg gold-edge-rail"
+      mode === "dashboard" ? "h-full overflow-hidden bg-[#0A0A0A]" : "min-h-full aims-page-bg gold-edge-rail"
     )}>
       {/* Subtle grid overlay for dashboard/form */}
       {(mode === "dashboard" || mode === "form") && (
@@ -75,7 +75,7 @@ export function LogoWallBackground({ mode = "hero", children }: Props) {
       {/* Content */}
       <main className={clsx(
         "relative z-10 flex flex-col",
-        mode === "dashboard" ? "h-full" : "min-h-screen",
+        mode === "dashboard" ? "h-full" : "min-h-full",
         mode === "hero" ? "p-4 md:p-6 lg:p-8 xl:p-12" : "p-0"
       )}>
         <div className={clsx(

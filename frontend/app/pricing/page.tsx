@@ -652,7 +652,7 @@ export default function PricingPage() {
                 </ul>
 
                 <Link
-                  href="/dashboard/chat"
+                  href="/dashboard"
                   className={`mt-6 block w-full text-center rounded-full py-2.5 text-xs font-semibold transition-all ${
                     i === 2
                       ? "bg-gold text-black hover:shadow-[0_0_20px_rgba(251,191,36,0.4)]"
@@ -774,7 +774,7 @@ export default function PricingPage() {
           <div className="mt-6 flex flex-col sm:flex-row gap-4">
             {selectedGroup === "enterprise-group" ? (
               <Link
-                href="/dashboard/chat"
+                href="/dashboard"
                 className="inline-flex items-center justify-center rounded-full bg-gold px-8 py-3 text-sm font-bold text-black hover:shadow-[0_0_30px_rgba(251,191,36,0.5)] transition-all hover:scale-105 active:scale-95"
               >
                 Contact Sales

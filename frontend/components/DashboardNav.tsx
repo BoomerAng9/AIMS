@@ -10,31 +10,13 @@ import clsx from "clsx";
 const userNavItems = [
   { href: "/dashboard/your-space", label: "Your Space" },
   { href: "/dashboard", label: "Overview" },
-  { href: "/dashboard/acheevy", label: "ACHEEVY", highlight: true },
-  { href: "/dashboard/chat", label: "Chat w/ACHEEVY" },
-  { href: "/dashboard/plan", label: "Plan" },
   { href: "/dashboard/deploy-dock", label: "Deploy Dock", highlight: true },
   { href: "/dashboard/plugs", label: "aiPlugs" },
   { href: "/dashboard/house-of-ang", label: "House of Ang" },
+  { href: "/dashboard/the-hangar", label: "The Hangar", highlight: true },
   { href: "/dashboard/project-management", label: "PMO Offices" },
-  { href: "/dashboard/workstreams", label: "Workstreams" },
-  { href: "/dashboard/lab", label: "Workbench" },
-  { href: "/dashboard/luc", label: "LUC" },
   { href: "/dashboard/make-it-mine", label: "Make It Mine" },
-  { href: "/dashboard/research", label: "R&D Hub" },
-  { href: "/dashboard/model-garden", label: "Model Garden" },
-  { href: "/dashboard/settings", label: "Settings" },
-];
-
-// ── Admin-only (Circuit Box) navigation ─────────────────────
-const adminNavItems = [
-  { href: "/dashboard/circuit-box", label: "Circuit Box" },
-  { href: "/dashboard/boomerangs", label: "Boomer_Angs" },
-  { href: "/dashboard/operations", label: "Operations" },
-  { href: "/dashboard/gates", label: "Gates & Evidence" },
-  { href: "/dashboard/environments", label: "Environments" },
-  { href: "/dashboard/security", label: "Security Center" },
-  { href: "/dashboard/sports-tracker", label: "Sports Tracker" },
+  { href: "/dashboard/circuit-box", label: "Circuit Box", highlight: true },
 ];
 
 function NavLink({ item, pathname }: { item: { href: string; label: string; highlight?: boolean }; pathname: string | null }) {
@@ -89,17 +71,9 @@ export function DashboardNav() {
         <NavLink key={item.href} item={item} pathname={pathname} />
       ))}
 
-      {/* Admin / Circuit Box section — only for OWNER */}
+      {/* Admin access — consolidated into Circuit Box */}
       {isAdmin && (
         <>
-          <div className="mx-3 my-2 border-t border-gold/10" />
-          <p className="px-3 pb-1 pt-1 text-[0.55rem] uppercase tracking-[0.2em] text-gold/30 font-mono">
-            Circuit Box
-          </p>
-          {adminNavItems.map((item) => (
-            <NavLink key={item.href} item={item} pathname={pathname} />
-          ))}
-
           <div className="mx-3 my-2 border-t border-red-500/20" />
           <Link
             href="/dashboard/admin"

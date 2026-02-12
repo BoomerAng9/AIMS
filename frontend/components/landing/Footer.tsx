@@ -62,7 +62,7 @@ const FOOTER_NAV = {
   platform: {
     title: 'Platform Sections',
     links: [
-      { label: 'ACHEEVY (AI Assistant)', href: '/dashboard/acheevy' },
+      { label: 'ACHEEVY (AI Assistant)', href: '/dashboard' },
       { label: 'House of Ang (Agents)', href: '/dashboard/house-of-ang' },
       { label: 'Model Garden (Tools)', href: '/dashboard/model-garden' },
       { label: 'Pricing', href: '/pricing' },
@@ -236,7 +236,7 @@ export function Footer() {
 
           {/* Related Links */}
           <div className="flex items-center gap-4 text-sm">
-            <Link href="/dashboard/acheevy" className="text-gray-400 hover:text-white transition-colors">
+            <Link href="/dashboard" className="text-gray-400 hover:text-white transition-colors">
               ACHEEVY
             </Link>
             <span className="text-gray-600">·</span>

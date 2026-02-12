@@ -15,6 +15,7 @@
 
 import { useChat } from 'ai/react';
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -24,6 +25,7 @@ import {
   Trophy, Search, Hammer, Layers, Container, Wand2,
   Building2, DollarSign, Activity, Megaphone, Palette, BookOpen,
   PanelLeftClose, PanelLeftOpen, Plus, MessageSquare, Trash2, Flame,
+  Mic, MicOff, Volume2, Loader2,
 } from 'lucide-react';
 import { SiteHeader } from '@/components/SiteHeader';
 
@@ -100,6 +102,177 @@ function loadThreads(): Thread[] {
 
 function saveThreads(threads: Thread[]) {
   try { localStorage.setItem(THREADS_STORAGE_KEY, JSON.stringify(threads)); } catch {}
+}
+
+// ─────────────────────────────────────────────────────────────
+// Voice Recording Hook
+// ─────────────────────────────────────────────────────────────
+
+function useVoiceRecorder() {
+  const [isRecording, setIsRecording] = useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false);
+  const [audioLevels, setAudioLevels] = useState<number[]>(new Array(20).fill(0));
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const animFrameRef = useRef<number>(0);
+  const chunksRef = useRef<Blob[]>([]);
+
+  const startRecording = useCallback(async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+      // Set up audio analyzer for visualization
+      const audioContext = new AudioContext();
+      const source = audioContext.createMediaStreamSource(stream);
+      const analyser = audioContext.createAnalyser();
+      analyser.fftSize = 64;
+      source.connect(analyser);
+      audioContextRef.current = audioContext;
+      analyserRef.current = analyser;
+
+      // Animate audio levels
+      const updateLevels = () => {
+        if (!analyserRef.current) return;
+        const data = new Uint8Array(analyserRef.current.frequencyBinCount);
+        analyserRef.current.getByteFrequencyData(data);
+        const levels = Array.from(data.slice(0, 20)).map(v => v / 255);
+        setAudioLevels(levels);
+        animFrameRef.current = requestAnimationFrame(updateLevels);
+      };
+      updateLevels();
+
+      // Start recording
+      const recorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+      chunksRef.current = [];
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunksRef.current.push(e.data);
+      };
+      mediaRecorderRef.current = recorder;
+      recorder.start();
+      setIsRecording(true);
+    } catch (err) {
+      console.error('[Voice] Mic access denied:', err);
+    }
+  }, []);
+
+  const stopRecording = useCallback(async (): Promise<string> => {
+    return new Promise((resolve) => {
+      if (!mediaRecorderRef.current || mediaRecorderRef.current.state === 'inactive') {
+        resolve('');
+        return;
+      }
+
+      mediaRecorderRef.current.onstop = async () => {
+        // Clean up audio context
+        cancelAnimationFrame(animFrameRef.current);
+        audioContextRef.current?.close();
+        setAudioLevels(new Array(20).fill(0));
+        setIsRecording(false);
+        setIsTranscribing(true);
+
+        // Stop all tracks
+        mediaRecorderRef.current?.stream.getTracks().forEach(t => t.stop());
+
+        // Transcribe
+        const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
+        const formData = new FormData();
+        formData.append('audio', blob, 'recording.webm');
+
+        try {
+          const res = await fetch('/api/voice/stt', { method: 'POST', body: formData });
+          if (res.ok) {
+            const data = await res.json();
+            setIsTranscribing(false);
+            resolve(data.text || '');
+          } else {
+            setIsTranscribing(false);
+            resolve('');
+          }
+        } catch {
+          setIsTranscribing(false);
+          resolve('');
+        }
+      };
+
+      mediaRecorderRef.current.stop();
+    });
+  }, []);
+
+  return { isRecording, isTranscribing, audioLevels, startRecording, stopRecording };
+}
+
+// ─────────────────────────────────────────────────────────────
+// Audio Waveform Visualization
+// ─────────────────────────────────────────────────────────────
+
+function AudioWaveform({ levels, isActive }: { levels: number[]; isActive: boolean }) {
+  if (!isActive) return null;
+
+  return (
+    <div className="flex items-center gap-[2px] h-6">
+      {levels.map((level, i) => (
+        <motion.div
+          key={i}
+          animate={{ height: Math.max(3, level * 24) }}
+          transition={{ duration: 0.05 }}
+          className="w-[3px] rounded-full bg-gold"
+          style={{ opacity: 0.4 + level * 0.6 }}
+        />
+      ))}
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// TTS Playback Hook
+// ─────────────────────────────────────────────────────────────
+
+function useTtsPlayback() {
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [ttsEnabled, setTtsEnabled] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  const speak = useCallback(async (text: string) => {
+    if (!ttsEnabled || !text) return;
+
+    try {
+      setIsSpeaking(true);
+      const res = await fetch('/api/voice/tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: text.slice(0, 2000) }),
+      });
+
+      if (res.ok && res.body) {
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        if (audioRef.current) {
+          audioRef.current.pause();
+          URL.revokeObjectURL(audioRef.current.src);
+        }
+        const audio = new Audio(url);
+        audioRef.current = audio;
+        audio.onended = () => { setIsSpeaking(false); URL.revokeObjectURL(url); };
+        audio.onerror = () => { setIsSpeaking(false); URL.revokeObjectURL(url); };
+        await audio.play();
+      } else {
+        setIsSpeaking(false);
+      }
+    } catch {
+      setIsSpeaking(false);
+    }
+  }, [ttsEnabled]);
+
+  const stopSpeaking = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
+    setIsSpeaking(false);
+  }, []);
+
+  return { isSpeaking, ttsEnabled, setTtsEnabled, speak, stopSpeaking };
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -430,6 +603,7 @@ function MessageBubble({ role, content, isStreaming }: {
 // ─────────────────────────────────────────────────────────────
 
 export default function ChatPage() {
+  const searchParams = useSearchParams();
   const {
     messages,
     input,
@@ -447,12 +621,32 @@ export default function ChatPage() {
   const [currentVerb, setCurrentVerb] = useState('Deploy');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const prefillHandled = useRef(false);
+
+  // Voice I/O
+  const { isRecording, isTranscribing, audioLevels, startRecording, stopRecording } = useVoiceRecorder();
+  const { isSpeaking, ttsEnabled, setTtsEnabled, speak, stopSpeaking } = useTtsPlayback();
+  const lastAssistantRef = useRef<string>('');
 
   // Threads
   const [threads, setThreads] = useState<Thread[]>([]);
   const [activeThreadId, setActiveThreadId] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [mottoVisible, setMottoVisible] = useState(true);
+
+  // Pre-fill from ?q= query param (from FloatingACHEEVY launcher)
+  useEffect(() => {
+    const prefill = searchParams.get('q');
+    if (prefill && !prefillHandled.current) {
+      prefillHandled.current = true;
+      setInput(prefill);
+      // Auto-submit after a brief delay to let the component mount
+      setTimeout(() => {
+        const form = document.getElementById('chat-form') as HTMLFormElement;
+        form?.requestSubmit();
+      }, 100);
+    }
+  }, [searchParams, setInput]);
 
   // Load persisted state
   useEffect(() => {
@@ -581,11 +775,36 @@ export default function ChatPage() {
     }
   };
 
+  // Voice recording toggle
+  const handleVoiceToggle = useCallback(async () => {
+    if (isRecording) {
+      const text = await stopRecording();
+      if (text) {
+        // Put transcribed text into input for user to review/edit before sending
+        setInput(text);
+        textareaRef.current?.focus();
+      }
+    } else {
+      startRecording();
+    }
+  }, [isRecording, stopRecording, startRecording, setInput]);
+
+  // Auto-play TTS when assistant finishes responding
+  useEffect(() => {
+    if (!isLoading && messages.length > 0) {
+      const last = messages[messages.length - 1];
+      if (last.role === 'assistant' && last.content && last.content !== lastAssistantRef.current) {
+        lastAssistantRef.current = last.content;
+        speak(last.content);
+      }
+    }
+  }, [isLoading, messages, speak]);
+
   return (
-    <div className="min-h-screen bg-[#0A0A0A] aims-page-bg flex flex-col">
+    <div className="h-full bg-[#0A0A0A] aims-page-bg flex flex-col overflow-hidden">
       <SiteHeader />
 
-      <div className="flex-1 flex h-[calc(100vh-64px)] overflow-hidden">
+      <div className="flex-1 flex overflow-hidden">
         {/* ── Threads Sidebar ── */}
         <ThreadsSidebar
           threads={threads}
@@ -614,8 +833,8 @@ export default function ChatPage() {
               )}
 
               <div className="relative">
-                <div className="w-11 h-11 rounded-xl bg-white/5 border border-gold/20 flex items-center justify-center">
-                  <Bot className="text-gold w-6 h-6" />
+                <div className="w-11 h-11 rounded-xl bg-white/5 border border-gold/20 flex items-center justify-center overflow-hidden">
+                  <Image src="/images/acheevy/acheevy-helmet.png" alt="ACHEEVY" width={28} height={28} className="w-7 h-7 object-cover rounded-lg" />
                 </div>
                 <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-400 rounded-full border-2 border-[#0A0A0A] animate-pulse" />
               </div>
@@ -744,19 +963,87 @@ export default function ChatPage() {
           {/* ── Input Area ── */}
           <div className="border-t border-wireframe-stroke bg-[#0A0A0A]/80 backdrop-blur-xl px-4 py-4">
             <div className="max-w-3xl mx-auto">
+              {/* Recording indicator with waveform */}
+              <AnimatePresence>
+                {(isRecording || isTranscribing) && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="mb-3"
+                  >
+                    <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl border border-gold/20 bg-gold/5">
+                      {isRecording && (
+                        <>
+                          <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                          <span className="text-xs text-white/60 font-mono">Recording...</span>
+                          <AudioWaveform levels={audioLevels} isActive={isRecording} />
+                          <button
+                            onClick={handleVoiceToggle}
+                            className="ml-auto px-3 py-1 rounded-lg bg-gold/20 text-gold text-xs hover:bg-gold/30 transition-colors"
+                          >
+                            Stop & Transcribe
+                          </button>
+                        </>
+                      )}
+                      {isTranscribing && (
+                        <>
+                          <Loader2 className="w-4 h-4 text-gold animate-spin" />
+                          <span className="text-xs text-white/60 font-mono">Transcribing audio...</span>
+                        </>
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
               <form id="chat-form" onSubmit={handleEnhancedSubmit}>
                 <div className="relative flex items-end gap-2 wireframe-card rounded-2xl p-3 focus-within:border-gold/30 transition-colors">
+                  {/* Mic button */}
+                  <button
+                    type="button"
+                    onClick={handleVoiceToggle}
+                    disabled={isLoading || isTranscribing}
+                    title={isRecording ? 'Stop recording' : 'Voice input'}
+                    className={`p-3 rounded-xl transition-all flex-shrink-0 ${
+                      isRecording
+                        ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30 animate-pulse'
+                        : 'bg-white/5 text-white/40 hover:text-gold hover:bg-gold/10'
+                    } disabled:opacity-40`}
+                  >
+                    {isRecording ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+                  </button>
+
                   {/* Textarea */}
                   <textarea
                     ref={textareaRef}
                     value={input}
                     onChange={handleInputChange}
                     onKeyDown={handleKeyDown}
-                    placeholder="Message ACHEEVY..."
-                    disabled={isLoading}
+                    placeholder={isRecording ? 'Recording... click Stop to transcribe' : 'Message ACHEEVY...'}
+                    disabled={isLoading || isRecording}
                     rows={1}
                     className="flex-1 bg-transparent text-white placeholder:text-white/20 resize-none outline-none text-[15px] leading-relaxed max-h-[160px] py-2 px-2"
                   />
+
+                  {/* TTS toggle */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (isSpeaking) stopSpeaking();
+                      else setTtsEnabled(!ttsEnabled);
+                    }}
+                    title={ttsEnabled ? (isSpeaking ? 'Stop speaking' : 'Voice output ON') : 'Enable voice output'}
+                    className={`p-3 rounded-xl transition-all flex-shrink-0 ${
+                      isSpeaking
+                        ? 'bg-gold/20 text-gold animate-pulse'
+                        : ttsEnabled
+                        ? 'bg-gold/10 text-gold'
+                        : 'bg-white/5 text-white/30 hover:text-white/50'
+                    }`}
+                  >
+                    <Volume2 className="w-5 h-5" />
+                  </button>
 
                   {/* Send / Stop */}
                   {isLoading ? (
@@ -771,10 +1058,10 @@ export default function ChatPage() {
                   ) : (
                     <button
                       type="submit"
-                      disabled={!input.trim()}
+                      disabled={!input.trim() || isRecording}
                       title="Send message"
                       className={`p-3 rounded-xl transition-all flex-shrink-0 ${
-                        input.trim()
+                        input.trim() && !isRecording
                           ? 'bg-gold text-black hover:bg-gold-light'
                           : 'bg-white/5 text-white/30 cursor-not-allowed'
                       }`}

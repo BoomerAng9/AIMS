@@ -67,13 +67,15 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${doto.variable} ${permanentMarker.variable} ${caveat.variable} ${patrickHand.variable} ${nabla.variable} antialiased min-h-screen bg-[#0A0A0A] text-white font-sans overflow-x-hidden selection:bg-gold/30 selection:text-white`}>
-        {/* Nano Banana Pro Texture Layers */}
-        <div className="texture-noise" />
-        <div className="texture-scanlines" />
-        <div className="vignette-overlay fixed inset-0 z-40 pointer-events-none" />
-        
-        <Providers>{children}</Providers>
+      <body className={`${doto.variable} ${permanentMarker.variable} ${caveat.variable} ${patrickHand.variable} ${nabla.variable} antialiased bg-[#050505] text-white font-sans overflow-hidden selection:bg-gold/30 selection:text-white`}>
+        <Providers>
+          <div className="aims-frame">
+            {/* Texture layers — inside frame */}
+            <div className="texture-noise" style={{ position: 'absolute', borderRadius: 'inherit' }} />
+            <div className="vignette-overlay absolute inset-0 z-40 pointer-events-none" style={{ borderRadius: 'inherit' }} />
+            {children}
+          </div>
+        </Providers>
       </body>
     </html>
   );

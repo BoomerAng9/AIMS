@@ -255,9 +255,8 @@ export function StatusStrip({ className = '', position = 'bottom' }: StatusStrip
                 {boomerAngs.map((agent) => (
                   <div
                     key={agent.id}
-                    className="p-3 rounded-lg"
+                    className="p-3 rounded-lg bg-white/[0.03]"
                     style={{
-                      backgroundColor: '#1a2234',
                       border: `1px solid ${
                         agent.status === 'running'
                           ? '#22c55e40'

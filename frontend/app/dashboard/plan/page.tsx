@@ -2,7 +2,6 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
 import { Target, ArrowRight, Clock, CheckCircle2, Circle, Loader2 } from "lucide-react";
 
 const missions = [
@@ -64,13 +63,16 @@ export default function PlanPage() {
             Track active objectives orchestrated by ACHEEVY and executed by your Boomer_Ang team.
           </p>
         </div>
-        <Link
-          href="/dashboard/chat"
+        <button
+          onClick={() => {
+            const input = document.querySelector<HTMLInputElement>('input[placeholder*="ACHEEVY"]');
+            if (input) { input.focus(); }
+          }}
           className="flex items-center gap-2 rounded-full bg-gold px-5 py-2.5 text-xs font-bold text-black shadow-[0_0_15px_rgba(251,191,36,0.3)] transition-all hover:scale-105 active:scale-95"
         >
           <Target size={14} />
           New Mission
-        </Link>
+        </button>
       </header>
 
       <div className="space-y-4">
@@ -137,12 +139,15 @@ export default function PlanPage() {
           <p className="mt-3 text-sm text-white/30">
             Start a conversation with ACHEEVY to create your next mission plan.
           </p>
-          <Link
-            href="/dashboard/chat"
+          <button
+            onClick={() => {
+              const input = document.querySelector<HTMLInputElement>('input[placeholder*="ACHEEVY"]');
+              if (input) { input.focus(); }
+            }}
             className="mt-4 flex items-center gap-2 rounded-full border border-gold/20 px-5 py-2 text-xs font-semibold text-gold hover:bg-gold/10 transition-colors"
           >
             Open Chat <ArrowRight size={12} />
-          </Link>
+          </button>
         </div>
       </div>
     </div>

@@ -162,7 +162,7 @@ export function DashboardShell({ children }: Props) {
       {/* Demo banner — only visible when NEXT_PUBLIC_DEMO_MODE=true */}
       <DemoBanner />
 
-      <div className={`flex min-h-screen ${IS_DEMO ? "pt-9" : "pt-[env(safe-area-inset-top)]"}`}>
+      <div className={`flex min-h-full ${IS_DEMO ? "pt-9" : "pt-[env(safe-area-inset-top)]"}`}>
         {/* Left rail — wireframe glass sidebar */}
         <aside className="hidden w-64 flex-shrink-0 flex-col border-r border-wireframe-stroke bg-black/60 backdrop-blur-xl lg:flex z-30 sticky top-0 h-screen">
           <div className="px-4 py-5">
@@ -209,7 +209,7 @@ export function DashboardShell({ children }: Props) {
         </aside>
 
         {/* Main column */}
-        <div className="flex flex-1 flex-col min-h-screen relative z-10">
+        <div className="flex flex-1 flex-col min-h-full relative z-10">
           {/* Top bar */}
           <header className="sticky top-0 flex items-center justify-between border-b border-wireframe-stroke bg-[#0A0A0A]/80 px-4 py-3 backdrop-blur-xl sm:px-6 lg:px-8 xl:px-12 z-20 shadow-lg shadow-black/20">
             <div className="flex items-center gap-5">
@@ -279,7 +279,7 @@ export function DashboardShell({ children }: Props) {
                       </div>
                       <div className="py-1">
                         <button
-                          onClick={() => { setShowAccountMenu(false); router.push('/dashboard/settings'); }}
+                          onClick={() => { setShowAccountMenu(false); router.push('/dashboard/circuit-box?tab=settings'); }}
                           className="w-full text-left px-4 py-2 text-sm text-white/60 hover:bg-white/5 hover:text-white transition-colors"
                         >
                           Settings

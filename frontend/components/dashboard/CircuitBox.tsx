@@ -336,7 +336,7 @@ function Panel({ title, children, className = '' }: { title: string; children: R
     <div
       className={`rounded-lg overflow-hidden ${className}`}
       style={{
-        backgroundColor: '#1a2234',
+        backgroundColor: 'rgba(255,255,255,0.03)',
         border: '1px solid #2d3a4d',
       }}
     >
@@ -658,8 +658,7 @@ export default function CircuitBox() {
 
   return (
     <div
-      className="min-h-screen p-6"
-      style={{ backgroundColor: '#0a0f1a' }}
+      className="min-h-screen p-6 aims-page-bg"
     >
       {/* Header */}
       <header className="flex items-center justify-between mb-6">
