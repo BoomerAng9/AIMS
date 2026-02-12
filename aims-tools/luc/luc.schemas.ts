@@ -141,7 +141,7 @@ export const CanExecuteResponseSchema = z.object({
   wouldExceed: z.boolean(),
   overage: z.number().min(0),
   warning: z.string().optional(),
-  warningLevel: z.enum(["none", "soft", "hard", "blocked"]),
+  warningLevel: z.enum(["none", "soft", "hard", "exceeded", "blocked"]),
 });
 
 export type CanExecuteResponse = z.infer<typeof CanExecuteResponseSchema>;

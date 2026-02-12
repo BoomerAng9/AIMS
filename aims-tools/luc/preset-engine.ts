@@ -16,7 +16,7 @@ export interface PresetInputs {
 }
 
 export interface PresetOutputs {
-  [fieldId: string]: string | number | boolean;
+  [fieldId: string]: string | number | boolean | string[] | undefined;
   _errors?: string[];
   _warnings?: string[];
 }
@@ -293,20 +293,20 @@ export class PresetEngine {
     }
 
     while (noIncoming.size > 0) {
-      const id = noIncoming.values().next().value;
+      const id = noIncoming.values().next().value!;
       noIncoming.delete(id);
       sorted.push(formulaMap.get(id)!);
 
       // Check other formulas that depend on this one
-      for (const [otherId, deps] of graph) {
+      graph.forEach((deps, otherId) => {
         if (deps.has(id)) {
           deps.delete(id);
-          const remainingFormulaDeps = [...deps].filter((d) => formulaMap.has(d));
+          const remainingFormulaDeps = Array.from(deps).filter((d) => formulaMap.has(d));
           if (remainingFormulaDeps.length === 0) {
             noIncoming.add(otherId);
           }
         }
-      }
+      });
     }
 
     // Check for cycles

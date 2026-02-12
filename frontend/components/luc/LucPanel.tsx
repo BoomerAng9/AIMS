@@ -18,8 +18,8 @@ import {
 import type {
   SummaryResponse,
   EstimateResponse,
-  ServiceKey,
 } from "@/aims-tools/luc/luc.schemas";
+import type { ServiceKey } from "@/aims-tools/luc/luc.constants";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types

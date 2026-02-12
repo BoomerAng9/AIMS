@@ -40,7 +40,7 @@ const openrouter = createOpenAI({
 const DEFAULT_MODEL = process.env.ACHEEVY_MODEL || 'anthropic/claude-opus-4.6';
 
 // ── Priority Model Roster (all accessible via OpenRouter) ───
-export const PRIORITY_MODELS: Record<string, { id: string; label: string; provider: string }> = {
+const PRIORITY_MODELS: Record<string, { id: string; label: string; provider: string }> = {
   'claude-opus':    { id: 'anthropic/claude-opus-4.6',        label: 'Claude Opus 4.6',      provider: 'Anthropic' },
   'claude-sonnet':  { id: 'anthropic/claude-sonnet-4.6',      label: 'Claude Sonnet 4.6',    provider: 'Anthropic' },
   'qwen':           { id: 'qwen/qwen-2.5-coder-32b',         label: 'Qwen 2.5 Coder 32B',  provider: 'Qwen' },

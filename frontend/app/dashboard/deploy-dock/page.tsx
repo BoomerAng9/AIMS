@@ -439,11 +439,11 @@ function AcheevyPanel() {
 // Transfer View Visualization
 // ─────────────────────────────────────────────────────────────
 
-function TransferView({ stage }: { stage: "idle" | "hatch" | "assign" | "launch" }) {
+function TransferView({ stage }: { stage: "idle" | "plan" | "quote" | "hatch" | "assign" | "launch" | "done" }) {
   const [particles, setParticles] = useState<{ id: number; x: number; y: number; progress: number }[]>([]);
 
   useEffect(() => {
-    if (stage === "idle") {
+    if (stage === "idle" || stage === "plan" || stage === "quote") {
       setParticles([]);
       return;
     }

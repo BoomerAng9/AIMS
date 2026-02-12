@@ -4,6 +4,12 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  webpack: (config) => {
+    // Prevent webpack from resolving symlinks to real paths so that
+    // symlinked aims-tools/ resolves dependencies from frontend/node_modules
+    config.resolve.symlinks = false;
+    return config;
+  },
 };
 
 export default nextConfig;
