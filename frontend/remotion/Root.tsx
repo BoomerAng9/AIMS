@@ -6,6 +6,7 @@ import { DeploymentAnimation } from "./compositions/DeploymentAnimation";
 import { PortTransition } from "./compositions/PortTransition";
 import { AcheevyCharacter } from "./compositions/AcheevyCharacter";
 import { PlugMeIn } from "./compositions/PlugMeIn";
+import { WelcomeVideo } from "./compositions/WelcomeVideo";
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -94,6 +95,14 @@ export const RemotionRoot: React.FC = () => {
         durationInFrames={150}
         fps={30}
         width={1920}
+        height={1080}
+      />
+      <Composition
+        id="WelcomeVideo"
+        component={WelcomeVideo}
+        durationInFrames={180}
+        fps={30}
+        width={800}
         height={1080}
       />
     </>
