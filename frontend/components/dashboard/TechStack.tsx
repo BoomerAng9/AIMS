@@ -147,7 +147,7 @@ function TechCard({ item, delay }: { item: TechItem; delay: number }) {
       transition={{ delay: delay * 0.05, duration: 0.3 }}
       className="flex items-center gap-3 px-4 py-3 rounded-lg transition-all hover:scale-105"
       style={{
-        backgroundColor: '#1a2234',
+        backgroundColor: 'rgba(255,255,255,0.03)',
         border: '1px solid #2d3a4d',
       }}
     >
@@ -331,7 +331,7 @@ export default function TechStack() {
           <div
             className="inline-flex items-center gap-4 px-8 py-4 rounded-2xl"
             style={{
-              backgroundColor: '#1a2234',
+              backgroundColor: 'rgba(255,255,255,0.03)',
               border: `1px solid ${AIMS_CIRCUIT_COLORS.primary}40`,
               boxShadow: `0 0 40px ${AIMS_CIRCUIT_COLORS.primary}10`,
             }}

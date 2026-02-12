@@ -23,14 +23,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const navItems = [
   { href: '/dashboard', label: 'Overview' },
-  { href: '/dashboard/acheevy', label: 'ACHEEVY' },
-  { href: '/dashboard/plan', label: 'Plan' },
-  { href: '/dashboard/ai-plugs', label: 'aiPlugs' },
-  { href: '/dashboard/boomerangs', label: 'BoomerAngs' },
-  { href: '/dashboard/lab', label: 'Lab' },
-  { href: '/dashboard/luc', label: 'LUC Usage' },
+  { href: '/dashboard/deploy-dock', label: 'Deploy Dock' },
+  { href: '/dashboard/plugs', label: 'aiPlugs' },
+  { href: '/dashboard/house-of-ang', label: 'House of Ang' },
   { href: '/dashboard/circuit-box', label: 'Circuit Box' },
-  { href: '/dashboard/settings', label: 'Settings' },
 ];
 
 // ─────────────────────────────────────────────────────────────

@@ -42,9 +42,9 @@ interface AIMSNavProps {
 
 const DEFAULT_NAV_ITEMS: NavItem[] = [
   { label: 'Dashboard', href: '/dashboard' },
-  { label: 'ACHEEVY', href: '/dashboard/acheevy' },
   { label: 'House of Ang', href: '/dashboard/house-of-ang' },
-  { label: 'Deploy', href: '/dashboard/deploy' },
+  { label: 'Deploy Dock', href: '/dashboard/deploy-dock' },
+  { label: 'Circuit Box', href: '/dashboard/circuit-box' },
   { label: 'Sports Tracker', href: '/dashboard/sports-tracker' },
 ];
 

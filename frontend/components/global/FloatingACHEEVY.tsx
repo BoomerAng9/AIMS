@@ -10,7 +10,6 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useRouter } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
 
 // ─────────────────────────────────────────────────────────────
@@ -32,12 +31,6 @@ interface Message {
 const SendIcon = ({ className }: { className?: string }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
-  </svg>
-);
-
-const ExpandIcon = ({ className }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
   </svg>
 );
 
@@ -99,7 +92,6 @@ function MessageBubble({ message }: { message: Message }) {
 // ─────────────────────────────────────────────────────────────
 
 export function FloatingACHEEVY() {
-  const router = useRouter();
   const [isExpanded, setIsExpanded] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
@@ -235,11 +227,6 @@ export function FloatingACHEEVY() {
       e.preventDefault();
       sendMessage();
     }
-  };
-
-  // Toggle maximized state
-  const toggleMaximized = () => {
-    setIsExpanded(true);
   };
 
   return (

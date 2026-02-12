@@ -62,7 +62,7 @@ const FOOTER_NAV = {
   platform: {
     title: 'Platform Sections',
     links: [
-      { label: 'ACHEEVY (AI Assistant)', href: '/dashboard/acheevy' },
+      { label: 'ACHEEVY (AI Assistant)', href: '/dashboard' },
       { label: 'House of Ang (Agents)', href: '/dashboard/house-of-ang' },
       { label: 'Model Garden (Tools)', href: '/dashboard/model-garden' },
       { label: 'Pricing', href: '/pricing' },

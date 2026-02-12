@@ -336,7 +336,7 @@ function Panel({ title, children, className = '' }: { title: string; children: R
     <div
       className={`rounded-lg overflow-hidden ${className}`}
       style={{
-        backgroundColor: '#1a2234',
+        backgroundColor: 'rgba(255,255,255,0.03)',
         border: '1px solid #2d3a4d',
       }}
     >
