@@ -322,6 +322,72 @@ body {
   background: rgba(212, 168, 67, 0.3);
 }
 
+/* ─────────────────────────────────────────────────────────────
+   The Hangar — Deployment Port Effects
+   ───────────────────────────────────────────────────────────── */
+
+/* Laser-print scanline on card hover */
+@keyframes hangar-scan {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(200%); }
+}
+
+.hangar-scanline {
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(212, 175, 55, 0.03) 45%,
+    rgba(212, 175, 55, 0.08) 50%,
+    rgba(212, 175, 55, 0.03) 55%,
+    transparent 100%
+  );
+  animation: hangar-scan 2s linear infinite;
+}
+
+/* Status flicker effect for "Deployment Port Active" label */
+@keyframes hangar-flicker {
+  0%, 90%, 100% { opacity: 1; }
+  92% { opacity: 0.4; }
+  94% { opacity: 1; }
+  96% { opacity: 0.6; }
+  98% { opacity: 1; }
+}
+
+.hangar-flicker {
+  animation: hangar-flicker 4s ease-in-out infinite;
+}
+
+/* LED ceiling pulse */
+@keyframes led-pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.5; }
+}
+
+.led-pulse {
+  animation: led-pulse 3s ease-in-out infinite;
+}
+
+/* Materialize-in for hierarchy nodes */
+@keyframes hangar-materialize {
+  0% {
+    opacity: 0;
+    filter: blur(12px);
+    transform: scale(0.8) translateY(10px);
+  }
+  60% {
+    filter: blur(2px);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0px);
+    transform: scale(1) translateY(0);
+  }
+}
+
+.hangar-materialize {
+  animation: hangar-materialize 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
 /* Circuit Box panel — strip nested page wrappers when embedded */
 .circuit-box-panel > div > .min-h-screen {
   min-height: auto !important;

@@ -13,6 +13,7 @@ const userNavItems = [
   { href: "/dashboard/deploy-dock", label: "Deploy Dock", highlight: true },
   { href: "/dashboard/plugs", label: "aiPlugs" },
   { href: "/dashboard/house-of-ang", label: "House of Ang" },
+  { href: "/dashboard/the-hangar", label: "The Hangar", highlight: true },
   { href: "/dashboard/project-management", label: "PMO Offices" },
   { href: "/dashboard/make-it-mine", label: "Make It Mine" },
   { href: "/dashboard/circuit-box", label: "Circuit Box", highlight: true },
