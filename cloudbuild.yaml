@@ -1,14 +1,19 @@
 # =============================================================================
-# A.I.M.S. — Google Cloud Build Pipeline
+# A.I.M.S. — Google Cloud Build Pipeline (Hybrid Deployment)
 # =============================================================================
 # Triggers: Push to main branch (configured in GCP Console or via gcloud)
+#
+# Hybrid architecture:
+#   Cloud Run (stateless):  frontend, uef-gateway — auto-scaling, managed
+#   VPS (stateful):         Redis, n8n, OpenClaw, Agent Bridge, agents
 #
 # What it does:
 #   1. Install + lint + test backend
 #   2. Install + lint + build frontend
-#   3. Build Docker images
+#   3. Build Docker images (gateway, frontend, agents)
 #   4. Push to Artifact Registry
-#   5. Deploy to Cloud Run (or SSH to VPS)
+#   5. Deploy stateless services to Cloud Run
+#   6. Optionally trigger VPS deployment via SSH
 #
 # Setup:
 #   gcloud builds submit --config=cloudbuild.yaml
@@ -110,7 +115,51 @@ steps:
       - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/frontend'
     waitFor: ['docker-frontend']
 
-  # ── Step 5: Deploy to Cloud Run ──
+  # ── Step 5: Build Agent Images (for VPS deployment via Artifact Registry) ──
+  - id: docker-research-ang
+    name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -t
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/research-ang:${SHORT_SHA}'
+      - -t
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/research-ang:latest'
+      - -f
+      - backend/agents/research-ang/Dockerfile
+      - backend/agents/research-ang
+    waitFor: ['backend-install']
+
+  - id: docker-router-ang
+    name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -t
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/router-ang:${SHORT_SHA}'
+      - -t
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/router-ang:latest'
+      - -f
+      - backend/agents/router-ang/Dockerfile
+      - backend/agents/router-ang
+    waitFor: ['backend-install']
+
+  - id: push-research-ang
+    name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - '--all-tags'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/research-ang'
+    waitFor: ['docker-research-ang']
+
+  - id: push-router-ang
+    name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - '--all-tags'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/router-ang'
+    waitFor: ['docker-router-ang']
+
+  # ── Step 6: Deploy Stateless Services to Cloud Run ──
+  # These connect back to VPS stateful services via _VPS_HOST
   - id: deploy-gateway
     name: gcr.io/cloud-builders/gcloud
     args:
@@ -126,8 +175,8 @@ steps:
       - --min-instances=0
       - --max-instances=3
       - --allow-unauthenticated
-      - --set-env-vars=NODE_ENV=production,PORT=3001,LOG_LEVEL=info
-      - --update-secrets=INTERNAL_API_KEY=INTERNAL_API_KEY:latest,OPENROUTER_API_KEY=OPENROUTER_API_KEY:latest
+      - --set-env-vars=NODE_ENV=production,PORT=3001,LOG_LEVEL=info,OPENCLAW_URL=https://${_VPS_DOMAIN}/api/bridge,REDIS_URL=redis://${_VPS_HOST}:6379,N8N_URL=http://${_VPS_HOST}:5678,RESEARCH_ANG_URL=http://${_VPS_HOST}:3020,ROUTER_ANG_URL=http://${_VPS_HOST}:3021
+      - --update-secrets=INTERNAL_API_KEY=INTERNAL_API_KEY:latest,OPENROUTER_API_KEY=OPENROUTER_API_KEY:latest,REDIS_PASSWORD=REDIS_PASSWORD:latest
     waitFor: ['push-gateway']
 
   - id: deploy-frontend
@@ -154,6 +203,8 @@ steps:
 substitutions:
   _REGION: us-central1
   _REPO: aims-docker
+  _VPS_HOST: '76.13.96.107'
+  _VPS_DOMAIN: plugmein.cloud
 
 # ── Images to push (Cloud Build auto-pushes these) ──
 images:
@@ -161,6 +212,10 @@ images:
   - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/uef-gateway:latest'
   - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/frontend:${SHORT_SHA}'
   - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/frontend:latest'
+  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/research-ang:${SHORT_SHA}'
+  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/research-ang:latest'
+  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/router-ang:${SHORT_SHA}'
+  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/router-ang:latest'
 
 # ── Build options ──
 options:

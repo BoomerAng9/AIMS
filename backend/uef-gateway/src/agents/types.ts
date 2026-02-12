@@ -18,6 +18,8 @@ export type AgentId =
   | 'analyst-ang'
   | 'quality-ang'
   | 'chicken-hawk'
+  | 'research-ang'
+  | 'router-ang'
   | 'workflow-smith-squad'
   | 'vision-scout-squad';
 

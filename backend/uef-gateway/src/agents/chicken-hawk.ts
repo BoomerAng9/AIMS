@@ -18,6 +18,7 @@
 import logger from '../logger';
 import { Agent, AgentId, AgentTaskInput, AgentTaskOutput, failOutput } from './types';
 import { registry } from './registry';
+import { scoreAndAudit } from '../../../../aims-skills/acheevy-verticals/execution-engine';
 
 const profile = {
   id: 'chicken-hawk' as const,
@@ -150,6 +151,21 @@ async function executePipeline(
         } else {
           step.status = 'failed';
           allLogs.push(`[Step ${step.index}] FAILED: ${result.result.summary}`);
+        }
+
+        // Bench scoring: Score ALL agents after each step (Boomer_Angs, Lil_Hawks, Chicken Hawk)
+        if (input.context?.benchScoringEnabled && step.assignedAgent) {
+          try {
+            await scoreAndAudit(
+              result,
+              step.assignedAgent,
+              (input.context.verticalId as string) || 'pipeline',
+              'system',
+              input.taskId,
+            );
+          } catch (scoreErr) {
+            logger.warn({ taskId: input.taskId, step: step.index, err: scoreErr }, '[ChickenHawk] Bench scoring failed (non-blocking)');
+          }
         }
       } else {
         // Agent not found in registry — run as Chicken Hawk internal step

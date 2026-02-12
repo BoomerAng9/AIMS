@@ -7,11 +7,17 @@
  * Takes a PmoPipelinePacket (already classified + directed by PMO Router)
  * and runs it through Squad assembly, wave execution, verification, and receipt seal.
  *
+ * Each step is dispatched to real agents via the Agent Registry (A2A protocol).
+ * Agents may be in-process Boomer_Angs or containerized services — the registry
+ * abstracts the difference. Bench scoring runs on every step output.
+ *
  * Doctrine: "Activity breeds Activity — shipped beats perfect."
  */
 
 import { v4 as uuidv4 } from 'uuid';
 import logger from '../logger';
+import { registry } from '../agents/registry';
+import type { AgentTaskInput, AgentTaskOutput, AgentId } from '../agents/types';
 import {
   PmoPipelinePacket,
   ShiftRecord,
@@ -157,10 +163,37 @@ function spawnShift(packet: PmoPipelinePacket): PmoPipelinePacket {
 }
 
 // ---------------------------------------------------------------------------
-// Step 4: Squad Wave Execution — Lil_Hawks process assigned steps
+// Step Routing — Map step descriptions to agent IDs
 // ---------------------------------------------------------------------------
 
-function executeWaves(packet: PmoPipelinePacket): PmoPipelinePacket {
+const STEP_AGENT_MAP: Array<{ keywords: string[]; agentId: AgentId }> = [
+  { keywords: ['scaffold', 'generate', 'implement', 'build', 'code', 'api', 'schema', 'database', 'migration', 'deploy', 'endpoint'], agentId: 'engineer-ang' },
+  { keywords: ['research', 'analyze', 'market', 'data', 'competitive', 'audit', 'report', 'survey', 'trend'], agentId: 'analyst-ang' },
+  { keywords: ['brand', 'campaign', 'copy', 'content', 'email', 'seo', 'social', 'outreach', 'marketing'], agentId: 'marketer-ang' },
+  { keywords: ['verify', 'test', 'security', 'review', 'compliance', 'check', 'validate', 'verification', 'oracle', 'quality'], agentId: 'quality-ang' },
+];
+
+function resolveAgentForStep(description: string): AgentId {
+  const lower = description.toLowerCase();
+  let bestMatch: AgentId = 'analyst-ang'; // default: research/analysis
+  let bestScore = 0;
+
+  for (const entry of STEP_AGENT_MAP) {
+    const score = entry.keywords.filter(kw => lower.includes(kw)).length;
+    if (score > bestScore) {
+      bestScore = score;
+      bestMatch = entry.agentId;
+    }
+  }
+
+  return bestMatch;
+}
+
+// ---------------------------------------------------------------------------
+// Step 4: Squad Wave Execution — Lil_Hawks dispatch to real A2A agents
+// ---------------------------------------------------------------------------
+
+async function executeWaves(packet: PmoPipelinePacket): Promise<PmoPipelinePacket> {
   const exec = packet.execution!;
   const squad = packet.squad!;
   const waveSize = squad.size;
@@ -176,28 +209,102 @@ function executeWaves(packet: PmoPipelinePacket): PmoPipelinePacket {
     const stepResults: StepResult[] = [];
     let waveDuration = 0;
 
-    for (const step of waveSteps) {
-      // Simulated execution — in production, this dispatches to the UEF Gateway agent runner
-      const durationMs = Math.floor(Math.random() * 3000) + 500;
-      const success = Math.random() > 0.05; // 95% success rate
+    // Execute wave steps concurrently via A2A dispatch
+    const stepPromises = waveSteps.map(async (step) => {
+      const agentId = resolveAgentForStep(step.description);
+      const agent = registry.get(agentId);
+      const startMs = Date.now();
 
-      step.status = success ? 'completed' : 'failed';
-      if (success) completedSteps++;
+      if (!agent) {
+        // No agent available — mark as failed
+        logger.warn(
+          { stepIndex: step.stepIndex, agentId, description: step.description },
+          '[Chain] No agent available for step — marking failed',
+        );
+        return {
+          step,
+          success: false,
+          durationMs: Date.now() - startMs,
+          summary: `No agent '${agentId}' available for: ${step.description}`,
+          agentId,
+        };
+      }
+
+      // Build A2A task input
+      const taskInput: AgentTaskInput = {
+        taskId: `${packet.shift!.shiftId}-step-${step.stepIndex}-${uuidv4().slice(0, 6)}`,
+        intent: packet.classification.executionLane === 'deploy_it' ? 'BUILD_PLUG' : 'AGENTIC_WORKFLOW',
+        query: step.description,
+        context: {
+          shiftId: packet.shift!.shiftId,
+          office: packet.classification.pmoOffice,
+          director: packet.boomerDirective?.director,
+          wave: wave + 1,
+          stepIndex: step.stepIndex,
+          lilHawk: step.assignedLilHawk,
+        },
+      };
+
+      try {
+        logger.info(
+          { taskId: taskInput.taskId, agentId, stepIndex: step.stepIndex, hawk: step.assignedLilHawk },
+          '[Chain] Dispatching step to agent via A2A',
+        );
+
+        const result: AgentTaskOutput = await agent.execute(taskInput);
+        const durationMs = Date.now() - startMs;
+        const success = result.status === 'COMPLETED';
+
+        return {
+          step,
+          success,
+          durationMs,
+          summary: success
+            ? `${step.assignedLilHawk} → ${agentId}: ${result.result.summary.slice(0, 200)}`
+            : `${step.assignedLilHawk} → ${agentId} FAILED: ${result.result.summary.slice(0, 200)}`,
+          agentId,
+          output: result,
+        };
+      } catch (err) {
+        const durationMs = Date.now() - startMs;
+        const errMsg = err instanceof Error ? err.message : 'Unknown error';
+        logger.error(
+          { taskId: taskInput.taskId, agentId, err: errMsg },
+          '[Chain] Step execution failed',
+        );
+        return {
+          step,
+          success: false,
+          durationMs,
+          summary: `${step.assignedLilHawk} → ${agentId} ERROR: ${errMsg}`,
+          agentId,
+        };
+      }
+    });
+
+    // Await all concurrent step executions in this wave
+    const waveOutcomes = await Promise.allSettled(stepPromises);
+
+    for (const outcome of waveOutcomes) {
+      const result = outcome.status === 'fulfilled'
+        ? outcome.value
+        : { step: waveSteps[0], success: false, durationMs: 0, summary: 'Promise rejected', agentId: 'analyst-ang' as AgentId };
+
+      result.step.status = result.success ? 'completed' : 'failed';
+      if (result.success) completedSteps++;
       else failedSteps++;
 
       stepResults.push({
-        stepIndex: step.stepIndex,
-        lilHawk: step.assignedLilHawk,
-        description: step.description,
-        status: step.status,
-        outputSummary: success
-          ? `${step.assignedLilHawk} completed: ${step.description}`
-          : `${step.assignedLilHawk} failed: ${step.description} — will retry`,
-        durationMs,
+        stepIndex: result.step.stepIndex,
+        lilHawk: result.step.assignedLilHawk,
+        description: result.step.description,
+        status: result.step.status,
+        outputSummary: result.summary,
+        durationMs: result.durationMs,
       });
 
-      logs.push(`[Wave ${wave + 1}][${step.assignedLilHawk}] ${step.status.toUpperCase()}: ${step.description} (${durationMs}ms)`);
-      waveDuration += durationMs;
+      logs.push(`[Wave ${wave + 1}][${result.step.assignedLilHawk} → ${result.agentId}] ${result.step.status.toUpperCase()}: ${result.step.description} (${result.durationMs}ms)`);
+      waveDuration += result.durationMs;
     }
 
     totalDurationMs += waveDuration;
@@ -209,11 +316,16 @@ function executeWaves(packet: PmoPipelinePacket): PmoPipelinePacket {
       stepResults,
       durationMs: waveDuration,
     });
+
+    logger.info(
+      { shiftId: packet.shift!.shiftId, wave: wave + 1, completed: stepResults.filter(s => s.status === 'completed').length, failed: stepResults.filter(s => s.status === 'failed').length },
+      '[Chain] Wave execution complete',
+    );
   }
 
   logger.info(
     { shiftId: packet.shift!.shiftId, completed: completedSteps, failed: failedSteps, waves: waveResults.length },
-    '[Chain] Squad execution complete',
+    '[Chain] Squad execution complete — all waves processed via A2A',
   );
 
   return {
@@ -448,18 +560,21 @@ function buildResponse(packet: PmoPipelinePacket): N8nPipelineResponse {
  *
  * Input: PmoPipelinePacket (already classified + directed by pmo-router)
  * Output: N8nPipelineResponse (ready to return to user)
+ *
+ * Each step in the pipeline is dispatched to real agents via the A2A registry.
+ * Agents may be in-process (Boomer_Angs) or containerized (Research_Ang, etc.).
  */
-export function executeChainOfCommand(packet: PmoPipelinePacket): N8nPipelineResponse {
+export async function executeChainOfCommand(packet: PmoPipelinePacket): Promise<N8nPipelineResponse> {
   logger.info(
     { requestId: packet.requestId, office: packet.classification.pmoOffice, director: packet.boomerDirective?.director },
-    '[Chain] Starting chain-of-command pipeline',
+    '[Chain] Starting chain-of-command pipeline (A2A dispatch active)',
   );
 
   // Step 3: Chicken_Hawk — Spawn Shift + Assemble Squad
   let state = spawnShift(packet);
 
-  // Step 4: Squad — Execute Waves with Lil_Hawks
-  state = executeWaves(state);
+  // Step 4: Squad — Execute Waves with Lil_Hawks → Real A2A Agent Dispatch
+  state = await executeWaves(state);
 
   // Step 5: Verification — Quality gates
   state = runVerification(state);
@@ -481,12 +596,12 @@ export function executeChainOfCommand(packet: PmoPipelinePacket): N8nPipelineRes
 /**
  * Get the full pipeline packet after execution (for debugging/audit).
  */
-export function executeChainOfCommandFull(packet: PmoPipelinePacket): {
+export async function executeChainOfCommandFull(packet: PmoPipelinePacket): Promise<{
   response: N8nPipelineResponse;
   packet: PmoPipelinePacket;
-} {
+}> {
   let state = spawnShift(packet);
-  state = executeWaves(state);
+  state = await executeWaves(state);
   state = runVerification(state);
   state = sealReceipt(state);
   const response = buildResponse(state);

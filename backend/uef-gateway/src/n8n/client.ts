@@ -18,7 +18,7 @@ import { N8nTriggerPayload, N8nPipelineResponse } from './types';
 // Configuration
 // ---------------------------------------------------------------------------
 
-const N8N_HOST = process.env.N8N_HOST || 'http://76.13.96.107:5678';
+const N8N_HOST = process.env.N8N_HOST || 'http://n8n:5678';
 const N8N_API_KEY = process.env.N8N_API_KEY || '';
 const PMO_WEBHOOK_PATH = '/webhook/pmo-intake';
 
@@ -87,8 +87,9 @@ export class N8nClient {
   /**
    * Execute the PMO pipeline in-process (no n8n dependency).
    * Uses the same logic as the n8n workflow but runs locally.
+   * Now async — each step dispatches to real agents via A2A registry.
    */
-  executePipelineLocal(payload: N8nTriggerPayload): N8nPipelineResponse {
+  async executePipelineLocal(payload: N8nTriggerPayload): Promise<N8nPipelineResponse> {
     const packet = createPipelinePacket(payload);
     return executeChainOfCommand(packet);
   }

@@ -18,7 +18,7 @@ import { pmoRegistry } from './pmo/registry';
 import { houseOfAng } from './pmo/house-of-ang';
 import { runCollaborationDemo, renderJSON } from './collaboration';
 import { TIER_CONFIGS, TASK_MULTIPLIERS as BILLING_MULTIPLIERS, PILLAR_CONFIGS, checkAllowance, calculatePillarAddon, checkAgentLimit } from './billing';
-import { openrouter, MODELS as LLM_MODELS } from './llm';
+import { openrouter, MODELS as LLM_MODELS, llmGateway, usageTracker } from './llm';
 import { verticalRegistry } from './verticals';
 import { projectStore, plugStore, deploymentStore, auditStore, evidenceStore, startCleanupSchedule, stopCleanupSchedule, closeDb } from './db';
 import { getQuestions, analyzeRequirements, generateProjectSpec, createProject } from './intake';
@@ -40,6 +40,8 @@ import { releaseManager } from './release';
 import { backupManager } from './backup';
 import { incidentManager } from './backup/incident-runbook';
 
+import { a2aRouter } from './a2a';
+import { openclawRouter } from './openclaw/router';
 import logger from './logger';
 
 const app = express();
@@ -129,9 +131,19 @@ app.get('/health', (_req, res) => {
 });
 
 // --------------------------------------------------------------------------
+// A2A Discovery — /.well-known/agent.json is public per A2A spec
+// --------------------------------------------------------------------------
+app.use(a2aRouter);
+
+// --------------------------------------------------------------------------
 // Apply API key gate to ALL subsequent routes
 // --------------------------------------------------------------------------
 app.use(requireApiKey);
+
+// --------------------------------------------------------------------------
+// OpenClaw Channel Router — receives messages from OpenClaw Gateway
+// --------------------------------------------------------------------------
+app.use('/api/channel', openclawRouter);
 
 // --------------------------------------------------------------------------
 // Agent Registry — list available agents and their profiles
@@ -238,14 +250,14 @@ app.post('/house-of-ang/forge', (req, res) => {
 // --------------------------------------------------------------------------
 // Collaboration Feed — Live Look-In (Agent Collaboration Transcript)
 // --------------------------------------------------------------------------
-app.post('/collaboration/demo', (req, res) => {
+app.post('/collaboration/demo', async (req, res) => {
   try {
     const { userName, message, projectLabel } = req.body;
     if (!message || typeof message !== 'string' || message.length > 2000) {
       res.status(400).json({ error: 'Invalid message: required string, max 2000 chars' });
       return;
     }
-    const session = runCollaborationDemo(
+    const session = await runCollaborationDemo(
       userName || 'Boss',
       message,
       projectLabel,
@@ -303,6 +315,86 @@ app.get('/admin/models', (_req, res) => {
       },
     })),
   });
+});
+
+// --------------------------------------------------------------------------
+// Unified LLM Gateway — Vertex AI + OpenRouter
+// --------------------------------------------------------------------------
+app.post('/llm/chat', async (req, res) => {
+  try {
+    const { model, messages, max_tokens, temperature, agentId, userId, sessionId } = req.body;
+    if (!messages || !Array.isArray(messages) || messages.length === 0) {
+      res.status(400).json({ error: 'Missing or empty messages array' });
+      return;
+    }
+    const result = await llmGateway.chat({ model, messages, max_tokens, temperature, agentId, userId, sessionId });
+    res.json(result);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'LLM chat failed';
+    logger.error({ err }, '[LLM] Chat error');
+    res.status(500).json({ error: msg });
+  }
+});
+
+app.post('/llm/stream', async (req, res) => {
+  try {
+    const { model, messages, max_tokens, temperature, agentId, userId, sessionId } = req.body;
+    if (!messages || !Array.isArray(messages) || messages.length === 0) {
+      res.status(400).json({ error: 'Missing or empty messages array' });
+      return;
+    }
+
+    const { stream, provider, model: resolvedModel } = await llmGateway.stream({ model, messages, max_tokens, temperature, agentId, userId, sessionId });
+
+    res.writeHead(200, {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      'Connection': 'keep-alive',
+      'X-LLM-Provider': provider,
+      'X-LLM-Model': resolvedModel,
+    });
+
+    const reader = stream.getReader();
+    const pump = async (): Promise<void> => {
+      const { done, value } = await reader.read();
+      if (done) {
+        res.write('data: [DONE]\n\n');
+        res.end();
+        return;
+      }
+      res.write(`data: ${JSON.stringify({ text: value })}\n\n`);
+      return pump();
+    };
+    await pump();
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'LLM stream failed';
+    logger.error({ err }, '[LLM] Stream error');
+    if (!res.headersSent) {
+      res.status(500).json({ error: msg });
+    } else {
+      res.end();
+    }
+  }
+});
+
+app.get('/llm/models', (_req, res) => {
+  res.json({
+    configured: llmGateway.isConfigured(),
+    models: llmGateway.listModels(),
+  });
+});
+
+app.get('/llm/usage', (req, res) => {
+  const userId = req.query.userId as string | undefined;
+  const sessionId = req.query.sessionId as string | undefined;
+
+  if (userId && sessionId) {
+    res.json(usageTracker.getSummary(userId, sessionId));
+  } else if (userId) {
+    res.json(usageTracker.getUserUsage(userId));
+  } else {
+    res.json(usageTracker.getGlobalStats());
+  }
 });
 
 // --------------------------------------------------------------------------

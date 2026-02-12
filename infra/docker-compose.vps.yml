@@ -2,17 +2,25 @@ version: "3.8"
 name: aims
 
 # =============================================================================
-# A.I.M.S. Production Stack
+# A.I.M.S. VPS Stack — Stateful Services Only
 # =============================================================================
+# Used in HYBRID deployment mode:
+#   Cloud Run → frontend, uef-gateway (stateless, auto-scaling)
+#   VPS       → Redis, n8n, OpenClaw, Agent Bridge, agents (stateful)
+#
+# The stateless services (frontend, uef-gateway) are deployed to Cloud Run
+# and connect back to these VPS services via the public IP / reverse proxy.
+#
 # Usage:
-#   ./deploy.sh                   — full build + launch
-#   docker compose -f infra/docker-compose.prod.yml logs -f
-#   docker compose -f infra/docker-compose.prod.yml down
+#   docker compose -f infra/docker-compose.vps.yml up -d
+#   docker compose -f infra/docker-compose.vps.yml --profile tier1-agents up -d
+#   docker compose -f infra/docker-compose.vps.yml --profile n8n up -d
 # =============================================================================
 
 services:
   # ---------------------------------------------------------------------------
-  # Reverse Proxy (nginx)
+  # Reverse Proxy (nginx) — Routes traffic to VPS services AND proxies
+  # Cloud Run services when accessed via the VPS domain.
   # ---------------------------------------------------------------------------
   nginx:
     build:
@@ -27,9 +35,7 @@ services:
       - nginx-conf:/etc/nginx/conf.d
       - nginx-logs:/var/log/nginx
     depends_on:
-      frontend:
-        condition: service_healthy
-      uef-gateway:
+      redis:
         condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "curl -sf http://127.0.0.1:80/health || exit 1"]
@@ -42,8 +48,7 @@ services:
       - aims-network
 
   # ---------------------------------------------------------------------------
-  # Certbot (Let's Encrypt) — renewal loop (every 12h)
-  # Initial cert issuance is done by deploy.sh before starting this.
+  # Certbot (Let's Encrypt) — renewal loop
   # ---------------------------------------------------------------------------
   certbot:
     image: certbot/certbot:latest
@@ -56,196 +61,13 @@ services:
       - aims-network
 
   # ---------------------------------------------------------------------------
-  # Frontend (Next.js 14)
-  # ---------------------------------------------------------------------------
-  frontend:
-    build:
-      context: ../frontend
-      dockerfile: Dockerfile
-    expose:
-      - "3000"
-    env_file:
-      - .env.production
-    environment:
-      - NODE_ENV=production
-      - NEXTAUTH_URL=${NEXTAUTH_URL}
-      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
-      - UEF_ENDPOINT=http://uef-gateway:3001
-      - HOUSE_OF_ANG_URL=http://house-of-ang:3002
-      - ACHEEVY_URL=http://acheevy:3003
-    depends_on:
-      uef-gateway:
-        condition: service_healthy
-      house-of-ang:
-        condition: service_healthy
-      acheevy:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>{process.exit(r.ok?0:1)}).catch(()=>process.exit(1))"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
-    volumes:
-      - luc-data:/app/.luc-data
-    restart: always
-    networks:
-      - aims-network
-
-  # ---------------------------------------------------------------------------
-  # Demo Frontend (Next.js 14 — sandbox mode)
-  # ---------------------------------------------------------------------------
-  demo-frontend:
-    build:
-      context: ../frontend
-      dockerfile: Dockerfile
-    expose:
-      - "3000"
-    env_file:
-      - .env.production
-    environment:
-      - NODE_ENV=production
-      - DEMO_MODE=true
-      - NEXT_PUBLIC_DEMO_MODE=true
-      - NEXTAUTH_URL=https://demo.plugmein.cloud
-      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
-      - UEF_ENDPOINT=http://uef-gateway:3001
-      - HOUSE_OF_ANG_URL=http://house-of-ang:3002
-      - ACHEEVY_URL=http://acheevy:3003
-    depends_on:
-      uef-gateway:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>{process.exit(r.ok?0:1)}).catch(()=>process.exit(1))"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
-    volumes:
-      - demo-luc-data:/app/.luc-data
-    restart: always
-    networks:
-      - aims-network
-    deploy:
-      resources:
-        limits:
-          cpus: '1'
-          memory: 1G
-
-  # ---------------------------------------------------------------------------
-  # UEF Gateway (Node/TS Orchestrator)
-  # ---------------------------------------------------------------------------
-  uef-gateway:
-    build:
-      context: ../backend/uef-gateway
-      dockerfile: Dockerfile
-    expose:
-      - "3001"
-    env_file:
-      - .env.production
-    environment:
-      - PORT=3001
-      - NODE_ENV=production
-      - CORS_ORIGIN=${CORS_ORIGIN}
-      - LOG_LEVEL=${LOG_LEVEL:-info}
-      - OPENCLAW_URL=http://agent-bridge:3010
-      - REDIS_URL=redis://:${REDIS_PASSWORD:-aims_redis_secret}@redis:6379
-      - N8N_URL=http://n8n:5678
-      - RESEARCH_ANG_URL=http://research-ang:3020
-      - ROUTER_ANG_URL=http://router-ang:3021
-      - DEBUG=false
-    volumes:
-      - gateway-data:/app/data
-    healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3001/health',r=>{process.exit(r.statusCode===200?0:1)}).on('error',()=>process.exit(1))"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 15s
-    stop_grace_period: 15s
-    restart: always
-    networks:
-      - aims-network
-
-  # ---------------------------------------------------------------------------
-  # House of Ang — Boomer_Ang Registry
-  # ---------------------------------------------------------------------------
-  house-of-ang:
-    build:
-      context: ../backend/house-of-ang
-      dockerfile: Dockerfile
-    expose:
-      - "3002"
-    environment:
-      - PORT=3002
-      - NODE_ENV=production
-      - REGISTRY_PATH=/app/registry/registry.json
-      - REDIS_URL=redis://:${REDIS_PASSWORD:-aims_redis_secret}@redis:6379
-    volumes:
-      - ./boomerangs:/app/registry:ro
-    depends_on:
-      redis:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3002/health',r=>{process.exit(r.statusCode===200?0:1)}).on('error',()=>process.exit(1))"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 15s
-    restart: always
-    networks:
-      - aims-network
-    user: "1000:1000"
-    deploy:
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 512M
-
-  # ---------------------------------------------------------------------------
-  # ACHEEVY — Executive Orchestrator (payments)
-  # ---------------------------------------------------------------------------
-  acheevy:
-    build:
-      context: ../backend/acheevy
-      dockerfile: Dockerfile
-    expose:
-      - "3003"
-    environment:
-      - PORT=3003
-      - NODE_ENV=production
-      - HOUSE_OF_ANG_URL=http://house-of-ang:3002
-      - UEF_GATEWAY_URL=http://uef-gateway:3001
-      - REDIS_URL=redis://:${REDIS_PASSWORD:-aims_redis_secret}@redis:6379
-      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
-      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
-    depends_on:
-      redis:
-        condition: service_healthy
-      house-of-ang:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3003/health',r=>{process.exit(r.statusCode===200?0:1)}).on('error',()=>process.exit(1))"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 15s
-    restart: always
-    networks:
-      - aims-network
-    user: "1000:1000"
-    deploy:
-      resources:
-        limits:
-          cpus: '1'
-          memory: 1G
-
-  # ---------------------------------------------------------------------------
-  # Redis — caching and session management
+  # Redis — State store, sessions, caching (STATEFUL)
   # ---------------------------------------------------------------------------
   redis:
     image: redis:7-alpine
     command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-aims_redis_secret}
+    ports:
+      - "127.0.0.1:6379:6379"
     volumes:
       - redis-data:/data
     networks:
@@ -264,30 +86,23 @@ services:
           memory: 512M
 
   # ---------------------------------------------------------------------------
-  # LAYER 3: AGENT SANDBOX (ISOLATED NETWORK)
-  # sandbox-network is internal: true (no internet access).
-  # Only agent-bridge spans both networks. OpenClaw NEVER touches aims-network.
+  # Agent Bridge — Security Gateway between networks (STATEFUL)
+  # Bridges Cloud Run gateway ↔ VPS sandbox agents
   # ---------------------------------------------------------------------------
-
-  # Agent Bridge — Security Gateway between networks
-  # Blocks ALL payment operations, rate limits, sanitizes payloads
   agent-bridge:
     build:
       context: ./agent-bridge
       dockerfile: Dockerfile
-    expose:
-      - "3010"
+    ports:
+      - "127.0.0.1:3010:3010"
     environment:
       - PORT=3010
-      - AIMS_GATEWAY_URL=http://uef-gateway:3001
+      - AIMS_GATEWAY_URL=${CLOUD_RUN_GATEWAY_URL:-http://uef-gateway:3001}
       - OPENCLAW_URL=http://openclaw:18789
       - RATE_LIMIT_REQUESTS=100
       - RATE_LIMIT_WINDOW=60000
       - ALLOWED_OPS=search,analyze,summarize,generate,read,write,edit,code
       - BLOCKED_OPS=payment,transfer,purchase,checkout,buy,order,credit_card,stripe,paypal,venmo,bank,wallet,invoice,billing,charge,refund,subscription
-    depends_on:
-      uef-gateway:
-        condition: service_healthy
     networks:
       - aims-network
       - sandbox-network
@@ -305,9 +120,9 @@ services:
           cpus: '0.5'
           memory: 256M
 
-  # OpenClaw — AI Multi-Channel Agent (SANDBOXED)
-  # Version: latest — Runs in isolated sandbox-network with NO internet.
-  # Security: read_only FS, no-new-privileges, all caps dropped, non-root, resource-limited
+  # ---------------------------------------------------------------------------
+  # OpenClaw — AI Multi-Channel Agent (SANDBOXED, STATEFUL)
+  # ---------------------------------------------------------------------------
   openclaw:
     image: ghcr.io/openclaw/openclaw:latest
     environment:
@@ -369,7 +184,7 @@ services:
           cpus: '0.5'
           memory: 1G
 
-  # OpenClaw Sandbox Image Builder (build profile only)
+  # OpenClaw Sandbox Image Builder
   openclaw-sandbox:
     build:
       context: ./openclaw-sandbox
@@ -382,29 +197,22 @@ services:
       - build
 
   # ---------------------------------------------------------------------------
-  # LAYER 4: TIER 1 CONTAINERIZED AGENTS (A2A Protocol)
-  # Standalone microservices that implement the A2A protocol.
-  # UEF Gateway discovers these via agent-proxy and registers them in
-  # the agent registry — they're interchangeable with in-process agents.
+  # Research_Ang — Deep Research Agent (A2A Container)
   # ---------------------------------------------------------------------------
-
-  # Research_Ang — Deep Research & Analysis Agent
-  # Handles: market research, competitive analysis, trend analysis, customer research
   research-ang:
     build:
       context: ../backend/agents/research-ang
       dockerfile: Dockerfile
     expose:
       - "3020"
+    ports:
+      - "127.0.0.1:3020:3020"
     environment:
       - PORT=3020
       - NODE_ENV=production
-      - UEF_GATEWAY_URL=http://uef-gateway:3001
+      - UEF_GATEWAY_URL=${CLOUD_RUN_GATEWAY_URL:-http://uef-gateway:3001}
       - AGENT_URL=http://research-ang:3020
       - LOG_LEVEL=${LOG_LEVEL:-info}
-    depends_on:
-      uef-gateway:
-        condition: service_healthy
     healthcheck:
       test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3020/health',r=>{process.exit(r.statusCode===200?0:1)}).on('error',()=>process.exit(1))"]
       interval: 30s
@@ -423,23 +231,23 @@ services:
     profiles:
       - tier1-agents
 
-  # Router_Ang — Smart Routing Agent with A2A Discovery
-  # Handles: intent classification, agent discovery, task delegation, load balancing
+  # ---------------------------------------------------------------------------
+  # Router_Ang — Smart Routing Agent (A2A Container)
+  # ---------------------------------------------------------------------------
   router-ang:
     build:
       context: ../backend/agents/router-ang
       dockerfile: Dockerfile
     expose:
       - "3021"
+    ports:
+      - "127.0.0.1:3021:3021"
     environment:
       - PORT=3021
       - NODE_ENV=production
-      - UEF_GATEWAY_URL=http://uef-gateway:3001
+      - UEF_GATEWAY_URL=${CLOUD_RUN_GATEWAY_URL:-http://uef-gateway:3001}
       - AGENT_URL=http://router-ang:3021
       - LOG_LEVEL=${LOG_LEVEL:-info}
-    depends_on:
-      uef-gateway:
-        condition: service_healthy
     healthcheck:
       test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3021/health',r=>{process.exit(r.statusCode===200?0:1)}).on('error',()=>process.exit(1))"]
       interval: 30s
@@ -459,37 +267,14 @@ services:
       - tier1-agents
 
   # ---------------------------------------------------------------------------
-  # Agent Zero — Autonomous AI Agent (II Agent Vertical)
-  # Computer-as-tool framework, Docker sandboxed, multi-agent cooperation
-  # ---------------------------------------------------------------------------
-  agent-zero:
-    image: frdel/agent-zero-run:latest
-    expose:
-      - "80"
-    environment:
-      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
-    volumes:
-      - agent-zero-data:/app/work_dir
-    healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/"]
-      interval: 60s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
-    restart: unless-stopped
-    networks:
-      - sandbox-network
-    profiles:
-      - ii-agents
-
-  # ---------------------------------------------------------------------------
-  # n8n — Workflow Automation (Boomer_Ang Build Layer)
-  # Factory floor for Chicken Hawk and Lil_Hawk workflow execution
+  # n8n — Workflow Automation (STATEFUL)
   # ---------------------------------------------------------------------------
   n8n:
     image: n8nio/n8n:latest
     expose:
       - "5678"
+    ports:
+      - "127.0.0.1:5678:5678"
     environment:
       - N8N_BASIC_AUTH_ACTIVE=true
       - N8N_BASIC_AUTH_USER=${N8N_AUTH_USER:-aims}
@@ -532,12 +317,12 @@ services:
       - "9090"
     environment:
       - PORT=9090
-      - UEF_GATEWAY_URL=http://uef-gateway:3001
-      - HOUSE_OF_ANG_URL=http://house-of-ang:3002
-      - ACHEEVY_URL=http://acheevy:3003
+      - UEF_GATEWAY_URL=${CLOUD_RUN_GATEWAY_URL:-http://uef-gateway:3001}
+      - HOUSE_OF_ANG_URL=${CLOUD_RUN_GATEWAY_URL:-http://uef-gateway:3001}
+      - ACHEEVY_URL=${CLOUD_RUN_GATEWAY_URL:-http://uef-gateway:3001}
       - OPENCLAW_URL=http://agent-bridge:3010
     depends_on:
-      uef-gateway:
+      agent-bridge:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:9090/health"]
@@ -558,14 +343,10 @@ volumes:
   certbot-certs:
   nginx-conf:
   nginx-logs:
-  gateway-data:
   redis-data:
   openclaw-data:
   openclaw-workspace:
-  agent-zero-data:
   n8n-data:
-  luc-data:
-  demo-luc-data:
 
 networks:
   aims-network:

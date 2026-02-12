@@ -287,6 +287,48 @@ app.post('/agent/response', async (req: Request, res: Response) => {
   }
 });
 
+// Forward message FROM agent (OpenClaw) TO UEF Gateway (ingest direction)
+// This is the reverse path: sandboxed agent sends a user's message to ACHEEVY
+app.post('/agent/ingest', async (req: Request, res: Response) => {
+  try {
+    const ingestPayload = req.body;
+
+    // Check for blocked patterns in the ingest message
+    const payloadStr = JSON.stringify(ingestPayload);
+    const blockedPattern = containsBlockedPatterns(payloadStr);
+
+    if (blockedPattern) {
+      console.warn(`[Agent Bridge] Blocked pattern in ingest: ${blockedPattern}`);
+      return res.status(403).json({
+        error: 'Message contains blocked security patterns',
+        code: 'INGEST_BLOCKED',
+      });
+    }
+
+    // Sanitize and forward to UEF Gateway's OpenClaw channel endpoint
+    const sanitizedPayload = sanitizePayload(ingestPayload);
+
+    const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY || '';
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (INTERNAL_API_KEY) headers['X-API-Key'] = INTERNAL_API_KEY;
+
+    const response = await fetch(`${AIMS_GATEWAY_URL}/api/channel/openclaw`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(sanitizedPayload),
+    });
+
+    const data = await response.json();
+
+    // Sanitize response before sending back to the agent
+    const sanitizedResponse = sanitizePayload(data as Record<string, unknown>);
+    res.json(sanitizedResponse);
+  } catch (error) {
+    console.error('[Agent Bridge] Ingest error:', error);
+    res.status(500).json({ error: 'Bridge ingest error', code: 'INGEST_ERROR' });
+  }
+});
+
 // List available agent operations
 app.get('/operations', (_req: Request, res: Response) => {
   res.json({

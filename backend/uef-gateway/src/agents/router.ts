@@ -15,6 +15,7 @@ import { v4 as uuidv4 } from 'uuid';
 import logger from '../logger';
 import { registry } from './registry';
 import { AgentTaskInput, AgentTaskOutput, AgentId } from './types';
+import { scoreAndAudit } from '../../../../aims-skills/acheevy-verticals/execution-engine';
 
 export interface RouterResult {
   executed: boolean;
@@ -110,6 +111,22 @@ export async function routeToAgents(
 
     default: {
       logger.warn({ reqId, intent }, '[Router] Unknown intent — no agent dispatch');
+    }
+  }
+
+  // Bench scoring: ALL team members are scored after execution
+  // Efficiency tracking applies to Boomer_Angs, Chicken Hawk, and Lil_Hawks alike
+  for (const output of outputs) {
+    try {
+      await scoreAndAudit(
+        output,
+        output.agentId,
+        'router-dispatch',
+        'system',
+        reqId,
+      );
+    } catch (scoreErr) {
+      logger.warn({ reqId, agentId: output.agentId, err: scoreErr }, '[Router] Bench scoring failed (non-blocking)');
     }
   }
 

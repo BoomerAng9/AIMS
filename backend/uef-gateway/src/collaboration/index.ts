@@ -40,12 +40,14 @@ import type { PmoPipelinePacket } from '../n8n/types';
 /**
  * Run a complete demo session: classify → direct → execute → feed.
  * Returns a fully populated CollaborationSession ready for rendering.
+ *
+ * Now async — executeChainOfCommandFull dispatches to real agents via A2A.
  */
-export function runCollaborationDemo(
+export async function runCollaborationDemo(
   userName: string,
   message: string,
   projectLabel?: string,
-): CollaborationSession {
+): Promise<CollaborationSession> {
   // 1. Classify + build pipeline packet
   const packet = createPipelinePacket({
     userId: 'demo-user',
@@ -53,8 +55,8 @@ export function runCollaborationDemo(
     requestId: `demo-${Date.now().toString(36)}`,
   });
 
-  // 2. Execute full chain of command
-  const { packet: executedPacket } = executeChainOfCommandFull(packet);
+  // 2. Execute full chain of command (dispatches to real agents via A2A)
+  const { packet: executedPacket } = await executeChainOfCommandFull(packet);
 
   // 3. Generate collaboration feed
   const generator = new CollaborationFeedGenerator({

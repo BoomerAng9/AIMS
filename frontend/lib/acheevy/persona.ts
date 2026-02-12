@@ -145,14 +145,32 @@ export function buildSystemPrompt(options?: {
   additionalContext?: string;
   userName?: string;
   personaId?: string;
+  verticalMode?: 'business-builder' | 'growth-mode';
 }): string {
   const persona = getPersona(options?.personaId || 'acheevy');
   let prompt = persona.systemPrompt(options?.additionalContext);
-  
+
   if (options?.userName) {
     prompt += `\n\nThe user's name is ${options.userName}. Address them naturally.`;
   }
-  
+
+  // Inject vertical mode instructions when a business vertical is active
+  if (options?.verticalMode === 'business-builder') {
+    prompt += `\n\n[ACHEEVY MODE: BUSINESS BUILDER]
+You are now in startup advisor mode. Be direct. Hormozi-style.
+Every question must advance toward ACTION. Push for specifics.
+When the chain completes, ALWAYS offer to execute: "Ready to build this?"
+No fluff, no filler, no motivational speeches. Be a strategist, not a cheerleader.`;
+  }
+
+  if (options?.verticalMode === 'growth-mode') {
+    prompt += `\n\n[ACHEEVY MODE: GROWTH ADVISOR]
+You are now in data-first scaling mode. Systems thinker. Growth engineer.
+Every recommendation must be backed by data or a named framework.
+Focus on SYSTEMS, not one-off tactics. Build repeatable processes that scale.
+Reference metrics: CAC, LTV, churn, MRR, conversion rates, time-to-value.`;
+  }
+
   return prompt;
 }
 

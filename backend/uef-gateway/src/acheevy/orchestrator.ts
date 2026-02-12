@@ -13,6 +13,7 @@ import { LUCEngine } from '../luc';
 import { v4 as uuidv4 } from 'uuid';
 import { triggerN8nPmoWorkflow } from '../n8n';
 import type { N8nPipelineResponse } from '../n8n';
+import { getVertical, executeVertical } from '../../../../aims-skills/acheevy-verticals';
 
 // ── Types ────────────────────────────────────────────────────
 
@@ -83,6 +84,11 @@ export class AcheevyOrchestrator {
 
       if (routedTo.startsWith('skill:')) {
         return await this.handleSkillExecution(requestId, req);
+      }
+
+      // Vertical execution: NLP-triggered business builder verticals with R-R-S pipeline
+      if (routedTo.startsWith('vertical:')) {
+        return await this.handleVerticalExecution(requestId, req);
       }
 
       if (routedTo === 'openclaw') {
@@ -335,6 +341,74 @@ export class AcheevyOrchestrator {
         status: 'queued',
         reply: 'PMO routing request received. The chain-of-command pipeline will process it when the n8n workflow engine is available.',
         taskId: `queued_pmo_${requestId}`,
+      };
+    }
+  }
+
+  /**
+   * Vertical execution: NLP-triggered business builder verticals with R-R-S downstream execution.
+   * Routes collected user data through the full governance stack:
+   *   ORACLE → ByteRover RAG → PREP_SQUAD → LUC → Chicken Hawk → Boomer_Angs → Artifacts
+   */
+  private async handleVerticalExecution(
+    requestId: string,
+    req: AcheevyExecuteRequest
+  ): Promise<AcheevyExecuteResponse> {
+    const verticalId = req.intent.split(':')[1];
+    const vertical = getVertical(verticalId);
+
+    if (!vertical) {
+      return {
+        requestId,
+        status: 'error',
+        reply: `Vertical "${verticalId}" not found.`,
+        error: `Unknown vertical: ${verticalId}`,
+      };
+    }
+
+    const collectedData = req.context || {};
+
+    try {
+      const result = await executeVertical(
+        vertical,
+        collectedData,
+        req.userId,
+        req.conversationId || requestId,
+      );
+
+      if (result.status === 'failed') {
+        return {
+          requestId,
+          status: 'error',
+          reply: `Vertical execution failed: ${result.error}`,
+          error: result.error,
+        };
+      }
+
+      return {
+        requestId,
+        status: 'streaming',
+        reply: `Executing ${vertical.name} pipeline — ${result.pipeline?.steps.length || 0} steps dispatched through the team. Task ID: ${result.taskId}`,
+        taskId: result.taskId,
+        data: {
+          verticalId,
+          verticalName: vertical.name,
+          pipelineSteps: result.pipeline?.steps,
+          estimatedAgents: result.pipeline?.estimated_agents,
+          oracleScore: result.pipeline?.oracleScore,
+          auditSessionId: result.auditSessionId,
+        },
+        lucUsage: {
+          service: 'vertical_execution',
+          amount: result.pipeline?.steps.length || 1,
+        },
+      };
+    } catch {
+      return {
+        requestId,
+        status: 'queued',
+        reply: `Vertical "${vertical.name}" request has been queued. The execution pipeline will process it when available.`,
+        taskId: `queued_vertical_${requestId}`,
       };
     }
   }
