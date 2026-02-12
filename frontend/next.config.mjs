@@ -22,6 +22,8 @@ const nextConfig = {
       path.resolve(__dirname, 'node_modules'),
       ...(config.resolve.modules || ['node_modules']),
     ];
+    // Prevent webpack from resolving symlinks to real paths
+    config.resolve.symlinks = false;
     return config;
   },
 };

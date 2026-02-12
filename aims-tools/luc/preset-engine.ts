@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * LUC Preset Engine
  *
@@ -294,7 +293,7 @@ export class PresetEngine {
     }
 
     while (noIncoming.size > 0) {
-      const id = noIncoming.values().next().value as string;
+      const id = noIncoming.values().next().value!;
       noIncoming.delete(id);
       sorted.push(formulaMap.get(id)!);
 

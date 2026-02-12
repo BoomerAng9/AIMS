@@ -25,6 +25,7 @@ import {
   storeAgentLogs,
   storeAttestation,
   type EvidenceLocker,
+  type EvidenceArtifact,
 } from "@/lib/evidence-locker/client";
 import { getMeteringClient, type ServiceKey } from "@/lib/luc/metering";
 
@@ -268,7 +269,7 @@ async function handleCreateDeployment(body: any, userId: string) {
     roster,
     jobPackets: [],
     events,
-    evidenceLocker: { deploymentId, artifacts: [] as any[], complete: false },
+    evidenceLocker: { deploymentId, artifacts: [] as EvidenceArtifact[], complete: false },
     lucBudget,
     lucSpent: 0,
     createdAt: now.toISOString(),
