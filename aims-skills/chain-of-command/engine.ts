@@ -7,8 +7,8 @@
  * Validates handles, enforces routing rules, checks gates, and
  * produces overlay-safe events.
  *
- * v2.0.0 — Revised hierarchy: ACHEEVY → Boomer_Ang → Chicken_Hawk → Squad Leader → Lil_Hawk
- *           Added: Chicken_Hawk chain validation, Lil_Hawk → Boomer_Ang deny
+ * v2.0.0 — Revised hierarchy: ACHEEVY → Boomer_Ang → Chicken Hawk → Squad Leader → Lil_Hawk
+ *           Added: Chicken Hawk chain validation, Lil_Hawk → Boomer_Ang deny
  *           Rule:  Persona ≠ Authority.
  */
 
@@ -36,7 +36,7 @@ import type {
 const HANDLE_PATTERNS: Record<RoleType, RegExp> = {
   ACHEEVY: /^ACHEEVY$/,
   Boomer_Ang: /^[A-Za-z0-9\-]+_Ang$/,
-  Chicken_Hawk: /^Chicken_Hawk$/,
+  Chicken Hawk: /^Chicken Hawk$/,
   Lil_Hawk: /^Lil_([A-Z][a-z0-9]+)(_[A-Z][a-z0-9]+)*_Hawk$/,
 };
 
@@ -111,11 +111,11 @@ export function validateRoleCard(card: RoleCard): ValidationResult {
     if (card.chain_of_command.reports_to !== null) {
       errors.push('ACHEEVY must have reports_to: null');
     }
-    // ACHEEVY should not directly message Chicken_Hawk or Lil_Hawks
+    // ACHEEVY should not directly message Chicken Hawk or Lil_Hawks
     if (card.chain_of_command.can_message.some(h =>
-      h === 'Chicken_Hawk' || HANDLE_PATTERNS.Lil_Hawk.test(h)
+      h === 'Chicken Hawk' || HANDLE_PATTERNS.Lil_Hawk.test(h)
     )) {
-      warnings.push('ACHEEVY should speak downward only via Boomer_Angs, not directly to Chicken_Hawk or Lil_Hawks');
+      warnings.push('ACHEEVY should speak downward only via Boomer_Angs, not directly to Chicken Hawk or Lil_Hawks');
     }
   }
 
@@ -129,28 +129,28 @@ export function validateRoleCard(card: RoleCard): ValidationResult {
     }
   }
 
-  if (card.role_type === 'Chicken_Hawk') {
-    // Chicken_Hawk reports to a Boomer_Ang
+  if (card.role_type === 'Chicken Hawk') {
+    // Chicken Hawk reports to a Boomer_Ang
     if (card.chain_of_command.reports_to === null ||
         !HANDLE_PATTERNS.Boomer_Ang.test(card.chain_of_command.reports_to)) {
-      warnings.push(`Chicken_Hawk should report to a Boomer_Ang (got "${card.chain_of_command.reports_to}")`);
+      warnings.push(`Chicken Hawk should report to a Boomer_Ang (got "${card.chain_of_command.reports_to}")`);
     }
-    // Chicken_Hawk must never message ACHEEVY or USER
+    // Chicken Hawk must never message ACHEEVY or USER
     if (!card.chain_of_command.cannot_message.includes('ACHEEVY')) {
-      errors.push('Chicken_Hawk must have ACHEEVY in cannot_message');
+      errors.push('Chicken Hawk must have ACHEEVY in cannot_message');
     }
-    // Chicken_Hawk must not have MENTOR or CHANGE_SCOPE in allowed_actions
+    // Chicken Hawk must not have MENTOR or CHANGE_SCOPE in allowed_actions
     if (card.capabilities.allowed_actions.includes('MENTOR')) {
-      errors.push('Chicken_Hawk is not authorized to MENTOR (coordinator, not mentor)');
+      errors.push('Chicken Hawk is not authorized to MENTOR (coordinator, not mentor)');
     }
     if (card.capabilities.allowed_actions.includes('CHANGE_SCOPE')) {
-      errors.push('Chicken_Hawk is not authorized to CHANGE_SCOPE');
+      errors.push('Chicken Hawk is not authorized to CHANGE_SCOPE');
     }
   }
 
   if (card.role_type === 'Lil_Hawk') {
-    if (card.chain_of_command.reports_to !== 'Chicken_Hawk') {
-      errors.push(`Lil_Hawk must report to Chicken_Hawk (got "${card.chain_of_command.reports_to}")`);
+    if (card.chain_of_command.reports_to !== 'Chicken Hawk') {
+      errors.push(`Lil_Hawk must report to Chicken Hawk (got "${card.chain_of_command.reports_to}")`);
     }
     if (!card.chain_of_command.cannot_message.includes('ACHEEVY')) {
       errors.push('Lil_Hawk must have ACHEEVY in cannot_message');
@@ -158,7 +158,7 @@ export function validateRoleCard(card: RoleCard): ValidationResult {
     // v2: Lil_Hawks must not directly message Boomer_Angs
     for (const handle of card.chain_of_command.can_message) {
       if (HANDLE_PATTERNS.Boomer_Ang.test(handle)) {
-        errors.push(`Lil_Hawk must not directly message Boomer_Ang "${handle}" — use Squad Leader or Chicken_Hawk`);
+        errors.push(`Lil_Hawk must not directly message Boomer_Ang "${handle}" — use Squad Leader or Chicken Hawk`);
       }
     }
   }
@@ -277,7 +277,7 @@ export function authorizeAction(
 
 /**
  * Check whether a role card is authorized to use a given tool.
- * v2: Tools are Boomer_Ang-owned. Chicken_Hawk and Lil_Hawks only access
+ * v2: Tools are Boomer_Ang-owned. Chicken Hawk and Lil_Hawks only access
  * tools via delegated workflow packets from their owning Boomer_Ang.
  */
 export function authorizeTool(
@@ -583,7 +583,7 @@ export class RoleCardRegistry {
       total: this.cards.size,
       ACHEEVY: 0,
       Boomer_Ang: 0,
-      Chicken_Hawk: 0,
+      Chicken Hawk: 0,
       Lil_Hawk: 0,
     };
     for (const card of this.cards.values()) {

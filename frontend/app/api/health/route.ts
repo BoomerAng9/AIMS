@@ -56,9 +56,6 @@ export async function GET() {
   if (process.env.ACHEEVY_URL) {
     serviceChecks.push({ name: 'ACHEEVY', url: `${process.env.ACHEEVY_URL}/health` });
   }
-  if (process.env.OPENCLAW_URL) {
-    serviceChecks.push({ name: 'OpenClaw', url: `${process.env.OPENCLAW_URL}/health` });
-  }
   if (process.env.AGENT_BRIDGE_URL) {
     serviceChecks.push({ name: 'Agent Bridge', url: `${process.env.AGENT_BRIDGE_URL}/health` });
   }

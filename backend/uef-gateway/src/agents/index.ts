@@ -1,6 +1,6 @@
 /**
  * Agent Client Hub
- * Connects to Agent Zero, OpenClaw, Chicken Hawk containers.
+ * Connects to Agent Zero and other agent containers.
  */
 
 import logger from '../logger';

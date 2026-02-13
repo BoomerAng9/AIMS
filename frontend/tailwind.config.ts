@@ -84,12 +84,17 @@ module.exports = {
           '0%': { opacity: '0', transform: 'translateX(60px)' },
           '100%': { opacity: '1', transform: 'translateX(0)' },
         },
+        head_bob: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-2px)' },
+        },
       },
       animation: {
         float: 'float 6s ease-in-out infinite',
         'pulse-gold': 'pulse_gold 3s ease-in-out infinite',
         'connector-pulse': 'connector_pulse 4s ease-in-out infinite',
         'shelf-slide': 'shelf_slide 0.5s ease-out forwards',
+        'head-bob': 'head_bob 4s ease-in-out infinite',
       }
     },
   },

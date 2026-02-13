@@ -107,7 +107,7 @@ const tiles = [
     highlight: true,
   },
   {
-    title: "OpenClaw (Chicken Hawk)",
+    title: "Chicken Hawk",
     icon: Terminal,
     desc: "Build & Execute Code.",
     href: "/dashboard/build",
@@ -218,7 +218,7 @@ export default function DashboardPage() {
                   Welcome to A.I.M.S.
                 </h2>
                 <p className="text-xs text-white/40 max-w-sm">
-                  Ready to deploy your first tool? Launch the OpenClaw builder.
+                  Ready to deploy your first tool? Launch the builder.
                 </p>
               </div>
               <div className="flex items-center gap-2">

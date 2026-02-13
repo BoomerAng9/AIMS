@@ -10,8 +10,8 @@
       "rule": "<Nickname>_Ang — role-fitting, not generic.",
       "examples": ["Forge_Ang", "Chronicle_Ang", "Gatekeeper_Ang", "Scout_Ang", "Bridge_Ang", "Patchsmith_Ang", "Lab_Ang"]
     },
-    "Chicken_Hawk": {
-      "pattern": "^Chicken_Hawk$",
+    "Chicken Hawk": {
+      "pattern": "^Chicken Hawk$",
       "rule": "Singular coordinator identity."
     },
     "Lil_Hawk": {
@@ -66,5 +66,5 @@
     "Squad_Security",
     "Squad_UI"
   ],
-  "squad_leader_rule": "A designated Lil_Hawk role; temporary coordination assignment, not a rank. Squad Leader speaks to Chicken_Hawk and coordinates peer Lil_Hawks within assigned squad."
+  "squad_leader_rule": "A designated Lil_Hawk role; temporary coordination assignment, not a rank. Squad Leader speaks to Chicken Hawk and coordinates peer Lil_Hawks within assigned squad."
 }

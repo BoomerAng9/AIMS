@@ -1,14 +1,14 @@
 {
   "$schema": "https://aims.dev/schemas/chicken-hawk-dispatch.json",
-  "name": "Chicken_Hawk Dispatch Interface",
+  "name": "Chicken Hawk Dispatch Interface",
   "version": "1.0.0",
-  "description": "API contract for Chicken_Hawk execution engine receiving commands from ACHEEVY",
+  "description": "API contract for Chicken Hawk execution engine receiving commands from ACHEEVY",
 
   "identity": {
-    "mascot": "Chicken_Hawk",
+    "mascot": "Chicken Hawk",
     "role": "Deploy Execution Engine",
     "governance_position": "Receives contracts from ACHEEVY/Boomer_Ang, spawns Squad/Lil_Hawks",
-    "canonical_id_pattern": "Chicken_Hawk_<EnvironmentId>",
+    "canonical_id_pattern": "Chicken Hawk_<EnvironmentId>",
     "evolution_levels": ["base", "powered", "maxPower"]
   },
 
@@ -242,7 +242,7 @@
   },
 
   "lil_hawk_spawning": {
-    "description": "How Chicken_Hawk spawns Lil_Hawks for a Squad",
+    "description": "How Chicken Hawk spawns Lil_Hawks for a Squad",
     "spawn_rules": [
       "Select Lil_Hawk types based on manifest capabilities",
       "Assign persona handles from designation catalog",

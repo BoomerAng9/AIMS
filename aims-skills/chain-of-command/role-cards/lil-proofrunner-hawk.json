@@ -13,8 +13,8 @@
     "communication_style": "technical"
   },
   "chain_of_command": {
-    "reports_to": "Chicken_Hawk",
-    "can_message": ["Chicken_Hawk"],
+    "reports_to": "Chicken Hawk",
+    "can_message": ["Chicken Hawk"],
     "cannot_message": ["ACHEEVY", "Forge_Ang"]
   },
   "capabilities": {
@@ -28,7 +28,7 @@
     "luc_budget": { "required": false, "max_estimated_cost_usd": null, "max_estimated_tokens": null, "on_exceed": "escalate" },
     "evidence": { "required_artifacts": ["PROOF_ARTIFACT", "PROOF_HASH"], "no_proof_no_done": true },
     "security": { "secrets_handling_required": true, "scope_least_privilege_required": true, "policy_check_required": true },
-    "approval": { "required_for_actions": [], "approvers": ["Chicken_Hawk"] }
+    "approval": { "required_for_actions": [], "approvers": ["Chicken Hawk"] }
   },
   "overlay_visibility": {
     "user_safe_events_only": true,

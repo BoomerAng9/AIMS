@@ -107,12 +107,8 @@ export class AcheevyOrchestrator {
         return await this.handleVerticalExecution(requestId, req);
       }
 
-      if (routedTo === 'openclaw') {
-        return await this.handleOpenClaw(requestId, req);
-      }
-
       // PMO routing: routes task through chain-of-command pipeline
-      // User → ACHEEVY → Boomer_Ang → Chicken_Hawk → Squad → Lil_Hawks → Receipt → ACHEEVY → User
+      // User → ACHEEVY → Boomer_Ang → Chicken Hawk → Squad → Lil_Hawks → Receipt → ACHEEVY → User
       if (routedTo === 'pmo-route' || routedTo.startsWith('pmo:')) {
         return await this.handlePmoRouting(requestId, req);
       }
@@ -276,53 +272,23 @@ export class AcheevyOrchestrator {
   }
 
   /**
-   * OpenClaw: multi-channel cloning/scaffolding
+   * Scaffolding: clone/build requests via Make It Mine pipeline
    */
-  private async handleOpenClaw(
+  private async handleScaffolding(
     requestId: string,
-    req: AcheevyExecuteRequest
+    _req: AcheevyExecuteRequest
   ): Promise<AcheevyExecuteResponse> {
-    // Forward to OpenClaw service via internal network
-    try {
-      const openclawUrl = process.env.OPENCLAW_URL || 'http://openclaw:18789';
-      const response = await fetch(`${openclawUrl}/api/clone`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId: req.userId,
-          message: req.message,
-          conversationId: req.conversationId,
-        }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        return {
-          requestId,
-          status: 'queued',
-          reply: data.reply || 'OpenClaw is scaffolding your project.',
-          taskId: data.taskId,
-          lucUsage: {
-            service: 'container_hours',
-            amount: 1,
-          },
-        };
-      }
-
-      throw new Error(`OpenClaw returned ${response.status}`);
-    } catch {
-      return {
-        requestId,
-        status: 'queued',
-        reply: 'Clone request received. OpenClaw will begin scaffolding when ready.',
-        taskId: `queued_${requestId}`,
-      };
+    return {
+      requestId,
+      status: 'queued',
+      reply: 'Clone request received. The scaffolding pipeline will begin when ready.',
+      taskId: `queued_${requestId}`,
     }
   }
 
   /**
    * PMO routing: chain-of-command pipeline via n8n
-   * User → ACHEEVY → Boomer_Ang → Chicken_Hawk → Squad → Lil_Hawks → Receipt → ACHEEVY → User
+   * User → ACHEEVY → Boomer_Ang → Chicken Hawk → Squad → Lil_Hawks → Receipt → ACHEEVY → User
    */
   private async handlePmoRouting(
     requestId: string,

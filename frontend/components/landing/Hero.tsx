@@ -88,7 +88,8 @@ export function Hero() {
           </h2>
 
           <p className="text-sm text-white/35 max-w-md mx-auto">
-            Think it. Prompt it. Let ACHEEVY build it.
+            I&apos;m ACHEEVY, at your service.<br />
+            What will we deploy today?
           </p>
         </div>
 
@@ -109,7 +110,7 @@ export function Hero() {
                     alt="ACHEEVY"
                     width={56}
                     height={56}
-                    className="w-12 h-12 md:w-14 md:h-14 object-cover"
+                    className="w-12 h-12 md:w-14 md:h-14 object-cover animate-head-bob"
                   />
                 </div>
                 <h3
@@ -140,7 +141,7 @@ export function Hero() {
                   <div className="w-20 h-20 md:w-24 md:h-24 rounded-xl overflow-hidden flex-shrink-0 border border-white/[0.06] group-hover:border-gold/20 transition-colors">
                     <Image
                       src="/images/boomerangs/ACHEEVY and the Boomer_Angs in a Hanger.png"
-                      alt="Boomer_Angs, Chicken_Hawk and Lil_Hawks"
+                      alt="Boomer_Angs, Chicken Hawk and Lil_Hawks"
                       width={96}
                       height={96}
                       className="w-full h-full object-cover"
@@ -154,7 +155,7 @@ export function Hero() {
                       Automate Everything
                     </h3>
                     <p className="text-xs md:text-sm text-white/35 leading-relaxed">
-                      Deploy Boomer_Angs, Chicken_Hawk &amp; Lil_Hawks to orchestrate your workflows.
+                      Deploy Boomer_Angs, Chicken Hawk &amp; Lil_Hawks to orchestrate your workflows.
                     </p>
                   </div>
                 </div>

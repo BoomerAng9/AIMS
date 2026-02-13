@@ -24,7 +24,7 @@ export type AgentRole =
   | 'system'       // AIMS platform messages
   | 'acheevy'      // ACHEEVY orchestrator (the only user-facing voice)
   | 'boomer_ang'   // Boomer_Ang (PMO manager / Expert)
-  | 'chicken_hawk' // Chicken_Hawk (shift spawner)
+  | 'chicken_hawk' // Chicken Hawk (shift spawner)
   | 'lil_hawk'     // Lil_Hawk (execution worker)
   | 'verifier'     // Verification gate runner
   | 'receipt';     // Receipt sealer
@@ -49,7 +49,7 @@ export type FeedEntryType =
   | 'classification'  // PMO routing decision
   | 'directive'       // Boomer_Ang issuing orders
   | 'handoff'         // Chain step transition
-  | 'squad_assembly'  // Chicken_Hawk assembling the squad
+  | 'squad_assembly'  // Chicken Hawk assembling the squad
   | 'execution'       // Lil_Hawk executing a step
   | 'wave_summary'    // Wave completion summary
   | 'verification'    // Gate check result

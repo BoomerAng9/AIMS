@@ -32,7 +32,7 @@ const ResearchPanel = lazy(() => import('@/app/dashboard/research/page'));
 // ─────────────────────────────────────────────────────────────
 
 type CircuitBoxTab =
-  | 'services' | 'integrations' | 'security'
+  | 'services' | 'integrations' | 'security' | 'control-plane'
   | 'model-garden' | 'boomerangs'
   | 'luc' | 'workbench' | 'workstreams' | 'plan'
   | 'settings' | 'research';
@@ -85,6 +85,7 @@ const SECTIONS: SectionGroup[] = [
       { id: 'services', label: 'Services', icon: '⚡' },
       { id: 'integrations', label: 'Integrations', icon: '🔗' },
       { id: 'security', label: 'Security', icon: '🛡' },
+      { id: 'control-plane', label: 'Control Plane', icon: '🎛' },
     ],
   },
   {
@@ -171,6 +172,36 @@ const BotIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
+const SliderIcon = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <line x1="4" y1="21" x2="4" y2="14" /><line x1="4" y1="10" x2="4" y2="3" />
+    <line x1="12" y1="21" x2="12" y2="12" /><line x1="12" y1="8" x2="12" y2="3" />
+    <line x1="20" y1="21" x2="20" y2="16" /><line x1="20" y1="12" x2="20" y2="3" />
+    <line x1="1" y1="14" x2="7" y2="14" /><line x1="9" y1="8" x2="15" y2="8" />
+    <line x1="17" y1="16" x2="23" y2="16" />
+  </svg>
+);
+
+const AlertIcon = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+  </svg>
+);
+
+const ToggleOnIcon = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 36 20" fill="none">
+    <rect x="0.5" y="0.5" width="35" height="19" rx="9.5" fill="currentColor" fillOpacity="0.2" stroke="currentColor" strokeOpacity="0.4" />
+    <circle cx="26" cy="10" r="7" fill="currentColor" />
+  </svg>
+);
+
+const ToggleOffIcon = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 36 20" fill="none">
+    <rect x="0.5" y="0.5" width="35" height="19" rx="9.5" fill="currentColor" fillOpacity="0.1" stroke="currentColor" strokeOpacity="0.3" />
+    <circle cx="10" cy="10" r="7" fill="currentColor" fillOpacity="0.4" />
+  </svg>
+);
+
 // ─────────────────────────────────────────────────────────────
 // Mock Data
 // ─────────────────────────────────────────────────────────────
@@ -180,7 +211,6 @@ const SERVICES: ServiceStatus[] = [
   { id: 'uef-gateway', name: 'UEF Gateway', type: 'core', status: 'online', endpoint: 'http://uef-gateway:3001', version: '1.0.0', features: ['ACP', 'UCP', 'Orchestration'] },
   { id: 'acheevy', name: 'ACHEEVY', type: 'core', status: 'online', endpoint: 'http://acheevy:3003', version: '1.0.0', features: ['Intent Analysis', 'Payment Processing', 'Executive Control'] },
   { id: 'house-of-ang', name: 'House of Ang', type: 'core', status: 'online', endpoint: 'http://house-of-ang:3002', version: '1.0.0', features: ['Agent Registry', 'Routing', 'Task Assignment'] },
-  { id: 'openclaw', name: 'OpenClaw', type: 'tool', status: 'sandbox', endpoint: 'http://openclaw:18789', version: '2026.2.3', features: ['Multi-model', 'KIMI K2.5', 'Tool Execution'] },
   { id: 'agent-bridge', name: 'Agent Bridge', type: 'core', status: 'online', endpoint: 'http://agent-bridge:3010', version: '1.0.0', features: ['Security Gateway', 'Rate Limiting', 'Payment Blocking'] },
   { id: 'n8n', name: 'n8n Automation', type: 'tool', status: 'sandbox', endpoint: 'http://n8n:5678', version: 'latest', features: ['Workflows', 'Webhooks', 'Integrations'] },
 ];
@@ -320,6 +350,216 @@ function BoomerAngCard({ ang }: { ang: BoomerAngConfig }) {
   );
 }
 
+// ─────────────────────────────────────────────────────────────
+// Control Plane Panel
+// ─────────────────────────────────────────────────────────────
+
+function ControlPlanePanel() {
+  return (
+    <div className="space-y-4">
+      {/* Panel Header */}
+      <div className="flex items-center gap-3 mb-2">
+        <SliderIcon className="w-5 h-5 text-gold" />
+        <div>
+          <h2 className="text-lg font-bold text-gold">Control Plane</h2>
+          <p className="text-xs text-gray-400">Master breaker toggles and system policy levers</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* 1. Autonomy Mode */}
+        <div className="p-4 rounded-xl border border-wireframe-stroke bg-black/30">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <BotIcon className="w-4 h-4 text-gold" />
+              <h3 className="text-sm font-semibold text-white">Autonomy Mode</h3>
+            </div>
+            <span className="px-2.5 py-0.5 rounded-lg text-[10px] font-bold tracking-wider bg-gold/15 text-gold border border-gold/30">
+              SUPERVISED
+            </span>
+          </div>
+          <p className="text-xs text-gray-400 mb-3">
+            Controls whether ACHEEVY can auto-execute or requires approval for each step.
+          </p>
+          <div className="flex items-center gap-2 cursor-not-allowed opacity-80">
+            <ToggleOffIcon className="w-9 h-5 text-gold" />
+            <span className="text-[10px] text-gray-500 uppercase tracking-wider">Auto-execute OFF</span>
+          </div>
+        </div>
+
+        {/* 2. Sandbox Required */}
+        <div className="p-4 rounded-xl border border-green-500/30 bg-green-500/5">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <ShieldIcon className="w-4 h-4 text-green-400" />
+              <h3 className="text-sm font-semibold text-white">Sandbox Required</h3>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <LockIcon className="w-3.5 h-3.5 text-green-400" />
+              <span className="px-2 py-0.5 rounded-lg text-[10px] font-bold tracking-wider bg-green-500/15 text-green-400 border border-green-500/30">
+                LOCKED ON
+              </span>
+            </div>
+          </div>
+          <p className="text-xs text-gray-400 mb-3">
+            All agent execution runs in sandboxed containers. This cannot be disabled.
+          </p>
+          <div className="flex items-center gap-2 cursor-not-allowed">
+            <ToggleOnIcon className="w-9 h-5 text-green-400" />
+            <span className="text-[10px] text-green-400/70 uppercase tracking-wider">Always On</span>
+            <LockIcon className="w-3 h-3 text-green-400/50" />
+          </div>
+        </div>
+
+        {/* 3. Kill Switch */}
+        <div className="p-4 rounded-xl border border-red-500/30 bg-red-500/5">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <PowerIcon className="w-4 h-4 text-red-400" />
+              <h3 className="text-sm font-semibold text-white">Kill Switch</h3>
+            </div>
+            <span className="px-2.5 py-0.5 rounded-lg text-[10px] font-bold tracking-wider bg-red-500/15 text-red-400 border border-red-500/30 animate-pulse">
+              ARMED
+            </span>
+          </div>
+          <p className="text-xs text-gray-400 mb-3">
+            Emergency halt for all active agent operations.
+          </p>
+          <div className="flex items-center justify-center">
+            <div className="relative cursor-not-allowed">
+              <div className="w-16 h-16 rounded-full border-2 border-red-500/40 bg-red-500/10 flex items-center justify-center shadow-[0_0_20px_rgba(239,68,68,0.15)]">
+                <PowerIcon className="w-7 h-7 text-red-400" />
+              </div>
+              <div className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-red-500 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.5)]" />
+            </div>
+          </div>
+        </div>
+
+        {/* 4. Tool Permissions */}
+        <div className="p-4 rounded-xl border border-wireframe-stroke bg-black/30">
+          <div className="flex items-center gap-2 mb-2">
+            <SettingsIcon className="w-4 h-4 text-gray-400" />
+            <h3 className="text-sm font-semibold text-white">Tool Permissions</h3>
+          </div>
+          <p className="text-xs text-gray-400 mb-3">
+            External tool access status and API key health.
+          </p>
+          <div className="grid grid-cols-2 gap-2">
+            {/* firecrawl - WARN */}
+            <div className="flex items-center gap-2 p-2.5 rounded-lg bg-yellow-500/5 border border-yellow-500/20">
+              <span className="inline-block w-2 h-2 rounded-full bg-yellow-500 shadow-[0_0_6px] shadow-yellow-500/50" />
+              <div>
+                <div className="text-xs font-medium text-white">firecrawl</div>
+                <div className="text-[10px] text-yellow-400 font-mono">WARN &mdash; no key</div>
+              </div>
+            </div>
+            {/* serper - active */}
+            <div className="flex items-center gap-2 p-2.5 rounded-lg bg-green-500/5 border border-green-500/20">
+              <span className="inline-block w-2 h-2 rounded-full bg-green-500 shadow-[0_0_6px] shadow-green-500/50" />
+              <div>
+                <div className="text-xs font-medium text-white">serper</div>
+                <div className="text-[10px] text-green-400 font-mono">active</div>
+              </div>
+            </div>
+            {/* tavily - active */}
+            <div className="flex items-center gap-2 p-2.5 rounded-lg bg-green-500/5 border border-green-500/20">
+              <span className="inline-block w-2 h-2 rounded-full bg-green-500 shadow-[0_0_6px] shadow-green-500/50" />
+              <div>
+                <div className="text-xs font-medium text-white">tavily</div>
+                <div className="text-[10px] text-green-400 font-mono">active</div>
+              </div>
+            </div>
+            {/* brave - active */}
+            <div className="flex items-center gap-2 p-2.5 rounded-lg bg-green-500/5 border border-green-500/20">
+              <span className="inline-block w-2 h-2 rounded-full bg-green-500 shadow-[0_0_6px] shadow-green-500/50" />
+              <div>
+                <div className="text-xs font-medium text-white">brave</div>
+                <div className="text-[10px] text-green-400 font-mono">active</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 5. Budget Cap */}
+        <div className="p-4 rounded-xl border border-wireframe-stroke bg-black/30">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <CircuitIcon className="w-4 h-4 text-gold" />
+              <h3 className="text-sm font-semibold text-white">Budget Cap</h3>
+            </div>
+            <span className="text-sm font-mono font-bold text-gold">$50.00 / day</span>
+          </div>
+          <p className="text-xs text-gray-400 mb-3">
+            Daily spend ceiling across all model providers and tool calls.
+          </p>
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between text-[10px]">
+              <span className="text-gray-500">Spent today</span>
+              <span className="text-gold font-mono">$6.00 (12%)</span>
+            </div>
+            <div className="w-full h-2 rounded-full bg-black/50 border border-wireframe-stroke overflow-hidden">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-gold/70 to-gold"
+                style={{ width: '12%' }}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* 6. Persona Mode */}
+        <div className="p-4 rounded-xl border border-wireframe-stroke bg-black/30">
+          <div className="flex items-center gap-2 mb-2">
+            <AlertIcon className="w-4 h-4 text-gold" />
+            <h3 className="text-sm font-semibold text-white">Persona Mode</h3>
+          </div>
+          <p className="text-xs text-gray-400 mb-3">
+            Controls ACHEEVY&apos;s communication style.
+          </p>
+          <div className="flex items-center gap-2 cursor-not-allowed">
+            <button
+              type="button"
+              disabled
+              className="px-3 py-1.5 rounded-lg text-xs font-bold tracking-wider bg-gold/15 text-gold border border-gold/30 cursor-not-allowed"
+            >
+              SMOOTH
+            </button>
+            <button
+              type="button"
+              disabled
+              className="px-3 py-1.5 rounded-lg text-xs font-medium tracking-wider bg-black/40 text-gray-500 border border-wireframe-stroke cursor-not-allowed"
+            >
+              CORPORATE
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* 7. Chicken Hawk Status — full width */}
+      <div className="p-4 rounded-xl border border-wireframe-stroke bg-black/30">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2">
+            <RefreshIcon className="w-4 h-4 text-gold" />
+            <h3 className="text-sm font-semibold text-white">Chicken Hawk Status</h3>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-gold opacity-75" />
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-gold" />
+            </span>
+            <span className="text-[10px] text-gold font-mono uppercase tracking-wider">polling</span>
+          </div>
+        </div>
+        <p className="text-xs text-gray-400 mb-3">
+          Live status from the Chicken Hawk execution engine.
+        </p>
+        <div className="p-3 rounded-lg bg-black/50 border border-wireframe-stroke font-mono text-xs text-gray-300">
+          <span className="text-gold">chickenhawk-core</span>: polling...
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function PanelLoader() {
   return (
     <div className="flex items-center justify-center py-20">
@@ -349,6 +589,36 @@ function CircuitBoxContent() {
       setActiveTab(tab);
     }
   }, [searchParams]);
+
+  // ── REST stub wire point ──
+  // Poll /api/circuit-box/policy every 2 seconds when Control Plane tab is active.
+  // The endpoint does not exist yet; responses are logged for future integration.
+  useEffect(() => {
+    if (activeTab !== 'control-plane') return;
+
+    const controller = new AbortController();
+    const poll = async () => {
+      try {
+        const res = await fetch('/api/circuit-box/policy', { signal: controller.signal });
+        const data = await res.json();
+        // eslint-disable-next-line no-console
+        console.log('[ControlPlane] policy poll:', data);
+      } catch (err: unknown) {
+        if (err instanceof DOMException && err.name === 'AbortError') return;
+        // Endpoint likely does not exist yet — suppress in dev
+        // eslint-disable-next-line no-console
+        console.debug('[ControlPlane] policy poll failed (stub):', err);
+      }
+    };
+
+    poll(); // initial fetch
+    const intervalId = setInterval(poll, 2000);
+
+    return () => {
+      controller.abort();
+      clearInterval(intervalId);
+    };
+  }, [activeTab]);
 
   const handleRefresh = () => {
     setRefreshing(true);
@@ -540,6 +810,11 @@ function CircuitBoxContent() {
                   </div>
                 </div>
               </div>
+            )}
+
+            {/* Control Plane */}
+            {activeTab === 'control-plane' && (
+              <ControlPlanePanel />
             )}
 
             {/* ── Lazy-loaded panels ── */}

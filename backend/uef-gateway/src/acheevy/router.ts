@@ -67,7 +67,7 @@ router.get('/health', (_req: Request, res: Response) => {
       'plug-fabrication',
       'skill-execution',
       'perform-analytics',
-      'openclaw-routing',
+      'scaffolding',
       'conversation',
     ],
   });
@@ -88,7 +88,7 @@ router.get('/capabilities', (_req: Request, res: Response) => {
       { pattern: 'skill:n8n-workflow', description: 'Workflow automation' },
       { pattern: 'skill:stitch', description: 'Design system generation' },
       { pattern: 'skill:best-practices', description: 'PRD/SOP/KPI generation' },
-      { pattern: 'openclaw', description: 'Platform cloning and scaffolding' },
+      { pattern: 'scaffolding', description: 'Platform cloning and scaffolding via Make It Mine' },
       { pattern: 'internal-llm', description: 'General AI conversation' },
     ],
   });

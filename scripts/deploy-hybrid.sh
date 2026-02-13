@@ -4,7 +4,7 @@
 # =============================================================================
 # Deploys A.I.M.S. in hybrid mode:
 #   Cloud Run → frontend + uef-gateway (stateless, auto-scaling, managed)
-#   VPS       → Redis, n8n, OpenClaw, Agent Bridge, agents (stateful, persistent)
+#   VPS       → Redis, n8n, Agent Bridge, agents (stateful, persistent)
 #
 # Usage:
 #   ./scripts/deploy-hybrid.sh                     # Deploy both tiers
@@ -157,7 +157,7 @@ if [ "${DEPLOY_CLOUD}" = "true" ]; then
         --min-instances=0 \
         --max-instances=3 \
         --allow-unauthenticated \
-        --set-env-vars="NODE_ENV=production,PORT=3001,LOG_LEVEL=info,OPENCLAW_URL=https://plugmein.cloud/api/bridge,REDIS_URL=redis://${VPS_HOST}:6379,N8N_URL=http://${VPS_HOST}:5678,RESEARCH_ANG_URL=http://${VPS_HOST}:3020,ROUTER_ANG_URL=http://${VPS_HOST}:3021" \
+        --set-env-vars="NODE_ENV=production,PORT=3001,LOG_LEVEL=info,AGENT_BRIDGE_URL=https://plugmein.cloud/api/bridge,REDIS_URL=redis://${VPS_HOST}:6379,N8N_URL=http://${VPS_HOST}:5678,RESEARCH_ANG_URL=http://${VPS_HOST}:3020,ROUTER_ANG_URL=http://${VPS_HOST}:3021" \
         --update-secrets="INTERNAL_API_KEY=INTERNAL_API_KEY:latest,OPENROUTER_API_KEY=OPENROUTER_API_KEY:latest,REDIS_PASSWORD=REDIS_PASSWORD:latest"
 
     # Get Cloud Run URLs
@@ -269,7 +269,7 @@ if [ "${DEPLOY_VPS}" = "true" ]; then
 echo "  │  VPS @ ${VPS_HOST} (stateful, persistent)         │"
 echo "  │    Redis:        :6379 (internal)                │"
 echo "  │    Agent Bridge:  :3010 (internal)               │"
-echo "  │    OpenClaw:     :18789 (sandboxed)              │"
+echo "  │    Agent Zero:   :50001 (sandboxed)              │"
 if [ "${WITH_AGENTS}" = "true" ]; then
 echo "  │    Research_Ang: :3020 (A2A)                     │"
 echo "  │    Router_Ang:   :3021 (A2A)                     │"

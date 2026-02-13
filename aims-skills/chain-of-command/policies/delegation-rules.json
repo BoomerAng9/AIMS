@@ -17,7 +17,7 @@
           "Does NOT micromanage or coordinate squads"
         ],
         "speaks_to": ["Boomer_Ang"],
-        "never_speaks_to": ["Chicken_Hawk", "Lil_Hawk", "USER_directly_bypassing_overlay"],
+        "never_speaks_to": ["Chicken Hawk", "Lil_Hawk", "USER_directly_bypassing_overlay"],
         "intervention_rule": "If ACHEEVY intervenes, it is via Boomer_Angs only."
       },
       {
@@ -25,7 +25,7 @@
         "role_type": "Boomer_Ang",
         "title": "Supervisor / Manager",
         "authority": [
-          "Manage Chicken_Hawk",
+          "Manage Chicken Hawk",
           "Train/upskill",
           "Correct behavior",
           "Set performance expectations",
@@ -33,13 +33,13 @@
           "Interface with ACHEEVY",
           "Own tool capabilities via Tool Registry"
         ],
-        "speaks_to": ["ACHEEVY", "Chicken_Hawk", "other Boomer_Angs"],
+        "speaks_to": ["ACHEEVY", "Chicken Hawk", "other Boomer_Angs"],
         "never_speaks_to": ["USER", "Lil_Hawk (directly)"],
         "key_rule": "ONLY ones that speak to ACHEEVY."
       },
       {
         "rank": 3,
-        "role_type": "Chicken_Hawk",
+        "role_type": "Chicken Hawk",
         "title": "Coordinator / Throughput Regulator",
         "authority": [
           "Assigns work",
@@ -64,10 +64,10 @@
         "description": "A temporary coordination assignment given to a Lil_Hawk. NOT a rank. NOT a promotion.",
         "authority": [
           "Coordinate peer Lil_Hawks within assigned squad",
-          "Relay instructions from Chicken_Hawk",
+          "Relay instructions from Chicken Hawk",
           "Consolidate status reports upward"
         ],
-        "speaks_to": ["Chicken_Hawk", "Lil_Hawk (within squad)"],
+        "speaks_to": ["Chicken Hawk", "Lil_Hawk (within squad)"],
         "never_speaks_to": ["ACHEEVY", "Boomer_Ang", "USER"]
       },
       {
@@ -85,7 +85,7 @@
           "Mentoring",
           "Direct tool invocation without workflow packet"
         ],
-        "speaks_to": ["Squad_Leader", "Chicken_Hawk"],
+        "speaks_to": ["Squad_Leader", "Chicken Hawk"],
         "never_speaks_to": ["ACHEEVY", "Boomer_Ang", "USER"]
       }
     ]
@@ -101,8 +101,8 @@
       "rule": "<Nickname>_Ang — role-fitting, not generic.",
       "examples": ["Forge_Ang", "Chronicle_Ang", "Gatekeeper_Ang", "Scout_Ang", "Bridge_Ang"]
     },
-    "Chicken_Hawk": {
-      "pattern": "^Chicken_Hawk$",
+    "Chicken Hawk": {
+      "pattern": "^Chicken Hawk$",
       "rule": "Singular coordinator identity."
     },
     "Lil_Hawk": {
@@ -120,8 +120,8 @@
   },
 
   "absolute_constraints": [
-    "Lil_Hawks ONLY speak to their Squad Leader or Chicken_Hawk.",
-    "Chicken_Hawk ONLY speaks to Boomer_Angs.",
+    "Lil_Hawks ONLY speak to their Squad Leader or Chicken Hawk.",
+    "Chicken Hawk ONLY speaks to Boomer_Angs.",
     "Boomer_Angs are the ONLY ones that speak to ACHEEVY.",
     "ACHEEVY almost never speaks downward; if ACHEEVY intervenes, it is via Boomer_Angs only.",
     "Persona ≠ Authority. Persona is voice + style overlay, NEVER permissions.",

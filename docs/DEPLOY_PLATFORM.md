@@ -20,7 +20,7 @@ The Deploy Platform is A.I.M.S.'s execution layer where work gets done. It uses 
 ## Governance Chain
 
 ```
-User → ACHEEVY → Boomer_Ang → Chicken_Hawk → Squad → Lil_Hawks
+User → ACHEEVY → Boomer_Ang → Chicken Hawk → Squad → Lil_Hawks
                                                         ↓
 User ← ACHEEVY ← Receipt ←─────────────────────────────┘
 ```
@@ -30,7 +30,7 @@ User ← ACHEEVY ← Receipt ←────────────────
 | 1 | User | Requests work via ACHEEVY |
 | 2 | ACHEEVY | Approves plan, creates Manifest |
 | 3 | Boomer_Ang | Validates scope against DSP limits |
-| 4 | Chicken_Hawk | Receives contract, spawns Squad |
+| 4 | Chicken Hawk | Receives contract, spawns Squad |
 | 5 | Squad | Coordinates Lil_Hawk workers |
 | 6 | Lil_Hawks | Execute tasks, emit events |
 | 7 | Receipt | Sealed proof of completion |
@@ -38,7 +38,7 @@ User ← ACHEEVY ← Receipt ←────────────────
 
 ## Core Components
 
-### Chicken_Hawk
+### Chicken Hawk
 
 The execution engine mascot. Responsible for:
 - Receiving contracts from ACHEEVY/Boomer_Ang
@@ -72,7 +72,7 @@ Example: `Build_Crane_Lil_Hawk_SH-ABC12345-001`
 ## Workforce Hierarchy
 
 ```
-Hatchling → Apprentice → Journeyman → Foreman → Chicken_Hawk_Candidate → Chicken_Hawk
+Hatchling → Apprentice → Journeyman → Foreman → Chicken Hawk_Candidate → Chicken Hawk
 ```
 
 | Level | Description | Permissions |
@@ -81,8 +81,8 @@ Hatchling → Apprentice → Journeyman → Foreman → Chicken_Hawk_Candidate �
 | Apprentice | Learning phase | Limited solo tasks |
 | Journeyman | Trusted independent worker | Full execution |
 | Foreman | Can mentor, high privilege | Supervisory access |
-| Chicken_Hawk_Candidate | Promotion track | Near-full authority |
-| Chicken_Hawk | Full engine authority | Everything |
+| Chicken Hawk_Candidate | Promotion track | Near-full authority |
+| Chicken Hawk | Full engine authority | Everything |
 
 ## Execution Lanes
 
@@ -296,7 +296,7 @@ infra/deploy-platform/
    - OEI: Low (0.2)
    - Quota: OK
 
-4. Chicken_Hawk spawns Squad:
+4. Chicken Hawk spawns Squad:
    - Squad_SH-ABC12345-001
    - Lil_Packer_Hawk (build)
    - Lil_ShipIt_Hawk (deploy)

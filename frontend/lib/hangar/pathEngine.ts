@@ -35,7 +35,7 @@ const PATH_DEFS: Record<PathId, PathDef> = {
     points: [
       new THREE.Vector3(-3, 1.5, -2),
       new THREE.Vector3(-1, 1, 0),
-      new THREE.Vector3(0, 0.5, 2),    // Chicken_Hawk runway
+      new THREE.Vector3(0, 0.5, 2),    // Chicken Hawk runway
     ],
     tension: 0.3,
   },

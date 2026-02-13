@@ -14,7 +14,6 @@ This document outlines the architecture for deploying the **A.I.M.S. Platform** 
 | **UEF Gateway** | `aims-uef-gateway` | `3001` | Main API Gateway & WebSocket Server. |
 | **ACHEEVY** | `aims-acheevy` | `3003` | Payment & High-Level Orchestration Agent. |
 | **House of Ang** | `aims-house-of-ang` | `3002` | Registry for Boomer_Angs. |
-| **OpenClaw** | `aims-openclaw` | `18789` | **Chicken Hawk**: Multi-channel agent (Discord/WhatsApp). |
 | **Agent Bridge** | `aims-agent-bridge` | `3010` | Security proxy between Core and Agents. |
 | **Redis** | `aims-redis` | `6379` | Shared state & caching. |
 | **PostgreSQL** | `aims-postgres` | `5432` | Primary Database. |
@@ -45,7 +44,6 @@ graph LR
     subgraph "VPS 1: A.I.M.S. Core"
         UI[Frontend]
         GW[UEF Gateway]
-        OC[OpenClaw/ChickenHawk]
         DB[(Postgres)]
     end
 
@@ -55,9 +53,7 @@ graph LR
     end
 
     UI --> GW
-    GW --> OC
     GW --"Trigger Workflow (HTTP)"--> N8N
-    OC --"Execute Task"--> N8N
     N8N --"Result (Webhook)"--> GW
 ```
 

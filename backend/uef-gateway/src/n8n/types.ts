@@ -2,7 +2,7 @@
  * n8n PMO Routing — Type Definitions
  *
  * Types for the chain-of-command pipeline:
- *   User → ACHEEVY → Boomer_Ang → Chicken_Hawk → Squad → Lil_Hawks → Receipt → ACHEEVY → User
+ *   User → ACHEEVY → Boomer_Ang → Chicken Hawk → Squad → Lil_Hawks → Receipt → ACHEEVY → User
  *
  * Doctrine: "Activity breeds Activity — shipped beats perfect."
  */
@@ -17,7 +17,7 @@ export type ChainStep =
   | 'User'
   | 'ACHEEVY'
   | 'Boomer_Ang'
-  | 'Chicken_Hawk'
+  | 'Chicken Hawk'
   | 'Squad'
   | 'Lil_Hawks'
   | 'Verification'
@@ -27,7 +27,7 @@ export const CHAIN_OF_COMMAND: ChainStep[] = [
   'User',
   'ACHEEVY',
   'Boomer_Ang',
-  'Chicken_Hawk',
+  'Chicken Hawk',
   'Squad',
   'Lil_Hawks',
   'Verification',

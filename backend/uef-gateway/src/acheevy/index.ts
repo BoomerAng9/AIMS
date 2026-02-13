@@ -2,7 +2,7 @@
  * ACHEEVY Module
  *
  * Backend orchestrator that classifies user intent and routes
- * execution to the appropriate service (II-Agent, OpenClaw, Skills, etc.)
+ * execution to the appropriate service (II-Agent, Skills, etc.)
  */
 
 export { acheevyRouter } from './router';

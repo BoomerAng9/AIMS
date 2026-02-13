@@ -41,7 +41,6 @@ import { backupManager } from './backup';
 import { incidentManager } from './backup/incident-runbook';
 
 import { a2aRouter } from './a2a';
-import { openclawRouter } from './openclaw/router';
 import { getOrchestrator } from './acheevy/orchestrator';
 import logger from './logger';
 
@@ -140,11 +139,6 @@ app.use(a2aRouter);
 // Apply API key gate to ALL subsequent routes
 // --------------------------------------------------------------------------
 app.use(requireApiKey);
-
-// --------------------------------------------------------------------------
-// OpenClaw Channel Router — receives messages from OpenClaw Gateway
-// --------------------------------------------------------------------------
-app.use('/api/channel', openclawRouter);
 
 // --------------------------------------------------------------------------
 // Agent Registry — list available agents and their profiles
@@ -402,7 +396,7 @@ app.get('/llm/usage', (req, res) => {
 // ACHEEVY Orchestrator — Intent classification → agent dispatch
 // This is the PRIMARY execution path for the chat interface.
 // Frontend sends: { userId, message, intent, context }
-// Gateway routes to II-Agent, A2A agents, n8n, OpenClaw, or verticals.
+// Gateway routes to II-Agent, A2A agents, n8n, or verticals.
 // --------------------------------------------------------------------------
 app.post('/acheevy/execute', async (req, res) => {
   try {

@@ -133,7 +133,7 @@ async function triggerPmoWorkflow(message, userId) {
     console.log(`  Director:   ${classification.director}`);
     console.log(`  Keywords:   ${classification.keywords.join(', ') || 'none'}`);
     console.log(`  Confidence: ${(classification.confidence * 100).toFixed(0)}%`);
-    console.log(`  Chain:      User -> ACHEEVY -> ${classification.director} -> Chicken_Hawk -> Squad -> Lil_Hawks -> Receipt -> ACHEEVY -> User`);
+    console.log(`  Chain:      User -> ACHEEVY -> ${classification.director} -> Chicken Hawk -> Squad -> Lil_Hawks -> Receipt -> ACHEEVY -> User`);
     console.log('');
 
     const payload = { userId: userId || 'cli-user', message, requestId: `CLI-${Date.now().toString(36).toUpperCase()}` };
@@ -182,7 +182,7 @@ async function triggerPmoWorkflow(message, userId) {
 async function main() {
     console.log(`\nBOOMER_ANG CLI v2.0 — PMO Chain of Command`);
     console.log(`Target: ${N8N_HOST}`);
-    console.log(`Chain: User -> ACHEEVY -> Boomer_Ang -> Chicken_Hawk -> Squad -> Lil_Hawks -> Receipt -> ACHEEVY -> User\n`);
+    console.log(`Chain: User -> ACHEEVY -> Boomer_Ang -> Chicken Hawk -> Squad -> Lil_Hawks -> Receipt -> ACHEEVY -> User\n`);
 
     if (!N8N_API_KEY) {
         console.warn("WARNING: N8N_API_KEY not found in infra/.env. Deploy operations will be simulated.\n");
@@ -295,7 +295,7 @@ async function main() {
                 console.log("  Action: Boomer_Ang agent initialized.");
                 if (WORKFLOW_NAME.toLowerCase() === 'pmo-router') {
                     console.log("\n  [SIMULATION] PMO Routing workflow ready.");
-                    console.log("  Chain: Webhook -> ACHEEVY Classifier -> PMO Switch -> 6x Boomer Directors -> Chicken_Hawk -> Squad -> Verification -> Receipt -> Response");
+                    console.log("  Chain: Webhook -> ACHEEVY Classifier -> PMO Switch -> 6x Boomer Directors -> Chicken Hawk -> Squad -> Verification -> Receipt -> Response");
                     console.log("  Nodes: 14 | Connections: 13");
                 }
             }
@@ -324,7 +324,7 @@ async function main() {
             console.log(`  Director:   ${result.director}`);
             console.log(`  Keywords:   ${result.keywords.join(', ') || 'none matched'}`);
             console.log(`  Confidence: ${(result.confidence * 100).toFixed(0)}%`);
-            console.log(`  Chain:      User -> ACHEEVY -> ${result.director} -> Chicken_Hawk -> Squad -> Lil_Hawks -> Receipt -> ACHEEVY -> User`);
+            console.log(`  Chain:      User -> ACHEEVY -> ${result.director} -> Chicken Hawk -> Squad -> Lil_Hawks -> Receipt -> ACHEEVY -> User`);
             break;
         }
 
@@ -406,7 +406,7 @@ async function main() {
             console.log("  marketer     Twitter/X auto-posting agent");
             console.log("");
             console.log("Chain of Command:");
-            console.log("  User -> ACHEEVY -> Boomer_Ang(CTO/CFO/COO/CMO/CDO/CPO/Betty-Ann/Astra) -> Chicken_Hawk -> Squad -> Lil_Hawks -> Receipt -> ACHEEVY -> User");
+            console.log("  User -> ACHEEVY -> Boomer_Ang(CTO/CFO/COO/CMO/CDO/CPO/Betty-Ann/Astra) -> Chicken Hawk -> Squad -> Lil_Hawks -> Receipt -> ACHEEVY -> User");
             break;
     }
 }

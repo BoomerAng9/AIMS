@@ -184,16 +184,16 @@
 └──────────────────────────────────────────────────────────────────────┘
 
 ┌──────────────────────────────────────────────────────────────────────┐
-│ 8. OPENCLAW EXECUTION ENGINE (CHICKEN HAWK)                          │
+│ 8. CHICKEN HAWK EXECUTION ENGINE                                     │
 │                                                                      │
 │    Role: The Builder / Executioner                                   │
 │    Identity: Chicken Hawk                                            │
 │    Workers: Lil_Hawks (Distributed Bots)                             │
 │                                                                      │
 │    Architecture:                                                     │
-│      • Controller: backend/openclaw (Multi-Channel Interface)        │
+│      • Controller: Chicken Hawk (Multi-Channel Interface)            │
 │      • Gateway:    Port 18789 (WebSocket)                            │
-│      • Routing:    UEF Gateway → OpenClaw (Bidirectional)            │
+│      • Routing:    UEF Gateway → Chicken Hawk (Bidirectional)        │
 │                                                                      │
 │    Capabilities:                                                     │
 │      • Multi-Channel Messaging (Discord, Slack, Telegram, WhatsApp)  │

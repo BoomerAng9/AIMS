@@ -38,7 +38,7 @@ priority: "high"
 | uef-gateway | 3001 | Active | Express orchestrator |
 | postgres | 5432 | Active | PostgreSQL database |
 | agent-zero | -- | Stubbed | Planning agent |
-| openclaw | -- | Stubbed | Architecture agent |
+| chicken-hawk | -- | Stubbed | Execution agent |
 | chicken-hawk | -- | Stubbed | Coding agent |
 | n8n | 5678 | External | Workflow automation (on VPS directly) |
 

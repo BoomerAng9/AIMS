@@ -43,7 +43,7 @@ Users come to our platform and say:
 
 | Component | Technology | Purpose |
 |-----------|-----------|---------|
-| **AI Orchestrator** | Chicken Hawk (OpenClaw) | Main gateway, multi-channel control plane |
+| **AI Orchestrator** | Chicken Hawk | Main gateway, multi-channel control plane |
 | **Code Generation Engine** | ii-agent (Intelligent Internet) | Full-stack development |
 | **Reasoning Engine** | II-Medical (Intelligent Internet) | Complex analysis: contracts, injury risk, compliance |
 | **Research Agent** | ii-researcher (Intelligent Internet) | Web scraping, data gathering, API research |
@@ -59,7 +59,7 @@ Users come to our platform and say:
 
 ## Our Agent Architecture
 
-### Chicken Hawk (OpenClaw) - The Orchestrator
+### Chicken Hawk - The Orchestrator
 
 Chicken Hawk is our **main control plane**. It:
 - Receives user requests via web chat, Discord, Slack, or API
@@ -120,7 +120,7 @@ names to current codebase identifiers for implementation reference:
 | Directive Claim | Actual State | Notes |
 |----------------|-------------|-------|
 | Firebase Auth | NextAuth + Redis | Migration to Firebase planned |
-| Chicken Hawk = OpenClaw | Separate entities | CH is executor, OpenClaw is autonomous agent framework |
+| Chicken Hawk | Execution engine | CH is executor and autonomous agent framework |
 | ii-agent backing | Agent Zero (similar) | II-Agent exists at /backend/ii-agent/ |
 | II-Commons (PostgreSQL) | SQLite (gateway) + Prisma (frontend) | Migration to PostgreSQL + VectorChord planned |
 | BunnyCDN | Not configured | CDN integration planned for Phase 3 |

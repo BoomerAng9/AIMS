@@ -129,7 +129,7 @@ async function executePipeline(
     step.status = 'running';
     logger.info(
       { taskId: input.taskId, step: step.index, agent: step.assignedAgent, description: step.description },
-      '[ChickenHawk] Executing step'
+      '[Chicken Hawk] Executing step'
     );
 
     if (step.assignedAgent) {
@@ -167,13 +167,13 @@ async function executePipeline(
               input.taskId,
             );
           } catch (scoreErr) {
-            logger.warn({ taskId: input.taskId, step: step.index, err: scoreErr }, '[ChickenHawk] Bench scoring failed (non-blocking)');
+            logger.warn({ taskId: input.taskId, step: step.index, err: scoreErr }, '[Chicken Hawk] Bench scoring failed (non-blocking)');
           }
         }
       } else {
         // Agent not found in registry — run as Chicken Hawk internal step
         step.status = 'completed';
-        allLogs.push(`[Step ${step.index}] ChickenHawk (internal): ${step.description}`);
+        allLogs.push(`[Step ${step.index}] Chicken Hawk (internal): ${step.description}`);
         allArtifacts.push(`[step-${step.index}] ${step.description}`);
         totalTokens += 100;
         totalUsd += 100 * 0.00003;
@@ -181,7 +181,7 @@ async function executePipeline(
     } else {
       // No specialist needed — Chicken Hawk handles directly
       step.status = 'completed';
-      allLogs.push(`[Step ${step.index}] ChickenHawk (direct): ${step.description}`);
+      allLogs.push(`[Step ${step.index}] Chicken Hawk (direct): ${step.description}`);
       allArtifacts.push(`[step-${step.index}] ${step.description}`);
       totalTokens += 100;
       totalUsd += 100 * 0.00003;
@@ -196,13 +196,13 @@ async function executePipeline(
 // ---------------------------------------------------------------------------
 
 async function execute(input: AgentTaskInput): Promise<AgentTaskOutput> {
-  logger.info({ taskId: input.taskId, intent: input.intent }, '[ChickenHawk] Pipeline received');
+  logger.info({ taskId: input.taskId, intent: input.intent }, '[Chicken Hawk] Pipeline received');
 
   try {
     // Derive steps from the execution plan context, or generate from query
     const steps = (input.context?.steps as string[]) || deriveSteps(input.intent, input.query);
 
-    logger.info({ taskId: input.taskId, stepCount: steps.length }, '[ChickenHawk] Pipeline planned');
+    logger.info({ taskId: input.taskId, stepCount: steps.length }, '[Chicken Hawk] Pipeline planned');
 
     const result = await executePipeline(input, steps);
 
@@ -220,7 +220,7 @@ async function execute(input: AgentTaskInput): Promise<AgentTaskOutput> {
 
     logger.info(
       { taskId: input.taskId, completed: completedSteps, failed: failedSteps },
-      `[ChickenHawk] Pipeline ${status}`
+      `[Chicken Hawk] Pipeline ${status}`
     );
 
     return {

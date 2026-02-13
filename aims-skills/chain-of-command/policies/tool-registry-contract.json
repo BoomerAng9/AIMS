@@ -8,7 +8,7 @@
     "rule": "Users NEVER interact with raw open-source tools, containers, or internal endpoints.",
     "surface": "Port Authority (Gateway)",
     "functions": [
-      "Routes internally to services (n8n, OpenClaw, executors, RAG, etc.)",
+      "Routes internally to services (n8n, executors, RAG, etc.)",
       "Enforces auth/tenant isolation",
       "Calls LUC before billable actions"
     ]
@@ -84,5 +84,5 @@
     "Audit events (who triggered, what was produced, where stored)"
   ],
 
-  "enforcement_rule": "Even if a tool is 'about coding' or 'about research,' it is still OWNED by a Boomer_Ang. Chicken_Hawk and Lil_Hawks don't get direct tool authority unless a Boomer_Ang explicitly delegates a bounded sub-action through workflow packets."
+  "enforcement_rule": "Even if a tool is 'about coding' or 'about research,' it is still OWNED by a Boomer_Ang. Chicken Hawk and Lil_Hawks don't get direct tool authority unless a Boomer_Ang explicitly delegates a bounded sub-action through workflow packets."
 }

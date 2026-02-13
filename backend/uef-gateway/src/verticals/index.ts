@@ -37,29 +37,6 @@ export interface Vertical {
 // Agent Verticals — Autonomous AI Agent Frameworks
 // ---------------------------------------------------------------------------
 
-const OPENCLAW: Vertical = {
-  id: 'openclaw',
-  name: 'OpenClaw',
-  category: 'AGENT',
-  description: 'Autonomous AI agent — executes tasks via LLMs, 100+ AgentSkills, messaging UI (Signal/Telegram/Discord). Model-agnostic, runs locally.',
-  homepage: 'https://openclaw.ai',
-  repo: 'https://github.com/psteinroe/openclaw',
-  install: 'pip install openclaw',
-  invoke: 'openclaw --config /home/aims/AIMS/infra/openclaw.yaml',
-  envKey: 'OPENROUTER_API_KEY',   // Uses same OpenRouter key
-  dockerImage: null,
-  port: null,
-  status: 'available',
-  capabilities: [
-    'autonomous-execution',
-    'messaging-ui',
-    'shell-commands',
-    'file-management',
-    'web-automation',
-    'multi-model',
-  ],
-};
-
 const AGENT_ZERO: Vertical = {
   id: 'agent-zero',
   name: 'Agent Zero',
@@ -139,7 +116,6 @@ const GEMINI_CLI: Vertical = {
 
 const ALL_VERTICALS: Vertical[] = [
   // Agent (II)
-  OPENCLAW,
   AGENT_ZERO,
   // Commons (II)
   CLAUDE_CODE,

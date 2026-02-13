@@ -2,7 +2,7 @@
  * PMO Job Map — Per-PMO, Per-Bench Job Definitions for Boomer_Angs
  *
  * Maps every PMO office to the specific jobs each bench level performs.
- * Boomer_Angs only — no Squad design, no Chicken_Hawk, no Lil_Hawks.
+ * Boomer_Angs only — no Squad design, no Chicken Hawk, no Lil_Hawks.
  *
  * Bench-to-Work Rules:
  *   - INTERN: may generate and assemble, but never decide.

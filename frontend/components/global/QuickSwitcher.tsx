@@ -171,7 +171,7 @@ const SWITCHER_ITEMS: SwitcherItem[] = [
   },
   {
     id: 'boomerangs',
-    label: 'BoomerAngs',
+    label: 'Boomer_Angs',
     description: 'Agent workforce',
     href: '/dashboard/boomerangs',
     icon: <UsersIcon className="w-4 h-4" />,

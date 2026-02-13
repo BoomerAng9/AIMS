@@ -6,7 +6,7 @@
  * using their Role Card voice, sidebar nuggets, and communication style.
  *
  * Chain:
- *   User → ACHEEVY → Boomer_Ang → Chicken_Hawk → Squad → Lil_Hawks → Verification → Receipt → ACHEEVY → User
+ *   User → ACHEEVY → Boomer_Ang → Chicken Hawk → Squad → Lil_Hawks → Verification → Receipt → ACHEEVY → User
  *
  * "Activity breeds Activity — shipped beats perfect."
  */
@@ -55,7 +55,7 @@ const ACHEEVY_AGENT: AgentIdentity = {
 };
 
 const CHICKEN_HAWK_AGENT: AgentIdentity = {
-  displayName: 'Chicken_Hawk',
+  displayName: 'Chicken Hawk',
   kunya: 'Shift Commander',
   role: 'chicken_hawk',
   avatar: 'hawk',
@@ -226,7 +226,7 @@ export class CollaborationFeedGenerator {
       ));
     }
 
-    // ── Phase 4: Chicken_Hawk — Shift + Squad Assembly ───────
+    // ── Phase 4: Chicken Hawk — Shift + Squad Assembly ───────
     if (packet.shift && packet.squad) {
       feed.push(...this.generateSquadAssembly(packet.shift.shiftId, packet.squad));
     }
@@ -400,11 +400,11 @@ export class CollaborationFeedGenerator {
       this.nuggetCount++;
     }
 
-    // Handoff to Chicken_Hawk
+    // Handoff to Chicken Hawk
     entries.push(entry(
       directorIdentity,
       'handoff',
-      `Chicken_Hawk — spawn shift. Here's the work order.`,
+      `Chicken Hawk — spawn shift. Here's the work order.`,
       0,
     ));
 

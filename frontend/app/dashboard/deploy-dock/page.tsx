@@ -66,7 +66,7 @@ interface DeploymentEvent {
     label: string;
     value: string;
   };
-  agent?: "ACHEEVY" | "Boomer_Ang" | "Chicken_Hawk" | "Lil_Hawk";
+  agent?: "ACHEEVY" | "Boomer_Ang" | "Chicken Hawk" | "Lil_Hawk";
 }
 
 interface AgentRoster {
@@ -611,7 +611,7 @@ export default function DeployDockPage() {
       stage: "launch",
       title: "Launch Sequence Initiated",
       description: "Deployment pipeline started",
-      agent: "Chicken_Hawk",
+      agent: "Chicken Hawk",
     });
     // Simulate completion
     setTimeout(() => setDeploymentStage("done"), 5000);

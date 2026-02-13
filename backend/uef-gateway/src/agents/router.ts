@@ -5,9 +5,9 @@
  *
  * Routing strategy (Boomer_Angs direct, Chicken Hawk + Lil_Hawks execute):
  *   CHAT             → Marketer_Ang (director) + Test_Ang/Quality_Ang (verify)
- *   BUILD_PLUG       → Code_Ang/Engineer_Ang (director) + ChickenHawk (executor) + Test_Ang/Quality_Ang (verify)
+ *   BUILD_PLUG       → Code_Ang/Engineer_Ang (director) + Chicken Hawk (executor) + Test_Ang/Quality_Ang (verify)
  *   RESEARCH         → Research_Ang/Analyst_Ang (director) + Test_Ang/Quality_Ang (verify)
- *   AGENTIC_WORKFLOW → ChickenHawk (executor, multi-step pipeline under Boomer_Ang oversight)
+ *   AGENTIC_WORKFLOW → Chicken Hawk (executor, multi-step pipeline under Boomer_Ang oversight)
  *   ESTIMATE_ONLY    → No agent execution (LUC handles it)
  *
  * Agent names follow [Function]_Ang convention per Platform Directive.
@@ -61,7 +61,7 @@ export async function routeToAgents(
 
     case 'BUILD_PLUG': {
       // Build: Chicken Hawk orchestrates the full pipeline
-      logger.info({ reqId }, '[Router] BUILD_PLUG → ChickenHawk pipeline');
+      logger.info({ reqId }, '[Router] BUILD_PLUG → Chicken Hawk pipeline');
       const hawk = registry.get('chicken-hawk');
       if (hawk) {
         const result = await hawk.execute(baseInput);
@@ -103,7 +103,7 @@ export async function routeToAgents(
 
     case 'AGENTIC_WORKFLOW': {
       // Full workflow: Chicken Hawk runs entire multi-agent pipeline
-      logger.info({ reqId }, '[Router] AGENTIC_WORKFLOW → ChickenHawk multi-agent pipeline');
+      logger.info({ reqId }, '[Router] AGENTIC_WORKFLOW → Chicken Hawk multi-agent pipeline');
       const hawk = registry.get('chicken-hawk');
       if (hawk) {
         const result = await hawk.execute(baseInput);

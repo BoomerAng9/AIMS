@@ -3,7 +3,7 @@
  *
  * THREE execution paths:
  *   1. Agent dispatch: message classified as actionable → /acheevy/execute → orchestrator
- *      → II-Agent / A2A agents / n8n / OpenClaw → structured response
+ *      → II-Agent / A2A agents / n8n → structured response
  *   2. LLM stream:    conversational message → /llm/stream → Vertex AI / OpenRouter
  *      → SSE text stream (metered through LUC)
  *   3. Direct fallback: gateway unreachable → Vercel AI SDK → OpenRouter

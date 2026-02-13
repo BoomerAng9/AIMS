@@ -1,103 +1,103 @@
 ID,App Name,Vertical,Type,Description,Infrastructure Stack,Priority
 PLUG-001,Flip Scorecard,Real Estate,Calculator,Calculates ROI for house flipping based on repair costs and ARV,Next.js + Postgres,High
 PLUG-002,Lease Analyzer,Real Estate,Document Analysis,Extracts key terms and risks from lease PDFs,Agent Zero + OCR,High
-PLUG-003,Auto-Invite Bot,Growth,Workflow,Scrapes local businesses and sends partner invites,OpenClaw + SendGrid,Critical
+PLUG-003,Auto-Invite Bot,Growth,Workflow,Scrapes local businesses and sends partner invites,Agent Bridge + SendGrid,Critical
 PLUG-004,Market Intel Report,Marketing,Research Agent,Monthly report on industry trends from Reddit/LinkedIn,n8n + Perplexity,High
 PLUG-005,Voice Concierge,General,Chat Assistant,Voice-enabled customer service using ElevenLabs,Deepgram + Agent Zero,High
 PLUG-006,Rental Yield Calculator,Real Estate,Calculator,ROI/Profit/Cost Estimator specifically tailored for the Real Estate industry.,Next.js + Postgres,Medium
 PLUG-007,Lease Agreement Creator,Real Estate,Document Generator,Auto-filled Contracts/Agreements specifically tailored for the Real Estate industry.,Agent Zero + Docx,Medium
-PLUG-008,Real Estate Lead Scraper,Real Estate,Lead Scraper,Finds local leads from directories specifically tailored for the Real Estate industry.,OpenClaw + Puppeteer,Medium
+PLUG-008,Real Estate Lead Scraper,Real Estate,Lead Scraper,Finds local leads from directories specifically tailored for the Real Estate industry.,Agent Bridge + Puppeteer,Medium
 PLUG-009,Real Estate SOP Builder,Real Estate,SOP Builder,Generates operational procedures specifically tailored for the Real Estate industry.,Agent Zero + LLM,Medium
 PLUG-010,Real Estate Chat Assistant,Real Estate,Chat Assistant,24/7 Customer Support Agent specifically tailored for the Real Estate industry.,Agent Zero + RAG,Medium
 PLUG-011,Real Estate Marketing Engine,Real Estate,Marketing Engine,Auto-posts to social media specifically tailored for the Real Estate industry.,n8n + OpenAI,Medium
 PLUG-012,Real Estate Invoice Generator,Real Estate,Invoice Generator,Professional billing system specifically tailored for the Real Estate industry.,Next.js + Stripe,Medium
 PLUG-013,Car Flip Profit Calc,Automotive,Calculator,ROI/Profit/Cost Estimator specifically tailored for the Automotive industry.,Next.js + Postgres,Medium
 PLUG-014,Automotive Document Generator,Automotive,Document Generator,Auto-filled Contracts/Agreements specifically tailored for the Automotive industry.,Agent Zero + Docx,Medium
-PLUG-015,Automotive Lead Scraper,Automotive,Lead Scraper,Finds local leads from directories specifically tailored for the Automotive industry.,OpenClaw + Puppeteer,Medium
+PLUG-015,Automotive Lead Scraper,Automotive,Lead Scraper,Finds local leads from directories specifically tailored for the Automotive industry.,Agent Bridge + Puppeteer,Medium
 PLUG-016,Automotive SOP Builder,Automotive,SOP Builder,Generates operational procedures specifically tailored for the Automotive industry.,Agent Zero + LLM,Medium
 PLUG-017,Automotive Chat Assistant,Automotive,Chat Assistant,24/7 Customer Support Agent specifically tailored for the Automotive industry.,Agent Zero + RAG,Medium
 PLUG-018,Automotive Marketing Engine,Automotive,Marketing Engine,Auto-posts to social media specifically tailored for the Automotive industry.,n8n + OpenAI,Medium
 PLUG-019,Automotive Invoice Generator,Automotive,Invoice Generator,Professional billing system specifically tailored for the Automotive industry.,Next.js + Stripe,Medium
 PLUG-020,Settlement Estimator,Legal,Calculator,ROI/Profit/Cost Estimator specifically tailored for the Legal industry.,Next.js + Postgres,Medium
 PLUG-021,NDA Auto-Drafter,Legal,Document Generator,Auto-filled Contracts/Agreements specifically tailored for the Legal industry.,Agent Zero + Docx,Medium
-PLUG-022,Legal Lead Scraper,Legal,Lead Scraper,Finds local leads from directories specifically tailored for the Legal industry.,OpenClaw + Puppeteer,Medium
+PLUG-022,Legal Lead Scraper,Legal,Lead Scraper,Finds local leads from directories specifically tailored for the Legal industry.,Agent Bridge + Puppeteer,Medium
 PLUG-023,Legal SOP Builder,Legal,SOP Builder,Generates operational procedures specifically tailored for the Legal industry.,Agent Zero + LLM,Medium
 PLUG-024,Legal Chat Assistant,Legal,Chat Assistant,24/7 Customer Support Agent specifically tailored for the Legal industry.,Agent Zero + RAG,Medium
 PLUG-025,Legal Marketing Engine,Legal,Marketing Engine,Auto-posts to social media specifically tailored for the Legal industry.,n8n + OpenAI,Medium
 PLUG-026,Legal Invoice Generator,Legal,Invoice Generator,Professional billing system specifically tailored for the Legal industry.,Next.js + Stripe,Medium
 PLUG-027,Consulting Calculator,Consulting,Calculator,ROI/Profit/Cost Estimator specifically tailored for the Consulting industry.,Next.js + Postgres,Medium
 PLUG-028,Consulting Document Generator,Consulting,Document Generator,Auto-filled Contracts/Agreements specifically tailored for the Consulting industry.,Agent Zero + Docx,Medium
-PLUG-029,Consulting Lead Scraper,Consulting,Lead Scraper,Finds local leads from directories specifically tailored for the Consulting industry.,OpenClaw + Puppeteer,Medium
+PLUG-029,Consulting Lead Scraper,Consulting,Lead Scraper,Finds local leads from directories specifically tailored for the Consulting industry.,Agent Bridge + Puppeteer,Medium
 PLUG-030,Consulting SOP Builder,Consulting,SOP Builder,Generates operational procedures specifically tailored for the Consulting industry.,Agent Zero + LLM,Medium
 PLUG-031,Consulting Chat Assistant,Consulting,Chat Assistant,24/7 Customer Support Agent specifically tailored for the Consulting industry.,Agent Zero + RAG,Medium
 PLUG-032,Consulting Marketing Engine,Consulting,Marketing Engine,Auto-posts to social media specifically tailored for the Consulting industry.,n8n + OpenAI,Medium
 PLUG-033,Consulting Invoice Generator,Consulting,Invoice Generator,Professional billing system specifically tailored for the Consulting industry.,Next.js + Stripe,Medium
 PLUG-034,E-commerce Calculator,E-commerce,Calculator,ROI/Profit/Cost Estimator specifically tailored for the E-commerce industry.,Next.js + Postgres,Medium
 PLUG-035,E-commerce Document Generator,E-commerce,Document Generator,Auto-filled Contracts/Agreements specifically tailored for the E-commerce industry.,Agent Zero + Docx,Medium
-PLUG-036,E-commerce Lead Scraper,E-commerce,Lead Scraper,Finds local leads from directories specifically tailored for the E-commerce industry.,OpenClaw + Puppeteer,Medium
+PLUG-036,E-commerce Lead Scraper,E-commerce,Lead Scraper,Finds local leads from directories specifically tailored for the E-commerce industry.,Agent Bridge + Puppeteer,Medium
 PLUG-037,E-commerce SOP Builder,E-commerce,SOP Builder,Generates operational procedures specifically tailored for the E-commerce industry.,Agent Zero + LLM,Medium
 PLUG-038,E-commerce Chat Assistant,E-commerce,Chat Assistant,24/7 Customer Support Agent specifically tailored for the E-commerce industry.,Agent Zero + RAG,Medium
 PLUG-039,E-commerce Marketing Engine,E-commerce,Marketing Engine,Auto-posts to social media specifically tailored for the E-commerce industry.,n8n + OpenAI,Medium
 PLUG-040,E-commerce Invoice Generator,E-commerce,Invoice Generator,Professional billing system specifically tailored for the E-commerce industry.,Next.js + Stripe,Medium
 PLUG-041,Construction Calculator,Construction,Calculator,ROI/Profit/Cost Estimator specifically tailored for the Construction industry.,Next.js + Postgres,Medium
 PLUG-042,Bid Proposal Builder,Construction,Document Generator,Auto-filled Contracts/Agreements specifically tailored for the Construction industry.,Agent Zero + Docx,Medium
-PLUG-043,Construction Lead Scraper,Construction,Lead Scraper,Finds local leads from directories specifically tailored for the Construction industry.,OpenClaw + Puppeteer,Medium
+PLUG-043,Construction Lead Scraper,Construction,Lead Scraper,Finds local leads from directories specifically tailored for the Construction industry.,Agent Bridge + Puppeteer,Medium
 PLUG-044,Construction SOP Builder,Construction,SOP Builder,Generates operational procedures specifically tailored for the Construction industry.,Agent Zero + LLM,Medium
 PLUG-045,Construction Chat Assistant,Construction,Chat Assistant,24/7 Customer Support Agent specifically tailored for the Construction industry.,Agent Zero + RAG,Medium
 PLUG-046,Construction Marketing Engine,Construction,Marketing Engine,Auto-posts to social media specifically tailored for the Construction industry.,n8n + OpenAI,Medium
 PLUG-047,Construction Invoice Generator,Construction,Invoice Generator,Professional billing system specifically tailored for the Construction industry.,Next.js + Stripe,Medium
 PLUG-048,Healthcare Calculator,Healthcare,Calculator,ROI/Profit/Cost Estimator specifically tailored for the Healthcare industry.,Next.js + Postgres,Medium
 PLUG-049,Healthcare Document Generator,Healthcare,Document Generator,Auto-filled Contracts/Agreements specifically tailored for the Healthcare industry.,Agent Zero + Docx,Medium
-PLUG-050,Healthcare Lead Scraper,Healthcare,Lead Scraper,Finds local leads from directories specifically tailored for the Healthcare industry.,OpenClaw + Puppeteer,Medium
+PLUG-050,Healthcare Lead Scraper,Healthcare,Lead Scraper,Finds local leads from directories specifically tailored for the Healthcare industry.,Agent Bridge + Puppeteer,Medium
 PLUG-051,Healthcare SOP Builder,Healthcare,SOP Builder,Generates operational procedures specifically tailored for the Healthcare industry.,Agent Zero + LLM,Medium
 PLUG-052,Healthcare Chat Assistant,Healthcare,Chat Assistant,24/7 Customer Support Agent specifically tailored for the Healthcare industry.,Agent Zero + RAG,Medium
 PLUG-053,Healthcare Marketing Engine,Healthcare,Marketing Engine,Auto-posts to social media specifically tailored for the Healthcare industry.,n8n + OpenAI,Medium
 PLUG-054,Healthcare Invoice Generator,Healthcare,Invoice Generator,Professional billing system specifically tailored for the Healthcare industry.,Next.js + Stripe,Medium
 PLUG-055,Education Calculator,Education,Calculator,ROI/Profit/Cost Estimator specifically tailored for the Education industry.,Next.js + Postgres,Medium
 PLUG-056,Education Document Generator,Education,Document Generator,Auto-filled Contracts/Agreements specifically tailored for the Education industry.,Agent Zero + Docx,Medium
-PLUG-057,Education Lead Scraper,Education,Lead Scraper,Finds local leads from directories specifically tailored for the Education industry.,OpenClaw + Puppeteer,Medium
+PLUG-057,Education Lead Scraper,Education,Lead Scraper,Finds local leads from directories specifically tailored for the Education industry.,Agent Bridge + Puppeteer,Medium
 PLUG-058,Education SOP Builder,Education,SOP Builder,Generates operational procedures specifically tailored for the Education industry.,Agent Zero + LLM,Medium
 PLUG-059,Education Chat Assistant,Education,Chat Assistant,24/7 Customer Support Agent specifically tailored for the Education industry.,Agent Zero + RAG,Medium
 PLUG-060,Education Marketing Engine,Education,Marketing Engine,Auto-posts to social media specifically tailored for the Education industry.,n8n + OpenAI,Medium
 PLUG-061,Education Invoice Generator,Education,Invoice Generator,Professional billing system specifically tailored for the Education industry.,Next.js + Stripe,Medium
 PLUG-062,Logistics Calculator,Logistics,Calculator,ROI/Profit/Cost Estimator specifically tailored for the Logistics industry.,Next.js + Postgres,Medium
 PLUG-063,Logistics Document Generator,Logistics,Document Generator,Auto-filled Contracts/Agreements specifically tailored for the Logistics industry.,Agent Zero + Docx,Medium
-PLUG-064,Logistics Lead Scraper,Logistics,Lead Scraper,Finds local leads from directories specifically tailored for the Logistics industry.,OpenClaw + Puppeteer,Medium
+PLUG-064,Logistics Lead Scraper,Logistics,Lead Scraper,Finds local leads from directories specifically tailored for the Logistics industry.,Agent Bridge + Puppeteer,Medium
 PLUG-065,Logistics SOP Builder,Logistics,SOP Builder,Generates operational procedures specifically tailored for the Logistics industry.,Agent Zero + LLM,Medium
 PLUG-066,Logistics Chat Assistant,Logistics,Chat Assistant,24/7 Customer Support Agent specifically tailored for the Logistics industry.,Agent Zero + RAG,Medium
 PLUG-067,Logistics Marketing Engine,Logistics,Marketing Engine,Auto-posts to social media specifically tailored for the Logistics industry.,n8n + OpenAI,Medium
 PLUG-068,Logistics Invoice Generator,Logistics,Invoice Generator,Professional billing system specifically tailored for the Logistics industry.,Next.js + Stripe,Medium
 PLUG-069,Marketing Calculator,Marketing,Calculator,ROI/Profit/Cost Estimator specifically tailored for the Marketing industry.,Next.js + Postgres,Medium
 PLUG-070,Marketing Document Generator,Marketing,Document Generator,Auto-filled Contracts/Agreements specifically tailored for the Marketing industry.,Agent Zero + Docx,Medium
-PLUG-071,Marketing Lead Scraper,Marketing,Lead Scraper,Finds local leads from directories specifically tailored for the Marketing industry.,OpenClaw + Puppeteer,Medium
+PLUG-071,Marketing Lead Scraper,Marketing,Lead Scraper,Finds local leads from directories specifically tailored for the Marketing industry.,Agent Bridge + Puppeteer,Medium
 PLUG-072,Marketing SOP Builder,Marketing,SOP Builder,Generates operational procedures specifically tailored for the Marketing industry.,Agent Zero + LLM,Medium
 PLUG-073,Marketing Chat Assistant,Marketing,Chat Assistant,24/7 Customer Support Agent specifically tailored for the Marketing industry.,Agent Zero + RAG,Medium
 PLUG-074,Marketing Marketing Engine,Marketing,Marketing Engine,Auto-posts to social media specifically tailored for the Marketing industry.,n8n + OpenAI,Medium
 PLUG-075,Marketing Invoice Generator,Marketing,Invoice Generator,Professional billing system specifically tailored for the Marketing industry.,Next.js + Stripe,Medium
 PLUG-076,Hospitality Calculator,Hospitality,Calculator,ROI/Profit/Cost Estimator specifically tailored for the Hospitality industry.,Next.js + Postgres,Medium
 PLUG-077,Hospitality Document Generator,Hospitality,Document Generator,Auto-filled Contracts/Agreements specifically tailored for the Hospitality industry.,Agent Zero + Docx,Medium
-PLUG-078,Hospitality Lead Scraper,Hospitality,Lead Scraper,Finds local leads from directories specifically tailored for the Hospitality industry.,OpenClaw + Puppeteer,Medium
+PLUG-078,Hospitality Lead Scraper,Hospitality,Lead Scraper,Finds local leads from directories specifically tailored for the Hospitality industry.,Agent Bridge + Puppeteer,Medium
 PLUG-079,Hospitality SOP Builder,Hospitality,SOP Builder,Generates operational procedures specifically tailored for the Hospitality industry.,Agent Zero + LLM,Medium
 PLUG-080,Hospitality Chat Assistant,Hospitality,Chat Assistant,24/7 Customer Support Agent specifically tailored for the Hospitality industry.,Agent Zero + RAG,Medium
 PLUG-081,Hospitality Marketing Engine,Hospitality,Marketing Engine,Auto-posts to social media specifically tailored for the Hospitality industry.,n8n + OpenAI,Medium
 PLUG-082,Hospitality Invoice Generator,Hospitality,Invoice Generator,Professional billing system specifically tailored for the Hospitality industry.,Next.js + Stripe,Medium
 PLUG-083,Compound Interest Forecaster,Finance,Calculator,ROI/Profit/Cost Estimator specifically tailored for the Finance industry.,Next.js + Postgres,Medium
 PLUG-084,Finance Document Generator,Finance,Document Generator,Auto-filled Contracts/Agreements specifically tailored for the Finance industry.,Agent Zero + Docx,Medium
-PLUG-085,Finance Lead Scraper,Finance,Lead Scraper,Finds local leads from directories specifically tailored for the Finance industry.,OpenClaw + Puppeteer,Medium
+PLUG-085,Finance Lead Scraper,Finance,Lead Scraper,Finds local leads from directories specifically tailored for the Finance industry.,Agent Bridge + Puppeteer,Medium
 PLUG-086,Finance SOP Builder,Finance,SOP Builder,Generates operational procedures specifically tailored for the Finance industry.,Agent Zero + LLM,Medium
 PLUG-087,Finance Chat Assistant,Finance,Chat Assistant,24/7 Customer Support Agent specifically tailored for the Finance industry.,Agent Zero + RAG,Medium
 PLUG-088,Finance Marketing Engine,Finance,Marketing Engine,Auto-posts to social media specifically tailored for the Finance industry.,n8n + OpenAI,Medium
 PLUG-089,Finance Invoice Generator,Finance,Invoice Generator,Professional billing system specifically tailored for the Finance industry.,Next.js + Stripe,Medium
 PLUG-090,Event Planning Calculator,Event Planning,Calculator,ROI/Profit/Cost Estimator specifically tailored for the Event Planning industry.,Next.js + Postgres,Medium
 PLUG-091,Event Planning Document Generator,Event Planning,Document Generator,Auto-filled Contracts/Agreements specifically tailored for the Event Planning industry.,Agent Zero + Docx,Medium
-PLUG-092,Event Planning Lead Scraper,Event Planning,Lead Scraper,Finds local leads from directories specifically tailored for the Event Planning industry.,OpenClaw + Puppeteer,Medium
+PLUG-092,Event Planning Lead Scraper,Event Planning,Lead Scraper,Finds local leads from directories specifically tailored for the Event Planning industry.,Agent Bridge + Puppeteer,Medium
 PLUG-093,Event Planning SOP Builder,Event Planning,SOP Builder,Generates operational procedures specifically tailored for the Event Planning industry.,Agent Zero + LLM,Medium
 PLUG-094,Event Planning Chat Assistant,Event Planning,Chat Assistant,24/7 Customer Support Agent specifically tailored for the Event Planning industry.,Agent Zero + RAG,Medium
 PLUG-095,Event Planning Marketing Engine,Event Planning,Marketing Engine,Auto-posts to social media specifically tailored for the Event Planning industry.,n8n + OpenAI,Medium
 PLUG-096,Event Planning Invoice Generator,Event Planning,Invoice Generator,Professional billing system specifically tailored for the Event Planning industry.,Next.js + Stripe,Medium
 PLUG-097,Fitness Calculator,Fitness,Calculator,ROI/Profit/Cost Estimator specifically tailored for the Fitness industry.,Next.js + Postgres,Medium
 PLUG-098,Fitness Document Generator,Fitness,Document Generator,Auto-filled Contracts/Agreements specifically tailored for the Fitness industry.,Agent Zero + Docx,Medium
-PLUG-099,Fitness Lead Scraper,Fitness,Lead Scraper,Finds local leads from directories specifically tailored for the Fitness industry.,OpenClaw + Puppeteer,Medium
+PLUG-099,Fitness Lead Scraper,Fitness,Lead Scraper,Finds local leads from directories specifically tailored for the Fitness industry.,Agent Bridge + Puppeteer,Medium
 PLUG-100,Fitness SOP Builder,Fitness,SOP Builder,Generates operational procedures specifically tailored for the Fitness industry.,Agent Zero + LLM,Medium
 PLUG-101,Fitness Chat Assistant,Fitness,Chat Assistant,24/7 Customer Support Agent specifically tailored for the Fitness industry.,Agent Zero + RAG,Medium
 PLUG-102,Fitness Marketing Engine,Fitness,Marketing Engine,Auto-posts to social media specifically tailored for the Fitness industry.,n8n + OpenAI,Medium

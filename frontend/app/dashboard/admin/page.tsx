@@ -292,7 +292,6 @@ function AdminPanel() {
             <p className="text-[10px] font-bold uppercase tracking-widest text-gold mb-3">Agent</p>
             <div className="space-y-2">
               {[
-                { id: "openclaw", name: "OpenClaw", desc: "Autonomous AI agent — 100+ AgentSkills, messaging UI", url: "https://openclaw.ai", cap: "execution, shell, web automation" },
                 { id: "agent-zero", name: "Agent Zero", desc: "Computer-as-tool framework — Docker sandbox, web UI", url: "https://agent-zero.ai", cap: "computer-use, multi-agent, code execution" },
               ].map((v) => (
                 <div key={v.id} className="rounded-2xl border border-wireframe-stroke bg-black/40 p-4">

@@ -64,23 +64,6 @@ interface ConsumptionModel {
 // ─────────────────────────────────────────────────────────────
 
 const AI_MODELS: AIModel[] = [
-  // Agent Platforms - Full AI assistants that can do tasks
-  {
-    id: 'openclaw',
-    name: 'OpenClaw',
-    friendlyName: 'AI Agent Platform',
-    provider: 'A.I.M.S.',
-    category: 'agent-platform',
-    description: 'Multi-model agent platform with sandboxed tool execution',
-    useCase: 'Best for: Building AI agents that can browse, code, and complete tasks autonomously',
-    capabilities: ['Agent Mode', 'Tool Use', 'Sandboxed', 'Multi-Model'],
-    pricing: 'free',
-    status: 'stable',
-    contextWindow: 'Unlimited',
-    inputCost: 'Included',
-    outputCost: 'Included',
-    popular: true,
-  },
   // Anthropic Claude Models (OpenRouter)
   {
     id: 'anthropic/claude-opus-4.6',
