@@ -55,6 +55,18 @@ interface Thread {
 // Constants
 // ─────────────────────────────────────────────────────────────
 
+const AI_MODELS = [
+  { key: 'claude-opus',   label: 'Claude Opus 4.6' },
+  { key: 'claude-sonnet', label: 'Claude Sonnet 4.6' },
+  { key: 'qwen',          label: 'Qwen 2.5 Coder 32B', tag: 'code' },
+  { key: 'qwen-max',      label: 'Qwen Max' },
+  { key: 'minimax',       label: 'MiniMax-01' },
+  { key: 'glm',           label: 'GLM-4 32B' },
+  { key: 'kimi',          label: 'Kimi K2.5', tag: 'fast' },
+  { key: 'nano-banana',   label: 'Nano Banana Pro', tag: 'fast' },
+  { key: 'gemini-pro',    label: 'Gemini 2.5 Pro' },
+] as const;
+
 const ACHEEVY_VERBS = ['Deploy', 'Build', 'Create', 'Launch', 'Ship', 'Forge', 'Craft', 'Execute'] as const;
 
 const QUICK_INTENTS = [
@@ -644,6 +656,7 @@ function MessageBubble({ role, content, isStreaming }: {
 
 export default function ChatPage() {
   const searchParams = useSearchParams();
+  const [selectedModel, setSelectedModel] = useState('claude-opus');
   const {
     messages,
     input,
@@ -654,6 +667,7 @@ export default function ChatPage() {
     setInput,
   } = useChat({
     api: '/api/chat',
+    body: { model: selectedModel },
   });
 
   const [pmoClassification, setPmoClassification] = useState<PmoClassification | null>(null);
@@ -891,7 +905,27 @@ export default function ChatPage() {
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              {/* Model Switcher */}
+              <div className="flex items-center gap-1.5 bg-white/5 rounded-lg px-2.5 py-1.5 border border-wireframe-stroke hover:border-gold/20 transition-colors">
+                <svg className="w-3.5 h-3.5 text-gold/60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="4" r="2" /><circle cx="4" cy="12" r="2" /><circle cx="20" cy="12" r="2" /><circle cx="12" cy="20" r="2" />
+                  <path d="M12 6v4m0 4v4M6 12h4m4 0h4" />
+                </svg>
+                <select
+                  value={selectedModel}
+                  onChange={(e) => setSelectedModel(e.target.value)}
+                  className="bg-transparent border-none outline-none text-white/70 text-xs cursor-pointer appearance-none pr-3 font-mono"
+                  title="Select AI Model"
+                >
+                  {AI_MODELS.map(m => (
+                    <option key={m.key} value={m.key} className="bg-[#0A0A0A]">
+                      {m.label}{'tag' in m ? ` (${m.tag})` : ''}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
               {/* MottoBar toggle */}
               <button
                 onClick={toggleMotto}
@@ -904,7 +938,7 @@ export default function ChatPage() {
               </button>
 
               {/* Agent Shelf */}
-              <div className="hidden md:flex items-center gap-1.5">
+              <div className="hidden lg:flex items-center gap-1.5">
                 {BOOMER_ANGS.map(agent => (
                   <div
                     key={agent.id}

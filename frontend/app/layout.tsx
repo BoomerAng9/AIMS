@@ -70,10 +70,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body className={`${doto.variable} ${permanentMarker.variable} ${caveat.variable} ${patrickHand.variable} ${nabla.variable} antialiased bg-[#050505] text-white font-sans overflow-x-hidden selection:bg-gold/30 selection:text-white`}>
         <Providers>
           <div className="aims-frame">
-            {/* Texture layers — inside frame */}
-            <div className="texture-noise" style={{ position: 'absolute', borderRadius: 'inherit' }} />
-            <div className="vignette-overlay absolute inset-0 z-40 pointer-events-none" style={{ borderRadius: 'inherit' }} />
-            {children}
+            {/* Texture layers — low z-index so they never block content */}
+            <div className="texture-noise" style={{ position: 'absolute', borderRadius: 'inherit', zIndex: 1 }} />
+            <div className="vignette-overlay absolute inset-0 pointer-events-none" style={{ borderRadius: 'inherit', zIndex: 1 }} />
+            <div className="relative z-10 flex flex-col min-h-full">
+              {children}
+            </div>
           </div>
         </Providers>
       </body>

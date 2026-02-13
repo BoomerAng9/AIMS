@@ -35,8 +35,8 @@ export const DEEPGRAM_ACHEEVY_PRESET = {
 export type PersonaMode = 'SMOOTH' | 'CORPORATE';
 
 export const VOICE_PRESETS: Record<PersonaMode, {
-  elevenlabs: typeof ELEVENLABS_ACHEEVY_PRESET;
-  deepgram: typeof DEEPGRAM_ACHEEVY_PRESET;
+  elevenlabs: { voiceId: string; model: string; stability: number; similarity_boost: number; style: number; use_speaker_boost: boolean };
+  deepgram: { model: string; tone: string; speed: number };
   greeting: string;
   microCopy: { acknowledge: string; sending: string; error: string };
 }> = {
