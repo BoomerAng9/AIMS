@@ -37,7 +37,7 @@ const openrouter = createOpenAI({
 });
 
 // ── Feature LLM ─────────────────────────────────────────────
-const DEFAULT_MODEL = process.env.ACHEEVY_MODEL || 'anthropic/claude-opus-4.6';
+const DEFAULT_MODEL = process.env.ACHEEVY_MODEL || process.env.OPENROUTER_MODEL || 'google/gemini-3.0-flash';
 
 // ── Priority Model Roster (all accessible via OpenRouter) ───
 const PRIORITY_MODELS: Record<string, { id: string; label: string; provider: string }> = {

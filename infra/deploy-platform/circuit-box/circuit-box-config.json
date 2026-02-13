@@ -186,13 +186,13 @@
 
   "integrations": {
     "acheevy": {
-      "endpoint": "http://acheevy:3003",
+      "endpoint": "http://acheevy:8000",
       "protocol": "REST + WebSocket",
       "auth": "mTLS + Service Identity"
     },
     "chicken_hawk": {
-      "endpoint": "http://chicken-hawk:8001",
-      "protocol": "gRPC",
+      "endpoint": "http://chickenhawk-core:4001",
+      "protocol": "REST + SSE",
       "auth": "mTLS + Service Identity"
     },
     "live_ops_theater": {

@@ -19,8 +19,8 @@ export class GeminiDeepResearch {
   private model;
 
   constructor() {
-    this.model = genAI.getGenerativeModel({ 
-      model: "gemini-2.0-flash-exp" // Will upgrade to deep-research-pro-preview when available
+    this.model = genAI.getGenerativeModel({
+      model: process.env.GEMINI_MODEL || "gemini-3.0-flash"
     });
   }
 

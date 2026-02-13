@@ -40,6 +40,7 @@ export const MODELS = {
   'gpt-4.1-mini': 'openai/gpt-4.1-mini',
 
   // ── Gemini (Google) ────────────────────────────────────────
+  'gemini-3.0-flash': 'google/gemini-3.0-flash',
   'gemini-3-pro': 'google/gemini-3-pro-preview',
   'gemini-2.5-flash': 'google/gemini-2.5-flash-preview',
   'gemini-2.5-pro': 'google/gemini-2.5-pro-preview',
@@ -64,11 +65,11 @@ export type ModelId = keyof typeof MODELS;
 // ─────────────────────────────────────────────────────────────
 
 export const MODEL_FOR_USE_CASE = {
-  // Default conversational
-  default: MODELS['claude-sonnet-4.5'],
+  // Default conversational — Gemini 3 primary
+  default: MODELS['gemini-3.0-flash'],
 
   // Fast responses
-  fast: MODELS['gemini-2.5-flash'],
+  fast: MODELS['gemini-3.0-flash'],
 
   // Vision / Image Analysis
   vision: MODELS['claude-opus-4.6'],
