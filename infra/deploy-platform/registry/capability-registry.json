@@ -11,7 +11,7 @@
     "default": "Chicken Hawk",
     "backends": {
       "Chicken Hawk": {
-        "description": "Chicken_Hawk execution engine - spawns Lil_Hawks via Squads",
+        "description": "Chicken Hawk execution engine - spawns Lil_Hawks via Squads",
         "type": "native",
         "worker_type": "Lil_Hawk"
       },

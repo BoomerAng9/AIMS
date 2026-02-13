@@ -5,7 +5,7 @@
  * Deploy Dock — Build → Assign → Launch
  *
  * The deployment center where ACHEEVY turns plans into running outcomes.
- * Users interact ONLY with ACHEEVY; downstream agents (Boomer_Angs, Chicken_Hawk, Lil_Hawks)
+ * Users interact ONLY with ACHEEVY; downstream agents (Boomer_Angs, Chicken Hawk, Lil_Hawks)
  * are invoked via deterministic job packets and emit proof-linked events only.
  *
  * tool_id: deploy_dock
@@ -66,7 +66,7 @@ interface DeploymentEvent {
     label: string;
     value: string;
   };
-  agent?: "ACHEEVY" | "Boomer_Ang" | "Chicken_Hawk" | "Lil_Hawk";
+  agent?: "ACHEEVY" | "Boomer_Ang" | "Chicken Hawk" | "Lil_Hawk";
 }
 
 interface AgentRoster {
@@ -135,7 +135,7 @@ const pulseGlow = {
 const MOCK_ROSTER: AgentRoster[] = [
   { id: "ba-1", name: "Code_Ang", role: "Lead Engineer", type: "boomer_ang", status: "idle", capabilities: ["code-gen", "review", "deploy"], image: "/images/angs/code-ang.png" },
   { id: "ba-2", name: "Quality_Ang", role: "QA Lead", type: "boomer_ang", status: "idle", capabilities: ["test", "audit", "validate"], image: "/images/angs/quality-ang.png" },
-  { id: "ch-1", name: "Chicken_Hawk", role: "Execution Supervisor", type: "chicken_hawk", status: "idle", capabilities: ["orchestrate", "gate", "dispatch"] },
+  { id: "ch-1", name: "Chicken Hawk", role: "Execution Supervisor", type: "chicken_hawk", status: "idle", capabilities: ["orchestrate", "gate", "dispatch"] },
   { id: "lh-1", name: "Build_Hawk", role: "Build Runner", type: "lil_hawk", status: "idle", capabilities: ["compile", "bundle", "artifact"] },
   { id: "lh-2", name: "Deploy_Hawk", role: "Deploy Runner", type: "lil_hawk", status: "idle", capabilities: ["container", "publish", "verify"] },
 ];
@@ -324,7 +324,7 @@ function AcheevyPanel() {
     setTimeout(() => {
       const responses: Record<AcheevyMode, string> = {
         recommend: `Based on your request, I recommend a 3-stage deployment:\n\n1. **Hatch** - Assemble Code_Ang and Quality_Ang\n2. **Assign** - Bind to n8n workflow #auth-deploy-v2\n3. **Launch** - Execute with rollback gates\n\nEstimated LUC cost: 150 tokens. Shall I proceed?`,
-        explain: `The deployment process follows the ACHEEVY delegation model:\n\n• I handle all user communication\n• Boomer_Angs supervise specialized work\n• Chicken_Hawk converts plans to job packets\n• Lil_Hawks execute bounded tasks with proofs\n\nEach step produces verifiable artifacts.`,
+        explain: `The deployment process follows the ACHEEVY delegation model:\n\n• I handle all user communication\n• Boomer_Angs supervise specialized work\n• Chicken Hawk converts plans to job packets\n• Lil_Hawks execute bounded tasks with proofs\n\nEach step produces verifiable artifacts.`,
         execute: `Initiating deployment sequence...\n\n✓ Job packet created: JP-2026-0210-AUTH\n✓ Gates configured: pre-deploy, health-check, rollback\n✓ LUC budget locked: 150 tokens\n\nAwaiting your approval to proceed to Hatch stage.`,
         prove: `Evidence bundle for current deployment:\n\n• Plan Manifest: sha256:a8f3e2...\n• Quote Document: QT-2026-0210\n• Agent Roster: 5 agents assigned\n• Gate Config: 3 approval gates\n\nAll artifacts are cryptographically signed.`,
       };
@@ -611,7 +611,7 @@ export default function DeployDockPage() {
       stage: "launch",
       title: "Launch Sequence Initiated",
       description: "Deployment pipeline started",
-      agent: "Chicken_Hawk",
+      agent: "Chicken Hawk",
     });
     // Simulate completion
     setTimeout(() => setDeploymentStage("done"), 5000);

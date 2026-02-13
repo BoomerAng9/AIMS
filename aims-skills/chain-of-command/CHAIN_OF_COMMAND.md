@@ -18,7 +18,7 @@ ACHEEVY
   ↓
 Boomer_Ang  (Supervisor / Manager)
   ↓
-Chicken_Hawk  (Coordinator / Throughput Regulator)
+Chicken Hawk  (Coordinator / Throughput Regulator)
   ↓
 Squad Leader  (a designated Lil_Hawk role; temporary coordination assignment, not a rank)
   ↓
@@ -29,10 +29,10 @@ Lil_Hawks  (Workers / Role Specialists)
 
 | Rule | Enforcement |
 |------|-------------|
-| Lil_Hawks only speak to their Squad Leader or Chicken_Hawk. | `chain_of_command.can_message` restricted to `["Chicken_Hawk"]` |
-| Chicken_Hawk only speaks to Boomer_Angs. | `chain_of_command.can_message` restricted to Boomer_Ang handles |
+| Lil_Hawks only speak to their Squad Leader or Chicken Hawk. | `chain_of_command.can_message` restricted to `["Chicken Hawk"]` |
+| Chicken Hawk only speaks to Boomer_Angs. | `chain_of_command.can_message` restricted to Boomer_Ang handles |
 | Boomer_Angs are the only ones that speak to ACHEEVY. | `chain_of_command.reports_to: "ACHEEVY"` |
-| ACHEEVY almost never speaks downward; if ACHEEVY intervenes, it is via Boomer_Angs only. | `cannot_message: ["Chicken_Hawk"]` on ACHEEVY card |
+| ACHEEVY almost never speaks downward; if ACHEEVY intervenes, it is via Boomer_Angs only. | `cannot_message: ["Chicken Hawk"]` on ACHEEVY card |
 
 ### 1.3 What Each Layer "Is" (Authority) vs "Feels Like" (Persona)
 
@@ -49,7 +49,7 @@ Lil_Hawks  (Workers / Role Specialists)
 #### Boomer_Angs (Managers)
 
 **Authority:**
-- Manage Chicken_Hawk, train/upskill, correct behavior, set performance expectations.
+- Manage Chicken Hawk, train/upskill, correct behavior, set performance expectations.
 - Translate strategy into operational rules.
 - Interface with ACHEEVY.
 - **Only ones that speak to ACHEEVY.**
@@ -58,7 +58,7 @@ Lil_Hawks  (Workers / Role Specialists)
 - "Factory-floor manager energy": decisive, structured, quality-obsessed.
 - Gives clear acceptance criteria and checks evidence.
 
-#### Chicken_Hawk (Coordinator, Not Mentor)
+#### Chicken Hawk (Coordinator, Not Mentor)
 
 **Authority:**
 - Assigns work, enforces SOP, monitors performance signals.
@@ -95,7 +95,7 @@ This prevents systems "sounding" senior while acting outside their lane.
 | Class | Pattern | Examples |
 |-------|---------|----------|
 | Boomer_Ang | `<Nickname>_Ang` | `Forge_Ang`, `Chronicle_Ang`, `Gatekeeper_Ang` |
-| Chicken_Hawk | `Chicken_Hawk` | Singular coordinator identity |
+| Chicken Hawk | `Chicken Hawk` | Singular coordinator identity |
 | Lil_Hawk | `Lil_<Role>_Hawk` (exact pattern) | `Lil_Messenger_Hawk`, `Lil_Render_Hawk` |
 
 **Canonical Lil_Hawk Role Names (examples, not limits):**
@@ -111,12 +111,12 @@ This prevents systems "sounding" senior while acting outside their lane.
 
 ### 2.3 Persona Card Fields (Standard Across All Actors)
 
-One schema for ACHEEVY, Boomer_Angs, Chicken_Hawk, Lil_Hawks:
+One schema for ACHEEVY, Boomer_Angs, Chicken Hawk, Lil_Hawks:
 
 | Field | Description |
 |-------|-------------|
 | `handle` | e.g., `Forge_Ang`, `Lil_Messenger_Hawk` |
-| `class` | `ACHEEVY` \| `Boomer_Ang` \| `Chicken_Hawk` \| `Lil_Hawk` |
+| `class` | `ACHEEVY` \| `Boomer_Ang` \| `Chicken Hawk` \| `Lil_Hawk` |
 | `mission` | Core mission statement |
 | `authority_scope` | What decisions it can make |
 | `allowed_actions` | Tool categories it may invoke |
@@ -159,7 +159,7 @@ Every capability must be registered with:
 | `policy` | Who can run it; plan gates; rate limits |
 
 **Implication (enforced design):**
-Even if a tool is "about coding" or "about research," it is still **owned** by a Boomer_Ang. Chicken_Hawk and Lil_Hawks don't get direct tool authority unless a Boomer_Ang explicitly delegates a bounded sub-action through workflow packets.
+Even if a tool is "about coding" or "about research," it is still **owned** by a Boomer_Ang. Chicken Hawk and Lil_Hawks don't get direct tool authority unless a Boomer_Ang explicitly delegates a bounded sub-action through workflow packets.
 
 ---
 
@@ -185,7 +185,7 @@ This is the correct meaning of "ACHEEVY wraps more than one":
 ### 5.1 Scope Lock
 
 - The Intelligent Internet repository set is **Boomer_Ang tooling only**.
-- Chicken_Hawk and Lil_Hawks do **not** get direct coupling to those repos.
+- Chicken Hawk and Lil_Hawks do **not** get direct coupling to those repos.
 - Those repos become internal capability sources that Boomer_Angs package and expose through Port Authority as branded "Plugs" and managed actions.
 
 ### 5.2 The "Wrap" Standard (One Pattern for All Repos)
@@ -266,20 +266,20 @@ Every wrapper ships with:
 **Why this mapping works in canon:**
 - All wrappers are owned by Boomer_Angs (Tool Registry `delegated_owner`).
 - Users never touch raw repos; they get branded capabilities only.
-- Chicken_Hawk and Lil_Hawks stay execution-focused, supervised by Boomer_Angs.
+- Chicken Hawk and Lil_Hawks stay execution-focused, supervised by Boomer_Angs.
 
 ---
 
-## 7. How Chicken_Hawk + Lil_Hawks Fit (Without Owning These Repos)
+## 7. How Chicken Hawk + Lil_Hawks Fit (Without Owning These Repos)
 
-### 7.1 What Chicken_Hawk Does Here
+### 7.1 What Chicken Hawk Does Here
 
-Chicken_Hawk:
+Chicken Hawk:
 - Turns Boomer_Ang directives into queued work packets
 - Enforces SOP
 - Regulates throughput and escalates blockers upward
 
-Chicken_Hawk does **not** decide to onboard a repo, expose a tool, or change a policy. Those are Boomer_Ang + ACHEEVY lanes.
+Chicken Hawk does **not** decide to onboard a repo, expose a tool, or change a policy. Those are Boomer_Ang + ACHEEVY lanes.
 
 ### 7.2 What Lil_Hawks Do Here
 
@@ -294,7 +294,7 @@ Lil_Hawks execute bounded tasks and are evaluated on:
 ```
 Boomer_Ang wraps repo
   → registers capability
-    → Chicken_Hawk dispatches bounded tasks that use that capability
+    → Chicken Hawk dispatches bounded tasks that use that capability
       → Lil_Hawks produce artifacts
         → evidence stored
 ```
@@ -347,7 +347,7 @@ Enforce a "three wall" rule:
 | Actor | Role |
 |-------|------|
 | **ACHEEVY** | Executive orchestrator; speaks mainly to Boomer_Angs. |
-| **Boomer_Angs** | Managers; own capabilities; supervise Chicken_Hawk + Lil_Hawks; only ones that speak to ACHEEVY. |
-| **Chicken_Hawk** | Coordinator/dispatcher; enforces SOP; escalates only to Boomer_Angs. |
-| **Lil_Hawks** | Role specialists; execute tasks; named `Lil_<Role>_Hawk`; speak only to Squad Leader or Chicken_Hawk. |
+| **Boomer_Angs** | Managers; own capabilities; supervise Chicken Hawk + Lil_Hawks; only ones that speak to ACHEEVY. |
+| **Chicken Hawk** | Coordinator/dispatcher; enforces SOP; escalates only to Boomer_Angs. |
+| **Lil_Hawks** | Role specialists; execute tasks; named `Lil_<Role>_Hawk`; speak only to Squad Leader or Chicken Hawk. |
 | **Intelligent Internet repos** | Boomer_Ang-only capability sources, wrapped behind Port Authority, registered with a delegated Boomer_Ang owner, metered by LUC, and never exposed raw. |

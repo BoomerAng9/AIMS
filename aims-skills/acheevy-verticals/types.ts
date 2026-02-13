@@ -89,7 +89,7 @@ export interface ExecutionBlueprint {
   /**
    * LLM meta-prompt with {placeholders} filled from collected Phase A data.
    * Instructs the LLM to generate step descriptions containing
-   * STEP_AGENT_MAP keywords so Chicken_Hawk can route them.
+   * STEP_AGENT_MAP keywords so Chicken Hawk can route them.
    */
   step_generation_prompt: string;
 

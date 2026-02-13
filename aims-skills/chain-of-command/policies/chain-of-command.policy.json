@@ -9,20 +9,20 @@
   },
   "delegation_chain": {
     "description": "The ONLY allowed command path (downward) and reporting path (upward).",
-    "hierarchy": ["ACHEEVY", "Boomer_Ang", "Chicken_Hawk", "Squad_Leader", "Lil_Hawk"],
+    "hierarchy": ["ACHEEVY", "Boomer_Ang", "Chicken Hawk", "Squad_Leader", "Lil_Hawk"],
     "squad_leader_rule": "A designated Lil_Hawk role; temporary coordination assignment, not a rank."
   },
   "chain_bypass_prevention": {
-    "lil_hawk_can_message": ["Chicken_Hawk", "Squad_Leader"],
-    "squad_leader_can_message": ["Chicken_Hawk"],
+    "lil_hawk_can_message": ["Chicken Hawk", "Squad_Leader"],
+    "squad_leader_can_message": ["Chicken Hawk"],
     "chicken_hawk_can_message": ["Boomer_Ang"],
     "boomer_ang_can_message": ["ACHEEVY"],
     "acheevy_speaks_downward_via": "Boomer_Ang",
     "deny_rules": [
       { "from_role": "Lil_Hawk", "to_handle": "ACHEEVY", "action": "MESSAGE", "result": "DENY" },
       { "from_role": "Lil_Hawk", "to_handle": "Boomer_Ang", "action": "MESSAGE", "result": "DENY" },
-      { "from_role": "Chicken_Hawk", "to_handle": "ACHEEVY", "action": "MESSAGE", "result": "DENY" },
-      { "from_role": "Chicken_Hawk", "to_handle": "USER", "action": "MESSAGE", "result": "DENY" },
+      { "from_role": "Chicken Hawk", "to_handle": "ACHEEVY", "action": "MESSAGE", "result": "DENY" },
+      { "from_role": "Chicken Hawk", "to_handle": "USER", "action": "MESSAGE", "result": "DENY" },
       { "from_role": "Boomer_Ang", "to_handle": "USER", "action": "MESSAGE", "result": "DENY" },
       { "from_role": "Lil_Hawk", "to_handle": "USER", "action": "MESSAGE", "result": "DENY" }
     ]
@@ -32,7 +32,7 @@
     "enforcement": "A persona cannot grant permissions. Bench level and role_type govern what an actor can do."
   },
   "tool_ownership_rule": {
-    "rule": "Every tool is owned by a delegated Boomer_Ang. Chicken_Hawk and Lil_Hawks do not get direct tool authority unless a Boomer_Ang explicitly delegates a bounded sub-action through workflow packets.",
+    "rule": "Every tool is owned by a delegated Boomer_Ang. Chicken Hawk and Lil_Hawks do not get direct tool authority unless a Boomer_Ang explicitly delegates a bounded sub-action through workflow packets.",
     "registry": "tool-registry-contract.json"
   },
   "no_proof_no_done": {

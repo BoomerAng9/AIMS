@@ -75,7 +75,7 @@
 | **Boomer_Ang Role** | **Code_Ang** — handles code generation, review, and refactoring tasks |
 | **Docker Complexity** | MEDIUM — Rust binary, needs sandbox |
 | **Port** | `3013` |
-| **Note** | Complements existing KiloCode/Chicken_Hawk execution agents |
+| **Note** | Complements existing KiloCode/Chicken Hawk execution agents |
 
 ### 6. `ii-zenith-action` → **CI/CD_Ang** 🚀
 | Field | Detail |

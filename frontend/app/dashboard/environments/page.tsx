@@ -133,7 +133,7 @@ const RECENT_DEPLOYMENTS: Deployment[] = [
     environment: "Production",
     timestamp: "2026-02-05T10:00:00Z",
     status: "success",
-    author: "Chicken_Hawk",
+    author: "Chicken Hawk",
     message: "Release v0.1.0 — initial production deploy",
   },
   {

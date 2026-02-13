@@ -6,9 +6,9 @@
 
   "comms_chain": {
     "description": "Enforced communication hierarchy",
-    "chain": "Lil_Hawks → Chicken_Hawk → ACHEEVY → User",
+    "chain": "Lil_Hawks → Chicken Hawk → ACHEEVY → User",
     "rules": [
-      "Users never message Lil_Hawks or Chicken_Hawk directly",
+      "Users never message Lil_Hawks or Chicken Hawk directly",
       "Users only WATCH in Live Ops Theater (read-only)",
       "All user interaction goes through ACHEEVY"
     ]

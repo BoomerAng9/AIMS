@@ -5,7 +5,7 @@
  *
  * This is the primary bridge for ACHEEVY → n8n PMO pipeline routing.
  * The frontend classifies a user message, then forwards the directive
- * to n8n for Chicken_Hawk dispatch and Lil_Hawk execution.
+ * to n8n for Chicken Hawk dispatch and Lil_Hawk execution.
  */
 
 import { NextResponse } from 'next/server';

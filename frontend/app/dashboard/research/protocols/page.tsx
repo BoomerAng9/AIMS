@@ -32,7 +32,7 @@ const protocols = [
       "A.I.M.S. native protocol. Standardized request/response format for agent-to-agent communication within the AIMS ecosystem.",
     status: "Active" as const,
     statusColor: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
-    agents: ["ACHEEVY", "Boomer_Angs", "Chicken_Hawks"],
+    agents: ["ACHEEVY", "Boomer_Angs", "Chicken Hawks"],
     features: [
       "Typed request/response envelopes",
       "Built-in retry & circuit-breaking",

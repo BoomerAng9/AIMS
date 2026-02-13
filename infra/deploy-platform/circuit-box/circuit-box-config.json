@@ -5,7 +5,7 @@
   "description": "Central integration hub connecting ACHEEVY to the Deploy Platform",
 
   "architecture": {
-    "diagram": "User → ACHEEVY → Circuit Box → Boomer_Ang → Chicken_Hawk → Squad → Lil_Hawks",
+    "diagram": "User → ACHEEVY → Circuit Box → Boomer_Ang → Chicken Hawk → Squad → Lil_Hawks",
     "layers": {
       "user_layer": {
         "description": "User interface and interaction",
@@ -23,8 +23,8 @@
         "protocols": ["Internal RPC"]
       },
       "execution_layer": {
-        "description": "Chicken_Hawk execution engine",
-        "components": ["Chicken_Hawk", "Squad Manager", "Lil_Hawk Pool"],
+        "description": "Chicken Hawk execution engine",
+        "components": ["Chicken Hawk", "Squad Manager", "Lil_Hawk Pool"],
         "protocols": ["Internal RPC", "Event Stream"]
       },
       "audit_layer": {
@@ -41,63 +41,63 @@
       {
         "tool": "deploy_it",
         "validation": ["dsp_gate_check", "oei_check", "quota_check"],
-        "dispatch_to": "Chicken_Hawk",
-        "response_path": "Chicken_Hawk → Circuit Box → ACHEEVY → User"
+        "dispatch_to": "Chicken Hawk",
+        "response_path": "Chicken Hawk → Circuit Box → ACHEEVY → User"
       },
       {
         "tool": "guide_me",
         "validation": ["uncertainty_check", "security_packet_check"],
-        "dispatch_to": "Chicken_Hawk",
+        "dispatch_to": "Chicken Hawk",
         "requires_approval": true,
-        "response_path": "Chicken_Hawk → Circuit Box → ACHEEVY (approval) → User → ACHEEVY → Chicken_Hawk"
+        "response_path": "Chicken Hawk → Circuit Box → ACHEEVY (approval) → User → ACHEEVY → Chicken Hawk"
       },
       {
         "tool": "spawn_shift",
         "validation": ["dsp_active", "squad_limits", "certification_check"],
-        "dispatch_to": "Chicken_Hawk",
-        "response_path": "Chicken_Hawk → Circuit Box → ACHEEVY"
+        "dispatch_to": "Chicken Hawk",
+        "response_path": "Chicken Hawk → Circuit Box → ACHEEVY"
       },
       {
         "tool": "execute_wave",
         "validation": ["shift_active", "wave_sequence", "lil_hawk_availability"],
-        "dispatch_to": "Chicken_Hawk",
+        "dispatch_to": "Chicken Hawk",
         "streaming": true,
-        "response_path": "Chicken_Hawk → Live Ops Theater (events) + Circuit Box → ACHEEVY"
+        "response_path": "Chicken Hawk → Live Ops Theater (events) + Circuit Box → ACHEEVY"
       },
       {
         "tool": "verify_shift",
         "validation": ["shift_exists", "execution_complete"],
-        "dispatch_to": "Chicken_Hawk",
-        "response_path": "Chicken_Hawk → Circuit Box → ACHEEVY"
+        "dispatch_to": "Chicken Hawk",
+        "response_path": "Chicken Hawk → Circuit Box → ACHEEVY"
       },
       {
         "tool": "seal_receipt",
         "validation": ["verification_passed", "no_active_incidents"],
-        "dispatch_to": "Chicken_Hawk",
-        "response_path": "Chicken_Hawk → Circuit Box → ACHEEVY → User"
+        "dispatch_to": "Chicken Hawk",
+        "response_path": "Chicken Hawk → Circuit Box → ACHEEVY → User"
       },
       {
         "tool": "get_shift_status",
         "validation": ["shift_exists"],
-        "dispatch_to": "Chicken_Hawk",
-        "response_path": "Chicken_Hawk → Circuit Box → ACHEEVY"
+        "dispatch_to": "Chicken Hawk",
+        "response_path": "Chicken Hawk → Circuit Box → ACHEEVY"
       },
       {
         "tool": "trigger_rollback",
         "validation": ["shift_exists", "user_confirmation"],
-        "dispatch_to": "Chicken_Hawk",
+        "dispatch_to": "Chicken Hawk",
         "requires_confirmation": true,
         "audit_required": true,
-        "response_path": "Chicken_Hawk → Circuit Box → ACHEEVY → User"
+        "response_path": "Chicken Hawk → Circuit Box → ACHEEVY → User"
       },
       {
         "tool": "emergency_kill_switch",
         "validation": ["shift_exists", "user_confirmation"],
-        "dispatch_to": "Chicken_Hawk",
+        "dispatch_to": "Chicken Hawk",
         "requires_confirmation": true,
         "audit_required": true,
         "priority": "critical",
-        "response_path": "Chicken_Hawk → Circuit Box → ACHEEVY → User"
+        "response_path": "Chicken Hawk → Circuit Box → ACHEEVY → User"
       }
     ]
   },
@@ -135,7 +135,7 @@
 
   "event_streaming": {
     "description": "Real-time event flow for Live Ops Theater",
-    "source": "Chicken_Hawk",
+    "source": "Chicken Hawk",
     "transform": "Circuit Box (redaction + sanitization)",
     "destination": "Live Ops Theater WebSocket",
     "protocol": "Server-Sent Events / WebSocket",

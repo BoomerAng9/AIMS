@@ -667,7 +667,7 @@ export default function PricingPage() {
 
           <p className="mt-4 text-[10px] text-white/20 text-center max-w-2xl mx-auto">
             All White Label plans include dedicated infrastructure, custom branding, and full access to the A.I.M.S.
-            agent ecosystem — ACHEEVY, Boomer_Angs, Chicken_Hawk, and Lil_Hawk squads.
+            agent ecosystem — ACHEEVY, Boomer_Angs, Chicken Hawk, and Lil_Hawk squads.
             Volume discounts available for multi-instance deployments.
           </p>
         </section>

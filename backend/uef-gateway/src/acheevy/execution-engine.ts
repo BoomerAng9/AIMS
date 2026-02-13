@@ -13,7 +13,7 @@
  *   3. ORACLE 8-gate verification
  *   4. PREP_SQUAD_ALPHA governance gate
  *   5. LUC metering + triple audit ledger
- *   6. Boomer_Ang directors → Chicken_Hawk (executor) + Lil_Hawks → artifacts
+ *   6. Boomer_Ang directors → Chicken Hawk (executor) + Lil_Hawks → artifacts
  *   7. Bench scoring for ALL agents
  *   8. ByteRover stores successful execution for future RAG
  *   9. HR PMO evaluates team performance

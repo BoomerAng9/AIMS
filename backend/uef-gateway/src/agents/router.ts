@@ -3,7 +3,7 @@
  *
  * Maps ACP intents to the right agent (or agent team) and runs the task.
  *
- * Routing strategy (Boomer_Angs direct, Chicken_Hawk + Lil_Hawks execute):
+ * Routing strategy (Boomer_Angs direct, Chicken Hawk + Lil_Hawks execute):
  *   CHAT             → Marketer_Ang (director) + Test_Ang/Quality_Ang (verify)
  *   BUILD_PLUG       → Code_Ang/Engineer_Ang (director) + Chicken Hawk (executor) + Test_Ang/Quality_Ang (verify)
  *   RESEARCH         → Research_Ang/Analyst_Ang (director) + Test_Ang/Quality_Ang (verify)
@@ -60,7 +60,7 @@ export async function routeToAgents(
     }
 
     case 'BUILD_PLUG': {
-      // Build: Chicken_Hawk orchestrates the full pipeline
+      // Build: Chicken Hawk orchestrates the full pipeline
       logger.info({ reqId }, '[Router] BUILD_PLUG → Chicken Hawk pipeline');
       const hawk = registry.get('chicken-hawk');
       if (hawk) {
@@ -102,7 +102,7 @@ export async function routeToAgents(
     }
 
     case 'AGENTIC_WORKFLOW': {
-      // Full workflow: Chicken_Hawk runs entire multi-agent pipeline
+      // Full workflow: Chicken Hawk runs entire multi-agent pipeline
       logger.info({ reqId }, '[Router] AGENTIC_WORKFLOW → Chicken Hawk multi-agent pipeline');
       const hawk = registry.get('chicken-hawk');
       if (hawk) {
@@ -118,7 +118,7 @@ export async function routeToAgents(
   }
 
   // Bench scoring: ALL team members are scored after execution
-  // Efficiency tracking applies to Boomer_Angs, Chicken_Hawk, and Lil_Hawks alike
+  // Efficiency tracking applies to Boomer_Angs, Chicken Hawk, and Lil_Hawks alike
   for (const output of outputs) {
     try {
       await scoreAndAudit(

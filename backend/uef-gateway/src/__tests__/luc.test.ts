@@ -33,7 +33,7 @@ describe('LUCEngine', () => {
         expect(variant.estimate.breakdown).toHaveLength(3);
         const names = variant.estimate.breakdown.map(b => b.componentName);
         expect(names).toContain('Planning (AVVA NOON)');
-        expect(names).toContain('Execution (Chicken_Hawk)');
+        expect(names).toContain('Execution (Chicken Hawk)');
         expect(names).toContain('Verification (ORACLE)');
       }
     });

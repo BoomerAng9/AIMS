@@ -51,7 +51,7 @@ export class LUCEngine {
           model: model,
         },
         {
-          componentName: 'Execution (Chicken_Hawk)',
+          componentName: 'Execution (Chicken Hawk)',
           tokens: complexityBase * 2.0 * taskMult,
           usd: (complexityBase * 2.0 * taskMult / 1000) * costPer1k,
           model: model,

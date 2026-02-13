@@ -80,7 +80,7 @@ describe('OpenRouter LLM Module', () => {
       }
     });
 
-    it('prompts reference Boomer_Ang identity (except Chicken_Hawk)', () => {
+    it('prompts reference Boomer_Ang identity (except Chicken Hawk)', () => {
       expect(AGENT_SYSTEM_PROMPTS['engineer-ang']).toContain('Boomer_Ang');
       expect(AGENT_SYSTEM_PROMPTS['marketer-ang']).toContain('Boomer_Ang');
       expect(AGENT_SYSTEM_PROMPTS['analyst-ang']).toContain('Boomer_Ang');

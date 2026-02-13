@@ -408,7 +408,7 @@ services:
 
   # ---------------------------------------------------------------------------
   # n8n — Workflow Automation (Boomer_Ang Build Layer)
-  # Factory floor for Chicken_Hawk and Lil_Hawk workflow execution
+  # Factory floor for Chicken Hawk and Lil_Hawk workflow execution
   # ---------------------------------------------------------------------------
   n8n:
     image: n8nio/n8n:latest

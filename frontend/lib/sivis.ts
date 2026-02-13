@@ -19,7 +19,7 @@
  *   QA: ORACLE 7-Gate verification + NTNTN Red Team Six-Sigma
  *   PMO: Boomer_Ang C-Suite (CTO/CFO/COO/CMO/CDO/CPO) + Departmental Agents
  *   Pricing: 3-6-9 Token Model + White Label + ByteRover Optimization
- *   Execution: Chicken_Hawk pipelines + Lil_Hawk squads (PREP/WORKFLOW/VISION)
+ *   Execution: Chicken Hawk pipelines + Lil_Hawk squads (PREP/WORKFLOW/VISION)
  *
  * Within SmelterOS, SIVIS acts as the visionary overseer. It ensures
  * the forge continuously evolves, embedding transparency, ethics, and
@@ -398,7 +398,7 @@ export const SYSTEM_MAP = {
     pmo: {
       cSuite: ['Boomer_CTO', 'Boomer_CFO', 'Boomer_COO', 'Boomer_CMO', 'Boomer_CDO', 'Boomer_CPO'],
       departmental: ['DevOps Agent', 'Value Agent', 'Flow Boss Agent', 'Social Campaign Agent', 'Video Editing Agent', 'Social Agent'],
-      execution: ['Engineer_Ang', 'Marketer_Ang', 'Analyst_Ang', 'Quality_Ang', 'Chicken_Hawk'],
+      execution: ['Engineer_Ang', 'Marketer_Ang', 'Analyst_Ang', 'Quality_Ang', 'Chicken Hawk'],
       squads: ['PREP_SQUAD_ALPHA', 'WORKFLOW_SMITH_SQUAD', 'VISION_SCOUT_SQUAD'],
     },
     qa: {

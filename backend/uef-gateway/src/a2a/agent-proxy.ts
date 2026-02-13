@@ -3,7 +3,7 @@
  *
  * When a containerized agent is registered (e.g., research-ang on :3020),
  * this proxy creates an Agent object that the existing registry, router,
- * and Chicken_Hawk can call as if it were in-process.
+ * and Chicken Hawk can call as if it were in-process.
  *
  * The proxy:
  *   1. Converts AgentTaskInput → A2ATaskSendRequest
@@ -12,7 +12,7 @@
  *   4. Converts the A2A response → AgentTaskOutput
  *
  * This means the in-process agents and containerized agents are
- * interchangeable from the perspective of the router and Chicken_Hawk.
+ * interchangeable from the perspective of the router and Chicken Hawk.
  */
 
 import logger from '../logger';

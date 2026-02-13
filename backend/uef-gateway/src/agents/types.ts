@@ -1,5 +1,5 @@
 /**
- * Agent Registry — Boomer_Ang Team + Chicken_Hawk Bot
+ * Agent Registry — Boomer_Ang Team + Chicken Hawk Bot
  *
  * Every agent is an in-process worker that fulfills ACP task contracts.
  * When external containers come online they'll implement the same interface

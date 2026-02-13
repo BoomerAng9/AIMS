@@ -3,12 +3,12 @@
  *
  * Classifies incoming requests and routes them to the correct PMO office.
  * Each Boomer_Ang director validates scope and produces an execution directive
- * for Chicken_Hawk.
+ * for Chicken Hawk.
  *
  * The forge resolves a REAL Boomer_Ang from infra/boomerangs/registry.json
  * and layers on persona + skill tier metadata.
  *
- * Chain: User → ACHEEVY → Boomer_Ang → Chicken_Hawk
+ * Chain: User → ACHEEVY → Boomer_Ang → Chicken Hawk
  *
  * Doctrine: "Activity breeds Activity — shipped beats perfect."
  */
@@ -414,14 +414,14 @@ export function createPipelinePacket(payload: N8nTriggerPayload): PmoPipelinePac
   const chain: ChainPosition = {
     step: 2,
     current: 'Boomer_Ang',
-    next: 'Chicken_Hawk',
-    path: ['User', 'ACHEEVY', profile.definition.name, 'Chicken_Hawk', 'Squad', 'Lil_Hawks', 'Receipt', 'ACHEEVY'],
+    next: 'Chicken Hawk',
+    path: ['User', 'ACHEEVY', profile.definition.name, 'Chicken Hawk', 'Squad', 'Lil_Hawks', 'Receipt', 'ACHEEVY'],
     startedAt: now,
   };
 
   logger.info(
     { requestId, userId: payload.userId, office: classification.pmoOffice, director: classification.director, angId: profile.definition.id },
-    '[PMO Router] Pipeline packet created — handing to Chicken_Hawk',
+    '[PMO Router] Pipeline packet created — handing to Chicken Hawk',
   );
 
   return {

@@ -21,7 +21,7 @@
  * "pending_provision" placeholder for services not yet deployed.
  *
  * Chain of Command:
- *   User → ACHEEVY → PMO Manager → Expert/Intermediate Ang → Chicken_Hawk → Lil_Hawks
+ *   User → ACHEEVY → PMO Manager → Expert/Intermediate Ang → Chicken Hawk → Lil_Hawks
  *
  * "Activity breeds Activity — shipped beats perfect."
  */

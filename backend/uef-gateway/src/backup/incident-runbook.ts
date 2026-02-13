@@ -57,7 +57,7 @@ const RUNBOOKS: Record<Severity, RunbookStep[]> = {
   P1: [
     {
       order: 1,
-      action: 'Alert on-call engineer and Chicken_Hawk coordinator immediately',
+      action: 'Alert on-call engineer and Chicken Hawk coordinator immediately',
       responsible: 'Monitoring System',
       escalation: 'Page CTO (Boomer_CTO) if no response in 5 minutes',
       automated: true,
@@ -65,7 +65,7 @@ const RUNBOOKS: Record<Severity, RunbookStep[]> = {
     {
       order: 2,
       action: 'Open incident bridge/war room channel',
-      responsible: 'Chicken_Hawk',
+      responsible: 'Chicken Hawk',
       escalation: 'Escalate to ACHEEVY if unresolved after 15 minutes',
       automated: false,
     },
@@ -103,7 +103,7 @@ const RUNBOOKS: Record<Severity, RunbookStep[]> = {
     {
       order: 8,
       action: 'Schedule post-mortem within 24 hours',
-      responsible: 'Chicken_Hawk',
+      responsible: 'Chicken Hawk',
       automated: false,
     },
   ],
@@ -150,7 +150,7 @@ const RUNBOOKS: Record<Severity, RunbookStep[]> = {
     {
       order: 7,
       action: 'Document incident and resolution in post-mortem',
-      responsible: 'Chicken_Hawk',
+      responsible: 'Chicken Hawk',
       automated: false,
     },
   ],
@@ -190,7 +190,7 @@ const RUNBOOKS: Record<Severity, RunbookStep[]> = {
     {
       order: 6,
       action: 'Update incident log with resolution details',
-      responsible: 'Chicken_Hawk',
+      responsible: 'Chicken Hawk',
       automated: false,
     },
   ],
@@ -205,7 +205,7 @@ const RUNBOOKS: Record<Severity, RunbookStep[]> = {
     {
       order: 2,
       action: 'Add to backlog for next sprint prioritization',
-      responsible: 'Chicken_Hawk',
+      responsible: 'Chicken Hawk',
       automated: false,
     },
     {

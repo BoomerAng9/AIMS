@@ -11,7 +11,7 @@
  * The step_generation_prompt is the key R-R-S mechanism:
  *   - Receives SPECIFIC user data collected during Phase A
  *   - Instructs LLM to generate step descriptions containing STEP_AGENT_MAP keywords
- *   - Keywords ensure Chicken_Hawk routes each step to the right Boomer_Ang
+ *   - Keywords ensure Chicken Hawk routes each step to the right Boomer_Ang
  *
  * STEP_AGENT_MAP keyword routing:
  *   scaffold/generate/implement → engineer-ang
@@ -460,7 +460,7 @@ Return ONLY a JSON array of step description strings.
     },
 
     revenue_signal: {
-      service: 'Plug Factory (Engineer_Ang + Chicken_Hawk deploy)',
+      service: 'Plug Factory (Engineer_Ang + Chicken Hawk deploy)',
       transition_prompt: 'Ready to build this? I can scaffold the entire project, generate the code, and deploy a staging environment right now.',
     },
   },
@@ -809,7 +809,7 @@ Return ONLY a JSON array of step description strings.
     },
 
     revenue_signal: {
-      service: 'Automation Factory (Chicken_Hawk + n8n integration)',
+      service: 'Automation Factory (Chicken Hawk + n8n integration)',
       transition_prompt: 'Ready to automate? I\'ll build the workflows, connect your tools, and deploy them — saving you hours every week.',
     },
   },

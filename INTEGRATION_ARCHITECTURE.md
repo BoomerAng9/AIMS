@@ -187,13 +187,13 @@
 │ 8. CHICKEN HAWK EXECUTION ENGINE                                     │
 │                                                                      │
 │    Role: The Builder / Executioner                                   │
-│    Identity: Chicken_Hawk                                            │
+│    Identity: Chicken Hawk                                            │
 │    Workers: Lil_Hawks (Distributed Bots)                             │
 │                                                                      │
 │    Architecture:                                                     │
-│      • Controller: Chicken_Hawk (Multi-Channel Interface)            │
+│      • Controller: Chicken Hawk (Multi-Channel Interface)            │
 │      • Gateway:    Port 18789 (WebSocket)                            │
-│      • Routing:    UEF Gateway → Chicken_Hawk (Bidirectional)        │
+│      • Routing:    UEF Gateway → Chicken Hawk (Bidirectional)        │
 │                                                                      │
 │    Capabilities:                                                     │
 │      • Multi-Channel Messaging (Discord, Slack, Telegram, WhatsApp)  │

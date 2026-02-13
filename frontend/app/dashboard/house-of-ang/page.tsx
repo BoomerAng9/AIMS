@@ -105,7 +105,7 @@ const EXECUTION_ROSTER: ExecutionAng[] = [
   },
   {
     id: "chicken-hawk",
-    name: "Chicken_Hawk",
+    name: "Chicken Hawk",
     role: "Coordinator / Enforcer",
     icon: Zap,
     status: "DEPLOYED",
@@ -245,8 +245,8 @@ export default function HouseOfAngPage() {
               ))}
             </div>
             <p className="mt-4 text-[10px] text-white/20 text-center max-w-lg mx-auto">
-              Lil_Hawks only speak to their Squad Leader or Chicken_Hawk.
-              Chicken_Hawks only speak to Boomer_Angs.
+              Lil_Hawks only speak to their Squad Leader or Chicken Hawk.
+              Chicken Hawks only speak to Boomer_Angs.
               Boomer_Angs are the only ones that speak to ACHEEVY.
               ACHEEVY rarely speaks downward — and only via Boomer_Angs.
             </p>
@@ -254,7 +254,7 @@ export default function HouseOfAngPage() {
         )}
       </section>
 
-      {/* ---- Chicken_Hawk + Lil_Hawk Evolution ---- */}
+      {/* ---- Chicken Hawk + Lil_Hawk Evolution ---- */}
       <section className="rounded-3xl border border-wireframe-stroke bg-black/60 p-6 backdrop-blur-2xl">
         <button
           onClick={() => setEvolutionOpen(!evolutionOpen)}
@@ -267,7 +267,7 @@ export default function HouseOfAngPage() {
                 Hawk Evolution &amp; Squads
               </h2>
               <p className="text-[0.65rem] text-white/30 uppercase tracking-wider">
-                Lil_Hawks evolve through discipline — Chicken_Hawk enforces order
+                Lil_Hawks evolve through discipline — Chicken Hawk enforces order
               </p>
             </div>
           </div>
@@ -276,26 +276,26 @@ export default function HouseOfAngPage() {
 
         {evolutionOpen && (
           <div className="mt-6 space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
-            {/* Chicken_Hawk */}
+            {/* Chicken Hawk */}
             <div className="flex flex-col md:flex-row gap-6 items-start">
               <div className="w-32 h-32 rounded-2xl border border-red-400/20 bg-black/40 overflow-hidden shrink-0 flex items-center justify-center">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={CHICKEN_HAWK_IMAGE}
-                  alt="Chicken_Hawk — Coordinator and Enforcer"
+                  alt="Chicken Hawk — Coordinator and Enforcer"
                   className="h-full w-full object-contain"
                 />
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
-                  <h3 className="text-sm font-bold text-red-400">Chicken_Hawk</h3>
+                  <h3 className="text-sm font-bold text-red-400">Chicken Hawk</h3>
                   <span className="rounded-full bg-red-400/10 border border-red-400/20 px-2 py-0.5 text-[8px] font-bold text-red-400 uppercase tracking-wider">
                     Coordinator
                   </span>
                 </div>
                 <p className="text-xs text-white/40 leading-relaxed">
                   Coordinators, disciplinarians, throughput regulators, and escalation points.
-                  Chicken_Hawks do <strong className="text-white/50">not</strong> mentor — they assign work, enforce SOP,
+                  Chicken Hawks do <strong className="text-white/50">not</strong> mentor — they assign work, enforce SOP,
                   monitor performance, and relay structured updates to Boomer_Angs.
                   They must themselves respond well to mentorship coming down from Boomer_Angs.
                 </p>
@@ -484,7 +484,7 @@ export default function HouseOfAngPage() {
           </h2>
         </div>
         <p className="text-[0.65rem] text-white/30 uppercase tracking-wider mb-4">
-          Task-level Boomer_Angs &amp; Chicken_Hawk — manage, train, coordinate, verify
+          Task-level Boomer_Angs &amp; Chicken Hawk — manage, train, coordinate, verify
         </p>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -571,8 +571,8 @@ export default function HouseOfAngPage() {
             <p className="text-xs text-white/30 leading-relaxed max-w-xl">
               Lil_Hawks are workers who prove themselves through discipline, teamwork, and responsiveness
               to guidance. They do not lead, teach, or mentor — they execute and adapt. Some earn the
-              right to coordinate as Squad Leaders, and a few rise to become Chicken_Hawks, whose role
-              is not to mentor but to enforce order and relay performance upward. Chicken_Hawks answer to
+              right to coordinate as Squad Leaders, and a few rise to become Chicken Hawks, whose role
+              is not to mentor but to enforce order and relay performance upward. Chicken Hawks answer to
               Boomer_Angs, who train, correct, and translate strategy from ACHEEVY. Growth in A.I.M.S.
               is earned through consistency, not power. Authority flows upward. Accountability flows
               downward. And Activity breeds Activity — only when discipline holds.

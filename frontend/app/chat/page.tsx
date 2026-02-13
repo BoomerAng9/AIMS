@@ -5,7 +5,7 @@
  *
  * Built with Vercel AI SDK (useChat) + n8n PMO pipeline visualization.
  * Streams AI responses via Google Gemini while showing real-time
- * Chain of Command routing (PMO Office → Boomer_Ang Director → Chicken_Hawk).
+ * Chain of Command routing (PMO Office → Boomer_Ang Director → Chicken Hawk).
  *
  * Features:
  * - Conversation threads sidebar (collapsible, localStorage persistence)
@@ -82,7 +82,7 @@ const BOOMER_ANGS = [
   { id: 'cmo', name: 'Boomer_CMO', office: 'marketing-office', color: 'pink' },
   { id: 'cdo', name: 'Boomer_CDO', office: 'design-office', color: 'orange' },
   { id: 'cpo', name: 'Boomer_CPO', office: 'publishing-office', color: 'cyan' },
-  { id: 'hawk', name: 'Chicken_Hawk', office: 'dispatch', color: 'red' },
+  { id: 'hawk', name: 'Chicken Hawk', office: 'dispatch', color: 'red' },
 ] as const;
 
 // Status chip labels (owner can toggle back to corporate in Circuit Box)

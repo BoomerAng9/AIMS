@@ -49,7 +49,7 @@
 │   ├── deploy-platform/           # Deploy Platform (NEW)
 │   │   ├── circuit-box/           # ACHEEVY tool calling
 │   │   │   ├── acheevy-tools.json       # Tool definitions
-│   │   │   ├── chicken-hawk-dispatch.json   # Chicken_Hawk API
+│   │   │   ├── chicken-hawk-dispatch.json   # Chicken Hawk API
 │   │   │   └── circuit-box-config.json      # Hub config
 │   │   ├── lore/                  # Workforce & standards
 │   │   │   ├── workforce-structure.json     # Career levels

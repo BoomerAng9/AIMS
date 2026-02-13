@@ -366,7 +366,7 @@ export const WHITE_LABEL_PLANS: WhiteLabelPlan[] = [
       'Everything in A.I.M.S. Managed',
       'ACHEEVY orchestrates all operations',
       'Boomer_Angs execute tasks autonomously',
-      'Chicken_Hawk pipelines run 24/7',
+      'Chicken Hawk pipelines run 24/7',
       'Lil_Hawks handle micro-tasks continuously',
       'Self-healing agent infrastructure',
       'Autonomous scaling based on demand',

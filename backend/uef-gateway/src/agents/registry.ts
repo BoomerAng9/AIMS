@@ -3,11 +3,11 @@
  *
  * Central lookup for all agents — in-process AND containerized.
  *
- * In-process agents (Boomer_Angs, Chicken_Hawk) are registered at startup.
+ * In-process agents (Boomer_Angs, Chicken Hawk) are registered at startup.
  * Container agents are discovered asynchronously via A2A and proxied through
  * agent-proxy.ts so they conform to the same Agent interface.
  *
- * The router and Chicken_Hawk don't care where an agent lives — they just
+ * The router and Chicken Hawk don't care where an agent lives — they just
  * call registry.get(id).execute(input) and it works.
  */
 

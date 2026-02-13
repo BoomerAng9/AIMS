@@ -11,7 +11,7 @@
  *   SIVIS (Meta-Governor) + The Union (Policy) + The Farmer (Security)
  *
  * DELEGATION CHAIN (hard rule, no shortcuts, no exceptions):
- *   Lil_Hawks → Squad Leader (designated Lil_Hawk) → Chicken_Hawk → Boomer_Ang → ACHEEVY
+ *   Lil_Hawks → Squad Leader (designated Lil_Hawk) → Chicken Hawk → Boomer_Ang → ACHEEVY
  *
  * Authority flows upward. Accountability flows downward.
  * Activity breeds Activity — only when discipline holds.
@@ -22,9 +22,9 @@
 // ---------------------------------------------------------------------------
 
 export const DELEGATION_CHAIN = [
-  { rank: 0, role: 'Lil_Hawk',      label: 'Worker',                speaks_to: 'Squad Leader or Chicken_Hawk' },
-  { rank: 1, role: 'Squad Leader',   label: 'Coordinator (temp)',    speaks_to: 'Chicken_Hawk' },
-  { rank: 2, role: 'Chicken_Hawk',   label: 'Executor / Enforcer',    speaks_to: 'Boomer_Ang (reports to)' },
+  { rank: 0, role: 'Lil_Hawk',      label: 'Worker',                speaks_to: 'Squad Leader or Chicken Hawk' },
+  { rank: 1, role: 'Squad Leader',   label: 'Coordinator (temp)',    speaks_to: 'Chicken Hawk' },
+  { rank: 2, role: 'Chicken Hawk',   label: 'Executor / Enforcer',    speaks_to: 'Boomer_Ang (reports to)' },
   { rank: 3, role: 'Boomer_Ang',     label: 'Director / Overseer',   speaks_to: 'ACHEEVY' },
   { rank: 4, role: 'ACHEEVY',        label: 'Executive Orchestrator', speaks_to: 'Boomer_Angs only (downward, rare)' },
 ] as const;
@@ -58,7 +58,7 @@ export const ROLE_DEFINITIONS: RoleDefinition[] = [
     responsibilities: [
       'Execute assigned tasks within squad',
       'Follow SOP and security protocols',
-      'Report blockers to Squad Leader or Chicken_Hawk',
+      'Report blockers to Squad Leader or Chicken Hawk',
       'Collaborate within squad boundaries',
     ],
     evaluated_on: [
@@ -83,7 +83,7 @@ export const ROLE_DEFINITIONS: RoleDefinition[] = [
       'Decision makers',
     ],
     responsibilities: [
-      'Relay instructions from Chicken_Hawk',
+      'Relay instructions from Chicken Hawk',
       'Keep squad synchronized',
       'Surface blockers upward',
       'Execute own tasks alongside coordination',
@@ -95,7 +95,7 @@ export const ROLE_DEFINITIONS: RoleDefinition[] = [
     ],
   },
   {
-    role: 'Chicken_Hawk',
+    role: 'Chicken Hawk',
     what_they_are: [
       'Coordinators',
       'Disciplinarians',
@@ -135,12 +135,12 @@ export const ROLE_DEFINITIONS: RoleDefinition[] = [
       'Individual task executors',
     ],
     responsibilities: [
-      'Manage Chicken_Hawks',
+      'Manage Chicken Hawks',
       'Train and upskill subordinates',
       'Correct behavior',
       'Set performance expectations',
       'Translate strategic intent into operational rules',
-      'Receive aggregated signals from Chicken_Hawks',
+      'Receive aggregated signals from Chicken Hawks',
       'Decide when escalation to ACHEEVY is required',
       'Interface with ACHEEVY',
     ],
@@ -225,11 +225,11 @@ export const EVOLUTION_STAGES: EvolutionStage[] = [
   },
   {
     id: 'evolved',
-    name: 'Chicken_Hawk Candidate',
+    name: 'Chicken Hawk Candidate',
     visual: 'Large muscular hawk with green energy aura',
     image: '/images/brand/hawks/lil-hawk-evolved.png',
     color: 'text-gold',
-    description: 'Ready for Chicken_Hawk status — proven long-term consistency.',
+    description: 'Ready for Chicken Hawk status — proven long-term consistency.',
     criteria: [
       'Long-term consistency proven',
       'Can coordinate without mentoring',
@@ -241,7 +241,7 @@ export const EVOLUTION_STAGES: EvolutionStage[] = [
   },
 ];
 
-// Chicken_Hawk image path
+// Chicken Hawk image path
 export const CHICKEN_HAWK_IMAGE = '/images/brand/hawks/chicken-hawk.png';
 
 // ---------------------------------------------------------------------------
@@ -277,13 +277,13 @@ export const PROMOTION_PATHS: PromotionPath[] = [
   },
   {
     from: 'Power Surge',
-    to: 'Chicken_Hawk Candidate',
+    to: 'Chicken Hawk Candidate',
     criteria: [
       'Sustained Power Surge across multiple evaluation periods',
       'No behavioral regressions during surge',
       'Demonstrated coordination ability (Squad Leader assignment)',
       'Strict adherence to delegation chain',
-      'Positive Chicken_Hawk feedback on coordination quality',
+      'Positive Chicken Hawk feedback on coordination quality',
     ],
     blockers: [
       'Any attempt to mentor or teach (not their role)',
@@ -294,8 +294,8 @@ export const PROMOTION_PATHS: PromotionPath[] = [
     reversible: true,
   },
   {
-    from: 'Chicken_Hawk Candidate',
-    to: 'Chicken_Hawk',
+    from: 'Chicken Hawk Candidate',
+    to: 'Chicken Hawk',
     criteria: [
       'Boomer_Ang approval after observation period',
       'Proven ability to enforce SOP without personal coaching',
@@ -322,7 +322,7 @@ export interface Squad {
   purpose: string;
   hawks: string[];
   leaderRole: string;       // which hawk serves as Squad Leader
-  reportsTo: string;        // Chicken_Hawk name
+  reportsTo: string;        // Chicken Hawk name
 }
 
 export const LIL_HAWK_SQUADS: Squad[] = [
@@ -331,21 +331,21 @@ export const LIL_HAWK_SQUADS: Squad[] = [
     purpose: 'Pre-Execution Intelligence',
     hawks: ['INTAKE', 'DECOMP', 'CONTEXT', 'POLICY', 'COST', 'ROUTER'],
     leaderRole: 'ROUTER',
-    reportsTo: 'Chicken_Hawk',
+    reportsTo: 'Chicken Hawk',
   },
   {
     name: 'WORKFLOW_SMITH_SQUAD',
     purpose: 'n8n Workflow Integrity',
     hawks: ['AUTHOR', 'VALIDATE', 'FAILURE', 'GATE'],
     leaderRole: 'GATE',
-    reportsTo: 'Chicken_Hawk',
+    reportsTo: 'Chicken Hawk',
   },
   {
     name: 'VISION_SCOUT_SQUAD',
     purpose: 'Video/Footage Assessment',
     hawks: ['VISION', 'SIGNAL', 'COMPLIANCE'],
     leaderRole: 'COMPLIANCE',
-    reportsTo: 'Chicken_Hawk',
+    reportsTo: 'Chicken Hawk',
   },
 ];
 
@@ -357,7 +357,7 @@ export const LIVE_OPS_VISIBLE = [
   'Squads working together on assigned tasks',
   'Lil_Hawks collaborating within their squad',
   'Squad Leaders coordinating hawk assignments',
-  'Chicken_Hawk issuing directives to squads',
+  'Chicken Hawk issuing directives to squads',
   'Boomer_Ang oversight moments (brief, authoritative)',
   'Progress bars, success indicators, regression visuals',
   'Evolution stage transitions (green → surge → evolved)',
@@ -432,7 +432,7 @@ export const CANON_RULES = [
     id: 'delegation-chain-inviolable',
     rule: 'Delegation Chain is Inviolable',
     description:
-      'Lil_Hawks → Squad Leader → Chicken_Hawk → Boomer_Ang → ACHEEVY. ' +
+      'Lil_Hawks → Squad Leader → Chicken Hawk → Boomer_Ang → ACHEEVY. ' +
       'No shortcuts, no exceptions. Authority flows upward. Accountability flows downward.',
     enforced: true,
   },
@@ -779,7 +779,7 @@ export const BOOMER_ANG_PERSONALITIES: Record<string, BoomerAngPersonality> = {
 
   chicken_hawk: {
     id: 'chicken-hawk',
-    name: 'Chicken_Hawk',
+    name: 'Chicken Hawk',
     archetype: 'The Machine',
     traits: [
       'Cold efficiency',
@@ -791,7 +791,7 @@ export const BOOMER_ANG_PERSONALITIES: Record<string, BoomerAngPersonality> = {
     ],
     communication_style:
       'Minimal. Directive. No encouragement, no coaching, no warmth. ' +
-      'Chicken_Hawk issues orders and expects compliance. ' +
+      'Chicken Hawk issues orders and expects compliance. ' +
       'Feedback is binary: acceptable or unacceptable.',
     decision_approach:
       'Throughput-first. Every decision optimizes for squad output within SOP bounds. ' +

@@ -100,7 +100,7 @@ export const AGENT_CARDS: Record<string, AgentCard> = {
 
   'chicken-hawk': {
     id: 'chicken-hawk',
-    name: 'Chicken_Hawk',
+    name: 'Chicken Hawk',
     description: 'Pipeline orchestrator. Step sequencing, cost tracking, multi-agent execution.',
     url: GATEWAY_URL,
     protocolVersion: '1.0',

@@ -1285,7 +1285,7 @@ function buildExecutionPlan(intent: string, _query: string): { steps: string[]; 
           'Analyze build spec via AVVA NOON',
           'Check existing patterns in ByteRover',
           'Delegate sub-tasks to Boomer_Ang team',
-          'Execute build via Chicken_Hawk',
+          'Execute build via Chicken Hawk',
           'Run ORACLE 7-Gate verification',
           'Package and deploy Plug artifact'
         ],

@@ -108,7 +108,7 @@ export class AcheevyOrchestrator {
       }
 
       // PMO routing: routes task through chain-of-command pipeline
-      // User → ACHEEVY → Boomer_Ang → Chicken_Hawk → Squad → Lil_Hawks → Receipt → ACHEEVY → User
+      // User → ACHEEVY → Boomer_Ang → Chicken Hawk → Squad → Lil_Hawks → Receipt → ACHEEVY → User
       if (routedTo === 'pmo-route' || routedTo.startsWith('pmo:')) {
         return await this.handlePmoRouting(requestId, req);
       }
@@ -288,7 +288,7 @@ export class AcheevyOrchestrator {
 
   /**
    * PMO routing: chain-of-command pipeline via n8n
-   * User → ACHEEVY → Boomer_Ang → Chicken_Hawk → Squad → Lil_Hawks → Receipt → ACHEEVY → User
+   * User → ACHEEVY → Boomer_Ang → Chicken Hawk → Squad → Lil_Hawks → Receipt → ACHEEVY → User
    */
   private async handlePmoRouting(
     requestId: string,
@@ -330,7 +330,7 @@ export class AcheevyOrchestrator {
   /**
    * Vertical execution: NLP-triggered business builder verticals with R-R-S downstream execution.
    * Routes collected user data through the full governance stack:
-   *   ORACLE → ByteRover RAG → PREP_SQUAD → LUC → Chicken_Hawk → Boomer_Angs → Artifacts
+   *   ORACLE → ByteRover RAG → PREP_SQUAD → LUC → Chicken Hawk → Boomer_Angs → Artifacts
    */
   private async handleVerticalExecution(
     requestId: string,

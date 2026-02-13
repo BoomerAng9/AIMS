@@ -3,7 +3,7 @@
   "version": "2.0.0",
   "effective_date": "2026-02-12",
   "description": "Repo-to-Boomer_Ang capability mapping. All Intelligent Internet repos are Boomer_Ang-only capability sources.",
-  "scope_lock": "Chicken_Hawk and Lil_Hawks do NOT get direct coupling to these repos.",
+  "scope_lock": "Chicken Hawk and Lil_Hawks do NOT get direct coupling to these repos.",
 
   "packs": [
     {
@@ -161,11 +161,11 @@
   ],
 
   "indirect_flow": {
-    "description": "How repos feed the ecosystem without Chicken_Hawk or Lil_Hawks touching them directly.",
+    "description": "How repos feed the ecosystem without Chicken Hawk or Lil_Hawks touching them directly.",
     "flow": [
       "Boomer_Ang wraps repo",
       "Registers capability via Tool Registry Contract",
-      "Chicken_Hawk dispatches bounded tasks that USE that capability",
+      "Chicken Hawk dispatches bounded tasks that USE that capability",
       "Lil_Hawks produce artifacts",
       "Evidence stored in audit trail"
     ]

@@ -8,7 +8,7 @@
  * are laser-printed from the digital world into reality.
  *
  * This is the central visualization for the AIMS organizational hierarchy:
- *   ACHEEVY → Boomer_Angs (PMO Offices) → Chicken_Hawk → Lil_Hawks (Squads)
+ *   ACHEEVY → Boomer_Angs (PMO Offices) → Chicken Hawk → Lil_Hawks (Squads)
  *   HR Department (Betty Ann Ang) oversees all actors.
  *
  * Features:
@@ -117,7 +117,7 @@ const HANGAR_ACTORS: HangarActor[] = [
   },
   {
     id: "chickenhawk",
-    name: "Chicken_Hawk",
+    name: "Chicken Hawk",
     title: "Executor & Enforcer",
     role: "Coordinator — The Machine That Keeps the Machine Running",
     tier: "enforcer",
@@ -127,7 +127,7 @@ const HANGAR_ACTORS: HangarActor[] = [
     accentGlow: "shadow-[0_0_30px_rgba(251,146,60,0.2)]",
     icon: Zap,
     avatar: "CH",
-    bio: "Cold efficiency. No feelings, no mentoring — just throughput. Chicken_Hawks assign work, enforce SOP, monitor performance, and relay structured updates to Boomer_Angs. They do not mentor — they execute and enforce. Feared, effective.",
+    bio: "Cold efficiency. No feelings, no mentoring — just throughput. Chicken Hawks assign work, enforce SOP, monitor performance, and relay structured updates to Boomer_Angs. They do not mentor — they execute and enforce. Feared, effective.",
     motto: "The machine runs or it does not. There is no in between.",
     capabilities: ["Squad Throughput", "SOP Enforcement", "Structured Escalation", "Performance Monitoring"],
   },
@@ -476,7 +476,7 @@ function EcosystemCycle() {
     { name: "Lil_Hawk", subtitle: "Worker", color: "text-emerald-400", bg: "bg-emerald-400/10", border: "border-emerald-400/30", icon: Bird },
     { name: "Power Surge", subtitle: "Peak Efficiency", color: "text-emerald-300", bg: "bg-emerald-300/10", border: "border-emerald-300/30", icon: TrendingUp },
     { name: "CH Candidate", subtitle: "Proven Consistent", color: "text-gold", bg: "bg-gold/10", border: "border-gold/30", icon: Star },
-    { name: "Chicken_Hawk", subtitle: "Enforcer", color: "text-orange-400", bg: "bg-orange-400/10", border: "border-orange-400/30", icon: Zap },
+    { name: "Chicken Hawk", subtitle: "Enforcer", color: "text-orange-400", bg: "bg-orange-400/10", border: "border-orange-400/30", icon: Zap },
     { name: "Builds Squad", subtitle: "New Lil_Hawks", color: "text-champagne", bg: "bg-champagne/10", border: "border-champagne/30", icon: Users },
   ];
 
@@ -828,7 +828,7 @@ export default function TheHangarPage() {
                 <p className="mt-3 text-sm text-white/40 max-w-2xl leading-relaxed">
                   The deployment port where digital entities materialize. Here, the organizational
                   hierarchy comes alive — from ACHEEVY&apos;s executive command through the Boomer_Angs&apos;
-                  PMO offices, down to Chicken_Hawk&apos;s enforcement squads and the ever-evolving Lil_Hawks.
+                  PMO offices, down to Chicken Hawk&apos;s enforcement squads and the ever-evolving Lil_Hawks.
                   Overseen by Betty Ann Ang&apos;s HR Department.
                 </p>
 
@@ -910,7 +910,7 @@ export default function TheHangarPage() {
                       </div>
                       <div className="hidden sm:block h-px flex-1 bg-gradient-to-r from-emerald-400/20 via-emerald-400/10 to-transparent" />
                       <div className="flex gap-2">
-                        {["ACHEEVY", "Boomer_Angs", "Chicken_Hawk", "Lil_Hawks"].map((name) => (
+                        {["ACHEEVY", "Boomer_Angs", "Chicken Hawk", "Lil_Hawks"].map((name) => (
                           <span key={name} className="px-2 py-1 rounded-lg text-[8px] font-mono text-emerald-400/50 border border-emerald-400/10 bg-emerald-400/5">
                             {name}
                           </span>
@@ -939,14 +939,14 @@ export default function TheHangarPage() {
                 </div>
               </ScrollSection>
 
-              {/* Chicken_Hawk Dispatch (No PMO) */}
+              {/* Chicken Hawk Dispatch (No PMO) */}
               <ScrollSection delay={0.1}>
                 <div className="rounded-3xl border border-orange-400/15 bg-black/50 backdrop-blur-xl p-6 sm:p-8">
                   <div className="flex items-center gap-3 mb-4">
                     <Zap size={16} className="text-orange-400" />
                     <div>
                       <h2 className="text-sm font-semibold uppercase tracking-widest text-white/80 font-display">
-                        Chicken_Hawk — Squad Dispatch
+                        Chicken Hawk — Squad Dispatch
                       </h2>
                       <p className="text-[10px] text-white/30 uppercase tracking-wider">
                         More specialized, more vast — no PMO offices. Direct squad delegation.
@@ -1030,8 +1030,8 @@ export default function TheHangarPage() {
                   </div>
 
                   <p className="mt-6 text-[10px] text-white/20 text-center max-w-lg mx-auto leading-relaxed">
-                    Lil_Hawks only speak to their Squad Leader or Chicken_Hawk.
-                    Chicken_Hawks only speak to Boomer_Angs.
+                    Lil_Hawks only speak to their Squad Leader or Chicken Hawk.
+                    Chicken Hawks only speak to Boomer_Angs.
                     Boomer_Angs are the only ones that speak to ACHEEVY.
                     ACHEEVY rarely speaks downward — and only via Boomer_Angs.
                   </p>
@@ -1202,7 +1202,7 @@ export default function TheHangarPage() {
                         The Ever-Growing Ecosystem
                       </h2>
                       <p className="text-[10px] text-white/30 uppercase tracking-wider">
-                        Lil_Hawks mature to Chicken_Hawks, who build their own squads
+                        Lil_Hawks mature to Chicken Hawks, who build their own squads
                       </p>
                     </div>
                   </div>
@@ -1212,7 +1212,7 @@ export default function TheHangarPage() {
                   <p className="mt-6 text-[10px] text-white/20 text-center max-w-lg mx-auto leading-relaxed">
                     This creates a self-perpetuating growth cycle. Lil_Hawks who prove themselves
                     through discipline and consistency evolve through Power Surge to become
-                    Chicken_Hawk Candidates. Once promoted, they build their own squads of new
+                    Chicken Hawk Candidates. Once promoted, they build their own squads of new
                     Lil_Hawks — and the cycle continues. The organization grows from within.
                   </p>
                 </div>
@@ -1308,7 +1308,7 @@ export default function TheHangarPage() {
                       {[
                         { actor: "ACHEEVY", scope: "Strategic alignment, governance integrity", color: "text-gold", border: "border-gold/15" },
                         { actor: "Boomer_Angs", scope: "Team output, training effectiveness, escalation quality", color: "text-signal-blue", border: "border-signal-blue/15" },
-                        { actor: "Chicken_Hawk", scope: "Throughput, SOP enforcement, escalation accuracy", color: "text-orange-400", border: "border-orange-400/15" },
+                        { actor: "Chicken Hawk", scope: "Throughput, SOP enforcement, escalation accuracy", color: "text-orange-400", border: "border-orange-400/15" },
                         { actor: "Lil_Hawks", scope: "Task quality, efficiency, squad collaboration, growth", color: "text-champagne", border: "border-champagne/15" },
                       ].map((item) => (
                         <div

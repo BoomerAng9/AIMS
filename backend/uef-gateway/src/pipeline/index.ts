@@ -6,7 +6,7 @@
  *   INTAKE -> SCOPE -> BUILD -> REVIEW -> DEPLOY -> LIVE
  *
  * Agents are assigned per-stage following the canonical delegation chain:
- *   Analyst_Ang -> Engineer_Ang -> Engineer_Ang -> Quality_Ang -> Chicken_Hawk -> (complete)
+ *   Analyst_Ang -> Engineer_Ang -> Engineer_Ang -> Quality_Ang -> Chicken Hawk -> (complete)
  *
  * Storage is in-memory (Map). A persistence adapter can be swapped in later.
  */
@@ -59,7 +59,7 @@ const STAGE_AGENT: Record<PipelineStage, string> = {
   SCOPE: 'Engineer_Ang',
   BUILD: 'Engineer_Ang',
   REVIEW: 'Quality_Ang',
-  DEPLOY: 'Chicken_Hawk',
+  DEPLOY: 'Chicken Hawk',
   LIVE: 'System',
 };
 
@@ -354,11 +354,11 @@ export class ExecutionPipeline {
       }
 
       case 'DEPLOY': {
-        // Trigger deployment through Chicken_Hawk
+        // Trigger deployment through Chicken Hawk
         return {
           stage,
           status: 'completed',
-          output: `Chicken_Hawk triggered deployment. Container provisioned and health-checked.`,
+          output: `Chicken Hawk triggered deployment. Container provisioned and health-checked.`,
           artifacts: [`deployment-manifest-${state.projectId}.yml`],
         };
       }

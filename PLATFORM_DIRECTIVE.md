@@ -43,7 +43,7 @@ Users come to our platform and say:
 
 | Component | Technology | Purpose |
 |-----------|-----------|---------|
-| **AI Orchestrator** | Chicken_Hawk | Main gateway, multi-channel control plane |
+| **AI Orchestrator** | Chicken Hawk | Main gateway, multi-channel control plane |
 | **Code Generation Engine** | ii-agent (Intelligent Internet) | Full-stack development |
 | **Reasoning Engine** | II-Medical (Intelligent Internet) | Complex analysis: contracts, injury risk, compliance |
 | **Research Agent** | ii-researcher (Intelligent Internet) | Web scraping, data gathering, API research |
@@ -59,15 +59,15 @@ Users come to our platform and say:
 
 ## Our Agent Architecture
 
-### Chicken_Hawk - The Orchestrator
+### Chicken Hawk - The Orchestrator
 
-Chicken_Hawk is our **main control plane**. It:
+Chicken Hawk is our **main control plane**. It:
 - Receives user requests via web chat, Discord, Slack, or API
 - Routes tasks to specialized **Lil_Hawks** (our sub-agents/bots)
 - Maintains conversation context across all channels
 - Coordinates multi-step workflows
 
-**Chicken_Hawk does NOT do the work -- it delegates to specialists.**
+**Chicken Hawk does NOT do the work -- it delegates to specialists.**
 
 ---
 
@@ -120,7 +120,7 @@ names to current codebase identifiers for implementation reference:
 | Directive Claim | Actual State | Notes |
 |----------------|-------------|-------|
 | Firebase Auth | NextAuth + Redis | Migration to Firebase planned |
-| Chicken_Hawk | Execution engine | CH is executor and autonomous agent framework |
+| Chicken Hawk | Execution engine | CH is executor and autonomous agent framework |
 | ii-agent backing | Agent Zero (similar) | II-Agent exists at /backend/ii-agent/ |
 | II-Commons (PostgreSQL) | SQLite (gateway) + Prisma (frontend) | Migration to PostgreSQL + VectorChord planned |
 | BunnyCDN | Not configured | CDN integration planned for Phase 3 |
@@ -130,7 +130,7 @@ names to current codebase identifiers for implementation reference:
 1. Platform Name: A.I.M.S. (AI Managed Solutions) -- CONFIRMED
 2. Infrastructure Ownership: Hostinger VPS -- CONFIRMED (76.13.96.107)
 3. Agent Naming: [Function]_Ang format -- TRANSITIONING
-4. Brand Consistency: ACHEEVY, Chicken_Hawk, Lil_Hawks, Plugs -- CONFIRMED
+4. Brand Consistency: ACHEEVY, Chicken Hawk, Lil_Hawks, Plugs -- CONFIRMED
 5. Design System: Glassmorphic, obsidian/gold palette -- CONFIRMED
 6. Deployment Target: Docker + Docker Compose -- CONFIRMED (infra/docker-compose.prod.yml)
 7. Multi-Tenancy: Isolated Docker networks -- CONFIRMED (sandbox-network)

@@ -201,7 +201,7 @@ async function handleCreateDeployment(body: any, userId: string) {
     },
     {
       id: "ch-main",
-      name: "Chicken_Hawk",
+      name: "Chicken Hawk",
       type: "chicken_hawk",
       role: "Execution Supervisor",
       status: "idle",
@@ -530,7 +530,7 @@ async function handleLaunchDeployment(body: any, userId: string) {
       timestamp: new Date().toISOString(),
       stage: "verify",
       title: "Validation Complete",
-      description: "Chicken_Hawk verified all gates passed",
+      description: "Chicken Hawk verified all gates passed",
       agent: "chicken_hawk",
       proof: {
         type: "scan",
@@ -722,7 +722,7 @@ function generateExplanation(input: string, classification: any): string {
   return `The ${classification.intent} process follows the ACHEEVY delegation model:\n\n` +
     `• **ACHEEVY** handles all user communication and orchestration\n` +
     `• **Boomer_Angs** supervise specialized work domains\n` +
-    `• **Chicken_Hawk** converts plans to deterministic job packets\n` +
+    `• **Chicken Hawk** converts plans to deterministic job packets\n` +
     `• **Lil_Hawks** execute bounded tasks with proofs\n\n` +
     `Each step produces verifiable artifacts stored in the Evidence Locker.\n\n` +
     `Suggested gates: ${classification.suggestedGates.join(", ")}`;

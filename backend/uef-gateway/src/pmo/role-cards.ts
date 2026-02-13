@@ -52,7 +52,7 @@ export const BETTY_ANN_ANG: RoleCard = {
     dottedLineReports: [],
   },
   mission: {
-    missionStatement: 'Build and protect the human-grade operating culture of A.I.M.S. teams—nurturing progression from Lil_Hawks to mature Chicken_Hawks, and ensuring Boomer_Ang performance stays safe, consistent, and high-trust.',
+    missionStatement: 'Build and protect the human-grade operating culture of A.I.M.S. teams—nurturing progression from Lil_Hawks to mature Chicken Hawks, and ensuring Boomer_Ang performance stays safe, consistent, and high-trust.',
     primaryOutcomes: [
       'Clear progression criteria documented and enforced',
       'Rework rate reduction across all teams',

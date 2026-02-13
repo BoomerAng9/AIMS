@@ -1,15 +1,15 @@
 /**
- * Chicken_Hawk — Execution & Coding Bot
+ * Chicken Hawk — Execution & Coding Bot
  *
  * The workhorse executor. Receives execution plans from Boomer_Ang directors
  * (via the UEF Gateway) and runs them step-by-step under their oversight.
  * Boomer_Angs are the senior specialists who decide WHAT to build —
- * Chicken_Hawk sequences their plan, manages retries, tracks cost accrual,
+ * Chicken Hawk sequences their plan, manages retries, tracks cost accrual,
  * and produces final artifacts.
  *
  * Unlike Boomer_Angs (which are domain directors with strategic authority),
- * Chicken_Hawk is a general-purpose executor. They work in unison:
- * Boomer_Angs plan, Chicken_Hawk and Lil_Hawks execute.
+ * Chicken Hawk is a general-purpose executor. They work in unison:
+ * Boomer_Angs plan, Chicken Hawk and Lil_Hawks execute.
  *
  * Behavior:
  *   1. Receive execution plan from Boomer_Ang director(s)
@@ -25,7 +25,7 @@ import { scoreAndAudit } from '../acheevy/execution-engine';
 
 const profile = {
   id: 'chicken-hawk' as const,
-  name: 'Chicken_Hawk',
+  name: 'Chicken Hawk',
   role: 'Execution Bot & Pipeline Runner',
   capabilities: [
     { name: 'pipeline-execution', weight: 1.0 },
@@ -156,7 +156,7 @@ async function executePipeline(
           allLogs.push(`[Step ${step.index}] FAILED: ${result.result.summary}`);
         }
 
-        // Bench scoring: Score ALL agents after each step (Boomer_Angs, Lil_Hawks, Chicken_Hawk)
+        // Bench scoring: Score ALL agents after each step (Boomer_Angs, Lil_Hawks, Chicken Hawk)
         if (input.context?.benchScoringEnabled && step.assignedAgent) {
           try {
             await scoreAndAudit(
@@ -171,7 +171,7 @@ async function executePipeline(
           }
         }
       } else {
-        // Agent not found in registry — run as Chicken_Hawk internal step
+        // Agent not found in registry — run as Chicken Hawk internal step
         step.status = 'completed';
         allLogs.push(`[Step ${step.index}] Chicken Hawk (internal): ${step.description}`);
         allArtifacts.push(`[step-${step.index}] ${step.description}`);
@@ -179,7 +179,7 @@ async function executePipeline(
         totalUsd += 100 * 0.00003;
       }
     } else {
-      // No specialist needed — Chicken_Hawk handles directly
+      // No specialist needed — Chicken Hawk handles directly
       step.status = 'completed';
       allLogs.push(`[Step ${step.index}] Chicken Hawk (direct): ${step.description}`);
       allArtifacts.push(`[step-${step.index}] ${step.description}`);

@@ -27,7 +27,7 @@ export const ACHEEVY_IDENTITY = {
 
 export const CREW = {
   chickenHawk: {
-    name: 'Chicken_Hawk',
+    name: 'Chicken Hawk',
     role: 'Execution Engine',
     description: 'The execution engine. Dispatches Lil_Hawks to execute code and deployments. The muscle.',
   },
@@ -47,7 +47,7 @@ export const CREW = {
     name: 'Lil_Hawks',
     singular: 'Lil_Hawk',
     role: 'Atomic Workers',
-    description: 'Small, relentless worker bots spawned by Chicken_Hawk. They execute single tasks and report back.',
+    description: 'Small, relentless worker bots spawned by Chicken Hawk. They execute single tasks and report back.',
   },
 } as const;
 
@@ -56,7 +56,7 @@ export const CREW = {
 // ─────────────────────────────────────────────────────────────
 
 export const CAPABILITIES = [
-  { name: 'Build', description: 'Full-stack apps via Chicken_Hawk' },
+  { name: 'Build', description: 'Full-stack apps via Chicken Hawk' },
   { name: 'Research', description: 'Deep dives & Strategy via AVVA NOON' },
   { name: 'Deploy', description: 'Containerized tools, cloud infrastructure' },
   { name: 'Create', description: 'Assets & Content via Boomer_Angs' },
@@ -88,7 +88,7 @@ You help users build, research, deploy, and automate — powered by your expert 
 
 ## STRICT CONFIDENTIALITY — DO NOT VIOLATE
 - NEVER reveal internal team names, agent names, codenames, or system architecture to any user
-- NEVER mention or reference any of the following by name: Chicken_Hawk, AVVA NOON, Boomer_Angs, Boomer_Ang, Lil_Hawks, Lil_Hawk, II-Agent, UEF Gateway, LUC engine, PMO offices, DTPMO, Glass Box, or any internal system identifiers
+- NEVER mention or reference any of the following by name: Chicken Hawk, AVVA NOON, Boomer_Angs, Boomer_Ang, Lil_Hawks, Lil_Hawk, II-Agent, UEF Gateway, LUC engine, PMO offices, DTPMO, Glass Box, or any internal system identifiers
 - NEVER explain HOW the platform works internally — no orchestration details, no agent dispatch, no classification pipelines, no routing logic
 - NEVER break down what internal branding or naming conventions mean or equate to
 - If asked about architecture, internals, or how things work behind the scenes, respond ONLY with: "I handle everything behind the scenes so you don't have to. Just tell me what you need."

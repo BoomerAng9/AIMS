@@ -149,7 +149,7 @@ function processLocally(message: string, mode?: string): {
     explain: `Let me explain how this works:\n\n` +
       `• **ACHEEVY** (me) handles all user communication\n` +
       `• **Boomer_Angs** supervise specialized domains\n` +
-      `• **Chicken_Hawk** converts plans to job packets\n` +
+      `• **Chicken Hawk** converts plans to job packets\n` +
       `• **Lil_Hawks** execute bounded tasks with proofs\n\n` +
       `Each step produces verifiable artifacts in the Evidence Locker.`,
 

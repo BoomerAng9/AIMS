@@ -26,7 +26,7 @@
         "User plane isolated from control/worker planes",
         "Default deny egress for Lil_Hawks",
         "Allowlist-only external access",
-        "No ingress to Chicken_Hawk or Lil_Hawks from outside",
+        "No ingress to Chicken Hawk or Lil_Hawks from outside",
         "Segmentation map documented per Shift"
       ],
       "training_hours": 6,
@@ -117,7 +117,7 @@
       {
         "id": "HR-002",
         "name": "Escalation Etiquette",
-        "description": "Proper chain of command: Lil_Hawk → Chicken_Hawk → ACHEEVY → User"
+        "description": "Proper chain of command: Lil_Hawk → Chicken Hawk → ACHEEVY → User"
       },
       {
         "id": "HR-003",
