@@ -61,7 +61,7 @@ while [[ $# -gt 0 ]]; do
             echo "  --no-cache                Force fresh Docker image rebuild"
             echo ""
             echo "Examples:"
-            echo "  ./deploy.sh --domain plugmein.cloud --landing-domain aimanagedsolutions.cloud --email admin@aimanagedsolutions.cloud"
+            echo "  ./deploy.sh --domain plugmein.cloud --landing-domain aimanagedsolutions.cloud --email acheevy@aimanagedsolutions.cloud"
             echo "  ./deploy.sh --ssl-renew"
             exit 0 ;;
         *) error "Unknown option: $1"; exit 1 ;;
