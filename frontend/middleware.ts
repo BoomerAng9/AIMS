@@ -16,6 +16,29 @@ import { NextRequest, NextResponse } from 'next/server';
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 const IS_DEMO = process.env.DEMO_MODE === 'true';
 
+// ── Domain Split: plugmein.cloud (DO) vs aimanagedsolutions.cloud (LEARN) ──
+const LANDING_HOST = (process.env.NEXT_PUBLIC_LANDING_URL || 'https://aimanagedsolutions.cloud').replace(/^https?:\/\//, '');
+const APP_HOST = (process.env.NEXT_PUBLIC_APP_URL || 'https://plugmein.cloud').replace(/^https?:\/\//, '');
+
+// Routes exclusive to aimanagedsolutions.cloud (story, galleries, plans, merch)
+const LANDING_ONLY_PREFIXES = [
+  '/the-book-of-vibe',
+  '/gallery',
+  '/plans',
+  '/merch',
+  '/about',
+];
+
+// Routes exclusive to plugmein.cloud (functional app)
+const APP_ONLY_PREFIXES = [
+  '/chat',
+  '/dashboard',
+  '/onboarding',
+  '/workspace',
+  '/hangar',
+  '/new',
+];
+
 const ALLOWED_ORIGINS = IS_PRODUCTION
   ? [
       'https://plugmein.cloud',
@@ -25,6 +48,8 @@ const ALLOWED_ORIGINS = IS_PRODUCTION
       'https://www.aims.plugmein.cloud',
       'https://api.aims.plugmein.cloud',
       'https://luc.plugmein.cloud',
+      'https://aimanagedsolutions.cloud',
+      'https://www.aimanagedsolutions.cloud',
     ]
   : [
       'http://localhost:3000',
@@ -239,7 +264,24 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // 0. Demo mode: auto-redirect root to /dashboard or /api/auth/demo-session
+  // 0a. Domain split — route enforcement between plugmein.cloud and aimanagedsolutions.cloud
+  if (IS_PRODUCTION) {
+    const host = request.headers.get('host') || '';
+    const isLandingSite = host.includes('aimanagedsolutions');
+    const isAppSite = host.includes('plugmein');
+
+    // Landing-only routes accessed from plugmein.cloud → redirect to aimanagedsolutions.cloud
+    if (isAppSite && LANDING_ONLY_PREFIXES.some(p => pathname.startsWith(p))) {
+      return NextResponse.redirect(`https://${LANDING_HOST}${pathname}`);
+    }
+
+    // App-only routes accessed from aimanagedsolutions.cloud → redirect to plugmein.cloud
+    if (isLandingSite && APP_ONLY_PREFIXES.some(p => pathname.startsWith(p))) {
+      return NextResponse.redirect(`https://${APP_HOST}${pathname}`);
+    }
+  }
+
+  // 0b. Demo mode: auto-redirect root to /dashboard or /api/auth/demo-session
   if (IS_DEMO && pathname === '/') {
     const hasSession = request.cookies.has('next-auth.session-token') || request.cookies.has('__Secure-next-auth.session-token');
     const redirectUrl = request.nextUrl.clone();
