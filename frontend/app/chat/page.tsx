@@ -282,7 +282,7 @@ function AudioWaveform({ levels, isActive }: { levels: number[]; isActive: boole
 
 function useTtsPlayback() {
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [ttsEnabled, setTtsEnabled] = useState(false);
+  const [ttsEnabled, setTtsEnabled] = useState(true);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const speak = useCallback(async (text: string) => {
