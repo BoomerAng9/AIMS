@@ -42,8 +42,10 @@ spec:
             - name: NODE_ENV
               value: production
             - name: NEXT_PUBLIC_API_URL
-              value: https://gateway.plugmein.cloud
+              value: https://gateway.aimanagedsolutions.cloud
             - name: NEXT_PUBLIC_LANDING_URL
+              value: https://plugmein.cloud
+            - name: NEXT_PUBLIC_APP_URL
               value: https://aimanagedsolutions.cloud
           startupProbe:
             httpGet:

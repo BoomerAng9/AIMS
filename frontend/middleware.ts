@@ -16,11 +16,13 @@ import { NextRequest, NextResponse } from 'next/server';
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 const IS_DEMO = process.env.DEMO_MODE === 'true';
 
-// ── Domain Split: plugmein.cloud (DO) vs aimanagedsolutions.cloud (LEARN) ──
-const LANDING_HOST = (process.env.NEXT_PUBLIC_LANDING_URL || 'https://aimanagedsolutions.cloud').replace(/^https?:\/\//, '');
-const APP_HOST = (process.env.NEXT_PUBLIC_APP_URL || 'https://plugmein.cloud').replace(/^https?:\/\//, '');
+// ── Domain Split ──
+// plugmein.cloud        = LEARN — lore, galleries, plans, merch, The Book of V.I.B.E.
+// aimanagedsolutions.cloud = DO  — functional app, chat, dashboard, build
+const LANDING_HOST = (process.env.NEXT_PUBLIC_LANDING_URL || 'https://plugmein.cloud').replace(/^https?:\/\//, '');
+const APP_HOST = (process.env.NEXT_PUBLIC_APP_URL || 'https://aimanagedsolutions.cloud').replace(/^https?:\/\//, '');
 
-// Routes exclusive to aimanagedsolutions.cloud (story, galleries, plans, merch)
+// Routes exclusive to plugmein.cloud (story, galleries, plans, merch, lore)
 const LANDING_ONLY_PREFIXES = [
   '/the-book-of-vibe',
   '/gallery',
@@ -29,7 +31,7 @@ const LANDING_ONLY_PREFIXES = [
   '/about',
 ];
 
-// Routes exclusive to plugmein.cloud (functional app)
+// Routes exclusive to aimanagedsolutions.cloud (functional app)
 const APP_ONLY_PREFIXES = [
   '/chat',
   '/dashboard',
@@ -264,18 +266,18 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // 0a. Domain split — route enforcement between plugmein.cloud and aimanagedsolutions.cloud
+  // 0a. Domain split — plugmein.cloud (LEARN) vs aimanagedsolutions.cloud (DO)
   if (IS_PRODUCTION) {
     const host = request.headers.get('host') || '';
-    const isLandingSite = host.includes('aimanagedsolutions');
-    const isAppSite = host.includes('plugmein');
+    const isLandingSite = host.includes('plugmein');
+    const isAppSite = host.includes('aimanagedsolutions');
 
-    // Landing-only routes accessed from plugmein.cloud → redirect to aimanagedsolutions.cloud
+    // Landing-only routes accessed from aimanagedsolutions.cloud → redirect to plugmein.cloud
     if (isAppSite && LANDING_ONLY_PREFIXES.some(p => pathname.startsWith(p))) {
       return NextResponse.redirect(`https://${LANDING_HOST}${pathname}`);
     }
 
-    // App-only routes accessed from aimanagedsolutions.cloud → redirect to plugmein.cloud
+    // App-only routes accessed from plugmein.cloud → redirect to aimanagedsolutions.cloud
     if (isLandingSite && APP_ONLY_PREFIXES.some(p => pathname.startsWith(p))) {
       return NextResponse.redirect(`https://${APP_HOST}${pathname}`);
     }

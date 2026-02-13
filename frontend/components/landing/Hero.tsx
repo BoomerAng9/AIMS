@@ -3,13 +3,13 @@
 /**
  * A.I.M.S. Landing Page — Hero Section
  *
- * Clean onboarding hero for aimanagedsolutions.cloud.
+ * Clean onboarding hero for plugmein.cloud (brand/lore site).
  * Triangle layout with three active cards:
  *   Top center: Chat w/ACHEEVY (main hero)
  *   Bottom-left: Automate Everything (with Boomer_Angs team image)
  *   Bottom-right: Deploy Your Apps (with Boomer_Ang on Assignment image)
  *
- * All three route to plugmein.cloud where users access AI features and ACHEEVY.
+ * All three route to aimanagedsolutions.cloud where users access the functional app.
  * Hero copy (non-negotiable):
  *   1) "Welcome to AI Managed Solutions."
  *   2) "I'm ACHEEVY, at your service."
@@ -20,8 +20,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 
-// App domain where users access AI features and ACHEEVY
-const APP_DOMAIN = process.env.NEXT_PUBLIC_APP_URL || 'https://plugmein.cloud';
+// App domain where users access AI features and ACHEEVY (functional platform)
+const APP_DOMAIN = process.env.NEXT_PUBLIC_APP_URL || 'https://aimanagedsolutions.cloud';
 
 // ── Animation Variants ──
 
