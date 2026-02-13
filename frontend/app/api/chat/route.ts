@@ -13,7 +13,7 @@
  * If requiresAgent=false, we stream via the LLM gateway.
  *
  * Feature LLM: Claude Opus 4.6
- * Priority Models: Qwen, Minimax, GLM, Kimi, WAN, Nano Banana Pro
+ * Priority Models: Qwen, Minimax, GLM-5, Kimi, WAN, Nano Banana Pro
  */
 
 import { streamText } from 'ai';
@@ -46,7 +46,7 @@ const PRIORITY_MODELS: Record<string, { id: string; label: string; provider: str
   'qwen':           { id: 'qwen/qwen-2.5-coder-32b',         label: 'Qwen 2.5 Coder 32B',  provider: 'Qwen' },
   'qwen-max':       { id: 'qwen/qwen-max',                   label: 'Qwen Max',             provider: 'Qwen' },
   'minimax':        { id: 'minimax/minimax-01',               label: 'MiniMax-01',           provider: 'MiniMax' },
-  'glm':            { id: 'thudm/glm-4-32b',                 label: 'GLM-4 32B',            provider: 'Zhipu' },
+  'glm':            { id: 'z-ai/glm-5',                      label: 'GLM-5',                provider: 'Z.ai' },
   'kimi':           { id: 'moonshot/kimi-k2.5',               label: 'Kimi K2.5',            provider: 'Moonshot' },
   'wan':            { id: 'alibaba/wan-2.1-t2v-turbo',        label: 'WAN 2.1',              provider: 'Alibaba' },
   'nano-banana':    { id: 'google/gemini-2.5-flash',          label: 'Nano Banana Pro',      provider: 'Google' },

@@ -36,7 +36,7 @@ const AI_MODELS = [
   { key: 'qwen',          label: 'Qwen 2.5 Coder 32B', tag: 'code' },
   { key: 'qwen-max',      label: 'Qwen Max',            tag: '' },
   { key: 'minimax',       label: 'MiniMax-01',          tag: '' },
-  { key: 'glm',           label: 'GLM-4 32B',           tag: '' },
+  { key: 'glm',           label: 'GLM-5',                tag: '' },
   { key: 'kimi',          label: 'Kimi K2.5',           tag: 'fast' },
   { key: 'nano-banana',   label: 'Nano Banana Pro',     tag: 'fast' },
   { key: 'gemini-pro',    label: 'Gemini 2.5 Pro',      tag: '' },
