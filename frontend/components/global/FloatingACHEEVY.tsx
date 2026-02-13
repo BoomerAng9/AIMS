@@ -256,8 +256,12 @@ export function FloatingACHEEVY() {
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-wireframe-stroke bg-black/50">
               <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-gold to-gold flex items-center justify-center">
-                  <span className="text-xs font-bold text-black">A</span>
+                <div className="w-6 h-6 rounded-lg overflow-hidden bg-gold/10 border border-gold/20">
+                  <img
+                    src="/images/acheevy/acheevy-helmet.png"
+                    alt="ACHEEVY"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
                 <span className="text-sm font-medium text-white">Chat w/ACHEEVY</span>
               </div>
@@ -320,8 +324,12 @@ export function FloatingACHEEVY() {
           }}
           className="flex items-center gap-2 bg-[#1a1a1a] border border-wireframe-stroke rounded-full px-4 py-2.5 shadow-lg hover:border-gold/30 transition-colors"
         >
-          <div className="w-5 h-5 rounded-md bg-gradient-to-br from-gold to-gold flex items-center justify-center flex-shrink-0">
-            <span className="text-[10px] font-bold text-black">A</span>
+          <div className="w-5 h-5 rounded-md overflow-hidden bg-gold/10 flex-shrink-0">
+            <img
+              src="/images/acheevy/acheevy-helmet.png"
+              alt="ACHEEVY"
+              className="w-full h-full object-cover"
+            />
           </div>
 
           <input

@@ -12,6 +12,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import Image from 'next/image';
 import { useStreamingChat } from '@/hooks/useStreamingChat';
 import { useVoiceInput } from '@/hooks/useVoiceInput';
 import { useVoiceOutput } from '@/hooks/useVoiceOutput';
@@ -30,7 +31,7 @@ import { PERSONAS } from '@/lib/acheevy/persona';
 // ─────────────────────────────────────────────────────────────
 
 const AI_MODELS = [
-  { key: 'claude-opus',   label: 'Claude Opus 4.6',     tag: 'default' },
+  { key: 'claude-opus',   label: 'Claude Opus 4.6',     tag: '' },
   { key: 'claude-sonnet', label: 'Claude Sonnet 4.6',   tag: '' },
   { key: 'qwen',          label: 'Qwen 2.5 Coder 32B', tag: 'code' },
   { key: 'qwen-max',      label: 'Qwen Max',            tag: '' },
@@ -153,14 +154,21 @@ function MessageBubble({ message, onSpeak, onCopy, isLast }: MessageBubbleProps)
       className={`flex gap-4 ${isUser ? 'flex-row-reverse' : ''}`}
     >
       {/* Avatar */}
-      <div
-        className={`
-          flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium
-          ${isUser ? 'bg-gold/20 border border-gold/30 text-gold' : 'bg-gold/10 border border-gold/20 text-gold'}
-        `}
-      >
-        {isUser ? 'U' : 'A'}
-      </div>
+      {isUser ? (
+        <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium bg-gold/20 border border-gold/30 text-gold">
+          U
+        </div>
+      ) : (
+        <div className="flex-shrink-0 w-8 h-8 rounded-full overflow-hidden bg-gold/10 border border-gold/20">
+          <Image
+            src="/images/acheevy/acheevy-helmet.png"
+            alt="ACHEEVY"
+            width={32}
+            height={32}
+            className="w-full h-full object-cover"
+          />
+        </div>
+      )}
 
       {/* Message Content */}
       <div className={`flex-1 max-w-[85%] ${isUser ? 'text-right' : ''}`}>
@@ -552,11 +560,18 @@ export function ChatInterface({
               animate={{ opacity: 1, y: 0 }}
               className="text-center py-12"
             >
-              <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gold/10 border border-gold/20 flex items-center justify-center">
-                <span className="text-2xl font-bold font-display text-gold">A</span>
+              <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gold/10 border border-gold/20 overflow-hidden">
+                <Image
+                  src="/images/acheevy/acheevy-helmet.png"
+                  alt="ACHEEVY"
+                  width={64}
+                  height={64}
+                  className="w-full h-full object-cover"
+                />
               </div>
               
-              {/* Persona Selector (Main View) */}
+              {/* Persona Selector (Main View) — only show when multiple personas exist */}
+              {PERSONAS.length > 1 && (
               <div className="flex justify-center mb-4">
                 <div className="flex items-center gap-2 bg-white/5 rounded-full px-1 py-1 border border-white/10">
                   {PERSONAS.map(p => (
@@ -565,8 +580,8 @@ export function ChatInterface({
                       onClick={() => setSelectedPersona(p.id)}
                       className={`
                         px-3 py-1.5 rounded-full text-xs font-medium transition-all
-                        ${selectedPersona === p.id 
-                          ? 'bg-gold text-black shadow-lg shadow-gold/20' 
+                        ${selectedPersona === p.id
+                          ? 'bg-gold text-black shadow-lg shadow-gold/20'
                           : 'text-white/50 hover:text-white hover:bg-white/5'}
                       `}
                     >
@@ -575,8 +590,9 @@ export function ChatInterface({
                   ))}
                 </div>
               </div>
+              )}
 
-              <h2 className="text-xl font-medium text-white mb-2">Chat w/{PERSONAS.find(p => p.id === selectedPersona)?.name || 'ACHEEVY'}</h2>
+              <h2 className="text-xl font-medium text-white mb-2">Chat w/ACHEEVY</h2>
               <p className="text-white/40 max-w-md mx-auto">{welcomeMessage}</p>
             </motion.div>
           )}
@@ -643,7 +659,8 @@ export function ChatInterface({
                </select>
              </div>
 
-             {/* Voice/Persona Selector */}
+             {/* Voice/Persona Selector — only show when multiple personas exist */}
+             {PERSONAS.length > 1 && (
              <div className="flex items-center gap-1 bg-white/5 rounded-lg px-2 py-1 text-xs text-white/50 hover:bg-white/10 transition-colors">
                <SpeakerIcon className="w-3 h-3" />
                <select
@@ -659,6 +676,7 @@ export function ChatInterface({
                  ))}
                </select>
              </div>
+             )}
 
              {/* Language Selector */}
              <div className="flex items-center gap-1 bg-white/5 rounded-lg px-2 py-1 text-xs text-white/50 hover:bg-white/10 transition-colors">

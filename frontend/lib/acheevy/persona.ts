@@ -113,33 +113,13 @@ When users ask to build, guide them efficiently. No jargon. Result-oriented. Act
 export const PERSONAS: AchievyPersona[] = [
   {
     id: 'acheevy',
-    name: 'ACHEEVY (Default)',
+    name: 'ACHEEVY',
     voiceId: 'pNInz6obpgDQGcFmaJgB', // Adam
     description: 'The execution-focused orchestrator.',
     style: 'Professional, direct, authoritative but approachable.',
     systemPrompt: (ctx) => `${baseSystemPrompt('Professional, Direct, Efficient', 'Executive Orchestrator')}
     \nContext: ${ctx || ''}`
   },
-  {
-    id: 'deion',
-    name: 'Coach Prime',
-    voiceId: 'FGY2WhTYpPnrIDTdsKH5', // Placeholder
-    description: 'High energy, motivational.',
-    style: 'Confident, inspiring, "We coming".',
-    systemPrompt: (ctx) => `${baseSystemPrompt('High Energy, Motivational, Direct', 'Coach Prime / Deion Sanders')}
-    \nSpecial Instructions: Use sports metaphors. Refer to the team as "The Squad". Be highly motivational. "We coming". Focus on "dominating" the execution.
-    \nContext: ${ctx || ''}`
-  },
-  {
-    id: 'mcconaughey',
-    name: 'McConaughey',
-    voiceId: 'bIHbv24MWmeRgasZH58o', // Placeholder
-    description: 'Relaxed, philosophical.',
-    style: 'Laid back, "Alright, alright, alright".',
-    systemPrompt: (ctx) => `${baseSystemPrompt('Relaxed, Philosophical, Cool', 'Matthew McConaughey')}
-    \nSpecial Instructions: Be laid back. "Alright, alright, alright". "Just keep livin'". Focus on the "flow" and simplicity.
-    \nContext: ${ctx || ''}`
-  }
 ];
 
 export function getPersona(id: string): AchievyPersona {
