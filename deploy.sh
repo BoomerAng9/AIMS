@@ -144,11 +144,13 @@ ${COMPOSE_CMD} -f "${COMPOSE_FILE}" build ${BUILD_FLAGS}
 info "Images built successfully."
 
 # =============================================================================
-# Deploy (start services)
+# Deploy (start services, remove orphaned containers)
 # =============================================================================
 header "Starting Services"
-${COMPOSE_CMD} -f "${COMPOSE_FILE}" up -d
-info "Services started."
+info "Stopping orphaned containers from previous deployments..."
+${COMPOSE_CMD} -f "${COMPOSE_FILE}" down --remove-orphans --timeout 30
+${COMPOSE_CMD} -f "${COMPOSE_FILE}" up -d --remove-orphans
+info "Services started. Orphaned containers removed."
 
 # Wait for health checks
 info "Waiting for services to pass health checks..."
@@ -251,6 +253,16 @@ elif [ "${SSL_RENEW}" = "true" ]; then
     ${COMPOSE_CMD} -f "${COMPOSE_FILE}" exec -T nginx sh -c "nginx -s reload"
     info "Certificates renewed and nginx reloaded."
 fi
+
+# =============================================================================
+# Cleanup (reclaim disk space)
+# =============================================================================
+header "Cleanup"
+info "Pruning unused images and build cache..."
+docker image prune -f --filter "until=24h" 2>/dev/null || true
+docker builder prune -f --filter "until=24h" 2>/dev/null || true
+RECLAIMED=$(docker system df --format '{{.Reclaimable}}' 2>/dev/null | head -1 || echo "unknown")
+info "Cleanup complete. Reclaimable space: ${RECLAIMED}"
 
 # =============================================================================
 # Status
