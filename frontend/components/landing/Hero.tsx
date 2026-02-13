@@ -240,7 +240,7 @@ export function Hero() {
                     The Book of V.I.B.E.
                   </h3>
                   <p className="text-xs text-white/30">
-                    The origin story of ACHEEVY and the V.I.B.E. Energy that powers everything.
+                    From NIL to ACHEEVY &mdash; the canonical origin of the V.I.B.E. universe. 13 chapters.
                   </p>
                 </div>
               </Link>
@@ -258,7 +258,7 @@ export function Hero() {
                     Character Gallery
                   </h3>
                   <p className="text-xs text-white/30">
-                    Meet ACHEEVY, the Boomer_Angs, Chicken Hawk, and the Lil_Hawks.
+                    The Elder, SOLAYNJ, Aether Vos, ACHEEVY, NIL &mdash; the full V.I.B.E. roster and the five races.
                   </p>
                 </div>
               </Link>
@@ -276,7 +276,7 @@ export function Hero() {
                     Merch Store
                   </h3>
                   <p className="text-xs text-white/30">
-                    Rep the V.I.B.E. — apparel, gear, and collectibles.
+                    Rep the V.I.B.E. &mdash; apparel, gear, and collectibles from the Aether.
                   </p>
                 </div>
               </Link>
