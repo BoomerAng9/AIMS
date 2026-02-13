@@ -1,0 +1,72 @@
+# =============================================================================
+# A.I.M.S. — Cloud Run Service: ACHEEVY (Executive Orchestrator)
+# =============================================================================
+# Stateless orchestrator. Intent analysis, routing, and user communication.
+# Image: us-central1-docker.pkg.dev/ai-managed-services/aims-docker/acheevy
+#
+# Deploy:
+#   gcloud run services replace infra/cloudrun/acheevy.service.yaml \
+#     --region us-central1
+# =============================================================================
+
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: aims-acheevy
+  labels:
+    cloud.googleapis.com/location: us-central1
+  annotations:
+    run.googleapis.com/ingress: internal-and-cloud-load-balancing
+    run.googleapis.com/launch-stage: GA
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/minScale: "1"
+        autoscaling.knative.dev/maxScale: "3"
+        run.googleapis.com/cpu-throttling: "false"
+        run.googleapis.com/startup-cpu-boost: "true"
+    spec:
+      containerConcurrency: 40
+      timeoutSeconds: 300
+      serviceAccountName: aims-acheevy@ai-managed-services.iam.gserviceaccount.com
+      containers:
+        - image: us-central1-docker.pkg.dev/ai-managed-services/aims-docker/acheevy:latest
+          ports:
+            - containerPort: 3003
+          resources:
+            limits:
+              cpu: "1"
+              memory: 512Mi
+          env:
+            - name: NODE_ENV
+              value: production
+            - name: PORT
+              value: "3003"
+            - name: UEF_GATEWAY_URL
+              value: https://gateway.plugmein.cloud
+            - name: OPENROUTER_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: latest
+                  name: OPENROUTER_API_KEY
+            - name: ANTHROPIC_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: latest
+                  name: ANTHROPIC_API_KEY
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 3003
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3003
+            periodSeconds: 30
+  traffic:
+    - percent: 100
+      latestRevision: true

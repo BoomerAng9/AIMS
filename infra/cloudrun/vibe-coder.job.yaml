@@ -1,0 +1,70 @@
+# =============================================================================
+# A.I.M.S. — Cloud Run Job: Vibe Coder (aiPLUG Builder)
+# =============================================================================
+# Long-running build job for the Managed Vibe Coding department.
+# Triggered by Chicken Hawk when aiPLUG build manifests are dispatched.
+#
+# Each execution:
+#   1. Receives a build manifest (app spec, tech stack, features)
+#   2. Scaffolds the project via Coder_Ang
+#   3. Generates code via Lil_Scaffold_Hawk + Lil_Code_Hawk
+#   4. Runs ORACLE verification via Quality_Ang
+#   5. Deploys preview via Dockmaster_Ang
+#   6. Returns sealed receipt with preview URL
+#
+# Deploy:
+#   gcloud run jobs replace infra/cloudrun/vibe-coder.job.yaml \
+#     --region us-central1
+# =============================================================================
+
+apiVersion: run.googleapis.com/v1
+kind: Job
+metadata:
+  name: aims-vibe-coder
+  labels:
+    cloud.googleapis.com/location: us-central1
+  annotations:
+    run.googleapis.com/launch-stage: GA
+spec:
+  template:
+    metadata:
+      annotations:
+        run.googleapis.com/execution-environment: gen2
+    spec:
+      template:
+        spec:
+          containers:
+            - image: us-central1-docker.pkg.dev/ai-managed-services/aims-docker/chicken-hawk:latest
+              resources:
+                limits:
+                  cpu: "2"
+                  memory: 2Gi
+              env:
+                - name: NODE_ENV
+                  value: production
+                - name: EXECUTION_MODE
+                  value: vibe-coder
+                - name: UEF_GATEWAY_URL
+                  value: https://gateway.plugmein.cloud
+                - name: CHICKEN_HAWK_URL
+                  value: http://76.13.96.107:4001
+                - name: E2B_API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      key: latest
+                      name: E2B_API_KEY
+                - name: OPENROUTER_API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      key: latest
+                      name: OPENROUTER_API_KEY
+                - name: ANTHROPIC_API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      key: latest
+                      name: ANTHROPIC_API_KEY
+              command: ["node"]
+              args: ["dist/index.js", "--mode=vibe-coder"]
+          maxRetries: 1
+          timeoutSeconds: 1800
+          serviceAccountName: aims-vibe-coder@ai-managed-services.iam.gserviceaccount.com

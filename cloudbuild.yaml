@@ -115,7 +115,50 @@ steps:
       - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/frontend'
     waitFor: ['docker-frontend']
 
-  # ── Step 5: Build Agent Images (for VPS deployment via Artifact Registry) ──
+  # ── Step 5a: Build ACHEEVY + Chicken Hawk Images ──
+  - id: docker-acheevy
+    name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -t
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/acheevy:${SHORT_SHA}'
+      - -t
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/acheevy:latest'
+      - -f
+      - backend/acheevy/Dockerfile
+      - backend/acheevy
+    waitFor: ['backend-install']
+
+  - id: docker-chicken-hawk
+    name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -t
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/chicken-hawk:${SHORT_SHA}'
+      - -t
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/chicken-hawk:latest'
+      - -f
+      - services/chicken-hawk/Dockerfile
+      - services/chicken-hawk
+    waitFor: ['backend-install']
+
+  - id: push-acheevy
+    name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - '--all-tags'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/acheevy'
+    waitFor: ['docker-acheevy']
+
+  - id: push-chicken-hawk
+    name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - '--all-tags'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/chicken-hawk'
+    waitFor: ['docker-chicken-hawk']
+
+  # ── Step 5b: Build Agent Images (for VPS deployment via Artifact Registry) ──
   - id: docker-research-ang
     name: gcr.io/cloud-builders/docker
     args:
@@ -198,6 +241,43 @@ steps:
       - --update-secrets=NEXTAUTH_SECRET=NEXTAUTH_SECRET:latest,INTERNAL_API_KEY=INTERNAL_API_KEY:latest
     waitFor: ['push-frontend']
 
+  - id: deploy-acheevy
+    name: gcr.io/cloud-builders/gcloud
+    args:
+      - run
+      - deploy
+      - aims-acheevy
+      - --image=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/acheevy:${SHORT_SHA}
+      - --region=${_REGION}
+      - --platform=managed
+      - --port=3003
+      - --memory=512Mi
+      - --cpu=1
+      - --min-instances=1
+      - --max-instances=3
+      - --no-allow-unauthenticated
+      - --set-env-vars=NODE_ENV=production,PORT=3003,UEF_GATEWAY_URL=https://gateway.plugmein.cloud
+      - --update-secrets=OPENROUTER_API_KEY=OPENROUTER_API_KEY:latest,ANTHROPIC_API_KEY=ANTHROPIC_API_KEY:latest
+    waitFor: ['push-acheevy']
+
+  # ── Step 7: Deploy Vibe Coder Cloud Run Job ──
+  - id: deploy-vibe-coder-job
+    name: gcr.io/cloud-builders/gcloud
+    args:
+      - run
+      - jobs
+      - update
+      - aims-vibe-coder
+      - --image=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/chicken-hawk:${SHORT_SHA}
+      - --region=${_REGION}
+      - --memory=2Gi
+      - --cpu=2
+      - --max-retries=1
+      - --task-timeout=1800s
+      - --set-env-vars=NODE_ENV=production,EXECUTION_MODE=vibe-coder,UEF_GATEWAY_URL=https://gateway.plugmein.cloud,CHICKEN_HAWK_URL=http://${_VPS_HOST}:4001
+      - --update-secrets=E2B_API_KEY=E2B_API_KEY:latest,OPENROUTER_API_KEY=OPENROUTER_API_KEY:latest,ANTHROPIC_API_KEY=ANTHROPIC_API_KEY:latest
+    waitFor: ['push-chicken-hawk']
+
 # ── Substitution Variables ──
 # Override these in your Cloud Build trigger config or via --substitutions
 substitutions:
@@ -212,6 +292,10 @@ images:
   - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/uef-gateway:latest'
   - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/frontend:${SHORT_SHA}'
   - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/frontend:latest'
+  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/acheevy:${SHORT_SHA}'
+  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/acheevy:latest'
+  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/chicken-hawk:${SHORT_SHA}'
+  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/chicken-hawk:latest'
   - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/research-ang:${SHORT_SHA}'
   - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/research-ang:latest'
   - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/router-ang:${SHORT_SHA}'

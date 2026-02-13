@@ -25,6 +25,7 @@ export type AgentId =
   | 'chicken-hawk'
   | 'research-ang'
   | 'router-ang'
+  | 'vibe-ang'
   | 'workflow-smith-squad'
   | 'vision-scout-squad';
 
@@ -44,7 +45,8 @@ export type VerticalCategory =
   | 'branding'
   | 'marketing'
   | 'engineering'
-  | 'automation';
+  | 'automation'
+  | 'vibe-coding';
 
 export type AcheevyMode = 'business-builder' | 'growth-mode';
 

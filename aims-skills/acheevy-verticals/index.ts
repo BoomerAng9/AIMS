@@ -62,6 +62,26 @@ export {
   completeSession,
 } from './hooks/vertical-detection.hook';
 
+// ── Managed Vibe Coding Department ──────────────────────────────────────
+export {
+  VIBE_CODING_VERTICAL,
+  matchVibeIntent,
+} from '../departments/vibe-coding/vibe-session.vertical';
+
+export {
+  VIBE_ANG_CARD,
+  VIBE_SQUAD_CARDS,
+} from '../departments/vibe-coding/agent-cards';
+
+export { generateBuildManifest } from '../departments/vibe-coding/build-manifest';
+
+export type {
+  AiPlugSpec,
+  BuildManifest,
+  VibeSessionData,
+  TechStackRecommendation,
+} from '../departments/vibe-coding/types';
+
 // ── Types ───────────────────────────────────────────────────────────────
 export type {
   VerticalDefinition,

@@ -1,0 +1,62 @@
+# =============================================================================
+# A.I.M.S. — Cloud Run Service: Frontend (Next.js 15)
+# =============================================================================
+# Stateless, auto-scaling web frontend.
+# Image: us-central1-docker.pkg.dev/ai-managed-services/aims-docker/frontend
+#
+# Deploy:
+#   gcloud run services replace infra/cloudrun/frontend.service.yaml \
+#     --region us-central1
+# =============================================================================
+
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: aims-frontend
+  labels:
+    cloud.googleapis.com/location: us-central1
+  annotations:
+    run.googleapis.com/ingress: all
+    run.googleapis.com/launch-stage: GA
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/minScale: "0"
+        autoscaling.knative.dev/maxScale: "5"
+        run.googleapis.com/cpu-throttling: "true"
+        run.googleapis.com/startup-cpu-boost: "true"
+    spec:
+      containerConcurrency: 80
+      timeoutSeconds: 300
+      serviceAccountName: aims-frontend@ai-managed-services.iam.gserviceaccount.com
+      containers:
+        - image: us-central1-docker.pkg.dev/ai-managed-services/aims-docker/frontend:latest
+          ports:
+            - containerPort: 3000
+          resources:
+            limits:
+              cpu: "1"
+              memory: 512Mi
+          env:
+            - name: NODE_ENV
+              value: production
+            - name: NEXT_PUBLIC_API_URL
+              value: https://gateway.plugmein.cloud
+            - name: NEXT_PUBLIC_LANDING_URL
+              value: https://aimanagedsolutions.cloud
+          startupProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 10
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+            periodSeconds: 30
+  traffic:
+    - percent: 100
+      latestRevision: true

@@ -1,0 +1,97 @@
+# =============================================================================
+# A.I.M.S. — Cloud Run Service: UEF Gateway (Port Authority)
+# =============================================================================
+# Stateless API gateway. Connects to VPS stateful services (Redis, agents).
+# Image: us-central1-docker.pkg.dev/ai-managed-services/aims-docker/uef-gateway
+#
+# Deploy:
+#   gcloud run services replace infra/cloudrun/gateway.service.yaml \
+#     --region us-central1
+# =============================================================================
+
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: aims-gateway
+  labels:
+    cloud.googleapis.com/location: us-central1
+  annotations:
+    run.googleapis.com/ingress: all
+    run.googleapis.com/launch-stage: GA
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/minScale: "1"
+        autoscaling.knative.dev/maxScale: "3"
+        run.googleapis.com/cpu-throttling: "false"
+        run.googleapis.com/startup-cpu-boost: "true"
+        run.googleapis.com/execution-environment: gen2
+    spec:
+      containerConcurrency: 80
+      timeoutSeconds: 300
+      serviceAccountName: aims-gateway@ai-managed-services.iam.gserviceaccount.com
+      containers:
+        - image: us-central1-docker.pkg.dev/ai-managed-services/aims-docker/uef-gateway:latest
+          ports:
+            - containerPort: 3001
+          resources:
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          env:
+            - name: NODE_ENV
+              value: production
+            - name: PORT
+              value: "3001"
+            - name: LOG_LEVEL
+              value: info
+            # ── VPS Stateful Services ──
+            - name: REDIS_URL
+              value: redis://76.13.96.107:6379
+            - name: N8N_URL
+              value: http://76.13.96.107:5678
+            - name: RESEARCH_ANG_URL
+              value: http://76.13.96.107:3020
+            - name: ROUTER_ANG_URL
+              value: http://76.13.96.107:3021
+            - name: CHICKEN_HAWK_URL
+              value: http://76.13.96.107:4001
+            - name: HOUSE_OF_ANG_URL
+              value: http://76.13.96.107:3002
+            # ── Secrets (from GCP Secret Manager) ──
+            - name: INTERNAL_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: latest
+                  name: INTERNAL_API_KEY
+            - name: OPENROUTER_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: latest
+                  name: OPENROUTER_API_KEY
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: latest
+                  name: REDIS_PASSWORD
+            - name: STRIPE_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: latest
+                  name: STRIPE_SECRET_KEY
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 3001
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3001
+            periodSeconds: 30
+  traffic:
+    - percent: 100
+      latestRevision: true

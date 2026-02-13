@@ -441,6 +441,33 @@
       "endpoint": "http://dtpmo-proof:8405/execute",
       "health_check": "http://dtpmo-proof:8405/health",
       "status": "registered"
+    },
+    {
+      "id": "vibe_ang",
+      "name": "Vibe_Ang",
+      "source_repo": "aims/departments/vibe-coding",
+      "description": "Managed Vibe Coding department manager — turns conversations into working aiPLUGs",
+      "capabilities": [
+        "requirements_analysis",
+        "tech_stack_recommendation",
+        "build_manifest_generation",
+        "iterative_development",
+        "preview_deployment",
+        "code_generation",
+        "containerization",
+        "cloud_deploy"
+      ],
+      "required_quotas": {
+        "api_calls": 50,
+        "container_hours": 1,
+        "storage_gb": 5,
+        "e2b_sessions": 3
+      },
+      "endpoint": "http://vibe-ang:8500/execute",
+      "health_check": "http://vibe-ang:8500/health",
+      "pmo_office": "Plug Factory",
+      "department": "vibe-coding",
+      "status": "registered"
     }
   ],
   "capability_index": {
@@ -497,8 +524,13 @@
     "coaching_coordination": ["betty_ann_ang", "rumi_ang"],
     "governance_management": ["astra_ang", "atlas_ang", "blueprint_ang", "sentinel_ang", "ledger_ang", "proof_ang"],
     "priority_setting": ["astra_ang"],
-    "conflict_arbitration": ["astra_ang"]
+    "conflict_arbitration": ["astra_ang"],
+    "requirements_analysis": ["vibe_ang"],
+    "tech_stack_recommendation": ["vibe_ang"],
+    "build_manifest_generation": ["vibe_ang"],
+    "iterative_development": ["vibe_ang", "coder_ang"],
+    "preview_deployment": ["vibe_ang"]
   },
-  "version": "2.0.0",
-  "last_updated": "2026-02-08T00:00:00Z"
+  "version": "2.1.0",
+  "last_updated": "2026-02-13T00:00:00Z"
 }

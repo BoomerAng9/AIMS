@@ -24,6 +24,7 @@
  */
 
 import type { VerticalDefinition } from './types';
+import { VIBE_CODING_VERTICAL } from '../departments/vibe-coding/vibe-session.vertical';
 
 // ---------------------------------------------------------------------------
 // 10 Revenue Verticals
@@ -900,6 +901,12 @@ Return ONLY a JSON array of step description strings.
       transition_prompt: 'Ready to fill your calendar? I\'ll generate 30 days of content, write the copy, and create templates for every content type.',
     },
   },
+
+  // ── 11. MANAGED VIBE CODING — aiPLUG BUILDER ───────────────────────────
+  // "Conversate your way to a working aiPLUG."
+  // See: aims-skills/departments/vibe-coding/DEPARTMENT.md
+
+  'vibe-coding': VIBE_CODING_VERTICAL,
 };
 
 // ---------------------------------------------------------------------------
@@ -936,6 +943,7 @@ export function matchVertical(message: string): VerticalDefinition | null {
 /**
  * Detect any business-building intent in a message.
  * Broader than matchVertical — catches general entrepreneurial intent.
+ * Includes vibe coding / app-building intent.
  */
 export function detectBusinessIntent(message: string): boolean {
   const INTENT_PATTERNS = [
@@ -950,6 +958,12 @@ export function detectBusinessIntent(message: string): boolean {
     /go\s*to\s*market/i,
     /what\s*should\s*i\s*build/i,
     /make\s*money/i,
+    // Vibe coding / app-building intent
+    /build\s*(me|my|a|an)\s*(app|site|tool|dashboard|platform)/i,
+    /vibe\s*cod(e|ing)/i,
+    /aiPlug/i,
+    /make\s*me\s*an?\s*(app|website|tool)/i,
+    /can\s*you\s*(build|code|create|ship)/i,
   ];
   return INTENT_PATTERNS.some(pattern => pattern.test(message));
 }

@@ -1,7 +1,7 @@
 # ACHEEVY BRAIN
 ## The Single Source of Truth for ACHEEVY's Behavior, Skills, Hooks & Recurring Tasks
 
-> **Version:** 1.0.0
+> **Version:** 1.1.0
 > **Owner:** ACHEEVY (Digital CEO of A.I.M.S.)
 > **Effective:** 2026-02-13
 > **Doctrine:** "Think it. Prompt it. Let ACHEEVY manage it."
@@ -190,7 +190,7 @@ Tasks are executable units that produce artifacts.
 
 ## 8. Revenue Verticals (Business Builder Engine)
 
-10 conversational verticals with 2-phase execution:
+11 conversational verticals with 2-phase execution:
 - **Phase A**: Conversational chain (NLP trigger → collect user requirements step-by-step)
 - **Phase B**: Execution blueprint (R-R-S pipeline → governance → agents → artifacts)
 
@@ -206,6 +206,24 @@ Tasks are executable units that produce artifacts.
 | 8 | **Cold Outreach Engine** | marketing | marketer-ang | "cold email", "outreach", "pitch email" |
 | 9 | **Task Automation Builder** | automation | chicken-hawk | "automate", "save time", "streamline" |
 | 10 | **Content Calendar Generator** | marketing | marketer-ang | "content plan", "posting schedule", "content calendar" |
+| 11 | **Managed Vibe Coding (aiPLUG Builder)** | vibe-coding | vibe-ang → chicken-hawk | "build me an app", "vibe coding", "aiPLUG", "make me a tool" |
+
+### Vertical 11: Managed Vibe Coding — The Plug Factory
+
+> **"Conversate your way to a working aiPLUG."**
+
+Unlike verticals 1-10 (which produce docs, research, and copy), Vertical 11
+**builds the actual product**. Users talk, ACHEEVY listens, Vibe_Ang builds.
+
+- **Department:** `aims-skills/departments/vibe-coding/`
+- **Manager:** Vibe_Ang (Boomer_Ang, Expert bench)
+- **Build Squad:** Lil_Scaffold_Hawk, Lil_Code_Hawk, Lil_Style_Hawk, Lil_Test_Hawk, Lil_Deploy_Hawk
+- **Support:** Coder_Ang (E2B), Quality_Ang (ORACLE), Dockmaster_Ang (containers)
+- **Infra:** Cloud Run Jobs (`aims-vibe-coder`) for large builds
+- **Revenue:** Build hours billed via LUC
+
+Phase A collects: vision, design vibe, features, tech stack, confirmation.
+Phase B executes: scaffold → code → style → test → deploy → verify.
 
 ### Vertical Execution Flow
 ```
@@ -315,6 +333,7 @@ Every tool and capability is **owned** by a Boomer_Ang. No raw tool access.
 | `OpsConsole_Ang` | Observability | Multi-agent monitoring, CommonGround |
 | `Index_Ang` | Data | Datasets, embeddings, II-Commons |
 | `Licensing_Ang` | Compliance | AGPL/license quarantine, PPTist |
+| `Vibe_Ang` | Vibe Coding (Plug Factory) | aiPLUG builds, conversational dev, preview deploys |
 
 ---
 
@@ -424,8 +443,16 @@ aims-skills/
 │   ├── kling-video.md                ← Video generation
 │   └── web-scrape.md                 ← Web scraping
 ├── acheevy-verticals/
-│   ├── vertical-definitions.ts    ← 10 revenue verticals
+│   ├── vertical-definitions.ts    ← 11 revenue verticals (incl. vibe-coding)
 │   └── types.ts                   ← Vertical type definitions
+├── departments/
+│   └── vibe-coding/               ← Managed Vibe Coding Department
+│       ├── DEPARTMENT.md           ← Department charter
+│       ├── index.ts                ← Barrel exports
+│       ├── types.ts                ← aiPLUG, BuildManifest types
+│       ├── vibe-session.vertical.ts← Vertical 11 definition
+│       ├── agent-cards.ts          ← Vibe_Ang + Lil_Hawk squad cards
+│       └── build-manifest.ts       ← Manifest generator + tech stack recommender
 ├── chain-of-command/
 │   ├── CHAIN_OF_COMMAND.md        ← Full governance document
 │   └── role-cards/
@@ -455,6 +482,15 @@ frontend/lib/acheevy/
 
 infra/deploy-platform/circuit-box/
 └── acheevy-tools.json             ← Tool registry (9 tools)
+
+infra/cloudrun/
+├── frontend.service.yaml          ← Cloud Run: Next.js frontend
+├── gateway.service.yaml           ← Cloud Run: UEF Gateway
+├── acheevy.service.yaml           ← Cloud Run: ACHEEVY orchestrator
+├── vibe-coder.job.yaml            ← Cloud Run Job: aiPLUG builder
+└── deploy-cloudrun.sh             ← Cloud Run deploy script
+
+services/chicken-hawk/             ← Chicken Hawk execution engine (port 4001)
 ```
 
 ---
@@ -498,6 +534,10 @@ aims-skills/tasks/<name>.md
 # 2. Follow the VerticalDefinition type
 # 3. Define Phase A chain_steps + Phase B execution
 # 4. Document in Section 8 of this file
+# For complex verticals with their own department:
+# 5. Create aims-skills/departments/<name>/
+# 6. Add agent cards, types, and manifest generator
+# 7. Register Boomer_Ang in infra/boomerangs/registry.json
 ```
 
 ### Adding a New Recurring Function
