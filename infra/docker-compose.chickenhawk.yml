@@ -1,0 +1,188 @@
+version: '3.8'
+name: aims-chickenhawk
+
+# ===========================================================================
+# ChickenHawk Service Cluster — Track 1 (P0, heavy)
+#
+# Usage:
+#   docker compose -f docker-compose.chickenhawk.yml up -d
+#
+# All services are internal-only (no host port mapping). They communicate
+# over the shared aims-network and are reachable by service name.
+# ===========================================================================
+
+services:
+  # -------------------------------------------------------------------------
+  # chickenhawk-core: Main orchestration hub (port 8081 internal)
+  # -------------------------------------------------------------------------
+  chickenhawk-core:
+    build:
+      context: ../services/chicken-hawk
+      dockerfile: Dockerfile
+    container_name: chickenhawk-core
+    expose:
+      - "8081"
+    environment:
+      - PORT=8081
+      - NODE_ENV=production
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY}
+      - DEEPGRAM_API_KEY=${DEEPGRAM_API_KEY}
+      - ACHEEVY_URL=http://acheevy:3003
+    volumes:
+      - chickenhawk-data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://127.0.0.1:8081/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
+    networks:
+      - aims-network
+
+  # -------------------------------------------------------------------------
+  # mim-orchestrator: MIM orchestration container (port 8082 internal)
+  # -------------------------------------------------------------------------
+  mim-orchestrator:
+    build:
+      context: ../services/chicken-hawk
+      dockerfile: Dockerfile
+    container_name: mim-orchestrator
+    command: ["bun", "run", "src/containers/mim-orchestrator.ts"]
+    expose:
+      - "8082"
+    environment:
+      - PORT=8082
+      - NODE_ENV=production
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY}
+      - DEEPGRAM_API_KEY=${DEEPGRAM_API_KEY}
+      - ACHEEVY_URL=http://acheevy:3003
+    volumes:
+      - chickenhawk-data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://127.0.0.1:8082/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
+    depends_on:
+      chickenhawk-core:
+        condition: service_healthy
+    networks:
+      - aims-network
+
+  # -------------------------------------------------------------------------
+  # boomerang-scout: Boomerang scout container (port 8083 internal)
+  # -------------------------------------------------------------------------
+  boomerang-scout:
+    build:
+      context: ../services/chicken-hawk
+      dockerfile: Dockerfile
+    container_name: boomerang-scout
+    command: ["bun", "run", "src/containers/boomerang-scout.ts"]
+    expose:
+      - "8083"
+    environment:
+      - PORT=8083
+      - NODE_ENV=production
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY}
+      - DEEPGRAM_API_KEY=${DEEPGRAM_API_KEY}
+      - ACHEEVY_URL=http://acheevy:3003
+    volumes:
+      - chickenhawk-data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://127.0.0.1:8083/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
+    depends_on:
+      chickenhawk-core:
+        condition: service_healthy
+    networks:
+      - aims-network
+
+  # -------------------------------------------------------------------------
+  # oracle-verifier: Oracle verification container (port 8084 internal)
+  # -------------------------------------------------------------------------
+  oracle-verifier:
+    build:
+      context: ../services/chicken-hawk
+      dockerfile: Dockerfile
+    container_name: oracle-verifier
+    command: ["bun", "run", "src/containers/oracle-verifier.ts"]
+    expose:
+      - "8084"
+    environment:
+      - PORT=8084
+      - NODE_ENV=production
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY}
+      - DEEPGRAM_API_KEY=${DEEPGRAM_API_KEY}
+      - ACHEEVY_URL=http://acheevy:3003
+    volumes:
+      - chickenhawk-data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://127.0.0.1:8084/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
+    depends_on:
+      chickenhawk-core:
+        condition: service_healthy
+    networks:
+      - aims-network
+
+  # -------------------------------------------------------------------------
+  # bamaram-generator: Bamaram generation container (port 8085 internal)
+  # -------------------------------------------------------------------------
+  bamaram-generator:
+    build:
+      context: ../services/chicken-hawk
+      dockerfile: Dockerfile
+    container_name: bamaram-generator
+    command: ["bun", "run", "src/containers/bamaram-generator.ts"]
+    expose:
+      - "8085"
+    environment:
+      - PORT=8085
+      - NODE_ENV=production
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY}
+      - DEEPGRAM_API_KEY=${DEEPGRAM_API_KEY}
+      - ACHEEVY_URL=http://acheevy:3003
+    volumes:
+      - chickenhawk-data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://127.0.0.1:8085/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
+    depends_on:
+      chickenhawk-core:
+        condition: service_healthy
+    networks:
+      - aims-network
+
+# ===========================================================================
+# Volumes
+# ===========================================================================
+volumes:
+  chickenhawk-data:
+    driver: local
+
+# ===========================================================================
+# Networks — join the existing AIMS network
+# ===========================================================================
+networks:
+  aims-network:
+    external: true
