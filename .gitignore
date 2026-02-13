@@ -16,6 +16,7 @@ dist/
 .DS_Store
 .claude/
 .stitch/
+.data/
 *.pem
 *.key
 *.log

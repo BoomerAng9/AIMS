@@ -11,6 +11,7 @@
  * - File attachments
  */
 
+import React from 'react';
 import { useChat } from 'ai/react';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import Image from 'next/image';
@@ -23,6 +24,9 @@ import {
 } from 'lucide-react';
 import { useVoiceInput } from '@/hooks/useVoiceInput';
 import { useVoiceOutput } from '@/hooks/useVoiceOutput';
+import { ReadReceiptChip } from '@/components/chat/ReadReceipt';
+import { createReadReceipt, advanceReceipt, classifyIntent } from '@/lib/acheevy/read-receipt';
+import type { ReadReceipt } from '@/lib/acheevy/read-receipt';
 
 // ── Types ──
 
@@ -174,6 +178,7 @@ export default function AcheevyChat() {
   const [attachments, setAttachments] = useState<UploadedFile[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [speakingMessageId, setSpeakingMessageId] = useState<string | null>(null);
+  const [readReceipts, setReadReceipts] = useState<Map<string, ReadReceipt>>(new Map());
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const prevMessageCountRef = useRef(0);
@@ -183,7 +188,7 @@ export default function AcheevyChat() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // ── Auto-TTS: speak new assistant messages ──
+  // ── Auto-TTS + Read Receipt: on new assistant messages ──
   useEffect(() => {
     if (isLoading) return;
     if (messages.length <= prevMessageCountRef.current) {
@@ -193,11 +198,28 @@ export default function AcheevyChat() {
     prevMessageCountRef.current = messages.length;
 
     const last = messages[messages.length - 1];
-    if (last?.role === 'assistant' && last.id !== 'welcome' && voiceOutput.autoPlayEnabled) {
-      const clean = stripMarkdownForTTS(last.content);
-      if (clean.length > 0 && clean.length <= 5000) {
-        setSpeakingMessageId(last.id);
-        voiceOutput.speak(clean);
+    if (last?.role === 'assistant' && last.id !== 'welcome') {
+      // Auto-TTS
+      if (voiceOutput.autoPlayEnabled) {
+        const clean = stripMarkdownForTTS(last.content);
+        if (clean.length > 0 && clean.length <= 5000) {
+          setSpeakingMessageId(last.id);
+          voiceOutput.speak(clean);
+        }
+      }
+
+      // Generate Read Receipt for this response
+      // Find the preceding user message to classify intent
+      const msgIndex = messages.findIndex(m => m.id === last.id);
+      const precedingUser = messages.slice(0, msgIndex).reverse().find(m => m.role === 'user');
+      if (precedingUser) {
+        const intentCat = classifyIntent(precedingUser.content);
+        let receipt = createReadReceipt(precedingUser.content, intentCat);
+        receipt = advanceReceipt(receipt, 'classifying', 'Intent classified');
+        receipt = advanceReceipt(receipt, 'routing', 'Routed to agent');
+        receipt = advanceReceipt(receipt, 'in_progress', 'Processing');
+        receipt = advanceReceipt(receipt, 'delivered', 'Response delivered');
+        setReadReceipts(prev => new Map(prev).set(last.id, receipt));
       }
     }
   }, [isLoading, messages, voiceOutput]);
@@ -461,74 +483,82 @@ export default function AcheevyChat() {
       {/* Messages */}
       <div className="relative z-10 flex-1 overflow-y-auto px-4 py-4 space-y-4 scroll-smooth">
         {messages.map((m, i) => (
-          <div key={m.id} className={`flex gap-3 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            {m.role === 'assistant' && (
-              <div className={`w-7 h-7 rounded-lg bg-white/5 border border-gold/10 flex items-center justify-center flex-shrink-0 mt-0.5 overflow-hidden ${
-                speakingMessageId === m.id ? 'ring-2 ring-gold/40 animate-pulse' : ''
-              }`}>
-                <Image
-                  src="/images/acheevy/acheevy-helmet.png"
-                  alt="ACHEEVY"
-                  width={20}
-                  height={20}
-                  className="object-contain"
-                />
-              </div>
-            )}
-            <div className={`relative group px-4 py-3 rounded-2xl text-sm leading-relaxed max-w-[85%] ${
-              m.role === 'user'
-                ? 'bg-gold/10 text-white rounded-tr-sm border border-gold/20'
-                : 'wireframe-card text-white/90 rounded-tl-sm'
-            }`}>
-              {m.role === 'user' ? (
-                m.content
-              ) : (
-                <div className="prose prose-invert prose-sm max-w-none prose-code:text-gold prose-code:bg-black/40 prose-code:px-1 prose-code:rounded">
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{m.content}</ReactMarkdown>
-                  {isLoading && i === messages.length - 1 && (
-                    <span className="inline-block w-1.5 h-4 bg-gold ml-0.5 animate-pulse" />
-                  )}
+          <React.Fragment key={m.id}>
+            <div className={`flex gap-3 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+              {m.role === 'assistant' && (
+                <div className={`w-7 h-7 rounded-lg bg-white/5 border border-gold/10 flex items-center justify-center flex-shrink-0 mt-0.5 overflow-hidden ${
+                  speakingMessageId === m.id ? 'ring-2 ring-gold/40 animate-pulse' : ''
+                }`}>
+                  <Image
+                    src="/images/acheevy/acheevy-helmet.png"
+                    alt="ACHEEVY"
+                    width={20}
+                    height={20}
+                    className="object-contain"
+                  />
                 </div>
               )}
-              {/* Per-message playback controls for assistant messages */}
-              {m.role === 'assistant' && m.id !== 'welcome' && !isLoading && (
-                <div className="flex items-center gap-1 mt-2 pt-2 border-t border-wireframe-stroke opacity-0 group-hover:opacity-100 transition-opacity">
-                  {speakingMessageId === m.id && voiceOutput.isPlaying ? (
-                    <button
-                      type="button"
-                      onClick={() => voiceOutput.pause()}
-                      title="Pause"
-                      className="p-1 rounded text-gold/60 hover:text-gold hover:bg-gold/10 transition-colors"
-                    >
-                      <Pause size={12} />
-                    </button>
-                  ) : (
+              <div className={`relative group px-4 py-3 rounded-2xl text-sm leading-relaxed max-w-[85%] ${
+                m.role === 'user'
+                  ? 'bg-gold/10 text-white rounded-tr-sm border border-gold/20'
+                  : 'wireframe-card text-white/90 rounded-tl-sm'
+              }`}>
+                {m.role === 'user' ? (
+                  m.content
+                ) : (
+                  <div className="prose prose-invert prose-sm max-w-none prose-code:text-gold prose-code:bg-black/40 prose-code:px-1 prose-code:rounded">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{m.content}</ReactMarkdown>
+                    {isLoading && i === messages.length - 1 && (
+                      <span className="inline-block w-1.5 h-4 bg-gold ml-0.5 animate-pulse" />
+                    )}
+                  </div>
+                )}
+                {/* Per-message playback controls for assistant messages */}
+                {m.role === 'assistant' && m.id !== 'welcome' && !isLoading && (
+                  <div className="flex items-center gap-1 mt-2 pt-2 border-t border-wireframe-stroke opacity-0 group-hover:opacity-100 transition-opacity">
+                    {speakingMessageId === m.id && voiceOutput.isPlaying ? (
+                      <button
+                        type="button"
+                        onClick={() => voiceOutput.pause()}
+                        title="Pause"
+                        className="p-1 rounded text-gold/60 hover:text-gold hover:bg-gold/10 transition-colors"
+                      >
+                        <Pause size={12} />
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => speakMessage(m.id, m.content)}
+                        title="Speak this message"
+                        className="p-1 rounded text-white/30 hover:text-gold hover:bg-gold/10 transition-colors"
+                      >
+                        <Play size={12} />
+                      </button>
+                    )}
                     <button
                       type="button"
                       onClick={() => speakMessage(m.id, m.content)}
-                      title="Speak this message"
+                      title="Replay"
                       className="p-1 rounded text-white/30 hover:text-gold hover:bg-gold/10 transition-colors"
                     >
-                      <Play size={12} />
+                      <RotateCcw size={12} />
                     </button>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => speakMessage(m.id, m.content)}
-                    title="Replay"
-                    className="p-1 rounded text-white/30 hover:text-gold hover:bg-gold/10 transition-colors"
-                  >
-                    <RotateCcw size={12} />
-                  </button>
+                  </div>
+                )}
+              </div>
+              {m.role === 'user' && (
+                <div className="w-7 h-7 rounded-lg bg-white/5 border border-wireframe-stroke flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <User className="w-3.5 h-3.5 text-white/50" />
                 </div>
               )}
             </div>
-            {m.role === 'user' && (
-              <div className="w-7 h-7 rounded-lg bg-white/5 border border-wireframe-stroke flex items-center justify-center flex-shrink-0 mt-0.5">
-                <User className="w-3.5 h-3.5 text-white/50" />
+            {/* Read Receipt — collapsible chip below assistant responses */}
+            {m.role === 'assistant' && m.id !== 'welcome' && !isLoading && readReceipts.has(m.id) && (
+              <div className="ml-10">
+                <ReadReceiptChip receipt={readReceipts.get(m.id)!} />
               </div>
             )}
-          </div>
+          </React.Fragment>
         ))}
         {isLoading && messages.length > 0 && messages[messages.length - 1].role === 'user' && (
           <div className="flex gap-3">
