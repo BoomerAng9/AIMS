@@ -36,7 +36,7 @@ const AI_MODELS = [
   { key: 'qwen',          label: 'Qwen 2.5 Coder 32B', tag: 'code' },
   { key: 'qwen-max',      label: 'Qwen Max',            tag: '' },
   { key: 'minimax',       label: 'MiniMax-01',          tag: '' },
-  { key: 'glm',           label: 'GLM-4 32B',           tag: '' },
+  { key: 'glm',           label: 'GLM-5',                tag: '' },
   { key: 'kimi',          label: 'Kimi K2.5',           tag: 'fast' },
   { key: 'nano-banana',   label: 'Nano Banana Pro',     tag: 'fast' },
   { key: 'gemini-pro',    label: 'Gemini 2.5 Pro',      tag: '' },
@@ -276,33 +276,67 @@ interface VoiceInputButtonProps {
 }
 
 function VoiceInputButton({ isListening, isProcessing, audioLevel, onStart, onStop }: VoiceInputButtonProps) {
+  const [elapsed, setElapsed] = useState(0);
+
+  useEffect(() => {
+    if (!isListening) { setElapsed(0); return; }
+    const t = setInterval(() => setElapsed(s => s + 1), 1000);
+    return () => clearInterval(t);
+  }, [isListening]);
+
+  const fmt = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+
   return (
-    <button
-      onClick={isListening ? onStop : onStart}
-      disabled={isProcessing}
-      className={`
-        relative p-3 rounded-xl transition-all
-        ${isListening
-          ? 'bg-red-500/20 text-red-400'
-          : 'bg-white/5 text-white/50 hover:bg-white/10 hover:text-white'
-        }
-        ${isProcessing ? 'opacity-50 cursor-not-allowed' : ''}
-      `}
-    >
-      {/* Audio level ring */}
+    <div className="flex items-center gap-2">
+      <button
+        onClick={isListening ? onStop : onStart}
+        disabled={isProcessing}
+        className={`
+          relative p-3 rounded-xl transition-all
+          ${isListening
+            ? 'bg-red-500/20 text-red-400'
+            : 'bg-white/5 text-white/50 hover:bg-white/10 hover:text-white'
+          }
+          ${isProcessing ? 'opacity-50 cursor-not-allowed' : ''}
+        `}
+      >
+        {/* Audio level ring */}
+        {isListening && (
+          <div
+            className="absolute inset-0 rounded-xl border-2 border-red-400 animate-ping"
+            style={{ opacity: audioLevel * 0.5 }}
+          />
+        )}
+
+        {isProcessing ? (
+          <div className="w-5 h-5 border-2 border-gold border-t-transparent rounded-full animate-spin" />
+        ) : (
+          <MicIcon className="w-5 h-5" />
+        )}
+      </button>
+
+      {/* Recording timer + level indicator */}
       {isListening && (
-        <div
-          className="absolute inset-0 rounded-xl border-2 border-red-400 animate-ping"
-          style={{ opacity: audioLevel * 0.5 }}
-        />
+        <div className="flex items-center gap-1.5">
+          <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+          <span className="text-xs font-mono text-red-400">{fmt(elapsed)}</span>
+          <div className="flex gap-0.5 items-end h-4">
+            {[0.3, 0.6, 1, 0.7, 0.4].map((scale, i) => (
+              <div
+                key={i}
+                className="w-0.5 bg-red-400/60 rounded-full transition-all duration-75"
+                style={{ height: `${Math.max(4, audioLevel * scale * 16)}px` }}
+              />
+            ))}
+          </div>
+        </div>
       )}
 
-      {isProcessing ? (
-        <div className="w-5 h-5 border-2 border-gold border-t-transparent rounded-full animate-spin" />
-      ) : (
-        <MicIcon className="w-5 h-5" />
+      {/* Processing indicator */}
+      {isProcessing && (
+        <span className="text-xs text-gold/60 animate-pulse">Transcribing...</span>
       )}
-    </button>
+    </div>
   );
 }
 
@@ -338,6 +372,7 @@ export function ChatInterface({
   const [inputValue, setInputValue] = useState('');
   const [showBoard, setShowBoard] = useState(false);
   const [showInputModal, setShowInputModal] = useState(false);
+  const [voiceTranscriptReady, setVoiceTranscriptReady] = useState(false);
   
   // New State for Persona and Language
   const [selectedPersona, setSelectedPersona] = useState(PERSONAS[0].id);
@@ -451,11 +486,11 @@ export function ChatInterface({
       language: selectedLanguage,
     },
     onTranscript: (result) => {
+      // Populate textarea for user to review/edit before sending
       setInputValue(result.text);
-      // Auto-send after voice input
-      if (result.text.trim()) {
-        handleSend(result.text);
-      }
+      setVoiceTranscriptReady(true);
+      // Focus the textarea so user can edit immediately
+      setTimeout(() => textareaRef.current?.focus(), 100);
     },
   });
 
@@ -530,6 +565,7 @@ export function ChatInterface({
 
     sendMessage(messageText);
     setInputValue('');
+    setVoiceTranscriptReady(false);
 
     // Reset textarea height
     if (textareaRef.current) {
@@ -696,7 +732,21 @@ export function ChatInterface({
              </div>
           </div>
 
-          <div className="relative flex items-end gap-3 wireframe-card rounded-2xl p-3 focus-within:border-gold/30 transition-colors">
+          {/* Voice transcript ready indicator */}
+          {voiceTranscriptReady && inputValue.trim() && (
+            <div className="flex items-center gap-2 px-3 py-1.5 mb-2 rounded-lg bg-gold/5 border border-gold/15 text-xs text-gold/70">
+              <MicIcon className="w-3 h-3" style={{}} />
+              <span>Voice transcript ready — review and press Enter to send</span>
+              <button
+                onClick={() => { setInputValue(''); setVoiceTranscriptReady(false); }}
+                className="ml-auto text-white/30 hover:text-white/60 transition-colors"
+              >
+                Clear
+              </button>
+            </div>
+          )}
+
+          <div className={`relative flex items-end gap-3 wireframe-card rounded-2xl p-3 focus-within:border-gold/30 transition-colors ${voiceTranscriptReady ? 'border-gold/20' : ''}`}>
             {/* Voice Input */}
             <VoiceInputButton
               isListening={voiceInput.isListening}

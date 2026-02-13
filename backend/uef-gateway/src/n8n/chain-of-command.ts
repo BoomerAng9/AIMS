@@ -2,7 +2,7 @@
  * Chain of Command Pipeline — Full Execution Engine
  *
  * Executes the complete chain:
- *   Chicken_Hawk → Squad → Lil_Hawks → Verification → Receipt → ACHEEVY → User
+ *   Chicken Hawk → Squad → Lil_Hawks → Verification → Receipt → ACHEEVY → User
  *
  * Takes a PmoPipelinePacket (already classified + directed by PMO Router)
  * and runs it through Squad assembly, wave execution, verification, and receipt seal.
@@ -78,7 +78,7 @@ const DESIGNATIONS: Record<CrewSpecialty, HawkDesignation[]> = {
 };
 
 // ---------------------------------------------------------------------------
-// Step 3: Chicken_Hawk — Shift Spawn & Squad Assembly
+// Step 3: Chicken Hawk — Shift Spawn & Squad Assembly
 // ---------------------------------------------------------------------------
 
 function spawnShift(packet: PmoPipelinePacket): PmoPipelinePacket {
@@ -150,12 +150,12 @@ function spawnShift(packet: PmoPipelinePacket): PmoPipelinePacket {
 
   logger.info(
     { shiftId, squadId, squadSize: members.length, steps: assignedSteps.length, waves: estimatedWaves },
-    '[Chain] Chicken_Hawk spawned shift + squad',
+    '[Chain] Chicken Hawk spawned shift + squad',
   );
 
   return {
     ...packet,
-    chainOfCommand: { ...packet.chainOfCommand, step: 3, current: 'Chicken_Hawk', next: 'Squad' },
+    chainOfCommand: { ...packet.chainOfCommand, step: 3, current: 'Chicken Hawk', next: 'Squad' },
     shift,
     squad,
     execution,
@@ -556,7 +556,7 @@ function buildResponse(packet: PmoPipelinePacket): N8nPipelineResponse {
 
 /**
  * Execute the full chain-of-command pipeline:
- *   Chicken_Hawk → Squad → Lil_Hawks → Verification → Receipt → Response
+ *   Chicken Hawk → Squad → Lil_Hawks → Verification → Receipt → Response
  *
  * Input: PmoPipelinePacket (already classified + directed by pmo-router)
  * Output: N8nPipelineResponse (ready to return to user)
@@ -570,7 +570,7 @@ export async function executeChainOfCommand(packet: PmoPipelinePacket): Promise<
     '[Chain] Starting chain-of-command pipeline (A2A dispatch active)',
   );
 
-  // Step 3: Chicken_Hawk — Spawn Shift + Assemble Squad
+  // Step 3: Chicken Hawk — Spawn Shift + Assemble Squad
   let state = spawnShift(packet);
 
   // Step 4: Squad — Execute Waves with Lil_Hawks → Real A2A Agent Dispatch

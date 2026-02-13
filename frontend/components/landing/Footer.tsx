@@ -48,6 +48,8 @@ const InstagramIcon = ({ className }: { className?: string }) => (
 // Footer Navigation
 // ─────────────────────────────────────────────────────────────
 
+const APP_DOMAIN = process.env.NEXT_PUBLIC_APP_URL || 'https://plugmein.cloud';
+
 const FOOTER_NAV = {
   company: {
     title: 'Company Navigation',
@@ -62,21 +64,21 @@ const FOOTER_NAV = {
   platform: {
     title: 'Platform Sections',
     links: [
-      { label: 'ACHEEVY (AI Assistant)', href: '/dashboard' },
-      { label: 'House of Ang (Agents)', href: '/dashboard/house-of-ang' },
-      { label: 'Model Garden (Tools)', href: '/dashboard/model-garden' },
+      { label: 'ACHEEVY (AI Assistant)', href: `${APP_DOMAIN}/dashboard` },
+      { label: 'House of Ang (Agents)', href: `${APP_DOMAIN}/dashboard/house-of-ang` },
+      { label: 'Model Garden (Tools)', href: `${APP_DOMAIN}/dashboard/model-garden` },
+      { label: 'Circuit Box', href: `${APP_DOMAIN}/dashboard/circuit-box` },
       { label: 'Pricing', href: '/pricing' },
-      { label: 'Subscription Plans', href: '/plans' },
     ],
   },
   community: {
     title: 'Community & Support',
     links: [
       { label: 'Discord Community', href: 'https://discord.gg/aims' },
-      { label: 'GitHub Repository', href: 'https://github.com/aims' },
+      { label: 'GitHub Repository', href: 'https://github.com/BoomerAng9/AIMS' },
       { label: 'Documentation', href: '/docs' },
       { label: 'FAQ', href: '/faq' },
-      { label: 'Support', href: 'mailto:support@aims.app' },
+      { label: 'Support', href: 'mailto:acheevy@aimanagedsolutions.cloud' },
     ],
   },
   legal: {
@@ -236,19 +238,19 @@ export function Footer() {
 
           {/* Related Links */}
           <div className="flex items-center gap-4 text-sm">
-            <Link href="/dashboard" className="text-gray-400 hover:text-white transition-colors">
+            <Link href={`${APP_DOMAIN}/dashboard`} className="text-gray-400 hover:text-white transition-colors">
               ACHEEVY
             </Link>
             <span className="text-gray-600">·</span>
-            <Link href="/dashboard/house-of-ang" className="text-gray-400 hover:text-white transition-colors">
+            <Link href={`${APP_DOMAIN}/dashboard/house-of-ang`} className="text-gray-400 hover:text-white transition-colors">
               House of Ang
             </Link>
             <span className="text-gray-600">·</span>
-            <Link href="/dashboard/model-garden" className="text-gray-400 hover:text-white transition-colors">
+            <Link href={`${APP_DOMAIN}/dashboard/model-garden`} className="text-gray-400 hover:text-white transition-colors">
               Model Garden
             </Link>
             <span className="text-gray-600">·</span>
-            <Link href="/dashboard/circuit-box" className="text-gray-400 hover:text-white transition-colors">
+            <Link href={`${APP_DOMAIN}/dashboard/circuit-box`} className="text-gray-400 hover:text-white transition-colors">
               Circuit Box
             </Link>
           </div>

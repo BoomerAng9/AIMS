@@ -5,7 +5,7 @@
 #
 # Hybrid architecture:
 #   Cloud Run (stateless):  frontend, uef-gateway — auto-scaling, managed
-#   VPS (stateful):         Redis, n8n, OpenClaw, Agent Bridge, agents
+#   VPS (stateful):         Redis, n8n, Agent Bridge, agents
 #
 # What it does:
 #   1. Install + lint + test backend
@@ -175,7 +175,7 @@ steps:
       - --min-instances=0
       - --max-instances=3
       - --allow-unauthenticated
-      - --set-env-vars=NODE_ENV=production,PORT=3001,LOG_LEVEL=info,OPENCLAW_URL=https://${_VPS_DOMAIN}/api/bridge,REDIS_URL=redis://${_VPS_HOST}:6379,N8N_URL=http://${_VPS_HOST}:5678,RESEARCH_ANG_URL=http://${_VPS_HOST}:3020,ROUTER_ANG_URL=http://${_VPS_HOST}:3021
+      - --set-env-vars=NODE_ENV=production,PORT=3001,LOG_LEVEL=info,REDIS_URL=redis://${_VPS_HOST}:6379,N8N_URL=http://${_VPS_HOST}:5678,RESEARCH_ANG_URL=http://${_VPS_HOST}:3020,ROUTER_ANG_URL=http://${_VPS_HOST}:3021
       - --update-secrets=INTERNAL_API_KEY=INTERNAL_API_KEY:latest,OPENROUTER_API_KEY=OPENROUTER_API_KEY:latest,REDIS_PASSWORD=REDIS_PASSWORD:latest
     waitFor: ['push-gateway']
 

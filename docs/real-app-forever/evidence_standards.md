@@ -188,9 +188,9 @@ Evidence: Normal browser request → 200
 
 **Network Segmentation**
 ```
-Evidence: docker exec aims-openclaw-1 ping 8.8.8.8 → fails (sandbox-network is internal)
-Evidence: docker exec aims-openclaw-1 curl http://uef-gateway:3001 → fails (not on aims-network)
-Evidence: docker exec aims-agent-bridge-1 curl http://openclaw:18789 → succeeds (bridges both networks)
+Evidence: docker exec aims-agent-zero-1 ping 8.8.8.8 → fails (sandbox-network is internal)
+Evidence: docker exec aims-agent-zero-1 curl http://uef-gateway:3001 → fails (not on aims-network)
+Evidence: docker exec aims-agent-bridge-1 curl http://agent-zero:80 → succeeds (bridges both networks)
 ```
 
 **Payment Blocking**

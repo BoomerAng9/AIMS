@@ -11,7 +11,7 @@ A.I.M.S. is a **Port + Longshoremen** system: a Next.js “Port” (dashboard + 
 - Partner: EmbedPartner Kit, partner scans, co-branded / white-label pods (“PMO Office”).
 
 ## Deployable stack (Hostinger-first)
-- Docker Compose “Longshoremen”: Agent Zero (execution), OpenClaw (autonomy), optional workflow automation, custom API gateway, DB services.
+- Docker Compose "Longshoremen": Agent Zero (execution), optional workflow automation, custom API gateway, DB services.
 - Optional managed services: Firebase Auth/Firestore/Storage for authentication + tenant isolation + storage; these can coexist with Hostinger compute.
 
 ## Plug taxonomy (how to organize 100+ ideas)

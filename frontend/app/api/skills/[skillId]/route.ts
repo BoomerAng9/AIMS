@@ -206,7 +206,7 @@ export async function POST(
   if (skillId === "docker-compose") {
     return NextResponse.json({
       message: "Docker Compose hook activated.",
-      services: ["frontend", "uef-gateway", "postgres", "agent-zero (stubbed)", "openclaw (stubbed)", "chicken-hawk (stubbed)"],
+      services: ["frontend", "uef-gateway", "postgres", "agent-zero (stubbed)", "chicken-hawk (stubbed)"],
       commands: {
         up: "docker compose -f infra/docker-compose.yml up -d",
         down: "docker compose -f infra/docker-compose.yml down",

@@ -475,7 +475,7 @@ How A.I.M.S. maps to this SOP:
 |-------------|------------------------|
 | Intake | Chat w/ACHEEVY (PMO classification → Boomer_Ang director routing) |
 | Workstream | n8n PMO pipeline (6 offices: CTO/CFO/COO/CMO/CDO/CPO) |
-| Live Build | OpenClaw sandbox + Plug Factory |
+| Live Build | Agent sandbox + Plug Factory |
 | Gates & Evidence | CI/CD pipeline (Cloud Build), middleware WAF, agent-bridge payment blocking |
 | Environments | Docker Compose (dev) → VPS prod (31.97.138.45, 76.13.96.107) |
 | Integrations | OpenRouter (LLM), ElevenLabs (Voice), Stripe (Billing), Google OAuth |

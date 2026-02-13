@@ -96,8 +96,8 @@
     {
       "id": "coder_ang",
       "name": "Coder_Ang",
-      "source_repo": "openclaw/openclaw",
-      "description": "Real-time code generation and execution via OpenClaw sandbox",
+      "source_repo": "aims/coder-sandbox",
+      "description": "Real-time code generation and execution via sandboxed environment",
       "capabilities": [
         "code_generation",
         "sandbox_execution",
@@ -108,8 +108,8 @@
         "container_hours": 0.25,
         "api_calls": 20
       },
-      "endpoint": "http://openclaw:8001/execute",
-      "health_check": "http://openclaw:8001/health",
+      "endpoint": "http://coder-ang:8001/execute",
+      "health_check": "http://coder-ang:8001/health",
       "status": "registered"
     },
     {

@@ -5,7 +5,7 @@
  *
  * Barrel exports for the A.I.M.S. Chain of Command + Persona System.
  *
- * v2.0.0 — Revised hierarchy: ACHEEVY → Boomer_Ang → Chicken_Hawk → Squad Leader → Lil_Hawk
+ * v2.0.0 — Revised hierarchy: ACHEEVY → Boomer_Ang → Chicken Hawk → Squad Leader → Lil_Hawk
  *           Persona ≠ Authority. Boomer_Ang-only tool ownership. Anti-hack behavior contract.
  *
  * Usage:

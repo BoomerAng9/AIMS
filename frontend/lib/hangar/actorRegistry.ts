@@ -2,7 +2,7 @@
  * Hangar Actor Registry — Actor definitions and initial placement
  *
  * v2 — Revised to match canonical Chain-of-Command hierarchy:
- *   ACHEEVY → Boomer_Ang (Managers) → Chicken_Hawk (Coordinator) → Lil_Hawks (Workers)
+ *   ACHEEVY → Boomer_Ang (Managers) → Chicken Hawk (Coordinator) → Lil_Hawks (Workers)
  *
  * Display names use canonical <Nickname>_Ang and Lil_<Role>_Hawk patterns.
  * Persona ≠ Authority. Visual representation only.
@@ -56,7 +56,7 @@ export function createDefaultActors(): HangarActor[] {
       state: createActorState(),
       metadata: { role: 'Executive Orchestrator' },
     },
-    // Boomer_Ang pods — Managers; own capabilities; supervise Chicken_Hawk + Lil_Hawks
+    // Boomer_Ang pods — Managers; own capabilities; supervise Chicken Hawk + Lil_Hawks
     {
       id: 'boomer-ang-alpha',
       type: 'BOOMER_ANG',
@@ -79,11 +79,11 @@ export function createDefaultActors(): HangarActor[] {
       state: createActorState(),
       metadata: { role: 'Supervisor / Manager', bench_level: 'Expert' },
     },
-    // Chicken_Hawk — Coordinator / Throughput Regulator (NOT mentor, NOT strategy setter)
+    // Chicken Hawk — Coordinator / Throughput Regulator (NOT mentor, NOT strategy setter)
     {
       id: 'chicken-hawk-prime',
       type: 'CHICKEN_HAWK',
-      displayName: 'Chicken_Hawk',
+      displayName: 'Chicken Hawk',
       color: ACTOR_COLORS.CHICKEN_HAWK.color,
       emissiveColor: ACTOR_COLORS.CHICKEN_HAWK.emissive,
       emissiveIntensity: 0.6,

@@ -1,0 +1,20 @@
+{
+  "feature": "circuit-box-live-events",
+  "description": "Real-time event feed with scanline overlay, color-coded severity, and auto-refresh",
+  "owner_only": true,
+  "event_types": {
+    "info": { "color": "cb-cyan", "example": "Gateway started — listening on :3001" },
+    "route": { "color": "gold", "example": "Prompt routed → Engineer_Ang (code generation task)" },
+    "warn": { "color": "cb-amber", "example": "Voice API key not configured — TTS unavailable" },
+    "error": { "color": "cb-red", "example": "Service unreachable — retry in 5s" },
+    "security": { "color": "cb-red", "example": "Blocked payment tool call from Seller_Ang (policy: deny)" }
+  },
+  "ui_features": {
+    "scanline_overlay": "Subtle CSS animation (animate-cb-scan) for instrument-grade feel",
+    "auto_scroll": "New events animate in with motion.div (opacity + x slide)",
+    "max_events": 100,
+    "refresh_interval_ms": 8000,
+    "sources": ["ACHEEVY", "Chicken Hawk", "UEF Gateway", "Agent Bridge", "Telegram Bot"]
+  },
+  "status": "implemented"
+}

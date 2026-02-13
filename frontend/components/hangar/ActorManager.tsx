@@ -103,7 +103,7 @@ function BoomerAngMesh({ actor }: { actor: HangarActor }) {
   );
 }
 
-// ─── Chicken_Hawk Dispatch Bar ───────────────────────────────
+// ─── Chicken Hawk Dispatch Bar ───────────────────────────────
 function ChickenHawkMesh({ actor }: { actor: HangarActor }) {
   const ref = useRef<THREE.Group>(null);
   const glow = STATE_GLOW[actor.state.current];

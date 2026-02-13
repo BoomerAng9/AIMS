@@ -3,6 +3,9 @@
 Centralized trigger-aware system for Hooks, Tasks, and Skills.
 ACHEEVY matches user prompts against trigger keywords to activate the right definition.
 
+> **Brain File:** See [`ACHEEVY_BRAIN.md`](./ACHEEVY_BRAIN.md) for the complete single source of truth —
+> identity, chain of command, all hooks, skills, tasks, verticals, recurring functions, and file map.
+
 ## Taxonomy
 
 | Type    | Purpose                                         | Fires When              |

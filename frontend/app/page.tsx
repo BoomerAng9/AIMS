@@ -12,7 +12,7 @@ import FloatingChat from '@/components/FloatingChat';
 
 export default function HomePage() {
   return (
-    <main className="min-h-full bg-[#0A0A0A]">
+    <main className="flex flex-col min-h-full bg-ink">
       <SiteHeader />
       <Hero />
       <Footer />

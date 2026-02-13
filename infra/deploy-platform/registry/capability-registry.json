@@ -7,10 +7,10 @@
 
   "execution_backend": {
     "description": "Available execution backends for Deploy operations",
-    "enum": ["ChickenHawk", "AgentZero", "n8n"],
-    "default": "ChickenHawk",
+    "enum": ["Chicken Hawk", "AgentZero", "n8n"],
+    "default": "Chicken Hawk",
     "backends": {
-      "ChickenHawk": {
+      "Chicken Hawk": {
         "description": "Chicken Hawk execution engine - spawns Lil_Hawks via Squads",
         "type": "native",
         "worker_type": "Lil_Hawk"

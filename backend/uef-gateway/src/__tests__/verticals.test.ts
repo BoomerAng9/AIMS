@@ -1,16 +1,16 @@
 import { verticalRegistry } from '../verticals';
 
 describe('Verticals Registry', () => {
-  it('has 4 verticals registered (II Agent, II Commons)', () => {
+  it('has 3 verticals registered (II Agent, II Commons)', () => {
     const all = verticalRegistry.list();
-    expect(all).toHaveLength(4);
+    expect(all).toHaveLength(3);
   });
 
-  it('has 2 Agent verticals', () => {
+  it('has 1 Agent vertical', () => {
     const agents = verticalRegistry.listByCategory('AGENT');
-    expect(agents).toHaveLength(2);
+    expect(agents).toHaveLength(1);
     expect(agents.map(v => v.id)).toEqual(
-      expect.arrayContaining(['openclaw', 'agent-zero'])
+      expect.arrayContaining(['agent-zero'])
     );
   });
 
@@ -23,7 +23,6 @@ describe('Verticals Registry', () => {
   });
 
   it('can look up verticals by ID', () => {
-    expect(verticalRegistry.get('openclaw')?.name).toBe('OpenClaw');
     expect(verticalRegistry.get('agent-zero')?.name).toBe('Agent Zero');
     expect(verticalRegistry.get('claude-code')?.name).toBe('Claude Code');
     expect(verticalRegistry.get('gemini-cli')?.name).toBe('Gemini CLI');
@@ -63,8 +62,8 @@ describe('Verticals Registry', () => {
 
   it('getStats returns correct counts', () => {
     const stats = verticalRegistry.getStats();
-    expect(stats.total).toBe(4);
-    expect(stats.agents).toBe(2);
+    expect(stats.total).toBe(3);
+    expect(stats.agents).toBe(1);
     expect(stats.commons).toBe(2);
   });
 

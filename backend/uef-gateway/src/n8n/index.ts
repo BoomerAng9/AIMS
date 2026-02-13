@@ -2,7 +2,7 @@
  * n8n PMO Routing — Module Barrel Export
  *
  * Chain of Command Pipeline:
- *   User → ACHEEVY → Boomer_Ang → Chicken_Hawk → Squad → Lil_Hawks → Receipt → ACHEEVY → User
+ *   User → ACHEEVY → Boomer_Ang → Chicken Hawk → Squad → Lil_Hawks → Receipt → ACHEEVY → User
  */
 
 export { classifyIntent, buildDirective, createPipelinePacket } from './pmo-router';

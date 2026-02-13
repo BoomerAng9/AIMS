@@ -5,7 +5,7 @@
  *
  * Built with Vercel AI SDK (useChat) + n8n PMO pipeline visualization.
  * Streams AI responses via Google Gemini while showing real-time
- * Chain of Command routing (PMO Office → Boomer_Ang Director → Chicken_Hawk).
+ * Chain of Command routing (PMO Office → Boomer_Ang Director → Chicken Hawk).
  *
  * Features:
  * - Conversation threads sidebar (collapsible, localStorage persistence)
@@ -55,6 +55,18 @@ interface Thread {
 // Constants
 // ─────────────────────────────────────────────────────────────
 
+const AI_MODELS = [
+  { key: 'claude-opus',   label: 'Claude Opus 4.6' },
+  { key: 'claude-sonnet', label: 'Claude Sonnet 4.6' },
+  { key: 'qwen',          label: 'Qwen 2.5 Coder 32B', tag: 'code' },
+  { key: 'qwen-max',      label: 'Qwen Max' },
+  { key: 'minimax',       label: 'MiniMax-01' },
+  { key: 'glm',           label: 'GLM-5' },
+  { key: 'kimi',          label: 'Kimi K2.5', tag: 'fast' },
+  { key: 'nano-banana',   label: 'Nano Banana Pro', tag: 'fast' },
+  { key: 'gemini-pro',    label: 'Gemini 2.5 Pro' },
+] as const;
+
 const ACHEEVY_VERBS = ['Deploy', 'Build', 'Create', 'Launch', 'Ship', 'Forge', 'Craft', 'Execute'] as const;
 
 const QUICK_INTENTS = [
@@ -82,8 +94,16 @@ const BOOMER_ANGS = [
   { id: 'cmo', name: 'Boomer_CMO', office: 'marketing-office', color: 'pink' },
   { id: 'cdo', name: 'Boomer_CDO', office: 'design-office', color: 'orange' },
   { id: 'cpo', name: 'Boomer_CPO', office: 'publishing-office', color: 'cyan' },
-  { id: 'hawk', name: 'Chicken_Hawk', office: 'dispatch', color: 'red' },
+  { id: 'hawk', name: 'Chicken Hawk', office: 'dispatch', color: 'red' },
 ] as const;
+
+// Status chip labels (owner can toggle back to corporate in Circuit Box)
+const STATUS_LABELS: Record<string, string> = {
+  active: "Maintainin'",
+  idle: "Chillin'",
+  building: "Buildin'",
+  error: 'Stay Loose',
+};
 
 const THREADS_STORAGE_KEY = 'aims_chat_threads';
 const SIDEBAR_STORAGE_KEY = 'aims_chat_sidebar';
@@ -112,12 +132,14 @@ function saveThreads(threads: Thread[]) {
 function useVoiceRecorder() {
   const [isRecording, setIsRecording] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
+  const [interimTranscript, setInterimTranscript] = useState('');
   const [audioLevels, setAudioLevels] = useState<number[]>(new Array(20).fill(0));
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const animFrameRef = useRef<number>(0);
   const chunksRef = useRef<Blob[]>([]);
+  const speechRecRef = useRef<any>(null);
 
   const startRecording = useCallback(async () => {
     try {
@@ -143,6 +165,26 @@ function useVoiceRecorder() {
       };
       updateLevels();
 
+      // Start browser SpeechRecognition for live interim transcription
+      setInterimTranscript('');
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        const recognition = new SpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = 'en-US';
+        recognition.onresult = (event: any) => {
+          let interim = '';
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            interim += event.results[i][0].transcript;
+          }
+          setInterimTranscript(interim);
+        };
+        recognition.onerror = () => { /* ignore — Groq Whisper is the final source */ };
+        recognition.start();
+        speechRecRef.current = recognition;
+      }
+
       // Start recording
       const recorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
       chunksRef.current = [];
@@ -158,6 +200,12 @@ function useVoiceRecorder() {
   }, []);
 
   const stopRecording = useCallback(async (): Promise<string> => {
+    // Stop browser speech recognition
+    if (speechRecRef.current) {
+      try { speechRecRef.current.stop(); } catch {}
+      speechRecRef.current = null;
+    }
+
     return new Promise((resolve) => {
       if (!mediaRecorderRef.current || mediaRecorderRef.current.state === 'inactive') {
         resolve('');
@@ -175,7 +223,7 @@ function useVoiceRecorder() {
         // Stop all tracks
         mediaRecorderRef.current?.stream.getTracks().forEach(t => t.stop());
 
-        // Transcribe
+        // Transcribe via Groq Whisper for final quality result
         const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
         const formData = new FormData();
         formData.append('audio', blob, 'recording.webm');
@@ -185,13 +233,16 @@ function useVoiceRecorder() {
           if (res.ok) {
             const data = await res.json();
             setIsTranscribing(false);
+            setInterimTranscript('');
             resolve(data.text || '');
           } else {
             setIsTranscribing(false);
+            setInterimTranscript('');
             resolve('');
           }
         } catch {
           setIsTranscribing(false);
+          setInterimTranscript('');
           resolve('');
         }
       };
@@ -200,7 +251,7 @@ function useVoiceRecorder() {
     });
   }, []);
 
-  return { isRecording, isTranscribing, audioLevels, startRecording, stopRecording };
+  return { isRecording, isTranscribing, interimTranscript, audioLevels, startRecording, stopRecording };
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -231,7 +282,7 @@ function AudioWaveform({ levels, isActive }: { levels: number[]; isActive: boole
 
 function useTtsPlayback() {
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [ttsEnabled, setTtsEnabled] = useState(false);
+  const [ttsEnabled, setTtsEnabled] = useState(true);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const speak = useCallback(async (text: string) => {
@@ -605,6 +656,7 @@ function MessageBubble({ role, content, isStreaming }: {
 
 export default function ChatPage() {
   const searchParams = useSearchParams();
+  const [selectedModel, setSelectedModel] = useState('claude-opus');
   const {
     messages,
     input,
@@ -615,6 +667,7 @@ export default function ChatPage() {
     setInput,
   } = useChat({
     api: '/api/chat',
+    body: { model: selectedModel },
   });
 
   const [pmoClassification, setPmoClassification] = useState<PmoClassification | null>(null);
@@ -625,7 +678,7 @@ export default function ChatPage() {
   const prefillHandled = useRef(false);
 
   // Voice I/O
-  const { isRecording, isTranscribing, audioLevels, startRecording, stopRecording } = useVoiceRecorder();
+  const { isRecording, isTranscribing, interimTranscript, audioLevels, startRecording, stopRecording } = useVoiceRecorder();
   const { isSpeaking, ttsEnabled, setTtsEnabled, speak, stopSpeaking } = useTtsPlayback();
   const lastAssistantRef = useRef<string>('');
 
@@ -852,7 +905,27 @@ export default function ChatPage() {
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              {/* Model Switcher */}
+              <div className="flex items-center gap-1.5 bg-white/5 rounded-lg px-2.5 py-1.5 border border-wireframe-stroke hover:border-gold/20 transition-colors">
+                <svg className="w-3.5 h-3.5 text-gold/60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="4" r="2" /><circle cx="4" cy="12" r="2" /><circle cx="20" cy="12" r="2" /><circle cx="12" cy="20" r="2" />
+                  <path d="M12 6v4m0 4v4M6 12h4m4 0h4" />
+                </svg>
+                <select
+                  value={selectedModel}
+                  onChange={(e) => setSelectedModel(e.target.value)}
+                  className="bg-transparent border-none outline-none text-white/70 text-xs cursor-pointer appearance-none pr-3 font-mono"
+                  title="Select AI Model"
+                >
+                  {AI_MODELS.map(m => (
+                    <option key={m.key} value={m.key} className="bg-[#0A0A0A]">
+                      {m.label}{'tag' in m ? ` (${m.tag})` : ''}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
               {/* MottoBar toggle */}
               <button
                 onClick={toggleMotto}
@@ -865,7 +938,7 @@ export default function ChatPage() {
               </button>
 
               {/* Agent Shelf */}
-              <div className="hidden md:flex items-center gap-1.5">
+              <div className="hidden lg:flex items-center gap-1.5">
                 {BOOMER_ANGS.map(agent => (
                   <div
                     key={agent.id}
@@ -916,7 +989,7 @@ export default function ChatPage() {
                   </div>
                   <h2 className="text-2xl font-bold text-white mb-2">Chat w/ACHEEVY</h2>
                   <p className="text-white/50 max-w-lg mx-auto leading-relaxed mb-10">
-                    Welcome to AI Managed Solutions. I&apos;m ACHEEVY, I&apos;m at your service.<br />
+                    I&apos;m ACHEEVY, at your service.<br />
                     What will we deploy today?
                   </p>
 
@@ -992,25 +1065,32 @@ export default function ChatPage() {
                     exit={{ opacity: 0, height: 0 }}
                     className="mb-3"
                   >
-                    <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl border border-gold/20 bg-gold/5">
+                    <div className="flex flex-col gap-2 px-4 py-2.5 rounded-xl border border-gold/20 bg-gold/5">
                       {isRecording && (
                         <>
-                          <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-                          <span className="text-xs text-white/60 font-mono">Recording...</span>
-                          <AudioWaveform levels={audioLevels} isActive={isRecording} />
-                          <button
-                            onClick={handleVoiceToggle}
-                            className="ml-auto px-3 py-1 rounded-lg bg-gold/20 text-gold text-xs hover:bg-gold/30 transition-colors"
-                          >
-                            Stop & Transcribe
-                          </button>
+                          <div className="flex items-center gap-3">
+                            <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                            <span className="text-xs text-white/60 font-mono">Recording...</span>
+                            <AudioWaveform levels={audioLevels} isActive={isRecording} />
+                            <button
+                              onClick={handleVoiceToggle}
+                              className="ml-auto px-3 py-1 rounded-lg bg-gold/20 text-gold text-xs hover:bg-gold/30 transition-colors"
+                            >
+                              Stop & Transcribe
+                            </button>
+                          </div>
+                          {interimTranscript && (
+                            <p className="text-xs text-white/40 italic pl-5 truncate">
+                              {interimTranscript}
+                            </p>
+                          )}
                         </>
                       )}
                       {isTranscribing && (
-                        <>
+                        <div className="flex items-center gap-3">
                           <Loader2 className="w-4 h-4 text-gold animate-spin" />
                           <span className="text-xs text-white/60 font-mono">Transcribing audio...</span>
-                        </>
+                        </div>
                       )}
                     </div>
                   </motion.div>

@@ -39,8 +39,36 @@ const DEPLOY_COSTS: Record<string, { service: ServiceKey; amount: number }> = {
   rollback: { service: "DEPLOY", amount: 5 },
 };
 
-// Mock data store (replace with Redis/Postgres in production)
-const deployments = new Map<string, any>();
+// ── Persistent file-backed store (survives server restarts) ──
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
+import { join } from 'path';
+
+const STORE_DIR = join(process.cwd(), '.data');
+const STORE_FILE = join(STORE_DIR, 'deployments.json');
+
+function loadDeployments(): Map<string, any> {
+  try {
+    if (existsSync(STORE_FILE)) {
+      const data = JSON.parse(readFileSync(STORE_FILE, 'utf-8'));
+      return new Map(Object.entries(data));
+    }
+  } catch {
+    console.warn('[Deploy Dock] Failed to load deployments, starting fresh');
+  }
+  return new Map();
+}
+
+function saveDeployments(deployments: Map<string, any>) {
+  try {
+    if (!existsSync(STORE_DIR)) mkdirSync(STORE_DIR, { recursive: true });
+    const obj = Object.fromEntries(deployments);
+    writeFileSync(STORE_FILE, JSON.stringify(obj, null, 2), 'utf-8');
+  } catch (err) {
+    console.error('[Deploy Dock] Failed to save deployments:', err);
+  }
+}
+
+const deployments = loadDeployments();
 
 // ─────────────────────────────────────────────────────────────
 // GET: List deployments or get single deployment
@@ -277,6 +305,7 @@ async function handleCreateDeployment(body: any, userId: string) {
   };
 
   deployments.set(deploymentId, deployment);
+  saveDeployments(deployments);
 
   // Store initial manifest in Evidence Locker (async, don't block response)
   createDeploymentManifest(deploymentId, {
@@ -346,6 +375,7 @@ async function handleHatchAgent(body: any, userId: string) {
     },
   });
 
+  saveDeployments(deployments);
   return NextResponse.json({
     success: true,
     agent,
@@ -419,6 +449,7 @@ async function handleAssignWorkflow(body: any, userId: string) {
     },
   });
 
+  saveDeployments(deployments);
   return NextResponse.json({
     success: true,
     jobPacket,
@@ -541,6 +572,7 @@ async function handleLaunchDeployment(body: any, userId: string) {
     });
   }, 2000);
 
+  saveDeployments(deployments);
   return NextResponse.json({
     success: true,
     executionId,
@@ -590,6 +622,7 @@ async function handleVerifyDeployment(body: any, userId: string) {
     },
   });
 
+  saveDeployments(deployments);
   return NextResponse.json({
     success: true,
     deployment,
@@ -646,6 +679,7 @@ async function handleRollbackDeployment(body: any, userId: string) {
     },
   });
 
+  saveDeployments(deployments);
   return NextResponse.json({
     success: true,
     deployment,

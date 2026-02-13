@@ -11,85 +11,85 @@ type Props = {
 };
 
 /**
- * LogoWallBackground — Dark cinematic background system
+ * LogoWallBackground — Premium branded environment
  *
- * Tron/Matrix/digital hangar aesthetic:
- * - Dark base with subtle gold grid
- * - Gold ACHIEVEMOR logo on edges only (never tiled across content)
- * - Cinematic vignette depth
- * - Content centered within margins, no clipping
+ * Gold ACHIEVEMOR logo embossed across all pages at ultra-low opacity,
+ * like a luxury brand's monogram wallpaper — think Louis Vuitton or
+ * Gucci's repeating logo pattern pressed into leather.
+ *
+ * The emboss effect: subtle repeating logo + inner shadow illusion
+ * on ink-dark background with ambient gold accent lighting.
  */
 export function LogoWallBackground({ mode = "hero", children }: Props) {
   return (
     <div className={clsx(
       "relative text-white",
-      mode === "dashboard" ? "h-full overflow-hidden bg-[#050505]" : "min-h-full bg-[#050505] gold-edge-rail"
+      mode === "dashboard" ? "h-full bg-ink" : "min-h-full bg-ink"
     )}>
-      {/* Base: Fine gold grid — Tron aesthetic */}
-      <div
-        className="pointer-events-none absolute inset-0 z-0"
-        style={{
-          backgroundImage: `
-            linear-gradient(rgba(212,175,55,0.03) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(212,175,55,0.03) 1px, transparent 1px)
-          `,
-          backgroundSize: '48px 48px',
-        }}
-        aria-hidden="true"
-      />
-
-      {/* Dot matrix overlay — subtle depth */}
-      <div
-        className="pointer-events-none absolute inset-0 z-0"
-        style={{
-          backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px)',
-          backgroundSize: '24px 24px',
-        }}
-        aria-hidden="true"
-      />
-
-      {/* Cinematic vignette — dark edges */}
-      <div
-        className="pointer-events-none absolute inset-0 z-0"
-        style={{
-          background: 'radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.7) 100%)',
-        }}
-        aria-hidden="true"
-      />
-
-      {/* Gold ACHIEVEMOR logo — edges only, never tiled across content */}
-      <div
-        className="pointer-events-none absolute inset-0 z-0"
-        style={{
-          backgroundImage: "url('/images/logos/achievemor-gold.png')",
-          backgroundSize: '80px 80px',
-          backgroundRepeat: 'repeat',
-          opacity: 0.02,
-          maskImage: 'linear-gradient(135deg, black 0%, transparent 15%, transparent 85%, black 100%)',
-          WebkitMaskImage: 'linear-gradient(135deg, black 0%, transparent 15%, transparent 85%, black 100%)',
-        }}
-        aria-hidden="true"
-      />
-
-      {/* Gold edge glow — corner accents */}
+      {/* Base gradient — warm ink with gold bias */}
       <div
         className="pointer-events-none absolute inset-0 z-0"
         style={{
           background: `
-            linear-gradient(135deg, rgba(212,175,55,0.04) 0%, transparent 15%),
-            linear-gradient(225deg, rgba(212,175,55,0.03) 0%, transparent 15%),
-            linear-gradient(315deg, rgba(212,175,55,0.04) 0%, transparent 15%),
-            linear-gradient(45deg, rgba(212,175,55,0.03) 0%, transparent 15%)
+            radial-gradient(ellipse at 20% 20%, rgba(212,175,55,0.03) 0%, transparent 50%),
+            radial-gradient(ellipse at 80% 80%, rgba(212,175,55,0.02) 0%, transparent 50%),
+            linear-gradient(180deg, #0B0E14 0%, #080A10 50%, #0B0E14 100%)
           `,
         }}
         aria-hidden="true"
       />
 
-      {/* Horizontal scan lines — cinematic Matrix effect */}
+      {/* EMBOSSED ACHIEVEMOR LOGO — repeating monogram wallpaper */}
       <div
-        className="pointer-events-none absolute inset-0 z-0 opacity-[0.01]"
+        className="pointer-events-none absolute inset-0 z-0"
         style={{
-          backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.15) 2px, rgba(255,255,255,0.15) 4px)',
+          backgroundImage: "url('/images/logos/achievemor-gold.png')",
+          backgroundSize: '100px 100px',
+          backgroundRepeat: 'repeat',
+          opacity: 0.025,
+          filter: 'contrast(0.8) brightness(0.9)',
+        }}
+        aria-hidden="true"
+      />
+
+      {/* Emboss depth layer — shifted copy for 3D pressed-in effect */}
+      <div
+        className="pointer-events-none absolute inset-0 z-0"
+        style={{
+          backgroundImage: "url('/images/logos/achievemor-gold.png')",
+          backgroundSize: '100px 100px',
+          backgroundRepeat: 'repeat',
+          backgroundPosition: '1px 1px',
+          opacity: 0.012,
+          filter: 'brightness(1.5) contrast(0.7)',
+          mixBlendMode: 'overlay',
+        }}
+        aria-hidden="true"
+      />
+
+      {/* Ambient gold glow — top-left accent */}
+      <div
+        className="pointer-events-none absolute top-0 left-0 w-[600px] h-[600px] z-0"
+        style={{
+          background: 'radial-gradient(circle at 0% 0%, rgba(212,175,55,0.04) 0%, transparent 60%)',
+        }}
+        aria-hidden="true"
+      />
+
+      {/* Ambient gold glow — bottom-right */}
+      <div
+        className="pointer-events-none absolute bottom-0 right-0 w-[400px] h-[400px] z-0"
+        style={{
+          background: 'radial-gradient(circle at 100% 100%, rgba(212,175,55,0.025) 0%, transparent 60%)',
+        }}
+        aria-hidden="true"
+      />
+
+      {/* Cinematic vignette — dark edges for depth */}
+      <div
+        className="pointer-events-none absolute inset-0 z-0"
+        style={{
+          background: 'radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.45) 100%)',
         }}
         aria-hidden="true"
       />

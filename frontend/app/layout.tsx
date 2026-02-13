@@ -45,7 +45,7 @@ export const metadata: Metadata = {
   description: "The Hybrid Business Architect for modern enterprises.",
   viewport: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover",
   keywords: ['AI', 'automation', 'agents', 'ACHEEVY', 'Boomer_Ang', 'PMO', 'AI management', 'business intelligence', 'plugs', 'workflow'],
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://plugmein.cloud'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_LANDING_URL || 'https://aimanagedsolutions.cloud'),
   openGraph: {
     type: 'website',
     siteName: 'A.I.M.S.',
@@ -67,13 +67,15 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${doto.variable} ${permanentMarker.variable} ${caveat.variable} ${patrickHand.variable} ${nabla.variable} antialiased bg-[#050505] text-white font-sans overflow-hidden selection:bg-gold/30 selection:text-white`}>
+      <body className={`${doto.variable} ${permanentMarker.variable} ${caveat.variable} ${patrickHand.variable} ${nabla.variable} antialiased bg-[#050505] text-white font-sans overflow-x-hidden selection:bg-gold/30 selection:text-white`}>
         <Providers>
           <div className="aims-frame">
-            {/* Texture layers — inside frame */}
-            <div className="texture-noise" style={{ position: 'absolute', borderRadius: 'inherit' }} />
-            <div className="vignette-overlay absolute inset-0 z-40 pointer-events-none" style={{ borderRadius: 'inherit' }} />
-            {children}
+            {/* Texture layers — low z-index so they never block content */}
+            <div className="texture-noise" style={{ position: 'absolute', borderRadius: 'inherit', zIndex: 1 }} />
+            <div className="vignette-overlay absolute inset-0 pointer-events-none" style={{ borderRadius: 'inherit', zIndex: 1 }} />
+            <div className="relative z-10 flex flex-col min-h-full">
+              {children}
+            </div>
           </div>
         </Providers>
       </body>

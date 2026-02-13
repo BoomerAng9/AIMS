@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------------
 
 export type ACPIntent = 'ESTIMATE_ONLY' | 'BUILD_PLUG' | 'RESEARCH' | 'AGENTIC_WORKFLOW' | 'CHAT';
-export type ACPChannel = 'WEB' | 'VOICE' | 'WHATSAPP' | 'TELEGRAM' | 'SLACK' | 'DISCORD' | 'OPENCLAW';
+export type ACPChannel = 'WEB' | 'VOICE' | 'WHATSAPP' | 'TELEGRAM' | 'SLACK' | 'DISCORD';
 
 export interface ACPStandardizedRequest {
   reqId: string;
@@ -35,7 +35,7 @@ export interface ACPStandardizedRequest {
 
 export interface ACPAgentTask {
   taskId: string;
-  agentId: 'AGENT_ZERO' | 'OPENCLAW' | 'CHICKEN_HAWK';
+  agentId: 'AGENT_ZERO' | 'CHICKEN_HAWK';
   spec: {
     description: string;
     requirements: string[];

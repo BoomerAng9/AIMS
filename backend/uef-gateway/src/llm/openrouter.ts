@@ -138,6 +138,15 @@ export const MODELS: Record<string, ModelSpec> = {
   },
 
   // ── Fast Tier ────────────────────────────────────────────────────────
+  'gemini-3.0-flash': {
+    id: 'google/gemini-3.0-flash',
+    name: 'Gemini 3.0 Flash',
+    provider: 'Google',
+    inputPer1M: 0.10,
+    outputPer1M: 0.40,
+    contextWindow: 1000000,
+    tier: 'fast',
+  },
   'claude-haiku-4.5': {
     id: 'anthropic/claude-haiku-4.5',
     name: 'Claude Haiku 4.5',
@@ -170,7 +179,8 @@ export const MODELS: Record<string, ModelSpec> = {
 };
 
 // Default model used by agents when no preference is set
-export const DEFAULT_MODEL = 'claude-sonnet-4.5';
+// Reads from OPENROUTER_MODEL env var, defaults to Gemini 3.0 Flash
+export const DEFAULT_MODEL = process.env.OPENROUTER_MODEL || 'gemini-3.0-flash';
 
 // ---------------------------------------------------------------------------
 // OpenRouter Client

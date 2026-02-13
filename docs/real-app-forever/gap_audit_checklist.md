@@ -142,7 +142,7 @@
 | 7.1 | Multi-stage Dockerfiles | PASS | All Dockerfiles | Build + production stages |
 | 7.2 | Health checks on all services | PASS | `docker-compose.prod.yml` | All 7 services have healthchecks |
 | 7.3 | Restart policies | PASS | `docker-compose.prod.yml` | always/unless-stopped |
-| 7.4 | Resource limits | PARTIAL | `docker-compose.prod.yml` | Redis + OpenClaw have limits, frontend/gateway don't |
+| 7.4 | Resource limits | PARTIAL | `docker-compose.prod.yml` | Redis + Chicken Hawk have limits, frontend/gateway don't |
 | 7.5 | CI/CD pipeline complete | PASS | `cloudbuild.yaml` | lint→test→build→push→deploy |
 | 7.6 | Rollback procedure | FAIL | — | Not documented |
 | 7.7 | Backup automation | FAIL | — | No automated backups |

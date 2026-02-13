@@ -1,6 +1,6 @@
 # Agent Bridge - Security Gateway
 # Bridges AIMS network and sandboxed agents with strict security controls
-# Compatible with OpenClaw v2026.2.3
+# Bridges AIMS core and sandbox networks
 
 FROM node:24-alpine AS builder
 

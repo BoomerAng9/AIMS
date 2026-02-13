@@ -14,15 +14,15 @@ graph TD
     end
 
     subgraph "Deploy Platform - Boomer_Angs on the Port"
-        CircuitBox -->|Contract| ChickenHawk[Chicken_Hawk\nExecution Engine]
-        ChickenHawk -->|Spawn| Squad[Squad]
+        CircuitBox -->|Contract| Chicken Hawk[Chicken Hawk\nExecution Engine]
+        Chicken Hawk -->|Spawn| Squad[Squad]
         Squad -->|Workers| LilHawks[Lil_Hawks\nWorker Bots]
         LilHawks -->|Events| Theater[Live Ops Theater]
     end
 
     subgraph "Persistence Layer"
-        ChickenHawk -->|Logs| KYB[KYB Flight Recorder]
-        ChickenHawk -->|Receipt| Receipt[Signed Receipt]
+        Chicken Hawk -->|Logs| KYB[KYB Flight Recorder]
+        Chicken Hawk -->|Receipt| Receipt[Signed Receipt]
     end
 
     Theater -->|Watch Only| Frontend
@@ -32,14 +32,14 @@ graph TD
 ## Governance Chain
 
 ```
-User → ACHEEVY → Boomer_Ang → Chicken_Hawk → Squad → Lil_Hawks → Receipt → ACHEEVY → User
+User → ACHEEVY → Boomer_Ang → Chicken Hawk → Squad → Lil_Hawks → Receipt → ACHEEVY → User
 ```
 
 | Step | Actor | Action |
 |------|-------|--------|
 | 1 | ACHEEVY | Approves plan, presents to user |
 | 2 | Boomer_Ang | Validates scope against DSP limits |
-| 3 | Chicken_Hawk | Receives contract with ShiftId |
+| 3 | Chicken Hawk | Receives contract with ShiftId |
 | 4 | Squad | Coordinates Lil_Hawk workers |
 | 5 | Lil_Hawks | Execute tasks, report logs only |
 | 6 | ACHEEVY | Verifies receipt, closes with user |
@@ -56,7 +56,7 @@ The user-facing Next.js application with:
 ### 2. Circuit Box
 
 Central integration hub connecting ACHEEVY to the Deploy Platform:
-- **Tool Router**: Routes ACHEEVY tool calls to Chicken_Hawk
+- **Tool Router**: Routes ACHEEVY tool calls to Chicken Hawk
 - **Validation Gates**: DSP, OEI, quota, certification checks
 - **Event Streaming**: Real-time events to Live Ops Theater
 
@@ -66,7 +66,7 @@ Central integration hub connecting ACHEEVY to the Deploy Platform:
 
 | Component | Role |
 |-----------|------|
-| Chicken_Hawk | Execution engine, spawns workers |
+| Chicken Hawk | Execution engine, spawns workers |
 | Squad | Coordinated group for a Shift |
 | Lil_Hawks | Individual worker bots |
 | Shift | Unit of work with lifecycle |
@@ -76,7 +76,7 @@ Central integration hub connecting ACHEEVY to the Deploy Platform:
 ### 4. Workforce Hierarchy
 
 ```
-Hatchling → Apprentice → Journeyman → Foreman → Chicken_Hawk_Candidate → Chicken_Hawk
+Hatchling → Apprentice → Journeyman → Foreman → Chicken Hawk_Candidate → Chicken Hawk
 ```
 
 Each level has:
@@ -146,7 +146,7 @@ sequenceDiagram
     participant U as User
     participant A as ACHEEVY
     participant CB as Circuit Box
-    participant CH as Chicken_Hawk
+    participant CH as Chicken Hawk
     participant LH as Lil_Hawks
     participant T as Live Ops Theater
 
@@ -169,7 +169,7 @@ sequenceDiagram
 infra/deploy-platform/
 ├── circuit-box/
 │   ├── acheevy-tools.json      # ACHEEVY tool definitions
-│   ├── chicken-hawk-dispatch.json  # Chicken_Hawk API
+│   ├── chicken-hawk-dispatch.json  # Chicken Hawk API
 │   └── circuit-box-config.json     # Hub configuration
 ├── lore/
 │   ├── workforce-structure.json    # Career levels

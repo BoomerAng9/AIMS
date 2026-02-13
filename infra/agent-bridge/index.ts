@@ -22,7 +22,7 @@ import rateLimit from 'express-rate-limit';
 
 const PORT = parseInt(process.env.PORT || '3010', 10);
 const AIMS_GATEWAY_URL = process.env.AIMS_GATEWAY_URL || 'http://uef-gateway:3001';
-const OPENCLAW_URL = process.env.OPENCLAW_URL || 'http://openclaw:8001';
+const SANDBOX_AGENT_URL = process.env.SANDBOX_AGENT_URL || 'http://agent-zero:80';
 
 // Rate limiting
 const RATE_LIMIT_REQUESTS = parseInt(process.env.RATE_LIMIT_REQUESTS || '100', 10);
@@ -234,8 +234,8 @@ app.post('/agent/request', async (req: Request, res: Response) => {
       payload: sanitizePayload(agentRequest.payload),
     };
 
-    // Forward to OpenClaw
-    const response = await fetch(`${OPENCLAW_URL}/api/request`, {
+    // Forward to sandbox agent
+    const response = await fetch(`${SANDBOX_AGENT_URL}/api/request`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(sanitizedRequest),
@@ -287,7 +287,7 @@ app.post('/agent/response', async (req: Request, res: Response) => {
   }
 });
 
-// Forward message FROM agent (OpenClaw) TO UEF Gateway (ingest direction)
+// Forward message FROM sandbox agent TO UEF Gateway (ingest direction)
 // This is the reverse path: sandboxed agent sends a user's message to ACHEEVY
 app.post('/agent/ingest', async (req: Request, res: Response) => {
   try {
@@ -305,14 +305,14 @@ app.post('/agent/ingest', async (req: Request, res: Response) => {
       });
     }
 
-    // Sanitize and forward to UEF Gateway's OpenClaw channel endpoint
+    // Sanitize and forward to UEF Gateway's agent callback endpoint
     const sanitizedPayload = sanitizePayload(ingestPayload);
 
     const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY || '';
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
     if (INTERNAL_API_KEY) headers['X-API-Key'] = INTERNAL_API_KEY;
 
-    const response = await fetch(`${AIMS_GATEWAY_URL}/api/channel/openclaw`, {
+    const response = await fetch(`${AIMS_GATEWAY_URL}/api/agent/callback`, {
       method: 'POST',
       headers,
       body: JSON.stringify(sanitizedPayload),

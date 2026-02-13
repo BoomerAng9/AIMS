@@ -102,7 +102,7 @@ export const PLUG_REGISTRY: PlugDefinition[] = [
     icon: "mail",
     status: "coming-soon",
     tier: "pro",
-    infrastructure: ["OpenClaw", "SendGrid", "n8n"],
+    infrastructure: ["SendGrid", "n8n"],
     features: ["Directory scraping", "Auto-sequencing", "Template management", "Analytics"],
     color: "pink",
     priority: "high",

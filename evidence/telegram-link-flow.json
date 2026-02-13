@@ -1,0 +1,36 @@
+{
+  "flow": "telegram-account-linking",
+  "steps": [
+    {
+      "step": 1,
+      "action": "User sends /start to Telegram bot",
+      "response": "Bot returns 6-char link code + instructions to paste in Circuit Box > Social Channels",
+      "status": "implemented"
+    },
+    {
+      "step": 2,
+      "action": "User pastes link code in A.I.M.S. dashboard (Circuit Box > Social Channels > Telegram)",
+      "response": "POST /api/social/link with { code, platform_user_id } claims the code",
+      "status": "implemented"
+    },
+    {
+      "step": 3,
+      "action": "After linking, user sends any message in Telegram",
+      "response": "Message routes through ACHEEVY chat orchestration, reply sent back to Telegram",
+      "status": "implemented"
+    }
+  ],
+  "commands": {
+    "/start": "Welcome message + link code generation (if not linked)",
+    "/help": "Show available commands",
+    "/disconnect": "Unlink Telegram from A.I.M.S. account",
+    "/status": "System status (UEF Gateway, Chicken Hawk)",
+    "/health": "Health check all services"
+  },
+  "security": {
+    "link_code_expiry": "10 minutes",
+    "link_code_format": "6 alphanumeric characters (uppercase)",
+    "single_use": true,
+    "unlinked_messages": "Rejected with instruction to link first"
+  }
+}

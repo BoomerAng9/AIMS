@@ -6,7 +6,7 @@
  * Canonical type definitions for the A.I.M.S. Chain of Command + Persona System.
  * All role cards, enforcement policies, and overlay configs derive from these types.
  *
- * v2.0.0 — Revised hierarchy: ACHEEVY → Boomer_Ang → Chicken_Hawk → Squad Leader → Lil_Hawk
+ * v2.0.0 — Revised hierarchy: ACHEEVY → Boomer_Ang → Chicken Hawk → Squad Leader → Lil_Hawk
  *           Added: PersonaCard, ToolRegistryEntry, CapabilityPack, BehaviorContract
  *           Rule:  Persona ≠ Authority. Persona is voice + style overlay, NEVER permissions.
  */
@@ -15,7 +15,7 @@
 /*  1. Enum / Literal Types                                           */
 /* ------------------------------------------------------------------ */
 
-export type RoleType = 'ACHEEVY' | 'Boomer_Ang' | 'Chicken_Hawk' | 'Lil_Hawk';
+export type RoleType = 'ACHEEVY' | 'Boomer_Ang' | 'Chicken Hawk' | 'Lil_Hawk';
 
 export type BenchLevel = 'Intern' | 'Intermediate' | 'Expert';
 
@@ -78,7 +78,7 @@ export interface SidebarNuggetRules {
 /* ------------------------------------------------------------------ */
 /*  4. Persona Card (Section 2.3 — Standard Across All Actors)        */
 /*                                                                    */
-/*  One schema for ACHEEVY, Boomer_Angs, Chicken_Hawk, Lil_Hawks.    */
+/*  One schema for ACHEEVY, Boomer_Angs, Chicken Hawk, Lil_Hawks.    */
 /*  Persona ≠ Authority. Voice overlay is flavor, not power.          */
 /* ------------------------------------------------------------------ */
 
@@ -222,7 +222,7 @@ export interface HandleRule {
 export interface HandleRules {
   ACHEEVY: HandleRule;
   Boomer_Ang: HandleRule;
-  Chicken_Hawk: HandleRule;
+  'Chicken Hawk': HandleRule;
   Lil_Hawk: HandleRule;
 }
 
