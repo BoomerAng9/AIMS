@@ -53,6 +53,16 @@ frontend/public/media/research/*.mp4
 frontend/public/media/research/*.m4a
 frontend/public/media/research/*.pdf
 
+# Vendor repos (cloned at build time, not tracked in git)
+vendor/intelligent-internet/CommonGround/
+vendor/intelligent-internet/ii-researcher/
+vendor/intelligent-internet/Common_Chronicle/
+vendor/intelligent-internet/litellm-debugger/
+vendor/intelligent-internet/codex-as-mcp/
+
+# Chicken Hawk evidence data
+services/chicken-hawk/data/
+
 # Temp files
 tmpclaude-*
 

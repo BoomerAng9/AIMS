@@ -2,174 +2,167 @@ version: '3.8'
 name: aims-chickenhawk
 
 # ===========================================================================
-# Chicken Hawk Service Cluster — Track 1 (P0, heavy)
+# Chicken Hawk Service Cluster — A.I.M.S. Execution Engine
+#
+# 4 services per CHICKENHAWK_SPEC.md:
+#   chickenhawk-core    (4001) — Planner/executor/verifier loop
+#   chickenhawk-policy  (4002) — Circuit Box policy enforcement
+#   chickenhawk-audit   (4003) — Immutable event log + evidence locker
+#   chickenhawk-voice   (4004) — Voice I/O routing (STT/TTS)
 #
 # Usage:
 #   docker compose -f docker-compose.chickenhawk.yml up -d
 #
-# All services are internal-only (no host port mapping). They communicate
-# over the shared aims-network and are reachable by service name.
+# All services communicate over aims-network. Core depends on policy
+# and audit being healthy before starting.
 # ===========================================================================
 
 services:
   # -------------------------------------------------------------------------
-  # chickenhawk-core: Main orchestration hub (port 8081 internal)
+  # chickenhawk-core: Main execution engine (port 4001)
+  # Receives manifests, spawns Squads of Lil_Hawks, executes waves
   # -------------------------------------------------------------------------
   chickenhawk-core:
     build:
       context: ../services/chicken-hawk
       dockerfile: Dockerfile
     container_name: chickenhawk-core
-    expose:
-      - "8081"
+    ports:
+      - "4001:4001"
     environment:
-      - PORT=8081
+      - PORT=4001
       - NODE_ENV=production
-      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
-      - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY}
-      - DEEPGRAM_API_KEY=${DEEPGRAM_API_KEY}
+      - POLICY_URL=http://chickenhawk-policy:4002
+      - AUDIT_URL=http://chickenhawk-audit:4003
+      - N8N_URL=http://n8n:5678
+      - AGENT_BRIDGE_URL=http://agent-bridge:3010
       - ACHEEVY_URL=http://acheevy:3003
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - CORS_ORIGIN=${CORS_ORIGIN:-*}
     volumes:
       - chickenhawk-data:/app/data
     healthcheck:
-      test: ["CMD", "curl", "-sf", "http://127.0.0.1:8081/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 15s
-    restart: unless-stopped
-    networks:
-      - aims-network
-
-  # -------------------------------------------------------------------------
-  # mim-orchestrator: MIM orchestration container (port 8082 internal)
-  # -------------------------------------------------------------------------
-  mim-orchestrator:
-    build:
-      context: ../services/chicken-hawk
-      dockerfile: Dockerfile
-    container_name: mim-orchestrator
-    command: ["bun", "run", "src/containers/mim-orchestrator.ts"]
-    expose:
-      - "8082"
-    environment:
-      - PORT=8082
-      - NODE_ENV=production
-      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
-      - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY}
-      - DEEPGRAM_API_KEY=${DEEPGRAM_API_KEY}
-      - ACHEEVY_URL=http://acheevy:3003
-    volumes:
-      - chickenhawk-data:/app/data
-    healthcheck:
-      test: ["CMD", "curl", "-sf", "http://127.0.0.1:8082/health"]
+      test: ["CMD", "curl", "-sf", "http://127.0.0.1:4001/health"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 15s
     restart: unless-stopped
     depends_on:
-      chickenhawk-core:
+      chickenhawk-policy:
         condition: service_healthy
+      chickenhawk-audit:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
     networks:
       - aims-network
 
   # -------------------------------------------------------------------------
-  # boomerang-scout: Boomerang scout container (port 8083 internal)
+  # chickenhawk-policy: Circuit Box policy enforcement (port 4002)
+  # Badge-level gating, tool permissions, budget caps, kill switch
   # -------------------------------------------------------------------------
-  boomerang-scout:
+  chickenhawk-policy:
     build:
       context: ../services/chicken-hawk
       dockerfile: Dockerfile
-    container_name: boomerang-scout
-    command: ["bun", "run", "src/containers/boomerang-scout.ts"]
-    expose:
-      - "8083"
+    container_name: chickenhawk-policy
+    command: ["bun", "run", "src/policy/server.ts"]
+    ports:
+      - "4002:4002"
     environment:
-      - PORT=8083
+      - PORT=4002
       - NODE_ENV=production
-      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
-      - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY}
-      - DEEPGRAM_API_KEY=${DEEPGRAM_API_KEY}
-      - ACHEEVY_URL=http://acheevy:3003
+      - CIRCUIT_BOX_CONFIG=/config/circuit-box.json
     volumes:
-      - chickenhawk-data:/app/data
+      - ../infra/deploy-platform:/config:ro
     healthcheck:
-      test: ["CMD", "curl", "-sf", "http://127.0.0.1:8083/health"]
+      test: ["CMD", "curl", "-sf", "http://127.0.0.1:4002/health"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 15s
+      start_period: 10s
     restart: unless-stopped
-    depends_on:
-      chickenhawk-core:
-        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
     networks:
       - aims-network
 
   # -------------------------------------------------------------------------
-  # oracle-verifier: Oracle verification container (port 8084 internal)
+  # chickenhawk-audit: Immutable event log + evidence locker (port 4003)
+  # Flight recorder, JSONL logs, 90-day retention, structured timelines
   # -------------------------------------------------------------------------
-  oracle-verifier:
+  chickenhawk-audit:
     build:
       context: ../services/chicken-hawk
       dockerfile: Dockerfile
-    container_name: oracle-verifier
-    command: ["bun", "run", "src/containers/oracle-verifier.ts"]
-    expose:
-      - "8084"
+    container_name: chickenhawk-audit
+    command: ["bun", "run", "src/audit/server.ts"]
+    ports:
+      - "4003:4003"
     environment:
-      - PORT=8084
+      - PORT=4003
       - NODE_ENV=production
-      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
-      - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY}
-      - DEEPGRAM_API_KEY=${DEEPGRAM_API_KEY}
-      - ACHEEVY_URL=http://acheevy:3003
+      - EVIDENCE_DIR=/data/evidence
+      - RETENTION_DAYS=90
     volumes:
-      - chickenhawk-data:/app/data
+      - chickenhawk-evidence:/data/evidence
     healthcheck:
-      test: ["CMD", "curl", "-sf", "http://127.0.0.1:8084/health"]
+      test: ["CMD", "curl", "-sf", "http://127.0.0.1:4003/health"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 15s
+      start_period: 10s
     restart: unless-stopped
-    depends_on:
-      chickenhawk-core:
-        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
     networks:
       - aims-network
 
   # -------------------------------------------------------------------------
-  # bamaram-generator: Bamaram generation container (port 8085 internal)
+  # chickenhawk-voice: Voice gateway (port 4004)
+  # STT (Groq Whisper / Deepgram) → TTS (ElevenLabs / Deepgram)
   # -------------------------------------------------------------------------
-  bamaram-generator:
+  chickenhawk-voice:
     build:
       context: ../services/chicken-hawk
       dockerfile: Dockerfile
-    container_name: bamaram-generator
-    command: ["bun", "run", "src/containers/bamaram-generator.ts"]
-    expose:
-      - "8085"
+    container_name: chickenhawk-voice
+    command: ["bun", "run", "src/voice/server.ts"]
+    ports:
+      - "4004:4004"
     environment:
-      - PORT=8085
+      - PORT=4004
       - NODE_ENV=production
-      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - CORE_URL=http://chickenhawk-core:4001
       - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY}
+      - ELEVENLABS_VOICE_ID=${ELEVENLABS_VOICE_ID:-pNInz6obpgDQGcFmaJgB}
       - DEEPGRAM_API_KEY=${DEEPGRAM_API_KEY}
-      - ACHEEVY_URL=http://acheevy:3003
-    volumes:
-      - chickenhawk-data:/app/data
+      - GROQ_API_KEY=${GROQ_API_KEY}
     healthcheck:
-      test: ["CMD", "curl", "-sf", "http://127.0.0.1:8085/health"]
+      test: ["CMD", "curl", "-sf", "http://127.0.0.1:4004/health"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 15s
+      start_period: 10s
     restart: unless-stopped
     depends_on:
       chickenhawk-core:
         condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
     networks:
       - aims-network
 
@@ -178,6 +171,8 @@ services:
 # ===========================================================================
 volumes:
   chickenhawk-data:
+    driver: local
+  chickenhawk-evidence:
     driver: local
 
 # ===========================================================================

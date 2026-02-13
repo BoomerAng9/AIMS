@@ -1,20 +1,19 @@
 {
   "name": "@aims/chicken-hawk",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
-  "description": "Chicken Hawk service - AIMS Track 1 P0 orchestration layer",
+  "description": "Chicken Hawk — A.I.M.S. Execution Engine. Spawns and coordinates Lil_Hawks via Squads.",
   "scripts": {
     "dev": "bun run --watch src/index.ts",
     "start": "bun run src/index.ts",
-    "start:mim": "bun run src/containers/mim-orchestrator.ts",
-    "start:boomerang": "bun run src/containers/boomerang-scout.ts",
-    "start:oracle": "bun run src/containers/oracle-verifier.ts",
-    "start:bamaram": "bun run src/containers/bamaram-generator.ts"
+    "start:core": "bun run src/index.ts",
+    "start:policy": "bun run src/policy/server.ts",
+    "start:audit": "bun run src/audit/server.ts",
+    "start:voice": "bun run src/voice/server.ts"
   },
   "dependencies": {
     "express": "^4.18.2",
-    "dotenv": "^16.3.1",
-    "eventsource": "^2.0.2"
+    "dotenv": "^16.3.1"
   },
   "devDependencies": {
     "@types/express": "^4.17.21",
