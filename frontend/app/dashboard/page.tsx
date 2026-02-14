@@ -103,7 +103,7 @@ const tiles = [
     title: "Chat w/ACHEEVY",
     icon: MessageSquare,
     desc: "Executive Orchestrator. Start here.",
-    href: "/dashboard",
+    href: "/dashboard/chat",
     highlight: true,
   },
   {

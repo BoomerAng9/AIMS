@@ -16,9 +16,8 @@ import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import clsx from "clsx";
 import {
-  MessageSquare, Zap, Shield, Bot, BarChart3,
-  Settings, Cpu, Wrench, CreditCard, Rocket,
-  FlaskConical, FolderKanban, Users, Boxes,
+  MessageSquare, Zap, Shield, BarChart3,
+  Cpu, Rocket, FlaskConical, FolderKanban, Users,
   Trophy, Activity, Mic, Theater, BookOpen,
   Coins, CircleDot, TrendingUp, Building, Layers,
 } from "lucide-react";
@@ -47,19 +46,6 @@ const CORE_ITEMS: NavItem[] = [
   { href: "/dashboard/deploy-dock", label: "Deploy Dock", icon: Rocket, highlight: true },
   { href: "/dashboard/your-space", label: "Your Space", icon: Users },
   { href: "/dashboard/plan", label: "Plan", icon: FolderKanban },
-];
-
-// Circuit Box tabs — consolidated into single page with tab routing
-const CIRCUIT_BOX_TABS: NavItem[] = [
-  { href: "/dashboard/circuit-box?tab=services", label: "Services", icon: Shield },
-  { href: "/dashboard/circuit-box?tab=integrations", label: "Integrations", icon: Boxes },
-  { href: "/dashboard/circuit-box?tab=social-channels", label: "Social Channels", icon: MessageSquare },
-  { href: "/dashboard/circuit-box?tab=model-garden", label: "Model Garden", icon: Cpu },
-  { href: "/dashboard/circuit-box?tab=boomerangs", label: "Boomer_Angs", icon: Bot },
-  { href: "/dashboard/circuit-box?tab=luc", label: "LUC Credits", icon: CreditCard },
-  { href: "/dashboard/circuit-box?tab=workbench", label: "Workbench", icon: Wrench },
-  { href: "/dashboard/circuit-box?tab=workstreams", label: "Workstreams", icon: BarChart3 },
-  { href: "/dashboard/circuit-box?tab=settings", label: "Settings", icon: Settings },
 ];
 
 // Workshop — Voice-First Companion Flows
@@ -173,25 +159,22 @@ export function DashboardNav() {
 
       <div className="mx-2 mt-2 border-t border-gold/10" />
 
-      {/* Circuit Box — Consolidated Hub */}
+      {/* Circuit Box — Single link, tabs are inside the page */}
       <div className="mt-2 space-y-0.5">
         <SectionLabel label="Circuit Box" icon={Shield} />
         <Link
           href="/dashboard/circuit-box"
           className={clsx(
             "flex items-center gap-2.5 rounded-lg px-3 py-2 transition-all text-sm",
-            pathname === "/dashboard/circuit-box" && !new URLSearchParams(typeof window !== "undefined" ? window.location.search : "").get("tab")
+            pathname?.startsWith("/dashboard/circuit-box")
               ? "border border-gold/30 bg-gold/8 text-gold shadow-[0_0_12px_rgba(212,175,55,0.08)]"
               : "border border-gold/15 bg-gold/5 text-gold/80 hover:bg-gold/10 hover:border-gold/25"
           )}
         >
           <Shield className="w-4 h-4 text-gold/60" />
           <span className="truncate">System Panel</span>
-          <span className="ml-auto w-1.5 h-1.5 rounded-full bg-gold/60 animate-pulse" />
+          <span className="ml-auto text-[9px] font-mono text-gold/40 tracking-wider">9 TABS</span>
         </Link>
-        {CIRCUIT_BOX_TABS.map((item) => (
-          <NavLink key={item.href} item={item} pathname={pathname} />
-        ))}
       </div>
 
       {/* Workshop — Voice-First Companion Flows */}

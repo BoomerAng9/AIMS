@@ -355,7 +355,7 @@ function AcheevyPanel() {
             <Sparkles size={16} className="text-gold" />
           </motion.div>
           <div>
-            <p className="text-sm font-semibold text-gold">Ask ACHEEVY</p>
+            <p className="text-sm font-semibold text-gold">Chat w/ACHEEVY</p>
             <p className="text-[10px] text-gold/50 uppercase tracking-wider">Master Control Interface</p>
           </div>
         </div>
