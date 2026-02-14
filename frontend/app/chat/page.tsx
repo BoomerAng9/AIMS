@@ -880,9 +880,6 @@ export default function ChatPage() {
                   </div>
                 </form>
 
-                <p className="text-center text-[8px] font-mono text-white/10 uppercase tracking-[0.2em] mt-2">
-                  A.I.M.S. Neural Link
-                </p>
               </div>
             </div>
           </main>
