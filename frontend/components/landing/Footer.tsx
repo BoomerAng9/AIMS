@@ -66,6 +66,7 @@ const FOOTER_NAV = {
     links: [
       { label: 'Chat w/ACHEEVY', href: `${APP_DOMAIN}/chat` },
       { label: 'Dashboard', href: `${APP_DOMAIN}/dashboard` },
+      { label: 'N.I.L.', href: `${APP_DOMAIN}/dashboard/nil` },
       { label: 'Model Garden', href: `${APP_DOMAIN}/dashboard/model-garden` },
       { label: 'Circuit Box', href: `${APP_DOMAIN}/dashboard/circuit-box` },
       { label: 'House of Ang', href: `${APP_DOMAIN}/dashboard/house-of-ang` },

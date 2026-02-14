@@ -19,6 +19,7 @@ import {
   MessageSquare, Zap, Shield, Bot, BarChart3,
   Settings, Cpu, Wrench, CreditCard, Rocket,
   FlaskConical, FolderKanban, Users, Boxes,
+  Trophy, Activity,
 } from "lucide-react";
 
 // ── Types ──
@@ -58,6 +59,12 @@ const CIRCUIT_BOX_TABS: NavItem[] = [
   { href: "/dashboard/circuit-box?tab=workbench", label: "Workbench", icon: Wrench },
   { href: "/dashboard/circuit-box?tab=workstreams", label: "Workstreams", icon: BarChart3 },
   { href: "/dashboard/circuit-box?tab=settings", label: "Settings", icon: Settings },
+];
+
+// Per|Form — Sports Analytics & N.I.L.
+const PERFORM_ITEMS: NavItem[] = [
+  { href: "/dashboard/nil", label: "N.I.L.", icon: Trophy },
+  { href: "/dashboard/sports-tracker", label: "Sports Tracker", icon: Activity },
 ];
 
 // Owner-only Circuit Box tabs
@@ -165,6 +172,15 @@ export function DashboardNav() {
           <span className="ml-auto w-1.5 h-1.5 rounded-full bg-gold/60 animate-pulse" />
         </Link>
         {CIRCUIT_BOX_TABS.map((item) => (
+          <NavLink key={item.href} item={item} pathname={pathname} />
+        ))}
+      </div>
+
+      {/* Per|Form — Sports Analytics & N.I.L. */}
+      <div className="mx-2 mt-2 border-t border-amber-500/10" />
+      <div className="mt-1 space-y-0.5">
+        <SectionLabel label="Per|Form" icon={Trophy} />
+        {PERFORM_ITEMS.map((item) => (
           <NavLink key={item.href} item={item} pathname={pathname} />
         ))}
       </div>
