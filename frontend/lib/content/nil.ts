@@ -122,7 +122,7 @@ export const NIL_FOUNDATION: NILFoundation = {
       title: 'The Transfer Portal',
       subtitle: 'Free agency meets college athletics.',
       content:
-        'The NCAA Transfer Portal changed the game. Athletes can now enter the portal, explore options, and transfer to a new school — often with NIL deals as a deciding factor. The portal has created a de facto free agency system in college sports.\n\nFor athletes, the portal is leverage. If your current school\'s collective isn\'t competitive, or your playing time is limited, the portal opens doors. For programs, the portal is both a recruiting tool and a retention challenge. Losing a star to a higher-bidding collective is real.\n\nPortal dynamics directly impact NIL valuation. An athlete entering the portal with strong production and social presence can see their NIL value spike as programs compete. Conversely, a portal entrant with declining stats may find their leverage shrinking.\n\nPer|Form tracks portal movement as a core data stream. When a prospect enters the portal, their GROC+Luke scores are recalculated against new competitive contexts. Market size changes, conference affiliation shifts, and collective strength at the destination school all factor into updated NIL projections.\n\nThe Transfer Portal isn\'t just about where you play — it\'s about what your brand is worth when you get there.',
+        'The NCAA Transfer Portal changed the game. Athletes can now enter the portal, explore options, and transfer to a new school — often with NIL deals as a deciding factor. The portal has created a de facto free agency system in college sports.\n\nFor athletes, the portal is leverage. If your current school\'s collective isn\'t competitive, or your playing time is limited, the portal opens doors. For programs, the portal is both a recruiting tool and a retention challenge. Losing a star to a higher-bidding collective is real.\n\nPortal dynamics directly impact NIL valuation. An athlete entering the portal with strong production and social presence can see their NIL value spike as programs compete. Conversely, a portal entrant with declining stats may find their leverage shrinking.\n\nPer|Form tracks portal movement as a core data stream. When a prospect enters the portal, their P.A.I. composite scores are recalculated against new competitive contexts. Market size changes, conference affiliation shifts, and collective strength at the destination school all factor into updated NIL projections.\n\nThe Transfer Portal isn\'t just about where you play — it\'s about what your brand is worth when you get there.',
       color: 'blue',
       icon: 'portal',
     },
@@ -131,7 +131,7 @@ export const NIL_FOUNDATION: NILFoundation = {
       title: 'Revenue Sharing',
       subtitle: 'The next frontier: schools paying athletes directly.',
       content:
-        'Revenue sharing is the evolution of NIL that many predicted and few were ready for. Starting with the House v. NCAA settlement, schools can now share a portion of their athletic revenue directly with athletes.\n\nThis changes the equation fundamentally. NIL was always third-party money — brands, collectives, donors paying athletes for their name and likeness. Revenue sharing is institutional money — the school itself compensating athletes from media rights, ticket sales, and licensing revenue.\n\nThe two systems coexist. An athlete can earn revenue share from their school AND maintain independent NIL deals. But the dynamics shift. Schools with larger revenue pools can offer more competitive revenue sharing, potentially reducing the outsized influence of collectives at certain programs.\n\nRevenue sharing also introduces new compliance complexity. How is the money allocated? Is it per-sport, per-roster-spot, or performance-based? What happens to Olympic sports athletes? How do Title IX requirements apply?\n\nPer|Form models revenue sharing alongside traditional NIL valuation. The GROC+Luke framework evaluates an athlete\'s total compensation potential — combining projected revenue share with independent NIL deal capacity. This gives athletes and their advisors a complete picture of what a school is worth, not just what a collective is offering.\n\nThe era of athletes as employees of their universities has effectively begun. Understanding revenue sharing is no longer optional — it\'s essential.',
+        'Revenue sharing is the evolution of NIL that many predicted and few were ready for. Starting with the House v. NCAA settlement, schools can now share a portion of their athletic revenue directly with athletes.\n\nThis changes the equation fundamentally. NIL was always third-party money — brands, collectives, donors paying athletes for their name and likeness. Revenue sharing is institutional money — the school itself compensating athletes from media rights, ticket sales, and licensing revenue.\n\nThe two systems coexist. An athlete can earn revenue share from their school AND maintain independent NIL deals. But the dynamics shift. Schools with larger revenue pools can offer more competitive revenue sharing, potentially reducing the outsized influence of collectives at certain programs.\n\nRevenue sharing also introduces new compliance complexity. How is the money allocated? Is it per-sport, per-roster-spot, or performance-based? What happens to Olympic sports athletes? How do Title IX requirements apply?\n\nPer|Form models revenue sharing alongside traditional NIL valuation. The P.A.I. formula evaluates an athlete\'s total compensation potential — combining projected revenue share with independent NIL deal capacity. This gives athletes and their advisors a complete picture of what a school is worth, not just what a collective is offering.\n\nThe era of athletes as employees of their universities has effectively begun. Understanding revenue sharing is no longer optional — it\'s essential.',
       color: 'emerald',
       icon: 'revenue',
     },
@@ -140,7 +140,7 @@ export const NIL_FOUNDATION: NILFoundation = {
       title: 'Per|Form & N.I.L.',
       subtitle: 'Where scouting intelligence meets brand value.',
       content:
-        'Per|Form\'s autonomous scouting pipeline doesn\'t just evaluate athletic talent — it builds the data foundation that informs NIL valuation.\n\nThe GROC+Luke grading system produces objective performance scores. Those scores — Game Performance, Raw Athletics, Overall Production, Competition Level — are the same metrics that brands and collectives use to assess an athlete\'s market value.\n\nWhen the Scout Hub runs adversarial analysis on a prospect, the Bull/Bear debate isn\'t just about draft stock — it\'s about marketability. An "UNDERRATED" finding means the athlete\'s NIL value may be suppressed relative to their actual ability. An "OVERRATED" flag means their current deals may exceed sustainable value.\n\nFilm Room analysis adds another dimension: measurable athletic data (speed bursts, separation, route sharpness) that sponsors can reference when justifying deal sizes.\n\nPer|Form positions A.I.M.S. as the bridge between raw talent evaluation and NIL market intelligence — giving athletes, agents, and collectives the data they need to make informed decisions.',
+        'Per|Form\'s autonomous scouting pipeline doesn\'t just evaluate athletic talent — it builds the data foundation that informs NIL valuation.\n\nThe P.A.I. formula — Score = (P × 0.40) + (A × 0.30) + (I × 0.30) — is the engine. P (Performance) is sourced by Lil_Bull_Hawk and Lil_Bear_Hawk through Firecrawl, pulling stats from MaxPreps and ESPN. A (Athleticism) comes from SAM 2 on Vertex AI, measuring speed bursts and separation distance from actual film. I (Intangibles) is gathered by Chicken Hawk via Brave Search, analyzing news coverage, leadership signals, captaincy history, and existing NIL deals.\n\nWhen the Scout Hub runs adversarial analysis, Lil_Bull_Hawk takes the UNDERRATED stance — this prospect\'s NIL value is suppressed relative to their ability. Lil_Bear_Hawk takes the OVERRATED stance — this prospect\'s current deals exceed sustainable value. Chicken Hawk mediates the debate, runs the P.A.I. formula, and assigns the final composite score and tier.\n\nA score of 101+ flags a generational talent (PRIME PLAYER). 90-100 is A+ (Elite Prospect). 80-89 is A (Starter Potential). The tiers map directly to NIL valuation brackets — brands and collectives reference Per|Form grades when sizing deals.\n\nPer|Form positions A.I.M.S. as the bridge between raw talent evaluation and NIL market intelligence — giving athletes, agents, and collectives the data they need to make informed decisions.',
       color: 'amber',
       icon: 'bridge',
     },
@@ -421,6 +421,88 @@ export interface PositionNILProfile {
   challenge: string;
   color: string;
 }
+
+// ─────────────────────────────────────────────────────────────
+// P.A.I. Formula — The Per|Form Grading Algorithm
+// Derived from "Mastering the N.I.L." methodology
+// ─────────────────────────────────────────────────────────────
+
+export interface PAIFormulaComponent {
+  variable: string;
+  name: string;
+  weight: number;
+  sourceAgent: string;
+  dataSource: string;
+  description: string;
+  color: string;
+}
+
+export interface PAITier {
+  scoreRange: string;
+  label: string;
+  grade: string;
+  color: string;
+}
+
+export interface PAIFormula {
+  name: string;
+  equation: string;
+  description: string;
+  components: PAIFormulaComponent[];
+  tiers: PAITier[];
+}
+
+export const PAI_FORMULA: PAIFormula = {
+  name: 'P.A.I. Composite Score',
+  equation: 'Score = (P × 0.40) + (A × 0.30) + (I × 0.30)',
+  description:
+    'The Per|Form grading algorithm produces a Composite Score (0-100+) using three weighted components. Each component is sourced by a specific agent in the Gridiron Sandbox pipeline. The formula is rooted in the methodology from "Mastering the N.I.L." and drives all prospect evaluation, NIL valuation, and content generation.',
+  components: [
+    {
+      variable: 'P',
+      name: 'Game Performance',
+      weight: 0.40,
+      sourceAgent: 'Lil_Bull_Hawk + Lil_Bear_Hawk',
+      dataSource: 'Firecrawl (MaxPreps, ESPN, 247Sports)',
+      description:
+        'Statistical production normalized to a 0-100 scale. Yards, touchdowns, completion percentage, tackles, sacks — the numbers that define what a player does on the field. Lil_Bull_Hawk argues the prospect is UNDERRATED; Lil_Bear_Hawk argues OVERRATED. Both cite stats with confidence scores.',
+      color: 'amber',
+    },
+    {
+      variable: 'A',
+      name: 'Athleticism',
+      weight: 0.30,
+      sourceAgent: 'SAM 2 (Meta)',
+      dataSource: 'Vertex AI on NVIDIA Tesla T4',
+      description:
+        'Measurable athletic traits extracted from actual game film. SAM 2 segments the player in video and calculates speed bursts, separation distance from defenders, route sharpness, and play recognition. Separation > 3.0 yards and burst speed > 20 mph are key thresholds.',
+      color: 'cyan',
+    },
+    {
+      variable: 'I',
+      name: 'Intangibles',
+      weight: 0.30,
+      sourceAgent: 'Chicken Hawk',
+      dataSource: 'Brave Search (news, interviews, social media)',
+      description:
+        'Leadership, character, and off-field factors that shape an athlete\'s brand and ceiling. Sourced from news coverage sentiment, captaincy history, community involvement, existing NIL deals, and interview presence. Chicken Hawk mediates the Lil_Hawk debate and finalizes the composite score.',
+      color: 'emerald',
+    },
+  ],
+  tiers: [
+    { scoreRange: '101+', label: 'PRIME PLAYER', grade: 'Generational Talent', color: 'gold' },
+    { scoreRange: '90 – 100', label: 'A+', grade: 'Elite Prospect', color: 'amber' },
+    { scoreRange: '80 – 89', label: 'A', grade: 'Starter Potential', color: 'cyan' },
+    { scoreRange: '70 – 79', label: 'B+', grade: 'High-Upside Prospect', color: 'emerald' },
+    { scoreRange: '60 – 69', label: 'B', grade: 'Solid Contributor', color: 'purple' },
+    { scoreRange: '50 – 59', label: 'C+', grade: 'Developmental', color: 'blue' },
+    { scoreRange: 'Below 50', label: 'C', grade: 'Project', color: 'zinc' },
+  ],
+};
+
+// ─────────────────────────────────────────────────────────────
+// Position Group NIL Dynamics
+// ─────────────────────────────────────────────────────────────
 
 export const POSITION_NIL_PROFILES: PositionNILProfile[] = [
   {

@@ -16,6 +16,7 @@ import {
   VALUATION_FACTORS,
   NIL_TIERS,
   POSITION_NIL_PROFILES,
+  PAI_FORMULA,
 } from '@/lib/content/nil';
 
 // ─── Color Mapping ────────────────────────────────────────────────────
@@ -361,61 +362,67 @@ function PortalRevenueTab() {
         </div>
       )}
 
-      {/* GROC+Luke Formula Connection */}
+      {/* P.A.I. Formula — The Per|Form Grading Algorithm */}
       <div className="bg-zinc-900/50 border border-amber-500/30 rounded-xl p-6">
-        <h2 className="text-lg font-semibold text-amber-400 mb-3">The GROC+Luke Framework</h2>
-        <p className="text-sm text-zinc-400 leading-relaxed mb-4">
-          Per|Form&apos;s proprietary evaluation framework — rooted in the methodology from{' '}
-          <span className="text-amber-400 font-medium">{NIL_FOUNDATION.book.title}</span> — powers
-          NIL valuation, portal analysis, and revenue sharing projections.
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-lg font-semibold text-amber-400">The P.A.I. Formula</h2>
+          <span className="text-xs text-zinc-600 italic">
+            from {NIL_FOUNDATION.book.title}
+          </span>
+        </div>
+
+        {/* Equation Display */}
+        <div className="bg-zinc-800/80 border border-zinc-700/50 rounded-lg p-4 mb-4 text-center">
+          <p className="text-lg font-mono font-bold text-amber-400 tracking-wider">
+            {PAI_FORMULA.equation}
+          </p>
+          <p className="text-xs text-zinc-500 mt-2">Composite Score (0-100+)</p>
+        </div>
+
+        <p className="text-sm text-zinc-400 leading-relaxed mb-5">
+          {PAI_FORMULA.description}
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* GROC */}
-          <div className="bg-zinc-800/50 border border-zinc-700/50 rounded-lg p-4">
-            <h3 className="text-sm font-mono font-bold text-amber-400 mb-2">G.R.O.C.</h3>
-            <ul className="space-y-2 text-xs text-zinc-400">
-              <li className="flex items-center gap-2">
-                <span className="w-5 h-5 rounded bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 font-bold text-[10px]">G</span>
-                <span><strong className="text-zinc-300">Game Performance</strong> — 35% weight</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="w-5 h-5 rounded bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 font-bold text-[10px]">R</span>
-                <span><strong className="text-zinc-300">Raw Athletics</strong> — 25% weight</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="w-5 h-5 rounded bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 font-bold text-[10px]">O</span>
-                <span><strong className="text-zinc-300">Overall Production</strong> — 25% weight</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="w-5 h-5 rounded bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 font-bold text-[10px]">C</span>
-                <span><strong className="text-zinc-300">Competition Level</strong> — 15% weight</span>
-              </li>
-            </ul>
-          </div>
+        {/* Components */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
+          {PAI_FORMULA.components.map(comp => {
+            const colors = getColors(comp.color);
+            return (
+              <div key={comp.variable} className={`bg-zinc-800/50 border ${colors.border} rounded-lg p-4`}>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className={`w-8 h-8 rounded-lg ${colors.bg} border ${colors.border} flex items-center justify-center ${colors.text} font-bold text-lg font-mono`}>
+                    {comp.variable}
+                  </span>
+                  <div>
+                    <h3 className={`text-sm font-semibold ${colors.text}`}>{comp.name}</h3>
+                    <p className="text-[10px] text-zinc-500 font-mono">{(comp.weight * 100)}% weight</p>
+                  </div>
+                </div>
+                <p className="text-xs text-zinc-400 mb-2">{comp.description}</p>
+                <div className="border-t border-zinc-700/50 pt-2 mt-2">
+                  <p className="text-[10px] text-zinc-500 uppercase tracking-wider mb-0.5">Source Agent</p>
+                  <p className="text-xs text-zinc-300 font-medium">{comp.sourceAgent}</p>
+                  <p className="text-[10px] text-zinc-500 uppercase tracking-wider mt-1.5 mb-0.5">Data Source</p>
+                  <p className="text-xs text-zinc-300">{comp.dataSource}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
 
-          {/* Luke */}
-          <div className="bg-zinc-800/50 border border-zinc-700/50 rounded-lg p-4">
-            <h3 className="text-sm font-mono font-bold text-cyan-400 mb-2">L.U.K.E.</h3>
-            <ul className="space-y-2 text-xs text-zinc-400">
-              <li className="flex items-center gap-2">
-                <span className="w-5 h-5 rounded bg-cyan-500/20 border border-cyan-500/30 flex items-center justify-center text-cyan-400 font-bold text-[10px]">L</span>
-                <span><strong className="text-zinc-300">Leadership</strong> — Multiplier (0.8-1.2)</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="w-5 h-5 rounded bg-cyan-500/20 border border-cyan-500/30 flex items-center justify-center text-cyan-400 font-bold text-[10px]">U</span>
-                <span><strong className="text-zinc-300">Upside/Ceiling</strong> — Score (0-100)</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="w-5 h-5 rounded bg-cyan-500/20 border border-cyan-500/30 flex items-center justify-center text-cyan-400 font-bold text-[10px]">K</span>
-                <span><strong className="text-zinc-300">Known Concerns</strong> — Risk flags</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="w-5 h-5 rounded bg-cyan-500/20 border border-cyan-500/30 flex items-center justify-center text-cyan-400 font-bold text-[10px]">E</span>
-                <span><strong className="text-zinc-300">Evaluator Confidence</strong> — Score (0-100)</span>
-              </li>
-            </ul>
-          </div>
+        {/* Tier Scale */}
+        <h3 className="text-sm font-semibold text-zinc-300 mb-3">Grade Scale</h3>
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2">
+          {PAI_FORMULA.tiers.map(tier => {
+            const colors = getColors(tier.color);
+            return (
+              <div key={tier.label} className={`p-2 rounded-lg border ${colors.border} ${colors.bg} text-center`}>
+                <p className={`text-sm font-bold font-mono ${colors.text}`}>{tier.label}</p>
+                <p className="text-[10px] text-zinc-400">{tier.scoreRange}</p>
+                <p className="text-[9px] text-zinc-500 mt-0.5">{tier.grade}</p>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
