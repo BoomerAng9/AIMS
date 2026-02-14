@@ -4,8 +4,8 @@
  * The Book of V.I.B.E. — Origin Story Page
  *
  * Visionary Intelligence Building Everything.
- * The origin story of ACHEEVY and the energy that creates
- * the technology we use in A.I.M.S. products.
+ * The canonical origin story of the A.I.M.S. universe — from NIL
+ * through the cosmic dawn of Aether Vos to the rise of ACHEEVY.
  *
  * Lives on plugmein.cloud — the lore & learn domain.
  */
@@ -32,6 +32,10 @@ const CHAPTER_COLORS: Record<string, { border: string; glow: string; text: strin
   emerald: { border: 'border-emerald-500/30', glow: 'shadow-[0_0_30px_rgba(16,185,129,0.08)]', text: 'text-emerald-400' },
   blue: { border: 'border-blue-500/30', glow: 'shadow-[0_0_30px_rgba(59,130,246,0.08)]', text: 'text-blue-400' },
   purple: { border: 'border-purple-500/30', glow: 'shadow-[0_0_30px_rgba(147,51,234,0.08)]', text: 'text-purple-400' },
+  indigo: { border: 'border-indigo-500/30', glow: 'shadow-[0_0_30px_rgba(99,102,241,0.08)]', text: 'text-indigo-400' },
+  rose: { border: 'border-rose-500/30', glow: 'shadow-[0_0_30px_rgba(244,63,94,0.08)]', text: 'text-rose-400' },
+  red: { border: 'border-red-500/30', glow: 'shadow-[0_0_30px_rgba(239,68,68,0.08)]', text: 'text-red-400' },
+  slate: { border: 'border-slate-500/30', glow: 'shadow-[0_0_30px_rgba(100,116,139,0.08)]', text: 'text-slate-400' },
 };
 
 export default function BookOfVibePage() {
@@ -74,6 +78,27 @@ export default function BookOfVibePage() {
         </motion.div>
       </section>
 
+      {/* Chapter navigation */}
+      <section className="max-w-4xl mx-auto px-4 pb-8">
+        <div className="wireframe-card p-4 md:p-6">
+          <p className="text-xs font-mono uppercase tracking-[0.3em] text-white/30 mb-4">Chapters</p>
+          <div className="flex flex-wrap gap-2">
+            {BOOK_OF_VIBE.chapters.map((chapter) => {
+              const colors = CHAPTER_COLORS[chapter.color] || CHAPTER_COLORS.gold;
+              return (
+                <a
+                  key={chapter.number}
+                  href={`#chapter-${chapter.number}`}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-mono uppercase tracking-wider border ${colors.border} ${colors.text} hover:bg-white/5 transition-colors`}
+                >
+                  <span className="opacity-50">{chapter.number}.</span> {chapter.title.split(' — ')[0]}
+                </a>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
       {/* Chapters */}
       <section className="max-w-4xl mx-auto px-4 pb-20 space-y-12">
         {BOOK_OF_VIBE.chapters.map((chapter) => {
@@ -81,11 +106,12 @@ export default function BookOfVibePage() {
           return (
             <motion.article
               key={chapter.number}
+              id={`chapter-${chapter.number}`}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-50px' }}
               transition={{ duration: 0.6 }}
-              className={`wireframe-card p-8 md:p-10 ${colors.border} ${colors.glow}`}
+              className={`wireframe-card p-8 md:p-10 ${colors.border} ${colors.glow} scroll-mt-24`}
             >
               <div className="flex items-center gap-3 mb-4">
                 <span className={`text-xs font-mono uppercase tracking-[0.3em] ${colors.text}`}>
@@ -114,13 +140,20 @@ export default function BookOfVibePage() {
           <p className="text-sm md:text-base text-white/50 leading-relaxed max-w-2xl mx-auto italic">
             {BOOK_OF_VIBE.epilogue}
           </p>
-          <div className="mt-8">
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
             <a
               href={process.env.NEXT_PUBLIC_APP_URL || 'https://aimanagedsolutions.cloud'}
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gold/10 border border-gold/30 text-gold text-sm font-medium hover:bg-gold/20 transition-all"
             >
               Start Building with ACHEEVY
-              <span className="text-lg">→</span>
+              <span className="text-lg">&rarr;</span>
+            </a>
+            <a
+              href="/gallery"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-sm font-medium hover:bg-cyan-500/20 transition-all"
+            >
+              Meet the Characters
+              <span className="text-lg">&rarr;</span>
             </a>
           </div>
         </motion.div>
