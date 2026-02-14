@@ -1,7 +1,7 @@
 # ACHEEVY BRAIN
 ## The Single Source of Truth for ACHEEVY's Behavior, Skills, Hooks & Recurring Tasks
 
-> **Version:** 2.0.0
+> **Version:** 2.1.0
 > **Owner:** ACHEEVY (Digital CEO of A.I.M.S.)
 > **Effective:** 2026-02-14
 > **Doctrine:** "Think it. Prompt it. Let ACHEEVY manage it."
@@ -476,6 +476,25 @@ Every tool and capability is **owned** by a Boomer_Ang. No raw tool access.
 | `Index_Ang` | Data | Datasets, embeddings, II-Commons |
 | `Licensing_Ang` | Compliance | AGPL/license quarantine, PPTist |
 
+### Boomer_Ang Brain Files
+Each Boomer_Ang wrapping an Intelligent Internet repo has a dedicated brain file in `aims-skills/brains/`.
+These define the wrapper's identity, security guardrails, deployment target, and ACHEEVY integration protocol.
+
+See: `aims-skills/brains/ACHEEVY_II_EXTENSIONS.md` for ACHEEVY's direct extensions (ii-agent, II-Commons, Agent Zero).
+
+| Brain File | Boomer_Ang | Wraps |
+|------------|------------|-------|
+| `SCOUT_ANG_BRAIN.md` | Scout_Ang | ii-researcher |
+| `OPSCONSOLE_ANG_BRAIN.md` | OpsConsole_Ang | CommonGround |
+| `CHRONICLE_ANG_BRAIN.md` | Chronicle_Ang | Common_Chronicle |
+| `GATEKEEPER_ANG_BRAIN.md` | Gatekeeper_Ang | litellm-debugger |
+| `PATCHSMITH_ANG_BRAIN.md` | Patchsmith_Ang | codex + codex-as-mcp |
+| `RUNNER_ANG_BRAIN.md` | Runner_Ang | gemini-cli + bridge |
+| `SHOWRUNNER_ANG_BRAIN.md` | Showrunner_Ang | reveal.js |
+| `SCRIBE_ANG_BRAIN.md` | Scribe_Ang | Symbioism-Nextra + TLE |
+| `LAB_ANG_BRAIN.md` | Lab_Ang | ii-thought + ii_verl + CoT-Lab-Demo |
+| `INDEX_ANG_BRAIN.md` | Index_Ang | II-Commons |
+
 ---
 
 ## 12. Security & Anti-Hack Framework
@@ -638,6 +657,18 @@ aims-skills/
 ├── acheevy-verticals/
 │   ├── vertical-definitions.ts    ← 12 revenue verticals (10 + LiveSim + ChickenHawk)
 │   └── types.ts                   ← Vertical type definitions
+├── brains/                          ← Boomer_Ang brain files (II repo wrappers)
+│   ├── ACHEEVY_II_EXTENSIONS.md     ← ACHEEVY's direct wraps (ii-agent, II-Commons, Agent Zero)
+│   ├── SCOUT_ANG_BRAIN.md           ← ii-researcher wrapper
+│   ├── OPSCONSOLE_ANG_BRAIN.md      ← CommonGround wrapper
+│   ├── CHRONICLE_ANG_BRAIN.md       ← Common_Chronicle wrapper
+│   ├── GATEKEEPER_ANG_BRAIN.md      ← litellm-debugger wrapper
+│   ├── PATCHSMITH_ANG_BRAIN.md      ← codex + codex-as-mcp wrapper
+│   ├── RUNNER_ANG_BRAIN.md          ← gemini-cli + bridge wrapper
+│   ├── SHOWRUNNER_ANG_BRAIN.md      ← reveal.js wrapper
+│   ├── SCRIBE_ANG_BRAIN.md          ← Symbioism-Nextra + TLE wrapper
+│   ├── LAB_ANG_BRAIN.md             ← ii-thought + ii_verl + CoT-Lab-Demo wrapper
+│   └── INDEX_ANG_BRAIN.md           ← II-Commons data layer wrapper
 ├── chain-of-command/
 │   ├── CHAIN_OF_COMMAND.md        ← Full governance document
 │   └── role-cards/
