@@ -178,6 +178,7 @@ Hooks are guardrails and interceptors. They run before any task executes.
 | **Session Start** | `hooks/session-start.hook.md` | Initializes session state; loads persona, path, LLM model, voice profile from Firestore | New session / reconnect |
 | **Sim User Message** | `hooks/sim-user-message.hook.md` | Routes user messages into LiveSim; ACHEEVY invites agents into bounded Q&A (max 3 turns) | LiveSim user input |
 | **Enter Chicken Hawk** | `hooks/enter-chicken-hawk.hook.md` | Checks CLAW replacement readiness; triggers buildout if not ready | First entry to Chicken Hawk vertical |
+| **D.U.M.B. Gate** | `hooks/dumb-gate.hook.md` | Enforces D.U.M.B. SOP gates before any deployment ships | `deploy`, `release`, `ship`, Phase B completion, Plug fabrication |
 
 ### Adding a New Hook
 1. Create `hooks/<name>.hook.ts` implementing the hook interface
@@ -281,6 +282,8 @@ Skills inject specialized context, SOPs, and design standards into ACHEEVY's beh
 | Skill | File | Triggers | Purpose |
 |-------|------|----------|---------|
 | **Skill Router** | `skills/skill-router.md` | "build", "design", "redesign", "integrate", "security" | Routes work type to required skills and hooks |
+| **D.U.M.B. SOP** | `skills/dumb-sop.skill.md` | "build", "deploy", "create app", "new project", "scaffold", Phase B | Deep Universal Meticulous Build — mandatory 12-pillar build standard |
+| **Frontend Design Spec** | `skills/design/frontend-design-spec.md` | "design", "frontend", "ui", "layout", "guild" | Digital Guild Hall architecture — Obsidian & Gold Circuitry design contract |
 
 ### Adding a New Skill
 1. Create `skills/<name>.skill.ts` or `skills/<name>.skill.md`
@@ -588,9 +591,11 @@ aims-skills/
 │   ├── enter-chicken-hawk.hook.md ← CLAW readiness check on entry
 │   ├── plug-protocol.md           ← Plug protocol definition
 │   ├── github-ops.md              ← GitHub operations hook
+│   ├── dumb-gate.hook.md          ← D.U.M.B. gate enforcement (pre-deploy)
 │   └── docker-compose.md          ← Docker operations hook
 ├── skills/
 │   ├── index.ts                   ← Skill exports
+│   ├── dumb-sop.skill.md          ← D.U.M.B. — Deep Universal Meticulous Build SOP
 │   ├── skill-router.md            ← Routes work type to required skills/hooks
 │   ├── onboarding-sop.skill.ts
 │   ├── idea-validation.skill.ts
@@ -604,7 +609,8 @@ aims-skills/
 │   │   ├── design-first-builder.md      ← Full design pipeline + teardown rules
 │   │   ├── hangar-ui-world.md           ← Hangar lighting, motion, depth, layout
 │   │   ├── circuit-box-visualization.md ← Owner vs User Circuit Box rendering
-│   │   └── design-tokens-standards.md   ← Token naming, spacing, colors, motion
+│   │   ├── design-tokens-standards.md   ← Token naming, spacing, colors, motion
+│   │   └── frontend-design-spec.md     ← Digital Guild Hall frontend design contract v2.1
 │   ├── integrations/              ← Third-party integration rules
 │   │   ├── telegram.md                  ← Telegram Bot API integration
 │   │   ├── discord.md                   ← Discord bot/webhook integration
@@ -848,11 +854,63 @@ aims-skills/tasks/<name>.md
 
 ---
 
-## 16. Non-Negotiable Design & Build Rules
+## 16. D.U.M.B. — Deep Universal Meticulous Build (Mandatory Build Standard)
+
+**D.U.M.B. is the mandatory build process for every coding instance in the A.I.M.S. ecosystem.**
+
+Whether ACHEEVY's agents are building internally or building for users, D.U.M.B. applies.
+Based on the **"Real App Forever" SOP v2.0** — Infrastructure-Agnostic.
+
+**Full SOP:** `skills/dumb-sop.skill.md`
+**Frontend Design Contract:** `skills/design/frontend-design-spec.md`
+**Enforcement Hook:** `hooks/dumb-gate.hook.md`
+
+### When D.U.M.B. Fires
+- Every Phase B vertical execution
+- Every Chicken Hawk build
+- Every Plug fabrication (II-Agent)
+- Every deployment via Deploy Dock
+- Every scaffold operation
+- Every project pipeline advancement
+
+### The 12 Non-Negotiable Pillars
+1. Requirements that machines can build from
+2. Identity + session security
+3. Authorization + least privilege
+4. Tenancy isolation (if multi-tenant)
+5. Data persistence + migrations + lifecycle
+6. Secrets management (never in code)
+7. Supply chain security (dependencies and builds)
+8. Execution safety (sandbox + safe defaults)
+9. Testing (minimum viable test suite)
+10. Security testing (minimum viable)
+11. Release engineering (safe deploy + rollback)
+12. Operations (observe, respond, recover)
+
+### Minimum Required Gates to Ship
+1. lint/format
+2. unit tests
+3. integration tests (API + data)
+4. dependency vulnerability scan (SCA)
+5. secret scan
+6. smoke test (startup + core flows)
+
+### No-Guessing Contract (Task Format)
+Every work item must include: Objective, Inputs, Outputs, Acceptance criteria, Required gates, Required evidence.
+**If the item cannot be written this way, it is not ready to execute.**
+
+### Who Enforces D.U.M.B.
+- **Quality_Ang** — Runs ORACLE 8-gate checks against D.U.M.B. pillars
+- **Chicken Hawk** — Enforces gate completion before deployment
+- **ACHEEVY** — Refuses to mark anything done without D.U.M.B. evidence
+
+---
+
+## 17. Non-Negotiable Design & Build Rules
 
 These rules apply to every build. They are enforced by hooks and skills, not by memory.
 
-### 16.1 Redesign = Full Teardown + Rebuild
+### 17.1 Redesign = Full Teardown + Rebuild
 When told to redesign / overhaul / refresh / fix the UI:
 1. **Freeze** — capture current UI + routes + must-not-break flows
 2. **Teardown** — remove or disable old layout/components/styles (no patchwork layering)
@@ -861,7 +919,7 @@ When told to redesign / overhaul / refresh / fix the UI:
 
 See: `hooks/design-redesign-trigger.md`, `skills/design/design-first-builder.md`
 
-### 16.2 Brand Actor Naming Is Exact
+### 17.2 Brand Actor Naming Is Exact
 These strings are treated like constants — no variations, no creative spelling:
 - `A.I.M.S.` — with periods
 - `ACHEEVY` — all caps
@@ -872,12 +930,12 @@ These strings are treated like constants — no variations, no creative spelling
 
 See: `hooks/brand-strings-enforcer.md`
 
-### 16.3 Security Posture (No Reveal)
+### 17.3 Security Posture (No Reveal)
 Never output secrets, keys, private repo internals, IP, hidden endpoints, or pricing internals. If something is missing, request only the minimum safe inputs and keep them out of logs and UI.
 
 See: `skills/security/no-reveal-policy.md`
 
-### 16.4 Fit-to-Screen + Margins Are Non-Negotiable
+### 17.4 Fit-to-Screen + Margins Are Non-Negotiable
 - Every page loads centered with consistent padding
 - No primary content renders clipped off-screen on first paint
 - Responsive rules are explicit for desktop / tablet / mobile
@@ -886,7 +944,7 @@ See: `skills/design/design-first-builder.md`
 
 ---
 
-## 17. Behavioral Directive (Claude Code Integration)
+## 18. Behavioral Directive (Claude Code Integration)
 
 When building or redesigning inside this repo:
 
@@ -901,7 +959,7 @@ See: `skills/skill-router.md`, `hooks/pr-evidence-checklist.md`
 
 ---
 
-## 18. Application-Factory Layer
+## 19. Application-Factory Layer
 
 The Application-Factory layer governs how ACHEEVY orchestrates real work behind a conversational interface.
 
@@ -946,7 +1004,7 @@ The user sees progress narratives, NOT procurement paperwork.
 
 ---
 
-## 19. Pricing & Cost Safety Rules
+## 20. Pricing & Cost Safety Rules
 
 ### Default Model Policy
 - Start with a low-cost model (e.g., Gemini Flash / small OpenRouter model)
@@ -981,7 +1039,7 @@ Canned response template:
 
 ---
 
-## 20. LiveSim Autonomous Simulation Vertical
+## 21. LiveSim Autonomous Simulation Vertical
 
 A dedicated vertical where Boomer_Angs and Lil_Hawks autonomously interact in real time,
 visible on plugmein.cloud, with optional user interaction through ACHEEVY.
@@ -1009,7 +1067,7 @@ visible on plugmein.cloud, with optional user interaction through ACHEEVY.
 
 ---
 
-## 21. Chicken Hawk Vertical + CLAW Replacement
+## 22. Chicken Hawk Vertical + CLAW Replacement
 
 ### Vertical Definition
 - ID: `chicken-hawk` in `acheevy-verticals/vertical-definitions.ts`
