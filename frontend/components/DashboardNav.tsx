@@ -19,7 +19,8 @@ import {
   MessageSquare, Zap, Shield, Bot, BarChart3,
   Settings, Cpu, Wrench, CreditCard, Rocket,
   FlaskConical, FolderKanban, Users, Boxes,
-  Trophy, Activity,
+  Trophy, Activity, Mic, Theater, BookOpen,
+  Coins, CircleDot, TrendingUp, Building, Layers,
 } from "lucide-react";
 
 // ── Types ──
@@ -59,6 +60,23 @@ const CIRCUIT_BOX_TABS: NavItem[] = [
   { href: "/dashboard/circuit-box?tab=workbench", label: "Workbench", icon: Wrench },
   { href: "/dashboard/circuit-box?tab=workstreams", label: "Workstreams", icon: BarChart3 },
   { href: "/dashboard/circuit-box?tab=settings", label: "Settings", icon: Settings },
+];
+
+// Workshop — Voice-First Companion Flows
+const WORKSHOP_ITEMS: NavItem[] = [
+  { href: "/workshop", label: "Workshop Hub", icon: Mic, highlight: true },
+  { href: "/workshop/life-scenes", label: "Life Scenes", icon: Theater },
+  { href: "/workshop/moment-studio", label: "Moment Studio", icon: BookOpen },
+  { href: "/workshop/money-moves", label: "Money Moves", icon: Coins },
+  { href: "/workshop/creator-circles", label: "Creator Circles", icon: CircleDot },
+];
+
+// Sandbox — Autonomous Projects
+const SANDBOX_ITEMS: NavItem[] = [
+  { href: "/sandbox", label: "Sandbox Hub", icon: Layers, highlight: true },
+  { href: "/sandbox/perform", label: "Per|Form", icon: TrendingUp },
+  { href: "/sandbox/blockwise", label: "Blockwise AI", icon: Building },
+  { href: "/sandbox/verticals", label: "Verticals", icon: Shield },
 ];
 
 // Per|Form — Sports Analytics & N.I.L.
@@ -172,6 +190,24 @@ export function DashboardNav() {
           <span className="ml-auto w-1.5 h-1.5 rounded-full bg-gold/60 animate-pulse" />
         </Link>
         {CIRCUIT_BOX_TABS.map((item) => (
+          <NavLink key={item.href} item={item} pathname={pathname} />
+        ))}
+      </div>
+
+      {/* Workshop — Voice-First Companion Flows */}
+      <div className="mx-2 mt-2 border-t border-cyan-500/10" />
+      <div className="mt-1 space-y-0.5">
+        <SectionLabel label="Workshop" icon={Mic} />
+        {WORKSHOP_ITEMS.map((item) => (
+          <NavLink key={item.href} item={item} pathname={pathname} />
+        ))}
+      </div>
+
+      {/* Sandbox — Autonomous Projects */}
+      <div className="mx-2 mt-2 border-t border-emerald-500/10" />
+      <div className="mt-1 space-y-0.5">
+        <SectionLabel label="Sandbox" icon={Layers} />
+        {SANDBOX_ITEMS.map((item) => (
           <NavLink key={item.href} item={item} pathname={pathname} />
         ))}
       </div>

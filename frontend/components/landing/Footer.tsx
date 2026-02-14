@@ -61,13 +61,24 @@ const FOOTER_NAV = {
       { label: 'Pricing', href: '/pricing' },
     ],
   },
+  experiences: {
+    title: 'Experiences',
+    links: [
+      { label: 'Workshop', href: '/workshop' },
+      { label: 'Life Scenes', href: '/workshop/life-scenes' },
+      { label: 'Moment Studio', href: '/workshop/moment-studio' },
+      { label: 'Money Moves', href: '/workshop/money-moves' },
+      { label: 'Creator Circles', href: '/workshop/creator-circles' },
+      { label: 'Sandbox', href: '/sandbox' },
+    ],
+  },
   platform: {
     title: 'Platform',
     links: [
       { label: 'Chat w/ACHEEVY', href: `${APP_DOMAIN}/chat` },
       { label: 'Dashboard', href: `${APP_DOMAIN}/dashboard` },
-      { label: 'N.I.L.', href: `${APP_DOMAIN}/dashboard/nil` },
-      { label: 'Model Garden', href: `${APP_DOMAIN}/dashboard/model-garden` },
+      { label: 'Per|Form', href: '/sandbox/perform' },
+      { label: 'Blockwise AI', href: '/sandbox/blockwise' },
       { label: 'Circuit Box', href: `${APP_DOMAIN}/dashboard/circuit-box` },
       { label: 'House of Ang', href: `${APP_DOMAIN}/dashboard/house-of-ang` },
     ],
@@ -238,17 +249,17 @@ export function Footer() {
           </div>
 
           {/* Related Links */}
-          <div className="flex items-center gap-4 text-sm">
+          <div className="flex items-center gap-4 text-sm flex-wrap">
+            <Link href="/workshop" className="text-gray-400 hover:text-white transition-colors">
+              Workshop
+            </Link>
+            <span className="text-gray-600">·</span>
+            <Link href="/sandbox" className="text-gray-400 hover:text-white transition-colors">
+              Sandbox
+            </Link>
+            <span className="text-gray-600">·</span>
             <Link href={`${APP_DOMAIN}/dashboard`} className="text-gray-400 hover:text-white transition-colors">
               ACHEEVY
-            </Link>
-            <span className="text-gray-600">·</span>
-            <Link href={`${APP_DOMAIN}/dashboard/house-of-ang`} className="text-gray-400 hover:text-white transition-colors">
-              House of Ang
-            </Link>
-            <span className="text-gray-600">·</span>
-            <Link href={`${APP_DOMAIN}/dashboard/model-garden`} className="text-gray-400 hover:text-white transition-colors">
-              Model Garden
             </Link>
             <span className="text-gray-600">·</span>
             <Link href={`${APP_DOMAIN}/dashboard/circuit-box`} className="text-gray-400 hover:text-white transition-colors">
