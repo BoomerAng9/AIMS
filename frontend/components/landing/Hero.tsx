@@ -3,13 +3,11 @@
 /**
  * A.I.M.S. Landing Page — Hero Section
  *
- * Clean onboarding hero for plugmein.cloud (brand/lore site).
- * Triangle layout with three active cards:
- *   Top center: Chat w/ACHEEVY (main hero)
- *   Bottom-left: Automate Everything (with Boomer_Angs team image)
- *   Bottom-right: Deploy Your Apps (with Boomer_Ang on Assignment image)
+ * The front door at plugmein.cloud.
+ * Users see what's available and click to go where they need:
+ *   - DO stuff → aimanagedsolutions.cloud (chat, dashboard, deploy)
+ *   - EXPLORE lore → stays on plugmein.cloud (Book of V.I.B.E., gallery, etc.)
  *
- * All three route to aimanagedsolutions.cloud where users access the functional app.
  * Hero copy (non-negotiable):
  *   1) "Welcome to AI Managed Solutions."
  *   2) "I'm ACHEEVY, at your service."
@@ -20,7 +18,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 
-// App domain where users access AI features and ACHEEVY (functional platform)
+// Functional app domain
 const APP_DOMAIN = process.env.NEXT_PUBLIC_APP_URL || 'https://aimanagedsolutions.cloud';
 
 // ── Animation Variants ──
@@ -28,7 +26,7 @@ const APP_DOMAIN = process.env.NEXT_PUBLIC_APP_URL || 'https://aimanagedsolution
 const staggerContainer = {
   hidden: {},
   visible: {
-    transition: { staggerChildren: 0.15 },
+    transition: { staggerChildren: 0.12 },
   },
 };
 
@@ -103,102 +101,169 @@ export function Hero() {
           </p>
         </div>
 
-        {/* ── Triangle Card Layout ── */}
+        {/* ── Card Grid ── */}
         <motion.div
           variants={staggerContainer}
           initial="hidden"
           animate="visible"
-          className="flex flex-col items-center gap-5 mt-8"
+          className="flex flex-col items-center gap-8 mt-8"
         >
-          {/* Top — Chat w/ACHEEVY (main hero card) */}
-          <motion.div variants={staggerItem} className="w-full max-w-xl">
-            <Link href={`${APP_DOMAIN}/chat`} className="group block">
-              <div className="wireframe-card p-6 md:p-8 text-center hover:border-gold/30 hover:shadow-[0_0_40px_rgba(212,175,55,0.08)] transition-all duration-500">
-                <div className="w-16 h-16 md:w-20 md:h-20 mx-auto mb-4 rounded-2xl bg-gold/10 border border-gold/20 flex items-center justify-center overflow-hidden group-hover:scale-105 transition-transform">
-                  <Image
-                    src="/images/acheevy/acheevy-helmet.png"
-                    alt="ACHEEVY"
-                    width={56}
-                    height={56}
-                    className="w-12 h-12 md:w-14 md:h-14 object-cover animate-head-bob"
-                  />
-                </div>
-                <h3
-                  className="text-xl md:text-2xl font-bold text-white mb-2 group-hover:text-gold transition-colors"
-                  style={{ fontFamily: 'var(--font-display, "Doto", monospace)' }}
-                >
-                  Chat w/ACHEEVY
-                </h3>
-                <p className="text-sm text-white/40 mb-3">
-                  Your AI executive orchestrator. Route tasks through the Chain of Command.
-                </p>
-                <span
-                  className="text-gold/60 text-sm uppercase tracking-[0.15em] group-hover:text-gold transition-colors"
-                  style={{ fontFamily: 'var(--font-display, "Doto", monospace)' }}
-                >
-                  Activity Breeds Activity
-                </span>
-              </div>
-            </Link>
-          </motion.div>
+          {/* ─── DO: Go build something ─── */}
+          <div className="w-full max-w-4xl">
+            <motion.p
+              variants={staggerItem}
+              className="text-xs uppercase tracking-[0.2em] text-gold/50 mb-3 text-center"
+              style={{ fontFamily: 'var(--font-doto), "Doto", monospace' }}
+            >
+              Build &amp; Deploy
+            </motion.p>
 
-          {/* Bottom row — two cards forming triangle base */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 w-full max-w-4xl">
-            {/* Bottom-left: Automate Everything */}
-            <motion.div variants={staggerItem}>
-              <Link href={`${APP_DOMAIN}/chat`} className="group block h-full">
-                <div className="wireframe-card p-5 md:p-6 flex items-center gap-4 hover:border-gold/30 hover:shadow-[0_0_30px_rgba(212,175,55,0.06)] transition-all duration-500 h-full">
-                  <div className="w-20 h-20 md:w-24 md:h-24 rounded-xl overflow-hidden flex-shrink-0 border border-white/[0.06] group-hover:border-gold/20 transition-colors">
+            {/* Top — Chat w/ACHEEVY (main hero card) */}
+            <motion.div variants={staggerItem} className="w-full max-w-xl mx-auto mb-5">
+              <a href={`${APP_DOMAIN}/chat`} className="group block">
+                <div className="wireframe-card p-6 md:p-8 text-center hover:border-gold/30 hover:shadow-[0_0_40px_rgba(212,175,55,0.08)] transition-all duration-500">
+                  <div className="w-16 h-16 md:w-20 md:h-20 mx-auto mb-4 rounded-2xl bg-gold/10 border border-gold/20 flex items-center justify-center overflow-hidden group-hover:scale-105 transition-transform">
                     <Image
-                      src="/images/boomerangs/ACHEEVY and the Boomer_Angs in a Hanger.png"
-                      alt="Boomer_Angs, Chicken Hawk and Lil_Hawks"
-                      width={96}
-                      height={96}
-                      className="w-full h-full object-cover"
+                      src="/images/acheevy/acheevy-helmet.png"
+                      alt="ACHEEVY"
+                      width={56}
+                      height={56}
+                      className="w-12 h-12 md:w-14 md:h-14 object-cover animate-head-bob"
                     />
                   </div>
-                  <div>
-                    <h3
-                      className="text-base md:text-lg font-bold text-white mb-1 group-hover:text-gold transition-colors"
-                      style={{ fontFamily: 'var(--font-display, "Doto", monospace)' }}
-                    >
-                      Automate Everything
-                    </h3>
-                    <p className="text-xs md:text-sm text-white/35 leading-relaxed">
-                      Deploy Boomer_Angs, Chicken Hawk &amp; Lil_Hawks to orchestrate your workflows.
-                    </p>
-                  </div>
+                  <h3
+                    className="text-xl md:text-2xl font-bold text-white mb-2 group-hover:text-gold transition-colors"
+                    style={{ fontFamily: 'var(--font-display, "Doto", monospace)' }}
+                  >
+                    Chat w/ACHEEVY
+                  </h3>
+                  <p className="text-sm text-white/40 mb-3">
+                    Your AI executive orchestrator. Route tasks through the Chain of Command.
+                  </p>
+                  <span
+                    className="text-gold/60 text-sm uppercase tracking-[0.15em] group-hover:text-gold transition-colors"
+                    style={{ fontFamily: 'var(--font-display, "Doto", monospace)' }}
+                  >
+                    Activity Breeds Activity
+                  </span>
                 </div>
-              </Link>
+              </a>
             </motion.div>
 
-            {/* Bottom-right: Deploy Your Apps */}
-            <motion.div variants={staggerItem}>
-              <Link href={`${APP_DOMAIN}/chat`} className="group block h-full">
-                <div className="wireframe-card p-5 md:p-6 flex items-center gap-4 hover:border-gold/30 hover:shadow-[0_0_30px_rgba(212,175,55,0.06)] transition-all duration-500 h-full">
-                  <div className="w-20 h-20 md:w-24 md:h-24 rounded-xl overflow-hidden flex-shrink-0 border border-white/[0.06] group-hover:border-gold/20 transition-colors">
-                    <Image
-                      src="/images/boomerangs/Boomer_ang on Assignment.JPG"
-                      alt="Boomer_Angs at the port"
-                      width={96}
-                      height={96}
-                      className="w-full h-full object-cover"
-                    />
+            {/* Bottom row — Automate + Deploy */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 w-full">
+              <motion.div variants={staggerItem}>
+                <a href={`${APP_DOMAIN}/dashboard`} className="group block h-full">
+                  <div className="wireframe-card p-5 md:p-6 flex items-center gap-4 hover:border-gold/30 hover:shadow-[0_0_30px_rgba(212,175,55,0.06)] transition-all duration-500 h-full">
+                    <div className="w-20 h-20 md:w-24 md:h-24 rounded-xl overflow-hidden flex-shrink-0 border border-white/[0.06] group-hover:border-gold/20 transition-colors">
+                      <Image
+                        src="/images/boomerangs/ACHEEVY and the Boomer_Angs in a Hanger.png"
+                        alt="Boomer_Angs, Chicken Hawk and Lil_Hawks"
+                        width={96}
+                        height={96}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div>
+                      <h3
+                        className="text-base md:text-lg font-bold text-white mb-1 group-hover:text-gold transition-colors"
+                        style={{ fontFamily: 'var(--font-display, "Doto", monospace)' }}
+                      >
+                        Automate Everything
+                      </h3>
+                      <p className="text-xs md:text-sm text-white/35 leading-relaxed">
+                        Deploy Boomer_Angs, Chicken Hawk &amp; Lil_Hawks to orchestrate your workflows.
+                      </p>
+                    </div>
                   </div>
-                  <div>
+                </a>
+              </motion.div>
+
+              <motion.div variants={staggerItem}>
+                <a href={`${APP_DOMAIN}/hangar`} className="group block h-full">
+                  <div className="wireframe-card p-5 md:p-6 flex items-center gap-4 hover:border-gold/30 hover:shadow-[0_0_30px_rgba(212,175,55,0.06)] transition-all duration-500 h-full">
+                    <div className="w-20 h-20 md:w-24 md:h-24 rounded-xl overflow-hidden flex-shrink-0 border border-white/[0.06] group-hover:border-gold/20 transition-colors">
+                      <Image
+                        src="/images/boomerangs/Boomer_ang on Assignment.JPG"
+                        alt="Boomer_Angs at the port"
+                        width={96}
+                        height={96}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div>
+                      <h3
+                        className="text-base md:text-lg font-bold text-white mb-1 group-hover:text-gold transition-colors"
+                        style={{ fontFamily: 'var(--font-display, "Doto", monospace)' }}
+                      >
+                        Deploy Your Apps
+                      </h3>
+                      <p className="text-xs md:text-sm text-white/35 leading-relaxed">
+                        Containerized. Managed. Deployed to production instantly.
+                      </p>
+                    </div>
+                  </div>
+                </a>
+              </motion.div>
+            </div>
+          </div>
+
+          {/* ─── EXPLORE: Lore & World ─── */}
+          <div className="w-full max-w-4xl">
+            <motion.p
+              variants={staggerItem}
+              className="text-xs uppercase tracking-[0.2em] text-white/25 mb-3 text-center"
+              style={{ fontFamily: 'var(--font-doto), "Doto", monospace' }}
+            >
+              Explore the Universe
+            </motion.p>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
+              <motion.div variants={staggerItem}>
+                <Link href="/the-book-of-vibe" className="group block h-full">
+                  <div className="wireframe-card p-5 text-center hover:border-white/20 transition-all duration-500 h-full">
+                    <div className="text-3xl mb-3">&#x1F4D6;</div>
                     <h3
-                      className="text-base md:text-lg font-bold text-white mb-1 group-hover:text-gold transition-colors"
+                      className="text-sm font-bold text-white mb-1 group-hover:text-gold transition-colors"
                       style={{ fontFamily: 'var(--font-display, "Doto", monospace)' }}
                     >
-                      Deploy Your Apps
+                      The Book of V.I.B.E.
                     </h3>
-                    <p className="text-xs md:text-sm text-white/35 leading-relaxed">
-                      Containerized. Managed. Deployed to production instantly.
-                    </p>
+                    <p className="text-xs text-white/30">The origin story. How it all began.</p>
                   </div>
-                </div>
-              </Link>
-            </motion.div>
+                </Link>
+              </motion.div>
+
+              <motion.div variants={staggerItem}>
+                <Link href="/gallery" className="group block h-full">
+                  <div className="wireframe-card p-5 text-center hover:border-white/20 transition-all duration-500 h-full">
+                    <div className="text-3xl mb-3">&#x1F3A8;</div>
+                    <h3
+                      className="text-sm font-bold text-white mb-1 group-hover:text-gold transition-colors"
+                      style={{ fontFamily: 'var(--font-display, "Doto", monospace)' }}
+                    >
+                      Gallery
+                    </h3>
+                    <p className="text-xs text-white/30">Meet the crew. ACHEEVY, LUC, the Boomer_Angs.</p>
+                  </div>
+                </Link>
+              </motion.div>
+
+              <motion.div variants={staggerItem}>
+                <Link href="/plans" className="group block h-full">
+                  <div className="wireframe-card p-5 text-center hover:border-white/20 transition-all duration-500 h-full">
+                    <div className="text-3xl mb-3">&#x1F680;</div>
+                    <h3
+                      className="text-sm font-bold text-white mb-1 group-hover:text-gold transition-colors"
+                      style={{ fontFamily: 'var(--font-display, "Doto", monospace)' }}
+                    >
+                      Plans
+                    </h3>
+                    <p className="text-xs text-white/30">Choose your level. Free, Pro, Enterprise.</p>
+                  </div>
+                </Link>
+              </motion.div>
+            </div>
           </div>
         </motion.div>
       </motion.div>

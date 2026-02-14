@@ -48,7 +48,7 @@ const InstagramIcon = ({ className }: { className?: string }) => (
 // Footer Navigation
 // ─────────────────────────────────────────────────────────────
 
-const APP_DOMAIN = process.env.NEXT_PUBLIC_APP_URL || 'https://plugmein.cloud';
+const APP_DOMAIN = process.env.NEXT_PUBLIC_APP_URL || 'https://aimanagedsolutions.cloud';
 
 const FOOTER_NAV = {
   company: {

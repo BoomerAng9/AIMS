@@ -6,7 +6,20 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
 
-const NAV_LINKS = [
+// Functional app domain
+const APP_DOMAIN = process.env.NEXT_PUBLIC_APP_URL || 'https://aimanagedsolutions.cloud';
+
+// Nav for plugmein.cloud (lore/brand site)
+const LANDING_NAV = [
+  { href: "/", label: "Home" },
+  { href: "/the-book-of-vibe", label: "Book of V.I.B.E." },
+  { href: "/gallery", label: "Gallery" },
+  { href: "/plans", label: "Plans" },
+  { href: "/about", label: "About" },
+];
+
+// Nav for aimanagedsolutions.cloud (functional app)
+const APP_NAV = [
   { href: "/", label: "Home" },
   { href: "/dashboard", label: "Dashboard" },
   { href: "/chat", label: "Chat" },
@@ -17,6 +30,12 @@ const NAV_LINKS = [
 export function SiteHeader() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
+
+  // In production, detect domain. In dev, default to landing nav.
+  const isAppSite = typeof window !== 'undefined' && window.location.hostname.includes('aimanagedsolutions');
+  const navLinks = isAppSite ? APP_NAV : LANDING_NAV;
+  const ctaHref = isAppSite ? "/chat" : `${APP_DOMAIN}/chat`;
+  const ctaLabel = isAppSite ? "Chat" : "Get Started";
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-wireframe-stroke bg-[#0A0A0A]/90 backdrop-blur-xl">
@@ -35,7 +54,7 @@ export function SiteHeader() {
 
         {/* Desktop Navigation */}
         <nav className="ml-auto hidden md:flex items-center gap-1">
-          {NAV_LINKS.map((link) => {
+          {navLinks.map((link) => {
             const active = pathname === link.href;
             return (
               <Link
@@ -54,10 +73,10 @@ export function SiteHeader() {
           })}
           <div className="ml-2 flex items-center gap-2">
             <Link
-              href="/sign-up"
+              href={ctaHref}
               className="rounded-lg bg-gold/90 px-3 py-1.5 text-sm font-medium text-black transition-colors hover:bg-gold"
             >
-              Sign Up
+              {ctaLabel}
             </Link>
           </div>
         </nav>
@@ -65,10 +84,10 @@ export function SiteHeader() {
         {/* Mobile hamburger */}
         <div className="ml-auto flex items-center gap-2 md:hidden">
           <Link
-            href="/sign-up"
+            href={ctaHref}
             className="rounded-lg bg-gold/90 px-2.5 py-1.5 text-xs font-medium text-black"
           >
-            Sign Up
+            {ctaLabel}
           </Link>
           <button
             onClick={() => setMenuOpen(!menuOpen)}
@@ -89,7 +108,7 @@ export function SiteHeader() {
       {/* Mobile dropdown nav */}
       {menuOpen && (
         <div className="md:hidden border-t border-wireframe-stroke bg-[#0A0A0A]/95 backdrop-blur-xl px-4 py-3 space-y-1">
-          {NAV_LINKS.map((link) => {
+          {navLinks.map((link) => {
             const active = pathname === link.href;
             return (
               <Link
