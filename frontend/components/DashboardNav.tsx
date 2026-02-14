@@ -4,10 +4,7 @@
 /**
  * Consolidated Dashboard Navigation
  *
- * Primary actions at top: Chat w/ACHEEVY, ACHEEVY
- * Everything else routes into Circuit Box with ?tab= parameter.
- * No more scattered pages — Circuit Box IS the hub.
- *
+ * Complete platform access — every section that exists is routable from here.
  * Owner-only items gated by session role.
  */
 
@@ -16,7 +13,7 @@ import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import clsx from "clsx";
 import {
-  MessageSquare, Zap, Shield, BarChart3,
+  MessageSquare, Zap, Shield, BarChart3, Bot,
   Cpu, Rocket, FlaskConical, FolderKanban, Users,
   Trophy, Activity, Mic, Theater, BookOpen,
   Coins, CircleDot, TrendingUp, Building, Layers,
@@ -34,18 +31,37 @@ interface NavItem {
 
 // ── Navigation Items ──
 
-// Primary actions — always visible at top, full-width
 const PRIMARY_ACTIONS: NavItem[] = [
   { href: "/dashboard/chat", label: "Chat w/ACHEEVY", icon: MessageSquare, highlight: true },
   { href: "/dashboard/acheevy", label: "ACHEEVY", icon: Zap, highlight: true },
 ];
 
-// Core pages — always visible
 const CORE_ITEMS: NavItem[] = [
   { href: "/dashboard", label: "Overview", icon: BarChart3 },
   { href: "/dashboard/deploy-dock", label: "Deploy Dock", icon: Rocket, highlight: true },
-  { href: "/dashboard/your-space", label: "Your Space", icon: Users },
+  { href: "/dashboard/plugs", label: "Plugs", icon: Layers },
   { href: "/dashboard/plan", label: "Plan", icon: FolderKanban },
+];
+
+// Agent Command — Boomer_Ang ecosystem
+const AGENT_ITEMS: NavItem[] = [
+  { href: "/dashboard/house-of-ang", label: "House of Ang", icon: Users, highlight: true },
+  { href: "/dashboard/boomerangs", label: "Boomer_Angs", icon: Bot },
+  { href: "/dashboard/the-hangar", label: "The Hangar", icon: Zap },
+];
+
+// Per|Form — Sports Analytics & N.I.L.
+const PERFORM_ITEMS: NavItem[] = [
+  { href: "/sandbox/perform", label: "Per|Form Scouting", icon: TrendingUp, highlight: true },
+  { href: "/dashboard/nil", label: "N.I.L.", icon: Trophy },
+  { href: "/dashboard/sports-tracker", label: "Sports Tracker", icon: Activity },
+];
+
+// Sandbox — Autonomous Projects
+const SANDBOX_ITEMS: NavItem[] = [
+  { href: "/sandbox", label: "Sandbox Hub", icon: Layers, highlight: true },
+  { href: "/sandbox/blockwise", label: "Blockwise AI", icon: Building },
+  { href: "/sandbox/verticals", label: "Verticals", icon: Shield },
 ];
 
 // Workshop — Voice-First Companion Flows
@@ -57,33 +73,24 @@ const WORKSHOP_ITEMS: NavItem[] = [
   { href: "/workshop/creator-circles", label: "Creator Circles", icon: CircleDot },
 ];
 
-// Sandbox — Autonomous Projects
-const SANDBOX_ITEMS: NavItem[] = [
-  { href: "/sandbox", label: "Sandbox Hub", icon: Layers, highlight: true },
-  { href: "/sandbox/perform", label: "Per|Form", icon: TrendingUp },
-  { href: "/sandbox/blockwise", label: "Blockwise AI", icon: Building },
-  { href: "/sandbox/verticals", label: "Verticals", icon: Shield },
+// Intelligence
+const INTELLIGENCE_ITEMS: NavItem[] = [
+  { href: "/dashboard/model-garden", label: "Model Garden", icon: Cpu },
+  { href: "/dashboard/research", label: "R&D Hub", icon: FlaskConical },
 ];
 
-// Per|Form — Sports Analytics & N.I.L.
-const PERFORM_ITEMS: NavItem[] = [
-  { href: "/dashboard/nil", label: "N.I.L.", icon: Trophy },
-  { href: "/dashboard/sports-tracker", label: "Sports Tracker", icon: Activity },
-];
-
-// Owner-only Circuit Box tabs
+// Owner-only
 const OWNER_TABS: NavItem[] = [
   { href: "/dashboard/circuit-box?tab=control-plane", label: "Control Plane", icon: Shield, ownerOnly: true },
   { href: "/dashboard/circuit-box?tab=live-events", label: "Live Events", icon: Zap, ownerOnly: true },
   { href: "/dashboard/circuit-box?tab=security", label: "Security", icon: Shield, ownerOnly: true },
-  { href: "/dashboard/circuit-box?tab=research", label: "R&D Hub", icon: FlaskConical, ownerOnly: true },
+  { href: "/dashboard/circuit-box?tab=research", label: "Research Lab", icon: FlaskConical, ownerOnly: true },
   { href: "/dashboard/war-room", label: "War Room", icon: Cpu, ownerOnly: true },
 ];
 
 // ── NavLink Component ──
 
 function NavLink({ item, pathname }: { item: NavItem; pathname: string | null }) {
-  // For Circuit Box tab links, check both the base path and query param
   const itemBase = item.href.split("?")[0];
   const itemTab = item.href.includes("?tab=") ? item.href.split("?tab=")[1] : null;
 
@@ -121,9 +128,9 @@ function NavLink({ item, pathname }: { item: NavItem; pathname: string | null })
 
 // ── Section Label ──
 
-function SectionLabel({ label, icon: Icon }: { label: string; icon: typeof MessageSquare }) {
+function SectionLabel({ label, icon: Icon, color = "text-white/30" }: { label: string; icon: typeof MessageSquare; color?: string }) {
   return (
-    <div className="flex items-center gap-2 px-3 py-1.5 text-white/30">
+    <div className={`flex items-center gap-2 px-3 py-1.5 ${color}`}>
       <Icon className="w-3.5 h-3.5 flex-shrink-0" />
       <span className="font-mono uppercase tracking-[0.15em] text-[10px]">{label}</span>
     </div>
@@ -140,7 +147,7 @@ export function DashboardNav() {
 
   return (
     <nav className="flex flex-col gap-1 text-sm">
-      {/* Primary Actions — always visible */}
+      {/* Primary Actions */}
       <div className="space-y-1 mb-2">
         {PRIMARY_ACTIONS.map((item) => (
           <NavLink key={item.href} item={item} pathname={pathname} />
@@ -149,7 +156,7 @@ export function DashboardNav() {
 
       <div className="mx-2 border-t border-wireframe-stroke" />
 
-      {/* Core Pages */}
+      {/* Command */}
       <div className="mt-2 space-y-0.5">
         <SectionLabel label="Command" icon={BarChart3} />
         {CORE_ITEMS.map((item) => (
@@ -159,7 +166,7 @@ export function DashboardNav() {
 
       <div className="mx-2 mt-2 border-t border-gold/10" />
 
-      {/* Circuit Box — Single link, tabs are inside the page */}
+      {/* Circuit Box */}
       <div className="mt-2 space-y-0.5">
         <SectionLabel label="Circuit Box" icon={Shield} />
         <Link
@@ -177,20 +184,12 @@ export function DashboardNav() {
         </Link>
       </div>
 
-      {/* Workshop — Voice-First Companion Flows */}
-      <div className="mx-2 mt-2 border-t border-cyan-500/10" />
-      <div className="mt-1 space-y-0.5">
-        <SectionLabel label="Workshop" icon={Mic} />
-        {WORKSHOP_ITEMS.map((item) => (
-          <NavLink key={item.href} item={item} pathname={pathname} />
-        ))}
-      </div>
+      <div className="mx-2 mt-2 border-t border-gold/10" />
 
-      {/* Sandbox — Autonomous Projects */}
-      <div className="mx-2 mt-2 border-t border-emerald-500/10" />
+      {/* Agent Command */}
       <div className="mt-1 space-y-0.5">
-        <SectionLabel label="Sandbox" icon={Layers} />
-        {SANDBOX_ITEMS.map((item) => (
+        <SectionLabel label="Agent Command" icon={Users} color="text-gold/40" />
+        {AGENT_ITEMS.map((item) => (
           <NavLink key={item.href} item={item} pathname={pathname} />
         ))}
       </div>
@@ -198,18 +197,45 @@ export function DashboardNav() {
       {/* Per|Form — Sports Analytics & N.I.L. */}
       <div className="mx-2 mt-2 border-t border-amber-500/10" />
       <div className="mt-1 space-y-0.5">
-        <SectionLabel label="Per|Form" icon={Trophy} />
+        <SectionLabel label="Per|Form" icon={Trophy} color="text-amber-500/40" />
         {PERFORM_ITEMS.map((item) => (
           <NavLink key={item.href} item={item} pathname={pathname} />
         ))}
       </div>
 
-      {/* Owner-Only Tabs */}
+      {/* Sandbox — Autonomous Projects */}
+      <div className="mx-2 mt-2 border-t border-emerald-500/10" />
+      <div className="mt-1 space-y-0.5">
+        <SectionLabel label="Sandbox" icon={Layers} color="text-emerald-500/40" />
+        {SANDBOX_ITEMS.map((item) => (
+          <NavLink key={item.href} item={item} pathname={pathname} />
+        ))}
+      </div>
+
+      {/* Workshop — Voice-First Companion Flows */}
+      <div className="mx-2 mt-2 border-t border-cyan-500/10" />
+      <div className="mt-1 space-y-0.5">
+        <SectionLabel label="Workshop" icon={Mic} color="text-cyan-500/40" />
+        {WORKSHOP_ITEMS.map((item) => (
+          <NavLink key={item.href} item={item} pathname={pathname} />
+        ))}
+      </div>
+
+      {/* Intelligence */}
+      <div className="mx-2 mt-2 border-t border-purple-500/10" />
+      <div className="mt-1 space-y-0.5">
+        <SectionLabel label="Intelligence" icon={Cpu} color="text-purple-500/40" />
+        {INTELLIGENCE_ITEMS.map((item) => (
+          <NavLink key={item.href} item={item} pathname={pathname} />
+        ))}
+      </div>
+
+      {/* Owner-Only */}
       {isOwner && (
         <>
           <div className="mx-2 mt-2 border-t border-red-500/15" />
           <div className="mt-1 space-y-0.5">
-            <SectionLabel label="Owner Only" icon={Shield} />
+            <SectionLabel label="Owner Only" icon={Shield} color="text-red-400/40" />
             {OWNER_TABS.map((item) => (
               <NavLink key={item.href} item={item} pathname={pathname} />
             ))}
