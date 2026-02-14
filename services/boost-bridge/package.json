@@ -1,0 +1,14 @@
+{
+  "name": "@aims/boost-bridge",
+  "version": "1.0.0",
+  "description": "Boost|Bridge — Simulation Lab, Trial Orchestrator, P2P Training Dojo",
+  "type": "module",
+  "scripts": {
+    "dev": "bun run --watch src/server.ts",
+    "start": "bun run src/server.ts",
+    "discord": "bun run src/discord/bot.ts"
+  },
+  "dependencies": {
+    "discord.js": "^14.14.1"
+  }
+}
