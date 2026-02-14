@@ -17,6 +17,7 @@ import {
   Cpu, Rocket, FlaskConical, FolderKanban, Users,
   Trophy, Activity, Mic, Theater, BookOpen,
   Coins, CircleDot, TrendingUp, Building, Layers,
+  Globe, Container, Key,
 } from "lucide-react";
 
 // ── Types ──
@@ -34,6 +35,13 @@ interface NavItem {
 const PRIMARY_ACTIONS: NavItem[] = [
   { href: "/dashboard/chat", label: "Chat w/ACHEEVY", icon: MessageSquare, highlight: true },
   { href: "/dashboard/acheevy", label: "ACHEEVY", icon: Zap, highlight: true },
+];
+
+// Guild Zones — The Digital Guild layout (Lobby / YourSpace / Secure Pipe)
+const GUILD_ZONES: NavItem[] = [
+  { href: "/dashboard/lobby", label: "The Lobby", icon: Globe, highlight: true },
+  { href: "/dashboard/workspace", label: "YourSpace", icon: Container, highlight: true },
+  { href: "/dashboard/secure-pipe", label: "Secure Pipe", icon: Key, highlight: true },
 ];
 
 const CORE_ITEMS: NavItem[] = [
@@ -155,6 +163,16 @@ export function DashboardNav() {
       </div>
 
       <div className="mx-2 border-t border-wireframe-stroke" />
+
+      {/* Guild Zones — Lobby / YourSpace / Secure Pipe */}
+      <div className="mt-2 space-y-0.5">
+        <SectionLabel label="Guild" icon={Globe} color="text-gold/50" />
+        {GUILD_ZONES.map((item) => (
+          <NavLink key={item.href} item={item} pathname={pathname} />
+        ))}
+      </div>
+
+      <div className="mx-2 mt-2 border-t border-gold/10" />
 
       {/* Command */}
       <div className="mt-2 space-y-0.5">

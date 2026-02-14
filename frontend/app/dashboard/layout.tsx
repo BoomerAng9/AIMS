@@ -7,6 +7,7 @@ import type { ReactNode } from "react";
 import { DashboardShell } from "../../components/DashboardShell";
 import { FloatingACHEEVY } from "../../components/global/FloatingACHEEVY";
 import { QuickSwitcher } from "../../components/global/QuickSwitcher";
+import { ChainOfCommandDrawer } from "../../components/global/ChainOfCommandDrawer";
 
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
   return (
@@ -15,6 +16,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
       {/* Persistent global components */}
       <FloatingACHEEVY />
       <QuickSwitcher />
+      <ChainOfCommandDrawer />
     </>
   );
 }
