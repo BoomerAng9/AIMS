@@ -83,6 +83,16 @@ function writeJSONFile<T>(filePath: string, data: T): void {
   }
 }
 
+async function writeJSONFileAsync<T>(filePath: string, data: T): Promise<void> {
+  try {
+    ensureDataDir();
+    await fs.promises.writeFile(filePath, JSON.stringify(data, null, 2), 'utf-8');
+  } catch (error) {
+    console.error(`[LUC Server Storage] Failed to write ${filePath}:`, error);
+    throw error;
+  }
+}
+
 // ─────────────────────────────────────────────────────────────
 // Server Storage Adapter
 // ─────────────────────────────────────────────────────────────
@@ -110,8 +120,8 @@ export class ServerStorageAdapter {
     return this.accountsCache;
   }
 
-  private saveAccounts(accounts: AccountsData): void {
-    writeJSONFile(ACCOUNTS_FILE, accounts);
+  private async saveAccounts(accounts: AccountsData): Promise<void> {
+    await writeJSONFileAsync(ACCOUNTS_FILE, accounts);
     this.accountsCache = accounts;
     this.cacheTimestamp = Date.now();
   }
@@ -124,8 +134,8 @@ export class ServerStorageAdapter {
     return this.historyCache;
   }
 
-  private saveHistory(history: UsageHistoryData): void {
-    writeJSONFile(USAGE_HISTORY_FILE, history);
+  private async saveHistory(history: UsageHistoryData): Promise<void> {
+    await writeJSONFileAsync(USAGE_HISTORY_FILE, history);
     this.historyCache = history;
   }
 
@@ -149,13 +159,13 @@ export class ServerStorageAdapter {
   async saveAccount(account: LUCAccountRecord): Promise<void> {
     const accounts = this.getAccounts();
     accounts[account.userId] = serializeLUCAccount(account);
-    this.saveAccounts(accounts);
+    await this.saveAccounts(accounts);
   }
 
   async deleteAccount(userId: string): Promise<void> {
     const accounts = this.getAccounts();
     delete accounts[userId];
-    this.saveAccounts(accounts);
+    await this.saveAccounts(accounts);
 
     // Also clear usage history
     await this.clearUsageHistory(userId);
@@ -207,7 +217,7 @@ export class ServerStorageAdapter {
       history[entry.userId] = history[entry.userId].slice(0, 1000);
     }
 
-    this.saveHistory(history);
+    await this.saveHistory(history);
   }
 
   async getUsageHistory(userId: string, limit: number = 100): Promise<UsageHistoryEntry[]> {
@@ -218,7 +228,7 @@ export class ServerStorageAdapter {
   async clearUsageHistory(userId: string): Promise<void> {
     const history = this.getHistory();
     delete history[userId];
-    this.saveHistory(history);
+    await this.saveHistory(history);
   }
 
   // ─────────────────────────────────────────────────────────
@@ -254,7 +264,7 @@ export class ServerStorageAdapter {
         ...entry,
         userId,
       }));
-      this.saveHistory(history);
+      await this.saveHistory(history);
     }
   }
 
