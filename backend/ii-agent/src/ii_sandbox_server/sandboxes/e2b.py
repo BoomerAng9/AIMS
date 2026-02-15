@@ -382,6 +382,7 @@ class E2BSandbox(BaseSandbox):
         return True
 
     @classmethod
+    @classmethod
     @e2b_exception_handler
     async def is_paused(cls, config: SandboxConfig, sandbox_id: str) -> bool:
         paginator = AsyncSandbox.list(
@@ -402,3 +403,41 @@ class E2BSandbox(BaseSandbox):
             else:
                 return False
         return False
+
+    @classmethod
+    @e2b_exception_handler
+    async def get_status(
+        cls,
+        provider_sandbox_id: str,
+        config: SandboxConfig,
+        sandbox_id: Optional[str] = None,
+    ) -> str:
+        cls._ensure_credentials(config)
+
+        query_metadata = {}
+        if sandbox_id:
+            query_metadata["ii_sandbox_id"] = sandbox_id
+
+        paginator = AsyncSandbox.list(
+            api_key=config.e2b_api_key,
+            query=SandboxListQuery(
+                state=["running", "paused"],
+                metadata=query_metadata if query_metadata else None,
+            ),
+        )
+
+        while True:
+            sandboxes = await paginator.next_items()
+            if not sandboxes:
+                break
+
+            for sb in sandboxes:
+                if sandbox_id and sb.metadata.get("ii_sandbox_id") == sandbox_id:
+                    return sb.state
+                if sb.sandbox_id == provider_sandbox_id:
+                    return sb.state
+
+            if not paginator.has_next:
+                break
+
+        return "stopped"

@@ -273,13 +273,27 @@ class SandboxController:
         sandbox = await self.connect(sandbox_id)
         return await sandbox.create_directory(directory_path, exist_ok)
 
-    # TODO: use sandbox.get_status() instead of database, then sync the status with the database
     async def get_sandbox_status(self, sandbox_id: str) -> str:
         """Get the status of a sandbox."""
         sandbox_data = await Sandboxes.get_sandbox_by_id(sandbox_id)
         if not sandbox_data:
             raise SandboxNotFoundException(sandbox_id)
-        return str(sandbox_data.status)
+
+        # Query the provider for status
+        status = await self.sandbox_provider.get_status(
+            provider_sandbox_id=str(sandbox_data.provider_sandbox_id),
+            config=self.sandbox_config,
+            sandbox_id=sandbox_id,
+        )
+
+        # Sync with database if status changed
+        if status != sandbox_data.status:
+            logger.info(
+                f"Syncing sandbox {sandbox_id} status: {sandbox_data.status} -> {status}"
+            )
+            await Sandboxes.update_sandbox_status(sandbox_id, status)
+
+        return status
 
     async def get_sandbox_info(self, sandbox_id: str) -> Optional[SandboxInfo]:
         """Get sandbox information."""

@@ -108,6 +108,20 @@ class BaseSandbox(ABC):
         """Schedule a timeout for the sandbox."""
         raise NotImplementedError
 
+    @classmethod
+    async def get_status(
+        cls,
+        provider_sandbox_id: str,
+        config: SandboxConfig,
+        sandbox_id: Optional[str] = None,
+    ) -> str:
+        """Get the status of a sandbox from the provider.
+
+        Returns:
+            Status of the sandbox
+        """
+        raise NotImplementedError
+
     @abstractmethod
     async def expose_port(self, port: int) -> str:
         """Expose a port in a sandbox.
