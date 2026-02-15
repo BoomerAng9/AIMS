@@ -350,3 +350,46 @@ async def get_all_available_models(
         )
 
     return LLMModelList(models=models)
+
+async def get_available_model_by_id(
+    *, model_id: str, user_id: str, db_session: DBSession
+) -> Optional[LLMModelInfo]:
+    """
+    Get a specific available model by ID.
+    Checks both system configs and user settings.
+
+    Args:
+        model_id: Model ID to find
+        user_id: User ID to check user-configured models
+        db_session: Database session
+
+    Returns:
+        Optional[LLMModelInfo]: The model information if found, else None
+    """
+    # Check system models from config
+    llm_config = config.llm_configs.get(model_id)
+    if llm_config:
+        return LLMModelInfo(
+            id=model_id,
+            model=llm_config.model,
+            api_type=llm_config.api_type,
+            source="system",
+            description=f"System configured {model_id}",
+        )
+
+    # Check user-configured models
+    setting = await get_model_settings(
+        db_session=db_session, model_id=model_id, user_id=user_id
+    )
+
+    if setting:
+        return LLMModelInfo(
+            id=setting.id,
+            model=setting.model,
+            api_type=setting.api_type,
+            source="user",
+            description=f"User configured {setting.model}",
+            base_url=setting.base_url,
+        )
+
+    return None

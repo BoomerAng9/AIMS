@@ -44,7 +44,7 @@ from ii_agent.server.credits.service import (
 from ii_agent.server.llm_settings.service import (
     get_user_llm_config,
     get_system_llm_config,
-    get_all_available_models,
+    get_available_model_by_id,
 )
 from ii_agent.server.vectordb import openai_vector_store
 from ii_agent.server.chat import cancel
@@ -242,14 +242,10 @@ class ChatService:
         Raises:
             ValueError: If model is not found
         """
-        # Get all available models
-        # TODO: Optimize this
-        all_models = await get_all_available_models(
-            user_id=user_id, db_session=db_session
+        # Check if the model is available
+        model_info = await get_available_model_by_id(
+            model_id=model_id, user_id=user_id, db_session=db_session
         )
-
-        # Find the requested model
-        model_info = next((m for m in all_models.models if m.id == model_id), None)
 
         if not model_info:
             raise ValueError(f"Model not found: {model_id}")
