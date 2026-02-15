@@ -2,33 +2,35 @@
  * A.I.M.S. 3-6-9 Pricing Model — Build-Your-Bill
  *
  * The 3-6-9 model follows Tesla's vortex mathematics:
- *   3 = Entry (Test)    — Validate utility
- *   6 = Balance (Lock)  — Mid-term commitment
- *   9 = Completion (V.I.B.E.) — Pay 9, get 3 free (12-month cycle)
- *   P2P = Proud to Pay  — No commitment, appreciation-based metering
+ *   Pay-per-Use = No commitment, highest token markup (25%)
+ *   3 months    = Entry — 20% token markup
+ *   6 months    = Balance — 15% token markup
+ *   9 months    = Completion — 10% token markup, receive 12 months of access
  *
- * Build-Your-Bill: No two users need identical bills.
- * 7 Dimensions:
- *   Base Frequency × Group Structure × Task Multipliers × Usage Modifiers
- *   × Agent Automation × Three Pillars (Confidence · Convenience · Security)
+ * Token pricing: Users pay our cost + markup percentage.
+ * Markup decreases with longer commitments to reward loyalty.
+ *
+ * Free LLMs available for exploration (chat, basic tasks).
+ * Opus 4.6 default for building apps — pay-per-use token rates apply.
  *
  * "Activity breeds Activity."
  */
 
 // ---------------------------------------------------------------------------
-// Dimension 1: Base Frequency (Choose One)
+// Dimension 1: Plan Duration (Choose One)
 // ---------------------------------------------------------------------------
 
-export type FrequencyId = 'garage' | 'community' | 'enterprise' | 'p2p';
+export type FrequencyId = '3mo' | '6mo' | '9mo' | 'p2p';
 
 export interface BaseTier {
   id: FrequencyId;
   name: string;
-  commitmentMonths: number;   // 3, 6, 9 (delivers 12), or 0 for P2P
-  deliveredMonths: number;    // what user actually gets
-  monthlyPrice: number;       // per-month cost
+  commitmentMonths: number;   // 3, 6, 9, or 0 for Pay-per-Use
+  deliveredMonths: number;    // what user actually gets (9 → 12)
+  monthlyPrice: number;       // per-month subscription cost
   tokensIncluded: number;     // monthly token allocation
   overdraftBuffer: number;    // buffer before overage kicks in
+  tokenMarkup: number;        // markup over API cost (0.25 = 25%)
   discount: string;           // human-readable discount
   models: string[];           // accessible model tiers
   agents: number;             // active agent/bot limit (0 = unlimited)
@@ -38,60 +40,64 @@ export interface BaseTier {
 
 export const BASE_TIERS: BaseTier[] = [
   {
-    id: 'garage',
-    name: 'Garage',
-    commitmentMonths: 3,
-    deliveredMonths: 3,
-    monthlyPrice: 99,
-    tokensIncluded: 100_000,
-    overdraftBuffer: 50_000,
-    discount: '0% (baseline)',
-    models: ['claude-sonnet-4.5', 'gemini-2.5-pro'],
-    agents: 3,
-    concurrent: 1,
-    stripePriceId: process.env.STRIPE_PRICE_GARAGE || '',
-  },
-  {
-    id: 'community',
-    name: 'Community',
-    commitmentMonths: 6,
-    deliveredMonths: 6,
-    monthlyPrice: 89,
-    tokensIncluded: 250_000,
-    overdraftBuffer: 150_000,
-    discount: '10% off monthly',
-    models: ['claude-sonnet-4.5', 'claude-opus-4.6', 'gemini-2.5-pro'],
-    agents: 10,
-    concurrent: 5,
-    stripePriceId: process.env.STRIPE_PRICE_COMMUNITY || '',
-  },
-  {
-    id: 'enterprise',
-    name: 'Enterprise',
-    commitmentMonths: 9,
-    deliveredMonths: 12,
-    monthlyPrice: 67,
-    tokensIncluded: 500_000,
-    overdraftBuffer: 500_000,
-    discount: '33% off (pay 9 get 3 free)',
-    models: ['claude-sonnet-4.5', 'claude-opus-4.6', 'gemini-2.5-pro', 'kimi-k2.5'],
-    agents: 50,
-    concurrent: 25,
-    stripePriceId: process.env.STRIPE_PRICE_ENTERPRISE || '',
-  },
-  {
     id: 'p2p',
-    name: 'P2P (Proud to Pay)',
+    name: 'Pay-per-Use',
     commitmentMonths: 0,
     deliveredMonths: 0,
     monthlyPrice: 0,
     tokensIncluded: 0,
     overdraftBuffer: 0,
-    discount: 'Pay-as-you-go',
-    models: ['claude-sonnet-4.5'],
+    tokenMarkup: 0.25,
+    discount: 'No commitment — 25% token markup',
+    models: ['free-models', 'claude-opus-4-6', 'gemini-2.5-pro'],
     agents: 0, // unlimited — pay per execution
     concurrent: 1,
     stripePriceId: process.env.STRIPE_PRICE_P2P || '',
+  },
+  {
+    id: '3mo',
+    name: '3 Months',
+    commitmentMonths: 3,
+    deliveredMonths: 3,
+    monthlyPrice: 19.99,
+    tokensIncluded: 100_000,
+    overdraftBuffer: 50_000,
+    tokenMarkup: 0.20,
+    discount: '20% token markup',
+    models: ['free-models', 'claude-opus-4-6', 'gemini-2.5-pro'],
+    agents: 5,
+    concurrent: 2,
+    stripePriceId: process.env.STRIPE_PRICE_3MO || '',
+  },
+  {
+    id: '6mo',
+    name: '6 Months',
+    commitmentMonths: 6,
+    deliveredMonths: 6,
+    monthlyPrice: 17.99,
+    tokensIncluded: 250_000,
+    overdraftBuffer: 150_000,
+    tokenMarkup: 0.15,
+    discount: '15% token markup',
+    models: ['free-models', 'claude-opus-4-6', 'gemini-2.5-pro', 'kimi-k2.5'],
+    agents: 15,
+    concurrent: 5,
+    stripePriceId: process.env.STRIPE_PRICE_6MO || '',
+  },
+  {
+    id: '9mo',
+    name: '9 Months',
+    commitmentMonths: 9,
+    deliveredMonths: 12,
+    monthlyPrice: 14.99,
+    tokensIncluded: 500_000,
+    overdraftBuffer: 500_000,
+    tokenMarkup: 0.10,
+    discount: '10% token markup — pay 9, get 12',
+    models: ['free-models', 'claude-opus-4-6', 'gemini-2.5-pro', 'kimi-k2.5', 'glm-4.7', 'qwen-coder'],
+    agents: 50,
+    concurrent: 25,
+    stripePriceId: process.env.STRIPE_PRICE_9MO || '',
   },
 ];
 
@@ -101,7 +107,10 @@ export const BASE_TIERS: BaseTier[] = [
 
 export const USAGE_MODIFIERS = {
   overageRatePer1K: 0.06,         // $0.06 per 1K tokens over limit
-  p2pRatePer100Tokens: 1.00,     // 100 tokens per $1
+  p2pMarkup: 0.25,               // 25% markup for pay-per-use
+  threeMonthMarkup: 0.20,        // 20% markup for 3-month plan
+  sixMonthMarkup: 0.15,          // 15% markup for 6-month plan
+  nineMonthMarkup: 0.10,         // 10% markup for 9-month plan (best deal)
   realTimeLucConvenience: 0.10,   // +10% convenience fee on market rate top-ups
   lucCalculator: 'included',      // always included — pre-action cost transparency
 };
