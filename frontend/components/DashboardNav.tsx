@@ -21,6 +21,7 @@ import {
   FlaskConical, FolderKanban, Users, Boxes,
   Trophy, Activity, Mic, Theater, BookOpen,
   Coins, CircleDot, TrendingUp, Building, Layers,
+  Store, ShoppingCart, Calculator,
 } from "lucide-react";
 
 // ── Types ──
@@ -77,6 +78,13 @@ const SANDBOX_ITEMS: NavItem[] = [
   { href: "/sandbox/perform", label: "Per|Form", icon: TrendingUp },
   { href: "/sandbox/blockwise", label: "Blockwise AI", icon: Building },
   { href: "/sandbox/verticals", label: "Verticals", icon: Shield },
+];
+
+// Live Apps — Standalone tools accessible without diving into verticals
+const LIVE_APPS: NavItem[] = [
+  { href: "/dashboard/luc", label: "LUC Calculator", icon: Calculator, highlight: true },
+  { href: "/dashboard/garage-to-global", label: "Garage to Global", icon: Store, highlight: true },
+  { href: "/dashboard/buy-in-bulk", label: "Buy in Bulk", icon: ShoppingCart, highlight: true },
 ];
 
 // Per|Form — Sports Analytics & N.I.L.
@@ -167,6 +175,15 @@ export function DashboardNav() {
       <div className="mt-2 space-y-0.5">
         <SectionLabel label="Command" icon={BarChart3} />
         {CORE_ITEMS.map((item) => (
+          <NavLink key={item.href} item={item} pathname={pathname} />
+        ))}
+      </div>
+
+      {/* Live Apps — Direct access tools */}
+      <div className="mx-2 mt-2 border-t border-emerald-500/15" />
+      <div className="mt-1 space-y-0.5">
+        <SectionLabel label="Live Apps" icon={Rocket} />
+        {LIVE_APPS.map((item) => (
           <NavLink key={item.href} item={item} pathname={pathname} />
         ))}
       </div>

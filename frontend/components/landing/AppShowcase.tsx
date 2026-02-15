@@ -62,7 +62,7 @@ const SHOWCASE_APPS: AppShowcaseItem[] = [
       'Listing SEO optimizer',
       '5-stage growth journey',
     ],
-    demoLink: '/dashboard/boomerangs',
+    demoLink: '/dashboard/garage-to-global',
     builtIn: '< 1 hour',
     status: 'live',
   },
@@ -78,9 +78,9 @@ const SHOWCASE_APPS: AppShowcaseItem[] = [
       'Cart optimization',
       'Never shares payment info',
     ],
-    demoLink: '/dashboard/boomerangs',
+    demoLink: '/dashboard/buy-in-bulk',
     builtIn: '< 45 minutes',
-    status: 'demo',
+    status: 'live',
   },
 ];
 
