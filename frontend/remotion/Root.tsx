@@ -19,7 +19,7 @@ export const RemotionRoot: React.FC = () => {
   return (
     <>
       {/* ── Book of V.I.B.E. ──────────────────────────────── */}
-      <Folder name="Book of VIBE">
+      <Folder name="BookOfVIBE">
         <Composition
           id="BookOfVibeIntro-Landscape"
           component={BookOfVibeIntro}
@@ -49,7 +49,7 @@ export const RemotionRoot: React.FC = () => {
       </Folder>
 
       {/* ── Legacy compositions ───────────────────────────── */}
-      <Folder name="AIMS Platform">
+      <Folder name="AIMSPlatform">
         <Composition
           id="AIMSIntro"
           component={AIMSIntro as any}
