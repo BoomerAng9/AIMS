@@ -1,116 +1,297 @@
 # AIMS Security Audit & Integration Report — Feb 2026
 
-## Executive Summary
-This audit identified several critical security vulnerabilities and integration issues in the AIMS codebase as of February 15, 2026.
+> **Initial audit:** Jules (Feb 15, 2026)
+> **Reviewed & upgraded by:** Claude Code (Feb 15, 2026)
+> **Review method:** Every Jules claim cross-checked against source code. Additional deep sweep performed across all API routes, webhook handlers, auth flows, and deployment configs.
 
-**High-Level Findings:**
-- **Critical:** 2 (SSRF and Missing Auth in Sandbox Server)
-- **High:** 1 (IDOR in LUC Meter)
-- **Medium:** 3 (Missing Auth in New APIs, Race Condition in LUC Storage, Dependency Vulnerabilities)
-- **Low:** 2 (Public GCS logos, Middleware IP spoofing potential)
+---
+
+## Executive Summary
+
+The AIMS codebase has **significant security gaps** across multiple layers. The initial Jules audit caught the most visible issues but missed critical webhook, auth, and integration problems. This upgraded report adds **10 new findings** on top of Jules' original 8.
+
+| Severity | Jules Found | Claude Added | Total |
+|----------|-------------|--------------|-------|
+| **Critical** | 2 | 1 | **3** |
+| **High** | 1 | 3 | **4** |
+| **Medium** | 3 | 4 | **7** |
+| **Low** | 2 | 2 | **4** |
+| **Total** | **8** | **10** | **18** |
+
+**Jules Accuracy: 7/8 claims confirmed. 1 false positive (build failure claim was wrong).**
 
 **Integration Status:**
-- **Kling AI:** FAILED (Direct API call, violates Gateway policy)
+- **Kling AI:** FAILED — Direct API call, violates Gateway policy
+- **Stripe Webhooks:** FAILED — Handler missing entirely
+- **Discord Webhook:** FAILED — Signature verification not implemented
+- **Telegram Webhook:** FAILED — Secret token validation not implemented
+- **n8n Webhook:** FAILED — Zero authentication
 - **Remotion:** VERIFIED
 - **LUC Storage Chain:** VERIFIED (with race condition warning)
-- **Dashboard Routes:** VERIFIED (but missing Auth)
+- **Dashboard Routes:** VERIFIED (but missing auth)
 - **ACHEEVY Brain:** VERIFIED
+
+---
 
 ## Security Findings
 
 ### Critical
 
-#### 1. Unauthenticated Command Execution & SSRF in Sandbox Server
+#### C1. Unauthenticated Command Execution & SSRF in Sandbox Server
 **File:** `backend/ii-agent/src/ii_sandbox_server/main.py`
-**Description:** The `ii_sandbox_server` is a standalone FastAPI application that lacks any form of authentication or authorization. Furthermore, it contains multiple SSRF vectors.
-- **Missing Auth:** Anyone who can reach the server (port 8100 by default) can call endpoints like `/sandboxes/run-cmd` to execute arbitrary commands within a sandbox.
-- **SSRF in `upload_file_from_url`:** The endpoint `/sandboxes/upload-file-from-url` takes a URL and fetches it using `httpx.AsyncClient()`, allowing an attacker to probe internal services or cloud metadata endpoints (SSRF).
-- **SSRF in `download_to_presigned_url`:** The endpoint `/sandboxes/download-to-presigned-url` allows an attacker to exfiltrate sandbox data to an arbitrary external URL via a PUT request.
+**Status:** CONFIRMED by source code review
 
-#### 2. SSRF in GCS Storage Provider
-**File:** `backend/ii-agent/src/ii_agent/storage/gcs.py`
-**Description:** The `write_from_url` method in the GCS class uses `requests.get(url, stream=True)` without any URL validation or restriction.
-- **Risk:** If this method is exposed through any user-controllable API, it can be used for SSRF to probe internal networks or exfiltrate data to GCS buckets.
+The `ii_sandbox_server` is a standalone FastAPI app with **zero authentication**. It binds to `0.0.0.0:8100` and is port-mapped in docker-compose.
+
+- **No auth on any endpoint** — `/sandboxes/run-cmd`, `/sandboxes/create`, `/sandboxes/read-file`, `/sandboxes/download-file` are all open
+- **SSRF via `/sandboxes/upload-file-from-url`** (line 365) — accepts arbitrary URL, fetches with `httpx.AsyncClient()`, no allowlist, no private-IP blocking
+- **SSRF via `/sandboxes/download-to-presigned-url`** (line 395) — PUTs sandbox data to any URL the caller provides
+- **Exposed port** — `docker-compose.stack.yaml` line 109 maps `8100:8100` to the host
+
+Unlike the UEF Gateway (which has `requireApiKey` middleware), this server has no protective layer.
+
+#### C2. SSRF in GCS Storage Provider
+**File:** `backend/ii-agent/src/ii_agent/storage/gcs.py` (lines 34-42)
+**Status:** CONFIRMED
+
+```python
+def write_from_url(self, url: str, path: str, content_type: str | None = None) -> str:
+    blob = self.bucket.blob(path)
+    with requests.get(url, stream=True) as response:  # No URL validation
+        response.raise_for_status()
+        blob.upload_from_file(response.raw, content_type=content_type)
+    return blob.public_url
+```
+
+Accepts arbitrary URLs. If reachable from any user-facing flow, this is an SSRF vector to internal services or GCP metadata (`169.254.169.254`).
+
+#### C3. n8n Webhook — Zero Authentication (NEW)
+**File:** `frontend/app/api/n8n/webhook/route.ts` (lines 14-47)
+**Status:** NEW FINDING
+
+POST handler has **no `getServerSession()` call, no API key check, no request signing**. Anyone who discovers this endpoint can:
+- Dispatch PMO tasks to backend systems
+- Impersonate any user via the `userId` body parameter
+- Trigger workflows in any `pmoOffice` / `executionLane`
+
+**Risk:** Arbitrary task dispatch and user impersonation.
+
+---
 
 ### High
 
-#### 1. Insecure Direct Object Reference (IDOR) in LUC Meter
+#### H1. IDOR in LUC Meter (GET + POST)
 **File:** `frontend/app/api/luc/meter/route.ts`
-**Line:** 114
-**Code:**
+**Status:** CONFIRMED — worse than originally reported
+
+**GET handler** (line 178):
 ```typescript
-const { searchParams } = new URL(req.url);
 const userId = searchParams.get("userId") || session.user.email;
 ```
-**Description:** The GET endpoint allows an authenticated user to view the usage quotas of *any* other user by simply providing their `userId` or `email` in the query string. The server uses this parameter directly without verifying if the authenticated user has permission to view that specific user's data.
+
+**POST handler** (line 235):
+```typescript
+const { action, userId = session.user.email, ... } = body;
+```
+
+Both handlers accept a caller-supplied `userId` without ownership verification. An authenticated user can read *and modify* any other user's usage quotas.
+
+#### H2. Kling AI Bypasses UEF Gateway
+**File:** `frontend/lib/kling-video.ts` (line 53)
+**Status:** CONFIRMED
+
+```typescript
+private baseUrl = "https://api.klingai.com/v1";
+```
+
+Direct `fetch()` calls to Kling at lines 163 and 218. Violates the core architecture rule: "All tool access goes through Port Authority (UEF Gateway)." This means Kling usage is **unmetered, unlogged, and unenforced**.
+
+#### H3. Missing Stripe Webhook Handler (NEW)
+**Status:** NEW FINDING
+
+`STRIPE_WEBHOOK_SECRET` is declared in:
+- `infra/.env.production.example`
+- `backend/uef-gateway/src/integrations/index.ts`
+- `aims-skills/tools/index.ts`
+
+But **no `/api/stripe/webhook` route exists**. There is no handler to receive Stripe events (payment success, subscription changes, disputes). When implemented, it must include `stripe.webhooks.constructEvent()` signature verification to prevent spoofed events.
+
+#### H4. Stripe Empty Key Fallback (NEW)
+**File:** `frontend/app/api/stripe/subscription/route.ts` (line 13)
+**Status:** NEW FINDING
+
+```typescript
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', { ... });
+```
+
+If `STRIPE_SECRET_KEY` is unset, Stripe client silently operates with an empty string. Should throw on startup, not fail silently in production.
+
+---
 
 ### Medium
 
-#### 1. Missing Authentication in New API Routes
+#### M1. Missing Authentication — Sellers & Shopping Routes
 **Files:** `frontend/app/api/sellers/route.ts`, `frontend/app/api/shopping/route.ts`
-**Description:** These new API routes lack any session verification (`getServerSession`). While they currently return demo data, they are publicly accessible and allow anyone to trigger mock actions (e.g., `create-mission`).
+**Status:** CONFIRMED
 
-#### 2. Race Condition in LUC Server Storage
-**File:** `frontend/lib/luc/server-storage.ts`
-**Description:** The `addUsageEntry` method reads the entire history file, modifies it in memory, and writes it back.
-**Risk:** Under high concurrency (e.g., during `flushPendingEvents` with `Promise.all`), multiple requests may read the same initial state and overwrite each other's updates, leading to data loss in usage history.
+Neither file calls `getServerSession()`. Currently return demo data, but are publicly accessible and allow mock action triggers.
 
-#### 3. High Severity Dependency Vulnerabilities
-**Files:** `frontend/package.json`
-**Description:** `npm audit` identified a high-severity vulnerability in `next` (14.2.35).
-- **Vulnerability:** Next.js self-hosted applications are vulnerable to DoS via Image Optimizer remotePatterns configuration and HTTP request deserialization.
-- **Recommendation:** Upgrade to a patched version of Next.js.
+#### M2. Race Condition in LUC Server Storage
+**File:** `frontend/lib/luc/server-storage.ts` (lines 197-213)
+**Status:** CONFIRMED
+
+Classic TOCTOU: `getHistory()` → modify in memory → `saveHistory()` with no file lock. Under concurrent `Promise.all` flushes, writes will overwrite each other.
+
+#### M3. Next.js Dependency Vulnerability
+**File:** `frontend/package.json`
+**Status:** CONFIRMED
+
+`npm audit` flags high-severity CVE in `next` (14.2.35) — DoS via Image Optimizer and HTTP deserialization.
+
+#### M4. Discord Webhook — No Signature Verification (NEW)
+**File:** `frontend/app/api/discord/webhook/route.ts` (line 42)
+**Status:** NEW FINDING
+
+`DISCORD_PUBLIC_KEY` is imported (line 14) but **never used** for signature verification. The handler accepts `await req.json()` without validating the `X-Signature-Ed25519` / `X-Signature-Timestamp` headers. Webhook messages can be spoofed.
+
+#### M5. Telegram Webhook — No Secret Token Validation (NEW)
+**File:** `frontend/app/api/telegram/webhook/route.ts`
+**Status:** NEW FINDING
+
+No `X-Telegram-Bot-Api-Secret-Token` header check. Telegram updates can be spoofed by anyone who knows the endpoint URL.
+
+#### M6. Edge Relay Path Bypass via `.startsWith()` (NEW)
+**File:** `frontend/app/api/edge/relay/route.ts` (line 58)
+**Status:** NEW FINDING
+
+Path allowlist uses `.startsWith()`:
+```typescript
+const ALLOWED = ['/acheevy/execute', '/acheevy/classify', '/llm/chat', '/health', '/luc/balance'];
+```
+
+This means `/acheevy/execute-anything-else` would pass validation. Should use exact match or regex with anchors.
+
+#### M7. Deploy Dock IDOR (NEW)
+**File:** `frontend/app/api/deploy-dock/route.ts` (line 97)
+**Status:** NEW FINDING
+
+Authenticates that a user is logged in but does not enforce ownership. User A could view/modify User B's deployments.
+
+---
 
 ### Low
 
-#### 1. Public Exposure of Branding Logos
-**File:** `backend/ii-agent/src/ii_agent/storage/gcs.py`
-**Description:** The `upload_and_get_permanent_url` method explicitly calls `blob.make_public()`.
-- **Risk:** While branding logos are often intended to be public, this behavior is hardcoded. If a user uploads a sensitive image as a "logo", it becomes publicly accessible to anyone who can guess or find the URL.
+#### L1. Public Exposure of Branding Logos
+**File:** `backend/ii-agent/src/ii_agent/storage/gcs.py` (lines 152-156)
+**Status:** CONFIRMED
 
-#### 2. Client IP Spoofing in Middleware
-**File:** `frontend/middleware.ts`
-**Line:** 113
-**Description:** `getClientIP` trusts the first element of the `x-forwarded-for` header.
-- **Risk:** If the application is not behind a trusted proxy that sanitizes this header, an attacker can spoof their IP to bypass rate limits by providing a fake `x-forwarded-for` header.
+`blob.make_public()` is called unconditionally. Any file uploaded via `upload_and_get_permanent_url` becomes publicly accessible.
+
+#### L2. Client IP Spoofing in Middleware
+**File:** `frontend/middleware.ts` (lines 126-133)
+**Status:** CONFIRMED
+
+```typescript
+function getClientIP(request: NextRequest): string {
+  return (
+    request.headers.get('x-forwarded-for')?.split(',')[0].trim() ||
+    request.headers.get('x-real-ip') ||
+    request.headers.get('cf-connecting-ip') ||
+    '127.0.0.1'
+  );
+}
+```
+
+Rate limits keyed by this IP (line 327). Spoofable via `x-forwarded-for` header if not behind a trusted proxy that strips it.
+
+#### L3. Dev Mode Password Bypass (NEW)
+**File:** `frontend/lib/auth.ts` (line 102)
+**Status:** NEW FINDING
+
+```typescript
+if (isOwnerEmail(credentials.email) && process.env.NODE_ENV !== 'production') {
+    return { id: 'owner-dev', name: 'ACHEEVY Operator (Dev)', email: credentials.email, ... }
+```
+
+Owner emails can log in without a password when `NODE_ENV !== 'production'`. If NODE_ENV is accidentally misconfigured on a public-facing instance, this is an auth bypass.
+
+#### L4. Fire-and-Forget Error Swallowing (NEW)
+**File:** `frontend/app/api/edge/relay/route.ts` (line 99)
+**Status:** NEW FINDING
+
+`.catch(() => {})` silently drops errors. Failed relays are never logged, masking potential malicious activity or misconfigurations.
+
+---
+
+## Corrections to Jules Report
+
+#### FALSE: Build failure in buy-in-bulk/page.tsx
+**Jules claimed:** `'Settings' is not defined. react/jsx-no-undef`
+**Actual:** `Settings` is properly imported from `lucide-react` on line 20. No build failure exists from this reference.
+
+---
 
 ## Integration Findings
 
-### Broken/Missing Integrations
+### Broken / Missing Integrations
 
-#### 1. Kling AI Direct API Calls
-**File:** `frontend/lib/kling-video.ts`
-**Finding:** The `KlingVideoService` calls `https://api.klingai.com/v1` directly.
-**Status:** **FAILED**.
-**Violation:** Platform policy requires ALL external API calls to route through the UEF Gateway (Port Authority) for metering, logging, and security enforcement.
+| Integration | File | Issue |
+|-------------|------|-------|
+| Kling AI | `frontend/lib/kling-video.ts:53` | Direct API call, bypasses UEF Gateway |
+| Stripe Webhooks | (missing) | No webhook handler exists |
+| Discord Webhook | `frontend/app/api/discord/webhook/route.ts` | Signature not verified |
+| Telegram Webhook | `frontend/app/api/telegram/webhook/route.ts` | Secret token not validated |
+| n8n Webhook | `frontend/app/api/n8n/webhook/route.ts` | Zero auth |
 
 ### Misconfigured Integrations
-- **LUC Storage Concurrency:** The use of `Promise.all` in `flushPendingEvents` (`metering.ts`) combined with non-atomic file writes in `server-storage.ts` creates a race condition.
+
+| Integration | File | Issue |
+|-------------|------|-------|
+| LUC Storage | `frontend/lib/luc/server-storage.ts` | Race condition under concurrent writes |
+| Edge Relay | `frontend/app/api/edge/relay/route.ts` | `.startsWith()` path bypass |
+| Deploy Dock | `frontend/app/api/deploy-dock/route.ts` | Missing user ownership check |
 
 ### Verified Working
 
-#### 1. Remotion Registration
-**File:** `frontend/remotion/Root.tsx`
-**Status:** **VERIFIED**. All compositions are properly registered and exported.
+| Integration | File | Status |
+|-------------|------|--------|
+| Remotion | `frontend/remotion/Root.tsx` | All compositions registered (Landscape + Portrait) |
+| Dashboard Nav | `frontend/components/DashboardNav.tsx` | "Garage to Global" + "Buy in Bulk" links present |
+| ACHEEVY Brain | `aims-skills/ACHEEVY_BRAIN.md` | Skills/hooks/tasks consistent with filesystem |
+| .gitignore | `.gitignore` (root) | `.env`, `.env.*`, `.pem`, `.key` all covered |
+| MCP Retry | `backend/ii-agent/src/ii_tool/mcp/server.py` | tenacity backoff, no injection risk |
+| Deployment Hub | `backend/uef-gateway/src/deployment-hub/` | Chain-of-command gates, no arbitrary spawn |
 
-#### 2. Dashboard Navigation
-**File:** `frontend/components/DashboardNav.tsx`
-**Status:** **VERIFIED**. "Garage to Global" and "Buy in Bulk" links are correctly added and point to the appropriate routes.
+---
 
-#### 3. ACHEEVY Brain Consistency
-**File:** `aims-skills/ACHEEVY_BRAIN.md`
-**Status:** **VERIFIED**. Referenced skills (e.g., `orchestrateTurn`, `app-factory/*`) and hooks (e.g., `onSimUserMessage`) have corresponding files in the `aims-skills/` directory.
+## Recommendations — Prioritized
 
-## Recommendations
+### Immediate (do before next deploy)
 
-1. **IMMEDIATE:** Implement authentication for `ii_sandbox_server` and disable/sanitize SSRF-vulnerable endpoints (`upload_file_from_url`, `download_to_presigned_url`).
-2. **HIGH:** Fix the IDOR in `frontend/app/api/luc/meter/route.ts` by ensuring users can only query their own data or data they own.
-3. **HIGH:** Route Kling AI API calls through the UEF Gateway to comply with platform standards.
-4. **MEDIUM:** Add session checks to `/api/sellers` and `/api/shopping`.
-5. **MEDIUM:** Implement a write lock or atomic update mechanism for `server-storage.ts` to prevent usage history data loss.
-6. **MEDIUM:** Upgrade `next` and other vulnerable dependencies identified by `npm audit`.
+1. **Add auth to `ii_sandbox_server`** — API key middleware or restrict to Docker-internal network only (remove port mapping from docker-compose)
+2. **Block SSRF endpoints** — Add URL allowlist + private IP blocklist to `upload_file_from_url` and `download_to_presigned_url`
+3. **Add auth to n8n webhook** — `getServerSession()` or shared secret validation
+4. **Fix LUC Meter IDOR** — Force `userId = session.user.email` on both GET and POST handlers
 
-### Broken Build
-- **File:** `frontend/app/dashboard/buy-in-bulk/page.tsx`
-- **Error:** `'Settings' is not defined.  react/jsx-no-undef`
-- **Status:** **FAILED**. The production build (`npm run build`) fails due to this reference error.
+### High Priority
+
+5. **Route Kling through UEF Gateway** — Replace direct `api.klingai.com` calls with gateway-proxied calls
+6. **Implement Stripe webhook handler** — Create `/api/stripe/webhook` with `stripe.webhooks.constructEvent()` signature verification
+7. **Fix Stripe empty key fallback** — Throw on missing key instead of `|| ''`
+8. **Verify Discord webhook signatures** — Use the already-imported `DISCORD_PUBLIC_KEY` with `nacl` verification
+9. **Verify Telegram webhook tokens** — Check `X-Telegram-Bot-Api-Secret-Token` header
+
+### Medium Priority
+
+10. **Add auth to `/api/sellers` and `/api/shopping`** — `getServerSession()` before serving data
+11. **Fix LUC storage race condition** — File lock or atomic write (write to tmp + rename)
+12. **Upgrade Next.js** — Patch high-severity CVE
+13. **Fix edge relay path validation** — Exact match instead of `.startsWith()`
+14. **Fix deploy dock IDOR** — Enforce user ownership on deployment records
+
+### Low Priority
+
+15. **Audit `make_public()` usage** — Ensure only intended assets are made public
+16. **Harden middleware IP detection** — Document proxy trust chain, consider Cloudflare `cf-connecting-ip` priority
+17. **Remove dev auth bypass** — Use proper test accounts instead
+18. **Add logging to fire-and-forget relay** — Replace `.catch(() => {})` with actual error logging
