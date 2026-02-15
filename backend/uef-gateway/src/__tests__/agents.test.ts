@@ -102,7 +102,7 @@ describe('Quality_Ang', () => {
   });
 });
 
-describe('ChickenHawk', () => {
+describe('Chicken Hawk', () => {
   it('runs a full BUILD_PLUG pipeline', async () => {
     const result = await ChickenHawk.execute(makeInput({
       context: {

@@ -201,8 +201,8 @@ function VoiceInputPanel({ onCapture }: VoiceInputPanelProps) {
     <div className="flex flex-col items-center justify-center py-8">
       {isTranscribing ? (
         <div className="text-center">
-          <div className="w-12 h-12 border-3 border-amber-400 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-amber-100/70">Transcribing...</p>
+          <div className="w-12 h-12 border-3 border-gold border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-white/70">Transcribing...</p>
         </div>
       ) : (
         <>
@@ -212,14 +212,14 @@ function VoiceInputPanel({ onCapture }: VoiceInputPanelProps) {
               w-20 h-20 rounded-full flex items-center justify-center transition-all
               ${isRecording
                 ? 'bg-red-500/20 border-2 border-red-500 animate-pulse'
-                : 'bg-amber-400/20 border-2 border-amber-400/50 hover:border-amber-400'
+                : 'bg-gold/20 border-2 border-gold/50 hover:border-gold'
               }
             `}
           >
-            <MicIcon className={`w-8 h-8 ${isRecording ? 'text-red-400' : 'text-amber-400'}`} />
+            <MicIcon className={`w-8 h-8 ${isRecording ? 'text-red-400' : 'text-gold'}`} />
           </button>
 
-          <p className="mt-4 text-sm text-amber-100/70">
+          <p className="mt-4 text-sm text-white/70">
             {isRecording ? (
               <span className="text-red-400">Recording: {formatTime(duration)}</span>
             ) : (
@@ -228,7 +228,7 @@ function VoiceInputPanel({ onCapture }: VoiceInputPanelProps) {
           </p>
 
           {isRecording && (
-            <p className="mt-2 text-xs text-amber-100/50">
+            <p className="mt-2 text-xs text-white/40">
               Click again to stop and transcribe
             </p>
           )}
@@ -290,7 +290,7 @@ function ImageInputPanel({ onCapture }: ImageInputPanelProps) {
         className={`
           border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all
           ${isDragging
-            ? 'border-amber-400 bg-amber-400/10'
+            ? 'border-gold bg-gold/10'
             : 'border-white/20 hover:border-white/40'
           }
         `}
@@ -299,9 +299,9 @@ function ImageInputPanel({ onCapture }: ImageInputPanelProps) {
           <img src={preview} alt="Preview" className="max-h-48 mx-auto rounded-lg" />
         ) : (
           <>
-            <ImageIcon className="w-12 h-12 mx-auto text-amber-100/40 mb-3" />
-            <p className="text-amber-100/70">Drop an image here or click to browse</p>
-            <p className="text-xs text-amber-100/40 mt-2">PNG, JPG, GIF up to 10MB</p>
+            <ImageIcon className="w-12 h-12 mx-auto text-white/30 mb-3" />
+            <p className="text-white/70">Drop an image here or click to browse</p>
+            <p className="text-xs text-white/30 mt-2">PNG, JPG, GIF up to 10MB</p>
           </>
         )}
       </div>
@@ -367,21 +367,21 @@ function FileInputPanel({ onCapture }: FileInputPanelProps) {
         className={`
           border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all
           ${isDragging
-            ? 'border-amber-400 bg-amber-400/10'
+            ? 'border-gold bg-gold/10'
             : 'border-white/20 hover:border-white/40'
           }
         `}
       >
         {fileName ? (
           <div className="flex items-center justify-center gap-3">
-            <FileIcon className="w-8 h-8 text-amber-400" />
-            <span className="text-amber-100">{fileName}</span>
+            <FileIcon className="w-8 h-8 text-gold" />
+            <span className="text-white">{fileName}</span>
           </div>
         ) : (
           <>
-            <FileIcon className="w-12 h-12 mx-auto text-amber-100/40 mb-3" />
-            <p className="text-amber-100/70">Drop a file here or click to browse</p>
-            <p className="text-xs text-amber-100/40 mt-2">PDF, DOC, TXT, CSV, JSON up to 25MB</p>
+            <FileIcon className="w-12 h-12 mx-auto text-white/30 mb-3" />
+            <p className="text-white/70">Drop a file here or click to browse</p>
+            <p className="text-xs text-white/30 mt-2">PDF, DOC, TXT, CSV, JSON up to 25MB</p>
           </>
         )}
       </div>
@@ -435,7 +435,7 @@ function CodeInputPanel({ onCapture }: CodeInputPanelProps) {
         <select
           value={language}
           onChange={(e) => setLanguage(e.target.value)}
-          className="h-10 px-3 rounded-lg bg-black/40 border border-white/10 text-amber-100 text-sm focus:border-amber-300 outline-none"
+          className="h-10 px-3 rounded-lg bg-black/40 border border-wireframe-stroke text-white text-sm focus:border-gold outline-none"
         >
           {LANGUAGES.map(lang => (
             <option key={lang} value={lang} className="bg-black">
@@ -449,7 +449,7 @@ function CodeInputPanel({ onCapture }: CodeInputPanelProps) {
           value={filename}
           onChange={(e) => setFilename(e.target.value)}
           placeholder="Filename (optional)"
-          className="flex-1 h-10 px-3 rounded-lg bg-black/40 border border-white/10 text-amber-100 text-sm placeholder:text-white/20 focus:border-amber-300 outline-none"
+          className="flex-1 h-10 px-3 rounded-lg bg-black/40 border border-wireframe-stroke text-white text-sm placeholder:text-white/20 focus:border-gold outline-none"
         />
       </div>
 
@@ -457,17 +457,17 @@ function CodeInputPanel({ onCapture }: CodeInputPanelProps) {
         value={code}
         onChange={(e) => setCode(e.target.value)}
         placeholder="Paste or type your code here..."
-        className="w-full h-48 p-4 rounded-xl bg-black/60 border border-white/10 text-amber-100 font-mono text-sm placeholder:text-white/20 focus:border-amber-300 outline-none resize-none"
+        className="w-full h-48 p-4 rounded-xl bg-black/60 border border-wireframe-stroke text-white font-mono text-sm placeholder:text-white/20 focus:border-gold outline-none resize-none"
       />
 
       <div className="flex justify-between items-center">
-        <span className="text-xs text-amber-100/40">
+        <span className="text-xs text-white/30">
           {code.split('\n').length} lines
         </span>
         <button
           onClick={handleSubmit}
           disabled={!code.trim()}
-          className="px-4 py-2 rounded-lg bg-amber-400 text-black text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-amber-300 transition-colors"
+          className="px-4 py-2 rounded-lg bg-gold text-black text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gold-light transition-colors"
         >
           Add Code
         </button>
@@ -504,17 +504,17 @@ function TextInputPanel({ onCapture }: TextInputPanelProps) {
         value={text}
         onChange={(e) => setText(e.target.value)}
         placeholder="Type your clarification or additional information here..."
-        className="w-full h-40 p-4 rounded-xl bg-black/40 border border-white/10 text-amber-100 text-sm placeholder:text-white/20 focus:border-amber-300 outline-none resize-none"
+        className="w-full h-40 p-4 rounded-xl bg-black/40 border border-wireframe-stroke text-white text-sm placeholder:text-white/20 focus:border-gold outline-none resize-none"
       />
 
       <div className="flex justify-between items-center">
-        <span className="text-xs text-amber-100/40">
+        <span className="text-xs text-white/30">
           {text.trim() ? text.trim().split(/\s+/).length : 0} words
         </span>
         <button
           onClick={handleSubmit}
           disabled={!text.trim()}
-          className="px-4 py-2 rounded-lg bg-amber-400 text-black text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-amber-300 transition-colors"
+          className="px-4 py-2 rounded-lg bg-gold text-black text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gold-light transition-colors"
         >
           Add Text
         </button>
@@ -549,15 +549,15 @@ function InputPreview({ input, onRemove }: { input: ChangeOrderInput; onRemove: 
   };
 
   return (
-    <div className="flex items-center gap-2 px-3 py-2 bg-white/5 rounded-lg border border-white/10">
-      <span className="text-amber-400">{getIcon()}</span>
-      <span className="flex-1 text-sm text-amber-100 truncate">{getLabel()}</span>
-      <span className="text-xs text-amber-100/40">
+    <div className="flex items-center gap-2 px-3 py-2 bg-white/5 rounded-lg border border-wireframe-stroke">
+      <span className="text-gold">{getIcon()}</span>
+      <span className="flex-1 text-sm text-white truncate">{getLabel()}</span>
+      <span className="text-xs text-white/30">
         ~{estimateInputTokens(input)} tokens
       </span>
       <button
         onClick={onRemove}
-        className="p-1 hover:bg-white/10 rounded text-amber-100/50 hover:text-red-400 transition-colors"
+        className="p-1 hover:bg-white/10 rounded text-white/40 hover:text-red-400 transition-colors"
       >
         <XIcon className="w-4 h-4" />
       </button>
@@ -642,10 +642,10 @@ export function UserInputModal({
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-xl bg-[#0A0A0A] border border-white/10 rounded-2xl shadow-2xl z-50 overflow-hidden"
+            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-xl bg-[#0A0A0A] border border-wireframe-stroke rounded-2xl shadow-2xl z-50 overflow-hidden"
           >
             {/* Header */}
-            <div className="px-6 py-4 border-b border-white/5">
+            <div className="px-6 py-4 border-b border-wireframe-stroke">
               <div className="flex items-start justify-between">
                 <div>
                   <div className="flex items-center gap-2">
@@ -653,22 +653,22 @@ export function UserInputModal({
                       CHANGE ORDER
                     </span>
                   </div>
-                  <h2 className="text-lg font-semibold text-amber-50 mt-2">
+                  <h2 className="text-lg font-semibold text-white mt-2">
                     Input Required
                   </h2>
-                  <p className="text-sm text-amber-100/50 mt-1">{triggerQuestion}</p>
+                  <p className="text-sm text-white/40 mt-1">{triggerQuestion}</p>
                 </div>
                 <button
                   onClick={onClose}
-                  className="p-2 hover:bg-white/10 rounded-lg text-amber-100/50 hover:text-amber-100 transition-colors"
+                  className="p-2 hover:bg-white/10 rounded-lg text-white/40 hover:text-white transition-colors"
                 >
                   <XIcon className="w-5 h-5" />
                 </button>
               </div>
 
               {/* Requesting agent */}
-              <p className="text-xs text-amber-100/40 mt-3">
-                Requested by <span className="text-amber-300">{requestingAgent}</span> from {department}
+              <p className="text-xs text-white/30 mt-3">
+                Requested by <span className="text-gold">{requestingAgent}</span> from {department}
               </p>
             </div>
 
@@ -682,8 +682,8 @@ export function UserInputModal({
                     className={`
                       flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all
                       ${activeTab === type
-                        ? 'bg-amber-400/20 text-amber-300 border border-amber-400/30'
-                        : 'text-amber-100/50 hover:text-amber-100 hover:bg-white/5'
+                        ? 'bg-gold/20 text-gold border border-gold/30'
+                        : 'text-white/40 hover:text-white hover:bg-white/5'
                       }
                     `}
                   >
@@ -705,8 +705,8 @@ export function UserInputModal({
 
             {/* Collected Inputs */}
             {inputs.length > 0 && (
-              <div className="px-6 py-4 border-t border-white/5">
-                <p className="text-xs text-amber-100/40 mb-2">Collected Inputs ({inputs.length})</p>
+              <div className="px-6 py-4 border-t border-wireframe-stroke">
+                <p className="text-xs text-white/30 mb-2">Collected Inputs ({inputs.length})</p>
                 <div className="space-y-2 max-h-32 overflow-y-auto">
                   {inputs.map((input, i) => (
                     <InputPreview
@@ -720,9 +720,9 @@ export function UserInputModal({
             )}
 
             {/* Footer */}
-            <div className="px-6 py-4 border-t border-white/5 bg-white/[0.02]">
+            <div className="px-6 py-4 border-t border-wireframe-stroke bg-white/[0.02]">
               <div className="flex items-center justify-between">
-                <div className="text-xs text-amber-100/50">
+                <div className="text-xs text-white/40">
                   <span>Est. tokens: {totalTokens.toLocaleString()}</span>
                   <span className="mx-2">•</span>
                   <span>Est. cost: {formatCurrency(estimatedCost)}</span>
@@ -731,14 +731,14 @@ export function UserInputModal({
                 <div className="flex gap-3">
                   <button
                     onClick={onClose}
-                    className="px-4 py-2 rounded-lg border border-white/10 text-amber-100/70 hover:bg-white/5 transition-colors"
+                    className="px-4 py-2 rounded-lg border border-wireframe-stroke text-white/70 hover:bg-white/5 transition-colors"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleSubmit}
                     disabled={inputs.length === 0}
-                    className="px-4 py-2 rounded-lg bg-amber-400 text-black font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-amber-300 transition-colors"
+                    className="px-4 py-2 rounded-lg bg-gold text-black font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gold-light transition-colors"
                   >
                     Submit Change Order
                   </button>

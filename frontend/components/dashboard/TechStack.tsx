@@ -147,7 +147,7 @@ function TechCard({ item, delay }: { item: TechItem; delay: number }) {
       transition={{ delay: delay * 0.05, duration: 0.3 }}
       className="flex items-center gap-3 px-4 py-3 rounded-lg transition-all hover:scale-105"
       style={{
-        backgroundColor: '#1a2234',
+        backgroundColor: 'rgba(255,255,255,0.03)',
         border: '1px solid #2d3a4d',
       }}
     >
@@ -232,7 +232,7 @@ function CategoryColumn({ category, index }: { category: TechCategory; index: nu
 
 export default function TechStack() {
   return (
-    <div className="min-h-screen p-8" style={{ backgroundColor: '#0a0f1a' }}>
+    <div className="min-h-screen p-8 aims-page-bg">
       {/* Background */}
       <CircuitBoardPattern density="sparse" animated={false} glowIntensity={0.1} />
 
@@ -331,7 +331,7 @@ export default function TechStack() {
           <div
             className="inline-flex items-center gap-4 px-8 py-4 rounded-2xl"
             style={{
-              backgroundColor: '#1a2234',
+              backgroundColor: 'rgba(255,255,255,0.03)',
               border: `1px solid ${AIMS_CIRCUIT_COLORS.primary}40`,
               boxShadow: `0 0 40px ${AIMS_CIRCUIT_COLORS.primary}10`,
             }}

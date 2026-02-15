@@ -137,7 +137,7 @@ const SWITCHER_ITEMS: SwitcherItem[] = [
     id: 'acheevy',
     label: 'ACHEEVY',
     description: 'AI assistant chat',
-    href: '/dashboard/acheevy',
+    href: '/dashboard',
     icon: <ChatIcon className="w-4 h-4" />,
     category: 'navigation',
     keywords: ['chat', 'ai', 'assistant', 'talk'],
@@ -152,17 +152,26 @@ const SWITCHER_ITEMS: SwitcherItem[] = [
     keywords: ['planning', 'project', 'roadmap'],
   },
   {
+    id: 'deploy-dock',
+    label: 'Deploy Dock',
+    description: 'Build → Assign → Launch',
+    href: '/dashboard/deploy-dock',
+    icon: <DeployIcon className="w-4 h-4" />,
+    category: 'navigation',
+    keywords: ['deploy', 'launch', 'hatch', 'assign', 'build', 'release'],
+  },
+  {
     id: 'ai-plugs',
     label: 'aiPlugs',
     description: 'AI integrations',
-    href: '/dashboard/ai-plugs',
+    href: '/dashboard/plugs',
     icon: <PlugIcon className="w-4 h-4" />,
     category: 'navigation',
     keywords: ['plugins', 'integrations', 'tools'],
   },
   {
     id: 'boomerangs',
-    label: 'BoomerAngs',
+    label: 'Boomer_Angs',
     description: 'Agent workforce',
     href: '/dashboard/boomerangs',
     icon: <UsersIcon className="w-4 h-4" />,
@@ -200,7 +209,7 @@ const SWITCHER_ITEMS: SwitcherItem[] = [
     id: 'settings',
     label: 'Settings',
     description: 'Account & preferences',
-    href: '/dashboard/settings',
+    href: '/dashboard/circuit-box?tab=settings',
     icon: <SettingsIcon className="w-4 h-4" />,
     category: 'navigation',
     keywords: ['preferences', 'account', 'config'],
@@ -299,7 +308,7 @@ export function QuickSwitcher() {
       {/* Trigger Button (Bottom Left) */}
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-4 left-4 z-50 p-2.5 rounded-xl bg-[#1a1a1a] border border-white/10 text-gray-400 hover:text-amber-300 hover:border-amber-500/30 transition-all shadow-lg group"
+        className="fixed bottom-4 left-4 z-50 p-2.5 rounded-xl bg-[#1a1a1a] border border-wireframe-stroke text-gray-400 hover:text-gold hover:border-gold/30 transition-all shadow-lg group"
         title="Quick Switcher (⌘K)"
       >
         <CommandIcon className="w-5 h-5" />
@@ -326,10 +335,10 @@ export function QuickSwitcher() {
               initial={{ opacity: 0, scale: 0.95, y: -20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: -20 }}
-              className="fixed top-[20%] left-1/2 -translate-x-1/2 w-full max-w-lg bg-[#0a0a0a] border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50"
+              className="fixed top-[20%] left-1/2 -translate-x-1/2 w-full max-w-lg bg-[#0a0a0a] border border-wireframe-stroke rounded-xl shadow-2xl overflow-hidden z-50"
             >
               {/* Search Input */}
-              <div className="flex items-center gap-3 px-4 py-3 border-b border-white/10">
+              <div className="flex items-center gap-3 px-4 py-3 border-b border-wireframe-stroke">
                 <SearchIcon className="w-5 h-5 text-gray-500" />
                 <input
                   ref={inputRef}
@@ -338,7 +347,7 @@ export function QuickSwitcher() {
                   onChange={(e) => setSearch(e.target.value)}
                   onKeyDown={handleInputKeyDown}
                   placeholder="Search pages, actions..."
-                  className="flex-1 bg-transparent text-amber-50 placeholder:text-gray-500 outline-none text-sm"
+                  className="flex-1 bg-transparent text-white placeholder:text-gray-500 outline-none text-sm"
                 />
                 <kbd className="px-2 py-1 text-[10px] text-gray-500 bg-white/5 rounded">ESC</kbd>
               </div>
@@ -370,11 +379,11 @@ export function QuickSwitcher() {
                               onMouseEnter={() => setSelectedIndex(globalIndex)}
                               className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors ${
                                 isSelected
-                                  ? 'bg-amber-500/20 text-amber-100'
+                                  ? 'bg-gold/20 text-white'
                                   : 'text-gray-300 hover:bg-white/5'
-                              } ${isActive ? 'border-l-2 border-amber-500' : ''}`}
+                              } ${isActive ? 'border-l-2 border-gold' : ''}`}
                             >
-                              <span className={isSelected ? 'text-amber-400' : 'text-gray-500'}>
+                              <span className={isSelected ? 'text-gold' : 'text-gray-500'}>
                                 {item.icon}
                               </span>
                               <div className="flex-1 min-w-0">
@@ -384,7 +393,7 @@ export function QuickSwitcher() {
                                 )}
                               </div>
                               {isActive && (
-                                <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/30 text-amber-300">
+                                <span className="text-[10px] px-1.5 py-0.5 rounded bg-gold/30 text-gold">
                                   Current
                                 </span>
                               )}
@@ -395,7 +404,7 @@ export function QuickSwitcher() {
 
                     {/* Actions */}
                     {filteredItems.some((i) => i.category === 'action') && (
-                      <div className="px-2 mt-2 pt-2 border-t border-white/5">
+                      <div className="px-2 mt-2 pt-2 border-t border-wireframe-stroke">
                         <p className="px-2 py-1 text-[10px] uppercase tracking-wider text-gray-600">
                           Quick Actions
                         </p>
@@ -412,11 +421,11 @@ export function QuickSwitcher() {
                                 onMouseEnter={() => setSelectedIndex(globalIndex)}
                                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors ${
                                   isSelected
-                                    ? 'bg-amber-500/20 text-amber-100'
+                                    ? 'bg-gold/20 text-white'
                                     : 'text-gray-300 hover:bg-white/5'
                                 }`}
                               >
-                                <span className={isSelected ? 'text-amber-400' : 'text-gray-500'}>
+                                <span className={isSelected ? 'text-gold' : 'text-gray-500'}>
                                   {item.icon}
                                 </span>
                                 <div className="flex-1 min-w-0">
@@ -435,7 +444,7 @@ export function QuickSwitcher() {
               </div>
 
               {/* Footer */}
-              <div className="flex items-center justify-between px-4 py-2 border-t border-white/5 text-[10px] text-gray-600">
+              <div className="flex items-center justify-between px-4 py-2 border-t border-wireframe-stroke text-[10px] text-gray-600">
                 <div className="flex items-center gap-4">
                   <span><kbd className="px-1 py-0.5 bg-white/5 rounded">↑↓</kbd> Navigate</span>
                   <span><kbd className="px-1 py-0.5 bg-white/5 rounded">↵</kbd> Select</span>

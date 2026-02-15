@@ -18,7 +18,7 @@ export const AIMS_CIRCUIT_COLORS = {
   primary: '#D4AF37',     // Champagne gold
   secondary: '#F5DEB3',   // Amber wheat
   accent: '#FFD700',      // Pure gold
-  background: '#0A1628',  // Deepsea
+  background: '#0A0A0A',  // Obsidian
   glow: 'rgba(212, 175, 55, 0.6)',
   dimLine: 'rgba(212, 175, 55, 0.15)',
   brightLine: 'rgba(255, 215, 0, 0.4)',

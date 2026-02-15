@@ -1,0 +1,101 @@
+{
+  "policy_id": "gateway-security-v1",
+  "version": "1.0.0",
+  "description": "A.I.M.S. Gateway security controls, tenant isolation, and trust rules",
+
+  "tenant_isolation": {
+    "enforce_at_layers": ["ui", "api", "storage", "secrets", "compute"],
+    "rbac_roles": ["owner", "admin", "member", "viewer"],
+    "attribute_based_controls": {
+      "enabled": true,
+      "applies_to": ["sensitive_evidence", "exports", "secrets"]
+    },
+    "cross_tenant_access": "DENY_ALL"
+  },
+
+  "sdt_hardening": {
+    "default_ttl_seconds": 3600,
+    "max_ttl_seconds": 86400,
+    "scope_minimization": true,
+    "revocation_immediate": true,
+    "rotation_on_compromise": true,
+    "rate_limiting": {
+      "issuance_per_minute_per_tenant": 30,
+      "access_per_minute_per_token": 60
+    },
+    "anomaly_detection": {
+      "enabled": true,
+      "triggers": [
+        "access_from_new_ip_range",
+        "burst_download_pattern",
+        "access_after_hours",
+        "multiple_concurrent_sessions"
+      ]
+    },
+    "session_restrictions": {
+      "ip_allowlist_supported": true,
+      "device_fingerprint_supported": true,
+      "max_access_count_enforced": true
+    }
+  },
+
+  "evidence_auditability": {
+    "immutable_event_log": true,
+    "logged_actions": [
+      "token_issuance",
+      "token_access",
+      "token_revocation",
+      "artifact_creation",
+      "artifact_modification",
+      "submission_created",
+      "submission_delivered",
+      "acknowledgement_received",
+      "plug_install",
+      "plug_update",
+      "plug_removal",
+      "managed_execution_approval",
+      "receipt_signed"
+    ],
+    "export_signing_required": true,
+    "chain_of_custody_required": true
+  },
+
+  "supply_chain_defense": {
+    "build_provenance_required": true,
+    "dependency_manifest_required": true,
+    "permission_manifest_required": true,
+    "deterministic_runners": true,
+    "scan_pipeline": [
+      "dependency_vulnerability_scan",
+      "permissions_audit",
+      "containerized_smoke_test",
+      "rollback_readiness_check"
+    ]
+  },
+
+  "glass_box_safety": {
+    "user_sees": [
+      "phase_progression",
+      "proof_links",
+      "signed_receipts",
+      "artifact_summaries",
+      "verified_events"
+    ],
+    "user_never_sees": [
+      "internal_prompts",
+      "raw_agent_reasoning",
+      "secrets",
+      "endpoints",
+      "operational_internals",
+      "inter_role_dialogue"
+    ],
+    "external_voice_rule": "ACHEEVY_only"
+  },
+
+  "privacy": {
+    "data_residency_enforced": true,
+    "pii_scanning_on_export": true,
+    "redaction_on_partner_delivery": true,
+    "log_retention_days": 365
+  }
+}

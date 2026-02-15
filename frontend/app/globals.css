@@ -1,21 +1,31 @@
 
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --background: #0A0A0A;
+  --background: #050505;
   --foreground: #ededed;
   --font-doto: 'Doto', monospace;
   --font-marker: 'Permanent Marker', cursive;
   --font-caveat: 'Caveat', cursive;
+  --frame-inset: 12px;
+}
+
+@media (min-width: 768px) {
+  :root { --frame-inset: 16px; }
+}
+@media (min-width: 1280px) {
+  :root { --frame-inset: 24px; }
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
   font-family: 'Inter', sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Custom Scrollbar for Obsidian feel */
@@ -50,3 +60,374 @@ body {
     0 0 0 1px rgba(0, 0, 0, 0.3);
 }
 
+
+/* --- A.I.M.S. Design System Utilities --- */
+
+@layer utilities {
+  .text-shadow-gold {
+    text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+  }
+  
+  .text-shadow-neon {
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.5), 0 0 20px rgba(212, 175, 55, 0.5);
+  }
+
+  .glass-panel {
+    @apply bg-white/5 backdrop-blur-xl border border-white/10 shadow-glass;
+  }
+
+  /* Deep, premium glass for main containers */
+  .glass-premium {
+    background: radial-gradient(
+      circle at top left,
+      rgba(212, 175, 55, 0.05),
+      rgba(0, 0, 0, 0) 60%
+    ), rgba(20, 20, 20, 0.6);
+    @apply backdrop-blur-3xl border border-gold/20 shadow-neon-gold;
+  }
+  
+  /* Subtle Tech Grid Background */
+  .bg-grid-pattern {
+    background-size: 40px 40px;
+    background-image: linear-gradient(to right, #1a1a1a 1px, transparent 1px),
+                      linear-gradient(to bottom, #1a1a1a 1px, transparent 1px);
+    mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
+    -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
+  }
+
+  /* Utility for glowing borders on hover */
+  .hover-glow-border {
+    @apply transition-all duration-300 hover:border-gold/50 hover:shadow-[0_0_15px_rgba(212,175,55,0.2)];
+  }
+
+  /* ── Wireframe Glass Card — core card primitive ── */
+  .wireframe-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 16px;
+    box-shadow:
+      inset 0 1px 1px rgba(255, 255, 255, 0.06),
+      inset 0 -1px 1px rgba(255, 255, 255, 0.02);
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+  .wireframe-card:hover {
+    border-color: rgba(255, 255, 255, 0.18);
+    box-shadow:
+      inset 0 1px 1px rgba(255, 255, 255, 0.08),
+      0 4px 24px rgba(0, 0, 0, 0.3);
+  }
+
+  /* ── Global Viewport Frame — half-inch border around entire UI ── */
+  .aims-frame {
+    margin: var(--frame-inset);
+    min-height: calc(100vh - var(--frame-inset) * 2);
+    max-height: calc(100vh - var(--frame-inset) * 2);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    position: relative;
+    background: var(--background);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.04),
+      0 0 80px rgba(0, 0, 0, 0.8);
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── A.I.M.S. Page Background — cinematic dark with gold grid ── */
+  .aims-page-bg {
+    background-color: #050505;
+    background-image:
+      radial-gradient(circle, rgba(212,175,55,0.03) 1px, transparent 1px),
+      linear-gradient(to right, rgba(212,175,55,0.02) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(212,175,55,0.02) 1px, transparent 1px);
+    background-size: 24px 24px, 48px 48px, 48px 48px;
+  }
+
+  /* ── Gold Edge Rail — replaces tiled logo ── */
+  .gold-edge-rail {
+    position: relative;
+  }
+  .gold-edge-rail::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 1px solid rgba(212, 175, 55, 0.08);
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .gold-edge-rail::after {
+    content: '';
+    position: absolute;
+    top: -1px; left: -1px; right: -1px; bottom: -1px;
+    background: linear-gradient(135deg, rgba(212,175,55,0.12) 0%, transparent 30%, transparent 70%, rgba(212,175,55,0.08) 100%);
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0.6;
+    z-index: 1;
+  }
+
+  /* ── Controlled Glow — never bright haze ── */
+  .glow-controlled {
+    box-shadow: 0 0 40px rgba(212, 175, 55, 0.06);
+  }
+
+  /* ── Nano Banana Pro Textures ── */
+  .texture-noise {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  }
+
+  .texture-scanlines {
+    background: linear-gradient(
+      to bottom,
+      rgba(255,255,255,0),
+      rgba(255,255,255,0) 50%,
+      rgba(0,0,0,0.1) 50%,
+      rgba(0,0,0,0.1)
+    );
+    background-size: 100% 4px;
+    pointer-events: none;
+  }
+
+  .vignette-overlay {
+    background: radial-gradient(
+      circle at center,
+      transparent 60%,
+      rgba(0, 0, 0, 0.25) 100%
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
+  /* ── Core Layout Fixes ── */
+  html, body {
+    min-height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    /* Prevent bouncy scroll on iOS/Safari which causes layout shifts */
+    overscroll-behavior-y: none;
+  }
+
+  /* Lock body for dashboard to prevent browser chrome jumping */
+  .dashboard-scroll-lock {
+    height: 100% !important;
+    overflow: hidden !important;
+    width: 100% !important;
+    position: fixed !important; /* Strict lock */
+    top: 0;
+    left: 0;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Deploy Dock — Lo-fi Retro-Futurism Effects
+   ───────────────────────────────────────────────────────────── */
+
+/* Scanline animation for Transfer View */
+@keyframes scan {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+.animate-scan {
+  animation: scan 4s linear infinite;
+}
+
+/* Subtle grain overlay */
+.texture-grain {
+  position: absolute;
+  inset: 0;
+  opacity: 0.03;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+}
+
+/* Pulse glow for active elements */
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(212, 168, 67, 0); }
+  50% { box-shadow: 0 0 20px 4px rgba(212, 168, 67, 0.3); }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Materialize entrance effect */
+@keyframes materialize {
+  0% {
+    opacity: 0;
+    filter: blur(8px);
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0px);
+    transform: translateY(0);
+  }
+}
+
+.animate-materialize {
+  animation: materialize 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Swarm convergence for Hatch animation */
+@keyframes swarm-converge {
+  0% {
+    transform: translate(var(--swarm-x, 0), var(--swarm-y, 0)) scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-swarm {
+  animation: swarm-converge 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Protocol line connection animation */
+@keyframes line-connect {
+  0% { transform: scaleX(0); transform-origin: left; }
+  100% { transform: scaleX(1); transform-origin: left; }
+}
+
+.animate-line-connect {
+  animation: line-connect 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Launch pulse animation */
+@keyframes launch-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.3); opacity: 1; }
+}
+
+.animate-launch-pulse {
+  animation: launch-pulse 2s ease-in-out infinite;
+}
+
+/* Glass box timeline marker */
+.timeline-dot {
+  position: relative;
+}
+
+.timeline-dot::before {
+  content: '';
+  position: absolute;
+  left: -5px;
+  top: 0;
+  height: 10px;
+  width: 10px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  background: var(--background);
+}
+
+/* Scrollbar for ACHEEVY panel */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 4px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: rgba(212, 168, 67, 0.3);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   The Hangar — Deployment Port Effects
+   ───────────────────────────────────────────────────────────── */
+
+/* Laser-print scanline on card hover */
+@keyframes hangar-scan {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(200%); }
+}
+
+.hangar-scanline {
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(212, 175, 55, 0.03) 45%,
+    rgba(212, 175, 55, 0.08) 50%,
+    rgba(212, 175, 55, 0.03) 55%,
+    transparent 100%
+  );
+  animation: hangar-scan 2s linear infinite;
+}
+
+/* Status flicker effect for "Deployment Port Active" label */
+@keyframes hangar-flicker {
+  0%, 90%, 100% { opacity: 1; }
+  92% { opacity: 0.4; }
+  94% { opacity: 1; }
+  96% { opacity: 0.6; }
+  98% { opacity: 1; }
+}
+
+.hangar-flicker {
+  animation: hangar-flicker 4s ease-in-out infinite;
+}
+
+/* LED ceiling pulse */
+@keyframes led-pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.5; }
+}
+
+.led-pulse {
+  animation: led-pulse 3s ease-in-out infinite;
+}
+
+/* Materialize-in for hierarchy nodes */
+@keyframes hangar-materialize {
+  0% {
+    opacity: 0;
+    filter: blur(12px);
+    transform: scale(0.8) translateY(10px);
+  }
+  60% {
+    filter: blur(2px);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0px);
+    transform: scale(1) translateY(0);
+  }
+}
+
+.hangar-materialize {
+  animation: hangar-materialize 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Circuit Box panel — strip nested page wrappers when embedded */
+.circuit-box-panel > div > .min-h-screen {
+  min-height: auto !important;
+  background-color: transparent !important;
+  background-image: none !important;
+}
+.circuit-box-panel .aims-page-bg {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+/* Hide nested CircuitBoardPattern when inside Circuit Box */
+.circuit-box-panel canvas {
+  display: none !important;
+}

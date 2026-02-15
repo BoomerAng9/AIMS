@@ -1,0 +1,10 @@
+{
+  "name": "@aims/veritas",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "bun run src/server.ts",
+    "dev": "bun --watch src/server.ts"
+  },
+  "dependencies": {}
+}

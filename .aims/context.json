@@ -5,5 +5,20 @@
   "actor_id": "builder_ang",
   "environment": "dev",
   "budget_envelope_id": "be_001",
-  "risk_tier": "low"
+  "risk_tier": "low",
+
+  "owner": {
+    "name": "Rish",
+    "role": "OWNER",
+    "email": "admin@plugmein.cloud"
+  },
+
+  "project": {
+    "name": "A.I.M.S.",
+    "fullName": "AI Managed Solutions",
+    "tagline": "Your Personal AI Company"
+  },
+
+  "stack_file": ".aims/stack.json",
+  "secrets_file": ".aims/secrets.md"
 }

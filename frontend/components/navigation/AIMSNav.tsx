@@ -42,10 +42,10 @@ interface AIMSNavProps {
 
 const DEFAULT_NAV_ITEMS: NavItem[] = [
   { label: 'Dashboard', href: '/dashboard' },
-  { label: 'ACHEEVY', href: '/dashboard/acheevy' },
+  { label: 'Workshop', href: '/workshop' },
+  { label: 'Sandbox', href: '/sandbox' },
   { label: 'House of Ang', href: '/dashboard/house-of-ang' },
-  { label: 'Deploy', href: '/dashboard/deploy' },
-  { label: 'Sports Tracker', href: '/dashboard/sports-tracker' },
+  { label: 'Circuit Box', href: '/dashboard/circuit-box' },
 ];
 
 // ─────────────────────────────────────────────────────────────
@@ -255,7 +255,7 @@ export function AIMSNav({
 
               {/* User menu */}
               {user && (
-                <div className="hidden sm:flex items-center gap-3 pl-3 border-l border-white/10">
+                <div className="hidden sm:flex items-center gap-3 pl-3 border-l border-wireframe-stroke">
                   <div className="text-right">
                     <div
                       className="text-sm font-medium"

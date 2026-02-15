@@ -1,0 +1,39 @@
+name: Deploy to VPS (Legacy)
+
+# Primary deploy now happens via GCP Cloud Build → Cloud Run.
+# This workflow is kept as a manual Hostinger VPS fallback only.
+# Use: Actions → Deploy to VPS → Run workflow (manual trigger)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy to Hostinger VPS (Manual)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: root
+          password: ${{ secrets.VPS_PASSWORD }}
+          script: |
+            set -e
+
+            if [ -d /home/aims/AIMS ]; then
+              cd /home/aims/AIMS
+              git fetch origin main
+              git reset --hard origin/main
+            else
+              git clone https://github.com/BoomerAng9/AIMS.git /home/aims/AIMS
+              cd /home/aims/AIMS
+            fi
+
+            docker compose -p locale down 2>/dev/null || true
+            chmod +x deploy.sh
+            ./deploy.sh
+
+            echo "Deployment complete!"

@@ -80,13 +80,13 @@ export function useVoiceOutput(options: UseVoiceOutputOptions = {}): UseVoiceOut
       return audioCache.get(cacheKey)!;
     }
 
-    const response = await fetch('/api/tts', {
+    const response = await fetch('/api/voice/tts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         text,
+        provider: config?.provider || 'elevenlabs',
         voiceId: config?.voiceId,
-        speed: config?.speed || 1.0,
       }),
     });
 

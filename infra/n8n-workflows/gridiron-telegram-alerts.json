@@ -1,0 +1,275 @@
+{
+  "name": "Gridiron → Telegram Alerts",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 30
+            }
+          ]
+        }
+      },
+      "id": "cron-trigger",
+      "name": "Every 30 Minutes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [200, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.WAR_ROOM_URL || 'http://war-room:5003' }}/api/status",
+        "options": {
+          "timeout": 8000
+        }
+      },
+      "id": "fetch-war-room-status",
+      "name": "Fetch War Room Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [420, 200]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.SCOUT_HUB_URL || 'http://scout-hub:5001' }}/health",
+        "options": {
+          "timeout": 8000
+        }
+      },
+      "id": "fetch-scout-health",
+      "name": "Fetch Scout Hub Health",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [420, 400]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.WAR_ROOM_URL || 'http://war-room:5003' }}/api/content?type=BLOG&limit=5",
+        "options": {
+          "timeout": 8000
+        }
+      },
+      "id": "fetch-new-content",
+      "name": "Fetch New Content",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [420, 600]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "check-new-content",
+              "leftValue": "={{ $node['Fetch New Content'].json.total }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "has-new-content",
+      "name": "Has New Content?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [640, 600]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "build-status-message",
+              "name": "statusMessage",
+              "value": "={{ '📊 *Gridiron Status Report*\\n\\n' + '**War Room:**\\n' + '• Prospects Graded: ' + ($node['Fetch War Room Status'].json.state?.totalProspectsGraded || 0) + '\\n' + '• Content Pieces: ' + ($node['Fetch War Room Status'].json.state?.totalContentPieces || 0) + '\\n' + '• HS Rankings: ' + ($node['Fetch War Room Status'].json.state?.rankings?.highSchool || 0) + '\\n' + '• College Rankings: ' + ($node['Fetch War Room Status'].json.state?.rankings?.college || 0) + '\\n\\n' + '**Scout Hub:** ' + ($node['Fetch Scout Hub Health'].json.status === 'ok' ? '🟢 Online' : '🔴 Offline') + '\\n\\n' + '**Last Scout Delivery:** ' + ($node['Fetch War Room Status'].json.state?.lastScoutDelivery || 'None') }}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "id": "build-status-message",
+      "name": "Build Status Message",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [640, 200]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "build-content-alert",
+              "name": "contentMessage",
+              "value": "={{ '📝 *New Content Ready for Review*\\n\\nEditors Desk has ' + $node['Fetch New Content'].json.total + ' new pieces awaiting your approval.\\n\\n' + ($node['Fetch New Content'].json.items || []).slice(0, 3).map(i => '• ' + i.type + ': ' + i.title).join('\\n') + '\\n\\n➡️ Review at: https://plugmein.cloud/dashboard/editors-desk' }}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "id": "build-content-alert",
+      "name": "Build Content Alert",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [860, 500]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $env.TELEGRAM_CHAT_ID }}",
+        "text": "={{ $node['Build Status Message'].json.statusMessage }}",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "send-status-telegram",
+      "name": "Send Status to Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [860, 200],
+      "credentials": {
+        "telegramApi": {
+          "id": "telegram-creds",
+          "name": "Telegram Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $env.TELEGRAM_CHAT_ID }}",
+        "text": "={{ $node['Build Content Alert'].json.contentMessage }}",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "send-content-telegram",
+      "name": "Send Content Alert to Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [1080, 500],
+      "credentials": {
+        "telegramApi": {
+          "id": "telegram-creds",
+          "name": "Telegram Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "gridiron-scout-complete",
+        "options": {}
+      },
+      "id": "scout-webhook",
+      "name": "Scout Run Complete Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 800],
+      "webhookId": "gridiron-scout-complete"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $env.TELEGRAM_CHAT_ID }}",
+        "text": "={{ '🦅 *Scout Run Complete*\\n\\n' + 'Run ID: `' + $json.body?.runId + '`\\n' + 'Debates: ' + ($json.body?.debateCount || 0) + '\\n' + 'Status: ' + ($json.body?.status || 'unknown') + '\\n\\n' + 'Content is being generated by Boomer_Angs.\\nCheck Editors Desk shortly for approval.' }}",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "send-scout-telegram",
+      "name": "Notify Scout Complete",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [420, 800],
+      "credentials": {
+        "telegramApi": {
+          "id": "telegram-creds",
+          "name": "Telegram Bot"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Every 30 Minutes": {
+      "main": [
+        [
+          { "node": "Fetch War Room Status", "type": "main", "index": 0 },
+          { "node": "Fetch Scout Hub Health", "type": "main", "index": 0 },
+          { "node": "Fetch New Content", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Fetch War Room Status": {
+      "main": [
+        [
+          { "node": "Build Status Message", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Fetch Scout Hub Health": {
+      "main": [
+        [
+          { "node": "Build Status Message", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Fetch New Content": {
+      "main": [
+        [
+          { "node": "Has New Content?", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Has New Content?": {
+      "main": [
+        [
+          { "node": "Build Content Alert", "type": "main", "index": 0 }
+        ],
+        []
+      ]
+    },
+    "Build Status Message": {
+      "main": [
+        [
+          { "node": "Send Status to Telegram", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Build Content Alert": {
+      "main": [
+        [
+          { "node": "Send Content Alert to Telegram", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Scout Run Complete Webhook": {
+      "main": [
+        [
+          { "node": "Notify Scout Complete", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "tags": [
+    { "name": "gridiron" },
+    { "name": "telegram" },
+    { "name": "alerts" }
+  ],
+  "meta": {
+    "description": "Gridiron Sandbox → Telegram Commander Alerts. Sends status reports every 30 min, notifies when new content is ready for Editor's Desk review, and alerts when scout runs complete.",
+    "templateCredsSetupCompleted": false
+  }
+}

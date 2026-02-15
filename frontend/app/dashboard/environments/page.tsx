@@ -186,7 +186,7 @@ const DEPLOY_STATUS_CONFIG: Record<
   in_progress: {
     label: "In Progress",
     icon: Clock,
-    cls: "text-amber-400 animate-pulse",
+    cls: "text-gold animate-pulse",
   },
   failed: {
     label: "Failed",
@@ -247,24 +247,24 @@ export default function EnvironmentsPage() {
     <div className="space-y-6 animate-in fade-in duration-700">
       {/* Header */}
       <header>
-        <p className="text-[10px] uppercase tracking-[0.3em] text-amber-200/50 mb-1">
+        <p className="text-[10px] uppercase tracking-[0.3em] text-gold/50 mb-1">
           Infrastructure
         </p>
-        <h1 className="text-3xl font-bold tracking-tight text-amber-50 font-display">
+        <h1 className="text-3xl font-bold tracking-tight text-white font-display">
           ENVIRONMENTS
         </h1>
-        <p className="mt-1 text-sm text-amber-100/50">
+        <p className="mt-1 text-sm text-white/40">
           Deployment pipeline and environment health across the A.I.M.S.
           platform.
         </p>
       </header>
 
       {/* ---- Pipeline Visualization ---- */}
-      <section className="rounded-3xl border border-white/10 bg-black/60 p-6 backdrop-blur-2xl">
-        <h2 className="text-sm font-semibold uppercase tracking-widest text-amber-200/90 font-display">
+      <section className="rounded-3xl border border-wireframe-stroke bg-black/60 p-6 backdrop-blur-2xl">
+        <h2 className="text-sm font-semibold uppercase tracking-widest text-white/80 font-display">
           Promotion Pipeline
         </h2>
-        <p className="mt-1 text-[0.65rem] text-amber-100/40 uppercase tracking-wider">
+        <p className="mt-1 text-[0.65rem] text-white/30 uppercase tracking-wider">
           Promote builds across environments
         </p>
 
@@ -284,7 +284,7 @@ export default function EnvironmentsPage() {
                 >
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-white/5 text-amber-200">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-white/5 text-gold">
                         {i === 0 ? (
                           <Server size={16} />
                         ) : i === 1 ? (
@@ -294,10 +294,10 @@ export default function EnvironmentsPage() {
                         )}
                       </div>
                       <div>
-                        <p className="text-xs font-semibold text-amber-50">
+                        <p className="text-xs font-semibold text-white">
                           {env.name}
                         </p>
-                        <p className="text-[10px] text-amber-100/40 font-mono">
+                        <p className="text-[10px] text-white/30 font-mono">
                           {env.url}
                         </p>
                       </div>
@@ -313,7 +313,7 @@ export default function EnvironmentsPage() {
                     >
                       {STATUS_CONFIG[env.status].label}
                     </span>
-                    <span className="rounded-full border border-amber-400/20 bg-amber-400/5 px-2 py-0.5 text-[9px] font-mono text-amber-300">
+                    <span className="rounded-full border border-gold/20 bg-gold/10 px-2 py-0.5 text-[9px] font-mono text-gold">
                       {env.version}
                     </span>
                   </div>
@@ -325,14 +325,14 @@ export default function EnvironmentsPage() {
                         <span
                           className={`h-1.5 w-1.5 rounded-full ${STATUS_CONFIG[svc.status].dot}`}
                         />
-                        <span className="text-[10px] text-amber-100/50">
+                        <span className="text-[10px] text-white/40">
                           {svc.name}
                         </span>
                       </div>
                     ))}
                   </div>
 
-                  <div className="mt-3 flex items-center gap-3 text-[10px] text-amber-100/30">
+                  <div className="mt-3 flex items-center gap-3 text-[10px] text-white/20">
                     <span className="flex items-center gap-1">
                       <Clock size={10} />
                       {formatTimestamp(env.lastDeploy)}
@@ -354,7 +354,7 @@ export default function EnvironmentsPage() {
                   <div className="hidden lg:flex flex-col items-center gap-2">
                     <ArrowRight
                       size={18}
-                      className="text-amber-400/40"
+                      className="text-gold/40"
                     />
                     <button
                       onClick={() =>
@@ -364,12 +364,12 @@ export default function EnvironmentsPage() {
                         promoting ===
                         `${env.id}-${ENVIRONMENTS[i + 1].id}`
                       }
-                      className="rounded-lg border border-amber-400/20 bg-amber-400/5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-amber-300 transition-all hover:bg-amber-400/10 hover:border-amber-400/40 hover:shadow-[0_0_15px_rgba(251,191,36,0.1)] disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="rounded-lg border border-gold/20 bg-gold/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-gold transition-all hover:bg-gold/10 hover:border-gold/20 hover:shadow-[0_0_15px_rgba(251,191,36,0.1)] disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {promoting ===
                       `${env.id}-${ENVIRONMENTS[i + 1].id}` ? (
                         <span className="flex items-center gap-1.5">
-                          <span className="h-3 w-3 animate-spin rounded-full border border-amber-400/30 border-t-amber-400" />
+                          <span className="h-3 w-3 animate-spin rounded-full border border-gold/30 border-t-gold" />
                           Promoting
                         </span>
                       ) : (
@@ -380,7 +380,7 @@ export default function EnvironmentsPage() {
 
                   {/* Mobile: vertical arrow */}
                   <div className="flex lg:hidden items-center gap-3">
-                    <div className="h-px flex-1 bg-amber-400/10" />
+                    <div className="h-px flex-1 bg-gold/10" />
                     <button
                       onClick={() =>
                         handlePromote(env.id, ENVIRONMENTS[i + 1].id)
@@ -389,12 +389,12 @@ export default function EnvironmentsPage() {
                         promoting ===
                         `${env.id}-${ENVIRONMENTS[i + 1].id}`
                       }
-                      className="flex items-center gap-2 rounded-lg border border-amber-400/20 bg-amber-400/5 px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-amber-300 transition-all hover:bg-amber-400/10 hover:border-amber-400/40 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="flex items-center gap-2 rounded-lg border border-gold/20 bg-gold/10 px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-gold transition-all hover:bg-gold/10 hover:border-gold/20 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {promoting ===
                       `${env.id}-${ENVIRONMENTS[i + 1].id}` ? (
                         <span className="flex items-center gap-1.5">
-                          <span className="h-3 w-3 animate-spin rounded-full border border-amber-400/30 border-t-amber-400" />
+                          <span className="h-3 w-3 animate-spin rounded-full border border-gold/30 border-t-gold" />
                           Promoting
                         </span>
                       ) : (
@@ -404,7 +404,7 @@ export default function EnvironmentsPage() {
                         </>
                       )}
                     </button>
-                    <div className="h-px flex-1 bg-amber-400/10" />
+                    <div className="h-px flex-1 bg-gold/10" />
                   </div>
                 </div>
               )}
@@ -418,15 +418,15 @@ export default function EnvironmentsPage() {
         {ENVIRONMENTS.map((env, i) => (
           <section
             key={env.id}
-            className="rounded-2xl border border-amber-400/10 bg-black/60 p-5 backdrop-blur-2xl"
+            className="rounded-2xl border border-gold/20 bg-black/60 p-5 backdrop-blur-2xl"
           >
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <div
                   className={`flex h-9 w-9 items-center justify-center rounded-xl ${
                     i === 2
-                      ? "bg-gradient-to-br from-amber-400/20 to-amber-600/10 text-amber-300"
-                      : "bg-white/5 text-amber-200/60"
+                      ? "bg-gradient-to-br from-gold/20 to-gold/10 text-gold"
+                      : "bg-white/5 text-gold"
                   }`}
                 >
                   {i === 0 ? (
@@ -437,7 +437,7 @@ export default function EnvironmentsPage() {
                     <Globe size={16} />
                   )}
                 </div>
-                <h3 className="text-sm font-semibold text-amber-50">
+                <h3 className="text-sm font-semibold text-white">
                   {env.name}
                 </h3>
               </div>
@@ -449,37 +449,37 @@ export default function EnvironmentsPage() {
             </div>
 
             <div className="space-y-3">
-              <div className="rounded-xl border border-white/5 bg-black/40 p-3">
-                <p className="text-[10px] uppercase tracking-wider text-amber-100/40">
+              <div className="rounded-xl border border-wireframe-stroke bg-black/40 p-3">
+                <p className="text-[10px] uppercase tracking-wider text-white/30">
                   URL
                 </p>
-                <p className="text-xs font-mono text-amber-200 mt-0.5 truncate">
+                <p className="text-xs font-mono text-gold mt-0.5 truncate">
                   {env.url}
                 </p>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                <div className="rounded-xl border border-white/5 bg-black/40 p-3">
-                  <p className="text-[10px] uppercase tracking-wider text-amber-100/40">
+                <div className="rounded-xl border border-wireframe-stroke bg-black/40 p-3">
+                  <p className="text-[10px] uppercase tracking-wider text-white/30">
                     Version
                   </p>
-                  <p className="text-xs font-mono text-amber-50 mt-0.5">
+                  <p className="text-xs font-mono text-white mt-0.5">
                     {env.version}
                   </p>
                 </div>
-                <div className="rounded-xl border border-white/5 bg-black/40 p-3">
-                  <p className="text-[10px] uppercase tracking-wider text-amber-100/40">
+                <div className="rounded-xl border border-wireframe-stroke bg-black/40 p-3">
+                  <p className="text-[10px] uppercase tracking-wider text-white/30">
                     Last Deploy
                   </p>
-                  <p className="text-xs text-amber-50 mt-0.5">
+                  <p className="text-xs text-white mt-0.5">
                     {formatTimestamp(env.lastDeploy)}
                   </p>
                 </div>
               </div>
 
               {/* Service Health */}
-              <div className="rounded-xl border border-white/5 bg-black/40 p-3">
-                <p className="text-[10px] uppercase tracking-wider text-amber-100/40 mb-2">
+              <div className="rounded-xl border border-wireframe-stroke bg-black/40 p-3">
+                <p className="text-[10px] uppercase tracking-wider text-white/30 mb-2">
                   Services ({env.services.length})
                 </p>
                 <div className="space-y-2">
@@ -488,11 +488,11 @@ export default function EnvironmentsPage() {
                       key={svc.name}
                       className="flex items-center justify-between"
                     >
-                      <span className="text-[11px] text-amber-100/60">
+                      <span className="text-[11px] text-white/50">
                         {svc.name}
                       </span>
                       <div className="flex items-center gap-1.5">
-                        <span className="text-[9px] text-amber-100/30">
+                        <span className="text-[9px] text-white/20">
                           {STATUS_CONFIG[svc.status].label}
                         </span>
                         <span
@@ -520,19 +520,19 @@ export default function EnvironmentsPage() {
       </div>
 
       {/* ---- Recent Deployments Table ---- */}
-      <section className="rounded-3xl border border-white/10 bg-black/60 p-6 backdrop-blur-2xl">
+      <section className="rounded-3xl border border-wireframe-stroke bg-black/60 p-6 backdrop-blur-2xl">
         <div className="flex items-center justify-between mb-1">
-          <h2 className="text-sm font-semibold uppercase tracking-widest text-amber-200/90 font-display">
+          <h2 className="text-sm font-semibold uppercase tracking-widest text-white/80 font-display">
             Recent Deployments
           </h2>
-          <Activity size={16} className="text-amber-400/40" />
+          <Activity size={16} className="text-gold/40" />
         </div>
-        <p className="text-[0.65rem] text-amber-100/40 uppercase tracking-wider mb-4">
+        <p className="text-[0.65rem] text-white/30 uppercase tracking-wider mb-4">
           Latest promotion and deployment activity
         </p>
 
         {/* Table Header */}
-        <div className="hidden sm:grid grid-cols-12 gap-4 px-4 py-2 text-[10px] uppercase tracking-wider text-amber-100/30 border-b border-white/5">
+        <div className="hidden sm:grid grid-cols-12 gap-4 px-4 py-2 text-[10px] uppercase tracking-wider text-white/20 border-b border-wireframe-stroke">
           <span className="col-span-1">Status</span>
           <span className="col-span-2">Version</span>
           <span className="col-span-2">Environment</span>
@@ -564,35 +564,35 @@ export default function EnvironmentsPage() {
 
                 {/* Version */}
                 <div className="col-span-2 flex items-center">
-                  <span className="rounded-full border border-amber-400/20 bg-amber-400/5 px-2 py-0.5 text-[10px] font-mono text-amber-300">
+                  <span className="rounded-full border border-gold/20 bg-gold/10 px-2 py-0.5 text-[10px] font-mono text-gold">
                     {dep.version}
                   </span>
                 </div>
 
                 {/* Environment */}
                 <div className="col-span-2 flex items-center">
-                  <span className="text-xs text-amber-100/60">
+                  <span className="text-xs text-white/50">
                     {dep.environment}
                   </span>
                 </div>
 
                 {/* Message */}
                 <div className="col-span-3 flex items-center">
-                  <span className="text-xs text-amber-100/50 truncate">
+                  <span className="text-xs text-white/40 truncate">
                     {dep.message}
                   </span>
                 </div>
 
                 {/* Author */}
                 <div className="col-span-2 flex items-center">
-                  <span className="text-[11px] text-amber-200/50 font-medium">
+                  <span className="text-[11px] text-gold/50 font-medium">
                     {dep.author}
                   </span>
                 </div>
 
                 {/* Timestamp */}
                 <div className="col-span-2 flex items-center justify-end">
-                  <span className="text-[10px] text-amber-100/30 font-mono">
+                  <span className="text-[10px] text-white/20 font-mono">
                     {formatDate(dep.timestamp)}
                   </span>
                 </div>

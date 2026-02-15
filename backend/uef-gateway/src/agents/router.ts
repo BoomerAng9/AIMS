@@ -3,18 +3,22 @@
  *
  * Maps ACP intents to the right agent (or agent team) and runs the task.
  *
- * Routing strategy:
- *   CHAT             → Marketer_Ang (conversational) + Quality_Ang (verify)
- *   BUILD_PLUG       → ChickenHawk (pipeline) orchestrating Engineer_Ang
- *   RESEARCH         → Analyst_Ang (primary) + Quality_Ang (verify)
- *   AGENTIC_WORKFLOW → ChickenHawk (full pipeline, multi-agent)
+ * Routing strategy (Boomer_Angs direct, Chicken Hawk + Lil_Hawks execute):
+ *   CHAT             → Marketer_Ang (director) + Test_Ang/Quality_Ang (verify)
+ *   BUILD_PLUG       → Code_Ang/Engineer_Ang (director) + Chicken Hawk (executor) + Test_Ang/Quality_Ang (verify)
+ *   RESEARCH         → Research_Ang/Analyst_Ang (director) + Test_Ang/Quality_Ang (verify)
+ *   AGENTIC_WORKFLOW → Chicken Hawk (executor, multi-step pipeline under Boomer_Ang oversight)
  *   ESTIMATE_ONLY    → No agent execution (LUC handles it)
+ *
+ * Agent names follow [Function]_Ang convention per Platform Directive.
+ * See pmo/persona-catalog.ts DIRECTIVE_AGENT_ALIASES for name mapping.
  */
 
 import { v4 as uuidv4 } from 'uuid';
 import logger from '../logger';
 import { registry } from './registry';
 import { AgentTaskInput, AgentTaskOutput, AgentId } from './types';
+import { scoreAndAudit } from '../acheevy/execution-engine';
 
 export interface RouterResult {
   executed: boolean;
@@ -57,7 +61,7 @@ export async function routeToAgents(
 
     case 'BUILD_PLUG': {
       // Build: Chicken Hawk orchestrates the full pipeline
-      logger.info({ reqId }, '[Router] BUILD_PLUG → ChickenHawk pipeline');
+      logger.info({ reqId }, '[Router] BUILD_PLUG → Chicken Hawk pipeline');
       const hawk = registry.get('chicken-hawk');
       if (hawk) {
         const result = await hawk.execute(baseInput);
@@ -99,7 +103,7 @@ export async function routeToAgents(
 
     case 'AGENTIC_WORKFLOW': {
       // Full workflow: Chicken Hawk runs entire multi-agent pipeline
-      logger.info({ reqId }, '[Router] AGENTIC_WORKFLOW → ChickenHawk multi-agent pipeline');
+      logger.info({ reqId }, '[Router] AGENTIC_WORKFLOW → Chicken Hawk multi-agent pipeline');
       const hawk = registry.get('chicken-hawk');
       if (hawk) {
         const result = await hawk.execute(baseInput);
@@ -110,6 +114,22 @@ export async function routeToAgents(
 
     default: {
       logger.warn({ reqId, intent }, '[Router] Unknown intent — no agent dispatch');
+    }
+  }
+
+  // Bench scoring: ALL team members are scored after execution
+  // Efficiency tracking applies to Boomer_Angs, Chicken Hawk, and Lil_Hawks alike
+  for (const output of outputs) {
+    try {
+      await scoreAndAudit(
+        output,
+        output.agentId,
+        'router-dispatch',
+        'system',
+        reqId,
+      );
+    } catch (scoreErr) {
+      logger.warn({ reqId, agentId: output.agentId, err: scoreErr }, '[Router] Bench scoring failed (non-blocking)');
     }
   }
 

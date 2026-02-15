@@ -1,4 +1,5 @@
 version: '3.8'
+name: aims
 
 services:
   # ---------------------------------------------------------------------------
@@ -37,7 +38,7 @@ services:
       - NODE_ENV=production
       - CORS_ORIGIN=http://localhost:3000,http://frontend:3000
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/health"]
+      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3001/health',r=>{process.exit(r.statusCode===200?0:1)}).on('error',()=>process.exit(1))"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -47,32 +48,39 @@ services:
       - aims-network
 
   # ---------------------------------------------------------------------------
-  # Layer 3: Agents & Tools (STUBBED FOR BOOTSTRAP)
+  # Layer 3: II Agents & Automation
+  # Activate with: docker compose --profile ii-agents --profile n8n up -d
   # ---------------------------------------------------------------------------
+  agent-zero:
+    image: frdel/agent-zero-run:latest
+    ports:
+      - "50001:80"
+    environment:
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+    volumes:
+      - agent-zero-data:/app/work_dir
+    networks:
+      - aims-network
+    profiles:
+      - ii-agents
 
-  # agent-zero:
-  #   image: agent-zero:latest
-  #   environment:
-  #     - LLM_API_KEY=${LLM_API_KEY}
-  #   networks:
-  #     - aims-network
+  n8n:
+    image: n8nio/n8n:latest
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=false
+      - WEBHOOK_URL=http://localhost:5678
+    volumes:
+      - n8n-data:/home/node/.n8n
+    networks:
+      - aims-network
+    profiles:
+      - n8n
 
-  # openclaw:
-  #   image: openclaw:latest
-  #   networks:
-  #     - aims-network
-
-  # chicken-hawk:
-  #   image: chicken-hawk-service:latest
-  #   networks:
-  #     - aims-network
-
-  # n8n:
-  #   image: n8nio/n8n
-  #   ports:
-  #     - "5678:5678"
-  #   networks:
-  #     - aims-network
+volumes:
+  agent-zero-data:
+  n8n-data:
 
 networks:
   aims-network:

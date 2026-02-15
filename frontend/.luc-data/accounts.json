@@ -1,0 +1,74 @@
+{
+  "default-user": {
+    "userId": "default-user",
+    "planId": "starter",
+    "planName": "Starter",
+    "quotas": {
+      "brave_searches": {
+        "limit": 1000,
+        "used": 347,
+        "overage": 0,
+        "lastUpdated": "2026-02-09T14:22:31.000Z"
+      },
+      "elevenlabs_chars": {
+        "limit": 100000,
+        "used": 24850,
+        "overage": 0,
+        "lastUpdated": "2026-02-09T12:45:10.000Z"
+      },
+      "container_hours": {
+        "limit": 10,
+        "used": 3.7,
+        "overage": 0,
+        "lastUpdated": "2026-02-09T13:30:00.000Z"
+      },
+      "n8n_executions": {
+        "limit": 500,
+        "used": 182,
+        "overage": 0,
+        "lastUpdated": "2026-02-09T14:10:00.000Z"
+      },
+      "storage_gb": {
+        "limit": 10,
+        "used": 2.4,
+        "overage": 0,
+        "lastUpdated": "2026-02-08T20:00:00.000Z"
+      },
+      "api_calls": {
+        "limit": 10000,
+        "used": 4215,
+        "overage": 0,
+        "lastUpdated": "2026-02-09T14:28:00.000Z"
+      },
+      "openrouter_tokens": {
+        "limit": 1000,
+        "used": 812,
+        "overage": 0,
+        "lastUpdated": "2026-02-09T14:15:00.000Z"
+      },
+      "vision_analyses": {
+        "limit": 200,
+        "used": 45,
+        "overage": 0,
+        "lastUpdated": "2026-02-09T10:00:00.000Z"
+      },
+      "code_generations": {
+        "limit": 100,
+        "used": 67,
+        "overage": 0,
+        "lastUpdated": "2026-02-09T13:55:00.000Z"
+      },
+      "embeddings": {
+        "limit": 500,
+        "used": 128,
+        "overage": 0,
+        "lastUpdated": "2026-02-09T11:30:00.000Z"
+      }
+    },
+    "totalOverageCost": 0,
+    "billingCycleStart": "2026-02-01T00:00:00.000Z",
+    "billingCycleEnd": "2026-03-01T00:00:00.000Z",
+    "createdAt": "2026-01-15T08:00:00.000Z",
+    "updatedAt": "2026-02-09T14:28:00.000Z"
+  }
+}

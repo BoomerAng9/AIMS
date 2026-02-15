@@ -1,0 +1,24 @@
+{
+  "service": "aims-discord-webhook",
+  "endpoint": "/api/discord/webhook",
+  "status": "implemented",
+  "features": {
+    "interaction_verification": "POST with type=1 → returns { type: 1 } (Discord ping/pong)",
+    "inbound_messages": "Parses Discord message event (author.id, channel_id, content)",
+    "account_linking": "User sends !link → receives 6-char code → claims in dashboard",
+    "help_command": "!help → shows available commands",
+    "outbound_replies": "Uses Discord REST API (discord.com/api/v10/channels/<ID>/messages)",
+    "gateway_routing": "Linked messages forward to /api/social/gateway as NormalizedMessage",
+    "bot_filter": "Ignores messages from bots (author.bot === true)"
+  },
+  "required_env": [
+    "DISCORD_BOT_TOKEN",
+    "DISCORD_PUBLIC_KEY"
+  ],
+  "smoke_test": {
+    "GET_health": "Returns { service, status } — shows configured/missing_token",
+    "POST_ping": "Discord type=1 verification → returns { type: 1 }",
+    "POST_link": "Simulated !link message → generates code → sends via Discord API",
+    "POST_message": "Simulated linked user message → forwards to /api/social/gateway"
+  }
+}

@@ -1,0 +1,224 @@
+# =============================================================================
+# A.I.M.S. — Google Cloud Build Pipeline (Hybrid Deployment)
+# =============================================================================
+# Triggers: Push to main branch (configured in GCP Console or via gcloud)
+#
+# Hybrid architecture:
+#   Cloud Run (stateless):  frontend, uef-gateway — auto-scaling, managed
+#   VPS (stateful):         Redis, n8n, Agent Bridge, agents
+#
+# What it does:
+#   1. Install + lint + test backend
+#   2. Install + lint + build frontend
+#   3. Build Docker images (gateway, frontend, agents)
+#   4. Push to Artifact Registry
+#   5. Deploy stateless services to Cloud Run
+#   6. Optionally trigger VPS deployment via SSH
+#
+# Setup:
+#   gcloud builds submit --config=cloudbuild.yaml
+#   — OR —
+#   Connect GitHub repo in Cloud Build Triggers UI
+# =============================================================================
+
+steps:
+  # ── Step 1: Backend — Install, Lint, Build, Test ──
+  - id: backend-install
+    name: node:20-alpine
+    dir: backend/uef-gateway
+    entrypoint: npm
+    args: ['ci']
+
+  - id: backend-lint
+    name: node:20-alpine
+    dir: backend/uef-gateway
+    entrypoint: npm
+    args: ['run', 'lint']
+    waitFor: ['backend-install']
+
+  - id: backend-build
+    name: node:20-alpine
+    dir: backend/uef-gateway
+    entrypoint: npm
+    args: ['run', 'build']
+    waitFor: ['backend-install']
+
+  - id: backend-test
+    name: node:20-alpine
+    dir: backend/uef-gateway
+    entrypoint: npm
+    args: ['test']
+    waitFor: ['backend-build']
+
+  # ── Step 2: Frontend — Install, Lint, Build ──
+  - id: frontend-install
+    name: node:20-alpine
+    dir: frontend
+    entrypoint: npm
+    args: ['ci']
+
+  - id: frontend-lint
+    name: node:20-alpine
+    dir: frontend
+    entrypoint: npm
+    args: ['run', 'lint']
+    waitFor: ['frontend-install']
+
+  - id: frontend-build
+    name: node:20-alpine
+    dir: frontend
+    entrypoint: npm
+    args: ['run', 'build']
+    waitFor: ['frontend-install']
+
+  # ── Step 3: Build Docker Images ──
+  - id: docker-gateway
+    name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -t
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/uef-gateway:${SHORT_SHA}'
+      - -t
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/uef-gateway:latest'
+      - -f
+      - backend/uef-gateway/Dockerfile
+      - backend/uef-gateway
+    waitFor: ['backend-test']
+
+  - id: docker-frontend
+    name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -t
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/frontend:${SHORT_SHA}'
+      - -t
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/frontend:latest'
+      - -f
+      - frontend/Dockerfile
+      - frontend
+    waitFor: ['frontend-build']
+
+  # ── Step 4: Push to Artifact Registry ──
+  - id: push-gateway
+    name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - '--all-tags'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/uef-gateway'
+    waitFor: ['docker-gateway']
+
+  - id: push-frontend
+    name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - '--all-tags'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/frontend'
+    waitFor: ['docker-frontend']
+
+  # ── Step 5: Build Agent Images (for VPS deployment via Artifact Registry) ──
+  - id: docker-research-ang
+    name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -t
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/research-ang:${SHORT_SHA}'
+      - -t
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/research-ang:latest'
+      - -f
+      - backend/agents/research-ang/Dockerfile
+      - backend/agents/research-ang
+    waitFor: ['backend-install']
+
+  - id: docker-router-ang
+    name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -t
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/router-ang:${SHORT_SHA}'
+      - -t
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/router-ang:latest'
+      - -f
+      - backend/agents/router-ang/Dockerfile
+      - backend/agents/router-ang
+    waitFor: ['backend-install']
+
+  - id: push-research-ang
+    name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - '--all-tags'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/research-ang'
+    waitFor: ['docker-research-ang']
+
+  - id: push-router-ang
+    name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - '--all-tags'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/router-ang'
+    waitFor: ['docker-router-ang']
+
+  # ── Step 6: Deploy Stateless Services to Cloud Run ──
+  # These connect back to VPS stateful services via _VPS_HOST
+  - id: deploy-gateway
+    name: gcr.io/cloud-builders/gcloud
+    args:
+      - run
+      - deploy
+      - aims-gateway
+      - --image=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/uef-gateway:${SHORT_SHA}
+      - --region=${_REGION}
+      - --platform=managed
+      - --port=3001
+      - --memory=512Mi
+      - --cpu=1
+      - --min-instances=0
+      - --max-instances=3
+      - --allow-unauthenticated
+      - --set-env-vars=NODE_ENV=production,PORT=3001,LOG_LEVEL=info,REDIS_URL=redis://${_VPS_HOST}:6379,N8N_URL=http://${_VPS_HOST}:5678,RESEARCH_ANG_URL=http://${_VPS_HOST}:3020,ROUTER_ANG_URL=http://${_VPS_HOST}:3021
+      - --update-secrets=INTERNAL_API_KEY=INTERNAL_API_KEY:latest,OPENROUTER_API_KEY=OPENROUTER_API_KEY:latest,REDIS_PASSWORD=REDIS_PASSWORD:latest
+    waitFor: ['push-gateway']
+
+  - id: deploy-frontend
+    name: gcr.io/cloud-builders/gcloud
+    args:
+      - run
+      - deploy
+      - aims-frontend
+      - --image=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/frontend:${SHORT_SHA}
+      - --region=${_REGION}
+      - --platform=managed
+      - --port=3000
+      - --memory=512Mi
+      - --cpu=1
+      - --min-instances=0
+      - --max-instances=5
+      - --allow-unauthenticated
+      - --set-env-vars=NODE_ENV=production
+      - --update-secrets=NEXTAUTH_SECRET=NEXTAUTH_SECRET:latest,INTERNAL_API_KEY=INTERNAL_API_KEY:latest
+    waitFor: ['push-frontend']
+
+# ── Substitution Variables ──
+# Override these in your Cloud Build trigger config or via --substitutions
+substitutions:
+  _REGION: us-central1
+  _REPO: aims-docker
+  _VPS_HOST: '76.13.96.107'
+  _VPS_DOMAIN: plugmein.cloud
+
+# ── Images to push (Cloud Build auto-pushes these) ──
+images:
+  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/uef-gateway:${SHORT_SHA}'
+  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/uef-gateway:latest'
+  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/frontend:${SHORT_SHA}'
+  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/frontend:latest'
+  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/research-ang:${SHORT_SHA}'
+  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/research-ang:latest'
+  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/router-ang:${SHORT_SHA}'
+  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/router-ang:latest'
+
+# ── Build options ──
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: E2_HIGHCPU_8
+timeout: 1200s

@@ -18,7 +18,7 @@ const ICON_MAP: Record<string, React.ElementType> = {
 };
 
 const COLOR_MAP: Record<string, { bg: string; border: string; text: string; glow: string }> = {
-  amber:   { bg: "bg-amber-500/10",   border: "border-amber-500/20",   text: "text-amber-400",   glow: "shadow-[0_0_20px_rgba(245,158,11,0.15)]" },
+  amber:   { bg: "bg-gold/10",   border: "border-amber-500/20",   text: "text-gold",   glow: "shadow-[0_0_20px_rgba(245,158,11,0.15)]" },
   emerald: { bg: "bg-emerald-500/10",  border: "border-emerald-500/20", text: "text-emerald-400",  glow: "shadow-[0_0_20px_rgba(16,185,129,0.15)]" },
   blue:    { bg: "bg-blue-500/10",     border: "border-blue-500/20",    text: "text-blue-400",     glow: "shadow-[0_0_20px_rgba(59,130,246,0.15)]" },
   pink:    { bg: "bg-pink-500/10",     border: "border-pink-500/20",    text: "text-pink-400",     glow: "shadow-[0_0_20px_rgba(236,72,153,0.15)]" },
@@ -41,7 +41,7 @@ export default function PlugCatalogPage() {
         {/* Header */}
         <div className="mb-10">
           <div className="flex items-center gap-3 mb-2">
-            <Zap className="h-6 w-6 text-amber-400" />
+            <Zap className="h-6 w-6 text-gold" />
             <h1 className="text-3xl font-display text-white tracking-wide">Plug Catalog</h1>
           </div>
           <p className="text-zinc-400 max-w-2xl">
@@ -55,9 +55,9 @@ export default function PlugCatalogPage() {
           {Object.entries(TIER_LABELS).map(([key, { label, price }]) => (
             <span
               key={key}
-              className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] uppercase tracking-[0.15em] text-zinc-400"
+              className="inline-flex items-center gap-2 rounded-full border border-wireframe-stroke bg-white/5 px-3 py-1 text-[10px] uppercase tracking-[0.15em] text-zinc-400"
             >
-              {label} <span className="text-amber-400 font-display">{price}</span>
+              {label} <span className="text-gold font-display">{price}</span>
             </span>
           ))}
         </div>
@@ -77,7 +77,7 @@ export default function PlugCatalogPage() {
               >
                 {/* Priority Badge */}
                 {plug.priority === "critical" && (
-                  <div className="absolute -top-2 -right-2 px-2 py-0.5 rounded-full bg-amber-500 text-black text-[9px] font-bold uppercase tracking-wider">
+                  <div className="absolute -top-2 -right-2 px-2 py-0.5 rounded-full bg-gold text-black text-[9px] font-bold uppercase tracking-wider">
                     Priority
                   </div>
                 )}
@@ -114,7 +114,7 @@ export default function PlugCatalogPage() {
                     {plug.features.slice(0, 3).map((f) => (
                       <span
                         key={f}
-                        className="text-[10px] bg-white/5 border border-white/5 text-zinc-500 rounded px-1.5 py-0.5"
+                        className="text-[10px] bg-white/5 border border-wireframe-stroke text-zinc-500 rounded px-1.5 py-0.5"
                       >
                         {f}
                       </span>

@@ -1,0 +1,277 @@
+version: "3.8"
+name: aims
+
+# =============================================================================
+# A.I.M.S. VPS Stack — Stateful Services Only
+# =============================================================================
+# Used in HYBRID deployment mode:
+#   Cloud Run → frontend, uef-gateway (stateless, auto-scaling)
+#   VPS       → Redis, n8n, Agent Bridge, agents (stateful)
+#
+# The stateless services (frontend, uef-gateway) are deployed to Cloud Run
+# and connect back to these VPS services via the public IP / reverse proxy.
+#
+# Usage:
+#   docker compose -f infra/docker-compose.vps.yml up -d
+#   docker compose -f infra/docker-compose.vps.yml --profile tier1-agents up -d
+#   docker compose -f infra/docker-compose.vps.yml --profile n8n up -d
+# =============================================================================
+
+services:
+  # ---------------------------------------------------------------------------
+  # Reverse Proxy (nginx) — Routes traffic to VPS services AND proxies
+  # Cloud Run services when accessed via the VPS domain.
+  # ---------------------------------------------------------------------------
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - certbot-webroot:/var/www/certbot:ro
+      - certbot-certs:/etc/letsencrypt:ro
+      - nginx-conf:/etc/nginx/conf.d
+      - nginx-logs:/var/log/nginx
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://127.0.0.1:80/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: always
+    networks:
+      - aims-network
+
+  # ---------------------------------------------------------------------------
+  # Certbot (Let's Encrypt) — renewal loop
+  # ---------------------------------------------------------------------------
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - certbot-webroot:/var/www/certbot
+      - certbot-certs:/etc/letsencrypt
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do sleep 12h & wait $${!}; certbot renew --webroot -w /var/www/certbot --quiet; done'"
+    restart: unless-stopped
+    networks:
+      - aims-network
+
+  # ---------------------------------------------------------------------------
+  # Redis — State store, sessions, caching (STATEFUL)
+  # ---------------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-aims_redis_secret}
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - aims-network
+      - sandbox-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-aims_redis_secret}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  # ---------------------------------------------------------------------------
+  # Agent Bridge — Security Gateway between networks (STATEFUL)
+  # Bridges Cloud Run gateway ↔ VPS sandbox agents
+  # ---------------------------------------------------------------------------
+  agent-bridge:
+    build:
+      context: ./agent-bridge
+      dockerfile: Dockerfile
+    ports:
+      - "127.0.0.1:3010:3010"
+    environment:
+      - PORT=3010
+      - AIMS_GATEWAY_URL=${CLOUD_RUN_GATEWAY_URL:-http://uef-gateway:3001}
+      - RATE_LIMIT_REQUESTS=100
+      - RATE_LIMIT_WINDOW=60000
+      - ALLOWED_OPS=search,analyze,summarize,generate,read,write,edit,code
+      - BLOCKED_OPS=payment,transfer,purchase,checkout,buy,order,credit_card,stripe,paypal,venmo,bank,wallet,invoice,billing,charge,refund,subscription
+    networks:
+      - aims-network
+      - sandbox-network
+    restart: unless-stopped
+    user: "1000:1000"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:3010/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+
+  # ---------------------------------------------------------------------------
+  # Research_Ang — Deep Research Agent (A2A Container)
+  # ---------------------------------------------------------------------------
+  research-ang:
+    build:
+      context: ../backend/agents/research-ang
+      dockerfile: Dockerfile
+    expose:
+      - "3020"
+    ports:
+      - "127.0.0.1:3020:3020"
+    environment:
+      - PORT=3020
+      - NODE_ENV=production
+      - UEF_GATEWAY_URL=${CLOUD_RUN_GATEWAY_URL:-http://uef-gateway:3001}
+      - AGENT_URL=http://research-ang:3020
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3020/health',r=>{process.exit(r.statusCode===200?0:1)}).on('error',()=>process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
+    networks:
+      - aims-network
+    user: "1000:1000"
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+    profiles:
+      - tier1-agents
+
+  # ---------------------------------------------------------------------------
+  # Router_Ang — Smart Routing Agent (A2A Container)
+  # ---------------------------------------------------------------------------
+  router-ang:
+    build:
+      context: ../backend/agents/router-ang
+      dockerfile: Dockerfile
+    expose:
+      - "3021"
+    ports:
+      - "127.0.0.1:3021:3021"
+    environment:
+      - PORT=3021
+      - NODE_ENV=production
+      - UEF_GATEWAY_URL=${CLOUD_RUN_GATEWAY_URL:-http://uef-gateway:3001}
+      - AGENT_URL=http://router-ang:3021
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3021/health',r=>{process.exit(r.statusCode===200?0:1)}).on('error',()=>process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
+    networks:
+      - aims-network
+    user: "1000:1000"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+    profiles:
+      - tier1-agents
+
+  # ---------------------------------------------------------------------------
+  # n8n — Workflow Automation (STATEFUL)
+  # ---------------------------------------------------------------------------
+  n8n:
+    image: n8nio/n8n:latest
+    expose:
+      - "5678"
+    ports:
+      - "127.0.0.1:5678:5678"
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=${N8N_AUTH_USER:-aims}
+      - N8N_BASIC_AUTH_PASSWORD=${N8N_AUTH_PASSWORD}
+      - N8N_HOST=0.0.0.0
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - WEBHOOK_URL=${N8N_WEBHOOK_URL:-http://n8n:5678}
+      - N8N_HIRING_BANNER_ENABLED=false
+      - N8N_DIAGNOSTICS_ENABLED=false
+    volumes:
+      - n8n-data:/home/node/.n8n
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5678/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    restart: unless-stopped
+    user: "1000:1000"
+    networks:
+      - aims-network
+      - sandbox-network
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+    profiles:
+      - n8n
+
+  # ---------------------------------------------------------------------------
+  # Circuit Metrics — Service Health Dashboard
+  # ---------------------------------------------------------------------------
+  circuit-metrics:
+    build:
+      context: ./circuit-metrics
+      dockerfile: Dockerfile
+    expose:
+      - "9090"
+    environment:
+      - PORT=9090
+      - UEF_GATEWAY_URL=${CLOUD_RUN_GATEWAY_URL:-http://uef-gateway:3001}
+      - HOUSE_OF_ANG_URL=${CLOUD_RUN_GATEWAY_URL:-http://uef-gateway:3001}
+      - ACHEEVY_URL=${CLOUD_RUN_GATEWAY_URL:-http://uef-gateway:3001}
+      - AGENT_BRIDGE_URL=http://agent-bridge:3010
+    depends_on:
+      agent-bridge:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:9090/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - aims-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 128M
+
+volumes:
+  certbot-webroot:
+  certbot-certs:
+  nginx-conf:
+  nginx-logs:
+  redis-data:
+  n8n-data:
+
+networks:
+  aims-network:
+    driver: bridge
+  sandbox-network:
+    driver: bridge
+    internal: true

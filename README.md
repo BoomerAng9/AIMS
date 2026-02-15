@@ -23,21 +23,21 @@ A.I.M.S. (AI Managed Solutions) is a professional support platform that uses spe
 ### Governance Model
 
 ```
-User → ACHEEVY → Boomer_Ang → Chicken_Hawk → Squad → Lil_Hawks
+User → ACHEEVY → Boomer_Ang → Chicken Hawk → Squad → Lil_Hawks
 ```
 
 1. **ACHEEVY** approves plan and presents to user
 2. **Boomer_Ang** validates scope against DSP limits
-3. **Contract** issued to Chicken_Hawk with ShiftId
-4. **Chicken_Hawk** spawns Squad with Lil_Hawks
+3. **Contract** issued to Chicken Hawk with ShiftId
+4. **Chicken Hawk** spawns Squad with Lil_Hawks
 5. **Lil_Hawks** execute and report (logs only)
 6. **ACHEEVY** verifies receipt and closes
 
 ### Key Features
 
 - **ACHEEVY**: Voice-first AI assistant that orchestrates complex tasks
-- **Deploy Platform**: "Boomer_Angs on the Port" - containerized execution with Chicken_Hawk engine
-- **Lil_Hawks**: Specialized worker bots with career progression (Hatchling → Chicken_Hawk)
+- **Deploy Platform**: "Boomer_Angs on the Port" - containerized execution with Chicken Hawk engine
+- **Lil_Hawks**: Specialized worker bots with career progression (Hatchling → Chicken Hawk)
 - **Live Ops Theater**: Watch-only view of operations in progress
 - **Circuit Box**: Central hub connecting ACHEEVY to execution layer
 - **LUC (Live Usage Calculator)**: Real-time quota tracking and cost management
@@ -79,8 +79,8 @@ The Deploy Platform ("Boomer_Angs on the Port") is A.I.M.S.'s containerized exec
 | Apprentice | Learning, limited solo tasks |
 | Journeyman | Trusted independent worker |
 | Foreman | Can mentor, high privilege |
-| Chicken_Hawk_Candidate | Promotion track |
-| Chicken_Hawk | Full engine authority |
+| Chicken Hawk_Candidate | Promotion track |
+| Chicken Hawk | Full engine authority |
 
 See [DEPLOY_PLATFORM.md](docs/DEPLOY_PLATFORM.md) for complete documentation.
 
@@ -134,7 +134,6 @@ infra/
     lore/                    # Workforce & Y-ISO standards
     contracts/               # DSP schemas
     registry/                # Capability registry
-  openclaw-sandbox/          # Chicken_Hawk sandbox config
 ```
 
 ### Local Development
@@ -185,4 +184,4 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 **A.I.M.S. - Build Your Future. Empower Your Vision.**
 
-*Powered by ACHEEVY, Chicken_Hawk, and Lil_Hawk workers*
+*Powered by ACHEEVY, Chicken Hawk, and Lil_Hawk workers*

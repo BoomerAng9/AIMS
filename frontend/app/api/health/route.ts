@@ -44,13 +44,10 @@ async function checkService(name: string, url: string): Promise<ServiceHealth> {
 export async function GET() {
   const startTime = Date.now();
 
-  // Check internal services (in production these would be real endpoints)
+  // Check downstream services (not self — responding to this request proves frontend is alive)
   const services: ServiceHealth[] = [];
 
-  // In production, check actual service endpoints
-  const serviceChecks = [
-    { name: 'Frontend', url: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000' },
-  ];
+  const serviceChecks: { name: string; url: string }[] = [];
 
   // Only check external services if URLs are configured
   if (process.env.UEF_GATEWAY_URL) {
@@ -58,9 +55,6 @@ export async function GET() {
   }
   if (process.env.ACHEEVY_URL) {
     serviceChecks.push({ name: 'ACHEEVY', url: `${process.env.ACHEEVY_URL}/health` });
-  }
-  if (process.env.OPENCLAW_URL) {
-    serviceChecks.push({ name: 'OpenClaw', url: `${process.env.OPENCLAW_URL}/health` });
   }
   if (process.env.AGENT_BRIDGE_URL) {
     serviceChecks.push({ name: 'Agent Bridge', url: `${process.env.AGENT_BRIDGE_URL}/health` });
@@ -88,7 +82,8 @@ export async function GET() {
     services,
   };
 
-  const statusCode = overallStatus === 'healthy' ? 200 : overallStatus === 'degraded' ? 200 : 503;
-
-  return NextResponse.json(response, { status: statusCode });
+  // Always return 200 for liveness — this endpoint responding proves the frontend
+  // is alive. Downstream service status is informational (in the response body).
+  // Docker/nginx healthchecks depend on this returning 200.
+  return NextResponse.json(response, { status: 200 });
 }

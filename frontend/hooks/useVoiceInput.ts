@@ -170,7 +170,7 @@ export function useVoiceInput(options: UseVoiceInputOptions = {}): UseVoiceInput
             formData.append('language', config.language);
           }
 
-          const response = await fetch('/api/transcribe', {
+          const response = await fetch('/api/voice/stt', {
             method: 'POST',
             body: formData,
           });

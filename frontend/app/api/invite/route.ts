@@ -1,4 +1,3 @@
-import { Resend } from 'resend';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
@@ -8,6 +7,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'RESEND_API_KEY not configured' }, { status: 503 });
     }
 
+    // Dynamic import to avoid build-time resolution of broken htmlparser2/entities chain
+    const { Resend } = await import('resend');
     const resend = new Resend(apiKey);
     const { email } = await request.json();
 
@@ -16,7 +17,7 @@ export async function POST(request: Request) {
     }
 
     const data = await resend.emails.send({
-      from: 'A.I.M.S. <onboarding@resend.dev>', // Update this if you have a verified domain
+      from: 'A.I.M.S. <onboarding@resend.dev>',
       to: [email],
       subject: 'Welcome to the A.I.M.S. Orchestration Loop',
       html: `

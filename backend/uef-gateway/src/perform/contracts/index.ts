@@ -202,3 +202,104 @@ export interface PipelineOutput {
   pipelineLog: string[];
   totalCost: { tokens: number; usd: number };
 }
+
+// ---------------------------------------------------------------------------
+// Gridiron Sandbox contracts — adversarial scouting + GROC+Luke grading
+// ---------------------------------------------------------------------------
+
+export interface ProspectTarget {
+  name: string;
+  pool: 'HIGH_SCHOOL' | 'COLLEGE';
+  source: string;
+  position?: string;
+  school?: string;
+  state?: string;
+  classYear?: number;
+}
+
+export interface DebateArgument {
+  hawk: 'Lil_Bull_Hawk' | 'Lil_Bear_Hawk';
+  stance: 'UNDERRATED' | 'OVERRATED';
+  points: string[];
+  statsCited: Record<string, string | number>[];
+  confidence: number;
+}
+
+export interface ScoutingDebateLog {
+  debateId: string;
+  prospect: ProspectTarget;
+  timestamp: string;
+  arguments: DebateArgument[];
+  rawData: {
+    braveResults: number;
+    firecrawlPages: number;
+    statsFound: number;
+  };
+  status: 'COMPLETE' | 'PARTIAL' | 'FAILED';
+}
+
+/** GROC = Game performance, Raw athletics, Overall production, Competition level */
+export interface GROCScore {
+  gamePerformance: number;
+  rawAthletics: number;
+  overallProduction: number;
+  competitionLevel: number;
+}
+
+/** Luke = Leadership, Upside, Known concerns, Evaluator confidence */
+export interface LukeAdjustment {
+  leadershipMultiplier: number;
+  upsideCeiling: number;
+  knownConcerns: string[];
+  evaluatorConfidence: number;
+}
+
+export interface GradingDossier {
+  dossierId: string;
+  prospectName: string;
+  pool: string;
+  grocScore: GROCScore;
+  lukeAdjustment: LukeAdjustment;
+  preliminaryGrade: number;
+  tier: 'ELITE' | 'BLUE_CHIP' | 'PROSPECT' | 'SLEEPER' | 'DEVELOPMENTAL';
+  flaggedForFilm: boolean;
+  debateWinner: 'BULL' | 'BEAR' | 'SPLIT';
+  validatedStats: Record<string, string | number>[];
+}
+
+export interface PerFormRanking {
+  rank: number;
+  prospectName: string;
+  position: string;
+  pool: string;
+  grade: number;
+  tier: string;
+  trend: 'UP' | 'DOWN' | 'STEADY' | 'NEW';
+  previousRank?: number;
+  lastUpdated: string;
+}
+
+export interface FilmAnalysisRequest {
+  requestId: string;
+  prospectName: string;
+  videoUrl: string;
+  clickCoords: [number, number][];
+  frameRate?: number;
+  analysisType: 'FULL_GAME' | 'HIGHLIGHT_REEL' | 'SINGLE_PLAY';
+}
+
+export interface FilmAnalysisMetrics {
+  speedBursts: number;
+  avgSeparationYards: number;
+  routeSharpness: number;
+  playRecognition: number;
+}
+
+export interface ContentOutput {
+  type: 'BLOG' | 'PODCAST' | 'RANKING_UPDATE';
+  prospectName: string;
+  title: string;
+  content: string;
+  generatedAt: string;
+  generatedBy: string;
+}

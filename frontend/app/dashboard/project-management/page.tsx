@@ -65,6 +65,30 @@ const PMO_OFFICES: PMOOffice[] = [
     kpis: ["Publishing cadence", "Engagement rate", "Audience growth", "Content quality"],
     status: "ACTIVE",
   },
+  {
+    id: "hr-office", code: "HR OFFICE", fullName: "Chief Human Resources Office",
+    mission: "Manage talent acquisition, team culture, performance reviews, and agent workforce planning.",
+    director: { name: "Boomer_CHRO", title: "Chief Human Resources Officer", scope: "Talent strategy, workforce planning, agent onboarding" },
+    departmentalAgent: { name: "Talent Agent", role: "Recruitment automation, skill matching, onboarding workflows" },
+    kpis: ["Agent utilization", "Onboarding speed", "Skill coverage", "Team satisfaction"],
+    status: "ACTIVE",
+  },
+  {
+    id: "sales-office", code: "SALES OFFICE", fullName: "Chief Sales Office",
+    mission: "Drive revenue growth, manage sales pipelines, and optimize conversion funnels.",
+    director: { name: "Boomer_CSO", title: "Chief Sales Officer", scope: "Revenue targets, pipeline management, deal closing" },
+    departmentalAgent: { name: "Deal Closer Agent", role: "Lead qualification, proposal generation, follow-up automation" },
+    kpis: ["Revenue growth", "Pipeline velocity", "Conversion rate", "Deal size"],
+    status: "ACTIVE",
+  },
+  {
+    id: "digital-transformation-office", code: "DIGITAL TRANSFORMATION", fullName: "Chief Digital Transformation Office",
+    mission: "Lead innovation initiatives, digital strategy, and modernization of legacy processes.",
+    director: { name: "Boomer_CDTO", title: "Chief Digital Transformation Officer", scope: "Innovation strategy, process automation, digital roadmap" },
+    departmentalAgent: { name: "Innovation Agent", role: "Process analysis, automation opportunities, technology scouting" },
+    kpis: ["Automation rate", "Process efficiency", "Innovation pipeline", "Digital adoption"],
+    status: "ACTIVE",
+  },
 ];
 
 /* ------------------------------------------------------------------ */
@@ -90,18 +114,18 @@ export default function ProjectManagementPage() {
       {/* ---- Header ---- */}
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <p className="text-[10px] uppercase tracking-[0.3em] text-amber-200/50 mb-1">
+          <p className="text-[10px] uppercase tracking-[0.3em] text-gold/50 mb-1">
             Governance &middot; Strategy &middot; Execution
           </p>
-          <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-amber-50 font-display">
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-white font-display">
             PROJECT MANAGEMENT
           </h1>
-          <p className="text-sm text-amber-100/60 mt-2 max-w-lg">
-            PMO Offices &mdash; 6 C-Suite Boomer_Ang directors governing all operations.
+          <p className="text-sm text-white/50 mt-2 max-w-lg">
+            PMO Offices &mdash; 9 C-Suite Boomer_Ang directors governing all operations.
             Every request flows through the command chain before reaching execution.
           </p>
         </div>
-        <div className="flex items-center gap-2 rounded-full border border-white/5 bg-black/60 px-4 py-2">
+        <div className="flex items-center gap-2 rounded-full border border-wireframe-stroke bg-black/60 px-4 py-2">
           <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
           <span className="text-[10px] uppercase font-bold text-emerald-400/80 tracking-widest">
             {PMO_OFFICES.length} OFFICES ONLINE
@@ -114,15 +138,15 @@ export default function ProjectManagementPage() {
         {PMO_OFFICES.map((office) => (
           <div
             key={office.id}
-            className="group relative overflow-hidden rounded-3xl border border-white/10 bg-black/60 p-6 backdrop-blur-2xl transition-all hover:border-amber-300/30 hover:bg-black/80"
+            className="group relative overflow-hidden rounded-3xl border border-wireframe-stroke bg-black/60 p-6 backdrop-blur-2xl transition-all hover:border-gold/20 hover:bg-black/80"
           >
             {/* Office Header */}
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-semibold text-amber-50 font-display">
+                <h3 className="text-lg font-semibold text-white font-display">
                   {office.code}
                 </h3>
-                <p className="text-[10px] uppercase tracking-wider text-amber-100/40 mt-0.5">
+                <p className="text-[10px] uppercase tracking-wider text-white/30 mt-0.5">
                   {office.fullName}
                 </p>
               </div>
@@ -135,38 +159,38 @@ export default function ProjectManagementPage() {
             </div>
 
             {/* Mission */}
-            <p className="mt-3 text-xs text-amber-100/60 leading-relaxed">
+            <p className="mt-3 text-xs text-white/50 leading-relaxed">
               {office.mission}
             </p>
 
             {/* Director */}
             <div className="mt-4 rounded-xl bg-white/5 p-3">
-              <p className="text-[10px] uppercase tracking-widest text-amber-200/90 font-semibold">
+              <p className="text-[10px] uppercase tracking-widest text-white/80 font-semibold">
                 Director
               </p>
-              <p className="text-sm font-medium text-amber-50 mt-1 font-mono">
+              <p className="text-sm font-medium text-white mt-1 font-mono">
                 {office.director.name}
               </p>
-              <p className="text-[10px] text-amber-100/50 mt-0.5">
+              <p className="text-[10px] text-white/40 mt-0.5">
                 {office.director.title}
               </p>
-              <p className="text-[10px] text-amber-100/40 italic mt-0.5">
+              <p className="text-[10px] text-white/30 italic mt-0.5">
                 {office.director.scope}
               </p>
             </div>
 
             {/* Departmental Agent */}
             <div className="mt-3">
-              <p className="text-[10px] uppercase tracking-widest text-amber-200/90 font-semibold mb-2">
+              <p className="text-[10px] uppercase tracking-widest text-white/80 font-semibold mb-2">
                 Departmental Agent
               </p>
-              <div className="flex items-center justify-between rounded-lg border border-white/5 bg-black/40 px-3 py-2">
+              <div className="flex items-center justify-between rounded-lg border border-wireframe-stroke bg-black/40 px-3 py-2">
                 <div>
-                  <p className="text-xs font-medium text-amber-50 font-mono">
+                  <p className="text-xs font-medium text-white font-mono">
                     {office.departmentalAgent.name}
                   </p>
                 </div>
-                <p className="text-[9px] text-amber-100/30 max-w-[160px] text-right">
+                <p className="text-[9px] text-white/20 max-w-[160px] text-right">
                   {office.departmentalAgent.role}
                 </p>
               </div>
@@ -177,7 +201,7 @@ export default function ProjectManagementPage() {
               {office.kpis.map((kpi) => (
                 <span
                   key={kpi}
-                  className="rounded-full border border-white/5 bg-white/5 px-2.5 py-1 text-[9px] text-amber-100/60 uppercase tracking-wider"
+                  className="rounded-full border border-wireframe-stroke bg-white/5 px-2.5 py-1 text-[9px] text-white/50 uppercase tracking-wider"
                 >
                   {kpi}
                 </span>
@@ -188,23 +212,23 @@ export default function ProjectManagementPage() {
       </div>
 
       {/* ---- ACHEEVY Command Chain Banner ---- */}
-      <section className="rounded-3xl border border-amber-300/20 bg-gradient-to-r from-amber-400/10 to-transparent p-1 transition-all">
+      <section className="rounded-3xl border border-gold/20 bg-gradient-to-r from-gold/10 to-transparent p-1 transition-all">
         <div className="rounded-[21px] bg-black/80 p-6 md:p-8">
-          <h2 className="text-sm font-semibold uppercase tracking-widest text-amber-200/90 font-display">
+          <h2 className="text-sm font-semibold uppercase tracking-widest text-white/80 font-display">
             ACHEEVY Command Chain
           </h2>
-          <p className="mt-1 text-[10px] text-amber-100/40 uppercase tracking-wider">
+          <p className="mt-1 text-[10px] text-white/30 uppercase tracking-wider">
             Request lifecycle from user intent to execution
           </p>
 
           <div className="mt-6 flex flex-wrap items-center justify-center gap-2 md:gap-0">
             {COMMAND_CHAIN.map((step, i) => (
               <React.Fragment key={step}>
-                <div className="flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-xs font-semibold text-amber-50 font-mono">
+                <div className="flex items-center justify-center rounded-xl border border-wireframe-stroke bg-white/5 px-4 py-2.5 text-xs font-semibold text-white font-mono">
                   {step}
                 </div>
                 {i < COMMAND_CHAIN.length - 1 && (
-                  <span className="hidden md:block text-amber-300/60 mx-2 text-lg select-none">
+                  <span className="hidden md:block text-gold mx-2 text-lg select-none">
                     &rarr;
                   </span>
                 )}
@@ -212,7 +236,7 @@ export default function ProjectManagementPage() {
             ))}
           </div>
 
-          <p className="mt-5 text-center text-[10px] text-amber-100/30 italic">
+          <p className="mt-5 text-center text-[10px] text-white/20 italic">
             Every request is routed through the governance layer before reaching execution agents.
           </p>
         </div>

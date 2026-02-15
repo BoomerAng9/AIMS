@@ -23,14 +23,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const navItems = [
   { href: '/dashboard', label: 'Overview' },
-  { href: '/dashboard/acheevy', label: 'ACHEEVY' },
-  { href: '/dashboard/plan', label: 'Plan' },
-  { href: '/dashboard/ai-plugs', label: 'aiPlugs' },
-  { href: '/dashboard/boomerangs', label: 'BoomerAngs' },
-  { href: '/dashboard/lab', label: 'Lab' },
-  { href: '/dashboard/luc', label: 'LUC Usage' },
+  { href: '/dashboard/deploy-dock', label: 'Deploy Dock' },
+  { href: '/dashboard/plugs', label: 'aiPlugs' },
+  { href: '/dashboard/house-of-ang', label: 'House of Ang' },
   { href: '/dashboard/circuit-box', label: 'Circuit Box' },
-  { href: '/dashboard/settings', label: 'Settings' },
 ];
 
 // ─────────────────────────────────────────────────────────────
@@ -67,10 +63,10 @@ export function MinimalSidebar() {
         {/* Logo */}
         <div className="p-6">
           <Link href="/dashboard" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/20">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-gold to-gold flex items-center justify-center shadow-lg shadow-gold/20">
               <span className="text-sm font-bold text-black">A</span>
             </div>
-            <span className="text-base font-semibold text-amber-50 tracking-tight">A.I.M.S.</span>
+            <span className="text-base font-semibold text-white tracking-tight">A.I.M.S.</span>
           </Link>
         </div>
 
@@ -91,8 +87,8 @@ export function MinimalSidebar() {
                     px-3 py-2.5 rounded-lg text-[15px] font-normal
                     transition-colors duration-200
                     ${isActive
-                      ? 'text-amber-50'
-                      : 'text-gray-400 hover:text-amber-100'
+                      ? 'text-white'
+                      : 'text-gray-400 hover:text-white'
                     }
                   `}
                   whileHover={{ x: 2 }}
@@ -116,11 +112,11 @@ export function MinimalSidebar() {
         {/* Footer */}
         <div className="p-4 border-t border-white/[0.06]">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gold to-gold flex items-center justify-center">
               <span className="text-xs font-medium text-black">U</span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm text-amber-50 truncate">User</p>
+              <p className="text-sm text-white truncate">User</p>
               <p className="text-xs text-gray-500 truncate">Free tier</p>
             </div>
           </div>
@@ -130,9 +126,9 @@ export function MinimalSidebar() {
       {/* Mobile Menu Button */}
       <button
         onClick={() => setIsOpen(true)}
-        className="lg:hidden fixed top-4 left-4 z-40 p-2 rounded-lg bg-black/60 backdrop-blur-xl border border-white/10"
+        className="lg:hidden fixed top-4 left-4 z-40 p-2 rounded-lg bg-black/60 backdrop-blur-xl border border-wireframe-stroke"
       >
-        <MenuIcon className="w-5 h-5 text-amber-50" />
+        <MenuIcon className="w-5 h-5 text-white" />
       </button>
 
       {/* Mobile Sidebar */}
@@ -154,15 +150,15 @@ export function MinimalSidebar() {
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-              className="lg:hidden fixed left-0 top-0 w-64 h-screen bg-[#0a0a0a] border-r border-white/10 z-50"
+              className="lg:hidden fixed left-0 top-0 w-64 h-screen bg-[#0a0a0a] border-r border-wireframe-stroke z-50"
             >
               {/* Header */}
-              <div className="flex items-center justify-between p-4 border-b border-white/10">
+              <div className="flex items-center justify-between p-4 border-b border-wireframe-stroke">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-gold to-gold flex items-center justify-center">
                     <span className="text-sm font-bold text-black">A</span>
                   </div>
-                  <span className="text-base font-semibold text-amber-50">A.I.M.S.</span>
+                  <span className="text-base font-semibold text-white">A.I.M.S.</span>
                 </div>
                 <button
                   onClick={() => setIsOpen(false)}
@@ -192,8 +188,8 @@ export function MinimalSidebar() {
                           block px-4 py-3 rounded-xl text-[15px] font-normal
                           transition-colors
                           ${isActive
-                            ? 'bg-amber-500/20 text-amber-50'
-                            : 'text-gray-400 hover:text-amber-100 hover:bg-white/5'
+                            ? 'bg-gold/20 text-white'
+                            : 'text-gray-400 hover:text-white hover:bg-white/5'
                           }
                         `}
                       >

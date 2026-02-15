@@ -1,0 +1,314 @@
+// frontend/prisma/schema.prisma
+// LUC (Ledger Usage Calculator) Database Schema
+// @version 2.0.0
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Core Entities
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// User account with authentication
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  name          String?
+  passwordHash  String?
+  role          String    @default("MEMBER")
+  status        String    @default("ACTIVE")
+
+  // Workspace membership
+  workspaces    WorkspaceMember[]
+
+  // Audit trail
+  auditLogs     AuditLog[]
+  policyChanges PolicyVersion[] @relation("CreatedBy")
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+
+
+/// Workspace (tenant) - primary scope for LUC
+model Workspace {
+  id            String    @id @default(uuid())
+  name          String
+  slug          String    @unique
+
+  // LUC account
+  lucAccount    LucAccount?
+
+  // Members
+  members       WorkspaceMember[]
+
+  // Usage tracking
+  usageEvents   UsageEvent[]
+
+  // Policy
+  policies      PolicyVersion[]
+
+  // Audit
+  auditLogs     AuditLog[]
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+/// Workspace membership (many-to-many)
+model WorkspaceMember {
+  id          String    @id @default(uuid())
+  userId      String
+  workspaceId String
+  role        String        @default("MEMBER")
+
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime  @default(now())
+
+  @@unique([userId, workspaceId])
+}
+
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LUC Account and Quotas
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// LUC account state per workspace
+model LucAccount {
+  id            String    @id @default(uuid())
+  workspaceId   String    @unique
+  workspace     Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  // Plan info
+  planId        String    @default("free")
+  status        String        @default("ACTIVE")
+
+  // Quotas stored as JSON (flexible for service additions)
+  quotas        String    // JSON: Record<ServiceKey, Quota>
+
+  // Overage policy
+  overagePolicy String    @default("block")
+
+  // Billing period
+  periodStart   DateTime
+  periodEnd     DateTime
+
+  // Stripe integration (optional)
+  stripeCustomerId    String?
+  stripeSubscriptionId String?
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Usage Events (Append-Only)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Usage event - immutable record of resource consumption
+model UsageEvent {
+  id            String    @id @default(uuid())
+  workspaceId   String
+  workspace     Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  // Event details
+  userId        String?
+  serviceKey    String    // Service being metered
+  units         Float     // Amount consumed
+  cost          Float     // Calculated cost
+  eventType     String    @default("USAGE")
+
+  // Tracing
+  requestId     String?   // Request correlation ID
+
+  // Metadata (JSON for flexibility)
+  metadata      String?   // JSON: { toolId, route, boomerAngOwner, etc. }
+
+  timestamp     DateTime  @default(now())
+
+  @@index([workspaceId, serviceKey, timestamp])
+  @@index([workspaceId, timestamp])
+}
+
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Policy Management
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Policy versions with draft/effective states
+model PolicyVersion {
+  id            String    @id @default(uuid())
+
+  // Scope
+  scope         String
+  scopeId       String?   // workspace/project/env ID (null for platform)
+  workspaceId   String?
+  workspace     Workspace? @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  // Version control
+  version       Int       @default(1)
+  status        String       @default("DRAFT")
+
+  // Policy content (JSON)
+  policy        String    // JSON: The actual policy configuration
+
+  // Audit
+  createdById   String
+  createdBy     User      @relation("CreatedBy", fields: [createdById], references: [id])
+  createdAt     DateTime  @default(now())
+  effectiveAt   DateTime?
+  supersededAt  DateTime?
+
+  @@index([scope, scopeId, status])
+  @@index([workspaceId, status])
+}
+
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Audit Log
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Audit log for security and compliance
+model AuditLog {
+  id            String    @id @default(uuid())
+
+  // Actor
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+  workspaceId   String?
+  workspace     Workspace? @relation(fields: [workspaceId], references: [id], onDelete: SetNull)
+
+  // Action
+  action        String    // e.g., "policy.update", "quota.adjust"
+  resource      String    // Resource type
+  resourceId    String?   // Resource ID
+
+  // Change tracking (JSON)
+  previousValue String?   // JSON: Previous state
+  newValue      String?   // JSON: New state
+  reason        String?   // Why the change was made
+
+  // Request context
+  ipAddress     String?
+  userAgent     String?
+
+  timestamp     DateTime  @default(now())
+
+  @@index([workspaceId, timestamp])
+  @@index([userId, timestamp])
+  @@index([resource, resourceId])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Evidence Storage (for Gates)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Evidence run record
+model EvidenceRun {
+  id            String    @id @default(uuid())
+
+  // Gate info
+  gateName      String    // e.g., "lint", "test", "security-scan"
+  status        String
+
+  // Timing
+  startedAt     DateTime
+  completedAt   DateTime?
+  durationMs    Int?
+
+  // Results
+  summary       String?   // Brief summary
+  artifactPath  String?   // Path to artifacts
+
+  // Metadata
+  gitCommit     String?
+  gitBranch     String?
+  triggeredBy   String?   // "ci", "manual", etc.
+
+  createdAt     DateTime  @default(now())
+
+  @@index([gateName, createdAt])
+}
+
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Presets (for Flip Secrets, etc.)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Preset calculation template
+model Preset {
+  id            String    @id @default(uuid())
+  slug          String    @unique
+  name          String
+  version       String
+  category      String
+  description   String?
+
+  // Preset definition (JSON)
+  definition    String    // JSON: { inputFields, outputFields, formulas }
+
+  // Status
+  isActive      Boolean   @default(true)
+  isBuiltIn     Boolean   @default(false)
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+/// Saved preset calculation
+model PresetCalculation {
+  id            String    @id @default(uuid())
+  presetId      String
+  workspaceId   String
+
+  // User inputs and results (JSON)
+  inputs        String    // JSON: User-provided values
+  outputs       String    // JSON: Calculated results
+
+  // Metadata
+  name          String?   // User-defined name for this calculation
+  notes         String?
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([workspaceId, presetId])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Active Boomer_Angs Tracking
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Active Boomer_Ang session
+model ActiveBoomerAng {
+  id            String    @id @default(uuid())
+  workspaceId   String
+  boomerAngId   String    // Agent identifier
+  boomerAngName String    // Display name
+
+  // Session info
+  startedAt     DateTime  @default(now())
+  lastHeartbeat DateTime  @default(now())
+
+  // Task context
+  currentTask   String?
+  deploymentId  String?
+
+  @@index([workspaceId])
+  @@unique([workspaceId, boomerAngId])
+}

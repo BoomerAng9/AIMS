@@ -4,17 +4,27 @@
   "buildCommand": "npm run build",
   "devCommand": "npm run dev",
   "installCommand": "npm install",
-  "regions": ["iad1"],
+  "regions": ["iad1", "sfo1", "cdg1", "hnd1", "gru1"],
   "env": {
     "NEXT_PUBLIC_APP_URL": "https://aims.plugmein.cloud"
   },
   "headers": [
     {
+      "source": "/api/edge/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET,POST,OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization, X-API-Key, X-Device-Type" },
+        { "key": "Access-Control-Max-Age", "value": "86400" },
+        { "key": "Cache-Control", "value": "no-store" }
+      ]
+    },
+    {
       "source": "/api/(.*)",
       "headers": [
         { "key": "Access-Control-Allow-Origin", "value": "*" },
         { "key": "Access-Control-Allow-Methods", "value": "GET,POST,OPTIONS" },
-        { "key": "Access-Control-Allow-Headers", "value": "Content-Type" }
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization, X-API-Key, X-Device-Type" }
       ]
     }
   ]

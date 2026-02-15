@@ -16,8 +16,9 @@ import { VISION_SQUAD_PROFILES } from './agents/lil-hawks/vision-scout-squad';
 import { PREP_SQUAD_PROFILES, runPrepSquad } from './agents/lil-hawks/prep-squad-alpha';
 import { pmoRegistry } from './pmo/registry';
 import { houseOfAng } from './pmo/house-of-ang';
+import { runCollaborationDemo, renderJSON } from './collaboration';
 import { TIER_CONFIGS, TASK_MULTIPLIERS as BILLING_MULTIPLIERS, PILLAR_CONFIGS, checkAllowance, calculatePillarAddon, checkAgentLimit } from './billing';
-import { openrouter, MODELS as LLM_MODELS } from './llm';
+import { openrouter, MODELS as LLM_MODELS, llmGateway, usageTracker } from './llm';
 import { verticalRegistry } from './verticals';
 import { projectStore, plugStore, deploymentStore, auditStore, evidenceStore, startCleanupSchedule, stopCleanupSchedule, closeDb } from './db';
 import { getQuestions, analyzeRequirements, generateProjectSpec, createProject } from './intake';
@@ -39,6 +40,8 @@ import { releaseManager } from './release';
 import { backupManager } from './backup';
 import { incidentManager } from './backup/incident-runbook';
 
+import { a2aRouter } from './a2a';
+import { getOrchestrator } from './acheevy/orchestrator';
 import logger from './logger';
 
 const app = express();
@@ -128,6 +131,11 @@ app.get('/health', (_req, res) => {
 });
 
 // --------------------------------------------------------------------------
+// A2A Discovery — /.well-known/agent.json is public per A2A spec
+// --------------------------------------------------------------------------
+app.use(a2aRouter);
+
+// --------------------------------------------------------------------------
 // Apply API key gate to ALL subsequent routes
 // --------------------------------------------------------------------------
 app.use(requireApiKey);
@@ -175,6 +183,58 @@ app.post('/perform/athlete', async (req, res) => {
 });
 
 // --------------------------------------------------------------------------
+// Gridiron Sandbox — Per|Form Sports Analytics Pipeline Proxy
+// Routes /api/gridiron/* to the three sandbox containers
+// --------------------------------------------------------------------------
+const GRIDIRON_SCOUT_HUB = process.env.GRIDIRON_SCOUT_HUB_URL || 'http://scout-hub:5001';
+const GRIDIRON_FILM_ROOM = process.env.GRIDIRON_FILM_ROOM_URL || 'http://film-room:5002';
+const GRIDIRON_WAR_ROOM = process.env.GRIDIRON_WAR_ROOM_URL || 'http://war-room:5003';
+
+async function gridironProxy(serviceUrl: string, path: string, method: string, body?: unknown): Promise<unknown> {
+  const url = `${serviceUrl}${path}`;
+  const opts: RequestInit = {
+    method,
+    headers: { 'Content-Type': 'application/json' },
+  };
+  if (body && method !== 'GET') opts.body = JSON.stringify(body);
+  const res = await fetch(url, opts);
+  return res.json();
+}
+
+app.all('/api/gridiron/scout-hub/*', async (req, res) => {
+  try {
+    const path = req.path.replace('/api/gridiron/scout-hub', '');
+    const data = await gridironProxy(GRIDIRON_SCOUT_HUB, path || '/health', req.method, req.body);
+    res.json(data);
+  } catch (error: unknown) {
+    logger.error({ err: error }, 'Gridiron Scout Hub proxy error');
+    res.status(502).json({ error: 'Scout Hub unreachable' });
+  }
+});
+
+app.all('/api/gridiron/film-room/*', async (req, res) => {
+  try {
+    const path = req.path.replace('/api/gridiron/film-room', '');
+    const data = await gridironProxy(GRIDIRON_FILM_ROOM, path || '/health', req.method, req.body);
+    res.json(data);
+  } catch (error: unknown) {
+    logger.error({ err: error }, 'Gridiron Film Room proxy error');
+    res.status(502).json({ error: 'Film Room unreachable' });
+  }
+});
+
+app.all('/api/gridiron/war-room/*', async (req, res) => {
+  try {
+    const path = req.path.replace('/api/gridiron/war-room', '');
+    const data = await gridironProxy(GRIDIRON_WAR_ROOM, path || '/health', req.method, req.body);
+    res.json(data);
+  } catch (error: unknown) {
+    logger.error({ err: error }, 'Gridiron War Room proxy error');
+    res.status(502).json({ error: 'War Room unreachable' });
+  }
+});
+
+// --------------------------------------------------------------------------
 // PMO Offices — Project Management Governance
 // --------------------------------------------------------------------------
 app.get('/pmo', (_req, res) => {
@@ -210,37 +270,51 @@ app.get('/house-of-ang/roster', (req, res) => {
   }
 });
 
-app.post('/house-of-ang/spawn', (req, res) => {
+app.post('/house-of-ang/forge', (req, res) => {
   try {
-    const { name, type, title, role, specialties } = req.body;
-    if (!name || typeof name !== 'string' || name.length > 100) {
-      res.status(400).json({ error: 'Invalid name: required string, max 100 chars' });
+    const { message, pmoOffice, director, requestedBy } = req.body;
+    if (!message || typeof message !== 'string' || message.length > 2000) {
+      res.status(400).json({ error: 'Invalid message: required string, max 2000 chars' });
       return;
     }
-    if (!type || !['SUPERVISORY', 'EXECUTION'].includes(type)) {
-      res.status(400).json({ error: 'Invalid type: must be SUPERVISORY or EXECUTION' });
+    if (!pmoOffice || typeof pmoOffice !== 'string') {
+      res.status(400).json({ error: 'Invalid pmoOffice: required string' });
       return;
     }
-    if (!title || typeof title !== 'string' || title.length > 200) {
-      res.status(400).json({ error: 'Invalid title: required string, max 200 chars' });
+    if (!director || typeof director !== 'string') {
+      res.status(400).json({ error: 'Invalid director: required string' });
       return;
     }
-    if (!role || typeof role !== 'string' || role.length > 500) {
-      res.status(400).json({ error: 'Invalid role: required string, max 500 chars' });
-      return;
-    }
-    if (specialties && !Array.isArray(specialties)) {
-      res.status(400).json({ error: 'specialties must be an array' });
-      return;
-    }
-    const ang = houseOfAng.spawn(name, type, title, role, specialties || []);
-    res.status(201).json(ang);
+    const result = houseOfAng.forgeForTask(message, pmoOffice as any, director as any, requestedBy || 'API');
+    res.status(201).json(result);
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Spawn failed';
-    res.status(409).json({ error: message });
+    const errMessage = error instanceof Error ? error.message : 'Forge failed';
+    res.status(409).json({ error: errMessage });
   }
 });
 
+
+// --------------------------------------------------------------------------
+// Collaboration Feed — Live Look-In (Agent Collaboration Transcript)
+// --------------------------------------------------------------------------
+app.post('/collaboration/demo', async (req, res) => {
+  try {
+    const { userName, message, projectLabel } = req.body;
+    if (!message || typeof message !== 'string' || message.length > 2000) {
+      res.status(400).json({ error: 'Invalid message: required string, max 2000 chars' });
+      return;
+    }
+    const session = await runCollaborationDemo(
+      userName || 'Boss',
+      message,
+      projectLabel,
+    );
+    res.json(renderJSON(session));
+  } catch (error: unknown) {
+    const errMessage = error instanceof Error ? error.message : 'Collaboration demo failed';
+    res.status(500).json({ error: errMessage });
+  }
+});
 
 // --------------------------------------------------------------------------
 // Admin — API Key Status (OWNER-only, called via frontend proxy)
@@ -288,6 +362,174 @@ app.get('/admin/models', (_req, res) => {
       },
     })),
   });
+});
+
+// --------------------------------------------------------------------------
+// Unified LLM Gateway — Vertex AI + OpenRouter
+// --------------------------------------------------------------------------
+app.post('/llm/chat', async (req, res) => {
+  try {
+    const { model, messages, max_tokens, temperature, agentId, userId, sessionId } = req.body;
+    if (!messages || !Array.isArray(messages) || messages.length === 0) {
+      res.status(400).json({ error: 'Missing or empty messages array' });
+      return;
+    }
+    const result = await llmGateway.chat({ model, messages, max_tokens, temperature, agentId, userId, sessionId });
+    res.json(result);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'LLM chat failed';
+    logger.error({ err }, '[LLM] Chat error');
+    res.status(500).json({ error: msg });
+  }
+});
+
+app.post('/llm/stream', async (req, res) => {
+  try {
+    const { model, messages, max_tokens, temperature, agentId, userId, sessionId } = req.body;
+    if (!messages || !Array.isArray(messages) || messages.length === 0) {
+      res.status(400).json({ error: 'Missing or empty messages array' });
+      return;
+    }
+
+    const { stream, provider, model: resolvedModel } = await llmGateway.stream({ model, messages, max_tokens, temperature, agentId, userId, sessionId });
+
+    res.writeHead(200, {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      'Connection': 'keep-alive',
+      'X-LLM-Provider': provider,
+      'X-LLM-Model': resolvedModel,
+    });
+
+    const reader = stream.getReader();
+    const pump = async (): Promise<void> => {
+      const { done, value } = await reader.read();
+      if (done) {
+        res.write('data: [DONE]\n\n');
+        res.end();
+        return;
+      }
+      res.write(`data: ${JSON.stringify({ text: value })}\n\n`);
+      return pump();
+    };
+    await pump();
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'LLM stream failed';
+    logger.error({ err }, '[LLM] Stream error');
+    if (!res.headersSent) {
+      res.status(500).json({ error: msg });
+    } else {
+      res.end();
+    }
+  }
+});
+
+app.get('/llm/models', (_req, res) => {
+  res.json({
+    configured: llmGateway.isConfigured(),
+    models: llmGateway.listModels(),
+  });
+});
+
+app.get('/llm/usage', (req, res) => {
+  const userId = req.query.userId as string | undefined;
+  const sessionId = req.query.sessionId as string | undefined;
+
+  if (userId && sessionId) {
+    res.json(usageTracker.getSummary(userId, sessionId));
+  } else if (userId) {
+    res.json(usageTracker.getUserUsage(userId));
+  } else {
+    res.json(usageTracker.getGlobalStats());
+  }
+});
+
+// --------------------------------------------------------------------------
+// ACHEEVY Orchestrator — Intent classification → agent dispatch
+// This is the PRIMARY execution path for the chat interface.
+// Frontend sends: { userId, message, intent, context }
+// Gateway routes to II-Agent, A2A agents, n8n, or verticals.
+// --------------------------------------------------------------------------
+app.post('/acheevy/execute', async (req, res) => {
+  try {
+    const { userId, message, intent, conversationId, plugId, skillId, context } = req.body;
+    if (!message || typeof message !== 'string') {
+      res.status(400).json({ error: 'Missing message field' });
+      return;
+    }
+    if (!intent || typeof intent !== 'string') {
+      res.status(400).json({ error: 'Missing intent field' });
+      return;
+    }
+
+    const orchestrator = getOrchestrator();
+    const result = await orchestrator.execute({
+      userId: userId || 'web-user',
+      message,
+      intent,
+      conversationId: conversationId || 'chat-ui',
+      plugId,
+      skillId,
+      context,
+    });
+
+    res.json(result);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Orchestrator execution failed';
+    logger.error({ err }, '[ACHEEVY] Execute error');
+    res.status(500).json({ error: msg });
+  }
+});
+
+// --------------------------------------------------------------------------
+// ACHEEVY Classify — Quick intent classification for the chat route
+// Frontend can call this to determine if a message needs agent dispatch
+// --------------------------------------------------------------------------
+app.post('/acheevy/classify', (req, res) => {
+  try {
+    const { message } = req.body;
+    if (!message || typeof message !== 'string') {
+      res.status(400).json({ error: 'Missing message field' });
+      return;
+    }
+
+    // Intent classification based on keywords
+    const lower = message.toLowerCase();
+
+    // Check for build/engineering intents
+    if (/\b(build|create|scaffold|deploy|generate|implement|code|develop|launch|mvp)\b/.test(lower)) {
+      if (/\b(plug|app|site|website|saas|platform|tool)\b/.test(lower)) {
+        res.json({ intent: 'plug-factory:custom', confidence: 0.9, requiresAgent: true });
+        return;
+      }
+      res.json({ intent: 'skill:build', confidence: 0.75, requiresAgent: true });
+      return;
+    }
+
+    // Check for research intents
+    if (/\b(research|analyze|investigate|study|compare|benchmark|audit)\b/.test(lower)) {
+      res.json({ intent: 'skill:research', confidence: 0.8, requiresAgent: true });
+      return;
+    }
+
+    // Check for vertical/business intents
+    if (/\b(business|startup|entrepreneur|side hustle|monetize|revenue|scale)\b/.test(lower)) {
+      res.json({ intent: 'vertical:idea-generator', confidence: 0.85, requiresAgent: true });
+      return;
+    }
+
+    // Check for PMO/workflow intents
+    if (/\b(workflow|pipeline|automate|chain|team|assign|delegate)\b/.test(lower)) {
+      res.json({ intent: 'pmo-route', confidence: 0.7, requiresAgent: true });
+      return;
+    }
+
+    // Default: conversational (no agent needed, use LLM stream)
+    res.json({ intent: 'conversational', confidence: 0.5, requiresAgent: false });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Classification failed';
+    res.status(500).json({ error: msg });
+  }
 });
 
 // --------------------------------------------------------------------------

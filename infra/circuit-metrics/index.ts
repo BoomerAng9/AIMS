@@ -17,7 +17,6 @@ const SERVICES = {
   houseOfAng: process.env.HOUSE_OF_ANG_URL || 'http://house-of-ang:3002',
   acheevy: process.env.ACHEEVY_URL || 'http://acheevy:3003',
   agentBridge: process.env.AGENT_BRIDGE_URL || 'http://agent-bridge:3010',
-  openclaw: process.env.OPENCLAW_URL || 'http://openclaw:8001',
 };
 
 interface ServiceHealth {

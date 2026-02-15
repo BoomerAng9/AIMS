@@ -264,7 +264,7 @@ function checkPolicy(intent: NormalizedIntent, taskGraph: TaskGraph, _context: C
   const sandboxRequired = riskLevel === 'HIGH' || riskLevel === 'CRITICAL';
 
   // Tool eligibility
-  if (intent.signals.includes('BUILD')) toolsEligible.push('ORACLE', 'Engineer_Ang', 'ChickenHawk');
+  if (intent.signals.includes('BUILD')) toolsEligible.push('ORACLE', 'Engineer_Ang', 'Chicken Hawk');
   if (intent.signals.includes('RESEARCH')) toolsEligible.push('Analyst_Ang', 'ByteRover');
   if (intent.signals.includes('WORKFLOW')) toolsEligible.push('N8N', 'WORKFLOW_SMITH_SQUAD');
   if (intent.signals.includes('CHAT')) toolsEligible.push('Marketer_Ang', 'ACHEEVY');

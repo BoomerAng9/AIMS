@@ -54,10 +54,29 @@ server {
     }
 
     # -----------------------------------------------------------------
+    # Next.js static assets — no rate limiting, immutable cache
+    # -----------------------------------------------------------------
+    location /_next/static/ {
+        proxy_pass http://frontend;
+        proxy_set_header Host $host;
+        proxy_cache_valid 200 365d;
+        add_header Cache-Control "public, max-age=31536000, immutable";
+        access_log off;
+    }
+
+    # Public static files (images, fonts, favicon)
+    location ~* \.(ico|png|jpg|jpeg|gif|svg|woff|woff2|ttf|eot|css|js)$ {
+        proxy_pass http://frontend;
+        proxy_set_header Host $host;
+        add_header Cache-Control "public, max-age=86400";
+        access_log off;
+    }
+
+    # -----------------------------------------------------------------
     # Frontend — everything else -> frontend:3000
     # -----------------------------------------------------------------
     location / {
-        limit_req zone=general burst=20 nodelay;
+        limit_req zone=general burst=40 nodelay;
         proxy_pass http://frontend;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;

@@ -1,0 +1,218 @@
+version: '3.8'
+name: aims-gridiron
+
+# ===========================================================================
+# Gridiron Sandbox — Per|Form Sports Analytics Autonomous Pipeline
+#
+# Three containers on the Hostinger VPS that run nightly without user input:
+#   scout-hub       (5001) — Lil_Hawks data acquisition & adversarial debate
+#   film-room       (5002) — Vertex AI bridge for SAM 2 video segmentation
+#   war-room        (5003) — Boomer_Angs + Chicken Hawk analysis & content
+#
+# Data flow:
+#   scout-hub scrapes → debate logs → war-room mediates →
+#   film-room analyzes footage → war-room produces final rankings + content
+#
+# Usage:
+#   docker compose -f docker-compose.gridiron.yml up -d
+#   docker compose -f docker-compose.gridiron.yml logs -f scout-hub
+# ===========================================================================
+
+services:
+  # -------------------------------------------------------------------------
+  # Scout Hub — Lil_Hawk Data Acquisition & Adversarial Debate
+  #
+  # Spawns pairs of Lil_Hawks per prospect:
+  #   Lil_Bull_Hawk  — argues the player is underrated
+  #   Lil_Bear_Hawk  — argues the player is overrated
+  # Output: raw Scouting Debate Logs saved to shared volume
+  # -------------------------------------------------------------------------
+  scout-hub:
+    build:
+      context: ../services/gridiron/scout-hub
+      dockerfile: Dockerfile
+    container_name: gridiron-scout-hub
+    ports:
+      - "5001:5001"
+    environment:
+      - PORT=5001
+      - NODE_ENV=production
+      - BRAVE_API_KEY=${BRAVE_API_KEY}
+      - FIRECRAWL_URL=${FIRECRAWL_URL:-http://firecrawl:3002}
+      - WAR_ROOM_URL=http://war-room:5003
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-aims_redis_secret}@redis:6379
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - SCOUT_CRON=${SCOUT_CRON:-0 2 * * *}
+      # Target pools
+      - HS_POOL_SIZE=300
+      - COLLEGE_POOL_SIZE=551
+    volumes:
+      - gridiron-debate-logs:/data/debate-logs
+      - gridiron-scout-cache:/data/scout-cache
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://127.0.0.1:5001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
+    depends_on:
+      war-room:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+    networks:
+      - aims-network
+
+  # -------------------------------------------------------------------------
+  # Film Room — Vertex AI Bridge for SAM 2 Video Analysis
+  #
+  # Lightweight bridge that sends video URLs to Vertex AI where
+  # SAM 2 (Segment Anything Model 2) is hosted.
+  # Returns player segmentation masks, speed burst data, and separation
+  # metrics for the War Room to use in grading.
+  # -------------------------------------------------------------------------
+  film-room:
+    build:
+      context: ../services/gridiron/film-room
+      dockerfile: Dockerfile
+    container_name: gridiron-film-room
+    ports:
+      - "5002:5002"
+    environment:
+      - PORT=5002
+      - NODE_ENV=production
+      - GCP_PROJECT_ID=${GCP_PROJECT_ID:-ai-managed-services}
+      - GCP_REGION=${GCP_REGION:-us-central1}
+      - VERTEX_ENDPOINT_ID=${VERTEX_SAM2_ENDPOINT_ID}
+      - GOOGLE_APPLICATION_CREDENTIALS=/secrets/gcp-sa.json
+      - WAR_ROOM_URL=http://war-room:5003
+    volumes:
+      - gridiron-film-cache:/data/film-cache
+      - ${GCP_SA_KEY_PATH:-./secrets/gcp-sa.json}:/secrets/gcp-sa.json:ro
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://127.0.0.1:5002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
+    networks:
+      - aims-network
+
+  # -------------------------------------------------------------------------
+  # War Room — Boomer_Angs + Chicken Hawk Analysis & Content Pipeline
+  #
+  # Receives Scouting Debate Logs from Scout Hub.
+  # Chicken Hawk mediates: validates stats, applies GROC + Luke formula,
+  #   assigns preliminary grades, flags prospects for film review.
+  # Boomer_Angs produce final output:
+  #   - Blog posts (AI-generated scouting narratives)
+  #   - Podcast clips (ElevenLabs TTS)
+  #   - Official Per|Form Rankings
+  # -------------------------------------------------------------------------
+  war-room:
+    build:
+      context: ../services/gridiron/war-room
+      dockerfile: Dockerfile
+    container_name: gridiron-war-room
+    ports:
+      - "5003:5003"
+    environment:
+      - PORT=5003
+      - NODE_ENV=production
+      - CHICKENHAWK_CORE_URL=${CHICKENHAWK_CORE_URL:-http://chickenhawk-core:4001}
+      - FILM_ROOM_URL=http://film-room:5002
+      - SCOUT_HUB_URL=http://scout-hub:5001
+      - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY}
+      - ELEVENLABS_VOICE_ID=${ELEVENLABS_VOICE_ID:-pNInz6obpgDQGcFmaJgB}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GEMINI_MODEL=${GEMINI_MODEL:-gemini-3.0-flash}
+      - BRAVE_API_KEY=${BRAVE_API_KEY}
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-aims_redis_secret}@redis:6379
+      - FIREBASE_PROJECT_ID=${FIREBASE_PROJECT_ID}
+      - FIREBASE_SA_KEY=/secrets/firebase-sa.json
+    volumes:
+      - gridiron-debate-logs:/data/debate-logs:ro
+      - gridiron-rankings:/data/rankings
+      - gridiron-content:/data/content
+      - ${FIREBASE_SA_KEY_PATH:-./secrets/firebase-sa.json}:/secrets/firebase-sa.json:ro
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://127.0.0.1:5003/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1'
+    networks:
+      - aims-network
+
+  # -------------------------------------------------------------------------
+  # Firecrawl — Self-Hosted Web Scraper (optional, cost saver)
+  # Deep crawls MaxPreps, Hudl, university rosters
+  # -------------------------------------------------------------------------
+  firecrawl:
+    image: mendableai/firecrawl:latest
+    container_name: gridiron-firecrawl
+    expose:
+      - "3002"
+    environment:
+      - USE_DB=false
+      - PORT=3002
+    volumes:
+      - gridiron-firecrawl-data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://127.0.0.1:3002/health"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+    networks:
+      - aims-network
+    profiles:
+      - self-hosted-scraper
+
+# ===========================================================================
+# Volumes
+# ===========================================================================
+volumes:
+  gridiron-debate-logs:
+    driver: local
+  gridiron-scout-cache:
+    driver: local
+  gridiron-film-cache:
+    driver: local
+  gridiron-rankings:
+    driver: local
+  gridiron-content:
+    driver: local
+  gridiron-firecrawl-data:
+    driver: local
+
+# ===========================================================================
+# Networks — join the existing AIMS network
+# ===========================================================================
+networks:
+  aims-network:
+    external: true

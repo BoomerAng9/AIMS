@@ -6,7 +6,7 @@
 
   "hierarchy": {
     "command": {
-      "role": "Chicken_Hawk",
+      "role": "Chicken Hawk",
       "title": "Yardmaster / Shift Leader",
       "description": "Command role that oversees Squad operations and coordinates with Boomer_Ang supervisors",
       "responsibilities": [
@@ -120,7 +120,7 @@
       },
       {
         "level": 4,
-        "title": "Chicken_Hawk_Candidate",
+        "title": "Chicken Hawk_Candidate",
         "prefix": "Cand_",
         "description": "Training for command role",
         "requirements": {

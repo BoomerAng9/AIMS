@@ -18,8 +18,8 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
-        acheevy: "bg-amber-500 hover:bg-amber-400 text-black font-bold uppercase tracking-wider shadow-[0_0_15px_rgba(245,158,11,0.4)] border border-amber-300/20",
-        glass: "bg-white/5 border border-white/10 text-white hover:bg-white/10 hover:border-white/20 backdrop-blur-md",
+        acheevy: "bg-gold hover:bg-gold-light text-black font-bold uppercase tracking-wider shadow-neon-gold border border-gold/20 font-display",
+        glass: "bg-white/5 border border-wireframe-stroke text-white hover:bg-white/10 hover:border-gold/30 backdrop-blur-xl transition-all",
       },
       size: {
         default: "h-10 px-4 py-2",

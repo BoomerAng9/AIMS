@@ -64,39 +64,38 @@ interface ConsumptionModel {
 // ─────────────────────────────────────────────────────────────
 
 const AI_MODELS: AIModel[] = [
-  // Agent Platforms - Full AI assistants that can do tasks
+  // Anthropic Claude Models (OpenRouter)
   {
-    id: 'openclaw',
-    name: 'OpenClaw',
-    friendlyName: 'AI Agent Platform',
-    provider: 'A.I.M.S.',
-    category: 'agent-platform',
-    description: 'Multi-model agent platform with sandboxed tool execution',
-    useCase: 'Best for: Building AI agents that can browse, code, and complete tasks autonomously',
-    capabilities: ['Agent Mode', 'Tool Use', 'Sandboxed', 'Multi-Model'],
-    pricing: 'free',
+    id: 'anthropic/claude-opus-4.6',
+    name: 'Claude Opus 4.6',
+    friendlyName: 'Chief Strategist',
+    provider: 'Anthropic',
+    category: 'assistant',
+    description: 'Latest flagship — 1M context, advanced reasoning, tool orchestration',
+    useCase: 'Best for: Multi-agent orchestration, complex architecture, code-to-production',
+    capabilities: ['Reasoning', 'Analysis', 'Code', 'Vision', '1M Context', 'Agentic', 'Extended Thinking'],
+    pricing: 'pay-as-you-go',
     status: 'stable',
-    contextWindow: 'Unlimited',
-    inputCost: 'Included',
-    outputCost: 'Included',
+    contextWindow: '1M',
+    inputCost: '$5/M tokens',
+    outputCost: '$25/M tokens',
     popular: true,
   },
-  // Anthropic Claude Models (OpenRouter)
   {
     id: 'anthropic/claude-opus-4.5',
     name: 'Claude Opus 4.5',
     friendlyName: 'Executive Assistant',
     provider: 'Anthropic',
     category: 'assistant',
-    description: 'Most capable model with 1M context beta, complex reasoning',
+    description: 'Premium reasoning with 200K context, complex analysis',
     useCase: 'Best for: Complex business decisions, strategic planning, detailed analysis',
-    capabilities: ['Reasoning', 'Analysis', 'Code', 'Vision', '1M Context', 'Agentic'],
+    capabilities: ['Reasoning', 'Analysis', 'Code', 'Vision', 'Agentic'],
     pricing: 'pay-as-you-go',
     status: 'stable',
-    contextWindow: '1M',
-    inputCost: '$15/M tokens',
-    outputCost: '$75/M tokens',
-    popular: true,
+    contextWindow: '200K',
+    inputCost: '$5/M tokens',
+    outputCost: '$25/M tokens',
+    popular: false,
   },
   {
     id: 'anthropic/claude-sonnet-4.5',
@@ -614,10 +613,10 @@ function ModelCard({
       animate={{ opacity: 1, y: 0 }}
       className="relative p-4 rounded-xl transition-all"
       style={{
-        backgroundColor: enabled ? AIMS_CIRCUIT_COLORS.primary + '10' : '#1a2234',
+        backgroundColor: enabled ? AIMS_CIRCUIT_COLORS.primary + '10' : 'rgba(255,255,255,0.03)',
         border: enabled
           ? `2px solid ${AIMS_CIRCUIT_COLORS.primary}`
-          : '1px solid #2d3a4d',
+          : '1px solid rgba(255,255,255,0.08)',
       }}
     >
       {model.popular && (
@@ -653,7 +652,7 @@ function ModelCard({
       </div>
 
       {/* Use case in plain English */}
-      <p className="text-sm text-amber-300/80 mb-2">{model.useCase}</p>
+      <p className="text-sm text-gold mb-2">{model.useCase}</p>
       <p className="text-sm text-gray-400 mb-3">{model.description}</p>
 
       <div className="flex flex-wrap gap-1 mb-3">
@@ -703,10 +702,10 @@ function ToolCard({
       animate={{ opacity: 1, y: 0 }}
       className="p-4 rounded-xl transition-all"
       style={{
-        backgroundColor: enabled ? AIMS_CIRCUIT_COLORS.primary + '10' : '#1a2234',
+        backgroundColor: enabled ? AIMS_CIRCUIT_COLORS.primary + '10' : 'rgba(255,255,255,0.03)',
         border: enabled
           ? `2px solid ${AIMS_CIRCUIT_COLORS.primary}`
-          : '1px solid #2d3a4d',
+          : '1px solid rgba(255,255,255,0.08)',
       }}
     >
       <div className="flex items-start justify-between mb-3">
@@ -755,8 +754,8 @@ function ConsumptionCard({ model }: { model: ConsumptionModel }) {
     <div
       className={`relative p-4 rounded-xl ${model.recommended ? 'ring-2' : ''}`}
       style={{
-        backgroundColor: '#1a2234',
-        border: '1px solid #2d3a4d',
+        backgroundColor: 'rgba(255,255,255,0.03)',
+        border: '1px solid rgba(255,255,255,0.08)',
         '--tw-ring-color': model.recommended ? AIMS_CIRCUIT_COLORS.accent : undefined,
       } as React.CSSProperties}
     >
@@ -795,7 +794,7 @@ export default function ModelGardenPage() {
   const [activeTab, setActiveTab] = useState<'models' | 'tools' | 'consumption'>('models');
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
-  const [enabledModels, setEnabledModels] = useState<Set<string>>(new Set(['claude-opus-4', 'gpt-4o']));
+  const [enabledModels, setEnabledModels] = useState<Set<string>>(new Set(['claude-opus-4.6', 'claude-sonnet-4.5']));
   const [enabledTools, setEnabledTools] = useState<Set<string>>(new Set(['brave-search', 'elevenlabs']));
 
   const toggleModel = (id: string) => {
@@ -848,7 +847,7 @@ export default function ModelGardenPage() {
   };
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#0a0f1a' }}>
+    <div className="min-h-screen aims-page-bg">
       <CircuitBoardPattern density="sparse" animated={false} glowIntensity={0.1} />
 
       <div className="relative max-w-7xl mx-auto px-6 py-8">
@@ -878,7 +877,7 @@ export default function ModelGardenPage() {
           <div className="flex items-center gap-6 mt-6">
             <div
               className="px-6 py-4 rounded-xl"
-              style={{ backgroundColor: '#1a2234', border: '1px solid #2d3a4d' }}
+              style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}
             >
               <div className="text-3xl font-bold" style={{ color: AIMS_CIRCUIT_COLORS.accent }}>
                 {AI_MODELS.length}+
@@ -887,7 +886,7 @@ export default function ModelGardenPage() {
             </div>
             <div
               className="px-6 py-4 rounded-xl"
-              style={{ backgroundColor: '#1a2234', border: '1px solid #2d3a4d' }}
+              style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}
             >
               <div className="text-3xl font-bold" style={{ color: AIMS_CIRCUIT_COLORS.accent }}>
                 {TOOLS.length}+
@@ -896,7 +895,7 @@ export default function ModelGardenPage() {
             </div>
             <div
               className="px-6 py-4 rounded-xl"
-              style={{ backgroundColor: '#1a2234', border: '1px solid #2d3a4d' }}
+              style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}
             >
               <div className="text-3xl font-bold text-green-500">
                 {enabledModels.size + enabledTools.size}
@@ -941,7 +940,7 @@ export default function ModelGardenPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search models or providers..."
-                className="w-full pl-12 pr-4 py-3 rounded-lg bg-gray-800 border border-gray-700 text-white placeholder:text-gray-500 focus:border-amber-500 outline-none"
+                className="w-full pl-12 pr-4 py-3 rounded-lg bg-gray-800 border border-gray-700 text-white placeholder:text-gray-500 focus:border-gold/30 outline-none"
               />
             </div>
 
@@ -1035,7 +1034,7 @@ export default function ModelGardenPage() {
 
                 <div
                   className="p-6 rounded-2xl"
-                  style={{ backgroundColor: '#1a2234', border: '1px solid #2d3a4d' }}
+                  style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}
                 >
                   {/* AI Applications Layer */}
                   <div className="mb-6">
@@ -1058,7 +1057,7 @@ export default function ModelGardenPage() {
                   {/* A.I.M.S. Core */}
                   <div
                     className="p-4 rounded-xl mb-6"
-                    style={{ backgroundColor: '#0f172a', border: '1px solid #2d3a4d' }}
+                    style={{ backgroundColor: '#0f172a', border: '1px solid rgba(255,255,255,0.08)' }}
                   >
                     <div className="text-center mb-4" style={{ color: AIMS_CIRCUIT_COLORS.accent }}>
                       A.I.M.S. <span className="text-gray-400">for all your model and agent needs</span>
@@ -1126,7 +1125,7 @@ export default function ModelGardenPage() {
                   {/* Infrastructure */}
                   <div
                     className="p-4 rounded-xl text-center"
-                    style={{ backgroundColor: '#0f172a', border: '1px solid #2d3a4d' }}
+                    style={{ backgroundColor: '#0f172a', border: '1px solid rgba(255,255,255,0.08)' }}
                   >
                     <div className="text-lg font-medium text-white">Infrastructure</div>
                     <div className="text-sm text-gray-400">
@@ -1144,7 +1143,7 @@ export default function ModelGardenPage() {
           <div
             className="inline-flex flex-col items-center gap-4 px-8 py-6 rounded-2xl"
             style={{
-              backgroundColor: '#1a2234',
+              backgroundColor: 'rgba(255,255,255,0.03)',
               border: `1px solid ${AIMS_CIRCUIT_COLORS.primary}40`,
             }}
           >

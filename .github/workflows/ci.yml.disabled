@@ -1,0 +1,42 @@
+name: CI
+
+# CI runs on GCP Cloud Build (free 500 min/day).
+# This workflow is a lightweight fallback for PR checks only.
+# Push-to-main builds + deploys happen via Cloud Build trigger.
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  backend-lint:
+    name: Backend - Quick Lint
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend/uef-gateway
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: backend/uef-gateway/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+
+  frontend-lint:
+    name: Frontend - Quick Lint
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run lint

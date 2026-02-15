@@ -11,6 +11,27 @@
 import { getIIAgentClient, IIAgentClient, IIAgentTask } from '../ii-agent/client';
 import { LUCEngine } from '../luc';
 import { v4 as uuidv4 } from 'uuid';
+import { triggerN8nPmoWorkflow } from '../n8n';
+import type { N8nPipelineResponse } from '../n8n';
+import { executeVertical } from './execution-engine';
+import { spawnAgent, decommissionAgent, getRoster, getAvailableRoster } from '../deployment-hub';
+import type { SpawnRequest, EnvironmentTarget } from '../deployment-hub';
+
+// Vertical definitions: pure data (no gateway imports), loaded at runtime
+// to avoid tsconfig rootDir compilation issues with cross-boundary imports.
+let _verticals: Record<string, any> | null = null;
+function getVertical(id: string): any {
+  if (!_verticals) {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const mod = require('../../../../aims-skills/acheevy-verticals/vertical-definitions');
+      _verticals = mod.VERTICALS || {};
+    } catch {
+      _verticals = {};
+    }
+  }
+  return _verticals![id] || null;
+}
 
 // ── Types ────────────────────────────────────────────────────
 
@@ -41,6 +62,7 @@ export interface AcheevyExecuteResponse {
 
 // ── Skill definitions (mirrors frontend registry for backend routing) ──
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface SkillRoute {
   id: string;
   handler: (req: AcheevyExecuteRequest, iiAgent: IIAgentClient) => Promise<AcheevyExecuteResponse>;
@@ -82,8 +104,20 @@ export class AcheevyOrchestrator {
         return await this.handleSkillExecution(requestId, req);
       }
 
-      if (routedTo === 'openclaw') {
-        return await this.handleOpenClaw(requestId, req);
+      // Vertical execution: NLP-triggered business builder verticals with R-R-S pipeline
+      if (routedTo.startsWith('vertical:')) {
+        return await this.handleVerticalExecution(requestId, req);
+      }
+
+      // PMO routing: routes task through chain-of-command pipeline
+      // User → ACHEEVY → Boomer_Ang → Chicken Hawk → Squad → Lil_Hawks → Receipt → ACHEEVY → User
+      if (routedTo === 'pmo-route' || routedTo.startsWith('pmo:')) {
+        return await this.handlePmoRouting(requestId, req);
+      }
+
+      // Deployment Hub: spawn/decommission/roster for Boomer_Angs and Lil_Hawks
+      if (routedTo.startsWith('spawn:') || routedTo === 'deployment-hub') {
+        return await this.handleDeploymentHub(requestId, req);
       }
 
       // Default: conversational AI via II-Agent
@@ -245,48 +279,245 @@ export class AcheevyOrchestrator {
   }
 
   /**
-   * OpenClaw: multi-channel cloning/scaffolding
+   * Scaffolding: clone/build requests via Make It Mine pipeline
    */
-  private async handleOpenClaw(
+  private async handleScaffolding(
+    requestId: string,
+    _req: AcheevyExecuteRequest
+  ): Promise<AcheevyExecuteResponse> {
+    return {
+      requestId,
+      status: 'queued',
+      reply: 'Clone request received. The scaffolding pipeline will begin when ready.',
+      taskId: `queued_${requestId}`,
+    }
+  }
+
+  /**
+   * PMO routing: chain-of-command pipeline via n8n
+   * User → ACHEEVY → Boomer_Ang → Chicken Hawk → Squad → Lil_Hawks → Receipt → ACHEEVY → User
+   */
+  private async handlePmoRouting(
     requestId: string,
     req: AcheevyExecuteRequest
   ): Promise<AcheevyExecuteResponse> {
-    // Forward to OpenClaw service via internal network
     try {
-      const openclawUrl = process.env.OPENCLAW_URL || 'http://openclaw:18789';
-      const response = await fetch(`${openclawUrl}/api/clone`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId: req.userId,
-          message: req.message,
-          conversationId: req.conversationId,
-        }),
+      const result: N8nPipelineResponse = await triggerN8nPmoWorkflow({
+        userId: req.userId,
+        message: req.message,
+        requestId,
+        context: req.context,
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        return {
-          requestId,
-          status: 'queued',
-          reply: data.reply || 'OpenClaw is scaffolding your project.',
-          taskId: data.taskId,
-          lucUsage: {
-            service: 'container_hours',
-            amount: 1,
-          },
-        };
-      }
-
-      throw new Error(`OpenClaw returned ${response.status}`);
+      return {
+        requestId,
+        status: result.status === 'failed' ? 'error' : 'completed',
+        reply: result.summary,
+        data: {
+          receipt: result.receipt,
+          classification: result.classification,
+          metrics: result.metrics,
+          chainOfCommand: result.chainOfCommand,
+        },
+        lucUsage: {
+          service: 'api_calls',
+          amount: result.metrics.stepsCompleted + 1,
+        },
+      };
     } catch {
       return {
         requestId,
         status: 'queued',
-        reply: 'Clone request received. OpenClaw will begin scaffolding when ready.',
-        taskId: `queued_${requestId}`,
+        reply: 'PMO routing request received. The chain-of-command pipeline will process it when the n8n workflow engine is available.',
+        taskId: `queued_pmo_${requestId}`,
       };
     }
+  }
+
+  /**
+   * Vertical execution: NLP-triggered business builder verticals with R-R-S downstream execution.
+   * Routes collected user data through the full governance stack:
+   *   ORACLE → ByteRover RAG → PREP_SQUAD → LUC → Chicken Hawk → Boomer_Angs → Artifacts
+   */
+  private async handleVerticalExecution(
+    requestId: string,
+    req: AcheevyExecuteRequest
+  ): Promise<AcheevyExecuteResponse> {
+    const verticalId = req.intent.split(':')[1];
+    const vertical = getVertical(verticalId);
+
+    if (!vertical) {
+      return {
+        requestId,
+        status: 'error',
+        reply: `Vertical "${verticalId}" not found.`,
+        error: `Unknown vertical: ${verticalId}`,
+      };
+    }
+
+    const collectedData = req.context || {};
+
+    try {
+      const result = await executeVertical(
+        vertical,
+        collectedData,
+        req.userId,
+        req.conversationId || requestId,
+      );
+
+      if (result.status === 'failed') {
+        return {
+          requestId,
+          status: 'error',
+          reply: `Vertical execution failed: ${result.error}`,
+          error: result.error,
+        };
+      }
+
+      return {
+        requestId,
+        status: 'streaming',
+        reply: `Executing ${vertical.name} pipeline — ${result.pipeline?.steps.length || 0} steps dispatched through the team. Task ID: ${result.taskId}`,
+        taskId: result.taskId,
+        data: {
+          verticalId,
+          verticalName: vertical.name,
+          pipelineSteps: result.pipeline?.steps,
+          estimatedAgents: result.pipeline?.estimated_agents,
+          oracleScore: result.pipeline?.oracleScore,
+          auditSessionId: result.auditSessionId,
+        },
+        lucUsage: {
+          service: 'vertical_execution',
+          amount: result.pipeline?.steps.length || 1,
+        },
+      };
+    } catch {
+      return {
+        requestId,
+        status: 'queued',
+        reply: `Vertical "${vertical.name}" request has been queued. The execution pipeline will process it when available.`,
+        taskId: `queued_vertical_${requestId}`,
+      };
+    }
+  }
+
+  /**
+   * Deployment Hub: spawn, decommission, and query Boomer_Angs and Lil_Hawks.
+   * Intent patterns:
+   *   "spawn:<handle>"          → spawn a specific agent
+   *   "deployment-hub"          → roster/query operations
+   *   context.action = "decommission" → tear down an agent
+   *   context.action = "roster"       → get active roster
+   *   context.action = "available"    → get available agents from card files
+   */
+  private async handleDeploymentHub(
+    requestId: string,
+    req: AcheevyExecuteRequest
+  ): Promise<AcheevyExecuteResponse> {
+    const action = req.context?.action as string || 'spawn';
+
+    // Roster query
+    if (action === 'roster') {
+      const roster = getRoster();
+      return {
+        requestId,
+        status: 'completed',
+        reply: roster.length > 0
+          ? `Active roster: ${roster.map(r => `${r.handle} (${r.environment})`).join(', ')}`
+          : 'No agents currently active. Use spawn to deploy agents.',
+        data: { roster },
+      };
+    }
+
+    // Available agents query
+    if (action === 'available') {
+      const available = getAvailableRoster();
+      return {
+        requestId,
+        status: 'completed',
+        reply: `${available.length} agents available: ${available.map(a => a.handle).join(', ')}`,
+        data: { available },
+      };
+    }
+
+    // Decommission
+    if (action === 'decommission') {
+      const spawnId = req.context?.spawnId as string;
+      const reason = req.context?.reason as string || 'Requested via orchestrator';
+      if (!spawnId) {
+        return { requestId, status: 'error', reply: 'Missing spawnId for decommission.', error: 'spawnId required' };
+      }
+      const result = await decommissionAgent(spawnId, reason);
+      return {
+        requestId,
+        status: result.success ? 'completed' : 'error',
+        reply: result.success
+          ? `${result.handle} decommissioned. Audit trail sealed.`
+          : `Decommission failed: ${result.error}`,
+        data: { spawnResult: result },
+        error: result.error,
+      };
+    }
+
+    // Spawn
+    const handle = req.intent.startsWith('spawn:')
+      ? req.intent.split(':')[1]
+      : (req.context?.handle as string || '');
+
+    if (!handle) {
+      return { requestId, status: 'error', reply: 'Missing agent handle for spawn.', error: 'handle required' };
+    }
+
+    const spawnRequest: SpawnRequest = {
+      spawnType: (req.context?.spawnType as SpawnRequest['spawnType']) || 'BOOMER_ANG',
+      handle,
+      requestedBy: 'ACHEEVY',
+      taskId: req.context?.taskId as string,
+      environment: (req.context?.environment as EnvironmentTarget) || 'PRODUCTION',
+      budgetCapUsd: req.context?.budgetCapUsd as number,
+      sessionDurationMaxS: req.context?.sessionDurationMaxS as number,
+    };
+
+    const result = await spawnAgent(spawnRequest);
+
+    if (!result.success) {
+      return {
+        requestId,
+        status: 'error',
+        reply: `Spawn failed for ${handle}: ${result.error}`,
+        data: { spawnResult: result },
+        error: result.error,
+      };
+    }
+
+    const identity = result.roleCard?.identity;
+    return {
+      requestId,
+      status: 'completed',
+      reply: [
+        `${handle} is online. ${identity?.catchphrase || ''}`,
+        `PMO: ${result.roleCard?.pmo_office || 'N/A'}`,
+        `Environment: ${spawnRequest.environment}`,
+        `Gates passed: ${result.gatesPassed.join(', ')}`,
+        `Spawn ID: ${result.spawnId}`,
+      ].join('\n'),
+      data: {
+        spawnResult: result,
+        identity: {
+          displayName: identity?.display_name,
+          origin: identity?.origin,
+          motivation: identity?.motivation,
+          catchphrase: identity?.catchphrase,
+          communicationStyle: identity?.communication_style,
+        },
+        visualIdentity: result.visualIdentity,
+      },
+      lucUsage: {
+        service: 'spawn_shift',
+        amount: 1,
+      },
+    };
   }
 
   /**

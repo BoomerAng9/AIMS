@@ -49,7 +49,7 @@ function PermissionGate({
   if (isChecking) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-pulse text-amber-100/60">Checking permissions...</div>
+        <div className="animate-pulse text-white/50">Checking permissions...</div>
       </div>
     );
   }
@@ -65,10 +65,10 @@ function PermissionGate({
   return (
     <div className="max-w-lg mx-auto text-center space-y-6 py-12">
       <div className="text-6xl mb-4">🎥🎤</div>
-      <h2 className="text-xl font-semibold text-amber-50">
+      <h2 className="text-xl font-semibold text-white">
         Camera & Microphone Access Required
       </h2>
-      <p className="text-amber-100/60">
+      <p className="text-white/50">
         DIY Mode uses your camera to see your project and your microphone for voice interaction.
         This allows ACHEEVY to provide real-time guidance as you work.
       </p>
@@ -76,11 +76,11 @@ function PermissionGate({
       <div className="flex flex-col gap-3 mt-6">
         {/* Permission Status */}
         <div className="flex justify-center gap-8 text-sm">
-          <div className={`flex items-center gap-2 ${cameraGranted ? 'text-green-400' : 'text-amber-100/50'}`}>
+          <div className={`flex items-center gap-2 ${cameraGranted ? 'text-green-400' : 'text-white/40'}`}>
             <span>{cameraGranted ? '✓' : '○'}</span>
             <span>Camera</span>
           </div>
-          <div className={`flex items-center gap-2 ${micGranted ? 'text-green-400' : 'text-amber-100/50'}`}>
+          <div className={`flex items-center gap-2 ${micGranted ? 'text-green-400' : 'text-white/40'}`}>
             <span>{micGranted ? '✓' : '○'}</span>
             <span>Microphone</span>
           </div>
@@ -95,22 +95,22 @@ function PermissionGate({
         {/* Request Button */}
         <button
           onClick={handleRequestPermissions}
-          className="mt-4 px-6 py-3 rounded-full bg-gradient-to-r from-amber-400 to-amber-300 text-black font-semibold hover:shadow-[0_0_24px_rgba(251,191,36,0.5)] transition-shadow"
+          className="mt-4 px-6 py-3 rounded-full bg-gradient-to-r from-gold to-gold text-black font-semibold hover:shadow-[0_0_24px_rgba(251,191,36,0.5)] transition-shadow"
         >
           Grant Access
         </button>
 
         {/* Platform-specific instructions */}
         {(permissions.camera === 'denied' || permissions.microphone === 'denied') && (
-          <div className="mt-4 text-sm text-amber-100/50">
+          <div className="mt-4 text-sm text-white/40">
             <p className="mb-2">If the button doesn&apos;t work, you may need to enable permissions manually:</p>
             <button
               onClick={openSystemSettings}
-              className="text-amber-300 hover:text-amber-200 underline"
+              className="text-gold hover:text-gold underline"
             >
               Open Settings Instructions
             </button>
-            <p className="mt-2 text-xs text-amber-100/30">
+            <p className="mt-2 text-xs text-white/20">
               Platform detected: {platform}
             </p>
           </div>
@@ -197,21 +197,21 @@ function ConsultationFlow({
     <div className="max-w-2xl mx-auto py-8">
       {/* Progress Bar */}
       <div className="mb-8">
-        <div className="flex justify-between text-xs text-amber-100/40 mb-2">
+        <div className="flex justify-between text-xs text-white/30 mb-2">
           <span>Consultation</span>
           <span>{progress}%</span>
         </div>
         <div className="h-1 bg-white/10 rounded-full overflow-hidden">
           <div
-            className="h-full bg-gradient-to-r from-amber-400 to-amber-300 transition-all duration-500"
+            className="h-full bg-gradient-to-r from-gold to-gold transition-all duration-500"
             style={{ width: `${progress}%` }}
           />
         </div>
       </div>
 
       {/* Question Card */}
-      <div className="bg-white/[0.03] border border-amber-300/10 rounded-2xl p-8">
-        <p className="text-lg text-amber-50 whitespace-pre-line">
+      <div className="bg-white/[0.03] border border-gold/20 rounded-2xl p-8">
+        <p className="text-lg text-white whitespace-pre-line">
           {currentQuestion.prompt}
         </p>
 
@@ -233,25 +233,25 @@ function ConsultationFlow({
 
       {/* Project Summary Preview */}
       {Object.keys(state.projectDraft).length > 0 && state.currentStep === 'plan_review' && (
-        <div className="mt-6 bg-white/[0.02] border border-white/5 rounded-xl p-6">
-          <h3 className="text-sm font-medium text-amber-300 mb-3">Project Summary</h3>
+        <div className="mt-6 bg-white/[0.02] border border-wireframe-stroke rounded-xl p-6">
+          <h3 className="text-sm font-medium text-gold mb-3">Project Summary</h3>
           <dl className="space-y-2 text-sm">
             {state.projectDraft.title && (
               <div className="flex">
-                <dt className="w-24 text-amber-100/40">Project:</dt>
-                <dd className="text-amber-50">{state.projectDraft.title}</dd>
+                <dt className="w-24 text-white/30">Project:</dt>
+                <dd className="text-white">{state.projectDraft.title}</dd>
               </div>
             )}
             {state.projectDraft.category && (
               <div className="flex">
-                <dt className="w-24 text-amber-100/40">Category:</dt>
-                <dd className="text-amber-50 capitalize">{state.projectDraft.category.replace('_', ' ')}</dd>
+                <dt className="w-24 text-white/30">Category:</dt>
+                <dd className="text-white capitalize">{state.projectDraft.category.replace('_', ' ')}</dd>
               </div>
             )}
             {state.projectDraft.skillLevel && (
               <div className="flex">
-                <dt className="w-24 text-amber-100/40">Level:</dt>
-                <dd className="text-amber-50 capitalize">{state.projectDraft.skillLevel}</dd>
+                <dt className="w-24 text-white/30">Level:</dt>
+                <dd className="text-white capitalize">{state.projectDraft.skillLevel}</dd>
               </div>
             )}
           </dl>
@@ -270,14 +270,14 @@ function TextInput({ onSubmit }: { onSubmit: (value: string) => void }) {
       <textarea
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        className="w-full h-32 bg-black/40 border border-white/10 rounded-xl p-4 text-amber-50 placeholder:text-white/20 outline-none focus:border-amber-300/50 transition-colors resize-none"
+        className="w-full h-32 bg-black/40 border border-wireframe-stroke rounded-xl p-4 text-white placeholder:text-white/20 outline-none focus:border-gold/30 transition-colors resize-none"
         placeholder="Describe your project..."
         autoFocus
       />
       <button
         type="submit"
         disabled={!value.trim()}
-        className="mt-4 px-6 py-2 rounded-full bg-amber-400 text-black font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-amber-300 transition-colors"
+        className="mt-4 px-6 py-2 rounded-full bg-gold text-black font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gold transition-colors"
       >
         Continue
       </button>
@@ -292,7 +292,7 @@ function SelectInput({ options, onSelect }: { options: string[]; onSelect: (valu
         <button
           key={option}
           onClick={() => onSelect(option)}
-          className="text-left px-4 py-3 rounded-xl border border-white/10 bg-white/[0.02] text-amber-100/80 hover:border-amber-300/30 hover:bg-white/[0.05] transition-all"
+          className="text-left px-4 py-3 rounded-xl border border-wireframe-stroke bg-white/[0.02] text-white/70 hover:border-gold/20 hover:bg-white/[0.05] transition-all"
         >
           {option}
         </button>
@@ -323,8 +323,8 @@ function MultiSelectInput({ options, onSubmit }: { options: string[]; onSubmit: 
             onClick={() => toggle(option)}
             className={`text-left px-4 py-3 rounded-xl border transition-all ${
               selected.has(option)
-                ? 'border-amber-300/50 bg-amber-300/10 text-amber-50'
-                : 'border-white/10 bg-white/[0.02] text-amber-100/80 hover:border-white/20'
+                ? 'border-gold/30 bg-gold/10 text-white'
+                : 'border-wireframe-stroke bg-white/[0.02] text-white/70 hover:border-white/20'
             }`}
           >
             <span className="mr-2">{selected.has(option) ? '✓' : '○'}</span>
@@ -334,7 +334,7 @@ function MultiSelectInput({ options, onSubmit }: { options: string[]; onSubmit: 
       </div>
       <button
         onClick={() => onSubmit(Array.from(selected).join(', '))}
-        className="px-6 py-2 rounded-full bg-amber-400 text-black font-medium hover:bg-amber-300 transition-colors"
+        className="px-6 py-2 rounded-full bg-gold text-black font-medium hover:bg-gold transition-colors"
       >
         Continue
       </button>
@@ -349,7 +349,7 @@ function ConfirmInput({ options, onSelect }: { options: string[]; onSelect: (val
         <button
           key={option}
           onClick={() => onSelect(option)}
-          className="px-5 py-2 rounded-full border border-amber-300/20 bg-amber-300/5 text-amber-100 hover:border-amber-300/40 hover:bg-amber-300/10 transition-all"
+          className="px-5 py-2 rounded-full border border-gold/20 bg-gold/10 text-white/50 hover:border-gold/30 hover:bg-gold/10 transition-all"
         >
           {option}
         </button>
@@ -486,14 +486,14 @@ function VoiceVisionMode({
   return (
     <div className="flex flex-col h-[calc(100vh-8rem)]">
       {/* Header */}
-      <header className="flex items-center justify-between px-4 py-3 border-b border-white/10">
+      <header className="flex items-center justify-between px-4 py-3 border-b border-wireframe-stroke">
         <div>
-          <h2 className="font-semibold text-amber-50">{project.title}</h2>
-          <p className="text-xs text-amber-100/40 capitalize">{project.category.replace('_', ' ')} • {project.skillLevel}</p>
+          <h2 className="font-semibold text-white">{project.title}</h2>
+          <p className="text-xs text-white/30 capitalize">{project.category.replace('_', ' ')} • {project.skillLevel}</p>
         </div>
         <button
           onClick={onSwitchToConsole}
-          className="text-sm text-amber-100/60 hover:text-amber-300 transition-colors"
+          className="text-sm text-white/50 hover:text-gold transition-colors"
         >
           Switch to Console Mode
         </button>
@@ -515,7 +515,7 @@ function VoiceVisionMode({
           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-3">
             <button
               onClick={() => sendMessage('What do you see?', true)}
-              className="px-4 py-2 rounded-full bg-amber-400 text-black text-sm font-medium hover:bg-amber-300 transition-colors"
+              className="px-4 py-2 rounded-full bg-gold text-black text-sm font-medium hover:bg-gold transition-colors"
             >
               📸 Capture & Analyze
             </button>
@@ -523,13 +523,13 @@ function VoiceVisionMode({
 
           {!cameraActive && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/80">
-              <p className="text-amber-100/60">Starting camera...</p>
+              <p className="text-white/50">Starting camera...</p>
             </div>
           )}
         </div>
 
         {/* Chat Area */}
-        <div className="w-1/2 flex flex-col bg-white/[0.02] rounded-xl border border-white/5">
+        <div className="w-1/2 flex flex-col bg-white/[0.02] rounded-xl border border-wireframe-stroke">
           {/* Messages */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
             {messages.map((msg) => (
@@ -540,16 +540,16 @@ function VoiceVisionMode({
                 <div
                   className={`max-w-[85%] rounded-2xl px-4 py-3 ${
                     msg.role === 'user'
-                      ? 'bg-amber-400/20 text-amber-50'
-                      : 'bg-white/5 text-amber-100/90'
+                      ? 'bg-gold/10 text-white'
+                      : 'bg-white/5 text-white/70'
                   }`}
                 >
                   {msg.hasImage && (
-                    <span className="text-xs text-amber-300 block mb-1">📸 Image attached</span>
+                    <span className="text-xs text-gold block mb-1">📸 Image attached</span>
                   )}
                   <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
                   {msg.imageAnalysis && (
-                    <div className="mt-2 pt-2 border-t border-white/10 text-xs text-amber-100/50">
+                    <div className="mt-2 pt-2 border-t border-wireframe-stroke text-xs text-white/40">
                       <p>Detected: {msg.imageAnalysis.analysis.labels.slice(0, 3).map(l => l.description).join(', ')}</p>
                     </div>
                   )}
@@ -559,14 +559,14 @@ function VoiceVisionMode({
           </div>
 
           {/* Input Area */}
-          <div className="p-4 border-t border-white/5">
+          <div className="p-4 border-t border-wireframe-stroke">
             <div className="flex gap-2">
               <button
                 onClick={toggleListening}
                 className={`p-3 rounded-xl transition-all ${
                   isListening
                     ? 'bg-red-500/20 text-red-400 animate-pulse'
-                    : 'bg-white/5 text-amber-100/60 hover:bg-white/10'
+                    : 'bg-white/5 text-white/50 hover:bg-white/10'
                 }`}
               >
                 🎤
@@ -574,7 +574,7 @@ function VoiceVisionMode({
               <input
                 type="text"
                 placeholder="Type or speak your question..."
-                className="flex-1 bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-amber-50 placeholder:text-white/20 outline-none focus:border-amber-300/50"
+                className="flex-1 bg-black/40 border border-wireframe-stroke rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/20 outline-none focus:border-gold/30"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && e.currentTarget.value.trim()) {
                     sendMessage(e.currentTarget.value.trim());
@@ -584,7 +584,7 @@ function VoiceVisionMode({
               />
               <button
                 onClick={() => sendMessage('Show me what you see', true)}
-                className="p-3 rounded-xl bg-white/5 text-amber-100/60 hover:bg-white/10 transition-colors"
+                className="p-3 rounded-xl bg-white/5 text-white/50 hover:bg-white/10 transition-colors"
               >
                 📷
               </button>
@@ -594,7 +594,7 @@ function VoiceVisionMode({
       </div>
 
       {/* Status Bar */}
-      <footer className="px-4 py-2 border-t border-white/5 flex items-center justify-between text-xs text-amber-100/40">
+      <footer className="px-4 py-2 border-t border-wireframe-stroke flex items-center justify-between text-xs text-white/30">
         <div className="flex items-center gap-4">
           <span className={cameraActive ? 'text-green-400' : 'text-red-400'}>
             ● Camera {cameraActive ? 'Active' : 'Inactive'}
@@ -672,14 +672,14 @@ function ConsoleMode({
   return (
     <div className="flex flex-col h-[calc(100vh-8rem)] max-w-3xl mx-auto">
       {/* Header */}
-      <header className="flex items-center justify-between px-4 py-3 border-b border-white/10">
+      <header className="flex items-center justify-between px-4 py-3 border-b border-wireframe-stroke">
         <div>
-          <h2 className="font-semibold text-amber-50">{project.title}</h2>
-          <p className="text-xs text-amber-100/40">Console Mode • Voice Active • Camera Off</p>
+          <h2 className="font-semibold text-white">{project.title}</h2>
+          <p className="text-xs text-white/30">Console Mode • Voice Active • Camera Off</p>
         </div>
         <button
           onClick={onSwitchToVision}
-          className="text-sm text-amber-300 hover:text-amber-200 transition-colors"
+          className="text-sm text-gold hover:text-gold transition-colors"
         >
           Enable Camera
         </button>
@@ -695,8 +695,8 @@ function ConsoleMode({
             <div
               className={`max-w-[80%] rounded-2xl px-4 py-3 ${
                 msg.role === 'user'
-                  ? 'bg-amber-400/20 text-amber-50'
-                  : 'bg-white/5 text-amber-100/90'
+                  ? 'bg-gold/10 text-white'
+                  : 'bg-white/5 text-white/70'
               }`}
             >
               <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
@@ -706,7 +706,7 @@ function ConsoleMode({
       </div>
 
       {/* Input */}
-      <div className="p-4 border-t border-white/5">
+      <div className="p-4 border-t border-wireframe-stroke">
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -720,7 +720,7 @@ function ConsoleMode({
             className={`p-3 rounded-xl transition-all ${
               isListening
                 ? 'bg-red-500/20 text-red-400 animate-pulse'
-                : 'bg-white/5 text-amber-100/60 hover:bg-white/10'
+                : 'bg-white/5 text-white/50 hover:bg-white/10'
             }`}
           >
             🎤
@@ -730,12 +730,12 @@ function ConsoleMode({
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Type your question..."
-            className="flex-1 bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-amber-50 placeholder:text-white/20 outline-none focus:border-amber-300/50"
+            className="flex-1 bg-black/40 border border-wireframe-stroke rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/20 outline-none focus:border-gold/30"
           />
           <button
             type="submit"
             disabled={!input.trim()}
-            className="px-5 py-3 rounded-xl bg-amber-400 text-black font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-amber-300 transition-colors"
+            className="px-5 py-3 rounded-xl bg-gold text-black font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gold transition-colors"
           >
             Send
           </button>

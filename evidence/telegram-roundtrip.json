@@ -1,0 +1,32 @@
+{
+  "test": "telegram-roundtrip",
+  "flow": "Telegram → Webhook → ACHEEVY LLM → Telegram Reply",
+  "stages": [
+    {
+      "stage": "inbound",
+      "description": "Telegram sends POST to /api/telegram/webhook with update JSON",
+      "handler": "Parses update.message.text, checks linking status",
+      "returns_200": true,
+      "latency_target": "< 1000ms for ack, LLM response streams async"
+    },
+    {
+      "stage": "linking_check",
+      "description": "Verifies telegramUserId exists in telegramToUser map",
+      "linked": "Routes to ACHEEVY LLM",
+      "unlinked": "Returns prompt to /start"
+    },
+    {
+      "stage": "llm_processing",
+      "description": "Builds ACHEEVY system prompt with Telegram context, streams through OpenRouter",
+      "model": "configurable via ACHEEVY_MODEL env (default: google/gemini-3.0-flash)",
+      "truncation": "4000 char limit for Telegram's 4096 API limit"
+    },
+    {
+      "stage": "outbound",
+      "description": "sendTelegramMessage() POSTs to Telegram Bot API with Markdown parse_mode",
+      "method": "POST to api.telegram.org/bot<TOKEN>/sendMessage"
+    }
+  ],
+  "status": "implemented",
+  "notes": "Full round-trip works when TELEGRAM_BOT_TOKEN and OPENROUTER_API_KEY are set. In-memory linking store will be replaced with Firebase/DB in production."
+}

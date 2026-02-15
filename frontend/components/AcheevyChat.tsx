@@ -1,422 +1,723 @@
 'use client';
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { sendACPRequest } from '../lib/acp-client';
-import {
-  Bot, User, Send, CheckCircle2, ShieldCheck, DollarSign,
-  Cpu, Zap, Search, Hammer, BarChart3, Shield, Layers,
-  ChevronRight, Sparkles, ArrowRight,
-} from 'lucide-react';
 
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-interface Message {
-  id: string;
-  role: 'user' | 'assistant';
-  content: string;
-  quote?: Record<string, unknown>;
-  executionPlan?: { steps: string[]; estimatedDuration: string };
-  agentResults?: {
-    primaryAgent: string;
-    outputs: Array<{ agentId: string; status: string; summary: string; artifacts: string[] }>;
-  };
+/**
+ * AcheevyChat — Chat w/ACHEEVY Production Interface
+ *
+ * Features:
+ * - Voice recording with live waveform + clear state indicators
+ * - Editable transcription before submission
+ * - Per-message TTS playback controls (play, pause, replay, mute)
+ * - PMO classification routing
+ * - File attachments
+ */
+
+import React from 'react';
+import { useChat } from 'ai/react';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import Image from 'next/image';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import {
+  User, Send, Zap, Sparkles, Hammer, Search, Layers, Square,
+  Mic, MicOff, Volume2, VolumeX, Paperclip, X, FileText, ImageIcon, Code2, Loader2,
+  Play, Pause, RotateCcw,
+} from 'lucide-react';
+import { useVoiceInput } from '@/hooks/useVoiceInput';
+import { useVoiceOutput } from '@/hooks/useVoiceOutput';
+import { ReadReceiptChip } from '@/components/chat/ReadReceipt';
+import { createReadReceipt, advanceReceipt, classifyIntent } from '@/lib/acheevy/read-receipt';
+import type { ReadReceipt } from '@/lib/acheevy/read-receipt';
+
+// ── Types ──
+
+interface PmoClassification {
+  pmoOffice: string;
+  officeLabel: string;
+  director: string;
+  confidence: number;
+  executionLane: 'deploy_it' | 'guide_me';
 }
 
-type Intent = 'CHAT' | 'BUILD_PLUG' | 'RESEARCH' | 'AGENTIC_WORKFLOW';
-
-interface ActiveAgent {
+interface UploadedFile {
   id: string;
   name: string;
-  status: 'idle' | 'working' | 'done';
-  color: string;
+  type: string;
+  category: string;
+  size: number;
+  url: string;
+  uploadedAt: string;
 }
 
-// ---------------------------------------------------------------------------
-// Constants
-// ---------------------------------------------------------------------------
-const BOOMER_ANGS: ActiveAgent[] = [
-  { id: 'engineer-ang', name: 'Engineer_Ang', status: 'idle', color: 'emerald' },
-  { id: 'marketer-ang', name: 'Marketer_Ang', status: 'idle', color: 'blue' },
-  { id: 'analyst-ang', name: 'Analyst_Ang', status: 'idle', color: 'violet' },
-  { id: 'quality-ang', name: 'Quality_Ang', status: 'idle', color: 'amber' },
-  { id: 'chicken-hawk', name: 'Chicken Hawk', status: 'idle', color: 'red' },
-];
+// ── Constants ──
 
-const INTENT_OPTIONS: { value: Intent; label: string; icon: typeof Cpu; desc: string }[] = [
+const INTENT_OPTIONS = [
   { value: 'CHAT', label: 'Chat', icon: Sparkles, desc: 'Ask anything' },
-  { value: 'BUILD_PLUG', label: 'Build', icon: Hammer, desc: 'Create a Plug' },
+  { value: 'BUILD_PLUG', label: 'Build', icon: Hammer, desc: 'Create a tool' },
   { value: 'RESEARCH', label: 'Research', icon: Search, desc: 'Market intel' },
   { value: 'AGENTIC_WORKFLOW', label: 'Workflow', icon: Layers, desc: 'Multi-step pipeline' },
 ];
 
-// ---------------------------------------------------------------------------
-// Component
-// ---------------------------------------------------------------------------
-export default function AcheevyChat() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: 'welcome',
-      role: 'assistant',
-      content: "Greetings. I am ACHEEVY — your AI orchestrator.\n\nDescribe what you want to build, and I will marshal the full Boomer_Ang team to make it real. From intake to deployment, end-to-end.",
-    },
-  ]);
-  const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [intent, setIntent] = useState<Intent>('BUILD_PLUG');
-  const [agents, setAgents] = useState<ActiveAgent[]>(BOOMER_ANGS);
-  const [showIntentPicker, setShowIntentPicker] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+const TEAM_SLOTS = [
+  { id: 'engineer', name: 'Engineer', color: 'emerald' },
+  { id: 'marketer', name: 'Marketer', color: 'blue' },
+  { id: 'analyst', name: 'Analyst', color: 'violet' },
+  { id: 'quality', name: 'Quality', color: 'amber' },
+  { id: 'executor', name: 'Executor', color: 'red' },
+];
 
-  const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, []);
+const FILE_CATEGORY_ICON: Record<string, typeof FileText> = {
+  document: FileText,
+  image: ImageIcon,
+  code: Code2,
+  spreadsheet: FileText,
+  archive: FileText,
+};
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages, scrollToBottom]);
+// ── Waveform Visualizer ──
 
-  const animateAgents = useCallback((primaryAgent: string | null) => {
-    if (!primaryAgent) return;
-    setAgents(prev =>
-      prev.map(a => ({
-        ...a,
-        status: a.id === primaryAgent ? 'working' : a.status,
-      }))
+function VoiceWaveform({ audioLevel, state }: { audioLevel: number; state: 'idle' | 'listening' | 'processing' | 'error' }) {
+  const bars = 32;
+
+  if (state === 'processing') {
+    return (
+      <div className="flex items-center justify-center gap-1 h-12 px-4">
+        <div className="flex items-center gap-1.5">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div
+              key={i}
+              className="w-1.5 h-6 bg-gold/60 rounded-full animate-bounce"
+              style={{ animationDelay: `${i * 0.1}s`, animationDuration: '0.8s' }}
+            />
+          ))}
+        </div>
+        <span className="ml-3 text-xs text-gold/80 font-mono uppercase tracking-wider animate-pulse">
+          Transcribing
+        </span>
+      </div>
     );
-    setTimeout(() => {
-      setAgents(prev =>
-        prev.map(a => ({
-          ...a,
-          status: a.id === primaryAgent ? 'done' : a.status,
-        }))
-      );
-      setTimeout(() => {
-        setAgents(BOOMER_ANGS);
-      }, 3000);
-    }, 2000);
+  }
+
+  if (state !== 'listening') return null;
+
+  return (
+    <div className="flex items-end justify-center gap-[2px] h-12 px-4">
+      {Array.from({ length: bars }).map((_, i) => {
+        const position = Math.sin((i / bars) * Math.PI);
+        const height = Math.max(
+          3,
+          audioLevel * 48 * position * (0.7 + Math.random() * 0.3)
+        );
+        return (
+          <div
+            key={i}
+            className="w-1 rounded-full transition-all duration-75"
+            style={{
+              height: `${height}px`,
+              backgroundColor: `rgba(212, 175, 55, ${0.4 + audioLevel * 0.6})`,
+            }}
+          />
+        );
+      })}
+    </div>
+  );
+}
+
+// ── Playback Progress Bar ──
+
+function PlaybackBar({ progress, isPlaying }: { progress: number; isPlaying: boolean }) {
+  if (!isPlaying && progress === 0) return null;
+  return (
+    <div className="w-full h-0.5 bg-white/5 rounded-full overflow-hidden">
+      <div
+        className="h-full bg-gold/60 rounded-full transition-all duration-200"
+        style={{ width: `${progress * 100}%` }}
+      />
+    </div>
+  );
+}
+
+export default function AcheevyChat() {
+  const {
+    messages,
+    input,
+    setInput,
+    handleInputChange,
+    handleSubmit,
+    isLoading,
+    stop,
+  } = useChat({
+    api: '/api/chat',
+    initialMessages: [
+      {
+        id: 'welcome',
+        role: 'assistant',
+        content: "Greetings. I am ACHEEVY — your AI assistant.\n\nTell me what you need, and my team will make it happen.",
+      }
+    ]
+  });
+
+  // ── Voice Input (Groq Whisper STT → Deepgram fallback) ──
+  const voiceInput = useVoiceInput({
+    onTranscript: (result) => {
+      if (result.text) {
+        // Populate text field — user can edit before submitting
+        setInput((prev: string) => prev ? `${prev} ${result.text}` : result.text);
+      }
+    },
+  });
+
+  // ── Voice Output (ElevenLabs → Deepgram TTS) ──
+  const voiceOutput = useVoiceOutput({
+    config: { provider: 'elevenlabs', autoPlay: true },
+  });
+
+  // ── State ──
+  const [pmo, setPmo] = useState<PmoClassification | null>(null);
+  const [intent, setIntent] = useState('CHAT');
+  const [showIntentPicker, setShowIntentPicker] = useState(false);
+  const [attachments, setAttachments] = useState<UploadedFile[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
+  const [speakingMessageId, setSpeakingMessageId] = useState<string | null>(null);
+  const [readReceipts, setReadReceipts] = useState<Map<string, ReadReceipt>>(new Map());
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const prevMessageCountRef = useRef(0);
+
+  // ── Auto-scroll ──
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  // ── Auto-TTS + Read Receipt: on new assistant messages ──
+  useEffect(() => {
+    if (isLoading) return;
+    if (messages.length <= prevMessageCountRef.current) {
+      prevMessageCountRef.current = messages.length;
+      return;
+    }
+    prevMessageCountRef.current = messages.length;
+
+    const last = messages[messages.length - 1];
+    if (last?.role === 'assistant' && last.id !== 'welcome') {
+      // Auto-TTS
+      if (voiceOutput.autoPlayEnabled) {
+        const clean = stripMarkdownForTTS(last.content);
+        if (clean.length > 0 && clean.length <= 5000) {
+          setSpeakingMessageId(last.id);
+          voiceOutput.speak(clean);
+        }
+      }
+
+      // Generate Read Receipt for this response
+      // Find the preceding user message to classify intent
+      const msgIndex = messages.findIndex(m => m.id === last.id);
+      const precedingUser = messages.slice(0, msgIndex).reverse().find(m => m.role === 'user');
+      if (precedingUser) {
+        const intentCat = classifyIntent(precedingUser.content);
+        let receipt = createReadReceipt(precedingUser.content, intentCat);
+        receipt = advanceReceipt(receipt, 'classifying', 'Intent classified');
+        receipt = advanceReceipt(receipt, 'routing', 'Routed to agent');
+        receipt = advanceReceipt(receipt, 'in_progress', 'Processing');
+        receipt = advanceReceipt(receipt, 'delivered', 'Response delivered');
+        setReadReceipts(prev => new Map(prev).set(last.id, receipt));
+      }
+    }
+  }, [isLoading, messages, voiceOutput]);
+
+  // Track when speaking ends
+  useEffect(() => {
+    if (!voiceOutput.isPlaying && !voiceOutput.isLoading) {
+      setSpeakingMessageId(null);
+    }
+  }, [voiceOutput.isPlaying, voiceOutput.isLoading]);
+
+  // ── Helpers ──
+
+  function stripMarkdownForTTS(text: string): string {
+    return text
+      .replace(/```[\s\S]*?```/g, '')
+      .replace(/[#*_`~\[\]()>|]/g, '')
+      .replace(/\n{2,}/g, '. ')
+      .replace(/\n/g, ' ')
+      .trim();
+  }
+
+  const speakMessage = useCallback((messageId: string, content: string) => {
+    const clean = stripMarkdownForTTS(content);
+    if (clean.length > 0 && clean.length <= 5000) {
+      setSpeakingMessageId(messageId);
+      voiceOutput.speak(clean, true);
+    }
+  }, [voiceOutput]);
+
+  const togglePlayback = useCallback(() => {
+    if (voiceOutput.isPlaying) {
+      voiceOutput.pause();
+    } else if (voiceOutput.isPaused) {
+      voiceOutput.resume();
+    }
+  }, [voiceOutput]);
+
+  // ── Classify on submit ──
+  const classifyMessage = useCallback(async (message: string) => {
+    try {
+      const res = await fetch('/api/chat/classify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message }),
+      });
+      if (res.ok) setPmo(await res.json());
+    } catch { /* non-critical */ }
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // ── Enhanced submit ──
+  const handleEnhancedSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!input.trim() || isLoading) return;
+    if ((!input.trim() && attachments.length === 0) || isLoading) return;
 
-    const userMsg: Message = {
-      id: Date.now().toString(),
-      role: 'user',
-      content: input,
-    };
-
-    setMessages(prev => [...prev, userMsg]);
-    setInput('');
-    setIsLoading(true);
-
-    try {
-      const response = await sendACPRequest(userMsg.content, intent);
-
-      const acheevyMsg: Message = {
-        id: response.reqId || `resp-${Date.now()}`,
-        role: 'assistant',
-        content: response.message || 'Request processed.',
-        quote: response.quote,
-        executionPlan: response.executionPlan,
-        agentResults: response.agentResults,
-      };
-
-      setMessages(prev => [...prev, acheevyMsg]);
-
-      if (response.agentResults?.primaryAgent) {
-        animateAgents(response.agentResults.primaryAgent);
-      }
-    } catch {
-      setMessages(prev => [
-        ...prev,
-        {
-          id: `error-${Date.now()}`,
-          role: 'assistant',
-          content: 'Connection to UEF Gateway failed. Ensure infrastructure is running.',
-        },
-      ]);
-    } finally {
-      setIsLoading(false);
+    let fullMessage = input.trim();
+    if (attachments.length > 0) {
+      const fileList = attachments.map(f => `${f.name} (${f.category})`).join(', ');
+      fullMessage = `[Attached files: ${fileList}]\n${fullMessage}`;
     }
-  };
+
+    classifyMessage(fullMessage);
+
+    if (attachments.length > 0) {
+      setInput(fullMessage);
+      setTimeout(() => {
+        handleSubmit(e);
+        setAttachments([]);
+      }, 10);
+    } else {
+      handleSubmit(e);
+    }
+  }, [input, isLoading, classifyMessage, handleSubmit, attachments, setInput]);
+
+  // ── Mic toggle ──
+  const handleMicToggle = useCallback(async () => {
+    if (voiceInput.isListening) {
+      await voiceInput.stopListening();
+    } else {
+      voiceOutput.stop();
+      await voiceInput.startListening();
+    }
+  }, [voiceInput, voiceOutput]);
+
+  // ── File upload ──
+  const handleFileUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setIsUploading(true);
+    try {
+      const formData = new FormData();
+      Array.from(files).forEach(f => formData.append('files', f));
+
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setAttachments(prev => [...prev, ...data.files]);
+      }
+    } catch (err) {
+      console.error('[AcheevyChat] Upload failed:', err);
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  }, []);
+
+  const removeAttachment = useCallback((id: string) => {
+    setAttachments(prev => prev.filter(f => f.id !== id));
+  }, []);
 
   const selectedIntent = INTENT_OPTIONS.find(i => i.value === intent) || INTENT_OPTIONS[0];
 
+  // Voice state for UI
+  const voiceState = voiceInput.isListening ? 'listening' : voiceInput.isProcessing ? 'processing' : 'idle';
+
   return (
-    <div className="flex flex-col h-full relative overflow-hidden">
-      {/* Dot Grid Background */}
+    <div className="flex flex-col h-full relative overflow-hidden bg-[#0A0A0A] text-white font-sans">
+      {/* Branded background */}
       <div
-        className="absolute inset-0 opacity-[0.03]"
+        className="absolute inset-0 z-0 pointer-events-none"
         style={{
-          backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)',
-          backgroundSize: '24px 24px',
+          backgroundImage: `
+            radial-gradient(ellipse at center, rgba(212,175,55,0.03) 0%, transparent 70%),
+            url(/images/acheevy/acheevy-helmet.png)
+          `,
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: 'center center',
+          backgroundSize: 'auto, 200px 200px',
+          opacity: 0.04,
         }}
       />
+      <div className="absolute inset-0 z-0 pointer-events-none aims-page-bg" />
 
-      {/* ---- HEADER: Combined Arsenal Bar ---- */}
-      <div className="relative z-10 border-b border-white/5 bg-black/80 backdrop-blur-xl">
-        <div className="flex items-center justify-between px-6 py-3">
-          <div className="flex items-center gap-3">
+      {/* Header */}
+      <div className="relative z-10 border-b border-wireframe-stroke bg-[#0A0A0A]/80 backdrop-blur-xl">
+        <div className="flex items-center justify-between px-4 py-2.5">
+          <div className="flex items-center gap-2">
             <div className="relative">
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-400/20 to-amber-600/10 flex items-center justify-center border border-amber-400/30 shadow-[0_0_20px_rgba(251,191,36,0.15)]">
-                <Bot className="text-amber-400 w-5 h-5" />
+              <div className="w-8 h-8 rounded-lg bg-white/5 border border-gold/20 flex items-center justify-center overflow-hidden">
+                <Image
+                  src="/images/acheevy/acheevy-helmet.png"
+                  alt="ACHEEVY"
+                  width={24}
+                  height={24}
+                  className="object-contain"
+                />
               </div>
-              <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-400 rounded-full border-2 border-black animate-pulse" />
+              <div className="absolute -bottom-0.5 -right-0.5 w-2 h-2 bg-emerald-400 rounded-full border border-black animate-pulse" />
             </div>
             <div>
-              <h2 className="font-bold text-base text-amber-50 tracking-wide">ACHEEVY</h2>
-              <div className="flex items-center gap-1.5 text-[10px] text-emerald-400/80 font-medium tracking-wider uppercase">
-                <Zap className="w-2.5 h-2.5" /> Online
+              <h2 className="font-medium text-sm text-white">Chat w/ACHEEVY</h2>
+              <div className="flex items-center gap-1 text-[9px] text-emerald-400/80 font-mono uppercase tracking-widest">
+                <Zap className="w-2 h-2" /> Online
               </div>
             </div>
           </div>
 
-          {/* Intent Selector */}
-          <div className="relative">
+          <div className="flex items-center gap-1">
+            {/* Speaker toggle */}
             <button
-              onClick={() => setShowIntentPicker(!showIntentPicker)}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 hover:border-amber-400/30 transition-all text-sm"
+              type="button"
+              onClick={() => voiceOutput.setAutoPlay(!voiceOutput.autoPlayEnabled)}
+              title={voiceOutput.autoPlayEnabled ? 'Mute auto-speak' : 'Enable auto-speak'}
+              className={`p-1.5 rounded-lg transition-colors ${
+                voiceOutput.autoPlayEnabled
+                  ? 'text-gold bg-gold/10'
+                  : 'text-white/30 hover:text-white/60'
+              }`}
             >
-              <selectedIntent.icon className="w-4 h-4 text-amber-400" />
-              <span className="text-amber-50 font-medium">{selectedIntent.label}</span>
-              <ChevronRight className={`w-3 h-3 text-amber-400/50 transition-transform ${showIntentPicker ? 'rotate-90' : ''}`} />
+              {voiceOutput.autoPlayEnabled ? <Volume2 size={14} /> : <VolumeX size={14} />}
             </button>
-            {showIntentPicker && (
-              <div className="absolute right-0 top-full mt-2 w-56 bg-black/95 border border-white/10 rounded-2xl p-2 backdrop-blur-xl shadow-2xl z-50">
-                {INTENT_OPTIONS.map(opt => (
-                  <button
-                    key={opt.value}
-                    onClick={() => { setIntent(opt.value); setShowIntentPicker(false); }}
-                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all ${
-                      intent === opt.value ? 'bg-amber-400/10 border border-amber-400/20' : 'hover:bg-white/5 border border-transparent'
-                    }`}
-                  >
-                    <opt.icon className={`w-4 h-4 ${intent === opt.value ? 'text-amber-400' : 'text-white/40'}`} />
-                    <div>
-                      <div className={`text-sm font-medium ${intent === opt.value ? 'text-amber-50' : 'text-white/70'}`}>{opt.label}</div>
-                      <div className="text-[10px] text-white/30">{opt.desc}</div>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            )}
+
+            {/* Intent selector */}
+            <div className="relative">
+              <button
+                onClick={() => setShowIntentPicker(!showIntentPicker)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 border border-wireframe-stroke hover:border-gold/30 transition-all text-xs"
+              >
+                <selectedIntent.icon className="w-3.5 h-3.5 text-gold" />
+                <span className="text-white/80">{selectedIntent.label}</span>
+              </button>
+              {showIntentPicker && (
+                <div className="absolute right-0 top-full mt-1 w-48 bg-[#0A0A0A]/95 border border-wireframe-stroke rounded-xl p-1.5 backdrop-blur-xl shadow-2xl z-50">
+                  {INTENT_OPTIONS.map(opt => (
+                    <button
+                      key={opt.value}
+                      onClick={() => { setIntent(opt.value); setShowIntentPicker(false); }}
+                      className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left transition-all text-xs ${
+                        intent === opt.value ? 'bg-gold/10 border border-gold/20' : 'hover:bg-white/5 border border-transparent'
+                      }`}
+                    >
+                      <opt.icon className={`w-3.5 h-3.5 ${intent === opt.value ? 'text-gold' : 'text-white/40'}`} />
+                      <div>
+                        <div className={`font-medium ${intent === opt.value ? 'text-gold' : 'text-white/80'}`}>{opt.label}</div>
+                        <div className="text-[9px] text-white/30 font-mono">{opt.desc}</div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Arsenal Shelf — Active Boomer_Angs */}
-        <div className="px-6 pb-3 flex gap-2 overflow-x-auto">
-          {agents.map(agent => {
-            const isWorking = agent.status === 'working';
-            const isDone = agent.status === 'done';
-            return (
-              <div
-                key={agent.id}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border backdrop-blur-sm transition-all flex-shrink-0 ${
-                  isWorking
-                    ? 'bg-emerald-400/10 border-emerald-400/40 shadow-[0_0_12px_rgba(52,211,153,0.15)]'
-                    : isDone
-                    ? 'bg-emerald-400/10 border-emerald-400/30'
-                    : 'bg-white/[0.02] border-white/[0.06] hover:border-white/10'
-                }`}
-              >
-                <div
-                  className={`w-1.5 h-1.5 rounded-full ${
-                    isWorking ? 'bg-emerald-400 animate-pulse' : isDone ? 'bg-emerald-400' : 'bg-white/20'
-                  }`}
-                />
-                <span className={`text-[10px] font-medium tracking-wide ${
-                  isWorking ? 'text-white/90' : isDone ? 'text-emerald-300' : 'text-white/30'
-                }`}>
-                  {agent.name}
-                </span>
-              </div>
-            );
-          })}
+        {/* Team shelf */}
+        <div className="px-4 pb-2 flex gap-1.5 overflow-x-auto no-scrollbar">
+          {TEAM_SLOTS.map(slot => (
+            <div key={slot.id} className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border transition-colors cursor-default ${
+              pmo?.director?.toLowerCase().includes(slot.id) ? 'border-gold/20 bg-gold/5' : 'border-wireframe-stroke bg-white/[0.02]'
+            }`}>
+              <div className={`w-1.5 h-1.5 rounded-full ${
+                pmo?.director?.toLowerCase().includes(slot.id) ? 'bg-gold animate-pulse' : 'bg-white/20'
+              }`} />
+              <span className="text-[9px] font-mono text-white/50 uppercase tracking-wider">{slot.name}</span>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* ---- MESSAGES ---- */}
-      <div className="relative z-10 flex-1 overflow-y-auto px-6 py-6 space-y-6">
-        {messages.map(msg => (
-          <div key={msg.id} className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            {msg.role === 'assistant' && (
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-400/10 to-transparent flex-shrink-0 flex items-center justify-center border border-amber-400/20 mt-1">
-                <Bot className="w-4 h-4 text-amber-400" />
-              </div>
-            )}
+      {/* PMO routing pill */}
+      {pmo && (
+        <div className="relative z-10 mx-3 mt-2 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gold/5 border border-gold/10 text-[10px]">
+          <span className="text-gold font-medium">{pmo.officeLabel}</span>
+          <span className={`ml-auto px-1.5 py-0.5 rounded-full font-mono uppercase ${
+            pmo.executionLane === 'deploy_it' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-blue-500/10 text-blue-400'
+          }`}>{pmo.executionLane === 'deploy_it' ? 'DEPLOY' : 'GUIDE'}</span>
+        </div>
+      )}
 
-            <div className="max-w-[80%] space-y-3">
-              <div
-                className={`px-4 py-3 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${
-                  msg.role === 'user'
-                    ? 'bg-amber-400/10 border border-amber-400/20 text-amber-50 rounded-tr-sm'
-                    : 'bg-white/[0.03] border border-white/[0.06] text-white/80 rounded-tl-sm'
-                }`}
-              >
-                {msg.content}
-              </div>
+      {/* Global playback bar */}
+      {(voiceOutput.isPlaying || voiceOutput.isPaused) && (
+        <div className="relative z-10 mx-3 mt-2 flex items-center gap-2 px-3 py-2 rounded-lg bg-gold/5 border border-gold/15">
+          <button
+            type="button"
+            onClick={togglePlayback}
+            className="p-1 rounded-md bg-gold/10 text-gold hover:bg-gold/20 transition-colors"
+          >
+            {voiceOutput.isPlaying ? <Pause size={12} /> : <Play size={12} />}
+          </button>
+          <div className="flex-1">
+            <PlaybackBar progress={voiceOutput.progress} isPlaying={voiceOutput.isPlaying} />
+          </div>
+          <button
+            type="button"
+            onClick={() => voiceOutput.stop()}
+            className="p-1 rounded-md text-white/30 hover:text-red-400 transition-colors"
+          >
+            <X size={12} />
+          </button>
+          <span className="text-[9px] text-gold/60 font-mono uppercase">
+            {voiceOutput.isPlaying ? 'Speaking' : 'Paused'}
+          </span>
+        </div>
+      )}
 
-              {/* Agent Results */}
-              {msg.agentResults ? (
-                <div className="bg-black/40 border border-white/10 rounded-2xl p-4 space-y-3">
-                  <div className="flex items-center gap-2">
-                    <Cpu className="w-3.5 h-3.5 text-emerald-400" />
-                    <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-emerald-400/80">
-                      Agent Dispatch
-                    </span>
-                  </div>
-                  {msg.agentResults.outputs.map((out, i) => (
-                    <div key={i} className="bg-white/[0.02] border border-white/5 rounded-xl p-3">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-medium text-amber-200">{out.agentId}</span>
-                        <span className={`text-[9px] uppercase font-bold tracking-wider ${
-                          out.status === 'COMPLETED' ? 'text-emerald-400' : 'text-red-400'
-                        }`}>
-                          {out.status}
-                        </span>
-                      </div>
-                      <p className="text-xs text-white/50 leading-relaxed">{out.summary}</p>
-                      {out.artifacts.length > 0 ? (
-                        <div className="mt-2 flex flex-wrap gap-1.5">
-                          {out.artifacts.slice(0, 4).map((a, j) => (
-                            <span key={j} className="text-[9px] bg-white/5 border border-white/10 px-2 py-0.5 rounded-full text-white/40">
-                              {a}
-                            </span>
-                          ))}
-                        </div>
-                      ) : null}
-                    </div>
-                  ))}
+      {/* Messages */}
+      <div className="relative z-10 flex-1 overflow-y-auto px-4 py-4 space-y-4 scroll-smooth">
+        {messages.map((m, i) => (
+          <React.Fragment key={m.id}>
+            <div className={`flex gap-3 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+              {m.role === 'assistant' && (
+                <div className={`w-7 h-7 rounded-lg bg-white/5 border border-gold/10 flex items-center justify-center flex-shrink-0 mt-0.5 overflow-hidden ${
+                  speakingMessageId === m.id ? 'ring-2 ring-gold/40 animate-pulse' : ''
+                }`}>
+                  <Image
+                    src="/images/acheevy/acheevy-helmet.png"
+                    alt="ACHEEVY"
+                    width={20}
+                    height={20}
+                    className="object-contain"
+                  />
                 </div>
-              ) : null}
-
-              {/* LUC Quote */}
-              {msg.quote && (msg.quote as Record<string, unknown>).variants ? (
-                <div className="bg-black/60 border border-amber-400/20 rounded-2xl p-4 shadow-[0_0_20px_rgba(251,191,36,0.05)]">
-                  <div className="flex justify-between items-center mb-3">
-                    <h4 className="text-[10px] uppercase tracking-[0.2em] font-bold text-amber-400/80 flex items-center gap-2">
-                      <DollarSign className="w-3 h-3" /> LUC Estimate
-                    </h4>
-                    <span className="text-[9px] text-white/20">Valid: 1h</span>
+              )}
+              <div className={`relative group px-4 py-3 rounded-2xl text-sm leading-relaxed max-w-[85%] ${
+                m.role === 'user'
+                  ? 'bg-gold/10 text-white rounded-tr-sm border border-gold/20'
+                  : 'wireframe-card text-white/90 rounded-tl-sm'
+              }`}>
+                {m.role === 'user' ? (
+                  m.content
+                ) : (
+                  <div className="prose prose-invert prose-sm max-w-none prose-code:text-gold prose-code:bg-black/40 prose-code:px-1 prose-code:rounded">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{m.content}</ReactMarkdown>
+                    {isLoading && i === messages.length - 1 && (
+                      <span className="inline-block w-1.5 h-4 bg-gold ml-0.5 animate-pulse" />
+                    )}
                   </div>
-                  <div className="space-y-1.5">
-                    {((msg.quote as Record<string, unknown>).variants as Array<Record<string, unknown>>).map((v: Record<string, unknown>, idx: number) => (
-                      <div key={idx} className="flex justify-between items-center bg-white/[0.03] p-2.5 rounded-xl text-xs">
-                        <span className="text-white/60">{v.name as string}</span>
-                        <div className="text-right">
-                          <div className="text-amber-400 font-mono font-medium">
-                            ${((v.estimate as Record<string, unknown>)?.totalUsd as number)?.toFixed(4)}
-                          </div>
-                          <div className="text-white/20 text-[9px]">
-                            {((v.estimate as Record<string, unknown>)?.totalTokens as number)} tokens
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : null}
-
-              {/* Execution Plan */}
-              {msg.executionPlan ? (
-                <div className="bg-white/[0.02] border border-white/[0.06] rounded-2xl p-4">
-                  <h4 className="text-[10px] uppercase tracking-[0.2em] font-bold text-white/40 mb-3 flex items-center gap-2">
-                    <ShieldCheck className="w-3 h-3" /> Execution Protocol
-                  </h4>
-                  <div className="space-y-2">
-                    {msg.executionPlan.steps.map((step: string, i: number) => (
-                      <div key={i} className="flex items-start gap-3">
-                        <div className="w-5 h-5 rounded-lg bg-amber-400/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                          <span className="text-[9px] font-bold text-amber-400">{i + 1}</span>
-                        </div>
-                        <span className="text-xs text-white/50">{step}</span>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="mt-3 pt-2 border-t border-white/5 flex items-center justify-between">
-                    <span className="text-[9px] text-white/20">
-                      Est. Duration: {msg.executionPlan.estimatedDuration}
-                    </span>
-                    <button className="flex items-center gap-1 text-[10px] text-amber-400 font-medium hover:text-amber-300 transition-colors">
-                      Execute <ArrowRight className="w-3 h-3" />
+                )}
+                {/* Per-message playback controls for assistant messages */}
+                {m.role === 'assistant' && m.id !== 'welcome' && !isLoading && (
+                  <div className="flex items-center gap-1 mt-2 pt-2 border-t border-wireframe-stroke opacity-0 group-hover:opacity-100 transition-opacity">
+                    {speakingMessageId === m.id && voiceOutput.isPlaying ? (
+                      <button
+                        type="button"
+                        onClick={() => voiceOutput.pause()}
+                        title="Pause"
+                        className="p-1 rounded text-gold/60 hover:text-gold hover:bg-gold/10 transition-colors"
+                      >
+                        <Pause size={12} />
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => speakMessage(m.id, m.content)}
+                        title="Speak this message"
+                        className="p-1 rounded text-white/30 hover:text-gold hover:bg-gold/10 transition-colors"
+                      >
+                        <Play size={12} />
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => speakMessage(m.id, m.content)}
+                      title="Replay"
+                      className="p-1 rounded text-white/30 hover:text-gold hover:bg-gold/10 transition-colors"
+                    >
+                      <RotateCcw size={12} />
                     </button>
                   </div>
+                )}
+              </div>
+              {m.role === 'user' && (
+                <div className="w-7 h-7 rounded-lg bg-white/5 border border-wireframe-stroke flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <User className="w-3.5 h-3.5 text-white/50" />
                 </div>
-              ) : null}
+              )}
             </div>
-
-            {msg.role === 'user' && (
-              <div className="w-8 h-8 rounded-xl bg-white/5 flex-shrink-0 flex items-center justify-center border border-white/10 mt-1">
-                <User className="w-4 h-4 text-white/50" />
+            {/* Read Receipt — collapsible chip below assistant responses */}
+            {m.role === 'assistant' && m.id !== 'welcome' && !isLoading && readReceipts.has(m.id) && (
+              <div className="ml-10">
+                <ReadReceiptChip receipt={readReceipts.get(m.id)!} />
               </div>
             )}
-          </div>
+          </React.Fragment>
         ))}
-
-        {isLoading && (
+        {isLoading && messages.length > 0 && messages[messages.length - 1].role === 'user' && (
           <div className="flex gap-3">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-400/10 to-transparent flex-shrink-0 flex items-center justify-center border border-amber-400/20 animate-pulse">
-              <Bot className="w-4 h-4 text-amber-400" />
+            <div className="w-7 h-7 rounded-lg bg-white/5 border border-gold/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
+              <Image
+                src="/images/acheevy/acheevy-helmet.png"
+                alt="ACHEEVY"
+                width={20}
+                height={20}
+                className="object-contain animate-pulse"
+              />
             </div>
-            <div className="px-4 py-3 bg-white/[0.03] border border-white/[0.06] rounded-2xl rounded-tl-sm">
-              <div className="flex gap-1.5 h-5 items-center">
-                <div className="w-1.5 h-1.5 bg-amber-400/50 rounded-full animate-bounce [animation-delay:-0.3s]" />
-                <div className="w-1.5 h-1.5 bg-amber-400/50 rounded-full animate-bounce [animation-delay:-0.15s]" />
-                <div className="w-1.5 h-1.5 bg-amber-400/50 rounded-full animate-bounce" />
-              </div>
+            <div className="px-4 py-3 wireframe-card rounded-2xl rounded-tl-sm flex items-center gap-1.5">
+              <div className="w-1.5 h-1.5 bg-gold/50 rounded-full animate-bounce [animation-delay:-0.3s]" />
+              <div className="w-1.5 h-1.5 bg-gold/50 rounded-full animate-bounce [animation-delay:-0.15s]" />
+              <div className="w-1.5 h-1.5 bg-gold/50 rounded-full animate-bounce" />
             </div>
           </div>
         )}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* ---- INPUT AREA ---- */}
-      <div className="relative z-10 border-t border-white/5 bg-black/80 backdrop-blur-xl p-4">
-        <form onSubmit={handleSubmit} className="relative">
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/5 border border-white/10">
-              <selectedIntent.icon className="w-3.5 h-3.5 text-amber-400" />
-              <span className="text-[10px] font-medium text-amber-200 uppercase tracking-wider">{selectedIntent.label}</span>
-            </div>
-
-            <div className="flex-1 relative">
-              <input
-                ref={inputRef}
-                type="text"
-                value={input}
-                onChange={e => setInput(e.target.value)}
-                placeholder={
-                  intent === 'BUILD_PLUG'
-                    ? "Describe the Plug you want to build..."
-                    : intent === 'RESEARCH'
-                    ? "What do you want to research?"
-                    : intent === 'AGENTIC_WORKFLOW'
-                    ? "Describe the workflow pipeline..."
-                    : "Ask ACHEEVY anything..."
-                }
-                className="w-full bg-white/[0.03] border border-white/10 rounded-xl pl-4 pr-12 py-3 text-sm text-white/90 focus:outline-none focus:border-amber-400/30 focus:shadow-[0_0_20px_rgba(251,191,36,0.1)] transition-all placeholder:text-white/20"
-                disabled={isLoading}
-              />
-              <button
-                type="submit"
-                disabled={!input.trim() || isLoading}
-                className="absolute right-1.5 top-1.5 p-2 bg-amber-400/10 hover:bg-amber-400/20 text-amber-400 rounded-lg transition-all disabled:opacity-30 disabled:cursor-not-allowed hover:shadow-[0_0_12px_rgba(251,191,36,0.2)]"
+      {/* Attachment preview bar */}
+      {attachments.length > 0 && (
+        <div className="relative z-10 px-3 pt-2 flex gap-2 flex-wrap">
+          {attachments.map(file => {
+            const Icon = FILE_CATEGORY_ICON[file.category] || FileText;
+            return (
+              <div
+                key={file.id}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/5 border border-wireframe-stroke text-xs"
               >
-                <Send className="w-4 h-4" />
-              </button>
+                <Icon className="w-3 h-3 text-gold/60" />
+                <span className="text-white/70 max-w-[120px] truncate">{file.name}</span>
+                <button
+                  type="button"
+                  onClick={() => removeAttachment(file.id)}
+                  className="p-0.5 rounded text-white/30 hover:text-red-400 transition-colors"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Voice recording panel — waveform + state indicators */}
+      {(voiceState === 'listening' || voiceState === 'processing') && (
+        <div className="relative z-10 mx-3 mt-2 rounded-xl overflow-hidden border border-gold/20 bg-black/60 backdrop-blur-md">
+          {/* State label */}
+          <div className="flex items-center justify-between px-4 pt-3">
+            <div className="flex items-center gap-2">
+              <div className={`w-2.5 h-2.5 rounded-full ${
+                voiceState === 'listening' ? 'bg-red-500 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.6)]' : 'bg-gold animate-pulse'
+              }`} />
+              <span className={`text-xs font-mono uppercase tracking-wider ${
+                voiceState === 'listening' ? 'text-red-400' : 'text-gold'
+              }`}>
+                {voiceState === 'listening' ? 'Recording' : 'Processing'}
+              </span>
             </div>
+            {voiceState === 'listening' && (
+              <button
+                type="button"
+                onClick={() => voiceInput.cancelListening()}
+                className="text-[10px] text-white/30 hover:text-red-400 font-mono uppercase transition-colors"
+              >
+                Cancel
+              </button>
+            )}
           </div>
+          {/* Waveform */}
+          <VoiceWaveform audioLevel={voiceInput.audioLevel} state={voiceState} />
+        </div>
+      )}
+
+      {/* Input */}
+      <div className="relative z-20 p-3 bg-[#0A0A0A]/80 backdrop-blur-xl border-t border-wireframe-stroke">
+        <input
+          ref={fileInputRef}
+          type="file"
+          multiple
+          accept=".pdf,.txt,.csv,.png,.jpg,.jpeg,.json,.yaml,.yml,.ts,.tsx,.js,.jsx,.py,.go,.rs,.md"
+          onChange={handleFileUpload}
+          className="hidden"
+        />
+
+        <form onSubmit={handleEnhancedSubmit} className="relative flex items-center gap-2">
+          {/* Attachment button */}
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isUploading}
+            title="Attach files"
+            className="p-2 rounded-lg text-white/30 hover:text-gold hover:bg-gold/10 transition-all disabled:opacity-30"
+          >
+            {isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Paperclip className="w-4 h-4" />}
+          </button>
+
+          {/* Mic button — enhanced with state ring */}
+          <button
+            type="button"
+            onClick={handleMicToggle}
+            disabled={voiceInput.isProcessing}
+            title={voiceInput.isListening ? 'Stop recording' : 'Start voice input'}
+            className={`relative p-2 rounded-lg transition-all ${
+              voiceInput.isListening
+                ? 'bg-red-500/20 text-red-400 ring-2 ring-red-500/40 shadow-[0_0_12px_rgba(239,68,68,0.3)]'
+                : voiceInput.isProcessing
+                ? 'bg-gold/20 text-gold animate-pulse'
+                : 'text-white/30 hover:text-gold hover:bg-gold/10'
+            } disabled:opacity-30`}
+          >
+            {voiceInput.isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+            {voiceInput.isListening && (
+              <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-red-500 animate-ping" />
+            )}
+          </button>
+
+          {/* Text input */}
+          <input
+            value={input}
+            onChange={handleInputChange}
+            placeholder={voiceInput.isProcessing ? 'Transcribing your voice...' : 'Tell me what you need...'}
+            disabled={isLoading}
+            className="flex-1 bg-white/5 hover:bg-white/10 focus:bg-black border border-wireframe-stroke focus:border-gold/40 rounded-xl py-3 pl-4 pr-12 text-white text-sm placeholder:text-white/20 transition-all outline-none"
+          />
+
+          {/* Send / Stop button */}
+          {isLoading ? (
+            <button
+              type="button"
+              onClick={stop}
+              className="absolute right-2 top-1.5 p-2 bg-red-500/10 text-red-400 rounded-lg transition-all hover:bg-red-500/20"
+            >
+              <Square className="w-4 h-4" />
+            </button>
+          ) : (
+            <button
+              type="submit"
+              disabled={!input.trim() && attachments.length === 0}
+              className="absolute right-2 top-1.5 p-2 bg-gold/10 hover:bg-gold text-gold hover:text-black rounded-lg transition-all disabled:opacity-30"
+            >
+              <Send className="w-4 h-4" />
+            </button>
+          )}
         </form>
-        <div className="flex items-center justify-between mt-2 px-1">
-          <span className="text-[9px] text-white/15">
-            A.I.M.S. v1.0 | ACP-Secured | Monitored by ORACLE
-          </span>
-          <div className="flex items-center gap-1.5">
-            <BarChart3 className="w-2.5 h-2.5 text-white/10" />
-            <Shield className="w-2.5 h-2.5 text-white/10" />
-          </div>
+        <div className="flex items-center justify-center gap-1.5 mt-2">
+          <Image
+            src="/images/logos/achievemor-gold.png"
+            alt="A.I.M.S."
+            width={12}
+            height={12}
+            className="opacity-30"
+          />
+          <p className="text-[9px] font-mono text-white/15 uppercase tracking-[0.2em]">
+            A.I.M.S. v2.0 &bull; {intent} Mode
+          </p>
         </div>
       </div>
     </div>

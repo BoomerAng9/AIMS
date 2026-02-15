@@ -107,7 +107,7 @@ export interface ExecutionPacket {
   policyManifest: PolicyManifest;
   costEstimate: CostEstimate;
   routingDecision: {
-    engine: 'ORACLE' | 'OPENCLAW' | 'N8N' | 'HYBRID';
+    engine: 'ORACLE' | 'N8N' | 'HYBRID';
     executionOwner: string;    // Boomer_Ang ID or squad
     fallback: string | null;
   };

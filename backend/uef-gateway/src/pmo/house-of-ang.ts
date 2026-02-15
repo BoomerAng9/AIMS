@@ -1,14 +1,22 @@
 /**
- * House of Ang — Boomer_Ang Factory & Deployment Center
+ * House of Ang — Boomer_Ang Registry & Forge Integration
  *
  * The birthplace and command center for all Boomer_Angs.
- * Supervisory Angs govern through PMO offices.
- * Execution Angs build, research, market, audit, and orchestrate.
+ *
+ * Two roster layers:
+ *   1. Supervisory — C-Suite directors & departmental agents (static, seed data)
+ *   2. Execution — Canonical Boomer_Ang services from infra/boomerangs/registry.json
+ *
+ * The AngForge resolves tasks to real registry entries and adds persona metadata.
+ * This module bridges the PMO governance layer with the service registry.
  *
  * "Activity breeds Activity."
  */
 
 import logger from '../logger';
+import { angForge } from './ang-forge';
+import type { ForgedAngProfile, AngForgeResult } from './persona-types';
+import type { PmoId, DirectorId } from './types';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -75,33 +83,8 @@ function makeSupervisory(
   };
 }
 
-function makeExecution(
-  id: string,
-  name: string,
-  title: string,
-  role: string,
-  status: AngStatus,
-  tasksCompleted: number,
-  successRate: number,
-  specialties: string[],
-): DeployedAng {
-  return {
-    id,
-    name,
-    type: 'EXECUTION',
-    title,
-    role,
-    assignedPmo: null,
-    status,
-    spawnedAt: GENESIS_TIMESTAMP,
-    tasksCompleted,
-    successRate,
-    specialties,
-  };
-}
-
 // ---------------------------------------------------------------------------
-// Seed data
+// Seed data — Supervisory (C-Suite + Departmental Agents)
 // ---------------------------------------------------------------------------
 
 function seedSupervisoryAngs(): DeployedAng[] {
@@ -196,74 +179,19 @@ function seedSupervisoryAngs(): DeployedAng[] {
   ];
 }
 
-function seedExecutionAngs(): DeployedAng[] {
-  return [
-    makeExecution(
-      'engineer-ang',
-      'Engineer_Ang',
-      'Full-Stack Builder',
-      'Builds frontend, backend, and cloud infrastructure.',
-      'DEPLOYED',
-      12,
-      94,
-      ['React/Next.js', 'Node.js APIs', 'Cloud Deploy', 'TypeScript'],
-    ),
-    makeExecution(
-      'marketer-ang',
-      'Marketer_Ang',
-      'Growth & Content Strategist',
-      'Creates copy, runs campaigns, and optimises organic reach.',
-      'DEPLOYED',
-      8,
-      91,
-      ['SEO Audits', 'Copy Generation', 'Campaign Flows'],
-    ),
-    makeExecution(
-      'analyst-ang',
-      'Analyst_Ang',
-      'Data & Intelligence Officer',
-      'Gathers market intelligence, builds dashboards, and runs analysis.',
-      'STANDBY',
-      3,
-      97,
-      ['Market Research', 'Data Pipelines', 'Visualization'],
-    ),
-    makeExecution(
-      'quality-ang',
-      'Quality_Ang',
-      'ORACLE Gate Verifier',
-      'Runs 7-gate verification, security audits, and code reviews.',
-      'STANDBY',
-      5,
-      100,
-      ['7-Gate Checks', 'Security Audits', 'Code Review'],
-    ),
-    makeExecution(
-      'chicken-hawk',
-      'Chicken Hawk',
-      'Pipeline Executor',
-      'Sequences multi-agent pipelines and delegates to Boomer_Angs.',
-      'DEPLOYED',
-      28,
-      96,
-      ['Multi-agent orchestration', 'Step sequencing', 'Pipeline execution'],
-    ),
-  ];
-}
-
 // ---------------------------------------------------------------------------
 // HouseOfAng class
 // ---------------------------------------------------------------------------
 
 export class HouseOfAng {
   private readonly roster: Map<string, DeployedAng> = new Map();
+  private readonly forgedProfiles: Map<string, ForgedAngProfile> = new Map();
   private readonly spawnLog: SpawnEvent[] = [];
 
   constructor() {
     const supervisory = seedSupervisoryAngs();
-    const execution = seedExecutionAngs();
 
-    for (const ang of [...supervisory, ...execution]) {
+    for (const ang of supervisory) {
       this.roster.set(ang.id, ang);
       this.spawnLog.push({
         angId: ang.id,
@@ -275,8 +203,8 @@ export class HouseOfAng {
     }
 
     logger.info(
-      { supervisory: supervisory.length, execution: execution.length },
-      'House of Ang initialised — roster populated',
+      { supervisory: supervisory.length },
+      'House of Ang initialised — supervisory roster populated',
     );
   }
 
@@ -331,61 +259,6 @@ export class HouseOfAng {
   // -----------------------------------------------------------------------
 
   /**
-   * Spawn a brand-new Boomer_Ang.
-   *
-   * The Ang starts in SPAWNING status. The caller is responsible for
-   * transitioning it to DEPLOYED or STANDBY once initialisation completes.
-   */
-  spawn(
-    name: string,
-    type: AngType,
-    title: string,
-    role: string,
-    specialties: string[],
-    spawnedBy = 'ACHEEVY',
-  ): DeployedAng {
-    const id = name.toLowerCase().replace(/\s+/g, '-');
-    const now = new Date().toISOString();
-
-    if (this.roster.has(id)) {
-      logger.warn({ id }, 'Spawn rejected — Ang ID already exists in roster');
-      throw new Error(`Ang with id "${id}" already exists`);
-    }
-
-    const ang: DeployedAng = {
-      id,
-      name,
-      type,
-      title,
-      role,
-      assignedPmo: null,
-      status: 'SPAWNING',
-      spawnedAt: now,
-      tasksCompleted: 0,
-      successRate: 100,
-      specialties,
-    };
-
-    this.roster.set(id, ang);
-
-    const event: SpawnEvent = {
-      angId: id,
-      angName: name,
-      type,
-      spawnedAt: now,
-      spawnedBy,
-    };
-    this.spawnLog.push(event);
-
-    logger.info(
-      { id, name, type, spawnedBy },
-      'New Boomer_Ang spawned in House of Ang',
-    );
-
-    return ang;
-  }
-
-  /**
    * Assign an existing Ang to a PMO office.
    * Pass `null` to un-assign (float).
    */
@@ -422,6 +295,95 @@ export class HouseOfAng {
     );
 
     return ang;
+  }
+
+  // -----------------------------------------------------------------------
+  // AngForge Integration — resolves registry Boomer_Angs + persona
+  // -----------------------------------------------------------------------
+
+  /**
+   * Forge a Boomer_Ang assignment for a task.
+   *
+   * Resolves an existing Boomer_Ang from infra/boomerangs/registry.json,
+   * assigns persona + skill tier, and tracks the forge in the roster.
+   */
+  forgeForTask(
+    message: string,
+    pmoOffice: PmoId,
+    director: DirectorId,
+    requestedBy = 'ACHEEVY',
+  ): AngForgeResult {
+    const result = angForge.forgeFromMessage(message, pmoOffice, director, requestedBy);
+    const { profile } = result;
+    const def = profile.definition;
+
+    // Store forged profile for later lookup
+    this.forgedProfiles.set(def.id, profile);
+
+    // Register in main roster as EXECUTION if not already present
+    if (!this.roster.has(def.id)) {
+      const deployed: DeployedAng = {
+        id: def.id,
+        name: def.name,
+        type: 'EXECUTION',
+        title: `${profile.persona.displayName} — ${result.benchLabel}`,
+        role: def.description,
+        assignedPmo: pmoOffice,
+        status: 'DEPLOYED',
+        spawnedAt: profile.forgedAt,
+        tasksCompleted: 0,
+        successRate: 100,
+        specialties: def.capabilities,
+      };
+      this.roster.set(def.id, deployed);
+
+      this.spawnLog.push({
+        angId: def.id,
+        angName: def.name,
+        type: 'EXECUTION',
+        spawnedAt: profile.forgedAt,
+        spawnedBy: requestedBy,
+      });
+    }
+
+    logger.info(
+      {
+        angId: def.id,
+        name: def.name,
+        bench: profile.benchLevel,
+        pmo: pmoOffice,
+        resolvedFromRegistry: profile.resolvedFromRegistry,
+        endpoint: def.endpoint,
+      },
+      'Boomer_Ang forged and tracked in House of Ang',
+    );
+
+    return result;
+  }
+
+  /** Get a forged profile (registry definition + persona + tier). */
+  getForgedProfile(angId: string): ForgedAngProfile | undefined {
+    return this.forgedProfiles.get(angId);
+  }
+
+  /** List all forged profiles. */
+  listForged(): ForgedAngProfile[] {
+    return Array.from(this.forgedProfiles.values());
+  }
+
+  /** List forged profiles by PMO office. */
+  listForgedByPmo(pmoId: string): ForgedAngProfile[] {
+    return this.listForged().filter(p => p.assignedPmo === pmoId);
+  }
+
+  /** Extended stats including forge operations. */
+  getExtendedStats(): HouseStats & { forged: number; forgeLog: number } {
+    const base = this.getStats();
+    return {
+      ...base,
+      forged: this.forgedProfiles.size,
+      forgeLog: angForge.getSpawnCount(),
+    };
   }
 }
 

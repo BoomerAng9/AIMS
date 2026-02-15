@@ -18,13 +18,13 @@ export function OnboardingStepper({ currentStep }: Props) {
           <div className="flex flex-col items-center gap-2">
             <div className={clsx(
               "h-2.5 w-2.5 rounded-full transition-all duration-500",
-              idx <= currentIndex ? "bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.6)]" : "bg-white/10"
+              idx <= currentIndex ? "bg-gold shadow-[0_0_8px_rgba(251,191,36,0.6)]" : "bg-white/10"
             )} />
           </div>
           {idx < STEPS.length - 1 && (
             <div className={clsx(
               "h-[1px] flex-1 mx-2 transition-all duration-700",
-              idx < currentIndex ? "bg-amber-400/50" : "bg-white/5"
+              idx < currentIndex ? "bg-gold/50" : "bg-white/5"
             )} />
           )}
         </React.Fragment>

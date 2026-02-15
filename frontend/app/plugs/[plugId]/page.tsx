@@ -68,7 +68,7 @@ interface ScoutingReport {
 const STATUS_COLORS: Record<string, string> = {
   prospect: "bg-cyan-500/20 text-cyan-400 border-cyan-500/30",
   contacted: "bg-blue-500/20 text-blue-400 border-blue-500/30",
-  evaluating: "bg-amber-500/20 text-amber-400 border-amber-500/30",
+  evaluating: "bg-gold/20 text-gold border-gold/30",
   shortlisted: "bg-violet-500/20 text-violet-400 border-violet-500/30",
   "offer-pending": "bg-pink-500/20 text-pink-400 border-pink-500/30",
   offered: "bg-pink-500/20 text-pink-400 border-pink-500/30",
@@ -89,7 +89,7 @@ const PIPELINE_STAGES = [
   { key: "identified", label: "Identified", color: "bg-zinc-500" },
   { key: "scouted", label: "Scouted", color: "bg-cyan-500" },
   { key: "shortlisted", label: "Shortlisted", color: "bg-violet-500" },
-  { key: "offerPending", label: "Offer Pending", color: "bg-amber-500" },
+  { key: "offerPending", label: "Offer Pending", color: "bg-gold" },
   { key: "committed", label: "Committed", color: "bg-emerald-500" },
 ];
 
@@ -107,14 +107,14 @@ const TABS: { key: Tab; label: string; icon: React.ElementType }[] = [
 
 function gradeColor(grade: number): string {
   if (grade >= 85) return "text-emerald-400";
-  if (grade >= 70) return "text-amber-400";
+  if (grade >= 70) return "text-gold";
   if (grade >= 55) return "text-orange-400";
   return "text-red-400";
 }
 
 function gradeBg(grade: number): string {
   if (grade >= 85) return "bg-emerald-500";
-  if (grade >= 70) return "bg-amber-500";
+  if (grade >= 70) return "bg-gold";
   if (grade >= 55) return "bg-orange-500";
   return "bg-red-500";
 }
@@ -212,8 +212,8 @@ export default function PlugPage() {
                 <ArrowLeft className="h-5 w-5" />
               </Button>
             </Link>
-            <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20">
-              <Trophy className="h-7 w-7 text-amber-400" />
+            <div className="p-2.5 rounded-xl bg-gold/10 border border-gold/20">
+              <Trophy className="h-7 w-7 text-gold" />
             </div>
             <div>
               <h1 className="text-2xl font-display text-white tracking-wide">Perform</h1>
@@ -237,7 +237,7 @@ export default function PlugPage() {
               className={cn(
                 "flex items-center gap-2 px-4 py-2.5 text-sm transition-all rounded-t-lg",
                 activeTab === tab.key
-                  ? "bg-white/5 text-amber-400 border-b-2 border-amber-500"
+                  ? "bg-white/5 text-gold border-b-2 border-gold"
                   : "text-zinc-500 hover:text-zinc-300 hover:bg-white/5"
               )}
             >
@@ -249,7 +249,7 @@ export default function PlugPage() {
 
         {loading ? (
           <div className="flex items-center justify-center py-20">
-            <Loader2 className="h-8 w-8 text-amber-500 animate-spin" />
+            <Loader2 className="h-8 w-8 text-gold animate-spin" />
           </div>
         ) : (
           <>
@@ -261,7 +261,7 @@ export default function PlugPage() {
                   <Card>
                     <CardHeader>
                       <CardTitle className="text-base flex items-center gap-2">
-                        <Kanban className="h-4 w-4 text-amber-400" /> Recruitment Pipeline
+                        <Kanban className="h-4 w-4 text-gold" /> Recruitment Pipeline
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -291,7 +291,7 @@ export default function PlugPage() {
                   <Card>
                     <CardHeader>
                       <CardTitle className="text-base flex items-center gap-2">
-                        <Star className="h-4 w-4 text-amber-400" /> Top Prospects
+                        <Star className="h-4 w-4 text-gold" /> Top Prospects
                       </CardTitle>
                       <CardDescription>Highest scouting grades</CardDescription>
                     </CardHeader>
@@ -330,7 +330,7 @@ export default function PlugPage() {
                   <Card>
                     <CardHeader>
                       <CardTitle className="text-base flex items-center gap-2">
-                        <FileText className="h-4 w-4 text-amber-400" /> Recent Reports
+                        <FileText className="h-4 w-4 text-gold" /> Recent Reports
                       </CardTitle>
                       <CardDescription>Latest scouting evaluations</CardDescription>
                     </CardHeader>
@@ -359,7 +359,7 @@ export default function PlugPage() {
                 <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
                   {[
                     { label: "Total Athletes", value: athletes.length, color: "text-white" },
-                    { label: "Avg Grade", value: athletes.length > 0 ? Math.round(athletes.reduce((s, a) => s + a.scoutingGrade, 0) / athletes.length) : 0, color: "text-amber-400" },
+                    { label: "Avg Grade", value: athletes.length > 0 ? Math.round(athletes.reduce((s, a) => s + a.scoutingGrade, 0) / athletes.length) : 0, color: "text-gold" },
                     { label: "Reports Filed", value: recentReports.length, color: "text-cyan-400" },
                     { label: "Active Scouts", value: 3, color: "text-emerald-400" },
                   ].map((stat) => (
@@ -382,7 +382,7 @@ export default function PlugPage() {
                       key={ath.id}
                       className={cn(
                         "cursor-pointer transition-all hover:bg-white/5",
-                        selectedAthlete?.id === ath.id && "border-amber-500/30 bg-amber-500/5"
+                        selectedAthlete?.id === ath.id && "border-gold/30 bg-gold/5"
                       )}
                       onClick={() => {
                         setSelectedAthlete(ath);
@@ -397,7 +397,7 @@ export default function PlugPage() {
                             ath.scoutingGrade >= 85
                               ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
                               : ath.scoutingGrade >= 70
-                                ? "bg-amber-500/10 border-amber-500/30 text-amber-400"
+                                ? "bg-gold/10 border-gold/30 text-gold"
                                 : "bg-orange-500/10 border-orange-500/30 text-orange-400"
                           )}>
                             {ath.scoutingGrade}
@@ -450,7 +450,7 @@ export default function PlugPage() {
                 <div className="space-y-4">
                   {selectedAthlete ? (
                     <>
-                      <Card className="border-amber-500/20">
+                      <Card className="border-gold/20">
                         <CardHeader className="pb-3">
                           <CardTitle className="text-base">
                             {selectedAthlete.firstName} {selectedAthlete.lastName}
@@ -660,7 +660,7 @@ export default function PlugPage() {
                     <div className="space-y-3">
                       {[
                         { range: "85-100 (Elite)", count: athletes.filter((a) => a.scoutingGrade >= 85).length, color: "bg-emerald-500" },
-                        { range: "70-84 (Starter)", count: athletes.filter((a) => a.scoutingGrade >= 70 && a.scoutingGrade < 85).length, color: "bg-amber-500" },
+                        { range: "70-84 (Starter)", count: athletes.filter((a) => a.scoutingGrade >= 70 && a.scoutingGrade < 85).length, color: "bg-gold" },
                         { range: "55-69 (Rotational)", count: athletes.filter((a) => a.scoutingGrade >= 55 && a.scoutingGrade < 70).length, color: "bg-orange-500" },
                         { range: "0-54 (Developmental)", count: athletes.filter((a) => a.scoutingGrade < 55).length, color: "bg-red-500" },
                       ].map((bucket) => (
@@ -695,7 +695,7 @@ export default function PlugPage() {
                       ).map(([sport, count]) => (
                         <div key={sport} className="flex items-center justify-between p-2 rounded-lg bg-white/5">
                           <span className="text-sm text-white capitalize">{sport}</span>
-                          <span className="text-sm font-display text-amber-400">{count}</span>
+                          <span className="text-sm font-display text-gold">{count}</span>
                         </div>
                       ))}
                     </div>
@@ -716,7 +716,7 @@ export default function PlugPage() {
                         <div className="text-[10px] text-zinc-500 uppercase mt-1">Avg Scout Grade</div>
                       </div>
                       <div className="bg-white/5 rounded-lg p-4">
-                        <div className="text-2xl font-display text-amber-400 font-bold">
+                        <div className="text-2xl font-display text-gold font-bold">
                           {athletes.length > 0 ? Math.max(...athletes.map((a) => a.scoutingGrade)) : 0}
                         </div>
                         <div className="text-[10px] text-zinc-500 uppercase mt-1">Highest Grade</div>

@@ -1,139 +1,106 @@
 // frontend/components/LogoWallBackground.tsx
 "use client";
 
-import React from "react";
 import clsx from "clsx";
 
 type LogoWallMode = "hero" | "auth" | "form" | "dashboard";
-type LogoColorway = "champagne" | "deepsea";
 
-interface Props {
+type Props = {
   mode?: LogoWallMode;
-  colorway?: LogoColorway;
   children: React.ReactNode;
-}
+};
 
 /**
- * Diagonal rounded-bar pattern that forms the structural "brick" surface.
- * UI elements are the "windows" cut into this wall.
+ * LogoWallBackground — Premium branded environment
  *
- * The SVG renders capsule-shaped bars at 45 degrees with a 3D embossed effect,
- * tiled across the entire viewport.
+ * Gold A.I.M.S. logo embossed across all pages at ultra-low opacity,
+ * like a luxury brand's monogram wallpaper — think Louis Vuitton or
+ * Gucci's repeating logo pattern pressed into leather.
+ *
+ * The emboss effect: subtle repeating logo + inner shadow illusion
+ * on ink-dark background with ambient gold accent lighting.
  */
-function DiagonalBarPattern({ colorway }: { colorway: LogoColorway }) {
-  const color = colorway === "champagne"
-    ? { bar: "#B8962E", highlight: "#D4AF37", shadow: "#6B5B1F", glow: "rgba(212,175,55,0.15)" }
-    : { bar: "#0E7490", highlight: "#22D3EE", shadow: "#064E5C", glow: "rgba(34,211,238,0.12)" };
-
-  // Each bar is a rounded rect rotated -45deg. We define several bars at
-  // varying lengths/positions to match the logo pattern.
-  const bars = [
-    { x: 20,  y: 10,  w: 80,  h: 18 },
-    { x: 110, y: 10,  w: 50,  h: 18 },
-    { x: 10,  y: 40,  w: 50,  h: 18 },
-    { x: 70,  y: 40,  w: 100, h: 18 },
-    { x: 30,  y: 70,  w: 70,  h: 18 },
-    { x: 115, y: 70,  w: 55,  h: 18 },
-    { x: 5,   y: 100, w: 90,  h: 18 },
-    { x: 105, y: 100, w: 65,  h: 18 },
-    { x: 45,  y: 130, w: 60,  h: 18 },
-    { x: 120, y: 130, w: 40,  h: 18 },
-    { x: 15,  y: 160, w: 55,  h: 18 },
-    { x: 80,  y: 160, w: 85,  h: 18 },
-  ];
-
+export function LogoWallBackground({ mode = "hero", children }: Props) {
   return (
-    <svg
-      className="absolute inset-0 w-full h-full"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-hidden="true"
-    >
-      <defs>
-        <pattern
-          id="diag-bars"
-          x="0" y="0"
-          width="180" height="180"
-          patternUnits="userSpaceOnUse"
-          patternTransform="rotate(-45)"
-        >
-          {bars.map((b, i) => (
-            <React.Fragment key={i}>
-              {/* Shadow / depth */}
-              <rect
-                x={b.x + 1} y={b.y + 1}
-                width={b.w} height={b.h}
-                rx={b.h / 2}
-                fill={color.shadow}
-                opacity={0.6}
-              />
-              {/* Main bar */}
-              <rect
-                x={b.x} y={b.y}
-                width={b.w} height={b.h}
-                rx={b.h / 2}
-                fill={color.bar}
-                opacity={0.9}
-              />
-              {/* Top-edge highlight */}
-              <rect
-                x={b.x + 2} y={b.y + 1}
-                width={b.w - 4} height={3}
-                rx={1.5}
-                fill={color.highlight}
-                opacity={0.4}
-              />
-            </React.Fragment>
-          ))}
-        </pattern>
-      </defs>
-      <rect width="100%" height="100%" fill={`url(#diag-bars)`} />
-    </svg>
-  );
-}
-
-export function LogoWallBackground({ mode = "hero", colorway = "champagne", children }: Props) {
-  const patternOpacity = {
-    hero:      "opacity-[0.18]",
-    auth:      "opacity-[0.22]",
-    form:      "opacity-[0.10]",
-    dashboard: "opacity-[0.08]",
-  }[mode];
-
-  const overlayClass = {
-    hero:      "from-black/40 via-black/60 to-black/80",
-    auth:      "from-black/30 via-black/50 to-black/70",
-    form:      "from-black/70 via-black/85 to-black/95",
-    dashboard: "from-black/55 via-black/75 to-black/90",
-  }[mode];
-
-  return (
-    <div className="relative min-h-screen bg-[#050507] text-amber-50 overflow-hidden">
-      {/* Layer 0: Diagonal bar pattern — the structural "brick" material */}
+    <div className={clsx(
+      "relative text-white",
+      mode === "dashboard" ? "h-full bg-ink" : "min-h-full bg-ink"
+    )}>
+      {/* Base gradient — warm ink with gold bias */}
       <div
-        className={clsx("pointer-events-none absolute inset-0 transition-opacity duration-1000", patternOpacity)}
-        aria-hidden="true"
-      >
-        <DiagonalBarPattern colorway={colorway} />
-      </div>
-
-      {/* Layer 1: Depth gradient — bars recede behind content */}
-      <div
-        className={clsx(
-          "pointer-events-none absolute inset-0 bg-gradient-to-br transition-all duration-700",
-          overlayClass
-        )}
+        className="pointer-events-none absolute inset-0 z-0"
+        style={{
+          background: `
+            radial-gradient(ellipse at 20% 20%, rgba(212,175,55,0.03) 0%, transparent 50%),
+            radial-gradient(ellipse at 80% 80%, rgba(212,175,55,0.02) 0%, transparent 50%),
+            linear-gradient(180deg, #0B0E14 0%, #080A10 50%, #0B0E14 100%)
+          `,
+        }}
         aria-hidden="true"
       />
 
-      {/* Layer 2: Window layer — content cut into the wall */}
+      {/* EMBOSSED A.I.M.S. LOGO — repeating monogram wallpaper */}
+      <div
+        className="pointer-events-none absolute inset-0 z-0"
+        style={{
+          backgroundImage: "url('/images/logos/achievemor-gold.png')",
+          backgroundSize: '100px 100px',
+          backgroundRepeat: 'repeat',
+          opacity: 0.025,
+          filter: 'contrast(0.8) brightness(0.9)',
+        }}
+        aria-hidden="true"
+      />
+
+      {/* Emboss depth layer — shifted copy for 3D pressed-in effect */}
+      <div
+        className="pointer-events-none absolute inset-0 z-0"
+        style={{
+          backgroundImage: "url('/images/logos/achievemor-gold.png')",
+          backgroundSize: '100px 100px',
+          backgroundRepeat: 'repeat',
+          backgroundPosition: '1px 1px',
+          opacity: 0.012,
+          filter: 'brightness(1.5) contrast(0.7)',
+          mixBlendMode: 'overlay',
+        }}
+        aria-hidden="true"
+      />
+
+      {/* Ambient gold glow — top-left accent */}
+      <div
+        className="pointer-events-none absolute top-0 left-0 w-[600px] h-[600px] z-0"
+        style={{
+          background: 'radial-gradient(circle at 0% 0%, rgba(212,175,55,0.04) 0%, transparent 60%)',
+        }}
+        aria-hidden="true"
+      />
+
+      {/* Ambient gold glow — bottom-right */}
+      <div
+        className="pointer-events-none absolute bottom-0 right-0 w-[400px] h-[400px] z-0"
+        style={{
+          background: 'radial-gradient(circle at 100% 100%, rgba(212,175,55,0.025) 0%, transparent 60%)',
+        }}
+        aria-hidden="true"
+      />
+
+      {/* Cinematic vignette — dark edges for depth */}
+      <div
+        className="pointer-events-none absolute inset-0 z-0"
+        style={{
+          background: 'radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.45) 100%)',
+        }}
+        aria-hidden="true"
+      />
+
+      {/* Content */}
       <main className={clsx(
-        "relative z-10 min-h-screen flex flex-col",
-        mode === "hero" || mode === "dashboard" ? "p-4 md:p-8 lg:p-12" : "p-0"
+        "relative z-10 flex flex-col",
+        mode === "dashboard" ? "h-full" : "min-h-full",
+        mode === "hero" ? "p-4 md:p-6 lg:p-8 xl:p-12" : "p-0"
       )}>
-        <div className={clsx(
-          "flex-1 flex flex-col w-full",
-          (mode === "hero" || mode === "dashboard") && "rounded-[32px] border border-white/5 bg-black/20 backdrop-blur-[2px] shadow-2xl"
-        )}>
+        <div className="flex-1 flex flex-col w-full">
           {children}
         </div>
       </main>

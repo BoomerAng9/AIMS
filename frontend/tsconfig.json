@@ -18,10 +18,15 @@
         "name": "next"
       }
     ],
+    "typeRoots": ["./node_modules/@types"],
+    "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@/aims-tools/*": ["../aims-tools/*"],
+      "zod": ["./node_modules/zod"],
+      "uuid": ["./node_modules/@types/uuid"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "../aims-tools/**/*.ts"],
   "exclude": ["node_modules"]
 }

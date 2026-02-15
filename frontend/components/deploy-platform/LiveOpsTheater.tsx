@@ -112,7 +112,7 @@ function YardAnimation({ phase, progress }: { phase: string; progress: number })
   ];
 
   return (
-    <div className="relative h-24 bg-black/30 rounded-lg overflow-hidden border border-white/5">
+    <div className="relative h-24 bg-black/30 rounded-lg overflow-hidden border border-wireframe-stroke">
       <svg className="w-full h-full" viewBox="0 0 100 80">
         {/* Ground */}
         <rect x="0" y="70" width="100" height="10" fill="#1a2234" />
@@ -168,7 +168,7 @@ function YardAnimation({ phase, progress }: { phase: string; progress: number })
       </svg>
 
       {/* Phase label */}
-      <div className="absolute top-2 left-2 text-xs font-mono text-amber-400/70 uppercase">
+      <div className="absolute top-2 left-2 text-xs font-mono text-gold uppercase">
         {phase.replace('_', ' ')}
       </div>
     </div>
@@ -182,18 +182,18 @@ function YardAnimation({ phase, progress }: { phase: string; progress: number })
 function LilHawkCard({ hawk }: { hawk: LilHawkStatus }) {
   const statusColors = {
     idle: 'bg-gray-500',
-    working: 'bg-amber-500 animate-pulse',
+    working: 'bg-gold animate-pulse',
     verifying: 'bg-blue-500 animate-pulse',
     complete: 'bg-green-500',
   };
 
   return (
-    <div className="p-2 rounded-lg bg-black/30 border border-white/5 flex items-center gap-2">
-      <div className="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center">
-        <BirdIcon className="w-4 h-4 text-amber-400" />
+    <div className="p-2 rounded-lg bg-black/30 border border-wireframe-stroke flex items-center gap-2">
+      <div className="w-8 h-8 rounded-full bg-gold/20 flex items-center justify-center">
+        <BirdIcon className="w-4 h-4 text-gold" />
       </div>
       <div className="flex-1 min-w-0">
-        <div className="text-xs font-medium text-amber-100 truncate">{hawk.personaHandle}</div>
+        <div className="text-xs font-medium text-white truncate">{hawk.personaHandle}</div>
         <div className="text-[10px] text-gray-500 truncate">{hawk.currentTask || hawk.designation}</div>
       </div>
       <div className={`w-2 h-2 rounded-full ${statusColors[hawk.status]}`} />
@@ -250,7 +250,7 @@ function EventFeed({ events }: { events: ShiftEvent[] }) {
   return (
     <div
       ref={feedRef}
-      className="h-32 overflow-y-auto space-y-1 scrollbar-thin scrollbar-thumb-amber-500/20"
+      className="h-32 overflow-y-auto space-y-1 scrollbar-thin scrollbar-thumb-gold/20"
     >
       <AnimatePresence>
         {events.map((event) => (
@@ -263,9 +263,9 @@ function EventFeed({ events }: { events: ShiftEvent[] }) {
           >
             <div className="flex items-center gap-2">
               {event.lilHawk && (
-                <span className="text-amber-400 font-medium">{event.lilHawk}:</span>
+                <span className="text-gold font-medium">{event.lilHawk}:</span>
               )}
-              <span className="text-amber-100/70">{event.description}</span>
+              <span className="text-white/70">{event.description}</span>
             </div>
             <div className="text-[10px] text-gray-600 mt-0.5">
               {event.timestamp.toLocaleTimeString()}
@@ -375,19 +375,19 @@ export function LiveOpsTheater({ shiftId, isOpen, onClose, minimal = false }: Li
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
-        className={`bg-[#0a1628] rounded-xl border border-amber-500/20 overflow-hidden shadow-2xl ${
+        className={`bg-[#0a1628] rounded-xl border border-gold/20 overflow-hidden shadow-2xl ${
           minimal ? 'w-80' : 'w-full max-w-2xl'
         }`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-white/5">
+        <div className="flex items-center justify-between p-4 border-b border-wireframe-stroke">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-amber-500/20 flex items-center justify-center">
-              <CraneIcon className="w-5 h-5 text-amber-400" />
+            <div className="w-10 h-10 rounded-lg bg-gold/20 flex items-center justify-center">
+              <CraneIcon className="w-5 h-5 text-gold" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-amber-100">Live Ops Theater</h2>
+              <h2 className="text-lg font-bold text-white">Live Ops Theater</h2>
               <p className="text-xs text-gray-500">
                 {status?.squadName} | Shift {status?.shiftId?.slice(0, 12)}
               </p>
@@ -399,7 +399,7 @@ export function LiveOpsTheater({ shiftId, isOpen, onClose, minimal = false }: Li
                 type="checkbox"
                 checked={humorEnabled}
                 onChange={(e) => setHumorEnabled(e.target.checked)}
-                className="rounded border-gray-600 text-amber-500 focus:ring-amber-500"
+                className="rounded border-gray-600 text-gold focus:ring-gold"
               />
               Humor
             </label>
@@ -432,15 +432,15 @@ export function LiveOpsTheater({ shiftId, isOpen, onClose, minimal = false }: Li
                 <div key={phase} className="flex-1 flex items-center">
                   <div
                     className={`flex-1 h-1 rounded ${
-                      isActive ? 'bg-amber-500' : 'bg-gray-700'
+                      isActive ? 'bg-gold' : 'bg-gray-700'
                     }`}
                   />
                   <div
                     className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${
                       isCurrent
-                        ? 'bg-amber-500 text-black'
+                        ? 'bg-gold text-black'
                         : isActive
-                        ? 'bg-amber-500/50 text-amber-100'
+                        ? 'bg-gold/50 text-white'
                         : 'bg-gray-700 text-gray-500'
                     }`}
                   >
@@ -471,7 +471,7 @@ export function LiveOpsTheater({ shiftId, isOpen, onClose, minimal = false }: Li
         </div>
 
         {/* Footer */}
-        <div className="px-4 py-3 border-t border-white/5 text-center">
+        <div className="px-4 py-3 border-t border-wireframe-stroke text-center">
           <p className="text-xs text-gray-500">
             Watch only \u2014 Chat with ACHEEVY to make changes
           </p>

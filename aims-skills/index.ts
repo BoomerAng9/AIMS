@@ -25,6 +25,28 @@ export const ACHEEVY_SKILLS = [
   IdeaValidationSkill,
 ];
 
+// Chain of Command
+export { createRegistry, ALL_ROLE_CARDS, ENFORCEMENT_POLICY, OVERLAY_SNIPPET_POLICY } from './chain-of-command';
+export { ChainOfCommandHook } from './hooks/chain-of-command.hook';
+
+// Gateway System
+export {
+  createGateway,
+  SDTService,
+  EvidenceLockerService,
+  CertificationGateService,
+  SubmissionService,
+  CompliancePackService,
+  JobPacketService,
+  LucQuoteService,
+  OperationsFeedService,
+  GATEWAY_SECURITY_POLICY,
+  CERTIFICATION_REQUIREMENTS,
+  COMPLIANCE_PACK_SCHEMA,
+  GATEWAY_CONFIG,
+} from './gateway';
+export { GatewayEnforcementHook } from './hooks/gateway-enforcement.hook';
+
 // Hook Registry  
 export const ACHEEVY_HOOKS = [
   OnboardingFlowHook,

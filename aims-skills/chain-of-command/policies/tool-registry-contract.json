@@ -1,0 +1,88 @@
+{
+  "policy_id": "aims_tool_registry_contract.v2",
+  "version": "2.0.0",
+  "effective_date": "2026-02-12",
+  "description": "Tool Registry Contract — enforces Boomer_Ang-only wrapping of all capabilities.",
+
+  "single_public_surface_rule": {
+    "rule": "Users NEVER interact with raw open-source tools, containers, or internal endpoints.",
+    "surface": "Port Authority (Gateway)",
+    "functions": [
+      "Routes internally to services (n8n, executors, RAG, etc.)",
+      "Enforces auth/tenant isolation",
+      "Calls LUC before billable actions"
+    ]
+  },
+
+  "registration_schema": {
+    "required_fields": [
+      {
+        "field": "tool_id",
+        "type": "string",
+        "description": "Unique identifier for this tool/capability."
+      },
+      {
+        "field": "delegated_boomer_ang_owner",
+        "type": "string",
+        "pattern": "^[A-Za-z0-9\\-]+_Ang$",
+        "description": "The Boomer_Ang handle that owns this capability. THIS IS THE KEY CONTROL."
+      },
+      {
+        "field": "endpoint",
+        "type": "string",
+        "description": "Internal service endpoint (never exposed to users)."
+      },
+      {
+        "field": "luc_service_key",
+        "type": "string",
+        "description": "LUC metering key for runtime billing."
+      },
+      {
+        "field": "policy",
+        "type": "object",
+        "description": "Who can run it; plan gates; rate limits.",
+        "properties": {
+          "authorized_roles": "Role types allowed to trigger this tool.",
+          "plan_gate": "Minimum plan tier required.",
+          "rate_limit": "Requests per minute cap.",
+          "requires_approval": "Whether Boomer_Ang approval is needed before execution."
+        }
+      }
+    ],
+    "optional_fields": [
+      "wrapper_type",
+      "sbom_ref",
+      "permission_manifest",
+      "audit_event_schema"
+    ]
+  },
+
+  "wrapper_types": [
+    {
+      "type": "SERVICE_WRAPPER",
+      "description": "Repo runs as an internal API service (HTTP/gRPC) behind Port Authority."
+    },
+    {
+      "type": "JOB_RUNNER_WRAPPER",
+      "description": "Repo runs as a containerized 'run once' task (queued + metered + logged)."
+    },
+    {
+      "type": "CLI_WRAPPER",
+      "description": "Repo runs as a CLI inside a controlled container with narrow command surface."
+    },
+    {
+      "type": "MCP_BRIDGE_WRAPPER",
+      "description": "Repo exposes an MCP interface, but Port Authority remains the gate."
+    }
+  ],
+
+  "every_wrapper_ships_with": [
+    "Build metadata + version pinning",
+    "SBOM + vuln scan results stored as evidence",
+    "Permission manifest (what data it can touch)",
+    "LUC metering keys (runtime seconds, calls, tokens, storage)",
+    "Audit events (who triggered, what was produced, where stored)"
+  ],
+
+  "enforcement_rule": "Even if a tool is 'about coding' or 'about research,' it is still OWNED by a Boomer_Ang. Chicken Hawk and Lil_Hawks don't get direct tool authority unless a Boomer_Ang explicitly delegates a bounded sub-action through workflow packets."
+}

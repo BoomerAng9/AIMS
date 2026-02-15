@@ -1,71 +1,17 @@
 'use client';
 
 /**
- * App Showcase Component
+ * App Showcase + Build Prompts — Landing Page Sections
  *
- * Displays real production apps built with A.I.M.S.
- * Instead of conversation starter bubbles, shows actual working applications
- * that users can try immediately.
+ * Showcase: Real production apps built with A.I.M.S. using wireframe-card styling
+ * BuildPrompts: Natural language prompt examples
  */
 
 import { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { AIMS_CIRCUIT_COLORS } from '@/components/ui/CircuitBoard';
-
-// ─────────────────────────────────────────────────────────────
-// Icons
-// ─────────────────────────────────────────────────────────────
-
-const ArrowRightIcon = ({ className }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <line x1="5" y1="12" x2="19" y2="12" />
-    <polyline points="12 5 19 12 12 19" />
-  </svg>
-);
-
-const CalculatorIcon = ({ className }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <rect x="4" y="2" width="16" height="20" rx="2" />
-    <line x1="8" y1="6" x2="16" y2="6" />
-    <line x1="8" y1="10" x2="8" y2="10.01" />
-    <line x1="12" y1="10" x2="12" y2="10.01" />
-    <line x1="16" y1="10" x2="16" y2="10.01" />
-    <line x1="8" y1="14" x2="8" y2="14.01" />
-    <line x1="12" y1="14" x2="12" y2="14.01" />
-    <line x1="16" y1="14" x2="16" y2="14.01" />
-  </svg>
-);
-
-const RocketIcon = ({ className, style }: { className?: string; style?: React.CSSProperties }) => (
-  <svg className={className} style={style} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 00-2.91-.09z" />
-    <path d="M12 15l-3-3a22 22 0 012-3.95A12.88 12.88 0 0122 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 01-4 2z" />
-    <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0" />
-    <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
-  </svg>
-);
-
-const ShoppingCartIcon = ({ className }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <circle cx="9" cy="21" r="1" />
-    <circle cx="20" cy="21" r="1" />
-    <path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6" />
-  </svg>
-);
-
-const StoreIcon = ({ className }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
-    <polyline points="9 22 9 12 15 12 15 22" />
-  </svg>
-);
-
-const ZapIcon = ({ className }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-  </svg>
-);
+import { staggerContainer, staggerItem, cardLift } from '@/lib/motion/variants';
+import { ArrowRight, Calculator, Store, ShoppingCart, Zap, Rocket } from 'lucide-react';
 
 // ─────────────────────────────────────────────────────────────
 // Types
@@ -77,7 +23,6 @@ interface AppShowcaseItem {
   tagline: string;
   description: string;
   icon: React.ReactNode;
-  gradient: string;
   features: string[];
   demoLink: string;
   builtIn: string;
@@ -94,14 +39,12 @@ const SHOWCASE_APPS: AppShowcaseItem[] = [
     name: 'LUC - Usage Calculator',
     tagline: 'Track, Estimate, Optimize',
     description: 'Production-ready usage calculator with quota tracking, cost estimation, and execution gating. 8 industry presets included.',
-    icon: <CalculatorIcon className="w-8 h-8" />,
-    gradient: 'from-amber-500 to-orange-500',
+    icon: <Calculator className="w-6 h-6" />,
     features: [
       'Real-time quota tracking',
-      'Industry presets (SaaS, AI, E-commerce, etc.)',
+      'Industry presets (SaaS, AI, E-commerce)',
       'Import/Export functionality',
       'Usage history & analytics',
-      'File-based persistence',
     ],
     demoLink: '/dashboard/luc',
     builtIn: '< 30 minutes',
@@ -112,13 +55,11 @@ const SHOWCASE_APPS: AppShowcaseItem[] = [
     name: 'Garage to Global',
     tagline: 'From Side Hustle to Empire',
     description: 'Complete e-commerce seller suite with AI-powered best practices for Shopify, Amazon, KDP, and Etsy.',
-    icon: <StoreIcon className="w-8 h-8" />,
-    gradient: 'from-emerald-500 to-teal-500',
+    icon: <Store className="w-6 h-6" />,
     features: [
       'E-commerce best practices engine',
-      'Multi-platform adapters (Shopify, Amazon, KDP, Etsy)',
+      'Multi-platform adapters',
       'Listing SEO optimizer',
-      'Marketing automation',
       '5-stage growth journey',
     ],
     demoLink: '/dashboard/boomerangs',
@@ -130,13 +71,11 @@ const SHOWCASE_APPS: AppShowcaseItem[] = [
     name: 'Buy in Bulk',
     tagline: 'Smart Shopping at Scale',
     description: 'Boomer_Ang-powered shopping assistant that scouts deals, compares prices, and optimizes bulk purchases.',
-    icon: <ShoppingCartIcon className="w-8 h-8" />,
-    gradient: 'from-blue-500 to-indigo-500',
+    icon: <ShoppingCart className="w-6 h-6" />,
     features: [
       'AI price comparison',
       'Deal scouting agents',
       'Cart optimization',
-      'Purchase workflow automation',
       'Never shares payment info',
     ],
     demoLink: '/dashboard/boomerangs',
@@ -149,92 +88,69 @@ const SHOWCASE_APPS: AppShowcaseItem[] = [
 // App Card Component
 // ─────────────────────────────────────────────────────────────
 
-function AppCard({ app, index }: { app: AppShowcaseItem; index: number }) {
-  const [isHovered, setIsHovered] = useState(false);
-
+function AppCard({ app }: { app: AppShowcaseItem }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ delay: index * 0.15 }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      className="group relative overflow-hidden rounded-2xl"
-      style={{
-        backgroundColor: '#1a2234',
-        border: '1px solid #2d3a4d',
-      }}
+      variants={staggerItem}
+      {...cardLift}
+      className="wireframe-card overflow-hidden cursor-default"
     >
-      {/* Gradient Accent Bar */}
-      <div className={`h-1 bg-gradient-to-r ${app.gradient}`} />
+      {/* Gold accent line at top */}
+      <div className="h-px bg-gradient-to-r from-transparent via-gold/30 to-transparent" />
 
       <div className="p-6">
         {/* Header */}
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div
-              className={`p-3 rounded-xl bg-gradient-to-br ${app.gradient} text-white`}
-            >
+            <div className="p-2.5 rounded-xl border border-gold/20 bg-gold/5 text-gold">
               {app.icon}
             </div>
             <div>
-              <h3 className="text-xl font-bold text-white">{app.name}</h3>
-              <p className="text-sm text-gray-400">{app.tagline}</p>
+              <h3 className="text-base font-medium text-white">{app.name}</h3>
+              <p className="text-xs text-white/40">{app.tagline}</p>
             </div>
           </div>
-          <div
-            className={`px-3 py-1 rounded-full text-xs font-medium ${
-              app.status === 'live'
-                ? 'bg-green-500/20 text-green-400'
-                : app.status === 'demo'
-                ? 'bg-amber-500/20 text-amber-400'
-                : 'bg-gray-500/20 text-gray-400'
-            }`}
-          >
-            {app.status === 'live' ? 'LIVE' : app.status === 'demo' ? 'DEMO' : 'COMING SOON'}
-          </div>
+          <span className={`px-2 py-0.5 rounded text-[0.6rem] font-mono uppercase ${
+            app.status === 'live'
+              ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+              : app.status === 'demo'
+              ? 'bg-gold/10 text-gold border border-gold/20'
+              : 'bg-white/5 text-white/30 border border-wireframe-stroke'
+          }`}>
+            {app.status === 'live' ? 'LIVE' : app.status === 'demo' ? 'DEMO' : 'SOON'}
+          </span>
         </div>
 
         {/* Description */}
-        <p className="text-gray-300 text-sm mb-4">{app.description}</p>
+        <p className="text-sm text-white/40 mb-4 leading-relaxed">{app.description}</p>
 
         {/* Features */}
-        <div className="space-y-2 mb-6">
+        <div className="space-y-1.5 mb-5">
           {app.features.map((feature, i) => (
-            <div key={i} className="flex items-center gap-2 text-sm text-gray-400">
-              <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+            <div key={i} className="flex items-center gap-2 text-sm text-white/50">
+              <span className="w-1 h-1 rounded-full bg-gold/60 flex-shrink-0" />
               {feature}
             </div>
           ))}
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between pt-4 border-t border-gray-700/50">
-          <div className="flex items-center gap-2">
-            <ZapIcon className="w-4 h-4 text-amber-400" />
-            <span className="text-sm text-gray-400">
-              Built with A.I.M.S. in{' '}
-              <span className="text-amber-400 font-semibold">{app.builtIn}</span>
+        <div className="flex items-center justify-between pt-4 border-t border-wireframe-stroke">
+          <div className="flex items-center gap-1.5">
+            <Zap className="w-3.5 h-3.5 text-gold/60" />
+            <span className="text-xs text-white/30">
+              Built in <span className="text-gold/80 font-medium">{app.builtIn}</span>
             </span>
           </div>
           <Link
             href={app.demoLink}
-            className="flex items-center gap-1 text-sm font-medium transition-all group-hover:gap-2"
-            style={{ color: AIMS_CIRCUIT_COLORS.accent }}
+            className="flex items-center gap-1 text-xs font-medium text-gold/80 hover:text-gold transition-colors group"
           >
             Try it now
-            <ArrowRightIcon className="w-4 h-4" />
+            <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
           </Link>
         </div>
       </div>
-
-      {/* Hover Glow Effect */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: isHovered ? 0.1 : 0 }}
-        className={`absolute inset-0 bg-gradient-to-br ${app.gradient} pointer-events-none`}
-      />
     </motion.div>
   );
 }
@@ -245,7 +161,7 @@ function AppCard({ app, index }: { app: AppShowcaseItem; index: number }) {
 
 export function AppShowcase() {
   return (
-    <section className="py-20 px-6" style={{ backgroundColor: '#0a0f1a' }}>
+    <section className="py-20 px-4 md:px-6 lg:px-8 xl:px-12 bg-[#0A0A0A]">
       <div className="max-w-6xl mx-auto">
         {/* Section Header */}
         <motion.div
@@ -254,75 +170,60 @@ export function AppShowcase() {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <div
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6"
-            style={{
-              backgroundColor: AIMS_CIRCUIT_COLORS.primary + '20',
-              border: `1px solid ${AIMS_CIRCUIT_COLORS.primary}40`,
-            }}
-          >
-            <RocketIcon className="w-4 h-4" style={{ color: AIMS_CIRCUIT_COLORS.accent }} />
-            <span className="text-sm font-medium" style={{ color: AIMS_CIRCUIT_COLORS.secondary }}>
-              Production-Ready Apps
-            </span>
-          </div>
+          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-lg border border-gold/20 bg-gold/5 text-[0.65rem] uppercase tracking-[0.2em] text-gold/80 font-mono mb-6">
+            <Rocket className="w-3.5 h-3.5" />
+            Production-Ready Apps
+          </span>
 
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            <span style={{ color: AIMS_CIRCUIT_COLORS.accent }}>Real Apps.</span>{' '}
+          <h2 className="font-display text-3xl md:text-4xl uppercase tracking-wider mb-4">
+            <span className="text-gold">Real Apps.</span>{' '}
             <span className="text-white">Built Fast.</span>
           </h2>
 
-          <p className="text-gray-400 max-w-2xl mx-auto text-lg">
-            These aren't mockups or demos. These are production-ready applications
-            built with A.I.M.S. in under an hour. Try them now.
+          <p className="text-white/40 max-w-2xl mx-auto">
+            These aren&apos;t mockups. Production-ready applications built with
+            A.I.M.S. in under an hour.
           </p>
         </motion.div>
 
         {/* App Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-          {SHOWCASE_APPS.map((app, index) => (
-            <AppCard key={app.id} app={app} index={index} />
+        <motion.div
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-12"
+        >
+          {SHOWCASE_APPS.map((app) => (
+            <AppCard key={app.id} app={app} />
           ))}
-        </div>
+        </motion.div>
 
         {/* Build Your Own CTA */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center p-8 rounded-2xl"
-          style={{
-            backgroundColor: '#1a2234',
-            border: `1px solid ${AIMS_CIRCUIT_COLORS.primary}40`,
-            boxShadow: `0 0 60px ${AIMS_CIRCUIT_COLORS.glow}20`,
-          }}
+          className="wireframe-card text-center p-8"
         >
-          <h3 className="text-2xl font-bold text-white mb-2">
+          <h3 className="font-display text-xl uppercase tracking-wider text-white mb-2">
             What Will You Build?
           </h3>
-          <p className="text-gray-400 mb-6 max-w-xl mx-auto">
-            Tell ACHEEVY what you need. A.I.M.S. will build it. Fast.
-            No coding required. Just describe your vision.
+          <p className="text-sm text-white/40 mb-6 max-w-xl mx-auto">
+            Tell ACHEEVY what you need. A.I.M.S. will build it. No coding required.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link
-              href="/dashboard/chat"
-              className="flex items-center gap-2 px-8 py-4 rounded-xl font-semibold text-black transition-all hover:scale-105"
-              style={{
-                background: `linear-gradient(135deg, ${AIMS_CIRCUIT_COLORS.primary}, ${AIMS_CIRCUIT_COLORS.accent})`,
-                boxShadow: `0 0 30px ${AIMS_CIRCUIT_COLORS.glow}`,
-              }}
+              href="/chat"
+              className="inline-flex items-center gap-2 rounded-xl bg-gold px-6 py-3 text-sm font-medium text-black transition-colors hover:bg-gold-light"
             >
               Start Building with ACHEEVY
-              <ArrowRightIcon className="w-5 h-5" />
+              <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
               href="https://github.com/BoomerAng9/AIMS"
               target="_blank"
-              className="flex items-center gap-2 px-6 py-4 rounded-xl font-medium text-gray-300 transition-all hover:text-white hover:bg-white/5"
-              style={{
-                border: '1px solid #2d3a4d',
-              }}
+              className="inline-flex items-center gap-2 rounded-xl border border-wireframe-stroke px-6 py-3 text-sm text-white/60 transition-colors hover:bg-white/5 hover:text-white"
             >
               View on GitHub
             </Link>
@@ -334,35 +235,35 @@ export function AppShowcase() {
 }
 
 // ─────────────────────────────────────────────────────────────
-// Quote Prompts (Instead of Conversation Starters)
+// Build Prompts
 // ─────────────────────────────────────────────────────────────
 
 export function BuildPrompts() {
   const prompts = [
     {
       title: 'Build me a usage calculator',
-      description: 'Track API calls, storage, and compute with quota limits and overage billing.',
+      description: 'Track API calls, storage, and compute with quota limits.',
       result: 'LUC Calculator',
     },
     {
       title: 'Help me sell online',
-      description: 'Set up my e-commerce business from scratch with AI-powered best practices.',
+      description: 'Set up my e-commerce business with AI-powered best practices.',
       result: 'Garage to Global Suite',
     },
     {
       title: 'Find me the best deals',
-      description: 'Scout products across retailers and optimize my bulk purchases.',
+      description: 'Scout products across retailers and optimize bulk purchases.',
       result: 'Buy in Bulk Agent',
     },
     {
       title: 'Manage my AI costs',
-      description: 'Create dashboards and alerts for my multi-model AI spending.',
+      description: 'Create dashboards and alerts for multi-model AI spending.',
       result: 'AI Platform Calculator',
     },
   ];
 
   return (
-    <section className="py-16 px-6" style={{ backgroundColor: '#0a0f1a' }}>
+    <section className="py-16 px-4 md:px-6 lg:px-8 xl:px-12 bg-[#0A0A0A]">
       <div className="max-w-4xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -370,41 +271,35 @@ export function BuildPrompts() {
           viewport={{ once: true }}
           className="text-center mb-12"
         >
-          <h2 className="text-3xl font-bold text-white mb-2">
+          <h2 className="font-display text-2xl md:text-3xl uppercase tracking-wider text-white mb-2">
             Just Tell ACHEEVY What You Need
           </h2>
-          <p className="text-gray-400">
-            No technical jargon required. Speak naturally.
-          </p>
+          <p className="text-white/40">No technical jargon required. Speak naturally.</p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <motion.div
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          className="grid grid-cols-1 md:grid-cols-2 gap-3"
+        >
           {prompts.map((prompt, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, x: i % 2 === 0 ? -20 : 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-            >
+            <motion.div key={i} variants={staggerItem}>
               <Link
-                href="/dashboard/chat"
-                className="block p-5 rounded-xl transition-all hover:scale-[1.02] group"
-                style={{
-                  backgroundColor: '#1a2234',
-                  border: '1px solid #2d3a4d',
-                }}
+                href="/chat"
+                className="block wireframe-card p-5 transition-all hover:border-gold/20 group"
               >
                 <div className="flex items-start gap-3">
-                  <div className="p-2 rounded-lg bg-amber-500/10">
-                    <ZapIcon className="w-5 h-5 text-amber-400" />
+                  <div className="p-2 rounded-lg border border-gold/10 bg-gold/5">
+                    <Zap className="w-4 h-4 text-gold/60" />
                   </div>
                   <div>
-                    <h4 className="text-white font-medium mb-1 group-hover:text-amber-400 transition-colors">
-                      "{prompt.title}"
+                    <h4 className="text-sm font-medium text-white mb-1 group-hover:text-gold transition-colors">
+                      &ldquo;{prompt.title}&rdquo;
                     </h4>
-                    <p className="text-sm text-gray-400 mb-2">{prompt.description}</p>
-                    <span className="text-xs text-amber-400/80">
+                    <p className="text-xs text-white/40 mb-2">{prompt.description}</p>
+                    <span className="text-[0.6rem] text-gold/60 font-mono uppercase">
                       Creates: {prompt.result}
                     </span>
                   </div>
@@ -412,7 +307,7 @@ export function BuildPrompts() {
               </Link>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

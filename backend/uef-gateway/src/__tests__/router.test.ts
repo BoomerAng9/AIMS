@@ -19,7 +19,7 @@ describe('Agent Router', () => {
     expect(result.agentOutputs.length).toBeGreaterThan(0);
   });
 
-  it('dispatches BUILD_PLUG to ChickenHawk + Quality_Ang', async () => {
+  it('dispatches BUILD_PLUG to Chicken Hawk + Quality_Ang', async () => {
     const result = await routeToAgents(
       'BUILD_PLUG',
       'Build a CRM plug with user management dashboard and API',
@@ -27,7 +27,7 @@ describe('Agent Router', () => {
       'req-003'
     );
     expect(result.executed).toBe(true);
-    // Should have ChickenHawk output + Quality_Ang verification
+    // Should have Chicken Hawk output + Quality_Ang verification
     expect(result.agentOutputs.length).toBe(2);
     expect(result.primaryAgent).toBe('chicken-hawk');
   });
@@ -44,7 +44,7 @@ describe('Agent Router', () => {
     expect(result.primaryAgent).toBe('analyst-ang');
   });
 
-  it('dispatches AGENTIC_WORKFLOW to ChickenHawk', async () => {
+  it('dispatches AGENTIC_WORKFLOW to Chicken Hawk', async () => {
     const result = await routeToAgents(
       'AGENTIC_WORKFLOW',
       'Run a full product launch workflow with research, build, and deploy',

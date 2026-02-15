@@ -5,10 +5,10 @@
   "description": "Naming conventions for Lil_Hawks - Chicken Hawk spawned workers organized in Squads",
 
   "mascot": {
-    "name": "Chicken_Hawk",
+    "name": "Chicken Hawk",
     "description": "Deploy execution engine + mascot - small but relentless, powers up when needed",
     "role": "Execution engine that spawns and coordinates Lil_Hawks",
-    "replaces": "OpenClaw (in user-facing + internal artifacts)",
+    "role_note": "Primary execution engine for all user-facing + internal artifacts",
     "evolution": {
       "base": "Small chick - handles atomic tasks",
       "powered": "Wings spread - handles parallel tasks",
@@ -18,7 +18,7 @@
   },
 
   "terminology": {
-    "Chicken_Hawk": "Deploy execution engine + mascot",
+    "Chicken Hawk": "Deploy execution engine + mascot",
     "Lil_Hawks": "Spawned worker bots (atomic workers)",
     "Squad": "Coordinated group of Lil_Hawks spawned for a single Shift/Manifest",
     "X_Lil_Hawk": "Individual persona name format for any single Lil_Hawk"
@@ -236,7 +236,7 @@
       "note": "Supervisors are persistent Boomer_Angs, not tied to shifts"
     },
     "execution_engine": {
-      "type": "Chicken_Hawk",
+      "type": "Chicken Hawk",
       "description": "Spawns and coordinates Lil_Hawks, executes manifests"
     },
     "workers": {
@@ -244,6 +244,6 @@
       "pattern": "<Function>_<CrewRole>_Lil_Hawk_<ShiftId>-<Serial>",
       "note": "Lil_Hawks are spawned per shift, organized in Squads when N>1"
     },
-    "command_chain": "ACHEEVY → Boomer_Ang → Chicken_Hawk → Squad → Lil_Hawk"
+    "command_chain": "ACHEEVY → Boomer_Ang → Chicken Hawk → Squad → Lil_Hawk"
   }
 }

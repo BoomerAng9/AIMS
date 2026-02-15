@@ -1,15 +1,16 @@
 /**
- * Agent LLM Bridge — Connects Boomer_Angs to OpenRouter
+ * Agent LLM Bridge — Connects Boomer_Angs to the Unified LLM Gateway
  *
  * Each agent calls agentChat() to get LLM-powered responses.
- * When OpenRouter is not configured, returns null so agents
+ * When no LLM provider is configured, returns null so agents
  * can fall back to their heuristic logic.
  *
- * Voltron piece: This is the neural link between the power source
- * (OpenRouter) and each individual lion (Boomer_Ang).
+ * Routing: Vertex AI (Claude/Gemini) → OpenRouter fallback → stub.
+ * All calls are metered through the usage tracker for LUC billing.
  */
 
-import { openrouter, DEFAULT_MODEL } from './openrouter';
+import { llmGateway } from './gateway';
+import { DEFAULT_MODEL } from './openrouter';
 import type { LLMResult, ChatMessage } from './openrouter';
 import { AGENT_SYSTEM_PROMPTS } from './agent-prompts';
 import logger from '../logger';
@@ -21,14 +22,16 @@ export interface AgentChatOptions {
   context?: string;
   model?: string;
   maxTokens?: number;
+  userId?: string;
+  sessionId?: string;
 }
 
 /**
  * Send a task to the LLM as a specific agent persona.
- * Returns null if OpenRouter is not configured (agents fall back to heuristics).
+ * Returns null if no LLM provider is configured (agents fall back to heuristics).
  */
 export async function agentChat(opts: AgentChatOptions): Promise<LLMResult | null> {
-  if (!openrouter.isConfigured()) {
+  if (!llmGateway.isConfigured()) {
     return null;
   }
 
@@ -61,12 +64,16 @@ export async function agentChat(opts: AgentChatOptions): Promise<LLMResult | nul
   });
 
   try {
-    return await openrouter.chat({
+    const result = await llmGateway.chat({
       model: opts.model || DEFAULT_MODEL,
       messages,
       max_tokens: opts.maxTokens || 2048,
       temperature: 0.7,
+      agentId: opts.agentId,
+      userId: opts.userId || 'agent-system',
+      sessionId: opts.sessionId || 'agent-dispatch',
     });
+    return result;
   } catch (err) {
     logger.error({ agentId: opts.agentId, err }, '[AgentLLM] LLM call failed — agent will use heuristic fallback');
     return null;

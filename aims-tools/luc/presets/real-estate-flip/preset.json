@@ -1,0 +1,221 @@
+{
+  "id": "real-estate-flip",
+  "name": "Real Estate Flip Calculator",
+  "version": "1.0.0",
+  "description": "Calculate potential profits for house flipping projects based on the Flip Secrets methodology",
+  "category": "real-estate",
+  "inputFields": [
+    {
+      "id": "purchasePrice",
+      "name": "Purchase Price",
+      "type": "currency",
+      "category": "acquisition",
+      "description": "The purchase price of the property",
+      "constraints": { "min": 0, "required": true }
+    },
+    {
+      "id": "repairCosts",
+      "name": "Repair/Renovation Costs",
+      "type": "currency",
+      "category": "renovation",
+      "description": "Total estimated cost of repairs and renovations",
+      "constraints": { "min": 0, "required": true }
+    },
+    {
+      "id": "arv",
+      "name": "ARV (After Repair Value)",
+      "type": "currency",
+      "category": "valuation",
+      "description": "Estimated value after all repairs are complete",
+      "constraints": { "min": 0, "required": true }
+    },
+    {
+      "id": "holdingPeriodMonths",
+      "name": "Holding Period (Months)",
+      "type": "number",
+      "category": "timeline",
+      "description": "Expected time to complete and sell the property",
+      "defaultValue": 6,
+      "constraints": { "min": 1, "max": 36 }
+    },
+    {
+      "id": "purchaseClosingCostPercent",
+      "name": "Purchase Closing Costs (%)",
+      "type": "percentage",
+      "category": "costs",
+      "description": "Closing costs as percentage of purchase price",
+      "defaultValue": 2
+    },
+    {
+      "id": "saleClosingCostPercent",
+      "name": "Sale Closing Costs (%)",
+      "type": "percentage",
+      "category": "costs",
+      "description": "Closing costs as percentage of sale price",
+      "defaultValue": 3
+    },
+    {
+      "id": "realtorCommissionPercent",
+      "name": "Realtor Commission (%)",
+      "type": "percentage",
+      "category": "costs",
+      "description": "Real estate agent commission",
+      "defaultValue": 6
+    },
+    {
+      "id": "loanToValue",
+      "name": "Loan-to-Value (%)",
+      "type": "percentage",
+      "category": "financing",
+      "description": "Percentage of purchase financed",
+      "defaultValue": 70
+    },
+    {
+      "id": "interestRate",
+      "name": "Annual Interest Rate (%)",
+      "type": "percentage",
+      "category": "financing",
+      "description": "Annual interest rate on loan",
+      "defaultValue": 12
+    },
+    {
+      "id": "loanPoints",
+      "name": "Loan Points",
+      "type": "number",
+      "category": "financing",
+      "description": "Points charged on loan origination",
+      "defaultValue": 2
+    },
+    {
+      "id": "monthlyHoldingCosts",
+      "name": "Monthly Holding Costs",
+      "type": "currency",
+      "category": "costs",
+      "description": "Monthly costs (taxes, insurance, utilities, etc.)",
+      "defaultValue": 500
+    },
+    {
+      "id": "contingencyPercent",
+      "name": "Contingency (%)",
+      "type": "percentage",
+      "category": "renovation",
+      "description": "Buffer for unexpected repair costs",
+      "defaultValue": 10
+    }
+  ],
+  "outputFields": [
+    {
+      "id": "totalInvestment",
+      "name": "Total Investment",
+      "type": "currency",
+      "description": "Total capital required"
+    },
+    {
+      "id": "cashRequired",
+      "name": "Cash Required",
+      "type": "currency",
+      "description": "Out-of-pocket cash needed"
+    },
+    {
+      "id": "loanAmount",
+      "name": "Loan Amount",
+      "type": "currency",
+      "description": "Amount financed"
+    },
+    {
+      "id": "totalFinancingCosts",
+      "name": "Total Financing Costs",
+      "type": "currency",
+      "description": "All financing-related costs"
+    },
+    {
+      "id": "totalHoldingCosts",
+      "name": "Total Holding Costs",
+      "type": "currency",
+      "description": "All holding period costs"
+    },
+    {
+      "id": "totalSellingCosts",
+      "name": "Total Selling Costs",
+      "type": "currency",
+      "description": "All costs related to sale"
+    },
+    {
+      "id": "totalCosts",
+      "name": "Total Project Costs",
+      "type": "currency",
+      "description": "Sum of all costs"
+    },
+    {
+      "id": "profit",
+      "name": "Net Profit",
+      "type": "currency",
+      "description": "Expected profit from flip"
+    },
+    {
+      "id": "roi",
+      "name": "ROI (%)",
+      "type": "percentage",
+      "description": "Return on investment"
+    },
+    {
+      "id": "cashOnCashReturn",
+      "name": "Cash-on-Cash Return (%)",
+      "type": "percentage",
+      "description": "Return on actual cash invested"
+    },
+    {
+      "id": "maxOffer",
+      "name": "Maximum Offer Price",
+      "type": "currency",
+      "description": "Maximum price for target profit margin"
+    },
+    {
+      "id": "dealStatus",
+      "name": "Deal Status",
+      "type": "string",
+      "description": "Quick assessment of deal quality"
+    }
+  ],
+  "formulas": [],
+  "testCases": [
+    {
+      "name": "Basic Flip - 100k Purchase",
+      "inputs": {
+        "purchasePrice": 100000,
+        "repairCosts": 30000,
+        "arv": 180000,
+        "holdingPeriodMonths": 4,
+        "purchaseClosingCostPercent": 2,
+        "saleClosingCostPercent": 3,
+        "realtorCommissionPercent": 6,
+        "loanToValue": 70,
+        "interestRate": 12,
+        "loanPoints": 2,
+        "monthlyHoldingCosts": 400,
+        "contingencyPercent": 10
+      },
+      "expectedOutputs": {
+        "loanAmount": 70000,
+        "totalInvestment": 137000,
+        "profit": 20240
+      }
+    },
+    {
+      "name": "All Cash Deal",
+      "inputs": {
+        "purchasePrice": 150000,
+        "repairCosts": 25000,
+        "arv": 220000,
+        "holdingPeriodMonths": 3,
+        "loanToValue": 0,
+        "interestRate": 0,
+        "loanPoints": 0
+      },
+      "expectedOutputs": {
+        "loanAmount": 0,
+        "cashRequired": 180500
+      }
+    }
+  ]
+}

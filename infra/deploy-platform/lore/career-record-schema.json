@@ -41,7 +41,7 @@
         },
         "spawnedBy": {
           "type": "string",
-          "description": "Chicken_Hawk that spawned this Lil_Hawk"
+          "description": "Chicken Hawk that spawned this Lil_Hawk"
         }
       }
     },
@@ -84,7 +84,7 @@
         },
         "title": {
           "type": "string",
-          "enum": ["Hatchling", "Apprentice", "Journeyman", "Foreman", "Chicken_Hawk_Candidate", "Chicken_Hawk"]
+          "enum": ["Hatchling", "Apprentice", "Journeyman", "Foreman", "Chicken Hawk_Candidate", "Chicken Hawk"]
         },
         "prefix": {
           "type": "string",

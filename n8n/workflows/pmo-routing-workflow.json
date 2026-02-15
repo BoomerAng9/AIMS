@@ -1,0 +1,320 @@
+{
+  "name": "AIMS PMO Routing — Chain of Command Pipeline",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "pmo-intake",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "node-trigger",
+      "name": "PMO Intake Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [220, 460],
+      "webhookId": "pmo-intake"
+    },
+    {
+      "parameters": {
+        "functionCode": "// ═══════════════════════════════════════════════════════\n// ACHEEVY — Intent Classifier & PMO Routing Engine\n// Chain: User → ACHEEVY → Boomer_Ang → Chicken Hawk\n// ═══════════════════════════════════════════════════════\n\nconst body = $input.first().json;\nconst message = (body.message || '').toLowerCase();\nconst userId = body.userId || 'anonymous';\nconst requestId = body.requestId || `REQ-${Date.now().toString(36).toUpperCase()}`;\n\n// ── PMO Office Routing Map ──────────────────────────\nconst PMO_KEYWORDS = {\n  'tech-office': {\n    director: 'Boomer_CTO',\n    agent: 'DevOps Agent',\n    keywords: ['deploy', 'infrastructure', 'docker', 'ci/cd', 'pipeline', 'build', 'server', 'vps', 'architecture', 'devops', 'container', 'kubernetes', 'api', 'backend', 'database', 'schema', 'migrate', 'nginx', 'ssl', 'dns']\n  },\n  'finance-office': {\n    director: 'Boomer_CFO',\n    agent: 'Value Agent',\n    keywords: ['budget', 'cost', 'token', 'luc', 'pricing', 'revenue', 'expense', 'roi', 'financial', 'billing', 'invoice', 'subscription', 'payment', 'stripe']\n  },\n  'ops-office': {\n    director: 'Boomer_COO',\n    agent: 'Flow Boss Agent',\n    keywords: ['workflow', 'automate', 'schedule', 'cron', 'sla', 'throughput', 'queue', 'monitor', 'health', 'uptime', 'performance', 'load', 'scaling', 'ops', 'operations']\n  },\n  'marketing-office': {\n    director: 'Boomer_CMO',\n    agent: 'Social Campaign Agent',\n    keywords: ['campaign', 'marketing', 'social', 'ad', 'seo', 'content', 'brand', 'growth', 'acquisition', 'funnel', 'conversion', 'twitter', 'linkedin', 'instagram', 'tiktok', 'outreach', 'email blast']\n  },\n  'design-office': {\n    director: 'Boomer_CDO',\n    agent: 'Video Editing Agent',\n    keywords: ['video', 'design', 'ui', 'ux', 'graphic', 'thumbnail', 'motion', 'animation', 'render', 'remotion', 'visual', 'creative', 'logo', 'brand identity', 'multimedia']\n  },\n  'publishing-office': {\n    director: 'Boomer_CPO',\n    agent: 'Social Agent',\n    keywords: ['publish', 'post', 'article', 'blog', 'content schedule', 'editorial', 'newsletter', 'distribution', 'audience', 'engagement', 'community']\n  }\n};\n\n// ── Intent Classification ───────────────────────────\nlet matchedOffice = null;\nlet matchScore = 0;\nlet matchedKeywords = [];\n\nfor (const [officeId, config] of Object.entries(PMO_KEYWORDS)) {\n  let score = 0;\n  const hits = [];\n  for (const kw of config.keywords) {\n    if (message.includes(kw)) {\n      score += kw.split(' ').length; // multi-word keywords score higher\n      hits.push(kw);\n    }\n  }\n  if (score > matchScore) {\n    matchScore = score;\n    matchedOffice = officeId;\n    matchedKeywords = hits;\n  }\n}\n\n// Default to ops-office if no clear match\nif (!matchedOffice) matchedOffice = 'ops-office';\n\nconst office = PMO_KEYWORDS[matchedOffice];\n\n// ── Determine Execution Lane ────────────────────────\n// Deploy It = fast lane (pre-approved, low complexity)\n// Guide Me  = consultative lane (requires review)\nconst isSimple = matchScore <= 2 && message.length < 200;\nconst executionLane = isSimple ? 'deploy_it' : 'guide_me';\n\n// ── Build ACHEEVY Classified Output ─────────────────\nreturn [{\n  json: {\n    requestId,\n    userId,\n    message: body.message || '',\n    timestamp: new Date().toISOString(),\n    classification: {\n      pmoOffice: matchedOffice,\n      director: office.director,\n      departmentalAgent: office.agent,\n      matchedKeywords,\n      confidence: Math.min(matchScore / 5, 1.0),\n      executionLane\n    },\n    chainOfCommand: {\n      step: 1,\n      current: 'ACHEEVY',\n      next: office.director,\n      path: ['User', 'ACHEEVY', office.director, 'Chicken Hawk', 'Squad', 'Lil_Hawks', 'Receipt', 'ACHEEVY', 'User']\n    }\n  }\n}];"
+      },
+      "id": "node-acheevy-classifier",
+      "name": "ACHEEVY Classifier",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [440, 460]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "rules": [
+            {
+              "output": 0,
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.classification.pmoOffice }}",
+                    "rightValue": "tech-office",
+                    "operator": { "type": "string", "operation": "equals" }
+                  }
+                ]
+              }
+            },
+            {
+              "output": 1,
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.classification.pmoOffice }}",
+                    "rightValue": "finance-office",
+                    "operator": { "type": "string", "operation": "equals" }
+                  }
+                ]
+              }
+            },
+            {
+              "output": 2,
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.classification.pmoOffice }}",
+                    "rightValue": "ops-office",
+                    "operator": { "type": "string", "operation": "equals" }
+                  }
+                ]
+              }
+            },
+            {
+              "output": 3,
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.classification.pmoOffice }}",
+                    "rightValue": "marketing-office",
+                    "operator": { "type": "string", "operation": "equals" }
+                  }
+                ]
+              }
+            },
+            {
+              "output": 4,
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.classification.pmoOffice }}",
+                    "rightValue": "design-office",
+                    "operator": { "type": "string", "operation": "equals" }
+                  }
+                ]
+              }
+            },
+            {
+              "output": 5,
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.classification.pmoOffice }}",
+                    "rightValue": "publishing-office",
+                    "operator": { "type": "string", "operation": "equals" }
+                  }
+                ]
+              }
+            }
+          ],
+          "fallbackOutput": 2
+        }
+      },
+      "id": "node-pmo-switch",
+      "name": "PMO Office Router",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [680, 460]
+    },
+    {
+      "parameters": {
+        "functionCode": "// ═══════════════════════════════════════════════════════\n// Boomer_CTO — Chief Technology Officer Scope Validator\n// PMO: tech-office | Agent: DevOps Agent\n// ═══════════════════════════════════════════════════════\n\nconst data = $input.first().json;\nconst message = data.message.toLowerCase();\n\n// Scope validation — does this truly belong to tech-office?\nconst techSignals = ['deploy', 'build', 'docker', 'api', 'server', 'database', 'schema', 'nginx', 'ssl', 'ci/cd', 'infrastructure', 'container', 'backend', 'vps'];\nconst inScope = techSignals.some(s => message.includes(s));\n\n// Break into execution steps for Chicken Hawk\nconst steps = [];\nif (message.includes('deploy')) steps.push('Prepare deployment manifest', 'Validate Docker configuration', 'Execute deployment to target environment');\nif (message.includes('build')) steps.push('Scaffold project structure', 'Generate component tree', 'Implement core logic');\nif (message.includes('api')) steps.push('Design API schema', 'Implement endpoint handlers', 'Add authentication middleware');\nif (message.includes('database') || message.includes('schema')) steps.push('Design database schema', 'Generate migration files', 'Apply migration');\nif (message.includes('infrastructure') || message.includes('server') || message.includes('vps')) steps.push('Audit current infrastructure', 'Plan infrastructure changes', 'Apply infrastructure updates');\nif (steps.length === 0) steps.push('Analyze technical requirements', 'Plan implementation', 'Execute technical task');\n\n// Always add verification\nsteps.push('Run ORACLE verification gates');\n\nreturn [{\n  json: {\n    ...data,\n    chainOfCommand: { ...data.chainOfCommand, step: 2, current: 'Boomer_CTO', next: 'Chicken Hawk' },\n    boomerDirective: {\n      director: 'Boomer_CTO',\n      office: 'tech-office',\n      inScope,\n      authority: 'Approve architecture changes, tech stack decisions, deployment pipelines',\n      executionSteps: steps,\n      crewSpecialties: ['crane-ops', 'deploy-ops', 'safety-ops'],\n      squadSize: Math.min(steps.length, 6)\n    }\n  }\n}];"
+      },
+      "id": "node-boomer-cto",
+      "name": "Boomer_CTO Director",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [940, 100]
+    },
+    {
+      "parameters": {
+        "functionCode": "// ═══════════════════════════════════════════════════════\n// Boomer_CFO — Chief Financial Officer Scope Validator\n// PMO: finance-office | Agent: Value Agent\n// ═══════════════════════════════════════════════════════\n\nconst data = $input.first().json;\nconst message = data.message.toLowerCase();\n\nconst steps = [];\nif (message.includes('cost') || message.includes('budget')) steps.push('Audit current spending', 'Generate cost breakdown report');\nif (message.includes('pricing') || message.includes('subscription')) steps.push('Analyze pricing tiers', 'Model revenue impact');\nif (message.includes('token') || message.includes('luc')) steps.push('Calculate LUC token efficiency', 'Optimize token allocation');\nif (message.includes('roi')) steps.push('Model return on investment', 'Generate ROI dashboard');\nif (steps.length === 0) steps.push('Analyze financial requirements', 'Generate financial report');\nsteps.push('Run financial verification gates');\n\nreturn [{\n  json: {\n    ...data,\n    chainOfCommand: { ...data.chainOfCommand, step: 2, current: 'Boomer_CFO', next: 'Chicken Hawk' },\n    boomerDirective: {\n      director: 'Boomer_CFO',\n      office: 'finance-office',\n      inScope: true,\n      authority: 'Approve spend thresholds, cost optimization, settlement policies',\n      executionSteps: steps,\n      crewSpecialties: ['load-ops', 'safety-ops'],\n      squadSize: Math.min(steps.length, 4)\n    }\n  }\n}];"
+      },
+      "id": "node-boomer-cfo",
+      "name": "Boomer_CFO Director",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [940, 260]
+    },
+    {
+      "parameters": {
+        "functionCode": "// ═══════════════════════════════════════════════════════\n// Boomer_COO — Chief Operating Officer Scope Validator\n// PMO: ops-office | Agent: Flow Boss Agent\n// ═══════════════════════════════════════════════════════\n\nconst data = $input.first().json;\nconst message = data.message.toLowerCase();\n\nconst steps = [];\nif (message.includes('workflow') || message.includes('automate')) steps.push('Map current workflow', 'Design automation pipeline', 'Implement workflow nodes');\nif (message.includes('schedule') || message.includes('cron')) steps.push('Define schedule parameters', 'Configure cron triggers', 'Set up alerting');\nif (message.includes('monitor') || message.includes('health')) steps.push('Audit system health', 'Configure monitoring dashboards', 'Set up alert thresholds');\nif (message.includes('scaling') || message.includes('performance')) steps.push('Analyze current throughput', 'Identify bottlenecks', 'Implement scaling strategy');\nif (steps.length === 0) steps.push('Analyze operational requirements', 'Design operational workflow', 'Implement operations task');\nsteps.push('Run SLA verification gates');\n\nreturn [{\n  json: {\n    ...data,\n    chainOfCommand: { ...data.chainOfCommand, step: 2, current: 'Boomer_COO', next: 'Chicken Hawk' },\n    boomerDirective: {\n      director: 'Boomer_COO',\n      office: 'ops-office',\n      inScope: true,\n      authority: 'Scale agent capacity, enforce SLAs, pause degraded pipelines',\n      executionSteps: steps,\n      crewSpecialties: ['yard-ops', 'dispatch-ops', 'safety-ops'],\n      squadSize: Math.min(steps.length, 6)\n    }\n  }\n}];"
+      },
+      "id": "node-boomer-coo",
+      "name": "Boomer_COO Director",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [940, 420]
+    },
+    {
+      "parameters": {
+        "functionCode": "// ═══════════════════════════════════════════════════════\n// Boomer_CMO — Chief Marketing Officer Scope Validator\n// PMO: marketing-office | Agent: Social Campaign Agent\n// ═══════════════════════════════════════════════════════\n\nconst data = $input.first().json;\nconst message = data.message.toLowerCase();\n\nconst steps = [];\nif (message.includes('campaign')) steps.push('Define campaign objectives', 'Create campaign assets', 'Schedule campaign distribution');\nif (message.includes('seo')) steps.push('Run SEO audit', 'Generate keyword strategy', 'Implement on-page optimizations');\nif (message.includes('social') || message.includes('twitter') || message.includes('linkedin')) steps.push('Analyze target audience', 'Create social content calendar', 'Draft social media posts');\nif (message.includes('email') || message.includes('outreach')) steps.push('Build email list segments', 'Draft outreach templates', 'Configure send automation');\nif (steps.length === 0) steps.push('Analyze marketing requirements', 'Create marketing strategy', 'Execute marketing campaign');\nsteps.push('Run campaign verification gates');\n\nreturn [{\n  json: {\n    ...data,\n    chainOfCommand: { ...data.chainOfCommand, step: 2, current: 'Boomer_CMO', next: 'Chicken Hawk' },\n    boomerDirective: {\n      director: 'Boomer_CMO',\n      office: 'marketing-office',\n      inScope: true,\n      authority: 'Approve campaigns, allocate marketing budget, brand guidelines enforcement',\n      executionSteps: steps,\n      crewSpecialties: ['load-ops', 'dispatch-ops'],\n      squadSize: Math.min(steps.length, 4)\n    }\n  }\n}];"
+      },
+      "id": "node-boomer-cmo",
+      "name": "Boomer_CMO Director",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [940, 580]
+    },
+    {
+      "parameters": {
+        "functionCode": "// ═══════════════════════════════════════════════════════\n// Boomer_CDO — Chief Design Officer Scope Validator\n// PMO: design-office | Agent: Video Editing Agent\n// ═══════════════════════════════════════════════════════\n\nconst data = $input.first().json;\nconst message = data.message.toLowerCase();\n\nconst steps = [];\nif (message.includes('video') || message.includes('remotion')) steps.push('Storyboard video concept', 'Generate video assets', 'Render final video');\nif (message.includes('design') || message.includes('ui') || message.includes('ux')) steps.push('Audit current design system', 'Create design mockups', 'Implement design tokens');\nif (message.includes('thumbnail') || message.includes('graphic')) steps.push('Define visual concept', 'Generate graphic assets', 'Optimize for platform specs');\nif (message.includes('animation') || message.includes('motion')) steps.push('Design motion storyboard', 'Build animation keyframes', 'Render motion graphics');\nif (steps.length === 0) steps.push('Analyze design requirements', 'Create design deliverables', 'Review visual consistency');\nsteps.push('Run design quality verification gates');\n\nreturn [{\n  json: {\n    ...data,\n    chainOfCommand: { ...data.chainOfCommand, step: 2, current: 'Boomer_CDO', next: 'Chicken Hawk' },\n    boomerDirective: {\n      director: 'Boomer_CDO',\n      office: 'design-office',\n      inScope: true,\n      authority: 'Approve design systems, visual standards, multimedia assets',\n      executionSteps: steps,\n      crewSpecialties: ['crane-ops', 'load-ops'],\n      squadSize: Math.min(steps.length, 4)\n    }\n  }\n}];"
+      },
+      "id": "node-boomer-cdo",
+      "name": "Boomer_CDO Director",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [940, 740]
+    },
+    {
+      "parameters": {
+        "functionCode": "// ═══════════════════════════════════════════════════════\n// Boomer_CPO — Chief Publication Officer Scope Validator\n// PMO: publishing-office | Agent: Social Agent\n// ═══════════════════════════════════════════════════════\n\nconst data = $input.first().json;\nconst message = data.message.toLowerCase();\n\nconst steps = [];\nif (message.includes('publish') || message.includes('post')) steps.push('Prepare content for publication', 'Format for target platform', 'Schedule publication');\nif (message.includes('article') || message.includes('blog')) steps.push('Draft article outline', 'Write article content', 'Edit and proofread');\nif (message.includes('newsletter')) steps.push('Curate newsletter content', 'Design newsletter layout', 'Schedule newsletter send');\nif (message.includes('distribution') || message.includes('audience')) steps.push('Analyze audience segments', 'Plan distribution strategy', 'Execute distribution');\nif (steps.length === 0) steps.push('Analyze publishing requirements', 'Create content deliverables', 'Execute publication workflow');\nsteps.push('Run editorial verification gates');\n\nreturn [{\n  json: {\n    ...data,\n    chainOfCommand: { ...data.chainOfCommand, step: 2, current: 'Boomer_CPO', next: 'Chicken Hawk' },\n    boomerDirective: {\n      director: 'Boomer_CPO',\n      office: 'publishing-office',\n      inScope: true,\n      authority: 'Approve publication schedules, editorial guidelines, distribution strategy',\n      executionSteps: steps,\n      crewSpecialties: ['load-ops', 'dispatch-ops'],\n      squadSize: Math.min(steps.length, 4)\n    }\n  }\n}];"
+      },
+      "id": "node-boomer-cpo",
+      "name": "Boomer_CPO Director",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [940, 900]
+    },
+    {
+      "parameters": {
+        "functionCode": "// ═══════════════════════════════════════════════════════\n// Chicken Hawk — Shift Spawner & Squad Assembler\n// Receives validated directive from Boomer_Ang director\n// Spawns Squad of Lil_Hawks for execution\n// ═══════════════════════════════════════════════════════\n\nconst data = $input.first().json;\nconst directive = data.boomerDirective;\nconst steps = directive.executionSteps;\n\n// Generate Shift ID\nconst shiftId = `SH-${Date.now().toString(36).toUpperCase().slice(-8)}`;\nconst squadId = `Squad_${shiftId}-001`;\n\n// ── Lil_Hawk Designation Catalog ────────────────────\nconst DESIGNATIONS = {\n  'crane-ops': [\n    { handle: 'Lil_Popeye_Hawk', role: 'Heavy infrastructure lifting' },\n    { handle: 'Lil_IronWing_Hawk', role: 'System architecture assembly' },\n    { handle: 'Lil_StackMaster_Hawk', role: 'Full-stack construction' }\n  ],\n  'load-ops': [\n    { handle: 'Lil_Busy_Hawk', role: 'Task errand execution' },\n    { handle: 'Lil_Scurry_Hawk', role: 'Rapid data movement' },\n    { handle: 'Lil_Parcel_Hawk', role: 'Payload packaging and delivery' }\n  ],\n  'deploy-ops': [\n    { handle: 'Lil_Packer_Hawk', role: 'Container packaging' },\n    { handle: 'Lil_ShipIt_Hawk', role: 'Deployment execution' },\n    { handle: 'Lil_Rollout_Hawk', role: 'Progressive rollout management' }\n  ],\n  'safety-ops': [\n    { handle: 'Lil_RedFlag_Hawk', role: 'Risk detection and alerting' },\n    { handle: 'Lil_Seatbelt_Hawk', role: 'Safety constraint enforcement' },\n    { handle: 'Lil_Guardian_Hawk', role: 'Access control and security' }\n  ],\n  'yard-ops': [\n    { handle: 'Lil_LaneBoss_Hawk', role: 'Workflow lane management' },\n    { handle: 'Lil_Tetris_Hawk', role: 'Resource optimization fitting' },\n    { handle: 'Lil_Pathfinder_Hawk', role: 'Route discovery and planning' }\n  ],\n  'dispatch-ops': [\n    { handle: 'Lil_Dispatch_Hawk', role: 'Task dispatching and coordination' },\n    { handle: 'Lil_Wave_Hawk', role: 'Wave execution orchestration' },\n    { handle: 'Lil_Sync_Hawk', role: 'Cross-agent synchronization' }\n  ]\n};\n\n// ── Assemble Squad ──────────────────────────────────\nconst squadMembers = [];\nconst specialties = directive.crewSpecialties || ['yard-ops', 'safety-ops'];\n\nfor (const spec of specialties) {\n  const pool = DESIGNATIONS[spec] || [];\n  if (pool.length > 0) {\n    // Pick first available hawk from each specialty\n    const hawk = pool[squadMembers.length % pool.length];\n    squadMembers.push({\n      canonicalId: `${hawk.handle.toUpperCase().replace(/ /g, '_')}_${shiftId}`,\n      personaHandle: hawk.handle,\n      designation: spec,\n      careerLevel: 'Journeyman',\n      assignedCapability: hawk.role\n    });\n  }\n}\n\n// Ensure minimum squad of 2\nwhile (squadMembers.length < 2) {\n  squadMembers.push({\n    canonicalId: `LIL_WORKER_HAWK_${shiftId}_${squadMembers.length}`,\n    personaHandle: 'Lil_Worker_Hawk',\n    designation: 'load-ops',\n    careerLevel: 'Hatchling',\n    assignedCapability: 'General task execution'\n  });\n}\n\n// ── Assign Steps to Lil_Hawks ───────────────────────\nconst assignedSteps = steps.map((step, i) => ({\n  stepIndex: i,\n  description: step,\n  assignedLilHawk: squadMembers[i % squadMembers.length].personaHandle,\n  status: 'pending'\n}));\n\n// ── Estimate Waves ──────────────────────────────────\n// Each wave can execute up to (squadSize) parallel steps\nconst estimatedWaves = Math.ceil(steps.length / squadMembers.length);\n\nreturn [{\n  json: {\n    ...data,\n    chainOfCommand: {\n      ...data.chainOfCommand,\n      step: 3,\n      current: 'Chicken Hawk',\n      next: 'Squad'\n    },\n    shift: {\n      shiftId,\n      phase: 'execution',\n      spawnedAt: new Date().toISOString(),\n      director: directive.director,\n      office: directive.office\n    },\n    squad: {\n      squadId,\n      members: squadMembers,\n      size: squadMembers.length\n    },\n    execution: {\n      steps: assignedSteps,\n      totalSteps: steps.length,\n      estimatedWaves,\n      currentWave: 0,\n      lane: data.classification.executionLane\n    }\n  }\n}];"
+      },
+      "id": "node-chicken-hawk",
+      "name": "Chicken Hawk Dispatch",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1220, 460]
+    },
+    {
+      "parameters": {
+        "functionCode": "// ═══════════════════════════════════════════════════════\n// Squad Wave Executor — Lil_Hawks Execute Assigned Steps\n// Each hawk processes their assigned steps in waves\n// ═══════════════════════════════════════════════════════\n\nconst data = $input.first().json;\nconst steps = data.execution.steps;\nconst squad = data.squad;\nconst waveSize = squad.size;\n\nconst waveResults = [];\nconst logs = [];\nlet completedSteps = 0;\nlet failedSteps = 0;\nlet totalDurationMs = 0;\n\n// ── Execute Waves ───────────────────────────────────\nfor (let wave = 0; wave < data.execution.estimatedWaves; wave++) {\n  const waveStart = Date.now();\n  const waveSteps = steps.slice(wave * waveSize, (wave + 1) * waveSize);\n  const waveStepResults = [];\n\n  for (const step of waveSteps) {\n    const stepStart = Date.now();\n    // Simulate step execution (in production, this calls the UEF Gateway)\n    const success = Math.random() > 0.05; // 95% success rate\n    const durationMs = Math.floor(Math.random() * 3000) + 500;\n\n    step.status = success ? 'completed' : 'failed';\n    if (success) completedSteps++;\n    else failedSteps++;\n\n    const stepResult = {\n      stepIndex: step.stepIndex,\n      lilHawk: step.assignedLilHawk,\n      description: step.description,\n      status: step.status,\n      outputSummary: success\n        ? `${step.assignedLilHawk} completed: ${step.description}`\n        : `${step.assignedLilHawk} failed: ${step.description} — will retry`,\n      durationMs\n    };\n    waveStepResults.push(stepResult);\n    logs.push(`[Wave ${wave + 1}][${step.assignedLilHawk}] ${step.status.toUpperCase()}: ${step.description} (${durationMs}ms)`);\n  }\n\n  const waveDuration = Date.now() - waveStart;\n  totalDurationMs += waveDuration;\n\n  waveResults.push({\n    waveNumber: wave + 1,\n    result: waveStepResults.every(s => s.status === 'completed') ? 'success' : 'partial',\n    stepsCompleted: waveStepResults.filter(s => s.status === 'completed').length,\n    stepsFailed: waveStepResults.filter(s => s.status === 'failed').length,\n    stepResults: waveStepResults,\n    durationMs: waveDuration\n  });\n}\n\nreturn [{\n  json: {\n    ...data,\n    chainOfCommand: {\n      ...data.chainOfCommand,\n      step: 4,\n      current: 'Squad/Lil_Hawks',\n      next: 'Verification'\n    },\n    execution: {\n      ...data.execution,\n      steps,\n      completedSteps,\n      failedSteps,\n      waveResults,\n      totalDurationMs,\n      logs\n    }\n  }\n}];"
+      },
+      "id": "node-squad-executor",
+      "name": "Squad Wave Executor",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1480, 460]
+    },
+    {
+      "parameters": {
+        "functionCode": "// ═══════════════════════════════════════════════════════\n// Verification Gate — Quality checks before Receipt seal\n// Mirrors ORACLE 7-gate verification pattern\n// ═══════════════════════════════════════════════════════\n\nconst data = $input.first().json;\nconst exec = data.execution;\n\nconst checks = [];\nlet allPassed = true;\n\n// Gate 1: Completion Rate\nconst completionRate = exec.completedSteps / exec.totalSteps;\nchecks.push({\n  gate: 'completion-rate',\n  passed: completionRate >= 0.8,\n  detail: `${(completionRate * 100).toFixed(0)}% steps completed (threshold: 80%)`\n});\nif (completionRate < 0.8) allPassed = false;\n\n// Gate 2: No Critical Failures\nconst criticalFailures = exec.failedSteps;\nchecks.push({\n  gate: 'critical-failures',\n  passed: criticalFailures === 0,\n  detail: `${criticalFailures} failed steps detected`\n});\nif (criticalFailures > exec.totalSteps * 0.2) allPassed = false;\n\n// Gate 3: Execution Duration\nconst maxDurationMs = exec.totalSteps * 30000; // 30s per step max\nchecks.push({\n  gate: 'duration-budget',\n  passed: exec.totalDurationMs <= maxDurationMs,\n  detail: `${exec.totalDurationMs}ms / ${maxDurationMs}ms budget`\n});\n\n// Gate 4: Squad Utilization\nconst utilizationRate = exec.totalSteps / (data.squad.size * data.execution.estimatedWaves);\nchecks.push({\n  gate: 'squad-utilization',\n  passed: utilizationRate >= 0.5,\n  detail: `${(utilizationRate * 100).toFixed(0)}% squad utilization`\n});\n\n// Gate 5: Wave Consistency\nconst waveSuccessRates = exec.waveResults.map(w => w.stepsCompleted / (w.stepsCompleted + w.stepsFailed));\nconst avgWaveSuccess = waveSuccessRates.reduce((a, b) => a + b, 0) / waveSuccessRates.length;\nchecks.push({\n  gate: 'wave-consistency',\n  passed: avgWaveSuccess >= 0.75,\n  detail: `Average wave success rate: ${(avgWaveSuccess * 100).toFixed(0)}%`\n});\n\nreturn [{\n  json: {\n    ...data,\n    chainOfCommand: {\n      ...data.chainOfCommand,\n      step: 5,\n      current: 'Verification',\n      next: 'Receipt'\n    },\n    verification: {\n      passed: allPassed,\n      checksRun: checks.length,\n      checksPassed: checks.filter(c => c.passed).length,\n      checks,\n      verifiedAt: new Date().toISOString()\n    }\n  }\n}];"
+      },
+      "id": "node-verification",
+      "name": "Verification Gate",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1740, 460]
+    },
+    {
+      "parameters": {
+        "functionCode": "// ═══════════════════════════════════════════════════════\n// Receipt Seal — Generate signed audit trail (DSP)\n// Seals the Shift and produces the final Receipt\n// ═══════════════════════════════════════════════════════\n\nconst data = $input.first().json;\nconst shift = data.shift;\nconst exec = data.execution;\nconst verification = data.verification;\n\n// Generate receipt ID and hash\nconst receiptId = `RCP-${Date.now().toString(36).toUpperCase().slice(-8)}`;\nconst hashInput = `${shift.shiftId}|${receiptId}|${exec.completedSteps}|${verification.passed}`;\nlet hash = 0;\nfor (let i = 0; i < hashInput.length; i++) {\n  const char = hashInput.charCodeAt(i);\n  hash = ((hash << 5) - hash) + char;\n  hash = hash & hash; // Convert to 32bit integer\n}\nconst receiptHash = `sha256-${Math.abs(hash).toString(16).padStart(16, '0')}`;\n\n// Determine final status\nlet shiftStatus = 'completed';\nif (!verification.passed) shiftStatus = 'completed_with_warnings';\nif (exec.failedSteps > exec.totalSteps * 0.5) shiftStatus = 'failed';\n\nreturn [{\n  json: {\n    ...data,\n    chainOfCommand: {\n      ...data.chainOfCommand,\n      step: 6,\n      current: 'Receipt',\n      next: 'ACHEEVY'\n    },\n    receipt: {\n      receiptId,\n      receiptHash,\n      shiftId: shift.shiftId,\n      sealedAt: new Date().toISOString(),\n      shiftStatus,\n      finalMetrics: {\n        totalDurationMs: exec.totalDurationMs,\n        wavesExecuted: exec.waveResults.length,\n        stepsCompleted: exec.completedSteps,\n        stepsFailed: exec.failedSteps,\n        lilHawksUsed: data.squad.size,\n        verificationPassed: verification.passed,\n        checksRun: verification.checksRun,\n        checksPassed: verification.checksPassed\n      },\n      auditTrail: {\n        director: data.boomerDirective.director,\n        office: data.boomerDirective.office,\n        executionLane: data.classification.executionLane,\n        squadId: data.squad.squadId,\n        squadMembers: data.squad.members.map(m => m.personaHandle)\n      }\n    }\n  }\n}];"
+      },
+      "id": "node-receipt",
+      "name": "Receipt Seal",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [2000, 460]
+    },
+    {
+      "parameters": {
+        "functionCode": "// ═══════════════════════════════════════════════════════\n// ACHEEVY Response — Final assembly back to User\n// Chain complete: User → ACHEEVY → Boomer_Ang →\n//   Chicken Hawk → Squad → Lil_Hawks → Receipt → ACHEEVY → User\n// ═══════════════════════════════════════════════════════\n\nconst data = $input.first().json;\nconst receipt = data.receipt;\nconst classification = data.classification;\nconst exec = data.execution;\nconst boomer = data.boomerDirective;\nconst verification = data.verification;\n\n// Build human-readable summary\nconst statusEmoji = receipt.shiftStatus === 'completed' ? 'SUCCESS' : receipt.shiftStatus === 'completed_with_warnings' ? 'WARNING' : 'FAILED';\n\nconst summary = [\n  '=== AIMS PMO Execution Report ===',\n  `Request: ${data.message}`,\n  `Status: ${statusEmoji}`,\n  '',\n  `--- Chain of Command ---`,\n  `PMO Office: ${classification.pmoOffice} (${boomer.director})`,\n  `Execution Lane: ${classification.executionLane}`,\n  `Shift: ${data.shift.shiftId}`,\n  `Squad: ${data.squad.squadId} (${data.squad.size} Lil_Hawks)`,\n  '',\n  `--- Execution Summary ---`,\n  `Steps: ${exec.completedSteps}/${exec.totalSteps} completed`,\n  `Waves: ${exec.waveResults.length} executed`,\n  `Duration: ${exec.totalDurationMs}ms`,\n  '',\n  `--- Verification ---`,\n  `Gate: ${verification.passed ? 'PASSED' : 'REVIEW REQUIRED'}`,\n  `Checks: ${verification.checksPassed}/${verification.checksRun} passed`,\n  '',\n  `--- Receipt ---`,\n  `Receipt ID: ${receipt.receiptId}`,\n  `Hash: ${receipt.receiptHash}`,\n  `Sealed: ${receipt.sealedAt}`,\n  '',\n  `--- Squad Members ---`,\n  ...data.squad.members.map(m => `  ${m.personaHandle} (${m.designation}) — ${m.assignedCapability}`),\n  '',\n  `--- Execution Logs ---`,\n  ...exec.logs.slice(0, 20)\n].join('\\n');\n\nreturn [{\n  json: {\n    requestId: data.requestId,\n    userId: data.userId,\n    status: receipt.shiftStatus,\n    summary,\n    receipt: {\n      receiptId: receipt.receiptId,\n      hash: receipt.receiptHash,\n      shiftId: data.shift.shiftId,\n      shiftStatus: receipt.shiftStatus\n    },\n    classification: {\n      pmoOffice: classification.pmoOffice,\n      director: boomer.director,\n      executionLane: classification.executionLane\n    },\n    metrics: receipt.finalMetrics,\n    chainOfCommand: {\n      ...data.chainOfCommand,\n      step: 7,\n      current: 'ACHEEVY',\n      next: 'User',\n      completedAt: new Date().toISOString()\n    }\n  }\n}];"
+      },
+      "id": "node-acheevy-response",
+      "name": "ACHEEVY Response",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [2260, 460]
+    },
+    {
+      "parameters": {},
+      "id": "node-respond",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [2500, 460]
+    }
+  ],
+  "connections": {
+    "PMO Intake Webhook": {
+      "main": [
+        [{ "node": "ACHEEVY Classifier", "type": "main", "index": 0 }]
+      ]
+    },
+    "ACHEEVY Classifier": {
+      "main": [
+        [{ "node": "PMO Office Router", "type": "main", "index": 0 }]
+      ]
+    },
+    "PMO Office Router": {
+      "main": [
+        [{ "node": "Boomer_CTO Director", "type": "main", "index": 0 }],
+        [{ "node": "Boomer_CFO Director", "type": "main", "index": 0 }],
+        [{ "node": "Boomer_COO Director", "type": "main", "index": 0 }],
+        [{ "node": "Boomer_CMO Director", "type": "main", "index": 0 }],
+        [{ "node": "Boomer_CDO Director", "type": "main", "index": 0 }],
+        [{ "node": "Boomer_CPO Director", "type": "main", "index": 0 }]
+      ]
+    },
+    "Boomer_CTO Director": {
+      "main": [
+        [{ "node": "Chicken Hawk Dispatch", "type": "main", "index": 0 }]
+      ]
+    },
+    "Boomer_CFO Director": {
+      "main": [
+        [{ "node": "Chicken Hawk Dispatch", "type": "main", "index": 0 }]
+      ]
+    },
+    "Boomer_COO Director": {
+      "main": [
+        [{ "node": "Chicken Hawk Dispatch", "type": "main", "index": 0 }]
+      ]
+    },
+    "Boomer_CMO Director": {
+      "main": [
+        [{ "node": "Chicken Hawk Dispatch", "type": "main", "index": 0 }]
+      ]
+    },
+    "Boomer_CDO Director": {
+      "main": [
+        [{ "node": "Chicken Hawk Dispatch", "type": "main", "index": 0 }]
+      ]
+    },
+    "Boomer_CPO Director": {
+      "main": [
+        [{ "node": "Chicken Hawk Dispatch", "type": "main", "index": 0 }]
+      ]
+    },
+    "Chicken Hawk Dispatch": {
+      "main": [
+        [{ "node": "Squad Wave Executor", "type": "main", "index": 0 }]
+      ]
+    },
+    "Squad Wave Executor": {
+      "main": [
+        [{ "node": "Verification Gate", "type": "main", "index": 0 }]
+      ]
+    },
+    "Verification Gate": {
+      "main": [
+        [{ "node": "Receipt Seal", "type": "main", "index": 0 }]
+      ]
+    },
+    "Receipt Seal": {
+      "main": [
+        [{ "node": "ACHEEVY Response", "type": "main", "index": 0 }]
+      ]
+    },
+    "ACHEEVY Response": {
+      "main": [
+        [{ "node": "Respond to Webhook", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    { "name": "PMO" },
+    { "name": "chain-of-command" },
+    { "name": "ACHEEVY" },
+    { "name": "production" }
+  ]
+}

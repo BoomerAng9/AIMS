@@ -1,0 +1,68 @@
+{
+  "policy_id": "aims_chain_of_command.v2",
+  "version": "2.0.0",
+  "effective_date": "2026-02-12",
+  "external_voice_rule": {
+    "only_user_facing_handle": "ACHEEVY",
+    "block_if_any_other_handle_attempts_user_message": true,
+    "acheevy_intervenes_via": "Boomer_Ang"
+  },
+  "delegation_chain": {
+    "description": "The ONLY allowed command path (downward) and reporting path (upward).",
+    "hierarchy": ["ACHEEVY", "Boomer_Ang", "Chicken Hawk", "Squad_Leader", "Lil_Hawk"],
+    "squad_leader_rule": "A designated Lil_Hawk role; temporary coordination assignment, not a rank."
+  },
+  "chain_bypass_prevention": {
+    "lil_hawk_can_message": ["Chicken Hawk", "Squad_Leader"],
+    "squad_leader_can_message": ["Chicken Hawk"],
+    "chicken_hawk_can_message": ["Boomer_Ang"],
+    "boomer_ang_can_message": ["ACHEEVY"],
+    "acheevy_speaks_downward_via": "Boomer_Ang",
+    "deny_rules": [
+      { "from_role": "Lil_Hawk", "to_handle": "ACHEEVY", "action": "MESSAGE", "result": "DENY" },
+      { "from_role": "Lil_Hawk", "to_handle": "Boomer_Ang", "action": "MESSAGE", "result": "DENY" },
+      { "from_role": "Chicken Hawk", "to_handle": "ACHEEVY", "action": "MESSAGE", "result": "DENY" },
+      { "from_role": "Chicken Hawk", "to_handle": "USER", "action": "MESSAGE", "result": "DENY" },
+      { "from_role": "Boomer_Ang", "to_handle": "USER", "action": "MESSAGE", "result": "DENY" },
+      { "from_role": "Lil_Hawk", "to_handle": "USER", "action": "MESSAGE", "result": "DENY" }
+    ]
+  },
+  "persona_authority_separation": {
+    "rule": "Persona ≠ Authority. Persona is voice + style overlay only. Authority comes from chain-of-command and tool-policy gates.",
+    "enforcement": "A persona cannot grant permissions. Bench level and role_type govern what an actor can do."
+  },
+  "tool_ownership_rule": {
+    "rule": "Every tool is owned by a delegated Boomer_Ang. Chicken Hawk and Lil_Hawks do not get direct tool authority unless a Boomer_Ang explicitly delegates a bounded sub-action through workflow packets.",
+    "registry": "tool-registry-contract.json"
+  },
+  "no_proof_no_done": {
+    "enabled": true,
+    "required_artifacts_by_stage": {
+      "INTAKE": ["TASK_PLAN"],
+      "SCOPE": ["SCOPE_SUMMARY", "RISK_FLAGS"],
+      "BUILD": ["BUILD_LOG", "TEST_RESULTS"],
+      "REVIEW": ["SECURITY_SCAN", "APPROVAL_RECORD"],
+      "DEPLOY": ["DEPLOY_ATTESTATION", "ROLLBACK_PLAN"]
+    }
+  },
+  "budget_governance": {
+    "luc_required_for": ["BUILD", "DEPLOY", "CERTIFY", "EXPORT_PACKAGE"],
+    "on_budget_exceed": "BLOCK_AND_ESCALATE_TO_ACHEEVY"
+  },
+  "safety_and_privacy": {
+    "disallow_in_overlay": [
+      "secrets",
+      "access_tokens",
+      "raw_system_prompts",
+      "internal_reasoning",
+      "customer_private_data_beyond_first_name",
+      "internal_tool_names",
+      "raw_endpoints",
+      "infrastructure_details"
+    ],
+    "enforce_least_privilege": true,
+    "log_all_access": true,
+    "never_request_user_api_keys": true,
+    "never_claim_unconfirmed_action": true
+  }
+}

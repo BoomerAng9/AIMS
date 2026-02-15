@@ -50,15 +50,15 @@ export interface SkillDefinition {
   metadata: SkillMetadata;
   triggers: SkillTrigger[];
   dependencies?: SkillDependencies;
-  inputs: Record<string, SkillInput>;
-  outputs: Record<string, SkillOutput>;
-  behavior: SkillBehavior;
+  inputs?: Record<string, SkillInput>;
+  outputs?: Record<string, SkillOutput>;
+  behavior?: SkillBehavior;
   chain_steps?: ChainStep[];
   final_synthesis?: {
     template: string;
     output_format: string;
   };
-  testing: {
+  testing?: {
     test_cases: SkillTestCase[];
   };
 }
@@ -66,7 +66,7 @@ export interface SkillDefinition {
 export interface ChainStep {
   step: number;
   name: string;
-  prompt: string;
+  prompt?: string;
   purpose: string;
   acheevy_behavior: string;
   output_schema: Record<string, string>;

@@ -180,8 +180,8 @@ export default function SportsTrackerPage() {
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <header className="mb-8">
-          <h1 className="text-3xl font-bold text-amber-50 mb-2">Sports Tracker</h1>
-          <p className="text-amber-100/50">
+          <h1 className="text-3xl font-bold text-white mb-2">Sports Tracker</h1>
+          <p className="text-white/40">
             Track player careers, stats, and injury history with AI-powered analysis
           </p>
         </header>
@@ -190,19 +190,19 @@ export default function SportsTrackerPage() {
         <form onSubmit={handleSearch} className="mb-8">
           <div className="flex gap-3">
             <div className="flex-1 relative">
-              <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-amber-100/30" />
+              <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search player (e.g., R.J. Johnson CU Buffs)"
-                className="w-full h-14 pl-12 pr-4 rounded-xl bg-black/40 border border-white/10 text-amber-50 placeholder:text-white/20 focus:border-amber-300/50 outline-none text-lg"
+                className="w-full h-14 pl-12 pr-4 rounded-xl bg-black/40 border border-wireframe-stroke text-white placeholder:text-white/20 focus:border-gold/30 outline-none text-lg"
               />
             </div>
             <button
               type="submit"
               disabled={isSearching}
-              className="px-8 h-14 rounded-xl bg-amber-400 text-black font-semibold hover:bg-amber-300 transition-colors disabled:opacity-50"
+              className="px-8 h-14 rounded-xl bg-gold text-black font-semibold hover:bg-gold-light transition-colors disabled:opacity-50"
             >
               {isSearching ? 'Searching...' : 'Track Player'}
             </button>
@@ -219,44 +219,44 @@ export default function SportsTrackerPage() {
               className="space-y-6"
             >
               {/* Player Card */}
-              <div className="flex gap-6 p-6 rounded-2xl bg-black/40 border border-white/10">
+              <div className="flex gap-6 p-6 rounded-2xl bg-black/40 border border-wireframe-stroke">
                 {/* Avatar */}
-                <div className="w-32 h-32 rounded-2xl bg-gradient-to-br from-amber-400/20 to-amber-600/20 border border-amber-400/30 flex items-center justify-center">
-                  <span className="text-5xl font-bold text-amber-400">
+                <div className="w-32 h-32 rounded-2xl bg-gradient-to-br from-gold/20 to-gold/10 border border-gold/30 flex items-center justify-center">
+                  <span className="text-5xl font-bold text-gold">
                     #{player.number}
                   </span>
                 </div>
 
                 {/* Info */}
                 <div className="flex-1">
-                  <h2 className="text-3xl font-bold text-amber-50 mb-1">{player.name}</h2>
-                  <p className="text-amber-100/70 text-lg mb-4">
+                  <h2 className="text-3xl font-bold text-white mb-1">{player.name}</h2>
+                  <p className="text-white/50 text-lg mb-4">
                     {player.position} • {player.team}
                   </p>
 
                   <div className="grid grid-cols-4 gap-4">
                     <div>
-                      <p className="text-xs text-amber-100/40 uppercase">Class</p>
-                      <p className="text-amber-100 font-medium">{player.class}</p>
+                      <p className="text-xs text-white/30 uppercase">Class</p>
+                      <p className="text-white/50 font-medium">{player.class}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-amber-100/40 uppercase">Height</p>
-                      <p className="text-amber-100 font-medium">{player.height}</p>
+                      <p className="text-xs text-white/30 uppercase">Height</p>
+                      <p className="text-white/50 font-medium">{player.height}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-amber-100/40 uppercase">Weight</p>
-                      <p className="text-amber-100 font-medium">{player.weight} lbs</p>
+                      <p className="text-xs text-white/30 uppercase">Weight</p>
+                      <p className="text-white/50 font-medium">{player.weight} lbs</p>
                     </div>
                     <div>
-                      <p className="text-xs text-amber-100/40 uppercase">Hometown</p>
-                      <p className="text-amber-100 font-medium">{player.hometown}</p>
+                      <p className="text-xs text-white/30 uppercase">Hometown</p>
+                      <p className="text-white/50 font-medium">{player.hometown}</p>
                     </div>
                   </div>
                 </div>
 
                 {/* Start Rate */}
                 <div className="text-right">
-                  <p className="text-xs text-amber-100/40 uppercase mb-1">Start Rate</p>
+                  <p className="text-xs text-white/30 uppercase mb-1">Start Rate</p>
                   <NixieTubeDisplay
                     value={showStats ? Math.round((player.stats.gamesStarted / player.stats.gamesPlayed) * 100) : 0}
                     digits={3}
@@ -269,8 +269,8 @@ export default function SportsTrackerPage() {
 
               {/* Nixie Stats Panel */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-amber-50 flex items-center gap-2">
-                  <TrendingUpIcon className="w-5 h-5 text-amber-400" />
+                <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+                  <TrendingUpIcon className="w-5 h-5 text-gold" />
                   Career Statistics
                 </h3>
 
@@ -278,9 +278,9 @@ export default function SportsTrackerPage() {
               </div>
 
               {/* Availability Meter */}
-              <div className="p-6 rounded-2xl bg-black/40 border border-white/10">
-                <h3 className="text-lg font-semibold text-amber-50 flex items-center gap-2 mb-4">
-                  <ActivityIcon className="w-5 h-5 text-amber-400" />
+              <div className="p-6 rounded-2xl bg-black/40 border border-wireframe-stroke">
+                <h3 className="text-lg font-semibold text-white flex items-center gap-2 mb-4">
+                  <ActivityIcon className="w-5 h-5 text-gold" />
                   Availability Rate
                 </h3>
 
@@ -312,10 +312,10 @@ export default function SportsTrackerPage() {
                   </div>
 
                   <div className="text-right">
-                    <p className="text-2xl font-bold text-amber-50">
+                    <p className="text-2xl font-bold text-white">
                       {player.stats.gamesPlayed} / {player.stats.gamesPlayed + player.injuryGames}
                     </p>
-                    <p className="text-xs text-amber-100/40">Games Played vs Available</p>
+                    <p className="text-xs text-white/30">Games Played vs Available</p>
                   </div>
                 </div>
               </div>
@@ -323,12 +323,12 @@ export default function SportsTrackerPage() {
               {/* Season Breakdown */}
               <div className="grid grid-cols-2 gap-6">
                 {/* Per Game Averages */}
-                <div className="p-6 rounded-2xl bg-black/40 border border-white/10">
-                  <h3 className="text-lg font-semibold text-amber-50 mb-4">Per Game Averages</h3>
+                <div className="p-6 rounded-2xl bg-black/40 border border-wireframe-stroke">
+                  <h3 className="text-lg font-semibold text-white mb-4">Per Game Averages</h3>
 
                   <div className="space-y-4">
                     <div className="flex justify-between items-center">
-                      <span className="text-amber-100/60">Tackles/Game</span>
+                      <span className="text-white/50">Tackles/Game</span>
                       <NixieTubeDisplay
                         value={showStats ? (player.stats.tackles / player.stats.gamesPlayed) : 0}
                         digits={3}
@@ -338,7 +338,7 @@ export default function SportsTrackerPage() {
                       />
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-amber-100/60">Pass Deflections/Game</span>
+                      <span className="text-white/50">Pass Deflections/Game</span>
                       <NixieTubeDisplay
                         value={showStats ? (player.stats.passesDefended / player.stats.gamesPlayed) : 0}
                         digits={3}
@@ -348,7 +348,7 @@ export default function SportsTrackerPage() {
                       />
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-amber-100/60">INTs/Season</span>
+                      <span className="text-white/50">INTs/Season</span>
                       <NixieTubeDisplay
                         value={showStats ? (player.stats.interceptions / player.seasons) : 0}
                         digits={3}
@@ -361,8 +361,8 @@ export default function SportsTrackerPage() {
                 </div>
 
                 {/* Injury History */}
-                <div className="p-6 rounded-2xl bg-black/40 border border-white/10">
-                  <h3 className="text-lg font-semibold text-amber-50 mb-4">Injury Report</h3>
+                <div className="p-6 rounded-2xl bg-black/40 border border-wireframe-stroke">
+                  <h3 className="text-lg font-semibold text-white mb-4">Injury Report</h3>
 
                   {player.injuryGames > 0 ? (
                     <div className="space-y-3">
@@ -395,8 +395,8 @@ export default function SportsTrackerPage() {
         {/* Loading State */}
         {isSearching && (
           <div className="flex flex-col items-center justify-center py-20">
-            <div className="w-16 h-16 border-4 border-amber-400/30 border-t-amber-400 rounded-full animate-spin mb-4" />
-            <p className="text-amber-100/50">Searching player database...</p>
+            <div className="w-16 h-16 border-4 border-gold/30 border-t-gold rounded-full animate-spin mb-4" />
+            <p className="text-white/40">Searching player database...</p>
           </div>
         )}
       </div>

@@ -1,37 +1,27 @@
 // frontend/app/dashboard/plugs/page.tsx
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
+import { staggerContainer, staggerItem } from "@/lib/motion";
 import {
   Activity,
   ArrowRight,
   ArrowUpRight,
-  Circle,
   Eye,
   Layers,
-  MoreVertical,
-  Pause,
   Plus,
   Rocket,
   Server,
-  ShoppingCart,
-  Settings,
-  Users,
-  Layout,
-  Store,
 } from "lucide-react";
-
-/* ------------------------------------------------------------------ */
-/*  Types & Data                                                       */
-/* ------------------------------------------------------------------ */
 
 type PlugStatus = "live" | "building" | "review" | "ready" | "deployed";
 
 interface Plug {
   id: string;
   name: string;
-  archetype: string;
+  archetype?: string;
   status: PlugStatus;
   domain?: string;
   requests?: number;
@@ -40,130 +30,67 @@ interface Plug {
   progress?: number;
 }
 
-const PLUGS: Plug[] = [
-  {
-    id: "plug-001",
-    name: "RealtyVision CRM",
-    archetype: "CRM",
-    status: "live",
-    domain: "realtyvision.com",
-    requests: 1247,
-    uptime: 99.9,
-  },
-  {
-    id: "plug-002",
-    name: "FitTrack Pro",
-    archetype: "SaaS",
-    status: "building",
-    stage: "BUILD",
-    progress: 65,
-  },
-  {
-    id: "plug-003",
-    name: "LegalDocs Hub",
-    archetype: "Internal Tool",
-    status: "review",
-    stage: "REVIEW",
-  },
-  {
-    id: "plug-004",
-    name: "ArtisanMarket",
-    archetype: "Marketplace",
-    status: "ready",
-    stage: "DEPLOY",
-  },
-  {
-    id: "plug-005",
-    name: "PortfolioX",
-    archetype: "Portfolio",
-    status: "deployed",
-    domain: "portfoliox.dev",
-    requests: 423,
-    uptime: 100,
-  },
-];
-
-const STATUS_CONFIG: Record<
-  PlugStatus,
-  { label: string; color: string; dot: string; bg: string }
-> = {
-  live: {
-    label: "Live",
-    color: "text-emerald-400",
-    dot: "bg-emerald-400 animate-pulse",
-    bg: "border-emerald-400/20 bg-emerald-500/5",
-  },
-  building: {
-    label: "Building",
-    color: "text-blue-400",
-    dot: "bg-blue-400 animate-pulse",
-    bg: "border-blue-400/20 bg-blue-500/5",
-  },
-  review: {
-    label: "In Review",
-    color: "text-amber-400",
-    dot: "bg-amber-400",
-    bg: "border-amber-400/20 bg-amber-500/5",
-  },
-  ready: {
-    label: "Ready",
-    color: "text-violet-400",
-    dot: "bg-violet-400",
-    bg: "border-violet-400/20 bg-violet-500/5",
-  },
-  deployed: {
-    label: "Deployed",
-    color: "text-emerald-400",
-    dot: "bg-emerald-400",
-    bg: "border-emerald-400/20 bg-emerald-500/5",
-  },
-};
-
-const ARCHETYPE_ICON: Record<string, React.ElementType> = {
-  CRM: Users,
-  SaaS: Layers,
-  "Internal Tool": Settings,
-  Marketplace: Store,
-  Portfolio: Layout,
-  "E-commerce": ShoppingCart,
+const STATUS_CONFIG: Record<PlugStatus, { label: string; color: string; dot: string }> = {
+  live:     { label: "Live",      color: "text-emerald-400", dot: "bg-emerald-400 animate-pulse" },
+  building: { label: "Building",  color: "text-blue-400",    dot: "bg-blue-400 animate-pulse" },
+  review:   { label: "In Review", color: "text-gold",        dot: "bg-gold" },
+  ready:    { label: "Ready",     color: "text-violet-400",  dot: "bg-violet-400" },
+  deployed: { label: "Deployed",  color: "text-emerald-400", dot: "bg-emerald-400" },
 };
 
 const PIPELINE_STAGES = ["INTAKE", "SCOPE", "BUILD", "REVIEW", "DEPLOY"];
 
-/* ------------------------------------------------------------------ */
-/*  Component                                                          */
-/* ------------------------------------------------------------------ */
-
 export default function PlugsPage() {
-  const liveCount = PLUGS.filter(
-    (p) => p.status === "live" || p.status === "deployed"
-  ).length;
+  const [plugs, setPlugs] = useState<Plug[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("/api/plugs")
+      .then((res) => {
+        if (!res.ok) throw new Error(`${res.status}`);
+        return res.json();
+      })
+      .then((data) => {
+        const items = Array.isArray(data) ? data : data.plugs || [];
+        setPlugs(items);
+      })
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const liveCount = plugs.filter((p) => p.status === "live" || p.status === "deployed").length;
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-700">
+    <motion.div
+      variants={staggerContainer}
+      initial="hidden"
+      animate="visible"
+      className="space-y-6"
+    >
       {/* Header */}
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <p className="text-[10px] uppercase tracking-[0.3em] text-amber-200/50 mb-1">
+          <p className="text-[0.6rem] uppercase tracking-[0.25em] text-gold/50 mb-1 font-mono">
             Plug Management
           </p>
           <div className="flex items-center gap-3">
-            <h1 className="text-3xl font-bold tracking-tight text-amber-50 font-display">
-              YOUR PLUGS
+            <h1 className="text-2xl md:text-3xl font-display uppercase tracking-wider text-white">
+              Deploy Like a Champion Today
             </h1>
-            <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-amber-400/10 border border-amber-400/20 px-2 text-[10px] font-bold text-amber-300">
-              {PLUGS.length}
+            <span className="flex h-5 min-w-5 items-center justify-center rounded border border-gold/20 bg-gold/5 px-1.5 text-[0.6rem] font-mono text-gold">
+              {plugs.length}
             </span>
           </div>
-          <p className="mt-1 text-sm text-amber-100/50">
+          <p className="mt-1 text-xs text-white/40">
             Manage, monitor, and deploy your active Plugs.
           </p>
         </div>
         <Link
           href="/dashboard/build"
-          className="flex items-center gap-2 rounded-full bg-amber-400 px-6 py-3 text-sm font-bold text-black shadow-[0_0_20px_rgba(251,191,36,0.3)] transition-all hover:scale-105 active:scale-95"
+          className="flex items-center gap-2 rounded-xl bg-gold px-5 py-2.5 text-sm font-medium text-black transition-colors hover:bg-gold-light"
         >
-          <Plus size={16} />
+          <Plus size={14} />
           Build New Plug
         </Link>
       </header>
@@ -171,195 +98,205 @@ export default function PlugsPage() {
       {/* Stats Bar */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          {
-            label: "Total Plugs",
-            value: PLUGS.length,
-            color: "text-amber-50",
-          },
+          { label: "Total Plugs", value: plugs.length, color: "text-white" },
           { label: "Live", value: liveCount, color: "text-emerald-400" },
-          {
-            label: "Building",
-            value: PLUGS.filter((p) => p.status === "building").length,
-            color: "text-blue-400",
-          },
-          {
-            label: "Total Requests",
-            value: PLUGS.reduce((s, p) => s + (p.requests || 0), 0).toLocaleString(),
-            color: "text-amber-200",
-          },
+          { label: "Building", value: plugs.filter((p) => p.status === "building").length, color: "text-blue-400" },
+          { label: "Total Requests", value: plugs.reduce((s, p) => s + (p.requests || 0), 0).toLocaleString(), color: "text-gold" },
         ].map((stat) => (
-          <div
-            key={stat.label}
-            className="rounded-2xl border border-white/10 bg-black/60 p-4 backdrop-blur-2xl text-center"
-          >
-            <p className="text-[10px] uppercase tracking-widest text-amber-100/40">
+          <motion.div key={stat.label} variants={staggerItem} whileHover={{ scale: 1.03, borderColor: "rgba(212,168,67,0.3)" }} className="wireframe-card p-4 text-center">
+            <p className="text-[0.55rem] uppercase tracking-widest text-white/30 font-mono">
               {stat.label}
             </p>
-            <p className={`text-2xl font-semibold mt-1 ${stat.color}`}>
-              {stat.value}
-            </p>
-          </div>
+            <p className={`text-xl font-display mt-1 ${stat.color}`}>{stat.value}</p>
+          </motion.div>
         ))}
       </div>
 
-      {/* Plug Cards */}
-      <div className="space-y-4">
-        {PLUGS.map((plug) => {
-          const status = STATUS_CONFIG[plug.status];
-          const ArchetypeIcon = ARCHETYPE_ICON[plug.archetype] || Layers;
-
-          return (
-            <div
-              key={plug.id}
-              className="group relative overflow-hidden rounded-3xl border border-white/10 bg-black/60 p-6 backdrop-blur-2xl transition-all hover:border-amber-300/20 hover:bg-black/80"
-            >
-              <div className="flex flex-col md:flex-row md:items-center gap-4">
-                {/* Icon + Name */}
-                <div className="flex items-center gap-4 flex-1 min-w-0">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/5 text-amber-200 group-hover:bg-amber-300 group-hover:text-black transition-colors">
-                    <ArchetypeIcon size={22} />
-                  </div>
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-sm font-semibold text-amber-50 truncate">
-                        {plug.name}
-                      </h3>
-                      <span className="shrink-0 rounded-full border border-white/5 bg-white/5 px-2.5 py-0.5 text-[9px] font-medium text-amber-100/60 uppercase tracking-wider">
-                        {plug.archetype}
-                      </span>
-                    </div>
-                    <p className="text-[10px] text-amber-100/30 font-mono mt-0.5">
-                      {plug.id}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Status */}
-                <div className="flex items-center gap-6 flex-wrap">
-                  <div className="flex items-center gap-2">
-                    <span className={`h-2 w-2 rounded-full ${status.dot}`} />
-                    <span
-                      className={`text-[10px] uppercase font-bold tracking-wider ${status.color}`}
-                    >
-                      {status.label}
-                    </span>
-                  </div>
-
-                  {/* Building Progress */}
-                  {plug.status === "building" && plug.progress !== undefined && (
-                    <div className="flex items-center gap-3 min-w-[160px]">
-                      <div className="flex-1 h-1.5 rounded-full bg-white/5 overflow-hidden">
-                        <div
-                          className="h-full rounded-full bg-blue-400 transition-all"
-                          style={{ width: `${plug.progress}%` }}
-                        />
-                      </div>
-                      <span className="text-[10px] font-mono text-blue-400">
-                        {plug.progress}%
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Stage Badge */}
-                  {plug.stage && (
-                    <div className="flex items-center gap-1">
-                      {PIPELINE_STAGES.map((stage, i) => {
-                        const stageIndex = PIPELINE_STAGES.indexOf(
-                          plug.stage || ""
-                        );
-                        return (
-                          <div
-                            key={stage}
-                            className={`h-1.5 w-4 rounded-full transition-all ${
-                              i <= stageIndex
-                                ? i === stageIndex
-                                  ? "bg-amber-400"
-                                  : "bg-emerald-400/60"
-                                : "bg-white/10"
-                            }`}
-                            title={stage}
-                          />
-                        );
-                      })}
-                      <span className="ml-1.5 text-[9px] font-mono text-amber-100/40">
-                        {plug.stage}
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Live Stats */}
-                  {(plug.status === "live" || plug.status === "deployed") && (
-                    <div className="flex items-center gap-4">
-                      {plug.domain && (
-                        <a
-                          href={`https://${plug.domain}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-1 text-[10px] text-amber-200/60 hover:text-amber-200 transition-colors"
-                        >
-                          {plug.domain}
-                          <ArrowUpRight size={10} />
-                        </a>
-                      )}
-                      <div className="flex items-center gap-1.5">
-                        <Activity size={10} className="text-amber-100/30" />
-                        <span className="text-[10px] text-amber-100/50 font-mono">
-                          {plug.requests?.toLocaleString()} req
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <Server size={10} className="text-amber-100/30" />
-                        <span className="text-[10px] text-emerald-400 font-mono">
-                          {plug.uptime}% up
-                        </span>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Actions */}
-                  <div className="flex items-center gap-2 ml-auto">
-                    <Link
-                      href={`/dashboard/plugs/${plug.id}`}
-                      className="flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-[10px] font-medium text-amber-100/60 transition-all hover:border-amber-300/30 hover:text-amber-50"
-                    >
-                      <Eye size={12} /> View
-                    </Link>
-                    {(plug.status === "ready" || plug.status === "review") && (
-                      <button className="flex items-center gap-1.5 rounded-xl bg-amber-400/10 border border-amber-400/20 px-3 py-2 text-[10px] font-bold text-amber-300 transition-all hover:bg-amber-400 hover:text-black">
-                        <Rocket size={12} /> Deploy
-                      </button>
-                    )}
-                    {(plug.status === "live" || plug.status === "deployed") && (
-                      <button className="flex items-center gap-1.5 rounded-xl border border-red-400/20 bg-red-400/5 px-3 py-2 text-[10px] font-medium text-red-400/60 transition-all hover:bg-red-400/10 hover:text-red-400">
-                        <Pause size={12} /> Stop
-                      </button>
-                    )}
-                  </div>
+      {/* Loading skeleton */}
+      {loading && (
+        <div className="space-y-3">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="wireframe-card p-6 animate-pulse">
+              <div className="flex items-center gap-4">
+                <div className="h-10 w-10 rounded-xl bg-white/5" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-3 w-32 bg-white/5 rounded" />
+                  <div className="h-2 w-20 bg-white/5 rounded" />
                 </div>
               </div>
             </div>
-          );
-        })}
-      </div>
-
-      {/* Empty State / Build CTA */}
-      <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-white/10 bg-black/20 p-10 text-center transition-all hover:border-amber-300/20 group">
-        <div className="flex h-14 w-14 items-center justify-center rounded-full border border-dashed border-white/20 text-amber-100/30 group-hover:border-amber-300/40 group-hover:text-amber-300 transition-all">
-          <Plus size={24} />
+          ))}
         </div>
-        <p className="mt-4 text-sm font-semibold text-amber-200/50 group-hover:text-amber-200 transition-colors">
+      )}
+
+      {/* Error */}
+      {error && (
+        <div className="wireframe-card p-6 text-center">
+          <p className="text-sm text-red-400/60">Failed to load plugs ({error})</p>
+          <button onClick={() => window.location.reload()} className="mt-2 text-xs text-gold/60 hover:text-gold transition-colors">
+            Retry
+          </button>
+        </div>
+      )}
+
+      {/* Empty state */}
+      {!loading && !error && plugs.length === 0 && (
+        <div className="wireframe-card border-dashed p-10 text-center">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl border border-dashed border-white/20 text-white/30">
+            <Plus size={20} />
+          </div>
+          <p className="mt-4 text-sm text-white/50">No plugs yet</p>
+          <p className="mt-1 text-xs text-white/30">
+            Use the Build Wizard to create your first Plug.
+          </p>
+          <Link
+            href="/dashboard/build"
+            className="mt-4 inline-flex items-center gap-2 rounded-xl border border-wireframe-stroke bg-white/5 px-5 py-2 text-xs text-white/60 hover:bg-gold hover:text-black hover:border-gold transition-all"
+          >
+            Open Build Wizard <ArrowRight size={12} />
+          </Link>
+        </div>
+      )}
+
+      {/* Plug Cards */}
+      {!loading && plugs.length > 0 && (
+        <motion.div
+          variants={staggerContainer}
+          initial="hidden"
+          animate="visible"
+          className="space-y-3"
+        >
+          {plugs.map((plug) => {
+            const status = STATUS_CONFIG[plug.status] || STATUS_CONFIG.ready;
+
+            return (
+              <motion.div
+                key={plug.id}
+                variants={staggerItem}
+                className="wireframe-card group p-5 hover:border-gold/20 transition-all"
+              >
+                <div className="flex flex-col md:flex-row md:items-center gap-4">
+                  {/* Icon + Name */}
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-wireframe-stroke bg-white/[0.02] text-white/40 group-hover:border-gold/30 group-hover:text-gold transition-colors">
+                      <Layers size={18} />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-sm font-medium text-white truncate">
+                          {plug.name}
+                        </h3>
+                        {plug.archetype && (
+                          <span className="shrink-0 rounded border border-wireframe-stroke px-2 py-0.5 text-[0.55rem] font-mono text-white/40 uppercase">
+                            {plug.archetype}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[0.6rem] text-white/20 font-mono mt-0.5">
+                        {plug.id}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Status + actions */}
+                  <div className="flex items-center gap-4 flex-wrap">
+                    <div className="flex items-center gap-1.5">
+                      <span className={`h-1.5 w-1.5 rounded-full ${status.dot}`} />
+                      <span className={`text-[0.6rem] uppercase font-mono tracking-wider ${status.color}`}>
+                        {status.label}
+                      </span>
+                    </div>
+
+                    {/* Pipeline stages */}
+                    {plug.stage && (
+                      <div className="flex items-center gap-0.5">
+                        {PIPELINE_STAGES.map((stage, i) => {
+                          const stageIndex = PIPELINE_STAGES.indexOf(plug.stage || "");
+                          return (
+                            <div
+                              key={stage}
+                              className={`h-1 w-3 rounded-full ${
+                                i <= stageIndex
+                                  ? i === stageIndex ? "bg-gold" : "bg-emerald-400/50"
+                                  : "bg-white/10"
+                              }`}
+                              title={stage}
+                            />
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    {/* Live stats */}
+                    {(plug.status === "live" || plug.status === "deployed") && (
+                      <div className="flex items-center gap-3">
+                        {plug.domain && (
+                          <a
+                            href={`https://${plug.domain}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-1 text-[0.6rem] text-white/40 hover:text-gold transition-colors font-mono"
+                          >
+                            {plug.domain}
+                            <ArrowUpRight size={10} />
+                          </a>
+                        )}
+                        {plug.requests !== undefined && (
+                          <div className="flex items-center gap-1">
+                            <Activity size={10} className="text-white/20" />
+                            <span className="text-[0.6rem] text-white/40 font-mono">
+                              {plug.requests.toLocaleString()} req
+                            </span>
+                          </div>
+                        )}
+                        {plug.uptime !== undefined && (
+                          <div className="flex items-center gap-1">
+                            <Server size={10} className="text-white/20" />
+                            <span className="text-[0.6rem] text-emerald-400 font-mono">
+                              {plug.uptime}%
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Actions */}
+                    <div className="flex items-center gap-2 ml-auto">
+                      <Link
+                        href={`/dashboard/plugs/${plug.id}`}
+                        className="flex items-center gap-1 rounded-lg border border-wireframe-stroke px-2.5 py-1.5 text-[0.6rem] font-mono text-white/50 hover:border-gold/20 hover:text-gold transition-all"
+                      >
+                        <Eye size={11} /> View
+                      </Link>
+                      {(plug.status === "ready" || plug.status === "review") && (
+                        <button className="flex items-center gap-1 rounded-lg bg-gold/10 border border-gold/20 px-2.5 py-1.5 text-[0.6rem] font-mono text-gold hover:bg-gold hover:text-black transition-all">
+                          <Rocket size={11} /> Deploy
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })}
+        </motion.div>
+      )}
+
+      {/* Build CTA */}
+      <div className="wireframe-card border-dashed p-8 text-center hover:border-gold/15 transition-colors group">
+        <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl border border-dashed border-white/15 text-white/20 group-hover:border-gold/30 group-hover:text-gold transition-all">
+          <Plus size={18} />
+        </div>
+        <p className="mt-3 text-sm text-white/40 group-hover:text-white/60 transition-colors">
           Build Another Plug
-        </p>
-        <p className="mt-1 text-xs text-amber-100/30 max-w-sm">
-          Use the Build Wizard to create a new Plug from a template or start a custom build.
         </p>
         <Link
           href="/dashboard/build"
-          className="mt-4 flex items-center gap-2 rounded-full bg-white/5 border border-white/10 px-5 py-2 text-xs font-medium text-amber-200/60 transition-all hover:bg-amber-300 hover:text-black hover:border-amber-300"
+          className="mt-3 inline-flex items-center gap-2 rounded-lg border border-wireframe-stroke bg-white/5 px-4 py-2 text-xs text-white/50 hover:bg-gold hover:text-black hover:border-gold transition-all"
         >
           Open Build Wizard <ArrowRight size={12} />
         </Link>
       </div>
-    </div>
+    </motion.div>
   );
 }

@@ -1,0 +1,131 @@
+{
+  "policy_id": "aims_delegation_rules.v2",
+  "version": "2.0.0",
+  "effective_date": "2026-02-12",
+  "description": "Hard rule delegation chain — the ONLY allowed command and reporting path.",
+
+  "hierarchy": {
+    "layers": [
+      {
+        "rank": 1,
+        "role_type": "ACHEEVY",
+        "title": "Executive Orchestrator",
+        "authority": [
+          "Sets policy",
+          "Approves strategic pivots",
+          "Triggers exceptional interventions",
+          "Does NOT micromanage or coordinate squads"
+        ],
+        "speaks_to": ["Boomer_Ang"],
+        "never_speaks_to": ["Chicken Hawk", "Lil_Hawk", "USER_directly_bypassing_overlay"],
+        "intervention_rule": "If ACHEEVY intervenes, it is via Boomer_Angs only."
+      },
+      {
+        "rank": 2,
+        "role_type": "Boomer_Ang",
+        "title": "Supervisor / Manager",
+        "authority": [
+          "Manage Chicken Hawk",
+          "Train/upskill",
+          "Correct behavior",
+          "Set performance expectations",
+          "Translate strategy into operational rules",
+          "Interface with ACHEEVY",
+          "Own tool capabilities via Tool Registry"
+        ],
+        "speaks_to": ["ACHEEVY", "Chicken Hawk", "other Boomer_Angs"],
+        "never_speaks_to": ["USER", "Lil_Hawk (directly)"],
+        "key_rule": "ONLY ones that speak to ACHEEVY."
+      },
+      {
+        "rank": 3,
+        "role_type": "Chicken Hawk",
+        "title": "Coordinator / Throughput Regulator",
+        "authority": [
+          "Assigns work",
+          "Enforces SOP",
+          "Monitors performance signals",
+          "Escalates up through Boomer_Angs"
+        ],
+        "not_authorized_for": [
+          "Coaching",
+          "Mentoring",
+          "Strategy setting",
+          "Tool onboarding",
+          "Policy changes"
+        ],
+        "speaks_to": ["Boomer_Ang", "Squad_Leader", "Lil_Hawk"],
+        "never_speaks_to": ["ACHEEVY", "USER"]
+      },
+      {
+        "rank": 4,
+        "role_type": "Squad_Leader",
+        "title": "Designated Lil_Hawk Coordination Role",
+        "description": "A temporary coordination assignment given to a Lil_Hawk. NOT a rank. NOT a promotion.",
+        "authority": [
+          "Coordinate peer Lil_Hawks within assigned squad",
+          "Relay instructions from Chicken Hawk",
+          "Consolidate status reports upward"
+        ],
+        "speaks_to": ["Chicken Hawk", "Lil_Hawk (within squad)"],
+        "never_speaks_to": ["ACHEEVY", "Boomer_Ang", "USER"]
+      },
+      {
+        "rank": 5,
+        "role_type": "Lil_Hawk",
+        "title": "Worker / Role Specialist",
+        "authority": [
+          "Task execution",
+          "Role-specific artifact production",
+          "Team contribution within squad"
+        ],
+        "not_authorized_for": [
+          "Leadership decisions",
+          "Authority delegation",
+          "Mentoring",
+          "Direct tool invocation without workflow packet"
+        ],
+        "speaks_to": ["Squad_Leader", "Chicken Hawk"],
+        "never_speaks_to": ["ACHEEVY", "Boomer_Ang", "USER"]
+      }
+    ]
+  },
+
+  "naming_rules": {
+    "ACHEEVY": {
+      "pattern": "^ACHEEVY$",
+      "rule": "Singular identity. No variants."
+    },
+    "Boomer_Ang": {
+      "pattern": "^[A-Za-z0-9\\-]+_Ang$",
+      "rule": "<Nickname>_Ang — role-fitting, not generic.",
+      "examples": ["Forge_Ang", "Chronicle_Ang", "Gatekeeper_Ang", "Scout_Ang", "Bridge_Ang"]
+    },
+    "Chicken Hawk": {
+      "pattern": "^Chicken Hawk$",
+      "rule": "Singular coordinator identity."
+    },
+    "Lil_Hawk": {
+      "pattern": "^Lil_([A-Z][a-z0-9]+)(_[A-Z][a-z0-9]+)*_Hawk$",
+      "rule": "MUST be Lil_<Role>_Hawk (exact pattern).",
+      "examples": [
+        "Lil_Messenger_Hawk",
+        "Lil_Render_Hawk",
+        "Lil_Verify_Hawk",
+        "Lil_Patch_Hawk",
+        "Lil_Index_Hawk",
+        "Lil_Sentinel_Hawk"
+      ]
+    }
+  },
+
+  "absolute_constraints": [
+    "Lil_Hawks ONLY speak to their Squad Leader or Chicken Hawk.",
+    "Chicken Hawk ONLY speaks to Boomer_Angs.",
+    "Boomer_Angs are the ONLY ones that speak to ACHEEVY.",
+    "ACHEEVY almost never speaks downward; if ACHEEVY intervenes, it is via Boomer_Angs only.",
+    "Persona ≠ Authority. Persona is voice + style overlay, NEVER permissions.",
+    "All Intelligent Internet repos are Boomer_Ang-only capability sources.",
+    "Users NEVER interact with raw tools, containers, or internal endpoints."
+  ]
+}

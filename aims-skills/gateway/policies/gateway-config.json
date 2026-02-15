@@ -1,0 +1,67 @@
+{
+  "policy_id": "gateway-config-v1",
+  "version": "1.0.0",
+  "description": "Default runtime configuration for A.I.M.S. Gateway services",
+
+  "sdt_defaults": {
+    "default_ttl_seconds": 3600,
+    "max_ttl_seconds": 86400,
+    "default_permissions": ["view", "download", "acknowledge"],
+    "rate_limit_issuance_per_minute": 30,
+    "rate_limit_access_per_minute": 60
+  },
+
+  "evidence_locker": {
+    "max_artifact_size_bytes": 104857600,
+    "default_retention_period": "P1Y",
+    "allowed_mime_types": [
+      "application/pdf",
+      "application/json",
+      "text/csv",
+      "text/plain",
+      "image/png",
+      "image/jpeg",
+      "application/zip",
+      "application/gzip"
+    ],
+    "hash_algorithm": "SHA-256",
+    "custody_chain_required": true
+  },
+
+  "marketplace": {
+    "managed_installs_enabled": true,
+    "certification_required_for_install": true,
+    "exception_approval_flow": true,
+    "max_retained_versions": 10
+  },
+
+  "partner_portal": {
+    "webhooks_enabled": true,
+    "max_webhook_payload_bytes": 10485760,
+    "webhook_retry_attempts": 3,
+    "webhook_retry_delay_seconds": 30
+  },
+
+  "billing": {
+    "luc_required_at": ["quote_time", "deploy_time", "heavy_workflows", "high_risk_operations"],
+    "commit_periods_months": [3, 6, 9],
+    "metering_flush_interval_seconds": 60
+  },
+
+  "operations_feed": {
+    "phases": ["ingest", "route", "delegate", "verify", "deliver"],
+    "max_entries_per_job": 500,
+    "retention_days": 90
+  },
+
+  "plans": {
+    "billing_modes": ["pay_per_use", "commitment_3mo", "commitment_6mo", "commitment_9mo"],
+    "add_ons": [
+      "capabilities",
+      "higher_tier_managed_support",
+      "premium_models",
+      "expanded_environments",
+      "compliance_packs"
+    ]
+  }
+}

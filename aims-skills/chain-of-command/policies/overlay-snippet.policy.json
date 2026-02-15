@@ -1,0 +1,38 @@
+{
+  "policy_id": "overlay_snippet_policy.v1",
+  "visibility_modes": {
+    "default": "HIDDEN",
+    "auto_show_thresholds": {
+      "complexity_score_0_20": "HIDDEN",
+      "complexity_score_21_60": "INTERMITTENT",
+      "complexity_score_61_100": "PERSISTENT"
+    },
+    "user_toggle": ["Show Operations", "Hide Operations"]
+  },
+  "snippet_format": {
+    "max_chars": 160,
+    "max_lines": 2,
+    "tone": "neutral_professional",
+    "allowed_fields": ["role_handle", "event", "artifact_ref", "short_status"],
+    "forbidden_fields": ["raw_prompt", "system_instructions", "secrets", "unredacted_urls_with_tokens"]
+  },
+  "frequency_limits": {
+    "intermittent_mode": { "max_events_per_minute": 3, "burst_limit": 2 },
+    "persistent_mode": { "max_events_per_minute": 6, "burst_limit": 3 }
+  },
+  "personalization_rules": {
+    "allowed": ["preferred_name", "project_label"],
+    "forbidden": ["race_ethnicity", "sensitive_traits", "payment_details", "full_address"],
+    "example_template": "For {preferred_name}: {event} • Proof: {artifact_ref}"
+  },
+  "event_catalog": [
+    "PHASE_CHANGE",
+    "ASSIGNED",
+    "RUN_STARTED",
+    "RUN_STEP_COMPLETE",
+    "EVIDENCE_ATTACHED",
+    "BLOCKED_NEEDS_INPUT",
+    "APPROVAL_REQUESTED",
+    "DELIVERABLE_READY"
+  ]
+}

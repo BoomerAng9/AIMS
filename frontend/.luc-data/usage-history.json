@@ -1,0 +1,154 @@
+{
+  "default-user": [
+    {
+      "id": "1707490080000-a1b2c3d4e",
+      "userId": "default-user",
+      "service": "api_calls",
+      "amount": 215,
+      "type": "debit",
+      "cost": 0,
+      "timestamp": "2026-02-09T14:28:00.000Z",
+      "description": "Chat w/ACHEEVY session — project intake"
+    },
+    {
+      "id": "1707489300000-f5g6h7i8j",
+      "userId": "default-user",
+      "service": "openrouter_tokens",
+      "amount": 42,
+      "type": "debit",
+      "cost": 0,
+      "timestamp": "2026-02-09T14:15:00.000Z",
+      "description": "Claude Opus 4.6 — code generation task"
+    },
+    {
+      "id": "1707488400000-k9l0m1n2o",
+      "userId": "default-user",
+      "service": "brave_searches",
+      "amount": 12,
+      "type": "debit",
+      "cost": 0,
+      "timestamp": "2026-02-09T14:22:31.000Z",
+      "description": "Researcher_Ang — competitor analysis"
+    },
+    {
+      "id": "1707487200000-p3q4r5s6t",
+      "userId": "default-user",
+      "service": "n8n_executions",
+      "amount": 8,
+      "type": "debit",
+      "cost": 0,
+      "timestamp": "2026-02-09T14:10:00.000Z",
+      "description": "Lead capture workflow — email sequence"
+    },
+    {
+      "id": "1707486000000-u7v8w9x0y",
+      "userId": "default-user",
+      "service": "code_generations",
+      "amount": 3,
+      "type": "debit",
+      "cost": 0,
+      "timestamp": "2026-02-09T13:55:00.000Z",
+      "description": "Engineer_Ang — API endpoint scaffolding"
+    },
+    {
+      "id": "1707484500000-z1a2b3c4d",
+      "userId": "default-user",
+      "service": "container_hours",
+      "amount": 0.5,
+      "type": "debit",
+      "cost": 0,
+      "timestamp": "2026-02-09T13:30:00.000Z",
+      "description": "Sandbox — code execution"
+    },
+    {
+      "id": "1707483000000-e5f6g7h8i",
+      "userId": "default-user",
+      "service": "elevenlabs_chars",
+      "amount": 3200,
+      "type": "debit",
+      "cost": 0,
+      "timestamp": "2026-02-09T12:45:10.000Z",
+      "description": "TTS narration — product demo video"
+    },
+    {
+      "id": "1707480000000-j9k0l1m2n",
+      "userId": "default-user",
+      "service": "embeddings",
+      "amount": 28,
+      "type": "debit",
+      "cost": 0,
+      "timestamp": "2026-02-09T11:30:00.000Z",
+      "description": "Knowledge base indexing — customer FAQ"
+    },
+    {
+      "id": "1707476400000-o3p4q5r6s",
+      "userId": "default-user",
+      "service": "vision_analyses",
+      "amount": 5,
+      "type": "debit",
+      "cost": 0,
+      "timestamp": "2026-02-09T10:00:00.000Z",
+      "description": "Product image analysis — SEO tagging"
+    },
+    {
+      "id": "1707440000000-t7u8v9w0x",
+      "userId": "default-user",
+      "service": "api_calls",
+      "amount": 1850,
+      "type": "debit",
+      "cost": 0,
+      "timestamp": "2026-02-08T20:00:00.000Z",
+      "description": "Batch operations — daily sync jobs"
+    },
+    {
+      "id": "1707436400000-y1z2a3b4c",
+      "userId": "default-user",
+      "service": "openrouter_tokens",
+      "amount": 310,
+      "type": "debit",
+      "cost": 0,
+      "timestamp": "2026-02-08T18:00:00.000Z",
+      "description": "KIMI K2.5 — research summarization"
+    },
+    {
+      "id": "1707433200000-d5e6f7g8h",
+      "userId": "default-user",
+      "service": "brave_searches",
+      "amount": 85,
+      "type": "debit",
+      "cost": 0,
+      "timestamp": "2026-02-08T15:00:00.000Z",
+      "description": "Market research — industry trends"
+    },
+    {
+      "id": "1707390000000-i9j0k1l2m",
+      "userId": "default-user",
+      "service": "code_generations",
+      "amount": 14,
+      "type": "debit",
+      "cost": 0,
+      "timestamp": "2026-02-07T22:00:00.000Z",
+      "description": "Engineer_Ang — dashboard component build"
+    },
+    {
+      "id": "1707357600000-n3o4p5q6r",
+      "userId": "default-user",
+      "service": "n8n_executions",
+      "amount": 45,
+      "type": "debit",
+      "cost": 0,
+      "timestamp": "2026-02-07T14:00:00.000Z",
+      "description": "Email campaign workflow — drip sequence"
+    },
+    {
+      "id": "1707300000000-s7t8u9v0w",
+      "userId": "default-user",
+      "service": "openrouter_tokens",
+      "amount": 460,
+      "type": "debit",
+      "cost": 0,
+      "timestamp": "2026-02-06T22:00:00.000Z",
+      "description": "Content generation — blog posts batch"
+    }
+  ]
+}

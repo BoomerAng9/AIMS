@@ -48,35 +48,49 @@ const InstagramIcon = ({ className }: { className?: string }) => (
 // Footer Navigation
 // ─────────────────────────────────────────────────────────────
 
+const APP_DOMAIN = process.env.NEXT_PUBLIC_APP_URL || 'https://plugmein.cloud';
+
 const FOOTER_NAV = {
-  company: {
-    title: 'Company Navigation',
+  lore: {
+    title: 'The A.I.M.S. Universe',
     links: [
-      { label: 'About Us', href: '/about' },
-      { label: 'Mission & Values', href: '/mission' },
-      { label: 'Team', href: '/team' },
-      { label: 'Careers', href: '/careers' },
-      { label: 'Blog', href: '/blog' },
+      { label: 'The Book of V.I.B.E.', href: '/the-book-of-vibe' },
+      { label: 'Character Gallery', href: '/gallery' },
+      { label: 'Merch Store', href: '/merch' },
+      { label: 'About A.I.M.S.', href: '/about' },
+      { label: 'Pricing', href: '/pricing' },
+    ],
+  },
+  experiences: {
+    title: 'Experiences',
+    links: [
+      { label: 'Workshop', href: '/workshop' },
+      { label: 'Life Scenes', href: '/workshop/life-scenes' },
+      { label: 'Moment Studio', href: '/workshop/moment-studio' },
+      { label: 'Money Moves', href: '/workshop/money-moves' },
+      { label: 'Creator Circles', href: '/workshop/creator-circles' },
+      { label: 'Sandbox', href: '/sandbox' },
     ],
   },
   platform: {
-    title: 'Platform Sections',
+    title: 'Platform',
     links: [
-      { label: 'ACHEEVY (AI Assistant)', href: '/dashboard/acheevy' },
-      { label: 'House of Ang (Agents)', href: '/dashboard/house-of-ang' },
-      { label: 'Model Garden (Tools)', href: '/dashboard/model-garden' },
-      { label: 'Pricing', href: '/pricing' },
-      { label: 'Subscription Plans', href: '/plans' },
+      { label: 'Chat w/ACHEEVY', href: `${APP_DOMAIN}/chat` },
+      { label: 'Dashboard', href: `${APP_DOMAIN}/dashboard` },
+      { label: 'Per|Form', href: '/sandbox/perform' },
+      { label: 'Blockwise AI', href: '/sandbox/blockwise' },
+      { label: 'Circuit Box', href: `${APP_DOMAIN}/dashboard/circuit-box` },
+      { label: 'House of Ang', href: `${APP_DOMAIN}/dashboard/house-of-ang` },
     ],
   },
   community: {
     title: 'Community & Support',
     links: [
       { label: 'Discord Community', href: 'https://discord.gg/aims' },
-      { label: 'GitHub Repository', href: 'https://github.com/aims' },
+      { label: 'GitHub Repository', href: 'https://github.com/BoomerAng9/AIMS' },
       { label: 'Documentation', href: '/docs' },
       { label: 'FAQ', href: '/faq' },
-      { label: 'Support', href: 'mailto:support@aims.app' },
+      { label: 'Support', href: 'mailto:acheevy@plugmein.cloud' },
     ],
   },
   legal: {
@@ -86,7 +100,6 @@ const FOOTER_NAV = {
       { label: 'Privacy Policy', href: '/privacy' },
       { label: 'Security Policy', href: '/security' },
       { label: 'Cookie Policy', href: '/cookies' },
-      { label: 'License (MIT)', href: '/license' },
     ],
   },
 };
@@ -100,10 +113,11 @@ export function Footer() {
 
   return (
     <footer
-      className="py-16 px-6"
+      className="relative z-20 mt-0 py-16 px-6"
       style={{
         backgroundColor: '#0f1219',
         borderTop: `1px solid ${AIMS_CIRCUIT_COLORS.dimLine}`,
+        clear: 'both',
       }}
     >
       <div className="max-w-7xl mx-auto">
@@ -156,7 +170,7 @@ export function Footer() {
                 <input
                   type="email"
                   placeholder="Email"
-                  className="flex-1 px-4 py-2 rounded-lg bg-black/40 border border-white/10 text-white text-sm placeholder:text-gray-500 outline-none focus:border-amber-500/50"
+                  className="flex-1 px-4 py-2 rounded-lg bg-black/40 border border-wireframe-stroke text-white text-sm placeholder:text-gray-500 outline-none focus:border-gold/50"
                 />
                 <button
                   className="px-4 py-2 rounded-lg transition-colors"
@@ -236,20 +250,20 @@ export function Footer() {
           </div>
 
           {/* Related Links */}
-          <div className="flex items-center gap-4 text-sm">
-            <Link href="/dashboard/acheevy" className="text-gray-400 hover:text-white transition-colors">
+          <div className="flex items-center gap-4 text-sm flex-wrap">
+            <Link href="/workshop" className="text-gray-400 hover:text-white transition-colors">
+              Workshop
+            </Link>
+            <span className="text-gray-600">·</span>
+            <Link href="/sandbox" className="text-gray-400 hover:text-white transition-colors">
+              Sandbox
+            </Link>
+            <span className="text-gray-600">·</span>
+            <Link href={`${APP_DOMAIN}/dashboard`} className="text-gray-400 hover:text-white transition-colors">
               ACHEEVY
             </Link>
             <span className="text-gray-600">·</span>
-            <Link href="/dashboard/house-of-ang" className="text-gray-400 hover:text-white transition-colors">
-              House of Ang
-            </Link>
-            <span className="text-gray-600">·</span>
-            <Link href="/dashboard/model-garden" className="text-gray-400 hover:text-white transition-colors">
-              Model Garden
-            </Link>
-            <span className="text-gray-600">·</span>
-            <Link href="/dashboard/circuit-box" className="text-gray-400 hover:text-white transition-colors">
+            <Link href={`${APP_DOMAIN}/dashboard/circuit-box`} className="text-gray-400 hover:text-white transition-colors">
               Circuit Box
             </Link>
           </div>

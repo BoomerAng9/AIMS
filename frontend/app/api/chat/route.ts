@@ -1,297 +1,281 @@
 /**
- * Streaming Chat API Route
- * Uses Server-Sent Events (SSE) for real-time streaming responses
+ * Chat API Route — Unified LLM Gateway + Agent Orchestrator
  *
- * POST /api/chat
- * Body: { messages, model?, sessionId? }
- * Returns: text/event-stream
+ * THREE execution paths:
+ *   1. Agent dispatch: message classified as actionable → /acheevy/execute → orchestrator
+ *      → II-Agent / A2A agents / n8n → structured response
+ *   2. LLM stream:    conversational message → /llm/stream → Vertex AI / OpenRouter
+ *      → SSE text stream (metered through LUC)
+ *   3. Direct fallback: gateway unreachable → Vercel AI SDK → OpenRouter
  *
- * SECURITY: All inputs validated and sanitized
+ * The classify step calls /acheevy/classify to determine intent.
+ * If requiresAgent=true, we dispatch to the orchestrator.
+ * If requiresAgent=false, we stream via the LLM gateway.
+ *
+ * Feature LLM: Claude Opus 4.6
+ * Priority Models: Qwen, Minimax, GLM-5, Kimi, WAN, Nano Banana Pro
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { validateChatRequest } from '@/lib/security/validation';
+import { streamText } from 'ai';
+import { createOpenAI } from '@ai-sdk/openai';
+import { buildSystemPrompt } from '@/lib/acheevy/persona';
 
-const ACHEEVY_URL = process.env.ACHEEVY_URL || 'http://localhost:3003';
+export const maxDuration = 120;
 
-// Model routing
-const MODEL_ENDPOINTS: Record<string, { url: string; key: string }> = {
-  'kimi-k2.5': {
-    url: 'https://api.moonshot.cn/v1/chat/completions',
-    key: process.env.MOONSHOT_API_KEY || '',
+// ── UEF Gateway (primary — metered through LUC) ─────────────
+const UEF_GATEWAY_URL = process.env.UEF_GATEWAY_URL || process.env.NEXT_PUBLIC_UEF_GATEWAY_URL || '';
+const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY || '';
+
+// ── OpenRouter (fallback — direct, unmetered) ───────────────
+const openrouter = createOpenAI({
+  apiKey: process.env.OPENROUTER_API_KEY || '',
+  baseURL: process.env.OPENROUTER_BASE_URL || 'https://openrouter.ai/api/v1',
+  headers: {
+    'HTTP-Referer': process.env.NEXT_PUBLIC_APP_URL || 'https://plugmein.cloud',
+    'X-Title': 'A.I.M.S. AI Managed Solutions',
   },
-  'gemini-3-flash': {
-    url: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:streamGenerateContent',
-    key: process.env.GOOGLE_AI_API_KEY || '',
-  },
-  'claude-opus-4.6': {
-    url: 'https://api.anthropic.com/v1/messages',
-    key: process.env.ANTHROPIC_API_KEY || '',
-  },
+});
+
+// ── Feature LLM ─────────────────────────────────────────────
+const DEFAULT_MODEL = process.env.ACHEEVY_MODEL || process.env.OPENROUTER_MODEL || 'google/gemini-3.0-flash';
+
+// ── Priority Model Roster (all accessible via OpenRouter) ───
+const PRIORITY_MODELS: Record<string, { id: string; label: string; provider: string }> = {
+  'claude-opus':    { id: 'anthropic/claude-opus-4.6',        label: 'Claude Opus 4.6',      provider: 'Anthropic' },
+  'claude-sonnet':  { id: 'anthropic/claude-sonnet-4.6',      label: 'Claude Sonnet 4.6',    provider: 'Anthropic' },
+  'qwen':           { id: 'qwen/qwen-2.5-coder-32b',         label: 'Qwen 2.5 Coder 32B',  provider: 'Qwen' },
+  'qwen-max':       { id: 'qwen/qwen-max',                   label: 'Qwen Max',             provider: 'Qwen' },
+  'minimax':        { id: 'minimax/minimax-01',               label: 'MiniMax-01',           provider: 'MiniMax' },
+  'glm':            { id: 'z-ai/glm-5',                      label: 'GLM-5',                provider: 'Z.ai' },
+  'kimi':           { id: 'moonshot/kimi-k2.5',               label: 'Kimi K2.5',            provider: 'Moonshot' },
+  'wan':            { id: 'alibaba/wan-2.1-t2v-turbo',        label: 'WAN 2.1',              provider: 'Alibaba' },
+  'nano-banana':    { id: 'google/gemini-2.5-flash',          label: 'Nano Banana Pro',      provider: 'Google' },
+  'gemini-flash':   { id: 'google/gemini-2.5-flash',          label: 'Gemini 2.5 Flash',     provider: 'Google' },
+  'gemini-pro':     { id: 'google/gemini-2.5-pro',            label: 'Gemini 2.5 Pro',       provider: 'Google' },
 };
 
-export async function POST(request: NextRequest) {
-  // Parse and validate request body
-  let body: unknown;
+function resolveModelId(model?: string): string {
+  if (model && PRIORITY_MODELS[model]) return PRIORITY_MODELS[model].id;
+  if (model && model.includes('/')) return model;
+  return DEFAULT_MODEL;
+}
+
+// ── Headers helper ──────────────────────────────────────────
+function gatewayHeaders(): Record<string, string> {
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (INTERNAL_API_KEY) headers['X-API-Key'] = INTERNAL_API_KEY;
+  return headers;
+}
+
+// ---------------------------------------------------------------------------
+// Step 1: Classify intent — determines if we need agent dispatch or LLM chat
+// ---------------------------------------------------------------------------
+
+interface ClassifyResult {
+  intent: string;
+  confidence: number;
+  requiresAgent: boolean;
+}
+
+async function classifyIntent(lastMessage: string): Promise<ClassifyResult | null> {
+  if (!UEF_GATEWAY_URL) return null;
+
   try {
-    body = await request.json();
+    const res = await fetch(`${UEF_GATEWAY_URL}/acheevy/classify`, {
+      method: 'POST',
+      headers: gatewayHeaders(),
+      body: JSON.stringify({ message: lastMessage }),
+    });
+
+    if (!res.ok) return null;
+    return await res.json() as ClassifyResult;
   } catch {
-    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
+    return null;
   }
+}
 
-  // Validate all inputs - NO BACKDOORS
-  const validation = validateChatRequest(body);
-  if (!validation.valid || !validation.data) {
-    console.warn(`[Chat API] Validation failed: ${validation.error}`);
-    return NextResponse.json({ error: validation.error }, { status: 400 });
+// ---------------------------------------------------------------------------
+// Path A: Agent dispatch — for actionable intents (build, research, verticals)
+// ---------------------------------------------------------------------------
+
+async function tryAgentDispatch(
+  lastMessage: string,
+  classification: ClassifyResult,
+  conversationHistory: Array<{ role: string; content: string }>,
+): Promise<Response | null> {
+  if (!UEF_GATEWAY_URL) return null;
+
+  try {
+    const res = await fetch(`${UEF_GATEWAY_URL}/acheevy/execute`, {
+      method: 'POST',
+      headers: gatewayHeaders(),
+      body: JSON.stringify({
+        userId: 'web-user',
+        message: lastMessage,
+        intent: classification.intent,
+        conversationId: 'chat-ui',
+        context: {
+          history: conversationHistory.slice(-6), // last 6 messages for context
+          classification,
+        },
+      }),
+    });
+
+    if (!res.ok) return null;
+
+    const result = await res.json();
+
+    // Format orchestrator response as Vercel AI SDK text stream
+    const reply = result.reply || 'Task received. Processing...';
+    const meta = [];
+    if (result.taskId) meta.push(`Task ID: ${result.taskId}`);
+    if (result.status) meta.push(`Status: ${result.status}`);
+    if (result.data?.pipelineSteps) meta.push(`Pipeline: ${result.data.pipelineSteps.length} steps`);
+    if (result.lucUsage) meta.push(`LUC: ${result.lucUsage.amount} ${result.lucUsage.service}`);
+
+    const fullReply = meta.length > 0
+      ? `${reply}\n\n---\n*${meta.join(' | ')}*`
+      : reply;
+
+    // Emit as Vercel AI SDK text stream format (single-shot)
+    const encoder = new TextEncoder();
+    const stream = new ReadableStream({
+      start(controller) {
+        controller.enqueue(encoder.encode(`0:${JSON.stringify(fullReply)}\n`));
+        controller.close();
+      },
+    });
+
+    return new Response(stream, {
+      headers: {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'X-ACHEEVY-Intent': classification.intent,
+        'X-ACHEEVY-Agent': 'true',
+      },
+    });
+  } catch (err) {
+    console.warn('[ACHEEVY Chat] Agent dispatch failed:', err instanceof Error ? err.message : err);
+    return null;
   }
+}
 
-  const { messages, model = 'gemini-3-flash', sessionId } = validation.data;
+// ---------------------------------------------------------------------------
+// Path B: LLM stream — for conversational messages
+// ---------------------------------------------------------------------------
 
-  // Create a readable stream for SSE
-  const encoder = new TextEncoder();
+async function tryGatewayStream(
+  modelId: string,
+  messages: Array<{ role: string; content: string }>,
+  systemPrompt: string,
+): Promise<Response | null> {
+  if (!UEF_GATEWAY_URL) return null;
 
-  const stream = new ReadableStream({
-    async start(controller) {
-      try {
-        // Send to ACHEEVY first for intent analysis
-        const acheevyResponse = await fetch(`${ACHEEVY_URL}/chat`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            sessionId,
-            message: messages[messages.length - 1]?.content || '',
-          }),
-        }).catch(() => null);
+  try {
+    const gatewayMessages = [
+      { role: 'system', content: systemPrompt },
+      ...messages,
+    ];
 
-        let acheevyData: any = null;
-        if (acheevyResponse?.ok) {
-          acheevyData = await acheevyResponse.json();
-        }
+    const res = await fetch(`${UEF_GATEWAY_URL}/llm/stream`, {
+      method: 'POST',
+      headers: gatewayHeaders(),
+      body: JSON.stringify({
+        model: modelId,
+        messages: gatewayMessages,
+        agentId: 'acheevy-chat',
+        userId: 'web-user',
+        sessionId: 'chat-ui',
+      }),
+    });
 
-        // Get the appropriate model endpoint
-        const endpoint = MODEL_ENDPOINTS[model];
+    if (!res.ok || !res.body) return null;
 
-        if (!endpoint?.key) {
-          // Fallback: Stream ACHEEVY's response or a default message
-          const fallbackText = acheevyData?.reply ||
-            "I'm ACHEEVY, your AI assistant. I'm here to help with your projects. What would you like to work on today?";
+    // Transform gateway SSE format to Vercel AI SDK format
+    const encoder = new TextEncoder();
+    const decoder = new TextDecoder();
+    const reader = res.body.getReader();
 
-          // Simulate streaming by chunking the response
-          const words = fallbackText.split(' ');
-          for (let i = 0; i < words.length; i++) {
-            const chunk = words[i] + (i < words.length - 1 ? ' ' : '');
-            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content: chunk })}\n\n`));
-            await new Promise(r => setTimeout(r, 30)); // 30ms per word
-          }
-
-          controller.enqueue(encoder.encode('data: [DONE]\n\n'));
+    const stream = new ReadableStream({
+      async pull(controller) {
+        const { done, value } = await reader.read();
+        if (done) {
           controller.close();
           return;
         }
-
-        // Make streaming request to the model
-        // Implementation varies by provider...
-
-        // For Gemini (Google AI)
-        if (model === 'gemini-3-flash') {
-          await streamGemini(controller, encoder, messages, endpoint);
-        }
-        // For Claude (Anthropic)
-        else if (model === 'claude-opus-4.6') {
-          await streamClaude(controller, encoder, messages, endpoint);
-        }
-        // For Kimi (Moonshot)
-        else if (model === 'kimi-k2.5') {
-          await streamKimi(controller, encoder, messages, endpoint);
-        }
-        else {
-          // Unknown model, use fallback
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content: "Model not configured." })}\n\n`));
-          controller.enqueue(encoder.encode('data: [DONE]\n\n'));
-        }
-
-        controller.close();
-      } catch (error: any) {
-        console.error('[Chat API] Error:', error);
-        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ error: error.message })}\n\n`));
-        controller.close();
-      }
-    },
-  });
-
-  return new Response(stream, {
-    headers: {
-      'Content-Type': 'text/event-stream',
-      'Cache-Control': 'no-cache',
-      'Connection': 'keep-alive',
-    },
-  });
-}
-
-// ─────────────────────────────────────────────────────────────
-// Provider-Specific Streaming
-// ─────────────────────────────────────────────────────────────
-
-async function streamGemini(
-  controller: ReadableStreamDefaultController,
-  encoder: TextEncoder,
-  messages: any[],
-  endpoint: { url: string; key: string }
-) {
-  const response = await fetch(`${endpoint.url}?key=${endpoint.key}&alt=sse`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      contents: messages.map(m => ({
-        role: m.role === 'assistant' ? 'model' : 'user',
-        parts: [{ text: m.content }],
-      })),
-      generationConfig: {
-        temperature: 0.7,
-        maxOutputTokens: 2048,
-      },
-    }),
-  });
-
-  if (!response.ok || !response.body) {
-    throw new Error(`Gemini API error: ${response.statusText}`);
-  }
-
-  const reader = response.body.getReader();
-  const decoder = new TextDecoder();
-
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-
-    const chunk = decoder.decode(value);
-    const lines = chunk.split('\n');
-
-    for (const line of lines) {
-      if (line.startsWith('data: ')) {
-        try {
-          const data = JSON.parse(line.slice(6));
-          const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-          if (text) {
-            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content: text })}\n\n`));
-          }
-        } catch {
-          // Skip malformed JSON
-        }
-      }
-    }
-  }
-
-  controller.enqueue(encoder.encode('data: [DONE]\n\n'));
-}
-
-async function streamClaude(
-  controller: ReadableStreamDefaultController,
-  encoder: TextEncoder,
-  messages: any[],
-  endpoint: { url: string; key: string }
-) {
-  const response = await fetch(endpoint.url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': endpoint.key,
-      'anthropic-version': '2023-06-01',
-    },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 2048,
-      stream: true,
-      messages: messages.map(m => ({
-        role: m.role,
-        content: m.content,
-      })),
-    }),
-  });
-
-  if (!response.ok || !response.body) {
-    throw new Error(`Claude API error: ${response.statusText}`);
-  }
-
-  const reader = response.body.getReader();
-  const decoder = new TextDecoder();
-
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-
-    const chunk = decoder.decode(value);
-    const lines = chunk.split('\n');
-
-    for (const line of lines) {
-      if (line.startsWith('data: ')) {
-        try {
-          const data = JSON.parse(line.slice(6));
-          if (data.type === 'content_block_delta') {
-            const text = data.delta?.text;
-            if (text) {
-              controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content: text })}\n\n`));
+        const chunk = decoder.decode(value, { stream: true });
+        const lines = chunk.split('\n');
+        for (const line of lines) {
+          if (!line.startsWith('data: ')) continue;
+          const data = line.slice(6).trim();
+          if (data === '[DONE]') { controller.close(); return; }
+          try {
+            const parsed = JSON.parse(data);
+            if (parsed.text) {
+              // Emit as Vercel AI SDK text stream format
+              controller.enqueue(encoder.encode(`0:${JSON.stringify(parsed.text)}\n`));
             }
-          }
-        } catch {
-          // Skip
+          } catch { /* skip malformed */ }
         }
-      }
-    }
-  }
+      },
+    });
 
-  controller.enqueue(encoder.encode('data: [DONE]\n\n'));
+    return new Response(stream, {
+      headers: {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'X-LLM-Provider': res.headers.get('X-LLM-Provider') || 'gateway',
+        'X-LLM-Model': res.headers.get('X-LLM-Model') || modelId,
+      },
+    });
+  } catch (err) {
+    console.warn('[ACHEEVY Chat] Gateway unreachable, falling back to direct OpenRouter:', err instanceof Error ? err.message : err);
+    return null;
+  }
 }
 
-async function streamKimi(
-  controller: ReadableStreamDefaultController,
-  encoder: TextEncoder,
-  messages: any[],
-  endpoint: { url: string; key: string }
-) {
-  const response = await fetch(endpoint.url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${endpoint.key}`,
-    },
-    body: JSON.stringify({
-      model: 'moonshot-v1-128k',
-      messages,
-      stream: true,
-      temperature: 0.7,
-    }),
-  });
+// ---------------------------------------------------------------------------
+// POST handler — the unified entry point
+// ---------------------------------------------------------------------------
 
-  if (!response.ok || !response.body) {
-    throw new Error(`Kimi API error: ${response.statusText}`);
-  }
+export async function POST(req: Request) {
+  try {
+    const { messages, model, personaId } = await req.json();
+    const modelId = resolveModelId(model);
+    const systemPrompt = buildSystemPrompt({ personaId, additionalContext: 'User is using the Chat Interface.' });
 
-  const reader = response.body.getReader();
-  const decoder = new TextDecoder();
+    // Get the last user message for classification
+    const lastUserMessage = [...messages].reverse().find((m: { role: string }) => m.role === 'user');
+    const lastMessage = lastUserMessage?.content || '';
 
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
+    // Step 1: Classify intent via gateway
+    const classification = await classifyIntent(lastMessage);
 
-    const chunk = decoder.decode(value);
-    const lines = chunk.split('\n');
-
-    for (const line of lines) {
-      if (line.startsWith('data: ') && !line.includes('[DONE]')) {
-        try {
-          const data = JSON.parse(line.slice(6));
-          const text = data.choices?.[0]?.delta?.content;
-          if (text) {
-            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content: text })}\n\n`));
-          }
-        } catch {
-          // Skip
-        }
-      }
+    // Step 2: If agent dispatch is needed, route to orchestrator
+    if (classification?.requiresAgent && classification.confidence > 0.6) {
+      console.log(`[ACHEEVY Chat] Agent dispatch: intent=${classification.intent} confidence=${classification.confidence}`);
+      const agentResponse = await tryAgentDispatch(lastMessage, classification, messages);
+      if (agentResponse) return agentResponse;
+      // If agent dispatch fails, fall through to LLM stream
+      console.warn('[ACHEEVY Chat] Agent dispatch failed, falling through to LLM stream');
     }
-  }
 
-  controller.enqueue(encoder.encode('data: [DONE]\n\n'));
+    // Step 3: LLM stream via UEF Gateway (metered, Vertex AI + OpenRouter)
+    const gatewayResponse = await tryGatewayStream(modelId, messages, systemPrompt);
+    if (gatewayResponse) return gatewayResponse;
+
+    // Step 4: Direct OpenRouter via Vercel AI SDK (fallback)
+    const result = await streamText({
+      model: openrouter(modelId),
+      system: systemPrompt,
+      messages,
+    });
+
+    return result.toAIStreamResponse();
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Chat API error';
+    console.error('[ACHEEVY Chat]', message);
+    return new Response(JSON.stringify({ error: message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
 }

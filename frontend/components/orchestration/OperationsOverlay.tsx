@@ -33,7 +33,7 @@ const PHASE_CONFIG: Record<OrchestrationPhase, {
   ingest: { label: 'Receiving', icon: '📥', color: 'text-blue-400' },
   route: { label: 'Routing', icon: '🔀', color: 'text-purple-400' },
   delegate: { label: 'Delegating', icon: '👥', color: 'text-cyan-400' },
-  execute: { label: 'Working', icon: '⚙️', color: 'text-amber-400' },
+  execute: { label: 'Working', icon: '⚙️', color: 'text-gold' },
   verify: { label: 'Verifying', icon: '✓', color: 'text-green-400' },
   consolidate: { label: 'Consolidating', icon: '📋', color: 'text-indigo-400' },
   deliver: { label: 'Delivering', icon: '📤', color: 'text-emerald-400' },
@@ -48,7 +48,7 @@ const STATUS_CONFIG: Record<BoomerAngStatus, {
 }> = {
   idle: { label: 'Idle', color: 'text-gray-400', bgColor: 'bg-gray-400/20' },
   queued: { label: 'Queued', color: 'text-blue-400', bgColor: 'bg-blue-400/20' },
-  working: { label: 'Working', color: 'text-amber-400', bgColor: 'bg-amber-400/20' },
+  working: { label: 'Working', color: 'text-gold', bgColor: 'bg-gold/20' },
   blocked: { label: 'Blocked', color: 'text-red-400', bgColor: 'bg-red-400/20' },
   waiting_on_user: { label: 'Waiting', color: 'text-orange-400', bgColor: 'bg-orange-400/20' },
   complete: { label: 'Complete', color: 'text-green-400', bgColor: 'bg-green-400/20' },
@@ -71,7 +71,7 @@ function AgentAvatar({ agent, size = 'sm', status }: {
   };
 
   const roleColors = {
-    acheevy: 'bg-gradient-to-br from-amber-400 to-amber-600',
+    acheevy: 'bg-gradient-to-br from-gold to-gold/60',
     manager: 'bg-gradient-to-br from-cyan-500 to-blue-600',
     boomerang: 'bg-gradient-to-br from-purple-500 to-indigo-600',
   };
@@ -107,21 +107,21 @@ function HandoffEventItem({ event, isLatest }: { event: HandoffEvent; isLatest: 
       animate={{ opacity: 1, x: 0 }}
       className={`
         flex items-start gap-2 py-2 px-3 rounded-lg
-        ${isLatest ? 'bg-amber-400/10' : 'bg-white/[0.02]'}
+        ${isLatest ? 'bg-gold/10' : 'bg-white/[0.02]'}
       `}
     >
       <AgentAvatar agent={event.fromAgent} size="sm" />
       <div className="flex-1 min-w-0">
-        <p className="text-xs text-amber-100/80 truncate">
+        <p className="text-xs text-white/70 truncate">
           {event.message}
         </p>
         {event.userContext && (
-          <p className="text-[10px] text-amber-300/60 mt-0.5 truncate">
+          <p className="text-[10px] text-gold/50 mt-0.5 truncate">
             {event.userContext}
           </p>
         )}
       </div>
-      <span className="text-[10px] text-amber-100/30 whitespace-nowrap">
+      <span className="text-[10px] text-white/20 whitespace-nowrap">
         {timeAgo}
       </span>
     </motion.div>
@@ -141,10 +141,10 @@ function DialogueBubble({ dialogue }: { dialogue: AgentDialogue }) {
     >
       <AgentAvatar agent={dialogue.speaker} size="sm" />
       <div className="flex-1">
-        <span className="text-[10px] text-amber-300/70 font-medium">
+        <span className="text-[10px] text-gold font-medium">
           {dialogue.speaker.name}
         </span>
-        <p className="text-xs text-amber-100/70 mt-0.5">
+        <p className="text-xs text-white/70 mt-0.5">
           {highlightUserName(dialogue.content, dialogue.userNameMention)}
         </p>
       </div>
@@ -158,7 +158,7 @@ function highlightUserName(text: string, userName?: string): React.ReactNode {
   const parts = text.split(new RegExp(`(${userName})`, 'gi'));
   return parts.map((part, i) =>
     part.toLowerCase() === userName.toLowerCase() ? (
-      <span key={i} className="text-amber-300 font-medium">{part}</span>
+      <span key={i} className="text-gold font-medium">{part}</span>
     ) : (
       part
     )
@@ -186,7 +186,7 @@ function PhaseProgress({ currentPhase }: { currentPhase: OrchestrationPhase }) {
             <div
               className={`
                 w-2 h-2 rounded-full transition-all
-                ${isActive && !isBlocked ? 'bg-amber-400 animate-pulse' : ''}
+                ${isActive && !isBlocked ? 'bg-gold animate-pulse' : ''}
                 ${isComplete ? 'bg-green-400' : ''}
                 ${!isActive && !isComplete ? 'bg-white/20' : ''}
                 ${isBlocked && isActive ? 'bg-orange-400 animate-pulse' : ''}
@@ -243,7 +243,7 @@ function ActiveAgentsList({ state }: { state: OrchestrationState }) {
             >
               <AgentAvatar agent={ang} size="sm" status={ang.currentStatus} />
               <div className="flex-1 min-w-0">
-                <p className="text-[10px] font-medium text-amber-100 truncate">
+                <p className="text-[10px] font-medium text-white truncate">
                   {ang.name}
                 </p>
                 <p className={`text-[9px] ${statusConfig.color}`}>
@@ -292,13 +292,13 @@ export function OperationsOverlay({ state, onClose, onExpand, onMinimize }: Oper
       className={`
         fixed bottom-24 right-4 z-50
         ${isExpanded ? 'w-96' : 'w-72'}
-        bg-black/90 backdrop-blur-xl border border-white/10 rounded-2xl
+        bg-black/90 backdrop-blur-xl border border-wireframe-stroke rounded-2xl
         shadow-2xl shadow-black/50
         overflow-hidden transition-all duration-300
       `}
     >
       {/* Header */}
-      <div className="px-4 py-3 border-b border-white/5 flex items-center justify-between">
+      <div className="px-4 py-3 border-b border-wireframe-stroke flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className={`text-lg ${phaseConfig.color}`}>
             {phaseConfig.icon}
@@ -314,19 +314,19 @@ export function OperationsOverlay({ state, onClose, onExpand, onMinimize }: Oper
         <div className="flex items-center gap-1">
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="p-1.5 rounded-lg hover:bg-white/10 text-amber-100/50 hover:text-amber-100 transition-colors"
+            className="p-1.5 rounded-lg hover:bg-white/10 text-white/40 hover:text-white transition-colors"
           >
             {isExpanded ? '⊖' : '⊕'}
           </button>
           <button
             onClick={onExpand}
-            className="p-1.5 rounded-lg hover:bg-white/10 text-amber-100/50 hover:text-amber-100 transition-colors"
+            className="p-1.5 rounded-lg hover:bg-white/10 text-white/40 hover:text-white transition-colors"
           >
             ⊡
           </button>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg hover:bg-white/10 text-amber-100/50 hover:text-amber-100 transition-colors"
+            className="p-1.5 rounded-lg hover:bg-white/10 text-white/40 hover:text-white transition-colors"
           >
             ✕
           </button>
@@ -335,9 +335,9 @@ export function OperationsOverlay({ state, onClose, onExpand, onMinimize }: Oper
 
       {/* User Context Bar */}
       {state.userName && (
-        <div className="px-4 py-2 bg-amber-400/5 border-b border-white/5">
-          <p className="text-[10px] text-amber-300/80">
-            Working on: <span className="font-medium text-amber-300">{state.userName}</span>
+        <div className="px-4 py-2 bg-gold/5 border-b border-wireframe-stroke">
+          <p className="text-[10px] text-gold/80">
+            Working on: <span className="font-medium text-gold">{state.userName}</span>
             {state.projectTitle && ` • ${state.projectTitle}`}
           </p>
         </div>
@@ -350,8 +350,8 @@ export function OperationsOverlay({ state, onClose, onExpand, onMinimize }: Oper
       >
         {/* Active Agents (expanded view) */}
         {isExpanded && state.activeAngs.length > 0 && (
-          <div className="p-3 border-b border-white/5">
-            <p className="text-[10px] uppercase tracking-wider text-amber-100/40 mb-2">
+          <div className="p-3 border-b border-wireframe-stroke">
+            <p className="text-[10px] uppercase tracking-wider text-white/30 mb-2">
               Active Agents
             </p>
             <ActiveAgentsList state={state} />
@@ -360,7 +360,7 @@ export function OperationsOverlay({ state, onClose, onExpand, onMinimize }: Oper
 
         {/* Event Feed */}
         <div className="p-3 space-y-1">
-          <p className="text-[10px] uppercase tracking-wider text-amber-100/40 mb-2">
+          <p className="text-[10px] uppercase tracking-wider text-white/30 mb-2">
             Operations
           </p>
           <AnimatePresence mode="popLayout">
@@ -376,8 +376,8 @@ export function OperationsOverlay({ state, onClose, onExpand, onMinimize }: Oper
 
         {/* Agent Dialogue (expanded view) */}
         {isExpanded && latestDialogues.length > 0 && (
-          <div className="p-3 border-t border-white/5">
-            <p className="text-[10px] uppercase tracking-wider text-amber-100/40 mb-2">
+          <div className="p-3 border-t border-wireframe-stroke">
+            <p className="text-[10px] uppercase tracking-wider text-white/30 mb-2">
               Team Discussion
             </p>
             <div className="space-y-1">
@@ -408,7 +408,7 @@ export function OperationsOverlay({ state, onClose, onExpand, onMinimize }: Oper
       {state.phase === 'execute' && (
         <div className="h-1 bg-white/5 overflow-hidden">
           <motion.div
-            className="h-full bg-amber-400"
+            className="h-full bg-gold"
             initial={{ x: '-100%' }}
             animate={{ x: '100%' }}
             transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
@@ -438,7 +438,7 @@ export function OperationsPulse({ phase, onClick }: {
       className={`
         fixed bottom-24 right-4 z-50
         flex items-center gap-2 px-3 py-2
-        bg-black/80 backdrop-blur-xl border border-white/10 rounded-full
+        bg-black/80 backdrop-blur-xl border border-wireframe-stroke rounded-full
         hover:bg-black/90 transition-colors
       `}
     >
@@ -447,7 +447,7 @@ export function OperationsPulse({ phase, onClick }: {
         {config.label}
       </span>
       <motion.span
-        className="w-2 h-2 rounded-full bg-amber-400"
+        className="w-2 h-2 rounded-full bg-gold"
         animate={{ opacity: [1, 0.5, 1] }}
         transition={{ duration: 1, repeat: Infinity }}
       />

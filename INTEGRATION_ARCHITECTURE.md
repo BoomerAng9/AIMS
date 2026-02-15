@@ -183,6 +183,27 @@
 │    Status: ✅ Integrated                                             │
 └──────────────────────────────────────────────────────────────────────┘
 
+┌──────────────────────────────────────────────────────────────────────┐
+│ 8. CHICKEN HAWK EXECUTION ENGINE                                     │
+│                                                                      │
+│    Role: The Builder / Executioner                                   │
+│    Identity: Chicken Hawk                                            │
+│    Workers: Lil_Hawks (Distributed Bots)                             │
+│                                                                      │
+│    Architecture:                                                     │
+│      • Controller: Chicken Hawk (Multi-Channel Interface)            │
+│      • Gateway:    Port 18789 (WebSocket)                            │
+│      • Routing:    UEF Gateway → Chicken Hawk (Bidirectional)        │
+│                                                                      │
+│    Capabilities:                                                     │
+│      • Multi-Channel Messaging (Discord, Slack, Telegram, WhatsApp)  │
+│      • Browser Control (CDP)                                         │
+│      • Workflow Execution (via Lil_Hawks)                            │
+│                                                                      │
+│    Status: ✅ Integrated (Containerized)                             │
+└──────────────────────────────────────────────────────────────────────┘
+
+
 
 ══════════════════════════════════════════════════════════════════════
                     INTEGRATION DASHBOARD

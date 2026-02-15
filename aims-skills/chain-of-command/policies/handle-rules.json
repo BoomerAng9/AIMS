@@ -1,0 +1,70 @@
+{
+  "version": "2.0.0",
+  "handle_rules": {
+    "ACHEEVY": {
+      "pattern": "^ACHEEVY$",
+      "rule": "Singular identity. No variants."
+    },
+    "Boomer_Ang": {
+      "pattern": "^[A-Za-z0-9\\-]+_Ang$",
+      "rule": "<Nickname>_Ang — role-fitting, not generic.",
+      "examples": ["Forge_Ang", "Chronicle_Ang", "Gatekeeper_Ang", "Scout_Ang", "Bridge_Ang", "Patchsmith_Ang", "Lab_Ang"]
+    },
+    "Chicken Hawk": {
+      "pattern": "^Chicken Hawk$",
+      "rule": "Singular coordinator identity."
+    },
+    "Lil_Hawk": {
+      "pattern": "^Lil_([A-Z][a-z0-9]+)(_[A-Z][a-z0-9]+)*_Hawk$",
+      "rule": "MUST be Lil_<Role>_Hawk (exact pattern).",
+      "examples": [
+        "Lil_Messenger_Hawk",
+        "Lil_Render_Hawk",
+        "Lil_Verify_Hawk",
+        "Lil_Patch_Hawk",
+        "Lil_Index_Hawk",
+        "Lil_Sentinel_Hawk",
+        "Lil_Intake_Scribe_Hawk",
+        "Lil_Build_Surgeon_Hawk"
+      ]
+    }
+  },
+  "bench_levels": {
+    "Intern": {
+      "complexity_range": [0, 30],
+      "autonomy": "low",
+      "can_approve_gates": false,
+      "can_mentor": false,
+      "can_lead_multi_office": false,
+      "description": "Production muscle. Never strategy."
+    },
+    "Intermediate": {
+      "complexity_range": [31, 65],
+      "autonomy": "medium",
+      "can_approve_gates": true,
+      "can_mentor": false,
+      "can_lead_multi_office": false,
+      "gate_approval_scope": "low_risk_only",
+      "description": "Skilled operator. Owns workflows, not vision."
+    },
+    "Expert": {
+      "complexity_range": [66, 100],
+      "autonomy": "high",
+      "can_approve_gates": true,
+      "can_mentor": true,
+      "can_lead_multi_office": true,
+      "gate_approval_scope": "all",
+      "description": "PMO-grade specialist. Owns outcomes."
+    }
+  },
+  "squad_labels": [
+    "Squad_Intake",
+    "Squad_Proof",
+    "Squad_Workflow",
+    "Squad_Build",
+    "Squad_Deploy",
+    "Squad_Security",
+    "Squad_UI"
+  ],
+  "squad_leader_rule": "A designated Lil_Hawk role; temporary coordination assignment, not a rank. Squad Leader speaks to Chicken Hawk and coordinates peer Lil_Hawks within assigned squad."
+}

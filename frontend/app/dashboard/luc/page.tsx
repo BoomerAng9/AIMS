@@ -12,7 +12,7 @@
  * - Import/Export data
  * - View usage history
  *
- * LUC = Live Usage Calculator
+ * LUC = Locale Universal Calculator
  * A.I.M.S. core execution service for quota gating and cost tracking.
  */
 
@@ -319,7 +319,7 @@ function QuoteCalculator({
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
         className="w-full max-w-md rounded-2xl p-6"
-        style={{ backgroundColor: '#1a2234', border: '1px solid #2d3a4d' }}
+        style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-6">
@@ -334,7 +334,7 @@ function QuoteCalculator({
             <label className="block text-sm text-gray-400 mb-2">Service</label>
             <div
               className="px-4 py-3 rounded-lg"
-              style={{ backgroundColor: '#0f172a', border: '1px solid #2d3a4d' }}
+              style={{ backgroundColor: '#0f172a', border: '1px solid rgba(255,255,255,0.08)' }}
             >
               <div className="text-white font-medium">{bucket.name}</div>
               <div className="text-xs text-gray-400">{bucket.description}</div>
@@ -361,7 +361,7 @@ function QuoteCalculator({
           {quote && (
             <div
               className="p-4 rounded-lg space-y-3"
-              style={{ backgroundColor: '#0f172a', border: '1px solid #2d3a4d' }}
+              style={{ backgroundColor: '#0f172a', border: '1px solid rgba(255,255,255,0.08)' }}
             >
               <div className="flex justify-between text-sm">
                 <span className="text-gray-400">Current Usage</span>
@@ -438,7 +438,7 @@ function IndustryPresetSelector({
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
         className="w-full max-w-4xl max-h-[80vh] rounded-2xl p-6 overflow-hidden flex flex-col"
-        style={{ backgroundColor: '#1a2234', border: '1px solid #2d3a4d' }}
+        style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-6">
@@ -461,7 +461,7 @@ function IndustryPresetSelector({
               onClick={() => setSelectedCategory(cat.id)}
               className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
                 selectedCategory === cat.id
-                  ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40'
+                  ? 'bg-gold/10 text-gold border border-gold/30'
                   : 'bg-gray-800/50 text-gray-400 border border-gray-700 hover:bg-gray-700/50'
               }`}
             >
@@ -478,8 +478,8 @@ function IndustryPresetSelector({
                 key={preset.id}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="p-4 rounded-xl text-left transition-all hover:ring-2 hover:ring-amber-500/50"
-                style={{ backgroundColor: '#0f172a', border: '1px solid #2d3a4d' }}
+                className="p-4 rounded-xl text-left transition-all hover:ring-2 hover:ring-gold/50"
+                style={{ backgroundColor: '#0f172a', border: '1px solid rgba(255,255,255,0.08)' }}
                 onClick={() => onSelect(preset.id)}
               >
                 <div className="flex items-start gap-3">
@@ -534,12 +534,12 @@ function UsageHistoryPanel({
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
         className="w-full max-w-3xl max-h-[80vh] rounded-2xl p-6 overflow-hidden flex flex-col"
-        style={{ backgroundColor: '#1a2234', border: '1px solid #2d3a4d' }}
+        style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <HistoryIcon className="w-6 h-6 text-amber-400" />
+            <HistoryIcon className="w-6 h-6 text-gold" />
             <h2 className="text-xl font-bold text-white">Usage History</h2>
           </div>
           <button onClick={onClose} className="text-gray-400 hover:text-white">
@@ -558,7 +558,7 @@ function UsageHistoryPanel({
                 <div
                   key={entry.id}
                   className="p-3 rounded-lg flex items-center justify-between"
-                  style={{ backgroundColor: '#0f172a', border: '1px solid #2d3a4d' }}
+                  style={{ backgroundColor: '#0f172a', border: '1px solid rgba(255,255,255,0.08)' }}
                 >
                   <div className="flex items-center gap-3">
                     <div
@@ -677,7 +677,7 @@ function ImportExportPanel({
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
         className="w-full max-w-md rounded-2xl p-6"
-        style={{ backgroundColor: '#1a2234', border: '1px solid #2d3a4d' }}
+        style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-6">
@@ -691,10 +691,10 @@ function ImportExportPanel({
           {/* Export */}
           <div
             className="p-4 rounded-lg"
-            style={{ backgroundColor: '#0f172a', border: '1px solid #2d3a4d' }}
+            style={{ backgroundColor: '#0f172a', border: '1px solid rgba(255,255,255,0.08)' }}
           >
             <div className="flex items-center gap-2 mb-3">
-              <DownloadIcon className="w-5 h-5 text-amber-400" />
+              <DownloadIcon className="w-5 h-5 text-gold" />
               <h3 className="text-white font-medium">Export Data</h3>
             </div>
             <p className="text-xs text-gray-400 mb-3">
@@ -731,10 +731,10 @@ function ImportExportPanel({
           {/* Import */}
           <div
             className="p-4 rounded-lg"
-            style={{ backgroundColor: '#0f172a', border: '1px solid #2d3a4d' }}
+            style={{ backgroundColor: '#0f172a', border: '1px solid rgba(255,255,255,0.08)' }}
           >
             <div className="flex items-center gap-2 mb-3">
-              <UploadIcon className="w-5 h-5 text-amber-400" />
+              <UploadIcon className="w-5 h-5 text-gold" />
               <h3 className="text-white font-medium">Import Data</h3>
             </div>
             <p className="text-xs text-gray-400 mb-3">
@@ -852,7 +852,7 @@ export default function LUCWorkspacePage() {
   };
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#0a0f1a' }}>
+    <div className="min-h-screen aims-page-bg">
       <CircuitBoardPattern density="sparse" animated={false} glowIntensity={0.1} />
 
       <div className="relative max-w-7xl mx-auto px-6 py-8">
@@ -861,17 +861,17 @@ export default function LUCWorkspacePage() {
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex items-center gap-3">
               <div
-                className="w-12 h-12 rounded-xl flex items-center justify-center"
+                className="w-12 h-12 rounded-xl flex items-center justify-center overflow-hidden"
                 style={{
                   background: `linear-gradient(135deg, ${AIMS_CIRCUIT_COLORS.primary}, ${AIMS_CIRCUIT_COLORS.accent})`,
                   boxShadow: `0 0 20px ${AIMS_CIRCUIT_COLORS.glow}`,
                 }}
               >
-                <CalculatorIcon className="w-6 h-6 text-black" />
+                <img src="/images/luc/luc-logo.png" alt="LUC" className="w-10 h-10 object-contain" />
               </div>
               <div>
                 <h1 className="text-3xl font-bold" style={{ color: AIMS_CIRCUIT_COLORS.secondary }}>
-                  LUC - Usage Calculator
+                  LUC — Locale Universal Calculator
                 </h1>
                 <p className="text-gray-400">
                   Track quotas, estimate costs, and manage your resource usage
@@ -884,8 +884,8 @@ export default function LUCWorkspacePage() {
               <div
                 className="flex items-center gap-2 px-4 py-2 rounded-lg"
                 style={{
-                  backgroundColor: '#1a2234',
-                  border: '1px solid #2d3a4d',
+                  backgroundColor: 'rgba(255,255,255,0.03)',
+                  border: '1px solid rgba(255,255,255,0.08)',
                 }}
               >
                 <WalletIcon className="w-4 h-4 text-gray-400" />
@@ -900,8 +900,8 @@ export default function LUCWorkspacePage() {
                 onClick={() => setShowPresets(true)}
                 className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors"
                 style={{
-                  backgroundColor: '#1a2234',
-                  border: '1px solid #2d3a4d',
+                  backgroundColor: 'rgba(255,255,255,0.03)',
+                  border: '1px solid rgba(255,255,255,0.08)',
                   color: '#fff',
                 }}
               >
@@ -913,8 +913,8 @@ export default function LUCWorkspacePage() {
                 onClick={() => setShowHistory(true)}
                 className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors"
                 style={{
-                  backgroundColor: '#1a2234',
-                  border: '1px solid #2d3a4d',
+                  backgroundColor: 'rgba(255,255,255,0.03)',
+                  border: '1px solid rgba(255,255,255,0.08)',
                   color: '#fff',
                 }}
               >
@@ -926,8 +926,8 @@ export default function LUCWorkspacePage() {
                 onClick={() => setShowImportExport(true)}
                 className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors"
                 style={{
-                  backgroundColor: '#1a2234',
-                  border: '1px solid #2d3a4d',
+                  backgroundColor: 'rgba(255,255,255,0.03)',
+                  border: '1px solid rgba(255,255,255,0.08)',
                   color: '#fff',
                 }}
               >
@@ -953,7 +953,7 @@ export default function LUCWorkspacePage() {
 
         {loading ? (
           <div className="flex items-center justify-center py-20">
-            <div className="w-12 h-12 border-4 border-amber-400/30 border-t-amber-400 rounded-full animate-spin" />
+            <div className="w-12 h-12 border-4 border-gold/30 border-t-gold rounded-full animate-spin" />
           </div>
         ) : summary ? (
           <>
@@ -961,7 +961,7 @@ export default function LUCWorkspacePage() {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
               <div
                 className="p-4 rounded-xl"
-                style={{ backgroundColor: '#1a2234', border: '1px solid #2d3a4d' }}
+                style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}
               >
                 <div className="text-sm text-gray-400 mb-1">Plan</div>
                 <div className="text-xl font-bold" style={{ color: AIMS_CIRCUIT_COLORS.accent }}>
@@ -970,7 +970,7 @@ export default function LUCWorkspacePage() {
               </div>
               <div
                 className="p-4 rounded-xl"
-                style={{ backgroundColor: '#1a2234', border: '1px solid #2d3a4d' }}
+                style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}
               >
                 <div className="text-sm text-gray-400 mb-1">Overall Usage</div>
                 <div
@@ -987,7 +987,7 @@ export default function LUCWorkspacePage() {
               </div>
               <div
                 className="p-4 rounded-xl"
-                style={{ backgroundColor: '#1a2234', border: '1px solid #2d3a4d' }}
+                style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}
               >
                 <div className="text-sm text-gray-400 mb-1">Total Overage</div>
                 <div className="text-xl font-bold text-red-400">
@@ -996,7 +996,7 @@ export default function LUCWorkspacePage() {
               </div>
               <div
                 className="p-4 rounded-xl"
-                style={{ backgroundColor: '#1a2234', border: '1px solid #2d3a4d' }}
+                style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}
               >
                 <div className="text-sm text-gray-400 mb-1">Billing Cycle Ends</div>
                 <div className="text-xl font-bold text-white">
@@ -1009,10 +1009,10 @@ export default function LUCWorkspacePage() {
             {stats && stats.totalUsage > 0 && (
               <div
                 className="p-4 rounded-xl mb-8"
-                style={{ backgroundColor: '#1a2234', border: '1px solid #2d3a4d' }}
+                style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}
               >
                 <div className="flex items-center gap-2 mb-4">
-                  <ChartIcon className="w-5 h-5 text-amber-400" />
+                  <ChartIcon className="w-5 h-5 text-gold" />
                   <h3 className="text-white font-medium">Usage Statistics</h3>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -1022,7 +1022,7 @@ export default function LUCWorkspacePage() {
                   </div>
                   <div>
                     <div className="text-xs text-gray-400">Total Cost</div>
-                    <div className="text-lg font-bold text-amber-400">${stats.totalCost.toFixed(2)}</div>
+                    <div className="text-lg font-bold text-gold">${stats.totalCost.toFixed(2)}</div>
                   </div>
                   {stats.topServices.length > 0 && (
                     <div className="col-span-2">
@@ -1074,8 +1074,8 @@ export default function LUCWorkspacePage() {
                         : 'hover:bg-white/5'
                     }`}
                     style={{
-                      backgroundColor: '#1a2234',
-                      border: '1px solid #2d3a4d',
+                      backgroundColor: 'rgba(255,255,255,0.03)',
+                      border: '1px solid rgba(255,255,255,0.08)',
                       '--tw-ring-color': summary.planName === plan.name ? AIMS_CIRCUIT_COLORS.accent : undefined,
                     } as React.CSSProperties}
                   >
@@ -1109,7 +1109,7 @@ export default function LUCWorkspacePage() {
             {/* Rate Card */}
             <div
               className="p-6 rounded-xl"
-              style={{ backgroundColor: '#1a2234', border: '1px solid #2d3a4d' }}
+              style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}
             >
               <h2 className="text-lg font-semibold text-white mb-4">Rate Card</h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6">

@@ -356,7 +356,7 @@ export function VoiceButton({
         bg-gradient-to-b from-zinc-800 to-zinc-900
         border-2 border-zinc-700
         flex items-center justify-center
-        transition-all hover:border-amber-500/50
+        transition-all hover:border-gold/20
         disabled:opacity-50
       `}
       style={{

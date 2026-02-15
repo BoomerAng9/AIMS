@@ -6,14 +6,14 @@
 
   "governance_chain": {
     "description": "Enforced command hierarchy for all tool executions",
-    "chain": ["ACHEEVY", "Boomer_Ang", "Chicken_Hawk", "Squad", "Lil_Hawks"],
+    "chain": ["ACHEEVY", "Boomer_Ang", "Chicken Hawk", "Squad", "Lil_Hawks"],
     "rules": [
       "ACHEEVY approves plan and presents to user",
       "Boomer_Ang validates scope against DSP limits",
-      "Contract issued to Chicken_Hawk with ShiftId",
-      "Chicken_Hawk spawns Squad with Lil_Hawks",
-      "Lil_Hawks execute and report to Chicken_Hawk",
-      "Chicken_Hawk reports to ACHEEVY",
+      "Contract issued to Chicken Hawk with ShiftId",
+      "Chicken Hawk spawns Squad with Lil_Hawks",
+      "Lil_Hawks execute and report to Chicken Hawk",
+      "Chicken Hawk reports to ACHEEVY",
       "ACHEEVY verifies receipt and closes with user"
     ]
   },
@@ -38,7 +38,7 @@
         "new_integrations": false,
         "secrets_scope_expansion": false
       },
-      "dispatch_to": "Chicken_Hawk",
+      "dispatch_to": "Chicken Hawk",
       "user_experience": "Watch the crew work, get receipt"
     },
 
@@ -63,7 +63,7 @@
         "secrets_scope_expansion",
         "anomaly_detected"
       ],
-      "dispatch_to": "Chicken_Hawk",
+      "dispatch_to": "Chicken Hawk",
       "output": "Manifest for approval, then execution proceeds"
     },
 
@@ -81,7 +81,7 @@
           "crew_specialties": {"type": "array", "items": {"type": "string"}}
         }
       },
-      "dispatch_to": "Chicken_Hawk",
+      "dispatch_to": "Chicken Hawk",
       "returns": {
         "shift_id": "string",
         "squad_id": "string",
@@ -103,7 +103,7 @@
           "steps": {"type": "array", "items": {"$ref": "#/definitions/wave_step"}}
         }
       },
-      "dispatch_to": "Chicken_Hawk",
+      "dispatch_to": "Chicken Hawk",
       "returns": {
         "wave_result": "success | partial | failed",
         "steps_completed": "integer",
@@ -124,7 +124,7 @@
           "verification_level": {"type": "string", "enum": ["standard", "deep", "oracle"], "default": "standard"}
         }
       },
-      "dispatch_to": "Chicken_Hawk",
+      "dispatch_to": "Chicken Hawk",
       "returns": {
         "verification_passed": "boolean",
         "attestation_bundle": "object",
@@ -143,7 +143,7 @@
           "shift_id": {"type": "string"}
         }
       },
-      "dispatch_to": "Chicken_Hawk",
+      "dispatch_to": "Chicken Hawk",
       "returns": {
         "receipt_id": "string",
         "receipt_hash": "string",
@@ -164,7 +164,7 @@
           "include_captions": {"type": "boolean", "default": true}
         }
       },
-      "dispatch_to": "Chicken_Hawk",
+      "dispatch_to": "Chicken Hawk",
       "returns": {
         "phase": "string",
         "progress_percent": "number",
@@ -187,7 +187,7 @@
           "rollback_to": {"type": "string", "description": "Target state reference"}
         }
       },
-      "dispatch_to": "Chicken_Hawk",
+      "dispatch_to": "Chicken Hawk",
       "requires_confirmation": true,
       "returns": {
         "rollback_initiated": "boolean",
@@ -207,7 +207,7 @@
           "reason": {"type": "string"}
         }
       },
-      "dispatch_to": "Chicken_Hawk",
+      "dispatch_to": "Chicken Hawk",
       "requires_confirmation": true,
       "audit_required": true,
       "returns": {

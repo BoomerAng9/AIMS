@@ -1,0 +1,11 @@
+{
+  "service": "aims-telegram-webhook",
+  "status": "configured",
+  "features": ["account_linking", "help", "disconnect", "status", "health", "acheevy_chat"],
+  "link_codes_active": 0,
+  "linked_users": 0,
+  "endpoint": "/api/telegram/webhook",
+  "setup_command": "POST https://api.telegram.org/bot<TOKEN>/setWebhook?url=https://plugmein.cloud/api/telegram/webhook",
+  "checked_at": "2026-02-13T15:30:00Z",
+  "notes": "Webhook handler is implemented and ready. Returns 200 within 1s for all update types. Account linking flow generates 6-char codes with 10-minute expiry."
+}

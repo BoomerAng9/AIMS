@@ -16,16 +16,18 @@ interface ProxyOptions {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
   body?: unknown;
   requireOwner?: boolean;
+  /** Allow unauthenticated guest access (read-only endpoints) */
+  guestAllowed?: boolean;
 }
 
 export async function proxyToBackend(opts: ProxyOptions): Promise<NextResponse> {
   const session = await getServerSession(authOptions);
-  if (!session?.user) {
+  if (!session?.user && !opts.guestAllowed) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   if (opts.requireOwner) {
-    const role = (session.user as Record<string, unknown>).role;
+    const role = (session?.user as Record<string, unknown> | undefined)?.role;
     if (role !== 'OWNER') {
       return NextResponse.json({ error: 'Forbidden — OWNER role required' }, { status: 403 });
     }

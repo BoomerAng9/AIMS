@@ -2,6 +2,10 @@
 set -e
 
 # A.I.M.S. Full Infrastructure Setup
+# Project:  AI Managed Solutions
+# ID:       ai-managed-services
+# Number:   1008658271134
+#
 # Runs all setup scripts in the correct order.
 #
 # Order:

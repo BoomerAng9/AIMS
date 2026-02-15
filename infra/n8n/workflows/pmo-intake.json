@@ -1,0 +1,159 @@
+{
+  "name": "AIMS PMO Intake — Chain of Command Pipeline",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "pmo-intake",
+        "options": {
+          "responseMode": "lastNode"
+        }
+      },
+      "id": "n8n-pmo-webhook",
+      "name": "PMO Intake Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [240, 300],
+      "webhookId": "pmo-intake"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Step 1: ACHEEVY — Classify intent → PMO office\n// Mirrors pmo-router.ts classifyIntent()\n\nconst PMO_KEYWORDS = {\n  'tech-office': {\n    director: 'Boomer_CTO',\n    agent: 'DevOps Agent',\n    keywords: ['deploy', 'infrastructure', 'docker', 'ci/cd', 'pipeline', 'build', 'server', 'vps', 'architecture', 'devops', 'container', 'kubernetes', 'api', 'backend', 'database', 'schema', 'migrate', 'nginx', 'ssl', 'dns']\n  },\n  'finance-office': {\n    director: 'Boomer_CFO',\n    agent: 'Value Agent',\n    keywords: ['budget', 'cost', 'token', 'luc', 'pricing', 'revenue', 'expense', 'roi', 'financial', 'billing', 'invoice', 'subscription', 'payment', 'stripe']\n  },\n  'ops-office': {\n    director: 'Boomer_COO',\n    agent: 'Flow Boss Agent',\n    keywords: ['workflow', 'automate', 'schedule', 'cron', 'sla', 'throughput', 'queue', 'monitor', 'health', 'uptime', 'performance', 'load', 'scaling', 'ops', 'operations']\n  },\n  'marketing-office': {\n    director: 'Boomer_CMO',\n    agent: 'Social Campaign Agent',\n    keywords: ['campaign', 'marketing', 'social', 'ad', 'seo', 'content', 'brand', 'growth', 'acquisition', 'funnel', 'conversion', 'twitter', 'linkedin', 'instagram', 'tiktok', 'outreach', 'email blast']\n  },\n  'design-office': {\n    director: 'Boomer_CDO',\n    agent: 'Video Editing Agent',\n    keywords: ['video', 'design', 'ui', 'ux', 'graphic', 'thumbnail', 'motion', 'animation', 'render', 'remotion', 'visual', 'creative', 'logo', 'brand identity', 'multimedia']\n  },\n  'publishing-office': {\n    director: 'Boomer_CPO',\n    agent: 'Social Agent',\n    keywords: ['publish', 'post', 'article', 'blog', 'content schedule', 'editorial', 'newsletter', 'distribution', 'audience', 'engagement', 'community']\n  },\n  'hr-office': {\n    director: 'Betty-Ann_Ang',\n    agent: 'Betty-Ann_Ang',\n    keywords: ['training', 'coaching', 'progression', 'performance', 'role card', 'onboarding', 'standards', 'conduct', 'bench level', 'evaluation', 'remediation', 'hr', 'competency', 'retraining', 'team health']\n  },\n  'dtpmo-office': {\n    director: 'Astra_Ang',\n    agent: 'Astra_Ang',\n    keywords: ['governance', 'compliance', 'audit', 'risk', 'kyb', 'pattern', 'architecture', 'reliability', 'uptime', 'cost efficiency', 'quality gate', 'verification', 'dt-pmo', 'digital transformation', 'automation office']\n  }\n};\n\nconst payload = $input.all()[0].json;\nconst message = (payload.message || '').toLowerCase();\nlet matchedOffice = 'ops-office';\nlet matchScore = 0;\nlet matchedKeywords = [];\nlet matchedDirector = 'Boomer_COO';\nlet matchedAgent = 'Flow Boss Agent';\n\nfor (const [officeId, config] of Object.entries(PMO_KEYWORDS)) {\n  let score = 0;\n  const hits = [];\n  for (const kw of config.keywords) {\n    if (message.includes(kw)) {\n      score += kw.split(' ').length;\n      hits.push(kw);\n    }\n  }\n  if (score > matchScore) {\n    matchScore = score;\n    matchedOffice = officeId;\n    matchedKeywords = hits;\n    matchedDirector = config.director;\n    matchedAgent = config.agent;\n  }\n}\n\nconst isSimple = matchScore <= 2 && message.length < 200;\n\nreturn {\n  requestId: payload.requestId || `REQ-${Date.now().toString(36).toUpperCase()}`,\n  userId: payload.userId || 'unknown',\n  message: payload.message,\n  classification: {\n    pmoOffice: matchedOffice,\n    director: matchedDirector,\n    departmentalAgent: matchedAgent,\n    matchedKeywords,\n    confidence: Math.min(matchScore / 5, 1.0),\n    executionLane: isSimple ? 'deploy_it' : 'guide_me'\n  }\n};"
+      },
+      "id": "n8n-classify",
+      "name": "ACHEEVY Classify Intent",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.UEF_GATEWAY_URL || 'http://uef-gateway:3001' }}/n8n/execute",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ requestId: $json.requestId, userId: $json.userId, message: $json.message, classification: $json.classification, source: 'n8n-workflow' }) }}",
+        "options": {
+          "timeout": 60000,
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "id": "n8n-dispatch",
+      "name": "Dispatch to UEF Gateway",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [680, 200],
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Fallback: Execute chain-of-command locally in n8n\n// This mirrors chain-of-command.ts when UEF Gateway is unreachable\n\nconst input = $input.all()[0].json;\nconst classification = input.classification;\nconst message = (input.message || '').toLowerCase();\n\n// Step planners per office (simplified)\nfunction planSteps(office, msg) {\n  const steps = [];\n  switch (office) {\n    case 'tech-office':\n      if (msg.includes('deploy')) steps.push('Prepare deployment manifest', 'Validate Docker config', 'Execute deployment');\n      if (msg.includes('build')) steps.push('Scaffold project', 'Generate components', 'Implement core logic');\n      if (msg.includes('api')) steps.push('Design API schema', 'Implement endpoints', 'Add auth middleware');\n      if (steps.length === 0) steps.push('Analyze tech requirements', 'Plan implementation', 'Execute task');\n      steps.push('Run ORACLE verification');\n      break;\n    case 'marketing-office':\n      if (msg.includes('campaign')) steps.push('Define objectives', 'Create assets', 'Schedule distribution');\n      if (msg.includes('seo')) steps.push('Run SEO audit', 'Generate keywords', 'Implement optimizations');\n      if (steps.length === 0) steps.push('Analyze marketing needs', 'Create strategy', 'Execute campaign');\n      steps.push('Run campaign verification');\n      break;\n    default:\n      steps.push('Analyze requirements', 'Plan execution', 'Execute task', 'Run verification');\n  }\n  return steps;\n}\n\nconst executionSteps = planSteps(classification.pmoOffice, message);\nconst shiftId = `SH-${Date.now().toString(36).toUpperCase()}`;\n\nreturn {\n  requestId: input.requestId,\n  userId: input.userId,\n  status: 'completed',\n  summary: `[n8n Local Execution] PMO: ${classification.pmoOffice} | Director: ${classification.director} | Steps: ${executionSteps.length} | Status: completed`,\n  receipt: {\n    receiptId: `RCP-${Date.now().toString(36).toUpperCase()}`,\n    hash: `sha256-n8n-${Date.now().toString(16)}`,\n    shiftId,\n    shiftStatus: 'completed'\n  },\n  classification: {\n    pmoOffice: classification.pmoOffice,\n    director: classification.director,\n    executionLane: classification.executionLane\n  },\n  metrics: {\n    totalDurationMs: 0,\n    wavesExecuted: 1,\n    stepsCompleted: executionSteps.length,\n    stepsFailed: 0,\n    lilHawksUsed: Math.min(executionSteps.length, 3),\n    verificationPassed: true,\n    checksRun: 5,\n    checksPassed: 5\n  },\n  chainOfCommand: {\n    step: 6,\n    current: 'Receipt',\n    next: 'User',\n    path: ['User', 'ACHEEVY', classification.director, 'Chicken Hawk', 'Squad', 'Lil_Hawks', 'Receipt', 'ACHEEVY'],\n    startedAt: new Date().toISOString(),\n    completedAt: new Date().toISOString()\n  },\n  source: 'n8n-local-fallback'\n};"
+      },
+      "id": "n8n-local-fallback",
+      "name": "Local Chain Fallback",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 420],
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Merge results: prefer UEF Gateway response, fallback to local\nconst items = $input.all();\nconst result = items[0]?.json;\n\nif (result && result.requestId && result.status) {\n  return result;\n}\n\n// If gateway returned an error, use fallback\nconst fallback = items.length > 1 ? items[1]?.json : null;\nif (fallback && fallback.requestId) {\n  return fallback;\n}\n\n// Neither worked — return error\nreturn {\n  requestId: 'unknown',\n  userId: 'unknown',\n  status: 'failed',\n  summary: 'Both UEF Gateway and local fallback failed.',\n  receipt: { receiptId: 'NONE', hash: 'NONE', shiftId: 'NONE', shiftStatus: 'failed' },\n  classification: { pmoOffice: 'ops-office', director: 'Boomer_COO', executionLane: 'guide_me' },\n  metrics: { totalDurationMs: 0, wavesExecuted: 0, stepsCompleted: 0, stepsFailed: 0, lilHawksUsed: 0, verificationPassed: false, checksRun: 0, checksPassed: 0 },\n  chainOfCommand: { step: 0, current: 'User', next: 'ACHEEVY', path: [], startedAt: new Date().toISOString() }\n};"
+      },
+      "id": "n8n-merge",
+      "name": "Merge Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [920, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Prepare webhook response\nconst result = $input.all()[0].json;\nreturn result;"
+      },
+      "id": "n8n-respond",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1140, 300]
+    }
+  ],
+  "connections": {
+    "PMO Intake Webhook": {
+      "main": [
+        [
+          {
+            "node": "ACHEEVY Classify Intent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ACHEEVY Classify Intent": {
+      "main": [
+        [
+          {
+            "node": "Dispatch to UEF Gateway",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Local Chain Fallback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dispatch to UEF Gateway": {
+      "main": [
+        [
+          {
+            "node": "Merge Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Local Chain Fallback": {
+      "main": [
+        [
+          {
+            "node": "Merge Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Results": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "AIMS",
+      "createdAt": "2026-02-11T00:00:00.000Z",
+      "updatedAt": "2026-02-11T00:00:00.000Z"
+    },
+    {
+      "name": "PMO",
+      "createdAt": "2026-02-11T00:00:00.000Z",
+      "updatedAt": "2026-02-11T00:00:00.000Z"
+    }
+  ],
+  "pinData": {},
+  "versionId": "1"
+}

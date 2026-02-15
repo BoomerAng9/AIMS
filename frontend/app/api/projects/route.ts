@@ -3,7 +3,7 @@ import { proxyToBackend, getSessionUserId } from '@/lib/api-proxy';
 
 export async function GET() {
   const userId = await getSessionUserId();
-  return proxyToBackend({ path: `/projects${userId ? `?userId=${userId}` : ''}` });
+  return proxyToBackend({ path: `/projects${userId ? `?userId=${userId}` : ''}`, guestAllowed: true });
 }
 
 export async function POST(req: NextRequest) {

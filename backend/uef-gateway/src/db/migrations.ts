@@ -124,6 +124,48 @@ const migrations: Migration[] = [
       `);
     },
   },
+  {
+    version: '003',
+    name: 'create_analytics_tables',
+    up: (db: Database.Database): void => {
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS analytics_events (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          plugId TEXT NOT NULL,
+          event TEXT NOT NULL,
+          responseMs INTEGER,
+          detail TEXT NOT NULL DEFAULT '{}',
+          createdAt TEXT NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS analytics_daily (
+          plugId TEXT NOT NULL,
+          date TEXT NOT NULL,
+          requests INTEGER NOT NULL DEFAULT 0,
+          errors INTEGER NOT NULL DEFAULT 0,
+          avgResponseMs INTEGER NOT NULL DEFAULT 0,
+          totalResponseMs INTEGER NOT NULL DEFAULT 0,
+          responseCount INTEGER NOT NULL DEFAULT 0,
+          PRIMARY KEY (plugId, date)
+        );
+
+        CREATE TABLE IF NOT EXISTS analytics_summary (
+          plugId TEXT PRIMARY KEY,
+          requests INTEGER NOT NULL DEFAULT 0,
+          errors INTEGER NOT NULL DEFAULT 0,
+          uptime REAL NOT NULL DEFAULT 100,
+          avgResponseMs INTEGER NOT NULL DEFAULT 0,
+          totalResponseMs INTEGER NOT NULL DEFAULT 0,
+          responseCount INTEGER NOT NULL DEFAULT 0,
+          lastActive TEXT NOT NULL
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_analytics_events_plugId ON analytics_events(plugId);
+        CREATE INDEX IF NOT EXISTS idx_analytics_events_createdAt ON analytics_events(createdAt);
+        CREATE INDEX IF NOT EXISTS idx_analytics_daily_plugId ON analytics_daily(plugId);
+      `);
+    },
+  },
 ];
 
 // ---------------------------------------------------------------------------

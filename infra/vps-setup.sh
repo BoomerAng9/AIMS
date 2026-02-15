@@ -60,7 +60,7 @@ info "System packages updated."
 # ─────────────────────────────────────────────────────────────────────────────
 # 2. Node.js (required for Gemini CLI)
 # ─────────────────────────────────────────────────────────────────────────────
-header "2/7  Node.js 20 LTS"
+header "2/7  Node.js 20 LTS + Bun Runtime"
 
 if command -v node &> /dev/null; then
     info "Node.js already installed: $(node --version)"
@@ -68,6 +68,16 @@ else
     curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
     apt-get install -y -qq nodejs
     info "Node.js installed: $(node --version)"
+fi
+
+# Bun — required by Chicken Hawk execution engine
+if command -v bun &> /dev/null; then
+    info "Bun already installed: $(bun --version)"
+else
+    curl -fsSL https://bun.sh/install | bash
+    # Make bun available system-wide
+    ln -sf /root/.bun/bin/bun /usr/local/bin/bun 2>/dev/null || true
+    info "Bun installed: $(bun --version 2>/dev/null || echo 'restart shell to verify')"
 fi
 
 # ─────────────────────────────────────────────────────────────────────────────

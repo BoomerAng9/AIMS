@@ -1,0 +1,173 @@
+{
+  "policy_id": "aims_capability_packs.v2",
+  "version": "2.0.0",
+  "effective_date": "2026-02-12",
+  "description": "Repo-to-Boomer_Ang capability mapping. All Intelligent Internet repos are Boomer_Ang-only capability sources.",
+  "scope_lock": "Chicken Hawk and Lil_Hawks do NOT get direct coupling to these repos.",
+
+  "packs": [
+    {
+      "pack_id": "A",
+      "name": "Agent Factory Floor",
+      "primary": "Build/host agent runtimes as internal capabilities.",
+      "repos": [
+        {
+          "repo": "ii-agent",
+          "delegated_owner": "Forge_Ang",
+          "role": "Agent runtime packaging + deployment",
+          "wrapper_type": "SERVICE_WRAPPER"
+        },
+        {
+          "repo": "ii-agent-community",
+          "delegated_owner": "Dockmaster_Ang",
+          "role": "Example ingestion + safe templates",
+          "wrapper_type": "JOB_RUNNER_WRAPPER"
+        },
+        {
+          "repo": "CommonGround",
+          "delegated_owner": "OpsConsole_Ang",
+          "role": "Multi-agent observability + collaboration surface",
+          "wrapper_type": "SERVICE_WRAPPER"
+        }
+      ]
+    },
+    {
+      "pack_id": "B",
+      "name": "Research + Timeline",
+      "primary": "Research agents + sourced timeline artifacts.",
+      "repos": [
+        {
+          "repo": "ii-researcher",
+          "delegated_owner": "Scout_Ang",
+          "role": "Research agent execution",
+          "wrapper_type": "SERVICE_WRAPPER"
+        },
+        {
+          "repo": "Common_Chronicle",
+          "delegated_owner": "Chronicle_Ang",
+          "role": "Turn messy context into structured, sourced timelines",
+          "wrapper_type": "JOB_RUNNER_WRAPPER"
+        },
+        {
+          "repo": "II-Commons",
+          "delegated_owner": "Index_Ang",
+          "role": "Datasets + embeddings support",
+          "wrapper_type": "SERVICE_WRAPPER"
+        }
+      ]
+    },
+    {
+      "pack_id": "C",
+      "name": "Terminal Coders",
+      "primary": "Controlled coding assistance as Boomer_Ang-managed tools.",
+      "repos": [
+        {
+          "repo": "codex",
+          "delegated_owner": "Patchsmith_Ang",
+          "role": "Safe terminal coding jobs",
+          "wrapper_type": "CLI_WRAPPER"
+        },
+        {
+          "repo": "codex-as-mcp",
+          "delegated_owner": "Bridge_Ang",
+          "role": "Wrap codex into MCP, still gated by Port Authority",
+          "wrapper_type": "MCP_BRIDGE_WRAPPER"
+        },
+        {
+          "repo": "gemini-cli",
+          "delegated_owner": "Runner_Ang",
+          "role": "CLI execution pack",
+          "wrapper_type": "CLI_WRAPPER"
+        },
+        {
+          "repo": "gemini-cli-mcp-openai-bridge",
+          "delegated_owner": "Bridge_Ang",
+          "role": "Protocol translation pack",
+          "wrapper_type": "MCP_BRIDGE_WRAPPER"
+        }
+      ]
+    },
+    {
+      "pack_id": "D",
+      "name": "LLM Gateway + Debug",
+      "primary": "Debug/route model calls in OpenAI-format style.",
+      "repos": [
+        {
+          "repo": "litellm-debugger",
+          "delegated_owner": "Gatekeeper_Ang",
+          "role": "Debug + policy + routing validation",
+          "wrapper_type": "SERVICE_WRAPPER"
+        }
+      ]
+    },
+    {
+      "pack_id": "E",
+      "name": "Docs + Presentation Factory",
+      "primary": "Build user-facing decks and docs (with licensing discipline).",
+      "repos": [
+        {
+          "repo": "reveal.js",
+          "delegated_owner": "Showrunner_Ang",
+          "role": "Presentation engine",
+          "wrapper_type": "SERVICE_WRAPPER"
+        },
+        {
+          "repo": "PPTist",
+          "delegated_owner": "Licensing_Ang",
+          "role": "Quarantined: only used if AGPL obligations accepted",
+          "wrapper_type": "SERVICE_WRAPPER",
+          "license_flag": "AGPL",
+          "quarantined": true
+        },
+        {
+          "repo": "Symbioism-Nextra",
+          "delegated_owner": "Scribe_Ang",
+          "role": "Docs publishing patterns",
+          "wrapper_type": "SERVICE_WRAPPER"
+        },
+        {
+          "repo": "Symbioism-TLE",
+          "delegated_owner": "Scribe_Ang",
+          "role": "Docs publishing patterns",
+          "wrapper_type": "SERVICE_WRAPPER"
+        }
+      ]
+    },
+    {
+      "pack_id": "F",
+      "name": "Deep Lab / Experimental",
+      "primary": "Not default production; gated to R&D lanes.",
+      "repos": [
+        {
+          "repo": "ii-thought",
+          "delegated_owner": "Lab_Ang",
+          "role": "Experimental reasoning",
+          "wrapper_type": "JOB_RUNNER_WRAPPER"
+        },
+        {
+          "repo": "ii_verl",
+          "delegated_owner": "Lab_Ang",
+          "role": "Verification research",
+          "wrapper_type": "JOB_RUNNER_WRAPPER"
+        },
+        {
+          "repo": "CoT-Lab-Demo",
+          "delegated_owner": "Lab_Ang",
+          "role": "Chain-of-thought demos",
+          "wrapper_type": "JOB_RUNNER_WRAPPER"
+        }
+      ]
+    }
+  ],
+
+  "indirect_flow": {
+    "description": "How repos feed the ecosystem without Chicken Hawk or Lil_Hawks touching them directly.",
+    "flow": [
+      "Boomer_Ang wraps repo",
+      "Registers capability via Tool Registry Contract",
+      "Chicken Hawk dispatches bounded tasks that USE that capability",
+      "Lil_Hawks produce artifacts",
+      "Evidence stored in audit trail"
+    ]
+  }
+}

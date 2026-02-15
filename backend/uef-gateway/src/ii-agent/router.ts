@@ -16,7 +16,7 @@ const router = Router();
  */
 router.post('/execute', async (req: Request, res: Response) => {
   try {
-    const { prompt, type, context, streaming } = req.body;
+    const { prompt, type, streaming } = req.body;
 
     if (!prompt) {
       return res.status(400).json({ error: 'Prompt is required' });

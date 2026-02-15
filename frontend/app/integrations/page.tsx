@@ -174,7 +174,7 @@ export default function IntegrationsPage() {
   };
 
   const getStatusIcon = (status: string) => {
-    if (status === "testing") return <Loader2 className="h-5 w-5 animate-spin text-amber-500" />;
+    if (status === "testing") return <Loader2 className="h-5 w-5 animate-spin text-gold" />;
     if (status === "success") return <Check className="h-5 w-5 text-green-500" />;
     if (status === "error") return <X className="h-5 w-5 text-red-500" />;
     return null;
@@ -189,7 +189,7 @@ export default function IntegrationsPage() {
       <main className="flex-1 container max-w-6xl py-8 px-4">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-display text-amber-100 tracking-widest uppercase mb-2">
+          <h1 className="text-4xl font-display text-white tracking-widest uppercase mb-2">
             API Integrations
           </h1>
           <p className="text-zinc-400">
@@ -198,12 +198,12 @@ export default function IntegrationsPage() {
         </div>
 
         {/* Summary */}
-        <Card className="mb-6 bg-black/60 border-amber-500/20">
+        <Card className="mb-6 bg-black/60 border-gold/20">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div className="flex gap-6">
                 <div>
-                  <div className="text-2xl font-bold text-amber-500">{successCount}</div>
+                  <div className="text-2xl font-bold text-gold">{successCount}</div>
                   <div className="text-xs text-zinc-500">Passed</div>
                 </div>
                 <div>
@@ -240,13 +240,13 @@ export default function IntegrationsPage() {
             return (
               <Card
                 key={index}
-                className="bg-black/40 border-white/5 hover:border-amber-500/20 transition-colors"
+                className="bg-black/40 border-wireframe-stroke hover:border-gold/20 transition-colors"
               >
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="p-2 rounded bg-amber-500/10">
-                        <Icon className="h-5 w-5 text-amber-500" />
+                      <div className="p-2 rounded bg-gold/10">
+                        <Icon className="h-5 w-5 text-gold" />
                       </div>
                       <CardTitle className="text-lg text-white">{service.name}</CardTitle>
                     </div>
@@ -290,7 +290,7 @@ export default function IntegrationsPage() {
         </div>
 
         {/* Environment Check */}
-        <Card className="mt-6 bg-black/40 border-white/5">
+        <Card className="mt-6 bg-black/40 border-wireframe-stroke">
           <CardHeader>
             <CardTitle className="text-white">Environment Variables</CardTitle>
             <CardDescription>

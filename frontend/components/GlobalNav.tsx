@@ -16,7 +16,7 @@ export function GlobalNav() {
       <div className="flex items-center gap-4 pointer-events-auto">
         {/* ACHEEVY Helmet Logo */}
         <Link href="/" className="flex items-center gap-2 group">
-          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-xl shadow-[0_0_15px_rgba(251,191,36,0.5)] transition-transform group-hover:scale-110">
+          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-gold to-gold flex items-center justify-center text-xl shadow-[0_0_15px_rgba(251,191,36,0.5)] transition-transform group-hover:scale-110">
             🛡️
           </div>
         </Link>
@@ -26,7 +26,7 @@ export function GlobalNav() {
         {/* Home Button */}
         <Link 
           href="/" 
-          className="flex items-center gap-2 px-4 py-2 rounded-full border border-white/5 bg-black/40 backdrop-blur-md text-amber-100/70 hover:text-amber-50 hover:border-amber-400/30 transition-all text-xs font-semibold uppercase tracking-widest"
+          className="flex items-center gap-2 px-4 py-2 rounded-full border border-wireframe-stroke bg-black/40 backdrop-blur-md text-white/70 hover:text-white hover:border-gold/30 transition-all text-xs font-semibold uppercase tracking-widest"
         >
           <Home size={14} />
           <span>Home</span>
@@ -36,10 +36,10 @@ export function GlobalNav() {
         <button 
           onClick={() => router.back()}
           disabled={pathname === "/"}
-          className={`flex items-center gap-2 px-4 py-2 rounded-full border border-white/5 bg-black/40 backdrop-blur-md text-xs font-semibold uppercase tracking-widest transition-all ${
+          className={`flex items-center gap-2 px-4 py-2 rounded-full border border-wireframe-stroke bg-black/40 backdrop-blur-md text-xs font-semibold uppercase tracking-widest transition-all ${
             pathname === "/" 
               ? "opacity-50 cursor-not-allowed text-white/20" 
-              : "text-amber-100/70 hover:text-amber-50 hover:border-amber-400/30"
+              : "text-white/70 hover:text-white hover:border-gold/30"
           }`}
         >
           <ArrowLeft size={14} />
