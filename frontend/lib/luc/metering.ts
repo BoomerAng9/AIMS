@@ -346,17 +346,16 @@ export class LucMeteringClient {
     let successCount = 0;
     const eventsToRetry = [...this.pendingEvents];
     this.pendingEvents = [];
+    const results = await Promise.all(
+      eventsToRetry.map((event) =>
+        this.recordUsage(event.service, event.amount, {
+          toolId: event.toolId,
+          deploymentId: event.deploymentId,
+        })
+      )
+    );
 
-    for (const event of eventsToRetry) {
-      const result = await this.recordUsage(event.service, event.amount, {
-        toolId: event.toolId,
-        deploymentId: event.deploymentId,
-      });
-
-      if (result.success) {
-        successCount++;
-      }
-    }
+    successCount = results.filter((r) => r.success).length;
 
     return successCount;
   }
