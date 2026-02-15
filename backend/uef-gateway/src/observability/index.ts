@@ -354,11 +354,13 @@ const DEFAULT_METRIC_NAMES = [
 
 export class MetricsExporter {
   private metrics: Map<string, MetricDataPoint[]> = new Map();
+  private stats: Map<string, { sum: number; min: number; max: number }> = new Map();
 
   constructor() {
     // Pre-initialize default metric buckets
     for (const name of DEFAULT_METRIC_NAMES) {
       this.metrics.set(name, []);
+      this.stats.set(name, { sum: 0, min: Infinity, max: -Infinity });
     }
   }
 
@@ -368,18 +370,30 @@ export class MetricsExporter {
   record(metric: string, value: number, labels?: Record<string, string>): void {
     if (!this.metrics.has(metric)) {
       this.metrics.set(metric, []);
+      this.stats.set(metric, { sum: 0, min: Infinity, max: -Infinity });
     }
 
     const dataPoints = this.metrics.get(metric)!;
+    const stats = this.stats.get(metric)!;
+
     dataPoints.push({
       value,
       timestamp: new Date().toISOString(),
       labels,
     });
 
+    // Update stats incrementally
+    stats.sum += value;
+    if (value < stats.min) stats.min = value;
+    if (value > stats.max) stats.max = value;
+
     // Keep a rolling window of the last 10,000 data points per metric
     if (dataPoints.length > 10_000) {
-      dataPoints.splice(0, dataPoints.length - 10_000);
+      const removed = dataPoints.shift()!;
+      stats.sum -= removed.value;
+      if (removed.value === stats.min || removed.value === stats.max) {
+        this.recalculateMinMax(metric);
+      }
     }
   }
 
@@ -400,7 +414,10 @@ export class MetricsExporter {
     for (const [name, dataPoints] of this.metrics.entries()) {
       if (dataPoints.length === 0) continue;
 
-      const series = this.buildSeries(name, dataPoints);
+      const stats = this.stats.get(name)!;
+      const count = dataPoints.length;
+      const sumRounded = Math.round(stats.sum * 100) / 100;
+      const avg = Math.round((stats.sum / count) * 100) / 100;
 
       // HELP line
       lines.push(`# HELP ${name} A.I.M.S. UEF Gateway metric`);
@@ -414,11 +431,11 @@ export class MetricsExporter {
       lines.push(`${name}${labelStr} ${latest.value}`);
 
       // Also emit summary stats as suffixed metrics
-      lines.push(`${name}_count ${series.count}`);
-      lines.push(`${name}_sum ${series.sum}`);
-      lines.push(`${name}_avg ${series.avg}`);
-      lines.push(`${name}_min ${series.min}`);
-      lines.push(`${name}_max ${series.max}`);
+      lines.push(`${name}_count ${count}`);
+      lines.push(`${name}_sum ${sumRounded}`);
+      lines.push(`${name}_avg ${avg}`);
+      lines.push(`${name}_min ${stats.min}`);
+      lines.push(`${name}_max ${stats.max}`);
 
       lines.push('');
     }
@@ -454,27 +471,44 @@ export class MetricsExporter {
       return { name, values: [], count: 0, sum: 0, avg: 0, min: 0, max: 0 };
     }
 
-    let sum = 0;
-    let min = values[0].value;
-    let max = values[0].value;
-
-    for (const dp of values) {
-      sum += dp.value;
-      if (dp.value < min) min = dp.value;
-      if (dp.value > max) max = dp.value;
-    }
-
-    const avg = Math.round((sum / values.length) * 100) / 100;
+    const stats = this.stats.get(name)!;
+    const avg = Math.round((stats.sum / values.length) * 100) / 100;
 
     return {
       name,
       values: [...values],
       count: values.length,
-      sum: Math.round(sum * 100) / 100,
+      sum: Math.round(stats.sum * 100) / 100,
       avg,
-      min,
-      max,
+      min: stats.min,
+      max: stats.max,
     };
+  }
+
+  /**
+   * Re-calculate min and max for a metric series.
+   */
+  private recalculateMinMax(name: string): void {
+    const dataPoints = this.metrics.get(name)!;
+    const stats = this.stats.get(name)!;
+
+    if (dataPoints.length === 0) {
+      stats.min = Infinity;
+      stats.max = -Infinity;
+      return;
+    }
+
+    let min = dataPoints[0].value;
+    let max = dataPoints[0].value;
+
+    for (let i = 1; i < dataPoints.length; i++) {
+      const val = dataPoints[i].value;
+      if (val < min) min = val;
+      if (val > max) max = val;
+    }
+
+    stats.min = min;
+    stats.max = max;
   }
 
   /**
