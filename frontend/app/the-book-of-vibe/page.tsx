@@ -142,7 +142,7 @@ export default function BookOfVibePage() {
           </p>
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
             <a
-              href={process.env.NEXT_PUBLIC_APP_URL || 'https://aimanagedsolutions.cloud'}
+              href={process.env.NEXT_PUBLIC_APP_URL || 'https://plugmein.cloud'}
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gold/10 border border-gold/30 text-gold text-sm font-medium hover:bg-gold/20 transition-all"
             >
               Start Building with ACHEEVY

@@ -232,7 +232,7 @@ export default function SignInPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-2.5 rounded-lg bg-black/40 border border-white/10 text-white placeholder:text-white/10 focus:border-gold/50 focus:bg-black/60 focus:outline-none focus:ring-1 focus:ring-gold/20 transition-all text-sm font-mono"
-                placeholder="agent@aimanagedsolutions.cloud"
+                placeholder="agent@plugmein.cloud"
                 autoComplete="email"
               />
             </div>

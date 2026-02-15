@@ -6,10 +6,10 @@
  * Dual-purpose hero that serves both domains:
  *
  * plugmein.cloud (LEARN):
- *   DO cards → link to aimanagedsolutions.cloud (Chat, Build, Deploy)
+ *   DO cards → link to plugmein.cloud (Chat, Build, Deploy)
  *   EXPLORE cards → local lore pages (Book of V.I.B.E., Gallery, About)
  *
- * aimanagedsolutions.cloud (DO):
+ * plugmein.cloud (DO):
  *   Direct action cards → local routes (Chat, Dashboard, Circuit Box)
  *
  * Hero copy (non-negotiable):
@@ -23,7 +23,7 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 
 // Cross-domain URLs
-const APP_DOMAIN = process.env.NEXT_PUBLIC_APP_URL || 'https://aimanagedsolutions.cloud';
+const APP_DOMAIN = process.env.NEXT_PUBLIC_APP_URL || 'https://plugmein.cloud';
 
 // ── Animation Variants ──
 
@@ -105,7 +105,7 @@ export function Hero() {
           </p>
         </div>
 
-        {/* ── DO Section — Actions that go to aimanagedsolutions.cloud ── */}
+        {/* ── DO Section — Actions that go to plugmein.cloud ── */}
         <motion.div
           variants={staggerContainer}
           initial="hidden"

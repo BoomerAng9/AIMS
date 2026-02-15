@@ -19,23 +19,9 @@ const IS_DEMO = process.env.DEMO_MODE === 'true';
 // ─────────────────────────────────────────────────────────────
 // Domain Routing Configuration
 // ─────────────────────────────────────────────────────────────
-// plugmein.cloud = LEARN (lore, Book of V.I.B.E., galleries, merch, about)
-// aimanagedsolutions.cloud = DO (chat, dashboard, build aiPLUGs, deploy)
+// plugmein.cloud serves everything (landing + app)
 
-const LANDING_HOST = 'plugmein.cloud';          // Lore & learn domain
-const APP_HOST = 'aimanagedsolutions.cloud';     // Functional app domain
-
-// Routes that belong ONLY on the app domain (aimanagedsolutions.cloud)
-const APP_ONLY_ROUTES = [
-  '/dashboard', '/chat', '/api', '/sign-in', '/sign-up',
-  '/forgot-password', '/onboarding', '/workspace',
-];
-
-// Routes that belong ONLY on the landing domain (plugmein.cloud)
-const LANDING_ONLY_ROUTES = [
-  '/the-book-of-vibe', '/gallery', '/merch', '/about',
-  '/mission', '/team', '/careers', '/blog', '/lore',
-];
+const PRIMARY_HOST = 'plugmein.cloud';
 
 const ALLOWED_ORIGINS = IS_PRODUCTION
   ? [
@@ -46,8 +32,6 @@ const ALLOWED_ORIGINS = IS_PRODUCTION
       'https://www.aims.plugmein.cloud',
       'https://api.aims.plugmein.cloud',
       'https://luc.plugmein.cloud',
-      'https://aimanagedsolutions.cloud',
-      'https://www.aimanagedsolutions.cloud',
     ]
   : [
       'http://localhost:3000',
@@ -270,26 +254,8 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(redirectUrl);
   }
 
-  // 1. Domain routing — redirect wrong-domain requests to the right place
-  if (IS_PRODUCTION) {
-    const host = request.headers.get('host')?.replace(/^www\./, '') || '';
-
-    // On plugmein.cloud: redirect app routes → aimanagedsolutions.cloud
-    if (host === LANDING_HOST || host === `www.${LANDING_HOST}`) {
-      const isAppRoute = APP_ONLY_ROUTES.some(r => pathname.startsWith(r));
-      if (isAppRoute) {
-        return NextResponse.redirect(`https://${APP_HOST}${pathname}${request.nextUrl.search}`);
-      }
-    }
-
-    // On aimanagedsolutions.cloud: redirect lore routes → plugmein.cloud
-    if (host === APP_HOST || host === `www.${APP_HOST}`) {
-      const isLandingRoute = LANDING_ONLY_ROUTES.some(r => pathname.startsWith(r));
-      if (isLandingRoute) {
-        return NextResponse.redirect(`https://${LANDING_HOST}${pathname}${request.nextUrl.search}`);
-      }
-    }
-  }
+  // 1. Domain routing — all routes served from plugmein.cloud
+  // (aimanagedsolutions.cloud is deprecated)
 
   // 2. Honeypot check (block bots probing for vulnerabilities)
   if (isHoneypot(pathname)) {

@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 import clsx from "clsx";
 
 // Domain constants
-const APP_DOMAIN = process.env.NEXT_PUBLIC_APP_URL || 'https://aimanagedsolutions.cloud';
+const APP_DOMAIN = process.env.NEXT_PUBLIC_APP_URL || 'https://plugmein.cloud';
 const LANDING_DOMAIN = process.env.NEXT_PUBLIC_LANDING_URL || 'https://plugmein.cloud';
 
 // Navigation for the LANDING domain (plugmein.cloud — lore, learn, explore)
@@ -19,7 +19,7 @@ const LANDING_NAV = [
   { href: "/about", label: "About" },
 ];
 
-// Navigation for the APP domain (aimanagedsolutions.cloud — do, build, deploy)
+// Navigation for the APP domain (plugmein.cloud — do, build, deploy)
 const APP_NAV = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/chat", label: "Chat w/ACHEEVY" },
