@@ -15,7 +15,6 @@ dist/
 # System
 .DS_Store
 .claude/
-.stitch/
 .data/
 *.pem
 *.key
