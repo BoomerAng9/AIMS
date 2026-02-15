@@ -1,12 +1,16 @@
 """M.I.M. Branding API routes."""
 
+import io
 import logging
+import uuid
 from typing import Optional
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, status
+
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from fastapi.responses import PlainTextResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ii_agent.server.api.deps import get_db, get_current_user_optional, get_current_user
+from ii_agent.core.config.ii_agent_config import config
+from ii_agent.server.api.deps import get_current_user, get_current_user_optional, get_db
 from ii_agent.db.models import User
 from .models import BrandingSettings, BrandingUpdateRequest
 from .service import BrandingService
@@ -133,17 +137,8 @@ async def upload_logo(
             detail="File too large. Maximum size is 5MB"
         )
     
-    # TODO: Upload to GCS and get URL
-    # For now, we'll use a placeholder that stores locally or uses GCS
-    # This should be integrated with the existing file upload service
-    
-    from ii_agent.storage.factory import create_storage
-    from ii_agent.core.config.ii_agent_config import config
-    import uuid
-    import io
-    
     try:
-        storage = create_storage()
+        storage = config.storage
         file_ext = file.filename.split(".")[-1] if "." in file.filename else "png"
         unique_filename = f"{uuid.uuid4()}.{file_ext}"
         path = f"branding/{current_user.id}/{unique_filename}"
