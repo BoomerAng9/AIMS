@@ -70,5 +70,77 @@
     "billingCycleEnd": "2026-03-01T00:00:00.000Z",
     "createdAt": "2026-01-15T08:00:00.000Z",
     "updatedAt": "2026-02-09T14:28:00.000Z"
+  },
+  "user-123": {
+    "userId": "user-123",
+    "planId": "starter",
+    "planName": "Starter",
+    "quotas": {
+      "brave_searches": {
+        "limit": 1000,
+        "used": 0,
+        "overage": 0,
+        "lastUpdated": "2026-02-15T16:15:35.967Z"
+      },
+      "elevenlabs_chars": {
+        "limit": 100000,
+        "used": 0,
+        "overage": 0,
+        "lastUpdated": "2026-02-15T16:15:35.967Z"
+      },
+      "container_hours": {
+        "limit": 10,
+        "used": 0,
+        "overage": 0,
+        "lastUpdated": "2026-02-15T16:15:35.967Z"
+      },
+      "n8n_executions": {
+        "limit": 500,
+        "used": 0,
+        "overage": 0,
+        "lastUpdated": "2026-02-15T16:15:35.967Z"
+      },
+      "storage_gb": {
+        "limit": 10,
+        "used": 0,
+        "overage": 0,
+        "lastUpdated": "2026-02-15T16:15:35.967Z"
+      },
+      "api_calls": {
+        "limit": 10000,
+        "used": 0,
+        "overage": 0,
+        "lastUpdated": "2026-02-15T16:15:35.967Z"
+      },
+      "openrouter_tokens": {
+        "limit": 1000,
+        "used": 0,
+        "overage": 0,
+        "lastUpdated": "2026-02-15T16:15:35.967Z"
+      },
+      "vision_analyses": {
+        "limit": 200,
+        "used": 0,
+        "overage": 0,
+        "lastUpdated": "2026-02-15T16:15:35.967Z"
+      },
+      "code_generations": {
+        "limit": 100,
+        "used": 0,
+        "overage": 0,
+        "lastUpdated": "2026-02-15T16:15:35.967Z"
+      },
+      "embeddings": {
+        "limit": 500,
+        "used": 0,
+        "overage": 0,
+        "lastUpdated": "2026-02-15T16:15:35.967Z"
+      }
+    },
+    "totalOverageCost": 0,
+    "billingCycleStart": "2026-02-15T16:15:35.967Z",
+    "billingCycleEnd": "2026-03-15T16:15:35.967Z",
+    "createdAt": "2026-02-15T16:15:35.967Z",
+    "updatedAt": "2026-02-15T16:15:35.967Z"
   }
 }

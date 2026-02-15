@@ -73,12 +73,39 @@ function readJSONFile<T>(filePath: string, defaultValue: T): T {
   }
 }
 
+async function readJSONFileAsync<T>(filePath: string, defaultValue: T): Promise<T> {
+  try {
+    try {
+      await fs.promises.access(filePath);
+    } catch {
+      return defaultValue;
+    }
+    const content = await fs.promises.readFile(filePath, 'utf-8');
+    return JSON.parse(content);
+  } catch (error) {
+    console.error(`[LUC Server Storage] Failed to read async ${filePath}:`, error);
+    return defaultValue;
+  }
+}
+
 function writeJSONFile<T>(filePath: string, data: T): void {
   try {
     ensureDataDir();
     fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8');
   } catch (error) {
     console.error(`[LUC Server Storage] Failed to write ${filePath}:`, error);
+    throw error;
+  }
+}
+
+async function writeJSONFileAsync<T>(filePath: string, data: T): Promise<void> {
+  try {
+    // ensureDataDir is sync but fast (checks existence).
+    // If we want fully async, we could use fs.promises.mkdir, but standard mkdirSync is fine for ensuring dir exists.
+    ensureDataDir();
+    await fs.promises.writeFile(filePath, JSON.stringify(data, null, 2), 'utf-8');
+  } catch (error) {
+    console.error(`[LUC Server Storage] Failed to write async ${filePath}:`, error);
     throw error;
   }
 }
@@ -101,31 +128,31 @@ export class ServerStorageAdapter {
     return Date.now() - this.cacheTimestamp < this.cacheTTL;
   }
 
-  private getAccounts(): AccountsData {
+  private async getAccounts(): Promise<AccountsData> {
     if (this.accountsCache && this.isCacheValid()) {
       return this.accountsCache;
     }
-    this.accountsCache = readJSONFile<AccountsData>(ACCOUNTS_FILE, {});
+    this.accountsCache = await readJSONFileAsync<AccountsData>(ACCOUNTS_FILE, {});
     this.cacheTimestamp = Date.now();
     return this.accountsCache;
   }
 
-  private saveAccounts(accounts: AccountsData): void {
-    writeJSONFile(ACCOUNTS_FILE, accounts);
+  private async saveAccounts(accounts: AccountsData): Promise<void> {
+    await writeJSONFileAsync(ACCOUNTS_FILE, accounts);
     this.accountsCache = accounts;
     this.cacheTimestamp = Date.now();
   }
 
-  private getHistory(): UsageHistoryData {
+  private async getHistory(): Promise<UsageHistoryData> {
     if (this.historyCache && this.isCacheValid()) {
       return this.historyCache;
     }
-    this.historyCache = readJSONFile<UsageHistoryData>(USAGE_HISTORY_FILE, {});
+    this.historyCache = await readJSONFileAsync<UsageHistoryData>(USAGE_HISTORY_FILE, {});
     return this.historyCache;
   }
 
-  private saveHistory(history: UsageHistoryData): void {
-    writeJSONFile(USAGE_HISTORY_FILE, history);
+  private async saveHistory(history: UsageHistoryData): Promise<void> {
+    await writeJSONFileAsync(USAGE_HISTORY_FILE, history);
     this.historyCache = history;
   }
 
@@ -134,7 +161,7 @@ export class ServerStorageAdapter {
   // ─────────────────────────────────────────────────────────
 
   async getAccount(userId: string): Promise<LUCAccountRecord | null> {
-    const accounts = this.getAccounts();
+    const accounts = await this.getAccounts();
     const accountData = accounts[userId];
     if (!accountData) return null;
 
@@ -147,22 +174,22 @@ export class ServerStorageAdapter {
   }
 
   async saveAccount(account: LUCAccountRecord): Promise<void> {
-    const accounts = this.getAccounts();
+    const accounts = await this.getAccounts();
     accounts[account.userId] = serializeLUCAccount(account);
-    this.saveAccounts(accounts);
+    await this.saveAccounts(accounts);
   }
 
   async deleteAccount(userId: string): Promise<void> {
-    const accounts = this.getAccounts();
+    const accounts = await this.getAccounts();
     delete accounts[userId];
-    this.saveAccounts(accounts);
+    await this.saveAccounts(accounts);
 
     // Also clear usage history
     await this.clearUsageHistory(userId);
   }
 
   async listAccounts(): Promise<LUCAccountRecord[]> {
-    const accounts = this.getAccounts();
+    const accounts = await this.getAccounts();
     const result: LUCAccountRecord[] = [];
 
     for (const data of Object.values(accounts)) {
@@ -193,7 +220,7 @@ export class ServerStorageAdapter {
   // ─────────────────────────────────────────────────────────
 
   async addUsageEntry(entry: UsageHistoryEntry): Promise<void> {
-    const history = this.getHistory();
+    const history = await this.getHistory();
 
     if (!history[entry.userId]) {
       history[entry.userId] = [];
@@ -207,18 +234,18 @@ export class ServerStorageAdapter {
       history[entry.userId] = history[entry.userId].slice(0, 1000);
     }
 
-    this.saveHistory(history);
+    await this.saveHistory(history);
   }
 
   async getUsageHistory(userId: string, limit: number = 100): Promise<UsageHistoryEntry[]> {
-    const history = this.getHistory();
+    const history = await this.getHistory();
     return (history[userId] || []).slice(0, limit);
   }
 
   async clearUsageHistory(userId: string): Promise<void> {
-    const history = this.getHistory();
+    const history = await this.getHistory();
     delete history[userId];
-    this.saveHistory(history);
+    await this.saveHistory(history);
   }
 
   // ─────────────────────────────────────────────────────────
@@ -226,8 +253,10 @@ export class ServerStorageAdapter {
   // ─────────────────────────────────────────────────────────
 
   async exportAll(userId: string): Promise<string> {
-    const account = await this.getAccount(userId);
-    const history = await this.getUsageHistory(userId, 10000);
+    const [account, history] = await Promise.all([
+      this.getAccount(userId),
+      this.getUsageHistory(userId, 10000)
+    ]);
 
     const exportData = {
       version: '1.0',
@@ -249,12 +278,12 @@ export class ServerStorageAdapter {
     }
 
     if (importData.usageHistory && Array.isArray(importData.usageHistory)) {
-      const history = this.getHistory();
+      const history = await this.getHistory();
       history[userId] = importData.usageHistory.map((entry: UsageHistoryEntry) => ({
         ...entry,
         userId,
       }));
-      this.saveHistory(history);
+      await this.saveHistory(history);
     }
   }
 
@@ -263,8 +292,10 @@ export class ServerStorageAdapter {
   // ─────────────────────────────────────────────────────────
 
   async exportCSV(userId: string): Promise<string> {
-    const account = await this.getAccount(userId);
-    const history = await this.getUsageHistory(userId);
+    const [account, history] = await Promise.all([
+      this.getAccount(userId),
+      this.getUsageHistory(userId)
+    ]);
 
     let csv = '=== LUC ACCOUNT EXPORT ===\n\n';
 
