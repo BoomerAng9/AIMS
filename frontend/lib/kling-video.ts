@@ -33,9 +33,24 @@ export interface PromptAnalysis {
   suggestions: string[];
 }
 
+interface KlingApiTaskResponse {
+  code: number;
+  message: string;
+  data: {
+    task_id: string;
+    task_status: string;
+    task_result?: {
+      videos: Array<{
+        url: string;
+        duration: string;
+      }>;
+    };
+  };
+}
+
 export class KlingVideoService {
   private apiKey: string;
-  private baseUrl = "https://api.kling.ai/v1"; // Placeholder - update with actual endpoint
+  private baseUrl = "https://api.klingai.com/v1";
 
   constructor(apiKey: string) {
     this.apiKey = apiKey;
@@ -123,25 +138,132 @@ export class KlingVideoService {
     // Optimize prompt first
     const optimizedPrompt = this.optimizePrompt(request.prompt, request.model);
 
-    // TODO: Actual API integration
-    // For now, return mock response
-    return {
-      jobId: `kling_${Date.now()}`,
-      status: "queued",
-      estimatedTime: request.duration || 10,
-    };
+    try {
+      if (!this.apiKey) {
+        // Fallback for development if no key is present, to avoid breaking the UI flow
+        // But log a warning clearly.
+        if (process.env.NODE_ENV === 'development') {
+           console.warn("Kling API key is missing. Returning mock response for development.");
+           return {
+             jobId: `mock_kling_${Date.now()}`,
+             status: "queued",
+             estimatedTime: request.duration || 10,
+           };
+        }
+        throw new Error("Kling API key is missing");
+      }
+
+      const payload: any = {
+        model_name: request.model,
+        prompt: optimizedPrompt,
+        ratio: request.aspectRatio || "16:9",
+        duration: request.duration ? `${request.duration}` : "5",
+      };
+
+      const response = await fetch(`${this.baseUrl}/videos/text2video`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${this.apiKey}`
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `API request failed with status ${response.status}`);
+      }
+
+      const data: KlingApiTaskResponse = await response.json();
+
+      if (data.code !== 0) {
+        throw new Error(data.message || "Unknown API error");
+      }
+
+      return {
+        jobId: data.data.task_id,
+        status: "queued",
+        estimatedTime: request.duration || 10,
+      };
+
+    } catch (error: any) {
+      console.error("Kling API Generation Error:", error);
+      return {
+        jobId: "",
+        status: "failed",
+        error: error.message
+      };
+    }
   }
 
   /**
    * Check status of video generation job
    */
   async checkStatus(jobId: string): Promise<KlingVideoResponse> {
-    // TODO: Actual API integration
-    return {
-      jobId,
-      status: "processing",
-      estimatedTime: 30,
-    };
+    try {
+      if (jobId.startsWith("mock_")) {
+         // Mock status check
+         return {
+           jobId,
+           status: "completed",
+           videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+           thumbnailUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg"
+         };
+      }
+
+      if (!this.apiKey) {
+        throw new Error("Kling API key is missing");
+      }
+
+      const response = await fetch(`${this.baseUrl}/videos/text2video/${jobId}`, {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${this.apiKey}`
+        }
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `API request failed with status ${response.status}`);
+      }
+
+      const data: KlingApiTaskResponse = await response.json();
+
+      if (data.code !== 0) {
+         throw new Error(data.message || "Unknown API error");
+      }
+
+      const taskStatus = data.data.task_status;
+      let status: KlingVideoResponse["status"] = "processing";
+
+      if (["succeed", "success", "completed"].includes(taskStatus)) {
+        status = "completed";
+      } else if (taskStatus === "failed") {
+        status = "failed";
+      } else if (["submitted", "queued"].includes(taskStatus)) {
+        status = "queued";
+      }
+
+      // Extract video URL if completed
+      let videoUrl: string | undefined;
+      if (data.data.task_result?.videos && data.data.task_result.videos.length > 0) {
+        videoUrl = data.data.task_result.videos[0].url;
+      }
+
+      return {
+        jobId,
+        status,
+        videoUrl,
+      };
+
+    } catch (error: any) {
+      console.error("Kling API Status Check Error:", error);
+      return {
+        jobId,
+        status: "failed",
+        error: error.message
+      };
+    }
   }
 
   // Private helper methods
