@@ -13,7 +13,7 @@ import {
   Database,
   FileText,
   Globe,
-  Image,
+  Image as ImageIcon,
   Layout,
   Layers,
   Mail,
@@ -511,7 +511,7 @@ export default function BuildWizardPage() {
                   </p>
                   <div className="flex h-32 items-center justify-center rounded-2xl border border-dashed border-wireframe-stroke bg-black/40 transition-all hover:border-gold/20 cursor-pointer group">
                     <div className="text-center">
-                      <Image
+                      <ImageIcon
                         size={24}
                         className="mx-auto text-white/20 group-hover:text-gold/50 transition-colors"
                       />

@@ -7,7 +7,7 @@
  * Uses champagne/amber/gold brand colors.
  */
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import { motion } from 'framer-motion';
 
 // ─────────────────────────────────────────────────────────────
@@ -291,17 +291,21 @@ export function LEDBalance({
   color = AIMS_COLORS.champagne,
 }: LEDBalanceProps) {
   const [displayValue, setDisplayValue] = useState(0);
+  const displayValueRef = useRef(0);
 
   useEffect(() => {
     const duration = 2000;
     const startTime = Date.now();
-    const startValue = displayValue;
+    const startValue = displayValueRef.current;
 
     const animate = () => {
       const elapsed = Date.now() - startTime;
       const progress = Math.min(elapsed / duration, 1);
       const eased = 1 - Math.pow(1 - progress, 3);
-      setDisplayValue(startValue + (value - startValue) * eased);
+      const current = startValue + (value - startValue) * eased;
+
+      setDisplayValue(current);
+      displayValueRef.current = current;
 
       if (progress < 1) {
         requestAnimationFrame(animate);

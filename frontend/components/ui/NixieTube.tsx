@@ -7,7 +7,7 @@
  * Perfect for stats, costs, tokens, scores, and live data.
  */
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // ─────────────────────────────────────────────────────────────
@@ -376,10 +376,11 @@ export function NixieCounter({
   glowColor = '#ff6b1a',
 }: NixieCounterProps) {
   const [count, setCount] = useState(0);
+  const countRef = useRef(0);
 
   useEffect(() => {
     const startTime = Date.now();
-    const startValue = count;
+    const startValue = countRef.current;
 
     const animate = () => {
       const elapsed = Date.now() - startTime;
@@ -390,6 +391,7 @@ export function NixieCounter({
       const current = startValue + (target - startValue) * eased;
 
       setCount(current);
+      countRef.current = current;
 
       if (progress < 1) {
         requestAnimationFrame(animate);

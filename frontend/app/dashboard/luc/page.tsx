@@ -273,32 +273,32 @@ function QuoteCalculator({
 
   const bucket = selectedService ? SERVICE_BUCKETS[selectedService] : null;
 
-  const fetchQuote = async () => {
-    if (!selectedService) return;
-
-    setLoading(true);
-    try {
-      const res = await fetch('/api/luc', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'quote',
-          userId: 'default-user',
-          service: selectedService,
-          amount,
-        }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setQuote(data.quote);
-      }
-    } catch (error) {
-      console.error('Failed to fetch quote:', error);
-    }
-    setLoading(false);
-  };
-
   useEffect(() => {
+    const fetchQuote = async () => {
+      if (!selectedService) return;
+
+      setLoading(true);
+      try {
+        const res = await fetch('/api/luc', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'quote',
+            userId: 'default-user',
+            service: selectedService,
+            amount,
+          }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          setQuote(data.quote);
+        }
+      } catch (error) {
+        console.error('Failed to fetch quote:', error);
+      }
+      setLoading(false);
+    };
+
     if (selectedService) {
       fetchQuote();
     }
