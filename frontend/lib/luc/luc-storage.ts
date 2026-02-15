@@ -13,7 +13,7 @@ import {
   serializeLUCAccount,
   deserializeLUCAccount,
   createLUCAccount,
-  LUC_PLANS,
+  LUC_PLANS, SERVICE_BUCKETS,
 } from './luc-engine';
 
 // ─────────────────────────────────────────────────────────────
@@ -250,7 +250,7 @@ export function usageHistoryToCSV(history: UsageHistoryEntry[]): string {
 export function accountSummaryToCSV(account: LUCAccountRecord): string {
   const headers = ['Service', 'Used', 'Limit', 'Overage', 'Overage Cost', 'Percent Used'];
   const rows = Object.entries(account.quotas).map(([key, quota]) => {
-    const bucket = require('./luc-engine').SERVICE_BUCKETS[key];
+    const bucket = SERVICE_BUCKETS[key as LUCServiceKey];
     const percentUsed = quota.limit > 0 ? ((quota.used / quota.limit) * 100).toFixed(1) : '0';
     const overageCost = (quota.overage * (bucket?.overageRate || 0)).toFixed(4);
 
@@ -368,8 +368,10 @@ export class LUCAccountManager {
    */
   async exportData(userId: string, format: 'json' | 'csv' = 'json'): Promise<string> {
     if (format === 'csv') {
-      const account = await this.storage.getAccount(userId);
-      const history = await this.storage.getUsageHistory(userId);
+      const [account, history] = await Promise.all([
+        this.storage.getAccount(userId),
+        this.storage.getUsageHistory(userId),
+      ]);
 
       return `=== ACCOUNT SUMMARY ===\n${account ? accountSummaryToCSV(account) : 'No account'}\n\n=== USAGE HISTORY ===\n${usageHistoryToCSV(history)}`;
     }
