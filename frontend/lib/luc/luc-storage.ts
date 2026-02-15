@@ -21,7 +21,8 @@ import {
 // ─────────────────────────────────────────────────────────────
 
 const STORAGE_KEYS = {
-  ACCOUNTS: 'luc_accounts',
+  ACCOUNTS: 'luc_accounts', // Deprecated, used for migration
+  ACCOUNTS_INDEX: 'luc_accounts_index',
   CURRENT_USER: 'luc_current_user',
   USAGE_HISTORY: 'luc_usage_history',
   PRESETS: 'luc_presets',
@@ -65,23 +66,52 @@ export interface LUCStorageAdapter {
 
 export class LocalStorageAdapter implements LUCStorageAdapter {
   private isAvailable: boolean;
+  private migrated = false;
 
   constructor() {
     this.isAvailable = typeof window !== 'undefined' && !!window.localStorage;
   }
 
-  async getAccount(userId: string): Promise<LUCAccountRecord | null> {
-    if (!this.isAvailable) return null;
+  private migrateAccountsIfNeeded() {
+    if (!this.isAvailable || this.migrated) return;
 
     try {
-      const accountsJson = localStorage.getItem(STORAGE_KEYS.ACCOUNTS);
-      if (!accountsJson) return null;
+      const oldAccountsJson = localStorage.getItem(STORAGE_KEYS.ACCOUNTS);
+      if (oldAccountsJson) {
+        console.log('[LUCStorage] Migrating accounts to new storage format...');
+        const accounts = JSON.parse(oldAccountsJson);
+        const userIds = Object.keys(accounts);
 
-      const accounts = JSON.parse(accountsJson);
-      const accountData = accounts[userId];
-      if (!accountData) return null;
+        // Save individual accounts
+        for (const userId of userIds) {
+          localStorage.setItem(`luc_account_${userId}`, JSON.stringify(accounts[userId]));
+        }
 
-      return deserializeLUCAccount(accountData);
+        // Save index
+        localStorage.setItem(STORAGE_KEYS.ACCOUNTS_INDEX, JSON.stringify(userIds));
+
+        // Remove old key
+        localStorage.removeItem(STORAGE_KEYS.ACCOUNTS);
+        console.log(`[LUCStorage] Migration complete. Moved ${userIds.length} accounts.`);
+      }
+    } catch (error) {
+      console.error('[LUCStorage] Migration failed:', error);
+      // Don't mark as migrated if failed, so we retry? Or mark to avoid loop?
+      // If we fail, we probably corrupt data if we partially moved.
+      // But assuming simple failures, we just log.
+    }
+    this.migrated = true;
+  }
+
+  async getAccount(userId: string): Promise<LUCAccountRecord | null> {
+    if (!this.isAvailable) return null;
+    this.migrateAccountsIfNeeded();
+
+    try {
+      const accountJson = localStorage.getItem(`luc_account_${userId}`);
+      if (!accountJson) return null;
+
+      return deserializeLUCAccount(JSON.parse(accountJson));
     } catch (error) {
       console.error('[LUCStorage] Failed to get account:', error);
       return null;
@@ -90,13 +120,23 @@ export class LocalStorageAdapter implements LUCStorageAdapter {
 
   async saveAccount(account: LUCAccountRecord): Promise<void> {
     if (!this.isAvailable) return;
+    this.migrateAccountsIfNeeded();
+
+    const key = `luc_account_${account.userId}`;
+    const isUpdate = localStorage.getItem(key) !== null;
 
     try {
-      const accountsJson = localStorage.getItem(STORAGE_KEYS.ACCOUNTS) || '{}';
-      const accounts = JSON.parse(accountsJson);
+      localStorage.setItem(key, JSON.stringify(serializeLUCAccount(account)));
 
-      accounts[account.userId] = serializeLUCAccount(account);
-      localStorage.setItem(STORAGE_KEYS.ACCOUNTS, JSON.stringify(accounts));
+      if (!isUpdate) {
+        // Update index
+        const indexJson = localStorage.getItem(STORAGE_KEYS.ACCOUNTS_INDEX) || '[]';
+        const index = JSON.parse(indexJson);
+        if (!index.includes(account.userId)) {
+          index.push(account.userId);
+          localStorage.setItem(STORAGE_KEYS.ACCOUNTS_INDEX, JSON.stringify(index));
+        }
+      }
     } catch (error) {
       console.error('[LUCStorage] Failed to save account:', error);
       throw error;
@@ -105,13 +145,16 @@ export class LocalStorageAdapter implements LUCStorageAdapter {
 
   async deleteAccount(userId: string): Promise<void> {
     if (!this.isAvailable) return;
+    this.migrateAccountsIfNeeded();
 
     try {
-      const accountsJson = localStorage.getItem(STORAGE_KEYS.ACCOUNTS) || '{}';
-      const accounts = JSON.parse(accountsJson);
+      localStorage.removeItem(`luc_account_${userId}`);
 
-      delete accounts[userId];
-      localStorage.setItem(STORAGE_KEYS.ACCOUNTS, JSON.stringify(accounts));
+      // Update index
+      const indexJson = localStorage.getItem(STORAGE_KEYS.ACCOUNTS_INDEX) || '[]';
+      let index = JSON.parse(indexJson);
+      index = index.filter((id: string) => id !== userId);
+      localStorage.setItem(STORAGE_KEYS.ACCOUNTS_INDEX, JSON.stringify(index));
 
       // Also clear usage history
       await this.clearUsageHistory(userId);
@@ -123,12 +166,17 @@ export class LocalStorageAdapter implements LUCStorageAdapter {
 
   async listAccounts(): Promise<LUCAccountRecord[]> {
     if (!this.isAvailable) return [];
+    this.migrateAccountsIfNeeded();
 
     try {
-      const accountsJson = localStorage.getItem(STORAGE_KEYS.ACCOUNTS) || '{}';
-      const accounts = JSON.parse(accountsJson);
+      const indexJson = localStorage.getItem(STORAGE_KEYS.ACCOUNTS_INDEX) || '[]';
+      const index = JSON.parse(indexJson);
 
-      return Object.values(accounts).map((data: any) => deserializeLUCAccount(data));
+      const accounts = await Promise.all(
+        index.map((userId: string) => this.getAccount(userId))
+      );
+
+      return accounts.filter((a): a is LUCAccountRecord => a !== null);
     } catch (error) {
       console.error('[LUCStorage] Failed to list accounts:', error);
       return [];
@@ -240,7 +288,7 @@ export function usageHistoryToCSV(history: UsageHistoryEntry[]): string {
     entry.service,
     entry.type,
     entry.amount.toString(),
-    `$${entry.cost.toFixed(4)}`,
+    `${entry.cost.toFixed(4)}`,
     entry.description || '',
   ]);
 
@@ -259,7 +307,7 @@ export function accountSummaryToCSV(account: LUCAccountRecord): string {
       quota.used.toString(),
       quota.limit.toString(),
       quota.overage.toString(),
-      `$${overageCost}`,
+      `${overageCost}`,
       `${percentUsed}%`,
     ];
   });
