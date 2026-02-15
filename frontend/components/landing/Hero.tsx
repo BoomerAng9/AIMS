@@ -6,10 +6,10 @@
  * Dual-purpose hero that serves both domains:
  *
  * plugmein.cloud (LEARN):
- *   DO cards → link to aimanagedsolutions.cloud (Chat, Build, Deploy)
+ *   DO cards → link to plugmein.cloud (Chat, Build, Deploy)
  *   EXPLORE cards → local lore pages (Book of V.I.B.E., Gallery, About)
  *
- * aimanagedsolutions.cloud (DO):
+ * plugmein.cloud (DO):
  *   Direct action cards → local routes (Chat, Dashboard, Circuit Box)
  *
  * Hero copy (non-negotiable):
@@ -23,7 +23,7 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 
 // Cross-domain URLs
-const APP_DOMAIN = process.env.NEXT_PUBLIC_APP_URL || 'https://aimanagedsolutions.cloud';
+const APP_DOMAIN = process.env.NEXT_PUBLIC_APP_URL || 'https://plugmein.cloud';
 
 // ── Animation Variants ──
 
@@ -48,7 +48,26 @@ const staggerItem = {
 export function Hero() {
   return (
     <section className="relative flex flex-col items-center bg-ink">
-      {/* Subtle radial vignette */}
+      {/* Hero background — ACHEEVY X Elder Ceremony */}
+      <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
+        <Image
+          src="/images/acheevy/elder-ceremony-hero.jpeg"
+          alt=""
+          fill
+          priority
+          className="object-cover object-center opacity-30"
+          sizes="100vw"
+        />
+      </div>
+
+      {/* Gradient overlays for text readability */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: 'linear-gradient(to bottom, rgba(10,10,12,0.55) 0%, rgba(10,10,12,0.3) 35%, rgba(10,10,12,0.7) 65%, rgba(10,10,12,0.95) 100%)',
+        }}
+        aria-hidden="true"
+      />
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -105,7 +124,7 @@ export function Hero() {
           </p>
         </div>
 
-        {/* ── DO Section — Actions that go to aimanagedsolutions.cloud ── */}
+        {/* ── DO Section — Actions that go to plugmein.cloud ── */}
         <motion.div
           variants={staggerContainer}
           initial="hidden"

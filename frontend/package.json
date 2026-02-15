@@ -36,7 +36,7 @@
     "groq-sdk": "^0.8.0",
     "highlight.js": "^11.9.0",
     "lucide-react": "^0.303.0",
-    "next": "14.0.4",
+    "next": "^14.2.35",
     "next-auth": "^4.24.13",
     "react": "^18",
     "react-dom": "^18",

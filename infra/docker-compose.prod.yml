@@ -73,6 +73,12 @@ services:
       - UEF_ENDPOINT=http://uef-gateway:3001
       - HOUSE_OF_ANG_URL=http://house-of-ang:3002
       - ACHEEVY_URL=http://acheevy:3003
+      # Voice — TTS & STT
+      - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY}
+      - DEEPGRAM_API_KEY=${DEEPGRAM_API_KEY}
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      # Search
+      - BRAVE_API_KEY=${BRAVE_API_KEY}
     depends_on:
       uef-gateway:
         condition: service_healthy
@@ -112,6 +118,10 @@ services:
       - UEF_ENDPOINT=http://uef-gateway:3001
       - HOUSE_OF_ANG_URL=http://house-of-ang:3002
       - ACHEEVY_URL=http://acheevy:3003
+      # Voice — TTS & STT
+      - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY}
+      - DEEPGRAM_API_KEY=${DEEPGRAM_API_KEY}
+      - GROQ_API_KEY=${GROQ_API_KEY}
     depends_on:
       uef-gateway:
         condition: service_healthy

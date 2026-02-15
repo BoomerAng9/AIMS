@@ -48,7 +48,7 @@ const InstagramIcon = ({ className }: { className?: string }) => (
 // Footer Navigation
 // ─────────────────────────────────────────────────────────────
 
-const APP_DOMAIN = process.env.NEXT_PUBLIC_APP_URL || 'https://aimanagedsolutions.cloud';
+const APP_DOMAIN = process.env.NEXT_PUBLIC_APP_URL || 'https://plugmein.cloud';
 
 const FOOTER_NAV = {
   lore: {
@@ -90,7 +90,7 @@ const FOOTER_NAV = {
       { label: 'GitHub Repository', href: 'https://github.com/BoomerAng9/AIMS' },
       { label: 'Documentation', href: '/docs' },
       { label: 'FAQ', href: '/faq' },
-      { label: 'Support', href: 'mailto:acheevy@aimanagedsolutions.cloud' },
+      { label: 'Support', href: 'mailto:acheevy@plugmein.cloud' },
     ],
   },
   legal: {

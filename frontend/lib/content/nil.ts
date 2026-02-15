@@ -4,8 +4,17 @@
  * Single source of truth for all NIL content, deal types, valuation
  * factors, compliance landscape, and the Per|Form ↔ NIL connection.
  *
- * This is SPORTS. Real-world athlete empowerment, contracts, and value.
- * The V.I.B.E. universe lives in lore.ts — this is a separate domain.
+ * DOMAIN SEPARATION — CRITICAL:
+ * This file is SPORTS BUSINESS. Real-world athlete empowerment, contracts,
+ * and NIL (Name, Image & Likeness) valuation.
+ *
+ * The Book of V.I.B.E. universe lives in lore.ts — that is FICTION/STORYTELLING.
+ * "NIL" in lore.ts means "the void / anti-creation." "N.I.L." here means
+ * "Name, Image & Likeness" — a completely separate domain.
+ *
+ * DO NOT reference V.I.B.E. characters, lore races, or mythology in this file.
+ * DO NOT reference sports, athletes, or Per|Form in lore.ts.
+ * These are parallel verticals under the A.I.M.S. umbrella, not the same world.
  */
 
 // ─────────────────────────────────────────────────────────────
@@ -140,7 +149,7 @@ export const NIL_FOUNDATION: NILFoundation = {
       title: 'Per|Form & N.I.L.',
       subtitle: 'Where scouting intelligence meets brand value.',
       content:
-        'Per|Form\'s autonomous scouting pipeline doesn\'t just evaluate athletic talent — it builds the data foundation that informs NIL valuation.\n\nThe P.A.I. formula — Score = (P × 0.40) + (A × 0.30) + (I × 0.30) — is the engine. P (Performance) is sourced by Lil_Bull_Hawk and Lil_Bear_Hawk through Firecrawl, pulling stats from MaxPreps and ESPN. A (Athleticism) comes from SAM 2 on Vertex AI, measuring speed bursts and separation distance from actual film. I (Intangibles) is gathered by Chicken Hawk via Brave Search, analyzing news coverage, leadership signals, captaincy history, and existing NIL deals.\n\nWhen the Scout Hub runs adversarial analysis, Lil_Bull_Hawk takes the UNDERRATED stance — this prospect\'s NIL value is suppressed relative to their ability. Lil_Bear_Hawk takes the OVERRATED stance — this prospect\'s current deals exceed sustainable value. Chicken Hawk mediates the debate, runs the P.A.I. formula, and assigns the final composite score and tier.\n\nA score of 101+ flags a generational talent (PRIME PLAYER). 90-100 is A+ (Elite Prospect). 80-89 is A (Starter Potential). The tiers map directly to NIL valuation brackets — brands and collectives reference Per|Form grades when sizing deals.\n\nPer|Form positions A.I.M.S. as the bridge between raw talent evaluation and NIL market intelligence — giving athletes, agents, and collectives the data they need to make informed decisions.',
+        'Per|Form\'s autonomous scouting pipeline doesn\'t just evaluate athletic talent — it builds the data foundation that informs NIL valuation.\n\nThe P.A.I. formula — Score = (P × 0.40) + (A × 0.30) + (I × 0.30) — is the engine. Performance data is sourced through Firecrawl, pulling stats from MaxPreps and ESPN. Athleticism is measured via SAM 2 on Vertex AI, analyzing speed bursts and separation distance from actual game film. Intangibles are gathered via Brave Search, analyzing news coverage, leadership signals, captaincy history, and existing NIL deals.\n\nThe Scout Hub runs adversarial analysis with opposing evaluation stances — one argues the prospect is UNDERRATED (NIL value suppressed relative to ability), the other argues OVERRATED (current deals exceed sustainable value). The system mediates the debate, runs the P.A.I. formula, and assigns the final composite score and tier.\n\nA score of 101+ flags a generational talent (PRIME PLAYER). 90-100 is A+ (Elite Prospect). 80-89 is A (Starter Potential). The tiers map directly to NIL valuation brackets — brands and collectives reference Per|Form grades when sizing deals.\n\nPer|Form positions A.I.M.S. as the bridge between raw talent evaluation and NIL market intelligence — giving athletes, agents, and collectives the data they need to make informed decisions.',
       color: 'amber',
       icon: 'bridge',
     },
@@ -456,23 +465,23 @@ export const PAI_FORMULA: PAIFormula = {
   name: 'P.A.I. Composite Score',
   equation: 'Score = (P × 0.40) + (A × 0.30) + (I × 0.30)',
   description:
-    'The Per|Form grading algorithm produces a Composite Score (0-100+) using three weighted components. Each component is sourced by a specific agent in the Gridiron Sandbox pipeline. The formula is rooted in the methodology from "Mastering the N.I.L." and drives all prospect evaluation, NIL valuation, and content generation.',
+    'The Per|Form grading algorithm produces a Composite Score (0-100+) using three weighted components. Each component is sourced by a specialized pipeline stage in the Per|Form scouting system. The formula is rooted in the methodology from "Mastering the N.I.L." and drives all prospect evaluation, NIL valuation, and content generation.',
   components: [
     {
       variable: 'P',
       name: 'Game Performance',
       weight: 0.40,
-      sourceAgent: 'Lil_Bull_Hawk + Lil_Bear_Hawk',
+      sourceAgent: 'Adversarial Evaluation Pipeline',
       dataSource: 'Firecrawl (MaxPreps, ESPN, 247Sports)',
       description:
-        'Statistical production normalized to a 0-100 scale. Yards, touchdowns, completion percentage, tackles, sacks — the numbers that define what a player does on the field. Lil_Bull_Hawk argues the prospect is UNDERRATED; Lil_Bear_Hawk argues OVERRATED. Both cite stats with confidence scores.',
+        'Statistical production normalized to a 0-100 scale. Yards, touchdowns, completion percentage, tackles, sacks — the numbers that define what a player does on the field. The pipeline runs adversarial analysis: one evaluator argues UNDERRATED, the other argues OVERRATED. Both cite stats with confidence scores.',
       color: 'amber',
     },
     {
       variable: 'A',
       name: 'Athleticism',
       weight: 0.30,
-      sourceAgent: 'SAM 2 (Meta)',
+      sourceAgent: 'SAM 2 Video Analysis',
       dataSource: 'Vertex AI on NVIDIA Tesla T4',
       description:
         'Measurable athletic traits extracted from actual game film. SAM 2 segments the player in video and calculates speed bursts, separation distance from defenders, route sharpness, and play recognition. Separation > 3.0 yards and burst speed > 20 mph are key thresholds.',
@@ -482,10 +491,10 @@ export const PAI_FORMULA: PAIFormula = {
       variable: 'I',
       name: 'Intangibles',
       weight: 0.30,
-      sourceAgent: 'Chicken Hawk',
+      sourceAgent: 'Enrichment Pipeline',
       dataSource: 'Brave Search (news, interviews, social media)',
       description:
-        'Leadership, character, and off-field factors that shape an athlete\'s brand and ceiling. Sourced from news coverage sentiment, captaincy history, community involvement, existing NIL deals, and interview presence. Chicken Hawk mediates the Lil_Hawk debate and finalizes the composite score.',
+        'Leadership, character, and off-field factors that shape an athlete\'s brand and ceiling. Sourced from news coverage sentiment, captaincy history, community involvement, existing NIL deals, and interview presence. The system mediates the adversarial debate and finalizes the composite score.',
       color: 'emerald',
     },
   ],

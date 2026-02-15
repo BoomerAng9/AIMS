@@ -13,7 +13,7 @@ import { motion } from 'framer-motion';
 import { SiteHeader } from '@/components/SiteHeader';
 import { Footer } from '@/components/landing/Footer';
 
-const APP_DOMAIN = process.env.NEXT_PUBLIC_APP_URL || 'https://aimanagedsolutions.cloud';
+const APP_DOMAIN = process.env.NEXT_PUBLIC_APP_URL || 'https://plugmein.cloud';
 
 export default function AboutPage() {
   return (

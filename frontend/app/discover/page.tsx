@@ -247,7 +247,7 @@ export default function DiscoverPage() {
       {/* CTA */}
       <section className="px-6 py-20 text-center border-t border-zinc-800/50">
         <h2 className="text-2xl font-bold mb-2">Ready for production?</h2>
-        <p className="text-zinc-500 mb-6">Deploy these agents on aimanagedsolutions.cloud</p>
+        <p className="text-zinc-500 mb-6">Deploy these agents on plugmein.cloud</p>
         <Link
           href="/dashboard/chat"
           className="inline-block px-8 py-4 bg-amber-500/15 text-amber-400 border border-amber-500/25 rounded-xl font-medium hover:bg-amber-500/25 transition-all text-lg"

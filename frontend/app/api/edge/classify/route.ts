@@ -1,16 +1,14 @@
-import { NextRequest, NextResponse } from 'next/server';
+/**
+ * Edge Intent Classifier — PMO routing at the edge
+ *
+ * Pure computation, zero Node.js dependencies.
+ * Mirrors the full /api/chat/classify endpoint but runs on edge runtime
+ * with a leaner response payload optimized for wearable/mobile clients.
+ *
+ * Runtime: Vercel Edge (~10ms globally)
+ */
 
 export const runtime = 'edge';
-
-/**
- * PMO Intent Classification Endpoint — Edge Runtime
- *
- * Lightweight client-side classifier that mirrors the backend pmo-router.
- * Returns PMO office, director, confidence, and execution lane for a message.
- * Used by the Chat w/ACHEEVY UI to show pipeline routing in real-time.
- *
- * Runs on Vercel Edge for sub-10ms classification globally.
- */
 
 type PmoId =
   | 'tech-office' | 'finance-office' | 'ops-office'
@@ -72,84 +70,69 @@ const DIRECTOR_MAP: Record<PmoId, string> = {
   'dtpmo-office': 'Astra_Ang',
 };
 
-const OFFICE_LABELS: Record<PmoId, string> = {
-  'tech-office': 'Technology Office',
-  'finance-office': 'Finance Office',
-  'ops-office': 'Operations Office',
-  'marketing-office': 'Marketing Office',
-  'design-office': 'Design Office',
-  'publishing-office': 'Publishing Office',
-  'hr-office': 'HR Office',
-  'dtpmo-office': 'DT-PMO Office',
-};
-
 const ACTION_VERBS = [
   'deploy', 'build', 'create', 'implement', 'fix', 'update', 'run',
   'execute', 'start', 'launch', 'install', 'configure', 'setup', 'migrate',
 ];
 
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   try {
     const { message } = await req.json();
     if (!message || typeof message !== 'string') {
-      return NextResponse.json({ error: 'message required' }, { status: 400 });
+      return new Response(JSON.stringify({ error: 'message required' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
     }
 
     const lower = message.toLowerCase();
     const words = lower.split(/\s+/);
 
     // Score each office
-    const scores: Record<PmoId, { score: number; keywords: string[] }> = {
-      'tech-office': { score: 0, keywords: [] },
-      'finance-office': { score: 0, keywords: [] },
-      'ops-office': { score: 0, keywords: [] },
-      'marketing-office': { score: 0, keywords: [] },
-      'design-office': { score: 0, keywords: [] },
-      'publishing-office': { score: 0, keywords: [] },
-      'hr-office': { score: 0, keywords: [] },
-      'dtpmo-office': { score: 0, keywords: [] },
-    };
-
-    for (const [office, keywords] of Object.entries(PMO_KEYWORDS)) {
-      for (const kw of keywords) {
-        if (lower.includes(kw)) {
-          scores[office as PmoId].score += 1;
-          scores[office as PmoId].keywords.push(kw);
-        }
-      }
-    }
-
     let bestOffice: PmoId = 'tech-office';
     let bestScore = 0;
-    for (const [office, data] of Object.entries(scores)) {
-      if (data.score > bestScore) {
-        bestScore = data.score;
+    const matchedKeywords: string[] = [];
+
+    for (const [office, keywords] of Object.entries(PMO_KEYWORDS)) {
+      let score = 0;
+      for (const kw of keywords) {
+        if (lower.includes(kw)) score++;
+      }
+      if (score > bestScore) {
+        bestScore = score;
         bestOffice = office as PmoId;
       }
     }
 
+    // Collect matched keywords for the winning office
+    for (const kw of PMO_KEYWORDS[bestOffice]) {
+      if (lower.includes(kw)) matchedKeywords.push(kw);
+    }
+
     const confidence = Math.min(bestScore / Math.max(words.length, 1), 1);
-    const executionLane = ACTION_VERBS.some(v => lower.includes(v)) ? 'deploy_it' : 'guide_me';
+    const lane = ACTION_VERBS.some(v => lower.includes(v)) ? 'deploy_it' : 'guide_me';
 
-    // Complexity scoring
-    let complexity = 0;
-    complexity += Math.min(words.length * 1.5, 30);
-    const techSignals = ['api', 'docker', 'database', 'deploy', 'architecture', 'pipeline', 'webhook', 'oauth', 'ssl', 'kubernetes'];
-    for (const sig of techSignals) { if (lower.includes(sig)) complexity += 5; }
-    const multiStep = ['and then', 'after that', 'next', 'first', 'second', 'finally', 'step'];
-    for (const sig of multiStep) { if (lower.includes(sig)) complexity += 8; }
-    complexity = Math.min(Math.round(complexity), 100);
-
-    return NextResponse.json({
-      pmoOffice: bestOffice,
-      officeLabel: OFFICE_LABELS[bestOffice],
-      director: DIRECTOR_MAP[bestOffice],
-      confidence: Math.round(confidence * 100) / 100,
-      keywords: scores[bestOffice].keywords,
-      executionLane,
-      complexity,
-    });
+    // Lean response — no office labels or complexity scoring (wearable-optimized)
+    return new Response(
+      JSON.stringify({
+        office: bestOffice,
+        director: DIRECTOR_MAP[bestOffice],
+        confidence: Math.round(confidence * 100) / 100,
+        lane,
+        keywords: matchedKeywords,
+      }),
+      {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-store',
+        },
+      },
+    );
   } catch {
-    return NextResponse.json({ error: 'Classification failed' }, { status: 500 });
+    return new Response(JSON.stringify({ error: 'Classification failed' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 }

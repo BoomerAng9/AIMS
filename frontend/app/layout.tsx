@@ -45,7 +45,7 @@ export const metadata: Metadata = {
   description: "The Hybrid Business Architect for modern enterprises.",
   viewport: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover",
   keywords: ['AI', 'automation', 'agents', 'ACHEEVY', 'Boomer_Ang', 'PMO', 'AI management', 'business intelligence', 'plugs', 'workflow'],
-  metadataBase: new URL(process.env.NEXT_PUBLIC_LANDING_URL || 'https://aimanagedsolutions.cloud'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_LANDING_URL || 'https://plugmein.cloud'),
   openGraph: {
     type: 'website',
     siteName: 'A.I.M.S.',

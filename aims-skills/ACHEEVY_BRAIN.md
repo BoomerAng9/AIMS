@@ -262,11 +262,16 @@ Skills inject specialized context, SOPs, and design standards into ACHEEVY's beh
 | **CLAW Replacement Status** | `skills/chicken-hawk/claw-replacement-status.skill.md` | "claw status" | Check if CLAW is built, running, and passing smoke tests |
 | **Trigger CLAW Buildout** | `skills/chicken-hawk/trigger-claw-buildout.skill.md` | "claw buildout" | Open/continue a build task per `CHICKENHAWK_SPEC.md` |
 
-#### Gridiron Sandbox Skills (`skills/gridiron/`)
+#### Per|Form / Gridiron Sandbox Skills (`skills/gridiron/`)
+
+> **DOMAIN: Sports Business** — Per|Form is a standalone sports scouting & NIL intelligence
+> vertical. It is NOT part of the Book of V.I.B.E. fictional universe. V.I.B.E. lore characters
+> and mythology must never appear in Per|Form user-facing content, and sports/NIL references
+> must never appear in V.I.B.E. storytelling content.
 
 | Skill | File | Triggers | Purpose |
 |-------|------|----------|---------|
-| **Gridiron Scout Run** | `skills/gridiron/scout-run.skill.md` | "scout run", "scan prospects" | Trigger Lil_Hawk adversarial scouting pipeline |
+| **Gridiron Scout Run** | `skills/gridiron/scout-run.skill.md` | "scout run", "scan prospects" | Trigger adversarial scouting pipeline |
 | **Film Room Analysis** | `skills/gridiron/film-analysis.skill.md` | "analyze film", "tape review" | Send footage to SAM 2 (Vertex AI) for player segmentation |
 | **War Room Status** | `skills/gridiron/war-room-status.skill.md` | "war room status", "gridiron status" | Report Gridiron Sandbox health, rankings, content pipeline |
 
@@ -884,6 +889,22 @@ See: `skills/security/no-reveal-policy.md`
 
 See: `skills/design/design-first-builder.md`
 
+### 16.5 Domain Separation — V.I.B.E. Storytelling vs Business Verticals
+
+A.I.M.S. operates two distinct content domains. They must NEVER cross-contaminate:
+
+| Domain | Content Home | Purpose |
+|--------|-------------|---------|
+| **Book of V.I.B.E.** | `lore.ts`, `the-book-of-vibe/` | Fictional worldbuilding — Aether Vos, Achievmor, the races, the Elder, SOLAYNJ. "NIL" = the void / anti-creation. |
+| **Per|Form / N.I.L.** | `nil.ts`, `perform/`, `gridiron/` | Sports business — athlete evaluation, scouting, Name-Image-Likeness valuation. |
+
+**Rules:**
+1. V.I.B.E. character names (Boomer_Angs, Chicken Hawk, Lil_Hawks) may appear in technical/internal skill files as agent identifiers, but **must not** appear in user-facing Per|Form or N.I.L. content with mythological framing
+2. Sports terms (athlete, scouting, NIL deals, transfer portal, P.A.I. formula) **must not** appear in Book of V.I.B.E. storytelling content
+3. The Book of V.I.B.E. is the **storytelling layer** — it draws users into the A.I.M.S. world. Users discover tools through the narrative, not through sports jargon in lore
+4. Per|Form is a **standalone business vertical** — it ships athlete intelligence tools. It earns its own audience on its own merits
+5. When in doubt: if it's about Aether Vos, kinetic energy, or the Aether → V.I.B.E. If it's about athletes, P.A.I. scores, or NIL deals → Per|Form
+
 ---
 
 ## 17. Behavioral Directive (Claude Code Integration)
@@ -1033,6 +1054,72 @@ On first entry, `HOOK:onEnterChickenHawk` fires:
 - Return logs and status as natural-language updates in the conversation
 
 See: `hooks/enter-chicken-hawk.hook.md`, `skills/chicken-hawk/`
+
+---
+
+## 22. Storytelling-First Strategy (Internal Playbook)
+
+### The Thesis
+
+A.I.M.S. does not compete with Google, OpenAI, or xAI on model capability. We harness
+the best available tech — GCP, Vertex AI, Firebase, Cloud Run, Anthropic APIs, agentic
+tooling — and create **practical, containerized solutions** inside our ecosystem.
+
+What sets us apart: **storytelling**.
+
+The external business model stays the same (containerized AI-managed solutions). Internally,
+everything we build is understood through the lens of the **Book of V.I.B.E.**
+
+### How It Works
+
+```
+Story draws users in
+  → Users fall into the world of Aether Vos, Achievmor, kinetic energy, the Aether
+  → Inside that world, they discover ACHEEVY and interact with real tools
+  → They build systems, create functional AI, ship containerized solutions
+  → The tools work in-universe AND in the real world
+```
+
+Think **Dungeons & Dragons meets SaaS**: we create a world, and users build into that
+world using A.I.M.S. tools. They can also use those tools for things outside the world.
+But the **entry point is always the story**.
+
+### The Canonical Source
+
+The **Book of V.I.B.E.** (`frontend/docs/The Book of VIBE –Worldbuilding Glossary &Character Bible.md`)
+is the single source of truth for all storytelling, worldbuilding, character references,
+and narrative framing. Every page, component, vertical, and user-facing experience that
+touches the story MUST reference this document.
+
+The lore data layer (`frontend/lib/content/lore.ts`) is the code representation of the
+Book of V.I.B.E. — chapters, characters, races, and merch.
+
+### The Model: Story → Tools → Shipping
+
+1. **Draw them in** — Users encounter the Book of V.I.B.E. Afrofuturist saga
+2. **Let them explore** — The world of Achievmor, kinetic energy, the races, the tribes
+3. **Introduce ACHEEVY** — The character becomes the interface to real A.I.M.S. tools
+4. **Let them build** — Containerized environments, AI solutions, automations, apps
+5. **Ship real products** — Everything users create is production-grade and deployable
+
+### What We Lead On
+
+- **Storytelling** — No other AI platform wraps tooling in a living, breathing fictional universe
+- **Containerized shipping** — We containerize and ship tools faster than anyone (like OpenClaw)
+- **User experience** — Every tool is accessible through the narrative, not buried in dashboards
+
+### Verticals Inside the Story
+
+Users who are drawn into the Book of V.I.B.E. can:
+- Create their own stories (similar to Pocket FM) in the **containerized story environment**
+- Interact with ACHEEVY to build real systems within the narrative framing
+- Use any of the 12 revenue verticals, all of which are discoverable through the story arc
+
+### What This Is NOT
+
+- This is NOT a rebrand. The business model is the same.
+- This is NOT a pivot. Containerized AI solutions are still the product.
+- This is a **framing strategy**: the story is the front door, the tools are the house.
 
 ---
 

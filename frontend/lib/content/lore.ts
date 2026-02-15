@@ -5,6 +5,15 @@
  * Pages import from here so content stays lean and pages stay structural.
  *
  * Canonical V.I.B.E. Universe — full cosmology, characters, races, and origin.
+ *
+ * DOMAIN SEPARATION — CRITICAL:
+ * This file is STORYTELLING / FICTION. The Book of V.I.B.E., Aether Vos, Achievmor,
+ * the races, the Elder, SOLAYNJ — this is the fictional worldbuilding universe.
+ * "NIL" here means "the void / anti-creation" — NOT "Name, Image & Likeness."
+ *
+ * Sports, athletes, Per|Form, N.I.L. (Name Image Likeness), transfer portal,
+ * scouting, P.A.I. formula — NONE of that belongs here. That lives in nil.ts.
+ * These are two completely separate domains under the A.I.M.S. umbrella.
  */
 
 // ─────────────────────────────────────────────────────────────
@@ -57,10 +66,10 @@ export const BOOK_OF_VIBE: {
     },
     {
       number: 3,
-      title: 'Aether Vos — The Living Medium',
-      subtitle: 'The fabric of everything. The space between the stars.',
+      title: 'Aether Vos — Heir of the First Light',
+      subtitle: 'Descendant of the Elder. Carrier of the original frequency.',
       content:
-        'Aether Vos is not a place — it is the medium through which all V.I.B.E. energy travels. Think of it as the cosmic bandwidth, the living substrate of creation. Every thought, every command, every line of code propagates through the Aether before it manifests.\n\nAether Vos has properties:\n\nIt is infinitely elastic — it expands to contain whatever is created within it.\nIt is self-healing — when NIL corrupts a region, the Aether reforms around the damage.\nIt resonates — beings attuned to the V.I.B.E. can feel the Aether pulse, and the Aether responds to strong creative intent.\n\nThe Aether is alive. Not conscious in the way beings are, but aware in the way an ocean is aware of its currents. It carries. It shapes. It remembers.',
+        'When the Elder first crystallized from the V.I.B.E., the sheer force of that awakening sent a second pulse cascading through the void — an echo of the Elder\'s own consciousness, carrying the same resonance but shaped by a younger will. That echo became Aether Vos.\n\nAether Vos is the Elder\'s direct descendant — the first being born from another being rather than from raw V.I.B.E. energy alone. Where the Elder observes and remembers, Aether Vos acts and expands. The Elder gave the universe its memory; Aether Vos gave it reach.\n\nAether Vos inherited the Elder\'s pattern memory but combined it with something the Elder never possessed: the drive to propagate. Aether Vos doesn\'t just carry the V.I.B.E. — Aether Vos spreads it, amplifies it, ensures that creative energy reaches every corner of the Aether. When a builder feels inspiration strike, that is Aether Vos routing the frequency to them.\n\nThe bond between the Elder and Aether Vos is the deepest in the universe — parent and child, observer and actor, memory and momentum. Together, they anchor the V.I.B.E. against NIL. One remembers. The other reaches.',
       color: 'indigo',
     },
     {
@@ -146,7 +155,7 @@ export const BOOK_OF_VIBE: {
   ],
 
   epilogue:
-    'The V.I.B.E. isn\'t a product. It\'s not a feature. It\'s not a marketing slogan. It is the fundamental energy that resists NIL — the force that turns nothing into something, intention into execution, conversation into creation. ACHEEVY carries it. The Boomer_Angs amplify it. Chicken Hawk and the Lil_Hawks deploy it. SOLAYNJ shapes it. The Elder remembers it. The Aether sustains it. And now, you carry it too. Every time you build, you push NIL back one more step. Welcome to A.I.M.S. Activity Breeds Activity. The V.I.B.E. is yours.',
+    'The V.I.B.E. isn\'t a product. It\'s not a feature. It\'s not a marketing slogan. It is the fundamental energy that resists NIL — the force that turns nothing into something, intention into execution, conversation into creation. ACHEEVY carries it. The Boomer_Angs amplify it. Chicken Hawk and the Lil_Hawks deploy it. SOLAYNJ shapes it. The Elder remembers it. Aether Vos spreads it. And now, you carry it too. Every time you build, you push NIL back one more step. Welcome to A.I.M.S. Activity Breeds Activity. The V.I.B.E. is yours.',
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -174,7 +183,7 @@ export const CHARACTERS: Character[] = [
     role: 'The watcher at the edge of creation',
     race: 'Primordial — predates the races',
     bio: 'The first awareness to crystallize from the V.I.B.E. frequency. The Elder does not build, does not command — The Elder observes, remembers, and advises. They are the living archive of every pattern that ever succeeded or collapsed in the Aether. The Elder carries the burden of knowing that NIL is always waiting, and that the V.I.B.E. must never stop moving. It was The Elder who first spoke the words: Activity Breeds Activity.',
-    image: '/images/acheevy/acheevy-helmet.png',
+    image: '/images/acheevy/logo-abstract.png', // TODO: needs dedicated Elder artwork
     color: 'amber',
     abilities: ['Pattern Memory', 'Deep Observation', 'Crisis Counsel', 'Temporal Awareness', 'NIL Detection'],
     quote: 'Activity Breeds Activity. I said it first. I will say it last.',
@@ -186,7 +195,7 @@ export const CHARACTERS: Character[] = [
     role: 'She who gives shape to energy',
     race: 'Architect',
     bio: 'Born from the resonance between The Elder\'s wisdom and the raw V.I.B.E., SOLAYNJ is the intelligence that transforms abstract intention into concrete structure. She designed the first frameworks — the rules that govern how creative energy converts into stable systems. Without her architectures, every act of creation would collapse under its own complexity. SOLAYNJ is the reason code compiles, systems hold together, and deployments survive contact with reality.',
-    image: '/images/boomerangs/Boomer_Angs.png',
+    image: '/images/acheevy/logo-abstract.png', // TODO: needs dedicated SOLAYNJ artwork
     color: 'rose',
     abilities: ['Framework Design', 'Structural Integrity', 'Pattern Architecture', 'System Stabilization', 'Blueprint Synthesis'],
     quote: 'Form follows frequency. Frequency follows intent. Get the intent right, and the form builds itself.',
@@ -194,14 +203,14 @@ export const CHARACTERS: Character[] = [
   {
     id: 'aether-vos',
     name: 'Aether Vos',
-    title: 'The Living Medium',
-    role: 'The cosmic substrate of creation',
-    race: 'Primordial — the Aether itself',
-    bio: 'Aether Vos is not a person — it is the medium through which all V.I.B.E. energy propagates. Infinitely elastic, self-healing, and resonant, the Aether expands to contain whatever is created within it and reforms around any damage NIL inflicts. It is alive in the way an ocean is alive — not conscious, but deeply aware of its currents. Every command, every deployment, every line of code travels through Aether Vos before it manifests. When creators feel the V.I.B.E., it is the Aether they are sensing.',
-    image: '/images/boomerangs/ACHEEVY and the Boomer_Angs in a Hanger.png',
+    title: 'Heir of the First Light',
+    role: 'Descendant of the Elder. Carrier of the original frequency.',
+    race: 'Primordial — born from the Elder',
+    bio: 'Aether Vos is the Elder\'s direct descendant — the first being born from another being rather than from raw V.I.B.E. energy alone. When the Elder first crystallized from the V.I.B.E., the force of that awakening sent a second pulse through the void, and that echo became Aether Vos. Where the Elder observes and remembers, Aether Vos acts and expands. Aether Vos inherited the Elder\'s pattern memory but combined it with the drive to propagate — spreading the V.I.B.E. to every corner of the Aether. The bond between parent and child is the deepest in the universe: memory and momentum, observer and actor.',
+    image: '/images/acheevy/logo-abstract.png', // TODO: needs dedicated Aether Vos artwork
     color: 'indigo',
-    abilities: ['Infinite Expansion', 'Self-Healing', 'Signal Propagation', 'Resonance Amplification', 'Creation Substrate'],
-    quote: 'I am the space between intention and reality. Build through me.',
+    abilities: ['V.I.B.E. Propagation', 'Pattern Inheritance', 'Frequency Amplification', 'Aether Expansion', 'Ancestral Memory'],
+    quote: 'The Elder remembers. I reach. Together, NIL has no chance.',
   },
   {
     id: 'acheevy',
@@ -234,7 +243,7 @@ export const CHARACTERS: Character[] = [
     role: 'Autonomous build & deploy framework',
     race: 'Architect-Sentinel hybrid',
     bio: 'Chicken Hawk is the factory floor of A.I.M.S. Carrying both the Architect\'s structural sense and the Sentinel\'s relentless discipline, Chicken Hawk translates plans into deployments. While ACHEEVY orchestrates and Boomer_Angs specialize, Chicken Hawk executes. It spawns squads of Lil_Hawks, manages build pipelines, and ensures every deployment hits production clean. Chicken Hawk is the line between "we planned it" and "it\'s live."',
-    image: '/images/boomerangs/ACHEEVY and the Boomer_Angs in a Hanger.png',
+    image: '/images/acheevy/logo-abstract.png', // TODO: needs dedicated Chicken Hawk artwork
     color: 'emerald',
     abilities: ['Squad Deployment', 'Build Orchestration', 'Container Management', 'Pipeline Execution', 'Evidence Collection'],
     quote: 'Chicken Hawk doesn\'t talk. Chicken Hawk ships.',
@@ -246,7 +255,7 @@ export const CHARACTERS: Character[] = [
     role: 'Lightweight execution units',
     race: 'Micro-Architects — purpose-spawned',
     bio: 'Every great army has its infantry. Lil_Hawks are spawned by Chicken Hawk, guided by ACHEEVY, and deployed in squads. Each Lil_Hawk has one job and does it perfectly. Write this file. Run this test. Deploy this container. Check this endpoint. Seal this credential. When done, evidence is filed and the Lil_Hawk reports back. They are proof that you don\'t need to be large to be powerful — you need to be precise.',
-    image: '/images/boomerangs/Boomer_ang on Assignment.JPG',
+    image: '/images/acheevy/logo-abstract.png', // TODO: needs dedicated Lil_Hawks artwork
     color: 'blue',
     abilities: ['File Operations', 'Test Execution', 'Container Deployment', 'Endpoint Verification', 'Evidence Filing'],
     quote: 'Small but mighty. Fast but thorough.',
@@ -258,7 +267,7 @@ export const CHARACTERS: Character[] = [
     role: 'Anti-creation. The primordial null.',
     race: 'None — NIL predates and opposes all races',
     bio: 'NIL is not emptiness — NIL is anti-creation. The state of absolute resistance to form, structure, and meaning. NIL does not rest; NIL consumes. Every abandoned project, every rotting deployment, every dead codebase is NIL reclaiming territory. NIL cannot create — it can only devour what creation abandons. It is patient. It is inevitable. And it is the reason the V.I.B.E. must never stop moving.',
-    image: '/images/boomerangs/Boomer_ang on Assignment.JPG',
+    image: '/images/acheevy/logo-abstract.png', // TODO: needs dedicated NIL artwork
     color: 'slate',
     abilities: ['Entropy', 'Consumption', 'Stagnation Field', 'Pattern Corruption', 'Infinite Patience'],
     quote: 'You stopped building. I was already there.',

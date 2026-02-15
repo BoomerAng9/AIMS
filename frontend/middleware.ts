@@ -1,8 +1,9 @@
 /**
- * A.I.M.S. Next.js Middleware
+ * A.I.M.S. Next.js Middleware — Edge Runtime
  *
- * Global security layer that runs on every request.
+ * Global security layer + edge-aware routing that runs on every request.
  * Protects against bots, attacks, and abuse.
+ * Injects geo/device context headers for edge API consumers (wearables, mobile).
  *
  * NO BACK DOORS. TRUE PENTESTING-READY.
  */
@@ -19,23 +20,9 @@ const IS_DEMO = process.env.DEMO_MODE === 'true';
 // ─────────────────────────────────────────────────────────────
 // Domain Routing Configuration
 // ─────────────────────────────────────────────────────────────
-// plugmein.cloud = LEARN (lore, Book of V.I.B.E., galleries, merch, about)
-// aimanagedsolutions.cloud = DO (chat, dashboard, build aiPLUGs, deploy)
+// plugmein.cloud serves everything (landing + app)
 
-const LANDING_HOST = 'plugmein.cloud';          // Lore & learn domain
-const APP_HOST = 'aimanagedsolutions.cloud';     // Functional app domain
-
-// Routes that belong ONLY on the app domain (aimanagedsolutions.cloud)
-const APP_ONLY_ROUTES = [
-  '/dashboard', '/chat', '/api', '/sign-in', '/sign-up',
-  '/forgot-password', '/onboarding', '/workspace',
-];
-
-// Routes that belong ONLY on the landing domain (plugmein.cloud)
-const LANDING_ONLY_ROUTES = [
-  '/the-book-of-vibe', '/gallery', '/merch', '/about',
-  '/mission', '/team', '/careers', '/blog', '/lore',
-];
+const PRIMARY_HOST = 'plugmein.cloud';
 
 const ALLOWED_ORIGINS = IS_PRODUCTION
   ? [
@@ -46,8 +33,6 @@ const ALLOWED_ORIGINS = IS_PRODUCTION
       'https://www.aims.plugmein.cloud',
       'https://api.aims.plugmein.cloud',
       'https://luc.plugmein.cloud',
-      'https://aimanagedsolutions.cloud',
-      'https://www.aimanagedsolutions.cloud',
     ]
   : [
       'http://localhost:3000',
@@ -244,6 +229,27 @@ function createErrorResponse(message: string, status: number): NextResponse {
 }
 
 // ─────────────────────────────────────────────────────────────
+// Device Classification (edge-fast, no external deps)
+// ─────────────────────────────────────────────────────────────
+
+type DeviceType = 'wearable' | 'mobile' | 'tablet' | 'desktop' | 'bot' | 'unknown';
+
+function classifyDevice(userAgent: string): DeviceType {
+  const ua = userAgent.toLowerCase();
+  // Wearable patterns (watchOS, Wear OS, Tizen, Fitbit, custom AIMS wearable SDK)
+  if (/watch|wearable|tizen|fitbit|garmin|aims-wearable/i.test(ua)) return 'wearable';
+  // Tablet before mobile (iPad, Android tablet, etc.)
+  if (/ipad|tablet|kindle|silk|playbook/i.test(ua)) return 'tablet';
+  // Mobile (iPhone, Android phone, etc.)
+  if (/mobile|iphone|android|webos|ipod|blackberry|opera mini|opera mobi/i.test(ua)) return 'mobile';
+  // Bot detection (common crawlers)
+  if (/bot|crawler|spider|slurp|bingbot|googlebot/i.test(ua)) return 'bot';
+  // Anything with a real browser engine = desktop
+  if (/mozilla|chrome|safari|firefox|edge|opera/i.test(ua)) return 'desktop';
+  return 'unknown';
+}
+
+// ─────────────────────────────────────────────────────────────
 // Middleware
 // ─────────────────────────────────────────────────────────────
 
@@ -270,26 +276,8 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(redirectUrl);
   }
 
-  // 1. Domain routing — redirect wrong-domain requests to the right place
-  if (IS_PRODUCTION) {
-    const host = request.headers.get('host')?.replace(/^www\./, '') || '';
-
-    // On plugmein.cloud: redirect app routes → aimanagedsolutions.cloud
-    if (host === LANDING_HOST || host === `www.${LANDING_HOST}`) {
-      const isAppRoute = APP_ONLY_ROUTES.some(r => pathname.startsWith(r));
-      if (isAppRoute) {
-        return NextResponse.redirect(`https://${APP_HOST}${pathname}${request.nextUrl.search}`);
-      }
-    }
-
-    // On aimanagedsolutions.cloud: redirect lore routes → plugmein.cloud
-    if (host === APP_HOST || host === `www.${APP_HOST}`) {
-      const isLandingRoute = LANDING_ONLY_ROUTES.some(r => pathname.startsWith(r));
-      if (isLandingRoute) {
-        return NextResponse.redirect(`https://${LANDING_HOST}${pathname}${request.nextUrl.search}`);
-      }
-    }
-  }
+  // 1. Domain routing — all routes served from plugmein.cloud
+  // (aimanagedsolutions.cloud is deprecated)
 
   // 2. Honeypot check (block bots probing for vulnerabilities)
   if (isHoneypot(pathname)) {
@@ -366,10 +354,27 @@ export function middleware(request: NextRequest) {
     if (origin && (ALLOWED_ORIGINS.includes(origin) || !IS_PRODUCTION)) {
       response.headers.set('Access-Control-Allow-Origin', origin);
       response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-      response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-API-Key');
+      response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-API-Key, X-Device-Type');
       response.headers.set('Access-Control-Max-Age', '86400');
     }
   }
+
+  // ── Edge context injection (geo + device awareness) ──────
+  // Vercel populates these headers at the edge automatically.
+  // We normalize them so downstream API routes get clean context
+  // without each route parsing geo headers independently.
+  const geo = request.geo;
+  if (geo) {
+    if (geo.city) response.headers.set('X-Edge-City', geo.city);
+    if (geo.country) response.headers.set('X-Edge-Country', geo.country);
+    if (geo.region) response.headers.set('X-Edge-Region', geo.region);
+    if (geo.latitude) response.headers.set('X-Edge-Lat', geo.latitude);
+    if (geo.longitude) response.headers.set('X-Edge-Lon', geo.longitude);
+  }
+
+  // Device type detection — lightweight classification for wearable routing
+  const deviceType = classifyDevice(userAgent);
+  response.headers.set('X-Device-Type', deviceType);
 
   return response;
 }
