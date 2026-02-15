@@ -1,7 +1,10 @@
 # Skill: perform-session
 
-> Deploy Boomer_Angs to Per|Form Platform sessions for athlete evaluation,
+> Deploy Per|Form Platform sessions for athlete evaluation,
 > scouting debates, and performance grading.
+>
+> DOMAIN: Sports Business (Per|Form vertical).
+> This is NOT part of the Book of V.I.B.E. storytelling universe.
 
 ## Trigger
 - User requests athlete analysis, scouting report, or film review
@@ -153,5 +156,7 @@ No session closes without evidence. No grade ships without sources.
 
 ---
 
-*This skill is owned by the Per|Form vertical under ACHEEVY's Sandbox ecosystem.
-All sessions route through the Deployment Hub and produce audit-grade evidence.*
+*This skill is owned by the Per|Form vertical — a sports business vertical under A.I.M.S.
+Per|Form is a standalone scouting & NIL intelligence platform. It is NOT part of the
+Book of V.I.B.E. fictional universe. All sessions route through the Deployment Hub
+and produce audit-grade evidence.*

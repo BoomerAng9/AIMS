@@ -5,6 +5,15 @@
  * Pages import from here so content stays lean and pages stay structural.
  *
  * Canonical V.I.B.E. Universe — full cosmology, characters, races, and origin.
+ *
+ * DOMAIN SEPARATION — CRITICAL:
+ * This file is STORYTELLING / FICTION. The Book of V.I.B.E., Aether Vos, Achievmor,
+ * the races, the Elder, SOLAYNJ — this is the fictional worldbuilding universe.
+ * "NIL" here means "the void / anti-creation" — NOT "Name, Image & Likeness."
+ *
+ * Sports, athletes, Per|Form, N.I.L. (Name Image Likeness), transfer portal,
+ * scouting, P.A.I. formula — NONE of that belongs here. That lives in nil.ts.
+ * These are two completely separate domains under the A.I.M.S. umbrella.
  */
 
 // ─────────────────────────────────────────────────────────────
