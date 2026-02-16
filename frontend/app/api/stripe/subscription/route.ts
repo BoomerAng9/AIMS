@@ -11,9 +11,16 @@ import { getServerSession } from 'next-auth';
 import { authOptions, isOwnerEmail } from '@/lib/auth';
 import Stripe from 'stripe';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2023-10-16' as any,
-});
+// Lazy-initialized Stripe client — avoids instantiation with empty key at module load
+let _stripe: Stripe | null = null;
+function getStripe(): Stripe {
+  if (!_stripe) {
+    const key = process.env.STRIPE_SECRET_KEY;
+    if (!key) throw new Error('STRIPE_SECRET_KEY is not configured');
+    _stripe = new Stripe(key, { apiVersion: '2023-10-16' as any });
+  }
+  return _stripe;
+}
 
 /**
  * Maps Stripe price IDs to plan tiers.
@@ -98,6 +105,7 @@ export async function GET() {
       return NextResponse.json(P2P_RESPONSE);
     }
 
+    const stripe = getStripe();
     const customers = await stripe.customers.list({
       email: session.user.email,
       limit: 1,
@@ -129,9 +137,24 @@ export async function GET() {
       return NextResponse.json(P2P_RESPONSE);
     }
 
+    // Fetch token usage from LUC meter (in-memory for now, persistent store TODO)
+    let tokensUsed = 0;
+    try {
+      const meterRes = await fetch(
+        `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/luc/meter?userId=${encodeURIComponent(session.user.email)}`,
+        { headers: { cookie: '' } } // internal call — session already validated above
+      );
+      if (meterRes.ok) {
+        const meterData = await meterRes.json();
+        tokensUsed = meterData?.summary?.quotas?.AI_CHAT?.used ?? 0;
+      }
+    } catch {
+      // LUC meter unavailable — return 0 rather than blocking
+    }
+
     return NextResponse.json({
       ...tierInfo,
-      tokensUsed: 0, // TODO: wire to LUC metering
+      tokensUsed,
       subscriptionId: sub.id,
       currentPeriodEnd: sub.current_period_end,
     });

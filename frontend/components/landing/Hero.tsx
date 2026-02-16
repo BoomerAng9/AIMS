@@ -22,20 +22,24 @@
  *   3) "What will we deploy today?"
  */
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { MessageSquare, LayoutDashboard, Rocket, Zap, ArrowRight, Brain, GitBranch, Cpu, CheckCircle2 } from 'lucide-react';
+import { MessageSquare, LayoutDashboard, Rocket, ArrowRight, Brain, GitBranch, Cpu, CheckCircle2 } from 'lucide-react';
 
 // Cross-domain URLs
 const APP_DOMAIN = process.env.NEXT_PUBLIC_APP_URL || 'https://plugmein.cloud';
 
-// ── Domain Detection ──
+// ── Domain Detection (hydration-safe) ──
 
 function useIsLandingDomain(): boolean {
-  if (typeof window === 'undefined') return true;
-  const host = window.location.hostname.replace(/^www\./, '');
-  return host === 'plugmein.cloud' || host === 'localhost' || host === '127.0.0.1';
+  const [isLanding, setIsLanding] = useState(true);
+  useEffect(() => {
+    const host = window.location.hostname.replace(/^www\./, '');
+    setIsLanding(host === 'plugmein.cloud' || host === 'localhost' || host === '127.0.0.1');
+  }, []);
+  return isLanding;
 }
 
 // ── Animation Variants ──

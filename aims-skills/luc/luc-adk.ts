@@ -453,31 +453,38 @@ export class LucAdk {
   static recommendPlan(
     currentUsage: Record<string, number>
   ): { recommended_plan: string; savings: number; reason: string } {
-    let bestPlan = 'free';
+    let bestPlan = 'p2p';
     let bestSavings = 0;
-    let reason = 'Current usage fits within free tier';
+    let reason = 'Current usage fits within Pay-per-Use tier';
+
+    // Calculate what P2P (no plan) would cost in pure overage
+    let p2pOverageCost = 0;
+    for (const [service, used] of Object.entries(currentUsage)) {
+      const rate = OVERAGE_RATES[service as keyof typeof OVERAGE_RATES];
+      if (rate) p2pOverageCost += used * rate;
+    }
 
     for (const [planId, plan] of Object.entries(LUC_PLANS)) {
-      if (planId === 'free') continue;
+      if (planId === 'p2p') continue;
 
       // Check if all usage fits within plan limits
       let fitsWithinPlan = true;
-      let overageCost = 0;
 
       for (const [service, used] of Object.entries(currentUsage)) {
         const limit = plan.quotas[service as keyof typeof plan.quotas] || 0;
         if (limit > 0 && used > limit) {
           fitsWithinPlan = false;
-          overageCost += (used - limit) * OVERAGE_RATES[service as keyof typeof OVERAGE_RATES];
+          break;
         }
       }
 
       if (fitsWithinPlan) {
-        const savings = overageCost;
+        // Savings = P2P overage cost minus this plan's monthly cost
+        const savings = p2pOverageCost - plan.price_monthly;
         if (savings > bestSavings) {
           bestPlan = planId;
           bestSavings = savings;
-          reason = `${plan.name} covers your usage with ${savings.toFixed(2)} in overage savings`;
+          reason = `${plan.name} covers your usage and saves $${savings.toFixed(2)}/mo vs Pay-per-Use`;
         }
       }
     }

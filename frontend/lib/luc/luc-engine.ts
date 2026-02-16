@@ -312,7 +312,7 @@ export class LUCEngine {
 
   constructor(account: LUCAccountRecord) {
     this.account = account;
-    this.plan = LUC_PLANS[account.planId] || LUC_PLANS.free;
+    this.plan = LUC_PLANS[account.planId] || LUC_PLANS.p2p;
   }
 
   // ─────────────────────────────────────────────────────────
@@ -613,9 +613,9 @@ export class LUCEngine {
 
 export function createLUCAccount(
   userId: string,
-  planId: string = 'free'
+  planId: string = 'p2p'
 ): LUCAccountRecord {
-  const plan = LUC_PLANS[planId] || LUC_PLANS.free;
+  const plan = LUC_PLANS[planId] || LUC_PLANS.p2p;
   const now = new Date();
   const nextMonth = new Date(now);
   nextMonth.setMonth(nextMonth.getMonth() + 1);

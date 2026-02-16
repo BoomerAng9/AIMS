@@ -250,12 +250,11 @@ for domain in "${DOMAINS[@]}"; do
 done
 
 # =============================================================================
-header "8. Known Issue: www.plugmein.cloud"
+header "8. www.plugmein.cloud Status"
 # =============================================================================
-info "Your ssl.conf template only covers 'plugmein.cloud' (no www)."
-info "aimanagedsolutions.cloud has a www redirect block, but plugmein.cloud does not."
-info "If www.plugmein.cloud gets HTTPS traffic, there's no server block to handle it."
-warn "Consider adding a www→apex HTTPS redirect for plugmein.cloud."
+info "ssl.conf.template now includes www.plugmein.cloud support."
+info "Both plugmein.cloud and www.plugmein.cloud should redirect correctly."
+info "Verify: curl -sI https://www.plugmein.cloud | grep -i location"
 
 # =============================================================================
 header "9. Firewall (UFW)"

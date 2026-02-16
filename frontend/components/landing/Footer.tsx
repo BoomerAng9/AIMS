@@ -218,36 +218,51 @@ export function Footer() {
         >
           {/* Social Links */}
           <div className="flex items-center gap-4">
-            <Link
-              href="https://github.com/aims"
+            <a
+              href="https://github.com/BoomerAng9/AIMS"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="GitHub"
               className="text-gray-400 hover:text-white transition-colors"
             >
               <GitHubIcon className="w-6 h-6" />
-            </Link>
-            <Link
+            </a>
+            <a
               href="https://twitter.com/aims"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="X (Twitter)"
               className="text-gray-400 hover:text-white transition-colors"
             >
               <XIcon className="w-6 h-6" />
-            </Link>
-            <Link
+            </a>
+            <a
               href="https://linkedin.com/company/aims"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="LinkedIn"
               className="text-gray-400 hover:text-white transition-colors"
             >
               <LinkedInIcon className="w-6 h-6" />
-            </Link>
-            <Link
+            </a>
+            <a
               href="https://discord.gg/aims"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Discord"
               className="text-gray-400 hover:text-white transition-colors"
             >
               <DiscordIcon className="w-6 h-6" />
-            </Link>
-            <Link
+            </a>
+            <a
               href="https://instagram.com/aims"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram"
               className="text-gray-400 hover:text-white transition-colors"
             >
               <InstagramIcon className="w-6 h-6" />
-            </Link>
+            </a>
           </div>
 
           {/* Related Links */}

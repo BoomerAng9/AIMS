@@ -40,7 +40,7 @@ const STATUS_CONFIG: Record<EngagementStatus, { color: string; label: string }> 
 };
 
 export function ReadReceiptChip({ receipt }: ReadReceiptProps) {
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(false);
 
   const latestStatus = receipt.timelinePublic[receipt.timelinePublic.length - 1];
   const statusConfig = STATUS_CONFIG[latestStatus?.status || 'queued'];

@@ -117,7 +117,8 @@ export const USAGE_MODIFIERS = {
 
 // Internal-only markup rates — NEVER expose to user-facing UI
 // These are applied server-side in billing calculations only
-export const _INTERNAL_MARKUP_RATES = {
+// NOT exported: markup rates must stay server-side (see backend/uef-gateway/src/billing/)
+const _INTERNAL_MARKUP_RATES = {
   p2p: 0.25,
   '3mo': 0.20,
   '6mo': 0.15,

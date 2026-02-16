@@ -379,7 +379,7 @@ export async function POST(req: NextRequest) {
 
         // Adjust for actual usage (release difference)
         const difference = reservation.amount - amount;
-        quota.used -= difference;
+        quota.used = Math.max(0, quota.used - difference);
         updateQuotaMetrics(quota);
 
         // Log event
@@ -415,7 +415,7 @@ export async function POST(req: NextRequest) {
         const quota = quotas[reservation.service];
 
         // Release reserved quota
-        quota.used -= reservation.amount;
+        quota.used = Math.max(0, quota.used - reservation.amount);
         updateQuotaMetrics(quota);
 
         // Remove reservation

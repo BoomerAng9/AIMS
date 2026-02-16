@@ -31,8 +31,9 @@ export const ServiceKeySchema = z.enum([
 ]);
 
 export const PlanIdSchema = z.enum([
-  PLAN_IDS.FREE,
-  PLAN_IDS.STARTER,
+  PLAN_IDS.P2P,
+  PLAN_IDS.COFFEE,
+  PLAN_IDS.DATA_ENTRY,
   PLAN_IDS.PRO,
   PLAN_IDS.ENTERPRISE,
 ]);

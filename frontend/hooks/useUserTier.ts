@@ -89,19 +89,6 @@ export function useUserTier(): UseUserTierReturn {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Load from localStorage on mount
-  useEffect(() => {
-    try {
-      const cached = localStorage.getItem(TIER_STORAGE_KEY);
-      if (cached) {
-        const parsed = JSON.parse(cached) as UserTier;
-        setTier(parsed);
-      }
-    } catch {}
-    // Fetch fresh from API
-    refresh();
-  }, []);
-
   const refresh = useCallback(async () => {
     setIsLoading(true);
     setError(null);
@@ -138,6 +125,18 @@ export function useUserTier(): UseUserTierReturn {
       setIsLoading(false);
     }
   }, []);
+
+  // Load from localStorage on mount, then fetch fresh
+  useEffect(() => {
+    try {
+      const cached = localStorage.getItem(TIER_STORAGE_KEY);
+      if (cached) {
+        const parsed = JSON.parse(cached) as UserTier;
+        setTier(parsed);
+      }
+    } catch {}
+    refresh();
+  }, [refresh]);
 
   const gates = useMemo(() => buildGates(tier), [tier]);
 
