@@ -1,7 +1,5 @@
 'use client';
 
-export const dynamic = 'force-dynamic';
-
 /**
  * Chat w/ACHEEVY — Next-Level Command Center
  *
@@ -19,7 +17,7 @@ export const dynamic = 'force-dynamic';
  */
 
 import { useChat } from 'ai/react';
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
@@ -412,6 +410,14 @@ function VoiceSessionPanel({ conversation, active, onEnd }: {
 // ─────────────────────────────────────────────────────────────
 
 export default function ChatPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center h-dvh bg-ink"><Loader2 className="w-8 h-8 animate-spin text-gold" /></div>}>
+      <ChatContent />
+    </Suspense>
+  );
+}
+
+function ChatContent() {
   const searchParams = useSearchParams();
   const [selectedModel, setSelectedModel] = useState('claude-opus');
 
