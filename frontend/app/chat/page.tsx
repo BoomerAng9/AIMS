@@ -1,5 +1,7 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * Chat w/ACHEEVY — Next-Level Command Center
  *
