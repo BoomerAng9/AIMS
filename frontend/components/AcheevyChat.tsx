@@ -13,7 +13,7 @@
 
 import React from 'react';
 import { useChat } from 'ai/react';
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import Image from 'next/image';
 import {
   Send, Zap, Sparkles, Hammer, Search, Layers, Square,
@@ -166,18 +166,22 @@ export default function AcheevyChat() {
   });
 
   // ── Voice Input (Groq Whisper STT → Deepgram fallback) ──
+  const handleTranscript = useCallback((result: { text: string }) => {
+    if (result.text) {
+      // Populate text field — user can edit before submitting
+      setInput((prev: string) => prev ? `${prev} ${result.text}` : result.text);
+    }
+  }, [setInput]);
+
   const voiceInput = useVoiceInput({
-    onTranscript: (result) => {
-      if (result.text) {
-        // Populate text field — user can edit before submitting
-        setInput((prev: string) => prev ? `${prev} ${result.text}` : result.text);
-      }
-    },
+    onTranscript: handleTranscript,
   });
 
   // ── Voice Output (ElevenLabs → Deepgram TTS) ──
+  const voiceOutputConfig = useMemo(() => ({ provider: 'elevenlabs' as const, autoPlay: true }), []);
+
   const voiceOutput = useVoiceOutput({
-    config: { provider: 'elevenlabs', autoPlay: true },
+    config: voiceOutputConfig,
   });
 
   // ── State ──
@@ -198,6 +202,8 @@ export default function AcheevyChat() {
   }, [messages]);
 
   // ── Auto-TTS + Read Receipt: on new assistant messages ──
+  const { speak, autoPlayEnabled } = voiceOutput;
+
   useEffect(() => {
     if (isLoading) return;
     if (messages.length <= prevMessageCountRef.current) {
@@ -209,11 +215,11 @@ export default function AcheevyChat() {
     const last = messages[messages.length - 1];
     if (last?.role === 'assistant' && last.id !== 'welcome') {
       // Auto-TTS
-      if (voiceOutput.autoPlayEnabled) {
+      if (autoPlayEnabled) {
         const clean = stripMarkdownForTTS(last.content);
         if (clean.length > 0 && clean.length <= 5000) {
           setSpeakingMessageId(last.id);
-          voiceOutput.speak(clean);
+          speak(clean);
         }
       }
 
@@ -231,7 +237,7 @@ export default function AcheevyChat() {
         setReadReceipts(prev => new Map(prev).set(last.id, receipt));
       }
     }
-  }, [isLoading, messages, voiceOutput]);
+  }, [isLoading, messages, speak, autoPlayEnabled]);
 
   // Track when speaking ends
   useEffect(() => {
@@ -499,9 +505,11 @@ export default function AcheevyChat() {
             key={m.id}
             message={m}
             isSpeaking={speakingMessageId === m.id && voiceOutput.isPlaying}
-            isLoading={isLoading}
+            // Optimization: Only pass isLoading to assistant messages to prevent
+            // unnecessary re-renders of user messages when loading state toggles.
+            isLoading={m.role === 'assistant' ? isLoading : false}
             isLast={i === messages.length - 1}
-            readReceipt={readReceipts.get(m.id)}
+            readReceipt={m.role === 'assistant' ? readReceipts.get(m.id) : undefined}
             onSpeak={handleSpeak}
             onPause={handlePause}
             onReplay={handleReplay}
