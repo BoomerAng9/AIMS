@@ -1,6 +1,8 @@
 // frontend/app/(auth)/sign-in/page.tsx
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState } from 'react';
