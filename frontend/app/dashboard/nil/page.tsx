@@ -371,12 +371,12 @@ function PortalRevenueTab() {
           </span>
         </div>
 
-        {/* Equation Display */}
+        {/* P.A.I. Label — formula weights are proprietary */}
         <div className="bg-zinc-800/80 border border-zinc-700/50 rounded-lg p-4 mb-4 text-center">
           <p className="text-lg font-mono font-bold text-amber-400 tracking-wider">
-            {PAI_FORMULA.equation}
+            P.A.I. = Performance + Athleticism + Intangibles
           </p>
-          <p className="text-xs text-zinc-500 mt-2">Composite Score (0-100+)</p>
+          <p className="text-xs text-zinc-500 mt-2">Composite Score (0-100+) &middot; Proprietary weighting</p>
         </div>
 
         <p className="text-sm text-zinc-400 leading-relaxed mb-5">
@@ -395,7 +395,7 @@ function PortalRevenueTab() {
                   </span>
                   <div>
                     <h3 className={`text-sm font-semibold ${colors.text}`}>{comp.name}</h3>
-                    <p className="text-[10px] text-zinc-500 font-mono">{(comp.weight * 100)}% weight</p>
+                    <p className="text-[10px] text-zinc-500 font-mono">Weighted component</p>
                   </div>
                 </div>
                 <p className="text-xs text-zinc-400 mb-2">{comp.description}</p>

@@ -1,119 +1,50 @@
-"use client";
+'use client';
 
 /**
- * Per|Form Sandbox — AI Sports Scouting + NIL Intelligence
+ * Per|Form Hub — AI Sports Scouting + NIL Intelligence
  *
- * Autonomous scouting pipeline. This page is the entry point
- * for the Per|Form sandbox project. It showcases the athlete
- * grid, P.A.I. scoring system, and NIL valuation tools.
+ * The public landing page for the Per|Form platform.
+ * Links to Big Board, Prospect Profiles, and Content Feed.
  *
  * Services: Scout Hub (5001), Film Room (5002), War Room (5003)
+ *
+ * PROPRIETARY BOUNDARY:
+ * - P.A.I. grades and tiers are PUBLIC (shown to users)
+ * - Formula weights, GROC internals, and Luke adjustments are PRIVATE
  */
 
-import Link from "next/link";
-import { motion } from "framer-motion";
-import { staggerContainer, staggerItem } from "@/lib/motion/variants";
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { motion } from 'framer-motion';
+import { staggerContainer, staggerItem } from '@/lib/motion/variants';
 import {
   ArrowRight,
   TrendingUp,
-  Film,
-  Trophy,
-  DollarSign,
+  FileText,
   Swords,
   Mic,
-} from "lucide-react";
+  Users,
+  ListOrdered,
+} from 'lucide-react';
+import type { Prospect, ContentArticle } from '@/lib/perform/types';
+import { TIER_STYLES, getScoreColor, getProspectSlug } from '@/lib/perform/types';
 
-/* ── Tier badge colors ─── */
-function tierStyle(tier: string) {
-  switch (tier) {
-    case "ELITE":
-      return "bg-gold/20 text-gold border-gold/30";
-    case "BLUE_CHIP":
-      return "bg-blue-400/20 text-blue-400 border-blue-400/30";
-    case "PROSPECT":
-      return "bg-emerald-400/20 text-emerald-400 border-emerald-400/30";
-    case "SLEEPER":
-      return "bg-amber-400/20 text-amber-400 border-amber-400/30";
-    default:
-      return "bg-white/10 text-white/50 border-white/20";
-  }
-}
+export default function PerFormHub() {
+  const [topProspects, setTopProspects] = useState<Prospect[]>([]);
+  const [recentContent, setRecentContent] = useState<ContentArticle[]>([]);
+  const [loading, setLoading] = useState(true);
 
-/* ── Mock athlete data (replaced by Scout Hub API in prod) ─── */
-const MOCK_ATHLETES = [
-  {
-    id: "ath-001",
-    name: "Marcus Johnson",
-    position: "QB",
-    class: "'26",
-    school: "Oakwood HS, TX",
-    paiScore: 92,
-    tier: "ELITE",
-    nilEstimate: "$500K–$1M",
-    performance: 88,
-    athleticism: 94,
-    intangibles: 95,
-  },
-  {
-    id: "ath-002",
-    name: "DeShawn Williams",
-    position: "WR",
-    class: "'26",
-    school: "Central HS, GA",
-    paiScore: 85,
-    tier: "BLUE_CHIP",
-    nilEstimate: "$250K–$500K",
-    performance: 82,
-    athleticism: 90,
-    intangibles: 83,
-  },
-  {
-    id: "ath-003",
-    name: "Jaylen Carter",
-    position: "RB",
-    class: "'27",
-    school: "Summit Prep, FL",
-    paiScore: 78,
-    tier: "PROSPECT",
-    nilEstimate: "$100K–$250K",
-    performance: 80,
-    athleticism: 82,
-    intangibles: 72,
-  },
-  {
-    id: "ath-004",
-    name: "Trevor Mitchell",
-    position: "LB",
-    class: "'26",
-    school: "Heritage Academy, AL",
-    paiScore: 68,
-    tier: "SLEEPER",
-    nilEstimate: "$10K–$50K",
-    performance: 70,
-    athleticism: 72,
-    intangibles: 62,
-  },
-];
+  useEffect(() => {
+    Promise.all([
+      fetch('/api/perform/prospects').then(r => r.json()).catch(() => []),
+      fetch('/api/perform/content').then(r => r.json()).catch(() => []),
+    ]).then(([prospects, content]) => {
+      setTopProspects(Array.isArray(prospects) ? prospects.slice(0, 5) : []);
+      setRecentContent(Array.isArray(content) ? content.slice(0, 3) : []);
+      setLoading(false);
+    });
+  }, []);
 
-function StatBar({ label, value }: { label: string; value: number }) {
-  const pct = Math.min(value, 100);
-  return (
-    <div className="space-y-1">
-      <div className="flex justify-between text-[0.55rem] font-mono uppercase tracking-wider">
-        <span className="text-white/40">{label}</span>
-        <span className="text-white/60">{value}</span>
-      </div>
-      <div className="h-1.5 rounded-full bg-white/5 overflow-hidden">
-        <div
-          className="h-full rounded-full bg-gradient-to-r from-gold/60 to-gold transition-all"
-          style={{ width: `${pct}%` }}
-        />
-      </div>
-    </div>
-  );
-}
-
-export default function PerFormSandbox() {
   return (
     <motion.div
       variants={staggerContainer}
@@ -137,13 +68,13 @@ export default function PerFormSandbox() {
           </div>
         </div>
         <p className="text-sm text-white/40 max-w-xl">
-          Lil_Bull_Hawk argues underrated. Lil_Bear_Hawk argues overrated.
-          Chicken Hawk mediates. Film analysis via SAM 2 on Vertex AI.
-          Everything scores into the P.A.I. formula.
+          Autonomous scouting powered by the P.A.I. grading system.
+          Lil_Bull_Hawk argues underrated, Lil_Bear_Hawk argues overrated,
+          and Chicken Hawk mediates. Every prospect is scored, ranked, and debated.
         </p>
       </motion.header>
 
-      {/* Voice entry */}
+      {/* Voice Entry */}
       <motion.div
         variants={staggerItem}
         className="wireframe-card p-6 rounded-2xl flex items-center gap-4"
@@ -164,158 +95,206 @@ export default function PerFormSandbox() {
         </div>
       </motion.div>
 
-      {/* Quick nav */}
-      <motion.div
-        variants={staggerItem}
-        className="flex flex-wrap gap-3"
-      >
-        {[
-          { label: "Rankings", icon: Trophy, href: "#rankings" },
-          { label: "NIL Dashboard", icon: DollarSign, href: "/dashboard/nil" },
-          { label: "Film Room", icon: Film, href: "#film" },
-          { label: "War Room", icon: Swords, href: "/dashboard/war-room" },
-        ].map((link) => (
-          <Link
-            key={link.label}
-            href={link.href}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl border border-white/5 bg-white/[0.02] text-xs text-white/50 hover:text-gold hover:border-gold/20 transition-colors"
-          >
-            <link.icon size={14} />
-            {link.label}
-          </Link>
-        ))}
+      {/* Quick Nav */}
+      <motion.div variants={staggerItem} className="grid gap-3 sm:grid-cols-3">
+        <Link
+          href="/sandbox/perform/big-board"
+          className="wireframe-card rounded-2xl p-5 flex items-center gap-4 hover:border-gold/20 transition-colors group"
+        >
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gold/10 border border-gold/20 text-gold">
+            <ListOrdered size={18} />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-medium text-white group-hover:text-gold transition-colors">Big Board</p>
+            <p className="text-[0.55rem] text-white/30 font-mono">Ranked prospect list with P.A.I. grades</p>
+          </div>
+          <ArrowRight size={14} className="text-white/15 group-hover:text-gold/40 transition-colors" />
+        </Link>
+
+        <Link
+          href="/sandbox/perform/content"
+          className="wireframe-card rounded-2xl p-5 flex items-center gap-4 hover:border-gold/20 transition-colors group"
+        >
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-400/10 border border-blue-400/20 text-blue-400">
+            <FileText size={18} />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-medium text-white group-hover:text-gold transition-colors">Content Feed</p>
+            <p className="text-[0.55rem] text-white/30 font-mono">Reports, debates, analysis</p>
+          </div>
+          <ArrowRight size={14} className="text-white/15 group-hover:text-gold/40 transition-colors" />
+        </Link>
+
+        <Link
+          href="/dashboard/war-room"
+          className="wireframe-card rounded-2xl p-5 flex items-center gap-4 hover:border-gold/20 transition-colors group"
+        >
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-400/10 border border-amber-400/20 text-amber-400">
+            <Swords size={18} />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-medium text-white group-hover:text-gold transition-colors">War Room</p>
+            <p className="text-[0.55rem] text-white/30 font-mono">Bull vs Bear live debates</p>
+          </div>
+          <ArrowRight size={14} className="text-white/15 group-hover:text-gold/40 transition-colors" />
+        </Link>
       </motion.div>
 
-      {/* P.A.I. Formula */}
+      {/* P.A.I. System Explainer — grades shown, formula NEVER exposed */}
       <motion.div variants={staggerItem} className="wireframe-card p-6 rounded-2xl">
         <h2 className="text-xs uppercase tracking-widest text-gold/50 font-mono mb-4">
-          P.A.I. Scoring Formula
+          P.A.I. Grading System
         </h2>
         <div className="grid gap-4 md:grid-cols-3 text-sm">
           <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5">
-            <p className="text-gold font-display text-lg mb-1">P × 0.40</p>
-            <p className="text-white/60 font-medium text-xs">Performance</p>
+            <p className="text-gold font-display text-lg mb-1">Performance</p>
             <p className="text-white/30 text-[0.65rem] mt-1">
-              Stats from MaxPreps, ESPN, 247Sports via Firecrawl
+              Stats from MaxPreps, ESPN, 247Sports — game production, efficiency, and consistency
             </p>
           </div>
           <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5">
-            <p className="text-gold font-display text-lg mb-1">A × 0.30</p>
-            <p className="text-white/60 font-medium text-xs">Athleticism</p>
+            <p className="text-gold font-display text-lg mb-1">Athleticism</p>
             <p className="text-white/30 text-[0.65rem] mt-1">
-              Video analysis via SAM 2 — speed, separation, route sharpness
+              Film analysis via SAM 2 — speed, separation, explosiveness, and movement quality
             </p>
           </div>
           <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5">
-            <p className="text-gold font-display text-lg mb-1">I × 0.30</p>
-            <p className="text-white/60 font-medium text-xs">Intangibles</p>
+            <p className="text-gold font-display text-lg mb-1">Intangibles</p>
             <p className="text-white/30 text-[0.65rem] mt-1">
-              Brave Search analysis — news, interviews, leadership signals
+              Leadership signals, coachability, media presence, and character analysis
             </p>
           </div>
         </div>
+        <p className="text-[0.55rem] text-white/20 font-mono mt-4 text-center">
+          Proprietary scoring methodology &middot; Component scores visible &middot; Formula weights confidential
+        </p>
       </motion.div>
 
-      {/* Athlete Grid */}
-      <motion.section variants={staggerContainer} className="space-y-4">
-        <h2 className="text-xs uppercase tracking-widest text-white/30 font-mono">
-          Athlete Board
-        </h2>
-
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {MOCK_ATHLETES.map((athlete) => (
-            <motion.div
-              key={athlete.id}
-              variants={staggerItem}
-              className="wireframe-card p-5 rounded-2xl space-y-4 hover:border-gold/20 transition-colors"
+      {/* Top 5 Preview */}
+      {!loading && topProspects.length > 0 && (
+        <motion.section variants={staggerItem} className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xs uppercase tracking-widest text-white/30 font-mono">
+              Top Prospects
+            </h2>
+            <Link
+              href="/sandbox/perform/big-board"
+              className="text-[0.6rem] font-mono text-gold/50 hover:text-gold transition-colors flex items-center gap-1"
             >
-              {/* Header */}
-              <div className="flex items-start justify-between">
-                <div>
-                  <h3 className="text-sm font-medium text-white">
-                    {athlete.name}
-                  </h3>
-                  <p className="text-[0.6rem] text-white/40 font-mono">
-                    {athlete.position} · {athlete.class} · {athlete.school}
-                  </p>
-                </div>
-                <span
-                  className={`px-2 py-0.5 rounded-full text-[0.5rem] font-mono uppercase border ${tierStyle(athlete.tier)}`}
+              View Full Board <ArrowRight size={10} />
+            </Link>
+          </div>
+
+          <div className="wireframe-card rounded-2xl overflow-hidden">
+            {topProspects.map((prospect, i) => {
+              const tierStyle = TIER_STYLES[prospect.tier];
+              return (
+                <Link
+                  key={prospect.id}
+                  href={`/sandbox/perform/prospects/${getProspectSlug(prospect)}`}
+                  className={`flex items-center gap-4 px-5 py-4 hover:bg-white/[0.02] transition-colors ${
+                    i < topProspects.length - 1 ? 'border-b border-white/[0.04]' : ''
+                  }`}
                 >
-                  {athlete.tier}
-                </span>
-              </div>
+                  <span className="text-lg font-display text-white/40 w-8 text-center">
+                    {prospect.nationalRank}
+                  </span>
+                  <div className={`flex-shrink-0 h-9 w-9 rounded-lg ${tierStyle.bg} border ${tierStyle.border} flex items-center justify-center text-xs font-display ${tierStyle.text}`}>
+                    {prospect.position}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-white truncate">{prospect.name}</p>
+                    <p className="text-[0.6rem] text-white/30 font-mono">
+                      {prospect.school}, {prospect.state} &middot; {prospect.classYear}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <span className={`text-xl font-display ${getScoreColor(prospect.paiScore)}`}>
+                      {prospect.paiScore}
+                    </span>
+                    <p className="text-[0.5rem] font-mono text-white/20 uppercase">P.A.I.</p>
+                  </div>
+                  <ArrowRight size={14} className="text-white/10 flex-shrink-0" />
+                </Link>
+              );
+            })}
+          </div>
+        </motion.section>
+      )}
 
-              {/* P.A.I. Score */}
-              <div className="text-center py-2">
-                <span className="text-3xl font-display text-gold">
-                  {athlete.paiScore}
-                </span>
-                <span className="text-xs text-white/30 ml-1 font-mono">
-                  P.A.I.
-                </span>
-              </div>
+      {/* Recent Content Preview */}
+      {!loading && recentContent.length > 0 && (
+        <motion.section variants={staggerItem} className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xs uppercase tracking-widest text-white/30 font-mono">
+              Latest Content
+            </h2>
+            <Link
+              href="/sandbox/perform/content"
+              className="text-[0.6rem] font-mono text-gold/50 hover:text-gold transition-colors flex items-center gap-1"
+            >
+              View All <ArrowRight size={10} />
+            </Link>
+          </div>
 
-              {/* Stat Bars */}
-              <div className="space-y-2">
-                <StatBar label="Performance" value={athlete.performance} />
-                <StatBar label="Athleticism" value={athlete.athleticism} />
-                <StatBar label="Intangibles" value={athlete.intangibles} />
+          <div className="grid gap-3 md:grid-cols-3">
+            {recentContent.map(article => (
+              <div
+                key={article.id}
+                className="wireframe-card rounded-2xl p-4 space-y-2"
+              >
+                <div className="flex items-center gap-2">
+                  <span className="text-[0.5rem] font-mono uppercase text-gold/50">
+                    {article.type.replace('_', ' ')}
+                  </span>
+                  <span className="text-white/10">&middot;</span>
+                  <span className="text-[0.5rem] font-mono text-white/20">
+                    {article.readTimeMin} min
+                  </span>
+                </div>
+                <p className="text-sm text-white/70 font-medium leading-snug">{article.title}</p>
+                <p className="text-xs text-white/30 line-clamp-2">{article.excerpt}</p>
               </div>
+            ))}
+          </div>
+        </motion.section>
+      )}
 
-              {/* NIL */}
-              <div className="flex items-center justify-between pt-2 border-t border-white/5">
-                <span className="text-[0.55rem] font-mono text-white/30 uppercase">
-                  NIL Est.
-                </span>
-                <span className="text-xs text-gold/80 font-mono">
-                  {athlete.nilEstimate}
-                </span>
-              </div>
-            </motion.div>
-          ))}
+      {/* Loading State */}
+      {loading && (
+        <div className="text-center py-12">
+          <div className="inline-block h-6 w-6 border-2 border-gold/30 border-t-gold rounded-full animate-spin" />
+          <p className="text-xs text-white/30 mt-3 font-mono">Loading Per|Form data...</p>
         </div>
-      </motion.section>
+      )}
 
-      {/* Bull vs Bear */}
-      <motion.div
-        variants={staggerItem}
-        className="wireframe-card p-6 rounded-2xl"
-      >
+      {/* Pipeline Architecture */}
+      <motion.div variants={staggerItem} className="wireframe-card p-6 rounded-2xl">
         <h2 className="text-xs uppercase tracking-widest text-gold/50 font-mono mb-4">
-          War Room — Bull vs Bear Debate
+          Scouting Pipeline
         </h2>
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="p-4 rounded-xl bg-emerald-400/5 border border-emerald-400/10">
-            <p className="text-xs text-emerald-400 font-mono uppercase mb-2">
-              Lil_Bull_Hawk — Underrated
-            </p>
-            <p className="text-xs text-white/50">
-              &quot;Marcus Johnson&apos;s arm talent is generational. Film shows
-              consistent deep ball accuracy under pressure. The stats don&apos;t
-              capture how he elevates everyone around him.&quot;
-            </p>
+        <div className="grid gap-4 md:grid-cols-3 text-sm">
+          <div className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/5">
+            <Users size={16} className="text-emerald-400 flex-shrink-0" />
+            <div>
+              <p className="text-white/60 font-medium text-xs">Scout Hub</p>
+              <p className="text-white/25 text-[0.6rem] font-mono">Data aggregation + grading</p>
+            </div>
           </div>
-          <div className="p-4 rounded-xl bg-red-400/5 border border-red-400/10">
-            <p className="text-xs text-red-400 font-mono uppercase mb-2">
-              Lil_Bear_Hawk — Overrated
-            </p>
-            <p className="text-xs text-white/50">
-              &quot;Johnson&apos;s competition level is a concern. 5A Texas is
-              strong but the top opponents accounted for 3 of his 4 losses.
-              Needs to prove it against Power 5 speed.&quot;
-            </p>
+          <div className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/5">
+            <FileText size={16} className="text-blue-400 flex-shrink-0" />
+            <div>
+              <p className="text-white/60 font-medium text-xs">Film Room</p>
+              <p className="text-white/25 text-[0.6rem] font-mono">SAM 2 video analysis</p>
+            </div>
           </div>
-        </div>
-        <div className="mt-4 p-3 rounded-lg bg-gold/5 border border-gold/10">
-          <p className="text-[0.55rem] text-gold/60 font-mono uppercase mb-1">
-            Chicken Hawk — Mediation
-          </p>
-          <p className="text-xs text-white/40">
-            &quot;Bull makes the stronger case on film evidence. Bear raises a
-            valid concern on schedule strength. GROC adjusted +2 for film, Luke
-            -1 for competition. Net: P.A.I. holds at 92.&quot;
-          </p>
+          <div className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/5">
+            <Swords size={16} className="text-amber-400 flex-shrink-0" />
+            <div>
+              <p className="text-white/60 font-medium text-xs">War Room</p>
+              <p className="text-white/25 text-[0.6rem] font-mono">Bull vs Bear debate engine</p>
+            </div>
+          </div>
         </div>
       </motion.div>
     </motion.div>
