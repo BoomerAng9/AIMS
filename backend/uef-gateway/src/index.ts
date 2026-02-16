@@ -42,6 +42,12 @@ import { incidentManager } from './backup/incident-runbook';
 
 import { a2aRouter } from './a2a';
 import { getOrchestrator } from './acheevy/orchestrator';
+import { shelfRouter } from './shelves/shelf-router';
+import { shelfClient } from './shelves/firestore-client';
+import { lucProjectService } from './shelves/luc-project-service';
+import { allShelfTools } from './shelves/mcp-tools';
+import { ossModels } from './llm/oss-models';
+import { personaplex } from './llm/personaplex';
 import logger from './logger';
 
 const app = express();
@@ -878,6 +884,106 @@ app.get('/lil-hawks', (_req, res) => {
       'vision-scout': VISION_SQUAD_PROFILES,
     },
   });
+});
+
+// --------------------------------------------------------------------------
+// Shelving System — First-Class Data Collections (Firestore + Memory)
+// All shelves: projects, luc_projects, plugs, boomer_angs, workflows,
+// runs, logs, assets
+// --------------------------------------------------------------------------
+app.use(shelfRouter);
+
+// --------------------------------------------------------------------------
+// LUC Project Service — Pricing & Effort Oracle
+// --------------------------------------------------------------------------
+app.post('/luc/project', async (req, res) => {
+  try {
+    const { projectId, userId, scope, requirements, models } = req.body;
+    if (!projectId || !userId || !scope) {
+      res.status(400).json({ error: 'Missing required fields: projectId, userId, scope' });
+      return;
+    }
+    const lucProject = await lucProjectService.createLucProject({
+      projectId,
+      userId,
+      scope,
+      requirements: requirements || '',
+      requestedModels: models,
+    });
+    res.status(201).json({ lucProject });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'LUC project creation failed';
+    logger.error({ err }, '[LUC] Project creation error');
+    res.status(500).json({ error: msg });
+  }
+});
+
+app.post('/luc/estimate-project', async (req, res) => {
+  try {
+    const { scope, models } = req.body;
+    if (!scope || typeof scope !== 'string') {
+      res.status(400).json({ error: 'Missing scope field' });
+      return;
+    }
+    const estimate = await lucProjectService.estimate(scope, models);
+    res.json({ estimate });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'LUC estimation failed';
+    res.status(500).json({ error: msg });
+  }
+});
+
+app.get('/luc/project/:id', async (req, res) => {
+  try {
+    const project = await lucProjectService.getProject(req.params.id);
+    if (!project) {
+      res.status(404).json({ error: 'LUC project not found' });
+      return;
+    }
+    res.json({ lucProject: project });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'LUC project retrieval failed';
+    res.status(500).json({ error: msg });
+  }
+});
+
+// --------------------------------------------------------------------------
+// MCP Tool Definitions — Exposed for agent discovery
+// --------------------------------------------------------------------------
+app.get('/mcp/tools', (_req, res) => {
+  res.json({ tools: allShelfTools, count: allShelfTools.length });
+});
+
+// --------------------------------------------------------------------------
+// OSS Models — Self-hosted model catalog
+// --------------------------------------------------------------------------
+app.get('/llm/oss-models', (_req, res) => {
+  res.json({
+    configured: ossModels.isConfigured(),
+    models: ossModels.listModels(),
+  });
+});
+
+// --------------------------------------------------------------------------
+// Personaplex — Voice agent status
+// --------------------------------------------------------------------------
+app.get('/personaplex/status', (_req, res) => {
+  res.json({ configured: personaplex.isConfigured() });
+});
+
+app.post('/personaplex/speak', async (req, res) => {
+  try {
+    const { text, sessionId } = req.body;
+    if (!text || typeof text !== 'string') {
+      res.status(400).json({ error: 'Missing text field' });
+      return;
+    }
+    const result = await personaplex.speak(text, sessionId);
+    res.json(result);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Personaplex speak failed';
+    res.status(500).json({ error: msg });
+  }
 });
 
 // --------------------------------------------------------------------------
