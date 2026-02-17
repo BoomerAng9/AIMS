@@ -14,6 +14,8 @@ const LANDING_DOMAIN = process.env.NEXT_PUBLIC_LANDING_URL || 'https://plugmein.
 const LANDING_NAV = [
   { href: "/", label: "Home" },
   { href: "/the-book-of-vibe", label: "Book of V.I.B.E." },
+  { href: "/arena", label: "The Arena" },
+  { href: "/sandbox", label: "Sandbox" },
   { href: "/gallery", label: "Gallery" },
   { href: "/pricing", label: "Pricing" },
   { href: "/about", label: "About" },
