@@ -14,14 +14,15 @@
 import { useChat } from 'ai/react';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import Image from 'next/image';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import {
-  Send, Zap, Sparkles, Hammer, Search, Layers, Square,
+  User, Send, Zap, Sparkles, Hammer, Search, Layers, Square,
   Mic, MicOff, Volume2, VolumeX, Paperclip, X, FileText, ImageIcon, Code2, Loader2,
-  Play, Pause,
+  Play, Pause, RotateCcw,
 } from 'lucide-react';
 import { useVoiceInput } from '@/hooks/useVoiceInput';
 import { useVoiceOutput } from '@/hooks/useVoiceOutput';
-import { AcheevyMessage } from './AcheevyMessage';
 
 // ── Types ──
 
@@ -460,16 +461,74 @@ export default function AcheevyChat() {
       {/* Messages */}
       <div className="relative z-10 flex-1 overflow-y-auto px-4 py-4 space-y-4 scroll-smooth">
         {messages.map((m, i) => (
-          <AcheevyMessage
-            key={m.id}
-            message={m}
-            isLast={i === messages.length - 1}
-            isLoading={isLoading}
-            isSpeaking={speakingMessageId === m.id}
-            showPauseButton={speakingMessageId === m.id && voiceOutput.isPlaying}
-            onSpeak={speakMessage}
-            onPause={() => voiceOutput.pause()}
-          />
+          <div key={m.id} className={`flex gap-3 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+            {m.role === 'assistant' && (
+              <div className={`w-7 h-7 rounded-lg bg-white/5 border border-gold/10 flex items-center justify-center flex-shrink-0 mt-0.5 overflow-hidden ${
+                speakingMessageId === m.id ? 'ring-2 ring-gold/40 animate-pulse' : ''
+              }`}>
+                <Image
+                  src="/images/acheevy/acheevy-helmet.png"
+                  alt="ACHEEVY"
+                  width={20}
+                  height={20}
+                  className="object-contain"
+                />
+              </div>
+            )}
+            <div className={`relative group px-4 py-3 rounded-2xl text-sm leading-relaxed max-w-[85%] ${
+              m.role === 'user'
+                ? 'bg-gold/10 text-white rounded-tr-sm border border-gold/20'
+                : 'wireframe-card text-white/90 rounded-tl-sm'
+            }`}>
+              {m.role === 'user' ? (
+                m.content
+              ) : (
+                <div className="prose prose-invert prose-sm max-w-none prose-code:text-gold prose-code:bg-black/40 prose-code:px-1 prose-code:rounded">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{m.content}</ReactMarkdown>
+                  {isLoading && i === messages.length - 1 && (
+                    <span className="inline-block w-1.5 h-4 bg-gold ml-0.5 animate-pulse" />
+                  )}
+                </div>
+              )}
+              {/* Per-message playback controls for assistant messages */}
+              {m.role === 'assistant' && m.id !== 'welcome' && !isLoading && (
+                <div className="flex items-center gap-1 mt-2 pt-2 border-t border-wireframe-stroke opacity-0 group-hover:opacity-100 transition-opacity">
+                  {speakingMessageId === m.id && voiceOutput.isPlaying ? (
+                    <button
+                      type="button"
+                      onClick={() => voiceOutput.pause()}
+                      title="Pause"
+                      className="p-1 rounded text-gold/60 hover:text-gold hover:bg-gold/10 transition-colors"
+                    >
+                      <Pause size={12} />
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => speakMessage(m.id, m.content)}
+                      title="Speak this message"
+                      className="p-1 rounded text-white/30 hover:text-gold hover:bg-gold/10 transition-colors"
+                    >
+                      <Play size={12} />
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => speakMessage(m.id, m.content)}
+                    title="Replay"
+                    className="p-1 rounded text-white/30 hover:text-gold hover:bg-gold/10 transition-colors"
+                  >
+                    <RotateCcw size={12} />
+                  </button>
+                </div>
+              )}
+            </div>
+            {m.role === 'user' && (
+              <div className="w-7 h-7 rounded-lg bg-white/5 border border-wireframe-stroke flex items-center justify-center flex-shrink-0 mt-0.5">
+                <User className="w-3.5 h-3.5 text-white/50" />
+              </div>
+            )}
+          </div>
         ))}
         {isLoading && messages.length > 0 && messages[messages.length - 1].role === 'user' && (
           <div className="flex gap-3">
