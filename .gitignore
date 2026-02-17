@@ -64,6 +64,9 @@ vendor/intelligent-internet/codex-as-mcp/
 # Chicken Hawk evidence data
 services/chicken-hawk/data/
 
+# Stale self-referencing submodule dir
+/AIMS/
+
 # Temp files
 tmpclaude-*
 
