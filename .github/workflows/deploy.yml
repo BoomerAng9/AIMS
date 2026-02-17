@@ -1,0 +1,63 @@
+name: Build & Deploy to VPS
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  build-check:
+    name: Build Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        run: cd frontend && npm ci
+
+      - name: Build frontend
+        run: cd frontend && npm run build
+        env:
+          NEXT_TELEMETRY_DISABLED: 1
+
+  deploy:
+    name: Deploy to VPS
+    needs: build-check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: root
+          password: ${{ secrets.VPS_PASSWORD }}
+          command_timeout: 15m
+          script: |
+            set -e
+
+            if [ -d /home/aims/AIMS ]; then
+              cd /home/aims/AIMS
+              git fetch origin main
+              git reset --hard origin/main
+            else
+              git clone https://github.com/BoomerAng9/AIMS.git /home/aims/AIMS
+              cd /home/aims/AIMS
+            fi
+
+            docker compose -p locale down 2>/dev/null || true
+            chmod +x deploy.sh
+            ./deploy.sh
+
+            echo "Deployment complete!"
