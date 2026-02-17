@@ -13,7 +13,7 @@ import { springPresets } from "../../../styles/animations";
 /**
  * Scene 2: The First Frequency
  * A pulse of energy bursts from center — waveform ripples outward.
- * The void cracks. Color enters the universe.
+ * The Void cracks. Color enters the universe.
  */
 
 const RING_COUNT = 5;

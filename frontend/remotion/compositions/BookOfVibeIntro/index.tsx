@@ -16,7 +16,7 @@ import type { BookOfVibeIntroProps } from "./schema";
  * Book of V.I.B.E. — Intro
  *
  * 5-scene origin story:
- *   NIL → First Frequency → The Elder → ACHEEVY → Title Card
+ *   The Void → First Frequency → The Elder → ACHEEVY → Title Card
  *
  * Uses TransitionSeries with fade transitions between each scene.
  */
@@ -30,9 +30,9 @@ export const BookOfVibeIntro: React.FC<BookOfVibeIntroProps> = ({
   return (
     <AbsoluteFill style={{ backgroundColor: "#000000" }}>
       <TransitionSeries>
-        {/* Scene 1: NIL — The Void Before */}
+        {/* Scene 1: The Void — Before Creation */}
         <TransitionSeries.Sequence
-          durationInFrames={Math.round(SCENE_TIMING.nil * fps)}
+          durationInFrames={Math.round(SCENE_TIMING.theVoid * fps)}
         >
           <NilVoid />
         </TransitionSeries.Sequence>

@@ -33,6 +33,8 @@ const ALLOWED_ORIGINS = IS_PRODUCTION
       'https://www.aims.plugmein.cloud',
       'https://api.aims.plugmein.cloud',
       'https://luc.plugmein.cloud',
+      'https://aimanagedsolutions.cloud',
+      'https://www.aimanagedsolutions.cloud',
     ]
   : [
       'http://localhost:3000',
@@ -276,8 +278,8 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(redirectUrl);
   }
 
-  // 1. Domain routing — all routes served from plugmein.cloud
-  // (aimanagedsolutions.cloud is deprecated)
+  // 1. Domain routing — plugmein.cloud (app) + aimanagedsolutions.cloud (father site)
+  //    Both domains proxy to the same Next.js frontend via nginx.
 
   // 2. Honeypot check (block bots probing for vulnerabilities)
   if (isHoneypot(pathname)) {

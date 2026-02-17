@@ -9,11 +9,24 @@
  */
 
 import { NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 import { triggerPmoWebhook } from '@/lib/n8n-bridge';
 
 export async function POST(req: Request) {
+  // Authenticate — reject anonymous requests
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.email) {
+    return NextResponse.json(
+      { error: 'Unauthorized' },
+      { status: 401 }
+    );
+  }
+
   const body = await req.json();
-  const { message, userId, pmoOffice, director, executionLane } = body;
+  const { message, pmoOffice, director, executionLane } = body;
+  // Use authenticated user ID — never trust client-supplied userId
+  const userId = session.user.email;
 
   if (!message) {
     return NextResponse.json(

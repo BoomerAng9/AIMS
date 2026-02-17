@@ -384,8 +384,8 @@ export function estimateCost(toolId: string, multiplier: number = 1): number {
  * Format quota display
  */
 export function formatQuota(quota: UsageQuota): string {
-  if (quota.limit === -1) {
-    return "Unlimited";
+  if (quota.limit <= 0) {
+    return `${quota.used.toLocaleString()} (Metered)`;
   }
   return `${quota.used.toLocaleString()} / ${quota.limit.toLocaleString()}`;
 }
@@ -394,7 +394,7 @@ export function formatQuota(quota: UsageQuota): string {
  * Get quota status color
  */
 export function getQuotaStatusColor(quota: UsageQuota): string {
-  if (quota.limit === -1) return "text-green-400";
+  if (quota.limit <= 0) return "text-green-400"; // Metered/P2P
   if (quota.percent >= 100) return "text-red-400";
   if (quota.percent >= 80) return "text-yellow-400";
   return "text-green-400";

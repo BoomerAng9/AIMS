@@ -44,8 +44,8 @@ export class LucAdk {
       throw new Error(`Service ${service} not found in user's quotas`);
     }
 
-    // Check if unlimited (-1)
-    if (quota.limit === -1) {
+    // Check if P2P metered (limit <= 0) — always allow, bill per use
+    if (quota.limit <= 0) {
       return { success: true, can_execute: true };
     }
 
@@ -110,8 +110,8 @@ export class LucAdk {
       return { can_execute: false, reason: 'Service not available in plan' };
     }
 
-    // Unlimited
-    if (quota.limit === -1) {
+    // P2P metered — always allow, bill per use
+    if (quota.limit <= 0) {
       return { can_execute: true };
     }
 
@@ -154,7 +154,7 @@ export class LucAdk {
       quotaSummary[service] = {
         limit: quota.limit,
         used: quota.used,
-        percent: quota.limit === -1 ? 0 : Math.round((quota.used / quota.limit) * 100)
+        percent: quota.limit <= 0 ? 0 : Math.round((quota.used / quota.limit) * 100)
       };
     }
 
@@ -453,31 +453,38 @@ export class LucAdk {
   static recommendPlan(
     currentUsage: Record<string, number>
   ): { recommended_plan: string; savings: number; reason: string } {
-    let bestPlan = 'free';
+    let bestPlan = 'p2p';
     let bestSavings = 0;
-    let reason = 'Current usage fits within free tier';
+    let reason = 'Current usage fits within Pay-per-Use tier';
+
+    // Calculate what P2P (no plan) would cost in pure overage
+    let p2pOverageCost = 0;
+    for (const [service, used] of Object.entries(currentUsage)) {
+      const rate = OVERAGE_RATES[service as keyof typeof OVERAGE_RATES];
+      if (rate) p2pOverageCost += used * rate;
+    }
 
     for (const [planId, plan] of Object.entries(LUC_PLANS)) {
-      if (planId === 'free') continue;
+      if (planId === 'p2p') continue;
 
       // Check if all usage fits within plan limits
       let fitsWithinPlan = true;
-      let overageCost = 0;
 
       for (const [service, used] of Object.entries(currentUsage)) {
         const limit = plan.quotas[service as keyof typeof plan.quotas] || 0;
-        if (limit !== -1 && used > limit) {
+        if (limit > 0 && used > limit) {
           fitsWithinPlan = false;
-          overageCost += (used - limit) * OVERAGE_RATES[service as keyof typeof OVERAGE_RATES];
+          break;
         }
       }
 
       if (fitsWithinPlan) {
-        const savings = overageCost;
+        // Savings = P2P overage cost minus this plan's monthly cost
+        const savings = p2pOverageCost - plan.price_monthly;
         if (savings > bestSavings) {
           bestPlan = planId;
           bestSavings = savings;
-          reason = `${plan.name} covers your usage with ${savings.toFixed(2)} in overage savings`;
+          reason = `${plan.name} covers your usage and saves $${savings.toFixed(2)}/mo vs Pay-per-Use`;
         }
       }
     }

@@ -160,7 +160,7 @@ export default function AcheevyChat() {
       {
         id: 'welcome',
         role: 'assistant',
-        content: "Greetings. I am ACHEEVY — your AI assistant.\n\nTell me what you need, and my team will make it happen.",
+        content: "Greetings. I am ACHEEVY — your AI executive orchestrator.\n\nTell me what you need — my team will classify, route, execute, and deliver.\n\n**How it works:**\n- 🧠 **Classify** — I detect your intent\n- 🔀 **Route** — I assign the right team\n- ⚡ **Execute** — The pipeline runs\n- ✅ **Deliver** — Verified results, with proof",
       }
     ]
   });
@@ -387,9 +387,9 @@ export default function AcheevyChat() {
               <div className="absolute -bottom-0.5 -right-0.5 w-2 h-2 bg-emerald-400 rounded-full border border-black animate-pulse" />
             </div>
             <div>
-              <h2 className="font-medium text-sm text-white">Chat w/ACHEEVY</h2>
-              <div className="flex items-center gap-1 text-[9px] text-emerald-400/80 font-mono uppercase tracking-widest">
-                <Zap className="w-2 h-2" /> Online
+              <h2 className="font-medium text-base text-white">Chat w/ACHEEVY</h2>
+              <div className="flex items-center gap-1 text-[10px] text-emerald-400/80 font-mono uppercase tracking-widest">
+                <Zap className="w-2.5 h-2.5" /> Online
               </div>
             </div>
           </div>
@@ -518,10 +518,37 @@ export default function AcheevyChat() {
                 className="object-contain animate-pulse"
               />
             </div>
-            <div className="px-4 py-3 wireframe-card rounded-2xl rounded-tl-sm flex items-center gap-1.5">
-              <div className="w-1.5 h-1.5 bg-gold/50 rounded-full animate-bounce [animation-delay:-0.3s]" />
-              <div className="w-1.5 h-1.5 bg-gold/50 rounded-full animate-bounce [animation-delay:-0.15s]" />
-              <div className="w-1.5 h-1.5 bg-gold/50 rounded-full animate-bounce" />
+            <div className="flex flex-col gap-2">
+              {/* Action Chain — visible pipeline during processing */}
+              <div className="px-4 py-3 wireframe-card rounded-2xl rounded-tl-sm">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-[10px] font-mono text-gold/60 uppercase tracking-widest">Processing Pipeline</span>
+                </div>
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  {[
+                    { label: 'Classify', color: 'text-blue-400', bg: 'bg-blue-500/10', border: 'border-blue-500/20', delay: '0s' },
+                    { label: 'Route', color: 'text-cyan-400', bg: 'bg-cyan-500/10', border: 'border-cyan-500/20', delay: '0.3s' },
+                    { label: 'Execute', color: 'text-gold', bg: 'bg-gold/10', border: 'border-gold/20', delay: '0.6s' },
+                    { label: 'Deliver', color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', delay: '0.9s' },
+                  ].map((step, i) => (
+                    <div key={step.label} className="flex items-center gap-1.5">
+                      {i > 0 && <div className="w-3 h-px bg-white/10" />}
+                      <span
+                        className={`text-[10px] font-mono ${step.color} px-2 py-0.5 rounded-md ${step.bg} border ${step.border} animate-pulse`}
+                        style={{ animationDelay: step.delay }}
+                      >
+                        {step.label}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              {/* Typing indicator */}
+              <div className="px-4 py-3 wireframe-card rounded-2xl rounded-tl-sm flex items-center gap-1.5">
+                <div className="w-1.5 h-1.5 bg-gold/50 rounded-full animate-bounce [animation-delay:-0.3s]" />
+                <div className="w-1.5 h-1.5 bg-gold/50 rounded-full animate-bounce [animation-delay:-0.15s]" />
+                <div className="w-1.5 h-1.5 bg-gold/50 rounded-full animate-bounce" />
+              </div>
             </div>
           </div>
         )}
@@ -632,7 +659,7 @@ export default function AcheevyChat() {
             onChange={handleInputChange}
             placeholder={voiceInput.isProcessing ? 'Transcribing your voice...' : 'Tell me what you need...'}
             disabled={isLoading}
-            className="flex-1 bg-white/5 hover:bg-white/10 focus:bg-black border border-wireframe-stroke focus:border-gold/40 rounded-xl py-3 pl-4 pr-12 text-white text-sm placeholder:text-white/20 transition-all outline-none"
+            className="flex-1 bg-white/5 hover:bg-white/10 focus:bg-black border border-wireframe-stroke focus:border-gold/40 rounded-xl py-3 pl-4 pr-12 text-white text-base placeholder:text-white/20 transition-all outline-none"
           />
 
           {/* Send / Stop button */}

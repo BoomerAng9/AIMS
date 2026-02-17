@@ -794,7 +794,7 @@ export default function ModelGardenPage() {
   const [activeTab, setActiveTab] = useState<'models' | 'tools' | 'consumption'>('models');
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
-  const [enabledModels, setEnabledModels] = useState<Set<string>>(new Set(['claude-opus-4.6', 'claude-sonnet-4.5']));
+  const [enabledModels, setEnabledModels] = useState<Set<string>>(new Set(['anthropic/claude-opus-4.6', 'anthropic/claude-sonnet-4.5']));
   const [enabledTools, setEnabledTools] = useState<Set<string>>(new Set(['brave-search', 'elevenlabs']));
 
   const toggleModel = (id: string) => {

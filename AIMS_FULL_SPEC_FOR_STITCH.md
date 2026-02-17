@@ -129,7 +129,7 @@
 | `/dashboard/blockwise` | Block-based workflows |
 | `/dashboard/boost-bridge` | Integration bridge |
 | `/dashboard/sports-tracker` | Sports/fitness tracking |
-| `/dashboard/nil` | Nil/empty state |
+| `/dashboard/nil` | N.I.L. Dashboard |
 
 ### Onboarding Routes
 - `/onboarding` — Entry

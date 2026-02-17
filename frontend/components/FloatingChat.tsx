@@ -53,7 +53,7 @@ export default function FloatingChat() {
               initial="hidden"
               animate="visible"
               exit="exit"
-              className="relative z-10 flex flex-col w-full sm:w-[480px] h-full sm:h-[700px] sm:max-h-[85vh] sm:rounded-2xl overflow-hidden border-0 sm:border border-wireframe-stroke bg-[#0A0A0A] shadow-2xl shadow-black/60"
+              className="relative z-10 flex flex-col w-full sm:w-[540px] h-full sm:h-[750px] sm:max-h-[90vh] sm:rounded-2xl overflow-hidden border-0 sm:border border-wireframe-stroke bg-[#0A0A0A] shadow-2xl shadow-black/60"
             >
               {/* Console Header */}
               <div className="flex items-center justify-between px-4 py-3 border-b border-wireframe-stroke bg-black/80 backdrop-blur-xl">
@@ -71,11 +71,11 @@ export default function FloatingChat() {
                     <div className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-400 border border-[#0A0A0A] animate-pulse" />
                   </div>
                   <div>
-                    <span className="text-sm font-semibold text-white tracking-wide">
+                    <span className="text-base font-semibold text-white tracking-wide">
                       {mode === 'chat' ? 'Chat w/ACHEEVY' : 'ACHEEVY Voice'}
                     </span>
-                    <div className="flex items-center gap-1 text-[9px] text-emerald-400/80 font-mono uppercase tracking-widest">
-                      <Zap className="w-2 h-2" /> Active
+                    <div className="flex items-center gap-1 text-[10px] text-emerald-400/80 font-mono uppercase tracking-widest">
+                      <Zap className="w-2.5 h-2.5" /> Active
                     </div>
                   </div>
                 </div>
@@ -147,10 +147,10 @@ export default function FloatingChat() {
 
               {/* Label */}
               <div className="hidden sm:block">
-                <div className="text-xs font-semibold text-white/80 group-hover:text-gold transition-colors">
+                <div className="text-sm font-semibold text-white/80 group-hover:text-gold transition-colors">
                   Chat w/ACHEEVY
                 </div>
-                <div className="text-[9px] text-white/25 font-mono uppercase tracking-wider">
+                <div className="text-[10px] text-white/30 font-mono uppercase tracking-wider">
                   Command Console
                 </div>
               </div>

@@ -1,6 +1,17 @@
 /**
  * LUC (LUKE) Type Definitions
  * Ledger Usage Control - Billing and Usage Tracking Types
+ *
+ * TWO-AXIS MODEL:
+ *   Axis 1 — Plan Tier (what you get): Pay-per-Use | Coffee | Data Entry | Pro | Enterprise
+ *   Axis 2 — Commitment Duration (3-6-9 model): P2P | 3mo | 6mo | 9mo
+ *
+ * Commitment duration determines your token markup rate:
+ *   P2P = 25% markup | 3mo = 20% | 6mo = 15% | 9mo = 10% (pay 9, get 12)
+ *
+ * IMPORTANT: No plan is "unlimited". Every tier has explicit, auditable caps.
+ * Enterprise gets the highest allocations, but they are finite and metered.
+ * This is a tokenized economy — honest pricing means honest limits.
  */
 
 // ==========================================
@@ -77,12 +88,16 @@ export const OVERAGE_RATES = {
 
 // ==========================================
 // PLANS CONFIGURATION
+//
+// 5 tiers with explicit caps. Enterprise is the highest but NOT unlimited.
+// The 3-6-9 commitment model (P2P/3mo/6mo/9mo) applies as a separate
+// dimension that adjusts token markup rates — see frontend/lib/stripe.ts.
 // ==========================================
 
 export const LUC_PLANS: Record<string, LucPlan> = {
-  free: {
-    id: 'free',
-    name: 'Free (Guest)',
+  p2p: {
+    id: 'p2p',
+    name: 'Pay-per-Use',
     price_monthly: 0,
     price_annual: 0,
     quotas: {
@@ -93,7 +108,7 @@ export const LUC_PLANS: Record<string, LucPlan> = {
       storage_gb: 0.5,
       api_calls: 100
     },
-    features: ['Browse marketplace', 'View case studies', 'Basic AI chat'],
+    features: ['Browse marketplace', 'View case studies', 'Basic AI chat', 'Metered execution — pay as you go'],
     stripe_product_id: '',
     stripe_price_id_monthly: '',
     stripe_price_id_annual: ''
@@ -106,11 +121,11 @@ export const LUC_PLANS: Record<string, LucPlan> = {
     price_annual: 79.99,
     quotas: {
       brave_searches: 100,
-      elevenlabs_chars: 10000,
+      elevenlabs_chars: 10_000,
       container_hours: 2,
       n8n_executions: 50,
       storage_gb: 2,
-      api_calls: 1000
+      api_calls: 1_000
     },
     features: [
       'Basic automations',
@@ -129,18 +144,18 @@ export const LUC_PLANS: Record<string, LucPlan> = {
     price_monthly: 29.99,
     price_annual: 299.99,
     quotas: {
-      brave_searches: 1000,
-      elevenlabs_chars: 50000,
+      brave_searches: 1_000,
+      elevenlabs_chars: 50_000,
       container_hours: 10,
       n8n_executions: 500,
       storage_gb: 10,
-      api_calls: 10000
+      api_calls: 10_000
     },
     features: [
       'iAgent lite',
       'Full voice suite',
       'Research + analytics',
-      'Unlimited jobs',
+      '50 jobs/month',
       'Partner marketplace access'
     ],
     stripe_product_id: process.env.STRIPE_PRODUCT_DATA_ENTRY || '',
@@ -154,12 +169,12 @@ export const LUC_PLANS: Record<string, LucPlan> = {
     price_monthly: 99.99,
     price_annual: 999.99,
     quotas: {
-      brave_searches: 10000,
-      elevenlabs_chars: 200000,
+      brave_searches: 10_000,
+      elevenlabs_chars: 200_000,
       container_hours: 50,
-      n8n_executions: 5000,
+      n8n_executions: 5_000,
       storage_gb: 100,
-      api_calls: 100000
+      api_calls: 100_000
     },
     features: [
       'All II repos',
@@ -180,20 +195,21 @@ export const LUC_PLANS: Record<string, LucPlan> = {
     price_monthly: 299,
     price_annual: 2999,
     quotas: {
-      brave_searches: -1, // unlimited
-      elevenlabs_chars: -1,
-      container_hours: -1,
-      n8n_executions: -1,
+      brave_searches: 50_000,
+      elevenlabs_chars: 2_000_000,
+      container_hours: 500,
+      n8n_executions: 25_000,
       storage_gb: 500,
-      api_calls: -1
+      api_calls: 500_000
     },
     features: [
-      'Unlimited everything',
+      'Highest allocations across all services',
       'Custom integrations',
       'SLA guarantee',
       'Dedicated Boomer_Ang',
       'White-glove support',
-      'Custom billing'
+      'Custom billing',
+      '50% overage buffer before hard cap'
     ],
     stripe_product_id: process.env.STRIPE_PRODUCT_ENTERPRISE || '',
     stripe_price_id_monthly: process.env.STRIPE_PRICE_ENTERPRISE_MONTHLY || '',

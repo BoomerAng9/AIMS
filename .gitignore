@@ -14,7 +14,8 @@ dist/
 
 # System
 .DS_Store
-.claude/
+.claude/*
+!.claude/skills/
 .data/
 *.pem
 *.key

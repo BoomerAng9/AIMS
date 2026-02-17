@@ -129,6 +129,68 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // ══════════════════════════════════════════════════════════
+    // A.I.M.S. SHELVING SYSTEM — First-Class Data Collections
+    // Chicken Hawk and Lil_Hawks walk these shelves via Admin SDK.
+    // Users can read their own data. All writes are Admin SDK only.
+    // ══════════════════════════════════════════════════════════
+
+    // ── Projects (Top-level project records) ────────────────
+    match /projects/{projectId} {
+      allow read: if isAuthenticated() &&
+        resource.data.userId == request.auth.uid;
+      allow write: if false; // Admin SDK only
+    }
+
+    // ── LUC Projects (Pricing & effort oracle) ──────────────
+    match /luc_projects/{lucId} {
+      allow read: if isAuthenticated() &&
+        resource.data.userId == request.auth.uid;
+      allow write: if false; // Admin SDK only
+    }
+
+    // ── Plugs (Built artifacts / aiPlugs) ────────────────────
+    match /plugs/{plugId} {
+      allow read: if isAuthenticated() &&
+        resource.data.userId == request.auth.uid;
+      allow write: if false; // Admin SDK only
+    }
+
+    // ── Boomer_Angs (Agent roster) ──────────────────────────
+    // Public read for agent discovery. Admin write only.
+    match /boomer_angs/{angId} {
+      allow read: if isAuthenticated();
+      allow write: if false; // Admin SDK only
+    }
+
+    // ── Workflows (Automation definitions) ──────────────────
+    match /workflows/{workflowId} {
+      allow read: if isAuthenticated() &&
+        resource.data.userId == request.auth.uid;
+      allow write: if false; // Admin SDK only
+    }
+
+    // ── Runs (Execution run records) ────────────────────────
+    match /runs/{runId} {
+      allow read: if isAuthenticated() &&
+        resource.data.userId == request.auth.uid;
+      allow write: if false; // Admin SDK only
+    }
+
+    // ── Logs (Structured log entries) ───────────────────────
+    // Authenticated users can read logs for their runs.
+    match /logs/{logId} {
+      allow read: if isAuthenticated();
+      allow write: if false; // Admin SDK only
+    }
+
+    // ── Assets (Files, diagrams, screenshots, configs) ──────
+    match /assets/{assetId} {
+      allow read: if isAuthenticated() &&
+        resource.data.userId == request.auth.uid;
+      allow write: if false; // Admin SDK only
+    }
+
     // ── Schema documents (ignore) ─────────────────────────────
     // _SCHEMA docs are for documentation, not user-facing
   }

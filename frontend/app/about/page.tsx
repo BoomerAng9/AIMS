@@ -102,8 +102,8 @@ export default function AboutPage() {
             <h2 className="text-xl font-bold text-gold mb-3">The V.I.B.E.</h2>
             <p className="text-sm text-white/50 leading-relaxed">
               Visionary Intelligence Building Everything. The V.I.B.E. isn&apos;t a product &mdash; it&apos;s
-              the fundamental energy that resists NIL, the void of anti-creation. Every time you build,
-              you push NIL back one more step. Every deployment is an act of resistance against
+              the fundamental energy that resists The Void, the force of anti-creation. Every time you build,
+              you push The Void back one more step. Every deployment is an act of resistance against
               the entropy that devours abandoned ideas.
             </p>
           </motion.div>
@@ -162,7 +162,7 @@ export default function AboutPage() {
               <span className="text-white/40">The pattern memory &mdash; every lesson learned from previous builds informs the next.</span>
             </div>
             <div className="flex items-start gap-3">
-              <span className="text-slate-400 font-bold text-xs mt-0.5">NIL</span>
+              <span className="text-slate-400 font-bold text-xs mt-0.5">THE VOID</span>
               <span className="text-white/40">The enemy &mdash; the entropy, abandonment, and stagnation that we build against every day.</span>
             </div>
           </div>
@@ -171,7 +171,7 @@ export default function AboutPage() {
 
       {/* CTA */}
       <section className="text-center py-16 border-t border-wireframe-stroke">
-        <p className="text-sm text-white/40 mb-6">Ready to push NIL back and build something real?</p>
+        <p className="text-sm text-white/40 mb-6">Ready to push The Void back and build something real?</p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <a
             href={`${APP_DOMAIN}/sign-up`}

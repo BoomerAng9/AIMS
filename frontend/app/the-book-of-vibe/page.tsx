@@ -4,7 +4,7 @@
  * The Book of V.I.B.E. — Origin Story Page
  *
  * Visionary Intelligence Building Everything.
- * The canonical origin story of the A.I.M.S. universe — from NIL
+ * The canonical origin story of the A.I.M.S. universe — from The Void
  * through the cosmic dawn of Aether Vos to the rise of ACHEEVY.
  *
  * Lives on plugmein.cloud — the lore & learn domain.

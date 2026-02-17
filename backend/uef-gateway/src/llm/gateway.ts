@@ -13,6 +13,7 @@
 
 import { vertexAI, VERTEX_MODELS } from './vertex-ai';
 import { openrouter, MODELS as OPENROUTER_MODELS, DEFAULT_MODEL } from './openrouter';
+import { ossModels, OSS_MODELS } from './oss-models';
 import { usageTracker } from './usage-tracker';
 import type { LLMResult, ChatMessage, ModelSpec } from './openrouter';
 import logger from '../logger';
@@ -38,7 +39,7 @@ export interface GatewayStreamRequest extends GatewayRequest {
   onToken?: (token: string) => void;
 }
 
-type ProviderUsed = 'vertex-ai' | 'openrouter' | 'stub';
+type ProviderUsed = 'vertex-ai' | 'openrouter' | 'oss-hosted' | 'personaplex' | 'stub';
 
 // ---------------------------------------------------------------------------
 // Gateway
@@ -72,12 +73,23 @@ class LLMGateway {
         provider = 'vertex-ai';
       } catch (err) {
         logger.warn({ model, err }, '[Gateway] Vertex AI failed, falling back to OpenRouter');
-        // Fall through to OpenRouter
         result = await this.callOpenRouter(chatReq);
         provider = result.model === 'stub' ? 'stub' : 'openrouter';
       }
-    } else {
-      // Strategy 2: OpenRouter for everything else
+    }
+    // Strategy 2: OSS models on Hostinger VPS or self-hosted infra
+    else if (ossModels.canHandle(model)) {
+      try {
+        result = await ossModels.chat(chatReq);
+        provider = 'oss-hosted';
+      } catch (err) {
+        logger.warn({ model, err }, '[Gateway] OSS model failed, falling back to OpenRouter');
+        result = await this.callOpenRouter(chatReq);
+        provider = result.model === 'stub' ? 'stub' : 'openrouter';
+      }
+    }
+    // Strategy 3: OpenRouter for everything else
+    else {
       result = await this.callOpenRouter(chatReq);
       provider = result.model === 'stub' ? 'stub' : 'openrouter';
     }
@@ -183,7 +195,7 @@ class LLMGateway {
    * Check if the gateway has any LLM provider configured.
    */
   isConfigured(): boolean {
-    return vertexAI.isConfigured() || openrouter.isConfigured();
+    return vertexAI.isConfigured() || openrouter.isConfigured() || ossModels.isConfigured();
   }
 
   /**
@@ -209,6 +221,11 @@ class LLMGateway {
       }
     }
 
+    // Add OSS models (self-hosted)
+    for (const spec of ossModels.listModels()) {
+      combined.set(spec.id, { ...spec, availableOn: ['oss-hosted'] });
+    }
+
     return Array.from(combined.values());
   }
 
@@ -230,7 +247,7 @@ class LLMGateway {
    */
   private meterStream(
     source: ReadableStream<string>,
-    meta: { userId: string; sessionId: string; model: string; provider: 'vertex-ai' | 'openrouter'; agentId: string },
+    meta: { userId: string; sessionId: string; model: string; provider: ProviderUsed; agentId: string },
   ): ReadableStream<string> {
     const reader = source.getReader();
     let totalChars = 0;

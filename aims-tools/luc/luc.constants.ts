@@ -254,21 +254,26 @@ export const LUC_DEFAULTS = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const PLAN_IDS = {
-  FREE: "free",
-  STARTER: "starter",
+  P2P: "p2p",
+  COFFEE: "coffee",
+  DATA_ENTRY: "data_entry",
   PRO: "pro",
   ENTERPRISE: "enterprise",
 } as const;
 
 export type PlanId = (typeof PLAN_IDS)[keyof typeof PLAN_IDS];
 
-// Default plan quota multipliers (relative to base limits)
-// Actual limits are stored in policy storage, not here
+/**
+ * Plan quota multipliers (relative to base limits).
+ * No tier uses -1. Enterprise gets the highest multiplier (1000x base).
+ * Actual limits are stored in policy storage, not here.
+ */
 export const PLAN_MULTIPLIERS: Record<PlanId, number> = {
-  [PLAN_IDS.FREE]: 1,
-  [PLAN_IDS.STARTER]: 10,
+  [PLAN_IDS.P2P]: 1,
+  [PLAN_IDS.COFFEE]: 5,
+  [PLAN_IDS.DATA_ENTRY]: 25,
   [PLAN_IDS.PRO]: 100,
-  [PLAN_IDS.ENTERPRISE]: -1, // -1 = unlimited
+  [PLAN_IDS.ENTERPRISE]: 1000,
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

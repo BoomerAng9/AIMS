@@ -4,7 +4,7 @@
  * Character Gallery — Meet the A.I.M.S. Universe
  *
  * Full character roster: The Elder, SOLAYNJ, Aether Vos, ACHEEVY,
- * Boomer_Angs, Chicken Hawk, Lil_Hawks, and NIL.
+ * Boomer_Angs, Chicken Hawk, Lil_Hawks, and The Void.
  *
  * Plus the five Races of the Aether.
  *
@@ -52,7 +52,7 @@ export default function GalleryPage() {
           </h1>
           <p className="text-sm text-white/40 max-w-lg mx-auto">
             The beings, forces, and entities that shape the V.I.B.E. universe.
-            From the primordial void of NIL to the Executive Orchestrator.
+            From The Void to the Executive Orchestrator.
           </p>
         </div>
       </section>

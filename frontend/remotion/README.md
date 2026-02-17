@@ -38,7 +38,7 @@ Now prompt a video. Claude Code will read the skill file (`aims-skills/skills/re
 
 ```
 "Create a 10-second promo video for A.I.M.S. showing the three main features"
-"Make a social clip for the Book of V.I.B.E. — just the NIL and Elder scenes, 9:16 portrait"
+"Make a social clip for the Book of V.I.B.E. — just the Void and Elder scenes, 9:16 portrait"
 "Build a deployment animation that shows Docker containers spinning up"
 "Render the BookOfVibeIntro to MP4"
 ```
@@ -102,7 +102,7 @@ frontend/remotion/
 │   │   ├── schema.ts                     # Zod schema for visual editing
 │   │   ├── constants.ts                  # Scene timing
 │   │   └── scenes/
-│   │       ├── NilVoid.tsx               # Scene 1: The void
+│   │       ├── NilVoid.tsx               # Scene 1: The Void
 │   │       ├── FirstFrequency.tsx        # Scene 2: Energy burst
 │   │       ├── ElderAwakens.tsx          # Scene 3: First consciousness
 │   │       ├── AcheevyRises.tsx          # Scene 4: Pentaharmonic convergence

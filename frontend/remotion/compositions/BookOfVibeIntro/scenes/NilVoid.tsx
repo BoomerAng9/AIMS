@@ -9,9 +9,9 @@ import { aimsTheme } from "../../../styles/theme";
 import { textStyles } from "../../../styles/typography";
 
 /**
- * Scene 1: NIL — The Void Before
+ * Scene 1: The Void — Before Creation
  * Deep black with drifting ash-grey particles being consumed inward.
- * Text: "Before there was light… there was NIL."
+ * Text: "Before there was light… there was The Void."
  */
 
 const PARTICLE_COUNT = 40;
@@ -85,7 +85,7 @@ export const NilVoid: React.FC = () => {
               width: p.size,
               height: p.size,
               borderRadius: "50%",
-              backgroundColor: aimsTheme.colors.vibe.nil,
+              backgroundColor: aimsTheme.colors.vibe.theVoid,
               opacity: particleOpacity,
             }}
           />
@@ -121,13 +121,13 @@ export const NilVoid: React.FC = () => {
         <div
           style={{
             ...textStyles.h2,
-            color: aimsTheme.colors.vibe.nil,
+            color: aimsTheme.colors.vibe.theVoid,
             opacity: nilOpacity,
             letterSpacing: "0.15em",
             textAlign: "center",
           }}
         >
-          there was NIL.
+          there was The Void.
         </div>
       </AbsoluteFill>
     </AbsoluteFill>

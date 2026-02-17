@@ -52,17 +52,17 @@ export function ReadReceiptChip({ receipt }: ReadReceiptProps) {
       {/* Collapsed Chip */}
       <button
         onClick={() => setExpanded(!expanded)}
-        className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/[0.03] border border-wireframe-stroke hover:border-gold/20 transition-all text-[10px] group"
+        className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/[0.03] border border-wireframe-stroke hover:border-gold/20 transition-all text-xs group"
       >
-        <FileText size={10} className="text-gold/40 group-hover:text-gold/70 transition-colors" />
-        <span className="text-white/30 group-hover:text-white/50 transition-colors font-mono">
+        <FileText size={12} className="text-gold/40 group-hover:text-gold/70 transition-colors" />
+        <span className="text-white/40 group-hover:text-white/60 transition-colors font-mono">
           Read Receipt
         </span>
-        <span className="text-white/15 font-mono">{receipt.engagementId}</span>
+        <span className="text-white/25 font-mono">{receipt.engagementId}</span>
         <span className={`${statusConfig.color} font-mono uppercase tracking-wider`}>
           {statusConfig.label}
         </span>
-        <span className="text-white/15 font-mono">
+        <span className="text-white/25 font-mono">
           {passedCheckpoints}/{totalCheckpoints}
         </span>
         {expanded ? (

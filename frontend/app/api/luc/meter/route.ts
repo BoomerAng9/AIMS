@@ -45,30 +45,45 @@ const usageLog: Array<{
   timestamp: string;
 }> = [];
 
-// Default quotas by plan
+/**
+ * Default quotas by plan — 5-tier model. No -1 "unlimited" values.
+ * Enterprise gets the highest caps, but all usage is finite and metered.
+ */
 const PLAN_QUOTAS: Record<string, Record<ServiceKey, number>> = {
-  free: {
+  p2p: {
     AI_CHAT: 100,
-    CODE_GEN: 20,
-    DEPLOY: 5,
+    CODE_GEN: 10,
+    DEPLOY: 2,
     ANALYTICS: 50,
-    STORAGE: 100,
-    AGENTS: 10,
-    WORKFLOWS: 5,
-    MEDIA: 2,
-    API_CALLS: 500,
-    CUSTOM: 50,
+    STORAGE: 50,
+    AGENTS: 5,
+    WORKFLOWS: 2,
+    MEDIA: 1,
+    API_CALLS: 100,
+    CUSTOM: 25,
   },
-  starter: {
-    AI_CHAT: 1000,
+  coffee: {
+    AI_CHAT: 500,
+    CODE_GEN: 50,
+    DEPLOY: 10,
+    ANALYTICS: 200,
+    STORAGE: 200,
+    AGENTS: 25,
+    WORKFLOWS: 10,
+    MEDIA: 5,
+    API_CALLS: 1000,
+    CUSTOM: 100,
+  },
+  data_entry: {
+    AI_CHAT: 2000,
     CODE_GEN: 200,
     DEPLOY: 50,
-    ANALYTICS: 500,
+    ANALYTICS: 1000,
     STORAGE: 1000,
     AGENTS: 100,
     WORKFLOWS: 50,
     MEDIA: 20,
-    API_CALLS: 5000,
+    API_CALLS: 10000,
     CUSTOM: 500,
   },
   pro: {
@@ -84,16 +99,16 @@ const PLAN_QUOTAS: Record<string, Record<ServiceKey, number>> = {
     CUSTOM: 5000,
   },
   enterprise: {
-    AI_CHAT: -1, // Unlimited
-    CODE_GEN: -1,
-    DEPLOY: -1,
-    ANALYTICS: -1,
-    STORAGE: -1,
-    AGENTS: -1,
-    WORKFLOWS: -1,
-    MEDIA: -1,
-    API_CALLS: -1,
-    CUSTOM: -1,
+    AI_CHAT: 100000,
+    CODE_GEN: 20000,
+    DEPLOY: 5000,
+    ANALYTICS: 50000,
+    STORAGE: 100000,
+    AGENTS: 10000,
+    WORKFLOWS: 5000,
+    MEDIA: 2000,
+    API_CALLS: 500000,
+    CUSTOM: 50000,
   },
 };
 
@@ -101,8 +116,8 @@ const PLAN_QUOTAS: Record<string, Record<ServiceKey, number>> = {
 // Helper Functions
 // ─────────────────────────────────────────────────────────────
 
-function initializeUserQuotas(userId: string, plan: string = "free"): Record<ServiceKey, UsageQuota> {
-  const planLimits = PLAN_QUOTAS[plan] || PLAN_QUOTAS.free;
+function initializeUserQuotas(userId: string, plan: string = "p2p"): Record<ServiceKey, UsageQuota> {
+  const planLimits = PLAN_QUOTAS[plan] || PLAN_QUOTAS.p2p;
   const quotas: Record<ServiceKey, UsageQuota> = {} as Record<ServiceKey, UsageQuota>;
 
   for (const [service, limit] of Object.entries(planLimits)) {
@@ -120,7 +135,7 @@ function initializeUserQuotas(userId: string, plan: string = "free"): Record<Ser
   return quotas;
 }
 
-function getUserQuotas(userId: string, plan: string = "starter"): Record<ServiceKey, UsageQuota> {
+function getUserQuotas(userId: string, plan: string = "p2p"): Record<ServiceKey, UsageQuota> {
   if (!userQuotas.has(userId)) {
     return initializeUserQuotas(userId, plan);
   }
@@ -151,18 +166,19 @@ async function getUserPlan(userIdOrEmail: string): Promise<string> {
       }
     });
 
-    return user?.workspaces[0]?.workspace?.lucAccount?.planId || "free";
+    return user?.workspaces[0]?.workspace?.lucAccount?.planId || "p2p";
   } catch (error) {
     console.error("Error fetching user plan:", error);
-    return "free";
+    return "p2p";
   }
 }
 
 function updateQuotaMetrics(quota: UsageQuota): UsageQuota {
-  if (quota.limit === -1) {
+  if (quota.limit <= 0) {
+    // P2P tier with no included allocation — metered per use
     quota.percent = 0;
-    quota.overage = 0;
-    quota.canExecute = true;
+    quota.overage = quota.used;
+    quota.canExecute = true; // P2P always allowed, billed per use
   } else {
     quota.percent = Math.round((quota.used / quota.limit) * 100);
     quota.overage = Math.max(0, quota.used - quota.limit);
@@ -255,8 +271,8 @@ export async function POST(req: NextRequest) {
 
         // Check if would exceed limit
         const wouldUse = quota.used + amount;
-        const canExecute = quota.limit === -1 || wouldUse <= quota.limit * 1.1;
-        const quotaRemaining = quota.limit === -1 ? -1 : Math.max(0, quota.limit - quota.used);
+        const canExecute = quota.limit <= 0 || wouldUse <= quota.limit * 1.1;
+        const quotaRemaining = quota.limit <= 0 ? -1 : Math.max(0, quota.limit - quota.used);
 
         return NextResponse.json({
           canExecute,
@@ -298,7 +314,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({
           success: true,
           canExecute: quota.canExecute,
-          quotaRemaining: quota.limit === -1 ? -1 : Math.max(0, quota.limit - quota.used),
+          quotaRemaining: quota.limit <= 0 ? -1 : Math.max(0, quota.limit - quota.used),
           overage: quota.overage,
           warning: quota.percent >= 80 ? `${quota.percent}% of quota used` : undefined,
         });
@@ -318,7 +334,7 @@ export async function POST(req: NextRequest) {
 
         // Check if can reserve
         const wouldUse = quota.used + amount;
-        const canReserve = quota.limit === -1 || wouldUse <= quota.limit * 1.1;
+        const canReserve = quota.limit <= 0 || wouldUse <= quota.limit * 1.1;
 
         if (!canReserve) {
           return NextResponse.json({
@@ -363,7 +379,7 @@ export async function POST(req: NextRequest) {
 
         // Adjust for actual usage (release difference)
         const difference = reservation.amount - amount;
-        quota.used -= difference;
+        quota.used = Math.max(0, quota.used - difference);
         updateQuotaMetrics(quota);
 
         // Log event
@@ -382,7 +398,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({
           success: true,
           canExecute: quota.canExecute,
-          quotaRemaining: quota.limit === -1 ? -1 : Math.max(0, quota.limit - quota.used),
+          quotaRemaining: quota.limit <= 0 ? -1 : Math.max(0, quota.limit - quota.used),
         });
       }
 
@@ -399,7 +415,7 @@ export async function POST(req: NextRequest) {
         const quota = quotas[reservation.service];
 
         // Release reserved quota
-        quota.used -= reservation.amount;
+        quota.used = Math.max(0, quota.used - reservation.amount);
         updateQuotaMetrics(quota);
 
         // Remove reservation

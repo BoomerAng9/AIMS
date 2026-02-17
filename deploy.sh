@@ -171,12 +171,13 @@ if [ -n "${DOMAIN}" ] && [ -n "${EMAIL}" ]; then
     else
         info "Requesting SSL certificate for ${DOMAIN}..."
 
-        # Issue certificate via webroot challenge
+        # Issue certificate via webroot challenge (includes www subdomain)
         ${COMPOSE_CMD} -f "${COMPOSE_FILE}" run --rm certbot \
             certonly \
             --webroot \
             -w /var/www/certbot \
             -d "${DOMAIN}" \
+            -d "www.${DOMAIN}" \
             --email "${EMAIL}" \
             --agree-tos \
             --no-eff-email \

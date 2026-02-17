@@ -49,7 +49,7 @@ priority: "medium"
 
 | Composition | Resolution | Duration | Description |
 |-------------|-----------|----------|-------------|
-| BookOfVibeIntro-Landscape | 1920x1080 | ~17s | 5-scene V.I.B.E. origin story: NIL → First Frequency → Elder → ACHEEVY → Title Card |
+| BookOfVibeIntro-Landscape | 1920x1080 | ~17s | 5-scene V.I.B.E. origin story: The Void → First Frequency → Elder → ACHEEVY → Title Card |
 | BookOfVibeIntro-Portrait | 1080x1920 | ~17s | Same intro, portrait format for TikTok/Reels/Stories |
 
 ### AIMSPlatform Folder (Legacy)

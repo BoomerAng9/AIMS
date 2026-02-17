@@ -33,7 +33,7 @@ export interface BaseTier {
   tokenMarkup: number;        // markup over API cost (0.25 = 25%)
   discount: string;           // human-readable discount
   models: string[];           // accessible model tiers
-  agents: number;             // active agent/bot limit (0 = unlimited)
+  agents: number;             // active agent/bot limit (0 = pay-per-use, metered)
   concurrent: number;         // max concurrent agent executions
   stripePriceId: string;
 }
@@ -48,9 +48,9 @@ export const BASE_TIERS: BaseTier[] = [
     tokensIncluded: 0,
     overdraftBuffer: 0,
     tokenMarkup: 0.25,
-    discount: 'No commitment — 25% token markup',
+    discount: 'No commitment — pay as you go',
     models: ['free-models', 'claude-opus-4-6', 'gemini-2.5-pro'],
-    agents: 0, // unlimited — pay per execution
+    agents: 0, // metered — pay per execution, no included allocation
     concurrent: 1,
     stripePriceId: process.env.STRIPE_PRICE_P2P || '',
   },
@@ -63,7 +63,7 @@ export const BASE_TIERS: BaseTier[] = [
     tokensIncluded: 100_000,
     overdraftBuffer: 50_000,
     tokenMarkup: 0.20,
-    discount: '20% token markup',
+    discount: 'Best entry commitment',
     models: ['free-models', 'claude-opus-4-6', 'gemini-2.5-pro'],
     agents: 5,
     concurrent: 2,
@@ -78,7 +78,7 @@ export const BASE_TIERS: BaseTier[] = [
     tokensIncluded: 250_000,
     overdraftBuffer: 150_000,
     tokenMarkup: 0.15,
-    discount: '15% token markup',
+    discount: 'Best balance of value and access',
     models: ['free-models', 'claude-opus-4-6', 'gemini-2.5-pro', 'kimi-k2.5'],
     agents: 15,
     concurrent: 5,
@@ -93,7 +93,7 @@ export const BASE_TIERS: BaseTier[] = [
     tokensIncluded: 500_000,
     overdraftBuffer: 500_000,
     tokenMarkup: 0.10,
-    discount: '10% token markup — pay 9, get 12',
+    discount: 'Best rate — pay 9, get 12',
     models: ['free-models', 'claude-opus-4-6', 'gemini-2.5-pro', 'kimi-k2.5', 'glm-4.7', 'qwen-coder'],
     agents: 50,
     concurrent: 25,
@@ -107,13 +107,23 @@ export const BASE_TIERS: BaseTier[] = [
 
 export const USAGE_MODIFIERS = {
   overageRatePer1K: 0.06,         // $0.06 per 1K tokens over limit
-  p2pMarkup: 0.25,               // 25% markup for pay-per-use
-  threeMonthMarkup: 0.20,        // 20% markup for 3-month plan
-  sixMonthMarkup: 0.15,          // 15% markup for 6-month plan
-  nineMonthMarkup: 0.10,         // 10% markup for 9-month plan (best deal)
   realTimeLucConvenience: 0.10,   // +10% convenience fee on market rate top-ups
   lucCalculator: 'included',      // always included — pre-action cost transparency
+  maintenanceFee: 5.00,           // $5.00 mandatory platform maintenance fee per invoice
+  p2pTransactionFee: 0.99,        // $0.99 fee on every Pay-per-Use transaction
+  savingsSplitUser: 0.70,         // 70% of these two fees go to user savings plan
+  savingsSplitPlatform: 0.30,     // 30% of these two fees retained by platform
 };
+
+// Internal-only markup rates — NEVER expose to user-facing UI
+// These are applied server-side in billing calculations only
+// NOT exported: markup rates must stay server-side (see backend/uef-gateway/src/billing/)
+const _INTERNAL_MARKUP_RATES = {
+  p2p: 0.25,
+  '3mo': 0.20,
+  '6mo': 0.15,
+  '9mo': 0.10,
+} as const;
 
 // ---------------------------------------------------------------------------
 // Dimension 3: Group Structures (Add-On)
@@ -339,7 +349,7 @@ export const WHITE_LABEL_PLANS: WhiteLabelPlan[] = [
     id: 'self_managed',
     name: 'Self-Managed',
     tagline: 'Your brand, your control',
-    startingPrice: 'From $499/mo',
+    startingPrice: 'Custom Quote',
     features: [
       'Full A.I.M.S. platform under your brand',
       'Custom domain + branding (logo, colors, copy)',
@@ -354,7 +364,7 @@ export const WHITE_LABEL_PLANS: WhiteLabelPlan[] = [
     id: 'aims_managed',
     name: 'A.I.M.S. Managed',
     tagline: 'Hire us to run it for you',
-    startingPrice: 'From $999/mo',
+    startingPrice: 'Custom Quote',
     features: [
       'Everything in Self-Managed',
       'Dedicated A.I.M.S. operations team',
@@ -370,7 +380,7 @@ export const WHITE_LABEL_PLANS: WhiteLabelPlan[] = [
     id: 'fully_autonomous',
     name: 'Fully Autonomous',
     tagline: 'ACHEEVY + Boomer_Angs run it all',
-    startingPrice: 'From $1,499/mo',
+    startingPrice: 'Custom Quote',
     features: [
       'Everything in A.I.M.S. Managed',
       'ACHEEVY orchestrates all operations',
@@ -480,3 +490,146 @@ export function calculateBill(
     concurrent: tier.concurrent,
   };
 }
+
+// ---------------------------------------------------------------------------
+// Dimension 7: Lifetime Deal (LTD) Plans — AppSumo & Marketplace Partners
+// ---------------------------------------------------------------------------
+
+export type LtdTier = 'ltd_byok' | 'ltd_platform' | 'ltd_whitelabel';
+
+export interface LtdPlan {
+  id: LtdTier;
+  name: string;
+  tagline: string;
+  /** One-time price — displayed on AppSumo listing */
+  onetimePrice: number;
+  /** What the user gets forever */
+  access: PlatformApp[];
+  /** BYOK = user provides their own API keys (Bring Your Own Key) */
+  byok: boolean;
+  /** White label rights */
+  whitelabel: boolean;
+  features: string[];
+  quotaCap: string;
+  stripePriceId: string;
+}
+
+export const LTD_PLANS: LtdPlan[] = [
+  {
+    id: 'ltd_byok',
+    name: 'LTD — Bring Your Own Key',
+    tagline: 'Lifetime access, your API keys',
+    onetimePrice: 149,
+    access: ['perform', 'luc'],
+    byok: true,
+    whitelabel: false,
+    features: [
+      'Lifetime access to Per|Form and LUC platforms',
+      'Bring your own key (OpenAI, Anthropic, Google, etc.)',
+      'All agent types and workflow templates',
+      'Community support',
+      'Platform updates included forever',
+      'No monthly fees — one-time payment',
+    ],
+    quotaCap: 'Usage limited by your own API key spend',
+    stripePriceId: process.env.STRIPE_PRICE_LTD_BYOK || '',
+  },
+  {
+    id: 'ltd_platform',
+    name: 'LTD — Full Platform',
+    tagline: 'Lifetime access, our infrastructure',
+    onetimePrice: 399,
+    access: ['perform', 'luc', 'marketplace'],
+    byok: false,
+    whitelabel: false,
+    features: [
+      'Everything in BYOK tier',
+      'Platform-managed API keys (no BYOK needed)',
+      'Pro-level quotas locked in forever',
+      'Marketplace access for publishing apps',
+      'Priority execution queue',
+      'Priority support',
+      'Future app releases included',
+    ],
+    quotaCap: 'Pro-level monthly quotas (locked at time of purchase)',
+    stripePriceId: process.env.STRIPE_PRICE_LTD_PLATFORM || '',
+  },
+  {
+    id: 'ltd_whitelabel',
+    name: 'LTD — White Label',
+    tagline: 'Your brand, our engine, forever',
+    onetimePrice: 997,
+    access: ['perform', 'luc', 'marketplace', 'whitelabel'],
+    byok: false,
+    whitelabel: true,
+    features: [
+      'Everything in Full Platform tier',
+      'White-label rights — your brand, your domain',
+      'Custom branding (logo, colors, copy)',
+      'Resell to your own clients',
+      'API access for custom integrations',
+      'Enterprise-level quotas locked in forever',
+      'SOC 2 readiness package',
+      'Dedicated onboarding session',
+    ],
+    quotaCap: 'Enterprise-level monthly quotas (locked at time of purchase)',
+    stripePriceId: process.env.STRIPE_PRICE_LTD_WHITELABEL || '',
+  },
+];
+
+// ---------------------------------------------------------------------------
+// Dimension 8: Platform App Partitioning
+// ---------------------------------------------------------------------------
+
+/**
+ * A.I.M.S. is partitioned into discrete applications.
+ * Each app is a product that can be accessed independently or bundled.
+ * Subscriptions and LTDs grant access to specific apps.
+ */
+export type PlatformApp = 'perform' | 'luc' | 'marketplace' | 'whitelabel';
+
+export interface PlatformAppConfig {
+  id: PlatformApp;
+  name: string;
+  tagline: string;
+  description: string;
+  /** What this app does that's unique — the value-add mechanism */
+  valueMechanism: string;
+  /** Minimum plan tier required for access */
+  minTier: string;
+}
+
+export const PLATFORM_APPS: PlatformAppConfig[] = [
+  {
+    id: 'perform',
+    name: 'Per|Form',
+    tagline: 'Autonomous Execution Engine',
+    description: 'The application layer where AI agents execute tasks — code generation, workflow automation, deployments, and multi-agent orchestration.',
+    valueMechanism: 'ACHEEVY + Boomer_Angs orchestrate agent swarms on top of LLM APIs. The coordination, verification (ORACLE), and pipeline logic is the value beyond raw model access.',
+    minTier: 'p2p',
+  },
+  {
+    id: 'luc',
+    name: 'LUC',
+    tagline: 'Ledger Usage Control',
+    description: 'Real-time cost tracking, quota enforcement, and billing engine. Pre-flight gating ensures users never exceed budget.',
+    valueMechanism: 'Metering + quota + savings plan infrastructure that sits between the user and every API call. Cost transparency as a product.',
+    minTier: 'p2p',
+  },
+  {
+    id: 'marketplace',
+    name: 'Marketplace',
+    tagline: 'App & Agent Exchange',
+    description: 'Publish, discover, and trade agent templates, workflow blueprints, and automation packages built on the A.I.M.S. platform.',
+    valueMechanism: 'Two-sided marketplace — creators publish agents/workflows, users buy or subscribe. Revenue share model.',
+    minTier: 'data_entry',
+  },
+  {
+    id: 'whitelabel',
+    name: 'White Label',
+    tagline: 'Your Brand, Our Engine',
+    description: 'Deploy the full A.I.M.S. platform under your own brand with custom domain, branding, and client management.',
+    valueMechanism: 'Full platform rebrand with isolated infrastructure. Resellers deploy A.I.M.S. to their own customers.',
+    minTier: 'enterprise',
+  },
+];

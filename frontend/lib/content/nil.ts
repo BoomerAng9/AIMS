@@ -439,7 +439,6 @@ export interface PositionNILProfile {
 export interface PAIFormulaComponent {
   variable: string;
   name: string;
-  weight: number;
   sourceAgent: string;
   dataSource: string;
   description: string;
@@ -455,7 +454,6 @@ export interface PAITier {
 
 export interface PAIFormula {
   name: string;
-  equation: string;
   description: string;
   components: PAIFormulaComponent[];
   tiers: PAITier[];
@@ -463,14 +461,13 @@ export interface PAIFormula {
 
 export const PAI_FORMULA: PAIFormula = {
   name: 'P.A.I. Composite Score',
-  equation: 'Score = (P × 0.40) + (A × 0.30) + (I × 0.30)',
+  // PROPRIETARY: Formula weights are confidential — only component names and descriptions are public
   description:
-    'The Per|Form grading algorithm produces a Composite Score (0-100+) using three weighted components. Each component is sourced by a specialized pipeline stage in the Per|Form scouting system. The formula is rooted in the methodology from "Mastering the N.I.L." and drives all prospect evaluation, NIL valuation, and content generation.',
+    'The Per|Form grading algorithm produces a Composite Score (0-100+) using three proprietary-weighted components. Each component is sourced by a specialized pipeline stage in the Per|Form scouting system. The formula is rooted in the methodology from "Mastering the N.I.L." and drives all prospect evaluation, NIL valuation, and content generation.',
   components: [
     {
       variable: 'P',
       name: 'Game Performance',
-      weight: 0.40,
       sourceAgent: 'Adversarial Evaluation Pipeline',
       dataSource: 'Firecrawl (MaxPreps, ESPN, 247Sports)',
       description:
@@ -480,7 +477,6 @@ export const PAI_FORMULA: PAIFormula = {
     {
       variable: 'A',
       name: 'Athleticism',
-      weight: 0.30,
       sourceAgent: 'SAM 2 Video Analysis',
       dataSource: 'Vertex AI on NVIDIA Tesla T4',
       description:
@@ -490,7 +486,6 @@ export const PAI_FORMULA: PAIFormula = {
     {
       variable: 'I',
       name: 'Intangibles',
-      weight: 0.30,
       sourceAgent: 'Enrichment Pipeline',
       dataSource: 'Brave Search (news, interviews, social media)',
       description:

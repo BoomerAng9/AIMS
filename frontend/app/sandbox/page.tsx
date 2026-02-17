@@ -11,9 +11,21 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { staggerContainer, staggerItem } from "@/lib/motion/variants";
-import { ArrowRight, Zap, TrendingUp, Shield, Users, FileSearch, Video } from "lucide-react";
+import { ArrowRight, Zap, TrendingUp, Shield, Users, FileSearch, Video, Trophy } from "lucide-react";
 
 const LIVE_PROJECTS = [
+  {
+    slug: "/arena",
+    name: "The Arena",
+    tagline: "Skill-Based Contests Powered by AI",
+    description:
+      "Daily AI-generated trivia, sports pick'em, and Per|Form prospect ranking contests. Free and paid entries. Real prizes. Leaderboards, XP tiers, and wallet system. $300/day revenue target.",
+    icon: Trophy,
+    accent: "gold",
+    status: "LIVE",
+    ports: "3000",
+    external: true,
+  },
   {
     slug: "perform",
     name: "Per|Form",
@@ -115,7 +127,7 @@ export default function SandboxHub() {
           {LIVE_PROJECTS.map((project) => (
             <motion.div key={project.slug} variants={staggerItem}>
               <Link
-                href={`/sandbox/${project.slug}`}
+                href={(project as any).external ? project.slug : `/sandbox/${project.slug}`}
                 className="group block p-6 h-full rounded-2xl border border-white/5 bg-white/[0.02] hover:border-white/10 hover:bg-white/[0.04] transition-all relative overflow-hidden"
               >
                 {/* Icon */}

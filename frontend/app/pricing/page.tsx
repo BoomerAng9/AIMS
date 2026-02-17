@@ -62,12 +62,12 @@ export default function PricingPage() {
     })
   );
 
-  // Token markup rates by tier
-  const tokenMarkupRates: Record<string, string> = {
-    p2p: "25%",
-    "3mo": "20%",
-    "6mo": "15%",
-    "9mo": "10%",
+  // Commitment savings labels (markup is internal — never shown to users)
+  const commitmentLabels: Record<string, string> = {
+    p2p: "Pay as you go",
+    "3mo": "Save with 3-month commitment",
+    "6mo": "Save more with 6-month commitment",
+    "9mo": "Best rate — pay 9, get 12",
   };
 
   // Competitive comparison — 3 clusters of agentic platforms
@@ -183,7 +183,7 @@ export default function PricingPage() {
                           {tier.agents} agents &middot; {tier.concurrent} concurrent
                         </p>
                         <p className="text-[9px] text-gold/60 font-semibold">
-                          {tokenMarkupRates[tier.id]} token markup
+                          {commitmentLabels[tier.id]}
                         </p>
                       </div>
                       {tier.id === "9mo" && (
@@ -267,13 +267,13 @@ export default function PricingPage() {
               >
                 Pay-per-Use
               </button>
-              <span className="text-xs text-white/70">No commitment &middot; {tokenMarkupRates["p2p"]} token markup</span>
+              <span className="text-xs text-white/70">No commitment &middot; {commitmentLabels["p2p"]}</span>
             </div>
             <div className="flex items-center gap-6 text-xs">
               <span className="text-white/70">
                 100 tokens / <span className="text-white font-semibold">$1</span>
               </span>
-              <span className="text-emerald-400/70 font-semibold">Unlimited agents &middot; 1 concurrent</span>
+              <span className="text-emerald-400/70 font-semibold">Metered agents &middot; 1 concurrent</span>
               <span className="text-white/70">Pay-as-you-go</span>
             </div>
           </div>
@@ -509,20 +509,17 @@ export default function PricingPage() {
             </div>
             <div className="rounded-2xl border border-wireframe-stroke bg-black/60 p-5">
               <p className="text-xs uppercase tracking-widest text-white/70 mb-2">
-                Token Markup by Plan
+                Platform Fees
               </p>
               <div className="space-y-1 mt-2">
                 <p className="text-sm text-white/70">
-                  <span className="text-white font-semibold">25%</span> Pay-per-Use
+                  <span className="text-white font-semibold">${USAGE_MODIFIERS.maintenanceFee.toFixed(2)}</span> maintenance / invoice
                 </p>
                 <p className="text-sm text-white/70">
-                  <span className="text-white font-semibold">20%</span> 3-Month
+                  <span className="text-white font-semibold">${USAGE_MODIFIERS.p2pTransactionFee.toFixed(2)}</span> per P2P transaction
                 </p>
-                <p className="text-sm text-white/70">
-                  <span className="text-white font-semibold">15%</span> 6-Month
-                </p>
-                <p className="text-sm text-gold font-semibold">
-                  <span className="text-gold font-bold">10%</span> 9-Month (best)
+                <p className="text-sm text-emerald-400 font-semibold mt-2">
+                  70% of these fees fund your Savings Plan
                 </p>
               </div>
             </div>

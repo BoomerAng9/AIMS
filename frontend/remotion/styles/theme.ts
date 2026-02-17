@@ -22,7 +22,7 @@ export const aimsTheme = {
     },
     // V.I.B.E. character colors
     vibe: {
-      nil: "#64748B",
+      theVoid: "#64748B",
       elder: "#F59E0B",
       solaynj: "#F43F5E",
       aetherVos: "#6366F1",

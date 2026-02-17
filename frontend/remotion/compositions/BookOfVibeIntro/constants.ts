@@ -1,6 +1,6 @@
 /** Scene durations in seconds — multiplied by fps at usage site */
 export const SCENE_TIMING = {
-  nil: 4,
+  theVoid: 4,
   frequency: 3.5,
   elder: 3.5,
   acheevy: 4,
@@ -9,7 +9,7 @@ export const SCENE_TIMING = {
 } as const;
 
 export const TOTAL_DURATION_SECONDS =
-  SCENE_TIMING.nil +
+  SCENE_TIMING.theVoid +
   SCENE_TIMING.frequency +
   SCENE_TIMING.elder +
   SCENE_TIMING.acheevy +

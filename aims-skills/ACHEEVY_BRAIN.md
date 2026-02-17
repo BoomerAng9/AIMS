@@ -901,7 +901,7 @@ A.I.M.S. operates two distinct content domains. They must NEVER cross-contaminat
 
 | Domain | Content Home | Purpose |
 |--------|-------------|---------|
-| **Book of V.I.B.E.** | `lore.ts`, `the-book-of-vibe/` | Fictional worldbuilding — Aether Vos, Achievmor, the races, the Elder, SOLAYNJ. "NIL" = the void / anti-creation. |
+| **Book of V.I.B.E.** | `lore.ts`, `the-book-of-vibe/` | Fictional worldbuilding — Aether Vos, Achievmor, the races, the Elder, SOLAYNJ. "The Void" = anti-creation. |
 | **Per|Form / N.I.L.** | `nil.ts`, `perform/`, `gridiron/` | Sports business — athlete evaluation, scouting, Name-Image-Likeness valuation. |
 
 **Rules:**

@@ -273,8 +273,8 @@ export function LucPanel({ workspaceId, mode = "simulate", onModeChange }: LucPa
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-white/40">Quota remaining</span>
                     <span className={item.wouldExceed ? "text-red-400" : "text-white/60"}>
-                      {item.quotaRemaining === Infinity
-                        ? "Unlimited"
+                      {item.quotaRemaining <= 0
+                        ? "Metered"
                         : item.quotaRemaining.toLocaleString()}
                     </span>
                   </div>
@@ -301,7 +301,7 @@ export function LucPanel({ workspaceId, mode = "simulate", onModeChange }: LucPa
           <h3 className="text-sm font-medium text-white/80 mb-4">Quota Breakdown</h3>
           <div className="space-y-3">
             {summary.quotas
-              .filter((q) => q.limit !== -1) // Hide unlimited quotas
+              .filter((q) => q.limit > 0) // Hide metered-only quotas (no included allocation)
               .sort((a, b) => b.percentUsed - a.percentUsed)
               .map((quota) => (
                 <div key={quota.serviceKey} className="space-y-1">

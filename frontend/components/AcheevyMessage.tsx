@@ -55,7 +55,7 @@ const AcheevyMessage = memo(function AcheevyMessage({
             />
           </div>
         )}
-        <div className={`relative group px-4 py-3 rounded-2xl text-sm leading-relaxed max-w-[85%] ${
+        <div className={`relative group px-4 py-3 rounded-2xl text-base leading-relaxed max-w-[85%] ${
           m.role === 'user'
             ? 'bg-gold/10 text-white rounded-tr-sm border border-gold/20'
             : 'wireframe-card text-white/90 rounded-tl-sm'
@@ -63,7 +63,7 @@ const AcheevyMessage = memo(function AcheevyMessage({
           {m.role === 'user' ? (
             m.content
           ) : (
-            <div className="prose prose-invert prose-sm max-w-none prose-code:text-gold prose-code:bg-black/40 prose-code:px-1 prose-code:rounded">
+            <div className="prose prose-invert prose-base max-w-none prose-code:text-gold prose-code:bg-black/40 prose-code:px-1 prose-code:rounded prose-p:text-white/90 prose-strong:text-white prose-li:text-white/80">
               <ReactMarkdown remarkPlugins={[remarkGfm]}>{m.content}</ReactMarkdown>
               {isLoading && isLast && (
                 <span className="inline-block w-1.5 h-4 bg-gold ml-0.5 animate-pulse" />

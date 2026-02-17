@@ -31,8 +31,9 @@ export const ServiceKeySchema = z.enum([
 ]);
 
 export const PlanIdSchema = z.enum([
-  PLAN_IDS.FREE,
-  PLAN_IDS.STARTER,
+  PLAN_IDS.P2P,
+  PLAN_IDS.COFFEE,
+  PLAN_IDS.DATA_ENTRY,
   PLAN_IDS.PRO,
   PLAN_IDS.ENTERPRISE,
 ]);
@@ -57,7 +58,7 @@ export const RequestIdSchema = z.string().uuid().optional();
 
 export const QuotaSchema = z.object({
   serviceKey: ServiceKeySchema,
-  limit: z.number().int(), // -1 = unlimited
+  limit: z.number().int(), // 0 = metered/P2P (no included allocation)
   used: z.number().min(0),
   reserved: z.number().min(0).default(0),
   overage: z.number().min(0).default(0),
@@ -292,7 +293,7 @@ export type PolicyScope = z.infer<typeof PolicyScopeSchema>;
 
 export const QuotaLimitPolicySchema = z.object({
   serviceKey: ServiceKeySchema,
-  limit: z.number().int(), // -1 = unlimited
+  limit: z.number().int(), // 0 = metered/P2P (no included allocation)
   rate: z.number().min(0), // Cost per unit
 });
 
