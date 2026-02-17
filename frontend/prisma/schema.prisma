@@ -312,3 +312,216 @@ model ActiveBoomerAng {
   @@index([workspaceId])
   @@unique([workspaceId, boomerAngId])
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// The Arena — Contest & Gamification Platform
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Arena player profile (extends User for contest participation)
+model ArenaPlayer {
+  id            String    @id @default(uuid())
+  userId        String    @unique
+  displayName   String
+  avatarUrl     String?
+  tier          String    @default("ROOKIE")  // ROOKIE, CONTENDER, VETERAN, ELITE, LEGEND
+  xp            Int       @default(0)
+  level         Int       @default(1)
+  winCount      Int       @default(0)
+  totalContests Int       @default(0)
+  winRate       Float     @default(0)
+  streak        Int       @default(0)
+  bestStreak    Int       @default(0)
+
+  // Wallet
+  wallet        ArenaWallet?
+
+  // Contest entries
+  entries       ArenaEntry[]
+
+  // Leaderboard entries
+  leaderboard   ArenaLeaderboard[]
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([tier, xp])
+  @@index([winRate])
+}
+
+/// Player wallet for contest entry fees and winnings
+model ArenaWallet {
+  id            String    @id @default(uuid())
+  playerId      String    @unique
+  player        ArenaPlayer @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  balance       Float     @default(0)     // Available balance in USD
+  totalDeposited Float    @default(0)
+  totalWon      Float     @default(0)
+  totalSpent    Float     @default(0)
+
+  // Stripe
+  stripeCustomerId String?
+
+  transactions  ArenaWalletTx[]
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+/// Wallet transaction log (append-only)
+model ArenaWalletTx {
+  id            String    @id @default(uuid())
+  walletId      String
+  wallet        ArenaWallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  type          String    // DEPOSIT, ENTRY_FEE, WINNINGS, REFUND, BONUS
+  amount        Float
+  balanceAfter  Float
+  description   String
+  referenceId   String?   // contestId or stripe paymentId
+  stripePaymentId String?
+
+  createdAt     DateTime  @default(now())
+
+  @@index([walletId, createdAt])
+  @@index([type, createdAt])
+}
+
+/// A contest (trivia round, pick'em slate, etc.)
+model ArenaContest {
+  id            String    @id @default(uuid())
+  slug          String    @unique
+  title         String
+  description   String
+  type          String    // TRIVIA, PICKEM, PROSPECT_RANK, OVER_UNDER, STREAK
+  category      String    // SPORTS, GENERAL, ENTERTAINMENT, SCIENCE, HISTORY, MIXED
+  status        String    @default("UPCOMING")  // UPCOMING, LIVE, SCORING, COMPLETED, CANCELLED
+  entryFee      Float     @default(0)   // 0 = free contest
+  prizePool     Float     @default(0)
+  rakePercent   Float     @default(15)  // Platform take percentage
+  maxEntries    Int       @default(100)
+  minEntries    Int       @default(2)
+  currentEntries Int      @default(0)
+
+  // Timing
+  startsAt      DateTime
+  endsAt        DateTime
+  scoredAt      DateTime?
+
+  // Contest data (JSON) — questions, picks, scoring rules
+  contestData   String    // JSON: questions/picks/rules
+
+  // Prize structure (JSON)
+  prizeStructure String   // JSON: { 1st: 50%, 2nd: 30%, 3rd: 20% }
+
+  // Auto-generated metadata
+  generatedBy   String    @default("SYSTEM")
+  difficulty    String    @default("MEDIUM")  // EASY, MEDIUM, HARD, EXPERT
+  featured      Boolean   @default(false)
+
+  // Relations
+  entries       ArenaEntry[]
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([status, startsAt])
+  @@index([type, status])
+  @@index([featured, status])
+  @@index([category, status])
+}
+
+/// A player's entry into a contest
+model ArenaEntry {
+  id            String    @id @default(uuid())
+  contestId     String
+  contest       ArenaContest @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  playerId      String
+  player        ArenaPlayer @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  // Submission
+  answers       String    // JSON: Array of answers/picks
+  submittedAt   DateTime?
+  isSubmitted   Boolean   @default(false)
+
+  // Scoring
+  score         Float?
+  rank          Int?
+  correctCount  Int?
+  totalQuestions Int?
+  payout        Float     @default(0)
+
+  // Entry fee paid
+  entryFeePaid  Float     @default(0)
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@unique([contestId, playerId])
+  @@index([playerId, createdAt])
+  @@index([contestId, score])
+}
+
+/// Global leaderboard (weekly/monthly/all-time snapshots)
+model ArenaLeaderboard {
+  id            String    @id @default(uuid())
+  playerId      String
+  player        ArenaPlayer @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  period        String    // WEEKLY, MONTHLY, ALL_TIME, SEASON_1
+  periodKey     String    // e.g., "2026-W07", "2026-02", "all"
+  rank          Int
+  score         Float     @default(0)
+  wins          Int       @default(0)
+  entries       Int       @default(0)
+  earnings      Float     @default(0)
+  accuracy      Float     @default(0)
+
+  updatedAt     DateTime  @updatedAt
+
+  @@unique([playerId, period, periodKey])
+  @@index([period, periodKey, rank])
+  @@index([period, periodKey, score])
+}
+
+/// Imported trivia questions from OpenTDB and other sources
+model TriviaQuestion {
+  id            String    @id @default(uuid())
+  source        String    @default("opentdb")   // opentdb, custom, ai_generated
+  externalId    String?
+  category      String
+  difficulty    String    // easy, medium, hard
+  type          String    @default("multiple")  // multiple, boolean
+  question      String
+  correctAnswer String
+  incorrectAnswers String  // JSON array
+  tags          String?    // JSON array
+  timesUsed     Int       @default(0)
+  timesCorrect  Int       @default(0)
+
+  createdAt     DateTime  @default(now())
+
+  @@index([category, difficulty])
+  @@index([source])
+  @@index([timesUsed])
+}
+
+/// Sports pick data for pick'em contests
+model SportsPick {
+  id            String    @id @default(uuid())
+  sport         String    // NFL, NBA, CFB, etc.
+  eventDate     DateTime
+  homeTeam      String
+  awayTeam      String
+  league        String?
+  status        String    @default("UPCOMING")  // UPCOMING, LIVE, FINAL
+  homeScore     Int?
+  awayScore     Int?
+  spread        Float?
+  overUnder     Float?
+  result        String?   // HOME, AWAY, PUSH
+  metadata      String?   // JSON: odds, props, etc.
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([sport, eventDate])
+  @@index([status])
+}
