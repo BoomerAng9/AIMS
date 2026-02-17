@@ -55,6 +55,7 @@ frontend/public/media/research/*.m4a
 frontend/public/media/research/*.pdf
 
 # Vendor repos (cloned at build time, not tracked in git)
+vendor/common-ground-core/
 vendor/intelligent-internet/CommonGround/
 vendor/intelligent-internet/ii-researcher/
 vendor/intelligent-internet/Common_Chronicle/
