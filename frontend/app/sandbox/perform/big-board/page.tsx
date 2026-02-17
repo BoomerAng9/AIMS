@@ -31,7 +31,7 @@ export default function BigBoardPage() {
       .catch(() => setLoading(false));
   }, []);
 
-  const positions = ['ALL', ...new Set(prospects.map(p => p.position))];
+  const positions = ['ALL', ...Array.from(new Set(prospects.map(p => p.position)))];
 
   const filtered = prospects.filter(p => {
     const matchesSearch = !search ||

@@ -20,7 +20,7 @@ import {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const DEFAULT_PLAN_QUOTAS: Record<string, Record<ServiceKey, number>> = {
-  [PLAN_IDS.FREE]: {
+  [PLAN_IDS.P2P]: {
     [SERVICE_KEYS.LLM_TOKENS_IN]: 10000,
     [SERVICE_KEYS.LLM_TOKENS_OUT]: 5000,
     [SERVICE_KEYS.N8N_EXECUTIONS]: 50,
@@ -37,7 +37,7 @@ const DEFAULT_PLAN_QUOTAS: Record<string, Record<ServiceKey, number>> = {
     [SERVICE_KEYS.DEPLOY_OPERATIONS]: 5,
     [SERVICE_KEYS.API_CALLS]: 500,
   },
-  [PLAN_IDS.STARTER]: {
+  [PLAN_IDS.COFFEE]: {
     [SERVICE_KEYS.LLM_TOKENS_IN]: 100000,
     [SERVICE_KEYS.LLM_TOKENS_OUT]: 50000,
     [SERVICE_KEYS.N8N_EXECUTIONS]: 500,
@@ -96,7 +96,7 @@ const DEFAULT_PLAN_QUOTAS: Record<string, Record<ServiceKey, number>> = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function initializeQuotas(planId: string): Record<ServiceKey, Quota> {
-  const limits = DEFAULT_PLAN_QUOTAS[planId] || DEFAULT_PLAN_QUOTAS[PLAN_IDS.FREE];
+  const limits = DEFAULT_PLAN_QUOTAS[planId] || DEFAULT_PLAN_QUOTAS[PLAN_IDS.P2P];
   const quotas: Record<string, Quota> = {};
 
   for (const [key, limit] of Object.entries(limits)) {
@@ -347,7 +347,7 @@ export class PrismaLucPolicy implements LucPolicyAdapter {
   }
 
   async getPlanLimits(planId: string): Promise<Record<ServiceKey, number>> {
-    return DEFAULT_PLAN_QUOTAS[planId] || DEFAULT_PLAN_QUOTAS[PLAN_IDS.FREE];
+    return DEFAULT_PLAN_QUOTAS[planId] || DEFAULT_PLAN_QUOTAS[PLAN_IDS.P2P];
   }
 
   async canShowBoomerAngNames(workspaceId: string): Promise<boolean> {

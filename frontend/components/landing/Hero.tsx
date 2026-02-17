@@ -461,7 +461,7 @@ export function Hero() {
                       The Book of V.I.B.E.
                     </h3>
                     <p className="text-sm text-white/40">
-                      From NIL to ACHEEVY &mdash; the canonical origin of the V.I.B.E. universe. 13 chapters.
+                      An Afrofuturist saga of Achievmor &mdash; the canonical origin of the V.I.B.E. universe. 12 chapters.
                     </p>
                   </div>
                 </Link>
@@ -478,7 +478,7 @@ export function Hero() {
                       Character Gallery
                     </h3>
                     <p className="text-sm text-white/40">
-                      The Elder, SOLAYNJ, Aether Vos, ACHEEVY, NIL &mdash; the full V.I.B.E. roster and the five races.
+                      Aether Vos, The Elder, ACHEEVY &mdash; the full V.I.B.E. roster and the seven peoples of Achievmor.
                     </p>
                   </div>
                 </Link>

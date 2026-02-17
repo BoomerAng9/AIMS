@@ -17,7 +17,7 @@ import {
   ShoppingCart, Search, TrendingDown, Package, AlertCircle,
   Plus, Trash2, DollarSign, Truck, Shield, Zap, BarChart3,
   Star, Clock, Bell, ArrowRight, CheckCircle, XCircle,
-  ChevronDown, Tag, Users,
+  ChevronDown, Tag, Users, Settings,
 } from 'lucide-react';
 
 // ─────────────────────────────────────────────────────────────

@@ -54,7 +54,7 @@ export default function ContentFeedPage() {
       .catch(() => setLoading(false));
   }, []);
 
-  const types = ['ALL', ...new Set(articles.map(a => a.type))];
+  const types = ['ALL', ...Array.from(new Set(articles.map(a => a.type)))];
 
   const filtered = typeFilter === 'ALL'
     ? articles
