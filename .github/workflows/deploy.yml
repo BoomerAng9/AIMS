@@ -47,17 +47,32 @@ jobs:
           script: |
             set -e
 
+            echo "=== Starting deployment ==="
+
+            # Use GitHub token for private repo access (token is short-lived)
+            REPO_URL="https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git"
+
             if [ -d /home/aims/AIMS ]; then
+              echo "=== Pulling latest code ==="
               cd /home/aims/AIMS
+              git remote set-url origin "${REPO_URL}"
               git fetch origin main
               git reset --hard origin/main
+              # Remove token from persisted remote URL
+              git remote set-url origin "https://github.com/${{ github.repository }}.git"
             else
-              git clone https://github.com/BoomerAng9/AIMS.git /home/aims/AIMS
+              echo "=== Cloning repository ==="
+              mkdir -p /home/aims
+              git clone "${REPO_URL}" /home/aims/AIMS
               cd /home/aims/AIMS
+              git remote set-url origin "https://github.com/${{ github.repository }}.git"
             fi
 
+            echo "=== Stopping old containers ==="
             docker compose -p locale down 2>/dev/null || true
+
+            echo "=== Running deploy script ==="
             chmod +x deploy.sh
             ./deploy.sh
 
-            echo "Deployment complete!"
+            echo "=== Deployment complete! ==="
