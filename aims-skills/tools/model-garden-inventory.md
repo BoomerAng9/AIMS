@@ -251,22 +251,25 @@ n8n is **core infrastructure**, not optional. It powers:
 
 | Service | Role | Location |
 |---------|------|----------|
-| **Hostinger VPS** (76.13.96.107) | All containers, nginx, n8n, services | VPS |
-| **GCP** (ai-managed-services) | Vertex AI (LLM), GCS (storage) | Cloud |
-| **Nginx** | Reverse proxy, SSL termination | VPS |
-| **Certbot** | SSL certificates (Let's Encrypt) | VPS |
-| **Docker Compose** | Container orchestration | VPS |
+| **GCP Cloud Run** | Frontend + UEF Gateway (auto-scaling, managed) | GCP |
+| **GCP Artifact Registry** | Docker image storage (`aims-docker` repo) | GCP |
+| **GCP Cloud Build** | CI/CD pipeline (build, test, deploy on push to main) | GCP |
+| **GCP Vertex AI** | LLM calls (Claude, Gemini via Model Garden) | GCP |
+| **GCP Secret Manager** | Production secrets (API keys, auth tokens) | GCP |
+| **Hostinger VPS** (76.13.96.107) | n8n, Redis, agent containers (stateful services) | VPS |
+| **Docker Compose** | VPS stateful service orchestration | VPS |
 
 ---
 
 ## 17. Internal Services
 
-| Service | Port | Purpose |
-|---------|------|---------|
-| **UEF Gateway** | 3001 | All external tool access, LLM proxy, Port Authority |
-| **ACHEEVY Service** | 3003 | Orchestration, chat, payments |
-| **House of Ang** | 3002 | Boomer_Ang registry |
-| **n8n** | 5678 | Workflow automation engine |
+| Service | Port | Runs On | Purpose |
+|---------|------|---------|---------|
+| **Frontend** (Next.js) | 3000 | Cloud Run | App UI, auth, chat, payments |
+| **UEF Gateway** | 3001 | Cloud Run | All external tool access, LLM proxy, Port Authority |
+| **ACHEEVY Service** | 3003 | Cloud Run | Orchestration, chat, payments |
+| **House of Ang** | 3002 | Cloud Run | Boomer_Ang registry |
+| **n8n** | 5678 | VPS | Workflow automation engine (core) |
 | **Per\|Form Scout Hub** | 5001 | Sports scouting (Per\|Form Platform) |
 | **Per\|Form Film Room** | 5002 | Film analysis (Per\|Form Platform) |
 | **Per\|Form War Room** | 5003 | Rankings & content (Per\|Form Platform) |

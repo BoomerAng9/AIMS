@@ -158,8 +158,8 @@ steps:
       - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/router-ang'
     waitFor: ['docker-router-ang']
 
-  # ── Step 6: Deploy Stateless Services to Cloud Run ──
-  # These connect back to VPS stateful services via _VPS_HOST
+  # ── Step 6: Deploy to Cloud Run ──
+  # Gateway connects back to VPS for stateful services (n8n, Redis, agents)
   - id: deploy-gateway
     name: gcr.io/cloud-builders/gcloud
     args:
@@ -170,33 +170,49 @@ steps:
       - --region=${_REGION}
       - --platform=managed
       - --port=3001
-      - --memory=512Mi
+      - --memory=1Gi
       - --cpu=1
-      - --min-instances=0
+      - --min-instances=1
       - --max-instances=3
       - --allow-unauthenticated
-      - --set-env-vars=NODE_ENV=production,PORT=3001,LOG_LEVEL=info,REDIS_URL=redis://${_VPS_HOST}:6379,N8N_URL=http://${_VPS_HOST}:5678,RESEARCH_ANG_URL=http://${_VPS_HOST}:3020,ROUTER_ANG_URL=http://${_VPS_HOST}:3021
-      - --update-secrets=INTERNAL_API_KEY=INTERNAL_API_KEY:latest,OPENROUTER_API_KEY=OPENROUTER_API_KEY:latest,REDIS_PASSWORD=REDIS_PASSWORD:latest
+      - --set-env-vars=NODE_ENV=production,PORT=3001,LOG_LEVEL=info,GOOGLE_CLOUD_PROJECT=${PROJECT_ID},GOOGLE_CLOUD_REGION=${_REGION},N8N_URL=http://${_VPS_HOST}:5678,RESEARCH_ANG_URL=http://${_VPS_HOST}:3020,ROUTER_ANG_URL=http://${_VPS_HOST}:3021,CORS_ORIGIN=https://${_VPS_DOMAIN}
+      - --update-secrets=INTERNAL_API_KEY=INTERNAL_API_KEY:latest,OPENROUTER_API_KEY=OPENROUTER_API_KEY:latest
     waitFor: ['push-gateway']
 
+  # Get the gateway's Cloud Run URL after deploy
+  - id: get-gateway-url
+    name: gcr.io/cloud-builders/gcloud
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        gcloud run services describe aims-gateway \
+          --region=${_REGION} \
+          --format='value(status.url)' > /workspace/gateway-url.txt
+        echo "Gateway URL: $(cat /workspace/gateway-url.txt)"
+    waitFor: ['deploy-gateway']
+
+  # Frontend points to gateway's Cloud Run URL
   - id: deploy-frontend
     name: gcr.io/cloud-builders/gcloud
+    entrypoint: bash
     args:
-      - run
-      - deploy
-      - aims-frontend
-      - --image=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/frontend:${_SHORT_SHA}
-      - --region=${_REGION}
-      - --platform=managed
-      - --port=3000
-      - --memory=512Mi
-      - --cpu=1
-      - --min-instances=0
-      - --max-instances=5
-      - --allow-unauthenticated
-      - --set-env-vars=NODE_ENV=production
-      - --update-secrets=NEXTAUTH_SECRET=NEXTAUTH_SECRET:latest,INTERNAL_API_KEY=INTERNAL_API_KEY:latest
-    waitFor: ['push-frontend']
+      - -c
+      - |
+        GATEWAY_URL=$(cat /workspace/gateway-url.txt)
+        gcloud run deploy aims-frontend \
+          --image=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/frontend:${_SHORT_SHA} \
+          --region=${_REGION} \
+          --platform=managed \
+          --port=3000 \
+          --memory=512Mi \
+          --cpu=1 \
+          --min-instances=0 \
+          --max-instances=5 \
+          --allow-unauthenticated \
+          --set-env-vars="NODE_ENV=production,UEF_ENDPOINT=$${GATEWAY_URL},NEXTAUTH_URL=https://${_VPS_DOMAIN}" \
+          --update-secrets=NEXTAUTH_SECRET=NEXTAUTH_SECRET:latest,INTERNAL_API_KEY=INTERNAL_API_KEY:latest
+    waitFor: ['push-frontend', 'get-gateway-url']
 
 # ── Substitution Variables ──
 # Override these in your Cloud Build trigger config or via --substitutions
