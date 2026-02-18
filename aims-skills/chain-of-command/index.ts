@@ -78,7 +78,7 @@ import { RoleCardRegistry } from './engine';
 import acheevy from './role-cards/acheevy.json';
 import forgeAng from './role-cards/forge-ang.json';
 import bettyAnnAng from './role-cards/betty-ann-ang.json';
-import avvaNoonAng from './role-cards/avva-noon-ang.json';
+import avvaNoon from './role-cards/avva-noon.json';
 import chickenHawk from './role-cards/chicken-hawk.json';
 import lilMessengerHawk from './role-cards/lil-messenger-hawk.json';
 import lilIntakeScribeHawk from './role-cards/lil-intake-scribe-hawk.json';
@@ -105,7 +105,7 @@ export const ALL_ROLE_CARDS: RoleCard[] = [
   acheevy,
   forgeAng,
   bettyAnnAng,
-  avvaNoonAng,
+  avvaNoon,
   chickenHawk,
   lilMessengerHawk,
   lilIntakeScribeHawk,

@@ -228,6 +228,8 @@ Skills inject specialized context, SOPs, and design standards into ACHEEVY's beh
 | **Discord** | `skills/integrations/discord.md` | "discord", "discord bot", "discord webhook" | Discord bot/webhook rules, embed formatting, user setup |
 | **WhatsApp** | `skills/integrations/whatsapp.md` | "whatsapp", "whatsapp message" | WhatsApp Business API rules, template messages, opt-in flow |
 | **Voice (ElevenLabs + Deepgram)** | `skills/integrations/voice-elevenlabs-deepgram.md` | "voice", "tts", "stt", "waveform" | Voice-first UX: live waveform, editable transcript, TTS playback controls |
+| **NVIDIA PersonaPlex** | `skills/integrations/nvidia-personaplex.skill.md` | "personaplex", "full duplex voice", "nvidia voice" | Full-duplex speech-to-speech: 7B model, 0.07s switch latency, WebSocket |
+| **NVIDIA Parakeet** | `skills/integrations/nvidia-parakeet.skill.md` | "parakeet", "nvidia asr", "nvidia transcription" | State-of-the-art ASR: 6.05% WER, 3,386x real-time, CC-BY-4.0 |
 
 #### Security Skills (`skills/security/`)
 
@@ -261,6 +263,7 @@ Skills inject specialized context, SOPs, and design standards into ACHEEVY's beh
 |-------|------|----------|---------|
 | **CLAW Replacement Status** | `skills/chicken-hawk/claw-replacement-status.skill.md` | "claw status" | Check if CLAW is built, running, and passing smoke tests |
 | **Trigger CLAW Buildout** | `skills/chicken-hawk/trigger-claw-buildout.skill.md` | "claw buildout" | Open/continue a build task per `CHICKENHAWK_SPEC.md` |
+| **Chicken Hawk Executor** | `skills/chicken-hawk/chicken-hawk-executor.skill.md` | "chicken hawk", "build executor", "oracle gates" | Full build executor spec: task governance, Code Ang, ORACLE 7-gate, BAMARAM |
 
 #### Per|Form / Gridiron Sandbox Skills (`skills/gridiron/`)
 
@@ -493,8 +496,9 @@ These define the wrapper's identity, security guardrails, deployment target, and
 
 See: `aims-skills/brains/ACHEEVY_II_EXTENSIONS.md` for ACHEEVY's direct extensions (ii-agent, II-Commons, Agent Zero).
 
-| Brain File | Boomer_Ang | Wraps |
-|------------|------------|-------|
+| Brain File | Entity | Wraps |
+|------------|--------|-------|
+| `AVVA_NOON_BRAIN.md` | AVVA NOON (System-Level) | Puter / SmelterOS |
 | `SCOUT_ANG_BRAIN.md` | Scout_Ang | ii-researcher |
 | `OPSCONSOLE_ANG_BRAIN.md` | OpsConsole_Ang | CommonGround |
 | `CHRONICLE_ANG_BRAIN.md` | Chronicle_Ang | Common_Chronicle |
@@ -516,7 +520,7 @@ gates, overlay visibility, and evaluation KPIs. **No agent exists without a card
 | `acheevy.json` | ACHEEVY | Executive Office | Gold #D4AF37 |
 | `betty-ann-ang.json` | Betty-Ann_Ang | HR PMO | Gold #D4AF37 |
 | `forge-ang.json` | Forge_Ang | Digital Transformation PMO | Gold #D4AF37 |
-| `avva-noon-ang.json` | AVVA-NOON_Ang | Holdings Operational Excellence | Amber #F59E0B |
+| `avva-noon.json` | AVVA NOON | SmelterOS Governance (System-Level) | Amber #F59E0B |
 | `scout-ang.json` | Scout_Ang | Intelligence & Research PMO | Cyan #22D3EE |
 | `opsconsole-ang.json` | OpsConsole_Ang | Operations & Observability PMO | Green #22C55E |
 | `chronicle-ang.json` | Chronicle_Ang | Intelligence & Research PMO | Champagne #F6C453 |
@@ -620,7 +624,9 @@ aims-skills/
 │   │   ├── telegram.md                  ← Telegram Bot API integration
 │   │   ├── discord.md                   ← Discord bot/webhook integration
 │   │   ├── whatsapp.md                  ← WhatsApp Business API integration
-│   │   └── voice-elevenlabs-deepgram.md ← Voice-first UX rules
+│   │   ├── voice-elevenlabs-deepgram.md ← Voice-first UX rules
+│   │   ├── nvidia-personaplex.skill.md ← NVIDIA PersonaPlex full-duplex voice
+│   │   └── nvidia-parakeet.skill.md    ← NVIDIA Parakeet ASR
 │   ├── security/                  ← Security posture skills
 │   │   ├── no-reveal-policy.md          ← Never reveal secrets/pricing/IP
 │   │   ├── actions-redirect-policy.md   ← External actions redirect to platform
@@ -637,6 +643,7 @@ aims-skills/
 │   ├── simulation/                ← Autonomous simulation skills
 │   │   └── spawn-simulation-room.skill.md ← Create LiveSim room
 │   ├── chicken-hawk/              ← Chicken Hawk vertical skills
+│   │   ├── chicken-hawk-executor.skill.md   ← Full build executor spec (OpenClaw reconstructed)
 │   │   ├── claw-replacement-status.skill.md ← CLAW health check
 │   │   └── trigger-claw-buildout.skill.md   ← CLAW build trigger
 │   ├── orchestrate-turn.skill.md  ← Core turn orchestration
@@ -711,7 +718,8 @@ aims-skills/
 ├── acheevy-verticals/
 │   ├── vertical-definitions.ts    ← 12 revenue verticals (10 + LiveSim + ChickenHawk)
 │   └── types.ts                   ← Vertical type definitions
-├── brains/                          ← Boomer_Ang brain files (II repo wrappers)
+├── brains/                          ← Brain files (II repo wrappers + system entities)
+│   ├── AVVA_NOON_BRAIN.md           ← SmelterOS Overseer (Puter runtime, NOT a Boomer_Ang)
 │   ├── BOOMER_ANG_VISUAL_IDENTITY.md ← Canonical visual design spec for all Boomer_Angs
 │   ├── ACHEEVY_II_EXTENSIONS.md     ← ACHEEVY's direct wraps (ii-agent, II-Commons, Agent Zero)
 │   ├── SCOUT_ANG_BRAIN.md           ← ii-researcher wrapper
@@ -730,7 +738,7 @@ aims-skills/
 │       ├── acheevy.json           ← ACHEEVY role card
 │       ├── betty-ann-ang.json     ← HR PMO
 │       ├── forge-ang.json         ← Digital Transformation PMO
-│       ├── avva-noon-ang.json     ← Operational Excellence
+│       ├── avva-noon.json          ← SmelterOS Overseer (System-Level Entity — NOT a Boomer_Ang)
 │       ├── scout-ang.json         ← Intelligence & Research
 │       ├── opsconsole-ang.json    ← Operations & Observability
 │       ├── chronicle-ang.json     ← Timeline & Audit

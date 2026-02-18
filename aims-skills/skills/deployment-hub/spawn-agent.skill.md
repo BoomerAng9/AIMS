@@ -170,7 +170,7 @@ ACHEEVY → DECOMMISSION_ORDER → Agent stops accepting tasks
 |------------------|------------------------------|-------|----------|-----------|
 | Forge_Ang        | AIMS core infra              | —     | Gold     | Active    |
 | Betty-Ann_Ang    | HR/PMO governance            | —     | Gold     | Active    |
-| AVVA-NOON_Ang    | Operational excellence       | —     | Amber    | Active    |
+| AVVA NOON        | SmelterOS Overseer (System)  | 9020  | Amber    | Active    |
 | Scout_Ang        | ii-researcher                | 7010  | Cyan     | Ready     |
 | OpsConsole_Ang   | CommonGround                 | 7011  | Green    | Ready     |
 | Chronicle_Ang    | Common_Chronicle             | GCP   | Champagne| Ready     |

@@ -95,7 +95,7 @@ Accent colors appear on:
 | Lab_Ang          | Green       | #22C55E   | Lab goggles visor, experiment flask motif |
 | Index_Ang        | Gold        | #D4AF37   | Data-lattice visor, memory grid pattern |
 | Betty-Ann_Ang    | Gold        | #D4AF37   | Executive visor, clipboard insignia |
-| AVVA-NOON_Ang    | Amber       | #F59E0B   | Evaluator visor, rotating gauge |
+| AVVA NOON        | Amber       | #F59E0B   | System visor, SmelterOS forge insignia (NOT a Boomer_Ang — system entity) |
 
 ---
 
