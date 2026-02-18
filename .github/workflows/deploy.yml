@@ -42,4 +42,4 @@ jobs:
           gcloud builds submit \
             --config=cloudbuild.yaml \
             --project=${{ env.PROJECT_ID }} \
-            --substitutions=SHORT_SHA=$SHORT_SHA_SHORT
+            --substitutions=_SHORT_SHA=$SHORT_SHA_SHORT

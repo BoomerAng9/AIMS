@@ -77,7 +77,7 @@ steps:
     args:
       - build
       - -t
-      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/uef-gateway:${SHORT_SHA}'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/uef-gateway:${_SHORT_SHA}'
       - -t
       - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/uef-gateway:latest'
       - -f
@@ -90,7 +90,7 @@ steps:
     args:
       - build
       - -t
-      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/frontend:${SHORT_SHA}'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/frontend:${_SHORT_SHA}'
       - -t
       - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/frontend:latest'
       - -f
@@ -121,7 +121,7 @@ steps:
     args:
       - build
       - -t
-      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/research-ang:${SHORT_SHA}'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/research-ang:${_SHORT_SHA}'
       - -t
       - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/research-ang:latest'
       - -f
@@ -134,7 +134,7 @@ steps:
     args:
       - build
       - -t
-      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/router-ang:${SHORT_SHA}'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/router-ang:${_SHORT_SHA}'
       - -t
       - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/router-ang:latest'
       - -f
@@ -166,7 +166,7 @@ steps:
       - run
       - deploy
       - aims-gateway
-      - --image=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/uef-gateway:${SHORT_SHA}
+      - --image=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/uef-gateway:${_SHORT_SHA}
       - --region=${_REGION}
       - --platform=managed
       - --port=3001
@@ -185,7 +185,7 @@ steps:
       - run
       - deploy
       - aims-frontend
-      - --image=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/frontend:${SHORT_SHA}
+      - --image=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/frontend:${_SHORT_SHA}
       - --region=${_REGION}
       - --platform=managed
       - --port=3000
@@ -205,16 +205,17 @@ substitutions:
   _REPO: aims-docker
   _VPS_HOST: '76.13.96.107'
   _VPS_DOMAIN: plugmein.cloud
+  _SHORT_SHA: local
 
 # ── Images to push (Cloud Build auto-pushes these) ──
 images:
-  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/uef-gateway:${SHORT_SHA}'
+  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/uef-gateway:${_SHORT_SHA}'
   - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/uef-gateway:latest'
-  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/frontend:${SHORT_SHA}'
+  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/frontend:${_SHORT_SHA}'
   - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/frontend:latest'
-  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/research-ang:${SHORT_SHA}'
+  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/research-ang:${_SHORT_SHA}'
   - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/research-ang:latest'
-  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/router-ang:${SHORT_SHA}'
+  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/router-ang:${_SHORT_SHA}'
   - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/router-ang:latest'
 
 # ── Build options ──
