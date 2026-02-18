@@ -152,9 +152,26 @@ ${COMPOSE_CMD} -f "${COMPOSE_FILE}" down --remove-orphans --timeout 30
 ${COMPOSE_CMD} -f "${COMPOSE_FILE}" up -d --remove-orphans
 info "Services started. Orphaned containers removed."
 
-# Wait for health checks
-info "Waiting for services to pass health checks..."
-sleep 10
+# Wait for core services to be ready before SSL provisioning
+info "Waiting for core services to come up..."
+MAX_WAIT=120
+WAITED=0
+while [ $WAITED -lt $MAX_WAIT ]; do
+    HEALTHY=$(${COMPOSE_CMD} -f "${COMPOSE_FILE}" ps --format json 2>/dev/null | grep -c '"healthy"' || true)
+    RUNNING=$(${COMPOSE_CMD} -f "${COMPOSE_FILE}" ps --format json 2>/dev/null | grep -c '"running"' || true)
+    info "  Services: ${RUNNING} running, ${HEALTHY} healthy (${WAITED}s / ${MAX_WAIT}s)"
+    # nginx must be running for ACME challenges — check it specifically
+    NGINX_UP=$(${COMPOSE_CMD} -f "${COMPOSE_FILE}" ps nginx --format '{{.State}}' 2>/dev/null || echo "")
+    if echo "${NGINX_UP}" | grep -qi "running"; then
+        info "nginx is running — proceeding."
+        break
+    fi
+    sleep 5
+    WAITED=$((WAITED + 5))
+done
+if [ $WAITED -ge $MAX_WAIT ]; then
+    warn "Timed out waiting for services. Continuing anyway — check logs."
+fi
 
 # =============================================================================
 # SSL Certificate Provisioning — App Domain (plugmein.cloud)

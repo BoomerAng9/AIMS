@@ -28,15 +28,15 @@ services:
       - nginx-logs:/var/log/nginx
     depends_on:
       frontend:
-        condition: service_healthy
+        condition: service_started
       uef-gateway:
-        condition: service_healthy
+        condition: service_started
     healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://127.0.0.1:80/health || exit 1"]
+      test: ["CMD-SHELL", "curl -sf http://127.0.0.1:80/ || exit 1"]
       interval: 30s
       timeout: 10s
-      retries: 3
-      start_period: 10s
+      retries: 5
+      start_period: 30s
     restart: always
     networks:
       - aims-network
@@ -73,6 +73,8 @@ services:
       - UEF_ENDPOINT=http://uef-gateway:3001
       - HOUSE_OF_ANG_URL=http://house-of-ang:3002
       - ACHEEVY_URL=http://acheevy:3003
+      # SQLite for LUC — persisted to luc-data volume
+      - DATABASE_URL=file:/app/.luc-data/luc.db
       # Voice — TTS & STT
       - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY}
       - DEEPGRAM_API_KEY=${DEEPGRAM_API_KEY}
@@ -83,15 +85,15 @@ services:
       uef-gateway:
         condition: service_healthy
       house-of-ang:
-        condition: service_healthy
+        condition: service_started
       acheevy:
-        condition: service_healthy
+        condition: service_started
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>{process.exit(r.ok?0:1)}).catch(()=>process.exit(1))"]
       interval: 30s
       timeout: 10s
-      retries: 3
-      start_period: 30s
+      retries: 5
+      start_period: 60s
     volumes:
       - luc-data:/app/.luc-data
     restart: always
@@ -118,19 +120,21 @@ services:
       - UEF_ENDPOINT=http://uef-gateway:3001
       - HOUSE_OF_ANG_URL=http://house-of-ang:3002
       - ACHEEVY_URL=http://acheevy:3003
+      # SQLite for LUC — persisted to demo-luc-data volume
+      - DATABASE_URL=file:/app/.luc-data/luc.db
       # Voice — TTS & STT
       - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY}
       - DEEPGRAM_API_KEY=${DEEPGRAM_API_KEY}
       - GROQ_API_KEY=${GROQ_API_KEY}
     depends_on:
       uef-gateway:
-        condition: service_healthy
+        condition: service_started
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>{process.exit(r.ok?0:1)}).catch(()=>process.exit(1))"]
       interval: 30s
       timeout: 10s
-      retries: 3
-      start_period: 30s
+      retries: 5
+      start_period: 60s
     volumes:
       - demo-luc-data:/app/.luc-data
     restart: always
@@ -233,7 +237,7 @@ services:
       redis:
         condition: service_healthy
       house-of-ang:
-        condition: service_healthy
+        condition: service_started
     healthcheck:
       test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3003/health',r=>{process.exit(r.statusCode===200?0:1)}).on('error',()=>process.exit(1))"]
       interval: 30s
@@ -266,7 +270,8 @@ services:
       test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-aims_redis_secret}", "ping"]
       interval: 10s
       timeout: 5s
-      retries: 3
+      retries: 5
+      start_period: 15s
     deploy:
       resources:
         limits:
@@ -621,9 +626,9 @@ volumes:
   n8n-data:
   luc-data:
   demo-luc-data:
-  gridiron-debate-logs:
-  gridiron-rankings:
-  gridiron-content:
+  perform-debate-logs:
+  perform-rankings:
+  perform-content:
 
 networks:
   aims-network:

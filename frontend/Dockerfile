@@ -21,6 +21,8 @@ COPY aims-tools/ /aims-tools/
 
 # Build-time env vars (safe to embed, no secrets)
 ENV NEXT_TELEMETRY_DISABLED=1
+# Prisma needs DATABASE_URL at build time for `prisma generate` (SQLite)
+ENV DATABASE_URL=file:./prisma/luc.db
 
 RUN npm run build
 
