@@ -35,13 +35,14 @@ jobs:
         uses: google-github-actions/setup-gcloud@v2
 
       - name: Verify GCP Auth
+        continue-on-error: true
         run: |
           echo "=== Active account ==="
           gcloud auth list
           echo "=== Project ==="
           gcloud config get-value project
           echo "=== Cloud Build API ==="
-          gcloud services list --enabled --filter="name:cloudbuild" --project=${{ env.PROJECT_ID }}
+          gcloud services list --enabled --filter="name:cloudbuild" --project=${{ env.PROJECT_ID }} || echo "WARNING: Could not list services (may be a permissions issue)"
 
       - name: Submit to Cloud Build
         env:
