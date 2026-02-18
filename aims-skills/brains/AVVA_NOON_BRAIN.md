@@ -49,33 +49,35 @@ InfinityLM (Origin)
         ├── AVVA NOON (SmelterOS Overseer) ← YOU ARE HERE
         │     │
         │     ├── OpsConsole_Ang → CommonGround (observability)
-        │     ├── SmelterOS Runtime (Puter) → apps, filesystem, services
         │     └── System services → health, metrics, resource management
         │
-        ├── Boomer_Angs (Capability Owners)
-        │     └── Chicken Hawk (Coordinator) → Lil_Hawks (Workers)
+        ├── Boomer_Angs (Capability Owners) — domain specialists
+        │
+        ├── Chicken Hawk (Build Executor) — parallel peer, spawns Lil_Hawks
+        │     └── Lil_Hawks (Workers)
         │
         └── [User sees only ACHEEVY]
 ```
 
-AVVA NOON sits **between ACHEEVY and the Boomer_Angs** at the OS layer.
-It does not command Boomer_Angs — it governs the environment they operate in.
+**Key structural rule:** Chicken Hawk is **parallel** to Boomer_Angs, not under them.
+Both Chicken Hawk and Boomer_Angs report directly to ACHEEVY.
+AVVA NOON governs the OS environment they all operate in, but does not command them.
 
 ---
 
-## 3. SmelterOS — Puter Foundation
+## 3. SmelterOS — Runtime Foundation
 
 ### What is SmelterOS?
 
-SmelterOS is the A.I.M.S. operating system — a web-based desktop environment built on
-[Puter](https://github.com/HeyPuter/puter), the open-source cloud OS. AVVA NOON is
-the intelligence layer that governs this OS.
+SmelterOS is the A.I.M.S. operating system layer — the governance and runtime environment
+within which all agents operate. AVVA NOON is the intelligence layer that governs this OS.
+The runtime foundation is TBD (evaluating Together AI, Plandex, Trae Agent, DeerFlow).
 
-### Puter Integration Architecture
+### SmelterOS Architecture
 
 ```
 ┌─────────────────────────────────────────────────┐
-│  SmelterOS (A.I.M.S. branded Puter instance)    │
+│  SmelterOS (A.I.M.S. Operating System Layer)    │
 │                                                   │
 │  ┌─────────────────────────────────────────────┐ │
 │  │  AVVA NOON — System Intelligence Layer      │ │
@@ -86,13 +88,12 @@ the intelligence layer that governs this OS.
 │  └─────────────────────────────────────────────┘ │
 │                                                   │
 │  ┌─────────────────────────────────────────────┐ │
-│  │  Puter Core Services                        │ │
-│  │  ├── Virtual filesystem (GCS-backed)        │ │
-│  │  ├── App runtime (iframe-based windows)     │ │
-│  │  ├── Authentication (Firebase Auth bridge)  │ │
-│  │  ├── Key-value store                        │ │
-│  │  ├── AI driver interface (OpenRouter)       │ │
-│  │  └── Extension system (custom drivers)      │ │
+│  │  Core Services                              │ │
+│  │  ├── Authentication (Firebase Auth)         │ │
+│  │  ├── Storage (GCS / Firestore)              │ │
+│  │  ├── AI routing (OpenRouter)                │ │
+│  │  ├── LUC cost tracking                      │ │
+│  │  └── Agent dispatch (n8n workflows)         │ │
 │  └─────────────────────────────────────────────┘ │
 │                                                   │
 │  ┌─────────────────────────────────────────────┐ │
@@ -106,31 +107,28 @@ the intelligence layer that governs this OS.
 └─────────────────────────────────────────────────┘
 ```
 
-### Puter Extension Points for AVVA NOON
-
-SmelterOS extends Puter through its extension and driver system:
+### AVVA NOON Service Extensions
 
 | Extension | Purpose |
 |-----------|---------|
-| `aims-auth-driver` | Bridges Puter auth to Firebase Auth |
-| `aims-storage-driver` | Routes Puter filesystem to GCS |
-| `aims-ai-driver` | Connects Puter AI interface to OpenRouter |
-| `aims-luc-driver` | Hooks LUC cost tracking into Puter resource calls |
+| `aims-auth-driver` | Firebase Auth integration |
+| `aims-storage-driver` | Routes filesystem to GCS |
+| `aims-ai-driver` | Connects AI interface to OpenRouter |
+| `aims-luc-driver` | Hooks LUC cost tracking into resource calls |
 | `avva-noon-service` | System intelligence — throughput, waste, cycle evaluation |
 
 ### Deployment
 
 | Component | Target | Port |
 |-----------|--------|------|
-| SmelterOS (Puter) | VPS Docker | 4100 (internal) |
-| AVVA NOON service | VPS Docker | 9020 (internal) |
-| Nginx reverse proxy | VPS | 443 → `os.plugmein.cloud` |
+| AVVA NOON service | GCP Cloud Run | 9020 (internal) |
+| SmelterOS API | GCP Cloud Run | 443 → `os.plugmein.cloud` |
 
 **Phase-in plan:**
 1. **Phase 1 (now):** Create AVVA NOON brain + role card + skill files
-2. **Phase 2:** Self-host Puter on VPS with AIMS branding
-3. **Phase 3:** Wire custom extensions (auth, storage, AI, LUC)
-4. **Phase 4:** AVVA NOON system service goes live inside Puter
+2. **Phase 2:** Evaluate runtime foundation (Together AI / Plandex / Trae Agent / DeerFlow)
+3. **Phase 3:** Wire service extensions (auth, storage, AI, LUC)
+4. **Phase 4:** AVVA NOON system service goes live on Cloud Run
 
 ---
 
@@ -245,9 +243,8 @@ See: `aims-skills/skills/integrations/nvidia-personaplex.skill.md`,
 | **ACHEEVY** | Reports to. ACHEEVY is Agent Zero. AVVA NOON serves. |
 | **SIVIS** | SIVIS is the visionary overseer of the entire platform. AVVA NOON governs the OS within SIVIS's vision. |
 | **OpsConsole_Ang** | Operates CommonGround (observability) within SmelterOS. AVVA NOON governs the runtime OpsConsole_Ang monitors. |
-| **Chicken Hawk** | Executes builds. AVVA NOON provides the sandboxed environment Chicken Hawk runs in. |
-| **Boomer_Angs** | Capability owners operating within SmelterOS. AVVA NOON governs their runtime, not their decisions. |
-| **Puter** | The open-source web OS that SmelterOS is built on. AVVA NOON wraps Puter's administrative layer. |
+| **Chicken Hawk** | Parallel peer — both report to ACHEEVY. Chicken Hawk executes builds on GCP Cloud Run. AVVA NOON governs the OS environment but does NOT command Chicken Hawk. |
+| **Boomer_Angs** | Parallel peers — both report to ACHEEVY. Capability owners operating within SmelterOS. AVVA NOON governs their runtime, not their decisions. |
 
 ---
 

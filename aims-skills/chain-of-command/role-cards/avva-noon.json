@@ -39,13 +39,14 @@
       "RUNNER_EXECUTION",
       "BILLING_OVERRIDE"
     ],
-    "allowed_tools": ["AUDIT_LOG", "METRICS_ENGINE", "GAP_REGISTER", "LUC_ENGINE", "PUTER_ADMIN_API"],
+    "allowed_tools": ["AUDIT_LOG", "METRICS_ENGINE", "GAP_REGISTER", "LUC_ENGINE", "SMELTEROS_ADMIN_API"],
     "forbidden_tools": ["SHELL_RUNNER", "POLICY_OVERRIDE", "BILLING_OVERRIDE", "SECRET_STORE_RAW_DUMP"]
   },
   "smelter_os": {
-    "runtime": "Puter (open-source web OS)",
+    "runtime": "TBD (evaluating Together AI / Plandex / Trae Agent / DeerFlow)",
     "domain": "os.plugmein.cloud",
     "role": "Overseer — governs the environment, not the agents within it",
+    "deployment": "GCP Cloud Run",
     "extensions": [
       "aims-auth-driver",
       "aims-storage-driver",

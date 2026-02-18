@@ -28,7 +28,7 @@ output leaves the system. **Users never see OpenClaw. They see Chicken Hawk.**
         ↓ ACP HTTP POST
 [ACHEEVY Backend Gateway — Firebase Task Queue]
         ↓ Firestore tasks/{taskId}
-[Chicken Hawk — Docker Container, port :8081]
+[Chicken Hawk — GCP Cloud Run Job]
         ↓
     ┌─────────────────────────────────────┐
     │  LUC Engine  (pre-execution quote)  │
@@ -40,10 +40,35 @@ output leaves the system. **Users never see OpenClaw. They see Chicken Hawk.**
         ↓
 [Firestore / GCS — persist output artifacts]
         ↓
-[Nginx Gateway → chickenhawk.plugmein.cloud SSE Stream]
+[Cloud Run SSE → chickenhawk.plugmein.cloud Stream]
         ↓
 [User Dashboard — Live Build Stream]
 ```
+
+### Chain of Command
+
+Chicken Hawk is **parallel** to Boomer_Angs. Both report directly to ACHEEVY.
+
+```
+ACHEEVY (Agent Zero)
+  ├── AVVA NOON (SmelterOS Overseer) — governs the OS environment
+  ├── Boomer_Angs (Capability Owners) — domain specialists
+  └── Chicken Hawk (Build Executor) ← YOU ARE HERE
+        └── Lil_Hawks (Workers) — spawned per task
+```
+
+### Deployment Target: GCP Cloud Run (NOT VPS)
+
+Chicken Hawk runs exclusively on GCP Cloud Run Jobs. NOT on the VPS.
+
+| Why Cloud Run | Reason |
+|---------------|--------|
+| **Burst capacity** | Scales CPU/memory per build, doesn't starve other services |
+| **Isolation** | Sandboxed execution separate from control plane |
+| **Scale to zero** | No cost when idle |
+| **60 min timeout** | Long enough for any build |
+| **VPC connector** | Reaches Firestore, ByteRover, LUC on internal network |
+| **n8n triggers** | Existing workflow automation dispatches Cloud Run jobs |
 
 ---
 
@@ -59,41 +84,67 @@ output leaves the system. **Users never see OpenClaw. They see Chicken Hawk.**
 
 ---
 
-## Container Spec
+## Cloud Run Spec
 
 ```yaml
-chicken-hawk:
-  build: ./services/chicken-hawk
-  container_name: aims-chicken-hawk
-  expose:
-    - 8081                        # Internal only — never mapped to host
-  networks:
-    - aimsnet                     # Internal network only
-  environment:
-    - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
-    - FIREBASE_PROJECT_ID=${FIREBASE_PROJECT_ID}
-    - BYTEROUTER_ENDPOINT=http://byterover:7000
-    - LUC_ENGINE_URL=http://luc-engine:9010
-    - STITCH_SERVICE_ACCOUNT=/secrets/stitch-key.json
-    - CHICKENHAWK_GATEWAY_TOKEN=${CHICKENHAWK_GATEWAY_TOKEN}
-  volumes:
-    - chicken-hawk-workspace:/app/workspace
-    - stitch-secrets:/secrets:ro
-  security_opt:
-    - no-new-privileges:true
-    - apparmor:docker-default
-  cap_drop:
-    - ALL
-  cap_add:
-    - NET_BIND_SERVICE
-  read_only: true
-  tmpfs:
-    - /tmp
-  user: "1001:1001"               # Non-root
-  restart: unless-stopped
-  labels:
-    - "aims.service=chicken-hawk"
-    - "aims.tier=executor"
+# deploy/chicken-hawk-cloudrun.yaml
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: chicken-hawk
+  annotations:
+    run.googleapis.com/ingress: internal    # Never public
+    run.googleapis.com/vpc-access-connector: aims-vpc-connector
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/maxScale: "5"
+        run.googleapis.com/execution-environment: gen2
+        run.googleapis.com/cpu-throttling: "false"  # Full CPU during builds
+    spec:
+      containerConcurrency: 1               # One build per instance
+      timeoutSeconds: 3600                   # 60 min max per build
+      serviceAccountName: chicken-hawk@ai-managed-services.iam.gserviceaccount.com
+      containers:
+        - image: gcr.io/ai-managed-services/chicken-hawk:latest
+          ports:
+            - containerPort: 8081
+          env:
+            - name: OPENROUTER_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: openrouter-api-key
+                  key: latest
+            - name: FIREBASE_PROJECT_ID
+              value: ai-managed-services
+            - name: BYTEROUTER_ENDPOINT
+              value: http://byterover.internal:7000
+            - name: LUC_ENGINE_URL
+              value: http://luc-engine.internal:9010
+            - name: CHICKENHAWK_GATEWAY_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: chickenhawk-gateway-token
+                  key: latest
+          resources:
+            limits:
+              memory: 4Gi
+              cpu: "4"
+          securityContext:
+            runAsUser: 1001
+            runAsGroup: 1001
+            allowPrivilegeEscalation: false
+```
+
+### Cloud Run Job Variant (for batch/queued builds)
+
+```bash
+# Trigger a Chicken Hawk build job from n8n or ACHEEVY
+gcloud run jobs execute chicken-hawk-build \
+  --region us-central1 \
+  --args="--task-id=CH001" \
+  --update-env-vars="TASK_ID=CH001"
 ```
 
 ---
@@ -274,16 +325,18 @@ Once all 7 gates pass, Chicken Hawk issues a BAMARAM completion receipt:
 ### Network Segmentation
 
 ```
-networks:
-  frontendnet:
-    internal: false         # Public-facing (Next.js, Nginx only)
-  backendnet:
-    internal: true          # Internal services (Chicken Hawk, ACHEEVY, n8n)
-  datanet:
-    internal: true          # Databases only (Firestore proxy, ByteRover)
+VPS (76.13.96.107) — Control Plane:
+  frontendnet:  Nginx, Next.js (public)
+  backendnet:   ACHEEVY, n8n, UEF Gateway (internal)
+
+GCP Cloud Run — Execution Plane:
+  aims-vpc:     Chicken Hawk, LUC Engine, ByteRover (internal only)
+  datanet:      Firestore, GCS (internal only)
 ```
 
-Chicken Hawk lives **exclusively on backendnet**. Zero direct internet exposure.
+Chicken Hawk lives **exclusively on GCP Cloud Run** behind VPC connector.
+Zero direct internet exposure. Ingress set to `internal` only.
+VPS stays as the control plane (n8n, Nginx, lightweight services).
 
 ---
 
