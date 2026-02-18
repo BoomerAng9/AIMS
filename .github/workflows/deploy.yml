@@ -1,4 +1,4 @@
-name: Build & Deploy to VPS
+name: Build & Deploy to Cloud Run
 
 on:
   push:
@@ -31,48 +31,27 @@ jobs:
           NEXT_TELEMETRY_DISABLED: 1
 
   deploy:
-    name: Deploy to VPS
+    name: Deploy to Cloud Run
     needs: build-check
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v4
 
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1
+      - id: auth
+        name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
         with:
-          host: ${{ secrets.VPS_HOST }}
-          username: root
-          key: ${{ secrets.VPS_SSH_KEY }}
-          command_timeout: 15m
-          script: |
-            set -e
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-            echo "=== Starting deployment ==="
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
 
-            # Use GitHub token for private repo access (token is short-lived)
-            REPO_URL="https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git"
-
-            if [ -d /home/aims/AIMS ]; then
-              echo "=== Pulling latest code ==="
-              cd /home/aims/AIMS
-              git remote set-url origin "${REPO_URL}"
-              git fetch origin main
-              git reset --hard origin/main
-              # Remove token from persisted remote URL
-              git remote set-url origin "https://github.com/${{ github.repository }}.git"
-            else
-              echo "=== Cloning repository ==="
-              mkdir -p /home/aims
-              git clone "${REPO_URL}" /home/aims/AIMS
-              cd /home/aims/AIMS
-              git remote set-url origin "https://github.com/${{ github.repository }}.git"
-            fi
-
-            echo "=== Stopping old containers ==="
-            docker compose -f infra/docker-compose.prod.yml down --remove-orphans 2>/dev/null || true
-
-            echo "=== Running deploy script ==="
-            chmod +x deploy.sh
-            ./deploy.sh
-
-            echo "=== Deployment complete! ==="
+      - name: Submit to Cloud Build
+        run: |
+          gcloud builds submit \
+            --config=cloudbuild.yaml \
+            --substitutions=SHORT_SHA=$(git rev-parse --short HEAD) \
+            --project=${{ vars.GCP_PROJECT || 'ai-managed-services' }}
