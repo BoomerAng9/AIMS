@@ -154,7 +154,7 @@ export function Hero() {
             AI Managed Solutions
           </h2>
 
-          <p className="text-base md:text-xl text-white/60 max-w-lg mx-auto leading-relaxed">
+          <p className="text-base md:text-xl text-white/75 max-w-lg mx-auto leading-relaxed">
             I&apos;m ACHEEVY, at your service.<br />
             {isLore ? 'What will we deploy today?' : 'Your AI-managed operations platform.'}
           </p>
@@ -199,12 +199,12 @@ export function Hero() {
                       >
                         {step.label}
                       </h4>
-                      <p className="text-xs md:text-sm text-white/40">{step.desc}</p>
+                      <p className="text-xs md:text-sm text-white/55">{step.desc}</p>
                     </div>
                     {/* Connector arrow (hidden on last) */}
                     {i < ACTION_CHAIN.length - 1 && (
                       <div className="hidden md:flex absolute -right-3 top-1/2 -translate-y-1/2 z-10">
-                        <ArrowRight className="w-4 h-4 text-white/15" />
+                        <ArrowRight className="w-4 h-4 text-white/30" />
                       </div>
                     )}
                   </motion.div>
@@ -243,7 +243,7 @@ export function Hero() {
                   >
                     Chat w/ACHEEVY
                   </h3>
-                  <p className="text-base md:text-lg text-white/50 mb-4 max-w-md mx-auto">
+                  <p className="text-base md:text-lg text-white/65 mb-4 max-w-md mx-auto">
                     Your AI executive orchestrator. Tell ACHEEVY what you need — the team handles the rest.
                   </p>
                   <span
@@ -272,7 +272,7 @@ export function Hero() {
                       >
                         Mission Control
                       </h3>
-                      <p className="text-sm md:text-base text-white/45 leading-relaxed">
+                      <p className="text-sm md:text-base text-white/60 leading-relaxed">
                         Your operational dashboard. Monitor services, deploy apps, manage your AI fleet.
                       </p>
                     </div>
@@ -294,7 +294,7 @@ export function Hero() {
                       >
                         Deploy Your Apps
                       </h3>
-                      <p className="text-sm md:text-base text-white/45 leading-relaxed">
+                      <p className="text-sm md:text-base text-white/60 leading-relaxed">
                         Managed Vibe Coding. Conversate your way to a working aiPLUG.
                       </p>
                     </div>
@@ -320,7 +320,7 @@ export function Hero() {
                     >
                       {cap.label}
                     </h4>
-                    <p className="text-xs text-white/35">{cap.desc}</p>
+                    <p className="text-xs text-white/50">{cap.desc}</p>
                   </div>
                 ))}
               </div>
@@ -367,7 +367,7 @@ export function Hero() {
                   >
                     Chat w/ACHEEVY
                   </h3>
-                  <p className="text-base md:text-lg text-white/50 mb-4">
+                  <p className="text-base md:text-lg text-white/65 mb-4">
                     Your AI executive orchestrator. Tell ACHEEVY what you need — the team handles the rest.
                   </p>
                   <span
@@ -401,7 +401,7 @@ export function Hero() {
                       >
                         Automate Everything
                       </h3>
-                      <p className="text-sm md:text-base text-white/45 leading-relaxed">
+                      <p className="text-sm md:text-base text-white/60 leading-relaxed">
                         Deploy Boomer_Angs, Chicken Hawk &amp; Lil_Hawks to orchestrate your workflows.
                       </p>
                     </div>
@@ -428,7 +428,7 @@ export function Hero() {
                       >
                         Deploy Your Apps
                       </h3>
-                      <p className="text-sm md:text-base text-white/45 leading-relaxed">
+                      <p className="text-sm md:text-base text-white/60 leading-relaxed">
                         Managed Vibe Coding. Conversate your way to a working aiPLUG.
                       </p>
                     </div>
@@ -441,7 +441,7 @@ export function Hero() {
             <motion.div variants={staggerItem} className="flex items-center gap-3 w-full max-w-4xl mt-6">
               <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
               <span
-                className="text-sm tracking-[0.3em] uppercase text-white/30"
+                className="text-sm tracking-[0.3em] uppercase text-white/50"
                 style={{ fontFamily: 'var(--font-doto), "Doto", monospace' }}
               >
                 Explore
@@ -460,7 +460,7 @@ export function Hero() {
                     >
                       The Book of V.I.B.E.
                     </h3>
-                    <p className="text-sm text-white/40">
+                    <p className="text-sm text-white/55">
                       An Afrofuturist saga of Achievmor &mdash; the canonical origin of the V.I.B.E. universe. 12 chapters.
                     </p>
                   </div>
@@ -477,7 +477,7 @@ export function Hero() {
                     >
                       Character Gallery
                     </h3>
-                    <p className="text-sm text-white/40">
+                    <p className="text-sm text-white/55">
                       Aether Vos, The Elder, ACHEEVY &mdash; the full V.I.B.E. roster and the seven peoples of Achievmor.
                     </p>
                   </div>
@@ -494,7 +494,7 @@ export function Hero() {
                     >
                       Merch Store
                     </h3>
-                    <p className="text-sm text-white/40">
+                    <p className="text-sm text-white/55">
                       Rep the V.I.B.E. &mdash; apparel, gear, and collectibles from the Aether.
                     </p>
                   </div>

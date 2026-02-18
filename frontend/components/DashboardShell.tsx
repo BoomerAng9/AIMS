@@ -164,17 +164,17 @@ export function DashboardShell({ children }: Props) {
 
       <div className={`flex min-h-full ${IS_DEMO ? "pt-9" : "pt-[env(safe-area-inset-top)]"}`}>
         {/* Left rail — wireframe glass sidebar */}
-        <aside className="hidden w-64 flex-shrink-0 flex-col border-r border-wireframe-stroke bg-[#050505]/90 backdrop-blur-xl lg:flex z-30 sticky top-0 h-screen">
+        <aside className="hidden w-64 flex-shrink-0 flex-col border-r border-wireframe-stroke bg-[#0A0A0A]/90 backdrop-blur-xl lg:flex z-30 sticky top-0 h-screen">
           <div className="px-4 py-5">
             <div className="flex flex-col">
               <span className="font-display text-sm uppercase tracking-wider text-white">
                 A.I.M.S.
               </span>
-              <span className="text-[0.5rem] uppercase tracking-[0.12em] text-white/40 -mt-0.5">
+              <span className="text-[0.5rem] uppercase tracking-[0.12em] text-white/55 -mt-0.5">
                 AI Managed Solutions
               </span>
             </div>
-            <p className="mt-1 text-[0.65rem] text-white/40">
+            <p className="mt-1 text-[0.65rem] text-white/55">
               ACHEEVY command center
             </p>
           </div>
@@ -211,20 +211,20 @@ export function DashboardShell({ children }: Props) {
         {/* Main column */}
         <div className="flex flex-1 flex-col min-h-full relative z-10">
           {/* Top bar */}
-          <header className="sticky top-0 flex items-center justify-between border-b border-wireframe-stroke bg-[#050505]/85 px-4 py-3 backdrop-blur-xl sm:px-6 lg:px-8 xl:px-12 z-20 shadow-lg shadow-black/20">
+          <header className="sticky top-0 flex items-center justify-between border-b border-wireframe-stroke bg-[#0A0A0A]/90 px-4 py-3 backdrop-blur-xl sm:px-6 lg:px-8 xl:px-12 z-20 shadow-lg shadow-black/20">
             <div className="flex items-center gap-5">
               {/* Navigation Controls - Enhanced 'Pop' Style */}
               <div className="flex items-center gap-2 -ml-2">
                 <button 
                   onClick={() => router.back()}
-                  className="p-2.5 text-white/60 hover:text-gold hover:bg-gold/10 hover:shadow-[0_0_15px_rgba(212,175,55,0.2)] rounded-xl transition-all duration-300 border border-transparent hover:border-gold/20"
+                  className="p-2.5 text-white/70 hover:text-gold hover:bg-gold/10 hover:shadow-[0_0_15px_rgba(212,175,55,0.2)] rounded-xl transition-all duration-300 border border-transparent hover:border-gold/20"
                   title="Go Back"
                 >
                   <ArrowLeft className="w-5 h-5" />
                 </button>
                 <Link 
                   href="/"
-                  className="p-2.5 text-white/60 hover:text-gold hover:bg-gold/10 hover:shadow-[0_0_15px_rgba(212,175,55,0.2)] rounded-xl transition-all duration-300 border border-transparent hover:border-gold/20"
+                  className="p-2.5 text-white/70 hover:text-gold hover:bg-gold/10 hover:shadow-[0_0_15px_rgba(212,175,55,0.2)] rounded-xl transition-all duration-300 border border-transparent hover:border-gold/20"
                   title="Return Home"
                 >
                   <Home className="w-5 h-5" />
@@ -237,14 +237,14 @@ export function DashboardShell({ children }: Props) {
                 <span className="text-[0.65rem] uppercase tracking-[0.18em] text-gold/60 font-mono">
                   Dashboard
                 </span>
-                <span className="text-xs text-white/50">
+                <span className="text-xs text-white/65">
                   Think it. Prompt it. Let ACHEEVY manage it.
                 </span>
               </div>
             </div>
             <div className="flex items-center gap-3">
               {/* LUC pill */}
-              <div className="hidden items-center gap-2 rounded-lg border border-wireframe-stroke bg-black/60 px-3 py-1.5 text-xs text-white/60 sm:flex">
+              <div className="hidden items-center gap-2 rounded-lg border border-wireframe-stroke bg-black/60 px-3 py-1.5 text-xs text-white/70 sm:flex">
                 <span
                   className={`h-2 w-2 rounded-full ${statusDotClass(health.status)}`}
                 />
@@ -262,7 +262,7 @@ export function DashboardShell({ children }: Props) {
                     {userName.charAt(0).toUpperCase()}
                   </span>
                   <span className="hidden sm:inline">{userName}</span>
-                  <ChevronDown className="w-3 h-3 text-white/40" />
+                  <ChevronDown className="w-3 h-3 text-white/55" />
                 </button>
 
                 {/* Account Dropdown */}
@@ -272,7 +272,7 @@ export function DashboardShell({ children }: Props) {
                     <div className="absolute right-0 top-full mt-2 w-56 rounded-xl border border-wireframe-stroke bg-[#0A0A0A]/95 backdrop-blur-xl shadow-2xl z-40 overflow-hidden">
                       <div className="px-4 py-3 border-b border-wireframe-stroke">
                         <p className="text-sm text-white font-medium truncate">{userName}</p>
-                        <p className="text-[11px] text-white/40 truncate">{userEmail}</p>
+                        <p className="text-[11px] text-white/55 truncate">{userEmail}</p>
                         <span className="inline-block mt-1 text-[9px] px-1.5 py-0.5 rounded border border-gold/20 bg-gold/10 text-gold/80 font-mono uppercase">
                           {userRole}
                         </span>
@@ -280,7 +280,7 @@ export function DashboardShell({ children }: Props) {
                       <div className="py-1">
                         <button
                           onClick={() => { setShowAccountMenu(false); router.push('/dashboard/circuit-box?tab=settings'); }}
-                          className="w-full text-left px-4 py-2 text-sm text-white/60 hover:bg-white/5 hover:text-white transition-colors"
+                          className="w-full text-left px-4 py-2 text-sm text-white/70 hover:bg-white/5 hover:text-white transition-colors"
                         >
                           Settings
                         </button>

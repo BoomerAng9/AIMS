@@ -4,12 +4,19 @@
 @tailwind utilities;
 
 :root {
-  --background: #050505;
+  --background: #0A0A0A;
   --foreground: #ededed;
   --font-doto: 'Doto', monospace;
   --font-marker: 'Permanent Marker', cursive;
   --font-caveat: 'Caveat', cursive;
   --frame-inset: 12px;
+
+  /* ── Text Opacity Floors (Nothing-brand clarity) ── */
+  --text-primary: rgba(255, 255, 255, 0.95);
+  --text-secondary: rgba(255, 255, 255, 0.70);
+  --text-muted: rgba(255, 255, 255, 0.55);
+  --text-dim: rgba(255, 255, 255, 0.40);
+  /* NEVER go below 0.40 for any visible text */
 }
 
 @media (min-width: 768px) {
@@ -102,8 +109,8 @@ body {
 
   /* ── Wireframe Glass Card — core card primitive ── */
   .wireframe-card {
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.14);
     border-radius: 16px;
     box-shadow:
       inset 0 1px 1px rgba(255, 255, 255, 0.06),
@@ -111,9 +118,9 @@ body {
     transition: border-color 0.3s, box-shadow 0.3s;
   }
   .wireframe-card:hover {
-    border-color: rgba(255, 255, 255, 0.18);
+    border-color: rgba(255, 255, 255, 0.22);
     box-shadow:
-      inset 0 1px 1px rgba(255, 255, 255, 0.08),
+      inset 0 1px 1px rgba(255, 255, 255, 0.10),
       0 4px 24px rgba(0, 0, 0, 0.3);
   }
 
@@ -137,11 +144,11 @@ body {
 
   /* ── A.I.M.S. Page Background — cinematic dark with gold grid ── */
   .aims-page-bg {
-    background-color: #050505;
+    background-color: #0A0A0A;
     background-image:
-      radial-gradient(circle, rgba(212,175,55,0.03) 1px, transparent 1px),
-      linear-gradient(to right, rgba(212,175,55,0.02) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(212,175,55,0.02) 1px, transparent 1px);
+      radial-gradient(circle, rgba(212,175,55,0.04) 1px, transparent 1px),
+      linear-gradient(to right, rgba(212,175,55,0.03) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(212,175,55,0.03) 1px, transparent 1px);
     background-size: 24px 24px, 48px 48px, 48px 48px;
   }
 
@@ -202,8 +209,8 @@ body {
   .vignette-overlay {
     background: radial-gradient(
       circle at center,
-      transparent 60%,
-      rgba(0, 0, 0, 0.25) 100%
+      transparent 70%,
+      rgba(0, 0, 0, 0.10) 100%
     );
     pointer-events: none;
     z-index: 1;
@@ -430,4 +437,101 @@ body {
 /* Hide nested CircuitBoardPattern when inside Circuit Box */
 .circuit-box-panel canvas {
   display: none !important;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Retro 80s Glitch Effects — SELECTIVE USE ONLY
+   Apply to: /arena, /hangar, /the-book-of-vibe, /gallery
+   DO NOT apply to: /dashboard, /chat, auth pages
+   ───────────────────────────────────────────────────────────── */
+
+/* Chromatic aberration text glitch */
+@keyframes glitch-text {
+  0%, 100% {
+    text-shadow: none;
+  }
+  20% {
+    text-shadow: -2px 0 #ff006e, 2px 0 #00d4ff;
+  }
+  40% {
+    text-shadow: 2px 0 #ff006e, -2px 0 #00d4ff;
+  }
+  60% {
+    text-shadow: -1px 1px #ff006e, 1px -1px #00d4ff;
+  }
+  80% {
+    text-shadow: 1px 0 #ff006e, -1px 0 #00d4ff;
+  }
+}
+
+.glitch-text {
+  animation: glitch-text 3s ease-in-out infinite;
+}
+
+/* Subtle glitch on hover only */
+.glitch-text-hover:hover {
+  animation: glitch-text 0.3s ease-in-out;
+}
+
+/* Horizontal shift glitch for images/containers */
+@keyframes glitch-shift {
+  0%, 100% { transform: translate(0); }
+  10% { transform: translate(-2px, 1px); }
+  20% { transform: translate(2px, -1px); }
+  30% { transform: translate(-1px, 0); }
+  40% { transform: translate(0); }
+}
+
+.glitch-shift {
+  animation: glitch-shift 4s ease-in-out infinite;
+}
+
+/* CRT scanline overlay — apply to containers */
+.retro-scanlines::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 2px,
+    rgba(0, 0, 0, 0.08) 2px,
+    rgba(0, 0, 0, 0.08) 4px
+  );
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* VHS tracking lines */
+@keyframes vhs-tracking {
+  0% { transform: translateY(0); opacity: 0; }
+  10% { opacity: 0.5; }
+  50% { transform: translateY(100vh); opacity: 0.3; }
+  100% { transform: translateY(200vh); opacity: 0; }
+}
+
+.vhs-tracking::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.08);
+  z-index: 10;
+  pointer-events: none;
+  animation: vhs-tracking 8s linear infinite;
+}
+
+/* Neon flicker for headings */
+@keyframes neon-flicker {
+  0%, 100% { opacity: 1; }
+  92% { opacity: 1; }
+  93% { opacity: 0.7; }
+  94% { opacity: 1; }
+  96% { opacity: 0.8; }
+  97% { opacity: 1; }
+}
+
+.neon-flicker {
+  animation: neon-flicker 5s ease-in-out infinite;
 }
