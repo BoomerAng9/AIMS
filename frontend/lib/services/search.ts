@@ -23,10 +23,16 @@ export class BraveSearchService {
   private baseUrl = "https://api.search.brave.com/res/v1/web/search";
 
   constructor() {
-    this.apiKey = process.env.BRAVE_SEARCH_API_KEY || "";
+    this.apiKey = process.env.BRAVE_API_KEY || process.env.BRAVE_SEARCH_API_KEY || "";
+  }
+
+  isConfigured(): boolean {
+    return this.apiKey.length > 0;
   }
 
   async search(query: string, options: SearchOptions = {}): Promise<SearchResult[]> {
+    if (!this.isConfigured()) throw new Error("Brave API key not set");
+
     const { count = 10 } = options;
 
     const response = await fetch(
@@ -35,12 +41,13 @@ export class BraveSearchService {
         headers: {
           "X-Subscription-Token": this.apiKey,
           Accept: "application/json",
+          "Accept-Encoding": "gzip",
         },
       }
     );
 
     if (!response.ok) {
-      throw new Error(`Brave Search error: ${response.statusText}`);
+      throw new Error(`Brave Search error: ${response.status} ${response.statusText}`);
     }
 
     const data = await response.json();
@@ -147,20 +154,30 @@ export const serperSearch = new SerperSearchService();
 /**
  * Unified search - tries multiple providers
  */
+/**
+ * Unified search — priority chain: Brave > Tavily > Serper
+ * Brave is the AIMS standard (Pro AI tier). Tavily and Serper are fallbacks.
+ */
 export async function unifiedSearch(
   query: string,
   options: SearchOptions = {}
 ): Promise<SearchResult[]> {
-  try {
-    // Try Tavily first (usually fastest)
-    return await tavilySearch.search(query, options);
-  } catch (error) {
-    console.warn("Tavily failed, trying Brave...", error);
+  // 1. Brave (primary — AIMS standard)
+  if (braveSearch.isConfigured()) {
     try {
       return await braveSearch.search(query, options);
-    } catch (error2) {
-      console.warn("Brave failed, trying Serper...", error2);
-      return await serperSearch.search(query, options);
+    } catch (error) {
+      console.warn("[Search] Brave failed, falling back to Tavily:", error);
     }
   }
+
+  // 2. Tavily (fallback #1 — good for deep content extraction)
+  try {
+    return await tavilySearch.search(query, options);
+  } catch (error) {
+    console.warn("[Search] Tavily failed, falling back to Serper:", error);
+  }
+
+  // 3. Serper (fallback #2 — Google index)
+  return await serperSearch.search(query, options);
 }

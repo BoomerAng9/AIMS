@@ -16,7 +16,7 @@ execution:
   route: "/api/search"
 dependencies:
   env:
-    - "BRAVE_SEARCH_API_KEY"
+    - "BRAVE_API_KEY"
   files:
     - "aims-skills/tools/brave-search.tool.md"
     - "aims-skills/tools/tavily.tool.md"
@@ -34,7 +34,7 @@ Triggers when any agent needs to search the web for information, research, or da
 ## Provider Priority Chain
 
 ```
-1. Brave Search (BRAVE_SEARCH_API_KEY)
+1. Brave Search (BRAVE_API_KEY)
    ↓ if key missing or rate limited
 2. Tavily (TAVILY_API_KEY)
    ↓ if key missing or rate limited
@@ -56,7 +56,7 @@ Triggers when any agent needs to search the web for information, research, or da
 
 Before searching, verify at least one provider is configured:
 ```
-BRAVE_SEARCH_API_KEY → use Brave
+BRAVE_API_KEY → use Brave
 TAVILY_API_KEY → use Tavily
 SERPER_API_KEY → use Serper
 None set → return error, suggest user add a search API key
