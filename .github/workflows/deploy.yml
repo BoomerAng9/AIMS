@@ -38,6 +38,5 @@ jobs:
         run: |
           gcloud builds submit \
             --config=cloudbuild.yaml \
-            --project=${{ vars.GCP_PROJECT || 'ai-managed-services' }} \
-            --substitutions=SHORT_SHA=$(git rev-parse --short HEAD) \
-            --timeout=1200s
+            --project=${{ env.PROJECT_ID }} \
+            --substitutions=SHORT_SHA=${GITHUB_SHA:0:7}
