@@ -481,7 +481,7 @@ export function ChatInterface({
   // Voice input
   const voiceInput = useVoiceInput({
     config: {
-      provider: 'groq',
+      provider: 'elevenlabs',
       language: selectedLanguage,
     },
     onTranscript: (result) => {

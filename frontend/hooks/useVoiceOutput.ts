@@ -11,6 +11,7 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react';
 import type { VoiceOutputState, VoiceOutputConfig } from '@/lib/chat/types';
+import { sanitizeForTTS } from '@/lib/voice/sanitize';
 
 interface UseVoiceOutputOptions {
   config?: VoiceOutputConfig;
@@ -74,8 +75,12 @@ export function useVoiceOutput(options: UseVoiceOutputOptions = {}): UseVoiceOut
   // ─────────────────────────────────────────────────────────
 
   const fetchAudio = useCallback(async (text: string): Promise<ArrayBuffer> => {
+    // Strip markdown before sending to TTS — prevents reading "asterisk", "pound sign" etc.
+    const cleanText = sanitizeForTTS(text);
+    if (!cleanText) throw new Error('No speakable text after sanitization');
+
     // Check cache first
-    const cacheKey = `${config?.voiceId || 'default'}-${text}`;
+    const cacheKey = `${config?.voiceId || 'default'}-${cleanText}`;
     if (audioCache.has(cacheKey)) {
       return audioCache.get(cacheKey)!;
     }
@@ -84,7 +89,7 @@ export function useVoiceOutput(options: UseVoiceOutputOptions = {}): UseVoiceOut
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        text,
+        text: cleanText,
         provider: config?.provider || 'elevenlabs',
         voiceId: config?.voiceId,
       }),
@@ -97,7 +102,7 @@ export function useVoiceOutput(options: UseVoiceOutputOptions = {}): UseVoiceOut
     const audioData = await response.arrayBuffer();
 
     // Cache short phrases (under 200 chars)
-    if (text.length < 200) {
+    if (cleanText.length < 200) {
       audioCache.set(cacheKey, audioData);
     }
 

@@ -1,8 +1,9 @@
 /**
  * useVoiceInput Hook
- * Captures audio from microphone and transcribes via Groq Whisper
+ * Captures audio from microphone and transcribes via ElevenLabs Scribe v2
  *
- * Flow: Mic → MediaRecorder → Blob → API → Groq Whisper → Text
+ * Flow: Mic → MediaRecorder → Blob → API → ElevenLabs Scribe v2 → Text
+ * Fallback: Deepgram Nova-3
  */
 
 import { useState, useRef, useCallback, useEffect } from 'react';
@@ -165,7 +166,7 @@ export function useVoiceInput(options: UseVoiceInputOptions = {}): UseVoiceInput
           // Send to transcription API
           const formData = new FormData();
           formData.append('audio', audioBlob, 'recording.webm');
-          formData.append('provider', config?.provider || 'groq');
+          formData.append('provider', config?.provider || 'elevenlabs');
           if (config?.language) {
             formData.append('language', config.language);
           }
