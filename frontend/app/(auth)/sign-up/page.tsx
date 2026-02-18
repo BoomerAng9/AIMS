@@ -1,47 +1,53 @@
-// frontend/app/(auth)/sign-up/page.tsx
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { signIn } from 'next-auth/react';
-import { CountrySelect, StateSelect, CityInput, PostalCodeInput } from '@/components/form/RegionSelect';
-import type { Country } from '@/lib/region/types';
+import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
+import { Loader2 } from "lucide-react";
+import {
+  CountrySelect,
+  StateSelect,
+  CityInput,
+  PostalCodeInput,
+} from "@/components/form/RegionSelect";
+import type { Country } from "@/lib/region/types";
+
+type Step = "account" | "business" | "region";
+const STEPS: Step[] = ["account", "business", "region"];
 
 export default function SignUpPage() {
   const router = useRouter();
-  const [step, setStep] = useState<'account' | 'business' | 'region'>('account');
+  const [step, setStep] = useState<Step>("account");
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
-  // Account details
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  // Account
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  // Business details
-  const [businessName, setBusinessName] = useState('');
-  const [businessType, setBusinessType] = useState('');
+  // Business
+  const [businessName, setBusinessName] = useState("");
+  const [businessType, setBusinessType] = useState("");
 
-  // Region details
+  // Region
   const [country, setCountry] = useState<Country | null>(null);
   const [state, setState] = useState<string | null>(null);
-  const [city, setCity] = useState('');
-  const [postalCode, setPostalCode] = useState('');
+  const [city, setCity] = useState("");
+  const [postalCode, setPostalCode] = useState("");
+
+  const currentStepIndex = STEPS.indexOf(step);
 
   const handleAccountSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (firstName && lastName && email && password) {
-      setStep('business');
-    }
+    if (firstName && lastName && email && password) setStep("business");
   };
 
   const handleBusinessSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (businessName) {
-      setStep('region');
-    }
+    if (businessName) setStep("region");
   };
 
   const handleRegionSubmit = async (e: React.FormEvent) => {
@@ -49,13 +55,12 @@ export default function SignUpPage() {
     if (!country) return;
 
     setIsLoading(true);
-    setError('');
+    setError("");
 
     try {
-      // 1. Register User
-      const res = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           firstName,
           lastName,
@@ -72,170 +77,180 @@ export default function SignUpPage() {
 
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.error || 'Registration failed');
+        throw new Error(data.error || "Registration failed");
       }
 
-      // 2. Sign In
-      const signInRes = await signIn('credentials', {
+      const signInRes = await signIn("credentials", {
         email,
         password,
         redirect: false,
       });
 
-      if (signInRes?.error) {
-        throw new Error(signInRes.error);
-      }
-
-      // 3. Redirect
-      router.push('/onboarding/welcome');
+      if (signInRes?.error) throw new Error(signInRes.error);
+      router.push("/onboarding/welcome");
     } catch (err: any) {
-      console.error(err);
-      setError(err.message || 'Something went wrong. Please try again.');
+      setError(err.message || "Something went wrong. Please try again.");
       setIsLoading(false);
     }
   };
 
   const handleSocialSignIn = (provider: string) => {
-    signIn(provider, { callbackUrl: '/dashboard' });
+    signIn(provider, { callbackUrl: "/dashboard" });
   };
-
-  const renderStepIndicator = () => (
-    <div className="flex items-center justify-center gap-2 mb-6">
-      {['account', 'business', 'region'].map((s, i) => (
-        <div key={s} className="flex items-center">
-          <div className={`
-            w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium
-            ${step === s
-              ? 'bg-gold text-black'
-              : ['account', 'business', 'region'].indexOf(step) > i
-                ? 'bg-gold/30 text-gold'
-                : 'bg-white/10 text-white/30'
-            }
-          `}>
-            {i + 1}
-          </div>
-          {i < 2 && (
-            <div className={`w-8 h-0.5 mx-1 ${
-              ['account', 'business', 'region'].indexOf(step) > i
-                ? 'bg-gold/30'
-                : 'bg-white/10'
-            }`} />
-          )}
-        </div>
-      ))}
-    </div>
-  );
 
   return (
     <div className="space-y-6">
-      {/* LED dot-matrix heading */}
-      <header className="text-center">
-        <h1 className="text-[1.6rem] md:text-[2rem] font-bold tracking-[0.15em] leading-tight text-white font-display uppercase">
-          {step === 'account' && 'Create Your Account'}
-          {step === 'business' && 'Your Business'}
-          {step === 'region' && 'Your Location'}
+      {/* Header */}
+      <div className="text-center">
+        <h1 className="text-2xl font-bold text-white">
+          {step === "account" && "Create your account"}
+          {step === "business" && "About your business"}
+          {step === "region" && "Where are you based?"}
         </h1>
-        <p className="text-xs text-white/40 mt-2">
-          {step === 'account' && 'Step 1: Personal details'}
-          {step === 'business' && 'Step 2: Business information'}
-          {step === 'region' && 'Step 3: Where are you based?'}
+        <p className="mt-2 text-sm text-white/50">
+          {step === "account" && "Step 1 of 3 — Personal details"}
+          {step === "business" && "Step 2 of 3 — Business information"}
+          {step === "region" && "Step 3 of 3 — Location"}
         </p>
-      </header>
+      </div>
 
-      {renderStepIndicator()}
+      {/* Step indicator */}
+      <div className="flex items-center justify-center gap-2">
+        {STEPS.map((s, i) => (
+          <div key={s} className="flex items-center">
+            <div
+              className={`
+                w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium transition-colors
+                ${
+                  step === s
+                    ? "bg-gold text-black"
+                    : currentStepIndex > i
+                    ? "bg-gold/25 text-gold"
+                    : "bg-white/8 text-white/30"
+                }
+              `}
+            >
+              {i + 1}
+            </div>
+            {i < 2 && (
+              <div
+                className={`w-8 h-0.5 mx-1 transition-colors ${
+                  currentStepIndex > i ? "bg-gold/30" : "bg-white/8"
+                }`}
+              />
+            )}
+          </div>
+        ))}
+      </div>
 
+      {/* Error */}
       {error && (
-        <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-200 text-sm text-center">
+        <div className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-300 text-center">
           {error}
         </div>
       )}
 
-      {/* Step 1: Account Details */}
-      {step === 'account' && (
+      {/* Step 1: Account */}
+      {step === "account" && (
         <>
-          {/* Social auth tiles — Google + Discord (providers configured in lib/auth.ts) */}
-          <div className="flex justify-center gap-6">
+          {/* Social sign-in */}
+          <div className="flex justify-center gap-4">
             <button
-              onClick={() => handleSocialSignIn('google')}
-              className="group flex flex-col items-center justify-center w-[100px] h-[88px] rounded-2xl border border-gold/20 bg-white/5 backdrop-blur-md transition-all hover:border-gold/30 hover:bg-white/10 hover:shadow-[0_0_20px_rgba(212,175,55,0.15)]"
+              onClick={() => handleSocialSignIn("google")}
+              className="flex flex-col items-center justify-center w-24 h-20 rounded-xl border border-white/10 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.06] transition-all"
             >
-              <span className="text-2xl mb-1">G</span>
-              <span className="text-[10px] text-white/50 font-medium group-hover:text-white transition-colors">Google</span>
+              <svg className="w-5 h-5 mb-1.5 text-white/70" viewBox="0 0 24 24">
+                <path
+                  fill="currentColor"
+                  d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"
+                />
+              </svg>
+              <span className="text-[10px] text-white/40">Google</span>
             </button>
             <button
-              onClick={() => handleSocialSignIn('discord')}
-              className="group flex flex-col items-center justify-center w-[100px] h-[88px] rounded-2xl border border-gold/20 bg-white/5 backdrop-blur-md transition-all hover:border-gold/30 hover:bg-white/10 hover:shadow-[0_0_20px_rgba(212,175,55,0.15)]"
+              onClick={() => handleSocialSignIn("discord")}
+              className="flex flex-col items-center justify-center w-24 h-20 rounded-xl border border-white/10 bg-white/[0.03] hover:border-[#5865F2]/30 hover:bg-[#5865F2]/10 transition-all"
             >
-              <svg className="w-6 h-6 mb-1 text-white opacity-50 group-hover:opacity-100 transition-opacity" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z" /></svg>
-              <span className="text-[10px] text-white/50 font-medium group-hover:text-white transition-colors">Discord</span>
+              <svg
+                className="w-5 h-5 mb-1.5 text-[#5865F2]"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z" />
+              </svg>
+              <span className="text-[10px] text-white/40">Discord</span>
             </button>
           </div>
 
           {/* Divider */}
-          <div className="flex items-center gap-3 text-[0.7rem] uppercase tracking-[0.18em] text-white/30">
-            <span className="h-px flex-1 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-            <span>or register with email</span>
-            <span className="h-px flex-1 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+          <div className="flex items-center gap-4">
+            <div className="divider flex-1" />
+            <span className="text-[11px] uppercase tracking-widest text-white/25">
+              or register with email
+            </span>
+            <div className="divider flex-1" />
           </div>
 
           <form onSubmit={handleAccountSubmit} className="space-y-3">
             <div className="grid grid-cols-2 gap-3">
-              <label className="block text-xs text-white/50">
-                First Name
+              <div>
+                <label className="input-label">First Name</label>
                 <input
                   type="text"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
-                  className="mt-1 h-11 w-full rounded-xl border border-wireframe-stroke bg-black/60 px-3 text-sm text-white outline-none focus:border-gold transition-all placeholder:text-white/15"
+                  className="input-field"
                   placeholder="Jane"
                   required
                 />
-              </label>
-              <label className="block text-xs text-white/50">
-                Last Name
+              </div>
+              <div>
+                <label className="input-label">Last Name</label>
                 <input
                   type="text"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
-                  className="mt-1 h-11 w-full rounded-xl border border-wireframe-stroke bg-black/60 px-3 text-sm text-white outline-none focus:border-gold transition-all placeholder:text-white/15"
+                  className="input-field"
                   placeholder="Doe"
                   required
                 />
-              </label>
+              </div>
             </div>
-            <label className="block text-xs text-white/50">
-              Email
+
+            <div>
+              <label className="input-label">Email</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 h-11 w-full rounded-xl border border-wireframe-stroke bg-black/60 px-3 text-sm text-white outline-none focus:border-gold transition-all placeholder:text-white/15"
+                className="input-field"
                 placeholder="you@example.com"
                 required
               />
-            </label>
-            <label className="block text-xs text-white/50">
-              Password
+            </div>
+
+            <div>
+              <label className="input-label">Password</label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 h-11 w-full rounded-xl border border-wireframe-stroke bg-black/60 px-3 text-sm text-white outline-none focus:border-gold transition-all placeholder:text-white/15"
+                className="input-field"
                 placeholder="Create a password"
                 required
               />
-            </label>
+            </div>
 
-            <button
-              type="submit"
-              className="mt-4 flex items-center justify-center h-12 w-full rounded-full bg-gradient-to-r from-gold to-gold text-sm font-semibold text-black hover:shadow-[0_0_24px_rgba(251,191,36,0.5)] transition-shadow"
-            >
+            <button type="submit" className="btn-primary w-full mt-2">
               Continue
             </button>
 
-            <p className="pt-2 text-center text-[0.8rem] text-white/50">
+            <p className="text-center text-sm text-white/40 pt-1">
               Already have an account?{" "}
-              <Link href="/sign-in" className="text-gold hover:text-gold">
+              <Link
+                href="/sign-in"
+                className="text-gold hover:text-gold-light transition-colors"
+              >
                 Sign in
               </Link>
             </p>
@@ -243,145 +258,146 @@ export default function SignUpPage() {
         </>
       )}
 
-      {/* Step 2: Business Details */}
-      {step === 'business' && (
+      {/* Step 2: Business */}
+      {step === "business" && (
         <form onSubmit={handleBusinessSubmit} className="space-y-4">
-          <label className="block text-xs text-white/50">
-            Business Name
+          <div>
+            <label className="input-label">Business Name</label>
             <input
               type="text"
               value={businessName}
               onChange={(e) => setBusinessName(e.target.value)}
-              className="mt-1 h-11 w-full rounded-xl border border-wireframe-stroke bg-black/60 px-3 text-sm text-white outline-none focus:border-gold transition-all placeholder:text-white/15"
+              className="input-field"
               placeholder="Acme Corp"
               required
             />
-          </label>
+          </div>
 
-          <label className="block text-xs text-white/50">
-            Business Type
+          <div>
+            <label className="input-label">Business Type</label>
             <select
               value={businessType}
               onChange={(e) => setBusinessType(e.target.value)}
-              className="mt-1 h-11 w-full rounded-xl border border-wireframe-stroke bg-black/60 px-3 text-sm text-white outline-none focus:border-gold transition-all"
+              className="input-field"
             >
-              <option value="" className="bg-black">Select a type...</option>
-              <option value="startup" className="bg-black">Startup</option>
-              <option value="smb" className="bg-black">Small/Medium Business</option>
-              <option value="enterprise" className="bg-black">Enterprise</option>
-              <option value="agency" className="bg-black">Agency</option>
-              <option value="freelancer" className="bg-black">Freelancer / Solo</option>
-              <option value="nonprofit" className="bg-black">Non-Profit</option>
-              <option value="other" className="bg-black">Other</option>
+              <option value="">Select a type...</option>
+              <option value="startup">Startup</option>
+              <option value="smb">Small/Medium Business</option>
+              <option value="enterprise">Enterprise</option>
+              <option value="agency">Agency</option>
+              <option value="freelancer">Freelancer / Solo</option>
+              <option value="nonprofit">Non-Profit</option>
+              <option value="other">Other</option>
             </select>
-          </label>
+          </div>
 
-          <label className="block text-xs text-white/50">
-            What best describes your role?
-            <select
-              className="mt-1 h-11 w-full rounded-xl border border-wireframe-stroke bg-black/60 px-3 text-sm text-white outline-none focus:border-gold transition-all"
-            >
-              <option value="" className="bg-black">Select a role...</option>
-              <option value="founder" className="bg-black">Founder / CEO</option>
-              <option value="executive" className="bg-black">Executive / C-Suite</option>
-              <option value="manager" className="bg-black">Manager / Team Lead</option>
-              <option value="developer" className="bg-black">Developer / Engineer</option>
-              <option value="designer" className="bg-black">Designer</option>
-              <option value="marketer" className="bg-black">Marketing / Sales</option>
-              <option value="operations" className="bg-black">Operations</option>
-              <option value="other" className="bg-black">Other</option>
+          <div>
+            <label className="input-label">Your Role</label>
+            <select className="input-field">
+              <option value="">Select a role...</option>
+              <option value="founder">Founder / CEO</option>
+              <option value="executive">Executive / C-Suite</option>
+              <option value="manager">Manager / Team Lead</option>
+              <option value="developer">Developer / Engineer</option>
+              <option value="designer">Designer</option>
+              <option value="marketer">Marketing / Sales</option>
+              <option value="operations">Operations</option>
+              <option value="other">Other</option>
             </select>
-          </label>
+          </div>
 
-          <div className="flex gap-3 mt-6">
+          <div className="flex gap-3 pt-2">
             <button
               type="button"
-              onClick={() => setStep('account')}
-              className="flex-1 h-12 rounded-full border border-gold/20 text-sm font-medium text-gold hover:bg-gold/10 transition-all"
+              onClick={() => setStep("account")}
+              className="btn-secondary flex-1"
             >
               Back
             </button>
-            <button
-              type="submit"
-              className="flex-1 h-12 rounded-full bg-gradient-to-r from-gold to-gold text-sm font-semibold text-black hover:shadow-[0_0_24px_rgba(251,191,36,0.5)] transition-shadow"
-            >
+            <button type="submit" className="btn-primary flex-1">
               Continue
             </button>
           </div>
         </form>
       )}
 
-      {/* Step 3: Region Details */}
-      {step === 'region' && (
+      {/* Step 3: Region */}
+      {step === "region" && (
         <form onSubmit={handleRegionSubmit} className="space-y-4">
-          <div className="space-y-4">
-            <CountrySelect
-              value={country?.code}
-              onChange={(c) => {
-                setCountry(c);
-                setState(null); // Reset state when country changes
-              }}
-              label="Country"
-              placeholder="Start typing to search..."
-            />
+          <CountrySelect
+            value={country?.code}
+            onChange={(c) => {
+              setCountry(c);
+              setState(null);
+            }}
+            label="Country"
+            placeholder="Start typing to search..."
+          />
 
-            {country && (country.code === 'US' || country.code === 'CA' || country.code === 'AU' || country.code === 'MX') && (
+          {country &&
+            ["US", "CA", "AU", "MX"].includes(country.code) && (
               <StateSelect
                 countryCode={country.code}
                 value={state ?? undefined}
                 onChange={setState}
-                label={country.code === 'CA' ? 'Province' : 'State'}
-                placeholder={`Select ${country.code === 'CA' ? 'province' : 'state'}...`}
+                label={country.code === "CA" ? "Province" : "State"}
+                placeholder={`Select ${
+                  country.code === "CA" ? "province" : "state"
+                }...`}
               />
             )}
 
-            <CityInput
-              value={city}
-              onChange={setCity}
-              label="City"
-              placeholder="Enter your city"
-            />
+          <CityInput
+            value={city}
+            onChange={setCity}
+            label="City"
+            placeholder="Enter your city"
+          />
 
-            <PostalCodeInput
-              value={postalCode}
-              onChange={setPostalCode}
-              countryCode={country?.code || 'US'}
-              label={country?.code === 'US' ? 'ZIP Code' : 'Postal Code'}
-            />
-          </div>
+          <PostalCodeInput
+            value={postalCode}
+            onChange={setPostalCode}
+            countryCode={country?.code || "US"}
+            label={country?.code === "US" ? "ZIP Code" : "Postal Code"}
+          />
 
-          {/* Timezone display */}
           {country && (
-            <div className="p-3 rounded-xl bg-white/5 border border-wireframe-stroke">
+            <div className="rounded-xl border border-white/8 bg-white/[0.03] p-3">
               <p className="text-xs text-white/50">
-                <span className="text-white/30">Timezone:</span>{' '}
-                <span className="text-white">{country.timezone}</span>
+                <span className="text-white/30">Timezone:</span>{" "}
+                <span className="text-white/80">{country.timezone}</span>
               </p>
               <p className="text-xs text-white/50 mt-1">
-                <span className="text-white/30">Currency:</span>{' '}
-                <span className="text-white">{country.currencySymbol} {country.currency}</span>
+                <span className="text-white/30">Currency:</span>{" "}
+                <span className="text-white/80">
+                  {country.currencySymbol} {country.currency}
+                </span>
               </p>
             </div>
           )}
 
-          <div className="flex gap-3 mt-6">
+          <div className="flex gap-3 pt-2">
             <button
               type="button"
-              onClick={() => setStep('business')}
+              onClick={() => setStep("business")}
               disabled={isLoading}
-              className="flex-1 h-12 rounded-full border border-gold/20 text-sm font-medium text-gold hover:bg-gold/10 transition-all disabled:opacity-50"
+              className="btn-secondary flex-1"
             >
               Back
             </button>
             <button
               type="submit"
               disabled={!country || isLoading}
-              className="flex-1 h-12 rounded-full bg-gradient-to-r from-gold to-gold text-sm font-semibold text-black hover:shadow-[0_0_24px_rgba(251,191,36,0.5)] transition-shadow disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="btn-primary flex-1"
             >
-              {isLoading && (
-                <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                "Create Account"
               )}
-              {isLoading ? 'Creating...' : 'Create Account'}
             </button>
           </div>
         </form>

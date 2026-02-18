@@ -1,41 +1,117 @@
-// frontend/app/(auth)/forgot-password/page.tsx
-import Link from 'next/link';
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import { ArrowLeft, Loader2, CheckCircle } from "lucide-react";
 
 export default function ForgotPasswordPage() {
-  return (
-    <div className="space-y-8">
-      {/* LED dot-matrix heading */}
-      <header className="text-center">
-        <h1 className="text-[1.6rem] md:text-[2rem] font-bold tracking-[0.15em] leading-tight text-white font-display uppercase">
-          Reset
-          <br />
-          Password
-        </h1>
-        <p className="mt-4 text-sm text-white/50">
-          Enter your email and we&apos;ll send you instructions to reset your password.
-        </p>
-      </header>
+  const [email, setEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSent, setIsSent] = useState(false);
+  const [error, setError] = useState("");
 
-      <form className="space-y-4">
-        <label className="block text-xs text-white/50">
-          Email Address
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+
+    setIsLoading(true);
+    setError("");
+
+    try {
+      const res = await fetch("/api/auth/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Failed to send reset link");
+      }
+
+      setIsSent(true);
+    } catch (err: any) {
+      setError(err.message || "Something went wrong. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (isSent) {
+    return (
+      <div className="space-y-6 text-center">
+        <div className="flex justify-center">
+          <div className="flex h-14 w-14 items-center justify-center rounded-full border border-signal-green/20 bg-signal-green/10">
+            <CheckCircle className="w-7 h-7 text-signal-green" />
+          </div>
+        </div>
+        <div>
+          <h1 className="text-2xl font-bold text-white">Check your email</h1>
+          <p className="mt-2 text-sm text-white/50">
+            If an account exists for <strong className="text-white/70">{email}</strong>,
+            we&apos;ve sent password reset instructions.
+          </p>
+        </div>
+        <Link href="/sign-in" className="btn-secondary w-full">
+          <ArrowLeft className="w-4 h-4" />
+          Back to Sign In
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="text-center">
+        <h1 className="text-2xl font-bold text-white">Reset your password</h1>
+        <p className="mt-2 text-sm text-white/50">
+          Enter your email and we&apos;ll send you a reset link.
+        </p>
+      </div>
+
+      {/* Error */}
+      {error && (
+        <div className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-300 text-center">
+          {error}
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="input-label">Email Address</label>
           <input
             type="email"
-            className="mt-1 h-11 w-full rounded-xl border border-wireframe-stroke bg-black/60 px-3 text-sm text-white outline-none focus:border-gold transition-all placeholder:text-white/15"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="input-field"
             placeholder="you@example.com"
+            required
+            autoComplete="email"
           />
-        </label>
+        </div>
 
         <button
           type="submit"
-          className="mt-4 flex items-center justify-center h-12 w-full rounded-full bg-gradient-to-r from-gold to-gold text-sm font-semibold text-black hover:shadow-[0_0_24px_rgba(251,191,36,0.5)] transition-shadow"
+          disabled={isLoading || !email}
+          className="btn-primary w-full"
         >
-          Send Reset Link
+          {isLoading ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Sending...
+            </>
+          ) : (
+            "Send Reset Link"
+          )}
         </button>
 
-        <p className="pt-2 text-center text-[0.8rem] text-white/50">
+        <p className="text-center text-sm text-white/40">
           Remember your password?{" "}
-          <Link href="/sign-in" className="text-gold hover:text-gold">
+          <Link
+            href="/sign-in"
+            className="text-gold hover:text-gold-light transition-colors"
+          >
             Back to Sign In
           </Link>
         </p>

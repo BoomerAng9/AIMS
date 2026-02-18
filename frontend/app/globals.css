@@ -1,7 +1,11 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ═══════════════════════════════════════════════════════════
+   A.I.M.S. Design System — v2
+   Nothing-brand wireframe minimal · High contrast · Mobile-first
+   ═══════════════════════════════════════════════════════════ */
 
 :root {
   --background: #0A0A0A;
@@ -9,520 +13,275 @@
   --font-doto: 'Doto', monospace;
   --font-marker: 'Permanent Marker', cursive;
   --font-caveat: 'Caveat', cursive;
-  --frame-inset: 12px;
 
-  /* ── Text Opacity Floors (Nothing-brand clarity) ── */
+  /* Text — high contrast, never below 0.40 */
   --text-primary: rgba(255, 255, 255, 0.95);
   --text-secondary: rgba(255, 255, 255, 0.70);
-  --text-muted: rgba(255, 255, 255, 0.55);
-  --text-dim: rgba(255, 255, 255, 0.40);
-  /* NEVER go below 0.40 for any visible text */
+  --text-muted: rgba(255, 255, 255, 0.50);
+  --text-dim: rgba(255, 255, 255, 0.35);
+
+  /* Surfaces */
+  --color-surface: #111111;
+  --color-surface-raised: #161616;
+  --color-border: rgba(255, 255, 255, 0.10);
+  --color-border-hover: rgba(255, 255, 255, 0.20);
+
+  /* Gold */
+  --color-gold: #D4AF37;
 }
 
-@media (min-width: 768px) {
-  :root { --frame-inset: 16px; }
-}
-@media (min-width: 1280px) {
-  :root { --frame-inset: 24px; }
+/* ─── Base ────────────────────────────────────────────────── */
+
+html, body {
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  overscroll-behavior-y: none;
 }
 
 body {
-  color: var(--foreground);
+  color: var(--text-primary);
   background: var(--background);
-  font-family: 'Inter', sans-serif;
-  overflow-x: hidden;
+  font-family: 'Inter', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Custom Scrollbar for Obsidian feel */
-::-webkit-scrollbar {
-  width: 8px;
-}
-::-webkit-scrollbar-track {
-  background: #1A1A1A; 
-}
-::-webkit-scrollbar-thumb {
-  background: #333; 
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #D4AF37; 
+::selection {
+  background: rgba(212, 175, 55, 0.30);
+  color: white;
 }
 
-/* Stitch Nano Banana Pro Auth Glass — "Window" cut into the logo wall */
-.auth-glass-card {
-  background: radial-gradient(
-    ellipse at 50% 0%,
-    rgba(255, 255, 255, 0.12) 0%,
-    rgba(255, 255, 255, 0.06) 30%,
-    rgba(10, 10, 10, 0.85) 100%
-  );
-  backdrop-filter: blur(32px) saturate(1.2);
-  -webkit-backdrop-filter: blur(32px) saturate(1.2);
-  border: 1px solid rgba(212, 175, 55, 0.10);
-  box-shadow:
-    0 32px 96px rgba(0, 0, 0, 0.9),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    0 0 0 1px rgba(0, 0, 0, 0.3);
+/* ─── Scrollbar ───────────────────────────────────────────── */
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.16); }
+
+.scrollbar-thin::-webkit-scrollbar { width: 4px; }
+.scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+.scrollbar-thin::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+/* ─── Component Layer ─────────────────────────────────────── */
+
+@layer components {
+  /* Glass card — primary elevated surface */
+  .glass-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--color-border);
+    border-radius: 20px;
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+  }
+
+  /* Wireframe card — structural, minimal */
+  .wireframe-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 16px;
+    box-shadow:
+      inset 0 1px 1px rgba(255, 255, 255, 0.05),
+      inset 0 -1px 1px rgba(255, 255, 255, 0.02);
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .wireframe-card:hover {
+    border-color: rgba(255, 255, 255, 0.20);
+  }
+
+  /* Auth glass card */
+  .auth-glass-card {
+    background: radial-gradient(
+      ellipse at 50% 0%,
+      rgba(255, 255, 255, 0.08) 0%,
+      rgba(255, 255, 255, 0.04) 30%,
+      rgba(10, 10, 10, 0.90) 100%
+    );
+    backdrop-filter: blur(32px);
+    -webkit-backdrop-filter: blur(32px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow:
+      0 32px 96px rgba(0, 0, 0, 0.8),
+      inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  }
+
+  /* Primary button */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2;
+    @apply h-11 px-6 rounded-xl;
+    @apply text-sm font-semibold;
+    background: #D4AF37;
+    color: #000;
+    transition: all 0.2s;
+  }
+  .btn-primary:hover {
+    box-shadow: 0 0 24px rgba(212, 175, 55, 0.3);
+  }
+  .btn-primary:active {
+    transform: scale(0.98);
+  }
+  .btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* Secondary button */
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2;
+    @apply h-11 px-6 rounded-xl;
+    @apply text-sm font-medium;
+    color: rgba(255,255,255,0.90);
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.12);
+    transition: all 0.2s;
+  }
+  .btn-secondary:hover {
+    border-color: rgba(255,255,255,0.22);
+    background: rgba(255,255,255,0.07);
+  }
+  .btn-secondary:active {
+    transform: scale(0.98);
+  }
+
+  /* Form input */
+  .input-field {
+    @apply w-full h-11 px-4 rounded-xl text-sm;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.10);
+    color: white;
+    outline: none;
+    transition: all 0.2s;
+  }
+  .input-field::placeholder {
+    color: rgba(255,255,255,0.25);
+  }
+  .input-field:focus {
+    border-color: rgba(212,175,55,0.50);
+    background: rgba(255,255,255,0.06);
+    box-shadow: 0 0 0 2px rgba(212,175,55,0.10);
+  }
+
+  /* Input label */
+  .input-label {
+    @apply block text-xs font-medium mb-1.5;
+    color: rgba(255,255,255,0.60);
+  }
+
+  /* Divider */
+  .divider {
+    @apply h-px w-full;
+    background: linear-gradient(to right, transparent, rgba(255,255,255,0.10), transparent);
+  }
+
+  /* Gold gradient text */
+  .text-gold-gradient {
+    background: linear-gradient(135deg, #D4AF37, #E8D48A, #D4AF37);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
 }
 
-
-/* --- A.I.M.S. Design System Utilities --- */
+/* ─── Utility Layer ───────────────────────────────────────── */
 
 @layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
   .text-shadow-gold {
     text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
   }
-  
-  .text-shadow-neon {
-    text-shadow: 0 0 5px rgba(255, 255, 255, 0.5), 0 0 20px rgba(212, 175, 55, 0.5);
+
+  .glow-gold {
+    box-shadow: 0 0 40px rgba(212, 175, 55, 0.08);
   }
 
-  .glass-panel {
-    @apply bg-white/5 backdrop-blur-xl border border-white/10 shadow-glass;
+  .glow-gold-strong {
+    box-shadow: 0 0 60px rgba(212, 175, 55, 0.15);
   }
 
-  /* Deep, premium glass for main containers */
-  .glass-premium {
-    background: radial-gradient(
-      circle at top left,
-      rgba(212, 175, 55, 0.05),
-      rgba(0, 0, 0, 0) 60%
-    ), rgba(20, 20, 20, 0.6);
-    @apply backdrop-blur-3xl border border-gold/20 shadow-neon-gold;
-  }
-  
-  /* Subtle Tech Grid Background */
-  .bg-grid-pattern {
-    background-size: 40px 40px;
-    background-image: linear-gradient(to right, #1a1a1a 1px, transparent 1px),
-                      linear-gradient(to bottom, #1a1a1a 1px, transparent 1px);
-    mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
-    -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
-  }
-
-  /* Utility for glowing borders on hover */
-  .hover-glow-border {
-    @apply transition-all duration-300 hover:border-gold/50 hover:shadow-[0_0_15px_rgba(212,175,55,0.2)];
-  }
-
-  /* ── Wireframe Glass Card — core card primitive ── */
-  .wireframe-card {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    border-radius: 16px;
-    box-shadow:
-      inset 0 1px 1px rgba(255, 255, 255, 0.06),
-      inset 0 -1px 1px rgba(255, 255, 255, 0.02);
-    transition: border-color 0.3s, box-shadow 0.3s;
-  }
-  .wireframe-card:hover {
-    border-color: rgba(255, 255, 255, 0.22);
-    box-shadow:
-      inset 0 1px 1px rgba(255, 255, 255, 0.10),
-      0 4px 24px rgba(0, 0, 0, 0.3);
-  }
-
-  /* ── Global Viewport Frame — half-inch border around entire UI ── */
-  .aims-frame {
-    margin: var(--frame-inset);
-    min-height: calc(100vh - var(--frame-inset) * 2);
-    max-height: calc(100vh - var(--frame-inset) * 2);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 20px;
-    overflow-y: auto;
-    overflow-x: hidden;
-    position: relative;
-    background: var(--background);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.04),
-      0 0 80px rgba(0, 0, 0, 0.8);
-    display: flex;
-    flex-direction: column;
-  }
-
-  /* ── A.I.M.S. Page Background — cinematic dark with gold grid ── */
-  .aims-page-bg {
-    background-color: #0A0A0A;
+  /* Grid background */
+  .bg-grid {
     background-image:
-      radial-gradient(circle, rgba(212,175,55,0.04) 1px, transparent 1px),
-      linear-gradient(to right, rgba(212,175,55,0.03) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(212,175,55,0.03) 1px, transparent 1px);
-    background-size: 24px 24px, 48px 48px, 48px 48px;
+      linear-gradient(to right, rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 48px 48px;
   }
 
-  /* ── Gold Edge Rail — replaces tiled logo ── */
-  .gold-edge-rail {
-    position: relative;
-  }
-  .gold-edge-rail::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border: 1px solid rgba(212, 175, 55, 0.08);
-    border-radius: inherit;
-    pointer-events: none;
-    z-index: 1;
-  }
-  .gold-edge-rail::after {
-    content: '';
-    position: absolute;
-    top: -1px; left: -1px; right: -1px; bottom: -1px;
-    background: linear-gradient(135deg, rgba(212,175,55,0.12) 0%, transparent 30%, transparent 70%, rgba(212,175,55,0.08) 100%);
-    border-radius: inherit;
-    pointer-events: none;
-    opacity: 0.6;
-    z-index: 1;
+  /* Dot matrix */
+  .bg-dots {
+    background-image: radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px);
+    background-size: 24px 24px;
   }
 
-  /* ── Controlled Glow — never bright haze ── */
-  .glow-controlled {
-    box-shadow: 0 0 40px rgba(212, 175, 55, 0.06);
-  }
-
-  /* ── Nano Banana Pro Textures ── */
+  /* Noise texture */
   .texture-noise {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    inset: 0;
     pointer-events: none;
     z-index: 1;
-    opacity: 0.03;
+    opacity: 0.025;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
   }
 
-  .texture-scanlines {
-    background: linear-gradient(
-      to bottom,
-      rgba(255,255,255,0),
-      rgba(255,255,255,0) 50%,
-      rgba(0,0,0,0.1) 50%,
-      rgba(0,0,0,0.1)
-    );
-    background-size: 100% 4px;
-    pointer-events: none;
-  }
-
+  /* Vignette */
   .vignette-overlay {
-    background: radial-gradient(
-      circle at center,
-      transparent 70%,
-      rgba(0, 0, 0, 0.10) 100%
-    );
+    background: radial-gradient(circle at center, transparent 65%, rgba(0,0,0,0.15) 100%);
     pointer-events: none;
-    z-index: 1;
-  }
-  /* ── Core Layout Fixes ── */
-  html, body {
-    min-height: 100%;
-    margin: 0;
-    padding: 0;
-    overflow-x: hidden;
-    /* Prevent bouncy scroll on iOS/Safari which causes layout shifts */
-    overscroll-behavior-y: none;
-  }
-
-  /* Lock body for dashboard to prevent browser chrome jumping */
-  .dashboard-scroll-lock {
-    height: 100% !important;
-    overflow: hidden !important;
-    width: 100% !important;
-    position: fixed !important; /* Strict lock */
-    top: 0;
-    left: 0;
   }
 }
 
-/* ─────────────────────────────────────────────────────────────
-   Deploy Dock — Lo-fi Retro-Futurism Effects
-   ───────────────────────────────────────────────────────────── */
+/* ─── Animations ──────────────────────────────────────────── */
 
-/* Scanline animation for Transfer View */
-@keyframes scan {
-  0% { transform: translateY(-100%); }
-  100% { transform: translateY(100vh); }
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.animate-scan {
-  animation: scan 4s linear infinite;
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-/* Subtle grain overlay */
-.texture-grain {
-  position: absolute;
-  inset: 0;
-  opacity: 0.03;
-  pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }
 
-/* Pulse glow for active elements */
-@keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(212, 168, 67, 0); }
-  50% { box-shadow: 0 0 20px 4px rgba(212, 168, 67, 0.3); }
+@keyframes pulse-dot {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
 }
 
-.animate-pulse-glow {
-  animation: pulse-glow 2s ease-in-out infinite;
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
 }
 
-/* Materialize entrance effect */
-@keyframes materialize {
-  0% {
-    opacity: 0;
-    filter: blur(8px);
-    transform: translateY(20px);
-  }
-  100% {
-    opacity: 1;
-    filter: blur(0px);
-    transform: translateY(0);
-  }
-}
+.animate-fade-in { animation: fade-in 0.5s ease-out forwards; }
+.animate-fade-in-up { animation: fade-in-up 0.6s ease-out forwards; }
+.animate-float { animation: float 6s ease-in-out infinite; }
+.animate-pulse-dot { animation: pulse-dot 2s ease-in-out infinite; }
 
-.animate-materialize {
-  animation: materialize 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-/* Swarm convergence for Hatch animation */
-@keyframes swarm-converge {
-  0% {
-    transform: translate(var(--swarm-x, 0), var(--swarm-y, 0)) scale(0);
-    opacity: 0;
-  }
-  100% {
-    transform: translate(0, 0) scale(1);
-    opacity: 1;
-  }
-}
-
-.animate-swarm {
-  animation: swarm-converge 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-/* Protocol line connection animation */
-@keyframes line-connect {
-  0% { transform: scaleX(0); transform-origin: left; }
-  100% { transform: scaleX(1); transform-origin: left; }
-}
-
-.animate-line-connect {
-  animation: line-connect 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-/* Launch pulse animation */
-@keyframes launch-pulse {
-  0%, 100% { transform: scale(1); opacity: 0.5; }
-  50% { transform: scale(1.3); opacity: 1; }
-}
-
-.animate-launch-pulse {
-  animation: launch-pulse 2s ease-in-out infinite;
-}
-
-/* Glass box timeline marker */
-.timeline-dot {
-  position: relative;
-}
-
-.timeline-dot::before {
-  content: '';
-  position: absolute;
-  left: -5px;
-  top: 0;
-  height: 10px;
-  width: 10px;
-  border-radius: 50%;
-  border: 2px solid currentColor;
-  background: var(--background);
-}
-
-/* Scrollbar for ACHEEVY panel */
-.scrollbar-thin::-webkit-scrollbar {
-  width: 4px;
-}
-
-.scrollbar-thin::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.scrollbar-thin::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 2px;
-}
-
-.scrollbar-thin::-webkit-scrollbar-thumb:hover {
-  background: rgba(212, 168, 67, 0.3);
-}
-
-/* ─────────────────────────────────────────────────────────────
-   The Hangar — Deployment Port Effects
-   ───────────────────────────────────────────────────────────── */
-
-/* Laser-print scanline on card hover */
-@keyframes hangar-scan {
-  0% { transform: translateY(-100%); }
-  100% { transform: translateY(200%); }
-}
-
-.hangar-scanline {
-  background: linear-gradient(
-    to bottom,
-    transparent 0%,
-    rgba(212, 175, 55, 0.03) 45%,
-    rgba(212, 175, 55, 0.08) 50%,
-    rgba(212, 175, 55, 0.03) 55%,
-    transparent 100%
-  );
-  animation: hangar-scan 2s linear infinite;
-}
-
-/* Status flicker effect for "Deployment Port Active" label */
-@keyframes hangar-flicker {
-  0%, 90%, 100% { opacity: 1; }
-  92% { opacity: 0.4; }
-  94% { opacity: 1; }
-  96% { opacity: 0.6; }
-  98% { opacity: 1; }
-}
-
-.hangar-flicker {
-  animation: hangar-flicker 4s ease-in-out infinite;
-}
-
-/* LED ceiling pulse */
-@keyframes led-pulse {
-  0%, 100% { opacity: 0.3; }
-  50% { opacity: 0.5; }
-}
-
-.led-pulse {
-  animation: led-pulse 3s ease-in-out infinite;
-}
-
-/* Materialize-in for hierarchy nodes */
-@keyframes hangar-materialize {
-  0% {
-    opacity: 0;
-    filter: blur(12px);
-    transform: scale(0.8) translateY(10px);
-  }
-  60% {
-    filter: blur(2px);
-  }
-  100% {
-    opacity: 1;
-    filter: blur(0px);
-    transform: scale(1) translateY(0);
-  }
-}
-
-.hangar-materialize {
-  animation: hangar-materialize 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-/* Circuit Box panel — strip nested page wrappers when embedded */
-.circuit-box-panel > div > .min-h-screen {
-  min-height: auto !important;
-  background-color: transparent !important;
-  background-image: none !important;
-}
-.circuit-box-panel .aims-page-bg {
-  background-color: transparent !important;
-  background-image: none !important;
-}
-/* Hide nested CircuitBoardPattern when inside Circuit Box */
-.circuit-box-panel canvas {
-  display: none !important;
-}
-
-/* ─────────────────────────────────────────────────────────────
+/* ═══════════════════════════════════════════════════════════
    Retro 80s Glitch Effects — SELECTIVE USE ONLY
    Apply to: /arena, /hangar, /the-book-of-vibe, /gallery
    DO NOT apply to: /dashboard, /chat, auth pages
-   ───────────────────────────────────────────────────────────── */
+   ═══════════════════════════════════════════════════════════ */
 
-/* Chromatic aberration text glitch */
 @keyframes glitch-text {
-  0%, 100% {
-    text-shadow: none;
-  }
-  20% {
-    text-shadow: -2px 0 #ff006e, 2px 0 #00d4ff;
-  }
-  40% {
-    text-shadow: 2px 0 #ff006e, -2px 0 #00d4ff;
-  }
-  60% {
-    text-shadow: -1px 1px #ff006e, 1px -1px #00d4ff;
-  }
-  80% {
-    text-shadow: 1px 0 #ff006e, -1px 0 #00d4ff;
-  }
+  0%, 100% { text-shadow: none; }
+  20% { text-shadow: -2px 0 #ff006e, 2px 0 #00d4ff; }
+  40% { text-shadow: 2px 0 #ff006e, -2px 0 #00d4ff; }
+  60% { text-shadow: -1px 1px #ff006e, 1px -1px #00d4ff; }
+  80% { text-shadow: 1px 0 #ff006e, -1px 0 #00d4ff; }
 }
 
-.glitch-text {
-  animation: glitch-text 3s ease-in-out infinite;
-}
+.glitch-text { animation: glitch-text 3s ease-in-out infinite; }
+.glitch-text-hover:hover { animation: glitch-text 0.3s ease-in-out; }
 
-/* Subtle glitch on hover only */
-.glitch-text-hover:hover {
-  animation: glitch-text 0.3s ease-in-out;
-}
-
-/* Horizontal shift glitch for images/containers */
-@keyframes glitch-shift {
-  0%, 100% { transform: translate(0); }
-  10% { transform: translate(-2px, 1px); }
-  20% { transform: translate(2px, -1px); }
-  30% { transform: translate(-1px, 0); }
-  40% { transform: translate(0); }
-}
-
-.glitch-shift {
-  animation: glitch-shift 4s ease-in-out infinite;
-}
-
-/* CRT scanline overlay — apply to containers */
-.retro-scanlines::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(
-    to bottom,
-    transparent 0px,
-    transparent 2px,
-    rgba(0, 0, 0, 0.08) 2px,
-    rgba(0, 0, 0, 0.08) 4px
-  );
-  pointer-events: none;
-  z-index: 10;
-}
-
-/* VHS tracking lines */
-@keyframes vhs-tracking {
-  0% { transform: translateY(0); opacity: 0; }
-  10% { opacity: 0.5; }
-  50% { transform: translateY(100vh); opacity: 0.3; }
-  100% { transform: translateY(200vh); opacity: 0; }
-}
-
-.vhs-tracking::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  width: 100%;
-  height: 3px;
-  background: rgba(255, 255, 255, 0.08);
-  z-index: 10;
-  pointer-events: none;
-  animation: vhs-tracking 8s linear infinite;
-}
-
-/* Neon flicker for headings */
 @keyframes neon-flicker {
   0%, 100% { opacity: 1; }
   92% { opacity: 1; }
@@ -532,6 +291,13 @@ body {
   97% { opacity: 1; }
 }
 
-.neon-flicker {
-  animation: neon-flicker 5s ease-in-out infinite;
+.neon-flicker { animation: neon-flicker 5s ease-in-out infinite; }
+
+.retro-scanlines::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(to bottom, transparent 0px, transparent 2px, rgba(0,0,0,0.06) 2px, rgba(0,0,0,0.06) 4px);
+  pointer-events: none;
+  z-index: 10;
 }
