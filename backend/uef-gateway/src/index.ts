@@ -43,7 +43,6 @@ import { incidentManager } from './backup/incident-runbook';
 import { a2aRouter } from './a2a';
 import { getOrchestrator } from './acheevy/orchestrator';
 import { shelfRouter } from './shelves/shelf-router';
-import { shelfClient } from './shelves/firestore-client';
 import { lucProjectService } from './shelves/luc-project-service';
 import { allShelfTools } from './shelves/mcp-tools';
 import { ossModels } from './llm/oss-models';

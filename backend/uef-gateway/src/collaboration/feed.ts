@@ -12,7 +12,7 @@
  */
 
 import { v4 as uuidv4 } from 'uuid';
-import { ALL_ROLE_CARDS, getRoleCard } from '../pmo/role-cards';
+import { getRoleCard } from '../pmo/role-cards';
 import { getPersonaForAng } from '../pmo/persona-catalog';
 import type { RoleCard } from '../pmo/persona-types';
 import type { AngPersona } from '../pmo/persona-types';
@@ -24,13 +24,11 @@ import type {
   ExecutionRecord,
   VerificationResult,
   ShiftReceipt,
-  N8nPipelineResponse,
 } from '../n8n/types';
 import type {
   FeedEntry,
   FeedEntryType,
   AgentIdentity,
-  AgentRole,
   CollaborationSession,
   SessionStats,
   FeedConfig,
@@ -148,10 +146,6 @@ function entry(
 function pickNugget(roleCard: RoleCard): string {
   const nuggets = roleCard.communication.sidebarNuggets;
   return nuggets[Math.floor(Math.random() * nuggets.length)];
-}
-
-function pickCatchphrase(persona: AngPersona): string {
-  return persona.backstory.catchphrase;
 }
 
 // ---------------------------------------------------------------------------
@@ -458,7 +452,7 @@ export class CollaborationFeedGenerator {
     return entries;
   }
 
-  private generateExecution(execution: ExecutionRecord, squad: SquadRecord): FeedEntry[] {
+  private generateExecution(execution: ExecutionRecord, _squad: SquadRecord): FeedEntry[] {
     const entries: FeedEntry[] = [];
 
     for (const wave of execution.waveResults) {

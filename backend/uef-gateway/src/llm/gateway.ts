@@ -11,9 +11,9 @@
  * This replaces all direct OpenRouter/API calls throughout the codebase.
  */
 
-import { vertexAI, VERTEX_MODELS } from './vertex-ai';
+import { vertexAI } from './vertex-ai';
 import { openrouter, MODELS as OPENROUTER_MODELS, DEFAULT_MODEL } from './openrouter';
-import { ossModels, OSS_MODELS } from './oss-models';
+import { ossModels } from './oss-models';
 import { usageTracker } from './usage-tracker';
 import type { LLMResult, ChatMessage, ModelSpec } from './openrouter';
 import logger from '../logger';

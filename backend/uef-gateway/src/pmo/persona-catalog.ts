@@ -17,7 +17,7 @@
  * "Activity breeds Activity — shipped beats perfect."
  */
 
-import type { AngPersona, PersonaTemplate, RegistryPersonaBinding } from './persona-types';
+import type { AngPersona, RegistryPersonaBinding } from './persona-types';
 
 // ---------------------------------------------------------------------------
 // Registry Persona Bindings — one persona per canonical Boomer_Ang

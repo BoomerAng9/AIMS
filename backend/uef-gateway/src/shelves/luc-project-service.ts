@@ -21,13 +21,11 @@ import { v4 as uuidv4 } from 'uuid';
 import { shelfClient } from './firestore-client';
 import type {
   LucProject,
-  LucStatus,
   TimeBand,
   ModelMixEntry,
   CostBand,
   AimsProject,
 } from './types';
-import { VERTEX_MODELS } from '../llm/vertex-ai';
 import logger from '../logger';
 
 // ---------------------------------------------------------------------------
@@ -209,7 +207,6 @@ export class LucProjectService {
     // 3. Compute cost and time bands
     const costBand = this.computeCostBand(modelMix);
     const timeBands = this.computeTimeBands(complexity);
-    const profile = COMPLEXITY_PROFILES[complexity] || COMPLEXITY_PROFILES.intermediate;
     const totalTokens = modelMix.reduce((sum, m) => sum + m.estimatedTokens, 0);
 
     // 4. Find similar projects for estimate refinement

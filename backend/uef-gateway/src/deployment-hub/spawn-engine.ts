@@ -18,13 +18,12 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import logger from '../logger';
-import { getCard, getVisualIdentity, listBoomerAngs, listLilHawks, listCards } from './card-loader';
+import { getCard, getVisualIdentity, listCards } from './card-loader';
 import type {
   SpawnRequest,
   SpawnRecord,
   SpawnResponse,
   SpawnAuditEntry,
-  SpawnStatus,
   RosterEntry,
 } from './types';
 

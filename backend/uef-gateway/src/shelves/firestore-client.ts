@@ -41,6 +41,7 @@ function getFirestore(): any {
 
       const serviceAccountPath = process.env.GOOGLE_APPLICATION_CREDENTIALS;
       if (serviceAccountPath) {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
         const cert = require(serviceAccountPath);
         admin.initializeApp({ credential: admin.credential.cert(cert), projectId });
       } else {

@@ -17,8 +17,6 @@
  *   luc.get_project          — Get a LUC project's status and costs
  */
 
-import type { ShelfName } from './types';
-
 export interface MCPToolDefinition {
   name: string;
   description: string;

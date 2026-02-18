@@ -121,6 +121,7 @@ export const SAVINGS_SPLIT_USER = 0.70;    // 70% to user savings account
 export const SAVINGS_SPLIT_PLATFORM = 0.30; // 30% retained by platform
 
 // Internal-only markup rates — NEVER expose to users
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const _MARKUP_RATES: Record<string, number> = {
   p2p: 0.25,
   '3mo': 0.20,

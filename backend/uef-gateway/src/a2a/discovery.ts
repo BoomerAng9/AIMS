@@ -6,7 +6,7 @@
  */
 
 import { Router, Request, Response } from 'express';
-import { getAgentCard, getAllAgentCards, findAgentsByCapability, AGENT_CARDS } from './agent-cards';
+import { getAgentCard, getAllAgentCards, findAgentsByCapability } from './agent-cards';
 import { taskManager } from './task-manager';
 import type { A2ATaskSendRequest, A2ATaskEvent } from './types';
 import logger from '../logger';

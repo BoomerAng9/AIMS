@@ -14,7 +14,6 @@ import type {
   A2ATaskStatus,
   A2ATaskEvent,
   A2ATaskSendRequest,
-  A2APart,
   A2AArtifact,
 } from './types';
 
