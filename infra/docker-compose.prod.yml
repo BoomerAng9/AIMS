@@ -185,6 +185,8 @@ services:
       - ROUTER_ANG_URL=http://router-ang:3021
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
       - INTERNAL_API_KEY=${INTERNAL_API_KEY}
+      # Hugging Face — Nvidia models
+      - HF_TOKEN=${HF_TOKEN}
       # Voice — ElevenLabs + Deepgram + Nvidia PersonaPlex
       - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY}
       - DEEPGRAM_API_KEY=${DEEPGRAM_API_KEY}
