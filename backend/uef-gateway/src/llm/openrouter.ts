@@ -176,6 +176,19 @@ export const MODELS: Record<string, ModelSpec> = {
     contextWindow: 131072,
     tier: 'economy',
   },
+
+  // ── Visual Agentic / Agent Swarm ────────────────────────────────────
+  // Routed via Together.ai or Fireworks.ai — NOT through OpenRouter.
+  // Use kimi client: import { kimi } from './kimi'
+  'kimi-k2.5': {
+    id: 'moonshotai/Kimi-K2.5',
+    name: 'Kimi K2.5',
+    provider: 'Moonshot AI (Together.ai)',
+    inputPer1M: 0.90,
+    outputPer1M: 0.90,
+    contextWindow: 262144, // 256K
+    tier: 'premium',
+  },
 };
 
 // Default model used by agents when no preference is set

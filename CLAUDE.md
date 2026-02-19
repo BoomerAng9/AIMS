@@ -5,9 +5,13 @@
 These three rules determine WHERE every piece of code deploys. Apply them to every task:
 
 ```
-IF core platform service (ACHEEVY API, UEF Gateway, Per|Form, n8n, PersonaPlex, House of Ang, Redis)
-  THEN → Hostinger VPS (76.13.96.107) in Docker
+IF core platform service (ACHEEVY API, UEF Gateway, Per|Form, PersonaPlex, House of Ang, Redis)
+  THEN → AIMS Core VPS (31.97.138.45 / srv1318308.hstgr.cloud) in Docker
   Files: infra/docker-compose.prod.yml, deploy.sh
+
+IF n8n workflows, automation workers, or webhook receivers
+  THEN → n8n Factory VPS (76.13.96.107 / srv1328075.hstgr.cloud) in Docker
+  Files: infra/docker-compose.n8n.yml
 
 IF long-running/scheduled autonomous job or sandbox (content engine, autonomous builds, daily crons)
   THEN → GCP Cloud Run (job or service), trigger via cron/events
@@ -20,7 +24,7 @@ IF user-facing app/site, dashboard, or static artifact (landing pages, funnels, 
 
 ## Project Overview
 A.I.M.S. (AI Managed Solutions) is an AI-managed platform orchestrated by ACHEEVY.
-Domain: plugmein.cloud | VPS: 76.13.96.107 | GCP: ai-managed-services
+Domain: plugmein.cloud | AIMS VPS: 31.97.138.45 | n8n VPS: 76.13.96.107 | GCP: ai-managed-services
 
 ## ACHEEVY Brain
 The single source of truth for ACHEEVY's behavior, skills, hooks, and recurring tasks:

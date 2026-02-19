@@ -187,6 +187,9 @@ services:
       - INTERNAL_API_KEY=${INTERNAL_API_KEY}
       # Hugging Face — Nvidia models
       - HF_TOKEN=${HF_TOKEN}
+      # Kimi K2.5 — Moonshot AI via Together.ai + Fireworks.ai
+      - TOGETHER_API_KEY=${TOGETHER_API_KEY}
+      - FIREWORKS_API_KEY=${FIREWORKS_API_KEY}
       # Voice — ElevenLabs + Deepgram + Nvidia PersonaPlex
       - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY}
       - DEEPGRAM_API_KEY=${DEEPGRAM_API_KEY}

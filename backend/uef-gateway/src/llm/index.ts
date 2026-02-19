@@ -33,6 +33,10 @@ export type { OSSModelSpec } from './oss-models';
 export { personaplex } from './personaplex';
 export type { PersonaplexConfig, VoiceSession } from './personaplex';
 
+// Kimi K2.5 — Moonshot AI visual agentic model (Together.ai / Fireworks.ai)
+export { kimi } from './kimi';
+export type { KimiRequest, KimiResult, KimiMode } from './kimi';
+
 // Agent bridge
 export { agentChat } from './agent-llm';
 export type { AgentChatOptions } from './agent-llm';
