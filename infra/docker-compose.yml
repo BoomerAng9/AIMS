@@ -65,7 +65,7 @@ services:
       - ii-agents
 
   n8n:
-    image: n8nio/n8n:latest
+    image: n8nio/n8n:2.8.2
     ports:
       - "5678:5678"
     environment:

@@ -471,7 +471,7 @@ services:
   # This is CORE infrastructure — not optional.
   # ---------------------------------------------------------------------------
   n8n:
-    image: n8nio/n8n:latest
+    image: n8nio/n8n:2.8.2
     expose:
       - "5678"
     environment:
