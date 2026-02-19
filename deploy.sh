@@ -41,6 +41,7 @@ header(){ printf "\n${CYAN}━━━ %s ━━━${NC}\n\n" "$1"; }
 DOMAIN=""
 LANDING_DOMAIN=""
 NO_CACHE=false
+SSL_CHANGED=false
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -117,7 +118,7 @@ check_env() {
 
 header "Environment Validation"
 check_env "NEXTAUTH_SECRET"         "critical" "Auth will not work without this"
-check_env "INTERNAL_API_KEY"        "critical" "Frontend ↔ backend communication key"
+check_env "INTERNAL_API_KEY"        "critical" "Frontend <-> backend communication key"
 check_env "OPENROUTER_API_KEY"      "critical" "LLM inference (all Boomer_Angs)"
 check_env "REDIS_PASSWORD"          "critical" "Redis auth (sessions + cache)"
 check_env "N8N_AUTH_PASSWORD"       "critical" "n8n admin UI has no password — exposed"
