@@ -11,7 +11,7 @@ RUN npm run build
 
 FROM node:20-alpine
 WORKDIR /app
-RUN addgroup -g 1000 -S ang && adduser -u 1000 -S ang -G ang
+RUN addgroup -g 1001 -S ang && adduser -u 1001 -S ang -G ang
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY package*.json ./

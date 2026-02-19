@@ -249,6 +249,18 @@ if [ -n "${DOMAIN}" ] && [ -n "${EMAIL}" ]; then
     else
         info "Requesting SSL certificate for ${DOMAIN}..."
         certbot certonly \
+    # Check if certs already exist (--entrypoint "" overrides the renewal-loop entrypoint)
+    CERT_EXISTS=$(${COMPOSE_CMD} -f "${COMPOSE_FILE}" run --rm --entrypoint "" certbot \
+        sh -c "test -f /etc/letsencrypt/live/${DOMAIN}/fullchain.pem && echo 'yes' || echo 'no'" 2>/dev/null || echo "no")
+
+    if [ "${CERT_EXISTS}" = "yes" ] && [ "${SSL_RENEW}" = "false" ]; then
+        info "SSL certificate already exists for ${DOMAIN}."
+    else
+        info "Requesting SSL certificate for ${DOMAIN}..."
+
+        # Issue certificate via webroot challenge (includes www subdomain)
+        ${COMPOSE_CMD} -f "${COMPOSE_FILE}" run --rm --entrypoint "" certbot \
+            certbot certonly \
             --webroot \
             -w /var/www/certbot \
             -d "${DOMAIN}" \
@@ -283,6 +295,18 @@ if [ -n "${LANDING_DOMAIN}" ] && [ -n "${EMAIL}" ]; then
     else
         info "Requesting SSL certificate for ${LANDING_DOMAIN} + www.${LANDING_DOMAIN}..."
         certbot certonly \
+    # Check if certs already exist (--entrypoint "" overrides the renewal-loop entrypoint)
+    LANDING_CERT_EXISTS=$(${COMPOSE_CMD} -f "${COMPOSE_FILE}" run --rm --entrypoint "" certbot \
+        sh -c "test -f /etc/letsencrypt/live/${LANDING_DOMAIN}/fullchain.pem && echo 'yes' || echo 'no'" 2>/dev/null || echo "no")
+
+    if [ "${LANDING_CERT_EXISTS}" = "yes" ] && [ "${SSL_RENEW}" = "false" ]; then
+        info "SSL certificate already exists for ${LANDING_DOMAIN}."
+    else
+        info "Requesting SSL certificate for ${LANDING_DOMAIN} + www.${LANDING_DOMAIN}..."
+
+        # Issue certificate via webroot challenge (includes www subdomain)
+        ${COMPOSE_CMD} -f "${COMPOSE_FILE}" run --rm --entrypoint "" certbot \
+            certbot certonly \
             --webroot \
             -w /var/www/certbot \
             -d "${LANDING_DOMAIN}" \
