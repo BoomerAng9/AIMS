@@ -50,7 +50,6 @@ export const TOOL_REGISTRY: readonly ToolEntry[] = [
 
   // ── Infrastructure ──────────────────────────────────────────────────
   { id: 'nginx', file: 'nginx.tool.md', category: 'infra', provider: 'Nginx', envVars: [] },
-  { id: 'certbot', file: 'certbot.tool.md', category: 'infra', provider: "Let's Encrypt", envVars: [] },
   { id: 'hostinger-vps', file: 'hostinger-vps.tool.md', category: 'infra', provider: 'Hostinger', envVars: [] },
 
   // ── Cloud / GCP ─────────────────────────────────────────────────────
