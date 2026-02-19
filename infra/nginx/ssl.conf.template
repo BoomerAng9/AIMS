@@ -24,7 +24,7 @@ server {
     http2 on;
     server_name DOMAIN_PLACEHOLDER;
 
-    # SSL certificates (managed by certbot)
+    # SSL certificates (managed by host certbot, bind-mounted)
     ssl_certificate     /etc/letsencrypt/live/DOMAIN_PLACEHOLDER/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/DOMAIN_PLACEHOLDER/privkey.pem;
     ssl_protocols       TLSv1.2 TLSv1.3;
