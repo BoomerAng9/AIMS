@@ -1,128 +1,41 @@
+import { SiteHeader } from "@/components/SiteHeader";
+import { Hero } from "@/components/landing/Hero";
+import Footer from "@/components/landing/Footer";
 import Link from "next/link";
-import Image from "next/image";
 import {
-  ArrowRight,
   MessageSquare,
-  BarChart3,
   Trophy,
+  BarChart3,
   Shield,
   Zap,
   Clock,
   ChevronRight,
   CheckCircle2,
   Lock,
+  Users,
+  Code2,
+  Workflow,
 } from "lucide-react";
 
 /* ═══════════════════════════════════════════════════════════
-   A.I.M.S. Landing Page — Ship What Works v1
-   Honest, clean, mobile-first. Only links to working features.
+   A.I.M.S. Landing Page
+   AIMS is the product. ACHEEVY is the AI orchestrator.
+   Per|Form, Arena, Workshop are verticals / features.
+   Uses the domain-aware Hero component for plugmein.cloud
+   vs aimanagedsolutions.cloud differentiation.
    ═══════════════════════════════════════════════════════════ */
 
 export default function HomePage() {
   return (
     <main className="flex flex-col min-h-screen">
-      <Nav />
-      <HeroSection />
+      <SiteHeader />
+      <Hero />
       <LiveNowSection />
+      <WhyAIMSSection />
       <RoadmapSection />
       <FinalCTASection />
       <Footer />
     </main>
-  );
-}
-
-/* ─── Nav ──────────────────────────────────────────────────── */
-
-function Nav() {
-  return (
-    <header className="sticky top-0 z-50 border-b border-white/[0.06] bg-[#0A0A0A]/80 backdrop-blur-xl">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-        <Link href="/" className="flex items-center gap-3">
-          <Image
-            src="/images/logos/achievemor-gold.png"
-            alt="A.I.M.S."
-            width={120}
-            height={32}
-            className="h-7 w-auto"
-          />
-        </Link>
-
-        <nav className="hidden items-center gap-8 md:flex">
-          <a href="#live-now" className="text-sm text-white/60 hover:text-white transition-colors">
-            What&apos;s Live
-          </a>
-          <a href="#roadmap" className="text-sm text-white/60 hover:text-white transition-colors">
-            Roadmap
-          </a>
-          <Link href="/pricing" className="text-sm text-white/60 hover:text-white transition-colors">
-            Pricing
-          </Link>
-        </nav>
-
-        <div className="flex items-center gap-3">
-          <Link
-            href="/sign-in"
-            className="text-sm text-white/70 hover:text-white transition-colors hidden sm:block"
-          >
-            Sign in
-          </Link>
-          <Link
-            href="/chat"
-            className="btn-primary text-xs h-9 px-4"
-          >
-            Chat with ACHEEVY
-            <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
-        </div>
-      </div>
-    </header>
-  );
-}
-
-/* ─── Hero ─────────────────────────────────────────────────── */
-
-function HeroSection() {
-  return (
-    <section className="relative overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(212,175,55,0.06)_0%,transparent_70%)]" />
-
-      <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28 lg:py-36">
-        <div className="flex flex-col items-center text-center">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-gold/20 bg-gold/[0.05] px-4 py-1.5">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-xs font-medium text-gold/90">
-              Early Access — Live Now
-            </span>
-          </div>
-
-          <h1 className="max-w-4xl font-display text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl text-balance">
-            Your AI Business Architect.{" "}
-            <span className="text-gold-gradient">Building in Public.</span>
-          </h1>
-
-          <p className="mt-6 max-w-2xl text-lg text-white/60 leading-relaxed sm:text-xl">
-            ACHEEVY is an AI orchestrator that manages a team of agents to handle
-            your business operations. Chat is live. Per|Form sports analytics is live.
-            More capabilities ship every week.
-          </p>
-
-          <div className="mt-10 flex flex-col gap-4 sm:flex-row">
-            <Link href="/chat" className="btn-primary h-12 px-8 text-sm">
-              Chat with ACHEEVY
-              <MessageSquare className="w-4 h-4" />
-            </Link>
-            <Link href="/sandbox/perform" className="btn-secondary h-12 px-8 text-sm">
-              Explore Per|Form
-              <Trophy className="w-4 h-4" />
-            </Link>
-          </div>
-
-          <p className="mt-12 text-xs text-white/30 tracking-wide uppercase">
-            Voice-enabled &middot; LLM streaming &middot; Real-time analytics
-          </p>
-        </div>
-      </div>
-    </section>
   );
 }
 
@@ -133,15 +46,23 @@ const LIVE_FEATURES = [
     icon: MessageSquare,
     title: "Chat with ACHEEVY",
     description:
-      "Full LLM streaming with model selection (Claude, Qwen, Gemini, Kimi). Voice input via ElevenLabs. File attachments. Thread history.",
+      "Full LLM streaming with model selection (Claude, Qwen, Gemini, Kimi). Voice input. File attachments. Thread history.",
     href: "/chat",
+    status: "live" as const,
+  },
+  {
+    icon: Shield,
+    title: "Dashboard + Health Monitor",
+    description:
+      "Real-time platform health, onboarding flow, and quick-access to all AIMS capabilities.",
+    href: "/dashboard",
     status: "live" as const,
   },
   {
     icon: Trophy,
     title: "Per|Form Sports Analytics",
     description:
-      "P.A.I. prospect scoring, Big Board rankings, scouting content feed, full conference directory with 130+ programs. Gridiron football.",
+      "P.A.I. prospect scoring, Big Board rankings, scouting content feed. College football recruiting intelligence.",
     href: "/sandbox/perform",
     status: "live" as const,
   },
@@ -149,24 +70,24 @@ const LIVE_FEATURES = [
     icon: BarChart3,
     title: "Arena Contests",
     description:
-      "Live and upcoming AI contests with real-time prize pools, entry tracking, and leaderboard streaks.",
+      "AI contests with real-time prize pools, entry tracking, and leaderboard streaks.",
     href: "/arena",
-    status: "live" as const,
-  },
-  {
-    icon: Shield,
-    title: "Dashboard + Health Monitor",
-    description:
-      "Real-time platform health checks, onboarding flow, and quick-access navigation to all AIMS features.",
-    href: "/dashboard",
     status: "live" as const,
   },
   {
     icon: Zap,
     title: "Integrations Lab",
     description:
-      "Test all connected services — Groq, Brave Search, ElevenLabs TTS, E2B Sandbox, Video Analysis — with live pass/fail results.",
+      "Test connected services — Groq, Brave Search, ElevenLabs TTS, E2B Sandbox — with live pass/fail results.",
     href: "/integrations",
+    status: "live" as const,
+  },
+  {
+    icon: Code2,
+    title: "Sandbox",
+    description:
+      "Experiment with verticals, tools, and AI capabilities in a safe sandbox environment.",
+    href: "/sandbox",
     status: "live" as const,
   },
 ];
@@ -214,6 +135,73 @@ function LiveNowSection() {
                 <ChevronRight className="w-3 h-3" />
               </div>
             </Link>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ─── Why AIMS ─────────────────────────────────────────────── */
+
+const PLATFORM_PILLARS = [
+  {
+    icon: Users,
+    title: "25 AI Agents",
+    description: "Boomer_Ang workers — researcher, coder, designer, marketer — executing real tasks end-to-end under ACHEEVY's command.",
+  },
+  {
+    icon: Workflow,
+    title: "Managed Operations",
+    description: "From project management to deployment. ACHEEVY orchestrates your business operations with evidence-based execution.",
+  },
+  {
+    icon: Code2,
+    title: "Vibe Coding",
+    description: "Conversate your way to working applications. ACHEEVY builds and deploys aiPLUGs — real apps from conversation.",
+  },
+  {
+    icon: Shield,
+    title: "No Proof, No Done",
+    description: "Every completed task requires evidence. Built-in accountability across every operation and workflow.",
+  },
+];
+
+function WhyAIMSSection() {
+  return (
+    <section className="border-t border-white/[0.06] bg-[#080808]">
+      <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
+        <div className="text-center mb-16">
+          <p className="text-xs font-mono uppercase tracking-[0.2em] text-gold/60 mb-3">
+            The Platform
+          </p>
+          <h2 className="font-display text-3xl font-bold sm:text-4xl">
+            AI Managed Solutions
+          </h2>
+          <p className="mt-4 text-white/50 max-w-2xl mx-auto">
+            AIMS is a full-stack AI operations platform. ACHEEVY orchestrates a team of specialized agents
+            to handle your business — from content creation to code deployment.
+          </p>
+        </div>
+
+        <div className="grid gap-6 sm:grid-cols-2">
+          {PLATFORM_PILLARS.map((pillar) => (
+            <div
+              key={pillar.title}
+              className="wireframe-card p-6"
+            >
+              <div className="flex items-center gap-3 mb-3">
+                <div className="h-10 w-10 rounded-xl border border-gold/20 bg-gold/[0.05] flex items-center justify-center">
+                  <pillar.icon className="w-5 h-5 text-gold/70" />
+                </div>
+                <h3 className="text-base font-semibold text-white">
+                  {pillar.title}
+                </h3>
+              </div>
+              <p className="text-sm text-white/50 leading-relaxed">
+                {pillar.description}
+              </p>
+            </div>
           ))}
         </div>
       </div>
@@ -276,7 +264,7 @@ const ROADMAP_ITEMS = [
 
 function RoadmapSection() {
   return (
-    <section id="roadmap" className="border-t border-white/[0.06] bg-[#080808]">
+    <section id="roadmap" className="border-t border-white/[0.06]">
       <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
         <div className="text-center mb-16">
           <p className="text-xs font-mono uppercase tracking-[0.2em] text-gold/60 mb-3">
@@ -345,70 +333,32 @@ function RoadmapSection() {
 
 function FinalCTASection() {
   return (
-    <section className="border-t border-white/[0.06]">
+    <section className="border-t border-white/[0.06] bg-[#080808]">
       <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
         <div className="wireframe-card relative overflow-hidden p-8 sm:p-12 lg:p-16 text-center">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(212,175,55,0.05)_0%,transparent_60%)]" />
 
           <div className="relative">
             <h2 className="font-display text-3xl font-bold sm:text-4xl mb-4">
-              Try what&apos;s live. Watch what&apos;s next.
+              Your AI business architect awaits.
             </h2>
             <p className="text-white/50 max-w-lg mx-auto mb-8">
-              ACHEEVY is building in public. Chat is live, Per|Form is live,
-              and the execution engines are being wired in now.
+              ACHEEVY is live and building in public. Chat is live, the dashboard is live,
+              and execution engines are being wired now.
             </p>
             <div className="flex flex-col gap-4 sm:flex-row justify-center">
               <Link href="/chat" className="btn-primary h-12 px-8 text-sm">
                 Chat with ACHEEVY
                 <MessageSquare className="w-4 h-4" />
               </Link>
-              <Link href="/sandbox/perform" className="btn-secondary h-12 px-8 text-sm">
-                Explore Per|Form
+              <Link href="/dashboard" className="btn-secondary h-12 px-8 text-sm">
+                Open Dashboard
+                <Shield className="w-4 h-4" />
               </Link>
             </div>
           </div>
         </div>
       </div>
     </section>
-  );
-}
-
-/* ─── Footer ───────────────────────────────────────────────── */
-
-function Footer() {
-  return (
-    <footer className="border-t border-white/[0.06]">
-      <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
-        <div className="flex flex-col items-center gap-6 sm:flex-row sm:justify-between">
-          <div className="flex items-center gap-3">
-            <Image
-              src="/images/logos/achievemor-gold.png"
-              alt="A.I.M.S."
-              width={100}
-              height={28}
-              className="h-6 w-auto opacity-60"
-            />
-            <span className="text-xs text-white/30">AI Managed Solutions</span>
-          </div>
-
-          <nav className="flex items-center gap-6 text-xs text-white/40">
-            <Link href="/about" className="hover:text-white/70 transition-colors">
-              About
-            </Link>
-            <Link href="/pricing" className="hover:text-white/70 transition-colors">
-              Pricing
-            </Link>
-            <Link href="/discover" className="hover:text-white/70 transition-colors">
-              Discover
-            </Link>
-          </nav>
-
-          <p className="text-xs text-white/25">
-            &copy; {new Date().getFullYear()} Plugmein.cloud
-          </p>
-        </div>
-      </div>
-    </footer>
   );
 }
