@@ -1,94 +1,110 @@
 ---
 id: "brave-search"
-name: "Brave Search"
+name: "Brave Search Pro AI"
 type: "tool"
 category: "search"
 provider: "Brave"
-description: "Privacy-first web search API — primary search provider for AIMS research and information gathering."
+tier: "Pro AI"
+description: "Privacy-first web search API — AIMS standard search provider. Pro AI tier with AI summaries and extra snippets."
 env_vars:
-  - "BRAVE_SEARCH_API_KEY"
+  - "BRAVE_API_KEY"
 docs_url: "https://brave.com/search/api/"
 aims_files:
   - "frontend/lib/services/search.ts"
+  - "aims-skills/skills/brave-search.skill.md"
+  - "aims-skills/tasks/web-search.md"
+  - "aims-skills/hooks/search-provider-priority.hook.md"
 ---
 
-# Brave Search — Web Search Tool Reference
+# Brave Search Pro AI — Tool Reference
 
-## Overview
+## AIMS Standard
 
-Brave Search is the primary web search provider for AIMS. It provides privacy-first search results via REST API. Used by research tasks, Make It Mine vertical, and any agent needing web data.
+Brave Search is the **primary and mandatory** search provider for A.I.M.S.
+All agents must attempt Brave before any fallback (Tavily, Serper).
 
-## API Key Setup
+## Environment Variable
 
-| Variable | Required | Where to Get |
-|----------|----------|--------------|
-| `BRAVE_SEARCH_API_KEY` | Yes | https://brave.com/search/api/ |
-
-**Apply in:** `frontend/.env.local` or `infra/.env.production`
-
-## API Reference
-
-### Base URL
 ```
-https://api.search.brave.com/res/v1/web/search
+BRAVE_API_KEY=<your-key>
 ```
 
-### Auth Header
-```
-X-Subscription-Token: $BRAVE_SEARCH_API_KEY
-```
+**Canonical name:** `BRAVE_API_KEY`
+**Legacy alias:** `BRAVE_SEARCH_API_KEY` (accepted for backwards compat)
+
+Set in: `infra/.env.production` and `frontend/.env.local`
+
+## API Endpoints
 
 ### Web Search
 ```http
-GET /res/v1/web/search?q=AI+managed+solutions&count=10
+GET https://api.search.brave.com/res/v1/web/search?q=<query>
 Accept: application/json
+Accept-Encoding: gzip
+X-Subscription-Token: <BRAVE_API_KEY>
 ```
 
-**Response shape:**
-```json
-{
-  "web": {
-    "results": [
-      {
-        "title": "Result Title",
-        "url": "https://example.com",
-        "description": "Snippet text..."
-      }
-    ]
-  }
-}
+### AI Summarizer (Pro AI)
+```http
+GET https://api.search.brave.com/res/v1/summarizer/search?key=<summarizer_key>
+Accept: application/json
+X-Subscription-Token: <BRAVE_API_KEY>
 ```
 
-## AIMS Usage
+## Query Parameters
+
+| Param | Type | Description |
+|-------|------|-------------|
+| `q` | string | Search query (required) |
+| `count` | int | Results per page (max 20) |
+| `offset` | int | Pagination offset |
+| `country` | string | 2-letter country code |
+| `search_lang` | string | Search language |
+| `safesearch` | string | `off`, `moderate`, `strict` |
+| `freshness` | string | `pd`, `pw`, `pm`, `py` |
+| `extra_snippets` | bool | Pro AI: up to 5 extra snippets/result |
+| `summary` | bool | Pro AI: enable AI summarizer |
+| `result_filter` | string | Comma-separated sections to include |
+
+## Response Sections
+
+| Section | Type | Contains |
+|---------|------|----------|
+| `web` | search | Standard web results |
+| `news` | news | News articles |
+| `videos` | videos | Video results with metadata |
+| `discussions` | search | Forum/Reddit threads |
+| `faq` | faq | Question/answer pairs |
+| `infobox` | graph | Knowledge graph entities |
+| `locations` | locations | Local/place results |
+| `summarizer` | summarizer | AI summary key |
+| `mixed` | mixed | Recommended display ordering |
+
+## AIMS Code Usage
 
 ```typescript
-import { BraveSearchService } from '@/lib/services/search';
+import { braveSearch, unifiedSearch } from '@/lib/services/search';
 
-const brave = new BraveSearchService();
-const results = await brave.search('AI managed solutions', { count: 10 });
-// returns: SearchResult[] with { title, url, snippet, source: 'brave' }
+// Direct
+const results = await braveSearch.search('query', { count: 10 });
+
+// Unified (Brave first, auto-fallback)
+const results = await unifiedSearch('query');
 ```
-
-## Pricing
-- Free: 2,000 queries/month
-- Basic ($3/mo): 20,000 queries/month
-- Pro: Custom pricing
 
 ## Rate Limits
-- 1 request/second (free tier)
-- 20 requests/second (paid)
 
-## Search Provider Priority in AIMS
+| Tier | Requests/sec | Monthly |
+|------|-------------|---------|
+| Free | 1/sec | 2,000 |
+| Pro AI | 20/sec | Unlimited |
+
+## Search Provider Priority
+
 ```
-1. Brave Search (primary)
-2. Tavily (fallback #1)
-3. Serper (fallback #2)
+1. Brave Search Pro AI  ← ALWAYS FIRST (this tool)
+2. Tavily               ← fallback #1
+3. Serper               ← fallback #2
 ```
 
-## Troubleshooting
-
-| Issue | Fix |
-|-------|-----|
-| 401 Unauthorized | Check `BRAVE_SEARCH_API_KEY` is set |
-| 429 Rate limited | Reduce request frequency or upgrade plan |
-| Empty results | Broaden query terms or check language parameter |
+See: `aims-skills/hooks/search-provider-priority.hook.md`

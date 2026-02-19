@@ -29,6 +29,27 @@ interface AcheevyMessageProps {
   onReplay: (id: string, content: string) => void;
 }
 
+/**
+ * Custom areEqual comparator — prevents re-renders during streaming
+ * unless something visible in this specific message changed.
+ * Adapted from branches 4/6 bolt optimization analysis.
+ */
+function areEqual(prev: AcheevyMessageProps, next: AcheevyMessageProps): boolean {
+  // 1. If "last message" status changed, re-render (cursor may appear/disappear)
+  if (prev.isLast !== next.isLast) return false;
+  // 2. If this IS the last message and loading state changed, re-render (streaming cursor)
+  if (next.isLast && prev.isLoading !== next.isLoading) return false;
+  // 3. Content changed (streaming chunks arriving)
+  if (prev.message.content !== next.message.content) return false;
+  // 4. Role changed (shouldn't happen, but be safe)
+  if (prev.message.role !== next.message.role) return false;
+  // 5. Speaking state changed (TTS highlight ring)
+  if (prev.isSpeaking !== next.isSpeaking) return false;
+  // 6. Read receipt changed
+  if (prev.readReceipt !== next.readReceipt) return false;
+  return true;
+}
+
 const AcheevyMessage = memo(function AcheevyMessage({
   message: m,
   isSpeaking,
@@ -117,6 +138,6 @@ const AcheevyMessage = memo(function AcheevyMessage({
       )}
     </div>
   );
-});
+}, areEqual);
 
 export default AcheevyMessage;

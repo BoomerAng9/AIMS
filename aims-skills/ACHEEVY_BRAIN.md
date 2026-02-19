@@ -178,6 +178,7 @@ Hooks are guardrails and interceptors. They run before any task executes.
 | **Session Start** | `hooks/session-start.hook.md` | Initializes session state; loads persona, path, LLM model, voice profile from Firestore | New session / reconnect |
 | **Sim User Message** | `hooks/sim-user-message.hook.md` | Routes user messages into LiveSim; ACHEEVY invites agents into bounded Q&A (max 3 turns) | LiveSim user input |
 | **Enter Chicken Hawk** | `hooks/enter-chicken-hawk.hook.md` | Checks CLAW replacement readiness; triggers buildout if not ready | First entry to Chicken Hawk vertical |
+| **Search Provider Priority** | `hooks/search-provider-priority.hook.md` | Enforces Brave Pro AI as primary search; blocks skipping Brave when key is set | Any web search operation |
 
 ### Adding a New Hook
 1. Create `hooks/<name>.hook.ts` implementing the hook interface
@@ -201,7 +202,9 @@ Skills inject specialized context, SOPs, and design standards into ACHEEVY's beh
 | **Stitch Design** | `skills/stitch-nano-design.skill.md` | UI/design tasks | Nano Banana Pro design system standards |
 | **UI Motion** | `skills/ui-interaction-motion.skill.md` | Animation/interaction tasks | Framer Motion + interaction patterns |
 | **OpenRouter LLM** | `skills/openrouter-llm.skill.md` | "model", "llm", "openrouter" | Model selection rules, cost awareness, fallback chain |
+| **Kimi K2.5** | `skills/kimi-k2.5.skill.md` | "kimi", "moonshot", "vision agent", "agent swarm", "multimodal agent" | Moonshot AI 1T-param visual agentic model — API modes, vision/video input, swarm, quantization |
 | **ElevenLabs Voice** | `skills/elevenlabs-voice.skill.md` | "voice", "tts", "speak" | Voice persona rules, ACHEEVY voice identity |
+| **Brave Search** | `skills/brave-search.skill.md` | "search", "brave", "web search" | AIMS standard search — full Brave Pro AI reference with response schema |
 | **Unified Search** | `skills/unified-search.skill.md` | "search", "find", "lookup" | Provider priority: Brave > Tavily > Serper |
 | **Stripe Billing** | `skills/stripe-billing.skill.md` | "payment", "subscribe", "billing" | 3-6-9 model rules, subscription management |
 | **Firebase Data** | `skills/firebase-data.skill.md` | "store", "firestore", "firebase" | Tenant isolation, collection patterns |

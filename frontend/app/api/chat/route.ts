@@ -37,18 +37,18 @@ const openrouter = createOpenAI({
 });
 
 // ── Feature LLM ─────────────────────────────────────────────
-const DEFAULT_MODEL = process.env.ACHEEVY_MODEL || process.env.OPENROUTER_MODEL || 'google/gemini-3.0-flash';
+const DEFAULT_MODEL = process.env.ACHEEVY_MODEL || process.env.OPENROUTER_MODEL || 'google/gemini-2.5-flash';
 
 // ── Priority Model Roster (all accessible via OpenRouter) ───
+// Model IDs must match OpenRouter's catalog exactly (use dashes, not dots for versions)
 const PRIORITY_MODELS: Record<string, { id: string; label: string; provider: string }> = {
-  'claude-opus':    { id: 'anthropic/claude-opus-4.6',        label: 'Claude Opus 4.6',      provider: 'Anthropic' },
-  'claude-sonnet':  { id: 'anthropic/claude-sonnet-4.6',      label: 'Claude Sonnet 4.6',    provider: 'Anthropic' },
-  'qwen':           { id: 'qwen/qwen-2.5-coder-32b',         label: 'Qwen 2.5 Coder 32B',  provider: 'Qwen' },
+  'claude-opus':    { id: 'anthropic/claude-opus-4-6',        label: 'Claude Opus 4.6',      provider: 'Anthropic' },
+  'claude-sonnet':  { id: 'anthropic/claude-sonnet-4-5-20250929', label: 'Claude Sonnet 4.5', provider: 'Anthropic' },
+  'qwen':           { id: 'qwen/qwen-2.5-coder-32b-instruct', label: 'Qwen 2.5 Coder 32B', provider: 'Qwen' },
   'qwen-max':       { id: 'qwen/qwen-max',                   label: 'Qwen Max',             provider: 'Qwen' },
   'minimax':        { id: 'minimax/minimax-01',               label: 'MiniMax-01',           provider: 'MiniMax' },
-  'glm':            { id: 'z-ai/glm-5',                      label: 'GLM-5',                provider: 'Z.ai' },
-  'kimi':           { id: 'moonshot/kimi-k2.5',               label: 'Kimi K2.5',            provider: 'Moonshot' },
-  'wan':            { id: 'alibaba/wan-2.1-t2v-turbo',        label: 'WAN 2.1',              provider: 'Alibaba' },
+  'glm':            { id: 'thudm/glm-4-plus',                label: 'GLM-4 Plus',           provider: 'Zhipu' },
+  'kimi':           { id: 'moonshotai/moonshot-v1-auto',      label: 'Moonshot v1',          provider: 'Moonshot' },
   'nano-banana':    { id: 'google/gemini-2.5-flash',          label: 'Nano Banana Pro',      provider: 'Google' },
   'gemini-flash':   { id: 'google/gemini-2.5-flash',          label: 'Gemini 2.5 Flash',     provider: 'Google' },
   'gemini-pro':     { id: 'google/gemini-2.5-pro',            label: 'Gemini 2.5 Pro',       provider: 'Google' },

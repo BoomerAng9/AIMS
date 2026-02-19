@@ -2,6 +2,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import type { LucideIcon } from "lucide-react";
 import {
   Building2,
@@ -142,11 +143,13 @@ export default function HouseOfAngPage() {
       <section className="relative overflow-hidden rounded-3xl border border-gold/20 shadow-[0_0_60px_rgba(251,191,36,0.15)]">
         <div className="relative min-h-[280px] md:min-h-[380px]">
           <div className="absolute inset-0">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/images/brand/boomerangs-port.png"
+            <Image
+              src="/images/acheevy/acheevy-office-plug.png"
               alt="Boomer_Angs managing containers at the port"
-              className="h-full w-full object-cover"
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/60 to-transparent" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30" />
@@ -278,11 +281,12 @@ export default function HouseOfAngPage() {
           <div className="mt-6 space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
             {/* Chicken Hawk */}
             <div className="flex flex-col md:flex-row gap-6 items-start">
-              <div className="w-32 h-32 rounded-2xl border border-red-400/20 bg-black/40 overflow-hidden shrink-0 flex items-center justify-center">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+              <div className="w-32 h-32 rounded-2xl border border-red-400/20 bg-black/40 overflow-hidden shrink-0 flex items-center justify-center relative">
+                <Image
                   src={CHICKEN_HAWK_IMAGE}
                   alt="Chicken Hawk — Coordinator and Enforcer"
+                  width={128}
+                  height={128}
                   className="h-full w-full object-contain"
                 />
               </div>
@@ -310,12 +314,13 @@ export default function HouseOfAngPage() {
               <div className="grid gap-4 md:grid-cols-3">
                 {EVOLUTION_STAGES.map((stage) => (
                   <div key={stage.id} className="rounded-2xl border border-wireframe-stroke bg-black/40 p-4">
-                    <div className="h-24 rounded-xl border border-wireframe-stroke bg-black/20 mb-3 flex items-center justify-center overflow-hidden">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
+                    <div className="h-24 rounded-xl border border-wireframe-stroke bg-black/20 mb-3 flex items-center justify-center overflow-hidden relative">
+                      <Image
                         src={stage.image}
                         alt={stage.visual}
-                        className="h-full object-contain"
+                        fill
+                        className="object-contain p-2"
+                        sizes="(max-width: 768px) 100vw, 300px"
                       />
                     </div>
                     <div className="flex items-center gap-2 mb-1">
@@ -556,11 +561,12 @@ export default function HouseOfAngPage() {
       {/* ---- Section 3: Forged Boomerang + Canon ---- */}
       <section className="rounded-3xl border border-wireframe-stroke bg-black/60 p-6 backdrop-blur-2xl">
         <div className="flex flex-col md:flex-row gap-6 items-center">
-          <div className="w-40 h-40 rounded-2xl border border-gold/20 bg-black/40 overflow-hidden shrink-0 flex items-center justify-center">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/images/brand/boomerang-forged.png"
+          <div className="w-40 h-40 rounded-2xl border border-gold/20 bg-black/40 overflow-hidden shrink-0 flex items-center justify-center relative">
+            <Image
+              src="/images/acheevy/acheevy-helmet.png"
               alt="The Forged Boomerang — tool of the Angs"
+              width={160}
+              height={160}
               className="h-full w-full object-contain"
             />
           </div>

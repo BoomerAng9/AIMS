@@ -33,12 +33,11 @@ import { PERSONAS } from '@/lib/acheevy/persona';
 
 const AI_MODELS = [
   { key: 'claude-opus',   label: 'Claude Opus 4.6',     tag: '' },
-  { key: 'claude-sonnet', label: 'Claude Sonnet 4.6',   tag: '' },
+  { key: 'claude-sonnet', label: 'Claude Sonnet 4.5',   tag: '' },
   { key: 'qwen',          label: 'Qwen 2.5 Coder 32B', tag: 'code' },
   { key: 'qwen-max',      label: 'Qwen Max',            tag: '' },
   { key: 'minimax',       label: 'MiniMax-01',          tag: '' },
-  { key: 'glm',           label: 'GLM-5',                tag: '' },
-  { key: 'kimi',          label: 'Kimi K2.5',           tag: 'fast' },
+  { key: 'glm',           label: 'GLM-4 Plus',          tag: '' },
   { key: 'nano-banana',   label: 'Nano Banana Pro',     tag: 'fast' },
   { key: 'gemini-pro',    label: 'Gemini 2.5 Pro',      tag: '' },
 ];
@@ -484,7 +483,7 @@ export function ChatInterface({
   // Voice input
   const voiceInput = useVoiceInput({
     config: {
-      provider: 'groq',
+      provider: 'elevenlabs',
       language: selectedLanguage,
     },
     onTranscript: (result) => {

@@ -8,6 +8,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { ELEVENLABS_ACHEEVY_PRESET, DEEPGRAM_ACHEEVY_PRESET } from '@/lib/acheevy/voiceConfig';
 
 const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY || '';
 const DEEPGRAM_API_KEY = process.env.DEEPGRAM_API_KEY || '';
@@ -30,12 +31,12 @@ async function synthesizeElevenLabs(
         },
         body: JSON.stringify({
           text,
-          model_id: model || 'eleven_turbo_v2_5',
+          model_id: model || ELEVENLABS_ACHEEVY_PRESET.model,
           voice_settings: {
-            stability: 0.5,
-            similarity_boost: 0.75,
-            style: 0.0,
-            use_speaker_boost: true,
+            stability: ELEVENLABS_ACHEEVY_PRESET.stability,
+            similarity_boost: ELEVENLABS_ACHEEVY_PRESET.similarity_boost,
+            style: ELEVENLABS_ACHEEVY_PRESET.style,
+            use_speaker_boost: ELEVENLABS_ACHEEVY_PRESET.use_speaker_boost,
           },
         }),
       },
@@ -98,16 +99,15 @@ export async function POST(req: NextRequest) {
       let audioRes: Response | null = null;
 
       if (p === 'elevenlabs') {
-        // Use provided voiceId or fall back to first available voice
         audioRes = await synthesizeElevenLabs(
           safeText,
-          voiceId || 'pNInz6obpgDQGcFmaJgB', // Default: Adam
-          model || 'eleven_turbo_v2_5',
+          voiceId || ELEVENLABS_ACHEEVY_PRESET.voiceId,
+          model || ELEVENLABS_ACHEEVY_PRESET.model,
         );
       } else {
         audioRes = await synthesizeDeepgram(
           safeText,
-          voiceId || 'aura-2-orion-en',
+          voiceId || DEEPGRAM_ACHEEVY_PRESET.model,
         );
       }
 

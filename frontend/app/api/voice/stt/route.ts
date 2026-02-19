@@ -1,15 +1,17 @@
 /**
  * STT API Route — Speech-to-Text for ACHEEVY Voice Input
  *
- * Primary: Groq Whisper (whisper-large-v3-turbo, 216x real-time)
+ * Primary: ElevenLabs Scribe v2 (99% accuracy, 90+ languages, word timestamps)
  * Fallback: Deepgram Nova-3 (sub-300ms, 30+ languages)
  *
  * Accepts audio file upload, returns transcription text.
+ *
+ * NOTE: Groq Whisper was removed — exposed key deprecated.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 
-const GROQ_API_KEY = process.env.GROQ_API_KEY || '';
+const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY || '';
 const DEEPGRAM_API_KEY = process.env.DEEPGRAM_API_KEY || '';
 
 interface SttResponse {
@@ -20,55 +22,52 @@ interface SttResponse {
   words?: Array<{ word: string; start: number; end: number }>;
 }
 
-async function transcribeGroq(
+async function transcribeElevenLabs(
   audioBuffer: ArrayBuffer,
-  model: string,
   language?: string,
 ): Promise<SttResponse | null> {
-  if (!GROQ_API_KEY) return null;
+  if (!ELEVENLABS_API_KEY) return null;
 
   try {
     const formData = new FormData();
     formData.append('file', new Blob([audioBuffer], { type: 'audio/webm' }), 'audio.webm');
-    formData.append('model', model || 'whisper-large-v3-turbo');
-    formData.append('response_format', 'verbose_json');
-    formData.append('timestamp_granularities[]', 'word');
-    if (language) formData.append('language', language);
+    formData.append('model_id', 'scribe_v2');
+    if (language) formData.append('language_code', language);
 
-    const res = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
+    const res = await fetch('https://api.elevenlabs.io/v1/speech-to-text', {
       method: 'POST',
-      headers: { Authorization: `Bearer ${GROQ_API_KEY}` },
+      headers: { 'xi-api-key': ELEVENLABS_API_KEY },
       body: formData,
     });
 
     if (!res.ok) {
-      console.error(`[STT] Groq returned ${res.status}`);
+      console.error(`[STT] ElevenLabs Scribe returned ${res.status}`);
       return null;
     }
 
     const data = await res.json();
     return {
       text: data.text || '',
-      provider: 'groq',
-      model: model || 'whisper-large-v3-turbo',
-      words: data.words?.map((w: any) => ({ word: w.word, start: w.start, end: w.end })),
+      provider: 'elevenlabs',
+      model: 'scribe_v2',
+      confidence: data.language_probability,
+      words: data.words?.map((w: any) => ({ word: w.text, start: w.start, end: w.end })),
     };
   } catch (err) {
-    console.error('[STT] Groq error:', err);
+    console.error('[STT] ElevenLabs Scribe error:', err);
     return null;
   }
 }
 
 async function transcribeDeepgram(
   audioBuffer: ArrayBuffer,
-  model: string,
   language?: string,
 ): Promise<SttResponse | null> {
   if (!DEEPGRAM_API_KEY) return null;
 
   try {
     const params = new URLSearchParams({
-      model: model || 'nova-3',
+      model: 'nova-3',
       smart_format: 'true',
       punctuate: 'true',
     });
@@ -93,7 +92,7 @@ async function transcribeDeepgram(
     return {
       text: alt?.transcript || '',
       provider: 'deepgram',
-      model: model || 'nova-3',
+      model: 'nova-3',
       confidence: alt?.confidence,
       words: alt?.words?.map((w: any) => ({ word: w.word, start: w.start, end: w.end })),
     };
@@ -108,7 +107,6 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData();
     const audioFile = formData.get('audio') as File | null;
     const provider = formData.get('provider') as string | null;
-    const model = formData.get('model') as string | null;
     const language = formData.get('language') as string | null;
 
     if (!audioFile) {
@@ -119,16 +117,16 @@ export async function POST(req: NextRequest) {
 
     // Try primary provider first, then fallback
     const tryOrder = provider === 'deepgram'
-      ? ['deepgram', 'groq'] as const
-      : ['groq', 'deepgram'] as const;
+      ? ['deepgram', 'elevenlabs'] as const
+      : ['elevenlabs', 'deepgram'] as const;
 
     for (const p of tryOrder) {
       let result: SttResponse | null = null;
 
-      if (p === 'groq') {
-        result = await transcribeGroq(audioBuffer, model || 'whisper-large-v3-turbo', language || undefined);
+      if (p === 'elevenlabs') {
+        result = await transcribeElevenLabs(audioBuffer, language || undefined);
       } else {
-        result = await transcribeDeepgram(audioBuffer, model || 'nova-3', language || undefined);
+        result = await transcribeDeepgram(audioBuffer, language || undefined);
       }
 
       if (result && result.text) {

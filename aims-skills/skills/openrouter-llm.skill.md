@@ -41,6 +41,8 @@ Triggers when any agent needs to select a model, estimate costs, or understand t
 | Research summaries | `gemini-3-pro` | Standard | Good at synthesis, large context |
 | Quick extraction/parsing | `claude-haiku-4.5` | Fast | Fast, cheap, good enough |
 | Budget-sensitive batch work | `llama-3.3-70b` | Economy | $0.10/M, no API cost |
+| Visual agentic / agent swarm | `moonshotai/kimi-k2.5` | Premium | 1T MoE, native multimodal, 256K ctx — use via NVIDIA NIM or platform.moonshot.ai. See `skills/kimi-k2.5.skill.md` |
+| Video understanding | `moonshotai/kimi-k2.5` | Premium | Only model with native video input (official API only) |
 
 ### Cost Awareness Rules
 

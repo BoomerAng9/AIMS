@@ -100,6 +100,46 @@ if [ ! -f "${ENV_FILE}" ]; then
 fi
 info "Environment file: ${ENV_FILE}"
 
+# Validate critical environment variables
+ENV_WARNINGS=0
+check_env() {
+    local var_name="$1"
+    local severity="$2"  # "critical" or "warn"
+    local desc="$3"
+    local val
+    val=$(grep "^${var_name}=" "${ENV_FILE}" | cut -d'=' -f2-)
+    if [ -z "${val}" ]; then
+        if [ "${severity}" = "critical" ]; then
+            error "MISSING: ${var_name} — ${desc}"
+            ENV_WARNINGS=$((ENV_WARNINGS + 1))
+        else
+            warn "EMPTY:   ${var_name} — ${desc}"
+        fi
+    fi
+}
+
+header "Environment Validation"
+check_env "NEXTAUTH_SECRET"         "critical" "Auth will not work without this"
+check_env "INTERNAL_API_KEY"        "critical" "Frontend ↔ backend communication key"
+check_env "OPENROUTER_API_KEY"      "critical" "LLM inference (all Boomer_Angs)"
+check_env "REDIS_PASSWORD"          "critical" "Redis auth (sessions + cache)"
+check_env "N8N_AUTH_PASSWORD"       "critical" "n8n admin UI has no password — exposed"
+check_env "STRIPE_SECRET_KEY"       "warn"     "Payments disabled"
+check_env "STRIPE_WEBHOOK_SECRET"   "warn"     "Stripe webhooks will fail verification"
+check_env "STRIPE_PRICE_STARTER"    "warn"     "Starter tier subscription broken"
+check_env "STRIPE_PRICE_PRO"        "warn"     "Pro tier subscription broken"
+check_env "STRIPE_PRICE_ENTERPRISE" "warn"     "Enterprise tier subscription broken"
+check_env "ELEVENLABS_API_KEY"      "warn"     "Voice (TTS + STT) disabled"
+check_env "DEEPGRAM_API_KEY"        "warn"     "Deepgram fallback STT disabled"
+check_env "GOOGLE_CLIENT_ID"        "warn"     "Google OAuth login disabled"
+check_env "GOOGLE_CLIENT_SECRET"    "warn"     "Google OAuth login disabled"
+
+if [ "${ENV_WARNINGS}" -gt 0 ]; then
+    error "${ENV_WARNINGS} critical variable(s) missing. Fix ${ENV_FILE} before deploying."
+    exit 1
+fi
+info "Environment validation passed."
+
 # If domain provided, update CORS and NEXTAUTH_URL in .env.production
 if [ -n "${DOMAIN}" ]; then
     info "App domain: ${DOMAIN}"
@@ -152,9 +192,26 @@ ${COMPOSE_CMD} -f "${COMPOSE_FILE}" down --remove-orphans --timeout 30
 ${COMPOSE_CMD} -f "${COMPOSE_FILE}" up -d --remove-orphans
 info "Services started. Orphaned containers removed."
 
-# Wait for health checks
-info "Waiting for services to pass health checks..."
-sleep 10
+# Wait for core services to be ready before SSL provisioning
+info "Waiting for core services to come up..."
+MAX_WAIT=120
+WAITED=0
+while [ $WAITED -lt $MAX_WAIT ]; do
+    HEALTHY=$(${COMPOSE_CMD} -f "${COMPOSE_FILE}" ps --format json 2>/dev/null | grep -c '"healthy"' || true)
+    RUNNING=$(${COMPOSE_CMD} -f "${COMPOSE_FILE}" ps --format json 2>/dev/null | grep -c '"running"' || true)
+    info "  Services: ${RUNNING} running, ${HEALTHY} healthy (${WAITED}s / ${MAX_WAIT}s)"
+    # nginx must be running for ACME challenges — check it specifically
+    NGINX_UP=$(${COMPOSE_CMD} -f "${COMPOSE_FILE}" ps nginx --format '{{.State}}' 2>/dev/null || echo "")
+    if echo "${NGINX_UP}" | grep -qi "running"; then
+        info "nginx is running — proceeding."
+        break
+    fi
+    sleep 5
+    WAITED=$((WAITED + 5))
+done
+if [ $WAITED -ge $MAX_WAIT ]; then
+    warn "Timed out waiting for services. Continuing anyway — check logs."
+fi
 
 # =============================================================================
 # SSL Certificate Provisioning — App Domain (plugmein.cloud)

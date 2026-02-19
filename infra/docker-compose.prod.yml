@@ -28,15 +28,15 @@ services:
       - nginx-logs:/var/log/nginx
     depends_on:
       frontend:
-        condition: service_healthy
+        condition: service_started
       uef-gateway:
-        condition: service_healthy
+        condition: service_started
     healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://127.0.0.1:80/health || exit 1"]
+      test: ["CMD-SHELL", "curl -sf http://127.0.0.1:80/ || exit 1"]
       interval: 30s
       timeout: 10s
-      retries: 3
-      start_period: 10s
+      retries: 5
+      start_period: 30s
     restart: always
     networks:
       - aims-network
@@ -71,27 +71,43 @@ services:
       - NEXTAUTH_URL=${NEXTAUTH_URL}
       - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
       - UEF_ENDPOINT=http://uef-gateway:3001
+      - UEF_GATEWAY_URL=http://uef-gateway:3001
       - HOUSE_OF_ANG_URL=http://house-of-ang:3002
       - ACHEEVY_URL=http://acheevy:3003
-      # Voice — TTS & STT
+      # SQLite for LUC — persisted to luc-data volume
+      - DATABASE_URL=file:/app/.luc-data/luc.db
+      # LLM — OpenRouter for direct fallback
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      # Stripe — payments
+      - STRIPE_PUBLISHABLE_KEY=${STRIPE_PUBLISHABLE_KEY}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
+      # Voice — ElevenLabs (TTS + STT Scribe v2) + Deepgram (fallback)
       - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY}
       - DEEPGRAM_API_KEY=${DEEPGRAM_API_KEY}
-      - GROQ_API_KEY=${GROQ_API_KEY}
       # Search
       - BRAVE_API_KEY=${BRAVE_API_KEY}
+      - SERPER_API_KEY=${SERPER_API_KEY}
+      - TAVILY_API_KEY=${TAVILY_API_KEY}
+      # MCP integrations
+      - E2B_API_KEY=${E2B_API_KEY}
+      - COMPOSIO_API_KEY=${COMPOSIO_API_KEY}
+      # Communication
+      - RESEND_API_KEY=${RESEND_API_KEY}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
     depends_on:
       uef-gateway:
         condition: service_healthy
       house-of-ang:
-        condition: service_healthy
+        condition: service_started
       acheevy:
-        condition: service_healthy
+        condition: service_started
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>{process.exit(r.ok?0:1)}).catch(()=>process.exit(1))"]
       interval: 30s
       timeout: 10s
-      retries: 3
-      start_period: 30s
+      retries: 5
+      start_period: 60s
     volumes:
       - luc-data:/app/.luc-data
     restart: always
@@ -116,21 +132,25 @@ services:
       - NEXTAUTH_URL=https://demo.plugmein.cloud
       - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
       - UEF_ENDPOINT=http://uef-gateway:3001
+      - UEF_GATEWAY_URL=http://uef-gateway:3001
       - HOUSE_OF_ANG_URL=http://house-of-ang:3002
       - ACHEEVY_URL=http://acheevy:3003
-      # Voice — TTS & STT
+      # SQLite for LUC — persisted to demo-luc-data volume
+      - DATABASE_URL=file:/app/.luc-data/luc.db
+      # LLM — OpenRouter for direct fallback
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      # Voice — ElevenLabs (TTS + STT Scribe v2) + Deepgram (fallback)
       - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY}
       - DEEPGRAM_API_KEY=${DEEPGRAM_API_KEY}
-      - GROQ_API_KEY=${GROQ_API_KEY}
     depends_on:
       uef-gateway:
-        condition: service_healthy
+        condition: service_started
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>{process.exit(r.ok?0:1)}).catch(()=>process.exit(1))"]
       interval: 30s
       timeout: 10s
-      retries: 3
-      start_period: 30s
+      retries: 5
+      start_period: 60s
     volumes:
       - demo-luc-data:/app/.luc-data
     restart: always
@@ -163,6 +183,33 @@ services:
       - N8N_URL=http://n8n:5678
       - RESEARCH_ANG_URL=http://research-ang:3020
       - ROUTER_ANG_URL=http://router-ang:3021
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - INTERNAL_API_KEY=${INTERNAL_API_KEY}
+      # Hugging Face — Nvidia models
+      - HF_TOKEN=${HF_TOKEN}
+      # Kimi K2.5 — Moonshot AI via Together.ai + Fireworks.ai
+      - TOGETHER_API_KEY=${TOGETHER_API_KEY}
+      - FIREWORKS_API_KEY=${FIREWORKS_API_KEY}
+      # Voice — ElevenLabs + Deepgram + Nvidia PersonaPlex
+      - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY}
+      - DEEPGRAM_API_KEY=${DEEPGRAM_API_KEY}
+      - PERSONAPLEX_ENDPOINT=${PERSONAPLEX_ENDPOINT}
+      - PERSONAPLEX_API_KEY=${PERSONAPLEX_API_KEY}
+      - PERSONAPLEX_AVATAR_ID=${PERSONAPLEX_AVATAR_ID}
+      # Search
+      - BRAVE_API_KEY=${BRAVE_API_KEY}
+      - SERPER_API_KEY=${SERPER_API_KEY}
+      - TAVILY_API_KEY=${TAVILY_API_KEY}
+      - APIFY_API_KEY=${APIFY_API_KEY}
+      # MCP integrations
+      - E2B_API_KEY=${E2B_API_KEY}
+      - COMPOSIO_API_KEY=${COMPOSIO_API_KEY}
+      - FIRECRAWL_API_KEY=${FIRECRAWL_API_KEY}
+      # Communication
+      - RESEND_API_KEY=${RESEND_API_KEY}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      # Stripe (gateway validates billing)
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
       - DEBUG=false
     volumes:
       - gateway-data:/app/data
@@ -233,7 +280,7 @@ services:
       redis:
         condition: service_healthy
       house-of-ang:
-        condition: service_healthy
+        condition: service_started
     healthcheck:
       test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3003/health',r=>{process.exit(r.statusCode===200?0:1)}).on('error',()=>process.exit(1))"]
       interval: 30s
@@ -266,7 +313,8 @@ services:
       test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-aims_redis_secret}", "ping"]
       interval: 10s
       timeout: 5s
-      retries: 3
+      retries: 5
+      start_period: 15s
     deploy:
       resources:
         limits:
@@ -417,11 +465,13 @@ services:
       - ii-agents
 
   # ---------------------------------------------------------------------------
-  # n8n — Workflow Automation (Boomer_Ang Build Layer)
-  # Factory floor for Chicken Hawk and Lil_Hawk workflow execution
+  # n8n — Core Workflow Automation Engine
+  # Factory floor for Boomer_Ang dispatch, Chicken Hawk builds,
+  # Lil_Hawk workflows, PMO pipeline, and all automation tasks.
+  # This is CORE infrastructure — not optional.
   # ---------------------------------------------------------------------------
   n8n:
-    image: n8nio/n8n:latest
+    image: n8nio/n8n:2.8.2
     expose:
       - "5678"
     environment:
@@ -452,8 +502,6 @@ services:
         limits:
           cpus: '1'
           memory: 1G
-    profiles:
-      - n8n
 
   # ---------------------------------------------------------------------------
   # Circuit Metrics — Service Health Dashboard
@@ -488,9 +536,10 @@ services:
           memory: 128M
 
   # ---------------------------------------------------------------------------
-  # LAYER 5: GRIDIRON SANDBOX (Per|Form Autonomous Sports Analytics)
+  # LAYER 5: PER|FORM PLATFORM — Sports Analytics
   # Three containers: Scout Hub, Film Room, War Room
-  # Enable with: docker compose --profile gridiron up -d
+  # Gridiron (football) is one category within Per|Form
+  # Enable with: docker compose --profile perform up -d
   # ---------------------------------------------------------------------------
 
   # Scout Hub — Lil_Hawk Adversarial Scouting (nightly cron)
@@ -513,7 +562,7 @@ services:
       - HS_POOL_SIZE=${HS_POOL_SIZE:-300}
       - COLLEGE_POOL_SIZE=${COLLEGE_POOL_SIZE:-551}
     volumes:
-      - gridiron-debate-logs:/data/debate-logs
+      - perform-debate-logs:/data/debate-logs
     healthcheck:
       test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:5001/health"]
       interval: 30s
@@ -532,7 +581,7 @@ services:
           cpus: '0.5'
           memory: 512M
     profiles:
-      - gridiron
+      - perform
 
   # Film Room — Vertex AI SAM 2 Bridge
   film-room:
@@ -564,7 +613,7 @@ services:
           cpus: '0.25'
           memory: 256M
     profiles:
-      - gridiron
+      - perform
 
   # War Room — Boomer_Angs + Chicken Hawk Grading & Content
   war-room:
@@ -586,9 +635,9 @@ services:
       - BRAVE_API_KEY=${BRAVE_API_KEY}
       - REDIS_URL=redis://:${REDIS_PASSWORD:-aims_redis_secret}@redis:6379
     volumes:
-      - gridiron-debate-logs:/data/debate-logs:ro
-      - gridiron-rankings:/data/rankings
-      - gridiron-content:/data/content
+      - perform-debate-logs:/data/debate-logs:ro
+      - perform-rankings:/data/rankings
+      - perform-content:/data/content
     healthcheck:
       test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:5003/health"]
       interval: 30s
@@ -607,7 +656,7 @@ services:
           cpus: '1'
           memory: 1G
     profiles:
-      - gridiron
+      - perform
 
 volumes:
   certbot-webroot:
@@ -620,9 +669,9 @@ volumes:
   n8n-data:
   luc-data:
   demo-luc-data:
-  gridiron-debate-logs:
-  gridiron-rankings:
-  gridiron-content:
+  perform-debate-logs:
+  perform-rankings:
+  perform-content:
 
 networks:
   aims-network:

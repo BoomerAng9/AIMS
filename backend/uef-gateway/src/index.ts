@@ -188,14 +188,15 @@ app.post('/perform/athlete', async (req, res) => {
 });
 
 // --------------------------------------------------------------------------
-// Gridiron Sandbox — Per|Form Sports Analytics Pipeline Proxy
-// Routes /api/gridiron/* to the three sandbox containers
+// Per|Form Platform — Sports Analytics Pipeline Proxy
+// Routes /api/perform/* to the Per|Form service containers
+// Gridiron (football) is one category within Per|Form
 // --------------------------------------------------------------------------
-const GRIDIRON_SCOUT_HUB = process.env.GRIDIRON_SCOUT_HUB_URL || 'http://scout-hub:5001';
-const GRIDIRON_FILM_ROOM = process.env.GRIDIRON_FILM_ROOM_URL || 'http://film-room:5002';
-const GRIDIRON_WAR_ROOM = process.env.GRIDIRON_WAR_ROOM_URL || 'http://war-room:5003';
+const PERFORM_SCOUT_HUB = process.env.PERFORM_SCOUT_HUB_URL || 'http://scout-hub:5001';
+const PERFORM_FILM_ROOM = process.env.PERFORM_FILM_ROOM_URL || 'http://film-room:5002';
+const PERFORM_WAR_ROOM = process.env.PERFORM_WAR_ROOM_URL || 'http://war-room:5003';
 
-async function gridironProxy(serviceUrl: string, path: string, method: string, body?: unknown): Promise<unknown> {
+async function performProxy(serviceUrl: string, path: string, method: string, body?: unknown): Promise<unknown> {
   const url = `${serviceUrl}${path}`;
   const opts: RequestInit = {
     method,
@@ -206,35 +207,35 @@ async function gridironProxy(serviceUrl: string, path: string, method: string, b
   return res.json();
 }
 
-app.all('/api/gridiron/scout-hub/*', async (req, res) => {
+app.all('/api/perform/scout-hub/*', async (req, res) => {
   try {
-    const path = req.path.replace('/api/gridiron/scout-hub', '');
-    const data = await gridironProxy(GRIDIRON_SCOUT_HUB, path || '/health', req.method, req.body);
+    const path = req.path.replace('/api/perform/scout-hub', '');
+    const data = await performProxy(PERFORM_SCOUT_HUB, path || '/health', req.method, req.body);
     res.json(data);
   } catch (error: unknown) {
-    logger.error({ err: error }, 'Gridiron Scout Hub proxy error');
+    logger.error({ err: error }, 'Per|Form Scout Hub proxy error');
     res.status(502).json({ error: 'Scout Hub unreachable' });
   }
 });
 
-app.all('/api/gridiron/film-room/*', async (req, res) => {
+app.all('/api/perform/film-room/*', async (req, res) => {
   try {
-    const path = req.path.replace('/api/gridiron/film-room', '');
-    const data = await gridironProxy(GRIDIRON_FILM_ROOM, path || '/health', req.method, req.body);
+    const path = req.path.replace('/api/perform/film-room', '');
+    const data = await performProxy(PERFORM_FILM_ROOM, path || '/health', req.method, req.body);
     res.json(data);
   } catch (error: unknown) {
-    logger.error({ err: error }, 'Gridiron Film Room proxy error');
+    logger.error({ err: error }, 'Per|Form Film Room proxy error');
     res.status(502).json({ error: 'Film Room unreachable' });
   }
 });
 
-app.all('/api/gridiron/war-room/*', async (req, res) => {
+app.all('/api/perform/war-room/*', async (req, res) => {
   try {
-    const path = req.path.replace('/api/gridiron/war-room', '');
-    const data = await gridironProxy(GRIDIRON_WAR_ROOM, path || '/health', req.method, req.body);
+    const path = req.path.replace('/api/perform/war-room', '');
+    const data = await performProxy(PERFORM_WAR_ROOM, path || '/health', req.method, req.body);
     res.json(data);
   } catch (error: unknown) {
-    logger.error({ err: error }, 'Gridiron War Room proxy error');
+    logger.error({ err: error }, 'Per|Form War Room proxy error');
     res.status(502).json({ error: 'War Room unreachable' });
   }
 });

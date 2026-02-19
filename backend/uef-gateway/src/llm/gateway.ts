@@ -167,7 +167,18 @@ class LLMGateway {
       }
     }
 
-    // Fall back to non-streaming OpenRouter and simulate stream
+    // Try real streaming from OpenRouter (true token-by-token)
+    if (openrouter.isConfigured()) {
+      try {
+        const rawStream = await openrouter.streamChat(streamReq);
+        const metered = this.meterStream(rawStream, { userId, sessionId, model, provider: 'openrouter', agentId });
+        return { stream: metered, provider: 'openrouter', model };
+      } catch (err) {
+        logger.warn({ model, err }, '[Gateway] OpenRouter streaming failed, falling back to non-stream');
+      }
+    }
+
+    // Last resort: non-streaming OpenRouter call, simulate stream
     const result = await this.callOpenRouter(streamReq);
     const provider: ProviderUsed = result.model === 'stub' ? 'stub' : 'openrouter';
 
@@ -175,11 +186,9 @@ class LLMGateway {
       usageTracker.record({ userId, sessionId, model: result.model, provider, agentId, tokens: result.tokens, cost: result.cost });
     }
 
-    // Convert non-streaming response to a one-shot stream
     const content = result.content;
     const stream = new ReadableStream<string>({
       start(controller) {
-        // Emit in chunks to simulate streaming
         const chunkSize = 20;
         for (let i = 0; i < content.length; i += chunkSize) {
           controller.enqueue(content.slice(i, i + chunkSize));

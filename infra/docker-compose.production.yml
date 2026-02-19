@@ -304,7 +304,7 @@ services:
 
   # n8n - Workflow Automation (Sandboxed)
   n8n:
-    image: n8nio/n8n:latest
+    image: n8nio/n8n:2.8.2
     container_name: aims-n8n
     environment:
       - N8N_BASIC_AUTH_ACTIVE=true

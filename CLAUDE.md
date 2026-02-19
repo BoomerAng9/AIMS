@@ -1,8 +1,29 @@
 # A.I.M.S. — Claude Code Project Instructions
 
+## Deployment Pipeline Rules (READ FIRST)
+
+These rules determine WHERE every piece of code deploys. Apply them to every task:
+
+```
+IF core platform service (ACHEEVY API, UEF Gateway, Per|Form, House of Ang, Redis, n8n)
+  THEN → AIMS Core VPS (31.97.138.45 / srv1318308.hstgr.cloud) in Docker
+  Files: infra/docker-compose.prod.yml, deploy.sh
+  Deploy: ./deploy.sh --domain plugmein.cloud --landing-domain aimanagedsolutions.cloud --email <email>
+
+IF GPU-accelerated AI inference (PersonaPlex / Nemotron model serving)
+  THEN → GCP Cloud Run with GPU (L4 or A100)
+  Model: nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-Base-BF16 (MoE, 3B active params)
+  License: NVIDIA Nemotron Open Model License (commercial OK)
+  The UEF Gateway calls this via PERSONAPLEX_ENDPOINT env var.
+
+IF long-running/scheduled autonomous job or sandbox (content engine, autonomous builds, daily crons)
+  THEN → GCP Cloud Run (job or service), trigger via cron/events
+  Files: infra/gcp-setup.sh, Cloud Run job configs (TBD)
+```
+
 ## Project Overview
 A.I.M.S. (AI Managed Solutions) is an AI-managed platform orchestrated by ACHEEVY.
-Domain: plugmein.cloud | VPS: 76.13.96.107 | GCP: ai-managed-services
+Domain: plugmein.cloud | AIMS VPS: 31.97.138.45 | GCP: ai-managed-services
 
 ## ACHEEVY Brain
 The single source of truth for ACHEEVY's behavior, skills, hooks, and recurring tasks:
@@ -10,11 +31,23 @@ The single source of truth for ACHEEVY's behavior, skills, hooks, and recurring 
 
 Read that file before making any changes to ACHEEVY's behavior, skills, hooks, verticals, or chain-of-command logic.
 
+## Current Status & Plan
+See **`AIMS_PLAN.md`** for the full SOP, PRD, implementation roadmap, and AIMS_REQUIREMENTS checklist.
+
 ## Architecture
-- **Frontend**: Next.js 15 (App Router) at `frontend/`
+- **Frontend**: Next.js 14 (App Router) at `frontend/`
 - **Backend**: Express gateway at `backend/uef-gateway/`, ACHEEVY service at `backend/acheevy/`
 - **Skills Engine**: `aims-skills/` — hooks, skills, tasks, verticals, chain-of-command
-- **Infra**: Docker Compose at `infra/`, deploy scripts at root
+- **Infra**: Docker Compose at `infra/`, deploy script at root (`deploy.sh`)
+- **PersonaPlex**: NVIDIA Nemotron-3-Nano-30B-A3B on GCP Cloud Run w/ GPU — called via `PERSONAPLEX_ENDPOINT`
+
+### VPS Services (default deploy, no profiles)
+nginx, certbot, frontend, demo-frontend, uef-gateway, house-of-ang, acheevy, redis, agent-bridge, n8n, circuit-metrics (11 containers)
+
+### Optional profiles
+- `--profile tier1-agents` → research-ang, router-ang
+- `--profile ii-agents` → agent-zero
+- `--profile perform` → scout-hub, film-room, war-room (Per|Form / Gridiron)
 
 ## Key Rules
 1. All tool access goes through Port Authority (UEF Gateway) — no direct service exposure

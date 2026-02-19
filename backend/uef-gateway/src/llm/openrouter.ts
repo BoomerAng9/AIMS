@@ -9,7 +9,7 @@
  *
  * Usage:
  *   import { openrouter } from './llm/openrouter';
- *   const result = await openrouter.chat({ model: 'anthropic/claude-sonnet-4.5', messages: [...] });
+ *   const result = await openrouter.chat({ model: 'anthropic/claude-sonnet-4.6', messages: [...] });
  */
 
 import logger from '../logger';
@@ -29,7 +29,7 @@ export interface ChatRequest {
   max_tokens?: number;
   temperature?: number;
   top_p?: number;
-  stream?: false;
+  stream?: boolean;
 }
 
 export interface ChatChoice {
@@ -109,9 +109,9 @@ export const MODELS: Record<string, ModelSpec> = {
   },
 
   // ── Standard Tier ────────────────────────────────────────────────────
-  'claude-sonnet-4.5': {
-    id: 'anthropic/claude-sonnet-4.5',
-    name: 'Claude Sonnet 4.5',
+  'claude-sonnet-4.6': {
+    id: 'anthropic/claude-sonnet-4.6',
+    name: 'Claude Sonnet 4.6',
     provider: 'Anthropic',
     inputPer1M: 3.0,
     outputPer1M: 15.0,
@@ -147,22 +147,22 @@ export const MODELS: Record<string, ModelSpec> = {
     contextWindow: 1000000,
     tier: 'fast',
   },
-  'claude-haiku-4.5': {
-    id: 'anthropic/claude-haiku-4.5',
-    name: 'Claude Haiku 4.5',
+  'claude-haiku-4.6': {
+    id: 'anthropic/claude-haiku-4.6',
+    name: 'Claude Haiku 4.6',
     provider: 'Anthropic',
     inputPer1M: 0.80,
     outputPer1M: 4.0,
     contextWindow: 200000,
     tier: 'fast',
   },
-  'gemini-2.5-flash': {
-    id: 'google/gemini-2.5-flash-preview',
-    name: 'Gemini 2.5 Flash',
+  'gemini-3.0-flash-lite': {
+    id: 'google/gemini-3.0-flash-lite',
+    name: 'Gemini 3.0 Flash Lite',
     provider: 'Google',
-    inputPer1M: 0.30,
-    outputPer1M: 2.50,
-    contextWindow: 1050000,
+    inputPer1M: 0.05,
+    outputPer1M: 0.20,
+    contextWindow: 1000000,
     tier: 'fast',
   },
 
@@ -174,6 +174,27 @@ export const MODELS: Record<string, ModelSpec> = {
     inputPer1M: 0.30,
     outputPer1M: 0.88,
     contextWindow: 131072,
+    tier: 'economy',
+  },
+
+  // ── Together.ai Models ───────────────────────────────────────────────
+  // Routed via Together.ai direct — use dedicated clients, NOT OpenRouter.
+  'kimi-k2.5': {
+    id: 'moonshotai/Kimi-K2.5',
+    name: 'Kimi K2.5',
+    provider: 'Moonshot AI (Together.ai)',
+    inputPer1M: 0.90,
+    outputPer1M: 0.90,
+    contextWindow: 262144, // 256K
+    tier: 'premium',
+  },
+  'llama-4-maverick': {
+    id: 'meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8',
+    name: 'Llama 4 Maverick',
+    provider: 'Meta (Together.ai)',
+    inputPer1M: 0.27,
+    outputPer1M: 0.85,
+    contextWindow: 1048576, // 1M
     tier: 'economy',
   },
 };
@@ -272,6 +293,90 @@ class OpenRouterClient {
       },
       cost: { usd: totalCost },
     };
+  }
+
+  /**
+   * Streaming chat — sends stream:true to OpenRouter and returns a ReadableStream of text chunks.
+   * Used by the /llm/stream endpoint for real token-by-token streaming.
+   */
+  async streamChat(request: ChatRequest): Promise<ReadableStream<string>> {
+    if (!this.isConfigured()) {
+      return new ReadableStream<string>({
+        start(controller) {
+          controller.enqueue('[LLM Offline] OpenRouter API key not configured.');
+          controller.close();
+        },
+      });
+    }
+
+    const modelSpec = this.resolveModel(request.model);
+
+    const body = {
+      model: modelSpec.id,
+      messages: request.messages,
+      max_tokens: request.max_tokens || 4096,
+      temperature: request.temperature ?? 0.7,
+      top_p: request.top_p,
+      stream: true,
+    };
+
+    logger.info({ model: modelSpec.id }, '[OpenRouter] Streaming request');
+
+    const res = await fetch(OPENROUTER_API_URL, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${this.apiKey}`,
+        'Content-Type': 'application/json',
+        'HTTP-Referer': this.siteUrl,
+        'X-Title': this.siteName,
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (!res.ok) {
+      const errorBody = await res.text().catch(() => 'Unknown error');
+      logger.error({ status: res.status, body: errorBody }, '[OpenRouter] Stream API error');
+      throw new Error(`OpenRouter stream error ${res.status}: ${errorBody}`);
+    }
+
+    if (!res.body) {
+      throw new Error('OpenRouter returned no body for stream request');
+    }
+
+    // Parse SSE from OpenRouter into a text-only ReadableStream
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+
+    return new ReadableStream<string>({
+      async pull(controller) {
+        const { done, value } = await reader.read();
+        if (done) {
+          controller.close();
+          return;
+        }
+
+        const chunk = decoder.decode(value, { stream: true });
+        const lines = chunk.split('\n');
+
+        for (const line of lines) {
+          if (!line.startsWith('data: ')) continue;
+          const data = line.slice(6).trim();
+          if (data === '[DONE]') {
+            controller.close();
+            return;
+          }
+          try {
+            const parsed = JSON.parse(data);
+            const text = parsed.choices?.[0]?.delta?.content;
+            if (text) {
+              controller.enqueue(text);
+            }
+          } catch {
+            // Skip malformed SSE lines
+          }
+        }
+      },
+    });
   }
 
   /**

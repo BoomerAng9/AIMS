@@ -209,12 +209,13 @@ export default function AcheevyChat() {
   }, [handleSpeak]);
 
   const togglePlayback = useCallback(() => {
-    if (voiceOutput.isPlaying) {
-      voiceOutput.pause();
-    } else if (voiceOutput.isPaused) {
-      voiceOutput.resume();
+    const vo = voiceOutputRef.current;
+    if (vo.isPlaying) {
+      vo.pause();
+    } else if (vo.isPaused) {
+      vo.resume();
     }
-  }, [voiceOutput]);
+  }, []);
 
   // ── Classify on submit ──
   const classifyMessage = useCallback(async (message: string) => {
@@ -257,10 +258,10 @@ export default function AcheevyChat() {
     if (voiceInput.isListening) {
       await voiceInput.stopListening();
     } else {
-      voiceOutput.stop();
+      voiceOutputRef.current.stop();
       await voiceInput.startListening();
     }
-  }, [voiceInput, voiceOutput]);
+  }, [voiceInput]);
 
   // ── File upload ──
   const handleFileUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
