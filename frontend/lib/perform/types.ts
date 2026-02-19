@@ -164,6 +164,70 @@ export const CONTENT_TYPE_STYLES: Record<ContentType, {
 };
 
 // ─────────────────────────────────────────────────────────────
+// NFL Draft Types & Styles
+// ─────────────────────────────────────────────────────────────
+
+export type DraftTier = 'TOP_5' | 'TOP_15' | 'FIRST_ROUND' | 'DAY_2' | 'DAY_3' | 'PRIORITY_UDFA' | 'UDFA';
+
+export const DRAFT_TIER_STYLES: Record<DraftTier, {
+  label: string;
+  bg: string;
+  border: string;
+  text: string;
+  glow: string;
+}> = {
+  TOP_5: {
+    label: 'Top 5',
+    bg: 'bg-gold/15',
+    border: 'border-gold/30',
+    text: 'text-gold',
+    glow: 'shadow-[0_0_12px_rgba(212,175,55,0.2)]',
+  },
+  TOP_15: {
+    label: 'Top 15',
+    bg: 'bg-blue-400/15',
+    border: 'border-blue-400/30',
+    text: 'text-blue-400',
+    glow: 'shadow-[0_0_12px_rgba(96,165,250,0.2)]',
+  },
+  FIRST_ROUND: {
+    label: 'Round 1',
+    bg: 'bg-emerald-400/15',
+    border: 'border-emerald-400/30',
+    text: 'text-emerald-400',
+    glow: 'shadow-[0_0_12px_rgba(52,211,153,0.15)]',
+  },
+  DAY_2: {
+    label: 'Day 2',
+    bg: 'bg-amber-400/15',
+    border: 'border-amber-400/30',
+    text: 'text-amber-400',
+    glow: 'shadow-[0_0_12px_rgba(251,191,36,0.15)]',
+  },
+  DAY_3: {
+    label: 'Day 3',
+    bg: 'bg-zinc-400/15',
+    border: 'border-zinc-400/30',
+    text: 'text-zinc-400',
+    glow: '',
+  },
+  PRIORITY_UDFA: {
+    label: 'Priority UDFA',
+    bg: 'bg-orange-400/15',
+    border: 'border-orange-400/30',
+    text: 'text-orange-400',
+    glow: '',
+  },
+  UDFA: {
+    label: 'UDFA',
+    bg: 'bg-zinc-500/15',
+    border: 'border-zinc-500/30',
+    text: 'text-zinc-500',
+    glow: '',
+  },
+};
+
+// ─────────────────────────────────────────────────────────────
 // Helpers
 // ─────────────────────────────────────────────────────────────
 

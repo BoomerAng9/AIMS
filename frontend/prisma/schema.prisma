@@ -676,6 +676,161 @@ model PerformContent {
   @@index([createdAt])
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Per|Form — NFL Draft & Mock Draft Engine
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// NFL Draft-eligible prospect
+model DraftProspect {
+  id            String    @id @default(uuid())
+  slug          String    @unique
+
+  // Identity
+  firstName     String
+  lastName      String
+  position      String
+  college       String
+  conference    String?
+  classYear     String    // Senior, R-Senior, Junior (declared), etc.
+  eligibility   String?   // e.g., "RS-Senior", "Junior (declared)"
+
+  // Physical
+  height        String?
+  weight        Int?
+  armLength     String?
+  handSize      String?
+  fortyYard     Float?    // 40-yard dash
+  benchPress    Int?      // 225lb reps
+  verticalJump  Float?
+  broadJump     Int?      // inches
+  threeCone     Float?
+  shuttle       Float?
+
+  // Grade (P.A.I. for NFL Draft)
+  paiScore      Int       @default(0)
+  tier          String    @default("DAY_3")  // TOP_5, TOP_15, FIRST_ROUND, DAY_2, DAY_3, PRIORITY_UDFA, UDFA
+  performance   Int       @default(0)
+  athleticism   Int       @default(0)
+  intangibles   Int       @default(0)
+
+  // Rankings
+  overallRank   Int       @default(9999)
+  positionRank  Int       @default(9999)
+  trend         String    @default("NEW")
+
+  // Scouting
+  scoutMemo     String?
+  tags          String?         // JSON array
+  comparisons   String?         // JSON array
+  collegeStats  String?         // JSON: career stats
+  seniorBowl    Boolean   @default(false)
+  combineInvite Boolean   @default(false)
+
+  // Debate
+  bullCase      String?
+  bearCase      String?
+  mediationVerdict String?
+  debateWinner  String?
+
+  // Projection
+  projectedRound Int?     // 1-7
+  projectedPick  Int?     // 1-262
+  projectedTeam  String?  // NFL team name
+
+  // Data provenance
+  cfbdPlayerId  Int?      // CollegeFootballData.com player ID
+  sourceUrls    String?   // JSON array
+  lastEnriched  DateTime?
+  enrichedBy    String?
+
+  // Mock draft appearances
+  mockDraftPicks DraftPick[]
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([tier, overallRank])
+  @@index([position])
+  @@index([college])
+}
+
+/// NFL Team draft needs and picks
+model NFLTeamNeeds {
+  id            String    @id @default(uuid())
+  teamName      String    @unique  // e.g., "Chicago Bears"
+  abbreviation  String    @unique  // e.g., "CHI"
+  city          String
+  conference    String    // AFC, NFC
+  division      String    // North, South, East, West
+  record        String?   // e.g., "4-13"
+  draftOrder    Int?      // Overall pick position (round 1)
+
+  // Needs by position (1=critical, 2=moderate, 3=depth)
+  needs         String    // JSON: { "QB": 1, "WR": 2, "CB": 1, ... }
+
+  // Cap space
+  capSpace      String?   // e.g., "$45.2M"
+  keyFAs        String?   // JSON: notable free agents lost/gained
+
+  picks         DraftPick[]
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+/// A complete mock draft
+model MockDraft {
+  id            String    @id @default(uuid())
+  slug          String    @unique
+  title         String
+  description   String?
+  version       Int       @default(1)
+  rounds        Int       @default(7)   // How many rounds
+  totalPicks    Int       @default(259)
+  generatedBy   String    @default("SYSTEM") // SYSTEM, user ID, etc.
+  isPublished   Boolean   @default(false)
+  isFeatured    Boolean   @default(false)
+
+  picks         DraftPick[]
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([isPublished, createdAt])
+}
+
+/// Individual pick in a mock draft
+model DraftPick {
+  id            String    @id @default(uuid())
+
+  mockDraftId   String
+  mockDraft     MockDraft @relation(fields: [mockDraftId], references: [id], onDelete: Cascade)
+
+  prospectId    String
+  prospect      DraftProspect @relation(fields: [prospectId], references: [id])
+
+  nflTeamId     String?
+  nflTeam       NFLTeamNeeds? @relation(fields: [nflTeamId], references: [id])
+
+  // Pick details
+  overall       Int       // Overall pick number
+  round         Int
+  pickInRound   Int
+  teamName      String    // Denormalized for display
+  isTradeUp     Boolean   @default(false)
+  tradeNote     String?
+
+  // Analysis
+  fitScore      Int?      // 0-100 how well prospect fits team needs
+  rationale     String?   // Why this pick makes sense
+
+  createdAt     DateTime  @default(now())
+
+  @@unique([mockDraftId, overall])
+  @@index([prospectId])
+  @@index([mockDraftId, round])
+}
+
 /// Sports pick data for pick'em contests
 model SportsPick {
   id            String    @id @default(uuid())

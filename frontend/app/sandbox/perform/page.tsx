@@ -96,7 +96,7 @@ export default function PerFormHub() {
       </motion.div>
 
       {/* Quick Nav */}
-      <motion.div variants={staggerItem} className="grid gap-3 sm:grid-cols-3">
+      <motion.div variants={staggerItem} className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Link
           href="/sandbox/perform/big-board"
           className="wireframe-card rounded-2xl p-5 flex items-center gap-4 hover:border-gold/20 transition-colors group"
@@ -112,8 +112,22 @@ export default function PerFormHub() {
         </Link>
 
         <Link
+          href="/sandbox/perform/draft"
+          className="wireframe-card rounded-2xl p-5 flex items-center gap-4 hover:border-emerald-400/20 transition-colors group"
+        >
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-400/10 border border-emerald-400/20 text-emerald-400">
+            <TrendingUp size={18} />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-medium text-white group-hover:text-gold transition-colors">NFL Draft</p>
+            <p className="text-[0.55rem] text-white/30 font-mono">Mock drafts, simulator, prospect grades</p>
+          </div>
+          <ArrowRight size={14} className="text-white/15 group-hover:text-gold/40 transition-colors" />
+        </Link>
+
+        <Link
           href="/sandbox/perform/content"
-          className="wireframe-card rounded-2xl p-5 flex items-center gap-4 hover:border-gold/20 transition-colors group"
+          className="wireframe-card rounded-2xl p-5 flex items-center gap-4 hover:border-blue-400/20 transition-colors group"
         >
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-400/10 border border-blue-400/20 text-blue-400">
             <FileText size={18} />
@@ -127,7 +141,7 @@ export default function PerFormHub() {
 
         <Link
           href="/dashboard/war-room"
-          className="wireframe-card rounded-2xl p-5 flex items-center gap-4 hover:border-gold/20 transition-colors group"
+          className="wireframe-card rounded-2xl p-5 flex items-center gap-4 hover:border-amber-400/20 transition-colors group"
         >
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-400/10 border border-amber-400/20 text-amber-400">
             <Swords size={18} />
