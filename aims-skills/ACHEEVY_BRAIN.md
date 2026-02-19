@@ -202,6 +202,7 @@ Skills inject specialized context, SOPs, and design standards into ACHEEVY's beh
 | **Stitch Design** | `skills/stitch-nano-design.skill.md` | UI/design tasks | Nano Banana Pro design system standards |
 | **UI Motion** | `skills/ui-interaction-motion.skill.md` | Animation/interaction tasks | Framer Motion + interaction patterns |
 | **OpenRouter LLM** | `skills/openrouter-llm.skill.md` | "model", "llm", "openrouter" | Model selection rules, cost awareness, fallback chain |
+| **Kimi K2.5** | `skills/kimi-k2.5.skill.md` | "kimi", "moonshot", "vision agent", "agent swarm", "multimodal agent" | Moonshot AI 1T-param visual agentic model — API modes, vision/video input, swarm, quantization |
 | **ElevenLabs Voice** | `skills/elevenlabs-voice.skill.md` | "voice", "tts", "speak" | Voice persona rules, ACHEEVY voice identity |
 | **Brave Search** | `skills/brave-search.skill.md` | "search", "brave", "web search" | AIMS standard search — full Brave Pro AI reference with response schema |
 | **Unified Search** | `skills/unified-search.skill.md` | "search", "find", "lookup" | Provider priority: Brave > Tavily > Serper |
