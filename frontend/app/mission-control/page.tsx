@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import { OrchestratorStatus } from '@/components/autonomous/OrchestratorStatus';
 import { AgentLoopVisualizer } from '@/components/autonomous/AgentLoopVisualizer';
 import { SiteHeader } from '@/components/SiteHeader';
-import { GlobalNav } from '@/components/GlobalNav';
 
 // Mock data types for development
 type LoopStage = 'idle' | 'gather' | 'action' | 'verify' | 'output';
@@ -67,14 +66,39 @@ export default function AutonomousDashboardPage() {
     }]);
   };
 
-  const startSimulation = () => {
+  const startSimulation = async () => {
       setLogs([]);
-      // Helper function to trigger the effect logic would go here, 
-      // for now just a simplified direct state manipulation for the demo button
       setStatus('active');
-      setCurrentStage('gather');
-      setMessage('Starting manual simulation trigger...');
+      setMessage('Initializing autonomous sequence...');
       addLog('Manual override: Autonomous loop started');
+      setCurrentStage('gather');
+
+      await new Promise(r => setTimeout(r, 2000));
+      setMessage('Gathering context from codebase...');
+      addLog('Scanning file system via Agentic Search...');
+      addLog('Found 3 relevant files in /src/components');
+
+      await new Promise(r => setTimeout(r, 2500));
+      setCurrentStage('action');
+      setMessage('Executing changes...');
+      addLog('Action: Generate new component "StatusBadge.tsx"');
+      addLog('Running build verification script...');
+
+      await new Promise(r => setTimeout(r, 2500));
+      setCurrentStage('verify');
+      setMessage('Verifying output quality...');
+      addLog('Playback Check: UI renders correctly');
+      addLog('Lint Check: Passed');
+
+      await new Promise(r => setTimeout(r, 2000));
+      setCurrentStage('output');
+      setMessage('Finalizing payload...');
+      addLog('Task Completed Successfully');
+
+      await new Promise(r => setTimeout(r, 2000));
+      setStatus('idle');
+      setMessage('Ready for assignment');
+      setCurrentStage('idle');
   };
 
   return (
@@ -116,7 +140,16 @@ export default function AutonomousDashboardPage() {
                         >
                             <span>▶</span> Trigger Test Loop
                         </button>
-                         <button className="w-full py-3 px-4 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/50 font-bold rounded-lg transition-all">
+                         <button
+                            onClick={() => {
+                              setStatus('idle');
+                              setCurrentStage('idle');
+                              setMessage('Emergency stop — all loops halted.');
+                              addLog('EMERGENCY STOP triggered by operator', 'error');
+                            }}
+                            disabled={status === 'idle'}
+                            className="w-full py-3 px-4 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/50 font-bold rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
                             <span>⏹</span> Emergency Stop
                         </button>
                     </div>
@@ -167,7 +200,6 @@ export default function AutonomousDashboardPage() {
 
       </main>
 
-      <SiteHeader /> {/* Footer usage if needed, usually Layout handles this */}
     </div>
   );
 }
