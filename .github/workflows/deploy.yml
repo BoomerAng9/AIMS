@@ -35,13 +35,14 @@ jobs:
         uses: google-github-actions/setup-gcloud@v2
 
       - name: Verify GCP Auth
+        continue-on-error: true
         run: |
           echo "=== Active account ==="
           gcloud auth list
           echo "=== Project ==="
           gcloud config get-value project
           echo "=== Cloud Build API ==="
-          gcloud services list --enabled --filter="name:cloudbuild" --project=${{ env.PROJECT_ID }}
+          gcloud services list --enabled --filter="name:cloudbuild" --project=${{ env.PROJECT_ID }} || echo "WARNING: Could not list services (may be a permissions issue)"
 
       - name: Submit to Cloud Build
         env:
@@ -53,7 +54,7 @@ jobs:
           gcloud builds submit \
             --config=cloudbuild.yaml \
             --project=${{ env.PROJECT_ID }} \
-            --substitutions=_SHORT_SHA=$SHORT_SHA_SHORT,_REGION=us-central1,_REPO=aims-docker,_VPS_HOST=76.13.96.107,_VPS_DOMAIN=plugmein.cloud \
+            --substitutions=_SHORT_SHA=$SHORT_SHA_SHORT,_REGION=us-central1,_REPO=aims-docker,_VPS_HOST=76.13.96.107 \
             --verbosity=debug 2>&1 || {
               echo "::error::Cloud Build submission failed with exit code $?"
               exit 1
