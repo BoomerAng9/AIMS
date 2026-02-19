@@ -9,7 +9,7 @@ IF core platform service (ACHEEVY API, UEF Gateway, Per|Form, House of Ang, Redi
   THEN → AIMS Core VPS (31.97.138.45 / srv1318308.hstgr.cloud) in Docker
   Files: infra/docker-compose.prod.yml, deploy.sh
   Deploy: ./deploy.sh --domain plugmein.cloud --landing-domain aimanagedsolutions.cloud
-  SSL: Managed by Hostinger hPanel (not certbot). Certs at /etc/letsencrypt, bind-mounted into nginx.
+  First-time cert: ./deploy.sh --domain plugmein.cloud --landing-domain aimanagedsolutions.cloud --email admin@aimanagedsolutions.cloud
 
 IF GPU-accelerated AI inference (PersonaPlex / Nemotron model serving)
   THEN → GCP Cloud Run with GPU (L4 or A100)
@@ -44,7 +44,7 @@ See **`AIMS_PLAN.md`** for the full SOP, PRD, implementation roadmap, and AIMS_R
 
 ### VPS Services (default deploy, no profiles)
 nginx, frontend, demo-frontend, uef-gateway, house-of-ang, acheevy, redis, agent-bridge, chickenhawk-core, n8n, circuit-metrics, ii-agent, ii-agent-postgres, ii-agent-tools, ii-agent-sandbox (15 containers)
-SSL: Hostinger hPanel (auto-managed) — certs at /etc/letsencrypt, bind-mounted into nginx :ro
+SSL: host certbot (apt) — certs at /etc/letsencrypt, bind-mounted into nginx container
 
 ### Optional profiles
 - `--profile tier1-agents` → research-ang, router-ang

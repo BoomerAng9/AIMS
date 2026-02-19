@@ -206,8 +206,8 @@ P2.7  COMPETITOR_PARITY          DONE
                            │
             ┌──────────────┼──────────────┐
             │              │              │
-     ┌──────▼──────┐ ┌────▼────┐  Hostinger hPanel
-     │  Frontend   │ │   API   │  manages SSL certs
+     ┌──────▼──────┐ ┌────▼────┐  Host certbot (apt)
+     │  Frontend   │ │   API   │  manages certs at
      │  Next.js    │ │ /api/*  │  /etc/letsencrypt
      │  :3000      │ │  proxy  │  (bind-mounted :ro)
      └──────┬──────┘ └────┬────┘

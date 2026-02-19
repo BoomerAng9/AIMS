@@ -2,7 +2,7 @@
 # A.I.M.S. HTTPS Server Block — Landing Domain (aimanagedsolutions.cloud)
 # =============================================================================
 # The "father site" — brand home, landing page, marketing.
-# Activated by deploy.sh --landing-domain when Hostinger-managed SSL certs exist.
+# Activated by deploy.sh --landing-domain after Let's Encrypt certs are issued.
 # Copied to /etc/nginx/conf.d/ssl-landing.conf inside the nginx container.
 #
 # This is SEPARATE from ssl.conf (plugmein.cloud / functional app).
@@ -29,7 +29,7 @@ server {
     http2 on;
     server_name LANDING_DOMAIN_PLACEHOLDER;
 
-    # SSL certificates (managed by Hostinger hPanel, bind-mounted from host)
+    # SSL certificates (managed by host certbot, bind-mounted)
     ssl_certificate     /etc/letsencrypt/live/LANDING_DOMAIN_PLACEHOLDER/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/LANDING_DOMAIN_PLACEHOLDER/privkey.pem;
     ssl_protocols       TLSv1.2 TLSv1.3;
