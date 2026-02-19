@@ -54,7 +54,7 @@ jobs:
           gcloud builds submit \
             --config=cloudbuild.yaml \
             --project=${{ env.PROJECT_ID }} \
-            --substitutions=_SHORT_SHA=$SHORT_SHA_SHORT,_REGION=us-central1,_REPO=aims-docker,_VPS_HOST=76.13.96.107 \
+            --substitutions=_SHORT_SHA=$SHORT_SHA_SHORT,_REGION=us-central1,_REPO=aims-docker,_VPS_HOST=76.13.96.107,_VPS_DOMAIN=plugmein.cloud \
             --verbosity=debug 2>&1 || {
               echo "::error::Cloud Build submission failed with exit code $?"
               exit 1

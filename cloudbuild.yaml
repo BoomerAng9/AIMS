@@ -123,7 +123,7 @@ steps:
       - --min-instances=1
       - --max-instances=3
       - --allow-unauthenticated
-      - --set-env-vars=NODE_ENV=production,PORT=3001,LOG_LEVEL=info,REDIS_URL=redis://${_VPS_HOST}:6379,N8N_URL=http://${_VPS_HOST}:5678,RESEARCH_ANG_URL=http://${_VPS_HOST}:3020,ROUTER_ANG_URL=http://${_VPS_HOST}:3021,CORS_ORIGIN=https://${_VPS_DOMAIN}
+      - --set-env-vars=NODE_ENV=production,LOG_LEVEL=info,REDIS_URL=redis://${_VPS_HOST}:6379,N8N_URL=http://${_VPS_HOST}:5678,RESEARCH_ANG_URL=http://${_VPS_HOST}:3020,ROUTER_ANG_URL=http://${_VPS_HOST}:3021,CORS_ORIGIN=https://${_VPS_DOMAIN}
       - --update-secrets=INTERNAL_API_KEY=INTERNAL_API_KEY:latest,OPENROUTER_API_KEY=OPENROUTER_API_KEY:latest,REDIS_PASSWORD=REDIS_PASSWORD:latest
     waitFor: ['push-gateway']
 
@@ -168,6 +168,7 @@ substitutions:
   _REGION: us-central1
   _REPO: aims-docker
   _VPS_HOST: '76.13.96.107'
+  _VPS_DOMAIN: plugmein.cloud
   _SHORT_SHA: local
 
 # ── Images to push (Cloud Build auto-pushes these) ──
