@@ -13,7 +13,7 @@
 
 import React from 'react';
 import { useChat } from 'ai/react';
-import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo, memo } from 'react';
 import Image from 'next/image';
 import {
   Send, Zap, Sparkles, Hammer, Search, Layers, Square,
@@ -83,10 +83,15 @@ function stripMarkdownForTTS(text: string): string {
     .trim();
 }
 
-// ── Waveform Visualizer ──
+// ── Waveform Visualizer (memoized to prevent bar re-randomization) ──
 
-function VoiceWaveform({ audioLevel, state }: { audioLevel: number; state: 'idle' | 'listening' | 'processing' | 'error' }) {
+const VoiceWaveform = memo(function VoiceWaveform({ audioLevel, state }: { audioLevel: number; state: 'idle' | 'listening' | 'processing' | 'error' }) {
   const bars = 32;
+  // Seeded offsets — computed once, stable across re-renders
+  const offsets = useMemo(
+    () => Array.from({ length: bars }, (_, i) => 0.7 + ((Math.sin(i * 9.1 + 3.7) + 1) / 2) * 0.3),
+    [bars]
+  );
 
   if (state === 'processing') {
     return (
@@ -113,10 +118,7 @@ function VoiceWaveform({ audioLevel, state }: { audioLevel: number; state: 'idle
     <div className="flex items-end justify-center gap-[2px] h-12 px-4">
       {Array.from({ length: bars }).map((_, i) => {
         const position = Math.sin((i / bars) * Math.PI);
-        const height = Math.max(
-          3,
-          audioLevel * 48 * position * (0.7 + Math.random() * 0.3)
-        );
+        const height = Math.max(3, audioLevel * 48 * position * offsets[i]);
         return (
           <div
             key={i}
@@ -130,7 +132,7 @@ function VoiceWaveform({ audioLevel, state }: { audioLevel: number; state: 'idle
       })}
     </div>
   );
-}
+});
 
 export default function AcheevyChat() {
   const {
@@ -256,12 +258,13 @@ export default function AcheevyChat() {
   }, [handleSpeak]);
 
   const togglePlayback = useCallback(() => {
-    if (voiceOutput.isPlaying) {
-      voiceOutput.pause();
-    } else if (voiceOutput.isPaused) {
-      voiceOutput.resume();
+    const vo = voiceOutputRef.current;
+    if (vo.isPlaying) {
+      vo.pause();
+    } else if (vo.isPaused) {
+      vo.resume();
     }
-  }, [voiceOutput]);
+  }, []);
 
   // ── Classify on submit ──
   const classifyMessage = useCallback(async (message: string) => {
@@ -304,10 +307,10 @@ export default function AcheevyChat() {
     if (voiceInput.isListening) {
       await voiceInput.stopListening();
     } else {
-      voiceOutput.stop();
+      voiceOutputRef.current.stop();
       await voiceInput.startListening();
     }
-  }, [voiceInput, voiceOutput]);
+  }, [voiceInput]);
 
   // ── File upload ──
   const handleFileUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
