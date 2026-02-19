@@ -503,6 +503,179 @@ model TriviaQuestion {
   @@index([timesUsed])
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Per|Form — CFB Recruiting & Analytics
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// CFB Conference
+model PerformConference {
+  id            String    @id @default(uuid())
+  name          String    @unique
+  abbreviation  String    @unique
+  tier          String    // power4, group_of_5, independent
+  commissioner  String?
+  hqCity        String?
+  hqState       String?
+  founded       Int?
+
+  teams         PerformTeam[]
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+/// CFB Team
+model PerformTeam {
+  id            String    @id @default(uuid())
+  schoolName    String
+  commonName    String
+  abbreviation  String
+  mascot        String
+  city          String
+  state         String
+  stadium       String
+  stadiumCapacity Int     @default(0)
+  colors        String    // JSON: [{name, hex}]
+  headCoach     String
+  headCoachSince Int      @default(2024)
+  bio           String?
+  founded       Int?
+  enrollment    Int?
+
+  conferenceId  String
+  conference    PerformConference @relation(fields: [conferenceId], references: [id])
+
+  // Roster / recruits
+  prospects     PerformProspect[] @relation("CommittedTo")
+
+  // Season records
+  seasons       PerformTeamSeason[]
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@unique([schoolName, state])
+  @@index([conferenceId])
+}
+
+/// CFB Team Season Record
+model PerformTeamSeason {
+  id            String    @id @default(uuid())
+  teamId        String
+  team          PerformTeam @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  season        Int       // e.g., 2025
+  wins          Int       @default(0)
+  losses        Int       @default(0)
+  confWins      Int       @default(0)
+  confLosses    Int       @default(0)
+  apRank        Int?      // Final AP ranking
+  cfpRank       Int?      // Final CFP ranking
+  bowlGame      String?
+  bowlResult    String?   // W or L
+  notes         String?
+
+  createdAt     DateTime  @default(now())
+
+  @@unique([teamId, season])
+  @@index([season])
+}
+
+/// Recruiting Prospect
+model PerformProspect {
+  id            String    @id @default(uuid())
+  slug          String    @unique
+
+  // Identity
+  firstName     String
+  lastName      String
+  position      String
+  classYear     String    // e.g., "'26"
+  school        String    // HS or college name
+  state         String
+  pool          String    @default("HIGH_SCHOOL") // HIGH_SCHOOL, COLLEGE
+
+  // Physical
+  height        String?   // e.g., "6'2\""
+  weight        Int?
+  gpa           Float?
+
+  // P.A.I. Grade
+  paiScore      Int       @default(0)
+  tier          String    @default("DEVELOPMENTAL") // ELITE, BLUE_CHIP, PROSPECT, SLEEPER, DEVELOPMENTAL
+  performance   Int       @default(0)
+  athleticism   Int       @default(0)
+  intangibles   Int       @default(0)
+
+  // Rankings
+  nationalRank  Int       @default(9999)
+  stateRank     Int       @default(9999)
+  positionRank  Int       @default(9999)
+  trend         String    @default("NEW") // UP, DOWN, STEADY, NEW
+  previousRank  Int?
+
+  // NIL
+  nilEstimate   String?
+
+  // Scouting
+  scoutMemo     String?
+  tags          String?   // JSON array
+  comparisons   String?   // JSON array
+  stats         String?   // JSON: Record<string, string|number>
+
+  // Debate
+  bullCase      String?
+  bearCase      String?
+  mediationVerdict String?
+  debateWinner  String?   // BULL, BEAR, SPLIT
+
+  // Media
+  highlightsUrl String?
+  imageUrl      String?
+
+  // Commitment
+  committedTeamId String?
+  committedTeam   PerformTeam? @relation("CommittedTo", fields: [committedTeamId], references: [id])
+  commitDate      DateTime?
+  stars           Int?      // 2-5 star rating from composite
+
+  // Data provenance
+  sourceUrls    String?   // JSON: URLs used for data
+  lastEnriched  DateTime?
+  enrichedBy    String?   // "brave_search", "manual", "scout_hub"
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([tier, nationalRank])
+  @@index([position, classYear])
+  @@index([state, classYear])
+  @@index([pool, classYear])
+}
+
+/// Per|Form Content (blog posts, podcasts, scouting reports)
+model PerformContent {
+  id            String    @id @default(uuid())
+  slug          String    @unique
+  type          String    // BLOG, PODCAST, RANKING_UPDATE, SCOUTING_REPORT, DEBATE_RECAP
+  title         String
+  excerpt       String?
+  body          String?
+  prospectId    String?
+  prospectName  String?
+  generatedBy   String    @default("SYSTEM")
+  readTimeMin   Int       @default(5)
+  tags          String?   // JSON array
+  imageUrl      String?
+  audioUrl      String?
+  published     Boolean   @default(false)
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([type, published])
+  @@index([createdAt])
+}
+
 /// Sports pick data for pick'em contests
 model SportsPick {
   id            String    @id @default(uuid())
