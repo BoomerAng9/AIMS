@@ -32,7 +32,7 @@ services:
       uef-gateway:
         condition: service_started
     healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://127.0.0.1:80/ || exit 1"]
+      test: ["CMD-SHELL", "curl -sf http://127.0.0.1:80/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
