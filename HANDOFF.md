@@ -4,20 +4,20 @@
 
 ```bash
 cd /path/to/AIMS
-git fetch origin
-git checkout claude/kill-certbot-BzQqv
-git pull origin claude/kill-certbot-BzQqv
+git pull origin main
 cd frontend && npm run build   # verify clean build
 ```
 
 ---
 
-## What Changed (This Session)
+## What Changed (Recent Sessions)
 
-### 1. Certbot Removed (infra)
-- All certbot/ACME infrastructure deleted — SSL via Hostinger hPanel now
-- `deploy.sh` still activates HTTPS when certs exist at `/etc/letsencrypt`
-- No more `--email`, `--ssl-renew` flags
+### 1. VPS-First Architecture (infra)
+- All core services deploy to AIMS VPS (`76.13.96.107` / `srv1328075.hstgr.cloud`)
+- Cloud Run deploys removed from CI — `cloudbuild.yaml` is build+push only
+- SSL via host certbot (apt) — certs at `/etc/letsencrypt`, bind-mounted into nginx
+- First-time cert: `./deploy.sh --domain plugmein.cloud --landing-domain aimanagedsolutions.cloud --email admin@aimanagedsolutions.cloud`
+- PersonaPlex inference on GCP Vertex AI Endpoints (GPU), not Cloud Run
 
 ### 2. Landing Page Rewritten (`frontend/app/page.tsx`)
 - Uses shared `SiteHeader`, domain-aware `Hero.tsx`, and `Footer` components
@@ -32,10 +32,16 @@ cd frontend && npm run build   # verify clean build
   - **Roadmap** — 8 items with status badges
   - **Final CTA** — Chat with ACHEEVY + Open Dashboard
 
-### 3. Pricing Page Updated (`frontend/app/pricing/page.tsx`)
+### 3. Pricing Page Split (`frontend/app/pricing/page.tsx`)
+- AIMS platform pricing separated from Per|Form sports pricing
 - Title: "A.I.M.S. Pricing" (was "Per|Form Pricing")
 - CTA: "Ready to get started?" (was "Ready to Per|Form?")
 - All 4 subscription models (Creator, Partner, Families, All-In-One) unchanged
+
+### 4. CI Pipeline Simplified
+- `cloudbuild.yaml`: build + push 4 images to Artifact Registry (gateway, frontend, research-ang, router-ang)
+- No Cloud Run deploy steps — VPS pulls images via `deploy.sh`
+- `.github/workflows/deploy.yml`: renamed to "CI — Build & Push Images"
 
 ---
 
@@ -88,12 +94,16 @@ Also load all aims-*-ui skill packs when building UI. Available skills:
 
 ## Key Architecture Notes
 
+- **VPS**: `76.13.96.107` (`srv1328075.hstgr.cloud`) — all core services in Docker
 - **Domain routing**: `plugmein.cloud` = lore site, `aimanagedsolutions.cloud` = functions site
 - Both domains serve the same Next.js app, differentiated client-side via `useIsLandingDomain()` hook
 - `SiteHeader.tsx` shows different nav links per domain
 - `Hero.tsx` shows different content per domain (lore vs action chain)
 - All Per|Form data: `frontend/lib/perform/conferences.ts` (131 teams, static), `frontend/app/api/perform/prospects/route.ts` (10 seed prospects, falls back from Scout Hub)
 - Per|Form types/styles: `frontend/lib/perform/types.ts` (TIER_STYLES, TREND_STYLES, getScoreColor)
+- **SSL**: Host certbot (apt), certs bind-mounted into nginx container
+- **CI**: GitHub Actions → Cloud Build → Artifact Registry (build+push only, no deploys)
+- **GPU inference**: Vertex AI Endpoints for PersonaPlex/Nemotron
 
 ---
 
@@ -109,5 +119,4 @@ cd ../../aims-skills && npm test  # Skills
 
 ## Branch
 
-All work is on `claude/kill-certbot-BzQqv`. Push to this branch.
-When ready, merge to `main` via PR.
+All work is on `main`. Feature branches merge via PR.

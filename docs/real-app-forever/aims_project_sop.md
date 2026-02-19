@@ -477,7 +477,7 @@ How A.I.M.S. maps to this SOP:
 | Workstream | n8n PMO pipeline (6 offices: CTO/CFO/COO/CMO/CDO/CPO) |
 | Live Build | Agent sandbox + Plug Factory |
 | Gates & Evidence | CI/CD pipeline (Cloud Build), middleware WAF, agent-bridge payment blocking |
-| Environments | Docker Compose (dev) → VPS prod (31.97.138.45, 76.13.96.107) |
+| Environments | Docker Compose (dev) → VPS prod (76.13.96.107) |
 | Integrations | OpenRouter (LLM), ElevenLabs (Voice), Stripe (Billing), Google OAuth |
 | Security Center | Middleware WAF, DOCKER-USER iptables, UFW, SSH hardening |
 | Operations | Health endpoints, Docker healthchecks, nginx rate limiting |
@@ -520,7 +520,7 @@ How A.I.M.S. maps to this SOP:
 
 | Check | VPS | Result |
 |-------|-----|--------|
-| UFW active, only 22/80/443 | 31.97.138.45 | PASS |
+| UFW active, only 22/80/443 | 76.13.96.107 | PASS |
 | UFW active, only 22/80/443 | 76.13.96.107 | PASS (after fix) |
 | DOCKER-USER iptables DROP on internal ports | Both | PASS |
 | Honeypots (/wp-admin, /.env, /.git, /phpmyadmin, /admin) | plugmein.cloud | PASS (all 404) |
@@ -529,7 +529,7 @@ How A.I.M.S. maps to this SOP:
 | Path traversal blocking | plugmein.cloud | PASS (blocked) |
 | Security headers (CSP, HSTS, X-Frame-Options, etc.) | plugmein.cloud | PASS (all present) |
 | n8n bound to localhost only | 76.13.96.107 | PASS (127.0.0.1:5678) |
-| Docker internal services not exposed | 31.97.138.45 | PASS |
+| Docker internal services not exposed | 76.13.96.107 | PASS |
 | TypeScript build | Local | PASS (0 errors, 69 pages) |
 | `tsc --noEmit` | Local | PASS (0 errors) |
 

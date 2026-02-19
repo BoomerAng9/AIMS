@@ -6,7 +6,7 @@ These rules determine WHERE every piece of code deploys. Apply them to every tas
 
 ```
 IF core platform service (ACHEEVY API, UEF Gateway, Per|Form, House of Ang, Redis, n8n)
-  THEN → AIMS Core VPS (31.97.138.45 / srv1318308.hstgr.cloud) in Docker
+  THEN → AIMS Core VPS (76.13.96.107 / srv1328075.hstgr.cloud) in Docker
   Files: infra/docker-compose.prod.yml, deploy.sh
   Deploy: ./deploy.sh --domain plugmein.cloud --landing-domain aimanagedsolutions.cloud
   First-time cert: ./deploy.sh --domain plugmein.cloud --landing-domain aimanagedsolutions.cloud --email admin@aimanagedsolutions.cloud
@@ -25,7 +25,7 @@ IF CI pipeline (image builds on push to main)
 
 ## Project Overview
 A.I.M.S. (AI Managed Solutions) is an AI-managed platform orchestrated by ACHEEVY.
-Domain: plugmein.cloud | AIMS VPS: 31.97.138.45 | GCP: ai-managed-services
+Domain: plugmein.cloud | AIMS VPS: 76.13.96.107 | GCP: ai-managed-services
 
 ## ACHEEVY Brain
 The single source of truth for ACHEEVY's behavior, skills, hooks, and recurring tasks:

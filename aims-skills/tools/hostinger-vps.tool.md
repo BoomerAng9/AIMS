@@ -4,7 +4,7 @@ name: "Hostinger VPS"
 type: "tool"
 category: "infra"
 provider: "Hostinger"
-description: "Two Hostinger KVM2 VPS instances — AIMS Core (31.97.138.45) and n8n Factory (76.13.96.107)."
+description: "Hostinger KVM2 VPS — AIMS Core (76.13.96.107) runs all platform services."
 env_vars: []
 docs_url: "https://support.hostinger.com/en/articles/vps"
 aims_files:
@@ -17,33 +17,28 @@ aims_files:
 
 ## Overview
 
-AIMS uses **two separate Hostinger KVM2 VPS instances** to isolate the core platform from automation workloads.
+AIMS runs on a **single Hostinger KVM2 VPS** that hosts all core platform services and automation workloads.
 
 ## Server Details
 
-| | AIMS Core | n8n Factory |
-|---|---|---|
-| **Hostname** | `srv1318308.hstgr.cloud` | `srv1328075.hstgr.cloud` |
-| **IP** | `31.97.138.45` | `76.13.96.107` |
-| **Plan** | KVM 2 | KVM 2 |
-| **Expires** | 2027-02-01 | 2027-02-03 |
-| **OS** | Ubuntu 22.04+ | Ubuntu 22.04+ |
-| **Deploy user** | `aims` | `aims` |
-| **What runs here** | Frontend, UEF Gateway, ACHEEVY, PersonaPlex, Redis, Nginx | n8n workflows, automation workers, webhooks |
-| **Compose file** | `infra/docker-compose.prod.yml` | `infra/docker-compose.n8n.yml` |
+| | AIMS Core |
+|---|---|
+| **Hostname** | `srv1328075.hstgr.cloud` |
+| **IP** | `76.13.96.107` |
+| **Plan** | KVM 2 |
+| **Expires** | 2027-02-03 |
+| **OS** | Ubuntu 22.04+ |
+| **Deploy user** | `aims` |
+| **What runs here** | Frontend, UEF Gateway, ACHEEVY, Redis, Nginx, n8n, all agents |
+| **Compose file** | `infra/docker-compose.prod.yml` |
 
 ## Deployment
 
-### AIMS Core (31.97.138.45)
+### AIMS Core (76.13.96.107)
 ```bash
-./deploy.sh --domain plugmein.cloud --email admin@aimanagedsolutions.cloud
-# SSH: ssh root@31.97.138.45
-```
-
-### n8n Factory (76.13.96.107)
-```bash
+./deploy.sh --domain plugmein.cloud --landing-domain aimanagedsolutions.cloud
+# First-time cert: add --email admin@aimanagedsolutions.cloud
 # SSH: ssh root@76.13.96.107
-docker compose -f infra/docker-compose.n8n.yml up -d
 ```
 
 ## MCP Integration
@@ -58,7 +53,7 @@ sudo ./infra/vps-setup.sh
 
 Installs: Node.js 20, Bun, Docker, Docker Compose, UFW firewall, Fail2ban, Claude Code CLI, Gemini CLI.
 
-## Firewall Rules (UFW) — Both Servers
+## Firewall Rules (UFW)
 
 | Port | Service |
 |------|---------|
@@ -75,4 +70,4 @@ All other ports blocked. Internal services communicate via Docker network.
 | SSH timeout | Check UFW allows port 22; verify Hostinger firewall rules |
 | Docker not starting | Run `systemctl start docker` |
 | Disk full | Check `df -h`; prune Docker: `docker system prune -a` |
-| DNS not resolving | Update A record at Hostinger DNS to point to `31.97.138.45` (AIMS) |
+| DNS not resolving | Update A record at Hostinger DNS to point to `76.13.96.107` |

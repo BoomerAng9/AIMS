@@ -85,7 +85,7 @@ const ENVIRONMENTS: Environment[] = [
   {
     id: "production",
     name: "Production",
-    url: "31.97.138.45",
+    url: "76.13.96.107",
     status: "healthy",
     lastDeploy: "2026-02-05T10:00:00Z",
     version: "v0.1.0",

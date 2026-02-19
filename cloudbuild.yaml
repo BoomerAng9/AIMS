@@ -4,7 +4,7 @@
 # Triggers: Push to main branch (via GitHub Actions → gcloud builds submit)
 #
 # VPS-first architecture:
-#   All services run on VPS (31.97.138.45) via docker-compose.prod.yml
+#   All services run on VPS (76.13.96.107) via docker-compose.prod.yml
 #   This pipeline only builds images and pushes to Artifact Registry.
 #   VPS pulls latest images via deploy.sh.
 #

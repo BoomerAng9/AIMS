@@ -258,9 +258,9 @@
 
 ## 9. Configuration Drift & Hardcoded Values
 
-### 9.1 Dual VPS IP Confusion
-- **cloudbuild.yaml** has `_VPS_HOST=76.13.96.107`
-- **CLAUDE.md** documents AIMS VPS as `31.97.138.45`
+### 9.1 VPS IP Consolidation
+- AIMS Core VPS is now `76.13.96.107` (`srv1328075.hstgr.cloud`)
+- Old IP `31.97.138.45` (`srv1318308`) is no longer in use
 - **Lesson:** Single source of truth for infrastructure IPs. Use env vars or a shared config, not hardcoded values in multiple files.
 
 ### 9.2 deploy.sh sed -i Idempotency
