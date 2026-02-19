@@ -115,11 +115,12 @@ export default function PricingPage() {
             className="text-2xl md:text-4xl font-bold tracking-tight"
             style={{ fontFamily: markerFont }}
           >
-            Per|Form Pricing
+            A.I.M.S. Pricing
           </h1>
           <p className="mt-3 text-sm md:text-base text-white/70 max-w-2xl mx-auto leading-relaxed">
-            For sports content creators, schools, parents, and power users.
+            AI Managed Solutions for creators, businesses, and power users.
             Choose your plan, pick your commitment, and select the usage level that fits your workflow.
+            All plans include full platform access — Chat with ACHEEVY, Per|Form sports analytics, and more.
           </p>
         </div>
 
@@ -510,10 +511,10 @@ export default function PricingPage() {
             className="text-xl md:text-2xl font-bold text-white mb-2"
             style={{ fontFamily: markerFont }}
           >
-            Ready to Per|Form?
+            Ready to get started?
           </h2>
           <p className="text-sm md:text-base text-white/60 mb-6 max-w-lg mx-auto">
-            Join content creators, schools, and families already using Per|Form to level up their recruiting game.
+            Join creators, businesses, and families already using AIMS to automate their operations and level up.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link

@@ -2,11 +2,12 @@
 # =============================================================================
 # A.I.M.S. SSL Diagnostic Script
 # =============================================================================
-# Run this ON the VPS (76.13.96.107) to diagnose SSL/TLS issues.
+# Run this ON the VPS (31.97.138.45) to diagnose SSL/TLS issues.
+# SSL is managed by Hostinger hPanel (not certbot).
 #
 # Usage:
-#   ssh aims@76.13.96.107
-#   cd ~/AIMS && bash infra/ssl-diagnostic.sh
+#   ssh root@31.97.138.45
+#   cd ~/aims && bash infra/ssl-diagnostic.sh
 # =============================================================================
 set -uo pipefail
 
@@ -29,8 +30,7 @@ DOMAINS=(
     "www.aimanagedsolutions.cloud"
 )
 
-VPS_IP="76.13.96.107"
-HOSTINGER_SHARED_IP="76.13.132.174"
+VPS_IP="31.97.138.45"
 
 # =============================================================================
 header "1. DNS Resolution"
@@ -41,10 +41,8 @@ for domain in "${DOMAINS[@]}"; do
         fail "$domain — no A record found"
     elif [ "$resolved" = "$VPS_IP" ]; then
         pass "$domain → $resolved (VPS — correct)"
-    elif [ "$resolved" = "$HOSTINGER_SHARED_IP" ]; then
-        fail "$domain → $resolved (Hostinger shared hosting — WRONG! Should be $VPS_IP)"
     else
-        warn "$domain → $resolved (unknown IP — should be $VPS_IP)"
+        warn "$domain → $resolved (should be $VPS_IP)"
     fi
 done
 
@@ -62,19 +60,13 @@ fi
 
 if [ -n "$COMPOSE_CMD" ]; then
     nginx_running=$(docker ps --filter "name=nginx" --format "{{.Names}} {{.Status}}" 2>/dev/null)
-    certbot_running=$(docker ps --filter "name=certbot" --format "{{.Names}} {{.Status}}" 2>/dev/null)
 
     if [ -n "$nginx_running" ]; then
         pass "Nginx: $nginx_running"
     else
         fail "Nginx container is NOT running"
     fi
-
-    if [ -n "$certbot_running" ]; then
-        pass "Certbot: $certbot_running"
-    else
-        warn "Certbot container is not running (may be expected if using run --rm)"
-    fi
+    info "SSL managed by Hostinger hPanel (no certbot container)"
 fi
 
 # =============================================================================
@@ -93,10 +85,10 @@ else
 fi
 
 # =============================================================================
-header "4. Let's Encrypt Certificates"
+header "4. SSL Certificates (Hostinger-managed)"
 # =============================================================================
 CERT_BASE="/etc/letsencrypt/live"
-# Check if certs are accessible via the certbot volume or directly on host
+# Check if certs are accessible on host or inside container
 if [ -d "$CERT_BASE" ]; then
     CERT_ACCESS="host"
 else
@@ -275,15 +267,14 @@ fi
 header "Summary"
 # =============================================================================
 echo ""
-info "If certs are expired or missing:"
-info "  ./deploy.sh --domain plugmein.cloud --landing-domain aimanagedsolutions.cloud --email admin@aimanagedsolutions.cloud"
+info "SSL is managed by Hostinger hPanel (not certbot)."
+echo ""
+info "If certs are missing or expired:"
+info "  Go to Hostinger hPanel → SSL section → enable SSL for the domain"
 echo ""
 info "If certs exist but nginx doesn't have SSL configs:"
 info "  Re-run deploy.sh (it writes ssl.conf and ssl-landing.conf into nginx)"
 echo ""
-info "If DNS points to 76.13.132.174 (Hostinger shared hosting):"
-info "  Go to Hostinger DNS Manager → change A records to 76.13.96.107"
-echo ""
-info "To force-renew all certs:"
-info "  ./deploy.sh --ssl-renew"
+info "If DNS does not point to ${VPS_IP}:"
+info "  Go to Hostinger DNS Manager → change A records to ${VPS_IP}"
 echo ""
