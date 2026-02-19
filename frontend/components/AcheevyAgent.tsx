@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { useVoiceInput } from '@/hooks/useVoiceInput';
 import { useVoiceOutput } from '@/hooks/useVoiceOutput';
+import { useAudioLevel } from '@/hooks/useAudioLevel';
 
 // ─────────────────────────────────────────────────────────────
 // Types
@@ -119,7 +120,10 @@ function AudioVisualizer({ getFrequencyData, active, color = 'amber' }: {
 // Fallback Audio Level Bar (for custom pipeline)
 // ─────────────────────────────────────────────────────────────
 
-function AudioLevelBar({ level, active, label }: { level: number; active: boolean; label: string }) {
+function AudioLevelBar({ stream, active, label, levelOverride }: { stream?: MediaStream | null; active: boolean; label: string; levelOverride?: number }) {
+  const streamLevel = useAudioLevel(stream || null, active && levelOverride === undefined);
+  const level = levelOverride !== undefined ? levelOverride : streamLevel;
+
   return (
     <div>
       <p className="text-[9px] text-white/30 font-mono uppercase mb-1">{label}</p>
@@ -170,6 +174,7 @@ export default function AcheevyAgent() {
       // Send to chat API and speak response
       handleFallbackChat(result.text);
     },
+    enableAudioLevelState: false,
   });
 
   const voiceOutput = useVoiceOutput({
@@ -526,12 +531,12 @@ export default function AcheevyAgent() {
               <>
                 <AudioLevelBar
                   label="You"
-                  level={voiceInput.audioLevel}
+                  stream={voiceInput.stream}
                   active={voiceInput.isListening}
                 />
                 <AudioLevelBar
                   label="ACHEEVY"
-                  level={voiceOutput.isPlaying ? 0.6 : 0}
+                  levelOverride={voiceOutput.isPlaying ? 0.6 : 0}
                   active={voiceOutput.isPlaying}
                 />
               </>

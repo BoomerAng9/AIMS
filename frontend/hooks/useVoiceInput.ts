@@ -13,6 +13,13 @@ interface UseVoiceInputOptions {
   onTranscript?: (result: TranscriptionResult) => void;
   onError?: (error: string) => void;
   config?: VoiceInputConfig;
+  /**
+   * Whether to update audioLevel state internally.
+   * Disable this and use the returned `stream` with `useAudioLevel` hook
+   * to prevent high-frequency re-renders in the parent component.
+   * @default true
+   */
+  enableAudioLevelState?: boolean;
 }
 
 interface UseVoiceInputReturn {
@@ -25,10 +32,11 @@ interface UseVoiceInputReturn {
   stopListening: () => Promise<TranscriptionResult | null>;
   cancelListening: () => void;
   audioLevel: number;
+  stream: MediaStream | null;
 }
 
 export function useVoiceInput(options: UseVoiceInputOptions = {}): UseVoiceInputReturn {
-  const { onTranscript, onError, config } = options;
+  const { onTranscript, onError, config, enableAudioLevelState = true } = options;
 
   const [state, setState] = useState<VoiceInputState>('idle');
   const [transcript, setTranscript] = useState<string | null>(null);
@@ -46,6 +54,8 @@ export function useVoiceInput(options: UseVoiceInputOptions = {}): UseVoiceInput
   // ─────────────────────────────────────────────────────────
 
   const startAudioLevelMonitoring = useCallback((stream: MediaStream) => {
+    if (!enableAudioLevelState) return;
+
     const audioContext = new AudioContext();
     const source = audioContext.createMediaStreamSource(stream);
     const analyser = audioContext.createAnalyser();
@@ -65,7 +75,7 @@ export function useVoiceInput(options: UseVoiceInputOptions = {}): UseVoiceInput
     };
 
     updateLevel();
-  }, []);
+  }, [enableAudioLevelState]);
 
   const stopAudioLevelMonitoring = useCallback(() => {
     if (animationFrameRef.current) {
@@ -238,5 +248,6 @@ export function useVoiceInput(options: UseVoiceInputOptions = {}): UseVoiceInput
     stopListening,
     cancelListening,
     audioLevel,
+    stream: streamRef.current,
   };
 }
