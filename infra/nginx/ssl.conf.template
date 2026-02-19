@@ -24,6 +24,9 @@ server {
     http2 on;
     server_name DOMAIN_PLACEHOLDER;
 
+    # Cloud Run frontend URL (CI/CD deployed)
+    set $cloudrun_frontend aims-frontend-rlknukimaq-uc.a.run.app;
+
     # SSL certificates (managed by certbot)
     ssl_certificate     /etc/letsencrypt/live/DOMAIN_PLACEHOLDER/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/DOMAIN_PLACEHOLDER/privkey.pem;
@@ -102,8 +105,10 @@ server {
     # Next.js static assets — no rate limiting, immutable cache
     # -----------------------------------------------------------------
     location /_next/static/ {
-        proxy_pass http://frontend;
-        proxy_set_header Host $host;
+        proxy_pass https://$cloudrun_frontend;
+        proxy_ssl_server_name on;
+        proxy_set_header Host $cloudrun_frontend;
+        proxy_set_header X-Forwarded-Host $host;
         proxy_cache_valid 200 365d;
         add_header Cache-Control "public, max-age=31536000, immutable";
         access_log off;
@@ -111,22 +116,26 @@ server {
 
     # Public static files (images, fonts, favicon)
     location ~* \.(ico|png|jpg|jpeg|gif|svg|woff|woff2|ttf|eot|css|js)$ {
-        proxy_pass http://frontend;
-        proxy_set_header Host $host;
+        proxy_pass https://$cloudrun_frontend;
+        proxy_ssl_server_name on;
+        proxy_set_header Host $cloudrun_frontend;
+        proxy_set_header X-Forwarded-Host $host;
         add_header Cache-Control "public, max-age=86400";
         access_log off;
     }
 
     # -----------------------------------------------------------------
-    # Frontend — everything else -> frontend:3000
+    # Frontend — proxied to Cloud Run (CI/CD deployed)
     # -----------------------------------------------------------------
     location / {
         limit_req zone=general burst=40 nodelay;
-        proxy_pass http://frontend;
-        proxy_set_header Host $host;
+        proxy_pass https://$cloudrun_frontend;
+        proxy_ssl_server_name on;
+        proxy_set_header Host $cloudrun_frontend;
+        proxy_set_header X-Forwarded-Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Proto https;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
         proxy_read_timeout 60s;
