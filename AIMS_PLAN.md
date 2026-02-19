@@ -206,10 +206,10 @@ P2.7  COMPETITOR_PARITY          DONE
                            │
             ┌──────────────┼──────────────┐
             │              │              │
-     ┌──────▼──────┐ ┌────▼────┐  ┌──────▼──────┐
-     │  Frontend   │ │   API   │  │   certbot   │
-     │  Next.js    │ │ /api/*  │  │  (SSL)      │
-     │  :3000      │ │  proxy  │  └─────────────┘
+     ┌──────▼──────┐ ┌────▼────┐  Host certbot (apt)
+     │  Frontend   │ │   API   │  manages certs at
+     │  Next.js    │ │ /api/*  │  /etc/letsencrypt
+     │  :3000      │ │  proxy  │  (bind-mounted :ro)
      └──────┬──────┘ └────┬────┘
             │              │
             │        ┌─────▼──────────┐

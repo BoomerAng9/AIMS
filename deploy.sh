@@ -22,6 +22,7 @@ ENV_FILE="${SCRIPT_DIR}/infra/.env.production"
 ENV_EXAMPLE="${SCRIPT_DIR}/infra/.env.production.example"
 SSL_TEMPLATE="${SCRIPT_DIR}/infra/nginx/ssl.conf.template"
 SSL_LANDING_TEMPLATE="${SCRIPT_DIR}/infra/nginx/ssl-landing.conf.template"
+SSL_DEMO_TEMPLATE="${SCRIPT_DIR}/infra/nginx/demo-ssl.conf.template"
 
 # Colors
 RED='\033[0;31m'
@@ -141,6 +142,9 @@ if [ "${ENV_WARNINGS}" -gt 0 ]; then
 fi
 info "Environment validation passed."
 
+# Ensure certbot webroot directory exists on host (bind-mounted into nginx :ro)
+mkdir -p /var/www/certbot
+
 # If domain provided, update CORS and NEXTAUTH_URL in .env.production
 if [ -n "${DOMAIN}" ]; then
     info "App domain: ${DOMAIN}"
@@ -231,11 +235,12 @@ if [ -n "${DOMAIN}" ]; then
                 -w /var/www/certbot \
                 -d "${DOMAIN}" \
                 -d "www.${DOMAIN}" \
+                -d "demo.${DOMAIN}" \
                 --email "${EMAIL}" \
                 --agree-tos \
                 --no-eff-email \
                 --force-renewal
-            info "SSL certificate issued for ${DOMAIN}."
+            info "SSL certificate issued for ${DOMAIN} (+ www + demo)."
         else
             info "SSL certificate already exists for ${DOMAIN}."
         fi
@@ -248,6 +253,14 @@ if [ -n "${DOMAIN}" ]; then
         ${COMPOSE_CMD} -f "${COMPOSE_FILE}" exec -T nginx \
             sh -c "cat > /etc/nginx/conf.d/ssl.conf" <<< "${SSL_CONF}"
         info "App domain HTTPS config written."
+
+        # Activate demo subdomain HTTPS (shares cert with app domain)
+        if [ -f "${SSL_DEMO_TEMPLATE}" ]; then
+            info "Activating HTTPS server block for demo.${DOMAIN}..."
+            ${COMPOSE_CMD} -f "${COMPOSE_FILE}" exec -T nginx \
+                sh -c "cat > /etc/nginx/conf.d/demo-ssl.conf" < "${SSL_DEMO_TEMPLATE}"
+            info "Demo subdomain HTTPS config written."
+        fi
         SSL_CHANGED=true
     else
         warn "No SSL cert found for ${DOMAIN}. Run with --email to issue one."

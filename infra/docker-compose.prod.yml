@@ -23,6 +23,7 @@ services:
       - "443:443"
     volumes:
       - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /var/www/certbot:/var/www/certbot:ro
       - nginx-conf:/etc/nginx/conf.d
       - nginx-logs:/var/log/nginx
     depends_on:
