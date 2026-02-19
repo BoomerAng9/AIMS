@@ -3,6 +3,9 @@
 # A.I.M.S. Production Deployment Script
 # =============================================================================
 # Builds, deploys, and optionally provisions SSL certificates.
+# SSL is managed by certbot installed on the HOST (not in a container).
+# Certs are bind-mounted into the nginx container at /etc/letsencrypt.
+#
 # Supports dual-domain architecture:
 #   --domain          = plugmein.cloud (functional app)
 #   --landing-domain  = aimanagedsolutions.cloud (father site)
@@ -214,11 +217,38 @@ if [ $WAITED -ge $MAX_WAIT ]; then
 fi
 
 # =============================================================================
+# SSL: Ensure certbot is installed on HOST (not in a container)
+# =============================================================================
+ensure_certbot() {
+    if ! command -v certbot &> /dev/null; then
+        info "Installing certbot on host..."
+        if command -v apt-get &> /dev/null; then
+            apt-get update -qq && apt-get install -y -qq certbot
+        elif command -v yum &> /dev/null; then
+            yum install -y certbot
+        else
+            error "Cannot auto-install certbot. Install it manually: https://certbot.eff.org"
+            return 1
+        fi
+        info "certbot installed."
+    fi
+    # Ensure webroot directory exists on host
+    mkdir -p /var/www/certbot
+}
+
+# =============================================================================
 # SSL Certificate Provisioning — App Domain (plugmein.cloud)
+# Certs are issued by HOST certbot and bind-mounted into the nginx container.
 # =============================================================================
 if [ -n "${DOMAIN}" ] && [ -n "${EMAIL}" ]; then
     header "SSL Certificate Setup — App Domain (${DOMAIN})"
+    ensure_certbot
 
+    if [ -f "/etc/letsencrypt/live/${DOMAIN}/fullchain.pem" ] && [ "${SSL_RENEW}" = "false" ]; then
+        info "SSL certificate already exists for ${DOMAIN}."
+    else
+        info "Requesting SSL certificate for ${DOMAIN}..."
+        certbot certonly \
     # Check if certs already exist (--entrypoint "" overrides the renewal-loop entrypoint)
     CERT_EXISTS=$(${COMPOSE_CMD} -f "${COMPOSE_FILE}" run --rm --entrypoint "" certbot \
         sh -c "test -f /etc/letsencrypt/live/${DOMAIN}/fullchain.pem && echo 'yes' || echo 'no'" 2>/dev/null || echo "no")
@@ -239,7 +269,6 @@ if [ -n "${DOMAIN}" ] && [ -n "${EMAIL}" ]; then
             --agree-tos \
             --no-eff-email \
             --force-renewal
-
         info "SSL certificate issued for ${DOMAIN}."
     fi
 
@@ -259,7 +288,13 @@ fi
 # =============================================================================
 if [ -n "${LANDING_DOMAIN}" ] && [ -n "${EMAIL}" ]; then
     header "SSL Certificate Setup — Landing Domain (${LANDING_DOMAIN})"
+    ensure_certbot
 
+    if [ -f "/etc/letsencrypt/live/${LANDING_DOMAIN}/fullchain.pem" ] && [ "${SSL_RENEW}" = "false" ]; then
+        info "SSL certificate already exists for ${LANDING_DOMAIN}."
+    else
+        info "Requesting SSL certificate for ${LANDING_DOMAIN} + www.${LANDING_DOMAIN}..."
+        certbot certonly \
     # Check if certs already exist (--entrypoint "" overrides the renewal-loop entrypoint)
     LANDING_CERT_EXISTS=$(${COMPOSE_CMD} -f "${COMPOSE_FILE}" run --rm --entrypoint "" certbot \
         sh -c "test -f /etc/letsencrypt/live/${LANDING_DOMAIN}/fullchain.pem && echo 'yes' || echo 'no'" 2>/dev/null || echo "no")
@@ -280,7 +315,6 @@ if [ -n "${LANDING_DOMAIN}" ] && [ -n "${EMAIL}" ]; then
             --agree-tos \
             --no-eff-email \
             --force-renewal
-
         info "SSL certificate issued for ${LANDING_DOMAIN}."
     fi
 
@@ -307,9 +341,24 @@ if [ -n "${DOMAIN}" ] || [ -n "${LANDING_DOMAIN}" ]; then
     fi
 elif [ "${SSL_RENEW}" = "true" ]; then
     header "SSL Certificate Renewal"
-    ${COMPOSE_CMD} -f "${COMPOSE_FILE}" run --rm certbot renew --webroot -w /var/www/certbot
+    ensure_certbot
+    certbot renew --webroot -w /var/www/certbot --quiet
     ${COMPOSE_CMD} -f "${COMPOSE_FILE}" exec -T nginx sh -c "nginx -s reload"
     info "Certificates renewed and nginx reloaded."
+fi
+
+# =============================================================================
+# SSL Auto-Renewal Cron (host-level, runs twice daily)
+# =============================================================================
+if [ -n "${EMAIL}" ] && ([ -n "${DOMAIN}" ] || [ -n "${LANDING_DOMAIN}" ]); then
+    CRON_CMD="0 2,14 * * * certbot renew --webroot -w /var/www/certbot --quiet --deploy-hook '${COMPOSE_CMD} -f ${COMPOSE_FILE} exec -T nginx nginx -s reload'"
+    if ! crontab -l 2>/dev/null | grep -qF "certbot renew"; then
+        info "Installing SSL auto-renewal cron (twice daily)..."
+        (crontab -l 2>/dev/null; echo "${CRON_CMD}") | crontab -
+        info "Cron installed. Certs will auto-renew."
+    else
+        info "SSL auto-renewal cron already installed."
+    fi
 fi
 
 # =============================================================================
