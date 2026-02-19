@@ -1,66 +1,58 @@
 ---
 id: "certbot"
-name: "Certbot / Let's Encrypt"
+name: "SSL / TLS Certificates"
 type: "tool"
 category: "infra"
-provider: "Let's Encrypt"
-description: "Automated SSL/TLS certificate provisioning and renewal via Let's Encrypt."
+provider: "Hostinger"
+description: "SSL/TLS certificates managed by Hostinger Lifetime SSL. No manual cert provisioning needed."
 env_vars: []
-docs_url: "https://certbot.eff.org/docs/"
+docs_url: "https://support.hostinger.com/en/articles/1583403-what-is-lifetime-ssl"
 aims_files:
   - "infra/docker-compose.prod.yml"
   - "deploy.sh"
 ---
 
-# Certbot / Let's Encrypt — SSL Tool Reference
+# SSL / TLS Certificates — Hostinger Lifetime SSL
 
 ## Overview
 
-Certbot automates SSL certificate provisioning from Let's Encrypt. In AIMS, it runs as a Docker sidecar that issues certs on first deploy and renews every 12 hours.
+SSL certificates for both AIMS domains are managed by Hostinger Lifetime SSL. Certificates are auto-provisioned, auto-renewed, and never expire. No certbot or ACME challenges are needed.
 
-## No API Keys Required
+## Domains Covered
 
-Let's Encrypt is free and uses ACME protocol — no API key needed. Just needs domain validation (HTTP-01 challenge).
+| Domain | SSL Type | Status | Expires |
+|--------|----------|--------|---------|
+| plugmein.cloud | Hostinger Lifetime SSL | Active | Never |
+| aimanagedsolutions.cloud | Hostinger Lifetime SSL | Active | Never |
 
-## Docker Setup
+## How It Works
 
-```yaml
-certbot:
-  image: certbot/certbot
-  volumes:
-    - certbot-webroot:/var/www/certbot
-    - certbot-certs:/etc/letsencrypt
-  entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
-```
-
-## Initial Certificate Issuance
-
-Run by `deploy.sh`:
-```bash
-certbot certonly --webroot \
-  -w /var/www/certbot \
-  -d plugmein.cloud \
-  -d aimanagedsolutions.cloud \
-  --email acheevy@aimanagedsolutions.cloud \
-  --agree-tos --no-eff-email
-```
+1. Hostinger manages certificate lifecycle automatically
+2. Certs are available on the VPS host at `/etc/letsencrypt/live/<domain>/`
+3. The nginx container bind-mounts `/etc/letsencrypt` read-only
+4. `deploy.sh` activates HTTPS server blocks pointing to these certs
 
 ## Certificate Locations
 
 | File | Path |
 |------|------|
-| Full chain | `/etc/letsencrypt/live/plugmein.cloud/fullchain.pem` |
-| Private key | `/etc/letsencrypt/live/plugmein.cloud/privkey.pem` |
+| Full chain (plugmein.cloud) | `/etc/letsencrypt/live/plugmein.cloud/fullchain.pem` |
+| Private key (plugmein.cloud) | `/etc/letsencrypt/live/plugmein.cloud/privkey.pem` |
+| Full chain (aimanagedsolutions.cloud) | `/etc/letsencrypt/live/aimanagedsolutions.cloud/fullchain.pem` |
+| Private key (aimanagedsolutions.cloud) | `/etc/letsencrypt/live/aimanagedsolutions.cloud/privkey.pem` |
 
-## Renewal
-- Automatic: every 12 hours via Docker entrypoint
-- Manual: `docker exec aims-certbot certbot renew`
-- Certs expire after 90 days
+## Deploy Command
+
+```bash
+./deploy.sh --domain plugmein.cloud --landing-domain aimanagedsolutions.cloud
+```
+
+No `--email` or `--ssl-renew` flags needed — Hostinger handles everything.
 
 ## Troubleshooting
 
 | Issue | Fix |
 |-------|-----|
-| Challenge failed | Ensure port 80 is open and Nginx serves `.well-known/acme-challenge` |
-| Rate limited | Let's Encrypt has 5 certs/domain/week limit; use staging for testing |
-| Cert not found | Check volume mount: `certbot-certs:/etc/letsencrypt` |
+| Cert not found on host | Check Hostinger hPanel → Security → SSL Certificate |
+| HTTPS not working | Run `deploy.sh --domain ...` to activate nginx HTTPS blocks |
+| Cert path different | Hostinger may use a different path — check hPanel for details |

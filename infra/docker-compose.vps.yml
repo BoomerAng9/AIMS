@@ -30,8 +30,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - certbot-webroot:/var/www/certbot:ro
-      - certbot-certs:/etc/letsencrypt:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
       - nginx-conf:/etc/nginx/conf.d
       - nginx-logs:/var/log/nginx
     depends_on:
@@ -44,19 +43,6 @@ services:
       retries: 3
       start_period: 10s
     restart: always
-    networks:
-      - aims-network
-
-  # ---------------------------------------------------------------------------
-  # Certbot (Let's Encrypt) — renewal loop
-  # ---------------------------------------------------------------------------
-  certbot:
-    image: certbot/certbot:latest
-    volumes:
-      - certbot-webroot:/var/www/certbot
-      - certbot-certs:/etc/letsencrypt
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do sleep 12h & wait $${!}; certbot renew --webroot -w /var/www/certbot --quiet; done'"
-    restart: unless-stopped
     networks:
       - aims-network
 
@@ -262,8 +248,6 @@ services:
           memory: 128M
 
 volumes:
-  certbot-webroot:
-  certbot-certs:
   nginx-conf:
   nginx-logs:
   redis-data:
