@@ -510,6 +510,40 @@ app.post('/acheevy/execute', async (req, res) => {
 });
 
 // --------------------------------------------------------------------------
+// Vertical Execute — Phase B: dispatch vertical to n8n workflow pipeline
+// Called by the frontend after Phase A step-progression completes.
+// --------------------------------------------------------------------------
+app.post('/vertical/execute', async (req, res) => {
+  try {
+    const { verticalId, userId, collectedData, sessionId } = req.body;
+    if (!verticalId || !userId) {
+      res.status(400).json({ error: 'Missing verticalId or userId' });
+      return;
+    }
+
+    const { triggerVerticalWorkflow } = await import('./n8n/client');
+    const result = await triggerVerticalWorkflow({
+      verticalId,
+      userId: userId || req.headers['x-user-id'] as string || 'anon-unknown',
+      collectedData: collectedData || {},
+      sessionId: sessionId || `session-${userId}`,
+      requestId: `VRT-${Date.now()}`,
+    });
+
+    logger.info(
+      { verticalId, userId, requestId: result.requestId, status: result.status },
+      '[Vertical] Phase B execution dispatched',
+    );
+
+    res.json(result);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Vertical execution failed';
+    logger.error({ err }, '[Vertical] Execute error');
+    res.status(500).json({ error: msg });
+  }
+});
+
+// --------------------------------------------------------------------------
 // ACHEEVY Classify — Quick intent classification for the chat route
 // Frontend can call this to determine if a message needs agent dispatch
 // --------------------------------------------------------------------------
@@ -1163,6 +1197,42 @@ app.post('/billing/check-agents', (req, res) => {
   }
   const result = checkAgentLimit(tierId, activeAgents || 0);
   res.json(result);
+});
+
+// Provision tier — called by Stripe webhook after checkout/subscription events
+const provisionedTiers = new Map<string, { tierId: string; tierName: string; stripeCustomerId: string; stripeSubscriptionId: string; provisionedAt: string }>();
+
+app.post('/billing/provision', (req, res) => {
+  const { userId, tierId, tierName, stripeCustomerId, stripeSubscriptionId, provisionedAt, reason } = req.body;
+  if (!userId || !tierId) {
+    res.status(400).json({ error: 'Missing userId or tierId' });
+    return;
+  }
+
+  provisionedTiers.set(userId, {
+    tierId,
+    tierName: tierName || tierId,
+    stripeCustomerId: stripeCustomerId || '',
+    stripeSubscriptionId: stripeSubscriptionId || '',
+    provisionedAt: provisionedAt || new Date().toISOString(),
+  });
+
+  logger.info({ userId, tierId, tierName, reason }, '[Billing] Tier provisioned');
+  res.json({ success: true, userId, tierId, tierName, provisionedAt });
+});
+
+app.get('/billing/provision', (req, res) => {
+  const userId = req.query.userId as string;
+  if (!userId) {
+    res.status(400).json({ error: 'Missing userId' });
+    return;
+  }
+  const tier = provisionedTiers.get(userId);
+  if (!tier) {
+    res.json({ userId, tierId: 'p2p', tierName: 'Pay-per-Use', provisioned: false });
+    return;
+  }
+  res.json({ userId, ...tier, provisioned: true });
 });
 
 // --------------------------------------------------------------------------
