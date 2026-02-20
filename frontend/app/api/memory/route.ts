@@ -45,7 +45,9 @@ export async function GET(request: NextRequest) {
     const data = await res.json();
     return NextResponse.json(data, { status: res.status });
   } catch (error) {
-    return NextResponse.json({ memories: [], count: 0 });
+    const msg = error instanceof Error ? error.message : 'Memory fetch failed';
+    console.error('[Memory API] GET error:', msg);
+    return NextResponse.json({ memories: [], count: 0, error: msg }, { status: 502 });
   }
 }
 
