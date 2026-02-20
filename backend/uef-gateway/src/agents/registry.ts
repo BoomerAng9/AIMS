@@ -19,6 +19,8 @@ import { Quality_Ang } from './boomerangs/quality-ang';
 import { Node_Trigger_Ang } from './boomerangs/node-trigger-ang';
 import { ChickenHawk } from './chicken-hawk';
 import { JSON_Expert_Squad } from './lil-hawks/json-expert-squad';
+import { WorkflowSmithSquad } from './lil-hawks/workflow-smith-squad';
+import { VisionScoutSquad } from './lil-hawks/vision-scout-squad';
 import { discoverAndRegister, type ContainerAgentConfig } from '../a2a/agent-proxy';
 import logger from '../logger';
 
@@ -99,6 +101,8 @@ registry.register(Quality_Ang);
 registry.register(Node_Trigger_Ang);
 registry.register(ChickenHawk);
 registry.register(JSON_Expert_Squad);
+registry.register(WorkflowSmithSquad);
+registry.register(VisionScoutSquad);
 
 // Discover container agents asynchronously (non-blocking startup)
 // Retry every 60s for agents that weren't available at boot
