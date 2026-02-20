@@ -10,7 +10,7 @@
  *
  * PROPRIETARY BOUNDARY:
  * - P.A.I. grades and tiers are PUBLIC (shown to users)
- * - Formula weights, GROC internals, and Luke adjustments are PRIVATE
+ * - Formula weights, AGI internals, and AGI modifiers are PRIVATE
  */
 
 import { useEffect, useState } from 'react';
@@ -126,6 +126,20 @@ export default function PerFormHub() {
         </Link>
 
         <Link
+          href="/sandbox/perform/redraft"
+          className="wireframe-card rounded-2xl p-5 flex items-center gap-4 hover:border-red-400/20 transition-colors group"
+        >
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-400/10 border border-red-400/20 text-red-400">
+            <Swords size={18} />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-medium text-white group-hover:text-gold transition-colors">2025 Redraft</p>
+            <p className="text-[0.55rem] text-white/30 font-mono">AGI Accountability & Rookie Grades</p>
+          </div>
+          <ArrowRight size={14} className="text-white/15 group-hover:text-gold/40 transition-colors" />
+        </Link>
+
+        <Link
           href="/sandbox/perform/content"
           className="wireframe-card rounded-2xl p-5 flex items-center gap-4 hover:border-blue-400/20 transition-colors group"
         >
@@ -140,7 +154,7 @@ export default function PerFormHub() {
         </Link>
 
         <Link
-          href="/dashboard/war-room"
+          href="/sandbox/perform/war-room"
           className="wireframe-card rounded-2xl p-5 flex items-center gap-4 hover:border-amber-400/20 transition-colors group"
         >
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-400/10 border border-amber-400/20 text-amber-400">
@@ -152,6 +166,68 @@ export default function PerFormHub() {
           </div>
           <ArrowRight size={14} className="text-white/15 group-hover:text-gold/40 transition-colors" />
         </Link>
+
+        {/* NEW ANALYTICS MODALITIES */}
+        <Link
+          href="/sandbox/perform/state-boards"
+          className="wireframe-card rounded-2xl p-5 flex items-center gap-4 hover:border-purple-400/20 transition-colors group"
+        >
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-400/10 border border-purple-400/20 text-purple-400">
+            <ListOrdered size={18} />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-medium text-white group-hover:text-gold transition-colors">HS State Boards</p>
+            <p className="text-[0.55rem] text-white/30 font-mono">Top 100 by State &middot; Stats only</p>
+          </div>
+          <ArrowRight size={14} className="text-white/15 group-hover:text-gold/40 transition-colors" />
+        </Link>
+
+        <Link
+          href="/sandbox/perform/transfer-portal"
+          className="wireframe-card rounded-2xl p-5 flex items-center gap-4 hover:border-cyan-400/20 transition-colors group"
+        >
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-400/10 border border-cyan-400/20 text-cyan-400">
+            <Users size={18} />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-medium text-white group-hover:text-gold transition-colors">Transfer Matchmaker</p>
+            <p className="text-[0.55rem] text-white/30 font-mono">AGI NIL value & Roster Alignment</p>
+          </div>
+          <ArrowRight size={14} className="text-white/15 group-hover:text-gold/40 transition-colors" />
+        </Link>
+      </motion.div>
+
+      {/* Analytics Engine Explainer */}
+      <motion.div variants={staggerItem} className="wireframe-card p-6 rounded-2xl bg-white/[0.01]">
+        <h2 className="text-xs uppercase tracking-widest text-[#D4AF37] font-mono mb-4">
+          Layered Analytics Engine & Deep Research
+        </h2>
+        <div className="grid gap-4 md:grid-cols-3 text-sm">
+          <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-1 h-full bg-emerald-400/50" />
+            <p className="text-white font-display text-lg mb-1">Tier 1: Quick Search</p>
+            <p className="text-emerald-400/60 text-[0.65rem] font-mono mb-2 uppercase tracking-wide">Gemini 3.1 Pro / Flash</p>
+            <p className="text-white/40 text-[0.65rem] leading-relaxed">
+              Rapid retrieval for basic player stats, placeholder searches, and load-balanced high-traffic queries.
+            </p>
+          </div>
+          <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-1 h-full bg-blue-400/50" />
+            <p className="text-white font-display text-lg mb-1">Tier 2: Deep Research</p>
+            <p className="text-blue-400/60 text-[0.65rem] font-mono mb-2 uppercase tracking-wide">OpenRouter / DeepMind</p>
+            <p className="text-white/40 text-[0.65rem] leading-relaxed">
+              Complex historical analytics and multi-variable comparison. Runs the "X-Factor" evaluation on prospects.
+            </p>
+          </div>
+          <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-1 h-full bg-amber-400/50" />
+            <p className="text-white font-display text-lg mb-1">Tier 3: Targeted Crawl</p>
+            <p className="text-amber-400/60 text-[0.65rem] font-mono mb-2 uppercase tracking-wide">Brave Search API</p>
+            <p className="text-white/40 text-[0.65rem] leading-relaxed">
+              Activated for hyper-local clippings, community rumblings, and undrafted high school gems.
+            </p>
+          </div>
+        </div>
       </motion.div>
 
       {/* P.A.I. System Explainer — grades shown, formula NEVER exposed */}
@@ -206,9 +282,8 @@ export default function PerFormHub() {
                 <Link
                   key={prospect.id}
                   href={`/sandbox/perform/prospects/${getProspectSlug(prospect)}`}
-                  className={`flex items-center gap-4 px-5 py-4 hover:bg-white/[0.02] transition-colors ${
-                    i < topProspects.length - 1 ? 'border-b border-white/[0.04]' : ''
-                  }`}
+                  className={`flex items-center gap-4 px-5 py-4 hover:bg-white/[0.02] transition-colors ${i < topProspects.length - 1 ? 'border-b border-white/[0.04]' : ''
+                    }`}
                 >
                   <span className="text-lg font-display text-white/40 w-8 text-center">
                     {prospect.nationalRank}

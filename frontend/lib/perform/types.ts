@@ -31,6 +31,7 @@ export interface Prospect {
   position: string;
   classYear: string;
   school: string;
+  conference?: string;
   state: string;
   pool: Pool;
   height: string;
@@ -39,7 +40,7 @@ export interface Prospect {
 
   // P.A.I. Grade — score and tier are public, formula is not
   paiScore: number;
-  tier: Tier;
+  tier: Tier | string;
 
   // Component scores — values are public, weights are NOT
   performance: number;

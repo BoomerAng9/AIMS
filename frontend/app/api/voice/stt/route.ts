@@ -13,6 +13,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY || '';
 const DEEPGRAM_API_KEY = process.env.DEEPGRAM_API_KEY || '';
+const GROQ_API_KEY = process.env.GROQ_API_KEY || '';
 
 interface SttResponse {
   text: string;
@@ -102,6 +103,43 @@ async function transcribeDeepgram(
   }
 }
 
+async function transcribeGroq(
+  audioBuffer: ArrayBuffer,
+  language?: string,
+): Promise<SttResponse | null> {
+  if (!GROQ_API_KEY) return null;
+
+  try {
+    const formData = new FormData();
+    formData.append('file', new Blob([audioBuffer], { type: 'audio/webm' }), 'audio.webm');
+    formData.append('model', 'whisper-large-v3-turbo');
+    if (language) formData.append('language', language);
+
+    const res = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${GROQ_API_KEY}`,
+      },
+      body: formData,
+    });
+
+    if (!res.ok) {
+      console.error(`[STT] Groq returned ${res.status}`);
+      return null;
+    }
+
+    const data = await res.json();
+    return {
+      text: data.text || '',
+      provider: 'groq',
+      model: 'whisper-large-v3-turbo',
+    };
+  } catch (err) {
+    console.error('[STT] Groq error:', err);
+    return null;
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
@@ -116,17 +154,21 @@ export async function POST(req: NextRequest) {
     const audioBuffer = await audioFile.arrayBuffer();
 
     // Try primary provider first, then fallback
-    const tryOrder = provider === 'deepgram'
-      ? ['deepgram', 'elevenlabs'] as const
-      : ['elevenlabs', 'deepgram'] as const;
+    const tryOrder = provider === 'groq'
+      ? ['groq', 'elevenlabs', 'deepgram'] as const
+      : provider === 'deepgram'
+        ? ['deepgram', 'groq', 'elevenlabs'] as const
+        : ['elevenlabs', 'groq', 'deepgram'] as const;
 
     for (const p of tryOrder) {
       let result: SttResponse | null = null;
 
       if (p === 'elevenlabs') {
         result = await transcribeElevenLabs(audioBuffer, language || undefined);
-      } else {
+      } else if (p === 'deepgram') {
         result = await transcribeDeepgram(audioBuffer, language || undefined);
+      } else if (p === 'groq') {
+        result = await transcribeGroq(audioBuffer, language || undefined);
       }
 
       if (result && result.text) {

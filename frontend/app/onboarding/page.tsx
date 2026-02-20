@@ -131,7 +131,7 @@ export default function OnboardingPage() {
                 </motion.div>
 
                 <motion.div variants={staggerItem} className="pt-4 flex justify-end">
-                  <Link href="/dashboard">
+                  <Link href="/dashboard/acheevy">
                     <motion.div
                       whileHover={{ scale: 1.04 }}
                       whileTap={{ scale: 0.96 }}

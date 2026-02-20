@@ -2,18 +2,10 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate, useSearchParams } from 'react-router'
 
 import AgentSetting from '@/components/agent-setting'
-import {
-    Conversation,
-    ConversationContent,
-    ConversationScrollButton
-} from '@/components/ai-elements/conversation'
-import { Loader } from '@/components/ai-elements/loader'
-import ChatMessageContent from '@/components/chat-message-content'
+import AcheevyChat from '@/components/AcheevyChat'
 import AgentHeader from '@/components/header'
-import QuestionInput from '@/components/question-input'
 import RightSidebar from '@/components/right-sidebar'
 import Sidebar from '@/components/sidebar'
-import ThinkingMessage from '@/components/thinking-message'
 import { SidebarProvider } from '@/components/ui/sidebar'
 import { useChat } from '@/hooks/use-chat-query'
 import {
@@ -178,103 +170,32 @@ export function ChatPage() {
                 <Sidebar />
                 <div className="flex-1">
                     <AgentHeader sessionData={sessionData} isChatPage />
-                    <div className="flex justify-center">
-                        <div className="flex-1 flex flex-col max-w-4xl py-3 md:py-4">
-                            <Conversation
-                                className={`flex-1${filesCount > 0 ? ' with-files' : ''}`}
-                            >
-                                <ConversationContent className="p-0 md:p-2">
-                                    {isHistoryLoading && (
-                                        <div className="flex items-center justify-center gap-2 py-12">
-                                            <Loader size={20} />
-                                            <span className="text-sm text-neutral-500">
-                                                Loading conversation
-                                                history&hellip;
-                                            </span>
-                                        </div>
-                                    )}
-                                    {sessionError && (
-                                        <div className="mb-4 rounded border border-red-500/40 bg-red-500/10 p-3 text-sm text-red-500 dark:text-red-300">
-                                            {sessionError}
-                                        </div>
-                                    )}
-                                    {!isHistoryLoading &&
-                                        !sessionError &&
-                                        messages.length === 0 && (
-                                            <div className="text-sm text-neutral-500 text-center py-12">
-                                                Ask anything&mdash;your
-                                                assistant is ready to help.
-                                            </div>
-                                        )}
-
-                                    {groupedMessages.map((group, index) => {
-                                        // Check if this is the last group and agent is running
-                                        const isLastGroup =
-                                            index === groupedMessages.length - 1
-                                        const isStreaming =
-                                            isLastGroup &&
-                                            chatStatus === 'running'
-
-                                        return (
-                                            <ChatMessageContent
-                                                key={index}
-                                                group={group}
-                                                isStreaming={isStreaming}
-                                                isWaitingForNextEvent={
-                                                    isLastGroup &&
-                                                    isWaitingForNextEvent
-                                                }
-                                            />
-                                        )
-                                    })}
-
-                                    {showThinking && <ThinkingMessage />}
-
-                                    {lastMessageFinishReason &&
-                                        getFinishReasonMessage(
-                                            lastMessageFinishReason
-                                        ) && (
-                                            <div className="rounded-lg border border-yellow dark:border-yellow/40 bg-yellow dark:bg-yellow/10 p-3 text-sm text-black dark:text-yellow">
-                                                {getFinishReasonMessage(
-                                                    lastMessageFinishReason
-                                                )}
-                                            </div>
-                                        )}
-                                </ConversationContent>
-                                <ConversationScrollButton />
-                            </Conversation>
-
-                            <div className="flex flex-col items-start gap-2 px-3 md:px-4">
-                                <QuestionInput
-                                    hideSuggestions
-                                    className="w-full max-w-none"
-                                    textareaClassName="min-h-30 h-30 w-full"
-                                    placeholder="Ask me anything..."
-                                    value=""
-                                    handleKeyDown={handleKeyDown}
-                                    handleSubmit={handleSend}
-                                    hideFeatureSelector
-                                    isDisabled={isLoading}
-                                    hideModeSelector
-                                    handleCancel={stopActiveStream}
-                                    onOpenSetting={() => setIsOpenSetting(true)}
-                                    onFilesChange={setFilesCount}
-                                    onGoogleDriveClick={handleGoogleDriveClick}
-                                    isGoogleDriveConnected={
-                                        isGoogleDriveConnected
-                                    }
-                                    isGoogleDriveAuthLoading={
-                                        isGoogleDriveAuthLoading
-                                    }
-                                    googleDriveFiles={
-                                        downloadedGoogleDriveFiles
-                                    }
-                                    onGoogleDriveFilesHandled={
-                                        clearDownloadedFiles
-                                    }
-                                />
-                            </div>
-                        </div>
+                    <div className="flex justify-center flex-1 h-full max-h-[calc(100vh-var(--header-height,60px))]">
+                        <AcheevyChat
+                            workspace="A.I.M.S"
+                            vertical="CORE"
+                            groupedMessages={groupedMessages}
+                            isHistoryLoading={isHistoryLoading}
+                            sessionError={sessionError}
+                            chatStatus={chatStatus}
+                            isWaitingForNextEvent={isWaitingForNextEvent}
+                            showThinking={showThinking}
+                            lastMessageFinishReason={lastMessageFinishReason}
+                            getFinishReasonMessage={getFinishReasonMessage}
+                            handleKeyDown={handleKeyDown}
+                            handleSend={handleSend}
+                            isSubmitting={isSubmitting}
+                            isLoading={isLoading}
+                            stopActiveStream={stopActiveStream}
+                            setIsOpenSetting={setIsOpenSetting}
+                            setFilesCount={setFilesCount}
+                            handleGoogleDriveClick={handleGoogleDriveClick}
+                            isGoogleDriveConnected={isGoogleDriveConnected}
+                            isGoogleDriveAuthLoading={isGoogleDriveAuthLoading}
+                            downloadedGoogleDriveFiles={downloadedGoogleDriveFiles}
+                            clearDownloadedFiles={clearDownloadedFiles}
+                            filesCount={filesCount}
+                        />
                     </div>
                 </div>
             </SidebarProvider>

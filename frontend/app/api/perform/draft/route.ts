@@ -13,7 +13,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db/prisma';
 import { seedNFLTeams, NFL_TEAMS } from '@/lib/perform/mock-draft-engine';
-import { SEED_DRAFT_PROSPECTS, SEED_NFL_TEAM_NEEDS } from '@/lib/perform/seed-draft-data';
+import { SEED_DRAFT_PROSPECTS, NFL_TEAM_NEEDS_2026 } from '@/lib/perform/seed-draft-data';
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -29,24 +29,24 @@ export async function GET(req: NextRequest) {
     if (mock) {
       const mockDraft = mock === 'latest'
         ? await prisma.mockDraft.findFirst({
-            where: { isPublished: true },
-            orderBy: { createdAt: 'desc' },
-            include: {
-              picks: {
-                orderBy: { overall: 'asc' },
-                include: { prospect: true, nflTeam: true },
-              },
+          where: { isPublished: true },
+          orderBy: { createdAt: 'desc' },
+          include: {
+            picks: {
+              orderBy: { overall: 'asc' },
+              include: { prospect: true, nflTeam: true },
             },
-          })
+          },
+        })
         : await prisma.mockDraft.findUnique({
-            where: { id: mock },
-            include: {
-              picks: {
-                orderBy: { overall: 'asc' },
-                include: { prospect: true, nflTeam: true },
-              },
+          where: { id: mock },
+          include: {
+            picks: {
+              orderBy: { overall: 'asc' },
+              include: { prospect: true, nflTeam: true },
             },
-          });
+          },
+        });
 
       if (!mockDraft) {
         return NextResponse.json({ error: 'Mock draft not found' }, { status: 404 });
@@ -95,7 +95,7 @@ export async function POST(req: NextRequest) {
     // Full seed
     if (action === 'seed-all') {
       // 1. Seed NFL teams
-      const teamCount = await seedNFLTeams(SEED_NFL_TEAM_NEEDS);
+      const teamCount = await seedNFLTeams(NFL_TEAM_NEEDS_2026);
 
       // 2. Seed draft prospects
       let prospectCount = 0;
@@ -117,7 +117,7 @@ export async function POST(req: NextRequest) {
 
     // Seed teams only
     if (action === 'seed-teams') {
-      const count = await seedNFLTeams(SEED_NFL_TEAM_NEEDS);
+      const count = await seedNFLTeams(NFL_TEAM_NEEDS_2026);
       return NextResponse.json({ ok: true, teams: count });
     }
 

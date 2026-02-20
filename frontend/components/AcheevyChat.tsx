@@ -20,6 +20,8 @@ import {
   Mic, MicOff, Volume2, VolumeX, Paperclip, X, FileText, ImageIcon, Code2, Loader2,
   Play, Pause,
 } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { staggerContainer } from '@/lib/motion/tokens';
 import { useVoiceInput } from '@/hooks/useVoiceInput';
 import { useVoiceOutput } from '@/hooks/useVoiceOutput';
 import { createReadReceipt, advanceReceipt, classifyIntent } from '@/lib/acheevy/read-receipt';
@@ -300,7 +302,7 @@ export default function AcheevyChat() {
   const voiceState = voiceInput.isListening ? 'listening' : voiceInput.isProcessing ? 'processing' : 'idle';
 
   return (
-    <div className="flex flex-col h-full relative overflow-hidden bg-[#0A0A0A] text-white font-sans">
+    <div className="flex flex-col h-[calc(100dvh-3.5rem)] relative overflow-hidden bg-[#0A0A0A] text-white font-sans">
       {/* Branded background */}
       <div
         className="absolute inset-0 z-0 pointer-events-none"
@@ -317,99 +319,87 @@ export default function AcheevyChat() {
       />
       <div className="absolute inset-0 z-0 pointer-events-none aims-page-bg" />
 
-      {/* Header */}
-      <div className="relative z-10 border-b border-wireframe-stroke bg-[#0A0A0A]/80 backdrop-blur-xl">
-        <div className="flex items-center justify-between px-4 py-2.5">
-          <div className="flex items-center gap-2">
-            <div className="relative">
-              <div className="w-8 h-8 rounded-lg bg-white/5 border border-gold/20 flex items-center justify-center overflow-hidden">
-                <Image
-                  src="/images/acheevy/acheevy-helmet.png"
-                  alt="ACHEEVY"
-                  width={24}
-                  height={24}
-                  className="object-contain"
-                />
-              </div>
-              <div className="absolute -bottom-0.5 -right-0.5 w-2 h-2 bg-emerald-400 rounded-full border border-black animate-pulse" />
-            </div>
-            <div>
-              <h2 className="font-medium text-base text-white">Chat w/ACHEEVY</h2>
-              <div className="flex items-center gap-1 text-[10px] text-emerald-400/80 font-mono uppercase tracking-widest">
-                <Zap className="w-2.5 h-2.5" /> Online
-              </div>
+      {/* Internal Chat Header/Status Bar */}
+      <div className="relative z-10 border-b border-wireframe-stroke glass-card pl-4 pr-4 py-2 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="size-10 rounded flex items-center justify-center bg-gold/10 border border-gold/30 text-gold shadow-[inset_0_0_15px_rgba(214,175,55,0.05)]">
+            <span className="material-symbols-outlined text-2xl">memory</span>
+          </div>
+          <div>
+            <h1 className="text-sm font-bold tracking-[0.2em] uppercase text-slate-100">Acheevy AI</h1>
+            <div className="flex items-center gap-1.5">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </span>
+              <span className="text-[10px] font-medium tracking-wider text-emerald-500 uppercase">Systems: Nominal</span>
             </div>
           </div>
+        </div>
 
-          <div className="flex items-center gap-1">
-            {/* Speaker toggle */}
-            <button
-              type="button"
-              onClick={() => voiceOutput.setAutoPlay(!voiceOutput.autoPlayEnabled)}
-              title={voiceOutput.autoPlayEnabled ? 'Mute auto-speak' : 'Enable auto-speak'}
-              className={`p-1.5 rounded-lg transition-colors ${
-                voiceOutput.autoPlayEnabled
-                  ? 'text-gold bg-gold/10'
-                  : 'text-white/30 hover:text-white/60'
+        <div className="flex items-center gap-1">
+          {/* Speaker toggle */}
+          <button
+            type="button"
+            onClick={() => voiceOutput.setAutoPlay(!voiceOutput.autoPlayEnabled)}
+            title={voiceOutput.autoPlayEnabled ? 'Mute auto-speak' : 'Enable auto-speak'}
+            className={`p-1.5 rounded-lg transition-colors ${voiceOutput.autoPlayEnabled
+              ? 'text-gold bg-gold/10'
+              : 'text-white/30 hover:text-white/60'
               }`}
-            >
-              {voiceOutput.autoPlayEnabled ? <Volume2 size={14} /> : <VolumeX size={14} />}
-            </button>
+          >
+            {voiceOutput.autoPlayEnabled ? <Volume2 size={14} /> : <VolumeX size={14} />}
+          </button>
 
-            {/* Intent selector */}
-            <div className="relative">
-              <button
-                onClick={() => setShowIntentPicker(!showIntentPicker)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 border border-wireframe-stroke hover:border-gold/30 transition-all text-xs"
-              >
-                <selectedIntent.icon className="w-3.5 h-3.5 text-gold" />
-                <span className="text-white/80">{selectedIntent.label}</span>
-              </button>
-              {showIntentPicker && (
-                <div className="absolute right-0 top-full mt-1 w-48 bg-[#0A0A0A]/95 border border-wireframe-stroke rounded-xl p-1.5 backdrop-blur-xl shadow-2xl z-50">
-                  {INTENT_OPTIONS.map(opt => (
-                    <button
-                      key={opt.value}
-                      onClick={() => { setIntent(opt.value); setShowIntentPicker(false); }}
-                      className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left transition-all text-xs ${
-                        intent === opt.value ? 'bg-gold/10 border border-gold/20' : 'hover:bg-white/5 border border-transparent'
+          {/* Intent selector */}
+          <div className="relative">
+            <button
+              onClick={() => setShowIntentPicker(!showIntentPicker)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 border border-wireframe-stroke hover:border-gold/30 transition-all text-xs"
+            >
+              <selectedIntent.icon className="w-3.5 h-3.5 text-gold" />
+              <span className="text-white/80">{selectedIntent.label}</span>
+            </button>
+            {showIntentPicker && (
+              <div className="absolute right-0 top-full mt-1 w-48 bg-[#0A0A0A]/95 border border-wireframe-stroke rounded-xl p-1.5 backdrop-blur-xl shadow-2xl z-50">
+                {INTENT_OPTIONS.map(opt => (
+                  <button
+                    key={opt.value}
+                    onClick={() => { setIntent(opt.value); setShowIntentPicker(false); }}
+                    className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left transition-all text-xs ${intent === opt.value ? 'bg-gold/10 border border-gold/20' : 'hover:bg-white/5 border border-transparent'
                       }`}
-                    >
-                      <opt.icon className={`w-3.5 h-3.5 ${intent === opt.value ? 'text-gold' : 'text-white/40'}`} />
-                      <div>
-                        <div className={`font-medium ${intent === opt.value ? 'text-gold' : 'text-white/80'}`}>{opt.label}</div>
-                        <div className="text-[9px] text-white/30 font-mono">{opt.desc}</div>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+                  >
+                    <opt.icon className={`w-3.5 h-3.5 ${intent === opt.value ? 'text-gold' : 'text-white/40'}`} />
+                    <div>
+                      <div className={`font-medium ${intent === opt.value ? 'text-gold' : 'text-white/80'}`}>{opt.label}</div>
+                      <div className="text-[9px] text-white/30 font-mono">{opt.desc}</div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
+      </div>
 
-        {/* Team shelf */}
-        <div className="px-4 pb-2 flex gap-1.5 overflow-x-auto no-scrollbar">
-          {TEAM_SLOTS.map(slot => (
-            <div key={slot.id} className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border transition-colors cursor-default ${
-              pmo?.director?.toLowerCase().includes(slot.id) ? 'border-gold/20 bg-gold/5' : 'border-wireframe-stroke bg-white/[0.02]'
+      {/* Team shelf (Moved below new header) */}
+      <div className="relative z-10 px-4 py-2 border-b border-wireframe-stroke bg-black/50 backdrop-blur-md flex gap-1.5 overflow-x-auto no-scrollbar">
+        {TEAM_SLOTS.map(slot => (
+          <div key={slot.id} className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border transition-colors cursor-default ${pmo?.director?.toLowerCase().includes(slot.id) ? 'border-gold/20 bg-gold/5' : 'border-wireframe-stroke bg-white/[0.02]'
             }`}>
-              <div className={`w-1.5 h-1.5 rounded-full ${
-                pmo?.director?.toLowerCase().includes(slot.id) ? 'bg-gold animate-pulse' : 'bg-white/20'
+            <div className={`w-1.5 h-1.5 rounded-full ${pmo?.director?.toLowerCase().includes(slot.id) ? 'bg-gold animate-pulse' : 'bg-white/20'
               }`} />
-              <span className="text-[9px] font-mono text-white/50 uppercase tracking-wider">{slot.name}</span>
-            </div>
-          ))}
-        </div>
+            <span className="text-[9px] font-mono text-white/50 uppercase tracking-wider">{slot.name}</span>
+          </div>
+        ))}
       </div>
 
       {/* PMO routing pill */}
       {pmo && (
         <div className="relative z-10 mx-3 mt-2 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gold/5 border border-gold/10 text-[10px]">
           <span className="text-gold font-medium">{pmo.officeLabel}</span>
-          <span className={`ml-auto px-1.5 py-0.5 rounded-full font-mono uppercase ${
-            pmo.executionLane === 'deploy_it' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-blue-500/10 text-blue-400'
-          }`}>{pmo.executionLane === 'deploy_it' ? 'DEPLOY' : 'GUIDE'}</span>
+          <span className={`ml-auto px-1.5 py-0.5 rounded-full font-mono uppercase ${pmo.executionLane === 'deploy_it' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-blue-500/10 text-blue-400'
+            }`}>{pmo.executionLane === 'deploy_it' ? 'DEPLOY' : 'GUIDE'}</span>
         </div>
       )}
 
@@ -441,21 +431,28 @@ export default function AcheevyChat() {
 
       {/* Messages */}
       <div className="relative z-10 flex-1 overflow-y-auto px-4 py-4 space-y-4 scroll-smooth">
-        {messages.map((m, i) => (
-          <AcheevyMessage
-            key={m.id}
-            message={m}
-            isSpeaking={speakingMessageId === m.id && voiceOutput.isPlaying}
-            // Optimization: Only pass isLoading to assistant messages to prevent
-            // unnecessary re-renders of user messages when loading state toggles.
-            isLoading={m.role === 'assistant' ? isLoading : false}
-            isLast={i === messages.length - 1}
-            readReceipt={m.role === 'assistant' ? readReceipts.get(m.id) : undefined}
-            onSpeak={handleSpeak}
-            onPause={handlePause}
-            onReplay={handleReplay}
-          />
-        ))}
+        <motion.div
+          variants={staggerContainer}
+          initial="hidden"
+          animate="visible"
+          className="flex flex-col gap-4"
+        >
+          {messages.map((m, i) => (
+            <AcheevyMessage
+              key={m.id}
+              message={m}
+              isSpeaking={speakingMessageId === m.id && voiceOutput.isPlaying}
+              // Optimization: Only pass isLoading to assistant messages to prevent
+              // unnecessary re-renders of user messages when loading state toggles.
+              isLoading={m.role === 'assistant' ? isLoading : false}
+              isLast={i === messages.length - 1}
+              readReceipt={m.role === 'assistant' ? readReceipts.get(m.id) : undefined}
+              onSpeak={handleSpeak}
+              onPause={handlePause}
+              onReplay={handleReplay}
+            />
+          ))}
+        </motion.div>
         {isLoading && messages.length > 0 && messages[messages.length - 1].role === 'user' && (
           <div className="flex gap-3">
             <div className="w-7 h-7 rounded-lg bg-white/5 border border-gold/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
@@ -535,12 +532,10 @@ export default function AcheevyChat() {
           {/* State label */}
           <div className="flex items-center justify-between px-4 pt-3">
             <div className="flex items-center gap-2">
-              <div className={`w-2.5 h-2.5 rounded-full ${
-                voiceState === 'listening' ? 'bg-red-500 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.6)]' : 'bg-gold animate-pulse'
-              }`} />
-              <span className={`text-xs font-mono uppercase tracking-wider ${
-                voiceState === 'listening' ? 'text-red-400' : 'text-gold'
-              }`}>
+              <div className={`w-2.5 h-2.5 rounded-full ${voiceState === 'listening' ? 'bg-red-500 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.6)]' : 'bg-gold animate-pulse'
+                }`} />
+              <span className={`text-xs font-mono uppercase tracking-wider ${voiceState === 'listening' ? 'text-red-400' : 'text-gold'
+                }`}>
                 {voiceState === 'listening' ? 'Recording' : 'Processing'}
               </span>
             </div>
@@ -569,46 +564,42 @@ export default function AcheevyChat() {
           onChange={handleFileUpload}
           className="hidden"
         />
-
-        <form onSubmit={handleEnhancedSubmit} className="relative flex items-center gap-2">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (!input.trim() && attachments.length === 0) return;
+            append({ role: 'user', content: input });
+            setInput('');
+            setAttachments([]);
+          }}
+          className="relative flex items-center max-w-4xl mx-auto w-full gap-2"
+        >
           {/* Attachment button */}
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={isUploading}
             title="Attach files"
-            className="p-2 rounded-lg text-white/30 hover:text-gold hover:bg-gold/10 transition-all disabled:opacity-30"
+            className="p-3 text-white/40 hover:text-gold hover:bg-gold/10 rounded-xl transition-all border border-transparent hover:border-gold/30 disabled:opacity-30"
           >
-            {isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Paperclip className="w-4 h-4" />}
+            {isUploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Paperclip className="w-5 h-5" />}
           </button>
 
-          {/* Mic button — enhanced with state ring */}
-          <button
-            type="button"
-            onClick={handleMicToggle}
-            disabled={voiceInput.isProcessing}
-            title={voiceInput.isListening ? 'Stop recording' : 'Start voice input'}
-            className={`relative p-2 rounded-lg transition-all ${
-              voiceInput.isListening
-                ? 'bg-red-500/20 text-red-400 ring-2 ring-red-500/40 shadow-[0_0_12px_rgba(239,68,68,0.3)]'
-                : voiceInput.isProcessing
-                ? 'bg-gold/20 text-gold animate-pulse'
-                : 'text-white/30 hover:text-gold hover:bg-gold/10'
-            } disabled:opacity-30`}
-          >
-            {voiceInput.isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-            {voiceInput.isListening && (
-              <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-red-500 animate-ping" />
-            )}
-          </button>
+          <input
+            type="file"
+            multiple
+            className="hidden"
+            ref={fileInputRef}
+            onChange={handleFileSelect}
+            accept="image/*,.pdf,.doc,.docx,.txt"
+          />
 
-          {/* Text input */}
           <input
             value={input}
             onChange={handleInputChange}
             placeholder={voiceInput.isProcessing ? 'Transcribing your voice...' : 'Tell me what you need...'}
             disabled={isLoading}
-            className="flex-1 bg-white/5 hover:bg-white/10 focus:bg-black border border-wireframe-stroke focus:border-gold/40 rounded-xl py-3 pl-4 pr-12 text-white text-base placeholder:text-white/20 transition-all outline-none"
+            className="flex-1 bg-black/40 hover:bg-black/60 focus:bg-black border border-wireframe-stroke focus:border-gold/40 rounded-xl py-3 pl-4 pr-12 text-white text-base placeholder:text-white/20 transition-all outline-none shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)]"
           />
 
           {/* Send / Stop button */}
@@ -616,7 +607,7 @@ export default function AcheevyChat() {
             <button
               type="button"
               onClick={stop}
-              className="absolute right-2 top-1.5 p-2 bg-red-500/10 text-red-400 rounded-lg transition-all hover:bg-red-500/20"
+              className="absolute right-2 top-1.5 p-2 bg-red-500/10 text-red-400 rounded-lg transition-all hover:bg-red-500/20 border border-transparent hover:border-red-500/30"
             >
               <Square className="w-4 h-4" />
             </button>
@@ -624,19 +615,19 @@ export default function AcheevyChat() {
             <button
               type="submit"
               disabled={!input.trim() && attachments.length === 0}
-              className="absolute right-2 top-1.5 p-2 bg-gold/10 hover:bg-gold text-gold hover:text-black rounded-lg transition-all disabled:opacity-30"
+              className="absolute right-2 top-1.5 p-2 bg-gold/10 hover:bg-gold text-gold hover:text-black rounded-lg transition-all disabled:opacity-30 border border-gold/30 hover:border-gold"
             >
               <Send className="w-4 h-4" />
             </button>
           )}
         </form>
-        <div className="flex items-center justify-center gap-1.5 mt-2">
+        <div className="flex items-center justify-center gap-1.5 mt-2 pb-2">
           <Image
             src="/images/logos/achievemor-gold.png"
             alt="A.I.M.S."
             width={12}
             height={12}
-            className="opacity-30"
+            className="opacity-30 drop-shadow-[0_0_8px_rgba(214,175,55,0.5)]"
           />
           <p className="text-[9px] font-mono text-white/15 uppercase tracking-[0.2em]">
             A.I.M.S. v2.0 &bull; {intent} Mode

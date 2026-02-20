@@ -33,14 +33,14 @@ import { PERSONAS } from '@/lib/acheevy/persona';
 // ─────────────────────────────────────────────────────────────
 
 const AI_MODELS = [
-  { key: 'claude-opus',   label: 'Claude Opus 4.6',     tag: '' },
-  { key: 'claude-sonnet', label: 'Claude Sonnet 4.5',   tag: '' },
-  { key: 'qwen',          label: 'Qwen 2.5 Coder 32B', tag: 'code' },
-  { key: 'qwen-max',      label: 'Qwen Max',            tag: '' },
-  { key: 'minimax',       label: 'MiniMax-01',          tag: '' },
-  { key: 'glm',           label: 'GLM-4 Plus',          tag: '' },
-  { key: 'nano-banana',   label: 'Nano Banana Pro',     tag: 'fast' },
-  { key: 'gemini-pro',    label: 'Gemini 2.5 Pro',      tag: '' },
+  { key: 'claude-opus', label: 'Claude Opus 4.6', tag: '' },
+  { key: 'claude-sonnet', label: 'Claude Sonnet 4.5', tag: '' },
+  { key: 'qwen', label: 'Qwen 2.5 Coder 32B', tag: 'code' },
+  { key: 'qwen-max', label: 'Qwen Max', tag: '' },
+  { key: 'minimax', label: 'MiniMax-01', tag: '' },
+  { key: 'glm', label: 'GLM-4 Plus', tag: '' },
+  { key: 'nano-banana', label: 'Nano Banana Pro', tag: 'fast' },
+  { key: 'gemini-pro', label: 'Gemini 2.5 Pro', tag: '' },
 ];
 
 // ─────────────────────────────────────────────────────────────
@@ -376,7 +376,7 @@ export function ChatInterface({
   const [showCollabFeed, setShowCollabFeed] = useState(false);
   const [showInputModal, setShowInputModal] = useState(false);
   const [voiceTranscriptReady, setVoiceTranscriptReady] = useState(false);
-  
+
   // New State for Persona and Language
   const [selectedPersona, setSelectedPersona] = useState(PERSONAS[0].id);
   const [selectedLanguage, setSelectedLanguage] = useState('en');
@@ -485,7 +485,7 @@ export function ChatInterface({
   // Voice input
   const voiceInput = useVoiceInput({
     config: {
-      provider: 'elevenlabs',
+      provider: 'groq',
       language: selectedLanguage,
     },
     onTranscript: (result) => {
@@ -500,8 +500,8 @@ export function ChatInterface({
 
   // Voice output
   const voiceOutput = useVoiceOutput({
-    config: { 
-      autoPlay: autoPlayVoice, 
+    config: {
+      autoPlay: autoPlayVoice,
       provider: 'elevenlabs',
       voiceId: PERSONAS.find(p => p.id === selectedPersona)?.voiceId
     },
@@ -609,30 +609,36 @@ export function ChatInterface({
                   className="w-full h-full object-cover"
                 />
               </div>
-              
+
               {/* Persona Selector (Main View) — only show when multiple personas exist */}
               {PERSONAS.length > 1 && (
-              <div className="flex justify-center mb-4">
-                <div className="flex items-center gap-2 bg-white/5 rounded-full px-1 py-1 border border-white/10">
-                  {PERSONAS.map(p => (
-                    <button
-                      key={p.id}
-                      onClick={() => setSelectedPersona(p.id)}
-                      className={`
+                <div className="flex justify-center mb-4">
+                  <div className="flex items-center gap-2 bg-white/5 rounded-full px-1 py-1 border border-white/10">
+                    {PERSONAS.map(p => (
+                      <button
+                        key={p.id}
+                        onClick={() => setSelectedPersona(p.id)}
+                        className={`
                         px-3 py-1.5 rounded-full text-xs font-medium transition-all
                         ${selectedPersona === p.id
-                          ? 'bg-gold text-black shadow-lg shadow-gold/20'
-                          : 'text-white/50 hover:text-white hover:bg-white/5'}
+                            ? 'bg-gold text-black shadow-lg shadow-gold/20'
+                            : 'text-white/50 hover:text-white hover:bg-white/5'}
                       `}
-                    >
-                      {p.name}
-                    </button>
-                  ))}
+                      >
+                        {p.name}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
               )}
 
-              <h2 className="text-xl font-medium text-white mb-2">Chat w/ACHEEVY</h2>
+              <div className="flex justify-center mb-6">
+                <div className="glass-card px-6 py-2 rounded-full border border-gold/30 shadow-[0_0_15px_rgba(212,175,55,0.2)]">
+                  <h2 className="text-sm font-doto tracking-[0.3em] text-gold-gradient uppercase glitch-text-hover">
+                    chat w/ A C H E E V Y
+                  </h2>
+                </div>
+              </div>
               <p className="text-white/40 max-w-md mx-auto">{welcomeMessage}</p>
             </motion.div>
           )}
@@ -682,58 +688,58 @@ export function ChatInterface({
 
           {/* Input Container */}
           <div className="flex justify-end mb-2 gap-2">
-             {/* Model Selector */}
-             <div className="flex items-center gap-1 bg-white/5 rounded-lg px-2 py-1 text-xs text-white/50 hover:bg-white/10 transition-colors">
-               <BrainCircuitIcon className="w-3 h-3" />
-               <select 
-                 value={selectedModel}
-                 onChange={(e) => setSelectedModel(e.target.value)}
-                 className="bg-transparent border-none outline-none text-white/70 text-xs cursor-pointer appearance-none pr-4"
-                 title="Select AI Model"
-               >
-                 {AI_MODELS.map(m => (
-                   <option key={m.key} value={m.key} className="bg-[#0A0A0A]">
-                     {m.label}{m.tag ? ` (${m.tag})` : ''}
-                   </option>
-                 ))}
-               </select>
-             </div>
+            {/* Model Selector */}
+            <div className="flex items-center gap-1 bg-white/5 rounded-lg px-2 py-1 text-xs text-white/50 hover:bg-white/10 transition-colors">
+              <BrainCircuitIcon className="w-3 h-3" />
+              <select
+                value={selectedModel}
+                onChange={(e) => setSelectedModel(e.target.value)}
+                className="bg-transparent border-none outline-none text-white/70 text-xs cursor-pointer appearance-none pr-4"
+                title="Select AI Model"
+              >
+                {AI_MODELS.map(m => (
+                  <option key={m.key} value={m.key} className="bg-[#0A0A0A]">
+                    {m.label}{m.tag ? ` (${m.tag})` : ''}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-             {/* Voice/Persona Selector — only show when multiple personas exist */}
-             {PERSONAS.length > 1 && (
-             <div className="flex items-center gap-1 bg-white/5 rounded-lg px-2 py-1 text-xs text-white/50 hover:bg-white/10 transition-colors">
-               <SpeakerIcon className="w-3 h-3" />
-               <select
-                 value={selectedPersona}
-                 onChange={(e) => setSelectedPersona(e.target.value)}
-                 className="bg-transparent border-none outline-none text-white/70 text-xs cursor-pointer appearance-none pr-4"
-                 title="Select Voice Persona"
-               >
-                 {PERSONAS.map(p => (
-                   <option key={p.id} value={p.id} className="bg-[#0A0A0A]">
-                     {p.name}
-                   </option>
-                 ))}
-               </select>
-             </div>
-             )}
+            {/* Voice/Persona Selector — only show when multiple personas exist */}
+            {PERSONAS.length > 1 && (
+              <div className="flex items-center gap-1 bg-white/5 rounded-lg px-2 py-1 text-xs text-white/50 hover:bg-white/10 transition-colors">
+                <SpeakerIcon className="w-3 h-3" />
+                <select
+                  value={selectedPersona}
+                  onChange={(e) => setSelectedPersona(e.target.value)}
+                  className="bg-transparent border-none outline-none text-white/70 text-xs cursor-pointer appearance-none pr-4"
+                  title="Select Voice Persona"
+                >
+                  {PERSONAS.map(p => (
+                    <option key={p.id} value={p.id} className="bg-[#0A0A0A]">
+                      {p.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
 
-             {/* Language Selector */}
-             <div className="flex items-center gap-1 bg-white/5 rounded-lg px-2 py-1 text-xs text-white/50 hover:bg-white/10 transition-colors">
-               <GlobeIcon className="w-3 h-3" />
-               <select 
-                 value={selectedLanguage}
-                 onChange={(e) => setSelectedLanguage(e.target.value)}
-                 className="bg-transparent border-none outline-none text-white/70 text-xs cursor-pointer appearance-none"
-               >
-                 <option value="en" className="bg-[#0A0A0A]">EN</option>
-                 <option value="es" className="bg-[#0A0A0A]">ES</option>
-                 <option value="fr" className="bg-[#0A0A0A]">FR</option>
-                 <option value="de" className="bg-[#0A0A0A]">DE</option>
-                 <option value="zh" className="bg-[#0A0A0A]">ZH</option>
-                 <option value="ja" className="bg-[#0A0A0A]">JA</option>
-               </select>
-             </div>
+            {/* Language Selector */}
+            <div className="flex items-center gap-1 bg-white/5 rounded-lg px-2 py-1 text-xs text-white/50 hover:bg-white/10 transition-colors">
+              <GlobeIcon className="w-3 h-3" />
+              <select
+                value={selectedLanguage}
+                onChange={(e) => setSelectedLanguage(e.target.value)}
+                className="bg-transparent border-none outline-none text-white/70 text-xs cursor-pointer appearance-none"
+              >
+                <option value="en" className="bg-[#0A0A0A]">EN</option>
+                <option value="es" className="bg-[#0A0A0A]">ES</option>
+                <option value="fr" className="bg-[#0A0A0A]">FR</option>
+                <option value="de" className="bg-[#0A0A0A]">DE</option>
+                <option value="zh" className="bg-[#0A0A0A]">ZH</option>
+                <option value="ja" className="bg-[#0A0A0A]">JA</option>
+              </select>
+            </div>
           </div>
 
           {/* Voice transcript ready indicator */}
