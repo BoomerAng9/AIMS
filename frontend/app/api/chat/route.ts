@@ -233,6 +233,47 @@ async function tryGatewayStream(
 }
 
 // ---------------------------------------------------------------------------
+// Memory recall — fetch relevant context from the memory system
+// ---------------------------------------------------------------------------
+
+async function recallMemories(message: string): Promise<string> {
+  if (!UEF_GATEWAY_URL) return '';
+
+  try {
+    const res = await fetch(`${UEF_GATEWAY_URL}/memory/recall`, {
+      method: 'POST',
+      headers: gatewayHeaders(),
+      body: JSON.stringify({
+        userId: 'web-user',
+        query: message,
+        limit: 5,
+        minRelevance: 0.3,
+      }),
+    });
+
+    if (!res.ok) return '';
+
+    const result = await res.json();
+    if (!result.memories || result.memories.length === 0) return '';
+
+    const lines = result.memories.map((s: any, i: number) => {
+      const m = s.memory;
+      const typeLabel = (m.type || '').replace(/_/g, ' ');
+      return `  ${i + 1}. [${typeLabel}] ${m.summary}`;
+    });
+
+    return [
+      '--- ACHEEVY Memory Context ---',
+      `Recalled ${result.memories.length} relevant memories:`,
+      ...lines,
+      '--- End Memory Context ---',
+    ].join('\n');
+  } catch {
+    return '';
+  }
+}
+
+// ---------------------------------------------------------------------------
 // POST handler — the unified entry point
 // ---------------------------------------------------------------------------
 
@@ -240,11 +281,20 @@ export async function POST(req: Request) {
   try {
     const { messages, model, personaId } = await req.json();
     const modelId = resolveModelId(model);
-    const systemPrompt = buildSystemPrompt({ personaId, additionalContext: 'User is using the Chat Interface.' });
 
     // Get the last user message for classification
     const lastUserMessage = [...messages].reverse().find((m: { role: string }) => m.role === 'user');
     const lastMessage = lastUserMessage?.content || '';
+
+    // Memory recall: fetch relevant memories for this user's message
+    const memoryContext = await recallMemories(lastMessage);
+
+    const systemPrompt = buildSystemPrompt({
+      personaId,
+      additionalContext: memoryContext
+        ? `User is using the Chat Interface.\n\n${memoryContext}`
+        : 'User is using the Chat Interface.',
+    });
 
     // Step 1: Classify intent via gateway
     const classification = await classifyIntent(lastMessage);

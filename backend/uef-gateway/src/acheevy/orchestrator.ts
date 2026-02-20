@@ -19,6 +19,8 @@ import type { N8nPipelineResponse } from '../n8n';
 import { executeVertical } from './execution-engine';
 import { spawnAgent, decommissionAgent, getRoster, getAvailableRoster } from '../deployment-hub';
 import type { SpawnRequest, EnvironmentTarget } from '../deployment-hub';
+import { getMemoryEngine } from '../memory';
+import type { ExecutionOutcome } from '../memory';
 import logger from '../logger';
 
 // Vertical definitions: pure data (no gateway imports), loaded at runtime
@@ -188,6 +190,7 @@ interface SkillRoute {
 
 export class AcheevyOrchestrator {
   private iiAgent: IIAgentClient;
+  private memory = getMemoryEngine();
 
   constructor() {
     this.iiAgent = getIIAgentClient();
@@ -195,46 +198,67 @@ export class AcheevyOrchestrator {
 
   /**
    * Main execution entry point. Takes a classified intent and executes it.
+   * Now with memory: auto-recall before execution, auto-remember after.
    */
   async execute(req: AcheevyExecuteRequest): Promise<AcheevyExecuteResponse> {
     const requestId = uuidv4();
+    const startMs = Date.now();
 
     try {
+      // 0. Auto-recall: inject relevant memories into context
+      const memoryContext = this.memory.autoRecall(req.userId, req.message, {
+        projectId: req.plugId || req.context?.projectId as string,
+      });
+      if (memoryContext) {
+        req.context = { ...req.context, memoryContext };
+      }
+
       // 1. LUC quota check (lightweight)
       const estimate = LUCEngine.estimate(req.message);
 
       // 2. Route based on classified intent
       const routedTo = req.intent;
 
+      let routeResponse: AcheevyExecuteResponse | null = null;
+
       if (routedTo.startsWith('plug-factory:')) {
-        return await this.handlePlugFabrication(requestId, req);
+        routeResponse = await this.handlePlugFabrication(requestId, req);
+      } else if (routedTo === 'perform-stack') {
+        routeResponse = await this.handlePerformStack(requestId, req);
+      } else if (routedTo.startsWith('skill:')) {
+        routeResponse = await this.handleSkillExecution(requestId, req);
+      } else if (routedTo.startsWith('vertical:')) {
+        routeResponse = await this.handleVerticalExecution(requestId, req);
+      } else if (routedTo === 'pmo-route' || routedTo.startsWith('pmo:')) {
+        routeResponse = await this.handlePmoRouting(requestId, req);
+      } else if (routedTo.startsWith('spawn:') || routedTo === 'deployment-hub') {
+        routeResponse = await this.handleDeploymentHub(requestId, req);
       }
 
-      if (routedTo === 'perform-stack') {
-        return await this.handlePerformStack(requestId, req);
-      }
-
-      if (routedTo.startsWith('skill:')) {
-        return await this.handleSkillExecution(requestId, req);
-      }
-
-      if (routedTo.startsWith('vertical:')) {
-        return await this.handleVerticalExecution(requestId, req);
-      }
-
-      if (routedTo === 'pmo-route' || routedTo.startsWith('pmo:')) {
-        return await this.handlePmoRouting(requestId, req);
-      }
-
-      if (routedTo.startsWith('spawn:') || routedTo === 'deployment-hub') {
-        return await this.handleDeploymentHub(requestId, req);
+      if (routeResponse) {
+        this.autoRememberOutcome(req, routeResponse, startMs);
+        return routeResponse;
       }
 
       // Default: conversational AI via II-Agent → Chicken Hawk fallback
-      return await this.handleConversation(requestId, req, estimate);
+      const response = await this.handleConversation(requestId, req, estimate);
+
+      // Auto-remember: store execution outcome for learning
+      this.autoRememberOutcome(req, response, startMs);
+
+      return response;
 
     } catch (error: any) {
       logger.error({ err: error, requestId }, '[ACHEEVY] Execution error');
+
+      // Remember failures too
+      this.autoRememberOutcome(req, {
+        requestId,
+        status: 'error',
+        reply: error.message,
+        error: error.message,
+      }, startMs);
+
       return {
         requestId,
         status: 'error',
@@ -242,6 +266,30 @@ export class AcheevyOrchestrator {
         error: error.message,
       };
     }
+  }
+
+  /**
+   * Auto-remember execution outcomes for the memory system.
+   */
+  private autoRememberOutcome(
+    req: AcheevyExecuteRequest,
+    response: AcheevyExecuteResponse,
+    startMs: number,
+  ): void {
+    const outcome: ExecutionOutcome = {
+      userId: req.userId,
+      projectId: req.plugId || req.context?.projectId as string,
+      intent: req.intent,
+      message: req.message,
+      status: response.status as ExecutionOutcome['status'],
+      reply: response.reply,
+      toolsUsed: response.data?.toolsUsed as string[],
+      agentsInvolved: response.data?.agentsInvolved as string[],
+      durationMs: Date.now() - startMs,
+      costUsd: response.lucUsage?.amount ? response.lucUsage.amount * 0.001 : undefined,
+      artifacts: response.data?.artifacts as string[],
+    };
+    this.memory.autoRemember(outcome);
   }
 
   // ── Route Handlers ───────────────────────────────────────
