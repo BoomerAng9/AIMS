@@ -23,11 +23,19 @@ import type {
   RememberInput,
   MemoryFeedback,
   MemoryStats,
+  MemoryStorageConfig,
 } from './types';
+import { DEFAULT_STORAGE_CONFIG } from './types';
 
 // ── Memory Store ────────────────────────────────────────────────
 
 export class MemoryStore {
+  private config: MemoryStorageConfig;
+
+  constructor(config?: Partial<MemoryStorageConfig>) {
+    this.config = { ...DEFAULT_STORAGE_CONFIG, ...config };
+  }
+
   private get db() {
     return getDb();
   }
@@ -35,21 +43,30 @@ export class MemoryStore {
   /**
    * Store a new memory. Deduplicates by userId + summary hash —
    * if a memory with the same summary exists, it updates instead.
+   *
+   * Enforces storage limits: truncates oversized fields, evicts
+   * lowest-relevance memories when per-user cap is exceeded.
    */
   remember(input: RememberInput): MemoryRecord {
     const now = new Date().toISOString();
 
+    // ── Enforce size limits before storing ──
+    const summary = truncateField(input.summary, this.config.maxSummaryLength);
+    const content = truncateField(input.content, this.config.maxContentLength);
+    const payload = enforcePayloadSize(input.payload || {}, this.config.maxPayloadBytes);
+    const tags = (input.tags || []).slice(0, this.config.maxTags);
+
     // Check for existing memory with same user + summary
     const existing = this.db.prepare(
       `SELECT * FROM memories WHERE userId = ? AND summary = ? AND type = ?`
-    ).get(input.userId, input.summary, input.type) as Record<string, unknown> | undefined;
+    ).get(input.userId, summary, input.type) as Record<string, unknown> | undefined;
 
     if (existing) {
       // Update existing — boost relevance, merge tags
       const existingTags: string[] = existing.tags
         ? JSON.parse(existing.tags as string)
         : [];
-      const mergedTags = [...new Set([...existingTags, ...(input.tags || [])])];
+      const mergedTags = [...new Set([...existingTags, ...tags])].slice(0, this.config.maxTags);
       const newUseCount = (existing.useCount as number || 0) + 1;
       const newRelevance = Math.min(1.0, (existing.relevanceScore as number || 0.5) + 0.05);
 
@@ -59,8 +76,8 @@ export class MemoryStore {
             useCount = ?, feedbackSignal = ?, updatedAt = ?, source = ?
         WHERE id = ?
       `).run(
-        input.content,
-        JSON.stringify(input.payload || {}),
+        content,
+        JSON.stringify(payload),
         JSON.stringify(mergedTags),
         newRelevance,
         newUseCount,
@@ -70,9 +87,12 @@ export class MemoryStore {
         existing.id as string,
       );
 
-      logger.info({ id: existing.id, summary: input.summary }, '[Memory] Updated existing memory');
+      logger.info({ id: existing.id, summary }, '[Memory] Updated existing memory');
       return this.getById(existing.id as string)!;
     }
+
+    // ── Evict if at capacity before inserting ──
+    this.evictIfOverCap(input.userId);
 
     // Create new memory
     const id = uuidv4();
@@ -86,10 +106,10 @@ export class MemoryStore {
       projectId: input.projectId || '',
       type: input.type,
       scope: input.scope || 'user',
-      summary: input.summary,
-      content: input.content,
-      payload: input.payload || {},
-      tags: input.tags || [],
+      summary,
+      content,
+      payload,
+      tags,
       relevanceScore: 0.5,
       useCount: 0,
       feedbackSignal: input.feedbackSignal || 0,
@@ -126,7 +146,7 @@ export class MemoryStore {
       record.lastRecalledAt,
     );
 
-    logger.info({ id, type: input.type, summary: input.summary }, '[Memory] Stored new memory');
+    logger.info({ id, type: input.type, summary }, '[Memory] Stored new memory');
     return record;
   }
 
@@ -296,7 +316,7 @@ export class MemoryStore {
   }
 
   /**
-   * Get memory statistics for a user.
+   * Get memory statistics for a user (includes storage usage).
    */
   getStats(userId: string): MemoryStats {
     const total = this.db.prepare(
@@ -327,11 +347,19 @@ export class MemoryStore {
       'SELECT COALESCE(AVG(relevanceScore), 0) as val FROM memories WHERE userId = ?'
     ).get(userId) as { val: number };
 
+    // Approximate storage size: sum of summary + content + payload + tags
+    const sizeEstimate = this.db.prepare(
+      `SELECT COALESCE(SUM(LENGTH(summary) + LENGTH(content) + LENGTH(payload) + LENGTH(tags)), 0) as bytes
+       FROM memories WHERE userId = ?`
+    ).get(userId) as { bytes: number };
+
     const typeMap: Record<string, number> = {};
     for (const row of byType) typeMap[row.type] = row.cnt;
 
     const scopeMap: Record<string, number> = {};
     for (const row of byScope) scopeMap[row.scope] = row.cnt;
+
+    const cap = this.config.maxMemoriesPerUser;
 
     return {
       userId,
@@ -342,10 +370,83 @@ export class MemoryStore {
       newestMemory: newest.val,
       totalRecalls: totalRecalls.val,
       avgRelevanceScore: Math.round(avgRelevance.val * 100) / 100,
+      storageUsage: {
+        used: total.cnt,
+        cap,
+        percentFull: cap > 0 ? Math.round((total.cnt / cap) * 100) : 0,
+      },
+      estimatedSizeBytes: sizeEstimate.bytes,
     };
   }
 
-  // ── Private Helpers ─────────────────────────────────────────────
+  // ── Storage Compensation ──────────────────────────────────────
+
+  /**
+   * Evict lowest-relevance memories when a user exceeds their storage cap.
+   * Called automatically before every new insert.
+   */
+  evictIfOverCap(userId: string): number {
+    const count = this.db.prepare(
+      'SELECT COUNT(*) as cnt FROM memories WHERE userId = ?'
+    ).get(userId) as { cnt: number };
+
+    const excess = count.cnt - this.config.maxMemoriesPerUser;
+    if (excess <= 0) return 0;
+
+    // Evict the lowest-scoring memories (relevance * recency)
+    const toEvict = Math.min(excess + this.config.evictionBatchSize, count.cnt);
+    const result = this.db.prepare(`
+      DELETE FROM memories WHERE id IN (
+        SELECT id FROM memories
+        WHERE userId = ?
+        ORDER BY relevanceScore ASC, feedbackSignal ASC, updatedAt ASC
+        LIMIT ?
+      )
+    `).run(userId, toEvict);
+
+    if (result.changes > 0) {
+      logger.info(
+        { userId, evicted: result.changes, was: count.cnt, cap: this.config.maxMemoriesPerUser },
+        '[Memory] Evicted low-relevance memories (over cap)'
+      );
+    }
+    return result.changes;
+  }
+
+  /**
+   * Run full maintenance: purge expired, decay old, evict over-cap users.
+   * Returns a summary of what was cleaned.
+   */
+  runMaintenance(): { purged: number; decayed: number; evicted: number } {
+    const purged = this.purgeExpired();
+    const decayed = this.decayRelevance();
+
+    // Find all users over cap and evict
+    const overCapUsers = this.db.prepare(`
+      SELECT userId, COUNT(*) as cnt FROM memories
+      GROUP BY userId
+      HAVING cnt > ?
+    `).all(this.config.maxMemoriesPerUser) as { userId: string; cnt: number }[];
+
+    let totalEvicted = 0;
+    for (const { userId } of overCapUsers) {
+      totalEvicted += this.evictIfOverCap(userId);
+    }
+
+    logger.info(
+      { purged, decayed, evicted: totalEvicted, usersEvicted: overCapUsers.length },
+      '[Memory] Maintenance complete'
+    );
+
+    return { purged, decayed, evicted: totalEvicted };
+  }
+
+  /** Get the current storage config. */
+  getConfig(): MemoryStorageConfig {
+    return { ...this.config };
+  }
+
+  // ── Private Helpers ────────────────────────────────────────────
 
   private deserialize(row: Record<string, unknown>): MemoryRecord {
     return {
@@ -370,12 +471,38 @@ export class MemoryStore {
   }
 }
 
-// Singleton
+// ── Field Size Enforcement ─────────────────────────────────────
+
+function truncateField(value: string, maxLen: number): string {
+  if (value.length <= maxLen) return value;
+  return value.slice(0, maxLen - 3) + '...';
+}
+
+function enforcePayloadSize(
+  payload: Record<string, unknown>,
+  maxBytes: number
+): Record<string, unknown> {
+  const json = JSON.stringify(payload);
+  if (json.length <= maxBytes) return payload;
+  // Trim: keep only top-level scalar fields and truncate strings
+  const trimmed: Record<string, unknown> = {};
+  let size = 2; // {}
+  for (const [key, value] of Object.entries(payload)) {
+    const entry = JSON.stringify({ [key]: value });
+    if (size + entry.length > maxBytes) break;
+    trimmed[key] = value;
+    size += entry.length;
+  }
+  return trimmed;
+}
+
+// ── Singleton ──────────────────────────────────────────────────
+
 let _memoryStore: MemoryStore | undefined;
 
-export function getMemoryStore(): MemoryStore {
+export function getMemoryStore(config?: Partial<MemoryStorageConfig>): MemoryStore {
   if (!_memoryStore) {
-    _memoryStore = new MemoryStore();
+    _memoryStore = new MemoryStore(config);
   }
   return _memoryStore;
 }

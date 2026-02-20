@@ -2313,12 +2313,11 @@ app.delete('/memory/:memoryId', (req, res) => {
   }
 });
 
-// Maintenance: purge expired + decay relevance
+/// Maintenance: purge expired + decay relevance + evict over-cap
 app.post('/memory/maintenance', (_req, res) => {
   try {
-    const purged = memoryEngine.purgeExpired();
-    const decayed = memoryEngine.decayRelevance();
-    res.json({ purged, decayed });
+    const result = memoryEngine.runMaintenance();
+    res.json(result);
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'Memory maintenance failed';
     res.status(500).json({ error: msg });
