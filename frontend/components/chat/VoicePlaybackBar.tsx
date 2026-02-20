@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 
 // Minimal interface to avoid circular dependency or waiting for types
 // This matches the new UseVoiceOutputReturn interface we will implement
@@ -10,7 +10,7 @@ interface VoiceOutputInterface {
   onProgress: (callback: (p: number) => void) => () => void;
 }
 
-export function VoicePlaybackBar({ voiceOutput }: { voiceOutput: VoiceOutputInterface }) {
+export const VoicePlaybackBar = memo(function VoicePlaybackBar({ voiceOutput }: { voiceOutput: VoiceOutputInterface }) {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
@@ -27,7 +27,7 @@ export function VoicePlaybackBar({ voiceOutput }: { voiceOutput: VoiceOutputInte
     });
 
     return unsubscribe;
-  }, [voiceOutput, voiceOutput.isPlaying, voiceOutput.isPaused]);
+  }, [voiceOutput]);
 
   if (!voiceOutput.isPlaying && !voiceOutput.isPaused && progress === 0) return null;
 
@@ -39,4 +39,4 @@ export function VoicePlaybackBar({ voiceOutput }: { voiceOutput: VoiceOutputInte
       />
     </div>
   );
-}
+});
