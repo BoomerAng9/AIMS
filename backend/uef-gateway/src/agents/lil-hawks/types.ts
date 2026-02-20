@@ -34,9 +34,13 @@ export type LilHawkId =
   // VISION_SCOUT_SQUAD — Video/Footage Assessment
   | 'VISION_LIL_HAWK'
   | 'SIGNAL_LIL_HAWK'
-  | 'COMPLIANCE_LIL_HAWK';
+  | 'COMPLIANCE_LIL_HAWK'
+  // JSON_EXPERT_SQUAD — JSON Parsing/Transformation
+  | 'JSON_PARSE_LIL_HAWK'
+  | 'JSON_TRANSFORM_LIL_HAWK'
+  | 'JSON_SCHEMA_LIL_HAWK';
 
-export type SquadId = 'prep-squad-alpha' | 'workflow-smith' | 'vision-scout';
+export type SquadId = 'prep-squad-alpha' | 'workflow-smith' | 'vision-scout' | 'json-expert';
 
 export interface LilHawkProfile {
   id: LilHawkId;

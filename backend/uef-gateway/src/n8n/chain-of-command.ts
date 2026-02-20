@@ -171,6 +171,8 @@ const STEP_AGENT_MAP: Array<{ keywords: string[]; agentId: AgentId }> = [
   { keywords: ['research', 'analyze', 'market', 'data', 'competitive', 'audit', 'report', 'survey', 'trend'], agentId: 'analyst-ang' },
   { keywords: ['brand', 'campaign', 'copy', 'content', 'email', 'seo', 'social', 'outreach', 'marketing'], agentId: 'marketer-ang' },
   { keywords: ['verify', 'test', 'security', 'review', 'compliance', 'check', 'validate', 'verification', 'oracle', 'quality'], agentId: 'quality-ang' },
+  { keywords: ['n8n', 'workflow', 'webhook', 'trigger', 'cron', 'node', 'automation', 'pipeline', 'schedule'], agentId: 'node-trigger-ang' },
+  { keywords: ['json', 'parse', 'transform', 'schema', 'payload', 'serialize', 'deserialize', 'mapping', 'field map'], agentId: 'json-expert-squad' },
 ];
 
 function resolveAgentForStep(description: string): AgentId {

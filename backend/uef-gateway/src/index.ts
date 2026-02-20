@@ -14,6 +14,7 @@ import { runAthletePageFactory } from './perform/pipeline/athlete-page-factory';
 import { SQUAD_PROFILES } from './agents/lil-hawks/workflow-smith-squad';
 import { VISION_SQUAD_PROFILES } from './agents/lil-hawks/vision-scout-squad';
 import { PREP_SQUAD_PROFILES, runPrepSquad } from './agents/lil-hawks/prep-squad-alpha';
+import { JSON_SQUAD_PROFILES } from './agents/lil-hawks/json-expert-squad';
 import { pmoRegistry } from './pmo/registry';
 import { houseOfAng } from './pmo/house-of-ang';
 import { runCollaborationDemo, renderJSON } from './collaboration';
@@ -47,6 +48,7 @@ import { lucProjectService } from './shelves/luc-project-service';
 import { allShelfTools } from './shelves/mcp-tools';
 import { ossModels } from './llm/oss-models';
 import { personaplex } from './llm/personaplex';
+import { N8nClient } from './n8n';
 import logger from './logger';
 
 // Custom Lil_Hawks — User-Created Bots
@@ -64,6 +66,10 @@ import {
   getPlaygroundStats,
 } from './playground';
 import type { CreatePlaygroundRequest, ExecuteInPlaygroundRequest } from './playground';
+
+// Memory System — Persistent Agent Memory
+import { getMemoryEngine } from './memory';
+import type { RememberInput, RecallQuery, MemoryFeedback } from './memory';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -1168,6 +1174,7 @@ app.get('/lil-hawks', (_req, res) => {
       'prep-squad-alpha': PREP_SQUAD_PROFILES,
       'workflow-smith': SQUAD_PROFILES,
       'vision-scout': VISION_SQUAD_PROFILES,
+      'json-expert': JSON_SQUAD_PROFILES,
     },
   });
 });
@@ -2127,6 +2134,210 @@ app.post('/ingress/acp', acpLimiter, async (req, res) => {
     const message = error instanceof Error ? error.message : 'Unknown error';
     logger.error({ err: error }, 'ACP Ingress Error');
     res.status(500).json({ status: 'ERROR', message });
+  }
+});
+
+// --------------------------------------------------------------------------
+// n8n Management — Workflow Deploy, Activate, List, Health
+// --------------------------------------------------------------------------
+
+const n8nClient = new N8nClient();
+
+// n8n health check
+app.get('/n8n/health', async (_req, res) => {
+  try {
+    const health = await n8nClient.healthCheck();
+    res.json(health);
+  } catch (err) {
+    res.json({ ok: false, error: err instanceof Error ? err.message : 'Health check failed' });
+  }
+});
+
+// List n8n workflows
+app.get('/n8n/workflows', async (_req, res) => {
+  try {
+    const workflows = await n8nClient.listWorkflows();
+    res.json({ workflows, count: workflows.length });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Failed to list workflows';
+    res.status(500).json({ error: msg });
+  }
+});
+
+// Deploy a workflow to n8n
+app.post('/n8n/workflows/deploy', async (req, res) => {
+  try {
+    const { workflowJson } = req.body;
+    if (!workflowJson) {
+      res.status(400).json({ error: 'Missing workflowJson in body' });
+      return;
+    }
+    const result = await n8nClient.deployWorkflow(workflowJson);
+    res.status(201).json(result);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Workflow deploy failed';
+    res.status(500).json({ error: msg });
+  }
+});
+
+// Activate a workflow on n8n
+app.post('/n8n/workflows/:workflowId/activate', async (req, res) => {
+  try {
+    await n8nClient.activateWorkflow(req.params.workflowId);
+    res.json({ success: true, workflowId: req.params.workflowId });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Workflow activation failed';
+    res.status(500).json({ error: msg });
+  }
+});
+
+// Trigger PMO pipeline via n8n (or local fallback)
+app.post('/n8n/trigger', async (req, res) => {
+  try {
+    const { userId, message, context } = req.body;
+    if (!userId || !message) {
+      res.status(400).json({ error: 'Missing userId or message' });
+      return;
+    }
+    const result = await n8nClient.triggerPmoWorkflow({ userId, message, context });
+    res.json(result);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'n8n trigger failed';
+    res.status(500).json({ error: msg });
+  }
+});
+
+// --------------------------------------------------------------------------
+// Memory System — Persistent Agent Memory
+// --------------------------------------------------------------------------
+
+const memoryEngine = getMemoryEngine();
+
+// Remember: store a memory
+app.post('/memory/remember', (req, res) => {
+  try {
+    const input = req.body as RememberInput;
+    if (!input.userId || !input.summary || !input.content || !input.type) {
+      res.status(400).json({ error: 'Missing required fields: userId, type, summary, content' });
+      return;
+    }
+    const memory = memoryEngine.remember(input);
+    res.status(201).json({ success: true, memory });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Memory store failed';
+    logger.error({ err }, '[Memory] Remember error');
+    res.status(500).json({ error: msg });
+  }
+});
+
+// Recall: search memories by query
+app.post('/memory/recall', (req, res) => {
+  try {
+    const query = req.body as RecallQuery;
+    if (!query.userId || !query.query) {
+      res.status(400).json({ error: 'Missing required fields: userId, query' });
+      return;
+    }
+    const result = memoryEngine.recall(query);
+    res.json(result);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Memory recall failed';
+    logger.error({ err }, '[Memory] Recall error');
+    res.status(500).json({ error: msg });
+  }
+});
+
+// Feedback: apply feedback signal to a memory
+app.post('/memory/feedback', (req, res) => {
+  try {
+    const feedback = req.body as MemoryFeedback;
+    if (!feedback.memoryId || !feedback.signal) {
+      res.status(400).json({ error: 'Missing required fields: memoryId, signal' });
+      return;
+    }
+    memoryEngine.feedback(feedback);
+    res.json({ success: true });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Memory feedback failed';
+    res.status(500).json({ error: msg });
+  }
+});
+
+// List memories for a user
+app.get('/memory', (req, res) => {
+  try {
+    const userId = req.query.userId as string;
+    if (!userId) {
+      res.status(400).json({ error: 'Missing userId query parameter' });
+      return;
+    }
+    const type = req.query.type as string | undefined;
+    const projectId = req.query.projectId as string | undefined;
+    const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : undefined;
+    const memories = memoryEngine.listMemories(userId, {
+      type: type as any,
+      projectId,
+      limit,
+    });
+    res.json({ memories, count: memories.length, userId });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Memory list failed';
+    res.status(500).json({ error: msg });
+  }
+});
+
+// Get memory stats for a user
+app.get('/memory/stats', (req, res) => {
+  try {
+    const userId = req.query.userId as string;
+    if (!userId) {
+      res.status(400).json({ error: 'Missing userId query parameter' });
+      return;
+    }
+    const stats = memoryEngine.getStats(userId);
+    res.json(stats);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Memory stats failed';
+    res.status(500).json({ error: msg });
+  }
+});
+
+// Delete a memory
+app.delete('/memory/:memoryId', (req, res) => {
+  try {
+    const deleted = memoryEngine.deleteMemory(req.params.memoryId);
+    res.json({ success: deleted });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Memory delete failed';
+    res.status(500).json({ error: msg });
+  }
+});
+
+// Maintenance: purge expired + decay relevance
+app.post('/memory/maintenance', (_req, res) => {
+  try {
+    const purged = memoryEngine.purgeExpired();
+    const decayed = memoryEngine.decayRelevance();
+    res.json({ purged, decayed });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Memory maintenance failed';
+    res.status(500).json({ error: msg });
+  }
+});
+
+// Store a user preference
+app.post('/memory/preference', (req, res) => {
+  try {
+    const { userId, key, value, context } = req.body;
+    if (!userId || !key || !value) {
+      res.status(400).json({ error: 'Missing required fields: userId, key, value' });
+      return;
+    }
+    const memory = memoryEngine.rememberPreference(userId, key, value, context);
+    res.status(201).json({ success: true, memory });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Preference store failed';
+    res.status(500).json({ error: msg });
   }
 });
 
