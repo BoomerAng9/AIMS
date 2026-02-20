@@ -49,6 +49,22 @@ import { ossModels } from './llm/oss-models';
 import { personaplex } from './llm/personaplex';
 import logger from './logger';
 
+// Custom Lil_Hawks — User-Created Bots
+import {
+  createCustomHawk, listUserHawks, getHawk, updateHawkStatus, deleteHawk,
+  executeHawk, getAvailableDomains, getAvailableTools, getHawkExecutionHistory,
+  getGlobalStats as getHawkGlobalStats,
+} from './custom-hawks';
+import type { CustomHawkSpec, HawkExecutionRequest } from './custom-hawks';
+
+// Playground/Sandbox — Isolated Execution Environments
+import {
+  createPlayground, executeInPlayground, getPlayground, listPlaygrounds,
+  pausePlayground, resumePlayground, completePlayground, addFile,
+  getPlaygroundStats,
+} from './playground';
+import type { CreatePlaygroundRequest, ExecuteInPlaygroundRequest } from './playground';
+
 const app = express();
 const PORT = process.env.PORT || 3001;
 const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY || '';
@@ -954,6 +970,229 @@ app.get('/lil-hawks', (_req, res) => {
       'vision-scout': VISION_SQUAD_PROFILES,
     },
   });
+});
+
+// --------------------------------------------------------------------------
+// Custom Lil_Hawks — User-Created Bots
+// Users can create their own Lil_Hawks with custom names and specialties.
+// "Lil_Increase_My_Money_Hawk", "Lil_Grade_My_Essay_Hawk", etc.
+// --------------------------------------------------------------------------
+app.post('/custom-hawks', (req, res) => {
+  try {
+    const { userId, spec } = req.body as { userId: string; spec: CustomHawkSpec };
+    if (!userId || !spec) {
+      res.status(400).json({ error: 'Missing userId or spec' });
+      return;
+    }
+    const result = createCustomHawk(userId, spec);
+    if (!result.success) {
+      res.status(400).json(result);
+      return;
+    }
+    res.status(201).json(result);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Custom hawk creation failed';
+    logger.error({ err }, '[CustomHawks] Create error');
+    res.status(500).json({ error: msg });
+  }
+});
+
+app.get('/custom-hawks', (req, res) => {
+  const userId = req.query.userId as string;
+  if (!userId) {
+    res.status(400).json({ error: 'Missing userId query param' });
+    return;
+  }
+  res.json(listUserHawks(userId));
+});
+
+app.get('/custom-hawks/domains', (_req, res) => {
+  res.json({ domains: getAvailableDomains(), tools: getAvailableTools() });
+});
+
+app.get('/custom-hawks/stats', (_req, res) => {
+  res.json(getHawkGlobalStats());
+});
+
+app.get('/custom-hawks/:hawkId', (req, res) => {
+  const userId = req.query.userId as string;
+  if (!userId) {
+    res.status(400).json({ error: 'Missing userId query param' });
+    return;
+  }
+  const hawk = getHawk(req.params.hawkId, userId);
+  if (!hawk) {
+    res.status(404).json({ error: 'Hawk not found' });
+    return;
+  }
+  res.json({ hawk });
+});
+
+app.patch('/custom-hawks/:hawkId/status', (req, res) => {
+  const { userId, status } = req.body as { userId: string; status: 'active' | 'paused' | 'retired' };
+  if (!userId || !status) {
+    res.status(400).json({ error: 'Missing userId or status' });
+    return;
+  }
+  const hawk = updateHawkStatus(req.params.hawkId, userId, status);
+  if (!hawk) {
+    res.status(404).json({ error: 'Hawk not found or not authorized' });
+    return;
+  }
+  res.json({ hawk });
+});
+
+app.delete('/custom-hawks/:hawkId', (req, res) => {
+  const userId = req.query.userId as string;
+  if (!userId) {
+    res.status(400).json({ error: 'Missing userId query param' });
+    return;
+  }
+  const deleted = deleteHawk(req.params.hawkId, userId);
+  if (!deleted) {
+    res.status(404).json({ error: 'Hawk not found or not authorized' });
+    return;
+  }
+  res.json({ deleted: true });
+});
+
+app.post('/custom-hawks/:hawkId/execute', async (req, res) => {
+  try {
+    const { userId, message, context } = req.body as HawkExecutionRequest;
+    if (!userId || !message) {
+      res.status(400).json({ error: 'Missing userId or message' });
+      return;
+    }
+    const result = await executeHawk({
+      hawkId: req.params.hawkId,
+      userId,
+      message,
+      context,
+    });
+    res.json(result);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Hawk execution failed';
+    logger.error({ err }, '[CustomHawks] Execute error');
+    res.status(500).json({ error: msg });
+  }
+});
+
+app.get('/custom-hawks/:hawkId/history', (req, res) => {
+  const limit = parseInt(req.query.limit as string) || 20;
+  res.json({ executions: getHawkExecutionHistory(req.params.hawkId, limit) });
+});
+
+// --------------------------------------------------------------------------
+// Playground/Sandbox — Isolated Execution Environments
+// Code sandboxes, prompt testing, agent testing, training data, education
+// --------------------------------------------------------------------------
+app.post('/playground', (req, res) => {
+  try {
+    const request = req.body as CreatePlaygroundRequest;
+    if (!request.userId || !request.type || !request.name || !request.config) {
+      res.status(400).json({ error: 'Missing required fields: userId, type, name, config' });
+      return;
+    }
+    const result = createPlayground(request);
+    if (!result.success) {
+      res.status(400).json(result);
+      return;
+    }
+    res.status(201).json(result);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Playground creation failed';
+    logger.error({ err }, '[Playground] Create error');
+    res.status(500).json({ error: msg });
+  }
+});
+
+app.get('/playground', (req, res) => {
+  const userId = req.query.userId as string;
+  if (!userId) {
+    res.status(400).json({ error: 'Missing userId query param' });
+    return;
+  }
+  res.json({ sessions: listPlaygrounds(userId) });
+});
+
+app.get('/playground/stats', (_req, res) => {
+  res.json(getPlaygroundStats());
+});
+
+app.get('/playground/:sessionId', (req, res) => {
+  const userId = req.query.userId as string;
+  if (!userId) {
+    res.status(400).json({ error: 'Missing userId query param' });
+    return;
+  }
+  const session = getPlayground(req.params.sessionId, userId);
+  if (!session) {
+    res.status(404).json({ error: 'Playground session not found' });
+    return;
+  }
+  res.json({ session });
+});
+
+app.post('/playground/:sessionId/execute', async (req, res) => {
+  try {
+    const { userId, input, target } = req.body as ExecuteInPlaygroundRequest;
+    if (!userId || !input) {
+      res.status(400).json({ error: 'Missing userId or input' });
+      return;
+    }
+    const result = await executeInPlayground({
+      sessionId: req.params.sessionId,
+      userId,
+      input,
+      target,
+    });
+    res.json(result);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Playground execution failed';
+    logger.error({ err }, '[Playground] Execute error');
+    res.status(500).json({ error: msg });
+  }
+});
+
+app.post('/playground/:sessionId/pause', (req, res) => {
+  const { userId } = req.body as { userId: string };
+  if (!userId) {
+    res.status(400).json({ error: 'Missing userId' });
+    return;
+  }
+  res.json(pausePlayground(req.params.sessionId, userId));
+});
+
+app.post('/playground/:sessionId/resume', (req, res) => {
+  const { userId } = req.body as { userId: string };
+  if (!userId) {
+    res.status(400).json({ error: 'Missing userId' });
+    return;
+  }
+  res.json(resumePlayground(req.params.sessionId, userId));
+});
+
+app.post('/playground/:sessionId/complete', (req, res) => {
+  const { userId } = req.body as { userId: string };
+  if (!userId) {
+    res.status(400).json({ error: 'Missing userId' });
+    return;
+  }
+  res.json(completePlayground(req.params.sessionId, userId));
+});
+
+app.post('/playground/:sessionId/files', (req, res) => {
+  const { userId, file } = req.body as { userId: string; file: { path: string; content: string; language: string } };
+  if (!userId || !file) {
+    res.status(400).json({ error: 'Missing userId or file' });
+    return;
+  }
+  const result = addFile(req.params.sessionId, userId, {
+    ...file,
+    sizeBytes: file.content.length,
+    lastModified: new Date().toISOString(),
+  });
+  res.json(result);
 });
 
 // --------------------------------------------------------------------------

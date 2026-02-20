@@ -1082,6 +1082,172 @@ Return ONLY a JSON array of step description strings.
       transition_prompt: 'Ready to build? Chicken Hawk will scaffold, code, test, and deploy — from zero to production.',
     },
   },
+
+  // ── 13. CUSTOM LIL_HAWK CREATOR ────────────────────────────────────────
+
+  'custom-hawk': {
+    id: 'custom-hawk',
+    name: 'Custom Lil_Hawk Creator',
+    category: 'automation',
+    tags: ['custom bot', 'personal agent', 'lil hawk', 'create agent', 'my own bot', 'assistant'],
+    triggers: [
+      /custom\s*(hawk|bot|agent)/i,
+      /create\s*(a|my|an?)?\s*(hawk|bot|agent)/i,
+      /make\s*(a|my|an?)?\s*(hawk|bot|agent)/i,
+      /build\s*me\s*(a|an?)?\s*(hawk|bot|agent)/i,
+      /my\s*own\s*(hawk|bot|agent|assistant)/i,
+      /personal\s*(assistant|agent|bot)/i,
+      /lil_\w+_hawk/i,
+    ],
+
+    chain_steps: [
+      {
+        step: 1,
+        name: 'Name Your Hawk',
+        purpose: 'Let the user name their custom Lil_Hawk',
+        acheevy_behavior: 'Ask: "What should we call your hawk? It follows the pattern Lil_<YourName>_Hawk. Examples: Lil_Track_My_Stocks_Hawk, Lil_Write_My_Blogs_Hawk, Lil_Find_Me_Clients_Hawk. Be creative — this is YOUR bot."',
+        output_schema: { hawk_name: 'string' },
+      },
+      {
+        step: 2,
+        name: 'Define Purpose',
+        purpose: 'What this hawk does in plain English',
+        acheevy_behavior: 'Ask: "What does this hawk DO? One sentence, be specific. Like: \'Monitor my crypto portfolio and alert me when any holding moves more than 5% in a day.\'"',
+        output_schema: { purpose: 'string', domain: 'string' },
+      },
+      {
+        step: 3,
+        name: 'Pick Tools & Capabilities',
+        purpose: 'Select what tools and abilities the hawk has',
+        acheevy_behavior: 'Present available tools: web search, code sandbox, email, data analysis, file generation, etc. Ask: "Which tools does your hawk need?"',
+        output_schema: { tools: 'string[]', capabilities: 'string[]' },
+      },
+      {
+        step: 4,
+        name: 'Set Budget & Deploy',
+        purpose: 'Set budget cap, autonomy level, and deploy',
+        acheevy_behavior: 'Ask: "How much can this hawk spend per run? And should it ask before every action (manual), act on pre-approved tasks (semi-auto), or run fully autonomous?" Then deploy.',
+        output_schema: { budget_cap: 'number', autonomy: 'string', confirmed: 'boolean' },
+      },
+    ],
+
+    acheevy_mode: 'default',
+    expert_domain: ['automation', 'engineering'],
+
+    execution: {
+      primary_agent: 'chicken-hawk',
+      step_generation_prompt: `
+Create and deploy a custom Lil_Hawk for the user:
+Hawk name: {hawk_name}
+Purpose: {purpose}
+Domain: {domain}
+Tools: {tools}
+Capabilities: {capabilities}
+Budget cap: {budget_cap} USD per execution
+Autonomy: {autonomy}
+
+Steps:
+1. Validate hawk name against naming rules
+2. Compile system prompt from purpose + domain + tools
+3. Assign supervisor Boomer_Ang based on domain
+4. Run gate checks (budget, security, chain of command)
+5. Create hawk record and activate
+6. Confirm to user with hawk details
+
+Return ONLY a JSON array of step description strings.
+      `.trim(),
+      required_context: ['hawk_name', 'purpose', 'domain', 'tools', 'capabilities', 'budget_cap', 'autonomy'],
+      fallback_steps: [
+        'Validate hawk name follows Lil_<Name>_Hawk pattern',
+        'Research domain requirements and assign supervisor Boomer_Ang',
+        'Generate system prompt from purpose and capabilities',
+        'Implement gate checks: budget, security, chain of command',
+        'Deploy hawk to active status with full audit trail',
+        'Verify hawk responds correctly with a test execution',
+      ],
+      requires_verification: true,
+      max_steps: 8,
+    },
+
+    revenue_signal: {
+      service: 'Custom Hawk Factory (User Bot Creation)',
+      transition_prompt: 'Your hawk is ready. Want to deploy it now? It will be supervised by the right Boomer_Ang and start handling tasks immediately.',
+    },
+  },
+
+  // ── 14. PLAYGROUND / SANDBOX ──────────────────────────────────────────
+
+  'playground': {
+    id: 'playground',
+    name: 'Playground & Sandbox',
+    category: 'engineering',
+    tags: ['playground', 'sandbox', 'code', 'test', 'run', 'execute', 'training', 'education'],
+    triggers: [
+      /playground/i,
+      /sandbox/i,
+      /run\s*(some|this|my)?\s*code/i,
+      /test\s*(some|this|my)?\s*(code|prompt|agent)/i,
+      /code\s*sandbox/i,
+      /training\s*(data|task|annotation)/i,
+      /student\s*workspace/i,
+      /prompt\s*(test|playground)/i,
+    ],
+
+    chain_steps: [
+      {
+        step: 1,
+        name: 'Choose Playground Type',
+        purpose: 'What kind of environment the user needs',
+        acheevy_behavior: 'Ask: "What kind of playground? Code sandbox (run code), Prompt lab (test prompts), Agent testing (test your hawks), Training data (annotation work), or Education workspace (learn + practice)?"',
+        output_schema: { playground_type: 'string' },
+      },
+      {
+        step: 2,
+        name: 'Configure Environment',
+        purpose: 'Set up the specific playground config',
+        acheevy_behavior: 'Based on type: Code → ask language + packages. Prompt → ask models + system prompt. Agent → ask which hawk. Training → ask task type + labels. Education → ask subject + difficulty.',
+        output_schema: { config: 'object' },
+      },
+      {
+        step: 3,
+        name: 'Launch',
+        purpose: 'Create and launch the playground session',
+        acheevy_behavior: 'Summarize the config: "Launching a [type] playground. [Duration] session. Ready?" Then create.',
+        output_schema: { confirmed: 'boolean' },
+      },
+    ],
+
+    acheevy_mode: 'default',
+    expert_domain: ['engineering', 'automation'],
+
+    execution: {
+      primary_agent: 'chicken-hawk',
+      step_generation_prompt: `
+Set up a playground/sandbox environment:
+Type: {playground_type}
+Config: {config}
+
+This is a session creation task, not a multi-step pipeline.
+The playground engine handles execution internally.
+
+Return ONLY a JSON array of step description strings.
+      `.trim(),
+      required_context: ['playground_type', 'config'],
+      fallback_steps: [
+        'Validate playground configuration and user permissions',
+        'Scaffold isolated environment with requested tools and language',
+        'Deploy sandbox with security constraints and time limits',
+        'Verify environment is ready and execute test run',
+      ],
+      requires_verification: true,
+      max_steps: 6,
+    },
+
+    revenue_signal: {
+      service: 'Playground (Sandbox Execution + Training Contracts)',
+      transition_prompt: 'Your playground is live. Start coding, testing, or annotating. Everything runs in isolation — safe to experiment.',
+    },
+  },
 };
 
 // ---------------------------------------------------------------------------

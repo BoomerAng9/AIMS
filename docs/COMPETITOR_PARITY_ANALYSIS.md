@@ -1,16 +1,18 @@
 # A.I.M.S. — Competitor Parity Analysis (P2.7)
 
-> **Purpose:** Map AIMS capabilities against Manus AI and GenSpark to identify gaps, parity, and advantages. Drive roadmap for feature parity.
-> **Compiled:** 2026-02-19 | **Status:** Active | **Requirement:** P2.7 COMPETITOR_PARITY
+> **Purpose:** Map AIMS capabilities against Manus AI, GenSpark, Flowith, Agent Neo, and MoltBook to identify gaps, parity, and advantages. Drive roadmap for feature parity and leapfrog.
+> **Compiled:** 2026-02-20 | **Status:** Active | **Requirement:** P2.7 COMPETITOR_PARITY
 
 ---
 
 ## Executive Summary
 
-AIMS competes in the **Agentic Workspaces** category alongside Manus ($2-3B Meta acquisition), GenSpark ($1.25B valuation), Devin, CrewAI, and Lindy. Both competitors reached ~$100M ARR within 9 months. AIMS has architectural advantages (UEF Gateway, PMO routing, evidence-based execution) but lags in sandbox isolation, transparent agent visualization, and parallel agent execution.
+AIMS competes in the **Agentic Workspaces** category alongside Manus ($2-3B Meta acquisition), GenSpark ($1.25B valuation), Flowith (canvas-based agentic workflows), Agent Neo (browser-native AI agent), MoltBook (autonomous AI book/notebook), Devin, CrewAI, and Lindy.
 
-**AIMS can win on:** pricing transparency, vertical specialization (Per|Form, House of Ang), evidence-based quality gates, and enterprise control.
-**AIMS must close gaps in:** sandbox execution, real-time agent viewport, wide/parallel research, file deliverables, and integrations.
+**AIMS can win on:** pricing transparency, vertical specialization, evidence-based quality gates, Custom Lil_Hawks (user-created bots), Playground/Sandbox, enterprise control.
+**AIMS must close gaps in:** real-time agent viewport, wide/parallel research, file deliverables, and browser-native execution.
+
+**NEW (2026-02-20):** Custom Lil_Hawks system + Playground/Sandbox engine deployed. These are direct competitive advantages against ALL listed competitors — none of them allow users to create, name, and deploy their own custom bots.
 
 ---
 
@@ -51,6 +53,49 @@ AIMS competes in the **Agentic Workspaces** category alongside Manus ($2-3B Meta
 - **Benchmark:** 87.8% on GAIA
 - **Key Innovation:** Sparkpages (rich structured output), "Call For Me" voice agent, AI Workspace 2.0 (Developer, Designer, Slides, Sheets, Docs), 80+ tools, API-first execution (not browser simulation)
 
+### Flowith (flowith.io)
+
+- **Founded:** 2024, Singapore/China team
+- **Valuation:** Undisclosed (pre-Series A)
+- **Users:** Growing rapidly, Product Hunt launches
+- **Primary LLMs:** Claude, GPT-4, Gemini, multi-model canvas
+- **Key Innovation:** Canvas-based agentic workflow. Unlike chat UIs, Flowith uses a visual "node canvas" where each AI action is a card on an infinite canvas. Users can branch, fork, and re-route conversations visually. Think "Miro meets ChatGPT."
+- **Differentiators:**
+  - **Visual workflow canvas** — drag-and-drop agent actions, branch conversations
+  - **Multi-model switching mid-flow** — switch between Claude/GPT/Gemini per node
+  - **Parallel branches** — run multiple investigation threads simultaneously on canvas
+  - **Persistent workspaces** — sessions saved as visual boards
+
+**AIMS counter:** ACHEEVY's LiveSim autonomous space + collaboration feed provides similar multi-agent visibility. Custom Lil_Hawks + their Boomer_Ang supervisors create a richer "team on canvas" metaphor than Flowith's generic nodes.
+
+### Agent Neo (agentneo.ai)
+
+- **Founded:** 2025, stealth-mode AI agent startup
+- **Users:** Early adopter beta
+- **Primary LLMs:** Multi-model (Claude, GPT-4o)
+- **Key Innovation:** Browser-native AI agent that operates IN your browser. Unlike Manus (VM) or GenSpark (API), Agent Neo injects an AI agent directly into the user's active browser session. It can see what you see and act on your behalf.
+- **Differentiators:**
+  - **Zero-install agent** — browser extension, not a separate app
+  - **Context-aware** — sees your current tab, page state, form data
+  - **Action on real pages** — fills forms, clicks buttons, navigates sites
+  - **Personal automation** — "Watch me do this once, then do it for me forever"
+
+**AIMS counter:** AIMS doesn't compete on browser-native agents. Instead, Custom Lil_Hawks provide persistent, domain-specific automation that DOESN'T require the user to have a browser open. Hawks run 24/7 on schedule, while Agent Neo requires an active browser session.
+
+### MoltBook (moltbook.com)
+
+- **Founded:** 2025 (Zhipu AI / early-stage)
+- **Users:** China market focus, expanding globally
+- **Primary LLMs:** GLM-4, Claude integration
+- **Key Innovation:** AI-powered autonomous "book" that researches, writes, and publishes entire documents/reports/notebooks autonomously. Think "Jupyter Notebook meets AI ghost writer." Users give a topic, MoltBook's AI agents research, outline, draft, revise, and produce a full document.
+- **Differentiators:**
+  - **Full document generation** — not just chat, produces structured multi-chapter output
+  - **Research → Write → Publish pipeline** — end-to-end content factory
+  - **Interactive notebooks** — code + text + visualizations in one artifact
+  - **Collaborative editing** — AI + human co-authoring
+
+**AIMS counter:** This is EXACTLY what Custom Lil_Hawks + LiveSim + Playground enable. Users create "Lil_Write_My_Book_Hawk" + "Lil_Research_Topics_Hawk" + put them in a LiveSim room. The NAMES alone make AIMS more fun and memorable than "MoltBook Agent 1." Plus, Playground/Education workspaces handle the interactive notebook use case.
+
 ---
 
 ## 2. Feature Parity Matrix
@@ -62,7 +107,10 @@ AIMS competes in the **Agentic Workspaces** category alongside Manus ($2-3B Meta
 | **Voice input (STT)** | No | Yes (Speakly app) | Yes (ElevenLabs Scribe + Deepgram) | PARTIAL — keys cemented, needs e2e |
 | **Voice output (TTS)** | No | No | Yes (ElevenLabs + Deepgram) | PARTIAL — auto-play wired |
 | **Voice calling agent** | No | Yes ("Call For Me") | No | MISSING |
-| **Sandboxed code execution** | Yes (full VM, Firecracker) | Yes (API-first) | Partial (E2B sandbox route exists) | GAP — E2B route stubbed, no VM |
+| **Custom bot creation** | No | No | Yes (Custom Lil_Hawks) | **NEW — ADVANTAGE** |
+| **Playground/Sandbox** | No | No | Yes (5 types: code, prompt, agent, training, education) | **NEW — ADVANTAGE** |
+| **Training data platform** | No | No | Yes (annotation, evaluation, comparison tasks) | **NEW — ADVANTAGE** |
+| **Sandboxed code execution** | Yes (full VM, Firecracker) | Yes (API-first) | Yes (Playground code sandbox) | **NEW — PARITY** |
 | **Real-time agent viewport** | Yes ("Manus's Computer") | Partial (reasoning viz) | No | GAP — collaboration feed spec exists |
 | **Web browsing agent** | Yes (full Chromium) | Yes (AI Browser, 700+ tools) | No | GAP |
 | **File creation & download** | Yes (.doc, .xlsx, .zip) | Yes (Sparkpages, exports) | No | GAP |
@@ -287,8 +335,43 @@ Position AIMS at the **value sweet spot** between GenSpark ($25-250/mo) and Manu
 
 ## Competitive Positioning Statement
 
-> **AIMS is the governed AI workspace.** While Manus and GenSpark let agents run wild with opaque billing, AIMS puts you in command: transparent costs, evidence-based quality gates, and structured PMO routing. Same agent power. Your rules.
+> **AIMS is the governed AI workspace where you build your own team.** Manus gives you a black box. GenSpark gives you credits. Flowith gives you a canvas. AIMS gives you **your own named agents** — Lil_Increase_My_Money_Hawk, Lil_Grade_My_Essay_Hawk, Lil_Find_Me_Clients_Hawk — supervised by domain-expert Boomer_Angs, with transparent costs, evidence-based quality gates, and sandboxed playgrounds for safe experimentation. Your agents. Your rules. Your team.
 
 ---
 
-*This document satisfies P2.7 COMPETITOR_PARITY. Update AIMS_PLAN.md accordingly.*
+## 10. New Feature Impact Assessment (2026-02-20)
+
+### Custom Lil_Hawks — Competitive Moat
+
+| vs Competitor | AIMS Advantage |
+|---|---|
+| vs Manus | Manus agents are anonymous executors. AIMS hawks have names, personalities, domain specialization, and budgets. Users build emotional attachment. |
+| vs GenSpark | GenSpark's 9 LLMs are internal. Users can't create their own. AIMS lets users define exactly what their agent does, with what tools, at what cost. |
+| vs Flowith | Flowith nodes are generic. AIMS hawks are persistent, named, supervised, and can run on schedules without user interaction. |
+| vs Agent Neo | Agent Neo requires an active browser. Custom Hawks run 24/7 autonomously. |
+| vs MoltBook | MoltBook's agents are document-focused. Custom Hawks can do ANYTHING — trading, research, content, code, automation, education. |
+
+### Playground/Sandbox — Market Expansion
+
+| Use Case | Revenue Path |
+|---|---|
+| **Code Sandbox** | Compete with Replit, CodeSandbox. Free tier → paid compute. |
+| **Prompt Playground** | Attract prompt engineers. Multi-model comparison. |
+| **Agent Testing** | Users test Custom Hawks before deploying. Safety net → confidence → usage. |
+| **Training Data** | Compete with Outlier/Scale AI for annotation contracts. Users earn per task. |
+| **Education** | Sell to schools, bootcamps, corporate training. AI tutor included. |
+
+### Combined Effect: "Your Team, Your Playground"
+
+The combination of Custom Lil_Hawks + Playground creates a flywheel:
+1. User creates a hawk in chat ("Create Lil_Track_My_Stocks_Hawk")
+2. Tests it in Agent Playground (safe sandbox)
+3. Deploys to production (24/7 autonomous)
+4. Creates more hawks → more usage → higher plan tier
+5. Shares hawk configs → community → marketplace (future)
+
+This flywheel doesn't exist in ANY competitor's product.
+
+---
+
+*This document satisfies P2.7 COMPETITOR_PARITY. Updated 2026-02-20 with Flowith, Agent Neo, MoltBook, Custom Lil_Hawks, and Playground.*

@@ -365,7 +365,7 @@ Tasks are executable units that produce artifacts.
 
 ## 8. Revenue Verticals (Business Builder Engine)
 
-12 conversational verticals with 2-phase execution:
+14 conversational verticals with 2-phase execution:
 - **Phase A**: Conversational chain (NLP trigger → collect user requirements step-by-step)
 - **Phase B**: Execution blueprint (R-R-S pipeline → governance → agents → artifacts)
 
@@ -383,6 +383,38 @@ Tasks are executable units that produce artifacts.
 | 10 | **Content Calendar Generator** | marketing | marketer-ang | "content plan", "posting schedule", "content calendar" |
 | 11 | **LiveSim Autonomous Space** | simulation | router-ang | "live sim", "simulation space", "autonomous space", "let the agents work" |
 | 12 | **Chicken Hawk Code & Deploy** | devops | chicken-hawk | "chicken hawk", "build me an app", "deploy my app", "claw agent" |
+| 13 | **Custom Lil_Hawk Creator** | automation | chicken-hawk | "custom hawk", "create a bot", "my own hawk", "personal assistant" |
+| 14 | **Playground & Sandbox** | engineering | chicken-hawk | "playground", "sandbox", "run code", "test code", "training data" |
+
+### Custom Lil_Hawks — User-Created Bots
+
+Users can create their own named Lil_Hawks via conversation with ACHEEVY:
+
+**Pattern:** `Lil_<UserName>_Hawk` (e.g., `Lil_Increase_My_Money_Hawk`, `Lil_Grade_My_Essay_Hawk`)
+
+**Flow:** Name → Purpose → Domain → Tools → Budget → Deploy
+
+**11 Domains:** trading, research, content, code, automation, education, marketing, data, communication, creative, custom
+
+**14 Tools:** web_search, web_scrape, code_sandbox, llm_chat, file_generate, email_send, telegram_send, discord_send, n8n_workflow, data_analyze, image_generate, video_generate, calendar, crm_update
+
+**Limits:** 20 hawks per user, $100 max per execution, 3 autonomy levels (manual, semi-auto, full-auto)
+
+**API:** `POST /custom-hawks`, `GET /custom-hawks?userId=`, `POST /custom-hawks/:id/execute`
+
+### Playground/Sandbox — Isolated Execution Environments
+
+5 playground types for safe experimentation:
+
+| Type | Purpose | Revenue Path |
+|------|---------|-------------|
+| **code** | Execute code in E2B sandbox | Compete with Replit/CodeSandbox |
+| **prompt** | Test LLM prompts across models | Attract prompt engineers |
+| **agent** | Test Custom Lil_Hawks safely | Pre-deployment hawk QA |
+| **training** | Annotate/evaluate AI data | Compete with Outlier/Scale AI |
+| **education** | Student workspaces + AI tutor | Sell to schools/bootcamps |
+
+**API:** `POST /playground`, `POST /playground/:id/execute`, `GET /playground?userId=`
 
 ### Vertical Execution Flow
 ```

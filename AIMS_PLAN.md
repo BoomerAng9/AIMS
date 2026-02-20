@@ -98,6 +98,9 @@ Every job must:
 | P2.5 | CDN deploy for generated sites | **MISSING** — deploy-dock UI exists but no CDN push mechanism |
 | P2.6 | PersonaPlex full-duplex voice | **MISSING** — skill spec exists, no integration code |
 | P2.7 | Competitor parity (Manus/Genspark/Flow) | **DONE** — see `docs/COMPETITOR_PARITY_ANALYSIS.md` (feature matrix, gap analysis, roadmap) |
+| P2.8 | Custom Lil_Hawks (user-created bots) | **DONE** — types, engine, API routes, skill, vertical definition all wired |
+| P2.9 | Playground/Sandbox system | **DONE** — 5 playground types (code, prompt, agent, training, education), API routes wired |
+| P2.10 | Competitor parity v2 (Flowith/Agent Neo/MoltBook) | **DONE** — competitor profiles, feature matrix updated, advantage analysis |
 
 ---
 
@@ -131,14 +134,20 @@ Every job must:
 - [ ] Test full flow: auth → chat → LLM response → voice playback
 - [ ] VPS deploy + live smoke test
 
-### Phase 3: REVENUE VERTICALS
-**Target:** 12 verticals work through Phase A conversational chains
+### Phase 3: REVENUE VERTICALS + CUSTOM HAWKS
+**Target:** 14 verticals work through Phase A conversational chains, Custom Lil_Hawks live
 
 - [ ] Wire vertical detection to chat flow
 - [ ] Implement Phase A step progression UI
 - [ ] Connect Phase B execution to Chicken Hawk dispatch
 - [ ] Enable n8n workflow triggers for automation verticals
 - [ ] Per|Form lobby with live gridiron data
+- [x] Custom Lil_Hawks engine (types, engine, API routes, skill, vertical) ← DONE
+- [x] Playground/Sandbox engine (5 types, API routes, skill, vertical) ← DONE
+- [ ] Wire Custom Hawks creation flow into ACHEEVY chat UI
+- [ ] Wire Playground UI into dashboard (code editor, prompt tester, etc.)
+- [ ] Connect E2B API to code playground for real sandboxed execution
+- [ ] Enable hawk scheduling via n8n cron triggers
 
 ### Phase 4: AUTONOMY + CLOUD RUN
 **Target:** Agents work autonomously, jobs deploy to right targets
@@ -190,9 +199,12 @@ P2.4  CLOUD_RUN_JOBS             MISSING
 P2.5  CDN_DEPLOY_PIPELINE        MISSING
 P2.6  PERSONAPLEX_VOICE          MISSING
 P2.7  COMPETITOR_PARITY          DONE
+P2.8  CUSTOM_LIL_HAWKS           DONE       ← NEW: user-created bots system
+P2.9  PLAYGROUND_SANDBOX          DONE       ← NEW: 5-type sandbox engine
+P2.10 COMPETITOR_PARITY_V2        DONE       ← NEW: Flowith/Agent Neo/MoltBook
 ```
 
-**Score: 9 DONE / 10 PARTIAL / 4 MISSING = 43% complete** (was 39%)
+**Score: 13 DONE / 10 PARTIAL / 4 MISSING = 48% complete** (was 43%)
 
 ---
 
