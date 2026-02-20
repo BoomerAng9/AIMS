@@ -141,6 +141,35 @@ export interface ExecutionOutcome {
   artifacts?: string[];
 }
 
+// ── Storage Configuration ────────────────────────────────────────
+
+export interface MemoryStorageConfig {
+  /** Max memories per user before eviction kicks in */
+  maxMemoriesPerUser: number;
+  /** Max characters for the summary field */
+  maxSummaryLength: number;
+  /** Max characters for the content field */
+  maxContentLength: number;
+  /** Max size in bytes for the JSON payload */
+  maxPayloadBytes: number;
+  /** Max tags per memory */
+  maxTags: number;
+  /** How many excess memories to evict at once (batch size) */
+  evictionBatchSize: number;
+  /** Maintenance interval in milliseconds (0 = disabled) */
+  maintenanceIntervalMs: number;
+}
+
+export const DEFAULT_STORAGE_CONFIG: MemoryStorageConfig = {
+  maxMemoriesPerUser: 1000,
+  maxSummaryLength: 500,
+  maxContentLength: 10_000,
+  maxPayloadBytes: 50_000,
+  maxTags: 20,
+  evictionBatchSize: 50,
+  maintenanceIntervalMs: 6 * 60 * 60 * 1000, // 6 hours
+};
+
 // ── Memory Stats ────────────────────────────────────────────────
 
 export interface MemoryStats {
@@ -152,4 +181,12 @@ export interface MemoryStats {
   newestMemory: string | null;
   totalRecalls: number;
   avgRelevanceScore: number;
+  /** Storage usage relative to per-user cap */
+  storageUsage: {
+    used: number;
+    cap: number;
+    percentFull: number;
+  };
+  /** Total DB size for this user's memories (approximate bytes) */
+  estimatedSizeBytes: number;
 }

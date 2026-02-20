@@ -4,9 +4,9 @@
  * Three Lil_Hawks that handle all JSON operations across the AIMS platform:
  * parsing, validation, transformation, schema generation, and n8n node config.
  *
- *   JSON_PARSE_LIL_HAWK      — Parses, validates, and repairs malformed JSON
- *   JSON_TRANSFORM_LIL_HAWK  — Transforms JSON between schemas (n8n node ↔ API ↔ DB)
- *   JSON_SCHEMA_LIL_HAWK     — Generates/validates JSON schemas for workflows and APIs
+ *   Lil_JSON_Parse_Hawk      — Validates, repairs, normalizes malformed JSON
+ *   Lil_JSON_Transform_Hawk  — Transforms between schemas using field mapping with dot notation
+ *   Lil_JSON_Schema_Hawk     — Generates JSON Schema 2020-12 from sample data
  *
  * Works closely with Node_Trigger_Ang and the WORKFLOW_SMITH_SQUAD.
  *
@@ -25,22 +25,22 @@ import type { LilHawkProfile } from './types';
 
 export const JSON_SQUAD_PROFILES: LilHawkProfile[] = [
   {
-    id: 'JSON_PARSE_LIL_HAWK',
-    name: 'JSON_PARSE_LIL_HAWK',
+    id: 'Lil_JSON_Parse_Hawk',
+    name: 'Lil_JSON_Parse_Hawk',
     squad: 'json-expert',
     role: 'JSON Parser — validates, repairs, and normalizes JSON payloads',
     gate: false,
   },
   {
-    id: 'JSON_TRANSFORM_LIL_HAWK',
-    name: 'JSON_TRANSFORM_LIL_HAWK',
+    id: 'Lil_JSON_Transform_Hawk',
+    name: 'Lil_JSON_Transform_Hawk',
     squad: 'json-expert',
     role: 'JSON Transformer — converts between schemas, maps fields, restructures payloads',
     gate: false,
   },
   {
-    id: 'JSON_SCHEMA_LIL_HAWK',
-    name: 'JSON_SCHEMA_LIL_HAWK',
+    id: 'Lil_JSON_Schema_Hawk',
+    name: 'Lil_JSON_Schema_Hawk',
     squad: 'json-expert',
     role: 'Schema Expert — generates JSON Schema, validates against specs, types n8n node configs',
     gate: true,
@@ -309,7 +309,7 @@ function handleParse(input: AgentTaskInput, logs: string[]): AgentTaskOutput {
     return makeOutput(
       input.taskId,
       'json-expert-squad',
-      'JSON_PARSE_LIL_HAWK ready. Provide JSON to parse/repair via context.json or inline in the query.',
+      'Lil_JSON_Parse_Hawk ready. Provide JSON to parse/repair via context.json or inline in the query.',
       ['[json-parse] Awaiting input'],
       logs,
     );
@@ -349,7 +349,7 @@ function handleSchema(input: AgentTaskInput, logs: string[]): AgentTaskOutput {
     return makeOutput(
       input.taskId,
       'json-expert-squad',
-      'JSON_SCHEMA_LIL_HAWK ready. Provide a sample JSON object to generate a schema from.',
+      'Lil_JSON_Schema_Hawk ready. Provide a sample JSON object to generate a schema from.',
       ['[json-schema] Awaiting input'],
       logs,
     );
@@ -380,7 +380,7 @@ function handleTransform(input: AgentTaskInput, logs: string[]): AgentTaskOutput
     return makeOutput(
       input.taskId,
       'json-expert-squad',
-      'JSON_TRANSFORM_LIL_HAWK ready. Provide context.json (source data) and context.mapping (field map: { targetField: "source.path" }).',
+      'Lil_JSON_Transform_Hawk ready. Provide context.json (source data) and context.mapping (field map: { targetField: "source.path" }).',
       ['[json-transform] Awaiting input'],
       logs,
     );

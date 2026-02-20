@@ -23,8 +23,10 @@ import type {
   RecallResult,
   MemoryFeedback,
   MemoryStats,
+  MemoryStorageConfig,
   ExecutionOutcome,
 } from './types';
+import { DEFAULT_STORAGE_CONFIG } from './types';
 
 // Re-export types
 export type {
@@ -35,18 +37,64 @@ export type {
   RecallResult,
   MemoryFeedback,
   MemoryStats,
+  MemoryStorageConfig,
   ExecutionOutcome,
 } from './types';
+export { DEFAULT_STORAGE_CONFIG } from './types';
 
 // ── Memory Engine ───────────────────────────────────────────────
 
 export class MemoryEngine {
   private store: MemoryStore;
   private retriever: MemoryRetriever;
+  private maintenanceTimer: ReturnType<typeof setInterval> | null = null;
 
-  constructor() {
-    this.store = getMemoryStore();
+  constructor(config?: Partial<MemoryStorageConfig>) {
+    this.store = getMemoryStore(config);
     this.retriever = getMemoryRetriever();
+    this.startMaintenance();
+  }
+
+  /**
+   * Start periodic maintenance (purge expired, decay old, evict over-cap).
+   * Runs once immediately on startup, then on the configured interval.
+   */
+  private startMaintenance(): void {
+    const intervalMs = this.store.getConfig().maintenanceIntervalMs;
+    if (intervalMs <= 0) return;
+
+    // Run once on startup (deferred so it doesn't block init)
+    setTimeout(() => {
+      try { this.store.runMaintenance(); } catch (e) {
+        logger.warn({ err: (e as Error).message }, '[Memory] Startup maintenance failed');
+      }
+    }, 5_000);
+
+    // Schedule periodic runs
+    this.maintenanceTimer = setInterval(() => {
+      try { this.store.runMaintenance(); } catch (e) {
+        logger.warn({ err: (e as Error).message }, '[Memory] Periodic maintenance failed');
+      }
+    }, intervalMs);
+
+    // Don't keep the process alive just for maintenance
+    if (this.maintenanceTimer.unref) {
+      this.maintenanceTimer.unref();
+    }
+
+    logger.info(
+      { intervalMs, intervalHours: Math.round(intervalMs / 3_600_000) },
+      '[Memory] Maintenance scheduler started'
+    );
+  }
+
+  /** Stop the maintenance scheduler (for graceful shutdown). */
+  stopMaintenance(): void {
+    if (this.maintenanceTimer) {
+      clearInterval(this.maintenanceTimer);
+      this.maintenanceTimer = null;
+      logger.info('[Memory] Maintenance scheduler stopped');
+    }
   }
 
   // ── Manual Operations ───────────────────────────────────────
@@ -241,6 +289,16 @@ export class MemoryEngine {
   /** Decay relevance for old unused memories. */
   decayRelevance(ageDays?: number): number {
     return this.store.decayRelevance(ageDays);
+  }
+
+  /** Run full maintenance: purge + decay + evict. */
+  runMaintenance(): { purged: number; decayed: number; evicted: number } {
+    return this.store.runMaintenance();
+  }
+
+  /** Get the storage configuration. */
+  getStorageConfig(): MemoryStorageConfig {
+    return this.store.getConfig();
   }
 
   /**

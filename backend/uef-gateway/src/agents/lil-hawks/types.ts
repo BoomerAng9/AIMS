@@ -36,9 +36,9 @@ export type LilHawkId =
   | 'SIGNAL_LIL_HAWK'
   | 'COMPLIANCE_LIL_HAWK'
   // JSON_EXPERT_SQUAD — JSON Parsing/Transformation
-  | 'JSON_PARSE_LIL_HAWK'
-  | 'JSON_TRANSFORM_LIL_HAWK'
-  | 'JSON_SCHEMA_LIL_HAWK';
+  | 'Lil_JSON_Parse_Hawk'
+  | 'Lil_JSON_Transform_Hawk'
+  | 'Lil_JSON_Schema_Hawk';
 
 export type SquadId = 'prep-squad-alpha' | 'workflow-smith' | 'vision-scout' | 'json-expert';
 
