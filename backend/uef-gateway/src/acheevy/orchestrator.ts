@@ -21,6 +21,7 @@ import { spawnAgent, decommissionAgent, getRoster, getAvailableRoster } from '..
 import type { SpawnRequest, EnvironmentTarget } from '../deployment-hub';
 import { getMemoryEngine } from '../memory';
 import type { ExecutionOutcome } from '../memory';
+import { agentChat } from '../llm';
 import logger from '../logger';
 
 // Vertical definitions: pure data (no gateway imports), loaded at runtime
@@ -739,13 +740,39 @@ export class AcheevyOrchestrator {
           taskId: chResult.manifestId,
         };
       } catch {
-        // Both engines offline — use LLM stream directly
+        // Both engines offline — fall back to direct LLM chat
+        logger.warn({ requestId }, '[ACHEEVY] Both II-Agent and Chicken Hawk offline — falling back to LLM');
+        try {
+          const llmResult = await agentChat({
+            agentId: 'acheevy-chat',
+            query: req.message,
+            intent: req.intent || 'conversation',
+            context: req.context?.history ? JSON.stringify(req.context.history) : undefined,
+            userId: req.userId,
+            sessionId: req.conversationId,
+          });
+          if (llmResult?.content) {
+            return {
+              requestId,
+              status: 'completed',
+              reply: llmResult.content,
+              data: { quote: estimate, provider: 'llm-fallback', model: llmResult.model },
+              lucUsage: {
+                service: 'api_calls',
+                amount: llmResult.tokens?.total ? Math.ceil(llmResult.tokens.total / 1000) : 1,
+              },
+            };
+          }
+        } catch (llmErr) {
+          logger.error({ err: llmErr, requestId }, '[ACHEEVY] LLM fallback also failed');
+        }
+        // Last resort: queued status (no fake responses)
         return {
           requestId,
-          status: 'completed',
-          reply: `I've analyzed your request: "${req.message}". The execution engine is currently warming up. Your task has been noted and will be processed shortly.`,
+          status: 'queued',
+          reply: 'All execution engines are currently starting up. Your request has been queued and will be processed as soon as a provider comes online.',
           data: { quote: estimate },
-          lucUsage: { service: 'api_calls', amount: 1 },
+          taskId: `queued_${requestId}`,
         };
       }
     }

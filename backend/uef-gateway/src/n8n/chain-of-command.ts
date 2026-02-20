@@ -15,6 +15,7 @@
  */
 
 import { v4 as uuidv4 } from 'uuid';
+import { createHash } from 'crypto';
 import logger from '../logger';
 import { registry } from '../agents/registry';
 import type { AgentTaskInput, AgentTaskOutput, AgentId } from '../agents/types';
@@ -432,14 +433,8 @@ function sealReceipt(packet: PmoPipelinePacket): PmoPipelinePacket {
 
   const receiptId = `RCP-${uuidv4().slice(0, 8).toUpperCase()}`;
 
-  // Simple hash for audit trail (production would use crypto.createHash)
   const hashInput = `${shift.shiftId}|${receiptId}|${exec.completedSteps}|${verification.passed}`;
-  let hash = 0;
-  for (let i = 0; i < hashInput.length; i++) {
-    hash = ((hash << 5) - hash) + hashInput.charCodeAt(i);
-    hash = hash & hash;
-  }
-  const receiptHash = `sha256-${Math.abs(hash).toString(16).padStart(16, '0')}`;
+  const receiptHash = `sha256-${createHash('sha256').update(hashInput).digest('hex')}`;
 
   let shiftStatus: ShiftStatus = 'completed';
   if (!verification.passed) shiftStatus = 'completed_with_warnings';
