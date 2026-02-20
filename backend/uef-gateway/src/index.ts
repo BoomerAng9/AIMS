@@ -71,6 +71,11 @@ import type { CreatePlaygroundRequest, ExecuteInPlaygroundRequest } from './play
 import { getMemoryEngine } from './memory';
 import type { RememberInput, RecallQuery, MemoryFeedback } from './memory';
 
+// Twelve Labs Video Intelligence + ScoutVerify
+import { getTwelveLabsClient } from './twelve-labs';
+import { runScoutVerify } from './perform/scout-verify';
+import type { ScoutVerifyInput } from './perform/scout-verify';
+
 const app = express();
 const PORT = process.env.PORT || 3001;
 const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY || '';
@@ -259,6 +264,158 @@ app.all('/api/perform/war-room/*', async (req, res) => {
   } catch (error: unknown) {
     logger.error({ err: error }, 'Per|Form War Room proxy error');
     res.status(502).json({ error: 'War Room unreachable' });
+  }
+});
+
+// --------------------------------------------------------------------------
+// Per|Form Film Room — Twelve Labs Video Intelligence + ScoutVerify
+// Powered by Twelve Labs Marengo (search/embeddings) + Pegasus (generation)
+// --------------------------------------------------------------------------
+
+// Film Room: Check Twelve Labs integration status
+app.get('/api/perform/film-room/status', async (_req, res) => {
+  const client = getTwelveLabsClient();
+  if (!client) {
+    res.json({ status: 'disabled', reason: 'TWELVELABS_API_KEY not configured' });
+    return;
+  }
+  const healthy = await client.healthCheck();
+  res.json({ status: healthy ? 'connected' : 'error', provider: 'twelve-labs' });
+});
+
+// Film Room: List video indexes
+app.get('/api/perform/film-room/indexes', async (_req, res) => {
+  const client = getTwelveLabsClient();
+  if (!client) { res.status(503).json({ error: 'Twelve Labs not configured' }); return; }
+  try {
+    const indexes = await client.listIndexes();
+    res.json(indexes);
+  } catch (err) {
+    logger.error({ err }, '[FilmRoom] Failed to list indexes');
+    res.status(500).json({ error: 'Failed to list indexes' });
+  }
+});
+
+// Film Room: Create a new video index
+app.post('/api/perform/film-room/indexes', async (req, res) => {
+  const client = getTwelveLabsClient();
+  if (!client) { res.status(503).json({ error: 'Twelve Labs not configured' }); return; }
+  const { name } = req.body;
+  if (!name || typeof name !== 'string') {
+    res.status(400).json({ error: 'name is required' });
+    return;
+  }
+  try {
+    const index = await client.createIndex(name);
+    res.json(index);
+  } catch (err) {
+    logger.error({ err }, '[FilmRoom] Failed to create index');
+    res.status(500).json({ error: 'Failed to create index' });
+  }
+});
+
+// Film Room: Index a video by URL
+app.post('/api/perform/film-room/videos', async (req, res) => {
+  const client = getTwelveLabsClient();
+  if (!client) { res.status(503).json({ error: 'Twelve Labs not configured' }); return; }
+  const { indexId, videoUrl, metadata } = req.body;
+  if (!indexId || !videoUrl) {
+    res.status(400).json({ error: 'indexId and videoUrl are required' });
+    return;
+  }
+  try {
+    const task = await client.indexVideoByUrl(indexId, videoUrl, metadata);
+    res.json(task);
+  } catch (err) {
+    logger.error({ err }, '[FilmRoom] Failed to index video');
+    res.status(500).json({ error: 'Failed to index video' });
+  }
+});
+
+// Film Room: Check video indexing task status
+app.get('/api/perform/film-room/tasks/:taskId', async (req, res) => {
+  const client = getTwelveLabsClient();
+  if (!client) { res.status(503).json({ error: 'Twelve Labs not configured' }); return; }
+  try {
+    const task = await client.getTask(req.params.taskId);
+    res.json(task);
+  } catch (err) {
+    logger.error({ err }, '[FilmRoom] Failed to get task status');
+    res.status(500).json({ error: 'Failed to get task status' });
+  }
+});
+
+// Film Room: Semantic search over game film
+app.post('/api/perform/film-room/search', async (req, res) => {
+  const client = getTwelveLabsClient();
+  if (!client) { res.status(503).json({ error: 'Twelve Labs not configured' }); return; }
+  const { indexId, query, options } = req.body;
+  if (!indexId || !query) {
+    res.status(400).json({ error: 'indexId and query are required' });
+    return;
+  }
+  try {
+    const results = await client.search(indexId, query, options);
+    res.json(results);
+  } catch (err) {
+    logger.error({ err }, '[FilmRoom] Search failed');
+    res.status(500).json({ error: 'Search failed' });
+  }
+});
+
+// Film Room: Generate scouting report from video
+app.post('/api/perform/film-room/report', async (req, res) => {
+  const client = getTwelveLabsClient();
+  if (!client) { res.status(503).json({ error: 'Twelve Labs not configured' }); return; }
+  const { videoId, prompt } = req.body;
+  if (!videoId) {
+    res.status(400).json({ error: 'videoId is required' });
+    return;
+  }
+  try {
+    const report = await client.generate(
+      videoId,
+      prompt || 'Generate a professional scouting report from this game film. Include strengths, areas for improvement, bull case, bear case, and an overall verdict with specific play examples.'
+    );
+    res.json(report);
+  } catch (err) {
+    logger.error({ err }, '[FilmRoom] Report generation failed');
+    res.status(500).json({ error: 'Report generation failed' });
+  }
+});
+
+// Film Room: Summarize game film
+app.post('/api/perform/film-room/summarize', async (req, res) => {
+  const client = getTwelveLabsClient();
+  if (!client) { res.status(503).json({ error: 'Twelve Labs not configured' }); return; }
+  const { videoId, type, prompt } = req.body;
+  if (!videoId) {
+    res.status(400).json({ error: 'videoId is required' });
+    return;
+  }
+  try {
+    const summary = await client.summarize(videoId, type || 'summary', prompt);
+    res.json(summary);
+  } catch (err) {
+    logger.error({ err }, '[FilmRoom] Summarize failed');
+    res.status(500).json({ error: 'Summarize failed' });
+  }
+});
+
+// ScoutVerify: Automated prospect evaluation verification
+app.post('/api/perform/scout-verify', async (req, res) => {
+  const { prospectName, videoId, videoUrl, position, school, classYear } = req.body;
+  if (!prospectName || typeof prospectName !== 'string') {
+    res.status(400).json({ error: 'prospectName is required' });
+    return;
+  }
+  try {
+    const input: ScoutVerifyInput = { prospectName, videoId, videoUrl, position, school, classYear };
+    const report = await runScoutVerify(input);
+    res.json(report);
+  } catch (err) {
+    logger.error({ err }, '[ScoutVerify] Verification failed');
+    res.status(500).json({ error: 'ScoutVerify pipeline failed' });
   }
 });
 
