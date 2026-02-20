@@ -492,7 +492,7 @@ app.post('/acheevy/execute', async (req, res) => {
 
     const orchestrator = getOrchestrator();
     const result = await orchestrator.execute({
-      userId: userId || 'web-user',
+      userId: userId || req.headers['x-user-id'] as string || 'anon-unknown',
       message,
       intent,
       conversationId: conversationId || 'chat-ui',

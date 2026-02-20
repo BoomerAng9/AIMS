@@ -18,14 +18,18 @@ function gatewayHeaders(): Record<string, string> {
 
 export async function GET(request: NextRequest) {
   try {
-    const userId = request.nextUrl.searchParams.get('userId') || 'web-user';
+    const userId = request.nextUrl.searchParams.get('userId')
+      || request.headers.get('x-user-id')
+      || 'anon-unknown';
     const res = await fetch(`${UEF_GATEWAY_URL}/custom-hawks?userId=${userId}`, {
       headers: gatewayHeaders(),
     });
     const data = await res.json();
     return NextResponse.json(data, { status: res.status });
   } catch (error) {
-    return NextResponse.json({ hawks: [], count: 0, userId: 'web-user' });
+    const msg = error instanceof Error ? error.message : 'Custom hawks fetch failed';
+    console.error('[Custom Hawks API] GET error:', msg);
+    return NextResponse.json({ hawks: [], count: 0, error: msg }, { status: 502 });
   }
 }
 

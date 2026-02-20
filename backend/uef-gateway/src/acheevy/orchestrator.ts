@@ -372,7 +372,8 @@ export class AcheevyOrchestrator {
         data: { artifacts: result.artifacts },
         lucUsage: { service: 'brave_searches', amount: 5 },
       };
-    } catch {
+    } catch (iiErr) {
+      logger.warn({ err: iiErr instanceof Error ? iiErr.message : iiErr, requestId }, '[ACHEEVY] II-Agent offline for Perform, trying Chicken Hawk');
       // Fallback: Chicken Hawk
       try {
         const manifest = buildManifest(requestId, 'research', req.message, req.userId, { vertical: 'perform' });
@@ -385,7 +386,8 @@ export class AcheevyOrchestrator {
           lucUsage: { service: 'brave_searches', amount: 5 },
           taskId: chResult.manifestId,
         };
-      } catch {
+      } catch (chErr) {
+        logger.error({ err: chErr instanceof Error ? chErr.message : chErr, requestId }, '[ACHEEVY] Chicken Hawk also offline for Perform');
         return {
           requestId,
           status: 'queued',
@@ -430,7 +432,8 @@ export class AcheevyOrchestrator {
         data: { skillId, artifacts: result.artifacts },
         lucUsage: { service: 'api_calls', amount: 1 },
       };
-    } catch {
+    } catch (iiErr) {
+      logger.warn({ err: iiErr instanceof Error ? iiErr.message : iiErr, requestId, skillId }, '[ACHEEVY] II-Agent offline for skill, trying Chicken Hawk');
       // Fallback: Chicken Hawk
       try {
         const manifest = buildManifest(requestId, taskType, req.message, req.userId, { skillId });
@@ -443,7 +446,8 @@ export class AcheevyOrchestrator {
           lucUsage: { service: 'api_calls', amount: 1 },
           taskId: chResult.manifestId,
         };
-      } catch {
+      } catch (chErr) {
+        logger.error({ err: chErr instanceof Error ? chErr.message : chErr, requestId, skillId }, '[ACHEEVY] Chicken Hawk also offline for skill');
         return {
           requestId,
           status: 'queued',
@@ -484,7 +488,8 @@ export class AcheevyOrchestrator {
           amount: result.metrics.stepsCompleted + 1,
         },
       };
-    } catch {
+    } catch (n8nErr) {
+      logger.warn({ err: n8nErr instanceof Error ? n8nErr.message : n8nErr, requestId }, '[ACHEEVY] n8n PMO pipeline failed, trying Chicken Hawk');
       // Fallback: Chicken Hawk for PMO routing
       try {
         const manifest = buildManifest(requestId, 'research', req.message, req.userId, { pmo: true });
@@ -497,7 +502,8 @@ export class AcheevyOrchestrator {
           lucUsage: { service: 'api_calls', amount: 1 },
           taskId: chResult.manifestId,
         };
-      } catch {
+      } catch (chErr) {
+        logger.error({ err: chErr instanceof Error ? chErr.message : chErr, requestId }, '[ACHEEVY] Chicken Hawk also offline for PMO');
         return {
           requestId,
           status: 'queued',
@@ -564,7 +570,8 @@ export class AcheevyOrchestrator {
           amount: result.pipeline?.steps.length || 1,
         },
       };
-    } catch {
+    } catch (execErr) {
+      logger.warn({ err: execErr instanceof Error ? execErr.message : execErr, requestId, verticalId }, '[ACHEEVY] Vertical execution failed, trying Chicken Hawk');
       // Fallback: Chicken Hawk
       try {
         const manifest = buildManifest(requestId, 'research', req.message, req.userId, { verticalId, verticalName: vertical.name });
@@ -577,7 +584,8 @@ export class AcheevyOrchestrator {
           lucUsage: { service: 'vertical_execution', amount: 1 },
           taskId: chResult.manifestId,
         };
-      } catch {
+      } catch (chErr) {
+        logger.error({ err: chErr instanceof Error ? chErr.message : chErr, requestId, verticalId }, '[ACHEEVY] Chicken Hawk also offline for vertical');
         return {
           requestId,
           status: 'queued',

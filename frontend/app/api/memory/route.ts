@@ -19,7 +19,9 @@ function gatewayHeaders(): Record<string, string> {
 // GET /api/memory — List memories or stats
 export async function GET(request: NextRequest) {
   try {
-    const userId = request.nextUrl.searchParams.get('userId') || 'web-user';
+    const userId = request.nextUrl.searchParams.get('userId')
+      || request.headers.get('x-user-id')
+      || 'anon-unknown';
     const action = request.nextUrl.searchParams.get('action');
 
     if (action === 'stats') {
