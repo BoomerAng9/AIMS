@@ -15,6 +15,8 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { User, Play, Pause, RotateCcw } from 'lucide-react';
 import type { Message } from 'ai';
+import { motion } from 'framer-motion';
+import { fadeInUp } from '@/lib/motion/tokens';
 import { ReadReceiptChip } from '@/components/chat/ReadReceipt';
 import type { ReadReceipt } from '@/lib/acheevy/read-receipt';
 
@@ -61,12 +63,15 @@ const AcheevyMessage = memo(function AcheevyMessage({
   onReplay,
 }: AcheevyMessageProps) {
   return (
-    <div className="flex flex-col gap-1">
+    <motion.div
+      variants={fadeInUp}
+      // Assuming a staggerContainer is wrapping these messages in AcheevyChat
+      className="flex flex-col gap-1"
+    >
       <div className={`flex gap-3 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
         {m.role === 'assistant' && (
-          <div className={`w-7 h-7 rounded-lg bg-white/5 border border-gold/10 flex items-center justify-center flex-shrink-0 mt-0.5 overflow-hidden ${
-            isSpeaking ? 'ring-2 ring-gold/40 animate-pulse' : ''
-          }`}>
+          <div className={`w-7 h-7 rounded-lg bg-gold/10 border border-gold/30 flex items-center justify-center flex-shrink-0 mt-0.5 overflow-hidden shadow-[inset_0_0_15px_rgba(214,175,55,0.05)] ${isSpeaking ? 'ring-2 ring-gold/40 animate-pulse' : ''
+            }`}>
             <Image
               src="/images/acheevy/acheevy-helmet.png"
               alt="ACHEEVY"
@@ -76,11 +81,10 @@ const AcheevyMessage = memo(function AcheevyMessage({
             />
           </div>
         )}
-        <div className={`relative group px-4 py-3 rounded-2xl text-base leading-relaxed max-w-[85%] ${
-          m.role === 'user'
-            ? 'bg-gold/10 text-white rounded-tr-sm border border-gold/20'
-            : 'wireframe-card text-white/90 rounded-tl-sm'
-        }`}>
+        <div className={`relative group px-4 py-3 rounded-2xl text-base leading-relaxed max-w-[85%] ${m.role === 'user'
+            ? 'bg-white/5 text-white rounded-tr-sm border border-wireframe-stroke shadow-sm'
+            : 'glass-card border border-gold/10 bg-[#0a0a0a]/60 text-white/90 rounded-tl-sm shadow-[0_4px_20px_-4px_rgba(0,0,0,0.5)]'
+          }`}>
           {m.role === 'user' ? (
             m.content
           ) : (
@@ -136,7 +140,7 @@ const AcheevyMessage = memo(function AcheevyMessage({
           <ReadReceiptChip receipt={readReceipt} />
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }, areEqual);
 

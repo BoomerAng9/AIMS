@@ -72,3 +72,50 @@ export const reducedMotion = {
   duration: 0,
   ease: "linear" as const,
 };
+
+// ── Application Variants ──
+
+import type { Variants } from "framer-motion";
+
+export const fadeInUp: Variants = {
+  hidden: { opacity: 0, y: 10 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      ...spring.snappy,
+      staggerChildren: stagger.fast
+    }
+  },
+};
+
+export const hoverLiftGlow: Variants = {
+  rest: {
+    y: 0,
+    boxShadow: "0 0 0 rgba(212, 175, 55, 0)",
+    borderColor: "rgba(255, 255, 255, 0.1)",
+  },
+  hover: {
+    y: -4,
+    boxShadow: "0 8px 16px -4px rgba(212, 175, 55, 0.15)",
+    borderColor: "rgba(212, 175, 55, 0.3)",
+    transition: spring.snappy
+  },
+  tap: {
+    y: 0,
+    scale: 0.98,
+    transition: spring.bouncy
+  }
+};
+
+export const fadeOpacity: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: transition.normal
+  },
+  exit: {
+    opacity: 0,
+    transition: transition.fast
+  }
+};

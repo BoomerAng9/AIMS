@@ -166,7 +166,7 @@ export function FloatingACHEEVY() {
               alt=""
               className="w-6 h-6 rounded-md border border-black/20"
             />
-            <span>Chat w/ACHEEVY</span>
+            <span className="font-doto tracking-[0.2em] uppercase text-black font-bold">chat w/ A C H E E V Y</span>
           </motion.button>
         )}
       </AnimatePresence>
@@ -198,9 +198,11 @@ export function FloatingACHEEVY() {
                     className="w-full h-full object-cover"
                   />
                 </div>
-                <div>
-                  <p className="text-sm font-semibold text-white">ACHEEVY</p>
-                  <p className="text-[10px] text-gold/60 font-mono uppercase tracking-wider">AI Executive Orchestrator</p>
+                <div className="flex flex-col justify-center">
+                  <span className="text-[11px] font-doto tracking-[0.3em] text-gold-gradient uppercase glitch-text-hover leading-tight">
+                    chat w/ A C H E E V Y
+                  </span>
+                  <p className="text-[9px] text-white/40 font-mono uppercase tracking-widest mt-0.5">Executive Orchestrator</p>
                 </div>
               </div>
               <button
@@ -234,11 +236,10 @@ export function FloatingACHEEVY() {
                   className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
-                    className={`max-w-[85%] rounded-xl px-3.5 py-2.5 text-sm leading-relaxed ${
-                      msg.role === 'user'
+                    className={`max-w-[85%] rounded-xl px-3.5 py-2.5 text-sm leading-relaxed ${msg.role === 'user'
                         ? 'bg-gold/15 border border-gold/20 text-white'
                         : 'bg-white/5 border border-wireframe-stroke text-white/80'
-                    }`}
+                      }`}
                   >
                     <p className="whitespace-pre-wrap">{msg.content}</p>
                   </div>
