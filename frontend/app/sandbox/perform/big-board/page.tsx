@@ -10,7 +10,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Search, Download, Settings, ChevronLeft, ChevronRight, CheckCircle2 } from 'lucide-react';
+import { Search, Download, Settings, ChevronLeft, ChevronRight, CheckCircle2, TrendingUp, ArrowLeft } from 'lucide-react';
 import type { Prospect } from '@/lib/perform/types';
 import { TIER_STYLES, getProspectSlug } from '@/lib/perform/types';
 import { staggerContainer, staggerItem } from '@/lib/motion/variants';

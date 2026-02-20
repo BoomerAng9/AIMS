@@ -26,7 +26,7 @@ import {
   Users,
   ListOrdered,
 } from 'lucide-react';
-import type { Prospect, ContentArticle } from '@/lib/perform/types';
+import type { Prospect, ContentArticle, Tier } from '@/lib/perform/types';
 import { TIER_STYLES, getScoreColor, getProspectSlug } from '@/lib/perform/types';
 
 export default function PerFormHub() {
@@ -277,7 +277,7 @@ export default function PerFormHub() {
 
           <div className="wireframe-card rounded-2xl overflow-hidden">
             {topProspects.map((prospect, i) => {
-              const tierStyle = TIER_STYLES[prospect.tier];
+              const tierStyle = TIER_STYLES[prospect.tier as Tier];
               return (
                 <Link
                   key={prospect.id}
