@@ -2356,6 +2356,7 @@ export const server = app.listen(PORT, () => {
 function shutdown(signal: string) {
   logger.info({ signal }, '[UEF] Received shutdown signal, draining connections...');
   stopCleanupSchedule();
+  memoryEngine.stopMaintenance();
   server.close(() => {
     closeDb();
     logger.info('[UEF] All connections drained. DB closed. Exiting.');
