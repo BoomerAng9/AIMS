@@ -582,8 +582,8 @@ gates, overlay visibility, and evaluation KPIs. **No agent exists without a card
 | `scribe-ang.json` | Scribe_Ang | Creative & Presentation PMO | Frosty White #EDEDED |
 | `lab-ang.json` | Lab_Ang | R&D & Experimental PMO | Green #22C55E |
 | `index-ang.json` | Index_Ang | Intelligence & Research PMO | Gold #D4AF37 |
-| `picker-ang.json` | Picker_Ang | Creative Engineering PMO | Violet #8B5CF6 |
-| `buildsmith.json` | Buildsmith | Creative Engineering PMO | Forge Orange #F97316 |
+| `picker-ang.json` | Picker_Ang | Creative Engineering PMO | Blue #3B82F6 |
+| `buildsmith.json` | Buildsmith | Creative Engineering PMO | Orange-Gold #E5A530 |
 
 ### Boomer_Ang Visual Identity
 All Boomer_Angs follow the canonical visual spec in `aims-skills/brains/BOOMER_ANG_VISUAL_IDENTITY.md`.

@@ -13,11 +13,11 @@
     "communication_style": "methodical"
   },
   "visual_identity": {
-    "accent_color": "#F97316",
-    "accent_name": "Forge Orange",
+    "accent_color": "#E5A530",
+    "accent_name": "Orange-Gold",
     "helmet_style": "Welding visor with blueprint HUD overlay",
     "role_tool": "Build hammer and assembly frame",
-    "description": "Powerful digital humanoid in obsidian armor with forge-orange accent veins that glow brighter during active builds. Welding visor projects blueprint overlays showing component assembly in real-time. ANG in gold on chest plate — but notably, the name reads BUILDSMITH, not Buildsmith_Ang. AIMS logo on upper arm. Gloved hands wield a build hammer that shapes raw selections into finished products. The master builder — accredited with every finished piece."
+    "description": "Powerful digital humanoid in obsidian armor with orange-gold accent veins that glow brighter during active builds. Welding visor projects blueprint overlays showing component assembly in real-time. ANG in gold on chest plate — but notably, the name reads BUILDSMITH, not Buildsmith_Ang. AIMS logo on upper arm. Gloved hands wield a build hammer that shapes raw selections into finished products. The master builder — accredited with every finished piece."
   },
   "chain_of_command": {
     "reports_to": "ACHEEVY",

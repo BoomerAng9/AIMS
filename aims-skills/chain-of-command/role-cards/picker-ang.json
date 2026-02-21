@@ -13,11 +13,11 @@
     "communication_style": "decisive"
   },
   "visual_identity": {
-    "accent_color": "#8B5CF6",
-    "accent_name": "Violet",
+    "accent_color": "#3B82F6",
+    "accent_name": "Blue",
     "helmet_style": "Faceted gem visor with prismatic refraction lenses",
     "role_tool": "Component scanner and pattern matcher",
-    "description": "Sharp digital humanoid in obsidian armor with violet accent lines that pulse when scanning the NtNtN Engine library. Faceted gem visor refracts light into component spectra during selection analysis. ANG in gold on chest plate. AIMS logo on upper arm. Gloved hands hold a holographic component picker — a rotating carousel of frameworks, patterns, and techniques. The curator of the creative stack — picks precisely, never overloads."
+    "description": "Sharp digital humanoid in obsidian armor with blue accent lines that pulse when scanning the NtNtN Engine library. Faceted gem visor refracts light into component spectra during selection analysis. ANG in gold on chest plate. AIMS logo on upper arm. Gloved hands hold a holographic component picker — a rotating carousel of frameworks, patterns, and techniques. The curator of the creative stack — picks precisely, never overloads."
   },
   "chain_of_command": {
     "reports_to": "ACHEEVY",
