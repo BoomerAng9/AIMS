@@ -20,8 +20,10 @@ export type AgentId =
   | 'chicken-hawk'
   | 'research-ang'
   | 'router-ang'
+  | 'node-trigger-ang'
   | 'workflow-smith-squad'
   | 'vision-scout-squad'
+  | 'json-expert-squad'
   // Boomer_Ang roster (spawnable via Deployment Hub)
   | 'scout-ang'
   | 'opsconsole-ang'

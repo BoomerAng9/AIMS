@@ -14,6 +14,7 @@ import { runAthletePageFactory } from './perform/pipeline/athlete-page-factory';
 import { SQUAD_PROFILES } from './agents/lil-hawks/workflow-smith-squad';
 import { VISION_SQUAD_PROFILES } from './agents/lil-hawks/vision-scout-squad';
 import { PREP_SQUAD_PROFILES, runPrepSquad } from './agents/lil-hawks/prep-squad-alpha';
+import { JSON_SQUAD_PROFILES } from './agents/lil-hawks/json-expert-squad';
 import { pmoRegistry } from './pmo/registry';
 import { houseOfAng } from './pmo/house-of-ang';
 import { runCollaborationDemo, renderJSON } from './collaboration';
@@ -47,6 +48,7 @@ import { lucProjectService } from './shelves/luc-project-service';
 import { allShelfTools } from './shelves/mcp-tools';
 import { ossModels } from './llm/oss-models';
 import { personaplex } from './llm/personaplex';
+import { N8nClient } from './n8n';
 import logger from './logger';
 
 // Custom Lil_Hawks — User-Created Bots
@@ -64,6 +66,15 @@ import {
   getPlaygroundStats,
 } from './playground';
 import type { CreatePlaygroundRequest, ExecuteInPlaygroundRequest } from './playground';
+
+// Memory System — Persistent Agent Memory
+import { getMemoryEngine } from './memory';
+import type { RememberInput, RecallQuery, MemoryFeedback } from './memory';
+
+// Twelve Labs Video Intelligence + ScoutVerify
+import { getTwelveLabsClient } from './twelve-labs';
+import { runScoutVerify } from './perform/scout-verify';
+import type { ScoutVerifyInput } from './perform/scout-verify';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -253,6 +264,158 @@ app.all('/api/perform/war-room/*', async (req, res) => {
   } catch (error: unknown) {
     logger.error({ err: error }, 'Per|Form War Room proxy error');
     res.status(502).json({ error: 'War Room unreachable' });
+  }
+});
+
+// --------------------------------------------------------------------------
+// Per|Form Film Room — Twelve Labs Video Intelligence + ScoutVerify
+// Powered by Twelve Labs Marengo (search/embeddings) + Pegasus (generation)
+// --------------------------------------------------------------------------
+
+// Film Room: Check Twelve Labs integration status
+app.get('/api/perform/film-room/status', async (_req, res) => {
+  const client = getTwelveLabsClient();
+  if (!client) {
+    res.json({ status: 'disabled', reason: 'TWELVELABS_API_KEY not configured' });
+    return;
+  }
+  const healthy = await client.healthCheck();
+  res.json({ status: healthy ? 'connected' : 'error', provider: 'twelve-labs' });
+});
+
+// Film Room: List video indexes
+app.get('/api/perform/film-room/indexes', async (_req, res) => {
+  const client = getTwelveLabsClient();
+  if (!client) { res.status(503).json({ error: 'Twelve Labs not configured' }); return; }
+  try {
+    const indexes = await client.listIndexes();
+    res.json(indexes);
+  } catch (err) {
+    logger.error({ err }, '[FilmRoom] Failed to list indexes');
+    res.status(500).json({ error: 'Failed to list indexes' });
+  }
+});
+
+// Film Room: Create a new video index
+app.post('/api/perform/film-room/indexes', async (req, res) => {
+  const client = getTwelveLabsClient();
+  if (!client) { res.status(503).json({ error: 'Twelve Labs not configured' }); return; }
+  const { name } = req.body;
+  if (!name || typeof name !== 'string') {
+    res.status(400).json({ error: 'name is required' });
+    return;
+  }
+  try {
+    const index = await client.createIndex(name);
+    res.json(index);
+  } catch (err) {
+    logger.error({ err }, '[FilmRoom] Failed to create index');
+    res.status(500).json({ error: 'Failed to create index' });
+  }
+});
+
+// Film Room: Index a video by URL
+app.post('/api/perform/film-room/videos', async (req, res) => {
+  const client = getTwelveLabsClient();
+  if (!client) { res.status(503).json({ error: 'Twelve Labs not configured' }); return; }
+  const { indexId, videoUrl, metadata } = req.body;
+  if (!indexId || !videoUrl) {
+    res.status(400).json({ error: 'indexId and videoUrl are required' });
+    return;
+  }
+  try {
+    const task = await client.indexVideoByUrl(indexId, videoUrl, metadata);
+    res.json(task);
+  } catch (err) {
+    logger.error({ err }, '[FilmRoom] Failed to index video');
+    res.status(500).json({ error: 'Failed to index video' });
+  }
+});
+
+// Film Room: Check video indexing task status
+app.get('/api/perform/film-room/tasks/:taskId', async (req, res) => {
+  const client = getTwelveLabsClient();
+  if (!client) { res.status(503).json({ error: 'Twelve Labs not configured' }); return; }
+  try {
+    const task = await client.getTask(req.params.taskId);
+    res.json(task);
+  } catch (err) {
+    logger.error({ err }, '[FilmRoom] Failed to get task status');
+    res.status(500).json({ error: 'Failed to get task status' });
+  }
+});
+
+// Film Room: Semantic search over game film
+app.post('/api/perform/film-room/search', async (req, res) => {
+  const client = getTwelveLabsClient();
+  if (!client) { res.status(503).json({ error: 'Twelve Labs not configured' }); return; }
+  const { indexId, query, options } = req.body;
+  if (!indexId || !query) {
+    res.status(400).json({ error: 'indexId and query are required' });
+    return;
+  }
+  try {
+    const results = await client.search(indexId, query, options);
+    res.json(results);
+  } catch (err) {
+    logger.error({ err }, '[FilmRoom] Search failed');
+    res.status(500).json({ error: 'Search failed' });
+  }
+});
+
+// Film Room: Generate scouting report from video
+app.post('/api/perform/film-room/report', async (req, res) => {
+  const client = getTwelveLabsClient();
+  if (!client) { res.status(503).json({ error: 'Twelve Labs not configured' }); return; }
+  const { videoId, prompt } = req.body;
+  if (!videoId) {
+    res.status(400).json({ error: 'videoId is required' });
+    return;
+  }
+  try {
+    const report = await client.generate(
+      videoId,
+      prompt || 'Generate a professional scouting report from this game film. Include strengths, areas for improvement, bull case, bear case, and an overall verdict with specific play examples.'
+    );
+    res.json(report);
+  } catch (err) {
+    logger.error({ err }, '[FilmRoom] Report generation failed');
+    res.status(500).json({ error: 'Report generation failed' });
+  }
+});
+
+// Film Room: Summarize game film
+app.post('/api/perform/film-room/summarize', async (req, res) => {
+  const client = getTwelveLabsClient();
+  if (!client) { res.status(503).json({ error: 'Twelve Labs not configured' }); return; }
+  const { videoId, type, prompt } = req.body;
+  if (!videoId) {
+    res.status(400).json({ error: 'videoId is required' });
+    return;
+  }
+  try {
+    const summary = await client.summarize(videoId, type || 'summary', prompt);
+    res.json(summary);
+  } catch (err) {
+    logger.error({ err }, '[FilmRoom] Summarize failed');
+    res.status(500).json({ error: 'Summarize failed' });
+  }
+});
+
+// ScoutVerify: Automated prospect evaluation verification
+app.post('/api/perform/scout-verify', async (req, res) => {
+  const { prospectName, videoId, videoUrl, position, school, classYear } = req.body;
+  if (!prospectName || typeof prospectName !== 'string') {
+    res.status(400).json({ error: 'prospectName is required' });
+    return;
+  }
+  try {
+    const input: ScoutVerifyInput = { prospectName, videoId, videoUrl, position, school, classYear };
+    const report = await runScoutVerify(input);
+    res.json(report);
+  } catch (err) {
+    logger.error({ err }, '[ScoutVerify] Verification failed');
+    res.status(500).json({ error: 'ScoutVerify pipeline failed' });
   }
 });
 
@@ -486,7 +649,7 @@ app.post('/acheevy/execute', async (req, res) => {
 
     const orchestrator = getOrchestrator();
     const result = await orchestrator.execute({
-      userId: userId || 'web-user',
+      userId: userId || req.headers['x-user-id'] as string || 'anon-unknown',
       message,
       intent,
       conversationId: conversationId || 'chat-ui',
@@ -499,6 +662,40 @@ app.post('/acheevy/execute', async (req, res) => {
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'Orchestrator execution failed';
     logger.error({ err }, '[ACHEEVY] Execute error');
+    res.status(500).json({ error: msg });
+  }
+});
+
+// --------------------------------------------------------------------------
+// Vertical Execute — Phase B: dispatch vertical to n8n workflow pipeline
+// Called by the frontend after Phase A step-progression completes.
+// --------------------------------------------------------------------------
+app.post('/vertical/execute', async (req, res) => {
+  try {
+    const { verticalId, userId, collectedData, sessionId } = req.body;
+    if (!verticalId || !userId) {
+      res.status(400).json({ error: 'Missing verticalId or userId' });
+      return;
+    }
+
+    const { triggerVerticalWorkflow } = await import('./n8n/client');
+    const result = await triggerVerticalWorkflow({
+      verticalId,
+      userId: userId || req.headers['x-user-id'] as string || 'anon-unknown',
+      collectedData: collectedData || {},
+      sessionId: sessionId || `session-${userId}`,
+      requestId: `VRT-${Date.now()}`,
+    });
+
+    logger.info(
+      { verticalId, userId, requestId: result.requestId, status: result.status },
+      '[Vertical] Phase B execution dispatched',
+    );
+
+    res.json(result);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Vertical execution failed';
+    logger.error({ err }, '[Vertical] Execute error');
     res.status(500).json({ error: msg });
   }
 });
@@ -1159,6 +1356,42 @@ app.post('/billing/check-agents', (req, res) => {
   res.json(result);
 });
 
+// Provision tier — called by Stripe webhook after checkout/subscription events
+const provisionedTiers = new Map<string, { tierId: string; tierName: string; stripeCustomerId: string; stripeSubscriptionId: string; provisionedAt: string }>();
+
+app.post('/billing/provision', (req, res) => {
+  const { userId, tierId, tierName, stripeCustomerId, stripeSubscriptionId, provisionedAt, reason } = req.body;
+  if (!userId || !tierId) {
+    res.status(400).json({ error: 'Missing userId or tierId' });
+    return;
+  }
+
+  provisionedTiers.set(userId, {
+    tierId,
+    tierName: tierName || tierId,
+    stripeCustomerId: stripeCustomerId || '',
+    stripeSubscriptionId: stripeSubscriptionId || '',
+    provisionedAt: provisionedAt || new Date().toISOString(),
+  });
+
+  logger.info({ userId, tierId, tierName, reason }, '[Billing] Tier provisioned');
+  res.json({ success: true, userId, tierId, tierName, provisionedAt });
+});
+
+app.get('/billing/provision', (req, res) => {
+  const userId = req.query.userId as string;
+  if (!userId) {
+    res.status(400).json({ error: 'Missing userId' });
+    return;
+  }
+  const tier = provisionedTiers.get(userId);
+  if (!tier) {
+    res.json({ userId, tierId: 'p2p', tierName: 'Pay-per-Use', provisioned: false });
+    return;
+  }
+  res.json({ userId, ...tier, provisioned: true });
+});
+
 // --------------------------------------------------------------------------
 // Lil_Hawks — Squad profiles
 // --------------------------------------------------------------------------
@@ -1168,6 +1401,7 @@ app.get('/lil-hawks', (_req, res) => {
       'prep-squad-alpha': PREP_SQUAD_PROFILES,
       'workflow-smith': SQUAD_PROFILES,
       'vision-scout': VISION_SQUAD_PROFILES,
+      'json-expert': JSON_SQUAD_PROFILES,
     },
   });
 });
@@ -2131,6 +2365,209 @@ app.post('/ingress/acp', acpLimiter, async (req, res) => {
 });
 
 // --------------------------------------------------------------------------
+// n8n Management — Workflow Deploy, Activate, List, Health
+// --------------------------------------------------------------------------
+
+const n8nClient = new N8nClient();
+
+// n8n health check
+app.get('/n8n/health', async (_req, res) => {
+  try {
+    const health = await n8nClient.healthCheck();
+    res.json(health);
+  } catch (err) {
+    res.json({ ok: false, error: err instanceof Error ? err.message : 'Health check failed' });
+  }
+});
+
+// List n8n workflows
+app.get('/n8n/workflows', async (_req, res) => {
+  try {
+    const workflows = await n8nClient.listWorkflows();
+    res.json({ workflows, count: workflows.length });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Failed to list workflows';
+    res.status(500).json({ error: msg });
+  }
+});
+
+// Deploy a workflow to n8n
+app.post('/n8n/workflows/deploy', async (req, res) => {
+  try {
+    const { workflowJson } = req.body;
+    if (!workflowJson) {
+      res.status(400).json({ error: 'Missing workflowJson in body' });
+      return;
+    }
+    const result = await n8nClient.deployWorkflow(workflowJson);
+    res.status(201).json(result);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Workflow deploy failed';
+    res.status(500).json({ error: msg });
+  }
+});
+
+// Activate a workflow on n8n
+app.post('/n8n/workflows/:workflowId/activate', async (req, res) => {
+  try {
+    await n8nClient.activateWorkflow(req.params.workflowId);
+    res.json({ success: true, workflowId: req.params.workflowId });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Workflow activation failed';
+    res.status(500).json({ error: msg });
+  }
+});
+
+// Trigger PMO pipeline via n8n (or local fallback)
+app.post('/n8n/trigger', async (req, res) => {
+  try {
+    const { userId, message, context } = req.body;
+    if (!userId || !message) {
+      res.status(400).json({ error: 'Missing userId or message' });
+      return;
+    }
+    const result = await n8nClient.triggerPmoWorkflow({ userId, message, context });
+    res.json(result);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'n8n trigger failed';
+    res.status(500).json({ error: msg });
+  }
+});
+
+// --------------------------------------------------------------------------
+// Memory System — Persistent Agent Memory
+// --------------------------------------------------------------------------
+
+const memoryEngine = getMemoryEngine();
+
+// Remember: store a memory
+app.post('/memory/remember', (req, res) => {
+  try {
+    const input = req.body as RememberInput;
+    if (!input.userId || !input.summary || !input.content || !input.type) {
+      res.status(400).json({ error: 'Missing required fields: userId, type, summary, content' });
+      return;
+    }
+    const memory = memoryEngine.remember(input);
+    res.status(201).json({ success: true, memory });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Memory store failed';
+    logger.error({ err }, '[Memory] Remember error');
+    res.status(500).json({ error: msg });
+  }
+});
+
+// Recall: search memories by query
+app.post('/memory/recall', (req, res) => {
+  try {
+    const query = req.body as RecallQuery;
+    if (!query.userId || !query.query) {
+      res.status(400).json({ error: 'Missing required fields: userId, query' });
+      return;
+    }
+    const result = memoryEngine.recall(query);
+    res.json(result);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Memory recall failed';
+    logger.error({ err }, '[Memory] Recall error');
+    res.status(500).json({ error: msg });
+  }
+});
+
+// Feedback: apply feedback signal to a memory
+app.post('/memory/feedback', (req, res) => {
+  try {
+    const feedback = req.body as MemoryFeedback;
+    if (!feedback.memoryId || !feedback.signal) {
+      res.status(400).json({ error: 'Missing required fields: memoryId, signal' });
+      return;
+    }
+    memoryEngine.feedback(feedback);
+    res.json({ success: true });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Memory feedback failed';
+    res.status(500).json({ error: msg });
+  }
+});
+
+// List memories for a user
+app.get('/memory', (req, res) => {
+  try {
+    const userId = req.query.userId as string;
+    if (!userId) {
+      res.status(400).json({ error: 'Missing userId query parameter' });
+      return;
+    }
+    const type = req.query.type as string | undefined;
+    const projectId = req.query.projectId as string | undefined;
+    const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : undefined;
+    const memories = memoryEngine.listMemories(userId, {
+      type: type as any,
+      projectId,
+      limit,
+    });
+    res.json({ memories, count: memories.length, userId });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Memory list failed';
+    res.status(500).json({ error: msg });
+  }
+});
+
+// Get memory stats for a user
+app.get('/memory/stats', (req, res) => {
+  try {
+    const userId = req.query.userId as string;
+    if (!userId) {
+      res.status(400).json({ error: 'Missing userId query parameter' });
+      return;
+    }
+    const stats = memoryEngine.getStats(userId);
+    res.json(stats);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Memory stats failed';
+    res.status(500).json({ error: msg });
+  }
+});
+
+// Delete a memory
+app.delete('/memory/:memoryId', (req, res) => {
+  try {
+    const deleted = memoryEngine.deleteMemory(req.params.memoryId);
+    res.json({ success: deleted });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Memory delete failed';
+    res.status(500).json({ error: msg });
+  }
+});
+
+/// Maintenance: purge expired + decay relevance + evict over-cap
+app.post('/memory/maintenance', (_req, res) => {
+  try {
+    const result = memoryEngine.runMaintenance();
+    res.json(result);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Memory maintenance failed';
+    res.status(500).json({ error: msg });
+  }
+});
+
+// Store a user preference
+app.post('/memory/preference', (req, res) => {
+  try {
+    const { userId, key, value, context } = req.body;
+    if (!userId || !key || !value) {
+      res.status(400).json({ error: 'Missing required fields: userId, key, value' });
+      return;
+    }
+    const memory = memoryEngine.rememberPreference(userId, key, value, context);
+    res.status(201).json({ success: true, memory });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Preference store failed';
+    res.status(500).json({ error: msg });
+  }
+});
+
+// --------------------------------------------------------------------------
 // Start Server
 // --------------------------------------------------------------------------
 export const server = app.listen(PORT, () => {
@@ -2146,6 +2583,7 @@ export const server = app.listen(PORT, () => {
 function shutdown(signal: string) {
   logger.info({ signal }, '[UEF] Received shutdown signal, draining connections...');
   stopCleanupSchedule();
+  memoryEngine.stopMaintenance();
   server.close(() => {
     closeDb();
     logger.info('[UEF] All connections drained. DB closed. Exiting.');

@@ -327,6 +327,7 @@ Tasks are executable units that produce artifacts.
 | **Discord Message** | `tasks/discord-message.md` | "discord", "send discord" | Message receipt |
 | **Kling Video** | `tasks/kling-video.md` | "generate video", "kling" | Video file |
 | **Web Scrape** | `tasks/web-scrape.md` | "scrape", "crawl", "extract" | Structured data |
+| **Memory Maintenance** | `tasks/memory-maintenance.md` | "memory maintenance", "clean memories" | Purge/decay/evict report |
 
 #### Task Templates (`tasks/templates/`)
 

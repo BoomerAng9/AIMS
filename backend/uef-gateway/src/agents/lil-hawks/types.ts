@@ -4,39 +4,44 @@
  * Unlike Boomer_Angs (persistent domain specialists), Lil_Hawks are
  * lightweight, task-scoped workers that operate in squads.
  *
- * Naming convention: FUNCTION_LIL_HAWK (all caps, underscore separated)
+ * Naming convention: Lil_<Role>_Hawk (ACHEEVY Brain §16.2)
  *
  * Squads:
  *   PREP_SQUAD_ALPHA    — Pre-execution intelligence (6 hawks)
  *   WORKFLOW_SMITH_SQUAD — n8n workflow integrity (4 hawks)
  *   VISION_SCOUT_SQUAD  — Video/footage assessment (3 hawks)
+ *   JSON_EXPERT_SQUAD   — JSON parsing/transformation (3 hawks)
  *
  * Doctrine: "Activity breeds Activity — shipped beats perfect."
  */
 
 // ---------------------------------------------------------------------------
-// Lil_Hawk identifiers — canonical NAME_LIL_HAWK convention
+// Lil_Hawk identifiers — canonical Lil_<Role>_Hawk convention
 // ---------------------------------------------------------------------------
 
 export type LilHawkId =
   // PREP_SQUAD_ALPHA — Pre-Execution Intelligence
-  | 'INTAKE_LIL_HAWK'
-  | 'DECOMP_LIL_HAWK'
-  | 'CONTEXT_LIL_HAWK'
-  | 'POLICY_LIL_HAWK'
-  | 'COST_LIL_HAWK'
-  | 'ROUTER_LIL_HAWK'
+  | 'Lil_Intake_Hawk'
+  | 'Lil_Decomp_Hawk'
+  | 'Lil_Context_Hawk'
+  | 'Lil_Policy_Hawk'
+  | 'Lil_Cost_Hawk'
+  | 'Lil_Router_Hawk'
   // WORKFLOW_SMITH_SQUAD — n8n Workflow Integrity
-  | 'AUTHOR_LIL_HAWK'
-  | 'VALIDATE_LIL_HAWK'
-  | 'FAILURE_LIL_HAWK'
-  | 'GATE_LIL_HAWK'
+  | 'Lil_Author_Hawk'
+  | 'Lil_Validate_Hawk'
+  | 'Lil_Failure_Hawk'
+  | 'Lil_Gate_Hawk'
   // VISION_SCOUT_SQUAD — Video/Footage Assessment
-  | 'VISION_LIL_HAWK'
-  | 'SIGNAL_LIL_HAWK'
-  | 'COMPLIANCE_LIL_HAWK';
+  | 'Lil_Vision_Hawk'
+  | 'Lil_Signal_Hawk'
+  | 'Lil_Compliance_Hawk'
+  // JSON_EXPERT_SQUAD — JSON Parsing/Transformation
+  | 'Lil_JSON_Parse_Hawk'
+  | 'Lil_JSON_Transform_Hawk'
+  | 'Lil_JSON_Schema_Hawk';
 
-export type SquadId = 'prep-squad-alpha' | 'workflow-smith' | 'vision-scout';
+export type SquadId = 'prep-squad-alpha' | 'workflow-smith' | 'vision-scout' | 'json-expert';
 
 export interface LilHawkProfile {
   id: LilHawkId;

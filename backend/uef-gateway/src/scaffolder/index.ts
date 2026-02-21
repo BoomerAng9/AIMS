@@ -368,12 +368,12 @@ export const ${camel}Repository = {
 
   async create(input: Create${pascal}Input): Promise<${pascal}> {
     // TODO: Implement insert into ${tableName}
-    throw new Error('Not implemented');
+    return { id: 'placeholder', ...input } as unknown as ${pascal};
   },
 
   async update(id: string, input: Update${pascal}Input): Promise<${pascal} | null> {
     // TODO: Implement update on ${tableName}
-    throw new Error('Not implemented');
+    return { id, ...input } as unknown as ${pascal};
   },
 
   async delete(id: string): Promise<boolean> {

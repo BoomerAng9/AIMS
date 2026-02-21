@@ -3,9 +3,10 @@
  *
  * Three Lil_Hawks for evaluating athlete footage when it exists.
  *
- *   VISION_LIL_HAWK     — extracts observable events from footage
- *   SIGNAL_LIL_HAWK     — converts observations into structured "film signals"
- *   COMPLIANCE_LIL_HAWK — safety/compliance gate
+ * Lil_<Role>_Hawk convention (ACHEEVY Brain §16.2):
+ *   Lil_Vision_Hawk      — extracts observable events from footage
+ *   Lil_Signal_Hawk      — converts observations into structured "film signals"
+ *   Lil_Compliance_Hawk  — safety/compliance gate
  *
  * If no footage exists, the squad skips and grades using stats + text only.
  *
@@ -18,27 +19,27 @@ import { Agent, AgentTaskInput, AgentTaskOutput, makeOutput, failOutput } from '
 import { LilHawkProfile } from './types';
 
 // ---------------------------------------------------------------------------
-// Squad profiles — canonical NAME_LIL_HAWK convention
+// Squad profiles — Lil_<Role>_Hawk convention (ACHEEVY Brain §16.2)
 // ---------------------------------------------------------------------------
 
 export const VISION_SQUAD_PROFILES: LilHawkProfile[] = [
   {
-    id: 'VISION_LIL_HAWK',
-    name: 'VISION_LIL_HAWK',
+    id: 'Lil_Vision_Hawk',
+    name: 'Lil_Vision_Hawk',
     squad: 'vision-scout',
     role: 'Extracts observable events from footage (separation, tackles, throws, catches)',
     gate: false,
   },
   {
-    id: 'SIGNAL_LIL_HAWK',
-    name: 'SIGNAL_LIL_HAWK',
+    id: 'Lil_Signal_Hawk',
+    name: 'Lil_Signal_Hawk',
     squad: 'vision-scout',
     role: 'Converts observations into structured film signals with confidence scores',
     gate: false,
   },
   {
-    id: 'COMPLIANCE_LIL_HAWK',
-    name: 'COMPLIANCE_LIL_HAWK',
+    id: 'Lil_Compliance_Hawk',
+    name: 'Lil_Compliance_Hawk',
     squad: 'vision-scout',
     role: 'Safety/compliance gate — flags bad footage, wrong athlete, low confidence',
     gate: true,
@@ -75,7 +76,7 @@ export interface VisionAssessment {
 }
 
 // ---------------------------------------------------------------------------
-// VISION_LIL_HAWK — extract observations
+// Lil_Vision_Hawk — extract observations
 // ---------------------------------------------------------------------------
 
 function extractObservations(query: string): FilmObservation[] {
@@ -123,7 +124,7 @@ function extractObservations(query: string): FilmObservation[] {
 }
 
 // ---------------------------------------------------------------------------
-// SIGNAL_LIL_HAWK — convert to signals
+// Lil_Signal_Hawk — convert to signals
 // ---------------------------------------------------------------------------
 
 function convertToSignals(observations: FilmObservation[]): FilmSignal[] {
@@ -159,7 +160,7 @@ function mapEventToSignal(eventType: string): string {
 }
 
 // ---------------------------------------------------------------------------
-// COMPLIANCE_LIL_HAWK — compliance gate
+// Lil_Compliance_Hawk — compliance gate
 // ---------------------------------------------------------------------------
 
 function complianceGate(
@@ -203,23 +204,23 @@ async function execute(input: AgentTaskInput): Promise<AgentTaskOutput> {
     const hasFootage = input.context?.hasFootage !== false;
 
     if (!hasFootage) {
-      logs.push('[VISION_LIL_HAWK] No footage available — skipping video assessment');
+      logs.push('[Lil_Vision_Hawk] No footage available — skipping video assessment');
       return makeOutput(input.taskId, 'chicken-hawk', 'Video assessment skipped — no footage available. Grading will use stats + text only.', [], logs, 0, 0);
     }
 
-    logger.info({ taskId: input.taskId }, '[VISION_LIL_HAWK] Extracting observations');
+    logger.info({ taskId: input.taskId }, '[Lil_Vision_Hawk] Extracting observations');
     const observations = extractObservations(input.query);
-    logs.push(`[VISION_LIL_HAWK] Extracted ${observations.length} observations`);
+    logs.push(`[Lil_Vision_Hawk] Extracted ${observations.length} observations`);
 
-    logger.info({ taskId: input.taskId }, '[SIGNAL_LIL_HAWK] Converting to film signals');
+    logger.info({ taskId: input.taskId }, '[Lil_Signal_Hawk] Converting to film signals');
     const signals = convertToSignals(observations);
-    logs.push(`[SIGNAL_LIL_HAWK] Generated ${signals.length} film signals`);
+    logs.push(`[Lil_Signal_Hawk] Generated ${signals.length} film signals`);
 
     await VLJEPA.verifySemanticConsistency(input.intent, input.query);
 
-    logger.info({ taskId: input.taskId }, '[COMPLIANCE_LIL_HAWK] Running compliance gate');
+    logger.info({ taskId: input.taskId }, '[Lil_Compliance_Hawk] Running compliance gate');
     const compliance = complianceGate(observations, signals, input.query);
-    logs.push(`[COMPLIANCE_LIL_HAWK] Compliance: ${compliance.passed ? 'PASS' : 'FLAGGED'} (${compliance.flags.length} flags)`);
+    logs.push(`[Lil_Compliance_Hawk] Compliance: ${compliance.passed ? 'PASS' : 'FLAGGED'} (${compliance.flags.length} flags)`);
 
     const overallFilmGrade = compliance.passed
       ? Math.round(signals.reduce((a, s) => a + s.value, 0) / signals.length)

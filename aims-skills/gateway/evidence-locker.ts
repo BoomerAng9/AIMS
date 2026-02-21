@@ -23,6 +23,7 @@ import type {
   GatewayConfig,
 } from '../types/gateway';
 
+import { createHash } from 'crypto';
 import gatewayConfigJson from './policies/gateway-config.json';
 
 /* ------------------------------------------------------------------ */
@@ -40,17 +41,10 @@ function nowISO(): string {
 }
 
 /**
- * Simple hash function for integrity verification (placeholder).
- * In production, replaced by crypto.createHash('sha256').
+ * SHA-256 content hash for integrity verification.
  */
 function simpleHash(input: string): string {
-  let hash = 0;
-  for (let i = 0; i < input.length; i++) {
-    const char = input.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash |= 0; // 32-bit int
-  }
-  return 'sha256:' + Math.abs(hash).toString(16).padStart(8, '0');
+  return 'sha256:' + createHash('sha256').update(input).digest('hex');
 }
 
 /* ------------------------------------------------------------------ */
