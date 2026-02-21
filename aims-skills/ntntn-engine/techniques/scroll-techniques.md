@@ -12,7 +12,7 @@
 
 | Library | Approach | Performance | Bundle Impact |
 |---------|----------|-------------|---------------|
-| **Framer Motion** | `useScroll` + `useTransform` to map scroll progress to `y` offset | GPU-accelerated (transform) | Included in FM bundle |
+| **Motion** | `useScroll` + `useTransform` to map scroll progress to `y` offset | GPU-accelerated (transform) | Included in Motion bundle |
 | **GSAP ScrollTrigger** | `scrub: true` on timeline, different speeds per layer | GPU-accelerated | +45KB (GSAP core + ScrollTrigger) |
 | **CSS Only** | `perspective` + `translateZ` on parent/child layers | Native browser, best perf | 0KB |
 | **Rellax.js** | `data-rellax-speed` attribute on elements | RAF-based, decent perf | +1.5KB |
@@ -45,7 +45,7 @@
 
 | Library | Approach | Performance | Bundle Impact |
 |---------|----------|-------------|---------------|
-| **Canvas + Framer Motion** | `useScroll` maps progress → frame index, draw to Canvas | Excellent (Canvas 2D) | Included in FM bundle |
+| **Canvas + Motion** | `useScroll` maps progress → frame index, draw to Canvas | Excellent (Canvas 2D) | Included in Motion bundle |
 | **GSAP ScrollTrigger** | ScrollTrigger scrub drives frame index on Canvas | Excellent | +45KB |
 | **CSS Scroll-Driven** | `animation-timeline: scroll()` swaps background-image | Limited browser support | 0KB |
 | **Scrolly Video** | Decode video frames mapped to scroll (scrollyvideo.js) | Good (video decode) | +5KB |
@@ -77,7 +77,7 @@
 
 | Library | Approach | Performance | Bundle Impact |
 |---------|----------|-------------|---------------|
-| **Framer Motion** | Sticky container + `useScroll` + per-step opacity/transform mapping | GPU-accelerated | Included in FM bundle |
+| **Motion** | Sticky container + `useScroll` + per-step opacity/transform mapping | GPU-accelerated | Included in Motion bundle |
 | **GSAP ScrollTrigger** | `pin: true` + timeline with labeled steps | GPU-accelerated | +45KB |
 | **Scrollama** | Intersection Observer-based step detection | Lightweight | +3KB |
 | **CSS Scroll Snap** | `scroll-snap-type: y mandatory` with full-page sections | Native, limited control | 0KB |
@@ -110,7 +110,7 @@
 
 | Library | Approach | Performance | Bundle Impact |
 |---------|----------|-------------|---------------|
-| **Framer Motion** | `useScroll` + `useTransform` to map scrollY → translateX | GPU-accelerated | Included in FM bundle |
+| **Motion** | `useScroll` + `useTransform` to map scrollY → translateX | GPU-accelerated | Included in Motion bundle |
 | **GSAP ScrollTrigger** | `pin: true` + horizontal tween scrubbed to scroll | GPU-accelerated | +45KB |
 | **CSS Only** | `overflow-x: auto` + `scroll-snap-type: x mandatory` | Native, limited vertical trigger | 0KB |
 
@@ -140,7 +140,7 @@
 
 | Library | Approach | Performance | Bundle Impact |
 |---------|----------|-------------|---------------|
-| **Framer Motion** | `useInView` hook + `variants` (hidden/visible) | GPU-accelerated | Included in FM bundle |
+| **Motion** | `useInView` hook + `variants` (hidden/visible) | GPU-accelerated | Included in Motion bundle |
 | **GSAP ScrollTrigger** | `ScrollTrigger.batch()` for multiple elements | GPU-accelerated | +45KB |
 | **Intersection Observer** | Native API + CSS classes toggle | Best native perf | 0KB |
 | **Motion One** | `inView()` function + `animate()` | Tiny bundle, WAAPI | +3KB |
@@ -173,7 +173,7 @@
 
 | Library | Approach | Performance | Bundle Impact |
 |---------|----------|-------------|---------------|
-| **Framer Motion** | `useScroll` + `scaleX` on a fixed bar | GPU-accelerated | Included in FM bundle |
+| **Motion** | `useScroll` + `scaleX` on a fixed bar | GPU-accelerated | Included in Motion bundle |
 | **CSS Scroll-Driven** | `animation-timeline: scroll()` on a pseudo-element | Native, zero JS | 0KB |
 | **Custom JS** | `scrollTop / scrollHeight` → width percentage | Simple | 0KB |
 
@@ -196,7 +196,7 @@
 
 | Library | Approach | Performance | Bundle Impact |
 |---------|----------|-------------|---------------|
-| **Framer Motion** | Split text into spans + `staggerChildren` + `useInView` | GPU-accelerated | Included in FM bundle |
+| **Motion** | Split text into spans + `staggerChildren` + `useInView` | GPU-accelerated | Included in Motion bundle |
 | **GSAP SplitText** | SplitText plugin + ScrollTrigger scrub | GPU-accelerated, pro feature | +45KB + SplitText (Club) |
 | **CSS Scroll-Driven** | `animation-timeline: view()` on per-word spans | Native, experimental | 0KB |
 | **Custom** | Intersection Observer + CSS transition per word/line | Manual but flexible | 0KB |
@@ -221,7 +221,7 @@
 
 | Library | Approach | Performance | Bundle Impact |
 |---------|----------|-------------|---------------|
-| **Framer Motion** | `useScroll` + `useTransform` mapping progress to color values | Smooth | Included in FM bundle |
+| **Motion** | `useScroll` + `useTransform` mapping progress to color values | Smooth | Included in Motion bundle |
 | **GSAP ScrollTrigger** | `onEnter`/`onLeave` callbacks toggle CSS custom properties | Event-based | +45KB |
 | **Intersection Observer** | Toggle `data-theme` attribute on `<body>` per section | Native | 0KB |
 | **CSS Scroll-Driven** | `animation-timeline: view()` animating `--bg-color` | Native, experimental | 0KB |

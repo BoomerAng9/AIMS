@@ -10,7 +10,7 @@
 Real-time structured content platform. Define custom schemas, query with GROQ,
 collaborate in real-time. The most flexible headless CMS for custom workflows.
 
-- **Current:** Sanity v3 (Studio)
+- **Current:** Sanity v5.11 (Content Operating System)
 - **Query:** GROQ (Graph-Relational Object Queries)
 - **Hosting:** Cloud-hosted CDN (content), self-hosted Studio (admin)
 
@@ -62,7 +62,7 @@ live preview of the site. Requires `@sanity/visual-editing` package.
 Open-source headless CMS. Self-hosted, extensible, generates REST + GraphQL
 APIs from content types. Admin panel included.
 
-- **Current:** Strapi 5.x
+- **Current:** Strapi 5.36 (stability-focused, 70+ bug fixes recent)
 - **Hosting:** Self-hosted (Docker, VPS), Strapi Cloud
 - **API:** Auto-generated REST and GraphQL endpoints
 
@@ -105,7 +105,7 @@ const { data } = await graphqlClient.query({
 TypeScript-first headless CMS. Code-first configuration — define collections
 in TypeScript, get API + admin panel automatically. Can be embedded in Next.js.
 
-- **Current:** Payload 3.x (Next.js native)
+- **Current:** Payload 3.77 (Next.js native, localized status, MCP tools)
 - **Approach:** Config-driven (TypeScript), embedded in your Next.js app
 - **Database:** Postgres, MongoDB, SQLite (via Drizzle adapter)
 

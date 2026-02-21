@@ -10,7 +10,7 @@
 React is the dominant component-based UI library. Next.js is its premier meta-framework,
 providing SSR, SSG, ISR, App Router, Server Components, and Server Actions out of the box.
 
-- **Current:** React 19 + Next.js 15
+- **Current:** React 19.2 + Next.js 16 (Turbopack default bundler)
 - **Rendering:** SSR, SSG, ISR, Streaming SSR, Partial Prerendering
 - **A.I.M.S. Status:** Primary stack — all internal builds use Next.js
 
@@ -140,7 +140,7 @@ every 60 seconds. On-demand revalidation via `revalidatePath()` or `revalidateTa
 Vue is a progressive framework with an approachable API. Nuxt is its meta-framework
 providing SSR/SSG, auto-imports, file-based routing, and hybrid rendering.
 
-- **Current:** Vue 3.5 + Nuxt 4
+- **Current:** Vue 3.5 (3.6 imminent with Vapor Mode) + Nuxt 4.3
 - **Rendering:** SSR, SSG, ISR, Hybrid (per-route rendering rules)
 - **Reactivity:** Composition API with `ref()`, `reactive()`, `computed()`, `watch()`
 
@@ -209,7 +209,7 @@ export const useCounterStore = defineStore('counter', () => {
 Svelte is a compile-time framework — no runtime overhead. Components compile to efficient
 vanilla JS. SvelteKit is its meta-framework with file-based routing, SSR, and adapters.
 
-- **Current:** Svelte 5 + SvelteKit 2
+- **Current:** Svelte 5.46 + SvelteKit 2.52
 - **Reactivity:** Runes (`$state`, `$derived`, `$effect`) replace `let` reactivity
 - **Compilation:** Components compile to imperative DOM operations at build time
 
@@ -266,7 +266,7 @@ SvelteKit deploys anywhere via adapters:
 
 ### Picker_Ang Notes
 - Choose when: Performance is paramount, small bundle critical, team knows Svelte
-- Avoid when: Need large ecosystem (React has more libraries), heavy animation (Framer Motion is React-only)
+- Avoid when: Need large ecosystem (React has more libraries), heavy animation (Motion supports React + Vue + vanilla JS)
 
 ---
 
@@ -276,8 +276,8 @@ SvelteKit deploys anywhere via adapters:
 Angular is a batteries-included enterprise framework with dependency injection,
 TypeScript-first design, and a mature CLI.
 
-- **Current:** Angular 19+
-- **Reactivity:** Signals (fine-grained, replacing Zone.js)
+- **Current:** Angular 21 (signal forms, zoneless migration, AI-first tooling)
+- **Reactivity:** Signals (fine-grained, Zone.js fully removable via zoneless change detection)
 - **Components:** Standalone by default (no NgModules required)
 
 ### Key Patterns & Techniques
@@ -338,7 +338,7 @@ Full SSR + hydration support, including partial hydration with `@defer`.
 Astro is a content-first static site builder that ships zero JavaScript by default.
 Uses Islands Architecture — only interactive components hydrate, everything else is static HTML.
 
-- **Current:** Astro 5
+- **Current:** Astro 5.17 (Astro 6 beta — joined Cloudflare, redesigned dev server)
 - **Rendering:** Static first, with SSR opt-in per route
 - **Islands:** Interactive components from ANY framework (React, Vue, Svelte, Solid) inside static pages
 
@@ -529,7 +529,7 @@ Server-renderable Shadow DOM — works without JS:
 
 | Framework | Bundle Size | SSR | Fine-Grained | TypeScript | Animation Compat | Learning Curve |
 |-----------|------------|-----|---------------|-----------|-----------------|----------------|
-| **Next.js** | Medium | Excellent | No (VDOM) | Excellent | Framer Motion (native) | Medium |
+| **Next.js** | Medium | Excellent | No (VDOM) | Excellent | Motion (native) | Medium |
 | **Nuxt** | Medium | Excellent | No (VDOM) | Good | Vue Transition, GSAP | Medium |
 | **SvelteKit** | Small | Good | Yes (compiled) | Good | Built-in transitions | Low |
 | **Angular** | Large | Good | Signals (new) | Excellent | Angular Animations | High |

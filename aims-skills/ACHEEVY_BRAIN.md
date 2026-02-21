@@ -200,7 +200,7 @@ Skills inject specialized context, SOPs, and design standards into ACHEEVY's beh
 | **PMO Naming** | `skills/pmo-naming.skill.ts` | Agent naming needed | Enforces `Lil_<Role>_Hawk` and `<Name>_Ang` patterns |
 | **Best Practices** | `skills/best-practices.md` | Code/deploy tasks | Engineering standards and patterns |
 | **Stitch Design** | `skills/stitch-nano-design.skill.md` | UI/design tasks | Nano Banana Pro design system standards |
-| **UI Motion** | `skills/ui-interaction-motion.skill.md` | Animation/interaction tasks | Framer Motion + interaction patterns |
+| **UI Motion** | `skills/ui-interaction-motion.skill.md` | Animation/interaction tasks | Motion v12 + interaction patterns |
 | **OpenRouter LLM** | `skills/openrouter-llm.skill.md` | "model", "llm", "openrouter" | Model selection rules, cost awareness, fallback chain |
 | **Kimi K2.5** | `skills/kimi-k2.5.skill.md` | "kimi", "moonshot", "vision agent", "agent swarm", "multimodal agent" | Moonshot AI 1T-param visual agentic model — API modes, vision/video input, swarm, quantization |
 | **ElevenLabs Voice** | `skills/elevenlabs-voice.skill.md` | "voice", "tts", "speak" | Voice persona rules, ACHEEVY voice identity |
@@ -538,6 +538,7 @@ Every tool and capability is **owned** by a Boomer_Ang. No raw tool access.
 | `Licensing_Ang` | Compliance | AGPL/license quarantine, PPTist |
 | `Picker_Ang` | Component Selection | NtNtN Engine navigation, stack curation, creative intent analysis |
 | `Buildsmith` | Construction | Web builds, component assembly, creative execution (special: no _Ang suffix) |
+| `Plug_Ang` | Integration & MCP | API key management, account creation, MCP wiring, Composio gateway |
 
 ### Boomer_Ang Brain Files
 Each Boomer_Ang wrapping an Intelligent Internet repo has a dedicated brain file in `aims-skills/brains/`.
@@ -560,6 +561,7 @@ See: `aims-skills/brains/ACHEEVY_II_EXTENSIONS.md` for ACHEEVY's direct extensio
 | `INDEX_ANG_BRAIN.md` | Index_Ang | II-Commons |
 | `PICKER_ANG_BRAIN.md` | Picker_Ang | NtNtN Engine (component selector) |
 | `BUILDSMITH_BRAIN.md` | Buildsmith | NtNtN Engine (master builder) |
+| `PLUG_ANG_BRAIN.md` | Plug_Ang | Composio gateway + MCP wiring |
 
 ### Boomer_Ang Role Card Registry
 Every Boomer_Ang has a JSON role card in `aims-skills/chain-of-command/role-cards/`.
@@ -584,6 +586,7 @@ gates, overlay visibility, and evaluation KPIs. **No agent exists without a card
 | `index-ang.json` | Index_Ang | Intelligence & Research PMO | Gold #D4AF37 |
 | `picker-ang.json` | Picker_Ang | Creative Engineering PMO | Blue #3B82F6 |
 | `buildsmith.json` | Buildsmith | Creative Engineering PMO | Orange-Gold #E5A530 |
+| `plug-ang.json` | Plug_Ang | Operations & Integration PMO | Emerald #10B981 |
 
 ### Boomer_Ang Visual Identity
 All Boomer_Angs follow the canonical visual spec in `aims-skills/brains/BOOMER_ANG_VISUAL_IDENTITY.md`.

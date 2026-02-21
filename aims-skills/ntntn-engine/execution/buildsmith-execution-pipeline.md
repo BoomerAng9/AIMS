@@ -163,7 +163,7 @@ The INTERFACE pillar is the core builder — it generates the actual code, compo
 | **Component Generation** | LLM (Claude) + NtNtN patterns + shadcn/ui | Generate React components from descriptions | .tsx files |
 | **Page Composition** | LLM + App Router conventions + layout patterns | Compose full pages from component inventory | page.tsx files |
 | **Style System Setup** | Tailwind config + design tokens + CSS variables | Configure the visual foundation (colors, spacing, typography) | tailwind.config.ts, globals.css |
-| **Animation Wiring** | Framer Motion / GSAP patterns from NtNtN library | Wire animations per the technique spec | Motion components |
+| **Animation Wiring** | Motion v12.34 / GSAP 3.14.2 patterns from NtNtN library | Wire animations per the technique spec | Motion components |
 | **Responsive Implementation** | Tailwind breakpoints + container queries | Build mobile-first, enhance for tablet/desktop | Responsive layouts |
 | **Design System Creation** | shadcn/ui CLI + custom variants + CVA | Build a design system from the color palette and tokens | Component library |
 | **Live Preview** | Next.js dev server (inside sandbox) | Hot-reloading preview accessible via URL | Preview URL |
@@ -202,11 +202,11 @@ Output: Complete codebase (ready for integration)
 │  E2B Cloud Sandbox (or Docker container)     │
 │                                              │
 │  ┌─────────────────────────────────────┐    │
-│  │  Node.js 20+ Runtime                 │    │
-│  │  ├── next@15                         │    │
+│  │  Node.js 22+ Runtime                 │    │
+│  │  ├── next@16                         │    │
 │  │  ├── tailwindcss@4                   │    │
-│  │  ├── framer-motion@12+              │    │
-│  │  ├── @radix-ui/*                    │    │
+│  │  ├── motion@12                       │    │
+│  │  ├── radix-ui                        │    │
 │  │  ├── typescript@5+                  │    │
 │  │  └── [Picker_Ang selections]        │    │
 │  └─────────────────────────────────────┘    │
@@ -279,7 +279,7 @@ The INTEGRATIONS pillar connects the frontend to everything else — databases, 
 | Capability | Tool / Service | Purpose | Output |
 |-----------|---------------|---------|--------|
 | **Git Operations** | GitHub API / git CLI | Initialize repo, commit, branch, push | Git repository |
-| **Database Setup** | Prisma ORM + SQLite (dev) / PostgreSQL (prod) | Schema definition, migrations, seeding | Database + Prisma client |
+| **Database Setup** | Prisma v7 + SQLite (dev) / PostgreSQL (prod) | Schema definition, migrations, seeding | Database + Prisma client |
 | **Authentication** | NextAuth.js / Auth.js / Clerk | User auth flows (social, email, magic link) | Auth config + pages |
 | **Payments** | Stripe SDK + Checkout / Billing Portal | Payment processing, subscriptions, invoicing | Stripe integration |
 | **Email** | Resend / SendGrid / Nodemailer | Transactional emails, notifications | Email templates + API |

@@ -10,8 +10,8 @@
 The foundational 3D graphics library for the web. Built on WebGL (and now WebGPU).
 Everything else in the JS 3D ecosystem builds on or alongside Three.js.
 
-- **Current:** Three.js r170+
-- **Rendering:** WebGL 2 (default), WebGPU (experimental/opt-in)
+- **Current:** Three.js r183 (WebGPU production-ready since r171)
+- **Rendering:** WebGPU (default since r171, auto-fallback to WebGL 2)
 - **Scene Graph:** Scene → Camera → Renderer → Mesh (Geometry + Material)
 
 ### Key Patterns & Techniques
@@ -63,7 +63,7 @@ void main() {
 React renderer for Three.js. Write 3D scenes declaratively using JSX.
 Automatic disposal, Suspense loading, React event system on 3D objects.
 
-- **Current:** R3F v9+
+- **Current:** R3F v9.5 + Drei v10.7 (React 19 compatible)
 - **Approach:** Declarative JSX → Three.js scene graph
 - **A.I.M.S. Status:** Default for 3D in React/Next.js projects
 
@@ -132,9 +132,10 @@ Drei is the essential helper library for R3F:
 Next-generation GPU API replacing WebGL. Provides compute shaders, better
 GPU utilization, and modern rendering pipeline architecture.
 
-- **Current:** Production-ready in Chrome 130+, Safari 26+, Firefox 141+
-- **Three.js:** Opt-in WebGPU renderer available
-- **Status:** Ready for progressive enhancement (WebGL fallback)
+- **Current:** Universal browser support (~95% coverage) — Chrome, Safari 26+, Firefox, Edge
+- **Three.js:** `WebGPURenderer` production-ready since r171, import from `'three/webgpu'`
+- **TSL:** Three Shader Language — write once, compiles to WGSL (WebGPU) or GLSL (WebGL)
+- **Status:** Production-ready with automatic WebGL 2 fallback
 
 ### Key Capabilities
 - **Compute Shaders:** General-purpose GPU computing (ML inference, particle systems, physics)
@@ -144,7 +145,7 @@ GPU utilization, and modern rendering pipeline architecture.
 
 ### Picker_Ang Notes
 - Choose when: Performance-critical 3D, GPU compute (particles, physics), future-proofing
-- Avoid when: Basic 3D needs (WebGL is fine), wide browser support critical right now
+- Avoid when: Basic 3D needs (WebGL is fine via automatic fallback)
 
 ---
 

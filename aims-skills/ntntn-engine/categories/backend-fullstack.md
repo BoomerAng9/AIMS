@@ -55,7 +55,7 @@ const requireAuth = (req, res, next) => {
 Built-in server-side logic within Next.js. Route Handlers for REST-style APIs,
 Server Actions for form mutations and data writes.
 
-- **Current:** Next.js 15 (App Router)
+- **Current:** Next.js 16 (App Router, Turbopack default)
 - **Approach:** Server-side code co-located with frontend
 
 ### Key Patterns
@@ -132,7 +132,7 @@ async def create_user(user: User):
 End-to-end typesafe APIs for TypeScript. Define API procedures on the server,
 call them from the client with full type inference — no code generation.
 
-- **Current:** tRPC v11
+- **Current:** tRPC v11.10 (non-JSON content types, SSE subscriptions, improved RSC support)
 - **Approach:** Shared types between client and server (no REST/GraphQL schema)
 
 ### Key Patterns
@@ -162,8 +162,8 @@ const createUser = trpc.user.create.useMutation();
 Ultrafast web framework that runs everywhere — Node.js, Deno, Bun, Cloudflare Workers,
 Vercel Edge, AWS Lambda. Designed for edge-first development.
 
-- **Current:** Hono 4.x
-- **Bundle:** ~14KB (tiny)
+- **Current:** Hono 4.12 (28K+ GitHub stars, 2K+ dependents)
+- **Bundle:** ~12KB (`hono/tiny` preset, zero dependencies)
 - **Performance:** Fastest JS web framework in most benchmarks
 
 ### Key Patterns
@@ -238,7 +238,9 @@ Sub-millisecond cold starts, global distribution, limited runtime.
 
 ## Database Layer
 
-### Prisma ORM (A.I.M.S. Default)
+### Prisma ORM v7 (A.I.M.S. Default)
+Prisma v7 migrated away from Rust — rebuilt in TypeScript. 98% fewer types to evaluate,
+70% faster type checking. Config now via `prisma.config.ts`. No more auto-seeding or auto-generate.
 ```prisma
 model User {
   id        String   @id @default(cuid())
@@ -251,7 +253,8 @@ model User {
 ```
 
 ### Drizzle ORM (Alternative)
-TypeScript-first, SQL-like syntax, lighter than Prisma:
+TypeScript-first, SQL-like syntax, lighter than Prisma. v0.45 stable, v1.0 beta available.
+7.4KB minified+gzipped, zero dependencies, supports MSSQL in v1 beta.
 ```ts
 const users = await db.select().from(usersTable).where(eq(usersTable.email, email));
 ```
@@ -266,8 +269,8 @@ const users = await db.select().from(usersTable).where(eq(usersTable.email, emai
 | **Redis** | Key-Value | Caching, sessions, queues | Upstash, self-hosted |
 
 ### Picker_Ang Notes
-- **A.I.M.S. default:** Prisma + PostgreSQL (production), SQLite (development)
-- Choose Drizzle when: Maximum SQL control, smaller bundle needed
+- **A.I.M.S. default:** Prisma v7 + PostgreSQL (production), SQLite (development)
+- Choose Drizzle when: Maximum SQL control, smaller bundle, edge/serverless deploys
 
 ---
 

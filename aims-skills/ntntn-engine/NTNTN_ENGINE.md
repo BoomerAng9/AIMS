@@ -81,7 +81,7 @@ How things move. The life and personality of the interface.
 
 | Technology | What It Is | Best For | Key Techniques |
 |-----------|-----------|----------|----------------|
-| **Framer Motion** | Declarative React animation library with gesture support | React/Next.js projects, layout animations, gesture interactions | Variants, AnimatePresence, Layout animations, useScroll, Drag, Spring physics, Shared layout |
+| **Motion** | Declarative React animation library with gesture support | React/Next.js projects, layout animations, gesture interactions | Variants, AnimatePresence, Layout animations, useScroll, Drag, Spring physics, Shared layout |
 | **GSAP (GreenSock)** | Professional-grade animation platform — framework-agnostic | Complex timelines, scroll-driven sequences, SVG animation | ScrollTrigger, Timeline, SplitText, MorphSVG, DrawSVG, Flip plugin, MotionPath |
 | **Anime.js** | Lightweight JS animation library | Simple animations, SVG, DOM elements, quick prototypes | Timeline, Stagger, SVG path animation, CSS properties, Easing functions |
 | **Motion One** | Performant animation library using Web Animations API | Performance-critical animations, small bundle size | animate(), timeline(), scroll(), inView(), spring(), Hardware-accelerated |
@@ -90,10 +90,10 @@ How things move. The life and personality of the interface.
 | **Rive** | Real-time interactive animations with state machines | Interactive characters, game-like UI, data-driven animation | State machines, Input binding, Mesh deformation, Runtime control, Blend states |
 | **CSS Animations** | Native browser animations — zero JS dependency | Simple transitions, hover effects, loading spinners, performance-critical | @keyframes, transition, animation, will-change, contain, @starting-style |
 | **Web Animations API** | Native browser API for programmatic animation control | When you need JS control without library overhead | Element.animate(), getAnimations(), commitStyles(), Custom easing |
-| **Spring Animations** | Physics-based motion (available in Framer Motion, React Spring, etc.) | Natural-feeling motion, interactive elements, drag-and-release | Mass/tension/friction/damping config, Velocity inheritance, Interrupted transitions |
+| **Spring Animations** | Physics-based motion (available in Motion, React Spring, etc.) | Natural-feeling motion, interactive elements, drag-and-release | Mass/tension/friction/damping config, Velocity inheritance, Interrupted transitions |
 
 **Picker_Ang Decision Matrix:**
-- User wants React animations → **Framer Motion** (A.I.M.S. standard)
+- User wants React animations → **Motion** (A.I.M.S. standard)
 - User wants complex timeline choreography → **GSAP**
 - User wants After Effects export → **Lottie**
 - User wants interactive characters / state machines → **Rive**
@@ -175,7 +175,7 @@ How the page responds to the user's journey.
 - User wants native, zero-JS scroll effects → **CSS Scroll-Driven Animations**
 - User wants professional scroll choreography → **GSAP ScrollTrigger**
 - User wants smooth scrolling → **Lenis**
-- User wants parallax → **Framer Motion useTransform** (A.I.M.S. standard) or **GSAP**
+- User wants parallax → **Motion useTransform** (A.I.M.S. standard) or **GSAP**
 - User wants storytelling / step sequences → **Scrollytelling pattern**
 - User wants full-page sections → **Scroll Snapping**
 
@@ -306,9 +306,9 @@ Cross-cutting techniques that span multiple categories. Picker_Ang uses this ind
 
 | When the creative says... | Picker_Ang selects... |
 |--------------------------|----------------------|
-| "I want it to feel alive" | Framer Motion + Spring physics + Micro-interactions |
+| "I want it to feel alive" | Motion + Spring physics + Micro-interactions |
 | "Apple-style product page" | Scroll-linked image sequence + Parallax + GSAP ScrollTrigger |
-| "Modern, clean, fast" | Next.js + Tailwind + shadcn/ui + Framer Motion reveals |
+| "Modern, clean, fast" | Next.js + Tailwind + shadcn/ui + Motion reveals |
 | "Interactive 3D showcase" | R3F + Drei + OrbitControls + GLTF loading |
 | "Storytelling page" | Scrollytelling pattern + Sequential scroll + Text reveals |
 | "Dashboard with charts" | Next.js + shadcn/ui + D3.js or Recharts + CSS Grid |
@@ -318,8 +318,8 @@ Cross-cutting techniques that span multiple categories. Picker_Ang uses this ind
 | "Game-like / immersive" | Three.js/R3F + Babylon.js + Particle systems + Shaders |
 | "Animated logo / icon set" | Lottie or Rive + SVG animation + CSS animation |
 | "Data journalism / infographic" | D3.js + Scrollytelling + GSAP + SVG |
-| "Landing page that converts" | Next.js + Framer Motion + Parallax + CTA animations + A/B testing |
-| "Mobile-first app feel" | React + Framer Motion gestures + Spring physics + View Transitions |
+| "Landing page that converts" | Next.js + Motion + Parallax + CTA animations + A/B testing |
+| "Mobile-first app feel" | React + Motion gestures + Spring physics + View Transitions |
 | "Brutalist / experimental" | Custom CSS + p5.js + Canvas + Custom fonts + Grain overlays |
 | "Glassmorphic / frosted" | backdrop-filter + CSS gradients + Animated borders + Blur layers |
 | "Dark mode premium" | CSS custom properties + Tailwind dark: + Gradient meshes + Glow effects |
@@ -328,30 +328,30 @@ Cross-cutting techniques that span multiple categories. Picker_Ang uses this ind
 
 | Effect | Primary Tool | Fallback | Category |
 |--------|-------------|----------|----------|
-| Parallax | Framer Motion useTransform | CSS perspective | Scroll |
-| Scroll reveal | Framer Motion useInView | Intersection Observer + CSS | Scroll |
+| Parallax | Motion useTransform | CSS perspective | Scroll |
+| Scroll reveal | Motion useInView | Intersection Observer + CSS | Scroll |
 | Image sequence | Canvas + useScroll | Video with scroll scrub | Scroll |
 | Scrollytelling | Custom sticky + useScroll | GSAP ScrollTrigger + Pin | Scroll |
 | Smooth scroll | Lenis | CSS scroll-behavior | Scroll |
-| 3D card tilt | Framer Motion useMotionValue | CSS transform perspective | Hover |
-| Magnetic cursor | Framer Motion useSpring | GSAP | Hover |
+| 3D card tilt | Motion useMotionValue | CSS transform perspective | Hover |
+| Magnetic cursor | Motion useSpring | GSAP | Hover |
 | Custom cursor | CSS + motion tracking | mix-blend-mode circle | Hover |
-| Page transitions | View Transitions API | Framer Motion AnimatePresence | Navigation |
-| Layout animation | Framer Motion layoutId | FLIP technique | Layout |
-| Stagger reveal | Framer Motion staggerChildren | GSAP stagger | Reveal |
-| Typewriter | Framer Motion staggerChildren | CSS steps() | Text |
+| Page transitions | View Transitions API | Motion AnimatePresence | Navigation |
+| Layout animation | Motion layoutId | FLIP technique | Layout |
+| Stagger reveal | Motion staggerChildren | GSAP stagger | Reveal |
+| Typewriter | Motion staggerChildren | CSS steps() | Text |
 | Text split | GSAP SplitText | Manual span wrapping | Text |
-| Number counter | Framer Motion useSpring | requestAnimationFrame | Text |
+| Number counter | Motion useSpring | requestAnimationFrame | Text |
 | Particle system | Canvas / Three.js | CSS animation (limited) | Visual |
 | Gradient border | CSS conic-gradient + @property | SVG gradient | Visual |
 | Glassmorphism | backdrop-filter: blur() | Semi-transparent bg | Visual |
 | 3D scene | R3F + Drei | Three.js vanilla | 3D |
 | 3D text | Drei Text3D | CSS 3D transform (flat) | 3D |
 | Loading skeleton | CSS animation shimmer | Tailwind animate-pulse | Micro |
-| Button feedback | Framer Motion whileTap | CSS :active | Micro |
-| Toast notification | Framer Motion + AnimatePresence | CSS transition | Micro |
-| Accordion | Framer Motion animate height | HTML details/summary | Micro |
-| Drag reorder | Framer Motion Reorder | @dnd-kit | Micro |
+| Button feedback | Motion whileTap | CSS :active | Micro |
+| Toast notification | Motion + AnimatePresence | CSS transition | Micro |
+| Accordion | Motion animate height | HTML details/summary | Micro |
+| Drag reorder | Motion Reorder | @dnd-kit | Micro |
 
 ---
 

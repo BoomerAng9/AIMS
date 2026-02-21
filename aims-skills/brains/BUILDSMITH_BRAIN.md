@@ -111,10 +111,10 @@ ITERATE (user feedback loop) → POLISH (a11y, perf, cleanup)
 ```
 ┌──────────────────────────────────────────┐
 │  E2B Cloud Sandbox / Docker              │
-│  ├── Node.js 20+ Runtime                 │
-│  │   ├── next@15, tailwindcss@4          │
-│  │   ├── framer-motion@12+ (Motion)      │
-│  │   ├── @radix-ui/*, typescript@5+      │
+│  ├── Node.js 22+ Runtime                 │
+│  │   ├── next@16, tailwindcss@4          │
+│  │   ├── motion@12 (React + Vue + JS)    │
+│  │   ├── radix-ui, typescript@5+         │
 │  │   └── [Picker_Ang selections]         │
 │  ├── Dev Server (next dev :3000)         │
 │  │   └── HMR active, accessible via URL  │

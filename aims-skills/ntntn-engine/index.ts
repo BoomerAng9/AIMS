@@ -272,10 +272,10 @@ export interface BuildManifest {
 // ---------------------------------------------------------------------------
 
 export const AIMS_DEFAULT_STACK = {
-  framework: 'Next.js 15 (App Router)',
+  framework: 'Next.js 16 (App Router, Turbopack)',
   styling: 'Tailwind CSS v4',
-  animation: 'Motion (Framer Motion v12+)',
-  ui_components: 'shadcn/ui (Radix + Tailwind)',
+  animation: 'Motion v12 (React + Vue + vanilla JS)',
+  ui_components: 'shadcn/ui (Radix UI or Base UI + Tailwind v4)',
   state: 'React Server Components + Zustand',
   deployment: 'Docker Compose on VPS',
 } as const;

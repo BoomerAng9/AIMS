@@ -13,7 +13,7 @@
 | Library | Approach | Performance | Bundle Impact |
 |---------|----------|-------------|---------------|
 | **View Transitions API** | Native browser `document.startViewTransition()` | Best performance | 0KB |
-| **Framer Motion** | `AnimatePresence` wrapping route outlet + exit/enter animations | Full control | Included in FM |
+| **Motion** | `AnimatePresence` wrapping route outlet + exit/enter animations | Full control | Included in Motion |
 | **Next.js (App Router)** | `loading.tsx` + `template.tsx` with animation wrapper | Framework-native | 0KB |
 | **Barba.js** | Dedicated page transition library (framework-agnostic) | Feature-rich | +8KB |
 | **Swup** | Page transition library with plugin system | Modular | +5KB |
@@ -102,8 +102,8 @@
 
 | Library | Approach | Performance | Bundle Impact |
 |---------|----------|-------------|---------------|
-| **Framer Motion layout** | `layout` prop on `motion` elements — automatic FLIP | Smooth, declarative | Included in FM |
-| **Framer Motion layoutId** | Shared `layoutId` for cross-component layout transitions | Cross-container animation | Included in FM |
+| **Motion layout** | `layout` prop on `motion` elements — automatic FLIP | Smooth, declarative | Included in Motion |
+| **Motion layoutId** | Shared `layoutId` for cross-component layout transitions | Cross-container animation | Included in Motion |
 | **FLIP technique** | Manual First-Last-Invert-Play (measure → invert → animate) | Framework-agnostic | 0KB |
 | **Auto Animate** | `useAutoAnimate()` hook — zero-config layout animation | Dead simple | +4KB |
 
@@ -138,7 +138,7 @@
 - Only add `layout` to elements that actually move
 - Use `layout="position"` if only position changes (not size)
 - Use `layoutId` sparingly — each one triggers a measurement
-- `Auto Animate` is best for simple cases; Framer Motion for complex choreography
+- `Auto Animate` is best for simple cases; Motion for complex choreography
 
 ---
 
@@ -150,7 +150,7 @@
 
 | Library | Approach | Performance | Bundle Impact |
 |---------|----------|-------------|---------------|
-| **Framer Motion** | `staggerChildren` in parent variant + child variants | GPU-accelerated | Included in FM |
+| **Motion** | `staggerChildren` in parent variant + child variants | GPU-accelerated | Included in Motion |
 | **GSAP** | `gsap.from(items, { stagger: 0.1, ... })` | GPU-accelerated | +45KB |
 | **CSS** | `animation-delay: calc(var(--index) * 0.1s)` per item | Native | 0KB |
 | **Motion One** | `stagger(0.1)` in timeline | Lightweight | +3KB |
@@ -218,7 +218,7 @@
 
 | Library | Approach | Performance | Bundle Impact |
 |---------|----------|-------------|---------------|
-| **Framer Motion** | `AnimatePresence mode="wait"` or `mode="popLayout"` | GPU-accelerated | Included in FM |
+| **Motion** | `AnimatePresence mode="wait"` or `mode="popLayout"` | GPU-accelerated | Included in Motion |
 | **CSS** | Absolute positioning + `opacity` transition with state toggle | Native | 0KB |
 | **View Transitions API** | `document.startViewTransition()` for same-element content swap | Native, browser-level | 0KB |
 
@@ -243,7 +243,7 @@
 
 | Library | Approach | Performance | Bundle Impact |
 |---------|----------|-------------|---------------|
-| **Framer Motion** | `AnimatePresence` + backdrop + dialog motion components | Full control | Included in FM |
+| **Motion** | `AnimatePresence` + backdrop + dialog motion components | Full control | Included in Motion |
 | **Radix Dialog** | Headless dialog + CSS/FM animation | Accessible | +5KB |
 | **Headless UI Dialog** | Transition component with enter/leave classes | Tailwind-native | Included |
 | **CSS** | `:modal` pseudo-class + `@starting-style` (2024+) | Native, modern | 0KB |
@@ -279,7 +279,7 @@ Close (200ms total):
 
 | Library | Approach | Performance | Bundle Impact |
 |---------|----------|-------------|---------------|
-| **Framer Motion** | `AnimatePresence` + `motion.div` with `height: "auto"` | Smooth, spring-based | Included in FM |
+| **Motion** | `AnimatePresence` + `motion.div` with `height: "auto"` | Smooth, spring-based | Included in Motion |
 | **CSS** | `grid-template-rows: 0fr → 1fr` transition (modern) | Native, smooth | 0KB |
 | **Radix Accordion** | Headless accordion + CSS variable for height | Accessible | +3KB |
 | **HTML details/summary** | Native browser accordion (no animation by default) | Zero JS, accessible | 0KB |

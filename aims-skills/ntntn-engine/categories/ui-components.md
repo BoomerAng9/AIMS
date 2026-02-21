@@ -10,8 +10,8 @@
 Copy-paste React components built on Radix UI primitives + Tailwind CSS.
 You own the code — components are copied into your project, not imported from a package.
 
-- **Current:** shadcn/ui (continuously updated)
-- **Foundation:** Radix UI (accessibility) + Tailwind CSS (styling) + CVA (variants)
+- **Current:** shadcn/ui (Feb 2026: unified `radix-ui` package, Base UI support, RTL, 65K+ stars)
+- **Foundation:** Radix UI or Base UI (choose at init) + Tailwind CSS v4 (styling) + CVA (variants)
 - **A.I.M.S. Status:** Default component library for all builds
 
 ### Key Patterns & Techniques
@@ -86,13 +86,13 @@ Table, Tabs, Textarea, Toggle, Tooltip
 Unstyled, accessible React primitives. The foundation that shadcn/ui is built on.
 Handles all accessibility, keyboard navigation, and focus management.
 
-- **Current:** Radix Primitives 1.x
+- **Current:** Unified `radix-ui` package (Feb 2026 — replaces individual `@radix-ui/react-*` packages)
 - **Approach:** Headless components — you bring your own styles
 - **Accessibility:** WAI-ARIA compliant, keyboard navigable, screen reader tested
 
 ### Key Patterns
 ```tsx
-import * as Dialog from '@radix-ui/react-dialog';
+import { Dialog } from 'radix-ui'; // New unified import (was @radix-ui/react-dialog)
 
 <Dialog.Root>
   <Dialog.Trigger>Open</Dialog.Trigger>

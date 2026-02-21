@@ -4,14 +4,17 @@
 
 ---
 
-## Framer Motion
+## Motion (formerly Motion)
 
 ### Overview
-The declarative animation library for React. Provides gesture recognition, layout animations,
-scroll-linked animations, spring physics, and AnimatePresence for mount/unmount transitions.
+The declarative animation library for React, Vue, and vanilla JavaScript. Provides gesture
+recognition, layout animations, scroll-linked animations, spring physics, and AnimatePresence
+for mount/unmount transitions. Rebranded from "Motion" to "Motion" in 2025 as an
+independent project at motion.dev — now framework-agnostic.
 
-- **Current:** Framer Motion 11+
+- **Current:** Motion 12.34 (install: `npm i motion`, was `framer-motion`)
 - **Bundle:** ~30KB (tree-shakeable)
+- **Frameworks:** React, Vue, vanilla JavaScript
 - **A.I.M.S. Status:** Primary animation library — used on all pages
 
 ### Core API
@@ -133,10 +136,10 @@ transition={{ type: "spring", stiffness: 100, damping: 10, mass: 2 }}
 ```
 
 ### Picker_Ang Notes
-- **Default for all A.I.M.S. React builds** — ecosystem alignment
-- Strongest in: layout animations, gestures, scroll-linked, variants
+- **Default for all A.I.M.S. builds** — ecosystem alignment, now multi-framework
+- Strongest in: layout animations, gestures, scroll-linked, variants, `useScroll` hardware-accelerated
 - Weakest in: Complex multi-element timelines (GSAP is better here)
-- Does NOT work with Vue, Svelte, Angular — React only
+- Works with React, Vue, and vanilla JavaScript (no longer React-only)
 
 ---
 
@@ -146,10 +149,10 @@ transition={{ type: "spring", stiffness: 100, damping: 10, mass: 2 }}
 The professional animation platform — framework-agnostic, battle-tested, used by
 NASA, Google, Apple. Excels at complex timelines, scroll-driven choreography, and SVG animation.
 
-- **Current:** GSAP 3.12+
+- **Current:** GSAP 3.14.2
 - **Bundle:** ~25KB core + plugins (ScrollTrigger ~20KB, SplitText ~10KB)
-- **License:** Free for most use, Club GreenSock for premium plugins
-- **A.I.M.S. Status:** Secondary — used when Framer Motion can't handle the complexity
+- **License:** 100% FREE including ALL plugins (SplitText, MorphSVG, DrawSVG, etc.) — Webflow acquisition made everything free
+- **A.I.M.S. Status:** Secondary — used when Motion can't handle the complexity
 
 ### Core API
 
@@ -164,10 +167,10 @@ NASA, Google, Apple. Excels at complex timelines, scroll-driven choreography, an
 
 #### Plugins
 - **ScrollTrigger** — Scroll-linked animation controller (pin, scrub, snap, batch)
-- **SplitText** — Split text into chars/words/lines for animation (Club)
-- **MorphSVG** — Morph between SVG paths (Club)
-- **DrawSVG** — Animate SVG stroke drawing (Club)
-- **MotionPath** — Animate elements along SVG paths (Club)
+- **SplitText** — Split text into chars/words/lines for animation (FREE)
+- **MorphSVG** — Morph between SVG paths (FREE)
+- **DrawSVG** — Animate SVG stroke drawing (FREE)
+- **MotionPath** — Animate elements along SVG paths (FREE)
 - **Flip** — First-Last-Invert-Play layout animations
 - **Observer** — Unified input detection (scroll, touch, pointer)
 - **TextPlugin** — Animate text content changes
@@ -258,10 +261,11 @@ function Component() {
 ```
 
 ### Picker_Ang Notes
-- Choose over Framer Motion when: Complex timelines, SVG animation, SplitText, framework-agnostic
+- Choose over Motion when: Complex timelines, SVG animation, SplitText, scroll pinning
 - Strongest in: ScrollTrigger pinning/scrubbing, timeline choreography, SVG morphing
-- Weakest in: React layout animations (Framer Motion's layoutId is better)
-- Can coexist with Framer Motion in the same project (different elements)
+- Weakest in: React layout animations (Motion's layoutId is better)
+- NOW 100% FREE — no more Club GreenSock paywall for SplitText, MorphSVG, etc.
+- Can coexist with Motion in the same project (different elements)
 
 ---
 
@@ -298,14 +302,15 @@ anime({
 
 ---
 
-## Motion One
+## Motion (Vanilla JS API)
 
 ### Overview
-A tiny animation library built on the Web Animations API — hardware-accelerated by default.
-Created by the Framer Motion author as a framework-agnostic alternative.
+The vanilla JavaScript API of Motion (formerly "Motion One") — the same library as the React
+API above, but for non-React use. Built on the Web Animations API — hardware-accelerated by default.
+Now unified under the `motion` package alongside the React and Vue APIs.
 
-- **Current:** Motion One
-- **Bundle:** ~3KB
+- **Current:** Motion 12.34 (same package: `npm i motion`)
+- **Bundle:** ~3KB (vanilla API only)
 - **License:** MIT
 
 ### Key API
@@ -315,7 +320,7 @@ import { animate, scroll, inView, spring } from "motion";
 // Basic animation
 animate(".box", { x: 100, opacity: 1 }, { duration: 0.5 });
 
-// Scroll-linked
+// Scroll-linked (hardware-accelerated in v12.34+)
 scroll(animate(".progress", { scaleX: [0, 1] }));
 
 // Viewport detection
@@ -326,7 +331,7 @@ inView(".element", ({ target }) => {
 
 ### Picker_Ang Notes
 - Choose when: Need animation outside React, bundle size is critical, WAAPI performance
-- Avoid when: Need layout animations, gestures, AnimatePresence (use Framer Motion)
+- This IS the same library as "Motion for React" — just the vanilla/Vue API surface
 
 ---
 
@@ -467,7 +472,7 @@ dialog[open] {
 ### Picker_Ang Notes
 - **Always the first choice** for simple transitions (hover, focus, state changes)
 - Use for: hover effects, loading spinners, simple reveals, progress bars
-- Upgrade to Framer Motion when: gestures needed, layout animations, complex choreography
+- Upgrade to Motion when: gestures needed, layout animations, complex choreography
 - Upgrade to GSAP when: timeline sequences, SVG manipulation, scroll pinning
 
 ---
@@ -495,7 +500,7 @@ animation.finished.then(() => console.log("done"));
 
 ### Picker_Ang Notes
 - Choose when: Need JS control without library, performance-critical, framework-agnostic
-- Avoid when: Need spring physics, gestures, layout animations (use Framer Motion)
+- Avoid when: Need spring physics, gestures, layout animations (use Motion)
 
 ---
 
@@ -523,7 +528,7 @@ Molasses:  { stiffness: 50,  damping: 20, mass: 3 }
 ```
 
 ### Available In
-- Framer Motion (`type: "spring"`)
+- Motion (`type: "spring"`)
 - React Spring (`useSpring`)
 - GSAP (custom ease)
 - Motion One (`spring()`)
@@ -540,10 +545,10 @@ Molasses:  { stiffness: 50,  damping: 20, mass: 3 }
 
 | Library | Bundle | React | Vue | Svelte | Vanilla | Scroll | Gesture | Layout | Spring |
 |---------|--------|-------|-----|--------|---------|--------|---------|--------|--------|
-| **Framer Motion** | 30KB | Yes | No | No | No | Yes | Yes | Yes | Yes |
+| **Motion** | 30KB | Yes | Yes | No | Yes | Yes | Yes | Yes | Yes |
 | **GSAP** | 25KB+ | Plugin | Yes | Yes | Yes | Excellent | No | Flip | No |
 | **Anime.js** | 17KB | No | Yes | Yes | Yes | No | No | No | No |
-| **Motion One** | 3KB | No | Yes | Yes | Yes | Yes | No | No | Yes |
+| **Motion (vanilla)** | 3KB | No | Yes | Yes | Yes | Yes | No | No | Yes |
 | **Lottie** | 45KB+ | Yes | Yes | Yes | Yes | Manual | No | No | No |
 | **Rive** | 160KB | Yes | Yes | No | Yes | Manual | State | No | No |
 | **CSS** | 0KB | N/A | N/A | N/A | N/A | Native | No | No | No |

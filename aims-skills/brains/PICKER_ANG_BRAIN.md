@@ -31,8 +31,8 @@ When ACHEEVY routes a build request to Picker_Ang:
 
 ### Selection Rules (Hard)
 - **Maximum 3 primary technologies** per build — no stack soup
-- **Always check A.I.M.S. defaults first** — Next.js, Tailwind, Framer Motion, shadcn/ui
-- **Never select competing tools** — e.g., don't pick both GSAP and Framer Motion for the same animation type
+- **Always check A.I.M.S. defaults first** — Next.js, Tailwind, Motion, shadcn/ui
+- **Never select competing tools** — e.g., don't pick both GSAP and Motion for the same animation type
 - **Mobile-first consideration** — if the user mentions mobile, deprioritize heavy 3D/WebGL
 - **Performance budget** — total JS bundle for selected stack must stay under 200KB (gzipped)
 - **Accessibility compliance** — every selection must support prefers-reduced-motion
@@ -49,18 +49,18 @@ When ACHEEVY routes a build request to Picker_Ang:
   "recommendation_id": "SR-001",
   "creative_intent": "User's original description",
   "primary_stack": {
-    "framework": "Next.js 14",
+    "framework": "Next.js 16",
     "styling": "Tailwind CSS",
-    "animation": "Framer Motion"
+    "animation": "Motion"
   },
   "supplementary": [
     { "tool": "Lenis", "reason": "Smooth scroll requested" },
     { "tool": "R3F", "reason": "3D product showcase needed" }
   ],
   "techniques": [
-    { "id": "parallax", "category": "scroll", "library": "Framer Motion" },
-    { "id": "scroll-reveal", "category": "scroll", "library": "Framer Motion" },
-    { "id": "3d-card-tilt", "category": "hover", "library": "Framer Motion" }
+    { "id": "parallax", "category": "scroll", "library": "Motion" },
+    { "id": "scroll-reveal", "category": "scroll", "library": "Motion" },
+    { "id": "3d-card-tilt", "category": "hover", "library": "Motion" }
   ],
   "compatibility_check": "PASS",
   "estimated_bundle_kb": 145,

@@ -44,7 +44,7 @@ based on scroll position using CSS `animation-timeline` and `view-timeline`.
 Professional scroll-animation controller. Pin sections, scrub animations to scroll
 position, batch reveals, snap points. The gold standard for scroll choreography.
 
-- **Current:** GSAP 3.12+ (all plugins now free — Webflow acquisition)
+- **Current:** GSAP 3.14.2 (all plugins now 100% FREE — Webflow acquisition)
 - **Approach:** Declarative scroll triggers attached to GSAP timelines
 - **Bundle:** ~45KB for GSAP core + ScrollTrigger
 
@@ -86,17 +86,17 @@ ScrollTrigger.batch('.card', {
 
 ### Picker_Ang Notes
 - Choose when: Complex scroll choreography, pinned sections, scrub animations
-- Avoid when: Simple reveals (use Framer Motion useInView), minimal bundle needs
+- Avoid when: Simple reveals (use Motion useInView), minimal bundle needs
 
 ---
 
-## Framer Motion (Motion) Scroll Utilities
+## Motion Scroll Utilities
 
 ### Overview
 Motion (formerly Framer Motion) provides scroll hooks — `useScroll`, `useTransform`,
 `useInView` — for React-native scroll interactions.
 
-- **Current:** Motion v12+ (rebranded from Framer Motion)
+- **Current:** Motion v12.34 (hardware-accelerated `useScroll` since v12.34)
 - **Approach:** React hooks that map scroll progress to animated values
 - **A.I.M.S. Status:** Default scroll handler for React/Next.js
 
@@ -142,7 +142,7 @@ const opacity = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0, 1, 1, 0]);
 Smooth scroll library that enhances native scroll behavior. Adds momentum,
 lerp-based smoothing, and scroll events without hijacking native scroll.
 
-- **Current:** Lenis 1.x (Studio Freight)
+- **Current:** Lenis 1.3.17 (darkroom.engineering)
 - **Approach:** Wraps native scroll with smooth interpolation
 - **Performance:** Uses requestAnimationFrame, respects native scroll mechanics
 
@@ -294,6 +294,6 @@ on scroll position. Used in data journalism, feature tours, and product stories.
 
 ## A.I.M.S. Default: Motion useScroll + useInView
 
-For React/Next.js projects, **Motion (Framer Motion) scroll hooks** are the default.
+For React/Next.js projects, **Motion scroll hooks** are the default.
 Add **GSAP ScrollTrigger** for complex choreography with pinning/scrub.
 Add **Lenis** only when smooth scrolling is explicitly requested.
