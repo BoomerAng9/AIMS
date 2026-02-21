@@ -847,6 +847,8 @@ ntntn-engine/                          ← NtNtN Engine (A.I.M.S. Creative Dev L
 │   ├── backend-fullstack.md
 │   ├── cms-content.md
 │   └── deployment-infra.md
+├── execution/                            ← Buildsmith execution pipeline
+│   └── buildsmith-execution-pipeline.md  ← Three pillars: IMAGE, INTERFACE, INTEGRATIONS
 └── techniques/                        ← Deep dives per technique group
     ├── scroll-techniques.md           ← 10 scroll-based techniques
     ├── hover-interaction.md           ← 8 hover & interaction techniques
@@ -1147,11 +1149,13 @@ See: `hooks/enter-chicken-hawk.hook.md`, `skills/chicken-hawk/`
 
 ---
 
-## 22. NtNtN Engine (Creative Development Library)
+## 22. NtNtN Engine (Creative Development Library + Execution Engine)
 
-The NtNtN Engine is an **A.I.M.S. platform feature** — a comprehensive library and engine
-that translates creative intent into technical execution. It belongs to AI Managed Solutions,
+The NtNtN Engine is an **A.I.M.S. platform feature** — a comprehensive library and execution engine
+that translates creative intent into real, deployed products. It belongs to AI Managed Solutions,
 not to any single agent. All agents in the hierarchy access it when the work calls for it.
+
+**Doctrine: Execution on intention.**
 
 ### What It Contains
 - **10 Technology Categories:** Frontend Frameworks, Animation & Motion, Styling Systems,
@@ -1161,12 +1165,30 @@ not to any single agent. All agents in the hierarchy access it when the work cal
   text/typography, visual effects, 3D/immersive, and micro-interactions
 - **NLP Intent Map:** Keyword-to-category mapping for automatic routing from user descriptions
 - **Decision Matrices:** Per-category tool selection guides (Picker_Ang uses these)
+- **Execution Pipeline:** Buildsmith's three-pillar execution engine (IMAGE, INTERFACE, INTEGRATIONS)
 
 ### Connected Boomer_Angs
-- **Picker_Ang** — Selects components, techniques, and patterns from the library
+- **Picker_Ang** (Blue #3B82F6) — Selects components, techniques, and patterns from the library
   that match the creative's described vision. Produces a Stack Recommendation.
-- **Buildsmith** (special: no _Ang suffix) — Takes Picker_Ang's selections and
-  constructs the end product. Accredited with every finished build.
+- **Buildsmith** (Orange-Gold #E5A530, special: no _Ang suffix) — Takes Picker_Ang's selections and
+  constructs the end product through three execution pillars. Accredited with every finished build.
+
+### Buildsmith Execution Pipeline (Three Pillars)
+1. **IMAGE** — Visual asset pipeline: AI image gen, color palettes, typography, icons, logos, favicons, OG images, asset optimization
+2. **INTERFACE** — Code generation engine: E2B sandbox, component/page gen, animation wiring, live preview, user iteration loop
+3. **INTEGRATIONS** — Fullstack & deploy: Git, database (Prisma), auth, payments, API routes, build, deploy, domain/SSL, monitoring
+
+### Two Entry Points
+- **Entry A (ACHEEVY-Guided):** User describes → ACHEEVY walks creative brief → Picker_Ang selects → Buildsmith builds
+- **Entry B (Direct-to-Engine):** User writes prompt → NLP classify → Auto-select → Buildsmith builds
+
+### Scope Tiers
+| Tier | Scope | Est. Cost | Est. Time |
+|------|-------|-----------|-----------|
+| 1: Component | Single pattern | $0.25-$0.75 | 2-5 min |
+| 2: Page | Landing/portfolio | $1-$3 | 5-15 min |
+| 3: Application | Multi-page app | $3-$8 | 15-45 min |
+| 4: Platform | Enterprise SaaS | $8-$20 | 45-120 min |
 
 ### Routing Flow
 ```
@@ -1175,11 +1197,12 @@ User describes build → ACHEEVY NLP detects build intent
   → Picker_Ang queries NtNtN Engine library
   → Picker_Ang produces Stack Recommendation
   → Stack Recommendation → Buildsmith
-  → Buildsmith creates Build Manifest
-  → Build Manifest → Chicken Hawk
-  → Chicken Hawk dispatches Lil_Hawks
-  → Lil_Hawks execute (Lil_Interface_Forge_Hawk, Lil_Motion_Tuner_Hawk, etc.)
-  → Evidence collected → Buildsmith signs build
+  → Buildsmith creates Build Manifest (3 pillars)
+  → PHASE 1: IMAGE → Asset Catalog
+  → PHASE 2: INTERFACE → Code in sandbox, preview URL, iterate with user
+  → PHASE 3: INTEGRATIONS → DB, auth, deploy → Live URL
+  → PHASE 4: VERIFICATION → Lighthouse, a11y, CWV, security
+  → PHASE 5: SIGN → <!-- Buildsmith --> + delivery package
   → ACHEEVY delivers to user
 ```
 
@@ -1191,9 +1214,11 @@ Activated when user message contains:
 ### Key Files
 - `aims-skills/ntntn-engine/NTNTN_ENGINE.md` — Master reference document
 - `aims-skills/ntntn-engine/index.ts` — NLP keyword registry + intent detection
-- `aims-skills/ntntn-engine/techniques/` — Deep dives per technique group
+- `aims-skills/ntntn-engine/execution/buildsmith-execution-pipeline.md` — Full execution pipeline spec
+- `aims-skills/ntntn-engine/categories/` — 10 category deep-dive files
+- `aims-skills/ntntn-engine/techniques/` — 7 technique deep-dive files
 - `aims-skills/brains/PICKER_ANG_BRAIN.md` — Picker_Ang brain
-- `aims-skills/brains/BUILDSMITH_BRAIN.md` — Buildsmith brain
+- `aims-skills/brains/BUILDSMITH_BRAIN.md` — Buildsmith brain (includes execution pipeline summary)
 - `aims-skills/chain-of-command/role-cards/picker-ang.json` — Picker_Ang role card
 - `aims-skills/chain-of-command/role-cards/buildsmith.json` — Buildsmith role card
 

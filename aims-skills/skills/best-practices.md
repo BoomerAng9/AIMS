@@ -29,6 +29,19 @@ priority: "high"
 
 # Best Practices & Standards Skill
 
+## NtNtN Engine Integration
+
+All creative builds must comply with engineering best practices defined here.
+The NtNtN Engine provides the technology catalog and technique patterns;
+this skill enforces quality standards across the pipeline.
+
+**NtNtN Engine References:**
+- `aims-skills/ntntn-engine/NTNTN_ENGINE.md` — Technology/technique library
+- `aims-skills/ntntn-engine/execution/buildsmith-execution-pipeline.md` — Evidence gates and verification standards
+- Buildsmith's VERIFICATION phase enforces: Lighthouse > 90, Accessibility > 95, CWV targets
+
+---
+
 ## Available Templates
 
 ### PRD (Product Requirements Document)

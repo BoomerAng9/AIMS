@@ -385,12 +385,66 @@ IF intent contains [build, create, make, design, develop, code, scaffold, genera
 
 ---
 
+## Execution Layer — Buildsmith's Three Pillars
+
+The NtNtN Engine is not just a library — it's an execution engine. Buildsmith's execution pipeline turns Picker_Ang's selections into real, deployed products through three pillars:
+
+### Pillar 1: IMAGE (Visual Asset Pipeline)
+Generates everything the user sees before code is written — AI images, color palettes, typography, icons, logos, favicons, OG images, placeholders, animation assets.
+
+**Tools:** Flux Pro / DALL-E 3, Sharp / Squoosh, Satori, BlurHash, Vibrant.js, Google Fonts API, Rive / Lottie export
+
+### Pillar 2: INTERFACE (Code Generation Engine)
+The core builder — generates code, components, pages, styles, and animations inside an isolated sandbox with live preview and user iteration loop.
+
+**Tools:** E2B Cloud Sandbox / Docker, Next.js dev server, LLM (Claude) + NtNtN patterns, shadcn/ui CLI, ESLint, axe-core
+
+### Pillar 3: INTEGRATIONS (Fullstack & Deploy Pipeline)
+Connects frontend to databases, auth, payments, APIs, Git, deployment targets, monitoring.
+
+**Tools:** GitHub API, Prisma ORM, NextAuth.js / Clerk, Stripe, Resend, Vercel / Docker Compose, Sentry / Uptime Kuma
+
+### Execution Flow
+```
+User describes vision
+    ↓
+Picker_Ang → Stack Recommendation
+    ↓
+Buildsmith Execution Pipeline:
+  PHASE 0: INTAKE   → Build Manifest created
+  PHASE 1: IMAGE    → Visual assets generated + optimized
+  PHASE 2: INTERFACE → Code generated in sandbox, preview URL, user iterates
+  PHASE 3: INTEGRATIONS → DB, auth, API, deploy → Live URL
+  PHASE 4: VERIFICATION → Lighthouse, a11y, CWV, security, SEO
+  PHASE 5: SIGN      → <!-- Buildsmith --> + delivery package
+    ↓
+ACHEEVY delivers to user
+```
+
+### Two Entry Points
+- **Entry A (ACHEEVY-Guided):** Conversational creative brief → Picker_Ang → Buildsmith
+- **Entry B (Direct-to-Engine):** Detailed prompt → NLP classify → Auto-select → Buildsmith
+
+### Scope Tiers
+| Tier | Scope | Est. Cost | Est. Time |
+|------|-------|-----------|-----------|
+| 1: Component | Single pattern | $0.25-$0.75 | 2-5 min |
+| 2: Page | Landing/portfolio | $1-$3 | 5-15 min |
+| 3: Application | Multi-page app | $3-$8 | 15-45 min |
+| 4: Platform | Enterprise SaaS | $8-$20 | 45-120 min |
+
+**Full Pipeline Spec:** `aims-skills/ntntn-engine/execution/buildsmith-execution-pipeline.md`
+
+---
+
 ## Library File Structure
 
 ```
 aims-skills/ntntn-engine/
 ├── NTNTN_ENGINE.md              ← This file (master reference)
 ├── index.ts                     ← Exports + NLP keyword registry
+├── execution/
+│   └── buildsmith-execution-pipeline.md  ← Full execution pipeline spec (IMAGE, INTERFACE, INTEGRATIONS)
 ├── categories/
 │   ├── frontend-frameworks.md   ← Category 1 deep reference
 │   ├── animation-motion.md      ← Category 2 deep reference

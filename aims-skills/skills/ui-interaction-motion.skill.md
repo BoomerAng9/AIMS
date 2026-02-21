@@ -30,6 +30,25 @@ This skill covers:
 - Accessibility-safe fallbacks
 - Acceptance checklist
 
+## NtNtN Engine Integration
+
+This skill enforces motion consistency for A.I.M.S. internal builds. The NtNtN Engine
+provides the broader technique catalog that Picker_Ang draws from when selecting
+animation approaches for creative builds.
+
+**Relationship:**
+- This skill = A.I.M.S. internal motion standards (what we use)
+- NtNtN Engine = Full animation technique library (what's available for any build)
+- Picker_Ang selects from NtNtN Engine → Buildsmith executes → this skill validates consistency
+
+**NtNtN Engine References:**
+- `aims-skills/ntntn-engine/categories/animation-motion.md` — Full animation library (Motion, GSAP, Lottie, Rive, etc.)
+- `aims-skills/ntntn-engine/techniques/micro-interactions.md` — Button feedback, toggles, toasts, etc.
+- `aims-skills/ntntn-engine/techniques/page-transitions.md` — AnimatePresence, View Transitions, layout animations
+- `aims-skills/ntntn-engine/techniques/hover-interaction.md` — 3D tilt, magnetic cursor, gesture patterns
+
+---
+
 ## Core Motion Concepts (Required)
 - **Variants** — state-based animation declarations
 - **AnimatePresence** — mount/unmount clarity

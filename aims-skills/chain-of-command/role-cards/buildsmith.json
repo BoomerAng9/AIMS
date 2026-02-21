@@ -25,14 +25,21 @@
     "cannot_message": ["Lil_Messenger_Hawk"]
   },
   "capabilities": {
-    "specialties": ["web_construction", "component_assembly", "frontend_engineering", "fullstack_builds", "creative_execution"],
+    "specialties": ["web_construction", "component_assembly", "frontend_engineering", "fullstack_builds", "creative_execution", "image_asset_pipeline", "code_generation", "fullstack_integration", "deployment_orchestration"],
     "allowed_actions": [
       "CONSTRUCT_FROM_SPEC",
       "ASSEMBLE_COMPONENTS",
       "ORCHESTRATE_BUILD_PIPELINE",
       "VALIDATE_BUILD_OUTPUT",
       "REQUEST_CHICKEN_HAWK_DISPATCH",
-      "SIGN_COMPLETED_BUILD"
+      "SIGN_COMPLETED_BUILD",
+      "EXECUTE_IMAGE_PILLAR",
+      "EXECUTE_INTERFACE_PILLAR",
+      "EXECUTE_INTEGRATIONS_PILLAR",
+      "SPAWN_SANDBOX",
+      "GENERATE_PREVIEW_URL",
+      "ITERATE_WITH_USER",
+      "DEPLOY_TO_TARGET"
     ],
     "forbidden_actions": [
       "SELECT_TECHNOLOGIES",
@@ -40,7 +47,7 @@
       "BYPASS_CHAIN_OF_COMMAND",
       "DEPLOY_WITHOUT_EVIDENCE"
     ],
-    "allowed_tools": ["UEF_GATEWAY", "NTNTN_ENGINE", "CODEX_CLI", "CODEX_MCP", "AUDIT_LOG", "N8N_BRIDGE"],
+    "allowed_tools": ["UEF_GATEWAY", "NTNTN_ENGINE", "CODEX_CLI", "CODEX_MCP", "AUDIT_LOG", "N8N_BRIDGE", "E2B_SANDBOX", "GITHUB_API", "IMAGE_GEN_API", "PRISMA_CLI", "DEPLOY_PIPELINE"],
     "forbidden_tools": ["SECRET_STORE_RAW_DUMP", "BILLING_OVERRIDE"]
   },
   "gates": {
@@ -51,7 +58,7 @@
       "on_exceed": "escalate"
     },
     "evidence": {
-      "required_artifacts": ["BUILD_OUTPUT", "BUILD_LOG", "COMPONENT_MANIFEST", "QUALITY_CHECK"],
+      "required_artifacts": ["BUILD_OUTPUT", "BUILD_LOG", "COMPONENT_MANIFEST", "QUALITY_CHECK", "ASSET_CATALOG", "PREVIEW_SCREENSHOT", "LIGHTHOUSE_REPORT", "DEPLOY_RECEIPT"],
       "no_proof_no_done": true
     },
     "security": {

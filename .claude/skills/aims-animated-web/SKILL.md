@@ -16,6 +16,11 @@ no drag-and-drop builders. Pure Next.js + Framer Motion + CSS + Canvas.
 
 Use **together with** `aims-global-ui` and the relevant archetype skill (e.g., `aims-landing-ui`).
 
+**NtNtN Engine Relationship:** This skill is the *implementation standard* for A.I.M.S.
+internal animated pages. The NtNtN Engine (`aims-skills/ntntn-engine/`) is the full
+technique *library* that Picker_Ang and Buildsmith use for creative builds. This skill's
+patterns are drawn from the NtNtN Engine's animation, scroll, and visual effect categories.
+
 ## When to Use
 
 Activate this skill when:

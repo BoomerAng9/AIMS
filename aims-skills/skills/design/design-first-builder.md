@@ -61,6 +61,30 @@ Every design or redesign must produce:
 | **Layout Rules** | Grid, breakpoints, safe areas, overflow behavior |
 | **Composition Map** | Component hierarchy with token bindings |
 
+## NtNtN Engine Integration
+
+The Design-First Builder pipeline feeds into the NtNtN Engine execution pipeline:
+
+- **FEEL** phase → informs Picker_Ang's creative intent analysis
+- **ANCHORS** phase → feeds into Buildsmith's IMAGE pillar (color extraction, typography pairing)
+- **TOKENS** phase → feeds into Buildsmith's INTERFACE pillar (Tailwind config, CSS variables)
+- **COMPOSITION** phase → maps to NtNtN Engine's Layout & Responsive category
+- **IMPLEMENT** phase → Buildsmith executes using NtNtN Engine technique patterns
+
+When a build request comes through ACHEEVY, the Design-First Builder pipeline runs
+*before* Picker_Ang selects technologies. The design packet becomes input to the
+Stack Recommendation.
+
+**Key References:**
+- `aims-skills/ntntn-engine/NTNTN_ENGINE.md` — Master technique/technology library
+- `aims-skills/ntntn-engine/execution/buildsmith-execution-pipeline.md` — Three-pillar execution
+- `aims-skills/ntntn-engine/categories/styling-systems.md` — Token systems (Tailwind, Vanilla Extract)
+- `aims-skills/ntntn-engine/categories/layout-responsive.md` — Grid, responsive, container queries
+- `aims-skills/brains/PICKER_ANG_BRAIN.md` — Stack Recommendation format
+- `aims-skills/brains/BUILDSMITH_BRAIN.md` — Build phases and evidence gates
+
+---
+
 ## Fit-to-Screen Rules (Non-Negotiable)
 
 - Every page loads centered with consistent padding

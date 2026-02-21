@@ -272,13 +272,67 @@ export interface BuildManifest {
 // ---------------------------------------------------------------------------
 
 export const AIMS_DEFAULT_STACK = {
-  framework: 'Next.js 14 (App Router)',
-  styling: 'Tailwind CSS',
-  animation: 'Framer Motion',
+  framework: 'Next.js 15 (App Router)',
+  styling: 'Tailwind CSS v4',
+  animation: 'Motion (Framer Motion v12+)',
   ui_components: 'shadcn/ui (Radix + Tailwind)',
   state: 'React Server Components + Zustand',
   deployment: 'Docker Compose on VPS',
 } as const;
+
+// ---------------------------------------------------------------------------
+// Execution Pipeline Types
+// ---------------------------------------------------------------------------
+
+export type ExecutionPillar = 'image' | 'interface' | 'integrations';
+
+export type ScopeTier = 'component' | 'page' | 'application' | 'platform';
+
+export type BuildPhase =
+  | 'intake'
+  | 'image'
+  | 'interface'
+  | 'integrations'
+  | 'verification'
+  | 'sign';
+
+export interface ExecutionPipelineStatus {
+  manifest_id: string;
+  scope_tier: ScopeTier;
+  current_phase: BuildPhase;
+  pillars: {
+    image: 'not_started' | 'in_progress' | 'complete' | 'skipped';
+    interface: 'not_started' | 'in_progress' | 'complete';
+    integrations: 'not_started' | 'in_progress' | 'complete' | 'skipped';
+  };
+  preview_url: string | null;
+  live_url: string | null;
+  signed: boolean;
+}
+
+// ---------------------------------------------------------------------------
+// Scope Tier Detection
+// ---------------------------------------------------------------------------
+
+/**
+ * Determines the build scope tier based on the user's description.
+ * This informs which execution pipeline phases to activate.
+ */
+export function detectScopeTier(message: string): ScopeTier {
+  const lower = message.toLowerCase();
+
+  const platformKeywords = ['saas', 'platform', 'multi-tenant', 'enterprise', 'admin panel', 'team management', 'billing'];
+  const appKeywords = ['app', 'application', 'auth', 'login', 'database', 'api', 'user accounts', 'checkout', 'e-commerce'];
+  const pageKeywords = ['page', 'landing', 'portfolio', 'homepage', 'hero', 'section'];
+  const componentKeywords = ['component', 'button', 'card', 'table', 'form', 'modal', 'widget'];
+
+  if (platformKeywords.some((kw) => lower.includes(kw))) return 'platform';
+  if (appKeywords.some((kw) => lower.includes(kw))) return 'application';
+  if (pageKeywords.some((kw) => lower.includes(kw))) return 'page';
+  if (componentKeywords.some((kw) => lower.includes(kw))) return 'component';
+
+  return 'page'; // Default to page-level builds
+}
 
 // ---------------------------------------------------------------------------
 // Exports
@@ -292,5 +346,6 @@ export default {
   buildContextTargets: BUILD_CONTEXT_TARGETS,
   detectBuildIntent,
   classifyBuildIntent,
+  detectScopeTier,
   defaultStack: AIMS_DEFAULT_STACK,
 };

@@ -47,7 +47,7 @@ export {
 } from './gateway';
 export { GatewayEnforcementHook } from './hooks/gateway-enforcement.hook';
 
-// NtNtN Engine (Creative Development Library)
+// NtNtN Engine (Creative Development Library + Execution Engine)
 export {
   NTNTN_CATEGORIES,
   TECHNIQUE_GROUPS,
@@ -57,6 +57,7 @@ export {
   AIMS_DEFAULT_STACK,
   detectBuildIntent,
   classifyBuildIntent,
+  detectScopeTier,
 } from './ntntn-engine';
 export type {
   NtNtNCategory,
@@ -64,6 +65,10 @@ export type {
   IntentMapping,
   StackRecommendation,
   BuildManifest,
+  ExecutionPillar,
+  ScopeTier,
+  BuildPhase,
+  ExecutionPipelineStatus,
 } from './ntntn-engine';
 
 // Hook Registry

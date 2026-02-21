@@ -72,15 +72,40 @@ Chicken Hawk runs exclusively on GCP Cloud Run Jobs. NOT on the VPS.
 
 ---
 
+## NtNtN Engine Integration
+
+When Chicken Hawk receives build manifests from Buildsmith, it references the NtNtN Engine
+for technique patterns and implementation standards. Lil_Hawks use NtNtN technique IDs
+to pull the correct implementation reference for each task.
+
+**NtNtN Engine Build Flow (Chicken Hawk's perspective):**
+```
+Buildsmith creates Build Manifest (with NtNtN technique references)
+  → Chicken Hawk decomposes manifest into Lil_Hawk tasks
+  → Each task includes: technique_id, category, library, pattern_reference
+  → Lil_Hawks pull implementation patterns from NtNtN Engine techniques/
+  → Lil_Hawks execute and produce artifacts
+  → Chicken Hawk collects evidence → reports phase completion to Buildsmith
+```
+
+**Key NtNtN Engine References:**
+- `aims-skills/ntntn-engine/NTNTN_ENGINE.md` — Master technique/technology library
+- `aims-skills/ntntn-engine/execution/buildsmith-execution-pipeline.md` — Build manifest format + evidence gates
+- `aims-skills/ntntn-engine/techniques/` — Implementation patterns per technique group
+- `aims-skills/ntntn-engine/categories/` — Technology deep-dives per category
+
+---
+
 ## OBJECTIVES
 
-1. Execute structured task files from ACHEEVY / AVVA NOON
+1. Execute structured task files from ACHEEVY / AVVA NOON / Buildsmith
 2. Run Code Ang (OpenCode) for full-stack generation inside Docker sandbox
 3. Generate UI via Stitch CLI before wiring backend
-4. Run LUC pre-flight before every task
-5. Apply ORACLE 7-gate verification before any output is committed
-6. Issue BAMARAM receipt on successful deployment
-7. Log every event to KYB Flight Recorder (Firestore)
+4. Reference NtNtN Engine technique patterns for implementation standards
+5. Run LUC pre-flight before every task
+6. Apply ORACLE 7-gate verification before any output is committed
+7. Issue BAMARAM receipt on successful deployment
+8. Log every event to KYB Flight Recorder (Firestore)
 
 ---
 
