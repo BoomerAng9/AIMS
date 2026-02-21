@@ -83,6 +83,10 @@ export const ChainOfCommandHook: HookDefinition = {
     /**
      * Before a tool call — verify the calling agent is authorized
      * to use the tool and perform the action.
+     *
+     * PaaS actions (DEPLOY_INSTANCE, DECOMMISSION_INSTANCE, etc.) are
+     * validated against the agent's role card capabilities. Only agents
+     * whose allowed_actions include the PaaS action may proceed.
      */
     before_tool_call: {
       execute: async (context: any) => {
@@ -109,12 +113,25 @@ export const ChainOfCommandHook: HookDefinition = {
           }
         }
 
-        // Check action authorization
+        // Check action authorization (includes PaaS actions)
         if (actionName) {
           const actionAuth = authorizeAction(card, actionName);
           if (!actionAuth.authorized) {
             context.blocked = true;
             context.block_reason = actionAuth.reason;
+            return context;
+          }
+
+          // PaaS-specific enforcement: forbidden actions must never execute
+          const PAAS_FORBIDDEN_ACTIONS = [
+            'DEPLOY_WITHOUT_QUOTE',
+            'DECOMMISSION_WITHOUT_CONFIRM',
+          ];
+          if (PAAS_FORBIDDEN_ACTIONS.includes(actionName)) {
+            context.blocked = true;
+            context.block_reason =
+              `Chain of Command: action "${actionName}" is unconditionally forbidden. ` +
+              `PaaS operations require human-in-the-loop gates (LUC approval for deploy, explicit confirmation for decommission).`;
             return context;
           }
         }

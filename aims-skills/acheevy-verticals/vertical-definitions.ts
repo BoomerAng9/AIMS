@@ -1175,7 +1175,116 @@ Return ONLY a JSON array of step description strings.
     },
   },
 
-  // ── 14. PLAYGROUND / SANDBOX ──────────────────────────────────────────
+  // ── 14. PLUG CATALOG / PaaS OPERATIONS ──────────────────────────────
+
+  'plug-catalog': {
+    id: 'plug-catalog',
+    name: 'Plug Catalog & PaaS Operations',
+    category: 'paas',
+    tags: ['deploy', 'instance', 'container', 'plug', 'spin up', 'service', 'provision', 'catalog', 'self-host', 'export'],
+    triggers: [
+      /spin\s*up/i,
+      /deploy\s+(a\s+)?(tool|agent|instance|service|container)/i,
+      /launch\s+(a\s+)?(tool|agent|instance|service)/i,
+      /start\s+(an?\s+)?instance/i,
+      /one\s*click\s*(deploy|setup)/i,
+      /provision/i,
+      /what.?s\s*running/i,
+      /instance\s*status/i,
+      /show\s*(me\s+)?(my\s+)?(instances|services|containers)/i,
+      /deploy\s*dock/i,
+      /list\s*(my\s+)?(instances|services|deployments)/i,
+      /shut\s*down/i,
+      /decommission/i,
+      /tear\s*down/i,
+      /scale\s*(up|down|out)/i,
+      /export/i,
+      /self.?host/i,
+      /browse\s*(tools?|catalog|plugs?)/i,
+      /what\s*(tools?|agents?|services?)\s*(are\s+)?(available|can\s+i)/i,
+      /plug\s*catalog/i,
+      /what\s*can\s*(i|you)\s*deploy/i,
+      /needs?\s*analysis/i,
+      /recommend\s*(tools?|services?)/i,
+      /help\s*me\s*choose/i,
+    ],
+
+    chain_steps: [
+      {
+        step: 1,
+        name: 'Detect PaaS Intent',
+        purpose: 'Determine whether user wants to browse, deploy, manage, scale, export, or get recommendations',
+        acheevy_behavior: 'Classify the sub-intent: catalog_browse, spin_up, status, scale, decommission, export, or needs_analysis. If ambiguous, ask: "Are you looking to deploy a new tool, check on something running, or explore what\'s available?"',
+        output_schema: { paas_action: 'string', target_plug: 'string' },
+      },
+      {
+        step: 2,
+        name: 'Gather Requirements',
+        purpose: 'Collect deployment-specific details if needed',
+        acheevy_behavior: 'For spin_up: ask which tool and any customization. For scale: ask which instance and direction. For export: ask which instance. For needs_analysis: ask about business requirements.',
+        output_schema: { plug_id: 'string', customizations: 'object', instance_id: 'string' },
+      },
+      {
+        step: 3,
+        name: 'LUC Quote & Confirmation',
+        purpose: 'Present cost estimate and get human approval before execution',
+        acheevy_behavior: 'Present the LUC quote: "This will cost approximately X LUCs. Includes: container hours, port allocation, health monitoring. Approve?" For decommission: "This will shut down [instance]. Data will be preserved for 30 days. Confirm?"',
+        output_schema: { luc_estimate: 'number', approved: 'boolean' },
+      },
+      {
+        step: 4,
+        name: 'Execute PaaS Operation',
+        purpose: 'Carry out the approved operation via the Plug Engine',
+        acheevy_behavior: 'Execute the operation and stream Glass Box events: validate → configure → provision → deploy → health → ready. Present the result with URL and status.',
+        output_schema: { operation_result: 'object', instance_url: 'string', health_status: 'string' },
+      },
+    ],
+
+    acheevy_mode: 'ServiceManager',
+    expert_domain: ['paas', 'devops', 'automation'],
+
+    execution: {
+      primary_agent: 'plug-ang',
+      step_generation_prompt: `
+Execute a PaaS operation for the user:
+Action: {paas_action}
+Target plug: {target_plug}
+Instance ID: {instance_id}
+Customizations: {customizations}
+LUC approved: {approved}
+
+This routes to the Plug Engine for execution. Operations:
+- catalog_browse → GET /api/plug-catalog
+- spin_up → POST /api/plug-catalog/spin-up (validate → provision → deploy → health)
+- status → GET /api/plug-catalog/instances
+- scale → PATCH /api/plug-catalog/instances/:id/scale
+- decommission → DELETE /api/plug-catalog/instances/:id (requires confirmation)
+- export → POST /api/plug-catalog/instances/:id/export
+- needs_analysis → POST /api/plug-catalog/needs-analysis
+
+All operations emit Glass Box events for Deploy Dock visibility.
+
+Return ONLY a JSON array of step description strings.
+      `.trim(),
+      required_context: ['paas_action', 'target_plug'],
+      fallback_steps: [
+        'Validate the requested PaaS operation and target plug',
+        'Check user permissions and LUC budget for this operation',
+        'Execute the plug operation via the Plug Engine',
+        'Run health check and verify operation success',
+        'Report result with instance URL, status, and Glass Box summary',
+      ],
+      requires_verification: true,
+      max_steps: 8,
+    },
+
+    revenue_signal: {
+      service: 'Plug Engine (PaaS Operations — Container Deployment + Management)',
+      transition_prompt: 'Ready to deploy? I\'ll provision the container, configure networking, run health checks, and hand you the URL — one click.',
+    },
+  },
+
+  // ── 15. PLAYGROUND / SANDBOX ──────────────────────────────────────────
 
   'playground': {
     id: 'playground',

@@ -15,6 +15,74 @@ interface PatternRule {
 }
 
 const RULES: PatternRule[] = [
+  // ── PaaS Operations (HIGHEST PRIORITY — this is what A.I.M.S. literally does) ──
+  {
+    patterns: [
+      /spin\s*up/i, /deploy\s+(a\s+)?(tool|agent|instance|service|container)/i,
+      /launch\s+(a\s+)?(tool|agent|instance|service)/i, /start\s+(an?\s+)?instance/i,
+      /one\s*click\s*(deploy|setup)/i, /provision/i,
+    ],
+    intent: 'paas_deploy',
+    capabilities: ['plug_spin_up', 'container_provisioning', 'port_allocation', 'nginx_config', 'health_check'],
+    strategy: 'sequential',
+  },
+  {
+    patterns: [
+      /what.?s\s*running/i, /instance\s*status/i, /show\s*(me\s+)?(my\s+)?(instances|services|containers)/i,
+      /deploy\s*dock/i, /list\s*(my\s+)?(instances|services|deployments)/i,
+      /how.?s\s*(my|the)\s*(instance|service|deployment)/i,
+    ],
+    intent: 'paas_status',
+    capabilities: ['plug_list_instances', 'plug_status', 'health_check'],
+    strategy: 'single',
+  },
+  {
+    patterns: [
+      /shut\s*down/i, /stop\s+(the\s+)?(instance|service|container)/i,
+      /decommission/i, /tear\s*down/i, /remove\s+(the\s+)?(instance|service)/i,
+      /kill\s+(the\s+)?(instance|service|container)/i,
+    ],
+    intent: 'paas_decommission',
+    capabilities: ['plug_decommission', 'port_release', 'cleanup'],
+    strategy: 'sequential',
+  },
+  {
+    patterns: [
+      /scale\s*(up|down|out)/i, /more\s+(resources|memory|cpu)/i,
+      /resize\s+(the\s+)?(instance|service|container)/i,
+    ],
+    intent: 'paas_scale',
+    capabilities: ['plug_scale', 'resource_adjustment'],
+    strategy: 'single',
+  },
+  {
+    patterns: [
+      /export/i, /self.?host/i, /ship\s*it/i, /docker\s*export/i,
+      /download\s*(the\s+)?compose/i, /take\s*it\s*with\s*me/i, /give\s*me\s*(the\s+)?bundle/i,
+    ],
+    intent: 'paas_export',
+    capabilities: ['plug_export', 'bundle_generation'],
+    strategy: 'sequential',
+  },
+  {
+    patterns: [
+      /browse\s*(tools?|catalog|plugs?)/i, /what\s*(tools?|agents?|services?)\s*(are\s+)?(available|can\s+i)/i,
+      /plug\s*catalog/i, /show\s*me\s*(the\s+)?(tools?|catalog)/i, /what\s*can\s*(i|you)\s*deploy/i,
+    ],
+    intent: 'paas_catalog',
+    capabilities: ['plug_browse', 'catalog_search'],
+    strategy: 'single',
+  },
+  {
+    patterns: [
+      /needs?\s*analysis/i, /assess\s*(my\s+)?needs/i, /what\s*do\s*i\s*need/i,
+      /business\s*intake/i, /help\s*me\s*choose/i, /recommend\s*(tools?|services?)/i,
+      /which\s*tools?/i,
+    ],
+    intent: 'paas_needs_analysis',
+    capabilities: ['plug_needs_analysis', 'recommendation_engine'],
+    strategy: 'sequential',
+  },
   // Research
   {
     patterns: [/research/i, /find\s+(out|info)/i, /look\s+up/i, /investigate/i, /what\s+is/i, /who\s+is/i],
