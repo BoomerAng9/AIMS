@@ -10,7 +10,7 @@
 Utility-first CSS framework. Write styles directly in markup using atomic classes.
 The A.I.M.S. default styling system.
 
-- **Current:** Tailwind CSS v4 (Oxide engine — Rust-based, 10x faster builds)
+- **Current:** Tailwind CSS v4.2.0 (Oxide engine — Rust-based, 10x faster builds)
 - **Approach:** Utility classes composed in HTML/JSX
 - **A.I.M.S. Status:** Default — all builds use Tailwind
 
@@ -294,7 +294,7 @@ but native CSS is catching up fast.
 Build-time, type-safe CSS-in-JS with zero runtime. Created by the Chakra UI team.
 Uses static extraction to generate real CSS files at build time — RSC compatible.
 
-- **Current:** Pre-1.0 (approaching stable, close to v1.0 release)
+- **Current:** Panda CSS v1.6.0 (stable — reached 1.0 in 2024, actively maintained)
 - **Approach:** Write styles in TypeScript, extracted to static CSS at build time
 - **Production users:** Zillow (design system, ~30% faster page loads on low-cost devices)
 

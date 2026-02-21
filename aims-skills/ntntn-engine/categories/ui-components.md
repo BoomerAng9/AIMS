@@ -10,8 +10,9 @@
 Copy-paste React components built on Radix UI primitives + Tailwind CSS.
 You own the code — components are copied into your project, not imported from a package.
 
-- **Current:** shadcn/ui (Feb 2026: unified `radix-ui` package, Base UI support, RTL, 65K+ stars)
+- **Current:** shadcn/ui CLI 3.0+ (Feb 2026: unified `radix-ui` package, Base UI support, RTL, MCP Server, 65K+ stars)
 - **Foundation:** Radix UI or Base UI (choose at init) + Tailwind CSS v4 (styling) + CVA (variants)
+- **New:** MCP Server integration (AI-assisted component generation), multiple theme support, cross-framework exploration
 - **A.I.M.S. Status:** Default component library for all builds
 
 ### Key Patterns & Techniques
@@ -120,7 +121,7 @@ import { Dialog } from 'radix-ui'; // New unified import (was @radix-ui/react-di
 Unstyled, accessible components from Tailwind Labs. Designed specifically for
 Tailwind CSS projects. Fewer components than Radix but tighter Tailwind integration.
 
-- **Current:** Headless UI 2.x
+- **Current:** Headless UI 2.2.9 (Catalyst stable — fully styled component kit)
 - **Components:** Dialog, Disclosure, Listbox, Menu, Popover, Radio Group, Switch, Tabs, Transition
 
 ### Picker_Ang Notes
@@ -153,9 +154,10 @@ Vue, and Solid with the same API. Built on state machines for predictable behavi
 Styled component library with a comprehensive theme system. Ready-to-use components
 with sensible defaults. Good for rapid prototyping.
 
-- **Current:** Chakra UI v3.3+ (major v3 rewrite — Zag.js state machines, Ark UI headless, removed Framer Motion dependency)
+- **Current:** Chakra UI v3.33.0 (major v3 rewrite — zero-runtime CSS-in-JS, Zag.js state machines, Ark UI headless)
 - **Approach:** Style props + theme tokens + dark mode out of the box
-- **v3 Changes:** Emotion styling (Panda CSS-aligned APIs), Ark UI headless components, QRCode/ColorPicker/DatePicker added
+- **v3 Changes:** Zero-runtime CSS-in-JS (replaced Emotion), Ark UI headless components, QRCode/ColorPicker/DatePicker added
+- **Migration:** Official codemod available (`@chakra-ui/codemod`) for v2 → v3
 
 ### Key Patterns
 ```tsx
@@ -195,9 +197,10 @@ component library by install count. Enterprise-grade with extensive documentatio
 Enterprise UI component library with comprehensive data display and form components.
 Strong in admin panels, dashboards, and CJK (Chinese/Japanese/Korean) locales.
 
-- **Current:** Ant Design 5.x
+- **Current:** Ant Design 6.3.0 (React 19 default, IE support removed, React Compiler compatible)
 - **Approach:** CSS-in-JS (cssinjs) + Design tokens + ConfigProvider
 - **Components:** 60+ including ProComponents for enterprise layouts
+- **v6 Changes:** React 19 as default peer, dropped IE support, React Compiler compatibility, performance improvements
 
 ### Picker_Ang Notes
 - Choose when: Admin panels, data-heavy dashboards, CJK market
