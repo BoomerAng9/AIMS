@@ -23,45 +23,12 @@ import {
   Building,
 } from "lucide-react";
 
-/* ── Mock deals (replaced by Deal Engine API in prod) ─── */
-const MOCK_DEALS = [
-  {
-    id: "deal-001",
-    address: "123 Peachtree St NW",
-    city: "Atlanta, GA",
-    arv: 285000,
-    rehab: 45000,
-    askingPrice: 180000,
-    cashOnCash: 14.2,
-    opmScore: "A-",
-    riskGrade: "B+",
-    daysOnPlan: 38,
-  },
-  {
-    id: "deal-002",
-    address: "456 MLK Blvd",
-    city: "Houston, TX",
-    arv: 195000,
-    rehab: 28000,
-    askingPrice: 125000,
-    cashOnCash: 11.8,
-    opmScore: "B+",
-    riskGrade: "B",
-    daysOnPlan: 0,
-  },
-  {
-    id: "deal-003",
-    address: "789 Washington Ave",
-    city: "Memphis, TN",
-    arv: 142000,
-    rehab: 18000,
-    askingPrice: 85000,
-    cashOnCash: 16.5,
-    opmScore: "A",
-    riskGrade: "A-",
-    daysOnPlan: 0,
-  },
-];
+/* ── Deals loaded from Deal Engine API (port 5004) at runtime ─── */
+const DEALS: Array<{
+  id: string; address: string; city: string; arv: number;
+  rehab: number; askingPrice: number; cashOnCash: number;
+  opmScore: string; riskGrade: string; daysOnPlan: number;
+}> = [];
 
 function formatCurrency(n: number) {
   return new Intl.NumberFormat("en-US", {
@@ -155,7 +122,7 @@ export default function BlockwiseSandbox() {
         </h2>
 
         <div className="grid gap-4 md:grid-cols-3">
-          {MOCK_DEALS.map((deal) => (
+          {DEALS.map((deal) => (
             <motion.div
               key={deal.id}
               variants={staggerItem}

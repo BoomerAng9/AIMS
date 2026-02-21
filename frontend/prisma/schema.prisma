@@ -551,6 +551,22 @@ model PerformTeam {
   // Season records
   seasons       PerformTeamSeason[]
 
+  // Coaching carousel
+  coachesLeft   CoachingChange[]  @relation("CoachLeft")
+  coachesHired  CoachingChange[]  @relation("CoachHired")
+
+  // Transfer portal
+  transfersOut  TransferPortalEntry[] @relation("TransferFrom")
+  transfersIn   TransferPortalEntry[] @relation("TransferTo")
+
+  // NIL
+  nilDeals      NilDeal[]         @relation("NilTeam")
+  nilRankings   NilTeamRanking[]  @relation("NilRanking")
+  nilPlayerRanks NilPlayerRanking[] @relation("NilPlayerRank")
+
+  // Revenue Budget
+  budgets       SchoolRevenueBudget[] @relation("RevenueBudget")
+
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
@@ -852,4 +868,255 @@ model SportsPick {
 
   @@index([sport, eventDate])
   @@index([status])
+}
+
+// ─────────────────────────────────────────────────────────────
+// Per|Form — Coaching Carousel
+// ─────────────────────────────────────────────────────────────
+
+/// Head coaching change (hire, fire, resign, retire)
+model CoachingChange {
+  id              String    @id @default(uuid())
+  coachName       String
+  previousRole    String?   // e.g., "Head Coach"
+  newRole         String?   // e.g., "Head Coach", null if fired/resigned
+  previousTeamId  String?
+  previousTeam    PerformTeam? @relation("CoachLeft", fields: [previousTeamId], references: [id])
+  newTeamId       String?
+  newTeam         PerformTeam? @relation("CoachHired", fields: [newTeamId], references: [id])
+  changeType      String    // HIRED, FIRED, RESIGNED, RETIRED, INTERIM
+  season          Int       // e.g., 2026
+  effectiveDate   DateTime?
+  contractYears   Int?
+  contractValue   String?   // e.g., "$50M over 5 years"
+  buyout          String?   // e.g., "$10M"
+  record          String?   // e.g., "45-21" at previous school
+  notes           String?
+  source          String?   // URL or attribution
+  verified        Boolean   @default(false)
+  verifiedBy      String?   // "boomer_ang", "lil_hawk", "manual"
+  verifiedAt      DateTime?
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([season, changeType])
+  @@index([coachName])
+  @@index([newTeamId])
+  @@index([previousTeamId])
+}
+
+// ─────────────────────────────────────────────────────────────
+// Per|Form — Transfer Portal
+// ─────────────────────────────────────────────────────────────
+
+/// Player in the transfer portal
+model TransferPortalEntry {
+  id              String    @id @default(uuid())
+  playerName      String
+  position        String
+  eligibility     String?   // e.g., "RS-Junior", "Graduate"
+  previousTeamId  String?
+  previousTeam    PerformTeam? @relation("TransferFrom", fields: [previousTeamId], references: [id])
+  newTeamId       String?
+  newTeam         PerformTeam? @relation("TransferTo", fields: [newTeamId], references: [id])
+  status          String    @default("IN_PORTAL") // IN_PORTAL, COMMITTED, WITHDRAWN, SIGNED
+  season          Int       // e.g., 2026
+  enteredDate     DateTime?
+  committedDate   DateTime?
+  stars           Int?      // transfer star rating
+  previousStats   String?   // JSON: key stats from previous school
+  nilValuation    String?   // estimated NIL value
+  paiScore        Int?
+  tier            String?   // ELITE, BLUE_CHIP, PROSPECT, SLEEPER, DEVELOPMENTAL
+  transferWindow  String    @default("SPRING") // SPRING, SUMMER, WINTER
+  source          String?
+  verified        Boolean   @default(false)
+  verifiedBy      String?
+  verifiedAt      DateTime?
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([status, season])
+  @@index([position])
+  @@index([previousTeamId])
+  @@index([newTeamId])
+  @@index([transferWindow, season])
+}
+
+// ─────────────────────────────────────────────────────────────
+// Per|Form — NIL Ranking & Tracker
+// ─────────────────────────────────────────────────────────────
+
+/// NIL deal record
+model NilDeal {
+  id              String    @id @default(uuid())
+  playerName      String
+  teamId          String?
+  team            PerformTeam? @relation("NilTeam", fields: [teamId], references: [id])
+  position        String?
+  dealType        String    // ENDORSEMENT, COLLECTIVE, APPEARANCE, SOCIAL_MEDIA, MERCH, LICENSING, OTHER
+  brandOrCollective String? // e.g., "Gatorade", "On3 NIL"
+  estimatedValue  Float?    // annual USD
+  duration        String?   // e.g., "1 year", "per appearance"
+  status          String    @default("ACTIVE") // ACTIVE, EXPIRED, PENDING, TERMINATED
+  announcedDate   DateTime?
+  expiresDate     DateTime?
+  season          Int
+  source          String?
+  verified        Boolean   @default(false)
+  verifiedBy      String?
+  verifiedAt      DateTime?
+  notes           String?
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([teamId, season])
+  @@index([playerName])
+  @@index([dealType])
+  @@index([status])
+}
+
+/// Aggregated NIL ranking per team
+model NilTeamRanking {
+  id              String    @id @default(uuid())
+  teamId          String
+  team            PerformTeam @relation("NilRanking", fields: [teamId], references: [id])
+  season          Int
+  rank            Int
+  totalNilValue   Float     @default(0) // total estimated NIL spend
+  avgPerPlayer    Float     @default(0) // average NIL per rostered player
+  topDealValue    Float     @default(0)
+  dealCount       Int       @default(0)
+  collectiveCount Int       @default(0)
+  trend           String    @default("STEADY") // UP, DOWN, STEADY, NEW
+  previousRank    Int?
+  notes           String?
+  lastCalculated  DateTime  @default(now())
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@unique([teamId, season])
+  @@index([season, rank])
+}
+
+/// Individual player NIL valuation ranking
+model NilPlayerRanking {
+  id              String    @id @default(uuid())
+  playerName      String
+  teamId          String?
+  team            PerformTeam? @relation("NilPlayerRank", fields: [teamId], references: [id])
+  position        String?
+  season          Int
+  rank            Int
+  estimatedTotal  Float     @default(0)
+  dealCount       Int       @default(0)
+  socialFollowing Int?      // combined social media following
+  trend           String    @default("STEADY")
+  previousRank    Int?
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@unique([playerName, season])
+  @@index([season, rank])
+  @@index([teamId])
+}
+
+// ─────────────────────────────────────────────────────────────
+// Per|Form — School Revenue Budget (NCAA Free Agency System)
+// ─────────────────────────────────────────────────────────────
+
+/// School annual revenue/budget — acts like NFL salary cap
+model SchoolRevenueBudget {
+  id              String    @id @default(uuid())
+  teamId          String
+  team            PerformTeam @relation("RevenueBudget", fields: [teamId], references: [id])
+  season          Int
+  totalRevenue    Float     @default(0) // total athletic revenue
+  footballRevenue Float     @default(0)
+  nilBudget       Float     @default(0) // allocated NIL collective budget
+  nilSpent        Float     @default(0) // actual NIL spent
+  nilRemaining    Float     @default(0) // calculated remaining budget
+  coachingSalary  Float     @default(0) // total coaching staff salary
+  operatingBudget Float     @default(0) // facilities, travel, etc.
+  scholarships    Int       @default(85) // scholarship count
+  walkOns         Int       @default(0)
+  rosterSize      Int       @default(0)
+
+  // "Cap space" analogy
+  capSpace        Float     @default(0) // nilBudget - nilSpent
+  capRank         Int?      // rank among all schools
+  spendingTier    String    @default("MID") // ELITE, HIGH, MID, LOW, MINIMAL
+
+  // Revenue sources
+  tvRevenue       Float     @default(0)
+  ticketRevenue   Float     @default(0)
+  donorRevenue    Float     @default(0)
+  merchandiseRev  Float     @default(0)
+  conferenceShare Float     @default(0)
+
+  // Transactions
+  transactions    BudgetTransaction[]
+
+  notes           String?
+  lastUpdated     DateTime  @default(now())
+  updatedBy       String?   // "boomer_ang", "lil_hawk", "manual"
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@unique([teamId, season])
+  @@index([season, capRank])
+  @@index([spendingTier])
+}
+
+/// Transaction log for school budget changes (like NFL transactions)
+model BudgetTransaction {
+  id              String    @id @default(uuid())
+  budgetId        String
+  budget          SchoolRevenueBudget @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  transactionType String    // NIL_DEAL, COACH_HIRE, COACH_BUYOUT, FACILITY, TRANSFER_PORTAL_BONUS, SCHOLARSHIP, OTHER
+  description     String
+  amount          Float
+  playerName      String?
+  category        String?   // NIL, COACHING, OPERATIONS, RECRUITING
+  effectiveDate   DateTime  @default(now())
+
+  createdAt       DateTime  @default(now())
+
+  @@index([budgetId, createdAt])
+  @@index([transactionType])
+}
+
+// ─────────────────────────────────────────────────────────────
+// Automation Log — Boomer_Angs & Lil_Hawks oversight tracking
+// ─────────────────────────────────────────────────────────────
+
+/// Agent automation run record
+model PerformAutomationRun {
+  id              String    @id @default(uuid())
+  agentName       String    // "boomer_ang", "lil_hawk"
+  taskType        String    // COACHING_SCAN, PORTAL_SCAN, NIL_UPDATE, BUDGET_CALC, VERIFICATION
+  status          String    @default("RUNNING") // RUNNING, COMPLETED, FAILED, PARTIAL
+  targetModule    String    // coaching_carousel, transfer_portal, nil_tracker, revenue_budget
+  recordsScanned  Int       @default(0)
+  recordsUpdated  Int       @default(0)
+  recordsCreated  Int       @default(0)
+  errorCount      Int       @default(0)
+  summary         String?
+  errors          String?   // JSON array of error messages
+  startedAt       DateTime  @default(now())
+  completedAt     DateTime?
+  durationMs      Int?
+  triggeredBy     String    @default("SCHEDULE") // SCHEDULE, MANUAL, WEBHOOK, EVENT
+
+  createdAt       DateTime  @default(now())
+
+  @@index([agentName, createdAt])
+  @@index([taskType, status])
+  @@index([targetModule])
 }
