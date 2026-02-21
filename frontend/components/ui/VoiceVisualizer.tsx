@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useEffect, memo } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { useAudioAnalyser } from '@/hooks/useAudioAnalyser';
 
 interface VoiceVisualizerProps {
@@ -9,7 +9,7 @@ interface VoiceVisualizerProps {
   state: 'idle' | 'listening' | 'processing' | 'error';
 }
 
-export const VoiceVisualizer = memo(function VoiceVisualizer({ stream, isListening, state }: VoiceVisualizerProps) {
+export function VoiceVisualizer({ stream, isListening, state }: VoiceVisualizerProps) {
   // Use custom hook to get AnalyserNode directly, avoiding frequent React state updates
   const analyser = useAudioAnalyser(stream, isListening);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -130,4 +130,4 @@ export const VoiceVisualizer = memo(function VoiceVisualizer({ stream, isListeni
       />
     </div>
   );
-});
+}
