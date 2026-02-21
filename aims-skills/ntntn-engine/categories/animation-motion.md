@@ -4,13 +4,13 @@
 
 ---
 
-## Motion (formerly Motion)
+## Motion (formerly Framer Motion)
 
 ### Overview
 The declarative animation library for React, Vue, and vanilla JavaScript. Provides gesture
 recognition, layout animations, scroll-linked animations, spring physics, and AnimatePresence
-for mount/unmount transitions. Rebranded from "Motion" to "Motion" in 2025 as an
-independent project at motion.dev — now framework-agnostic.
+for mount/unmount transitions. Rebranded from "Framer Motion" to "Motion" in 2025 as an
+independent project at motion.dev — now framework-agnostic. 18M+ monthly npm downloads.
 
 - **Current:** Motion 12.34 (install: `npm i motion`, was `framer-motion`)
 - **Bundle:** ~30KB (tree-shakeable)
@@ -272,29 +272,35 @@ function Component() {
 ## Anime.js
 
 ### Overview
-Lightweight JavaScript animation library with a clean API. Good for simple DOM, SVG,
-and CSS property animations without the full weight of GSAP.
+Lightweight JavaScript animation library — v4 is a major rewrite with ESM-first architecture,
+built-in springs, Draggable API, and Scroll Observer. Consistent 60fps on thousands of DOM elements.
 
-- **Current:** Anime.js v4
+- **Current:** Anime.js v4.3.6 (breaking change from v3 — new import API)
 - **Bundle:** ~17KB
 - **License:** MIT (free)
 
 ### Key Techniques
 ```js
-anime({
-  targets: '.element',
+// v4 API (new — ESM imports)
+import { animate, stagger } from 'animejs';
+
+animate('.element', {
   translateX: 250,
   rotate: '1turn',
   duration: 1000,
-  easing: 'easeInOutQuad',
-  delay: anime.stagger(100), // 100ms stagger between elements
+  ease: 'inOutQuad',
+  delay: stagger(100),
 });
 ```
 
 - Timeline sequencing
 - SVG path animation (`strokeDashoffset`)
 - Stagger with grid support
-- Custom easing functions
+- **Built-in physics springs** (new in v4)
+- **Draggable API** (new in v4)
+- **Scroll Observer** for scroll-triggered animations (new in v4)
+- **WAAPI sync** with automatic `persist: true` (v4.3.4)
+- **`createLayout()`** for layout animations (v4.3.0)
 
 ### Picker_Ang Notes
 - Choose when: Simple animations, no React dependency, small bundle

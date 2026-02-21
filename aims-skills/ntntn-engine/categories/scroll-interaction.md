@@ -10,7 +10,7 @@
 Browser-native scroll-linked animations. No JavaScript required. Elements animate
 based on scroll position using CSS `animation-timeline` and `view-timeline`.
 
-- **Current:** Chrome 115+, Edge 115+, Safari 18+, Firefox (behind flag)
+- **Current:** Chrome 115+, Edge 115+, Safari 26+ (threaded in 26.4 beta), Firefox (behind flag only — Interop 2026 focus)
 - **Approach:** Pure CSS — `animation-timeline: scroll()` or `view()`
 - **Performance:** Best possible (compositor-driven, no main thread)
 
