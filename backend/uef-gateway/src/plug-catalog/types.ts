@@ -82,7 +82,7 @@ export interface PlugCustomization {
   id: string;
   label: string;
   description: string;
-  type: 'text' | 'select' | 'toggle' | 'number';
+  type: 'text' | 'select' | 'multi-select' | 'toggle' | 'number';
   options?: string[];
   default: string | boolean | number;
   envMapping?: string;      // Maps to an env var when deployed
