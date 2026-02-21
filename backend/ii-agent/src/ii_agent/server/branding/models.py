@@ -40,8 +40,8 @@ class BrandingSettingsDB(Base):
     show_powered_by = Column(Boolean, default=True)
     custom_footer_text = Column(String(500), nullable=True)
     
-    # Metadata
-    metadata = Column(JSONB, nullable=True)
+    # Metadata (column name stays "metadata" in DB, attribute renamed to avoid SQLAlchemy reserved name)
+    extra_metadata = Column("metadata", JSONB, nullable=True)
     
     # Timestamps
     created_at = Column(TimestampColumn, default=lambda: datetime.now(timezone.utc))

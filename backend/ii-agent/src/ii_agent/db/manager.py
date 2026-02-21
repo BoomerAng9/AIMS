@@ -39,7 +39,7 @@ def run_migrations():
         migrations_path = II_AGENT_DIR / "migrations"
         alembic_cfg.set_main_option("script_location", str(migrations_path))
 
-        command.upgrade(alembic_cfg, "head")
+        command.upgrade(alembic_cfg, "heads")
 
     except Exception as e:
         logger.error(f"Error running migrations: {e}")
