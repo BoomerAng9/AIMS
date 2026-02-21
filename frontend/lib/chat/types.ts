@@ -42,7 +42,7 @@ export interface VoiceInputConfig {
 }
 
 export interface VoiceOutputConfig {
-  provider: 'elevenlabs' | 'deepgram' | 'browser';
+  provider: 'elevenlabs' | 'deepgram' | 'browser' | 'groq';
   voiceId?: string;
   autoPlay: boolean;
   speed?: number;
