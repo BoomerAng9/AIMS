@@ -9,6 +9,10 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  eslint: {
+    // ESLint checked separately in CI; don't block production builds
+    ignoreDuringBuilds: true,
+  },
   // Allow imports from ../aims-tools/ outside the frontend directory
   experimental: {
     externalDir: true,
