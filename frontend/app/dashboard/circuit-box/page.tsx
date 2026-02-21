@@ -11,12 +11,16 @@
  * Motion: instrument-grade (120–180ms toggles, 180–240ms panels)
  */
 
-import { useState, useEffect, useCallback, Suspense, lazy } from 'react';
+import { useState, useEffect, useCallback, useMemo, Suspense, lazy } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { AIMS_CIRCUIT_COLORS, CircuitBoardPattern } from '@/components/ui/CircuitBoard';
+import {
+  AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid,
+  Tooltip, ResponsiveContainer, Cell,
+} from 'recharts';
 
 // ─────────────────────────────────────────────────────────────
 // Lazy-loaded panel components
@@ -35,7 +39,7 @@ const ResearchPanel = lazy(() => import('@/app/dashboard/research/page'));
 // ─────────────────────────────────────────────────────────────
 
 type CircuitBoxTab =
-  | 'services' | 'integrations' | 'social-channels' | 'security' | 'control-plane'
+  | 'services' | 'topology' | 'integrations' | 'social-channels' | 'security' | 'control-plane'
   | 'model-garden' | 'boomerangs' | 'live-events'
   | 'luc' | 'workbench' | 'workstreams' | 'plan'
   | 'settings' | 'research';
@@ -97,6 +101,7 @@ const OWNER_SECTIONS: SectionGroup[] = [
     label: 'Operations',
     tabs: [
       { id: 'services', label: 'Services', icon: '⚡' },
+      { id: 'topology', label: 'Topology', icon: '🗺' },
       { id: 'integrations', label: 'Integrations', icon: '🔗' },
       { id: 'social-channels', label: 'Social Channels', icon: '💬' },
       { id: 'security', label: 'Security', icon: '🛡' },
@@ -326,6 +331,27 @@ function StatusDot({ status }: { status: string }) {
   );
 }
 
+function ServiceLatencyBar({ latency }: { latency: number }) {
+  const pct = Math.min((latency / 500) * 100, 100);
+  const color = latency > 300 ? 'bg-cb-amber' : latency > 100 ? 'bg-gold' : 'bg-cb-green';
+  return (
+    <div className="w-full h-1 rounded-full bg-white/5 overflow-hidden">
+      <motion.div
+        initial={{ width: 0 }}
+        animate={{ width: `${pct}%` }}
+        transition={{ duration: 0.6, ease: 'easeOut' }}
+        className={`h-full rounded-full ${color}`}
+      />
+    </div>
+  );
+}
+
+// Mock latency values per service
+const SERVICE_LATENCIES: Record<string, number> = {
+  'frontend': 24, 'uef-gateway': 8, 'acheevy': 142, 'house-of-ang': 12,
+  'agent-bridge': 5, 'n8n': 340, 'telegram': 89, 'whatsapp': 0, 'discord': 0,
+};
+
 function ServiceCard({ service, isOwner }: { service: ServiceStatus; isOwner: boolean }) {
   if (!isOwner && service.ownerOnly) return null;
 
@@ -337,6 +363,7 @@ function ServiceCard({ service, isOwner }: { service: ServiceStatus; isOwner: bo
     social: { bg: 'bg-cb-cyan/10', border: 'border-cb-cyan/30', text: 'text-cb-cyan' },
   };
   const s = typeColors[service.type] || typeColors.core;
+  const latency = SERVICE_LATENCIES[service.id] ?? 0;
 
   return (
     <motion.div
@@ -360,6 +387,16 @@ function ServiceCard({ service, isOwner }: { service: ServiceStatus; isOwner: bo
           {service.features.map((f) => (
             <span key={f} className="px-1.5 py-0.5 rounded text-[10px] bg-black/40 text-gray-300">{f}</span>
           ))}
+        </div>
+      )}
+      {/* Latency bar */}
+      {service.status !== 'inactive' && latency > 0 && (
+        <div className="mb-2">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-[9px] text-cb-fog">Latency</span>
+            <span className={`text-[10px] font-mono font-semibold ${latency > 300 ? 'text-cb-amber' : latency > 100 ? 'text-gold' : 'text-cb-green'}`}>{latency}ms</span>
+          </div>
+          <ServiceLatencyBar latency={latency} />
         </div>
       )}
       <div className="flex items-center justify-between text-xs text-cb-fog pt-2 border-t border-wireframe-stroke">
@@ -752,6 +789,268 @@ function ControlPlanePanel() {
 }
 
 // ─────────────────────────────────────────────────────────────
+// Topology Chart Tooltip
+// ─────────────────────────────────────────────────────────────
+
+function TopoTooltip({ active, payload, label, unit = '' }: { active?: boolean; payload?: Array<{ value: number; name: string; color: string }>; label?: string; unit?: string }) {
+  if (!active || !payload?.length) return null;
+  return (
+    <div className="rounded-lg border border-wireframe-stroke bg-black/95 backdrop-blur-xl px-3 py-2 shadow-xl">
+      <p className="text-[10px] text-white/40 mb-1 font-mono">{label}</p>
+      {payload.map((entry, i) => (
+        <p key={i} className="text-xs font-semibold" style={{ color: entry.color }}>
+          {entry.name}: {entry.value}{unit}
+        </p>
+      ))}
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Topology Panel — Service Dependency Map + Telemetry
+// ─────────────────────────────────────────────────────────────
+
+interface TopologyNode {
+  id: string;
+  label: string;
+  category: 'core' | 'agent' | 'data' | 'external' | 'social';
+  status: 'online' | 'degraded' | 'offline';
+  x: number;
+  y: number;
+  latency: number;
+  rpm: number;
+}
+
+interface TopologyEdge {
+  from: string;
+  to: string;
+  label: string;
+  active: boolean;
+}
+
+function useTopologyTelemetry() {
+  const [latencyData, setLatencyData] = useState<Array<{ time: string; gateway: number; acheevy: number; agents: number }>>(() => {
+    return Array.from({ length: 30 }, (_, i) => ({
+      time: new Date(Date.now() - (29 - i) * 60000).toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }),
+      gateway: Math.round(8 + Math.random() * 12),
+      acheevy: Math.round(100 + Math.random() * 80),
+      agents: Math.round(30 + Math.random() * 40),
+    }));
+  });
+
+  const [throughputData, setThroughputData] = useState<Array<{ time: string; ingress: number; egress: number }>>(() => {
+    return Array.from({ length: 30 }, (_, i) => ({
+      time: new Date(Date.now() - (29 - i) * 60000).toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }),
+      ingress: Math.round(40 + Math.random() * 30),
+      egress: Math.round(35 + Math.random() * 25),
+    }));
+  });
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const time = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+      setLatencyData(prev => [...prev.slice(1), {
+        time,
+        gateway: Math.round(8 + Math.random() * 12),
+        acheevy: Math.round(100 + Math.random() * 80),
+        agents: Math.round(30 + Math.random() * 40),
+      }]);
+      setThroughputData(prev => [...prev.slice(1), {
+        time,
+        ingress: Math.round(40 + Math.random() * 30),
+        egress: Math.round(35 + Math.random() * 25),
+      }]);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return { latencyData, throughputData };
+}
+
+const TOPOLOGY_NODES: TopologyNode[] = [
+  { id: 'nginx', label: 'Nginx', category: 'core', status: 'online', x: 50, y: 8, latency: 2, rpm: 85 },
+  { id: 'frontend', label: 'Frontend', category: 'core', status: 'online', x: 20, y: 28, latency: 24, rpm: 42 },
+  { id: 'uef-gateway', label: 'UEF Gateway', category: 'core', status: 'online', x: 50, y: 28, latency: 8, rpm: 72 },
+  { id: 'acheevy', label: 'ACHEEVY', category: 'core', status: 'online', x: 50, y: 50, latency: 142, rpm: 38 },
+  { id: 'house-of-ang', label: 'House of Ang', category: 'agent', status: 'online', x: 80, y: 50, latency: 12, rpm: 24 },
+  { id: 'agent-bridge', label: 'Agent Bridge', category: 'agent', status: 'online', x: 80, y: 28, latency: 5, rpm: 56 },
+  { id: 'redis', label: 'Redis', category: 'data', status: 'online', x: 20, y: 50, latency: 1, rpm: 120 },
+  { id: 'n8n', label: 'n8n', category: 'external', status: 'degraded', x: 20, y: 72, latency: 340, rpm: 8 },
+  { id: 'circuit-metrics', label: 'Metrics', category: 'data', status: 'online', x: 80, y: 72, latency: 18, rpm: 32 },
+  { id: 'telegram', label: 'Telegram', category: 'social', status: 'online', x: 50, y: 72, latency: 89, rpm: 6 },
+];
+
+const TOPOLOGY_EDGES: TopologyEdge[] = [
+  { from: 'nginx', to: 'frontend', label: 'static', active: true },
+  { from: 'nginx', to: 'uef-gateway', label: 'API', active: true },
+  { from: 'uef-gateway', to: 'acheevy', label: 'orchestrate', active: true },
+  { from: 'uef-gateway', to: 'agent-bridge', label: 'secure', active: true },
+  { from: 'acheevy', to: 'house-of-ang', label: 'dispatch', active: true },
+  { from: 'acheevy', to: 'redis', label: 'cache', active: true },
+  { from: 'agent-bridge', to: 'house-of-ang', label: 'route', active: true },
+  { from: 'acheevy', to: 'n8n', label: 'workflow', active: false },
+  { from: 'acheevy', to: 'telegram', label: 'social', active: true },
+  { from: 'house-of-ang', to: 'circuit-metrics', label: 'telemetry', active: true },
+  { from: 'uef-gateway', to: 'circuit-metrics', label: 'metrics', active: true },
+];
+
+function TopologyPanel() {
+  const { latencyData, throughputData } = useTopologyTelemetry();
+  const [selectedNode, setSelectedNode] = useState<string | null>(null);
+
+  const categoryColors: Record<string, { bg: string; border: string; text: string; glow: string }> = {
+    core: { bg: 'bg-gold/15', border: 'border-gold/40', text: 'text-gold', glow: 'shadow-[0_0_12px_rgba(212,175,55,0.2)]' },
+    agent: { bg: 'bg-cb-cyan/15', border: 'border-cb-cyan/40', text: 'text-cb-cyan', glow: 'shadow-[0_0_12px_rgba(34,211,238,0.2)]' },
+    data: { bg: 'bg-purple-400/15', border: 'border-purple-400/40', text: 'text-purple-400', glow: 'shadow-[0_0_12px_rgba(192,132,252,0.2)]' },
+    external: { bg: 'bg-cb-amber/15', border: 'border-cb-amber/40', text: 'text-cb-amber', glow: 'shadow-[0_0_12px_rgba(245,158,11,0.2)]' },
+    social: { bg: 'bg-cb-cyan/15', border: 'border-cb-cyan/40', text: 'text-cb-cyan', glow: 'shadow-[0_0_12px_rgba(34,211,238,0.2)]' },
+  };
+
+  return (
+    <div className="space-y-4">
+      {/* Category legend */}
+      <div className="flex items-center gap-4 mb-2">
+        <span className="text-xs text-cb-fog">Category:</span>
+        {[
+          { cat: 'core', label: 'Core', color: '#D4AF37' },
+          { cat: 'agent', label: 'Agents', color: '#22D3EE' },
+          { cat: 'data', label: 'Data', color: '#C084FC' },
+          { cat: 'external', label: 'External', color: '#F59E0B' },
+          { cat: 'social', label: 'Social', color: '#22D3EE' },
+        ].map(c => (
+          <span key={c.cat} className="flex items-center gap-1.5 text-[10px]" style={{ color: c.color }}>
+            <span className="h-2 w-2 rounded-full" style={{ backgroundColor: c.color }} />
+            {c.label}
+          </span>
+        ))}
+      </div>
+
+      {/* Topology Map */}
+      <div className="rounded-2xl border border-wireframe-stroke bg-black/60 p-6 backdrop-blur-xl relative overflow-hidden" style={{ minHeight: '380px' }}>
+        {/* SVG Connection Lines */}
+        <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ minHeight: '380px' }}>
+          {TOPOLOGY_EDGES.map((edge) => {
+            const fromNode = TOPOLOGY_NODES.find(n => n.id === edge.from);
+            const toNode = TOPOLOGY_NODES.find(n => n.id === edge.to);
+            if (!fromNode || !toNode) return null;
+            const x1 = `${fromNode.x}%`;
+            const y1 = `${fromNode.y}%`;
+            const x2 = `${toNode.x}%`;
+            const y2 = `${toNode.y}%`;
+            const isHighlighted = selectedNode === edge.from || selectedNode === edge.to;
+            return (
+              <line
+                key={`${edge.from}-${edge.to}`}
+                x1={x1} y1={y1} x2={x2} y2={y2}
+                stroke={isHighlighted ? '#D4AF37' : edge.active ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.03)'}
+                strokeWidth={isHighlighted ? 2 : 1}
+                strokeDasharray={edge.active ? '' : '4 4'}
+                className="transition-all duration-300"
+              />
+            );
+          })}
+        </svg>
+
+        {/* Nodes */}
+        {TOPOLOGY_NODES.map((node) => {
+          const c = categoryColors[node.category];
+          const isSelected = selectedNode === node.id;
+          const statusDot = node.status === 'online' ? 'bg-cb-green' : node.status === 'degraded' ? 'bg-cb-amber animate-pulse' : 'bg-cb-red';
+          return (
+            <motion.div
+              key={node.id}
+              className={`absolute cursor-pointer transition-all duration-200 ${isSelected ? 'z-20' : 'z-10'}`}
+              style={{ left: `${node.x}%`, top: `${node.y}%`, transform: 'translate(-50%, -50%)' }}
+              onClick={() => setSelectedNode(isSelected ? null : node.id)}
+              whileHover={{ scale: 1.1 }}
+            >
+              <div className={`rounded-xl ${c.bg} border ${c.border} px-3 py-2 ${isSelected ? c.glow : ''} transition-shadow`}>
+                <div className="flex items-center gap-2">
+                  <span className={`h-2 w-2 rounded-full ${statusDot}`} />
+                  <span className={`text-xs font-semibold ${c.text}`}>{node.label}</span>
+                </div>
+                {isSelected && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    className="mt-2 pt-2 border-t border-wireframe-stroke space-y-0.5"
+                  >
+                    <div className="text-[10px] text-cb-fog">Latency: <span className={`font-mono font-bold ${node.latency > 200 ? 'text-cb-amber' : c.text}`}>{node.latency}ms</span></div>
+                    <div className="text-[10px] text-cb-fog">RPM: <span className={`font-mono font-bold ${c.text}`}>{node.rpm}</span></div>
+                    <div className="text-[10px] text-cb-fog">Status: <span className={`font-mono font-bold capitalize ${node.status === 'online' ? 'text-cb-green' : 'text-cb-amber'}`}>{node.status}</span></div>
+                  </motion.div>
+                )}
+              </div>
+            </motion.div>
+          );
+        })}
+      </div>
+
+      {/* Telemetry Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Latency by service tier */}
+        <div className="rounded-2xl border border-wireframe-stroke bg-black/60 p-5 backdrop-blur-xl">
+          <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
+            <span className="text-gold">⚡</span> Service Latency (ms)
+          </h3>
+          <div className="flex items-center gap-4 mb-3">
+            <span className="flex items-center gap-1 text-[10px] text-gold"><span className="h-1.5 w-1.5 rounded-full bg-gold" />Gateway</span>
+            <span className="flex items-center gap-1 text-[10px] text-cb-cyan"><span className="h-1.5 w-1.5 rounded-full bg-cb-cyan" />ACHEEVY</span>
+            <span className="flex items-center gap-1 text-[10px] text-purple-400"><span className="h-1.5 w-1.5 rounded-full bg-purple-400" />Agents</span>
+          </div>
+          <ResponsiveContainer width="100%" height={180}>
+            <AreaChart data={latencyData} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+              <defs>
+                <linearGradient id="gradGateway" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#D4AF37" stopOpacity={0.2} />
+                  <stop offset="100%" stopColor="#D4AF37" stopOpacity={0} />
+                </linearGradient>
+                <linearGradient id="gradAcheevy" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#22D3EE" stopOpacity={0.2} />
+                  <stop offset="100%" stopColor="#22D3EE" stopOpacity={0} />
+                </linearGradient>
+                <linearGradient id="gradAgents" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#C084FC" stopOpacity={0.2} />
+                  <stop offset="100%" stopColor="#C084FC" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
+              <XAxis dataKey="time" tick={{ fontSize: 9, fill: 'rgba(255,255,255,0.2)' }} tickLine={false} axisLine={false} interval={5} />
+              <YAxis tick={{ fontSize: 9, fill: 'rgba(255,255,255,0.2)' }} tickLine={false} axisLine={false} width={30} />
+              <Tooltip content={<TopoTooltip unit="ms" />} />
+              <Area type="monotone" dataKey="gateway" name="Gateway" stroke="#D4AF37" strokeWidth={1.5} fill="url(#gradGateway)" dot={false} isAnimationActive={false} />
+              <Area type="monotone" dataKey="acheevy" name="ACHEEVY" stroke="#22D3EE" strokeWidth={1.5} fill="url(#gradAcheevy)" dot={false} isAnimationActive={false} />
+              <Area type="monotone" dataKey="agents" name="Agents" stroke="#C084FC" strokeWidth={1.5} fill="url(#gradAgents)" dot={false} isAnimationActive={false} />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Throughput */}
+        <div className="rounded-2xl border border-wireframe-stroke bg-black/60 p-5 backdrop-blur-xl">
+          <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
+            <span className="text-cb-cyan">📡</span> Throughput (req/min)
+          </h3>
+          <div className="flex items-center gap-4 mb-3">
+            <span className="flex items-center gap-1 text-[10px] text-emerald-400"><span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />Ingress</span>
+            <span className="flex items-center gap-1 text-[10px] text-sky-400"><span className="h-1.5 w-1.5 rounded-full bg-sky-400" />Egress</span>
+          </div>
+          <ResponsiveContainer width="100%" height={180}>
+            <BarChart data={throughputData} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
+              <XAxis dataKey="time" tick={{ fontSize: 9, fill: 'rgba(255,255,255,0.2)' }} tickLine={false} axisLine={false} interval={5} />
+              <YAxis tick={{ fontSize: 9, fill: 'rgba(255,255,255,0.2)' }} tickLine={false} axisLine={false} width={30} />
+              <Tooltip content={<TopoTooltip unit=" rpm" />} />
+              <Bar dataKey="ingress" name="Ingress" fill="#22C55E" opacity={0.7} radius={[2, 2, 0, 0]} />
+              <Bar dataKey="egress" name="Egress" fill="#38BDF8" opacity={0.7} radius={[2, 2, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
 // Live Events Panel (OWNER ONLY)
 // ─────────────────────────────────────────────────────────────
 
@@ -1057,6 +1356,10 @@ function CircuitBoxContent() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                 {visibleServices.map((service) => <ServiceCard key={service.id} service={service} isOwner={isOwner} />)}
               </div>
+            )}
+
+            {activeTab === 'topology' && (
+              <TopologyPanel />
             )}
 
             {activeTab === 'integrations' && (
