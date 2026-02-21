@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
         method: 'POST',
         headers,
         body: JSON.stringify({
-          userId: session?.user?.email || 'web-user',
+          userId: session?.user?.email || request.headers.get('x-user-id') || 'anon-unknown',
           type: 'code',
           name: `Code Execution - ${new Date().toISOString()}`,
           config: { language, packages: packages || [] },
@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
         method: 'POST',
         headers,
         body: JSON.stringify({
-          userId: session?.user?.email || 'web-user',
+          userId: session?.user?.email || request.headers.get('x-user-id') || 'anon-unknown',
           input: code,
           target: language,
         }),

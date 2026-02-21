@@ -34,7 +34,7 @@ function useIsShowroom(): boolean {
     const host = window.location.hostname.replace(/^www\./, "");
     setIsShowroom(
       host === "aimanagedsolutions.cloud" ||
-      host === host.includes("localhost") ||
+      host.includes("localhost") ||
       host === "127.0.0.1"
     );
   }, []);

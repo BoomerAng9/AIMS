@@ -166,6 +166,42 @@ const migrations: Migration[] = [
       `);
     },
   },
+  {
+    version: '004',
+    name: 'create_memories_table',
+    up: (db: Database.Database): void => {
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS memories (
+          id TEXT PRIMARY KEY,
+          userId TEXT NOT NULL,
+          projectId TEXT NOT NULL DEFAULT '',
+          type TEXT NOT NULL,
+          scope TEXT NOT NULL DEFAULT 'user',
+          summary TEXT NOT NULL,
+          content TEXT NOT NULL,
+          payload TEXT NOT NULL DEFAULT '{}',
+          tags TEXT NOT NULL DEFAULT '[]',
+          relevanceScore REAL NOT NULL DEFAULT 0.5,
+          useCount INTEGER NOT NULL DEFAULT 0,
+          feedbackSignal INTEGER NOT NULL DEFAULT 0,
+          source TEXT NOT NULL DEFAULT 'system',
+          expiresAt TEXT,
+          createdAt TEXT NOT NULL,
+          updatedAt TEXT NOT NULL,
+          lastRecalledAt TEXT
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_memories_userId ON memories(userId);
+        CREATE INDEX IF NOT EXISTS idx_memories_type ON memories(type);
+        CREATE INDEX IF NOT EXISTS idx_memories_scope ON memories(scope);
+        CREATE INDEX IF NOT EXISTS idx_memories_projectId ON memories(projectId);
+        CREATE INDEX IF NOT EXISTS idx_memories_userId_type ON memories(userId, type);
+        CREATE INDEX IF NOT EXISTS idx_memories_relevance ON memories(relevanceScore DESC);
+        CREATE INDEX IF NOT EXISTS idx_memories_expiresAt ON memories(expiresAt);
+        CREATE INDEX IF NOT EXISTS idx_memories_userId_summary ON memories(userId, summary, type);
+      `);
+    },
+  },
 ];
 
 // ---------------------------------------------------------------------------

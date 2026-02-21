@@ -16,9 +16,9 @@ function makeInput(overrides: Partial<AgentTaskInput> = {}): AgentTaskInput {
 }
 
 describe('Agent Registry', () => {
-  it('registers all 5 agents', () => {
+  it('registers all 9 agents', () => {
     const agents = registry.list();
-    expect(agents).toHaveLength(5);
+    expect(agents).toHaveLength(9);
   });
 
   it('can look up agents by ID', () => {
@@ -27,6 +27,10 @@ describe('Agent Registry', () => {
     expect(registry.has('analyst-ang')).toBe(true);
     expect(registry.has('quality-ang')).toBe(true);
     expect(registry.has('chicken-hawk')).toBe(true);
+    expect(registry.has('node-trigger-ang')).toBe(true);
+    expect(registry.has('json-expert-squad')).toBe(true);
+    expect(registry.has('workflow-smith-squad')).toBe(true);
+    expect(registry.has('vision-scout-squad')).toBe(true);
   });
 
   it('returns profiles with correct structure', () => {

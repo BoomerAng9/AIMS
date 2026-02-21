@@ -102,6 +102,7 @@ async function tryAgentDispatch(
   lastMessage: string,
   classification: ClassifyResult,
   conversationHistory: Array<{ role: string; content: string }>,
+  userId: string,
 ): Promise<Response | null> {
   if (!UEF_GATEWAY_URL) return null;
 
@@ -110,10 +111,10 @@ async function tryAgentDispatch(
       method: 'POST',
       headers: gatewayHeaders(),
       body: JSON.stringify({
-        userId: 'web-user',
+        userId,
         message: lastMessage,
         intent: classification.intent,
-        conversationId: 'chat-ui',
+        conversationId: `session-${userId}`,
         context: {
           history: conversationHistory.slice(-6), // last 6 messages for context
           classification,
@@ -167,6 +168,7 @@ async function tryGatewayStream(
   modelId: string,
   messages: Array<{ role: string; content: string }>,
   systemPrompt: string,
+  userId: string,
 ): Promise<Response | null> {
   if (!UEF_GATEWAY_URL) return null;
 
@@ -183,8 +185,8 @@ async function tryGatewayStream(
         model: modelId,
         messages: gatewayMessages,
         agentId: 'acheevy-chat',
-        userId: 'web-user',
-        sessionId: 'chat-ui',
+        userId,
+        sessionId: `session-${userId}`,
       }),
     });
 
@@ -233,18 +235,73 @@ async function tryGatewayStream(
 }
 
 // ---------------------------------------------------------------------------
+// Memory recall — fetch relevant context from the memory system
+// ---------------------------------------------------------------------------
+
+async function recallMemories(message: string, userId: string): Promise<string> {
+  if (!UEF_GATEWAY_URL) return '';
+
+  try {
+    const res = await fetch(`${UEF_GATEWAY_URL}/memory/recall`, {
+      method: 'POST',
+      headers: gatewayHeaders(),
+      body: JSON.stringify({
+        userId,
+        query: message,
+        limit: 5,
+        minRelevance: 0.3,
+      }),
+    });
+
+    if (!res.ok) return '';
+
+    const result = await res.json();
+    if (!result.memories || result.memories.length === 0) return '';
+
+    const lines = result.memories.map((s: any, i: number) => {
+      const m = s.memory;
+      const typeLabel = (m.type || '').replace(/_/g, ' ');
+      return `  ${i + 1}. [${typeLabel}] ${m.summary}`;
+    });
+
+    return [
+      '--- ACHEEVY Memory Context ---',
+      `Recalled ${result.memories.length} relevant memories:`,
+      ...lines,
+      '--- End Memory Context ---',
+    ].join('\n');
+  } catch {
+    return '';
+  }
+}
+
+// ---------------------------------------------------------------------------
 // POST handler — the unified entry point
 // ---------------------------------------------------------------------------
 
 export async function POST(req: Request) {
   try {
-    const { messages, model, personaId } = await req.json();
+    const { messages, model, personaId, userId: bodyUserId } = await req.json();
+
+    // Derive userId: body > cookie > header > anon fallback
+    const userId = bodyUserId
+      || req.headers.get('x-user-id')
+      || `anon-${req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'}`;
     const modelId = resolveModelId(model);
-    const systemPrompt = buildSystemPrompt({ personaId, additionalContext: 'User is using the Chat Interface.' });
 
     // Get the last user message for classification
     const lastUserMessage = [...messages].reverse().find((m: { role: string }) => m.role === 'user');
     const lastMessage = lastUserMessage?.content || '';
+
+    // Memory recall: fetch relevant memories for this user's message
+    const memoryContext = await recallMemories(lastMessage, userId);
+
+    const systemPrompt = buildSystemPrompt({
+      personaId,
+      additionalContext: memoryContext
+        ? `User is using the Chat Interface.\n\n${memoryContext}`
+        : 'User is using the Chat Interface.',
+    });
 
     // Step 1: Classify intent via gateway
     const classification = await classifyIntent(lastMessage);
@@ -252,14 +309,14 @@ export async function POST(req: Request) {
     // Step 2: If agent dispatch is needed, route to orchestrator
     if (classification?.requiresAgent && classification.confidence > 0.6) {
       console.log(`[ACHEEVY Chat] Agent dispatch: intent=${classification.intent} confidence=${classification.confidence}`);
-      const agentResponse = await tryAgentDispatch(lastMessage, classification, messages);
+      const agentResponse = await tryAgentDispatch(lastMessage, classification, messages, userId);
       if (agentResponse) return agentResponse;
       // If agent dispatch fails, fall through to LLM stream
       console.warn('[ACHEEVY Chat] Agent dispatch failed, falling through to LLM stream');
     }
 
     // Step 3: LLM stream via UEF Gateway (metered, Vertex AI + OpenRouter)
-    const gatewayResponse = await tryGatewayStream(modelId, messages, systemPrompt);
+    const gatewayResponse = await tryGatewayStream(modelId, messages, systemPrompt, userId);
     if (gatewayResponse) return gatewayResponse;
 
     // Step 4: Direct OpenRouter via Vercel AI SDK (fallback)
@@ -269,7 +326,7 @@ export async function POST(req: Request) {
       messages,
     });
 
-    return result.toAIStreamResponse();
+    return result.toDataStreamResponse();
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Chat API error';
     console.error('[ACHEEVY Chat]', message);

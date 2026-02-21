@@ -3,8 +3,6 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { SiteHeader } from "@/components/SiteHeader";
-import Footer from "@/components/landing/Footer";
 import {
   SUBSCRIPTION_MODELS,
   TOKEN_TIERS,
@@ -105,9 +103,7 @@ export default function PerFormPricingPage() {
   }
 
   return (
-    <main className="min-h-screen bg-obsidian text-white">
-      <SiteHeader />
-      <div className="mx-auto max-w-6xl px-4 py-12 md:px-6 lg:px-8">
+    <div className="mx-auto max-w-6xl px-4 py-12 md:px-6 lg:px-8">
 
         {/* ──────────────────────── Hero Header ──────────────────────── */}
         <div className="text-center mb-10">
@@ -535,8 +531,6 @@ export default function PerFormPricingPage() {
             </Link>
           </div>
         </section>
-      </div>
-      <Footer />
-    </main>
+    </div>
   );
 }

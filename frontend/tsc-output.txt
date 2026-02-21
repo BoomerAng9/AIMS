@@ -1,0 +1,49 @@
+app/page.tsx(37,7): error TS2367: This comparison appears to be unintentional because the types 'string' and 'boolean' have no overlap.
+lib/perform/automation-runner.ts(29,37): error TS2339: Property 'coachingChange' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/perform/automation-runner.ts(33,32): error TS2339: Property 'coachingChange' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/perform/automation-runner.ts(69,14): error TS2339: Property 'transferPortalEntry' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/perform/automation-runner.ts(70,14): error TS2339: Property 'transferPortalEntry' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/perform/automation-runner.ts(71,14): error TS2339: Property 'transferPortalEntry' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/perform/automation-runner.ts(108,32): error TS2339: Property 'nilDeal' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/perform/automation-runner.ts(141,35): error TS2339: Property 'schoolRevenueBudget' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/perform/automation-runner.ts(148,33): error TS2339: Property 'nilTeamRanking' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/perform/automation-runner.ts(157,20): error TS2339: Property 'nilTeamRanking' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/perform/automation-runner.ts(217,34): error TS2339: Property 'schoolRevenueBudget' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/perform/automation-runner.ts(225,38): error TS2339: Property 'nilDeal' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/perform/automation-runner.ts(242,20): error TS2339: Property 'schoolRevenueBudget' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/perform/automation-runner.ts(257,33): error TS2339: Property 'schoolRevenueBudget' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/perform/automation-runner.ts(263,20): error TS2339: Property 'schoolRevenueBudget' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/perform/automation-runner.ts(306,41): error TS2339: Property 'coachingChange' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/perform/automation-runner.ts(313,26): error TS2339: Property 'coachingChange' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/perform/automation-runner.ts(323,41): error TS2339: Property 'transferPortalEntry' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/perform/automation-runner.ts(329,26): error TS2339: Property 'transferPortalEntry' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/perform/automation-runner.ts(339,41): error TS2339: Property 'nilDeal' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/perform/automation-runner.ts(345,26): error TS2339: Property 'nilDeal' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/perform/ncaa-data-service.ts(30,17): error TS2339: Property 'coachingChange' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/perform/ncaa-data-service.ts(40,17): error TS2339: Property 'coachingChange' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/perform/ncaa-data-service.ts(48,12): error TS2339: Property 'coachingChange' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/perform/ncaa-data-service.ts(49,12): error TS2339: Property 'coachingChange' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/perform/ncaa-data-service.ts(50,12): error TS2339: Property 'coachingChange' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/perform/ncaa-data-service.ts(51,12): error TS2339: Property 'coachingChange' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/perform/ncaa-data-service.ts(52,12): error TS2339: Property 'coachingChange' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/perform/ncaa-data-service.ts(53,12): error TS2339: Property 'coachingChange' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/perform/ncaa-data-service.ts(80,17): error TS2339: Property 'transferPortalEntry' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/perform/ncaa-data-service.ts(91,12): error TS2339: Property 'transferPortalEntry' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/perform/ncaa-data-service.ts(92,12): error TS2339: Property 'transferPortalEntry' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/perform/ncaa-data-service.ts(93,12): error TS2339: Property 'transferPortalEntry' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/perform/ncaa-data-service.ts(94,12): error TS2339: Property 'transferPortalEntry' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/perform/ncaa-data-service.ts(95,12): error TS2339: Property 'transferPortalEntry' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/perform/ncaa-data-service.ts(118,17): error TS2339: Property 'nilDeal' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/perform/ncaa-data-service.ts(128,17): error TS2339: Property 'nilTeamRanking' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/perform/ncaa-data-service.ts(144,17): error TS2339: Property 'nilPlayerRanking' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/perform/ncaa-data-service.ts(153,30): error TS2339: Property 'nilDeal' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/perform/ncaa-data-service.ts(154,36): error TS7006: Parameter 'sum' implicitly has an 'any' type.
+lib/perform/ncaa-data-service.ts(154,41): error TS7006: Parameter 'd' implicitly has an 'any' type.
+lib/perform/ncaa-data-service.ts(160,35): error TS7006: Parameter 'd' implicitly has an 'any' type.
+lib/perform/ncaa-data-service.ts(178,17): error TS2339: Property 'schoolRevenueBudget' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/perform/ncaa-data-service.ts(188,17): error TS2339: Property 'schoolRevenueBudget' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/perform/ncaa-data-service.ts(198,17): error TS2339: Property 'schoolRevenueBudget' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/perform/ncaa-data-service.ts(218,17): error TS2339: Property 'performAutomationRun' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/perform/ncaa-data-service.ts(231,17): error TS2339: Property 'performAutomationRun' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/perform/ncaa-data-service.ts(251,35): error TS2339: Property 'performAutomationRun' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/perform/ncaa-data-service.ts(254,17): error TS2339: Property 'performAutomationRun' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.

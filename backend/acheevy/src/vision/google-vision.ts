@@ -127,8 +127,7 @@ function parseDominantColors(imagePropertiesAnnotation: any = {}): string[] {
 
 export async function analyzeImage(imageBase64: string): Promise<VisionAnalysisResult> {
   if (!API_KEY) {
-    console.warn('[GoogleVision] No API key configured, returning mock analysis');
-    return getMockAnalysis();
+    throw new Error('[GoogleVision] GOOGLE_VISION_API_KEY not configured — cannot analyze image');
   }
 
   try {

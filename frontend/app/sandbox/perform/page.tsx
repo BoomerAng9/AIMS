@@ -20,7 +20,7 @@ import {
   Shuffle, MapPin, Radio, Flame, BarChart3, Activity, ChevronRight,
   Zap, Shield, Target, Star
 } from 'lucide-react';
-import type { Prospect, ContentArticle } from '@/lib/perform/types';
+import type { Prospect, ContentArticle, Tier } from '@/lib/perform/types';
 import { TIER_STYLES, getScoreColor, getProspectSlug } from '@/lib/perform/types';
 
 const CURRENT_YEAR = new Date().getFullYear();
@@ -290,8 +290,7 @@ export default function PerFormHub() {
 
           <div className="space-y-2">
             {topProspects.map((prospect, i) => {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              const tierStyle = (TIER_STYLES as any)[prospect.tier];
+              const tierStyle = TIER_STYLES[prospect.tier as Tier];
               const tierPill = TIER_PILL[prospect.tier] || 'bg-white/10 text-white/60';
               return (
                 <motion.div

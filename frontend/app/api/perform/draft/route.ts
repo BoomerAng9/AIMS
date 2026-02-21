@@ -13,7 +13,28 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db/prisma';
 import { seedNFLTeams, NFL_TEAMS } from '@/lib/perform/mock-draft-engine';
-import { SEED_DRAFT_PROSPECTS, NFL_TEAM_NEEDS_2026 } from '@/lib/perform/seed-draft-data';
+import { SEED_DRAFT_PROSPECTS, NFL_TEAM_NEEDS_2026, TeamNeed } from '@/lib/perform/seed-draft-data';
+
+/** Convert TeamNeed[] → the shape seedNFLTeams expects */
+function toSeedFormat(needs: TeamNeed[]) {
+  const teamLookup = new Map(NFL_TEAMS.map(t => [t.abbreviation, t]));
+  return needs.map(n => {
+    const base = teamLookup.get(n.abbrev);
+    // Build needs Record: primary needs weighted 3, secondary 1
+    const needsMap: Record<string, number> = {};
+    for (const p of n.primaryNeeds) needsMap[p] = 3;
+    for (const s of n.secondaryNeeds) needsMap[s] = needsMap[s] ?? 1;
+    return {
+      teamName: base?.teamName ?? n.team,
+      abbreviation: n.abbrev,
+      city: base?.city ?? '',
+      conference: base?.conference ?? '',
+      division: base?.division ?? '',
+      draftOrder: n.projectedPick,
+      needs: needsMap,
+    };
+  });
+}
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -95,23 +116,7 @@ export async function POST(req: NextRequest) {
     // Full seed
     if (action === 'seed-all') {
       // 1. Seed NFL teams
-      const enrichedNeeds = NFL_TEAM_NEEDS_2026.map(tn => {
-        const baseTeam = NFL_TEAMS.find(t => t.abbreviation === tn.abbrev);
-        const needsMap: Record<string, number> = {};
-        tn.primaryNeeds.forEach(pos => needsMap[pos] = 1);
-        tn.secondaryNeeds.forEach(pos => needsMap[pos] = 2);
-
-        return {
-          teamName: tn.team,
-          abbreviation: tn.abbrev,
-          city: baseTeam?.city || '',
-          conference: baseTeam?.conference || '',
-          division: baseTeam?.division || '',
-          needs: needsMap,
-          draftOrder: tn.projectedPick,
-        };
-      });
-      const teamCount = await seedNFLTeams(enrichedNeeds);
+      const teamCount = await seedNFLTeams(toSeedFormat(NFL_TEAM_NEEDS_2026));
 
       // 2. Seed draft prospects
       let prospectCount = 0;
@@ -133,23 +138,7 @@ export async function POST(req: NextRequest) {
 
     // Seed teams only
     if (action === 'seed-teams') {
-      const enrichedNeeds = NFL_TEAM_NEEDS_2026.map(tn => {
-        const baseTeam = NFL_TEAMS.find(t => t.abbreviation === tn.abbrev);
-        const needsMap: Record<string, number> = {};
-        tn.primaryNeeds.forEach(pos => needsMap[pos] = 1);
-        tn.secondaryNeeds.forEach(pos => needsMap[pos] = 2);
-
-        return {
-          teamName: tn.team,
-          abbreviation: tn.abbrev,
-          city: baseTeam?.city || '',
-          conference: baseTeam?.conference || '',
-          division: baseTeam?.division || '',
-          needs: needsMap,
-          draftOrder: tn.projectedPick,
-        };
-      });
-      const count = await seedNFLTeams(enrichedNeeds);
+      const count = await seedNFLTeams(toSeedFormat(NFL_TEAM_NEEDS_2026));
       return NextResponse.json({ ok: true, teams: count });
     }
 

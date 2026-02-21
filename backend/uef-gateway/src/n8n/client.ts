@@ -181,17 +181,107 @@ export class N8nClient {
 }
 
 // ---------------------------------------------------------------------------
-// Convenience function
+// Vertical-to-Workflow Mapping
+// ---------------------------------------------------------------------------
+
+/**
+ * Maps vertical IDs to n8n webhook paths.
+ * Each vertical can trigger a dedicated n8n workflow for Phase B execution.
+ * When no specific workflow exists, falls back to the PMO intake workflow.
+ */
+const VERTICAL_WORKFLOW_MAP: Record<string, string> = {
+  'automation':        '/webhook/vertical-automation',
+  'content-calendar':  '/webhook/vertical-content-calendar',
+  'social-hooks':      '/webhook/vertical-social-launch',
+  'cold-outreach':     '/webhook/vertical-cold-outreach',
+  'mvp-plan':          '/webhook/vertical-mvp-build',
+  'chicken-hawk':      '/webhook/vertical-code-deploy',
+  'custom-hawk':       '/webhook/vertical-custom-hawk',
+  'livesim':           '/webhook/vertical-livesim',
+};
+
+export interface VerticalTriggerPayload {
+  verticalId: string;
+  userId: string;
+  collectedData: Record<string, unknown>;
+  sessionId?: string;
+  requestId?: string;
+}
+
+// ---------------------------------------------------------------------------
+// Convenience functions
 // ---------------------------------------------------------------------------
 
 let defaultClient: N8nClient | null = null;
+
+function getClient(): N8nClient {
+  if (!defaultClient) defaultClient = new N8nClient();
+  return defaultClient;
+}
 
 /**
  * Trigger the PMO routing workflow (tries n8n first, falls back to local).
  */
 export async function triggerN8nPmoWorkflow(payload: N8nTriggerPayload): Promise<N8nPipelineResponse> {
-  if (!defaultClient) {
-    defaultClient = new N8nClient();
+  return getClient().triggerPmoWorkflow(payload);
+}
+
+/**
+ * Trigger a vertical-specific n8n workflow after Phase A completes.
+ * Falls back to PMO intake if no vertical-specific workflow exists.
+ */
+export async function triggerVerticalWorkflow(
+  payload: VerticalTriggerPayload,
+): Promise<N8nPipelineResponse> {
+  const client = getClient();
+  const webhookPath = VERTICAL_WORKFLOW_MAP[payload.verticalId] || PMO_WEBHOOK_PATH;
+  const url = `${N8N_HOST}${webhookPath}`;
+
+  logger.info(
+    { verticalId: payload.verticalId, userId: payload.userId, webhookPath },
+    '[n8n Client] Triggering vertical workflow',
+  );
+
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30000);
+
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(N8N_API_KEY ? { 'X-N8N-API-KEY': N8N_API_KEY } : {}),
+      },
+      body: JSON.stringify({
+        ...payload,
+        type: 'vertical_execution',
+        timestamp: new Date().toISOString(),
+      }),
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeout);
+
+    if (!res.ok) {
+      throw new Error(`n8n returned HTTP ${res.status}`);
+    }
+
+    const data = await res.json() as N8nPipelineResponse;
+    logger.info(
+      { requestId: data.requestId, verticalId: payload.verticalId, status: data.status },
+      '[n8n Client] Vertical workflow response received',
+    );
+    return data;
+  } catch (err) {
+    logger.warn(
+      { error: (err as Error).message, verticalId: payload.verticalId },
+      '[n8n Client] Vertical workflow unreachable — falling back to PMO pipeline',
+    );
+    // Fallback: convert to PMO payload and run through standard pipeline
+    return client.executePipelineLocal({
+      userId: payload.userId,
+      message: `[VERTICAL:${payload.verticalId}] Execute Phase B with collected data: ${JSON.stringify(payload.collectedData)}`,
+      requestId: payload.requestId,
+    });
   }
-  return defaultClient.triggerPmoWorkflow(payload);
 }

@@ -22,6 +22,10 @@ export type AlertCondition = 'gt' | 'lt' | 'eq';
 export type AlertSeverity = 'critical' | 'warning' | 'info';
 export type AlertChannel = 'log' | 'webhook' | 'email';
 
+// Environment-based dispatch config
+const ALERT_WEBHOOK_URL = process.env.ALERT_WEBHOOK_URL || '';
+const ALERT_EMAIL_ENDPOINT = process.env.ALERT_EMAIL_ENDPOINT || ''; // HTTP endpoint for email relay (e.g., SendGrid, SES)
+
 export interface AlertConfig {
   id: string;
   name: string;
@@ -190,39 +194,75 @@ export class AlertEngine {
 
   /**
    * Dispatch an alert event through the configured channel.
-   * Currently only 'log' is implemented; 'webhook' and 'email' are stubs.
+   * Supports log (always), webhook (POST to ALERT_WEBHOOK_URL), and
+   * email (POST to ALERT_EMAIL_ENDPOINT relay service).
    */
   private dispatch(config: AlertConfig, event: AlertEvent): void {
-    switch (config.channel) {
-      case 'log':
-        logger.warn(
-          {
-            alertId: event.alertId,
-            metric: event.metric,
-            value: event.value,
-            threshold: event.threshold,
-            severity: event.severity,
-          },
-          `[Observability] ALERT FIRED: ${event.name}`,
-        );
-        break;
+    // Always log regardless of channel
+    logger.warn(
+      {
+        alertId: event.alertId,
+        metric: event.metric,
+        value: event.value,
+        threshold: event.threshold,
+        severity: event.severity,
+        channel: config.channel,
+      },
+      `[Observability] ALERT FIRED: ${event.name}`,
+    );
 
-      case 'webhook':
-        // Stub: In production, POST to a webhook URL
-        logger.info(
-          { alertId: event.alertId, channel: 'webhook' },
-          '[Observability] Webhook dispatch (stub)',
-        );
-        break;
-
-      case 'email':
-        // Stub: In production, send email via SMTP/SES
-        logger.info(
-          { alertId: event.alertId, channel: 'email' },
-          '[Observability] Email dispatch (stub)',
-        );
-        break;
+    if (config.channel === 'webhook') {
+      this.dispatchWebhook(event);
+    } else if (config.channel === 'email') {
+      this.dispatchEmail(event);
     }
+  }
+
+  private dispatchWebhook(event: AlertEvent): void {
+    if (!ALERT_WEBHOOK_URL) {
+      logger.warn({ alertId: event.alertId }, '[Observability] Webhook URL not configured (set ALERT_WEBHOOK_URL)');
+      return;
+    }
+    fetch(ALERT_WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        source: 'aims-observability',
+        alert: event,
+        timestamp: new Date().toISOString(),
+      }),
+    })
+      .then(res => {
+        if (!res.ok) logger.error({ alertId: event.alertId, status: res.status }, '[Observability] Webhook dispatch failed');
+        else logger.info({ alertId: event.alertId }, '[Observability] Webhook dispatched');
+      })
+      .catch(err => {
+        logger.error({ alertId: event.alertId, err: err instanceof Error ? err.message : err }, '[Observability] Webhook dispatch error');
+      });
+  }
+
+  private dispatchEmail(event: AlertEvent): void {
+    if (!ALERT_EMAIL_ENDPOINT) {
+      logger.warn({ alertId: event.alertId }, '[Observability] Email endpoint not configured (set ALERT_EMAIL_ENDPOINT)');
+      return;
+    }
+    fetch(ALERT_EMAIL_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        to: process.env.ALERT_EMAIL_TO || 'admin@aimanagedsolutions.cloud',
+        subject: `[AIMS ${event.severity.toUpperCase()}] ${event.name}`,
+        body: `Alert: ${event.name}\nMetric: ${event.metric}\nValue: ${event.value} (threshold: ${event.threshold})\nSeverity: ${event.severity}\nTriggered: ${event.triggeredAt}`,
+        alert: event,
+      }),
+    })
+      .then(res => {
+        if (!res.ok) logger.error({ alertId: event.alertId, status: res.status }, '[Observability] Email dispatch failed');
+        else logger.info({ alertId: event.alertId }, '[Observability] Email dispatched');
+      })
+      .catch(err => {
+        logger.error({ alertId: event.alertId, err: err instanceof Error ? err.message : err }, '[Observability] Email dispatch error');
+      });
   }
 
   /**

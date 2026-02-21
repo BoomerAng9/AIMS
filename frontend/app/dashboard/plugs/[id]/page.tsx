@@ -60,142 +60,8 @@ interface PlugDetail {
   integrations: { name: string; status: "active" | "inactive" }[];
 }
 
-const MOCK_PLUGS: Record<string, PlugDetail> = {
-  "plug-001": {
-    id: "plug-001",
-    name: "RealtyVision CRM",
-    archetype: "CRM",
-    status: "live",
-    domain: "realtyvision.com",
-    requests: 1247,
-    errors: 3,
-    uptime: 99.9,
-    avgResponseTime: "142ms",
-    stage: "LIVE",
-    containerId: "ctr-8f3a2b1c",
-    port: 3000,
-    createdAt: "2025-11-14",
-    files: [
-      { path: "/app", type: "folder" },
-      { path: "/app/layout.tsx", type: "file" },
-      { path: "/app/page.tsx", type: "file" },
-      { path: "/app/dashboard/page.tsx", type: "file" },
-      { path: "/app/api/contacts/route.ts", type: "file" },
-      { path: "/app/api/deals/route.ts", type: "file" },
-      { path: "/components/Pipeline.tsx", type: "file" },
-      { path: "/components/ContactCard.tsx", type: "file" },
-      { path: "/lib/db.ts", type: "file" },
-      { path: "/tailwind.config.ts", type: "file" },
-      { path: "/package.json", type: "file" },
-    ],
-    integrations: [
-      { name: "Stripe Payments", status: "active" },
-      { name: "SendGrid Email", status: "active" },
-      { name: "Google OAuth", status: "active" },
-      { name: "Twilio SMS", status: "inactive" },
-    ],
-  },
-  "plug-002": {
-    id: "plug-002",
-    name: "FitTrack Pro",
-    archetype: "SaaS",
-    status: "building",
-    stage: "BUILD",
-    progress: 65,
-    createdAt: "2025-12-02",
-    files: [
-      { path: "/app", type: "folder" },
-      { path: "/app/layout.tsx", type: "file" },
-      { path: "/app/page.tsx", type: "file" },
-      { path: "/app/workouts/page.tsx", type: "file" },
-      { path: "/app/api/auth/route.ts", type: "file" },
-      { path: "/components/WorkoutLog.tsx", type: "file" },
-      { path: "/package.json", type: "file" },
-    ],
-    integrations: [
-      { name: "Stripe Subscriptions", status: "active" },
-      { name: "Auth0", status: "active" },
-    ],
-  },
-  "plug-003": {
-    id: "plug-003",
-    name: "LegalDocs Hub",
-    archetype: "Internal Tool",
-    status: "review",
-    stage: "REVIEW",
-    createdAt: "2025-12-08",
-    files: [
-      { path: "/app", type: "folder" },
-      { path: "/app/layout.tsx", type: "file" },
-      { path: "/app/page.tsx", type: "file" },
-      { path: "/app/documents/page.tsx", type: "file" },
-      { path: "/app/api/docs/route.ts", type: "file" },
-      { path: "/components/DocViewer.tsx", type: "file" },
-      { path: "/components/TemplateList.tsx", type: "file" },
-      { path: "/package.json", type: "file" },
-    ],
-    integrations: [
-      { name: "DocuSign", status: "active" },
-      { name: "AWS S3", status: "active" },
-      { name: "OpenAI Summarizer", status: "inactive" },
-    ],
-  },
-  "plug-004": {
-    id: "plug-004",
-    name: "ArtisanMarket",
-    archetype: "Marketplace",
-    status: "ready",
-    stage: "DEPLOY",
-    createdAt: "2025-12-10",
-    files: [
-      { path: "/app", type: "folder" },
-      { path: "/app/layout.tsx", type: "file" },
-      { path: "/app/page.tsx", type: "file" },
-      { path: "/app/listings/page.tsx", type: "file" },
-      { path: "/app/vendors/page.tsx", type: "file" },
-      { path: "/app/api/listings/route.ts", type: "file" },
-      { path: "/app/api/payments/route.ts", type: "file" },
-      { path: "/components/ListingCard.tsx", type: "file" },
-      { path: "/components/VendorProfile.tsx", type: "file" },
-      { path: "/package.json", type: "file" },
-    ],
-    integrations: [
-      { name: "Stripe Connect", status: "active" },
-      { name: "Algolia Search", status: "active" },
-      { name: "Cloudinary", status: "active" },
-    ],
-  },
-  "plug-005": {
-    id: "plug-005",
-    name: "PortfolioX",
-    archetype: "Portfolio",
-    status: "deployed",
-    domain: "portfoliox.dev",
-    requests: 423,
-    errors: 0,
-    uptime: 100,
-    avgResponseTime: "89ms",
-    stage: "LIVE",
-    containerId: "ctr-2d7f9e4a",
-    port: 3001,
-    createdAt: "2025-10-28",
-    files: [
-      { path: "/app", type: "folder" },
-      { path: "/app/layout.tsx", type: "file" },
-      { path: "/app/page.tsx", type: "file" },
-      { path: "/app/projects/page.tsx", type: "file" },
-      { path: "/app/about/page.tsx", type: "file" },
-      { path: "/components/ProjectGrid.tsx", type: "file" },
-      { path: "/components/Hero.tsx", type: "file" },
-      { path: "/public/images", type: "folder" },
-      { path: "/package.json", type: "file" },
-    ],
-    integrations: [
-      { name: "Google Analytics", status: "active" },
-      { name: "Vercel Hosting", status: "active" },
-    ],
-  },
-};
+// Plug data loaded from API — no hardcoded entries
+const PLUG_DATA: Record<string, PlugDetail> = {};
 
 const PIPELINE_STAGES = ["INTAKE", "SCOPE", "BUILD", "REVIEW", "DEPLOY", "LIVE"];
 
@@ -229,7 +95,7 @@ export default function PlugDetailPage() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   // Find plug data, fallback to default if id not found
-  const plug = MOCK_PLUGS[id] || {
+  const plug = PLUG_DATA[id] || {
     id,
     name: `Plug ${id}`,
     archetype: "Custom",

@@ -36,7 +36,7 @@ export type VoiceInputState = 'idle' | 'listening' | 'processing' | 'error';
 export type VoiceOutputState = 'idle' | 'loading' | 'playing' | 'paused' | 'error';
 
 export interface VoiceInputConfig {
-  provider: 'elevenlabs' | 'deepgram' | 'browser' | 'groq';
+  provider: 'elevenlabs' | 'deepgram' | 'groq' | 'browser';
   language?: string;
   continuous?: boolean;
 }

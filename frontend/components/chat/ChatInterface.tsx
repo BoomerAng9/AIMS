@@ -19,10 +19,12 @@ import { useVoiceOutput } from '@/hooks/useVoiceOutput';
 import { useAudioLevel } from '@/hooks/useAudioLevel';
 import { useOrchestration } from '@/hooks/useOrchestration';
 import { useChangeOrder } from '@/hooks/useChangeOrder';
+import { useVerticalFlow } from '@/hooks/useVerticalFlow';
 import { OperationsOverlay, OperationsPulse } from '@/components/orchestration/OperationsOverlay';
 import { DepartmentBoard } from '@/components/orchestration/DepartmentBoard';
 import { UserInputModal } from '@/components/change-order/UserInputModal';
 import { CollaborationSidebar } from '@/components/collaboration/CollaborationFeed';
+import { VerticalStepIndicator } from '@/components/chat/VerticalStepIndicator';
 import type { ChatMessage } from '@/lib/chat/types';
 import type { ChangeOrder } from '@/lib/change-order/types';
 import { formatCurrency } from '@/lib/change-order/types';
@@ -414,6 +416,21 @@ export function ChatInterface({
     },
   });
 
+  // Vertical flow — Phase A step progression
+  const verticalFlow = useVerticalFlow({
+    userId,
+    onPhaseAComplete: (verticalId, data) => {
+      console.log(`[Phase A] Complete: vertical=${verticalId}`, data);
+    },
+    onExecuteRequested: (verticalId, data) => {
+      console.log(`[Phase B] Execution requested: vertical=${verticalId}`, data);
+      // Dispatch to orchestrator via chat message
+      sendMessage(
+        `[EXECUTE VERTICAL: ${verticalId}] Collected data: ${JSON.stringify(data)}`
+      );
+    },
+  });
+
   // Streaming chat
   const {
     messages,
@@ -556,18 +573,35 @@ export function ChatInterface({
   // Send Message Handler
   // ─────────────────────────────────────────────────────────
 
-  const handleSend = useCallback((text?: string) => {
+  const handleSend = useCallback(async (text?: string) => {
     const messageText = text || inputValue;
     if (!messageText.trim() || isStreaming || isLoading) return;
 
-    // Start orchestration task
-    if (showOrchestration) {
-      orchestration.startTask(messageText);
-      orchestration.addEvent('task_received', `{userName} sent a new request`);
-      orchestration.updatePhase('route');
+    // If in vertical flow Phase A, advance the step and enrich the message
+    if (verticalFlow.isPhaseA) {
+      verticalFlow.advanceStep(messageText);
+      const stepContext = verticalFlow.getCurrentStepContext();
+      // Send message with step context injected for the LLM
+      const enrichedMessage = stepContext
+        ? `${messageText}\n\n---\n[SYSTEM_CONTEXT: ${stepContext}]`
+        : messageText;
+      sendMessage(enrichedMessage);
+    } else {
+      // Start orchestration task
+      if (showOrchestration) {
+        orchestration.startTask(messageText);
+        orchestration.addEvent('task_received', `{userName} sent a new request`);
+        orchestration.updatePhase('route');
+      }
+
+      sendMessage(messageText);
+
+      // Check if this message triggers a vertical (async, non-blocking)
+      if (!verticalFlow.isActive) {
+        classifyForVertical(messageText);
+      }
     }
 
-    sendMessage(messageText);
     setInputValue('');
     setVoiceTranscriptReady(false);
 
@@ -575,7 +609,30 @@ export function ChatInterface({
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
     }
-  }, [inputValue, isStreaming, isLoading, sendMessage, showOrchestration, orchestration]);
+  }, [inputValue, isStreaming, isLoading, sendMessage, showOrchestration, orchestration, verticalFlow]);
+
+  // Classify message for vertical match (non-blocking)
+  // Uses the gateway /acheevy/classify endpoint which returns { intent, confidence, requiresAgent }
+  const classifyForVertical = useCallback(async (message: string) => {
+    try {
+      const res = await fetch('/api/acheevy/classify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message }),
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      // The gateway returns intent as 'vertical:<id>' (e.g. 'vertical:idea-generator')
+      if (data.requiresAgent && data.confidence > 0.6 && data.intent) {
+        const intent = data.intent as string;
+        if (intent.startsWith('vertical:')) {
+          verticalFlow.startVertical(intent.replace('vertical:', ''));
+        }
+      }
+    } catch {
+      // Classification is non-blocking — silent fail
+    }
+  }, [verticalFlow]);
 
   // ─────────────────────────────────────────────────────────
   // Keyboard Handling
@@ -673,6 +730,16 @@ export function ChatInterface({
       {/* Input Area */}
       <div className="border-t border-wireframe-stroke bg-[#0A0A0A]/80 backdrop-blur-xl px-4 py-4">
         <div className="max-w-3xl mx-auto">
+          {/* Vertical Step Indicator — Phase A progression */}
+          {verticalFlow.isActive && (
+            <VerticalStepIndicator
+              state={verticalFlow.state}
+              transitionPrompt={verticalFlow.getTransitionPrompt()}
+              onExecute={verticalFlow.confirmExecution}
+              onDismiss={verticalFlow.reset}
+            />
+          )}
+
           {/* Regenerate button (when there are messages) */}
           {messages.length > 0 && !isStreaming && (
             <div className="flex justify-center mb-3">

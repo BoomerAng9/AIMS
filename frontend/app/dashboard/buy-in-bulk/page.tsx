@@ -72,41 +72,12 @@ const RETAILERS: RetailerInfo[] = [
   },
 ];
 
-const SAMPLE_DEALS = [
-  {
-    id: 'd1',
-    product: 'Office Paper (10 reams)',
-    retailer: 'Amazon',
-    originalPrice: 89.99,
-    salePrice: 54.99,
-    discount: 39,
-    rating: 4.5,
-    reviews: 12400,
-    prime: true,
-  },
-  {
-    id: 'd2',
-    product: 'K-Cups Variety Pack (100ct)',
-    retailer: 'Walmart',
-    originalPrice: 44.99,
-    salePrice: 32.97,
-    discount: 27,
-    rating: 4.3,
-    reviews: 8200,
-    prime: false,
-  },
-  {
-    id: 'd3',
-    product: 'Cleaning Supplies Bundle',
-    retailer: 'Amazon',
-    originalPrice: 67.50,
-    salePrice: 43.20,
-    discount: 36,
-    rating: 4.7,
-    reviews: 5600,
-    prime: true,
-  },
-];
+// Deals populated from DealScout API at runtime
+const DISCOVERED_DEALS: Array<{
+  id: string; product: string; retailer: string;
+  originalPrice: number; salePrice: number; discount: number;
+  rating: number; reviews: number; prime: boolean;
+}> = [];
 
 // ─────────────────────────────────────────────────────────────
 // Components
@@ -345,7 +316,7 @@ function DealScout() {
       </div>
 
       <div className="space-y-3">
-        {SAMPLE_DEALS.map((deal) => (
+        {DISCOVERED_DEALS.map((deal) => (
           <div
             key={deal.id}
             className="p-4 rounded-xl bg-white/3 border border-wireframe-stroke hover:border-gold/10 transition-all"

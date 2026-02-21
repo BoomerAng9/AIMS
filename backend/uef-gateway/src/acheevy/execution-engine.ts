@@ -342,6 +342,14 @@ export async function executeVertical(
       capability: undefined,
     });
 
+    // Fire post-execution hooks (RAG store + audit) — non-blocking
+    postExecutionHooks(vertical.id, userId, sessionId, pipeline, []).catch(err => {
+      auditLedger.write(createAuditEntry(
+        vertical.id, userId, sessionId, 'verification_failed',
+        { phase: 'post_execution_hooks', error: err instanceof Error ? err.message : String(err) },
+      ));
+    });
+
     return { taskId: task.id, status: 'executing', pipeline, auditSessionId };
 
   } catch (err) {

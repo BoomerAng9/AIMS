@@ -138,9 +138,10 @@ Every job must:
 **Target:** 14 verticals work through Phase A conversational chains, Custom Lil_Hawks live
 
 - [x] Wire vertical detection to chat flow ← DONE: `/acheevy/classify` now detects all 14 verticals via NLP trigger patterns
-- [ ] Implement Phase A step progression UI
+- [x] Implement Phase A step progression UI ← DONE: `VerticalStepIndicator.tsx` + `useVerticalFlow.ts` wired into ChatInterface
 - [ ] Connect Phase B execution to Chicken Hawk dispatch
 - [ ] Enable n8n workflow triggers for automation verticals
+- [x] Per|Form Film Room — Twelve Labs video intelligence integration ← DONE: client, 8 API routes, ScoutVerify engine, Film Room UI
 - [ ] Per|Form lobby with live gridiron data
 - [x] Custom Lil_Hawks engine (types, engine, API routes, skill, vertical) ← DONE
 - [x] Playground/Sandbox engine (5 types, API routes, skill, vertical) ← DONE
@@ -186,10 +187,10 @@ P0.7  VOICE_IO                   PARTIAL    (keys cemented, needs e2e test)
 P0.8  AUTH_FLOW                  PARTIAL    (needs Google OAuth credentials)
 P0.9  LUC_DASHBOARD              DONE
 P0.10 REDIS_SESSIONS             DONE
-P1.1  REVENUE_VERTICALS          PARTIAL
+P1.1  REVENUE_VERTICALS          PARTIAL    ← Phase A UI complete, Phase B execution pending
 P1.2  SINGLE_ACHEEVY_UI          PARTIAL
 P1.3  ONBOARDING_FLOW            PARTIAL
-P1.4  PERFORM_LOBBY              PARTIAL
+P1.4  PERFORM_LOBBY              PARTIAL    ← Film Room + Twelve Labs + ScoutVerify wired
 P1.5  DEPLOY_DOCK                DONE
 P1.6  ARENA_CONTESTS             DONE
 P1.7  STRIPE_PAYMENTS            PARTIAL    ← keys cemented, needs webhook setup
@@ -207,7 +208,7 @@ P2.10 COMPETITOR_PARITY_V2        DONE       ← NEW: Flowith/Agent Neo/MoltBook
 ```
 
 **Score: 13 DONE / 10 PARTIAL / 4 MISSING = 48% complete** (was 43%)
-**Phase 3 progress: 8/12 items complete** — vertical classifier, playground UI, custom hawks UI, code sandbox, agent viewport, file downloads all wired
+**Phase 3 progress: 10/13 items complete** — vertical classifier, Phase A UI, playground UI, custom hawks UI, code sandbox, agent viewport, file downloads, Film Room + Twelve Labs + ScoutVerify all wired
 
 ---
 
