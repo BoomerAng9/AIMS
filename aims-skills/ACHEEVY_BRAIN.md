@@ -536,6 +536,8 @@ Every tool and capability is **owned** by a Boomer_Ang. No raw tool access.
 | `OpsConsole_Ang` | Observability | Multi-agent monitoring, CommonGround |
 | `Index_Ang` | Data | Datasets, embeddings, II-Commons |
 | `Licensing_Ang` | Compliance | AGPL/license quarantine, PPTist |
+| `Picker_Ang` | Component Selection | NtNtN Engine navigation, stack curation, creative intent analysis |
+| `Buildsmith` | Construction | Web builds, component assembly, creative execution (special: no _Ang suffix) |
 
 ### Boomer_Ang Brain Files
 Each Boomer_Ang wrapping an Intelligent Internet repo has a dedicated brain file in `aims-skills/brains/`.
@@ -556,6 +558,8 @@ See: `aims-skills/brains/ACHEEVY_II_EXTENSIONS.md` for ACHEEVY's direct extensio
 | `SCRIBE_ANG_BRAIN.md` | Scribe_Ang | Symbioism-Nextra + TLE |
 | `LAB_ANG_BRAIN.md` | Lab_Ang | ii-thought + ii_verl + CoT-Lab-Demo |
 | `INDEX_ANG_BRAIN.md` | Index_Ang | II-Commons |
+| `PICKER_ANG_BRAIN.md` | Picker_Ang | NtNtN Engine (component selector) |
+| `BUILDSMITH_BRAIN.md` | Buildsmith | NtNtN Engine (master builder) |
 
 ### Boomer_Ang Role Card Registry
 Every Boomer_Ang has a JSON role card in `aims-skills/chain-of-command/role-cards/`.
@@ -578,6 +582,8 @@ gates, overlay visibility, and evaluation KPIs. **No agent exists without a card
 | `scribe-ang.json` | Scribe_Ang | Creative & Presentation PMO | Frosty White #EDEDED |
 | `lab-ang.json` | Lab_Ang | R&D & Experimental PMO | Green #22C55E |
 | `index-ang.json` | Index_Ang | Intelligence & Research PMO | Gold #D4AF37 |
+| `picker-ang.json` | Picker_Ang | Creative Engineering PMO | Violet #8B5CF6 |
+| `buildsmith.json` | Buildsmith | Creative Engineering PMO | Forge Orange #F97316 |
 
 ### Boomer_Ang Visual Identity
 All Boomer_Angs follow the canonical visual spec in `aims-skills/brains/BOOMER_ANG_VISUAL_IDENTITY.md`.
@@ -826,6 +832,29 @@ frontend/lib/acheevy/
 ├── voiceConfig.ts                 ← Voice/TTS configuration
 ├── client.ts                      ← Client utilities
 └── PersonaContext.tsx              ← React persona context
+
+ntntn-engine/                          ← NtNtN Engine (A.I.M.S. Creative Dev Library)
+├── NTNTN_ENGINE.md                    ← Master reference (taxonomy, categories, intent mapping)
+├── index.ts                           ← Exports + NLP keyword registry + build intent detection
+├── categories/                        ← Deep references per technology category
+│   ├── frontend-frameworks.md
+│   ├── animation-motion.md
+│   ├── styling-systems.md
+│   ├── 3d-visual.md
+│   ├── scroll-interaction.md
+│   ├── ui-components.md
+│   ├── layout-responsive.md
+│   ├── backend-fullstack.md
+│   ├── cms-content.md
+│   └── deployment-infra.md
+└── techniques/                        ← Deep dives per technique group
+    ├── scroll-techniques.md           ← 10 scroll-based techniques
+    ├── hover-interaction.md           ← 8 hover & interaction techniques
+    ├── page-transitions.md            ← 8 page & layout transition techniques
+    ├── text-typography.md             ← 7 text animation techniques
+    ├── visual-effects.md              ← 10 visual effect techniques
+    ├── 3d-immersive.md                ← 7 3D & immersive techniques
+    └── micro-interactions.md          ← 10 micro-interaction techniques
 
 infra/deploy-platform/circuit-box/
 └── acheevy-tools.json             ← Tool registry (9 tools)
@@ -1118,7 +1147,59 @@ See: `hooks/enter-chicken-hawk.hook.md`, `skills/chicken-hawk/`
 
 ---
 
-## 22. Storytelling-First Strategy (Internal Playbook)
+## 22. NtNtN Engine (Creative Development Library)
+
+The NtNtN Engine is an **A.I.M.S. platform feature** — a comprehensive library and engine
+that translates creative intent into technical execution. It belongs to AI Managed Solutions,
+not to any single agent. All agents in the hierarchy access it when the work calls for it.
+
+### What It Contains
+- **10 Technology Categories:** Frontend Frameworks, Animation & Motion, Styling Systems,
+  3D & Visual, Scroll & Interaction, UI Components, Layout & Responsive, Backend & Fullstack,
+  CMS & Content, Deployment & Infrastructure
+- **7 Technique Deep Dives:** 60+ individual techniques across scroll, hover, page transitions,
+  text/typography, visual effects, 3D/immersive, and micro-interactions
+- **NLP Intent Map:** Keyword-to-category mapping for automatic routing from user descriptions
+- **Decision Matrices:** Per-category tool selection guides (Picker_Ang uses these)
+
+### Connected Boomer_Angs
+- **Picker_Ang** — Selects components, techniques, and patterns from the library
+  that match the creative's described vision. Produces a Stack Recommendation.
+- **Buildsmith** (special: no _Ang suffix) — Takes Picker_Ang's selections and
+  constructs the end product. Accredited with every finished build.
+
+### Routing Flow
+```
+User describes build → ACHEEVY NLP detects build intent
+  → Route to Picker_Ang
+  → Picker_Ang queries NtNtN Engine library
+  → Picker_Ang produces Stack Recommendation
+  → Stack Recommendation → Buildsmith
+  → Buildsmith creates Build Manifest
+  → Build Manifest → Chicken Hawk
+  → Chicken Hawk dispatches Lil_Hawks
+  → Lil_Hawks execute (Lil_Interface_Forge_Hawk, Lil_Motion_Tuner_Hawk, etc.)
+  → Evidence collected → Buildsmith signs build
+  → ACHEEVY delivers to user
+```
+
+### Build Intent Detection
+Activated when user message contains:
+- **Trigger words:** build, create, make, design, develop, code, scaffold, generate, launch
+- **Target words:** website, page, app, dashboard, landing, portfolio, site, interface, UI
+
+### Key Files
+- `aims-skills/ntntn-engine/NTNTN_ENGINE.md` — Master reference document
+- `aims-skills/ntntn-engine/index.ts` — NLP keyword registry + intent detection
+- `aims-skills/ntntn-engine/techniques/` — Deep dives per technique group
+- `aims-skills/brains/PICKER_ANG_BRAIN.md` — Picker_Ang brain
+- `aims-skills/brains/BUILDSMITH_BRAIN.md` — Buildsmith brain
+- `aims-skills/chain-of-command/role-cards/picker-ang.json` — Picker_Ang role card
+- `aims-skills/chain-of-command/role-cards/buildsmith.json` — Buildsmith role card
+
+---
+
+## 23. Storytelling-First Strategy (Internal Playbook)
 
 ### The Thesis
 
