@@ -138,6 +138,14 @@ module.exports = {
           '0%': { transform: 'translateY(-100%)' },
           '100%': { transform: 'translateY(300%)' },
         },
+        gradient_shift: {
+          '0%, 100%': { backgroundPosition: '0% 50%' },
+          '50%': { backgroundPosition: '100% 50%' },
+        },
+        shimmer: {
+          '0%': { backgroundPosition: '-200% 0' },
+          '100%': { backgroundPosition: '200% 0' },
+        },
       },
       animation: {
         'float': 'float 6s ease-in-out infinite',
@@ -148,6 +156,8 @@ module.exports = {
         'shelf-slide': 'shelf_slide 0.5s ease-out forwards',
         'cb-breathe': 'cb_breathe 3s ease-in-out infinite',
         'cb-scan': 'cb_scanline 2.5s linear infinite',
+        'gradient-shift': 'gradient_shift 8s ease-in-out infinite',
+        'shimmer': 'shimmer 2s linear infinite',
       },
     },
   },

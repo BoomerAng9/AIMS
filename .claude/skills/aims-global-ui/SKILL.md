@@ -81,3 +81,16 @@ Avoid:
   - Keep navigation pattern consistent within that area.
 
 Always combine this skill with the appropriate archetype UI skill for the current page type.
+
+---
+
+## Animation
+
+For pages that warrant animation (landing pages, marketing surfaces, feature showcases, Plug intros):
+
+- Activate the `aims-animated-web` skill alongside this one.
+- All animations must use shared tokens from `@/lib/motion/tokens` and variants from `@/lib/motion/variants`.
+- No inline magic numbers for durations or easing curves.
+- Scroll-driven patterns (viewport reveals, parallax, scrollytelling) follow the `aims-animated-web` skill.
+- Internal dashboards and data-heavy pages should use minimal animation (micro-feedback only — hover, tap, focus states from `ui-interaction-motion` skill).
+- Always respect `prefers-reduced-motion`.
