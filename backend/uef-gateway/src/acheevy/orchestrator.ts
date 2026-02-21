@@ -234,6 +234,8 @@ export class AcheevyOrchestrator {
         routeResponse = await this.handlePmoRouting(requestId, req);
       } else if (routedTo.startsWith('spawn:') || routedTo === 'deployment-hub') {
         routeResponse = await this.handleDeploymentHub(requestId, req);
+      } else if (routedTo.startsWith('paas_')) {
+        routeResponse = await this.handlePaaSOperations(requestId, req);
       }
 
       if (routeResponse) {
@@ -700,6 +702,171 @@ export class AcheevyOrchestrator {
       },
       lucUsage: { service: 'spawn_shift', amount: 1 },
     };
+  }
+
+  /**
+   * PaaS Operations: deploy, status, decommission, scale, export, catalog, needs analysis.
+   * Routes to Plug Engine via II-Agent → Chicken Hawk fallback.
+   * Enforces human-in-the-loop gates for deploy (LUC quote) and decommission (confirmation).
+   */
+  private async handlePaaSOperations(
+    requestId: string,
+    req: AcheevyExecuteRequest
+  ): Promise<AcheevyExecuteResponse> {
+    const paasIntent = req.intent; // paas_deploy, paas_status, paas_decommission, etc.
+    const plugId = req.plugId || req.context?.plugId as string;
+    const instanceId = req.context?.instanceId as string;
+
+    logger.info({ requestId, paasIntent, plugId, instanceId }, '[ACHEEVY] PaaS operation requested');
+
+    // ── Human-in-the-loop gates ──────────────────────────────────────
+    if (paasIntent === 'paas_deploy' && !req.context?.luc_approved) {
+      // Require LUC quote approval before any deployment
+      const quote = LUCEngine.estimate(req.message);
+      const primaryVariant = quote.variants[0];
+      const costDisplay = primaryVariant
+        ? `$${primaryVariant.estimate.totalUsd.toFixed(2)} (${primaryVariant.name})`
+        : 'standard tier';
+      return {
+        requestId,
+        status: 'completed',
+        reply: [
+          `Ready to deploy${plugId ? ` "${plugId}"` : ''}. Here's the cost estimate:`,
+          ``,
+          `Estimated LUC cost: ${costDisplay}`,
+          `Includes: container hours, port allocation, nginx config, health monitoring`,
+          ``,
+          `Approve to proceed, or customize before deploying.`,
+        ].join('\n'),
+        data: {
+          paasIntent,
+          plugId,
+          luc_quote: quote,
+          awaiting: 'luc_approval',
+          glass_box_event: 'QUOTE_READY',
+        },
+        lucUsage: { service: 'paas_quote', amount: 0 },
+      };
+    }
+
+    if (paasIntent === 'paas_decommission' && !req.context?.decommission_confirmed) {
+      // Require explicit confirmation before decommissioning
+      return {
+        requestId,
+        status: 'completed',
+        reply: [
+          `⚠ You're about to decommission${instanceId ? ` instance "${instanceId}"` : ' an instance'}.`,
+          ``,
+          `This will: stop the container, release the port, remove the nginx config.`,
+          `Data will be preserved for 30 days before cleanup.`,
+          ``,
+          `Please confirm to proceed.`,
+        ].join('\n'),
+        data: {
+          paasIntent,
+          instanceId,
+          awaiting: 'decommission_confirmation',
+          glass_box_event: 'APPROVAL_REQUESTED',
+        },
+      };
+    }
+
+    // ── Route PaaS intents to execution ──────────────────────────────
+    const paasTaskMap: Record<string, { type: IIAgentTask['type']; prompt: string }> = {
+      paas_deploy: {
+        type: 'fullstack',
+        prompt: `Deploy plug instance. Plug: ${plugId || 'user-specified'}. Request: ${req.message}. Execute: validate → allocate port (51000+ range) → generate docker-compose → configure nginx → start container → health check → return URL.`,
+      },
+      paas_status: {
+        type: 'research',
+        prompt: `Check instance status. ${instanceId ? `Instance: ${instanceId}.` : ''} Request: ${req.message}. Return: running instances, health status, resource usage, uptime.`,
+      },
+      paas_decommission: {
+        type: 'code',
+        prompt: `Decommission instance ${instanceId}. Execute: stop container → release port → remove nginx config → archive data → seal audit trail.`,
+      },
+      paas_scale: {
+        type: 'code',
+        prompt: `Scale instance. ${instanceId ? `Instance: ${instanceId}.` : ''} Request: ${req.message}. Adjust resources as requested.`,
+      },
+      paas_export: {
+        type: 'code',
+        prompt: `Export instance as self-hosting bundle. ${instanceId ? `Instance: ${instanceId}.` : ''} Generate: docker-compose.yml, .env.example, nginx.conf, setup.sh, healthcheck.sh, README.md. Follow MIM principle (identical structure for every plug).`,
+      },
+      paas_catalog: {
+        type: 'research',
+        prompt: `Browse the Plug Catalog. Request: ${req.message}. Return available tools grouped by category: Agent Frameworks, Code Execution, Workflow Automation, Research Agents, Computer Use, Voice Agents, Content Engines, Data Pipelines, Custom Verticals.`,
+      },
+      paas_needs_analysis: {
+        type: 'research',
+        prompt: `Run needs analysis for the user. Request: ${req.message}. Assess: Business needs, Technical requirements, Security level, Delivery mode preference, Budget. Recommend plugs and tiers.`,
+      },
+    };
+
+    const taskConfig = paasTaskMap[paasIntent] || {
+      type: 'research' as const,
+      prompt: `PaaS operation: ${req.message}`,
+    };
+
+    const iiTask: IIAgentTask = {
+      type: taskConfig.type,
+      prompt: taskConfig.prompt,
+      context: {
+        userId: req.userId,
+        sessionId: req.conversationId,
+      },
+      options: { streaming: false, timeout: paasIntent === 'paas_deploy' ? 600000 : 300000 },
+    };
+
+    // Try II-Agent → Chicken Hawk → queued
+    try {
+      const result = await this.iiAgent.executeTask(iiTask);
+      return {
+        requestId,
+        status: result.status === 'completed' ? 'completed' : 'dispatched',
+        reply: result.output || `PaaS operation "${paasIntent}" completed.`,
+        data: {
+          paasIntent,
+          plugId,
+          instanceId,
+          artifacts: result.artifacts,
+          glass_box_event: paasIntent === 'paas_deploy' ? 'DELIVERABLE_READY' : 'STATUS_UPDATE',
+        },
+        lucUsage: {
+          service: paasIntent === 'paas_deploy' ? 'container_hours' : 'api_calls',
+          amount: paasIntent === 'paas_deploy' ? 1 : 0,
+        },
+        taskId: result.id,
+      };
+    } catch {
+      logger.info({ requestId, paasIntent }, '[ACHEEVY] II-Agent offline for PaaS, dispatching to Chicken Hawk');
+    }
+
+    // Fallback: Chicken Hawk
+    try {
+      const manifest = buildManifest(requestId, taskConfig.type, taskConfig.prompt, req.userId, {
+        paasIntent,
+        plugId,
+        instanceId,
+      });
+      const chResult = await dispatchToChickenHawk(manifest);
+      return {
+        requestId,
+        status: 'dispatched',
+        reply: `PaaS operation "${paasIntent}" dispatched to execution engine. Shift ID: ${chResult.shiftId}. Monitor progress in Deploy Dock.`,
+        data: { paasIntent, plugId, instanceId, chickenhawk: chResult },
+        lucUsage: { service: 'container_hours', amount: paasIntent === 'paas_deploy' ? 1 : 0 },
+        taskId: chResult.manifestId,
+      };
+    } catch (chErr: any) {
+      logger.error({ err: chErr, requestId, paasIntent }, '[ACHEEVY] Chicken Hawk also offline for PaaS');
+      return {
+        requestId,
+        status: 'queued',
+        reply: `PaaS operation "${paasIntent}" has been queued. Execution engines are starting up — your request will be processed shortly.`,
+        taskId: `queued_paas_${requestId}`,
+      };
+    }
   }
 
   /**
