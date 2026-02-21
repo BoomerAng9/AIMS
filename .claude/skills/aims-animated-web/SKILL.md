@@ -384,6 +384,290 @@ function ScrollProgress() {
 }
 ```
 
+### 13. Sequential Scroll (Scrollytelling Steps)
+
+A sticky viewport where different content steps — text, images, animations — appear
+and disappear **in sequence** as the user scrolls. Each scroll segment triggers the next
+step. Think Stripe product pages, Linear features, or long-form storytelling.
+
+This is the "scroll sequence" pattern: one fixed visual area, many scroll-triggered states.
+
+```tsx
+"use client";
+import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
+import { useRef } from "react";
+
+interface ScrollStep {
+  id: string;
+  /** Text content for this step */
+  heading: string;
+  body: string;
+  /** Visual element shown in the sticky panel (image, animation, component) */
+  visual: React.ReactNode;
+}
+
+function ScrollSequence({ steps }: { steps: ScrollStep[] }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end end"],
+  });
+
+  // Map scroll progress [0,1] to step index [0, steps.length - 1]
+  const rawIndex = useTransform(scrollYProgress, [0, 1], [0, steps.length - 1]);
+
+  return (
+    <section
+      ref={containerRef}
+      // Height = number of steps × viewport height (each step gets ~100vh of scroll)
+      style={{ height: `${steps.length * 100}vh` }}
+      className="relative"
+    >
+      <div className="sticky top-0 h-screen flex items-center">
+        <div className="max-w-6xl mx-auto w-full px-4 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          {/* Left: Text content — each step fades in/out */}
+          <div className="relative">
+            {steps.map((step, i) => (
+              <ScrollStepText
+                key={step.id}
+                index={i}
+                step={step}
+                progress={scrollYProgress}
+                totalSteps={steps.length}
+              />
+            ))}
+          </div>
+
+          {/* Right: Visual panel — each step's visual crossfades */}
+          <div className="relative h-[60vh] flex items-center justify-center">
+            {steps.map((step, i) => (
+              <ScrollStepVisual
+                key={step.id}
+                index={i}
+                visual={step.visual}
+                progress={scrollYProgress}
+                totalSteps={steps.length}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/** Each step's text is visible only in its scroll range */
+function ScrollStepText({
+  index,
+  step,
+  progress,
+  totalSteps,
+}: {
+  index: number;
+  step: ScrollStep;
+  progress: ReturnType<typeof useScroll>["scrollYProgress"];
+  totalSteps: number;
+}) {
+  const segmentSize = 1 / totalSteps;
+  const start = index * segmentSize;
+  const end = start + segmentSize;
+
+  // Fade in during first 20% of segment, hold, fade out during last 20%
+  const opacity = useTransform(progress, [
+    start,
+    start + segmentSize * 0.2,
+    end - segmentSize * 0.2,
+    end,
+  ], [0, 1, 1, 0]);
+
+  const y = useTransform(progress, [
+    start,
+    start + segmentSize * 0.2,
+    end - segmentSize * 0.2,
+    end,
+  ], [30, 0, 0, -30]);
+
+  return (
+    <motion.div
+      className="absolute inset-0 flex flex-col justify-center"
+      style={{ opacity, y }}
+    >
+      <h3 className="text-2xl md:text-3xl font-bold text-frosty-white mb-4">
+        {step.heading}
+      </h3>
+      <p className="text-muted text-base md:text-lg leading-relaxed max-w-md">
+        {step.body}
+      </p>
+
+      {/* Step indicator */}
+      <div className="flex gap-2 mt-8">
+        {Array.from({ length: totalSteps }).map((_, j) => (
+          <motion.div
+            key={j}
+            className="h-1 rounded-full"
+            style={{
+              width: j === index ? 32 : 12,
+              backgroundColor: j === index
+                ? "rgba(212, 175, 55, 1)"   /* gold when active */
+                : "rgba(255, 255, 255, 0.2)",
+            }}
+          />
+        ))}
+      </div>
+    </motion.div>
+  );
+}
+
+/** Each step's visual crossfades in its scroll range */
+function ScrollStepVisual({
+  index,
+  visual,
+  progress,
+  totalSteps,
+}: {
+  index: number;
+  visual: React.ReactNode;
+  progress: ReturnType<typeof useScroll>["scrollYProgress"];
+  totalSteps: number;
+}) {
+  const segmentSize = 1 / totalSteps;
+  const start = index * segmentSize;
+  const end = start + segmentSize;
+
+  const opacity = useTransform(progress, [
+    start,
+    start + segmentSize * 0.15,
+    end - segmentSize * 0.15,
+    end,
+  ], [0, 1, 1, 0]);
+
+  const scale = useTransform(progress, [
+    start,
+    start + segmentSize * 0.15,
+    end - segmentSize * 0.15,
+    end,
+  ], [0.95, 1, 1, 0.95]);
+
+  return (
+    <motion.div
+      className="absolute inset-0 flex items-center justify-center"
+      style={{ opacity, scale }}
+    >
+      {visual}
+    </motion.div>
+  );
+}
+```
+
+**Usage example:**
+
+```tsx
+<ScrollSequence
+  steps={[
+    {
+      id: "connect",
+      heading: "Connect your tools",
+      body: "ACHEEVY plugs into your existing stack — CRM, email, project management — in one click.",
+      visual: <img src="/features/connect.png" alt="Connect" className="rounded-xl shadow-2xl" />,
+    },
+    {
+      id: "automate",
+      heading: "Automate the busywork",
+      body: "Set up workflows that run while you sleep. ACHEEVY handles follow-ups, scheduling, and data entry.",
+      visual: <img src="/features/automate.png" alt="Automate" className="rounded-xl shadow-2xl" />,
+    },
+    {
+      id: "analyze",
+      heading: "See the big picture",
+      body: "Real-time dashboards show what's working and what's not — no spreadsheets needed.",
+      visual: <img src="/features/analyze.png" alt="Analyze" className="rounded-xl shadow-2xl" />,
+    },
+    {
+      id: "scale",
+      heading: "Scale without hiring",
+      body: "AI agents handle the tasks of 3-5 employees. You grow revenue, not headcount.",
+      visual: <img src="/features/scale.png" alt="Scale" className="rounded-xl shadow-2xl" />,
+    },
+  ]}
+/>
+```
+
+**Rules:**
+- Container height = `steps.length × 100vh` — each step gets a full viewport of scroll distance.
+- Each step has a fade-in zone (first 15-20%), a hold zone (middle 60-70%), and a fade-out zone (last 15-20%).
+- Text and visual crossfade independently for a polished transition.
+- Add a step indicator (dots or progress bar) so users know where they are.
+- Works best with 3-6 steps. More than 6 can feel tedious.
+- On mobile, consider converting to a vertical stack with `scrollReveal` instead of sticky.
+
+**Variations:**
+- **Background swap**: Instead of a side panel, change the full-screen background per step (hero-style storytelling).
+- **Progress ring**: Replace dot indicator with a circular SVG progress ring.
+- **Animated visuals**: Swap static images for Rive/Framer Motion components that play when their step is active.
+- **Combined with parallax**: Add subtle parallax to the visual panel for extra depth.
+
+### 14. Scroll-Triggered Effect Sequence
+
+For pages where you want **different effects to fire at specific scroll positions** across
+the whole page (not confined to one sticky section). Uses a timeline of triggers.
+
+```tsx
+"use client";
+import { useScroll, useMotionValueEvent } from "framer-motion";
+import { useRef, useState } from "react";
+
+interface ScrollEffect {
+  /** Scroll progress value (0-1) at which this effect triggers */
+  at: number;
+  /** Unique key for deduplication */
+  id: string;
+  /** Action to perform */
+  action: () => void;
+}
+
+function useScrollEffects(effects: ScrollEffect[]) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [fired, setFired] = useState<Set<string>>(new Set());
+
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end end"],
+  });
+
+  useMotionValueEvent(scrollYProgress, "change", (progress) => {
+    for (const effect of effects) {
+      if (progress >= effect.at && !fired.has(effect.id)) {
+        effect.action();
+        setFired((prev) => new Set(prev).add(effect.id));
+      }
+    }
+  });
+
+  return containerRef;
+}
+```
+
+**Usage:**
+```tsx
+function FeaturePage() {
+  const containerRef = useScrollEffects([
+    { id: "nav-dark",   at: 0.0,  action: () => setNavTheme("dark") },
+    { id: "show-stats", at: 0.25, action: () => setStatsVisible(true) },
+    { id: "nav-light",  at: 0.5,  action: () => setNavTheme("light") },
+    { id: "play-video", at: 0.7,  action: () => videoRef.current?.play() },
+    { id: "show-cta",   at: 0.9,  action: () => setCtaVisible(true) },
+  ]);
+
+  return <div ref={containerRef} className="min-h-[500vh]">{/* sections */}</div>;
+}
+```
+
+**Rules:**
+- Effects fire once by default (tracked in `fired` set). Reset the set if you need re-triggering.
+- Keep effects lightweight — toggle state, start animations, swap themes. Don't do heavy computation.
+- Order `effects` by ascending `at` value for clarity.
+- Combine with CSS transitions on the affected elements for smooth visual changes.
+
 ---
 
 ## Huly.io-Inspired Patterns
@@ -741,6 +1025,7 @@ Create these in `frontend/components/motion/` for reuse across pages:
 | `TypeReveal` | Character-by-character text animation | `TypeReveal.tsx` |
 | `ScrollProgress` | Fixed progress bar for section/page scroll | `ScrollProgress.tsx` |
 | `HorizontalScroll` | Vertical-to-horizontal scroll gallery | `HorizontalScroll.tsx` |
+| `ScrollSequence` | Multi-step scrollytelling with sticky viewport | `ScrollSequence.tsx` |
 
 All components must:
 - Be `"use client"` (they use hooks).
@@ -827,5 +1112,7 @@ When building animated pages, follow this process (inspired by Antigravity workf
 | Blur nav on scroll | `StickyNav` component | Section 12 above |
 | Gradient background animation | `animate-gradient-shift` | Tailwind class |
 | Loading skeleton shimmer | `animate-shimmer` | Tailwind class |
+| Multi-step scrollytelling | `ScrollSequence` component | Section 13 above |
+| Fire effects at scroll positions | `useScrollEffects` hook | Section 14 above |
 
 Always combine this skill with `aims-global-ui` and the relevant archetype skill.
