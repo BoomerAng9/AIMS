@@ -388,35 +388,239 @@ function ScrollProgress() {
 
 ## Huly.io-Inspired Patterns
 
-Huly.io (built by Pixel Point) achieves its premium feel through:
+Huly.io (built by Pixel Point, ~$90k budget) achieves its premium feel through specific
+techniques. Here is exactly how to replicate each for A.I.M.S.:
 
-1. **Rive animations** for complex vector interactions (state-machine driven, WASM runtime).
-2. **Dark background with vibrant accent gradients** (blue-to-purple, magenta highlights).
-3. **Generous whitespace** between sections with scroll-triggered reveals.
-4. **Smooth section transitions** — content fades and slides in as you scroll, never jumps.
-5. **Feature demos embedded inline** — not screenshots, but animated recreations.
-6. **Micro-interactions on hover** — cards lift, borders glow, icons animate.
+### 9. Animated Glow Border (Rotating Conic Gradient)
 
-### To replicate for A.I.M.S.:
-- Use our existing dark palette (obsidian/ink backgrounds) with gold accent gradients.
+The signature Huly.io effect — a rotating gradient border that creates a mesmerizing glow
+on CTAs, cards, and video frames. Pure CSS, no JS needed.
+
+```css
+/* Add to your global CSS or as a Tailwind plugin */
+@property --glow-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.glow-border {
+  position: relative;
+  background: #0a0a0a;
+  border-radius: 12px;
+  isolation: isolate;
+}
+
+.glow-border::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  /* A.I.M.S. uses gold — adapt the gradient to our palette */
+  background: conic-gradient(
+    from var(--glow-angle),
+    #D4AF37,      /* gold */
+    #3B82F6,      /* signal-blue */
+    #22D3EE,      /* signal-cyan */
+    #D4AF37       /* gold again — seamless loop */
+  );
+  border-radius: inherit;
+  animation: glow-rotate 4s linear infinite;
+  z-index: -1;
+}
+
+.glow-border::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  background: #0a0a0a;
+  border-radius: calc(12px - 2px);
+  z-index: -1;
+}
+
+@keyframes glow-rotate {
+  to { --glow-angle: 360deg; }
+}
+```
+
+**Usage:** Apply `glow-border` class to CTA buttons, featured cards, or video/image frames.
+
+**Rules:**
+- Use A.I.M.S. gold (#D4AF37) as the primary gradient color, not Huly's orange.
+- The `::after` pseudo-element fills the inside with the background color so only the border glows.
+- `@property` is required for animating CSS custom properties (supported in Chrome, Edge, Safari 15.4+).
+- Add a static fallback border for browsers without `@property` support.
+
+### 10. Hero Video Background
+
+Pre-rendered video overlay for dramatic hero sections (laser beams, particles, light streaks).
+
+```tsx
+"use client";
+
+function VideoHero({ children }: { children: React.ReactNode }) {
+  return (
+    <section className="relative h-screen overflow-hidden">
+      {/* Pre-rendered ambient video — keeps CPU usage near zero */}
+      <video
+        autoPlay
+        muted
+        loop
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover opacity-50 mix-blend-screen pointer-events-none"
+      >
+        <source src="/hero-ambient.mp4" type="video/mp4" />
+      </video>
+
+      {/* Dark overlay for text readability */}
+      <div className="absolute inset-0 bg-gradient-to-b from-obsidian/40 via-transparent to-obsidian" />
+
+      {/* Content */}
+      <div className="relative z-10 flex items-center justify-center h-full">
+        {children}
+      </div>
+    </section>
+  );
+}
+```
+
+**Rules:**
+- Video must be short (3-6s loop), small filesize (<2MB), and silent.
+- Use `mix-blend-screen` on dark backgrounds to overlay light effects.
+- Use `mix-blend-multiply` on light backgrounds for shadow effects.
+- Always add `playsInline` for mobile Safari autoplay.
+- Add gradient overlay to ensure text is readable over the video.
+- For mobile, consider replacing video with a static image + CSS animation.
+
+### 11. Bento Grid Feature Layout
+
+Asymmetric card grid showcasing features — each card with its own animation.
+
+```tsx
+"use client";
+import { motion } from "framer-motion";
+import { scrollReveal, staggerContainer } from "@/lib/motion";
+
+function BentoGrid({ features }: { features: Feature[] }) {
+  return (
+    <motion.div
+      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-6xl mx-auto px-4"
+      variants={staggerContainer}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, margin: "-80px" }}
+    >
+      {features.map((feature, i) => (
+        <motion.div
+          key={feature.id}
+          variants={scrollReveal}
+          whileHover={{
+            scale: 1.02,
+            borderColor: "rgba(212, 175, 55, 0.3)",
+            transition: { duration: 0.2 },
+          }}
+          className={`
+            rounded-card-lg p-6
+            bg-white/[0.03] border border-wireframe-stroke
+            backdrop-blur-sm
+            hover:bg-white/[0.06] transition-colors duration-300
+            ${feature.span === 2 ? "md:col-span-2" : ""}
+            ${feature.tall ? "md:row-span-2" : ""}
+          `}
+        >
+          {/* Rive animation or icon */}
+          <div className="mb-4 h-48 rounded-xl overflow-hidden bg-obsidian">
+            {feature.animation}
+          </div>
+          <h3 className="text-lg font-semibold text-frosty-white mb-2">
+            {feature.title}
+          </h3>
+          <p className="text-muted text-sm leading-relaxed">
+            {feature.description}
+          </p>
+        </motion.div>
+      ))}
+    </motion.div>
+  );
+}
+```
+
+**Rules:**
+- Use `grid-cols-3` on desktop with mixed `col-span-2` cards for asymmetry.
+- Each card should have a subtle hover effect (scale 1.02, border glow).
+- Stagger card reveals with 80-100ms delay between each.
+- Card backgrounds: `bg-white/[0.03]` to `bg-white/[0.06]` on hover.
+- Generous section padding: 120-200px vertical padding between major sections.
+
+### 12. Sticky Navigation with Blur
+
+```tsx
+"use client";
+import { motion, useScroll, useTransform } from "framer-motion";
+
+function StickyNav() {
+  const { scrollY } = useScroll();
+  const bgOpacity = useTransform(scrollY, [0, 100], [0, 0.85]);
+  const borderOpacity = useTransform(scrollY, [0, 100], [0, 0.06]);
+
+  return (
+    <motion.nav
+      className="fixed top-0 inset-x-0 z-50 backdrop-blur-xl"
+      style={{
+        backgroundColor: useTransform(bgOpacity, (v) => `rgba(10, 10, 10, ${v})`),
+        borderBottom: useTransform(borderOpacity, (v) => `1px solid rgba(255, 255, 255, ${v})`),
+      }}
+    >
+      <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+        {/* Logo + Nav links + CTA */}
+      </div>
+    </motion.nav>
+  );
+}
+```
+
+### To replicate Huly.io quality for A.I.M.S.:
+- Use our dark palette (obsidian/ink backgrounds) with gold accent gradients.
 - Apply `scrollReveal` + `staggerContainer` to every major section.
 - Add `hoverLiftGlow` to feature cards (already in our variants).
 - Use `parallax` on hero backgrounds.
+- Add `glow-border` effect to primary CTAs and featured content frames.
 - Embed animated feature demos using Framer Motion (or Rive for complex ones).
-- Add gradient mesh backgrounds with subtle `animate-gradient` shift.
+- Add gradient mesh backgrounds with subtle `animate-gradient-shift`.
+- Use generous whitespace between sections (120-200px vertical padding).
+- Every section: scroll-triggered reveal, never instant/jumping content.
 
 ### Rive Integration (When Needed)
 
-If a section requires complex vector animation beyond what Framer Motion provides (character animations, complex state machines, interactive illustrations):
+If a section requires complex vector animation beyond what Framer Motion provides
+(character animations, complex state machines, interactive illustrations):
 
 ```bash
 npm install @rive-app/react-canvas
 ```
 
 ```tsx
+import React, { Suspense, lazy } from "react";
+
+// Lazy-load Rive to keep initial bundle small
+const RiveFeature = lazy(() => import("./RiveFeature"));
+
+function FeatureWithRive({ src }: { src: string }) {
+  return (
+    <Suspense
+      fallback={<div className="animate-shimmer bg-surface-raised rounded-xl h-64" />}
+    >
+      <RiveFeature src={src} />
+    </Suspense>
+  );
+}
+```
+
+```tsx
+// RiveFeature.tsx (lazy-loaded)
+"use client";
 import { useRive, Layout, Fit, Alignment } from "@rive-app/react-canvas";
 
-function RiveAnimation({ src }: { src: string }) {
+export default function RiveFeature({ src }: { src: string }) {
   const { RiveComponent } = useRive({
     src,
     autoplay: true,
@@ -426,10 +630,13 @@ function RiveAnimation({ src }: { src: string }) {
 }
 ```
 
-**Rive optimization for Next.js:**
-- Self-host the WASM runtime (don't load from unpkg CDN).
-- Preload WASM with `<link rel="preload">` in layout.
-- Store `.riv` files in `public/animations/`.
+**Rive optimization for Next.js (Pixel Point best practices):**
+- **Self-host WASM**: Import `@rive-app/canvas/rive.wasm` and configure webpack URL loader.
+- **Preload WASM**: Add `<link rel="preload" href="/rive.wasm" as="fetch" crossOrigin="" />` in layout.
+- **Store `.riv` files** in `public/animations/`.
+- **Lazy-load**: Always wrap Rive in `React.lazy()` + `Suspense` — separate JS bundle.
+- **Skip on mobile**: Conditionally render Rive only on devices with enough power.
+- **File sizes**: Rive files are ~18KB vs Lottie ~181KB (10x smaller), ~2.6MB GPU vs ~150MB.
 
 ---
 
@@ -598,8 +805,8 @@ When building animated pages, follow this process (inspired by Antigravity workf
 
 ## Quick Reference: Which Variant to Use
 
-| I want to... | Use this variant | From |
-|--------------|-----------------|------|
+| I want to... | Use this variant / pattern | From |
+|--------------|--------------------------|------|
 | Fade in on scroll | `scrollReveal` | `@/lib/motion` |
 | Stagger a list of cards on scroll | `staggerContainer` + `staggerItem` | `@/lib/motion` |
 | Hero headline entrance | `heroStagger` + `heroItem` | `@/lib/motion` |
@@ -608,11 +815,17 @@ When building animated pages, follow this process (inspired by Antigravity workf
 | Modal/overlay appear | `scaleFade` | `@/lib/motion` |
 | Sidebar slide in | `slideLeft` or `slideRight` | `@/lib/motion` |
 | Dropdown menu | `fadeDown` | `@/lib/motion` |
-| Parallax background | Use `useScroll` + `useTransform` | Framer Motion hooks |
-| Image sequence on scroll | Canvas + `useScroll` pattern | See Section 3 above |
+| Parallax background | `useScroll` + `useTransform` | Framer Motion hooks |
+| Image sequence on scroll | Canvas + `useScroll` pattern | Section 3 above |
 | 3D tilt on hover | `TiltCard` component | `components/motion/` |
 | Text typewriter | `TypeReveal` component | `components/motion/` |
 | Ambient floating | `animate-float` | Tailwind class |
 | Gold pulse glow | `animate-pulse-gold` | Tailwind class |
+| Rotating glow border on CTA | `.glow-border` CSS class | Section 9 above |
+| Dramatic hero background | `VideoHero` component | Section 10 above |
+| Feature showcase grid | `BentoGrid` component | Section 11 above |
+| Blur nav on scroll | `StickyNav` component | Section 12 above |
+| Gradient background animation | `animate-gradient-shift` | Tailwind class |
+| Loading skeleton shimmer | `animate-shimmer` | Tailwind class |
 
 Always combine this skill with `aims-global-ui` and the relevant archetype skill.

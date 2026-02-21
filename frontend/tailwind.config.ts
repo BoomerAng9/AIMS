@@ -146,6 +146,9 @@ module.exports = {
           '0%': { backgroundPosition: '-200% 0' },
           '100%': { backgroundPosition: '200% 0' },
         },
+        glow_rotate: {
+          to: { '--glow-angle': '360deg' },
+        },
       },
       animation: {
         'float': 'float 6s ease-in-out infinite',
@@ -158,6 +161,7 @@ module.exports = {
         'cb-scan': 'cb_scanline 2.5s linear infinite',
         'gradient-shift': 'gradient_shift 8s ease-in-out infinite',
         'shimmer': 'shimmer 2s linear infinite',
+        'glow-rotate': 'glow_rotate 4s linear infinite',
       },
     },
   },
