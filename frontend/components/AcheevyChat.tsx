@@ -394,6 +394,24 @@ export default function AcheevyChat() {
           onChange={handleFileUpload}
         />
 
+        {/* Voice Visualizer — shown while recording */}
+        {(voiceInput.isListening || voiceInput.isProcessing) && (
+          <div className="max-w-4xl mx-auto w-full mb-2">
+            <VoiceVisualizer
+              stream={voiceInput.stream}
+              isListening={voiceInput.isListening}
+              state={voiceState}
+            />
+          </div>
+        )}
+
+        {/* TTS Playback Progress Bar */}
+        {(voiceOutput.isPlaying || voiceOutput.isPaused) && (
+          <div className="max-w-4xl mx-auto w-full mb-2">
+            <VoicePlaybackBar voiceOutput={voiceOutput} />
+          </div>
+        )}
+
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -413,10 +431,39 @@ export default function AcheevyChat() {
             {isUploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Paperclip className="w-5 h-5" />}
           </button>
 
+          {/* Mic button — tap to start recording, tap again to stop & transcribe */}
+          <button
+            type="button"
+            onClick={async () => {
+              if (voiceInput.isListening) {
+                await voiceInput.stopListening();
+              } else if (!voiceInput.isProcessing) {
+                await voiceInput.startListening();
+              }
+            }}
+            disabled={isLoading || voiceInput.isProcessing}
+            className={`p-3 rounded-xl transition-all border ${
+              voiceInput.isListening
+                ? 'text-red-400 bg-red-500/10 border-red-500/30 animate-pulse'
+                : voiceInput.isProcessing
+                  ? 'text-gold/60 bg-gold/5 border-gold/20 cursor-wait'
+                  : 'text-white/40 hover:text-gold hover:bg-gold/10 border-transparent hover:border-gold/30'
+            } disabled:opacity-30`}
+            title={voiceInput.isListening ? 'Stop recording' : voiceInput.isProcessing ? 'Transcribing...' : 'Start voice input'}
+          >
+            {voiceInput.isProcessing ? (
+              <Loader2 className="w-5 h-5 animate-spin" />
+            ) : voiceInput.isListening ? (
+              <MicOff className="w-5 h-5" />
+            ) : (
+              <Mic className="w-5 h-5" />
+            )}
+          </button>
+
           <input
             value={input}
             onChange={handleInputChange}
-            placeholder={voiceInput.isProcessing ? 'Transcribing your voice...' : 'Tell me what you need...'}
+            placeholder={voiceInput.isProcessing ? 'Transcribing your voice...' : voiceInput.isListening ? 'Listening...' : 'Tell me what you need...'}
             disabled={isLoading}
             className="flex-1 bg-black/40 hover:bg-black/60 focus:bg-black border border-wireframe-stroke focus:border-gold/40 rounded-xl py-3 pl-4 pr-12 text-white text-base placeholder:text-white/20 transition-all outline-none"
           />
