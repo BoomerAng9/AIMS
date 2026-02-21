@@ -10,7 +10,8 @@
 JavaScript runtime + minimal web framework. The most popular backend for JS/TS teams.
 Middleware-based architecture, massive ecosystem.
 
-- **Current:** Node.js 22 LTS, Express 5.x
+- **Current:** Node.js 24 LTS "Krypton" (Active), Node.js 22 LTS "Jod" (Maintenance until 2027-04), Express 5.x
+- **⚠️ Node.js 20 EOL:** April 30, 2026 — migrate off Node 20 now
 - **A.I.M.S. Status:** Default backend runtime (UEF Gateway uses Express)
 
 ### Key Patterns
@@ -191,7 +192,7 @@ app.get('/api/health', (c) => c.json({ status: 'ok' }));
 Compiled, concurrent systems language. Produces single static binaries. Excellent
 for high-throughput microservices, CLI tools, and infrastructure software.
 
-- **Current:** Go 1.23+
+- **Current:** Go 1.24+
 - **Approach:** Standard library `net/http` or frameworks (Gin, Echo, Fiber)
 - **Concurrency:** Goroutines + channels for effortless parallelism
 
@@ -233,6 +234,24 @@ Sub-millisecond cold starts, global distribution, limited runtime.
 ### Picker_Ang Notes
 - Choose when: Low-latency APIs, personalization, A/B testing, geo-routing
 - Avoid when: Long-running tasks, large memory needs, database-heavy operations
+
+---
+
+## TypeScript
+
+### Overview
+The language foundation for all A.I.M.S. TypeScript code. Major transition underway.
+
+- **Current:** TypeScript 5.9.3 (stable)
+- **Beta:** TypeScript 6.0 (released Feb 11, 2026) — last JavaScript-based release
+- **Coming:** TypeScript 7.0 — compiler rewritten in Go, up to 10x faster
+- **6.0 Changes:** `target: es5` deprecated (lowest is ES2015), `es2025` target/lib, subpath `#/` imports, Temporal types
+- **Note:** No TypeScript 6.1 planned — only 6.0.x patches, then straight to 7.0
+
+### Picker_Ang Notes
+- Pin to 5.9.x for production stability today
+- Prepare for 6.0 deprecations (especially `es5` target removal)
+- The Go-based 7.0 compiler will be a game-changer for large monorepos
 
 ---
 

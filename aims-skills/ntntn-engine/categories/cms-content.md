@@ -10,7 +10,7 @@
 Real-time structured content platform. Define custom schemas, query with GROQ,
 collaborate in real-time. The most flexible headless CMS for custom workflows.
 
-- **Current:** Sanity v5.11 (Content Operating System)
+- **Current:** Sanity v5.9+ (Dashboard Platform, GROQ in Functions, CLI typegen)
 - **Query:** GROQ (Graph-Relational Object Queries)
 - **Hosting:** Cloud-hosted CDN (content), self-hosted Studio (admin)
 
@@ -137,12 +137,14 @@ export const Posts: CollectionConfig = {
 Enterprise headless CMS. Cloud-hosted, CDN-delivered, structured content with
 Environments for staging/production content management.
 
-- **Current:** Contentful latest
+- **Current:** Contentful (evolving into Digital Experience Platform / DXP)
 - **Approach:** Visual content modeling, REST + GraphQL APIs, CDN delivery
+- **New Features:** AI Actions (translations, SEO, alt-text), Contentful Studio (low-code builder), enhanced A/B testing, Timeline scheduling
 - **Pricing:** Free tier available, enterprise pricing for larger teams
+- **Scale:** 100+ integrations, 20%+ YoY R&D investment
 
 ### Picker_Ang Notes
-- Choose when: Enterprise content operations, multi-channel delivery, large teams
+- Choose when: Enterprise content operations, multi-channel delivery, large teams, need AI-powered content workflows
 - Avoid when: Budget-sensitive (pricing scales with usage), need full self-hosting
 
 ---
@@ -199,9 +201,9 @@ Here's a **live demo** of the component:
 Git-based CMS with local-first editing. Content stored as files in your Git repo.
 Works with Astro, Next.js, and Remix.
 
-- **Current:** Keystatic 0.5+
-- **Approach:** Schema-defined content → stored as files in Git
-- **Modes:** Local (filesystem), GitHub (API-based)
+- **Current:** Keystatic 0.5.48 (still pre-1.0, ⚠️ React 19 compat unresolved)
+- **Approach:** Schema-defined content → stored as files in Git (Markdown/Markdoc/YAML/JSON)
+- **Modes:** Local (filesystem), GitHub (API-based), Keystatic Cloud (free, up to 3 users)
 
 ### Key Patterns
 ```ts

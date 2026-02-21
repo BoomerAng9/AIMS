@@ -138,7 +138,7 @@ Depth, dimension, and immersive experiences.
 | **Drei** | Helper library for R3F — pre-built 3D components | Quick 3D setups, common patterns, environment maps | OrbitControls, Environment, Text3D, Float, MeshTransmission, Sparkles, Stars |
 | **WebGPU** | Next-gen GPU API (successor to WebGL) | Compute-heavy rendering, ML on GPU, future-proofed 3D | Compute shaders, Render pipelines, Storage buffers, Indirect draws |
 | **Spline** | 3D design tool with web export | Designers who want 3D without code, quick embeds | Scene export, Runtime events, Material editor, Camera control |
-| **Babylon.js** | Full game engine for the web | Game-like experiences, VR/AR, physics-heavy scenes | PBR materials, Physics engine, XR support, Node material editor |
+| **Babylon.js** | Full game engine for the web (v8.x) | Game-like experiences, VR/AR, physics-heavy scenes | PBR materials, Physics engine (Havok), XR support, Node material editor, WebGPU |
 | **p5.js** | Creative coding library (Processing for JS) | Generative art, educational visuals, creative experiments | Sketch mode, WEBGL renderer, Shaders, Sound, Data visualization |
 | **D3.js** | Data-driven document manipulation | Complex data visualization, custom charts, geographic maps | Scales, Axes, Transitions, Force layouts, Geo projections, Voronoi |
 | **Canvas API** | Native 2D drawing surface | Custom graphics, image manipulation, game rendering | 2D context, requestAnimationFrame, OffscreenCanvas, ImageData |
@@ -235,7 +235,7 @@ What powers the server side when creatives need more than frontend.
 
 | Technology | What It Is | Best For | Key Techniques |
 |-----------|-----------|----------|----------------|
-| **Node.js / Express** | JS runtime + minimal web framework | API backends, real-time apps, existing JS teams | Middleware, REST/GraphQL, WebSockets, Streaming, Worker threads |
+| **Node.js / Express** | JS runtime (v24 LTS) + web framework | API backends, real-time apps, existing JS teams | Middleware, REST/GraphQL, WebSockets, Streaming, Worker threads |
 | **Next.js API Routes / Server Actions** | Built-in server-side logic in Next.js | Fullstack React apps, form handling, data mutations | Route Handlers, Server Actions, Middleware, Edge functions |
 | **Python / FastAPI** | Modern Python web framework with automatic OpenAPI | ML-heavy backends, data pipelines, rapid API development | Async/await, Pydantic models, Auto-docs, WebSockets, Background tasks |
 | **Python / Django** | Batteries-included Python framework | Content management, admin panels, auth-heavy apps | ORM, Admin panel, Templates, REST framework, Channels (WebSocket) |
@@ -283,10 +283,10 @@ How it ships and runs in production.
 
 | Technology | What It Is | Best For | Key Techniques |
 |-----------|-----------|----------|----------------|
-| **Docker** | Container runtime for reproducible environments | Consistent deploys, multi-service architectures, isolated environments | Dockerfile, docker-compose, Multi-stage builds, Volume mounts, Networking |
-| **Vercel** | Frontend cloud platform (Next.js creators) | Next.js apps, preview deploys, edge functions | Automatic deploys, Preview URLs, Edge middleware, Analytics, ISR |
-| **Netlify** | Web platform with CI/CD and serverless functions | Static sites, JAMstack, form handling | Deploy previews, Functions, Edge handlers, Identity, Forms |
-| **Cloudflare** | Edge compute + CDN + DNS | Global distribution, Workers, R2 storage, D1 database | Workers, Pages, R2, D1, KV, Durable Objects, Queues |
+| **Docker** | Container runtime (Engine 29.2, Compose v5) | Consistent deploys, multi-service architectures, AI sandboxes | Dockerfile, docker-compose, Multi-stage builds, Volume mounts, Sandboxes |
+| **Vercel** | Frontend cloud (AI Gateway, Fluid Compute) | Next.js apps, AI apps, preview deploys, edge functions | Automatic deploys, AI Gateway (20+ providers), Spend Management, ISR |
+| **Netlify** | Web platform with AI-native strategy | Static/JAMstack, AI-generated apps (Bolt.new) | Deploy previews, Functions, AI Gateway, Edge handlers, Identity |
+| **Cloudflare** | Edge compute + CDN (Workers VPC, D1 10GB) | Global distribution, Workers, R2 storage, D1 database | Workers, Pages, R2, D1 (10GB/db), Durable Objects, Browser Rendering (Playwright) |
 | **AWS** | Comprehensive cloud platform | Enterprise, scalable infrastructure, managed services | EC2, S3, Lambda, CloudFront, ECS/EKS, Amplify |
 | **GCP** | Google's cloud platform | ML/AI workloads, Kubernetes, analytics | Cloud Run, GKE, Cloud Build, Vertex AI, Artifact Registry |
 | **VPS (Self-hosted)** | Virtual Private Server — full control | Budget-conscious, custom setups, sovereignty | Docker Compose, nginx reverse proxy, Certbot SSL, systemd |

@@ -10,7 +10,8 @@
 Container runtime for reproducible environments. Package application + dependencies
 into a portable container that runs identically everywhere.
 
-- **Current:** Docker Engine 27+, Docker Compose 2.x
+- **Current:** Docker Engine 29.2, Docker Compose v5, Desktop with Sandbox support
+- **New:** Compose v5 (official Go SDK), Sandboxes (automated caching, shell mode for AI agents)
 - **A.I.M.S. Status:** Default deployment method (Docker Compose on VPS)
 
 ### Key Patterns
@@ -72,9 +73,11 @@ volumes:
 Frontend cloud platform created by the Next.js team. Zero-config deployments,
 preview URLs on every PR, edge functions, built-in analytics.
 
-- **Current:** Vercel (latest platform)
+- **Current:** Vercel (AI Gateway, Fluid Compute, Spend Management)
 - **Optimized for:** Next.js (but supports any framework)
-- **Features:** Preview deploys, Edge Middleware, ISR, Analytics, Speed Insights
+- **Pro Plan:** $20/mo included credit, 1 TB edge bandwidth, 2 GB / 1 vCPU functions (up to 4 GB / 2 vCPU)
+- **AI Gateway:** Pay-as-you-go, zero markup on token costs, 20+ AI providers
+- **Features:** Preview deploys, Edge Middleware, ISR, Analytics, Spend Management (default $200 cap on Pro)
 
 ### Key Patterns
 
@@ -111,9 +114,10 @@ vercel env add STRIPE_KEY production preview
 Edge compute + CDN + DNS + storage. The closest-to-user infrastructure.
 Workers, Pages, R2 (storage), D1 (SQLite at edge), KV (key-value), Queues.
 
-- **Current:** Cloudflare latest
-- **Edge Runtime:** V8 isolates (Workers), Node.js compat mode
+- **Current:** Cloudflare (Workers VPC beta, D1 10 GB/db, Astro acquisition, Playwright GA)
+- **Edge Runtime:** V8 isolates (Workers), Node.js compat mode, 10x cold start reduction via optimistic routing
 - **Global:** 300+ data centers worldwide
+- **Notable 2025-26:** Acquired Astro team, Browser Rendering with Playwright GA, Workflows Python support
 
 ### Key Services
 | Service | Purpose | Use Case |
@@ -121,10 +125,11 @@ Workers, Pages, R2 (storage), D1 (SQLite at edge), KV (key-value), Queues.
 | **Workers** | Edge compute | API proxies, middleware, transformations |
 | **Pages** | Static + SSR hosting | Full-stack web apps |
 | **R2** | S3-compatible storage | File uploads, media, backups (zero egress fees) |
-| **D1** | SQLite at edge | Edge-local database |
+| **D1** | SQLite at edge (10 GB/db, 1 TB/account) | Edge-local database |
 | **KV** | Key-value store | Sessions, config, feature flags |
-| **Durable Objects** | Stateful edge compute | Real-time, WebSockets, coordination |
+| **Durable Objects** | Stateful edge compute (SQLite-backed) | Real-time, WebSockets, coordination |
 | **Queues** | Message queues | Background jobs, event processing |
+| **Browser Rendering** | Playwright on Workers (GA) | Screenshots, PDFs, scraping |
 
 ### Picker_Ang Notes
 - Choose when: Edge-everything, global low-latency, static sites, zero egress costs
@@ -138,12 +143,13 @@ Workers, Pages, R2 (storage), D1 (SQLite at edge), KV (key-value), Queues.
 Web platform with CI/CD, serverless functions, and forms. Strong for static sites,
 JAMstack architecture, and Gatsby/Astro/Hugo deployments.
 
-- **Current:** Netlify (latest platform)
-- **Features:** Deploy previews, Functions, Edge Handlers, Identity, Forms
+- **Current:** Netlify (AI-native pivot, "Agent Experience" / AX strategy)
+- **Scale:** 9M developers, 1M+ AI-generated apps deployed, 10K+ AI-generated sites/day
+- **Features:** Deploy previews, Functions, Edge Handlers, AI Gateway (3 providers), Identity, Forms
 
 ### Picker_Ang Notes
-- Choose when: Static/JAMstack sites, built-in form handling, non-Next.js frameworks
-- Avoid when: Next.js projects (Vercel is better optimized), heavy SSR
+- Choose when: Static/JAMstack sites, built-in form handling, non-Next.js frameworks, AI-generated apps (Bolt.new etc.)
+- Avoid when: Next.js projects (Vercel is better optimized), heavy SSR, need many AI providers (Vercel AI Gateway has 20+)
 
 ---
 

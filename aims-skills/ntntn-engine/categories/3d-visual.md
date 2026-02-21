@@ -155,9 +155,11 @@ GPU utilization, and modern rendering pipeline architecture.
 3D design tool with direct web export. Designers create 3D scenes visually,
 export as embeddable web components or React components.
 
-- **Current:** Spline 2.x
+- **Current:** Spline (Hana 2D editor, Timeline animation beta, AI image generation)
 - **Approach:** Visual editor → embed or React component
-- **No Code:** Designers create; developers embed
+- **Editors:** Spline (3D), Hana (2D interactive/animated)
+- **AI:** Built-in image generation/transformation, OpenAI voice assistant (WebRTC)
+- **Pricing:** Free tier, Starter $12/mo, Professional $20/mo, Team $36/mo
 
 ### Key Patterns
 ```tsx
@@ -178,8 +180,8 @@ import Spline from '@splinetool/react-spline';
 Full game engine for the web. More feature-complete than Three.js for game-like
 experiences, VR/AR, and physics-heavy scenes.
 
-- **Current:** Babylon.js 7.x
-- **Features:** Physics engine (Havok), XR support, Node Material Editor, GUI system
+- **Current:** Babylon.js 8.x (8.0 released March 2025, daily patch releases)
+- **Features:** Physics engine (Havok), XR support, Node Material Editor, GUI system, full WebGPU support
 
 ### Picker_Ang Notes
 - Choose when: Game-like web experiences, VR/AR, physics-heavy simulations
