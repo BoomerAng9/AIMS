@@ -131,7 +131,7 @@ frontend/public/remotion/
 
 ### Rule 1: ALL animations via `useCurrentFrame()`
 
-CSS animations, CSS transitions, Tailwind animate utilities, and Framer Motion are **FORBIDDEN** in Remotion compositions. They do not render correctly in frame-by-frame rendering.
+CSS animations, CSS transitions, Tailwind animate utilities, and Motion (formerly Framer Motion) are **FORBIDDEN** in Remotion compositions. They do not render correctly in frame-by-frame rendering.
 
 ```typescript
 // CORRECT

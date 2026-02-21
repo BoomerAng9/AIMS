@@ -94,6 +94,24 @@ import lilSecretKeeperHawk from './role-cards/lil-secret-keeper-hawk.json';
 import lilInterfaceForgeHawk from './role-cards/lil-interface-forge-hawk.json';
 import lilMotionTunerHawk from './role-cards/lil-motion-tuner-hawk.json';
 
+// Boomer_Angs not in original v2.0.0 — added as created
+import pickerAng from './role-cards/picker-ang.json';
+import buildsmith from './role-cards/buildsmith.json';
+import plugAng from './role-cards/plug-ang.json';
+import bridgeAng from './role-cards/bridge-ang.json';
+import chronicleAng from './role-cards/chronicle-ang.json';
+import dockmasterAng from './role-cards/dockmaster-ang.json';
+import gatekeeperAng from './role-cards/gatekeeper-ang.json';
+import indexAng from './role-cards/index-ang.json';
+import labAng from './role-cards/lab-ang.json';
+import licensingAng from './role-cards/licensing-ang.json';
+import opsconsoleAng from './role-cards/opsconsole-ang.json';
+import patchsmithAng from './role-cards/patchsmith-ang.json';
+import runnerAng from './role-cards/runner-ang.json';
+import scoutAng from './role-cards/scout-ang.json';
+import scribeAng from './role-cards/scribe-ang.json';
+import showrunnerAng from './role-cards/showrunner-ang.json';
+
 // Static imports for policies
 import chainPolicy from './policies/chain-of-command.policy.json';
 import snippetPolicy from './policies/overlay-snippet.policy.json';
@@ -120,6 +138,23 @@ export const ALL_ROLE_CARDS: RoleCard[] = [
   lilSecretKeeperHawk,
   lilInterfaceForgeHawk,
   lilMotionTunerHawk,
+  // Boomer_Angs
+  pickerAng,
+  buildsmith,
+  plugAng,
+  bridgeAng,
+  chronicleAng,
+  dockmasterAng,
+  gatekeeperAng,
+  indexAng,
+  labAng,
+  licensingAng,
+  opsconsoleAng,
+  patchsmithAng,
+  runnerAng,
+  scoutAng,
+  scribeAng,
+  showrunnerAng,
 ] as unknown as RoleCard[];
 
 /**

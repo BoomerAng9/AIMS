@@ -200,7 +200,7 @@ Skills inject specialized context, SOPs, and design standards into ACHEEVY's beh
 | **PMO Naming** | `skills/pmo-naming.skill.ts` | Agent naming needed | Enforces `Lil_<Role>_Hawk` and `<Name>_Ang` patterns |
 | **Best Practices** | `skills/best-practices.md` | Code/deploy tasks | Engineering standards and patterns |
 | **Stitch Design** | `skills/stitch-nano-design.skill.md` | UI/design tasks | Nano Banana Pro design system standards |
-| **UI Motion** | `skills/ui-interaction-motion.skill.md` | Animation/interaction tasks | Framer Motion + interaction patterns |
+| **UI Motion** | `skills/ui-interaction-motion.skill.md` | Animation/interaction tasks | Motion v12 + interaction patterns |
 | **OpenRouter LLM** | `skills/openrouter-llm.skill.md` | "model", "llm", "openrouter" | Model selection rules, cost awareness, fallback chain |
 | **Kimi K2.5** | `skills/kimi-k2.5.skill.md` | "kimi", "moonshot", "vision agent", "agent swarm", "multimodal agent" | Moonshot AI 1T-param visual agentic model — API modes, vision/video input, swarm, quantization |
 | **ElevenLabs Voice** | `skills/elevenlabs-voice.skill.md` | "voice", "tts", "speak" | Voice persona rules, ACHEEVY voice identity |
@@ -536,6 +536,9 @@ Every tool and capability is **owned** by a Boomer_Ang. No raw tool access.
 | `OpsConsole_Ang` | Observability | Multi-agent monitoring, CommonGround |
 | `Index_Ang` | Data | Datasets, embeddings, II-Commons |
 | `Licensing_Ang` | Compliance | AGPL/license quarantine, PPTist |
+| `Picker_Ang` | Component Selection | NtNtN Engine navigation, stack curation, creative intent analysis |
+| `Buildsmith` | Construction | Web builds, component assembly, creative execution (special: no _Ang suffix) |
+| `Plug_Ang` | Integration & MCP | API key management, account creation, MCP wiring, Composio gateway |
 
 ### Boomer_Ang Brain Files
 Each Boomer_Ang wrapping an Intelligent Internet repo has a dedicated brain file in `aims-skills/brains/`.
@@ -556,6 +559,9 @@ See: `aims-skills/brains/ACHEEVY_II_EXTENSIONS.md` for ACHEEVY's direct extensio
 | `SCRIBE_ANG_BRAIN.md` | Scribe_Ang | Symbioism-Nextra + TLE |
 | `LAB_ANG_BRAIN.md` | Lab_Ang | ii-thought + ii_verl + CoT-Lab-Demo |
 | `INDEX_ANG_BRAIN.md` | Index_Ang | II-Commons |
+| `PICKER_ANG_BRAIN.md` | Picker_Ang | NtNtN Engine (component selector) |
+| `BUILDSMITH_BRAIN.md` | Buildsmith | NtNtN Engine (master builder) |
+| `PLUG_ANG_BRAIN.md` | Plug_Ang | Composio gateway + MCP wiring |
 
 ### Boomer_Ang Role Card Registry
 Every Boomer_Ang has a JSON role card in `aims-skills/chain-of-command/role-cards/`.
@@ -578,6 +584,9 @@ gates, overlay visibility, and evaluation KPIs. **No agent exists without a card
 | `scribe-ang.json` | Scribe_Ang | Creative & Presentation PMO | Frosty White #EDEDED |
 | `lab-ang.json` | Lab_Ang | R&D & Experimental PMO | Green #22C55E |
 | `index-ang.json` | Index_Ang | Intelligence & Research PMO | Gold #D4AF37 |
+| `picker-ang.json` | Picker_Ang | Creative Engineering PMO | Blue #3B82F6 |
+| `buildsmith.json` | Buildsmith | Creative Engineering PMO | Orange-Gold #E5A530 |
+| `plug-ang.json` | Plug_Ang | Operations & Integration PMO | Emerald #10B981 |
 
 ### Boomer_Ang Visual Identity
 All Boomer_Angs follow the canonical visual spec in `aims-skills/brains/BOOMER_ANG_VISUAL_IDENTITY.md`.
@@ -826,6 +835,31 @@ frontend/lib/acheevy/
 ├── voiceConfig.ts                 ← Voice/TTS configuration
 ├── client.ts                      ← Client utilities
 └── PersonaContext.tsx              ← React persona context
+
+ntntn-engine/                          ← NtNtN Engine (A.I.M.S. Creative Dev Library)
+├── NTNTN_ENGINE.md                    ← Master reference (taxonomy, categories, intent mapping)
+├── index.ts                           ← Exports + NLP keyword registry + build intent detection
+├── categories/                        ← Deep references per technology category
+│   ├── frontend-frameworks.md
+│   ├── animation-motion.md
+│   ├── styling-systems.md
+│   ├── 3d-visual.md
+│   ├── scroll-interaction.md
+│   ├── ui-components.md
+│   ├── layout-responsive.md
+│   ├── backend-fullstack.md
+│   ├── cms-content.md
+│   └── deployment-infra.md
+├── execution/                            ← Buildsmith execution pipeline
+│   └── buildsmith-execution-pipeline.md  ← Three pillars: IMAGE, INTERFACE, INTEGRATIONS
+└── techniques/                        ← Deep dives per technique group
+    ├── scroll-techniques.md           ← 10 scroll-based techniques
+    ├── hover-interaction.md           ← 8 hover & interaction techniques
+    ├── page-transitions.md            ← 8 page & layout transition techniques
+    ├── text-typography.md             ← 7 text animation techniques
+    ├── visual-effects.md              ← 10 visual effect techniques
+    ├── 3d-immersive.md                ← 7 3D & immersive techniques
+    └── micro-interactions.md          ← 10 micro-interaction techniques
 
 infra/deploy-platform/circuit-box/
 └── acheevy-tools.json             ← Tool registry (9 tools)
@@ -1118,7 +1152,82 @@ See: `hooks/enter-chicken-hawk.hook.md`, `skills/chicken-hawk/`
 
 ---
 
-## 22. Storytelling-First Strategy (Internal Playbook)
+## 22. NtNtN Engine (Creative Development Library + Execution Engine)
+
+The NtNtN Engine is an **A.I.M.S. platform feature** — a comprehensive library and execution engine
+that translates creative intent into real, deployed products. It belongs to AI Managed Solutions,
+not to any single agent. All agents in the hierarchy access it when the work calls for it.
+
+**Doctrine: Execution on intention.**
+
+### What It Contains
+- **10 Technology Categories:** Frontend Frameworks, Animation & Motion, Styling Systems,
+  3D & Visual, Scroll & Interaction, UI Components, Layout & Responsive, Backend & Fullstack,
+  CMS & Content, Deployment & Infrastructure
+- **7 Technique Deep Dives:** 60+ individual techniques across scroll, hover, page transitions,
+  text/typography, visual effects, 3D/immersive, and micro-interactions
+- **NLP Intent Map:** Keyword-to-category mapping for automatic routing from user descriptions
+- **Decision Matrices:** Per-category tool selection guides (Picker_Ang uses these)
+- **Execution Pipeline:** Buildsmith's three-pillar execution engine (IMAGE, INTERFACE, INTEGRATIONS)
+
+### Connected Boomer_Angs
+- **Picker_Ang** (Blue #3B82F6) — Selects components, techniques, and patterns from the library
+  that match the creative's described vision. Produces a Stack Recommendation.
+- **Buildsmith** (Orange-Gold #E5A530, special: no _Ang suffix) — Takes Picker_Ang's selections and
+  constructs the end product through three execution pillars. Accredited with every finished build.
+
+### Buildsmith Execution Pipeline (Three Pillars)
+1. **IMAGE** — Visual asset pipeline: Nano Banana Pro (default) / GPT Image 1.5 / FLUX.2 / Imagen 4 for raster; Recraft V4 / SVGMaker MCP for vectors; Sharp, Satori, Playwright, Figma MCP, video gen (Sora 2 / Runway Gen-4.5)
+2. **INTERFACE** — Code generation engine: E2B sandbox, component/page gen, animation wiring, live preview, user iteration loop
+3. **INTEGRATIONS** — Fullstack & deploy: Git, database (Prisma), auth, payments, API routes, build, deploy, domain/SSL, monitoring
+
+### Two Entry Points
+- **Entry A (ACHEEVY-Guided):** User describes → ACHEEVY walks creative brief → Picker_Ang selects → Buildsmith builds
+- **Entry B (Direct-to-Engine):** User writes prompt → NLP classify → Auto-select → Buildsmith builds
+
+### Scope Tiers
+| Tier | Scope | Est. Cost | Est. Time |
+|------|-------|-----------|-----------|
+| 1: Component | Single pattern | $0.25-$0.75 | 2-5 min |
+| 2: Page | Landing/portfolio | $1-$3 | 5-15 min |
+| 3: Application | Multi-page app | $3-$8 | 15-45 min |
+| 4: Platform | Enterprise SaaS | $8-$20 | 45-120 min |
+
+### Routing Flow
+```
+User describes build → ACHEEVY NLP detects build intent
+  → Route to Picker_Ang
+  → Picker_Ang queries NtNtN Engine library
+  → Picker_Ang produces Stack Recommendation
+  → Stack Recommendation → Buildsmith
+  → Buildsmith creates Build Manifest (3 pillars)
+  → PHASE 1: IMAGE → Asset Catalog
+  → PHASE 2: INTERFACE → Code in sandbox, preview URL, iterate with user
+  → PHASE 3: INTEGRATIONS → DB, auth, deploy → Live URL
+  → PHASE 4: VERIFICATION → Lighthouse, a11y, CWV, security
+  → PHASE 5: SIGN → <!-- Buildsmith --> + delivery package
+  → ACHEEVY delivers to user
+```
+
+### Build Intent Detection
+Activated when user message contains:
+- **Trigger words:** build, create, make, design, develop, code, scaffold, generate, launch
+- **Target words:** website, page, app, dashboard, landing, portfolio, site, interface, UI
+
+### Key Files
+- `aims-skills/ntntn-engine/NTNTN_ENGINE.md` — Master reference document
+- `aims-skills/ntntn-engine/index.ts` — NLP keyword registry + intent detection
+- `aims-skills/ntntn-engine/execution/buildsmith-execution-pipeline.md` — Full execution pipeline spec
+- `aims-skills/ntntn-engine/categories/` — 10 category deep-dive files
+- `aims-skills/ntntn-engine/techniques/` — 7 technique deep-dive files
+- `aims-skills/brains/PICKER_ANG_BRAIN.md` — Picker_Ang brain
+- `aims-skills/brains/BUILDSMITH_BRAIN.md` — Buildsmith brain (includes execution pipeline summary)
+- `aims-skills/chain-of-command/role-cards/picker-ang.json` — Picker_Ang role card
+- `aims-skills/chain-of-command/role-cards/buildsmith.json` — Buildsmith role card
+
+---
+
+## 23. Storytelling-First Strategy (Internal Playbook)
 
 ### The Thesis
 

@@ -66,6 +66,27 @@ export const cinematic = {
   ease: [0.16, 1, 0.3, 1] as const,
 };
 
+// ── Scroll-Driven Presets ──
+
+export const scrollTransition = {
+  /** Standard scroll reveal */
+  reveal: { duration: 0.6, ease: [0.16, 1, 0.3, 1] as const },
+  /** Slow cinematic reveal for hero sections */
+  cinematic: { duration: 0.8, ease: [0.16, 1, 0.3, 1] as const },
+  /** Quick pop-in for smaller elements */
+  pop: { duration: 0.4, ease: [0.16, 1, 0.3, 1] as const },
+};
+
+/** IntersectionObserver margin presets for useInView */
+export const viewportMargin = {
+  /** Trigger early — element enters 100px before visible */
+  early: "-100px",
+  /** Standard — trigger at ~80px before visible */
+  standard: "-80px",
+  /** Late — trigger only when nearly fully visible */
+  late: "-20px",
+};
+
 // ── Reduced Motion ──
 
 export const reducedMotion = {

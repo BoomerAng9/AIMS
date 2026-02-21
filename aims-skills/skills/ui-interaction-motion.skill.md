@@ -1,13 +1,13 @@
 ---
 name: UI Interaction Motion
-description: Design and enforce a consistent, high-performance UI interaction motion system using Framer Motion for A.I.M.S.
+description: Design and enforce a consistent, high-performance UI interaction motion system using Motion for A.I.M.S.
 version: 1.0.0
 ---
 
 # UI Interaction Motion (Skill)
 
 ## Purpose
-Govern a consistent, high-performance UI interaction motion system using Framer Motion for A.I.M.S.
+Govern a consistent, high-performance UI interaction motion system using Motion for A.I.M.S.
 
 This skill covers:
 - Overlays and drawers
@@ -30,6 +30,25 @@ This skill covers:
 - Accessibility-safe fallbacks
 - Acceptance checklist
 
+## NtNtN Engine Integration
+
+This skill enforces motion consistency for A.I.M.S. internal builds. The NtNtN Engine
+provides the broader technique catalog that Picker_Ang draws from when selecting
+animation approaches for creative builds.
+
+**Relationship:**
+- This skill = A.I.M.S. internal motion standards (what we use)
+- NtNtN Engine = Full animation technique library (what's available for any build)
+- Picker_Ang selects from NtNtN Engine → Buildsmith executes → this skill validates consistency
+
+**NtNtN Engine References:**
+- `aims-skills/ntntn-engine/categories/animation-motion.md` — Full animation library (Motion, GSAP, Lottie, Rive, etc.)
+- `aims-skills/ntntn-engine/techniques/micro-interactions.md` — Button feedback, toggles, toasts, etc.
+- `aims-skills/ntntn-engine/techniques/page-transitions.md` — AnimatePresence, View Transitions, layout animations
+- `aims-skills/ntntn-engine/techniques/hover-interaction.md` — 3D tilt, magnetic cursor, gesture patterns
+
+---
+
 ## Core Motion Concepts (Required)
 - **Variants** — state-based animation declarations
 - **AnimatePresence** — mount/unmount clarity
@@ -48,7 +67,7 @@ This skill covers:
 ## Motion vs Remotion Boundary
 | Layer | Tool | Purpose |
 |-------|------|---------|
-| UI Interactions | Framer Motion | State changes, overlays, micro-feedback |
+| UI Interactions | Motion | State changes, overlays, micro-feedback |
 | Cinematic/Narrative | Remotion | Video generation, story-driven compositions |
 
 They complement. They do not overlap.

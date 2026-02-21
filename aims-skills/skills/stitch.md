@@ -60,13 +60,13 @@ stitch "Create a dashboard card for athlete scouting grades"
 ## Persona Context
 The persona file (`.stitch/persona.md`) defines:
 - **Role:** Nano Banana Pro UI architect
-- **Framework:** Next.js 14 App Router + Tailwind CSS 3.3
+- **Framework:** Next.js 16 App Router + Tailwind CSS v4
 - **Aesthetic:** Retro-futurism — dark UI (#050505) + gold (#D4AF37)
 - **Layout Rule:** "Brick and Window" — logo wall = brick, content = glass window
 - **Colors:** Full Circuit Box palette (ink, obsidian, gold, signal colors)
 - **Typography:** Doto (headlines/data), Inter (body), Permanent Marker (wordmark)
 - **Glass panels:** backdrop-blur 20-26px, subtle inner glow, wireframe borders
-- **Motion:** Framer Motion specs (stagger, breathe, scan, pulse-gold)
+- **Motion:** Motion v12 specs (stagger, breathe, scan, pulse-gold)
 - **Tokens:** Maps to `--aims-{category}-{scale}` design token system
 
 ## Output Format
@@ -75,7 +75,7 @@ Every Stitch response includes:
 2. **Component Tree** — React hierarchy with props
 3. **Tailwind Classes** — Exact class strings
 4. **State Map** — Loading/empty/error/success
-5. **Motion Spec** — Framer Motion initial/animate/exit
+5. **Motion Spec** — Motion initial/animate/exit
 6. **QA Checklist** — Acceptance criteria
 
 ## Chicken Hawk Integration
