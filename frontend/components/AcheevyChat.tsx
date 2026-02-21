@@ -21,7 +21,7 @@ import {
   Play, Pause,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { staggerContainer } from '@/lib/motion/tokens';
+import { staggerContainer } from '@/lib/motion/variants';
 import { useVoiceInput } from '@/hooks/useVoiceInput';
 import { useVoiceOutput } from '@/hooks/useVoiceOutput';
 import { createReadReceipt, advanceReceipt, classifyIntent } from '@/lib/acheevy/read-receipt';
@@ -95,6 +95,7 @@ export default function AcheevyChat() {
     handleSubmit,
     isLoading,
     stop,
+    append,
   } = useChat({
     api: '/api/chat',
     initialMessages: [
@@ -584,15 +585,6 @@ export default function AcheevyChat() {
           >
             {isUploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Paperclip className="w-5 h-5" />}
           </button>
-
-          <input
-            type="file"
-            multiple
-            className="hidden"
-            ref={fileInputRef}
-            onChange={handleFileSelect}
-            accept="image/*,.pdf,.doc,.docx,.txt"
-          />
 
           <input
             value={input}
