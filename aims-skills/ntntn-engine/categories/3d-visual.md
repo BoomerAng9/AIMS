@@ -12,6 +12,7 @@ Everything else in the JS 3D ecosystem builds on or alongside Three.js.
 
 - **Current:** Three.js r183 (WebGPU production-ready since r171)
 - **Rendering:** WebGPU (default since r171, auto-fallback to WebGL 2)
+- **r183 Breaking:** PostProcessing renamed to `RenderPipeline`, `Clock` deprecated (use `Timer`), `PCFSoftShadowMap` deprecated for WebGLRenderer
 - **Scene Graph:** Scene → Camera → Renderer → Mesh (Geometry + Material)
 
 ### Key Patterns & Techniques

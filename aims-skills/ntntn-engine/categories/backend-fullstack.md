@@ -260,6 +260,7 @@ The language foundation for all A.I.M.S. TypeScript code. Major transition under
 ### Prisma ORM v7 (A.I.M.S. Default)
 Prisma v7 migrated away from Rust — rebuilt in TypeScript. 98% fewer types to evaluate,
 70% faster type checking. Config now via `prisma.config.ts`. No more auto-seeding or auto-generate.
+Client middleware API removed (use Client Extensions instead). MCP server available for AI dev environments.
 ```prisma
 model User {
   id        String   @id @default(cuid())

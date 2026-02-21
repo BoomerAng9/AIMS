@@ -63,6 +63,7 @@ Open-source headless CMS. Self-hosted, extensible, generates REST + GraphQL
 APIs from content types. Admin panel included.
 
 - **Current:** Strapi 5.36 (stability-focused, 70+ bug fixes recent)
+- **⚠️ Strapi v4 EOL:** Full support ended Oct 2025. Security updates end **April 2026**. Migrate to v5 now.
 - **Hosting:** Self-hosted (Docker, VPS), Strapi Cloud
 - **API:** Auto-generated REST and GraphQL endpoints
 
@@ -107,7 +108,8 @@ in TypeScript, get API + admin panel automatically. Can be embedded in Next.js.
 
 - **Current:** Payload 3.77 (Next.js native, localized status, MCP tools)
 - **Approach:** Config-driven (TypeScript), embedded in your Next.js app
-- **Database:** Postgres, MongoDB, SQLite (via Drizzle adapter)
+- **Database:** Postgres, MySQL, MongoDB, SQLite (via Drizzle adapter)
+- **Deploy:** One-click to Vercel (Neon DB + Vercel Blob) and Cloudflare (Workers + R2 + D1)
 
 ### Key Patterns
 ```ts

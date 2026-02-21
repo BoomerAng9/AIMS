@@ -243,6 +243,8 @@ custom services, and have complete sovereignty over your data.
 ## CI/CD Pipeline
 
 ### GitHub Actions (A.I.M.S. Standard)
+- **⚠️ Pricing change (Jan 1, 2026):** $0.002/min cloud platform charge added; hosted runner prices cut up to 39%. Still free for public repos.
+- **New:** Actions Data Stream (real-time observability), 71M jobs/day
 ```yaml
 name: Build and Push
 on:
