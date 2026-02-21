@@ -129,22 +129,12 @@ const pulseGlow = {
 };
 
 // ─────────────────────────────────────────────────────────────
-// Mock Data (replace with real API calls)
+// Initial Data — populated from House of Ang API at runtime
 // ─────────────────────────────────────────────────────────────
 
-const MOCK_ROSTER: AgentRoster[] = [
-  { id: "ba-1", name: "Code_Ang", role: "Lead Engineer", type: "boomer_ang", status: "idle", capabilities: ["code-gen", "review", "deploy"], image: "/images/angs/code-ang.png" },
-  { id: "ba-2", name: "Quality_Ang", role: "QA Lead", type: "boomer_ang", status: "idle", capabilities: ["test", "audit", "validate"], image: "/images/angs/quality-ang.png" },
-  { id: "ch-1", name: "Chicken Hawk", role: "Execution Supervisor", type: "chicken_hawk", status: "idle", capabilities: ["orchestrate", "gate", "dispatch"] },
-  { id: "lh-1", name: "Build_Hawk", role: "Build Runner", type: "lil_hawk", status: "idle", capabilities: ["compile", "bundle", "artifact"] },
-  { id: "lh-2", name: "Deploy_Hawk", role: "Deploy Runner", type: "lil_hawk", status: "idle", capabilities: ["container", "publish", "verify"] },
-];
+const INITIAL_ROSTER: AgentRoster[] = [];
 
-const MOCK_EVENTS: DeploymentEvent[] = [
-  { id: "e1", timestamp: new Date(Date.now() - 300000), stage: "ingest", title: "Intent Received", description: "User requested deployment of auth-service v2.1", agent: "ACHEEVY" },
-  { id: "e2", timestamp: new Date(Date.now() - 240000), stage: "plan", title: "Plan Generated", description: "3-stage deployment plan created with rollback gates", agent: "ACHEEVY", proof: { type: "manifest", label: "Plan Manifest", value: "sha256:a8f3..." } },
-  { id: "e3", timestamp: new Date(Date.now() - 180000), stage: "quote", title: "LUC Quote", description: "Estimated cost: 150 LUC tokens", agent: "ACHEEVY", proof: { type: "artifact", label: "Quote Document", value: "QT-2026-0210" } },
-];
+const INITIAL_EVENTS: DeploymentEvent[] = [];
 
 // ─────────────────────────────────────────────────────────────
 // Sub-Components
@@ -562,7 +552,7 @@ export default function DeployDockPage() {
   const [isHatching, setIsHatching] = useState(false); // Controls particle effect
 
   const [roster, setRoster] = useState<AgentRoster[]>([]);
-  const [events, setEvents] = useState<DeploymentEvent[]>(MOCK_EVENTS);
+  const [events, setEvents] = useState<DeploymentEvent[]>(INITIAL_EVENTS);
   const [selectedAgent, setSelectedAgent] = useState<string | null>(null);
 
   const [jobPackets, setJobPackets] = useState<JobPacket[]>([]);
@@ -593,7 +583,7 @@ export default function DeployDockPage() {
     setDeploymentStage("hatch");
     // Simulate API call
     setTimeout(() => {
-      setRoster(MOCK_ROSTER);
+      setRoster(INITIAL_ROSTER);
       addEvent({
         stage: "hatch",
         title: "Agents Hatched",

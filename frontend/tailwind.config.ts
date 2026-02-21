@@ -7,7 +7,7 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Surfaces
+        // Surfaces (dark legacy)
         obsidian: '#0A0A0A',
         surface: '#111111',
         'surface-raised': '#161616',
@@ -15,6 +15,17 @@ module.exports = {
         leather: '#1A1A1A',
         gunmetal: '#2A2A2A',
         ink: '#0B0E14',
+
+        // Warm Loft Palette (showroom redesign)
+        loft: {
+          bg: '#1C1410',         // deep warm brown (page base)
+          floor: '#3B2E22',      // hardwood floor brown
+          brick: '#8B4D3B',      // exposed brick red-brown
+          leather: '#6B4226',    // leather sofa brown
+          tan: '#C8A882',        // warm tan accent
+          cream: '#F5EDE0',      // light cream text
+          wall: '#2A2118',       // dark wall panel
+        },
 
         // Wireframe border system
         wireframe: {

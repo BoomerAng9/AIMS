@@ -1,4 +1,5 @@
 from ii_agent.storage import BaseStorage, GCS
+from ii_agent.storage.local import LocalStorage
 
 
 def create_storage_client(
@@ -13,4 +14,6 @@ def create_storage_client(
             bucket_name,
             custom_domain,
         )
+    if storage_provider == "local":
+        return LocalStorage()
     raise ValueError(f"Storage provider {storage_provider} not supported")

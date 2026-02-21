@@ -1,0 +1,21 @@
+conference_id,conference_name,abbreviation,division,subdivision,founded_year,headquarters_city,headquarters_state,commissioner,website,tier,active
+SEC,Southeastern Conference,SEC,FBS,Power 4,1932,Birmingham,AL,Greg Sankey,secsports.com,power,true
+BIG_TEN,Big Ten Conference,B1G,FBS,Power 4,1896,Rosemont,IL,Tony Petitti,bigten.org,power,true
+BIG_12,Big 12 Conference,Big 12,FBS,Power 4,1996,Irving,TX,Brett Yormark,big12sports.com,power,true
+ACC,Atlantic Coast Conference,ACC,FBS,Power 4,1953,Greensboro,NC,Jim Phillips,theacc.com,power,true
+AAC,American Athletic Conference,AAC,FBS,Group of 5,2013,Irving,TX,Tim Pernetti,theamerican.org,group_of_5,true
+SBC,Sun Belt Conference,SBC,FBS,Group of 5,1976,New Orleans,LA,Keith Gill,sunbeltsports.org,group_of_5,true
+MWC,Mountain West Conference,MW,FBS,Group of 5,1999,Colorado Springs,CO,Gloria Nevarez,themw.com,group_of_5,true
+MAC,Mid-American Conference,MAC,FBS,Group of 5,1946,Cleveland,OH,Jon Steinbrecher,getsomemaction.com,group_of_5,true
+CUSA,Conference USA,C-USA,FBS,Group of 5,1995,Dallas,TX,Judy MacLeod,conferenceusa.com,group_of_5,true
+IND,FBS Independents,IND,FBS,Independent,,,,,,independent,true
+PAC_12,Pac-12 Conference,Pac-12,FBS,,1915,San Francisco,CA,Teresa Gould,pac-12.com,power,true
+BIG_EAST,Big East Conference (Football),Big East,FBS,,1979,New York,NY,,,power,false
+SWC,Southwest Conference,SWC,FBS,,1914,Dallas,TX,,,power,false
+BIG_8,Big 8 Conference,Big 8,FBS,,1907,Kansas City,MO,,,power,false
+WAC,Western Athletic Conference,WAC,FBS,,1962,Denver,CO,,,group_of_5,false
+BORDER,Border Conference,Border,FBS,,1931,,,,,,false
+SOUTHERN,Southern Conference,SoCon,FCS,,1921,Spartanburg,SC,,,fcs,true
+MVC,Missouri Valley Football Conference,MVFC,FCS,,1907,St. Louis,MO,,,fcs,true
+CAA,Colonial Athletic Association,CAA,FCS,,1979,Richmond,VA,,,fcs,true
+BIG_SKY,Big Sky Conference,Big Sky,FCS,,1963,Ogden,UT,,,fcs,true

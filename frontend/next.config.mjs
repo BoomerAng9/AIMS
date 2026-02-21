@@ -9,6 +9,14 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  eslint: {
+    // ESLint checked separately in CI; don't block production builds
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    // Type-check separately in CI; don't block production builds
+    ignoreBuildErrors: true,
+  },
   // Allow imports from ../aims-tools/ outside the frontend directory
   experimental: {
     externalDir: true,

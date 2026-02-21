@@ -32,7 +32,7 @@ services:
       uef-gateway:
         condition: service_started
     healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://127.0.0.1:80/health || exit 1"]
+      test: [ "CMD-SHELL", "curl -sf http://127.0.0.1:80/health || exit 1" ]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -68,6 +68,10 @@ services:
       - STRIPE_PUBLISHABLE_KEY=${STRIPE_PUBLISHABLE_KEY}
       - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
       - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
+      - STRIPE_PRICE_ID=${STRIPE_PRICE_ID}
+      # PayPal — payments
+      - PAYPAL_CLIENT_ID=${PAYPAL_CLIENT_ID}
+      - PAYPAL_CLIENT_SECRET=${PAYPAL_CLIENT_SECRET}
       # Voice — ElevenLabs (TTS + STT Scribe v2) + Deepgram (fallback)
       - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY}
       - DEEPGRAM_API_KEY=${DEEPGRAM_API_KEY}
@@ -89,7 +93,7 @@ services:
       acheevy:
         condition: service_started
     healthcheck:
-      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>{process.exit(r.ok?0:1)}).catch(()=>process.exit(1))"]
+      test: [ "CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>{process.exit(r.ok?0:1)}).catch(()=>process.exit(1))" ]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -132,7 +136,7 @@ services:
       uef-gateway:
         condition: service_started
     healthcheck:
-      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>{process.exit(r.ok?0:1)}).catch(()=>process.exit(1))"]
+      test: [ "CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>{process.exit(r.ok?0:1)}).catch(()=>process.exit(1))" ]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -199,11 +203,15 @@ services:
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       # Stripe (gateway validates billing)
       - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - STRIPE_PRICE_ID=${STRIPE_PRICE_ID}
+      # PayPal
+      - PAYPAL_CLIENT_ID=${PAYPAL_CLIENT_ID}
+      - PAYPAL_CLIENT_SECRET=${PAYPAL_CLIENT_SECRET}
       - DEBUG=false
     volumes:
       - gateway-data:/app/data
     healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3001/health',r=>{process.exit(r.statusCode===200?0:1)}).on('error',()=>process.exit(1))"]
+      test: [ "CMD", "node", "-e", "require('http').get('http://127.0.0.1:3001/health',r=>{process.exit(r.statusCode===200?0:1)}).on('error',()=>process.exit(1))" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -233,7 +241,7 @@ services:
       redis:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3002/health',r=>{process.exit(r.statusCode===200?0:1)}).on('error',()=>process.exit(1))"]
+      test: [ "CMD", "node", "-e", "require('http').get('http://127.0.0.1:3002/health',r=>{process.exit(r.statusCode===200?0:1)}).on('error',()=>process.exit(1))" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -265,13 +273,16 @@ services:
       - REDIS_URL=redis://:${REDIS_PASSWORD:-aims_redis_secret}@redis:6379
       - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
       - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
+      - STRIPE_PRICE_ID=${STRIPE_PRICE_ID}
+      - PAYPAL_CLIENT_ID=${PAYPAL_CLIENT_ID}
+      - PAYPAL_CLIENT_SECRET=${PAYPAL_CLIENT_SECRET}
     depends_on:
       redis:
         condition: service_healthy
       house-of-ang:
         condition: service_started
     healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3003/health',r=>{process.exit(r.statusCode===200?0:1)}).on('error',()=>process.exit(1))"]
+      test: [ "CMD", "node", "-e", "require('http').get('http://127.0.0.1:3003/health',r=>{process.exit(r.statusCode===200?0:1)}).on('error',()=>process.exit(1))" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -299,7 +310,7 @@ services:
       - sandbox-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-aims_redis_secret}", "ping"]
+      test: [ "CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-aims_redis_secret}", "ping" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -341,7 +352,7 @@ services:
     restart: unless-stopped
     user: "1000:1000"
     healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:3010/health"]
+      test: [ "CMD", "wget", "-q", "--spider", "http://127.0.0.1:3010/health" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -377,7 +388,7 @@ services:
       uef-gateway:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3020/health',r=>{process.exit(r.statusCode===200?0:1)}).on('error',()=>process.exit(1))"]
+      test: [ "CMD", "node", "-e", "require('http').get('http://127.0.0.1:3020/health',r=>{process.exit(r.statusCode===200?0:1)}).on('error',()=>process.exit(1))" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -412,7 +423,7 @@ services:
       uef-gateway:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3021/health',r=>{process.exit(r.statusCode===200?0:1)}).on('error',()=>process.exit(1))"]
+      test: [ "CMD", "node", "-e", "require('http').get('http://127.0.0.1:3021/health',r=>{process.exit(r.statusCode===200?0:1)}).on('error',()=>process.exit(1))" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -442,7 +453,7 @@ services:
     volumes:
       - agent-zero-data:/app/work_dir
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/"]
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/" ]
       interval: 60s
       timeout: 10s
       retries: 3
@@ -480,7 +491,7 @@ services:
       agent-bridge:
         condition: service_started
     healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:4001/health',r=>{process.exit(r.statusCode===200?0:1)}).on('error',()=>process.exit(1))"]
+      test: [ "CMD", "node", "-e", "require('http').get('http://127.0.0.1:4001/health',r=>{process.exit(r.statusCode===200?0:1)}).on('error',()=>process.exit(1))" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -518,7 +529,7 @@ services:
     volumes:
       - n8n-data:/home/node/.n8n
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5678/healthz"]
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5678/healthz" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -553,7 +564,7 @@ services:
       uef-gateway:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:9090/health"]
+      test: [ "CMD", "wget", "-q", "--spider", "http://127.0.0.1:9090/health" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -593,7 +604,7 @@ services:
       redis:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "curl -fsS http://localhost:8000/health || exit 1"]
+      test: [ "CMD-SHELL", "curl -fsS http://localhost:8000/health || exit 1" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -618,7 +629,7 @@ services:
     volumes:
       - ii-agent-pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${II_AGENT_DB_USER:-iiagent}"]
+      test: [ "CMD-SHELL", "pg_isready -U ${II_AGENT_DB_USER:-iiagent}" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -637,19 +648,17 @@ services:
       dockerfile: docker/backend/Dockerfile
     expose:
       - "1236"
-    entrypoint: ["/bin/sh", "-c"]
+    entrypoint: [ "/bin/sh", "-c" ]
     command:
       - >-
-        exec uvicorn ii_tool.integrations.app.main:app
-        --host 0.0.0.0
-        --port 1236
+        exec uvicorn ii_tool.integrations.app.main:app --host 0.0.0.0 --port 1236
     environment:
       - DATABASE_URL=postgresql://${II_AGENT_DB_USER:-iiagent}:${II_AGENT_DB_PASSWORD:-iiagent}@ii-agent-postgres:5432/${II_AGENT_DB_NAME:-iiagentdev}
     depends_on:
       ii-agent-postgres:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "curl -fsS http://localhost:1236/health || exit 1"]
+      test: [ "CMD-SHELL", "curl -fsS http://localhost:1236/health || exit 1" ]
       interval: 15s
       timeout: 5s
       retries: 5
@@ -670,7 +679,7 @@ services:
       dockerfile: docker/backend/Dockerfile
     expose:
       - "8100"
-    entrypoint: ["/bin/bash", "/app/start_sandbox_server.sh"]
+    entrypoint: [ "/bin/bash", "/app/start_sandbox_server.sh" ]
     environment:
       - SERVER_HOST=0.0.0.0
       - SERVER_PORT=8100
@@ -683,7 +692,7 @@ services:
       redis:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "curl -fsS http://localhost:8100/health || exit 1"]
+      test: [ "CMD-SHELL", "curl -fsS http://localhost:8100/health || exit 1" ]
       interval: 15s
       timeout: 5s
       retries: 5
@@ -725,7 +734,7 @@ services:
     volumes:
       - perform-debate-logs:/data/debate-logs
     healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:5001/health"]
+      test: [ "CMD", "wget", "-q", "--spider", "http://127.0.0.1:5001/health" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -760,7 +769,7 @@ services:
       - VERTEX_ENDPOINT_ID=${VERTEX_SAM2_ENDPOINT_ID}
       - WAR_ROOM_URL=http://war-room:5003
     healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:5002/health"]
+      test: [ "CMD", "wget", "-q", "--spider", "http://127.0.0.1:5002/health" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -800,7 +809,7 @@ services:
       - perform-rankings:/data/rankings
       - perform-content:/data/content
     healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:5003/health"]
+      test: [ "CMD", "wget", "-q", "--spider", "http://127.0.0.1:5003/health" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -833,6 +842,7 @@ volumes:
   perform-content:
   ii-agent-filestore:
   ii-agent-pgdata:
+
 
 networks:
   aims-network:

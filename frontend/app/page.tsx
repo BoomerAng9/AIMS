@@ -1,156 +1,463 @@
 "use client";
 
-import { SiteHeader } from "@/components/SiteHeader";
-import { Hero } from "@/components/landing/Hero";
-import Footer from "@/components/landing/Footer";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   MessageSquare,
   Trophy,
-  Shield,
-  Zap,
-  Clock,
+  Hammer,
+  Bird,
+  Sparkles,
+  ArrowRight,
   ChevronRight,
-  CheckCircle2,
-  Lock,
   Users,
   Code2,
   Workflow,
-  GraduationCap,
-  ArrowUpRight,
+  Shield,
+  Clock,
 } from "lucide-react";
-import { CONFERENCES, INDEPENDENTS, type Conference } from "@/lib/perform/conferences";
-import { TIER_STYLES, TREND_STYLES, getScoreColor } from "@/lib/perform/types";
 
 /* ═══════════════════════════════════════════════════════════
-   A.I.M.S. Landing Page
-   AIMS is the product. ACHEEVY is the AI orchestrator.
-   Per|Form conferences + Big Board are featured prominently.
-   Domain-aware Hero for plugmein.cloud vs aimanagedsolutions.cloud.
+   A.I.M.S. Landing Page — Warm Loft / Showroom Redesign
+   
+   Two domains, two vibes:
+   • aimanagedsolutions.cloud → Showroom (loft, warm, premium)
+   • plugmein.cloud → Storefront (ACHEEVY with plug cube)
+   
+   Post sign-up → Experience Selection Gateway
+   All chat routes → /chat (central hub)
    ═══════════════════════════════════════════════════════════ */
 
-// ── Prospect seed data (same as API route fallback) ──
-const PROSPECTS = [
-  { name: "Cameron Price", position: "QB", school: "IMG Academy", state: "FL", classYear: "'26", paiScore: 95, tier: "ELITE" as const, nationalRank: 1, trend: "STEADY" as const, previousRank: 1, nilEstimate: "$1M+", slug: "cameron-price" },
-  { name: "Marcus Johnson", position: "QB", school: "Oakwood HS", state: "TX", classYear: "'26", paiScore: 92, tier: "ELITE" as const, nationalRank: 3, trend: "UP" as const, previousRank: 5, nilEstimate: "$500K–$1M", slug: "marcus-johnson" },
-  { name: "Damien Brooks", position: "DE", school: "Riverside HS", state: "SC", classYear: "'26", paiScore: 91, tier: "ELITE" as const, nationalRank: 4, trend: "UP" as const, previousRank: 6, nilEstimate: "$400K–$800K", slug: "damien-brooks" },
-  { name: "Khalil Robinson", position: "CB", school: "St. Augustine Prep", state: "NJ", classYear: "'26", paiScore: 88, tier: "BLUE_CHIP" as const, nationalRank: 8, trend: "STEADY" as const, previousRank: 7, nilEstimate: "$300K–$600K", slug: "khalil-robinson" },
-  { name: "Isaiah Torres", position: "OT", school: "Don Bosco Prep", state: "NJ", classYear: "'26", paiScore: 86, tier: "BLUE_CHIP" as const, nationalRank: 10, trend: "UP" as const, previousRank: 14, nilEstimate: "$200K–$450K", slug: "isaiah-torres" },
-  { name: "DeShawn Williams", position: "WR", school: "Central HS", state: "GA", classYear: "'26", paiScore: 85, tier: "BLUE_CHIP" as const, nationalRank: 12, trend: "UP" as const, previousRank: 18, nilEstimate: "$250K–$500K", slug: "deshawn-williams" },
-  { name: "Andre Washington", position: "S", school: "Cass Tech", state: "MI", classYear: "'26", paiScore: 82, tier: "BLUE_CHIP" as const, nationalRank: 15, trend: "STEADY" as const, previousRank: 16, nilEstimate: "$150K–$350K", slug: "andre-washington" },
-  { name: "Jaylen Carter", position: "RB", school: "Summit Prep", state: "FL", classYear: "'27", paiScore: 78, tier: "PROSPECT" as const, nationalRank: 28, trend: "STEADY" as const, previousRank: 28, nilEstimate: "$100K–$250K", slug: "jaylen-carter" },
-  { name: "Trevor Mitchell", position: "LB", school: "Heritage Academy", state: "AL", classYear: "'26", paiScore: 68, tier: "SLEEPER" as const, nationalRank: 85, trend: "UP" as const, previousRank: 120, nilEstimate: "$10K–$50K", slug: "trevor-mitchell" },
-  { name: "Xavier Coleman", position: "WR", school: "Mater Dei", state: "CA", classYear: "'26", paiScore: 58, tier: "DEVELOPMENTAL" as const, nationalRank: 180, trend: "NEW" as const, previousRank: 0, nilEstimate: "$5K–$15K", slug: "xavier-coleman" },
+// ── Domain Detection ──
+function useIsShowroom(): boolean {
+  const [isShowroom, setIsShowroom] = useState(false);
+  useEffect(() => {
+    const host = window.location.hostname.replace(/^www\./, "");
+    setIsShowroom(
+      host === "aimanagedsolutions.cloud" ||
+      host === "localhost" ||
+      host === "127.0.0.1"
+    );
+  }, []);
+  return isShowroom;
+}
+
+// ── Animation Variants ──
+const fadeUp = {
+  hidden: { opacity: 0, y: 30 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.1, duration: 0.7, ease: [0.16, 1, 0.3, 1] },
+  }),
+};
+
+const scaleIn = {
+  hidden: { opacity: 0, scale: 0.9 },
+  visible: (i: number) => ({
+    opacity: 1,
+    scale: 1,
+    transition: { delay: i * 0.08, duration: 0.5, ease: [0.16, 1, 0.3, 1] },
+  }),
+};
+
+// ── Experience Tiles ──
+const EXPERIENCES = [
+  {
+    id: "chat",
+    title: "Chat w/ACHEEVY",
+    description: "Your AI executive orchestrator. Voice + text. Multi-model. Real-time streaming.",
+    icon: MessageSquare,
+    href: "/chat",
+    gradient: "from-amber-900/40 to-yellow-900/20",
+    border: "border-gold/30",
+    accent: "text-gold",
+    status: "live",
+  },
+  {
+    id: "perform",
+    title: "Per|Form Platform",
+    description: "AI-powered sports analytics. P.A.I. scoring. 131 programs. Big Board. War Room.",
+    icon: Trophy,
+    href: "/sandbox/perform",
+    gradient: "from-emerald-900/30 to-teal-900/20",
+    border: "border-emerald-500/30",
+    accent: "text-emerald-400",
+    status: "live",
+  },
+  {
+    id: "boomerang",
+    title: "Build a Boomer_Ang",
+    description: "Design and deploy your own specialized AI worker. Custom skills. Custom persona.",
+    icon: Hammer,
+    href: "/dashboard/boomerangs",
+    gradient: "from-blue-900/30 to-indigo-900/20",
+    border: "border-blue-500/30",
+    accent: "text-blue-400",
+    status: "beta",
+  },
+  {
+    id: "chicken-hawk",
+    title: "Unleash Chicken Hawk",
+    description: "Autonomous execution engine. Chicken Hawk spawns Lil_Hawks to handle multi-step tasks.",
+    icon: Bird,
+    href: "/dashboard/deploy-dock",
+    gradient: "from-purple-900/30 to-violet-900/20",
+    border: "border-purple-500/30",
+    accent: "text-purple-400",
+    status: "beta",
+  },
+  {
+    id: "coming-soon",
+    title: "Coming Soon",
+    description: "PersonaPlex Voice Agent. Plug Marketplace. Autonomous Scheduling. Always growing.",
+    icon: Sparkles,
+    href: "#roadmap",
+    gradient: "from-white/[0.03] to-white/[0.01]",
+    border: "border-white/10",
+    accent: "text-white/50",
+    status: "planned",
+  },
 ];
 
-export default function HomePage() {
+// ── Status Badge ──
+function StatusBadge({ status }: { status: string }) {
+  const styles = {
+    live: "bg-emerald-500/15 text-emerald-400 border-emerald-500/25",
+    beta: "bg-amber-500/15 text-amber-400 border-amber-500/25",
+    planned: "bg-white/5 text-white/40 border-white/10",
+  };
+  const labels = { live: "Live", beta: "Beta", planned: "Planned" };
   return (
-    <main className="relative flex flex-col min-h-screen bg-obsidian">
-      {/* Stitch Nano: noise texture overlay (retro-futurism layer) */}
-      <div className="texture-noise" aria-hidden="true" />
-      <SiteHeader />
-      <Hero />
-      <LiveNowSection />
-      <ConferencesSection />
-      <BigBoardSection />
-      <WhyAIMSSection />
-      <RoadmapSection />
-      <FinalCTASection />
-      <Footer />
+    <span className={`inline-flex items-center gap-1.5 text-[11px] font-mono uppercase tracking-wider rounded-full px-2.5 py-0.5 border ${styles[status as keyof typeof styles] || styles.planned}`}>
+      {status === "live" && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />}
+      {labels[status as keyof typeof labels] || status}
+    </span>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════
+// MAIN PAGE
+// ═══════════════════════════════════════════════════════════
+
+export default function HomePage() {
+  const isShowroom = useIsShowroom();
+
+  return (
+    <main className="relative flex flex-col min-h-screen bg-loft-bg overflow-x-hidden">
+      {/* Warm ambient grain overlay */}
+      <div
+        className="fixed inset-0 pointer-events-none z-[1] opacity-[0.04]"
+        aria-hidden="true"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+        }}
+      />
+
+      {/* Warm vignette */}
+      <div
+        className="fixed inset-0 pointer-events-none z-[2]"
+        aria-hidden="true"
+        style={{
+          background: "radial-gradient(ellipse at center, transparent 40%, rgba(12,8,4,0.6) 100%)",
+        }}
+      />
+
+      <SiteNav />
+      {isShowroom ? <ShowroomHero /> : <PlugmeinHero />}
+      <ExperienceGateway />
+      <PlatformPillars />
+      <RoadmapPreview />
+      <FinalCTA />
+      <SiteFooter />
     </main>
   );
 }
 
-/* ─── Live Now ─────────────────────────────────────────────── */
+/* ─── Site Nav ─────────────────────────────────────────────── */
 
-const LIVE_FEATURES = [
-  {
-    icon: MessageSquare,
-    title: "Chat with ACHEEVY",
-    description:
-      "Full LLM streaming with model selection (Claude, Qwen, Gemini, Kimi). Voice input. File attachments. Thread history.",
-    href: "/chat",
-  },
-  {
-    icon: Shield,
-    title: "Dashboard + Health Monitor",
-    description:
-      "Real-time platform health, onboarding flow, and quick-access to all AIMS capabilities.",
-    href: "/dashboard",
-  },
-  {
-    icon: Trophy,
-    title: "Per|Form Sports Analytics",
-    description:
-      "P.A.I. prospect scoring, Big Board rankings, scouting content feed. 131 programs. 10 conferences.",
-    href: "/sandbox/perform",
-  },
-  {
-    icon: GraduationCap,
-    title: "Conference Directory",
-    description:
-      "Complete CFB directory — Power 4, Group of 5, Independents. Every team, coach, stadium, and recruiting contact.",
-    href: "/sandbox/perform/directory",
-  },
-  {
-    icon: Zap,
-    title: "Integrations Lab",
-    description:
-      "Test connected services — Groq, Brave Search, ElevenLabs TTS, E2B Sandbox — with live pass/fail results.",
-    href: "/integrations",
-  },
-  {
-    icon: Code2,
-    title: "Sandbox",
-    description:
-      "Experiment with verticals, tools, and AI capabilities in a safe sandbox environment.",
-    href: "/sandbox",
-  },
-];
-
-function LiveNowSection() {
+function SiteNav() {
   return (
-    <section id="live-now" className="border-t border-white/[0.06]">
-      <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
-        <div className="text-center mb-16">
-          <p className="text-xs font-mono uppercase tracking-[0.2em] text-emerald-400/80 mb-3">
-            Live Now
-          </p>
-          <h2 className="font-display text-3xl font-bold sm:text-4xl">
-            What you can use today
-          </h2>
-          <p className="mt-4 text-white/50 max-w-xl mx-auto">
-            These features are built, deployed, and working. Try them now.
-          </p>
+    <nav className="sticky top-0 z-50 backdrop-blur-md bg-loft-bg/80 border-b border-loft-floor/30">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 h-14 flex items-center justify-between">
+        <Link href="/" className="flex items-center gap-2.5 group">
+          <Image
+            src="/images/acheevy/acheevy-helmet.png"
+            alt="A.I.M.S."
+            width={28}
+            height={28}
+            className="rounded-lg group-hover:scale-110 transition-transform"
+          />
+          <span
+            className="text-lg font-black text-loft-cream tracking-wider"
+            style={{ fontFamily: "var(--font-marker), cursive" }}
+          >
+            A.I.M.S.
+          </span>
+        </Link>
+
+        <div className="flex items-center gap-3">
+          <Link
+            href="/chat"
+            className="hidden sm:inline-flex items-center gap-2 text-sm text-loft-tan hover:text-loft-cream transition-colors"
+          >
+            Chat w/ACHEEVY
+          </Link>
+          <Link
+            href="/(auth)/sign-in"
+            className="inline-flex items-center gap-2 h-9 px-5 rounded-lg bg-gold text-loft-bg text-sm font-semibold hover:bg-gold-light transition-colors"
+          >
+            Sign In
+          </Link>
+        </div>
+      </div>
+    </nav>
+  );
+}
+
+/* ─── Showroom Hero (aimanagedsolutions.cloud) ─────────────── */
+
+function ShowroomHero() {
+  return (
+    <section className="relative min-h-[85vh] flex items-center overflow-hidden">
+      {/* Showroom background */}
+      <div className="absolute inset-0" aria-hidden="true">
+        <Image
+          src="/images/acheevy/showroom-hero.png"
+          alt=""
+          fill
+          priority
+          className="object-cover object-center opacity-50"
+          sizes="100vw"
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(to bottom, rgba(28,20,16,0.4) 0%, rgba(28,20,16,0.2) 30%, rgba(28,20,16,0.6) 70%, rgba(28,20,16,0.98) 100%)",
+          }}
+        />
+      </div>
+
+      <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 py-20 md:py-28 w-full">
+        <div className="max-w-2xl">
+          {/* System badge */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-gold/20 bg-gold/5 mb-8"
+          >
+            <div className="relative w-2.5 h-2.5">
+              <div className="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-40" />
+              <div className="relative w-full h-full rounded-full bg-emerald-400" />
+            </div>
+            <span className="text-sm text-loft-cream/80 font-mono tracking-wide">
+              System Online
+            </span>
+          </motion.div>
+
+          {/* Title */}
+          <motion.h1
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.8 }}
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-loft-cream mb-4 leading-[1.1]"
+            style={{
+              fontFamily: 'var(--font-marker), "Permanent Marker", cursive',
+              textShadow: "0 4px 40px rgba(212,168,67,0.15)",
+            }}
+          >
+            A.I.M.S.
+          </motion.h1>
+
+          {/* Subtitle */}
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="text-lg sm:text-xl md:text-2xl text-gold font-bold tracking-[0.15em] uppercase mb-6"
+            style={{ fontFamily: 'var(--font-doto), "Doto", monospace' }}
+          >
+            AI Managed Solutions
+          </motion.h2>
+
+          {/* Copy */}
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+            className="text-base sm:text-lg text-loft-cream/70 max-w-lg leading-relaxed mb-10"
+          >
+            I&apos;m ACHEEVY, at your service. Your AI-managed operations
+            platform — 25 specialized agents, voice-first orchestration, and
+            evidence-based execution.
+          </motion.p>
+
+          {/* CTAs */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7 }}
+            className="flex flex-col sm:flex-row gap-4"
+          >
+            <Link
+              href="/chat"
+              className="inline-flex items-center justify-center gap-2 h-12 px-8 rounded-xl bg-gold text-loft-bg text-base font-bold hover:shadow-[0_0_30px_rgba(212,175,55,0.3)] transition-all"
+            >
+              Chat w/ACHEEVY
+              <MessageSquare className="w-5 h-5" />
+            </Link>
+            <Link
+              href="#experiences"
+              className="inline-flex items-center justify-center gap-2 h-12 px-8 rounded-xl border border-loft-tan/30 text-loft-cream text-base font-medium hover:border-gold/40 hover:bg-gold/5 transition-all"
+            >
+              Choose Your Experience
+              <ChevronRight className="w-4 h-4" />
+            </Link>
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ─── Plugmein Hero (plugmein.cloud) ───────────────────────── */
+
+function PlugmeinHero() {
+  return (
+    <section className="relative min-h-[85vh] flex items-center overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-b from-loft-bg via-loft-wall to-loft-bg" />
+
+      <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 py-20 md:py-28 w-full">
+        <div className="flex flex-col lg:flex-row items-center gap-12">
+          {/* Text side */}
+          <div className="flex-1 text-center lg:text-left">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <h1
+                className="text-4xl sm:text-5xl md:text-6xl font-black text-loft-cream mb-4 leading-[1.1]"
+                style={{
+                  fontFamily: 'var(--font-marker), "Permanent Marker", cursive',
+                  textShadow: "0 4px 40px rgba(212,168,67,0.15)",
+                }}
+              >
+                PLUG ME IN
+              </h1>
+              <p
+                className="text-xl text-gold/80 tracking-[0.2em] uppercase font-bold mb-6"
+                style={{ fontFamily: 'var(--font-doto), "Doto", monospace' }}
+              >
+                Deploy More Plugs
+              </p>
+              <p className="text-base sm:text-lg text-loft-cream/60 max-w-md mx-auto lg:mx-0 leading-relaxed mb-8">
+                ACHEEVY builds apps autonomously, deploys to CDN, and delivers
+                to users. From conversation to working software.
+              </p>
+              <Link
+                href="/chat"
+                className="inline-flex items-center justify-center gap-2 h-12 px-8 rounded-xl bg-gold text-loft-bg text-base font-bold hover:shadow-[0_0_30px_rgba(212,175,55,0.3)] transition-all"
+              >
+                Start Building
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+            </motion.div>
+          </div>
+
+          {/* ACHEEVY character */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.4, duration: 0.8 }}
+            className="flex-shrink-0"
+          >
+            <div className="relative w-[280px] h-[380px] sm:w-[340px] sm:h-[460px]">
+              <Image
+                src="/images/acheevy/hero-character.png"
+                alt="ACHEEVY holding a plug"
+                fill
+                className="object-contain drop-shadow-[0_20px_60px_rgba(212,175,55,0.15)]"
+                priority
+              />
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ─── Experience Gateway ───────────────────────────────────── */
+
+function ExperienceGateway() {
+  return (
+    <section id="experiences" className="relative border-t border-loft-floor/20">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 py-20 sm:py-28">
+        <div className="text-center mb-14">
+          <motion.p
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            className="text-xs font-mono uppercase tracking-[0.25em] text-gold/60 mb-3"
+          >
+            Choose Your Experience
+          </motion.p>
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-2xl sm:text-3xl md:text-4xl font-bold text-loft-cream"
+            style={{ fontFamily: 'var(--font-doto), "Doto", monospace' }}
+          >
+            What will we build today?
+          </motion.h2>
         </div>
 
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {LIVE_FEATURES.map((feature) => (
-            <Link
-              key={feature.title}
-              href={feature.href}
-              className="group wireframe-card p-6 hover:border-emerald-500/30 transition-all duration-300"
+          {EXPERIENCES.map((exp, i) => (
+            <motion.div
+              key={exp.id}
+              custom={i}
+              variants={scaleIn}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
             >
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] group-hover:border-emerald-500/20 group-hover:bg-emerald-500/[0.05] transition-colors">
-                  <feature.icon className="h-5 w-5 text-white/50 group-hover:text-emerald-400 transition-colors" />
+              <Link
+                href={exp.href}
+                className={`group block rounded-2xl border ${exp.border} bg-gradient-to-b ${exp.gradient} p-6 hover:scale-[1.02] hover:shadow-[0_8px_40px_rgba(0,0,0,0.3)] transition-all duration-300 h-full`}
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <div
+                    className={`w-11 h-11 rounded-xl border ${exp.border} bg-black/20 flex items-center justify-center group-hover:scale-110 transition-transform`}
+                  >
+                    <exp.icon className={`w-5 h-5 ${exp.accent}`} />
+                  </div>
+                  <StatusBadge status={exp.status} />
                 </div>
-                <span className="inline-flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-wider text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-2.5 py-0.5">
-                  <CheckCircle2 className="w-3 h-3" />
-                  Live
-                </span>
-              </div>
-              <h3 className="text-base font-semibold text-white mb-2 group-hover:text-emerald-50 transition-colors">
-                {feature.title}
-              </h3>
-              <p className="text-sm text-white/50 leading-relaxed">
-                {feature.description}
-              </p>
-              <div className="mt-4 flex items-center gap-1 text-xs text-emerald-400/70 group-hover:text-emerald-400 transition-colors">
-                Try it now
-                <ChevronRight className="w-3 h-3" />
-              </div>
-            </Link>
+
+                <h3
+                  className={`text-lg font-bold text-loft-cream mb-2 group-hover:${exp.accent} transition-colors`}
+                >
+                  {exp.title}
+                </h3>
+                <p className="text-sm text-loft-cream/50 leading-relaxed mb-4">
+                  {exp.description}
+                </p>
+
+                <div
+                  className={`flex items-center gap-1.5 text-xs font-mono ${exp.accent} opacity-60 group-hover:opacity-100 transition-opacity`}
+                >
+                  {exp.status === "planned" ? "Coming soon" : "Enter"}
+                  <ArrowRight className="w-3 h-3" />
+                </div>
+              </Link>
+            </motion.div>
           ))}
         </div>
       </div>
@@ -158,459 +465,149 @@ function LiveNowSection() {
   );
 }
 
-/* ─── Conferences ──────────────────────────────────────────── */
+/* ─── Platform Pillars ─────────────────────────────────────── */
 
-function ConferenceCard({ conf }: { conf: Conference }) {
-  const visibleTeams = conf.teams.slice(0, 5);
-  const remaining = conf.teams.length - visibleTeams.length;
-
-  return (
-    <Link
-      href="/sandbox/perform/directory"
-      className="group wireframe-card p-4 hover:border-gold/30 transition-all duration-300"
-    >
-      <div className="flex items-center justify-between mb-3">
-        <h4 className="text-sm font-bold text-white group-hover:text-gold transition-colors">
-          {conf.abbreviation}
-        </h4>
-        <span className={`text-[10px] font-mono uppercase tracking-wider rounded-full px-2 py-0.5 ${
-          conf.tier === "power4"
-            ? "text-gold bg-gold/10 border border-gold/20"
-            : "text-blue-400 bg-blue-400/10 border border-blue-400/20"
-        }`}>
-          {conf.teams.length} teams
-        </span>
-      </div>
-      <p className="text-xs text-white/40 mb-3 truncate">
-        {conf.name}
-      </p>
-      {/* Team list with color indicators */}
-      <div className="flex flex-col gap-1">
-        {visibleTeams.map((team) => (
-          <div key={team.id} className="flex items-center gap-2">
-            <div
-              className="w-2.5 h-2.5 rounded-full flex-shrink-0 border border-white/10"
-              style={{ backgroundColor: team.colors[0]?.hex || "#666" }}
-            />
-            <span className="text-[11px] text-white/50 truncate group-hover:text-white/70 transition-colors">
-              {team.commonName}
-            </span>
-          </div>
-        ))}
-        {remaining > 0 && (
-          <span className="text-[10px] text-white/30 pl-[18px]">
-            +{remaining} more
-          </span>
-        )}
-      </div>
-    </Link>
-  );
-}
-
-function ConferencesSection() {
-  const power4 = CONFERENCES.filter((c) => c.tier === "power4");
-  const g5 = CONFERENCES.filter((c) => c.tier === "group_of_5");
-  const totalTeams = CONFERENCES.reduce((sum, c) => sum + c.teams.length, 0) + INDEPENDENTS.length;
-
-  return (
-    <section className="border-t border-white/[0.06] bg-[#080808]">
-      <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
-        <div className="text-center mb-12">
-          <p className="text-xs font-mono uppercase tracking-[0.2em] text-gold/60 mb-3">
-            Per|Form Directory
-          </p>
-          <h2 className="font-display text-3xl font-bold sm:text-4xl">
-            {totalTeams} Programs. Every Conference.
-          </h2>
-          <p className="mt-4 text-white/50 max-w-xl mx-auto">
-            Complete college football directory with coaching staffs, stadiums, team colors, and recruiting contacts.
-          </p>
-        </div>
-
-        {/* Power 4 */}
-        <div className="mb-6">
-          <div className="flex items-center gap-2 mb-4">
-            <span className="text-xs font-mono uppercase tracking-wider text-gold/70">Power 4</span>
-            <div className="h-px flex-1 bg-gold/10" />
-          </div>
-          <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
-            {power4.map((conf) => (
-              <ConferenceCard key={conf.id} conf={conf} />
-            ))}
-          </div>
-        </div>
-
-        {/* Group of 5 */}
-        <div className="mb-6">
-          <div className="flex items-center gap-2 mb-4">
-            <span className="text-xs font-mono uppercase tracking-wider text-blue-400/70">Group of 5</span>
-            <div className="h-px flex-1 bg-blue-400/10" />
-          </div>
-          <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
-            {g5.map((conf) => (
-              <ConferenceCard key={conf.id} conf={conf} />
-            ))}
-          </div>
-        </div>
-
-        {/* Independents + CTA */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6">
-          <p className="text-sm text-white/40">
-            + {INDEPENDENTS.length} Independents: {INDEPENDENTS.map((t) => t.commonName).join(", ")}
-          </p>
-          <Link
-            href="/sandbox/perform/directory"
-            className="inline-flex items-center gap-2 text-sm text-gold/80 hover:text-gold transition-colors"
-          >
-            Browse all teams
-            <ArrowUpRight className="w-4 h-4" />
-          </Link>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ─── Big Board (All Prospects) ────────────────────────────── */
-
-function BigBoardSection() {
-  return (
-    <section className="border-t border-white/[0.06]">
-      <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
-        <div className="text-center mb-12">
-          <p className="text-xs font-mono uppercase tracking-[0.2em] text-gold/60 mb-3">
-            Per|Form Big Board
-          </p>
-          <h2 className="font-display text-3xl font-bold sm:text-4xl">
-            Top Prospects — P.A.I. Rankings
-          </h2>
-          <p className="mt-4 text-white/50 max-w-xl mx-auto">
-            Performance. Athleticism. Intangibles. AI-powered scouting with Bull vs Bear debate analysis.
-          </p>
-        </div>
-
-        {/* Mobile: card layout */}
-        <div className="flex flex-col gap-3 md:hidden">
-          {PROSPECTS.map((p) => {
-            const tierStyle = TIER_STYLES[p.tier];
-            const trendStyle = TREND_STYLES[p.trend];
-            const scoreColor = getScoreColor(p.paiScore);
-            const delta = p.trend === "UP" && p.previousRank > 0
-              ? p.previousRank - p.nationalRank
-              : 0;
-
-            return (
-              <Link
-                key={p.slug}
-                href={`/sandbox/perform/prospects/${p.slug}`}
-                className="wireframe-card p-4 hover:border-gold/30 transition-all duration-300"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-xs font-mono text-white/30">#{p.nationalRank}</span>
-                      <span className="text-xs font-mono text-white/60 bg-white/[0.04] rounded px-1.5 py-0.5">
-                        {p.position}
-                      </span>
-                      <span className="text-xs text-white/40">{p.classYear}</span>
-                    </div>
-                    <h4 className="text-sm font-semibold text-white truncate">{p.name}</h4>
-                    <p className="text-xs text-white/40">{p.school}, {p.state}</p>
-                  </div>
-                  <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
-                    <span className={`text-2xl font-bold font-display ${scoreColor}`}>
-                      {p.paiScore}
-                    </span>
-                    <span className={`text-[10px] font-mono uppercase tracking-wider rounded-full px-2 py-0.5 ${tierStyle.bg} ${tierStyle.border} ${tierStyle.text} border`}>
-                      {tierStyle.label}
-                    </span>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between mt-2 pt-2 border-t border-white/[0.04]">
-                  <span className={`text-xs font-mono ${trendStyle.color}`}>
-                    {trendStyle.icon}
-                    {delta > 0 && <span className="ml-0.5">+{delta}</span>}
-                  </span>
-                  <span className="text-xs text-white/40">{p.nilEstimate}</span>
-                </div>
-              </Link>
-            );
-          })}
-        </div>
-
-        {/* Desktop: table layout */}
-        <div className="hidden md:block overflow-x-auto rounded-xl border border-white/[0.06] bg-black/40">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-white/[0.06]">
-                <th className="p-3 text-left text-[10px] font-mono uppercase tracking-wider text-white/30 w-12">#</th>
-                <th className="p-3 text-left text-[10px] font-mono uppercase tracking-wider text-white/30">Prospect</th>
-                <th className="p-3 text-center text-[10px] font-mono uppercase tracking-wider text-white/30">Pos</th>
-                <th className="p-3 text-center text-[10px] font-mono uppercase tracking-wider text-white/30">Class</th>
-                <th className="p-3 text-center text-[10px] font-mono uppercase tracking-wider text-white/30">P.A.I.</th>
-                <th className="p-3 text-center text-[10px] font-mono uppercase tracking-wider text-white/30">Tier</th>
-                <th className="p-3 text-center text-[10px] font-mono uppercase tracking-wider text-white/30">Trend</th>
-                <th className="p-3 text-right text-[10px] font-mono uppercase tracking-wider text-white/30">NIL Est.</th>
-              </tr>
-            </thead>
-            <tbody>
-              {PROSPECTS.map((p) => {
-                const tierStyle = TIER_STYLES[p.tier];
-                const trendStyle = TREND_STYLES[p.trend];
-                const scoreColor = getScoreColor(p.paiScore);
-                const delta = p.trend === "UP" && p.previousRank > 0
-                  ? p.previousRank - p.nationalRank
-                  : 0;
-
-                return (
-                  <tr
-                    key={p.slug}
-                    className="border-t border-white/[0.03] hover:bg-white/[0.02] transition-colors"
-                  >
-                    <td className="p-3 text-sm font-mono text-white/40">
-                      {p.nationalRank}
-                    </td>
-                    <td className="p-3">
-                      <Link
-                        href={`/sandbox/perform/prospects/${p.slug}`}
-                        className="group"
-                      >
-                        <span className="text-sm font-semibold text-white group-hover:text-gold transition-colors">
-                          {p.name}
-                        </span>
-                        <span className="block text-xs text-white/40">
-                          {p.school}, {p.state}
-                        </span>
-                      </Link>
-                    </td>
-                    <td className="p-3 text-center">
-                      <span className="text-xs font-mono text-white/60 bg-white/[0.04] rounded px-1.5 py-0.5">
-                        {p.position}
-                      </span>
-                    </td>
-                    <td className="p-3 text-center text-xs text-white/50">
-                      {p.classYear}
-                    </td>
-                    <td className="p-3 text-center">
-                      <span className={`text-lg font-bold font-display ${scoreColor}`}>
-                        {p.paiScore}
-                      </span>
-                    </td>
-                    <td className="p-3 text-center">
-                      <span className={`text-[10px] font-mono uppercase tracking-wider rounded-full px-2 py-0.5 ${tierStyle.bg} ${tierStyle.border} ${tierStyle.text} border`}>
-                        {tierStyle.label}
-                      </span>
-                    </td>
-                    <td className="p-3 text-center">
-                      <span className={`text-xs font-mono ${trendStyle.color}`}>
-                        {trendStyle.icon}
-                        {delta > 0 && <span className="ml-0.5">+{delta}</span>}
-                      </span>
-                    </td>
-                    <td className="p-3 text-right text-xs text-white/50">
-                      {p.nilEstimate}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="flex justify-center mt-6">
-          <Link
-            href="/sandbox/perform/big-board"
-            className="inline-flex items-center gap-2 text-sm text-gold/80 hover:text-gold transition-colors"
-          >
-            View full Big Board with scouting reports
-            <ArrowUpRight className="w-4 h-4" />
-          </Link>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ─── Why AIMS ─────────────────────────────────────────────── */
-
-const PLATFORM_PILLARS = [
+const PILLARS = [
   {
     icon: Users,
     title: "25 AI Agents",
-    description: "Boomer_Ang workers — researcher, coder, designer, marketer — executing real tasks end-to-end under ACHEEVY's command.",
+    description:
+      "Boomer_Ang workers — researcher, coder, designer, marketer — executing real tasks end-to-end under ACHEEVY's command.",
   },
   {
     icon: Workflow,
     title: "Managed Operations",
-    description: "From project management to deployment. ACHEEVY orchestrates your business operations with evidence-based execution.",
+    description:
+      "From project management to deployment. ACHEEVY orchestrates your business operations with evidence-based execution.",
   },
   {
     icon: Code2,
     title: "Vibe Coding",
-    description: "Conversate your way to working applications. ACHEEVY builds and deploys aiPLUGs — real apps from conversation.",
+    description:
+      "Conversate your way to working applications. ACHEEVY builds and deploys aiPLUGs — real apps from conversation.",
   },
   {
     icon: Shield,
     title: "No Proof, No Done",
-    description: "Every completed task requires evidence. Built-in accountability across every operation and workflow.",
+    description:
+      "Every completed task requires evidence. Built-in accountability across every operation and workflow.",
   },
 ];
 
-function WhyAIMSSection() {
+function PlatformPillars() {
   return (
-    <section className="relative border-t border-white/[0.06] bg-[#080808]">
-      <div className="absolute inset-0 bg-dots opacity-30 pointer-events-none" aria-hidden="true" />
-      <div className="relative mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
-        <div className="text-center mb-16">
-          <p className="text-xs font-mono uppercase tracking-[0.2em] text-gold/60 mb-3">
+    <section className="relative border-t border-loft-floor/20 bg-loft-wall/50">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 py-20 sm:py-28">
+        <div className="text-center mb-14">
+          <p className="text-xs font-mono uppercase tracking-[0.25em] text-gold/60 mb-3">
             The Platform
           </p>
-          <h2 className="font-display text-3xl font-bold sm:text-4xl">
+          <h2
+            className="text-2xl sm:text-3xl md:text-4xl font-bold text-loft-cream"
+            style={{ fontFamily: 'var(--font-doto), "Doto", monospace' }}
+          >
             AI Managed Solutions
           </h2>
-          <p className="mt-4 text-white/50 max-w-2xl mx-auto">
-            AIMS is a full-stack AI operations platform. ACHEEVY orchestrates a team of specialized agents
-            to handle your business — from content creation to code deployment.
+          <p className="mt-4 text-loft-cream/50 max-w-2xl mx-auto text-sm sm:text-base leading-relaxed">
+            A.I.M.S. is a full-stack AI operations platform. ACHEEVY
+            orchestrates a team of specialized agents to handle your business —
+            from content creation to code deployment.
           </p>
         </div>
 
         <div className="grid gap-6 sm:grid-cols-2">
-          {PLATFORM_PILLARS.map((pillar) => (
-            <div
+          {PILLARS.map((pillar, i) => (
+            <motion.div
               key={pillar.title}
-              className="wireframe-card p-6"
+              custom={i}
+              variants={fadeUp}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              className="rounded-2xl border border-loft-floor/30 bg-loft-bg/60 p-6 backdrop-blur-sm"
             >
               <div className="flex items-center gap-3 mb-3">
-                <div className="h-10 w-10 rounded-xl border border-gold/20 bg-gold/[0.05] flex items-center justify-center">
+                <div className="h-10 w-10 rounded-xl border border-gold/20 bg-gold/5 flex items-center justify-center">
                   <pillar.icon className="w-5 h-5 text-gold/70" />
                 </div>
-                <h3 className="text-base font-semibold text-white">
+                <h3 className="text-base font-semibold text-loft-cream">
                   {pillar.title}
                 </h3>
               </div>
-              <p className="text-sm text-white/50 leading-relaxed">
+              <p className="text-sm text-loft-cream/50 leading-relaxed">
                 {pillar.description}
               </p>
-            </div>
+            </motion.div>
           ))}
         </div>
-      </div>  {/* closes relative wrapper */}
+      </div>
     </section>
   );
 }
 
-/* ─── Roadmap ──────────────────────────────────────────────── */
+/* ─── Roadmap Preview ──────────────────────────────────────── */
 
-const ROADMAP_ITEMS = [
-  {
-    title: "Chicken Hawk Execution Engine",
-    description: "Manifest-based autonomous task execution. Spawns Lil_Hawk squads to execute multi-step work.",
-    status: "wiring" as const,
-    eta: "Now",
-  },
-  {
-    title: "II-Agent Autonomous Backend",
-    description: "Full-stack dev, deep research, browser automation, and code execution via the ii-agent engine.",
-    status: "wiring" as const,
-    eta: "Now",
-  },
-  {
-    title: "Boomer_Ang Workers",
-    description: "25 specialized AI agents (researcher, coder, designer, marketer, etc.) executing real tasks end-to-end.",
-    status: "building" as const,
-    eta: "Q1 2026",
-  },
+const ROADMAP = [
   {
     title: "Google OAuth + Stripe Payments",
-    description: "One-click Google sign-in and subscription billing through Stripe for the 3-6-9 pricing model.",
-    status: "building" as const,
-    eta: "Q1 2026",
+    eta: "Now",
+    status: "wiring",
   },
   {
     title: "Per|Form Live Pipeline",
-    description: "Nightly autonomous scouting runs, real Brave Search data, SAM 2 film analysis on Vertex AI.",
-    status: "building" as const,
     eta: "Q1 2026",
+    status: "building",
   },
   {
     title: "PersonaPlex Full-Duplex Voice",
-    description: "NVIDIA Nemotron-powered voice agent with real-time bidirectional conversation via GCP Cloud Run.",
-    status: "planned" as const,
     eta: "Q2 2026",
+    status: "planned",
   },
   {
     title: "Plug Marketplace + CDN Deploy",
-    description: "ACHEEVY builds apps autonomously, deploys to CDN, and delivers to users. Revenue generation loop.",
-    status: "planned" as const,
     eta: "Q2 2026",
-  },
-  {
-    title: "Autonomous Scheduling",
-    description: "Cloud Run cron jobs, background workers, and event-driven agent loops. Always-on operations.",
-    status: "planned" as const,
-    eta: "Q2 2026",
+    status: "planned",
   },
 ];
 
-function RoadmapSection() {
+function RoadmapPreview() {
   return (
-    <section id="roadmap" className="border-t border-white/[0.06]">
-      <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
-        <div className="text-center mb-16">
-          <p className="text-xs font-mono uppercase tracking-[0.2em] text-gold/60 mb-3">
+    <section id="roadmap" className="border-t border-loft-floor/20">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 py-20 sm:py-28">
+        <div className="text-center mb-14">
+          <p className="text-xs font-mono uppercase tracking-[0.25em] text-gold/60 mb-3">
             Roadmap
           </p>
-          <h2 className="font-display text-3xl font-bold sm:text-4xl">
+          <h2
+            className="text-2xl sm:text-3xl font-bold text-loft-cream"
+            style={{ fontFamily: 'var(--font-doto), "Doto", monospace' }}
+          >
             What&apos;s coming next
           </h2>
-          <p className="mt-4 text-white/50 max-w-xl mx-auto">
-            Building in public. Every feature ships when it works — no placeholders, no demos.
-          </p>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          {ROADMAP_ITEMS.map((item) => (
+          {ROADMAP.map((item) => (
             <div
               key={item.title}
-              className="wireframe-card p-5 flex gap-4"
+              className="rounded-xl border border-loft-floor/20 bg-loft-wall/30 p-5 flex items-center gap-4"
             >
-              <div className="flex-shrink-0 mt-0.5">
-                {item.status === "wiring" ? (
-                  <div className="h-8 w-8 rounded-lg border border-amber-500/30 bg-amber-500/10 flex items-center justify-center">
-                    <Zap className="w-4 h-4 text-amber-400" />
-                  </div>
-                ) : item.status === "building" ? (
-                  <div className="h-8 w-8 rounded-lg border border-blue-500/30 bg-blue-500/10 flex items-center justify-center">
-                    <Clock className="w-4 h-4 text-blue-400" />
-                  </div>
-                ) : (
-                  <div className="h-8 w-8 rounded-lg border border-white/10 bg-white/[0.03] flex items-center justify-center">
-                    <Lock className="w-4 h-4 text-white/30" />
-                  </div>
-                )}
-              </div>
+              <div
+                className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${item.status === "wiring"
+                    ? "bg-amber-400"
+                    : item.status === "building"
+                      ? "bg-blue-400"
+                      : "bg-white/20"
+                  }`}
+              />
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <h3 className="text-sm font-semibold text-white truncate">
-                    {item.title}
-                  </h3>
-                  <span className={`flex-shrink-0 text-[10px] font-mono uppercase tracking-wider rounded-full px-2 py-0.5 ${
-                    item.status === "wiring"
-                      ? "text-amber-400 bg-amber-500/10 border border-amber-500/20"
-                      : item.status === "building"
-                      ? "text-blue-400 bg-blue-500/10 border border-blue-500/20"
-                      : "text-white/40 bg-white/[0.03] border border-white/10"
-                  }`}>
-                    {item.status === "wiring" ? "In Progress" : item.status === "building" ? "Building" : "Planned"}
-                  </span>
-                </div>
-                <p className="text-xs text-white/40 leading-relaxed">
-                  {item.description}
-                </p>
-                <p className="mt-1.5 text-[10px] font-mono text-white/25 uppercase">
-                  ETA: {item.eta}
-                </p>
+                <h3 className="text-sm font-semibold text-loft-cream truncate">
+                  {item.title}
+                </h3>
               </div>
+              <span className="text-[11px] font-mono text-loft-cream/30 uppercase flex-shrink-0">
+                {item.eta}
+              </span>
             </div>
           ))}
         </div>
@@ -621,35 +618,84 @@ function RoadmapSection() {
 
 /* ─── Final CTA ────────────────────────────────────────────── */
 
-function FinalCTASection() {
+function FinalCTA() {
   return (
-    <section className="relative border-t border-white/[0.06] bg-[#080808]">
-      <div className="absolute inset-0 vignette-overlay" aria-hidden="true" />
-      <div className="relative mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
-        <div className="wireframe-card relative overflow-hidden p-8 sm:p-12 lg:p-16 text-center">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(212,175,55,0.05)_0%,transparent_60%)]" />
+    <section className="relative border-t border-loft-floor/20 bg-loft-wall/40">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 py-20 sm:py-28">
+        <div className="relative rounded-3xl border border-gold/15 bg-gradient-to-b from-gold/[0.06] to-transparent p-8 sm:p-12 lg:p-16 text-center overflow-hidden">
+          {/* ACHEEVY avatar */}
+          <div className="w-16 h-16 mx-auto mb-6 rounded-2xl border border-gold/20 bg-loft-bg overflow-hidden">
+            <Image
+              src="/images/acheevy/acheevy-helmet-chat.png"
+              alt="ACHEEVY"
+              width={64}
+              height={64}
+              className="w-full h-full object-cover"
+            />
+          </div>
 
-          <div className="relative">
-            <h2 className="font-display text-3xl font-bold sm:text-4xl mb-4">
-              Your AI business architect awaits.
-            </h2>
-            <p className="text-white/50 max-w-lg mx-auto mb-8">
-              ACHEEVY is live and building in public. Chat is live, the dashboard is live,
-              and execution engines are being wired now.
-            </p>
-            <div className="flex flex-col gap-4 sm:flex-row justify-center">
-              <Link href="/chat" className="btn-primary h-12 px-8 text-sm">
-                Chat with ACHEEVY
-                <MessageSquare className="w-4 h-4" />
-              </Link>
-              <Link href="/dashboard" className="btn-secondary h-12 px-8 text-sm">
-                Open Dashboard
-                <Shield className="w-4 h-4" />
-              </Link>
-            </div>
+          <h2
+            className="text-2xl sm:text-3xl md:text-4xl font-bold text-loft-cream mb-4"
+            style={{ fontFamily: 'var(--font-doto), "Doto", monospace' }}
+          >
+            Your AI team awaits.
+          </h2>
+          <p className="text-loft-cream/50 max-w-lg mx-auto mb-8 text-sm sm:text-base leading-relaxed">
+            ACHEEVY is live and building in public. Chat is live, the dashboard
+            is live, and execution engines are being wired now.
+          </p>
+          <div className="flex flex-col gap-4 sm:flex-row justify-center">
+            <Link
+              href="/chat"
+              className="inline-flex items-center justify-center gap-2 h-12 px-8 rounded-xl bg-gold text-loft-bg text-sm font-bold hover:shadow-[0_0_30px_rgba(212,175,55,0.3)] transition-all"
+            >
+              Chat w/ACHEEVY
+              <MessageSquare className="w-4 h-4" />
+            </Link>
+            <Link
+              href="/(auth)/sign-up"
+              className="inline-flex items-center justify-center gap-2 h-12 px-8 rounded-xl border border-loft-tan/30 text-loft-cream text-sm font-medium hover:border-gold/40 hover:bg-gold/5 transition-all"
+            >
+              Sign Up Free
+              <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
         </div>
       </div>
     </section>
+  );
+}
+
+/* ─── Footer ───────────────────────────────────────────────── */
+
+function SiteFooter() {
+  return (
+    <footer className="border-t border-loft-floor/15 py-10">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <p className="text-xs text-loft-cream/30">
+          © {new Date().getFullYear()} ACHIEVEMOR · AI Managed Solutions
+        </p>
+        <div className="flex gap-6">
+          <Link
+            href="/the-book-of-vibe"
+            className="text-xs text-loft-cream/30 hover:text-gold/60 transition-colors"
+          >
+            The Book of V.I.B.E.
+          </Link>
+          <Link
+            href="/gallery"
+            className="text-xs text-loft-cream/30 hover:text-gold/60 transition-colors"
+          >
+            Gallery
+          </Link>
+          <Link
+            href="/pricing"
+            className="text-xs text-loft-cream/30 hover:text-gold/60 transition-colors"
+          >
+            Pricing
+          </Link>
+        </div>
+      </div>
+    </footer>
   );
 }

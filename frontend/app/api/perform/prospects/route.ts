@@ -1,7 +1,7 @@
 /**
  * Per|Form Prospects API
  *
- * GET /api/perform/prospects — Returns all prospects (from DB, falls back to seed)
+ * GET /api/perform/prospects — Returns all prospects (from DB, falls back to Scout Hub)
  * GET /api/perform/prospects?id=<uuid> — Returns single prospect by ID
  * GET /api/perform/prospects?slug=cameron-price — Returns single prospect by slug
  * GET /api/perform/prospects?position=QB — Filter by position
@@ -13,7 +13,6 @@
  * Data source priority:
  *   1. Database (Prisma) — primary, populated by /api/perform/ingest
  *   2. Scout Hub (port 5001) — live scouting service
- *   3. Curated seed data — fallback when DB is empty and Scout Hub is offline
  *
  * PROPRIETARY BOUNDARY:
  * Response includes P.A.I. scores and tiers but NEVER formula weights,
@@ -23,7 +22,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getProspects, getProspectBySlug, getProspectById } from '@/lib/perform/data-service';
 import prisma from '@/lib/db/prisma';
-import { SEED_PROSPECTS } from '@/lib/perform/seed-prospects';
 
 const SCOUT_HUB_URL = process.env.SCOUT_HUB_URL || 'http://localhost:5001';
 
@@ -36,16 +34,6 @@ function hydrateProspect(p: any) {
     comparisons: p.comparisons ? JSON.parse(p.comparisons) : [],
     stats: p.stats ? JSON.parse(p.stats) : {},
     sourceUrls: p.sourceUrls ? JSON.parse(p.sourceUrls) : [],
-  };
-}
-
-/** Convert seed data to the same shape as DB records */
-function seedToResponse(s: typeof SEED_PROSPECTS[number], index: number) {
-  return {
-    id: `seed-${index}`,
-    slug: `${s.firstName}-${s.lastName}`.toLowerCase().replace(/[^a-z0-9-]/g, ''),
-    name: `${s.firstName} ${s.lastName}`,
-    ...s,
   };
 }
 
@@ -123,34 +111,12 @@ export async function GET(req: NextRequest) {
       return NextResponse.json(data);
     }
   } catch {
-    // Scout Hub offline — fall through to seed data
+    // Scout Hub offline — return empty
   }
 
-  // ── Serve curated seed data ───────────────────────────────
-  const seedData = SEED_PROSPECTS.map(seedToResponse);
-
-  if (id) {
-    const prospect = seedData.find(p => p.id === id);
-    return prospect
-      ? NextResponse.json(prospect)
-      : NextResponse.json({ error: 'Prospect not found' }, { status: 404 });
+  // ── No data available ─────────────────────────────────────
+  if (id || slug) {
+    return NextResponse.json({ error: 'Prospect not found' }, { status: 404 });
   }
-
-  if (slug) {
-    const prospect = seedData.find(p => p.slug === slug);
-    return prospect
-      ? NextResponse.json(prospect)
-      : NextResponse.json({ error: 'Prospect not found' }, { status: 404 });
-  }
-
-  // Apply filters to seed data
-  let filtered = seedData;
-  if (position) filtered = filtered.filter(p => p.position === position);
-  if (tier) filtered = filtered.filter(p => p.tier === tier);
-  if (state) filtered = filtered.filter(p => p.state === state);
-  if (classYear) filtered = filtered.filter(p => p.classYear === classYear);
-  if (pool) filtered = filtered.filter(p => p.pool === pool);
-
-  const sorted = filtered.sort((a, b) => a.nationalRank - b.nationalRank);
-  return NextResponse.json(sorted.slice(offset, offset + limit));
+  return NextResponse.json([]);
 }

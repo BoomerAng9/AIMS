@@ -39,30 +39,7 @@ interface PlayerProfile {
   seasons: number;
 }
 
-// ─────────────────────────────────────────────────────────────
-// Mock data for R.J. Johnson
-// ─────────────────────────────────────────────────────────────
-
-const MOCK_PLAYER: PlayerProfile = {
-  name: 'R.J. Johnson',
-  position: 'CB',
-  team: 'Colorado Buffaloes',
-  number: 2,
-  class: 'JR',
-  height: "6'1\"",
-  weight: 190,
-  hometown: 'Cerritos, CA',
-  stats: {
-    gamesPlayed: 24,
-    gamesStarted: 18,
-    tackles: 67,
-    interceptions: 4,
-    passesDefended: 19,
-    forcedFumbles: 1,
-  },
-  injuryGames: 3,
-  seasons: 2,
-};
+// Player data fetched via Brave Search + SAM at runtime — no hardcoded entries
 
 // ─────────────────────────────────────────────────────────────
 // Icons
@@ -105,14 +82,7 @@ export default function SportsTrackerPage() {
   const [player, setPlayer] = useState<PlayerProfile | null>(null);
   const [showStats, setShowStats] = useState(false);
 
-  // Load demo player on mount
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setPlayer(MOCK_PLAYER);
-      setTimeout(() => setShowStats(true), 500);
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, []);
+  // Player loads when user searches — no auto-load
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -121,13 +91,11 @@ export default function SportsTrackerPage() {
     setIsSearching(true);
     setShowStats(false);
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
-
-    // For demo, always return mock data
-    setPlayer(MOCK_PLAYER);
+    // TODO: Call Brave Search API to fetch real player data
+    // For now, search is a no-op until the API is connected
+    await new Promise(resolve => setTimeout(resolve, 1500));
     setIsSearching(false);
-    setTimeout(() => setShowStats(true), 500);
+    // setPlayer(result) and setShowStats(true) when API returns data
   };
 
   const nixieStats = player ? [
