@@ -60,7 +60,7 @@ type CategoryKey =
 
 // ── Icon Map ─────────────────────────────────────────────────────────────
 
-const ICON_MAP: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
+const ICON_MAP: Record<string, React.ComponentType<{ size?: string | number; className?: string }>> = {
   Bot, Cpu, Globe, Mic, Monitor, PenTool, Search, Terminal, Trophy, Wind, Workflow,
 };
 
@@ -101,7 +101,7 @@ export default function PlugCatalogPage() {
         setPlugs(data.plugs || []);
         setCategories(data.categories || {});
       })
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => setLoading(false));
   }, []);
 
@@ -204,11 +204,10 @@ export default function PlugCatalogPage() {
                 <button
                   key={cat}
                   onClick={() => setActiveCategory(cat)}
-                  className={`shrink-0 flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-[0.6rem] font-mono uppercase tracking-wider transition-all ${
-                    isActive
+                  className={`shrink-0 flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-[0.6rem] font-mono uppercase tracking-wider transition-all ${isActive
                       ? "bg-gold/10 border border-gold/30 text-gold"
                       : "border border-wireframe-stroke text-white/40 hover:border-white/20 hover:text-white/60"
-                  }`}
+                    }`}
                 >
                   {CATEGORY_LABELS[cat] || cat}
                   {count > 0 && (
@@ -261,9 +260,8 @@ export default function PlugCatalogPage() {
                   key={plug.id}
                   variants={staggerItem}
                   whileHover={{ y: -4, borderColor: `${plug.accentColor}33` }}
-                  className={`wireframe-card group p-5 flex flex-col transition-all ${
-                    plug.comingSoon ? "opacity-60" : ""
-                  }`}
+                  className={`wireframe-card group p-5 flex flex-col transition-all ${plug.comingSoon ? "opacity-60" : ""
+                    }`}
                 >
                   {/* Top: Icon + Name + Tier */}
                   <div className="flex items-start gap-3 mb-3">
