@@ -89,7 +89,7 @@ The IMAGE pillar handles everything the user *sees* before and during the build 
 | **Color Palette Generation** | Colormind API / Hotpot.ai API + WCAG validation | Generate cohesive palettes, validate contrast accessibility | Design token JSON |
 | **Typography Pairing** | Fontjoy neural net + Google Fonts API / LLM-assisted | Select complementary font pairings based on mood/intent | Font config |
 | **Design-to-Code Bridge** | Figma MCP Server / v0.app / Google Stitch | Convert design files or prompts into code-ready specs | Design context JSON |
-| **Video Assets** | Sora 2 API / Runway Gen-4.5 / Kling 2.5 | Generate short video assets for hero sections, backgrounds | MP4/WebM |
+| **Video Assets** | Sora 2 API / Runway Gen-4.5 / Kling 2.6 / Pika 2.5 | Generate short video assets for hero sections, backgrounds | MP4/WebM |
 
 ### AI Image Generation Tier List (February 2026)
 
@@ -104,10 +104,14 @@ The IMAGE pillar handles everything the user *sees* before and during the build 
 | **SD4** | Stability AI | platform.stability.ai | ~$0.003 | Open-source, self-hostable, massive ecosystem |
 | **Adobe Firefly 5** | Adobe | Firefly Services API | Subscription | IP-indemnified, commercially safe |
 | **GPT Image 1-mini** | OpenAI | `gpt-image-1-mini` | ~$0.005-$0.011 | Budget, high-volume |
+| **FLUX.2 [dev]** | Black Forest Labs | BFL API / self-host | Open-weight | 32B params, editing workflows, self-hosting |
+| **FLUX.2 [flex]** | Black Forest Labs | BFL API | $0.014+ | Fine-grained parameter control, API-only |
 | **FLUX.2 [klein]** | Black Forest Labs | BFL API / self-host | $0.014+ | Sub-second gen, Apache 2.0, consumer GPU |
+| **Hunyuan Image 3.0** | Tencent | Tencent Cloud / Replicate / HuggingFace | Budget | 80B MoE (13B active), open-source, strong text rendering |
 
 **DALL-E 3 is deprecated.** API scheduled for full shutdown May 2026. Do not use.
 **Midjourney has no API.** Not viable for programmatic pipelines.
+**Gemini 2.0 Flash models retire March 31, 2026.** Migrate to 2.5-flash-lite or newer. Imagen 1/2/3 already shut down.
 
 ### Unified API Platforms
 For accessing multiple models through a single endpoint:
@@ -115,6 +119,10 @@ For accessing multiple models through a single endpoint:
 - **Replicate** — FLUX, SD, Hunyuan, open-source models
 - **WaveSpeedAI** — Multi-model with unified billing
 - **SiliconFlow** — Budget-friendly multi-model access
+- **Adobe Creative Cloud** — Bundles Firefly 5, Nano Banana Pro, GPT Image, Runway Gen-4, FLUX.2 under one subscription with unlimited generations
+
+### Editing & In-Context Generation
+- **FLUX.1 Kontext** — In-context image generation/editing with text+image prompting (integrated into Adobe Photoshop Generative Fill)
 
 ### IMAGE Pipeline Flow
 ```
@@ -147,6 +155,8 @@ Output: Asset Catalog (images, icons, fonts, colors, placeholders, video)
 - Font selections must include a system font fallback stack
 - Icons and logos must be generated as native SVG (not rasterized)
 - For commercial/enterprise builds requiring IP indemnification: use Adobe Firefly 5
+- EU AI Act: all synthetic photorealistic content must be clearly labeled as AI-generated
+- US Copyright: purely AI-generated works cannot be copyrighted — human-in-the-loop workflows may qualify
 
 ---
 
@@ -403,7 +413,7 @@ PHASE 2: INTERFACE (Code Generation)
   ├── Configure Tailwind + design tokens
   ├── Generate UI components
   ├── Compose pages from components
-  ├── Wire animations (Framer Motion / GSAP)
+  ├── Wire animations (Motion / GSAP)
   ├── Implement responsive breakpoints
   ├── Launch dev server preview
   └── Enter iteration loop with user
@@ -503,9 +513,9 @@ The Build Manifest is the contract that drives the entire pipeline:
     "references": ["nike.com", "adidas.com/yeezy"]
   },
   "stack_recommendation": {
-    "framework": "Next.js 15",
+    "framework": "Next.js 16",
     "styling": "Tailwind CSS v4",
-    "animation": "Motion (Framer Motion v12+)",
+    "animation": "Motion v12+",
     "ui_components": "shadcn/ui",
     "3d": "React Three Fiber + Drei",
     "scroll": "Lenis"

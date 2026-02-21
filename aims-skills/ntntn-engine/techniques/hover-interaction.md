@@ -12,7 +12,7 @@
 
 | Library | Approach | Performance | Bundle Impact |
 |---------|----------|-------------|---------------|
-| **Framer Motion** | `useMotionValue` for mouse position → `useTransform` for rotateX/rotateY | GPU-accelerated | Included in FM |
+| **Motion** | `useMotionValue` for mouse position → `useTransform` for rotateX/rotateY | GPU-accelerated | Included in Motion |
 | **Vanilla Tilt** | `data-tilt` attribute, auto-detects mouse position | Simple, standalone | +3KB |
 | **CSS Only** | `:hover` + `perspective` + `transform: rotateX() rotateY()` (static, no tracking) | Native, limited | 0KB |
 | **GSAP** | `quickTo` for smooth mouse-following rotation | GPU-accelerated | +45KB |
@@ -44,7 +44,7 @@
 
 | Library | Approach | Performance | Bundle Impact |
 |---------|----------|-------------|---------------|
-| **Framer Motion** | `useSpring` for position + distance calculation from cursor to element center | GPU-accelerated | Included in FM |
+| **Motion** | `useSpring` for position + distance calculation from cursor to element center | GPU-accelerated | Included in Motion |
 | **GSAP** | `quickTo` with distance threshold + `gsap.to` for smooth attraction | GPU-accelerated | +45KB |
 | **Custom JS** | `mousemove` listener + `transform: translate()` based on distance | Manual, flexible | 0KB |
 
@@ -75,7 +75,7 @@
 
 | Library | Approach | Performance | Bundle Impact |
 |---------|----------|-------------|---------------|
-| **Framer Motion** | `motion.div` following `clientX/clientY` with `useSpring` for lag | GPU-accelerated | Included in FM |
+| **Motion** | `motion.div` following `clientX/clientY` with `useSpring` for lag | GPU-accelerated | Included in Motion |
 | **CSS** | `cursor: url(custom.svg), auto` — static custom cursor | Native, simple | 0KB |
 | **Custom JS** | RAF loop updating `transform: translate()` on a fixed div | Manual, full control | 0KB |
 | **Cursor Effects (npm)** | Pre-built cursor effects library | Plug and play | +5-10KB |
@@ -117,7 +117,7 @@
 | Library | Approach | Performance | Bundle Impact |
 |---------|----------|-------------|---------------|
 | **CSS** | `transition` on `border-radius`, `background`, `transform`, `box-shadow` | Native, best perf | 0KB |
-| **Framer Motion** | `whileHover` prop with target values | GPU-accelerated | Included in FM |
+| **Motion** | `whileHover` prop with target values | GPU-accelerated | Included in Motion |
 | **GSAP** | `gsap.to` on hover event | GPU-accelerated | +45KB |
 
 ### Common Morphs
@@ -173,7 +173,7 @@
 
 | Library | Approach | Performance | Bundle Impact |
 |---------|----------|-------------|---------------|
-| **Framer Motion Reorder** | `<Reorder.Group>` + `<Reorder.Item>` with layout animations | GPU-accelerated, built-in | Included in FM |
+| **Motion Reorder** | `<Reorder.Group>` + `<Reorder.Item>` with layout animations | GPU-accelerated, built-in | Included in Motion |
 | **@dnd-kit** | Modular drag-and-drop toolkit with sensors and collision detection | Accessible, flexible | +15KB |
 | **react-beautiful-dnd** | Declarative DnD for lists (Atlassian) | Mature, accessible | +30KB (maintenance mode) |
 | **HTML Drag & Drop API** | Native `draggable` + `dragover`/`drop` events | No animations, basic | 0KB |
@@ -205,7 +205,7 @@
 
 | Library | Approach | Performance | Bundle Impact |
 |---------|----------|-------------|---------------|
-| **Framer Motion** | `drag`, `whileDrag`, drag constraints, `onDragEnd` velocity | GPU-accelerated | Included in FM |
+| **Motion** | `drag`, `whileDrag`, drag constraints, `onDragEnd` velocity | GPU-accelerated | Included in Motion |
 | **use-gesture** | React hook for all gestures (drag, pinch, scroll, wheel, move, hover) | Flexible, composable | +8KB |
 | **Hammer.js** | Multi-touch gesture recognition | Mature, touch-focused | +7KB |
 | **Pointer Events API** | Native `pointerdown/move/up` + manual gesture math | Zero dependency | 0KB |
@@ -239,7 +239,7 @@
 
 | Library | Approach | Performance | Bundle Impact |
 |---------|----------|-------------|---------------|
-| **Framer Motion** | `AnimatePresence` + `motion.div` with fade + scale | GPU-accelerated | Included in FM |
+| **Motion** | `AnimatePresence` + `motion.div` with fade + scale | GPU-accelerated | Included in Motion |
 | **Radix Tooltip** | Built-in animation support with CSS | Accessible, composable | +5KB |
 | **CSS** | `opacity` + `transform` transition with `pointer-events` toggle | Native | 0KB |
 | **Floating UI** | Positioning + optional animation via CSS/FM | Positioning-focused | +3KB |

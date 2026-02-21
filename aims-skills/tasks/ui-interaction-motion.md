@@ -11,13 +11,13 @@ triggers:
   - "drawer"
   - "micro-interaction"
   - "framer"
-description: "Apply Framer Motion interaction layer to A.I.M.S. UI components with shared motion tokens."
+description: "Apply Motion interaction layer to A.I.M.S. UI components with shared motion tokens."
 execution:
   target: "frontend"
   route: "frontend/lib/motion/"
 dependencies:
   packages:
-    - "framer-motion"
+    - "motion"
   files:
     - "frontend/lib/motion/tokens.ts"
     - "frontend/lib/motion/variants.ts"
@@ -27,7 +27,7 @@ dependencies:
 priority: "high"
 ---
 
-# UI Interaction Motion Tasks (Framer Motion)
+# UI Interaction Motion Tasks (Motion)
 
 ## Phase 1 — Motion Audit
 - [x] Identify interactive components (overlay, drawer, cards, buttons)

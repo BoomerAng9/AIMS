@@ -31,9 +31,9 @@ Make A.I.M.S. feel:
 - Motion should feel "built-in," not layered on
 - Test with `prefers-reduced-motion: reduce` active
 
-## Framer Motion vs Remotion Decision Matrix
+## Motion vs Remotion Decision Matrix
 
-| Question | Framer Motion | Remotion |
+| Question | Motion | Remotion |
 |----------|---------------|----------|
 | Is it a UI state change? | Yes | No |
 | Is it a video/composition? | No | Yes |

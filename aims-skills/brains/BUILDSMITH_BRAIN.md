@@ -53,7 +53,7 @@ Everything the user *sees*. Generated before code is written.
 | Typography Pairing | Fontjoy neural net + Google Fonts API | Font configuration |
 | Animation Assets | Rive / Lottie / Recraft V4 (Lottie export) | .riv / .json files |
 | Design-to-Code Bridge | Figma MCP Server / v0.app / Google Stitch | Design context JSON |
-| Video Assets | Sora 2 API / Runway Gen-4.5 / Kling 2.5 | MP4/WebM |
+| Video Assets | Sora 2 API / Runway Gen-4.5 / Kling 2.6 / Pika 2.5 | MP4/WebM |
 
 **A.I.M.S. Default Image Model:** Nano Banana Pro (Gemini 3 Pro Image)
 
@@ -89,7 +89,7 @@ The core builder. Generates all code, components, pages, styles, animations.
 | Component Generation | LLM (Claude) + NtNtN patterns + shadcn/ui | .tsx component files |
 | Page Composition | LLM + App Router conventions | page.tsx files |
 | Style System Setup | Tailwind config + design tokens + CSS vars | tailwind.config.ts, globals.css |
-| Animation Wiring | Motion (Framer) / GSAP patterns from NtNtN | Motion components |
+| Animation Wiring | Motion v12 / GSAP 3.14.2 patterns from NtNtN | Motion components |
 | Responsive Implementation | Tailwind breakpoints + container queries | Responsive layouts |
 | Design System Creation | shadcn/ui CLI + CVA variants | Component library |
 | Live Preview | Next.js dev server in sandbox | Preview URL |
@@ -153,7 +153,7 @@ Connects frontend to backend, third-party services, and deployment.
 | Capability | Tool / Service | Output |
 |-----------|---------------|--------|
 | Git Operations | GitHub API / git CLI | Repository |
-| Database Setup | Prisma ORM + SQLite/PostgreSQL | DB + Prisma client |
+| Database Setup | Prisma v7 + SQLite/PostgreSQL | DB + Prisma client |
 | Authentication | NextAuth.js / Auth.js / Clerk | Auth config + pages |
 | Payments | Stripe SDK + Checkout | Payment integration |
 | Email | Resend / SendGrid | Email templates + API |

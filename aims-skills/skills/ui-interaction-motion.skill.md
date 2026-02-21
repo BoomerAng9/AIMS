@@ -1,13 +1,13 @@
 ---
 name: UI Interaction Motion
-description: Design and enforce a consistent, high-performance UI interaction motion system using Framer Motion for A.I.M.S.
+description: Design and enforce a consistent, high-performance UI interaction motion system using Motion for A.I.M.S.
 version: 1.0.0
 ---
 
 # UI Interaction Motion (Skill)
 
 ## Purpose
-Govern a consistent, high-performance UI interaction motion system using Framer Motion for A.I.M.S.
+Govern a consistent, high-performance UI interaction motion system using Motion for A.I.M.S.
 
 This skill covers:
 - Overlays and drawers
@@ -67,7 +67,7 @@ animation approaches for creative builds.
 ## Motion vs Remotion Boundary
 | Layer | Tool | Purpose |
 |-------|------|---------|
-| UI Interactions | Framer Motion | State changes, overlays, micro-feedback |
+| UI Interactions | Motion | State changes, overlays, micro-feedback |
 | Cinematic/Narrative | Remotion | Video generation, story-driven compositions |
 
 They complement. They do not overlap.

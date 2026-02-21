@@ -12,7 +12,7 @@
 
 | Library | Approach | Performance | Bundle Impact |
 |---------|----------|-------------|---------------|
-| **Framer Motion** | Split into `<motion.span>` per character + `staggerChildren: 0.03` | GPU-accelerated | Included in FM |
+| **Motion** | Split into `<motion.span>` per character + `staggerChildren: 0.03` | GPU-accelerated | Included in Motion |
 | **CSS** | `steps()` timing function + `width` animation + `overflow: hidden` | Native, limited | 0KB |
 | **Typed.js** | Dedicated typewriter library with cursor, backspace, loop | Feature-rich | +5KB |
 | **Custom JS** | `setInterval` adding characters to `textContent` | Simple, no deps | 0KB |
@@ -84,7 +84,7 @@
 | Library | Approach | Performance | Bundle Impact |
 |---------|----------|-------------|---------------|
 | **GSAP SplitText** | Plugin splits text nodes + timeline animates each piece | Professional, feature-rich | Club GreenSock (paid) |
-| **Framer Motion** | Manual `.split("")` or `.split(" ")` + `staggerChildren` | GPU-accelerated | Included in FM |
+| **Motion** | Manual `.split("")` or `.split(" ")` + `staggerChildren` | GPU-accelerated | Included in Motion |
 | **splitting.js** | CSS-variable based splitting (chars, words, lines) + CSS animations | Lightweight, CSS-driven | +2KB |
 | **Custom** | Manual DOM splitting + Intersection Observer + CSS transitions | Zero deps | 0KB |
 
@@ -128,7 +128,7 @@
 
 | Library | Approach | Performance | Bundle Impact |
 |---------|----------|-------------|---------------|
-| **Framer Motion** | `useSpring` + `useMotionValueEvent` to update displayed number | Smooth, spring-based | Included in FM |
+| **Motion** | `useSpring` + `useMotionValueEvent` to update displayed number | Smooth, spring-based | Included in Motion |
 | **CountUp.js** | Dedicated counter library with easing, formatting, scroll trigger | Feature-rich | +4KB |
 | **Custom JS** | `requestAnimationFrame` loop with easing function | Zero deps, flexible | 0KB |
 | **CSS** | `@property --num` + `counter()` + CSS animation | Native, limited | 0KB |
@@ -170,7 +170,7 @@
 | Library | Approach | Performance | Bundle Impact |
 |---------|----------|-------------|---------------|
 | **Custom JS** | `setInterval` swapping random chars per position until resolved | Lightweight | 0KB |
-| **Framer Motion** | Animate through character array per position with `useAnimate` | Smooth control | Included in FM |
+| **Motion** | Animate through character array per position with `useAnimate` | Smooth control | Included in Motion |
 | **baffle.js** | Dedicated text obfuscation library | Simple API | +2KB |
 
 ### Algorithm
@@ -211,7 +211,7 @@ For each character position:
 | Library | Approach | Performance | Bundle Impact |
 |---------|----------|-------------|---------------|
 | **CSS** | `@keyframes` + `translateX(-100%)` on duplicated content | Native, smooth | 0KB |
-| **Framer Motion** | `animate` with `x` transition + `repeat: Infinity` | GPU-accelerated | Included in FM |
+| **Motion** | `animate` with `x` transition + `repeat: Infinity` | GPU-accelerated | Included in Motion |
 | **react-fast-marquee** | Dedicated React component with speed, direction, pause | Feature-rich | +3KB |
 
 ### Variations
@@ -249,7 +249,7 @@ For each character position:
 | Library | Approach | Performance | Bundle Impact |
 |---------|----------|-------------|---------------|
 | **GSAP** | Timeline with per-word/per-char animations, ScrollTrigger or time-based | Professional, full control | +45KB |
-| **Framer Motion** | `variants` per word + `useScroll` or timed sequences | GPU-accelerated | Included in FM |
+| **Motion** | `variants` per word + `useScroll` or timed sequences | GPU-accelerated | Included in Motion |
 | **Remotion** | Video-rendered kinetic typography (export as MP4) | Best for video content | +200KB+ |
 | **CSS** | Per-word `@keyframes` with `animation-delay` stagger | Native, limited | 0KB |
 

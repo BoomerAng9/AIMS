@@ -51,7 +51,7 @@ Hostinger API is available via MCP server: `mcp-tools/hostinger-config.json`
 sudo ./infra/vps-setup.sh
 ```
 
-Installs: Node.js 20, Bun, Docker, Docker Compose, UFW firewall, Fail2ban, Claude Code CLI, Gemini CLI.
+Installs: Node.js 22, Bun, Docker, Docker Compose, UFW firewall, Fail2ban, Claude Code CLI, Gemini CLI.
 
 ## Firewall Rules (UFW)
 

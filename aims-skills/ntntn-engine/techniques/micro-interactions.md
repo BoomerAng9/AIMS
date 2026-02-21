@@ -12,7 +12,7 @@
 
 | Library | Approach | Performance | Bundle Impact |
 |---------|----------|-------------|---------------|
-| **Framer Motion** | `whileTap={{ scale: 0.97 }}` + `whileHover={{ scale: 1.02 }}` | GPU-accelerated | Included in FM |
+| **Motion** | `whileTap={{ scale: 0.97 }}` + `whileHover={{ scale: 1.02 }}` | GPU-accelerated | Included in Motion |
 | **CSS** | `:active { transform: scale(0.97); }` + `:hover { transform: scale(1.02); }` | Native, instant | 0KB |
 | **Tailwind** | `active:scale-[0.97] hover:scale-[1.02] transition-transform` | Utility-based | 0KB |
 
@@ -39,7 +39,7 @@
 
 | Library | Approach | Performance | Bundle Impact |
 |---------|----------|-------------|---------------|
-| **Framer Motion** | `layout` animation on the knob + `animate` background color | Spring-based, smooth | Included in FM |
+| **Motion** | `layout` animation on the knob + `animate` background color | Spring-based, smooth | Included in Motion |
 | **CSS** | `transition` on `transform: translateX()` + `background-color` | Native | 0KB |
 | **Radix Switch** | Headless accessible switch + custom animation | Accessible | +2KB |
 
@@ -67,7 +67,7 @@
 | Library | Approach | Performance | Bundle Impact |
 |---------|----------|-------------|---------------|
 | **CSS** | `:focus-within` + `transition` on border/label/shadow | Native, zero JS | 0KB |
-| **Framer Motion** | `animate` border color and label position based on focus state | Spring-based | Included in FM |
+| **Motion** | `animate` border color and label position based on focus state | Spring-based | Included in Motion |
 | **Tailwind** | `focus-within:border-gold focus-within:ring-2` | Utility-based | 0KB |
 
 ### Focus Patterns
@@ -93,7 +93,7 @@
 
 | Library | Approach | Performance | Bundle Impact |
 |---------|----------|-------------|---------------|
-| **Framer Motion** | `AnimatePresence` + `motion.div` with x/y slide + opacity | GPU-accelerated | Included in FM |
+| **Motion** | `AnimatePresence` + `motion.div` with x/y slide + opacity | GPU-accelerated | Included in Motion |
 | **CSS** | `@keyframes slideIn` + `animation-fill-mode: forwards` | Native | 0KB |
 | **Sonner** | Purpose-built toast library for React | Polished, accessible | +8KB |
 | **react-hot-toast** | Lightweight toast with animations | Simple API | +5KB |
@@ -127,7 +127,7 @@
 
 | Library | Approach | Performance | Bundle Impact |
 |---------|----------|-------------|---------------|
-| **Framer Motion** | `animate` width from 0% → target with spring | GPU-accelerated | Included in FM |
+| **Motion** | `animate` width from 0% → target with spring | GPU-accelerated | Included in Motion |
 | **CSS** | `transition: width 300ms ease-out` on inner bar | Native | 0KB |
 | **Tailwind** | `transition-all duration-300` + dynamic `w-[${percent}%]` | Utility-based | 0KB |
 
@@ -156,7 +156,7 @@
 | Library | Approach | Performance | Bundle Impact |
 |---------|----------|-------------|---------------|
 | **CSS** | Hidden native input + styled `::before`/`::after` + `transition` | Native, accessible | 0KB |
-| **Framer Motion** | SVG checkmark path with `pathLength` animation | Smooth draw-in | Included in FM |
+| **Motion** | SVG checkmark path with `pathLength` animation | Smooth draw-in | Included in Motion |
 | **Radix Checkbox** | Headless accessible checkbox + custom animation | Accessible | +2KB |
 
 ### Checkbox Animation Patterns
@@ -186,7 +186,7 @@
 
 | Library | Approach | Performance | Bundle Impact |
 |---------|----------|-------------|---------------|
-| **Framer Motion** | `AnimatePresence` + staggered children with `variants` | GPU-accelerated | Included in FM |
+| **Motion** | `AnimatePresence` + staggered children with `variants` | GPU-accelerated | Included in Motion |
 | **CSS** | `@keyframes` + `animation-delay` per item | Native | 0KB |
 | **Headless UI Transition** | Transition component with enter/leave classes | Tailwind-native | Included in Headless UI |
 
@@ -224,8 +224,8 @@ Close sequence (200ms total):
 
 | Library | Approach | Performance | Bundle Impact |
 |---------|----------|-------------|---------------|
-| **Framer Motion** | `AnimatePresence` + `motion.div` with `key` per tab | GPU-accelerated | Included in FM |
-| **Framer Motion layoutId** | Shared `layoutId` on the active indicator underline | Smooth indicator slide | Included in FM |
+| **Motion** | `AnimatePresence` + `motion.div` with `key` per tab | GPU-accelerated | Included in Motion |
+| **Motion layoutId** | Shared `layoutId` on the active indicator underline | Smooth indicator slide | Included in Motion |
 | **CSS** | `transition` on tab indicator `left/width` + content `opacity` | Native | 0KB |
 | **Radix Tabs** | Headless tabs + custom transition | Accessible | +3KB |
 
@@ -254,7 +254,7 @@ Close sequence (200ms total):
 |---------|----------|-------------|---------------|
 | **Sonner** | Dedicated toast library with stacking, swipe-to-dismiss | Production-ready | +8KB |
 | **react-hot-toast** | Simple toast with enter/exit animation | Lightweight | +5KB |
-| **Framer Motion** | Custom toast with `AnimatePresence` + motion | Full control | Included in FM |
+| **Motion** | Custom toast with `AnimatePresence` + motion | Full control | Included in Motion |
 
 ### Toast Animation Sequence
 1. **Enter:** Slide up from bottom + fade in + subtle scale (250ms, spring)

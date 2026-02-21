@@ -393,7 +393,7 @@ The NtNtN Engine is not just a library — it's an execution engine. Buildsmith'
 Generates everything the user sees before code is written — AI images, color palettes, typography, icons, logos, favicons, OG images, placeholders, animation assets, video.
 
 **Default Image Model:** Nano Banana Pro (Gemini 3 Pro Image)
-**Tools:** Nano Banana Pro / GPT Image 1.5 / FLUX.2 / Imagen 4, Recraft V4 (native SVG), SVGMaker MCP, Sharp v0.34+, Satori + resvg-js, Playwright, Colormind API, Fontjoy, Figma MCP Server, v0.app, Sora 2 / Runway Gen-4.5
+**Tools:** Nano Banana Pro / GPT Image 1.5 / FLUX.2 / Imagen 4, Recraft V4 (native SVG), SVGMaker MCP, Sharp v0.34+, Satori + resvg-js, Playwright, Colormind API, Fontjoy, Figma MCP Server, v0.app, Sora 2 / Runway Gen-4.5 / Kling 2.6 / Pika 2.5
 
 ### Pillar 2: INTERFACE (Code Generation Engine)
 The core builder — generates code, components, pages, styles, and animations inside an isolated sandbox with live preview and user iteration loop.
@@ -403,7 +403,7 @@ The core builder — generates code, components, pages, styles, and animations i
 ### Pillar 3: INTEGRATIONS (Fullstack & Deploy Pipeline)
 Connects frontend to databases, auth, payments, APIs, Git, deployment targets, monitoring.
 
-**Tools:** GitHub API, Prisma ORM, NextAuth.js / Clerk, Stripe, Resend, Vercel / Docker Compose, Sentry / Uptime Kuma
+**Tools:** GitHub API, Prisma v7, NextAuth.js / Clerk, Stripe, Resend, Vercel / Docker Compose, Sentry / Uptime Kuma
 
 ### Execution Flow
 ```
