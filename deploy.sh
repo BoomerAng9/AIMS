@@ -1,16 +1,17 @@
-#!/usr/bin/env bash
+!/usr/bin/env bash
 # =============================================================================
 # A.I.M.S. Production Deployment Script
 # =============================================================================
 # Builds, deploys, and activates SSL for configured domains.
-# SSL managed by Hostinger hPanel — certs at /etc/letsencrypt on host,
-# bind-mounted read-only into the nginx container.
+# SSL managed by host certbot (apt) — certs at /etc/letsencrypt, bind-mounted into nginx.
 # Supports dual-domain architecture:
 #   --domain          = plugmein.cloud (functional app)
 #   --landing-domain  = aimanagedsolutions.cloud (father site)
 #
 # Usage:
-#   ./deploy.sh --domain plugmein.cloud --landing-domain aimanagedsolutions.cloud
+#   ./deploy.sh --domain plugmein.cloud --landing-domain aimanagedsolutions.cloud  # Standard deploy
+#   ./deploy.sh --domain plugmein.cloud --email a@b              # Issue new cert + deploy
+#   ./deploy.sh --ssl-renew                                      # Renew all certs
 #   ./deploy.sh --no-cache                                       # Force rebuild
 # =============================================================================
 set -euo pipefail
@@ -20,8 +21,8 @@ COMPOSE_FILE="${SCRIPT_DIR}/infra/docker-compose.prod.yml"
 ENV_FILE="${SCRIPT_DIR}/infra/.env.production"
 ENV_EXAMPLE="${SCRIPT_DIR}/infra/.env.production.example"
 SSL_TEMPLATE="${SCRIPT_DIR}/infra/nginx/ssl.conf.template"
-SSL_LANDING_TEMPLATE="${SCRIPT_DIR}/infra/nginx/ssl-landing.conf.template"
 SSL_DEMO_TEMPLATE="${SCRIPT_DIR}/infra/nginx/demo-ssl.conf.template"
+SSL_LANDING_TEMPLATE="${SCRIPT_DIR}/infra/nginx/ssl-landing.conf.template"
 
 # Colors
 RED='\033[0;31m'
@@ -38,6 +39,8 @@ header(){ printf "\n${CYAN}━━━ %s ━━━${NC}\n\n" "$1"; }
 # Parse arguments
 DOMAIN=""
 LANDING_DOMAIN=""
+EMAIL=""
+SSL_RENEW=false
 NO_CACHE=false
 SSL_CHANGED=false
 
@@ -45,6 +48,8 @@ while [[ $# -gt 0 ]]; do
     case $1 in
         --domain)         DOMAIN="$2"; shift 2 ;;
         --landing-domain) LANDING_DOMAIN="$2"; shift 2 ;;
+        --email)          EMAIL="$2"; shift 2 ;;
+        --ssl-renew)      SSL_RENEW=true; shift ;;
         --no-cache)       NO_CACHE=true; shift ;;
         -h|--help)
             echo "Usage: ./deploy.sh [OPTIONS]"
@@ -52,14 +57,14 @@ while [[ $# -gt 0 ]]; do
             echo "Options:"
             echo "  --domain DOMAIN           Functional app domain (e.g. plugmein.cloud)"
             echo "  --landing-domain DOMAIN   Landing/brand domain (e.g. aimanagedsolutions.cloud)"
+            echo "  --email EMAIL             Email for initial cert issuance (optional if certs exist)"
+            echo "  --ssl-renew               Force renewal of all SSL certificates"
             echo "  --no-cache                Force fresh Docker image rebuild"
-            echo ""
-            echo "SSL: Managed by Hostinger hPanel. Certs at /etc/letsencrypt on host."
-            echo "     deploy.sh activates HTTPS in nginx when certs exist on disk."
             echo ""
             echo "Examples:"
             echo "  ./deploy.sh --domain plugmein.cloud --landing-domain aimanagedsolutions.cloud"
-            echo "  ./deploy.sh --no-cache --domain plugmein.cloud"
+            echo "  ./deploy.sh --domain plugmein.cloud --email admin@aimanagedsolutions.cloud  # first-time cert"
+            echo "  ./deploy.sh --ssl-renew"
             exit 0 ;;
         *) error "Unknown option: $1"; exit 1 ;;
     esac
@@ -117,7 +122,7 @@ check_env() {
 
 header "Environment Validation"
 check_env "NEXTAUTH_SECRET"         "critical" "Auth will not work without this"
-check_env "INTERNAL_API_KEY"        "critical" "Frontend <-> backend communication key"
+check_env "INTERNAL_API_KEY"        "critical" "Frontend ↔ backend communication key"
 check_env "OPENROUTER_API_KEY"      "critical" "LLM inference (all Boomer_Angs)"
 check_env "REDIS_PASSWORD"          "critical" "Redis auth (sessions + cache)"
 check_env "N8N_AUTH_PASSWORD"       "critical" "n8n admin UI has no password — exposed"
@@ -189,7 +194,7 @@ ${COMPOSE_CMD} -f "${COMPOSE_FILE}" down --remove-orphans --timeout 30
 ${COMPOSE_CMD} -f "${COMPOSE_FILE}" up -d --remove-orphans
 info "Services started. Orphaned containers removed."
 
-# Wait for core services to be ready before activating SSL configs
+# Wait for core services to be ready before SSL provisioning
 info "Waiting for core services to come up..."
 MAX_WAIT=120
 WAITED=0
@@ -197,7 +202,7 @@ while [ $WAITED -lt $MAX_WAIT ]; do
     HEALTHY=$(${COMPOSE_CMD} -f "${COMPOSE_FILE}" ps --format json 2>/dev/null | grep -c '"healthy"' || true)
     RUNNING=$(${COMPOSE_CMD} -f "${COMPOSE_FILE}" ps --format json 2>/dev/null | grep -c '"running"' || true)
     info "  Services: ${RUNNING} running, ${HEALTHY} healthy (${WAITED}s / ${MAX_WAIT}s)"
-    # nginx must be running before we write SSL configs
+    # nginx must be running for ACME challenges — check it specifically
     NGINX_UP=$(${COMPOSE_CMD} -f "${COMPOSE_FILE}" ps nginx --format '{{.State}}' 2>/dev/null || echo "")
     if echo "${NGINX_UP}" | grep -qi "running"; then
         info "nginx is running — proceeding."
@@ -211,50 +216,92 @@ if [ $WAITED -ge $MAX_WAIT ]; then
 fi
 
 # =============================================================================
-# SSL Activation — App Domain (plugmein.cloud)
-# Certs managed by Hostinger hPanel at /etc/letsencrypt on host.
-# We just activate the nginx HTTPS config when certs are present.
+# SSL Certificate Setup — App Domain (plugmein.cloud)
+# Uses host certbot (apt-installed). Certs live at /etc/letsencrypt on the host,
+# bind-mounted into the nginx container.
 # =============================================================================
 if [ -n "${DOMAIN}" ]; then
     header "SSL Setup — App Domain (${DOMAIN})"
 
+    # Issue cert only if --email provided AND certs don't exist (or --ssl-renew)
+    if [ -n "${EMAIL}" ]; then
+        if [ ! -f "/etc/letsencrypt/live/${DOMAIN}/fullchain.pem" ] || [ "${SSL_RENEW}" = "true" ]; then
+            info "Requesting SSL certificate for ${DOMAIN}..."
+            certbot certonly \
+                --webroot \
+                -w /var/www/certbot \
+                -d "${DOMAIN}" \
+                -d "www.${DOMAIN}" \
+                --email "${EMAIL}" \
+                --agree-tos \
+                --no-eff-email \
+                --force-renewal
+            info "SSL certificate issued for ${DOMAIN}."
+        else
+            info "SSL certificate already exists for ${DOMAIN}."
+        fi
+    fi
+
+    # Activate HTTPS config if certs exist on disk
     if [ -f "/etc/letsencrypt/live/${DOMAIN}/fullchain.pem" ]; then
-        info "Cert found — activating HTTPS for ${DOMAIN}..."
+        info "Activating HTTPS server block for ${DOMAIN}..."
         SSL_CONF=$(sed "s/DOMAIN_PLACEHOLDER/${DOMAIN}/g" "${SSL_TEMPLATE}")
         ${COMPOSE_CMD} -f "${COMPOSE_FILE}" exec -T nginx \
             sh -c "cat > /etc/nginx/conf.d/ssl.conf" <<< "${SSL_CONF}"
         info "App domain HTTPS config written."
-
-        # Activate demo subdomain HTTPS (shares cert with app domain)
-        if [ -f "${SSL_DEMO_TEMPLATE}" ]; then
-            info "Activating HTTPS for demo.${DOMAIN}..."
-            ${COMPOSE_CMD} -f "${COMPOSE_FILE}" exec -T nginx \
-                sh -c "cat > /etc/nginx/conf.d/demo-ssl.conf" < "${SSL_DEMO_TEMPLATE}"
-            info "Demo subdomain HTTPS config written."
-        fi
         SSL_CHANGED=true
     else
-        warn "No SSL cert found for ${DOMAIN} at /etc/letsencrypt/live/${DOMAIN}/"
-        warn "Enable SSL via Hostinger hPanel → SSL section for this domain."
+        warn "No SSL cert found for ${DOMAIN}. Run with --email to issue one."
+    fi
+
+    # Activate demo HTTPS config if demo cert exists on disk
+    if [ -f "/etc/letsencrypt/live/demo.${DOMAIN}/fullchain.pem" ]; then
+        info "Activating HTTPS server block for demo.${DOMAIN}..."
+        SSL_DEMO_CONF=$(sed "s/DOMAIN_PLACEHOLDER/${DOMAIN}/g" "${SSL_DEMO_TEMPLATE}")
+        ${COMPOSE_CMD} -f "${COMPOSE_FILE}" exec -T nginx \
+            sh -c "cat > /etc/nginx/conf.d/ssl-demo.conf" <<< "${SSL_DEMO_CONF}"
+        info "Demo domain HTTPS config written."
+        SSL_CHANGED=true
+    else
+        warn "No SSL cert found for demo.${DOMAIN} — demo HTTPS not activated."
     fi
 fi
 
 # =============================================================================
-# SSL Activation — Landing Domain (aimanagedsolutions.cloud)
+# SSL Certificate Setup — Landing Domain (aimanagedsolutions.cloud)
 # =============================================================================
 if [ -n "${LANDING_DOMAIN}" ]; then
     header "SSL Setup — Landing Domain (${LANDING_DOMAIN})"
 
+    # Issue cert only if --email provided AND certs don't exist (or --ssl-renew)
+    if [ -n "${EMAIL}" ]; then
+        if [ ! -f "/etc/letsencrypt/live/${LANDING_DOMAIN}/fullchain.pem" ] || [ "${SSL_RENEW}" = "true" ]; then
+            info "Requesting SSL certificate for ${LANDING_DOMAIN} + www.${LANDING_DOMAIN}..."
+            certbot certonly \
+                --webroot \
+                -w /var/www/certbot \
+                -d "${LANDING_DOMAIN}" \
+                -d "www.${LANDING_DOMAIN}" \
+                --email "${EMAIL}" \
+                --agree-tos \
+                --no-eff-email \
+                --force-renewal
+            info "SSL certificate issued for ${LANDING_DOMAIN}."
+        else
+            info "SSL certificate already exists for ${LANDING_DOMAIN}."
+        fi
+    fi
+
+    # Activate HTTPS config if certs exist on disk
     if [ -f "/etc/letsencrypt/live/${LANDING_DOMAIN}/fullchain.pem" ]; then
-        info "Cert found — activating HTTPS for ${LANDING_DOMAIN}..."
+        info "Activating HTTPS server block for ${LANDING_DOMAIN}..."
         SSL_LANDING_CONF=$(sed "s/LANDING_DOMAIN_PLACEHOLDER/${LANDING_DOMAIN}/g" "${SSL_LANDING_TEMPLATE}")
         ${COMPOSE_CMD} -f "${COMPOSE_FILE}" exec -T nginx \
             sh -c "cat > /etc/nginx/conf.d/ssl-landing.conf" <<< "${SSL_LANDING_CONF}"
         info "Landing domain HTTPS config written."
         SSL_CHANGED=true
     else
-        warn "No SSL cert found for ${LANDING_DOMAIN} at /etc/letsencrypt/live/${LANDING_DOMAIN}/"
-        warn "Enable SSL via Hostinger hPanel → SSL section for this domain."
+        warn "No SSL cert found for ${LANDING_DOMAIN}. Run with --email to issue one."
     fi
 fi
 
@@ -266,6 +313,12 @@ if [ "${SSL_CHANGED}" = "true" ]; then
     ${COMPOSE_CMD} -f "${COMPOSE_FILE}" exec -T nginx \
         sh -c "nginx -t && nginx -s reload"
     info "HTTPS activated. nginx reloaded."
+fi
+if [ "${SSL_RENEW}" = "true" ] && [ -z "${DOMAIN}" ] && [ -z "${LANDING_DOMAIN}" ]; then
+    header "SSL Certificate Renewal"
+    certbot renew --webroot -w /var/www/certbot
+    ${COMPOSE_CMD} -f "${COMPOSE_FILE}" exec -T nginx sh -c "nginx -s reload"
+    info "Certificates renewed and nginx reloaded."
 fi
 
 # =============================================================================
@@ -304,5 +357,5 @@ info "Commands:"
 info "  Logs     : ${COMPOSE_CMD} -f ${COMPOSE_FILE} logs -f"
 info "  Stop     : ${COMPOSE_CMD} -f ${COMPOSE_FILE} down"
 info "  Restart  : ${COMPOSE_CMD} -f ${COMPOSE_FILE} restart"
-info "  SSL      : Managed by Hostinger hPanel (auto-renewal)"
+info "  SSL renew: certbot renew --webroot -w /var/www/certbot"
 echo ""
