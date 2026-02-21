@@ -63,7 +63,7 @@ void main() {
 React renderer for Three.js. Write 3D scenes declaratively using JSX.
 Automatic disposal, Suspense loading, React event system on 3D objects.
 
-- **Current:** R3F v9.5 + Drei v10.7 (React 19 compatible)
+- **Current:** R3F v9.5.0 + Drei v10.7.7 (React 19.0–19.2 compatible, v11 targeting WebGPU)
 - **Approach:** Declarative JSX → Three.js scene graph
 - **A.I.M.S. Status:** Default for 3D in React/Next.js projects
 
@@ -195,8 +195,9 @@ experiences, VR/AR, and physics-heavy scenes.
 Creative coding library (Processing for JavaScript). Sketch-based approach
 for generative art, data visualization, and creative experiments.
 
-- **Current:** p5.js 1.x
-- **Modes:** 2D (Canvas) and WEBGL (3D)
+- **Current:** p5.js 2.2 (2.0 released April 2025 — major rewrite, 1.x editor default until Aug 2026)
+- **Modes:** 2D (Canvas) and WEBGL (3D), WebGPU core add-on
+- **v2 Changes:** Variable fonts, JS shaders (replaces GLSL), OKLCH/LAB/LCH color modes, HDR canvases (Display P3), unified pointer events, async `setup()`, ES modules
 - **Community:** Massive creative coding community, extensive tutorials
 
 ### Picker_Ang Notes
@@ -211,8 +212,9 @@ for generative art, data visualization, and creative experiments.
 Data-driven document manipulation. The standard for complex, custom data
 visualization on the web. Low-level but extremely powerful.
 
-- **Current:** D3 v7
+- **Current:** D3 v7.9.0 (stable, maintained by Observable)
 - **Approach:** Data binding → DOM manipulation → transitions
+- **High-level:** Observable Plot (recommended charting API built on D3)
 - **Alternatives:** Recharts, Nivo, Visx (React wrappers over D3)
 
 ### Key Patterns
