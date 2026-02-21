@@ -1,7 +1,7 @@
-name: CI — Build & Push Images (DISABLED)
+name: CI — Build & Push Docker Images
 
-# Cloud Build disabled — VPS builds images locally via deploy.sh
-# To re-enable, uncomment the push trigger below
+# Builds Docker images directly on GitHub Actions runner (no Cloud Build).
+# Images pushed to Artifact Registry for VPS to pull via deploy.sh.
 on:
   # push:
   #   branches: [main]
@@ -12,13 +12,13 @@ concurrency:
   cancel-in-progress: false
 
 env:
+  REGISTRY: us-central1-docker.pkg.dev
   PROJECT_ID: ai-managed-services
-  REGION: us-central1
   REPO: aims-docker
 
 jobs:
-  deploy:
-    name: Build & Push to Artifact Registry
+  build:
+    name: Build & Push Images
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -36,28 +36,56 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
-      - name: Verify GCP Auth
-        continue-on-error: true
-        run: |
-          echo "=== Active account ==="
-          gcloud auth list
-          echo "=== Project ==="
-          gcloud config get-value project
-          echo "=== Cloud Build API ==="
-          gcloud services list --enabled --filter="name:cloudbuild" --project=${{ env.PROJECT_ID }} || echo "WARNING: Could not list services (may be a permissions issue)"
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker ${{ env.REGISTRY }} --quiet
 
-      - name: Submit to Cloud Build
-        env:
-          SHORT_SHA: ${{ github.sha }}
+      - name: Set SHORT_SHA
+        run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
+
+      # ── UEF Gateway ──
+      - name: Build uef-gateway
         run: |
-          set -x
-          SHORT_SHA_SHORT=${SHORT_SHA:0:7}
-          echo "Submitting with SHORT_SHA=$SHORT_SHA_SHORT"
-          gcloud builds submit \
-            --config=cloudbuild.yaml \
-            --project=${{ env.PROJECT_ID }} \
-            --substitutions=_SHORT_SHA=$SHORT_SHA_SHORT,_REGION=us-central1,_REPO=aims-docker \
-            --verbosity=debug 2>&1 || {
-              echo "::error::Cloud Build submission failed with exit code $?"
-              exit 1
-            }
+          docker build \
+            -t ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPO }}/uef-gateway:${{ env.SHORT_SHA }} \
+            -t ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPO }}/uef-gateway:latest \
+            -f backend/uef-gateway/Dockerfile \
+            backend/uef-gateway
+
+      - name: Push uef-gateway
+        run: docker push --all-tags ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPO }}/uef-gateway
+
+      # ── Frontend ──
+      - name: Build frontend
+        run: |
+          docker build \
+            -t ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPO }}/frontend:${{ env.SHORT_SHA }} \
+            -t ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPO }}/frontend:latest \
+            -f frontend/Dockerfile \
+            .
+
+      - name: Push frontend
+        run: docker push --all-tags ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPO }}/frontend
+
+      # ── Research Ang ──
+      - name: Build research-ang
+        run: |
+          docker build \
+            -t ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPO }}/research-ang:${{ env.SHORT_SHA }} \
+            -t ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPO }}/research-ang:latest \
+            -f backend/agents/research-ang/Dockerfile \
+            backend/agents/research-ang
+
+      - name: Push research-ang
+        run: docker push --all-tags ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPO }}/research-ang
+
+      # ── Router Ang ──
+      - name: Build router-ang
+        run: |
+          docker build \
+            -t ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPO }}/router-ang:${{ env.SHORT_SHA }} \
+            -t ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPO }}/router-ang:latest \
+            -f backend/agents/router-ang/Dockerfile \
+            backend/agents/router-ang
+
+      - name: Push router-ang
+        run: docker push --all-tags ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPO }}/router-ang
