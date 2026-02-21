@@ -266,9 +266,9 @@ text-align: left → text-align: start
 Native browser API for animated page transitions. Captures old/new state screenshots,
 animates between them. Shared element transitions natively.
 
-- **Current:** Chrome 111+, Safari 18+, Firefox (in development)
+- **Current:** Chrome 111+, Safari 18+, Firefox (in development, Interop 2026)
 - **Same-document:** SPA route changes
-- **Cross-document:** MPA page navigations (Chrome 126+)
+- **Cross-document:** MPA page navigations (Chrome 126+, Safari 26+)
 
 ### Key Patterns
 ```ts
@@ -288,6 +288,47 @@ document.startViewTransition(() => {
 ### Picker_Ang Notes
 - Choose when: Page transitions needed, shared element animations between routes
 - Avoid when: Complex choreography (use Motion AnimatePresence), need Firefox support today
+
+---
+
+## CSS Anchor Positioning
+
+### Overview
+Attach elements to other elements purely in CSS. The browser handles spatial
+awareness, overflow detection, and fallback positioning automatically.
+Replaces Popper.js / Floating UI for most tooltip/dropdown use cases.
+
+- **Current:** Chrome 125+, Safari (Interop 2026 focus), Firefox (in development)
+- **Approach:** Declare anchor on trigger, position target relative to anchor
+
+### Key Patterns
+```css
+.trigger {
+  anchor-name: --menu-trigger;
+}
+
+.dropdown {
+  position: fixed;
+  position-anchor: --menu-trigger;
+  inset-area: block-end span-inline-end;
+
+  /* Automatic fallback when no room below */
+  position-try-fallbacks: flip-block;
+}
+```
+
+### Fallback Styling
+```css
+/* Style tooltip arrows based on which fallback position is active */
+@position-try --flip-above {
+  inset-area: block-start span-inline-end;
+}
+```
+
+### Picker_Ang Notes
+- Choose when: Tooltips, dropdowns, popovers, contextual menus — no JS needed
+- Avoid when: Need Firefox support today (use Floating UI as fallback)
+- Progressive enhancement: use Anchor Positioning with Floating UI fallback
 
 ---
 
@@ -331,4 +372,5 @@ xl:  1280px  → Laptops / desktops
 | **Container Queries** | N/A | Container-based | Yes | Modern (95%+) |
 | **Fluid Typography** | Text | Continuous | No | Universal |
 | **View Transitions** | Navigation | N/A | N/A | Chrome/Safari |
+| **Anchor Positioning** | Positioning | N/A | N/A | Chrome (Interop 2026) |
 | **Logical Properties** | All | N/A | N/A | Universal |

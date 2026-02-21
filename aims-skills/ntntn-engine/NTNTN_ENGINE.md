@@ -111,7 +111,7 @@ How it looks. The visual foundation.
 |-----------|-----------|----------|----------------|
 | **Tailwind CSS** | Utility-first CSS framework | Rapid development, consistent spacing/colors, responsive design | JIT compilation, Custom design tokens, @apply, Plugins, Container queries, Dark mode |
 | **CSS Modules** | Scoped CSS with automatic class name hashing | Component isolation, avoiding class conflicts, SSR-friendly | :global, composes, CSS variables, co-located styles |
-| **Styled Components / Emotion** | CSS-in-JS with tagged template literals | Dynamic styling, theme-driven design, co-located styles | ThemeProvider, css prop, keyframes, createGlobalStyle, SSR extraction |
+| **Styled Components / Emotion** | CSS-in-JS with tagged template literals (⚠️ styled-components in maintenance mode) | Legacy projects with existing CSS-in-JS (plan migration) | ThemeProvider, css prop, keyframes, createGlobalStyle, SSR extraction |
 | **Vanilla Extract** | Zero-runtime CSS-in-TypeScript | Type-safe styling, large codebases, build-time extraction | sprinkles(), recipe(), createTheme, style(), globalStyle() |
 | **UnoCSS** | Instant atomic CSS engine — configurable | Custom utility systems, speed-critical builds, preset flexibility | Attributify mode, Variant groups, Shortcuts, Presets (Wind, Mini, Icons) |
 | **Open Props** | Pre-built CSS custom properties library | Design token adoption, consistent defaults, progressive enhancement | Adaptive colors, Easing tokens, Size scale, Gradients, Animations |
@@ -216,12 +216,14 @@ How content adapts and flows across devices and viewports.
 | **View Transitions API** | Native browser page transition animations | Multi-page apps, SPA route transitions, shared element animations | document.startViewTransition(), view-transition-name, ::view-transition pseudo-elements |
 | **Responsive Images** | Serve optimal image size per device | Performance, bandwidth savings, art direction | srcset, sizes, picture element, AVIF/WebP, loading=lazy, fetchpriority |
 | **Fluid Typography** | Font size scales smoothly with viewport | Responsive text without breakpoints, consistent readability | clamp(), min(), max(), CSS locks, modular type scales |
+| **CSS Anchor Positioning** | Attach elements to others in pure CSS | Tooltips, dropdowns, popovers without JS | anchor-name, position-anchor, inset-area, position-try-fallbacks |
 | **Logical Properties** | Direction-agnostic CSS (inline/block vs left/right) | RTL support, internationalization, future-proof layouts | margin-inline, padding-block, inset-inline, border-block |
 
 **Picker_Ang Decision Matrix:**
 - User wants grid layout → **CSS Grid** (always)
 - User wants responsive cards that adapt to their container → **Container Queries**
 - User wants page transitions → **View Transitions API**
+- User wants tooltips/dropdowns without JS → **CSS Anchor Positioning** (with Floating UI fallback)
 - User wants scalable text → **Fluid Typography (clamp)**
 - User needs RTL / i18n → **Logical Properties**
 

@@ -111,7 +111,7 @@ export const INTENT_MAP: IntentMapping[] = [
 
   // Layout & Responsive
   {
-    keywords: ['layout', 'grid', 'flexbox', 'responsive', 'mobile', 'adaptive', 'container query', 'bento', 'masonry', 'fluid', 'breakpoint'],
+    keywords: ['layout', 'grid', 'flexbox', 'responsive', 'mobile', 'adaptive', 'container query', 'bento', 'masonry', 'fluid', 'breakpoint', 'anchor', 'popover', 'tooltip position'],
     category: 'layout_responsive',
     primary_boomer_ang: 'Picker_Ang',
   },

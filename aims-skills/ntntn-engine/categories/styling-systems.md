@@ -229,9 +229,9 @@ typography, easing, gradients, and animations.
 CSS-in-JS libraries using tagged template literals. Styles are co-located with
 components and can access props and theme context dynamically.
 
-- **Current:** Styled Components v6, Emotion v11
+- **Current:** Styled Components v6 (⚠️ MAINTENANCE MODE since March 2025), Emotion v11
 - **Runtime:** Has runtime overhead (style injection at runtime)
-- **Status:** Declining in favor of zero-runtime alternatives (Tailwind, Vanilla Extract)
+- **Status:** styled-components officially in maintenance mode — no new features, only critical bug fixes. Incompatible with React Server Components (relies on Context API). Creator recommends against adoption for new projects. Sanity forked it for 40% faster renders while teams migrate.
 
 ### Key Patterns
 ```tsx
@@ -244,8 +244,9 @@ const Button = styled.button<{ $primary?: boolean }>`
 ```
 
 ### Picker_Ang Notes
-- Choose when: Existing codebase uses it, dynamic theme-driven styling
-- Avoid when: New projects (use Tailwind), SSR-heavy (runtime cost), performance-critical
+- Choose when: Existing codebase uses it (plan migration)
+- **Avoid for all new projects** — use Tailwind, CSS Modules, or Vanilla Extract instead
+- Migration targets: Tailwind CSS (most common), Vanilla Extract (type-safe), StyleX (Meta, zero-runtime)
 
 ---
 
@@ -253,10 +254,13 @@ const Button = styled.button<{ $primary?: boolean }>`
 
 ### Overview
 CSS preprocessor with nesting, mixins, functions, and variables. The original
-"CSS with superpowers." Still widely used in legacy and enterprise codebases.
+"CSS with superpowers." Still widely used in legacy and enterprise codebases,
+but native CSS is catching up fast.
 
 - **Current:** Dart Sass 1.x (only maintained version)
 - **Note:** Node Sass is deprecated. LibSass is deprecated.
+- **2026 Reality:** Native CSS now has nesting (stable in all browsers), `@function`, `@mixin`,
+  and `if()` — reducing the need for Sass in new projects.
 
 ### Key Patterns
 ```scss
@@ -279,8 +283,31 @@ CSS preprocessor with nesting, mixins, functions, and variables. The original
 ```
 
 ### Picker_Ang Notes
-- Choose when: Legacy codebases, migrating from older projects
-- Avoid when: New projects (Tailwind preferred), working with CSS-in-JS ecosystem
+- Choose when: Legacy codebases, migrating from older projects, complex math/loops
+- Avoid when: New projects — native CSS nesting + `@function` + `@mixin` cover most Sass use cases
+
+---
+
+## Modern CSS Features (2026)
+
+Native CSS is absorbing capabilities that previously required preprocessors or JavaScript:
+
+| Feature | Status | Replaces |
+|---------|--------|----------|
+| **CSS Nesting** | Stable (all browsers) | Sass nesting |
+| **CSS `if()`** | Chromium (shipping) | JS conditional styling |
+| **CSS `@function`** | Chromium (shipping) | Sass functions |
+| **CSS `@mixin` / `@apply`** | Chromium (shipping) | Sass mixins |
+| **CSS Anchor Positioning** | Chromium + Safari (Interop 2026) | Floating UI / Popper.js |
+| **Scroll-Driven Animations** | Chrome + Safari 26+ | JS scroll libraries |
+| **View Transitions** | Chrome + Safari | Page transition libraries |
+| **`@starting-style`** | Stable (all browsers) | JS entry animations |
+| **`@property`** | Stable (all browsers) | CSS Houdini APIs |
+
+### Picker_Ang Notes
+- Native CSS features should be preferred when browser support is sufficient
+- Tailwind CSS v4 already leverages native nesting and `@property`
+- For projects requiring broad browser support, use CSS features with fallbacks
 
 ---
 
