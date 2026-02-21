@@ -77,16 +77,44 @@ The IMAGE pillar handles everything the user *sees* before and during the build 
 
 | Capability | Tool / Service | Purpose | Output |
 |-----------|---------------|---------|--------|
-| **AI Image Generation** | Flux Pro / DALL-E 3 / Stable Diffusion XL | Generate hero images, backgrounds, illustrations, product shots | PNG/WebP files |
-| **Screenshot Preview** | Puppeteer / Playwright | Capture rendered page screenshots for review before deploy | PNG screenshots |
-| **Icon & Logo Generation** | Flux + SVG post-processing / Recraft V3 | Generate brand icons, logos, favicons from descriptions | SVG/PNG |
-| **Asset Optimization** | Sharp / Squoosh / next/image pipeline | Compress, resize, convert to WebP/AVIF, generate srcset variants | Optimized assets |
-| **OG Image Generation** | Satori (Vercel) + @vercel/og | Dynamic Open Graph images from templates | PNG (1200x630) |
-| **Background Generation** | CSS gradient generators + AI | Mesh gradients, aurora, animated gradients, noise textures | CSS/SVG/PNG |
+| **AI Image Generation** | Nano Banana Pro (Gemini 3 Pro Image) / GPT Image 1.5 / FLUX.2 [pro] / Imagen 4 | Generate hero images, backgrounds, illustrations, product shots | PNG/WebP/AVIF files |
+| **Screenshot Preview** | Playwright | Capture rendered page screenshots for review before deploy | PNG screenshots |
+| **Icon Generation** | SVGMaker MCP + Recraft V4 | Generate brand icons from descriptions — native SVG output | SVG files |
+| **Logo Generation** | Recraft V4 Pro (via fal.ai) / GPT Image 1.5 (wordmarks) | Generate brand logos as true vectors | SVG/PNG |
+| **Asset Optimization** | Sharp v0.34+ / next/image pipeline | Compress, resize, convert to AVIF/WebP, generate srcset variants | Optimized assets |
+| **OG Image Generation** | Satori + resvg-js / @vercel/og v0.8+ | Dynamic Open Graph images from JSX templates (no browser needed) | PNG (1200x630) |
+| **Background Generation** | CSS gradient generators + AI image gen | Mesh gradients, aurora, animated gradients, noise textures | CSS/SVG/PNG |
 | **Placeholder Generation** | BlurHash / ThumbHash / Plaiceholder | Low-quality image placeholders for loading states | Base64 data URIs |
-| **Sprite Sheet / Animation Assets** | Rive / Lottie export pipeline | Export interactive animation assets for embedding | .riv / .json |
-| **Color Palette Extraction** | Vibrant.js / AI color analysis | Extract color palettes from reference images or descriptions | Design token JSON |
-| **Typography Pairing** | AI-assisted font selection + Google Fonts API | Select complementary font pairings based on mood/intent | Font config |
+| **Animation Assets** | Rive / Lottie / Recraft V4 (Lottie export) | Export interactive animation assets for embedding | .riv / .json |
+| **Color Palette Generation** | Colormind API / Hotpot.ai API + WCAG validation | Generate cohesive palettes, validate contrast accessibility | Design token JSON |
+| **Typography Pairing** | Fontjoy neural net + Google Fonts API / LLM-assisted | Select complementary font pairings based on mood/intent | Font config |
+| **Design-to-Code Bridge** | Figma MCP Server / v0.app / Google Stitch | Convert design files or prompts into code-ready specs | Design context JSON |
+| **Video Assets** | Sora 2 API / Runway Gen-4.5 / Kling 2.5 | Generate short video assets for hero sections, backgrounds | MP4/WebM |
+
+### AI Image Generation Tier List (February 2026)
+
+| Model | Provider | API Endpoint | Price/Image | Best For |
+|-------|----------|-------------|-------------|----------|
+| **Nano Banana Pro** | Google (Gemini 3 Pro Image) | `gemini-3-pro-image-preview` | $0.02-$0.06 | Highest quality, A.I.M.S. default |
+| **GPT Image 1.5** | OpenAI | `gpt-image-1.5` | $0.005-$0.17 | Text rendering, instruction following |
+| **FLUX.2 [pro]** | Black Forest Labs | BFL API | $0.014-$0.05 | Fine-grained control, self-hosting options |
+| **Imagen 4** | Google Vertex AI | `imagen-4.0-generate-001` | $0.02-$0.06 | GCP ecosystem, high volume |
+| **Ideogram 3.0** | Ideogram | Ideogram API v3 | ~$0.06 | Typography in images (~90% accuracy) |
+| **Recraft V4** | Recraft | Recraft API / fal.ai | $0.04-$0.30 | Native SVG vector generation |
+| **SD4** | Stability AI | platform.stability.ai | ~$0.003 | Open-source, self-hostable, massive ecosystem |
+| **Adobe Firefly 5** | Adobe | Firefly Services API | Subscription | IP-indemnified, commercially safe |
+| **GPT Image 1-mini** | OpenAI | `gpt-image-1-mini` | ~$0.005-$0.011 | Budget, high-volume |
+| **FLUX.2 [klein]** | Black Forest Labs | BFL API / self-host | $0.014+ | Sub-second gen, Apache 2.0, consumer GPU |
+
+**DALL-E 3 is deprecated.** API scheduled for full shutdown May 2026. Do not use.
+**Midjourney has no API.** Not viable for programmatic pipelines.
+
+### Unified API Platforms
+For accessing multiple models through a single endpoint:
+- **fal.ai** — FLUX.2, Recraft V4, SD models
+- **Replicate** — FLUX, SD, Hunyuan, open-source models
+- **WaveSpeedAI** — Multi-model with unified billing
+- **SiliconFlow** — Budget-friendly multi-model access
 
 ### IMAGE Pipeline Flow
 ```
@@ -94,25 +122,31 @@ Creative Intent (from Picker_Ang spec)
     ↓
 1. ANALYZE — Parse visual requirements from Stack Recommendation
     ↓
-2. GENERATE — Create visual assets (AI image gen, color extraction, font pairing)
+2. GENERATE — Create visual assets (Nano Banana Pro / GPT Image 1.5 / FLUX.2)
     ↓
-3. OPTIMIZE — Compress, convert formats, generate responsive variants
+3. VECTORIZE — Generate icons/logos as native SVG (Recraft V4 / SVGMaker MCP)
     ↓
-4. CATALOG — Register assets in the Build Manifest with paths and metadata
+4. OPTIMIZE — Compress, convert to AVIF/WebP, generate responsive variants (Sharp)
     ↓
-5. PREVIEW — Generate screenshot mockup of the intended design
+5. CATALOG — Register assets in the Build Manifest with paths and metadata
     ↓
-Output: Asset Catalog (images, icons, fonts, colors, placeholders)
+6. PREVIEW — Generate screenshot mockup (Playwright) + OG images (Satori)
+    ↓
+Output: Asset Catalog (images, icons, fonts, colors, placeholders, video)
 ```
 
 ### IMAGE Rules
+- **A.I.M.S. default image model:** Nano Banana Pro (Gemini 3 Pro Image)
 - Every generated image must be optimized before inclusion (no raw AI output in production)
+- Serve AVIF with WebP/JPEG fallback (AVIF = ~50% smaller than WebP)
 - Maximum hero image: 400KB (after optimization)
 - All images must have alt text generated alongside them
 - Favicons generated in all required sizes (16, 32, 180, 192, 512)
 - OG images are mandatory for every page
 - Color palette must pass WCAG 2.1 AA contrast checks
 - Font selections must include a system font fallback stack
+- Icons and logos must be generated as native SVG (not rasterized)
+- For commercial/enterprise builds requiring IP indemnification: use Adobe Firefly 5
 
 ---
 

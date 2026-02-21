@@ -41,32 +41,43 @@ Everything the user *sees*. Generated before code is written.
 
 | Capability | Tool / Service | Output |
 |-----------|---------------|--------|
-| AI Image Generation | Flux Pro / DALL-E 3 / SDXL | PNG/WebP hero images, backgrounds |
-| Screenshot Preview | Puppeteer / Playwright | Page preview screenshots |
-| Icon & Logo Generation | Flux + SVG post-processing / Recraft V3 | SVG/PNG brand assets |
-| Asset Optimization | Sharp / Squoosh / next/image | Optimized WebP/AVIF files |
-| OG Image Generation | Satori (@vercel/og) | Dynamic Open Graph images |
-| Background Generation | CSS gradient gen + AI | Mesh gradients, noise textures |
+| AI Image Generation | Nano Banana Pro (Gemini 3 Pro) / GPT Image 1.5 / FLUX.2 [pro] / Imagen 4 | PNG/WebP/AVIF assets |
+| Screenshot Preview | Playwright | Page preview screenshots |
+| Icon Generation | SVGMaker MCP + Recraft V4 | Native SVG icons |
+| Logo Generation | Recraft V4 Pro (fal.ai) / GPT Image 1.5 | SVG/PNG brand logos |
+| Asset Optimization | Sharp v0.34+ / next/image | Optimized AVIF/WebP files |
+| OG Image Generation | Satori + resvg-js / @vercel/og v0.8+ | Dynamic OG images (no browser) |
+| Background Generation | CSS gradient gen + AI image gen | Mesh gradients, noise textures |
 | Placeholder Generation | BlurHash / ThumbHash | Base64 loading placeholders |
-| Color Palette Extraction | Vibrant.js / AI analysis | Design token JSON |
-| Typography Pairing | AI + Google Fonts API | Font configuration |
-| Animation Assets | Rive / Lottie export | .riv / .json files |
+| Color Palette Generation | Colormind API / Hotpot.ai API | Design token JSON |
+| Typography Pairing | Fontjoy neural net + Google Fonts API | Font configuration |
+| Animation Assets | Rive / Lottie / Recraft V4 (Lottie export) | .riv / .json files |
+| Design-to-Code Bridge | Figma MCP Server / v0.app / Google Stitch | Design context JSON |
+| Video Assets | Sora 2 API / Runway Gen-4.5 / Kling 2.5 | MP4/WebM |
+
+**A.I.M.S. Default Image Model:** Nano Banana Pro (Gemini 3 Pro Image)
 
 **IMAGE Pipeline:**
 ```
-Creative Intent → ANALYZE visual requirements → GENERATE assets (AI) →
-OPTIMIZE (compress, convert) → CATALOG in manifest → PREVIEW mockup
+Creative Intent → ANALYZE visual requirements → GENERATE raster assets (Nano Banana Pro) →
+VECTORIZE icons/logos (Recraft V4 / SVGMaker MCP) → OPTIMIZE (Sharp → AVIF/WebP) →
+CATALOG in manifest → PREVIEW (Playwright) + OG images (Satori)
 → Output: Asset Catalog
 ```
 
 **IMAGE Rules:**
+- A.I.M.S. default image model: Nano Banana Pro (Gemini 3 Pro Image)
 - Every AI-generated image must be optimized before production use
+- Serve AVIF with WebP/JPEG fallback (AVIF ~50% smaller than WebP)
 - Maximum hero image: 400KB after optimization
 - All images must have auto-generated alt text
 - Favicons in all sizes (16, 32, 180, 192, 512)
 - OG images mandatory for every page
+- Icons and logos must be native SVG (not rasterized)
 - Color palette must pass WCAG 2.1 AA contrast
 - Font selections include system font fallback stack
+- For IP-indemnified enterprise builds: use Adobe Firefly 5
+- DALL-E 3 is deprecated — do not use (shutdown May 2026)
 
 ### Pillar 2: INTERFACE — Code Generation Engine
 The core builder. Generates all code, components, pages, styles, animations.

@@ -1174,7 +1174,7 @@ not to any single agent. All agents in the hierarchy access it when the work cal
   constructs the end product through three execution pillars. Accredited with every finished build.
 
 ### Buildsmith Execution Pipeline (Three Pillars)
-1. **IMAGE** — Visual asset pipeline: AI image gen, color palettes, typography, icons, logos, favicons, OG images, asset optimization
+1. **IMAGE** — Visual asset pipeline: Nano Banana Pro (default) / GPT Image 1.5 / FLUX.2 / Imagen 4 for raster; Recraft V4 / SVGMaker MCP for vectors; Sharp, Satori, Playwright, Figma MCP, video gen (Sora 2 / Runway Gen-4.5)
 2. **INTERFACE** — Code generation engine: E2B sandbox, component/page gen, animation wiring, live preview, user iteration loop
 3. **INTEGRATIONS** — Fullstack & deploy: Git, database (Prisma), auth, payments, API routes, build, deploy, domain/SSL, monitoring
 

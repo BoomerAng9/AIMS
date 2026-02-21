@@ -390,9 +390,10 @@ IF intent contains [build, create, make, design, develop, code, scaffold, genera
 The NtNtN Engine is not just a library — it's an execution engine. Buildsmith's execution pipeline turns Picker_Ang's selections into real, deployed products through three pillars:
 
 ### Pillar 1: IMAGE (Visual Asset Pipeline)
-Generates everything the user sees before code is written — AI images, color palettes, typography, icons, logos, favicons, OG images, placeholders, animation assets.
+Generates everything the user sees before code is written — AI images, color palettes, typography, icons, logos, favicons, OG images, placeholders, animation assets, video.
 
-**Tools:** Flux Pro / DALL-E 3, Sharp / Squoosh, Satori, BlurHash, Vibrant.js, Google Fonts API, Rive / Lottie export
+**Default Image Model:** Nano Banana Pro (Gemini 3 Pro Image)
+**Tools:** Nano Banana Pro / GPT Image 1.5 / FLUX.2 / Imagen 4, Recraft V4 (native SVG), SVGMaker MCP, Sharp v0.34+, Satori + resvg-js, Playwright, Colormind API, Fontjoy, Figma MCP Server, v0.app, Sora 2 / Runway Gen-4.5
 
 ### Pillar 2: INTERFACE (Code Generation Engine)
 The core builder — generates code, components, pages, styles, and animations inside an isolated sandbox with live preview and user iteration loop.
