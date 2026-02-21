@@ -199,7 +199,7 @@ export default defineConfig({
 Pre-built CSS custom properties library. Drop-in design tokens for colors, spacing,
 typography, easing, gradients, and animations.
 
-- **Current:** Open Props 1.x
+- **Current:** Open Props 1.7+ (Open Props UI v3.3 companion library)
 - **Approach:** CSS variables that work with any framework
 - **Size:** Treeshakeable — import only what you use
 

@@ -181,7 +181,7 @@ Google Material Design implementation for React. The most widely-used React
 component library by install count. Enterprise-grade with extensive documentation.
 
 - **Current:** MUI v7.3 (released March 2025, CSS layers support, React 19)
-- **Design:** Material Design 3 (Material You)
+- **Design:** Material Design 2 default (MD3 / Material You deferred in v7)
 - **Components:** 50+ components, Data Grid, Date Pickers, Charts
 - **Note:** Pigment CSS (zero-runtime) is ON HOLD (alpha only, not production-ready). Joy UI and Toolpad also paused.
 
@@ -201,9 +201,10 @@ Strong in admin panels, dashboards, and CJK (Chinese/Japanese/Korean) locales.
 - **Approach:** CSS-in-JS (cssinjs) + Design tokens + ConfigProvider
 - **Components:** 60+ including ProComponents for enterprise layouts
 - **v6 Changes:** React 19 as default peer, dropped IE support, React Compiler compatibility, performance improvements
+- **Ant Design X 2.0:** Companion library for AI-driven interfaces (chat UIs, agent panels)
 
 ### Picker_Ang Notes
-- Choose when: Admin panels, data-heavy dashboards, CJK market
+- Choose when: Admin panels, data-heavy dashboards, CJK market, AI interfaces (with Ant Design X)
 - Avoid when: Consumer-facing creative sites, custom design systems
 
 ---
