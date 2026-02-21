@@ -13,8 +13,10 @@ for mount/unmount transitions. Rebranded from "Framer Motion" to "Motion" in 202
 independent project at motion.dev — now framework-agnostic. 18M+ monthly npm downloads.
 
 - **Current:** Motion 12.34 (install: `npm i motion`, was `framer-motion`)
-- **Bundle:** ~30KB (tree-shakeable)
+- **Bundle:** ~30KB (tree-shakeable), mini animate ~2.3KB
 - **Frameworks:** React, Vue, vanilla JavaScript
+- **Premium:** Motion+ ($) — 330+ copy-paste animations, AnimateView, scrambleText
+- **Note:** `motion-one` merged into main `motion` package as of v11.11.12
 - **A.I.M.S. Status:** Primary animation library — used on all pages
 
 ### Core API
@@ -347,9 +349,10 @@ inView(".element", ({ target }) => {
 Render After Effects animations on the web via JSON export. Designers create in AE,
 export with Bodymovin, developers play on web.
 
-- **Current:** lottie-web, DotLottie (compressed format)
-- **Bundle:** lottie-web ~250KB (light variant ~150KB), DotLottie player ~45KB
-- **Format:** JSON (Lottie) or .lottie (DotLottie — compressed, multi-animation)
+- **Current:** `@lottiefiles/dotlottie-react` 0.18 (recommended) — Rust-based renderer via WASM
+- **⚠️ Legacy:** `lottie-web` 5.13 and `lottie-react` 2.4.1 are in maintenance mode — use dotLottie instead
+- **Bundle:** dotLottie player ~45KB (Rust/WASM), lottie-web ~250KB (JS, stagnating)
+- **Format:** .lottie (dotLottie — 90% compression, multi-animation, state machines, themes) replaces Lottie JSON
 
 ### Key Techniques
 ```tsx
@@ -381,9 +384,10 @@ import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 Real-time interactive animation platform with state machines. Animations are designed
 in the Rive editor and controlled at runtime via input bindings.
 
-- **Current:** Rive runtime
-- **Bundle:** ~160KB (WASM runtime)
-- **Format:** `.riv` (binary, optimized)
+- **Current:** @rive-app/react-canvas 4.26, very actively developed across all platforms
+- **Bundle:** ~160KB (WASM runtime) — new Rust-based renderer (Metal, Vulkan, D3D, WebGL)
+- **Format:** `.riv` (binary, optimized) — WebGPU support incoming
+- **Platforms:** iOS, macOS, visionOS, Android, Web, Flutter, Unity, Unreal, C++
 
 ### Key Techniques
 ```tsx
@@ -412,8 +416,9 @@ function AnimatedButton() {
 - Blend states for smooth transitions between animations
 
 ### Picker_Ang Notes
-- Choose when: Interactive characters, game-like UI, complex state-driven animation
+- Choose when: Interactive characters, game-like UI, complex state-driven animation, cross-platform (iOS/Android/Web)
 - Avoid when: Simple transitions (overkill), need to modify animation in code (Rive is editor-first)
+- **Rive is surging** — most actively developed animation runtime, positioning as the premium Lottie alternative
 
 ---
 
@@ -537,7 +542,7 @@ Molasses:  { stiffness: 50,  damping: 20, mass: 3 }
 - Motion (`type: "spring"`)
 - React Spring (`useSpring`)
 - GSAP (custom ease)
-- Motion One (`spring()`)
+- Motion vanilla JS (`spring()`)
 
 ### Picker_Ang Notes
 - **Always prefer springs over tween/ease for interactive elements**
