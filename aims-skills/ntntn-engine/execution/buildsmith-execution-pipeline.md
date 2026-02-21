@@ -89,6 +89,7 @@ The IMAGE pillar handles everything the user *sees* before and during the build 
 | **Color Palette Generation** | Colormind API / Hotpot.ai API + WCAG validation | Generate cohesive palettes, validate contrast accessibility | Design token JSON |
 | **Typography Pairing** | Fontjoy neural net + Google Fonts API / LLM-assisted | Select complementary font pairings based on mood/intent | Font config |
 | **Design-to-Code Bridge** | Figma MCP Server / v0.app / Google Stitch | Convert design files or prompts into code-ready specs | Design context JSON |
+| **Template Assets** | Canva Connect APIs (12 APIs — resize, data connectors, design editing) | Template-driven marketing assets, data-driven design variants | PNG/PDF/designs |
 | **Video Assets** | Sora 2 API / Runway Gen-4.5 / Kling 2.6 / Pika 2.5 | Generate short video assets for hero sections, backgrounds | MP4/WebM |
 
 ### AI Image Generation Tier List (February 2026)
@@ -151,7 +152,7 @@ Output: Asset Catalog (images, icons, fonts, colors, placeholders, video)
 - All images must have alt text generated alongside them
 - Favicons generated in all required sizes (16, 32, 180, 192, 512)
 - OG images are mandatory for every page
-- Color palette must pass WCAG 2.1 AA contrast checks
+- Color palette must pass WCAG 2.1 AA contrast checks (use `color-contrast-checker` or axe-core)
 - Font selections must include a system font fallback stack
 - Icons and logos must be generated as native SVG (not rasterized)
 - For commercial/enterprise builds requiring IP indemnification: use Adobe Firefly 5
