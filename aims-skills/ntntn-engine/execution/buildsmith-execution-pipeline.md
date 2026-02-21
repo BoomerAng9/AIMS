@@ -290,7 +290,7 @@ The INTEGRATIONS pillar connects the frontend to everything else — databases, 
 |-----------|---------------|---------|--------|
 | **Git Operations** | GitHub API / git CLI | Initialize repo, commit, branch, push | Git repository |
 | **Database Setup** | Prisma v7 + SQLite (dev) / PostgreSQL (prod) | Schema definition, migrations, seeding | Database + Prisma client |
-| **Authentication** | NextAuth.js / Auth.js / Clerk | User auth flows (social, email, magic link) | Auth config + pages |
+| **Authentication** | Auth.js v5 / Clerk | User auth flows (social, email, magic link) | Auth config + pages |
 | **Payments** | Stripe SDK + Checkout / Billing Portal | Payment processing, subscriptions, invoicing | Stripe integration |
 | **Email** | Resend / SendGrid / Nodemailer | Transactional emails, notifications | Email templates + API |
 | **File Storage** | Uploadthing / S3 / GCS / Cloudflare R2 | User uploads, media storage | Storage config |
@@ -348,12 +348,14 @@ From build requirements:
 ```
 Based on Picker_Ang's auth selection:
 
-NextAuth.js / Auth.js:
-  - providers/[...nextauth]/route.ts
+Auth.js v5 (formerly NextAuth.js):
+  - auth.ts (root config, universal auth() method)
+  - app/api/auth/[...nextauth]/route.ts (handler export)
   - Social providers (Google, GitHub, Discord)
   - Email + magic link
   - Session handling (JWT or database)
   - Protected route middleware
+  - Edge runtime compatible
 
 Clerk:
   - ClerkProvider wrapper

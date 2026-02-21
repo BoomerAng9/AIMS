@@ -86,7 +86,8 @@ Table, Tabs, Textarea, Toggle, Tooltip
 Unstyled, accessible React primitives. The foundation that shadcn/ui is built on.
 Handles all accessibility, keyboard navigation, and focus management.
 
-- **Current:** Unified `radix-ui` package (Feb 2026 — replaces individual `@radix-ui/react-*` packages)
+- **Current:** Unified `radix-ui` v1.4.3 (Feb 2026 — replaces individual `@radix-ui/react-*` packages)
+- **New Primitives:** PasswordToggleField, OneTimePasswordField (OTP), Form (preview), Menubar (stable)
 - **Approach:** Headless components — you bring your own styles
 - **Accessibility:** WAI-ARIA compliant, keyboard navigable, screen reader tested
 
@@ -134,13 +135,15 @@ Tailwind CSS projects. Fewer components than Radix but tighter Tailwind integrat
 Framework-agnostic headless components from the Chakra UI team. Supports React,
 Vue, and Solid with the same API. Built on state machines for predictable behavior.
 
-- **Current:** Ark UI 4.x
-- **Frameworks:** React, Vue, Solid
+- **Current:** Ark UI v5.31 (45+ components, very actively maintained)
+- **Frameworks:** React, Vue, Solid, Svelte
 - **Foundation:** Zag.js state machines
+- **Companion:** Park UI (styled Ark UI + Panda CSS)
 
 ### Picker_Ang Notes
-- Choose when: Multi-framework projects, need same components across React + Vue
+- Choose when: Multi-framework projects, need same components across React + Vue + Solid + Svelte
 - Avoid when: React-only project (use shadcn/ui)
+- Pairs with: **Panda CSS** (zero-runtime styling from same Chakra team)
 
 ---
 
@@ -150,8 +153,9 @@ Vue, and Solid with the same API. Built on state machines for predictable behavi
 Styled component library with a comprehensive theme system. Ready-to-use components
 with sensible defaults. Good for rapid prototyping.
 
-- **Current:** Chakra UI v3
+- **Current:** Chakra UI v3.3+ (major v3 rewrite — Zag.js state machines, Ark UI headless, removed Framer Motion dependency)
 - **Approach:** Style props + theme tokens + dark mode out of the box
+- **v3 Changes:** Emotion styling (Panda CSS-aligned APIs), Ark UI headless components, QRCode/ColorPicker/DatePicker added
 
 ### Key Patterns
 ```tsx
@@ -174,9 +178,10 @@ with sensible defaults. Good for rapid prototyping.
 Google Material Design implementation for React. The most widely-used React
 component library by install count. Enterprise-grade with extensive documentation.
 
-- **Current:** MUI v6 (with Pigment CSS — zero-runtime)
+- **Current:** MUI v7.3 (released March 2025, CSS layers support, React 19)
 - **Design:** Material Design 3 (Material You)
 - **Components:** 50+ components, Data Grid, Date Pickers, Charts
+- **Note:** Pigment CSS (zero-runtime) is ON HOLD (alpha only, not production-ready). Joy UI and Toolpad also paused.
 
 ### Picker_Ang Notes
 - Choose when: Material Design required, enterprise admin panels, data-heavy tables

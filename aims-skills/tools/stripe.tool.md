@@ -4,7 +4,7 @@ name: "Stripe"
 type: "tool"
 category: "payments"
 provider: "Stripe"
-description: "Payment processing and subscription management — powers the 3-6-9 billing model."
+description: "Payment processing and subscription management — powers the 3-6-9 billing model. API version: 2026-01-28.clover."
 env_vars:
   - "STRIPE_SECRET_KEY"
   - "STRIPE_PUBLISHABLE_KEY"
@@ -24,6 +24,9 @@ aims_files:
 ## Overview
 
 Stripe powers all payment processing for AIMS. It implements the **3-6-9 billing model** (Starter/Pro/Enterprise tiers) with subscription management, webhooks, and usage-based billing via LUC integration.
+
+- **Current API:** `2026-01-28.clover` (Accounts v2 GA, agentic commerce, stablecoin payouts)
+- **SDK:** `stripe` npm package (pin to latest compatible version)
 
 ## API Key Setup
 

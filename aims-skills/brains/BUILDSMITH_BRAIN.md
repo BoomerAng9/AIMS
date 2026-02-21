@@ -154,7 +154,7 @@ Connects frontend to backend, third-party services, and deployment.
 |-----------|---------------|--------|
 | Git Operations | GitHub API / git CLI | Repository |
 | Database Setup | Prisma v7 + SQLite/PostgreSQL | DB + Prisma client |
-| Authentication | NextAuth.js / Auth.js / Clerk | Auth config + pages |
+| Authentication | Auth.js v5 / Clerk | Auth config + pages |
 | Payments | Stripe SDK + Checkout | Payment integration |
 | Email | Resend / SendGrid | Email templates + API |
 | File Storage | Uploadthing / S3 / R2 | Storage config |

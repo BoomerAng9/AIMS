@@ -121,7 +121,7 @@ import styles from './Button.module.css';
 Zero-runtime CSS-in-TypeScript. Styles are written in .css.ts files and extracted
 to static CSS at build time. Full TypeScript type safety for styles.
 
-- **Current:** Vanilla Extract 1.x
+- **Current:** Vanilla Extract 1.18 (⚠️ maintenance has slowed — community concerns about responsiveness)
 - **Approach:** TypeScript functions that generate CSS at build time
 - **Output:** Static CSS files (no runtime overhead)
 
@@ -162,7 +162,7 @@ export const button = recipe({
 Instant atomic CSS engine. Configurable rules, presets, and transformers.
 Faster than Tailwind in many benchmarks due to on-demand generation.
 
-- **Current:** UnoCSS 0.6x+
+- **Current:** UnoCSS v66.6 (actively maintained, frequent releases)
 - **Approach:** On-demand atomic CSS generation from configurable rules
 - **Presets:** Wind (Tailwind-compatible), Mini, Icons, Typography
 
@@ -288,6 +288,39 @@ but native CSS is catching up fast.
 
 ---
 
+## Panda CSS
+
+### Overview
+Build-time, type-safe CSS-in-JS with zero runtime. Created by the Chakra UI team.
+Uses static extraction to generate real CSS files at build time — RSC compatible.
+
+- **Current:** Pre-1.0 (approaching stable, close to v1.0 release)
+- **Approach:** Write styles in TypeScript, extracted to static CSS at build time
+- **Production users:** Zillow (design system, ~30% faster page loads on low-cost devices)
+
+### Key Patterns
+```ts
+import { css } from '../styled-system/css';
+
+function Button() {
+  return (
+    <button className={css({
+      bg: 'blue.500', color: 'white', px: '4', py: '2',
+      rounded: 'lg', _hover: { bg: 'blue.600' }
+    })}>
+      Click me
+    </button>
+  );
+}
+```
+
+### Picker_Ang Notes
+- Choose when: Want CSS-in-JS DX with zero runtime cost, TypeScript-first, RSC compatibility
+- Avoid when: Team invested in Tailwind ecosystem (similar benefits, larger community)
+- Pairs with: **Ark UI** (headless components by same Chakra team)
+
+---
+
 ## Modern CSS Features (2026)
 
 Native CSS is absorbing capabilities that previously required preprocessors or JavaScript:
@@ -321,6 +354,7 @@ Native CSS is absorbing capabilities that previously required preprocessors or J
 | **UnoCSS** | Zero | Partial | Via presets | Excellent | Small | Low |
 | **Open Props** | Zero | No | Pre-built | Adaptive | Treeshakeable | Very Low |
 | **Styled Components** | Runtime | Partial | Via ThemeProvider | Via theme | Medium | Medium |
+| **Panda CSS** | Zero | Full TS | Built-in | Via themes | Zero | Medium |
 | **Sass/SCSS** | Zero | No | Via variables | Manual | Zero | Low |
 
 ---

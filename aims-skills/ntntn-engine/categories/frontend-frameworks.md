@@ -117,7 +117,7 @@ every 60 seconds. On-demand revalidation via `revalidatePath()` or `revalidateTa
 - **State:** Zustand, Jotai, Valtio (lightweight) | Redux Toolkit (enterprise)
 - **Data Fetching:** React Query / TanStack Query, SWR
 - **Forms:** React Hook Form, Conform, Formik
-- **Auth:** NextAuth.js / Auth.js, Clerk, Lucia
+- **Auth:** Auth.js v5 (formerly NextAuth.js), Clerk, Lucia
 - **ORM:** Prisma, Drizzle
 - **Testing:** Vitest, Testing Library, Playwright
 

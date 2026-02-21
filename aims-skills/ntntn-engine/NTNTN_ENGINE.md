@@ -405,7 +405,7 @@ The core builder — generates code, components, pages, styles, and animations i
 ### Pillar 3: INTEGRATIONS (Fullstack & Deploy Pipeline)
 Connects frontend to databases, auth, payments, APIs, Git, deployment targets, monitoring.
 
-**Tools:** GitHub API, Prisma v7, NextAuth.js / Clerk, Stripe, Resend, Vercel / Docker Compose, Sentry / Uptime Kuma
+**Tools:** GitHub API, Prisma v7, Auth.js v5 / Clerk, Stripe (2026-01-28.clover), Resend, Vercel / Docker Compose, Sentry / Uptime Kuma
 
 ### Execution Flow
 ```
