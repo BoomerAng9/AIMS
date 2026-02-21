@@ -78,67 +78,27 @@ interface LogEntry {
 }
 
 // ─────────────────────────────────────────────────────────────
-// Mock Data
+// Initial Data — populated from Circuit Metrics API at runtime
 // ─────────────────────────────────────────────────────────────
 
-const MOCK_AI_AGENTS: AIAgent[] = [
-  { id: 'voice', name: 'Voice Agent', type: 'ElevenLabs STT/TTS', enabled: 'on', load: 78, lastActivity: '10:05 AM Today' },
-  { id: 'code', name: 'Code Generation Agent', type: '', enabled: 'on', load: 65, lastActivity: '10:05 AM Today' },
-  { id: 'backend', name: 'Backend Agent', type: '', enabled: 'on', load: 55, lastActivity: '10:05 AM Today' },
-  { id: 'frontend', name: 'Frontend Agent', type: '', enabled: 'on', load: 45, lastActivity: '10:05 AM Today' },
-  { id: 'testing', name: 'Testing Agent', type: '', enabled: 'on', load: 30, lastActivity: '10:05 AM Today' },
-  { id: 'deploy', name: 'Deploy Agent', type: '', enabled: 'on', load: 20, lastActivity: '10:05 AM Today' },
-];
+const INITIAL_AI_AGENTS: AIAgent[] = [];
+const INITIAL_REPOSITORIES: Repository[] = [];
+const INITIAL_INTEGRATIONS: Integration[] = [];
+const INITIAL_VOICE_CONFIG: VoiceConfig[] = [];
+const INITIAL_DEPLOYMENT: DeploymentService[] = [];
+const INITIAL_LOGS: LogEntry[] = [];
 
-const MOCK_REPOSITORIES: Repository[] = [
-  { id: 'core', name: 'Repo 1 - Core', signal: 5, lastSync: '3m ago', status: 'synced' },
-  { id: 'ui', name: 'Repo 2 - UI', signal: 4, lastSync: '3m ago', status: 'synced' },
-  { id: 'uk', name: 'Repo 2 - UK', signal: 4, lastSync: '3m ago', status: 'synced', errorCount: 0 },
-  { id: 'sox', name: 'Repo 4 - Sox', signal: 5, lastSync: '3m ago', status: 'synced', errorCount: 2 },
-  { id: 'ub', name: 'Repo 5 - UB', signal: 4, lastSync: '2m ago', status: 'synced' },
-  { id: 'ex', name: 'Repo 5 - Ex', signal: 4, lastSync: '3m ago', status: 'synced', errorCount: 0 },
-];
-
-const MOCK_INTEGRATIONS: Integration[] = [
-  { id: 'stripe', name: 'Stripe (Payments)', enabled: 'on', health: 'healthy' },
-  { id: 'github', name: 'GitHub', enabled: 'on', health: 'healthy' },
-  { id: 'cloudflare', name: 'CloudFlare Workers', enabled: 'on', health: 'healthy' },
-  { id: 'postgres', name: 'PostgreSQL Database', enabled: 'off', health: 'healthy' },
-  { id: 'websocket', name: 'WebSocket Service', enabled: 'on', health: 'healthy' },
-];
-
-const MOCK_VOICE_CONFIG: VoiceConfig[] = [
-  { id: 'elevenlabs', name: 'ElevenLabs Integration', enabled: 'on' },
-  { id: 'stt', name: 'Scribe STT circuit breaker', enabled: 'on' },
-  { id: 'tts', name: 'TTS circuit breaker', enabled: 'on' },
-];
-
-const MOCK_DEPLOYMENT: DeploymentService[] = [
-  { id: 'docker', name: 'Docker container registry', enabled: 'on', lastCheck: '3m ago' },
-  { id: 'cloudflare', name: 'Cloudflare Pages', enabled: 'on', lastCheck: '3m ago' },
-  { id: 'worker', name: 'Worker deployment', enabled: 'on', lastCheck: '3m ago' },
-  { id: 'backup', name: 'Database backups', enabled: 'on', lastCheck: '3m ago' },
-  { id: 'health', name: 'Health check circuit', enabled: 'on', lastCheck: '3m ago' },
-];
-
-const MOCK_LOGS: LogEntry[] = [
-  { level: 'info', timestamp: '10:10 AM', message: "User 'Admin_JD' enabled 'Testing Agent' circuit." },
-  { level: 'alert', timestamp: '10:08 AM', message: "'Repo 2 - UI' circuit tripped due to connection timeout." },
-  { level: 'info', timestamp: '10:05 AM', message: "'Voice Agent' processed 100 requests." },
-  { level: 'warning', timestamp: '09:55 AM', message: "'Database backups' storage nearing capacity." },
-];
-
-const MOCK_VOICE_AGENT: VoiceAgentConfig = {
-  apiKey: '**********',
-  rateLimits: '100 req/min',
-  timeout: '5000ms',
-  retryPolicies: '3 attempts',
-  errorHandling: 'Log & Alert',
-  currentLoad: 78,
-  requestCount: 1245,
-  errorRate: '0.1%',
-  responseTime: '50ms',
-  monthlyUsage: '150,000 chars',
+const INITIAL_VOICE_AGENT: VoiceAgentConfig = {
+  apiKey: '',
+  rateLimits: '--',
+  timeout: '--',
+  retryPolicies: '--',
+  errorHandling: '--',
+  currentLoad: 0,
+  requestCount: 0,
+  errorRate: '--',
+  responseTime: '--',
+  monthlyUsage: '--',
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -733,18 +693,18 @@ export default function CircuitBox() {
 
       {/* Main Panels Grid */}
       <div className="grid grid-cols-6 gap-4">
-        <AIAgentsPanel agents={MOCK_AI_AGENTS} />
-        <RepositoriesPanel repos={MOCK_REPOSITORIES} />
-        <IntegrationsPanel integrations={MOCK_INTEGRATIONS} />
-        <VoicePanel configs={MOCK_VOICE_CONFIG} />
-        <DeploymentPanel services={MOCK_DEPLOYMENT} />
-        <VoiceAgentPanel config={MOCK_VOICE_AGENT} />
+        <AIAgentsPanel agents={INITIAL_AI_AGENTS} />
+        <RepositoriesPanel repos={INITIAL_REPOSITORIES} />
+        <IntegrationsPanel integrations={INITIAL_INTEGRATIONS} />
+        <VoicePanel configs={INITIAL_VOICE_CONFIG} />
+        <DeploymentPanel services={INITIAL_DEPLOYMENT} />
+        <VoiceAgentPanel config={INITIAL_VOICE_AGENT} />
       </div>
 
       {/* Bottom Panels */}
       <div className="grid grid-cols-6 gap-4 mt-4">
         <div className="col-span-4">
-          <LogsPanel logs={MOCK_LOGS} />
+          <LogsPanel logs={INITIAL_LOGS} />
         </div>
         <div className="col-span-2">
           <div

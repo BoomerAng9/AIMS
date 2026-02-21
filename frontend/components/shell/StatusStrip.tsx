@@ -82,21 +82,15 @@ const SpinnerIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-// ─────────────────────────────────────────────────────────────
-// Mock Data (replace with real API calls)
-// ─────────────────────────────────────────────────────────────
-
-const MOCK_BOOMER_ANGS: BoomerAngStatus[] = [
-  { id: '1', name: 'Code Generator', status: 'running', department: 'Engineering', progress: 65 },
-  { id: '2', name: 'Data Analyzer', status: 'waiting', department: 'Analytics' },
-];
+// Boomer_Ang status populated from House of Ang API at runtime
+const INITIAL_BOOMER_ANGS: BoomerAngStatus[] = [];
 
 // ─────────────────────────────────────────────────────────────
 // StatusStrip Component
 // ─────────────────────────────────────────────────────────────
 
 export function StatusStrip({ className = '', position = 'bottom' }: StatusStripProps) {
-  const [boomerAngs, setBoomerAngs] = useState<BoomerAngStatus[]>(MOCK_BOOMER_ANGS);
+  const [boomerAngs, setBoomerAngs] = useState<BoomerAngStatus[]>(INITIAL_BOOMER_ANGS);
   const [lucStatus, setLucStatus] = useState<LUCStatus | null>(null);
   const [expanded, setExpanded] = useState(false);
 
