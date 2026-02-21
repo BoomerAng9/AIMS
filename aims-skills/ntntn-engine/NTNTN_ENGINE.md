@@ -55,13 +55,13 @@ The structural foundation. What the application is built on.
 
 | Technology | What It Is | Best For | Key Techniques |
 |-----------|-----------|----------|----------------|
-| **React / Next.js** | Component-based UI library + fullstack framework with SSR/SSG/ISR | Production web apps, SEO-critical sites, dashboard-heavy platforms | App Router, Server Components, Server Actions, Streaming SSR, Parallel Routes, Intercepting Routes |
-| **Vue / Nuxt** | Progressive framework + fullstack meta-framework | Rapid prototyping, content sites, developer-friendly SPAs | Composition API, Auto-imports, Hybrid rendering, Pinia state, Vue Vapor (2025+) |
-| **Svelte / SvelteKit** | Compile-time framework — zero runtime overhead | Performance-critical sites, small bundles, content-driven apps | Runes reactivity, $effect/$state, Form actions, Streaming, Shallow routing |
-| **Angular** | Enterprise framework with batteries included | Enterprise dashboards, large teams, regulated industries | Signals, Standalone components, Deferrable views, Hydration, Zoneless change detection |
-| **Astro** | Content-first static site builder with island architecture | Blogs, docs, marketing sites, content-heavy pages | Content Collections, View Transitions, Islands, Partial hydration, MDX integration |
-| **Solid.js** | Fine-grained reactive UI library — no virtual DOM | High-performance interactive UIs, real-time data displays | Signals, createResource, Suspense, Streaming SSR, fine-grained updates |
-| **Qwik** | Resumable framework — instant load, zero hydration | Sites where Time-to-Interactive is critical, e-commerce | Resumability, $() lazy boundaries, Speculative prefetching, QwikCity |
+| **React 19.2 / Next.js 16.1** | Component-based UI + fullstack framework (Turbopack, `"use cache"`) | Production web apps, SEO-critical sites, dashboard-heavy platforms | App Router, Server Components, Server Actions, `<Activity>`, React Compiler, View Transitions |
+| **Vue 3.6 / Nuxt 4.3** | Progressive framework + fullstack (Vapor Mode beta — no VDOM) | Rapid prototyping, content sites, developer-friendly SPAs | Composition API, Vapor Mode, Hybrid rendering, Pinia 3, alien-signals reactivity |
+| **Svelte 5.49 / SvelteKit 2.52** | Compile-time framework — Runes reactivity, zero runtime | Performance-critical sites, small bundles, content-driven apps | Runes ($state/$derived/$effect/$props), Async Svelte, MCP server, Form actions |
+| **Angular 21** | Enterprise framework (Zoneless default, Signal Forms, MCP) | Enterprise dashboards, large teams, regulated industries | Signals, Zoneless, Signal Forms, Angular ARIA (headless), Vitest, MCP server |
+| **Astro 5.17** | Content-first static builder (6.0 beta — acquired by Cloudflare) | Blogs, docs, marketing sites, content-heavy pages | Content Collections, View Transitions, Islands, Live Content, Cloudflare Workers |
+| **Solid.js** | Fine-grained reactive UI library — no virtual DOM | High-performance interactive UIs, real-time data displays | Signals, createResource, Suspense, Streaming SSR, @solidjs/signals (next-gen) |
+| **Qwik 2 (beta)** | Resumable framework — instant load, zero hydration (~1 KB) | Sites where Time-to-Interactive is critical, e-commerce | Resumability, $() lazy boundaries, Speculative prefetching, @qwik.dev/* scope |
 | **Web Components** | Native browser components — framework-agnostic | Design systems shared across frameworks, embeddable widgets | Shadow DOM, Custom Elements, HTML templates, Declarative Shadow DOM, Lit |
 
 **Picker_Ang Decision Matrix:**

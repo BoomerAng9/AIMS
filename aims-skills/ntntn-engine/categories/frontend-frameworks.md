@@ -10,7 +10,9 @@
 React is the dominant component-based UI library. Next.js is its premier meta-framework,
 providing SSR, SSG, ISR, App Router, Server Components, and Server Actions out of the box.
 
-- **Current:** React 19.2 + Next.js 16 (Turbopack default bundler)
+- **Current:** React 19.2.4 + Next.js 16.1 (Turbopack default bundler)
+- **React 19.2:** `<Activity>` component (state-preserving visibility), `useEffectEvent` hook, View Transitions (experimental), React Compiler 1.0 (auto-memoization)
+- **Next.js 16:** Turbopack default (dev + production), explicit `"use cache"` directive (replaces implicit caching), Build Adapters API
 - **Rendering:** SSR, SSG, ISR, Streaming SSR, Partial Prerendering
 - **A.I.M.S. Status:** Primary stack — all internal builds use Next.js
 
@@ -140,9 +142,10 @@ every 60 seconds. On-demand revalidation via `revalidatePath()` or `revalidateTa
 Vue is a progressive framework with an approachable API. Nuxt is its meta-framework
 providing SSR/SSG, auto-imports, file-based routing, and hybrid rendering.
 
-- **Current:** Vue 3.5 (3.6 imminent with Vapor Mode) + Nuxt 4.3
+- **Current:** Vue 3.5 (3.6 beta with Vapor Mode) + Nuxt 4.3.1 (Nuxt 5 imminent)
+- **Vapor Mode (beta):** Renders without Virtual DOM — 100k components in 100ms, base bundle under 10 KB, per-component opt-in via `<script setup vapor>`
 - **Rendering:** SSR, SSG, ISR, Hybrid (per-route rendering rules)
-- **Reactivity:** Composition API with `ref()`, `reactive()`, `computed()`, `watch()`
+- **Reactivity:** Composition API with `ref()`, `reactive()`, `computed()`, `watch()` — rebuilt on `alien-signals` for performance
 
 ### Key Patterns & Techniques
 
@@ -209,8 +212,9 @@ export const useCounterStore = defineStore('counter', () => {
 Svelte is a compile-time framework — no runtime overhead. Components compile to efficient
 vanilla JS. SvelteKit is its meta-framework with file-based routing, SSR, and adapters.
 
-- **Current:** Svelte 5.46 + SvelteKit 2.52
-- **Reactivity:** Runes (`$state`, `$derived`, `$effect`) replace `let` reactivity
+- **Current:** Svelte 5.49 + SvelteKit 2.52
+- **Reactivity:** Runes (`$state`, `$derived`, `$effect`, `$props`) — stable, default in Svelte 5
+- **New:** Async Svelte (Aug 2025), Svelte MCP (Nov 2025), Cloudflare Workers setup via CLI
 - **Compilation:** Components compile to imperative DOM operations at build time
 
 ### Key Patterns & Techniques
@@ -276,8 +280,9 @@ SvelteKit deploys anywhere via adapters:
 Angular is a batteries-included enterprise framework with dependency injection,
 TypeScript-first design, and a mature CLI.
 
-- **Current:** Angular 21 (signal forms, zoneless migration, AI-first tooling)
-- **Reactivity:** Signals (fine-grained, Zone.js fully removable via zoneless change detection)
+- **Current:** Angular 21 (Signal Forms, Zoneless default, Angular MCP, ARIA headless)
+- **Reactivity:** Signals (fine-grained), **Zoneless is now the default** for new projects (Zone.js gone)
+- **New:** Signal Forms (experimental), Angular MCP Server (AI tooling), Angular ARIA (headless accessible components), Vitest default
 - **Components:** Standalone by default (no NgModules required)
 
 ### Key Patterns & Techniques
@@ -338,7 +343,9 @@ Full SSR + hydration support, including partial hydration with `@defer`.
 Astro is a content-first static site builder that ships zero JavaScript by default.
 Uses Islands Architecture — only interactive components hydrate, everything else is static HTML.
 
-- **Current:** Astro 5.17 (Astro 6 beta — joined Cloudflare, redesigned dev server)
+- **Current:** Astro 5.17 (Astro 6 beta — joined Cloudflare, Vite Environment API dev server)
+- **⚠️ Astro acquired by Cloudflare** — remains open-source MIT, supports all deployment targets
+- **Astro 6:** Requires Node 22+, Zod 4, first-class Cloudflare Workers support, Live Content Collections
 - **Rendering:** Static first, with SSR opt-in per route
 - **Islands:** Interactive components from ANY framework (React, Vue, Svelte, Solid) inside static pages
 
@@ -403,8 +410,9 @@ all inside Astro's static HTML shell.
 Solid is a reactive UI library with fine-grained reactivity and no virtual DOM.
 Signals update only the exact DOM nodes that depend on changed data.
 
-- **Current:** Solid.js 2 + SolidStart
+- **Current:** SolidStart 1.2.0 (SolidJS 2.0 + SolidStart 2.0 in alpha)
 - **Reactivity:** Signals (`createSignal`), Memos (`createMemo`), Effects (`createEffect`)
+- **New:** `@solidjs/signals` (next-gen reactive primitives), TanStack Start convergence
 - **Rendering:** True fine-grained updates — no diffing, no re-rendering
 
 ### Key Patterns & Techniques
@@ -453,8 +461,8 @@ return <Show when={user()}>{u => <Profile user={u()} />}</Show>;
 Qwik is a resumable framework — instead of hydrating (re-executing all JS), it resumes
 from the server-serialized state. Zero JS on initial load, lazy-loads code on interaction.
 
-- **Current:** Qwik 2 + QwikCity
-- **Rendering:** Resumable (no hydration penalty)
+- **Current:** Qwik 1.18 stable (Qwik 2.0 beta — new `@qwik.dev/*` npm scope)
+- **Rendering:** Resumable (no hydration penalty) — ~1 KB initial JS regardless of app size
 - **Loading:** Progressive — JS loads only when user interacts with specific elements
 
 ### Key Patterns & Techniques
@@ -522,6 +530,36 @@ Server-renderable Shadow DOM — works without JS:
 ### Picker_Ang Notes
 - Choose when: Building a design system shared across multiple frameworks, embeddable widgets
 - Avoid when: Single-framework app (use that framework's components instead)
+
+---
+
+## Build Tools: Vite
+
+### Overview
+The dominant frontend build tool. Faster than webpack, used by Nuxt, SvelteKit, Astro, Solid, Qwik, and more.
+
+- **Current:** Vite 7.3.1 (31M+ weekly npm downloads)
+- **Beta:** Vite 8.0 — powered by **Rolldown** (replaces esbuild + Rollup), linear build: 46s → 6s
+- **Coming:** Vite+ (drop-in upgrade with additional features, public preview 2026)
+
+### Picker_Ang Notes
+- Default build tool for all non-Next.js projects (Next.js uses Turbopack)
+- Vite 8 with Rolldown will be a major speed improvement for production builds
+
+---
+
+## Remix → React Router v7
+
+**Remix as a React framework no longer exists.** It has been fully absorbed into React Router v7.
+
+- **Current:** React Router v7.13 (IS Remix — bundler + server runtime merged)
+- **Three modes:** Basic SPA routing, data router, full framework mode (was Remix)
+- **RSC support:** Unstable React Server Components in Framework Mode
+- **⚠️ "Remix 3" is NOT a continuation** — it's a separate project based on Preact, not React
+
+### Picker_Ang Notes
+- If user asks for Remix → use **React Router v7 Framework Mode** (same thing, new name)
+- If user is on Remix v2 → upgrading is mostly a dependency swap
 
 ---
 
