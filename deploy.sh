@@ -104,7 +104,7 @@ check_env() {
     local severity="$2"  # "critical" or "warn"
     local desc="$3"
     local val
-    val=$(grep "^${var_name}=" "${ENV_FILE}" | cut -d'=' -f2-)
+    val=$({ grep "^${var_name}=" "${ENV_FILE}" || true; } | cut -d'=' -f2-)
     if [ -z "${val}" ]; then
         if [ "${severity}" = "critical" ]; then
             error "MISSING: ${var_name} — ${desc}"
