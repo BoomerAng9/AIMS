@@ -1,8 +1,10 @@
-name: CI — Build & Push Images
+name: CI — Build & Push Images (DISABLED)
 
+# Cloud Build disabled — VPS builds images locally via deploy.sh
+# To re-enable, uncomment the push trigger below
 on:
-  push:
-    branches: [main]
+  # push:
+  #   branches: [main]
   workflow_dispatch:
 
 concurrency:
