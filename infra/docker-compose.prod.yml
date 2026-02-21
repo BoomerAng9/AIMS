@@ -674,8 +674,9 @@ services:
     environment:
       - SERVER_HOST=0.0.0.0
       - SERVER_PORT=8100
-      - DATABASE_URL=postgresql://${II_AGENT_DB_USER:-iiagent}:${II_AGENT_DB_PASSWORD:-iiagent}@ii-agent-postgres:5432/${II_AGENT_DB_NAME:-iiagentdev}
+      - SANDBOX_DATABASE_URL=postgresql+asyncpg://${II_AGENT_DB_USER:-iiagent}:${II_AGENT_DB_PASSWORD:-iiagent}@ii-agent-postgres:5432/${II_AGENT_DB_NAME:-iiagentdev}?sslmode=disable
       - REDIS_URL=redis://:${REDIS_PASSWORD:-aims_redis_secret}@redis:6379/3
+      - E2B_API_KEY=${E2B_API_KEY}
     depends_on:
       ii-agent-postgres:
         condition: service_healthy
