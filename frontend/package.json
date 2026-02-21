@@ -47,6 +47,7 @@
     "react": "^18",
     "react-dom": "^18",
     "react-markdown": "^9.0.1",
+    "recharts": "^3.7.0",
     "remark-gfm": "^4.0.0",
     "remotion": "^4.0.0",
     "resend": "^4.1.2",

@@ -293,6 +293,15 @@ Skills inject specialized context, SOPs, and design standards into ACHEEVY's beh
 |-------|------|----------|---------|
 | **Remotion Video Production** | `skills/remotion-video.skill.md` | "remotion", "video", "render", "composition", "clip" | Production-quality Remotion v4 video: schema-driven compositions, scene architecture, transitions, AIMS theme |
 
+#### Plug Catalog & Deployment Skills (`skills/plug-catalog/`)
+
+| Skill | File | Triggers | Purpose |
+|-------|------|----------|---------|
+| **Plug Catalog Browse** | `skills/plug-catalog/plug-catalog-browse.skill.md` | "browse tools", "plug catalog", "what tools", "available agents" | Present browsable catalog of deployable AI tools, agents, and platforms |
+| **Needs Analysis** | `skills/plug-catalog/needs-analysis.skill.md` | "needs analysis", "business intake", "what do I need", "assess my needs" | Formal 5-section business client intake: business, technical, security, delivery, budget |
+| **Plug Spin-Up** | `skills/plug-catalog/plug-spin-up.skill.md` | "spin up", "deploy tool", "launch agent", "start instance" | One-click deployment of catalog plug with config, port, domain, health check |
+| **Plug Export** | `skills/plug-catalog/plug-export.skill.md` | "export", "self-host", "ship it", "docker export" | Package plug as Docker Compose + env + nginx + setup script for self-hosting |
+
 #### Skill Router
 
 | Skill | File | Triggers | Purpose |
@@ -386,6 +395,8 @@ Tasks are executable units that produce artifacts.
 | 12 | **Chicken Hawk Code & Deploy** | devops | chicken-hawk | "chicken hawk", "build me an app", "deploy my app", "claw agent" |
 | 13 | **Custom Lil_Hawk Creator** | automation | chicken-hawk | "custom hawk", "create a bot", "my own hawk", "personal assistant" |
 | 14 | **Playground & Sandbox** | engineering | chicken-hawk | "playground", "sandbox", "run code", "test code", "training data" |
+| 15 | **Plug Catalog & Deploy** | deployment | chicken-hawk | "browse tools", "plug catalog", "spin up", "deploy tool", "what tools available" |
+| 16 | **Business Needs Analysis** | consulting | analyst-ang | "needs analysis", "assess my needs", "what do I need", "business intake" |
 
 ### Custom Lil_Hawks — User-Created Bots
 
