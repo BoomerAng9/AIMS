@@ -30,6 +30,15 @@ export interface ChatRequest {
   temperature?: number;
   top_p?: number;
   stream?: boolean;
+
+  /**
+   * Thinking level for models that support configurable reasoning depth.
+   * Gemini 3.1 Pro: 'low' | 'medium' | 'high' (default: 'high')
+   *
+   * 80/20 Rule: 80% of tasks on low/medium, 20% on high.
+   * Saves 50-70% on API spend.
+   */
+  thinking_level?: 'low' | 'medium' | 'high';
 }
 
 export interface ChatChoice {
@@ -136,6 +145,15 @@ export const MODELS: Record<string, ModelSpec> = {
     contextWindow: 1000000,
     tier: 'standard',
   },
+  'gemini-3.1-pro': {
+    id: 'google/gemini-3.1-pro',
+    name: 'Gemini 3.1 Pro',
+    provider: 'Google',
+    inputPer1M: 1.25,
+    outputPer1M: 10.0,
+    contextWindow: 2000000,
+    tier: 'standard',
+  },
 
   // ── Fast Tier ────────────────────────────────────────────────────────
   'gemini-3.0-flash': {
@@ -237,7 +255,7 @@ class OpenRouterClient {
 
     const modelSpec = this.resolveModel(request.model);
 
-    const body = {
+    const body: Record<string, unknown> = {
       model: modelSpec.id,
       messages: request.messages,
       max_tokens: request.max_tokens || 4096,
@@ -245,9 +263,17 @@ class OpenRouterClient {
       top_p: request.top_p,
     };
 
+    // Thinking level support — Gemini 3.1 Pro and future models
+    // When set, controls reasoning depth: low (routine), medium (balanced), high (deep think)
+    // CRITICAL: Gemini 3.1 defaults to HIGH. Explicit level saves 50-70% on routine tasks.
+    if (request.thinking_level) {
+      body.thinking = { type: 'enabled', budget_level: request.thinking_level };
+    }
+
     logger.info({
       model: modelSpec.id,
       messageCount: request.messages.length,
+      thinkingLevel: request.thinking_level || 'default',
     }, '[OpenRouter] Sending request');
 
     const res = await fetch(OPENROUTER_API_URL, {
@@ -311,7 +337,7 @@ class OpenRouterClient {
 
     const modelSpec = this.resolveModel(request.model);
 
-    const body = {
+    const body: Record<string, unknown> = {
       model: modelSpec.id,
       messages: request.messages,
       max_tokens: request.max_tokens || 4096,
@@ -320,7 +346,12 @@ class OpenRouterClient {
       stream: true,
     };
 
-    logger.info({ model: modelSpec.id }, '[OpenRouter] Streaming request');
+    // Thinking level for streaming calls
+    if (request.thinking_level) {
+      body.thinking = { type: 'enabled', budget_level: request.thinking_level };
+    }
+
+    logger.info({ model: modelSpec.id, thinkingLevel: request.thinking_level || 'default' }, '[OpenRouter] Streaming request');
 
     const res = await fetch(OPENROUTER_API_URL, {
       method: 'POST',
