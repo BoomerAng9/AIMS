@@ -150,12 +150,12 @@ export const MODELS: Record<string, ModelSpec> = {
     tier: 'standard',
   },
   'gemini-3.1-pro': {
-    id: 'google/gemini-3.1-pro',
+    id: 'google/gemini-3.1-pro-preview',
     name: 'Gemini 3.1 Pro',
     provider: 'Google',
-    inputPer1M: 1.25,
-    outputPer1M: 10.0,
-    contextWindow: 2000000,
+    inputPer1M: 2.0,
+    outputPer1M: 12.0,
+    contextWindow: 1048576, // 1M
     tier: 'standard',
   },
 
@@ -189,6 +189,15 @@ export const MODELS: Record<string, ModelSpec> = {
   },
 
   // ── Economy Tier ─────────────────────────────────────────────────────
+  'glm-5': {
+    id: 'z-ai/glm-5',
+    name: 'GLM-5',
+    provider: 'Z.ai',
+    inputPer1M: 1.0,
+    outputPer1M: 3.20,
+    contextWindow: 200000,
+    tier: 'economy',
+  },
   'deepseek-v3.2': {
     id: 'deepseek/deepseek-v3.2',
     name: 'DeepSeek V3.2',
@@ -196,6 +205,18 @@ export const MODELS: Record<string, ModelSpec> = {
     inputPer1M: 0.30,
     outputPer1M: 0.88,
     contextWindow: 131072,
+    tier: 'economy',
+  },
+
+  // ── Volcano Engine Models ────────────────────────────────────────────
+  // Routed via Volcano Engine direct — NOT available on OpenRouter.
+  'seed-2.0-pro': {
+    id: 'bytedance/seed-2.0-pro',
+    name: 'Doubao Seed 2.0 Pro',
+    provider: 'ByteDance (Volcano Engine)',
+    inputPer1M: 0.47,
+    outputPer1M: 2.37,
+    contextWindow: 200000,
     tier: 'economy',
   },
 
