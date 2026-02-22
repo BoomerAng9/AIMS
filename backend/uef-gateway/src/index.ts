@@ -2088,6 +2088,59 @@ app.post('/api/livesim/emit', (req, res) => {
   res.json({ emitted: true });
 });
 
+/**
+ * SSE stream endpoint for the frontend LiveSim page.
+ * Clients connect via EventSource and receive real-time agent events.
+ * The frontend expects `data: JSON` per SSE spec.
+ */
+app.get('/api/livesim/stream', (req, res) => {
+  const sessionId = req.query.sessionId as string;
+
+  // Set up SSE headers
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.setHeader('X-Accel-Buffering', 'no'); // Disable nginx buffering
+  res.flushHeaders();
+
+  // Send initial connection event
+  res.write(`data: ${JSON.stringify({ id: Date.now().toString(), type: 'coordination', agent: 'ACHEEVY', content: 'LiveSim connected — streaming real-time events', timestamp: new Date().toISOString() })}\n\n`);
+
+  // Poll recent events and send new ones as SSE
+  let lastSeen = 0;
+  const pollInterval = setInterval(() => {
+    const events = liveSim.getRecentEvents(20);
+    const newEvents = events.filter((_, i) => i >= lastSeen);
+    for (const evt of newEvents) {
+      // Map LiveSim events to the frontend's SimLogEntry format
+      const logEntry = {
+        id: evt.timestamp,
+        type: evt.type === 'agent_activity' ? 'action' :
+              evt.type === 'deploy_event' ? 'result' :
+              evt.type === 'health_update' ? 'coordination' :
+              evt.type === 'vertical_step' ? 'thought' : 'coordination',
+        agent: (evt.data as any).agent || 'ACHEEVY',
+        content: (evt.data as any).detail || (evt.data as any).message || JSON.stringify(evt.data),
+        timestamp: evt.timestamp,
+        sessionId,
+      };
+      res.write(`data: ${JSON.stringify(logEntry)}\n\n`);
+    }
+    lastSeen = events.length;
+  }, 2000);
+
+  // Heartbeat to keep connection alive
+  const heartbeat = setInterval(() => {
+    res.write(': heartbeat\n\n');
+  }, 15000);
+
+  // Clean up on disconnect
+  req.on('close', () => {
+    clearInterval(pollInterval);
+    clearInterval(heartbeat);
+  });
+});
+
 // --------------------------------------------------------------------------
 // LUC Project Service — Pricing & Effort Oracle
 // --------------------------------------------------------------------------
