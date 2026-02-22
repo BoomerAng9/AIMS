@@ -9,7 +9,7 @@
  * - Audio caching for repeated phrases
  */
 
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import type { VoiceOutputState, VoiceOutputConfig } from '@/lib/chat/types';
 import { sanitizeForTTS } from '@/lib/voice/sanitize';
 
@@ -280,7 +280,8 @@ export function useVoiceOutput(options: UseVoiceOutputOptions = {}): UseVoiceOut
     };
   }, [stop]);
 
-  return {
+  // Memoize the return object to prevent unnecessary re-renders in consumers
+  return useMemo(() => ({
     state,
     isPlaying: state === 'playing',
     isPaused: state === 'paused',
@@ -294,5 +295,16 @@ export function useVoiceOutput(options: UseVoiceOutputOptions = {}): UseVoiceOut
     stop,
     setAutoPlay,
     autoPlayEnabled,
-  };
+  }), [
+    state,
+    currentText,
+    error,
+    onProgress,
+    speak,
+    pause,
+    resume,
+    stop,
+    setAutoPlay,
+    autoPlayEnabled
+  ]);
 }

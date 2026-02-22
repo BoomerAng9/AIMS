@@ -6,7 +6,7 @@
  * Fallback: Deepgram Nova-3
  */
 
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import type { VoiceInputState, TranscriptionResult, VoiceInputConfig } from '@/lib/chat/types';
 
 interface UseVoiceInputOptions {
@@ -238,7 +238,9 @@ export function useVoiceInput(options: UseVoiceInputOptions = {}): UseVoiceInput
     };
   }, [stopAudioLevelMonitoring]);
 
-  return {
+  // Memoize the return object to prevent unnecessary re-renders in consumers
+  // when internal state (like audioLevel) is stable.
+  return useMemo(() => ({
     state,
     isListening: state === 'listening',
     isProcessing: state === 'processing',
@@ -249,5 +251,13 @@ export function useVoiceInput(options: UseVoiceInputOptions = {}): UseVoiceInput
     cancelListening,
     audioLevel,
     stream: streamRef.current,
-  };
+  }), [
+    state,
+    transcript,
+    error,
+    startListening,
+    stopListening,
+    cancelListening,
+    audioLevel,
+  ]);
 }
