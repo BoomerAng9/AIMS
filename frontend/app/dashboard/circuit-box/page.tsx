@@ -231,20 +231,59 @@ const ToggleOffIcon = ({ className }: { className?: string }) => (
 );
 
 // ─────────────────────────────────────────────────────────────
-// Mock Data — Services (with social channels)
+// Service data — fetched from circuit-metrics at runtime
 // ─────────────────────────────────────────────────────────────
 
-const SERVICES: ServiceStatus[] = [
-  { id: 'frontend', name: 'Frontend', type: 'core', status: 'online', endpoint: 'https://plugmein.cloud', version: '1.0.0', features: ['Dashboard', 'LUC', 'Model Garden'] },
-  { id: 'uef-gateway', name: 'UEF Gateway', type: 'core', status: 'online', endpoint: 'http://uef-gateway:3001', version: '1.0.0', features: ['ACP', 'UCP', 'Orchestration'], ownerOnly: true },
-  { id: 'acheevy', name: 'ACHEEVY', type: 'core', status: 'online', endpoint: 'http://acheevy:3003', version: '1.0.0', features: ['Intent Analysis', 'Payment Processing', 'Executive Control'] },
-  { id: 'house-of-ang', name: 'House of Ang', type: 'core', status: 'online', endpoint: 'http://house-of-ang:3002', version: '1.0.0', features: ['Agent Registry', 'Routing', 'Task Assignment'], ownerOnly: true },
-  { id: 'agent-bridge', name: 'Agent Bridge', type: 'core', status: 'online', endpoint: 'http://agent-bridge:3010', version: '1.0.0', features: ['Security Gateway', 'Rate Limiting', 'Payment Blocking'], ownerOnly: true },
-  { id: 'n8n', name: 'n8n Automation', type: 'tool', status: 'sandbox', endpoint: 'http://n8n:5678', version: 'latest', features: ['Workflows', 'Webhooks', 'Integrations'], ownerOnly: true },
-  { id: 'telegram', name: 'Telegram Bot', type: 'social', status: 'online', endpoint: '/api/telegram/webhook', version: '1.0.0', features: ['Inbound', 'Outbound', 'Link Flow'] },
-  { id: 'whatsapp', name: 'WhatsApp', type: 'social', status: 'inactive', endpoint: '/api/whatsapp/webhook', version: '1.0.0', features: ['Inbound', 'Outbound', 'Link Flow'] },
-  { id: 'discord', name: 'Discord Bot', type: 'social', status: 'inactive', endpoint: '/api/discord/webhook', version: '1.0.0', features: ['Inbound', 'Outbound', 'Link Flow'] },
+const DEFAULT_SERVICES: ServiceStatus[] = [
+  { id: 'frontend', name: 'Frontend', type: 'core', status: 'offline', endpoint: 'https://plugmein.cloud', features: ['Dashboard', 'LUC', 'Model Garden'] },
+  { id: 'uef-gateway', name: 'UEF Gateway', type: 'core', status: 'offline', endpoint: 'http://uef-gateway:4000', features: ['ACP', 'UCP', 'Orchestration'], ownerOnly: true },
+  { id: 'acheevy', name: 'ACHEEVY', type: 'core', status: 'offline', endpoint: 'http://acheevy:3003', features: ['Intent Analysis', 'Executive Control'] },
+  { id: 'house-of-ang', name: 'House of Ang', type: 'core', status: 'offline', endpoint: 'http://house-of-ang:3002', features: ['Agent Registry', 'Routing'], ownerOnly: true },
+  { id: 'agent-bridge', name: 'Agent Bridge', type: 'core', status: 'offline', endpoint: 'http://agent-bridge:3010', features: ['Security Gateway', 'Rate Limiting'], ownerOnly: true },
+  { id: 'chickenhawk-core', name: 'Chickenhawk Core', type: 'core', status: 'offline', endpoint: 'http://chickenhawk-core:4001', features: ['Task Execution', 'SOP Enforcement'], ownerOnly: true },
+  { id: 'n8n', name: 'n8n Automation', type: 'tool', status: 'offline', endpoint: 'http://n8n:5678', features: ['Workflows', 'Webhooks'], ownerOnly: true },
+  { id: 'redis', name: 'Redis', type: 'tool', status: 'offline', endpoint: 'redis://redis:6379', features: ['Session Store', 'Cache'], ownerOnly: true },
+  { id: 'ii-agent', name: 'II Agent', type: 'agent', status: 'offline', endpoint: 'http://ii-agent:8000', features: ['Research', 'Analysis'], ownerOnly: true },
 ];
+
+/** Fetch real service health from circuit-metrics via our API proxy */
+function useServiceHealth() {
+  const [services, setServices] = useState<ServiceStatus[]>(DEFAULT_SERVICES);
+  const [lastFetch, setLastFetch] = useState<string>('');
+
+  const refresh = useCallback(async () => {
+    try {
+      const res = await fetch('/api/circuit-box/services', { cache: 'no-store' });
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data.services && Array.isArray(data.services)) {
+        const mapped: ServiceStatus[] = data.services.map((s: { name: string; type?: string; status: string; responseTime?: number }) => ({
+          id: s.name,
+          name: s.name.replace(/-/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase()),
+          type: (s.type || 'core') as ServiceStatus['type'],
+          status: s.status === 'up' ? 'online' : s.status === 'degraded' ? 'degraded' : 'offline',
+          endpoint: `internal (${s.responseTime || 0}ms)`,
+          ownerOnly: s.type !== 'core' || ['house-of-ang', 'agent-bridge', 'chickenhawk-core'].includes(s.name),
+        }));
+        setServices(mapped);
+        setLastFetch(data.timestamp || new Date().toISOString());
+      }
+    } catch {
+      // Keep defaults on failure
+    }
+  }, []);
+
+  useEffect(() => {
+    refresh();
+    const interval = setInterval(refresh, 30000); // refresh every 30s
+    return () => clearInterval(interval);
+  }, [refresh]);
+
+  return { services, lastFetch, refresh };
+}
+
+// For backward compat — initial static reference (overridden by hook in component)
+const SERVICES = DEFAULT_SERVICES;
 
 const INTEGRATIONS: Integration[] = [
   { id: 'claude', name: 'Claude Opus 4.6', provider: 'Anthropic', type: 'ai_model', status: 'active', apiKeySet: true, usageToday: 12500, costToday: 0.45 },
@@ -257,54 +296,110 @@ const INTEGRATIONS: Integration[] = [
   { id: 'stripe', name: 'Stripe', provider: 'Stripe', type: 'payment', status: 'active', apiKeySet: true, ownerOnly: true },
 ];
 
-const BOOMERANGS: BoomerAngConfig[] = [
-  { id: 'engineer-ang', name: 'Engineer_Ang', role: 'Software Development', status: 'active', model: 'claude-opus-4.6', tasks: ['Code Generation', 'Refactoring', 'Bug Fixes'], permissions: ['read', 'write', 'execute'], sandboxed: true },
-  { id: 'researcher-ang', name: 'Researcher_Ang', role: 'Research & Analysis', status: 'active', model: 'kimi-k2.5', tasks: ['Web Search', 'Data Analysis', 'Summarization'], permissions: ['read', 'search'], sandboxed: true },
-  { id: 'marketer-ang', name: 'Marketer_Ang', role: 'Marketing & Content', status: 'standby', model: 'claude-sonnet-4.5', tasks: ['Content Generation', 'SEO', 'Social Media'], permissions: ['read', 'write'], sandboxed: true },
-  { id: 'seller-ang', name: 'Seller_Ang', role: 'E-commerce', status: 'active', model: 'deepseek-v3.2', tasks: ['Listing Optimization', 'Market Research', 'Pricing'], permissions: ['read', 'analyze'], sandboxed: true },
-  { id: 'quality-ang', name: 'Quality_Ang', role: 'Quality Assurance', status: 'standby', model: 'claude-opus-4.6', tasks: ['ORACLE Verification', 'Testing', 'Code Review'], permissions: ['read', 'test'], sandboxed: true },
-];
+/** Fetch real Boomer_Ang roster from House of Ang */
+function useBoomerangs() {
+  const [boomerangs, setBoomerangs] = useState<BoomerAngConfig[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch('/api/circuit-box/boomerangs', { cache: 'no-store' });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.agents && Array.isArray(data.agents)) {
+          setBoomerangs(data.agents.map((a: { id: string; name: string; description: string; capabilities: string[]; healthStatus: string }) => ({
+            id: a.id,
+            name: a.name,
+            role: a.description,
+            status: a.healthStatus === 'online' ? 'active' : a.healthStatus === 'degraded' ? 'standby' : 'disabled',
+            model: 'auto',
+            tasks: a.capabilities.slice(0, 3),
+            permissions: ['read', 'execute'],
+            sandboxed: true,
+          })));
+        }
+      } catch {
+        // No agents fetched — show empty state
+      }
+    })();
+  }, []);
+
+  return boomerangs;
+}
+
+const BOOMERANGS: BoomerAngConfig[] = [];
 
 // ─────────────────────────────────────────────────────────────
-// Live Events (SSE simulation — will wire to real SSE endpoint)
+// Live Events — real health-check derived events from circuit-metrics
 // ─────────────────────────────────────────────────────────────
 
 function useLiveEvents() {
-  const [events, setEvents] = useState<LiveEvent[]>([]);
+  const [events, setEvents] = useState<LiveEvent[]>([{
+    id: 'init',
+    timestamp: Date.now(),
+    type: 'info',
+    source: 'Circuit Box',
+    message: 'Connecting to circuit-metrics...',
+  }]);
 
   useEffect(() => {
-    const initial: LiveEvent[] = [
-      { id: 'e1', timestamp: Date.now() - 120000, type: 'info', source: 'UEF Gateway', message: 'Gateway started — listening on :3001' },
-      { id: 'e2', timestamp: Date.now() - 90000, type: 'route', source: 'ACHEEVY', message: 'Prompt routed → Engineer_Ang (code generation task)' },
-      { id: 'e3', timestamp: Date.now() - 60000, type: 'info', source: 'Chicken Hawk', message: 'Lil_Hawk spawned for build task #4821' },
-      { id: 'e4', timestamp: Date.now() - 30000, type: 'security', source: 'Agent Bridge', message: 'Blocked payment tool call from Seller_Ang (policy: deny)' },
-      { id: 'e5', timestamp: Date.now() - 10000, type: 'info', source: 'Telegram Bot', message: 'Inbound message processed — user linked' },
-      { id: 'e6', timestamp: Date.now() - 5000, type: 'warn', source: 'ElevenLabs', message: 'Voice API key not configured — TTS unavailable' },
-    ];
-    setEvents(initial);
+    let mounted = true;
+    let prevStatuses: Record<string, string> = {};
 
-    // Simulate periodic events
-    const interval = setInterval(() => {
-      const sources = ['ACHEEVY', 'Chicken Hawk', 'UEF Gateway', 'Agent Bridge', 'Telegram Bot'];
-      const types: LiveEvent['type'][] = ['info', 'route', 'info', 'security', 'info'];
-      const messages = [
-        'Heartbeat OK',
-        'Prompt classified → research task',
-        'Lil_Hawk returned — build complete',
-        'Rate limit check passed (42/100)',
-        'Social gateway — message normalized',
-      ];
-      const idx = Math.floor(Math.random() * sources.length);
-      setEvents(prev => [{
-        id: `e_${Date.now()}`,
-        timestamp: Date.now(),
-        type: types[idx],
-        source: sources[idx],
-        message: messages[idx],
-      }, ...prev].slice(0, 100));
-    }, 8000);
+    const poll = async () => {
+      try {
+        const res = await fetch('/api/circuit-box/services', { cache: 'no-store' });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!mounted || !data.services) return;
 
-    return () => clearInterval(interval);
+        const newEvents: LiveEvent[] = [];
+
+        for (const svc of data.services as { name: string; status: string; responseTime: number }[]) {
+          const prev = prevStatuses[svc.name];
+          if (prev && prev !== svc.status) {
+            newEvents.push({
+              id: `${svc.name}_${Date.now()}`,
+              timestamp: Date.now(),
+              type: svc.status === 'up' ? 'info' : svc.status === 'degraded' ? 'warn' : 'error',
+              source: svc.name,
+              message: svc.status === 'up'
+                ? `Service recovered (${svc.responseTime}ms)`
+                : svc.status === 'degraded'
+                  ? `Service degraded (${svc.responseTime}ms)`
+                  : 'Service went down',
+            });
+          } else if (!prev) {
+            newEvents.push({
+              id: `${svc.name}_init_${Date.now()}`,
+              timestamp: Date.now(),
+              type: svc.status === 'up' ? 'info' : 'warn',
+              source: svc.name,
+              message: svc.status === 'up' ? `Online (${svc.responseTime}ms)` : `Status: ${svc.status}`,
+            });
+          }
+          prevStatuses[svc.name] = svc.status;
+        }
+
+        if (newEvents.length > 0) {
+          setEvents(prev => [...newEvents, ...prev].slice(0, 100));
+        }
+      } catch {
+        if (mounted) {
+          setEvents(prev => [{
+            id: `err_${Date.now()}`,
+            timestamp: Date.now(),
+            type: 'warn',
+            source: 'Circuit Box',
+            message: 'Circuit metrics unreachable',
+          }, ...prev].slice(0, 100));
+        }
+      }
+    };
+
+    poll();
+    const interval = setInterval(poll, 30000);
+    return () => { mounted = false; clearInterval(interval); };
   }, []);
 
   return events;
@@ -346,11 +441,11 @@ function ServiceLatencyBar({ latency }: { latency: number }) {
   );
 }
 
-// Mock latency values per service
-const SERVICE_LATENCIES: Record<string, number> = {
-  'frontend': 24, 'uef-gateway': 8, 'acheevy': 142, 'house-of-ang': 12,
-  'agent-bridge': 5, 'n8n': 340, 'telegram': 89, 'whatsapp': 0, 'discord': 0,
-};
+// Latencies are extracted from the real endpoint string (e.g. "internal (142ms)")
+function extractLatency(endpoint: string): number {
+  const match = endpoint.match(/\((\d+)ms\)/);
+  return match ? parseInt(match[1], 10) : 0;
+}
 
 function ServiceCard({ service, isOwner }: { service: ServiceStatus; isOwner: boolean }) {
   if (!isOwner && service.ownerOnly) return null;
@@ -363,7 +458,7 @@ function ServiceCard({ service, isOwner }: { service: ServiceStatus; isOwner: bo
     social: { bg: 'bg-cb-cyan/10', border: 'border-cb-cyan/30', text: 'text-cb-cyan' },
   };
   const s = typeColors[service.type] || typeColors.core;
-  const latency = SERVICE_LATENCIES[service.id] ?? 0;
+  const latency = extractLatency(service.endpoint);
 
   return (
     <motion.div
@@ -1208,6 +1303,8 @@ function CircuitBoxContent() {
   const [activeTab, setActiveTab] = useState<CircuitBoxTab>(initialTab);
   const [refreshing, setRefreshing] = useState(false);
   const liveEvents = useLiveEvents();
+  const { services: liveServices, refresh: refreshServices } = useServiceHealth();
+  const liveBoomerangs = useBoomerangs();
 
   // Determine role
   const userRole = (session?.user as Record<string, unknown> | undefined)?.role;
@@ -1241,16 +1338,19 @@ function CircuitBoxContent() {
     return () => { controller.abort(); clearInterval(intervalId); };
   }, [activeTab, isOwner]);
 
-  const handleRefresh = useCallback(() => {
+  const handleRefresh = useCallback(async () => {
     setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 1500);
-  }, []);
+    await refreshServices();
+    setRefreshing(false);
+  }, [refreshServices]);
 
-  const visibleServices = isOwner ? SERVICES : SERVICES.filter(s => !s.ownerOnly);
+  const activeServices = liveServices.length > 0 ? liveServices : SERVICES;
+  const activeBoomerangs = liveBoomerangs.length > 0 ? liveBoomerangs : BOOMERANGS;
+  const visibleServices = isOwner ? activeServices : activeServices.filter(s => !s.ownerOnly);
   const onlineServices = visibleServices.filter((s) => s.status === 'online' || s.status === 'sandbox').length;
   const visibleIntegrations = isOwner ? INTEGRATIONS : INTEGRATIONS.filter(i => !i.ownerOnly);
   const activeIntegrations = visibleIntegrations.filter((i) => i.status === 'active').length;
-  const activeAngs = BOOMERANGS.filter((a) => a.status === 'active').length;
+  const activeAngs = activeBoomerangs.filter((a) => a.status === 'active').length;
 
   return (
     <div className="relative w-full -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8">
@@ -1395,7 +1495,7 @@ function CircuitBoxContent() {
             {activeTab === 'boomerangs' && (
               <div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                  {BOOMERANGS.map((ang) => <BoomerAngCard key={ang.id} ang={ang} />)}
+                  {activeBoomerangs.map((ang) => <BoomerAngCard key={ang.id} ang={ang} />)}
                 </div>
                 {isOwner && (
                   <button className="w-full mt-3 p-3 rounded-xl border border-dashed border-white/15 text-cb-fog text-sm hover:border-gold/20 hover:text-gold transition-all duration-cb-toggle">+ Spawn New Boomer_Ang</button>
