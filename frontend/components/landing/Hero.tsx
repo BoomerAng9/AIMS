@@ -71,10 +71,10 @@ const chainStep = {
 
 // ── Action Chain Steps ──
 const ACTION_CHAIN = [
-  { icon: Brain, label: 'Classify', desc: 'Intent detection', color: 'text-blue-400', bg: 'bg-blue-500/10', border: 'border-blue-500/20' },
-  { icon: GitBranch, label: 'Route', desc: 'Team assignment', color: 'text-cyan-400', bg: 'bg-cyan-500/10', border: 'border-cyan-500/20' },
-  { icon: Cpu, label: 'Execute', desc: 'Task pipeline', color: 'text-gold', bg: 'bg-gold/10', border: 'border-gold/20' },
-  { icon: CheckCircle2, label: 'Deliver', desc: 'Verified output', color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20' },
+  { icon: Brain, label: 'Classify', desc: 'Intent detection', color: 'text-blue-400', bg: 'bg-blue-500/10', border: 'border-blue-500/20', href: '/chat' },
+  { icon: GitBranch, label: 'Route', desc: 'Team assignment', color: 'text-cyan-400', bg: 'bg-cyan-500/10', border: 'border-cyan-500/20', href: '/dashboard/circuit-box' },
+  { icon: Cpu, label: 'Execute', desc: 'Task pipeline', color: 'text-gold', bg: 'bg-gold/10', border: 'border-gold/20', href: '/dashboard/plan' },
+  { icon: CheckCircle2, label: 'Deliver', desc: 'Verified output', color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', href: '/dashboard/deploy-dock' },
 ];
 
 // ── Hero Component ──
@@ -189,18 +189,20 @@ export function Hero() {
               >
                 {ACTION_CHAIN.map((step, i) => (
                   <motion.div key={step.label} variants={chainStep} className="relative">
-                    <div className={`wireframe-card p-4 md:p-5 text-center ${step.bg} ${step.border} hover:scale-[1.03] transition-transform duration-300`}>
-                      <div className={`w-10 h-10 md:w-12 md:h-12 mx-auto mb-3 rounded-xl ${step.bg} border ${step.border} flex items-center justify-center`}>
-                        <step.icon className={`w-5 h-5 md:w-6 md:h-6 ${step.color}`} />
+                    <Link href={step.href} className="block group">
+                      <div className={`wireframe-card p-4 md:p-5 text-center ${step.bg} ${step.border} group-hover:scale-[1.03] transition-transform duration-300`}>
+                        <div className={`w-10 h-10 md:w-12 md:h-12 mx-auto mb-3 rounded-xl ${step.bg} border ${step.border} flex items-center justify-center`}>
+                          <step.icon className={`w-5 h-5 md:w-6 md:h-6 ${step.color}`} />
+                        </div>
+                        <h4
+                          className={`text-sm md:text-base font-bold ${step.color} mb-1`}
+                          style={{ fontFamily: 'var(--font-display, "Doto", monospace)' }}
+                        >
+                          {step.label}
+                        </h4>
+                        <p className="text-xs md:text-sm text-white/55">{step.desc}</p>
                       </div>
-                      <h4
-                        className={`text-sm md:text-base font-bold ${step.color} mb-1`}
-                        style={{ fontFamily: 'var(--font-display, "Doto", monospace)' }}
-                      >
-                        {step.label}
-                      </h4>
-                      <p className="text-xs md:text-sm text-white/55">{step.desc}</p>
-                    </div>
+                    </Link>
                     {/* Connector arrow (hidden on last) */}
                     {i < ACTION_CHAIN.length - 1 && (
                       <div className="hidden md:flex absolute -right-3 top-1/2 -translate-y-1/2 z-10">
@@ -282,7 +284,7 @@ export function Hero() {
 
               {/* Deploy */}
               <motion.div variants={staggerItem}>
-                <Link href="/chat" className="group block h-full">
+                <Link href="/dashboard/deploy-dock" className="group block h-full">
                   <div className="wireframe-card p-6 md:p-7 flex items-center gap-5 hover:border-gold/30 hover:shadow-[0_0_30px_rgba(212,175,55,0.06)] transition-all duration-500 h-full">
                     <div className="w-14 h-14 md:w-16 md:h-16 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
                       <Rocket className="w-7 h-7 md:w-8 md:h-8 text-emerald-400/70" />
@@ -307,21 +309,23 @@ export function Hero() {
             <motion.div variants={staggerItem} className="w-full max-w-4xl">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {[
-                  { label: 'Voice I/O', desc: 'Speak and listen', icon: '🎙' },
-                  { label: 'Multi-Model', desc: 'Claude, Gemini, Qwen', icon: '🧠' },
-                  { label: 'Auto-Deploy', desc: 'Docker + CI/CD', icon: '🚀' },
-                  { label: 'Evidence-Based', desc: 'No proof, no done', icon: '📋' },
+                  { label: 'Voice I/O', desc: 'Speak and listen', icon: '🎙', href: '/workshop' },
+                  { label: 'Multi-Model', desc: 'Claude, Gemini, Qwen', icon: '🧠', href: '/dashboard/circuit-box?tab=model-garden' },
+                  { label: 'Auto-Deploy', desc: 'Docker + CI/CD', icon: '🚀', href: '/dashboard/deploy-dock' },
+                  { label: 'Evidence-Based', desc: 'No proof, no done', icon: '📋', href: '/sandbox/perform' },
                 ].map(cap => (
-                  <div key={cap.label} className="wireframe-card p-4 text-center">
-                    <div className="text-2xl mb-2">{cap.icon}</div>
-                    <h4
-                      className="text-sm font-bold text-white/80 mb-0.5"
-                      style={{ fontFamily: 'var(--font-display, "Doto", monospace)' }}
-                    >
-                      {cap.label}
-                    </h4>
-                    <p className="text-xs text-white/50">{cap.desc}</p>
-                  </div>
+                  <Link key={cap.label} href={cap.href} className="group block">
+                    <div className="wireframe-card p-4 text-center hover:border-gold/30 hover:shadow-[0_0_20px_rgba(212,175,55,0.05)] transition-all duration-500">
+                      <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">{cap.icon}</div>
+                      <h4
+                        className="text-sm font-bold text-white/80 mb-0.5 group-hover:text-gold transition-colors"
+                        style={{ fontFamily: 'var(--font-display, "Doto", monospace)' }}
+                      >
+                        {cap.label}
+                      </h4>
+                      <p className="text-xs text-white/50">{cap.desc}</p>
+                    </div>
+                  </Link>
                 ))}
               </div>
             </motion.div>
