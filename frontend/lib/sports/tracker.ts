@@ -6,7 +6,7 @@
  */
 
 import braveSearch from '@/lib/search/brave';
-import { generate, generateStructured } from '@/lib/ai/openrouter';
+import { generateStructured } from '@/lib/ai/openrouter';
 import { z } from 'zod';
 
 // ─────────────────────────────────────────────────────────────
@@ -161,6 +161,14 @@ export async function searchPlayerHighlights(
 // AI-Powered Data Extraction
 // ─────────────────────────────────────────────────────────────
 
+const CareerStatsArraySchema = z.object({
+  seasons: z.array(SeasonStatsSchema),
+});
+
+const InjuryArraySchema = z.object({
+  injuries: z.array(InjurySchema),
+});
+
 export async function extractPlayerProfile(
   searchResults: { webResults: any[]; newsResults: any[] },
   playerName: string
@@ -171,48 +179,67 @@ export async function extractPlayerProfile(
     ...searchResults.newsResults.map(r => `[NEWS] ${r.title}: ${r.description}`),
   ].join('\n\n');
 
-  // Extract structured player info
-  const playerInfo = await generateStructured({
-    model: 'gemini-2-flash',
-    prompt: `Extract player information for ${playerName} from this context:\n\n${context}`,
-    schema: PlayerSchema,
-    systemPrompt: 'You are a sports data extraction assistant. Extract accurate player information from search results.',
-  });
+  const systemPrompt = 'You are a sports data extraction assistant. Extract accurate player information from search results. If data is not available, use reasonable defaults (0 for numbers, "Unknown" for strings). Never fabricate stats — only extract what the sources support.';
 
-  // Extract career stats
-  const statsPrompt = `
-Based on this context, extract season-by-season statistics for ${playerName}:
+  // Extract all three in parallel for speed
+  const [playerInfo, statsData, injuryData] = await Promise.all([
+    // 1. Player bio
+    generateStructured({
+      model: 'gemini-2-flash',
+      prompt: `Extract player information for ${playerName} from this context:\n\n${context}`,
+      schema: PlayerSchema,
+      systemPrompt,
+    }),
 
-${context}
+    // 2. Career stats (structured)
+    generateStructured({
+      model: 'gemini-2-flash',
+      prompt: `Extract season-by-season career statistics for ${playerName} from this context. For each season include: year, team, games played, games started, tackles, interceptions, passes defended, sacks, forced fumbles. Only include seasons you can find evidence for.\n\n${context}`,
+      schema: CareerStatsArraySchema,
+      systemPrompt,
+    }).catch(() => ({ seasons: [] })),
 
-Focus on: games played, games started, tackles, interceptions, passes defended for defensive players.
-Return as structured data.
-`;
+    // 3. Injury history (structured)
+    generateStructured({
+      model: 'gemini-2-flash',
+      prompt: `Extract injury history for ${playerName} from this context. For each injury include: date, type, body part, severity (minor/moderate/major/season-ending), games missed. Only include injuries mentioned in the sources.\n\n${context}`,
+      schema: InjuryArraySchema,
+      systemPrompt,
+    }).catch(() => ({ injuries: [] })),
+  ]);
 
-  const statsText = await generate({
-    model: 'gemini-2-flash',
-    prompt: statsPrompt,
-  });
+  // Map structured stats to SeasonStats format
+  const careerStats: SeasonStats[] = statsData.seasons.map(s => ({
+    year: s.year,
+    team: s.team,
+    gamesPlayed: s.gamesPlayed,
+    gamesStarted: s.gamesStarted,
+    stats: {
+      tackles: s.tackles ?? 0,
+      interceptions: s.interceptions ?? 0,
+      passesDefended: s.passesDefended ?? 0,
+      sacks: s.sacks ?? 0,
+      forcedFumbles: s.forcedFumbles ?? 0,
+    },
+  }));
 
-  // Extract injury history
-  const injuryPrompt = `
-Based on this context, list any injuries for ${playerName}:
-
-${context}
-
-Include: date, type of injury, body part affected, games missed.
-`;
-
-  const injuryText = await generate({
-    model: 'gemini-2-flash',
-    prompt: injuryPrompt,
-  });
+  // Map structured injuries
+  const injuries: Injury[] = injuryData.injuries.map(i => ({
+    date: i.date,
+    type: i.type,
+    bodyPart: i.bodyPart,
+    severity: i.severity,
+    gamessMissed: i.gamesMissed,
+    notes: i.notes,
+  }));
 
   return {
     player: {
       id: `player-${playerName.toLowerCase().replace(/\s+/g, '-')}`,
       ...playerInfo,
     } as Player,
+    careerStats,
+    injuries,
     news: searchResults.newsResults.map(n => ({
       title: n.title,
       source: n.source,
@@ -245,7 +272,7 @@ export async function trackPlayer(
     searchPlayerHighlights(playerName, team),
   ]);
 
-  // Extract structured profile
+  // Extract structured profile (bio + stats + injuries in parallel via AI)
   const profile = await extractPlayerProfile(searchResults, playerName);
 
   // Compile highlights
@@ -258,9 +285,9 @@ export async function trackPlayer(
       position: 'Unknown',
       team: team || 'Unknown',
     },
-    careerStats: [],
+    careerStats: profile.careerStats || [],
     recentGames: [],
-    injuries: [],
+    injuries: profile.injuries || [],
     news: profile.news || [],
     highlights,
     lastUpdated: new Date(),
