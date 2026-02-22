@@ -900,6 +900,109 @@ app.post('/acheevy/classify', (req, res) => {
           /social\s*media\s*plan/i,
         ],
       },
+
+      // ── PaaS / Plug Operations ──────────────────────────────────────
+      {
+        id: 'paas-catalog',
+        name: 'Browse Plug Catalog',
+        patterns: [
+          /what\s*(tools?|plugs?|agents?)\s*(do\s*you|are|can)/i,
+          /show\s*me.*catalog/i,
+          /browse.*tools/i,
+          /what\s*can\s*(you|i)\s*(deploy|use|install|set\s*up)/i,
+          /available\s*(tools?|services?|plugs?)/i,
+        ],
+      },
+      {
+        id: 'paas-deploy',
+        name: 'Deploy Plug Instance',
+        patterns: [
+          /deploy\s*(a|an|the)?\s*(plug|tool|agent|instance|container)/i,
+          /spin\s*up/i,
+          /install\s*(a|an|the)?\s*(tool|agent|service)/i,
+          /set\s*up\s*(a|an)?\s*(tool|agent|service|n8n|openclaw)/i,
+          /launch\s*(a|an)?\s*(tool|agent|container)/i,
+          /\brun\s*(a|an)?\s*(tool|agent|service)\b/i,
+        ],
+      },
+      {
+        id: 'paas-status',
+        name: 'Check Instance Status',
+        patterns: [
+          /status\s*of\s*my/i,
+          /what('s|\s*is)\s*running/i,
+          /my\s*(instances?|services?|containers?)/i,
+          /check\s*(on|up\s*on)?\s*my/i,
+          /how('s|\s*is)\s*my.*doing/i,
+        ],
+      },
+
+      // ── Content / Video / UGC Pipeline ──────────────────────────────
+      {
+        id: 'content-pipeline',
+        name: 'Content Generation Pipeline',
+        patterns: [
+          /make.*video/i,
+          /generate.*video/i,
+          /create.*content/i,
+          /ugc/i,
+          /product\s*(video|ad|content)/i,
+          /turn.*into.*(video|content|ad)/i,
+          /amazon.*link.*video/i,
+          /seedance/i,
+          /marketing\s*(video|content|campaign)/i,
+          /ad\s*(creative|video|content)/i,
+          /social\s*(media\s*)?(video|content|ad)/i,
+        ],
+      },
+
+      // ── Automation / Workflow Pipeline ───────────────────────────────
+      {
+        id: 'workflow-pipeline',
+        name: 'Automation Pipeline Builder',
+        patterns: [
+          /whenever.*then/i,
+          /when.*happens.*do/i,
+          /automatically/i,
+          /every\s*(day|hour|week|morning|night)/i,
+          /schedule/i,
+          /trigger\s*when/i,
+          /if\s*this\s*then\s*that/i,
+          /connect.*to/i,
+          /integrate.*with/i,
+        ],
+      },
+    ];
+
+    // ── Vague Intent Refinement ───────────────────────────────────
+    // When input is too vague for keyword matching, detect the DOMAIN
+    // the user is thinking about and offer guided clarification.
+    const VAGUE_INTENT_MAP: Array<{ domain: string; hints: RegExp[]; refinement: string }> = [
+      {
+        domain: 'creation',
+        hints: [/i\s*want\s*to\s*make/i, /i\s*need\s*to\s*create/i, /help\s*me\s*(make|build|create)/i, /can\s*you\s*(make|build|create)/i],
+        refinement: 'I can help you create that. Are you looking to: (1) Build an app/website, (2) Generate content/videos, (3) Set up an automation, or (4) Deploy an AI tool?',
+      },
+      {
+        domain: 'money',
+        hints: [/make\s*money/i, /earn/i, /income/i, /revenue/i, /profit/i, /sell/i, /charge/i],
+        refinement: 'I can help with monetization. Are you looking to: (1) Launch a product/service, (2) Set up payment processing, (3) Build a business plan, or (4) Automate sales/outreach?',
+      },
+      {
+        domain: 'growth',
+        hints: [/grow/i, /scale/i, /more\s*(users|customers|traffic)/i, /marketing/i, /get\s*the\s*word\s*out/i],
+        refinement: 'Let\'s grow your reach. Are you looking to: (1) Create marketing content, (2) Automate outreach, (3) Build a content calendar, or (4) Set up analytics?',
+      },
+      {
+        domain: 'frustration',
+        hints: [/too\s*slow/i, /wasting\s*time/i, /takes\s*forever/i, /boring\s*task/i, /hate\s*doing/i, /repetitive/i],
+        refinement: 'Sounds like you need automation. Tell me what task is eating your time and I\'ll set up a workflow to handle it.',
+      },
+      {
+        domain: 'curiosity',
+        hints: [/what\s*can\s*you\s*do/i, /how\s*does\s*this\s*work/i, /what\s*is\s*this/i, /tell\s*me\s*about/i],
+        refinement: 'I\'m ACHEEVY — I deploy AI tools, build apps, automate workflows, and manage infrastructure. What are you working on? I\'ll match you with the right tools.',
+      },
     ];
 
     // ── Try vertical trigger matching first ────────────────────────
@@ -955,6 +1058,22 @@ app.post('/acheevy/classify', (req, res) => {
     if (/\b(spawn|activate|deploy)\s*(an?\s*)?(agent|boomer|ang)\b/.test(lower)) {
       res.json({ intent: 'deployment-hub', confidence: 0.85, requiresAgent: true });
       return;
+    }
+
+    // ── Vague intent refinement ─────────────────────────────────
+    // User's input didn't match any specific trigger. Try to detect
+    // the domain they're thinking about and offer guided refinement.
+    for (const vague of VAGUE_INTENT_MAP) {
+      if (vague.hints.some(h => h.test(message))) {
+        res.json({
+          intent: `refine:${vague.domain}`,
+          confidence: 0.6,
+          requiresAgent: false,
+          refinement: vague.refinement,
+          domain: vague.domain,
+        });
+        return;
+      }
     }
 
     // Default: conversational (no agent needed, use LLM stream)
