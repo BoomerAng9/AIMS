@@ -16,16 +16,25 @@
 // ---------------------------------------------------------------------------
 
 export type PlugCategory =
-  | 'agent-framework'      // OpenClaw, Agent Zero, CrewAI
-  | 'code-execution'       // ii-agent, E2B, Daytona
-  | 'workflow-automation'   // n8n, Windmill, Temporal
+  | 'agent-framework'      // OpenClaw, Agent Zero, CrewAI, Dify, Coze Studio
+  | 'code-execution'       // ii-agent, E2B, Daytona, Continue
+  | 'workflow-automation'   // n8n, Windmill, Temporal, Flowise
   | 'research-agent'        // DeerFlow, GPT Researcher
   | 'computer-use'          // OpenClaw, Trey AI, browser-use
   | 'voice-agent'           // PersonaPlex, Vapi, Retell
-  | 'content-engine'        // Content generation, social media
+  | 'content-engine'        // Content generation, social media, video
   | 'data-pipeline'         // ETL, scraping, analytics
   | 'custom-vertical'       // Per|Form, real estate, etc.
-  | 'dev-tools';            // IDEs, sandboxes, dashboards
+  | 'dev-tools'             // IDEs, sandboxes, dashboards
+  | 'chat-ui'               // Open WebUI, LibreChat
+  | 'database'              // Supabase, NocoDB
+  | 'storage'               // MinIO, R2
+  | 'monitoring'            // Uptime Kuma, Grafana
+  | 'cms'                   // Ghost, Strapi
+  | 'model-serving'         // Ollama, vLLM, TGI
+  | 'chatbot'               // Typebot, Botpress
+  | 'security'              // Vaultwarden, Authentik
+  | 'project-management';   // Plane, Huly
 
 export type PlugTier = 'free' | 'starter' | 'pro' | 'enterprise';
 

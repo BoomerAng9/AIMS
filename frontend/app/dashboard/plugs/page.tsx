@@ -269,7 +269,28 @@ export default function PlugsPage() {
                         <Eye size={11} /> View
                       </Link>
                       {(plug.status === "ready" || plug.status === "review") && (
-                        <button className="flex items-center gap-1 rounded-lg bg-gold/10 border border-gold/20 px-2.5 py-1.5 text-[0.6rem] font-mono text-gold hover:bg-gold hover:text-black transition-all">
+                        <button
+                          onClick={async () => {
+                            try {
+                              const res = await fetch("/api/plug-catalog", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({
+                                  plugId: plug.id,
+                                  instanceName: `${plug.name}-instance`,
+                                }),
+                              });
+                              if (res.ok) {
+                                setPlugs(prev => prev.map(p =>
+                                  p.id === plug.id ? { ...p, status: "deployed" as PlugStatus } : p
+                                ));
+                              }
+                            } catch (err) {
+                              console.error("Deploy failed:", err);
+                            }
+                          }}
+                          className="flex items-center gap-1 rounded-lg bg-gold/10 border border-gold/20 px-2.5 py-1.5 text-[0.6rem] font-mono text-gold hover:bg-gold hover:text-black transition-all"
+                        >
                           <Rocket size={11} /> Deploy
                         </button>
                       )}

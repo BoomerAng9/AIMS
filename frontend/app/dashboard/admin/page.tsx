@@ -75,9 +75,39 @@ function AdminPanel() {
   const [systemPrompt, setSystemPrompt] = useState(
     "You are ACHEEVY, the lead orchestrator for A.I.M.S. Your primary goal is to maintain business architecture integrity while delegating discrete tasks to Boomer_Angs. All tasks pass through PREP_SQUAD_ALPHA before execution. Activity breeds Activity."
   );
+  const [saving, setSaving] = useState(false);
   const [apiKeys, setApiKeys] = useState<ApiKeyInfo[]>([]);
   const [keysLoading, setKeysLoading] = useState(true);
   const [keysError, setKeysError] = useState<string | null>(null);
+
+  const handleSaveAll = useCallback(async () => {
+    setSaving(true);
+    try {
+      await fetch("/api/admin/api-keys", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ primaryModel, systemPrompt }),
+      });
+    } catch (err) {
+      console.error("Save failed:", err);
+    } finally {
+      setSaving(false);
+    }
+  }, [primaryModel, systemPrompt]);
+
+  const handleDangerAction = useCallback(async (action: string) => {
+    const confirmed = window.confirm(`Are you sure you want to ${action}? This cannot be undone.`);
+    if (!confirmed) return;
+    try {
+      await fetch("/api/admin/api-keys", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ dangerAction: action }),
+      });
+    } catch (err) {
+      console.error(`${action} failed:`, err);
+    }
+  }, []);
 
   const fetchApiKeys = useCallback(async () => {
     setKeysLoading(true);
@@ -115,8 +145,12 @@ function AdminPanel() {
               This panel is not visible to regular users.
             </p>
           </div>
-          <button className="rounded-full bg-gold px-4 py-2 text-xs font-semibold text-black shadow-[0_0_15px_rgba(251,191,36,0.4)] hover:scale-105 active:scale-95 transition-transform">
-            Save All
+          <button
+            onClick={handleSaveAll}
+            disabled={saving}
+            className="rounded-full bg-gold px-4 py-2 text-xs font-semibold text-black shadow-[0_0_15px_rgba(251,191,36,0.4)] hover:scale-105 active:scale-95 transition-transform disabled:opacity-50"
+          >
+            {saving ? "Saving..." : "Save All"}
           </button>
         </div>
       </section>
@@ -477,13 +511,22 @@ function AdminPanel() {
         </h2>
         <p className="mt-1 text-[0.65rem] text-red-400/40 uppercase tracking-wider">Destructive actions — proceed with caution</p>
         <div className="mt-4 flex flex-wrap gap-3">
-          <button className="rounded-full border border-red-500/30 px-4 py-2 text-xs font-semibold text-red-400 hover:bg-red-500/10 transition-colors">
+          <button
+            onClick={() => handleDangerAction("reset-agent-state")}
+            className="rounded-full border border-red-500/30 px-4 py-2 text-xs font-semibold text-red-400 hover:bg-red-500/10 transition-colors"
+          >
             Reset All Agent State
           </button>
-          <button className="rounded-full border border-red-500/30 px-4 py-2 text-xs font-semibold text-red-400 hover:bg-red-500/10 transition-colors">
+          <button
+            onClick={() => handleDangerAction("flush-byterover-cache")}
+            className="rounded-full border border-red-500/30 px-4 py-2 text-xs font-semibold text-red-400 hover:bg-red-500/10 transition-colors"
+          >
             Flush ByteRover Cache
           </button>
-          <button className="rounded-full border border-red-500/30 px-4 py-2 text-xs font-semibold text-red-400 hover:bg-red-500/10 transition-colors">
+          <button
+            onClick={() => handleDangerAction("clear-rate-limits")}
+            className="rounded-full border border-red-500/30 px-4 py-2 text-xs font-semibold text-red-400 hover:bg-red-500/10 transition-colors"
+          >
             Clear Rate Limits
           </button>
         </div>
