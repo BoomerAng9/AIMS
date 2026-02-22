@@ -83,15 +83,43 @@ export async function GET() {
     });
   }
 
-  // WhatsApp — no backend exists yet
-  channels.push({
-    id: 'whatsapp',
-    name: 'WhatsApp',
-    icon: '📱',
-    configured: false,
-    status: 'not_built',
-    endpoint: '',
-  });
+  // Check WhatsApp webhook
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const res = await fetch(`${baseUrl}/api/whatsapp/webhook`, {
+      method: 'GET',
+      signal: AbortSignal.timeout(5000),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      channels.push({
+        id: 'whatsapp',
+        name: 'WhatsApp',
+        icon: '📱',
+        configured: data.status === 'configured',
+        status: data.status || 'unknown',
+        endpoint: '/api/whatsapp/webhook',
+      });
+    } else {
+      channels.push({
+        id: 'whatsapp',
+        name: 'WhatsApp',
+        icon: '📱',
+        configured: false,
+        status: 'unreachable',
+        endpoint: '/api/whatsapp/webhook',
+      });
+    }
+  } catch {
+    channels.push({
+      id: 'whatsapp',
+      name: 'WhatsApp',
+      icon: '📱',
+      configured: !!process.env.WHATSAPP_API_TOKEN,
+      status: process.env.WHATSAPP_API_TOKEN ? 'configured' : 'not_configured',
+      endpoint: '/api/whatsapp/webhook',
+    });
+  }
 
   return NextResponse.json({
     timestamp: new Date().toISOString(),

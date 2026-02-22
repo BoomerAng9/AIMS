@@ -649,8 +649,8 @@ const CHANNEL_SETUP: Record<string, { steps: string[]; commands: string[] }> = {
     commands: ['!link — Begin setup', '!help — Show commands', '!disconnect — Unlink'],
   },
   whatsapp: {
-    steps: [],
-    commands: [],
+    steps: ['Add the AIMS WhatsApp number to your contacts', 'Send "link" as your first message', 'Copy the link code provided', 'Paste it in the field below'],
+    commands: ['Send "link" — Begin setup', 'Send "help" — Show commands', 'Send "disconnect" — Unlink'],
   },
 };
 
@@ -675,7 +675,7 @@ function SocialChannelsPanel({ isOwner }: { isOwner: boolean }) {
 
   const statusBadge = (status: string) => {
     if (status === 'configured') return { label: 'BOT TOKEN SET', cls: 'bg-cb-green/10 text-cb-green border-cb-green/30' };
-    if (status === 'not_built') return { label: 'NOT BUILT', cls: 'bg-cb-red/10 text-cb-red border-cb-red/30' };
+    if (status === 'unreachable') return { label: 'UNREACHABLE', cls: 'bg-cb-red/10 text-cb-red border-cb-red/30' };
     return { label: 'TOKEN MISSING', cls: 'bg-cb-fog/10 text-cb-fog border-cb-fog/30' };
   };
 
@@ -736,15 +736,9 @@ function SocialChannelsPanel({ isOwner }: { isOwner: boolean }) {
                   </span>
                 </div>
 
-                {ch.status === 'not_built' ? (
-                  <div className="py-4 text-center">
-                    <p className="text-xs text-white/30">No backend integration built yet</p>
-                    <p className="text-[10px] text-white/15 mt-1">Webhook endpoint does not exist</p>
-                  </div>
-                ) : (
-                  <>
+                <>
                     {/* Setup steps */}
-                    {setup?.steps.length > 0 && (
+                    {setup?.steps && setup.steps.length > 0 && (
                       <div className="mb-3">
                         <h4 className="text-xs font-medium text-white/60 mb-2 uppercase tracking-wider">Setup</h4>
                         <ol className="space-y-1">
@@ -772,14 +766,14 @@ function SocialChannelsPanel({ isOwner }: { isOwner: boolean }) {
                       </div>
                     )}
 
-                    {!ch.configured && ch.status !== 'not_built' && (
+                    {!ch.configured && (
                       <div className="p-2 rounded-lg bg-cb-amber/5 border border-cb-amber/20 mb-3">
-                        <p className="text-[10px] text-cb-amber">Bot token not set in environment. Set <code className="font-mono">{ch.id.toUpperCase()}_BOT_TOKEN</code> to enable.</p>
+                        <p className="text-[10px] text-cb-amber">Bot token not set in environment. Set <code className="font-mono">{ch.id === 'whatsapp' ? 'WHATSAPP_API_TOKEN' : `${ch.id.toUpperCase()}_BOT_TOKEN`}</code> to enable.</p>
                       </div>
                     )}
 
                     {/* Commands */}
-                    {setup?.commands.length > 0 && (
+                    {setup?.commands && setup.commands.length > 0 && (
                       <div>
                         <h4 className="text-xs font-medium text-white/60 mb-1.5 uppercase tracking-wider">Commands</h4>
                         <div className="space-y-0.5">
@@ -789,8 +783,7 @@ function SocialChannelsPanel({ isOwner }: { isOwner: boolean }) {
                         </div>
                       </div>
                     )}
-                  </>
-                )}
+                </>
               </div>
             );
           })}
