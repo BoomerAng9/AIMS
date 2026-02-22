@@ -57,10 +57,15 @@ interface KlingApiTaskResponse {
 
 export class KlingVideoService {
   private apiKey: string;
-  private baseUrl = "https://api.klingai.com/v1";
+  private baseUrl: string;
+  private gatewayUrl: string;
 
   constructor(apiKey: string) {
     this.apiKey = apiKey;
+    // Route through UEF Gateway for rate limiting, auth, and audit logging
+    // Direct API calls bypass all AIMS security controls
+    this.gatewayUrl = process.env.NEXT_PUBLIC_UEF_GATEWAY_URL || process.env.UEF_GATEWAY_URL || '';
+    this.baseUrl = this.gatewayUrl ? `${this.gatewayUrl}/video` : "https://api.klingai.com/v1";
   }
 
   /**
@@ -167,12 +172,27 @@ export class KlingVideoService {
         duration: request.duration ? `${request.duration}` : "5",
       };
 
-      const response = await fetch(`${this.baseUrl}/videos/text2video`, {
+      // Route through UEF Gateway when available (preferred — gets rate limiting, auth, audit)
+      const useGateway = !!this.gatewayUrl;
+      const url = useGateway
+        ? `${this.gatewayUrl}/video/generate`
+        : `${this.baseUrl}/videos/text2video`;
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+
+      if (useGateway) {
+        // Gateway handles API key injection — just pass the request
+        headers["x-internal-caller"] = "frontend";
+      } else {
+        // Direct fallback (only if gateway URL not configured)
+        console.warn("[KlingVideo] Bypassing UEF Gateway — configure UEF_GATEWAY_URL for production");
+        headers["Authorization"] = `Bearer ${this.apiKey}`;
+      }
+
+      const response = await fetch(url, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${this.apiKey}`
-        },
+        headers,
         body: JSON.stringify(payload)
       });
 
@@ -218,15 +238,26 @@ export class KlingVideoService {
          };
       }
 
-      if (!this.apiKey) {
-        throw new Error("Kling API key is missing");
+      if (!this.apiKey && !this.gatewayUrl) {
+        throw new Error("Kling API key or UEF Gateway URL is required");
       }
 
-      const response = await fetch(`${this.baseUrl}/videos/text2video/${jobId}`, {
+      // Route through UEF Gateway when available
+      const useGateway = !!this.gatewayUrl;
+      const url = useGateway
+        ? `${this.gatewayUrl}/video/status/${jobId}`
+        : `${this.baseUrl}/videos/text2video/${jobId}`;
+      const headers: Record<string, string> = {};
+
+      if (useGateway) {
+        headers["x-internal-caller"] = "frontend";
+      } else {
+        headers["Authorization"] = `Bearer ${this.apiKey}`;
+      }
+
+      const response = await fetch(url, {
         method: "GET",
-        headers: {
-          "Authorization": `Bearer ${this.apiKey}`
-        }
+        headers,
       });
 
       if (!response.ok) {

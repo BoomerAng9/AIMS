@@ -89,6 +89,10 @@ export async function GET(req: NextRequest) {
       if (!deployment) {
         return NextResponse.json({ error: "Deployment not found" }, { status: 404 });
       }
+      // Ownership check — users can only view their own deployments
+      if (deployment.userId !== session.user.email) {
+        return NextResponse.json({ error: "Deployment not found" }, { status: 404 });
+      }
       return NextResponse.json(deployment);
     }
 
@@ -330,10 +334,17 @@ async function handleCreateDeployment(body: any, userId: string) {
   });
 }
 
+/** Verify the authenticated user owns the deployment */
+function getOwnedDeployment(deploymentId: string, userId: string) {
+  const deployment = deployments.get(deploymentId);
+  if (!deployment || deployment.userId !== userId) return null;
+  return deployment;
+}
+
 async function handleHatchAgent(body: any, userId: string) {
   const { deploymentId, agentId } = body;
 
-  const deployment = deployments.get(deploymentId);
+  const deployment = getOwnedDeployment(deploymentId, userId);
   if (!deployment) {
     return NextResponse.json({ error: "Deployment not found" }, { status: 404 });
   }
@@ -387,7 +398,7 @@ async function handleHatchAgent(body: any, userId: string) {
 async function handleAssignWorkflow(body: any, userId: string) {
   const { deploymentId, workflowId, jobPacketName } = body;
 
-  const deployment = deployments.get(deploymentId);
+  const deployment = getOwnedDeployment(deploymentId, userId);
   if (!deployment) {
     return NextResponse.json({ error: "Deployment not found" }, { status: 404 });
   }
@@ -465,7 +476,7 @@ async function handleLaunchDeployment(body: any, userId: string) {
     return NextResponse.json({ error: "Launch must be confirmed" }, { status: 400 });
   }
 
-  const deployment = deployments.get(deploymentId);
+  const deployment = getOwnedDeployment(deploymentId, userId);
   if (!deployment) {
     return NextResponse.json({ error: "Deployment not found" }, { status: 404 });
   }
@@ -584,7 +595,7 @@ async function handleLaunchDeployment(body: any, userId: string) {
 async function handleVerifyDeployment(body: any, userId: string) {
   const { deploymentId } = body;
 
-  const deployment = deployments.get(deploymentId);
+  const deployment = getOwnedDeployment(deploymentId, userId);
   if (!deployment) {
     return NextResponse.json({ error: "Deployment not found" }, { status: 404 });
   }
@@ -633,7 +644,7 @@ async function handleVerifyDeployment(body: any, userId: string) {
 async function handleRollbackDeployment(body: any, userId: string) {
   const { deploymentId, reason } = body;
 
-  const deployment = deployments.get(deploymentId);
+  const deployment = getOwnedDeployment(deploymentId, userId);
   if (!deployment) {
     return NextResponse.json({ error: "Deployment not found" }, { status: 404 });
   }
