@@ -301,11 +301,9 @@ agentCommerceRouter.post('/api/payments/agent/confirm', async (req: Request, res
         res.status(400).json({ error: `Stripe verification failed: ${stripeErr.message}` });
         return;
       }
-    } else if (!stripe && process.env.NODE_ENV !== 'production') {
-      // Dev mode ONLY: accept without Stripe SDK — blocked in production
-      verifiedPaymentId = piId || `unverified_stripe_${sessionId}`;
-      logger.warn({ sessionId }, '[AgentCommerce] Stripe SDK not configured — accepting without verification (dev mode only)');
-    } else if (!stripe && process.env.NODE_ENV === 'production') {
+    } else if (!stripe) {
+      // SECURITY: Reject ALL unverified payments regardless of environment
+      logger.error({ sessionId }, '[AgentCommerce] Stripe SDK not configured — rejecting payment confirmation');
       res.status(503).json({ error: 'Payment processing not available — Stripe not configured' });
       return;
     } else {
@@ -455,13 +453,10 @@ agentCommerceRouter.post('/api/payments/stripe/webhook', async (req: Request, re
       res.status(400).json({ error: `Webhook signature verification failed: ${err.message}` });
       return;
     }
-  } else if (!webhookSecret && process.env.NODE_ENV !== 'production') {
-    // Dev mode ONLY: accept raw JSON body — blocked in production
-    event = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
-    logger.warn('[StripeWebhook] No STRIPE_WEBHOOK_SECRET — accepting unverified (dev mode only)');
-  } else if (!webhookSecret && process.env.NODE_ENV === 'production') {
-    logger.error('[StripeWebhook] STRIPE_WEBHOOK_SECRET not configured in production — rejecting');
-    res.status(500).json({ error: 'Webhook not configured' });
+  } else if (!webhookSecret || !stripe) {
+    // SECURITY: Reject ALL unverified webhooks regardless of environment
+    logger.error('[StripeWebhook] STRIPE_WEBHOOK_SECRET or Stripe SDK not configured — rejecting');
+    res.status(500).json({ error: 'Webhook not configured — signature verification required' });
     return;
   } else {
     res.status(400).json({ error: 'Missing stripe-signature header' });

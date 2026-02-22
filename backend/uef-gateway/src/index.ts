@@ -19,7 +19,7 @@ import { pmoRegistry } from './pmo/registry';
 import { houseOfAng } from './pmo/house-of-ang';
 import { runCollaborationDemo, renderJSON } from './collaboration';
 import { TIER_CONFIGS, TASK_MULTIPLIERS as BILLING_MULTIPLIERS, PILLAR_CONFIGS, checkAllowance, calculatePillarAddon, checkAgentLimit, meterAndRecord } from './billing';
-import { billingProvisions } from './billing/persistence';
+import { billingProvisions, paymentSessionStore, x402ReceiptStore } from './billing/persistence';
 import { agentPayments } from './payments/agent-payments';
 import { openrouter, MODELS as LLM_MODELS, llmGateway, usageTracker } from './llm';
 import { verticalRegistry } from './verticals';
@@ -156,9 +156,11 @@ function requireApiKey(req: express.Request, res: express.Response, next: expres
     return;
   }
 
-  // In dev without a key configured, allow requests through
-  if (!INTERNAL_API_KEY && process.env.NODE_ENV !== 'production') {
-    next();
+  // SECURITY: If no API key is configured, reject all requests.
+  // No dev-mode bypass — set INTERNAL_API_KEY in all environments.
+  if (!INTERNAL_API_KEY) {
+    logger.error({ path: req.path }, '[UEF] INTERNAL_API_KEY not configured — rejecting request');
+    res.status(503).json({ error: 'API key not configured — server misconfiguration' });
     return;
   }
 
@@ -2882,6 +2884,19 @@ async function startServer(): Promise<void> {
   } catch (err) {
     logger.error({ err }, '[UEF] Instance lifecycle init failed — continuing without health monitoring');
   }
+
+  // ── Billing Maintenance Cron (every 5 minutes) ──────────────────────────
+  setInterval(() => {
+    try {
+      const expiredSessions = paymentSessionStore.expireStaleSessions();
+      const expiredReceipts = x402ReceiptStore.cleanup();
+      if (expiredSessions > 0 || expiredReceipts > 0) {
+        logger.info({ expiredSessions, expiredReceipts }, '[BillingCron] Cleaned up expired records');
+      }
+    } catch (err) {
+      logger.error({ err }, '[BillingCron] Cleanup failed');
+    }
+  }, 5 * 60 * 1000);
 
   server.listen(PORT, () => {
     const agents = registry.list();
