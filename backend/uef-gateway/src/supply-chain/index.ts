@@ -418,6 +418,11 @@ export class SupplyChainManager {
       const version = versionSpec.replace(/[\^~>=<]/g, '');
 
       try {
+        // SECURITY: Validate package name to prevent command injection
+        if (!/^(@[\w-]+\/)?[\w.-]+$/.test(name)) {
+          logger.warn({ name }, '[SupplyChain] Skipping suspicious package name');
+          continue;
+        }
         const raw = execSync(`npm view ${name} time --json 2>/dev/null`, {
           encoding: 'utf-8',
           timeout: 10_000,
