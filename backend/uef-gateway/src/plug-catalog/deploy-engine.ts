@@ -19,6 +19,7 @@ import { plugCatalog } from './catalog';
 import { dockerRuntime } from './docker-runtime';
 import { portAllocator } from './port-allocator';
 import { instanceStore } from './instance-store';
+import { tenantNetworks } from './tenant-networks';
 import { liveSim } from '../livesim';
 import { Oracle } from '../oracle';
 import type {
@@ -219,6 +220,11 @@ export class PlugDeployEngine {
         events,
       };
     }
+
+    // 8.5. Ensure per-user tenant network isolation
+    const tenantNetwork = await tenantNetworks.ensureTenantNetwork(request.userId);
+    instance.envOverrides['__tenantNetwork'] = tenantNetwork;
+    addEvent('isolate', `Tenant network: ${tenantNetwork}`);
 
     // 9. Pull Docker image
     const image = plug.docker.image;

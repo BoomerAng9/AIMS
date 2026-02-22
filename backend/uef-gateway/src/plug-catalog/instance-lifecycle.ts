@@ -27,6 +27,7 @@ import { plugDeployEngine } from './deploy-engine';
 import { plugCatalog } from './catalog';
 import { cloudflare } from '../cloudflare/client';
 import { kvSync } from './kv-sync';
+import { tenantNetworks } from './tenant-networks';
 import { alertEngine } from '../observability';
 import { liveSim } from '../livesim';
 
@@ -278,6 +279,14 @@ export class InstanceLifecycle {
       steps.push({ step: 'remove-record', success: true });
     } catch (err) {
       steps.push({ step: 'remove-record', success: false, detail: String(err) });
+    }
+
+    // 8. Prune tenant network if no more instances for this user
+    try {
+      const pruned = await tenantNetworks.pruneTenantNetwork(instance.userId);
+      steps.push({ step: 'prune-tenant-network', success: true, detail: pruned ? 'Network removed' : 'Network still in use' });
+    } catch (err) {
+      steps.push({ step: 'prune-tenant-network', success: false, detail: String(err) });
     }
 
     const fullyDecommissioned = steps.every(s => s.success);

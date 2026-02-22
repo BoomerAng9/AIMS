@@ -53,6 +53,9 @@ export { PortAllocator, portAllocator } from './port-allocator';
 export { HealthMonitor, healthMonitor } from './health-monitor';
 export { InstanceLifecycle, instanceLifecycle } from './instance-lifecycle';
 export { KVSync, kvSync } from './kv-sync';
+export { TenantNetworkManager, tenantNetworks } from './tenant-networks';
+export { AutoScaler, autoScaler } from './auto-scaler';
+export { CdnDeployEngine, cdnDeploy } from './cdn-deploy';
 export { instanceStore } from './instance-store';
 
 // API Router

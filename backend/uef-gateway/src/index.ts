@@ -52,7 +52,9 @@ import { ossModels } from './llm/oss-models';
 import { personaplex } from './llm/personaplex';
 import { N8nClient } from './n8n';
 import { plugRouter } from './plug-catalog/router';
-import { instanceLifecycle } from './plug-catalog';
+import { instanceLifecycle, autoScaler, cdnDeploy, tenantNetworks } from './plug-catalog';
+import { dispatchChickenHawkBuild } from './agents/cloudrun-dispatcher';
+import { triggerVerticalWorkflow } from './n8n/client';
 import { cloudflareRouter, markdownForAgents } from './cloudflare';
 import { paymentsRouter } from './payments';
 import { normalizeInput, getDialectStats, SLANG_ENTRY_COUNT, INTENT_PHRASE_COUNT } from './nlp';
@@ -2142,6 +2144,125 @@ app.get('/api/livesim/stream', (req, res) => {
 });
 
 // --------------------------------------------------------------------------
+// Auto-Scaler — Horizontal & Vertical Scaling for Plug Instances
+// --------------------------------------------------------------------------
+
+app.get('/api/autoscaler/stats', (_req, res) => {
+  res.json(autoScaler.getStats());
+});
+
+app.post('/api/autoscaler/policy', (req, res) => {
+  const { instanceId, ...policy } = req.body;
+  if (!instanceId) {
+    res.status(400).json({ error: 'instanceId required' });
+    return;
+  }
+  const result = autoScaler.setPolicy(instanceId, policy);
+  res.json({ policy: result });
+});
+
+app.post('/api/autoscaler/tier', (req, res) => {
+  const { instanceId, tier } = req.body;
+  if (!instanceId || !tier) {
+    res.status(400).json({ error: 'instanceId and tier required' });
+    return;
+  }
+  const result = autoScaler.applyTierLimits(instanceId, tier);
+  res.json({ policy: result });
+});
+
+app.delete('/api/autoscaler/policy/:instanceId', (req, res) => {
+  autoScaler.removePolicy(req.params.instanceId);
+  res.json({ removed: true });
+});
+
+// --------------------------------------------------------------------------
+// CDN Deploy — Static Site Hosting Pipeline
+// --------------------------------------------------------------------------
+
+app.post('/api/cdn/deploy', async (req, res) => {
+  const { projectId, userId, projectName, files, customDomain, paywallEnabled } = req.body;
+  if (!projectId || !userId || !projectName || !files) {
+    res.status(400).json({ error: 'Missing required fields: projectId, userId, projectName, files' });
+    return;
+  }
+  try {
+    const result = await cdnDeploy.deploy({ projectId, userId, projectName, files, customDomain, paywallEnabled });
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err instanceof Error ? err.message : 'Deploy failed' });
+  }
+});
+
+app.get('/api/cdn/deployments', (_req, res) => {
+  res.json({ deployments: cdnDeploy.listDeployments() });
+});
+
+app.get('/api/cdn/deployments/:slug', (req, res) => {
+  const deployment = cdnDeploy.getDeployment(req.params.slug);
+  if (!deployment) {
+    res.status(404).json({ error: 'Deployment not found' });
+    return;
+  }
+  res.json(deployment);
+});
+
+app.delete('/api/cdn/deployments/:slug', async (req, res) => {
+  const result = await cdnDeploy.decommission(req.params.slug);
+  res.json(result);
+});
+
+// --------------------------------------------------------------------------
+// Cloud Run Dispatcher — Chicken Hawk Build Jobs
+// --------------------------------------------------------------------------
+
+app.post('/api/cloudrun/dispatch', async (req, res) => {
+  const { taskId, manifestUrl, preferService } = req.body;
+  if (!taskId) {
+    res.status(400).json({ error: 'taskId required' });
+    return;
+  }
+  try {
+    const result = await dispatchChickenHawkBuild(taskId, manifestUrl, preferService);
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err instanceof Error ? err.message : 'Dispatch failed' });
+  }
+});
+
+// --------------------------------------------------------------------------
+// Tenant Network Isolation — Per-User Docker Networks
+// --------------------------------------------------------------------------
+
+app.get('/api/tenant-networks', async (_req, res) => {
+  const networks = await tenantNetworks.listTenantNetworks();
+  res.json({ networks });
+});
+
+// --------------------------------------------------------------------------
+// Vertical Workflow Triggers — n8n Integration
+// --------------------------------------------------------------------------
+
+app.post('/api/vertical/trigger', async (req, res) => {
+  const { verticalId, userId, collectedData, sessionId } = req.body;
+  if (!verticalId || !userId) {
+    res.status(400).json({ error: 'verticalId and userId required' });
+    return;
+  }
+  try {
+    const result = await triggerVerticalWorkflow({
+      verticalId,
+      userId,
+      collectedData: collectedData || {},
+      sessionId,
+    });
+    res.json(result);
+  } catch (err) {
+    res.status(502).json({ error: err instanceof Error ? err.message : 'Workflow trigger failed' });
+  }
+});
+
+// --------------------------------------------------------------------------
 // LUC Project Service — Pricing & Effort Oracle
 // --------------------------------------------------------------------------
 app.post('/luc/project', async (req, res) => {
@@ -3176,7 +3297,8 @@ async function startServer(): Promise<void> {
   // starts background health sweeps, and reconciles with Docker state.
   try {
     await instanceLifecycle.initialize();
-    logger.info('[UEF] Instance lifecycle initialized — health monitor running');
+    autoScaler.start(60000); // Evaluate scaling every 60s
+    logger.info('[UEF] Instance lifecycle initialized — health monitor + auto-scaler running');
   } catch (err) {
     logger.error({ err }, '[UEF] Instance lifecycle init failed — continuing without health monitoring');
   }

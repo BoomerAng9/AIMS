@@ -161,7 +161,8 @@ export class DockerRuntime {
           RestartPolicy: { Name: 'unless-stopped' },
           Memory: parseMemoryLimit(plug.resources.memoryLimit),
           NanoCpus: parseCpuLimit(plug.resources.cpuLimit),
-          NetworkMode: plug.networkPolicy.isolatedSandbox ? SANDBOX_NETWORK : AIMS_NETWORK,
+          NetworkMode: instance.envOverrides['__tenantNetwork']
+            || (plug.networkPolicy.isolatedSandbox ? SANDBOX_NETWORK : AIMS_NETWORK),
           // SECURITY: Container hardening
           SecurityOpt: ['no-new-privileges:true'],
           PidsLimit: 256,
@@ -468,9 +469,10 @@ export class DockerRuntime {
 
   private async ensureNetwork(instance: PlugInstance): Promise<void> {
     const d = getDocker();
-    const networkName = instance.envOverrides['__isolated']
-      ? SANDBOX_NETWORK
-      : AIMS_NETWORK;
+
+    // Priority: per-user tenant network > sandbox > shared aims-network
+    const networkName = instance.envOverrides['__tenantNetwork']
+      || (instance.envOverrides['__isolated'] ? SANDBOX_NETWORK : AIMS_NETWORK);
 
     try {
       const network = d.getNetwork(networkName);

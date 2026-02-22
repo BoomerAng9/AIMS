@@ -15,6 +15,7 @@ import { getIIAgentClient, IIAgentClient, IIAgentTask } from '../ii-agent/client
 import { LUCEngine } from '../luc';
 import { v4 as uuidv4 } from 'uuid';
 import { triggerN8nPmoWorkflow } from '../n8n';
+import { triggerVerticalWorkflow } from '../n8n/client';
 import type { N8nPipelineResponse } from '../n8n';
 import { executeVertical } from './execution-engine';
 import { spawnAgent, decommissionAgent, getRoster, getAvailableRoster } from '../deployment-hub';
@@ -24,6 +25,7 @@ import type { ExecutionOutcome } from '../memory';
 import { agentChat } from '../llm';
 import logger from '../logger';
 import { liveSim } from '../livesim';
+import { dispatchChickenHawkBuild } from '../agents/cloudrun-dispatcher';
 
 // NtNtN Engine: loaded at runtime to avoid tsconfig rootDir compilation issues
 let _ntntnEngine: any = null;
@@ -154,6 +156,23 @@ async function dispatchToChickenHawk(manifest: ChickenHawkManifest): Promise<{
   shiftId: string;
   result: any;
 }> {
+  // Try Cloud Run first (GCP sandboxed environment)
+  try {
+    const crResult = await dispatchChickenHawkBuild(manifest.manifest_id);
+    if ('dispatched' in crResult && crResult.dispatched) {
+      logger.info({ manifestId: manifest.manifest_id, mode: crResult.mode }, '[ACHEEVY] Build dispatched to Cloud Run');
+      return {
+        dispatched: true,
+        manifestId: manifest.manifest_id,
+        shiftId: manifest.shift_id,
+        result: { cloudRun: crResult },
+      };
+    }
+  } catch (crErr) {
+    logger.warn({ err: crErr instanceof Error ? crErr.message : crErr }, '[ACHEEVY] Cloud Run dispatch failed, falling back to local Chicken Hawk');
+  }
+
+  // Fallback: local Chicken Hawk container
   const res = await fetch(`${CHICKENHAWK_URL}/api/manifest`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -575,6 +594,17 @@ export class AcheevyOrchestrator {
           error: result.error,
         };
       }
+
+      // Fire-and-forget: also trigger n8n workflow for this vertical (Phase B automation)
+      triggerVerticalWorkflow({
+        verticalId,
+        userId: req.userId,
+        collectedData: collectedData as Record<string, unknown>,
+        sessionId: req.conversationId || requestId,
+        requestId,
+      }).catch(err => {
+        logger.warn({ err: err instanceof Error ? err.message : err, verticalId }, '[ACHEEVY] n8n vertical workflow trigger failed (non-blocking)');
+      });
 
       return {
         requestId,
