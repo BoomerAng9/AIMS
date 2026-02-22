@@ -103,6 +103,8 @@ services:
     restart: always
     networks:
       - aims-network
+    security_opt:
+      - no-new-privileges:true
 
   # ---------------------------------------------------------------------------
   # Demo Frontend (Next.js 14 — sandbox mode)
@@ -146,6 +148,8 @@ services:
     restart: always
     networks:
       - aims-network
+    security_opt:
+      - no-new-privileges:true
     deploy:
       resources:
         limits:
@@ -220,6 +224,8 @@ services:
     restart: always
     networks:
       - aims-network
+    security_opt:
+      - no-new-privileges:true
 
   # ---------------------------------------------------------------------------
   # House of Ang — Boomer_Ang Registry
@@ -250,6 +256,8 @@ services:
     networks:
       - aims-network
     user: "1000:1000"
+    security_opt:
+      - no-new-privileges:true
     deploy:
       resources:
         limits:
@@ -291,6 +299,8 @@ services:
     networks:
       - aims-network
     user: "1000:1000"
+    security_opt:
+      - no-new-privileges:true
     deploy:
       resources:
         limits:
@@ -309,6 +319,8 @@ services:
       - aims-network
       - sandbox-network
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     healthcheck:
       test: [ "CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-aims_redis_secret}", "ping" ]
       interval: 10s
@@ -351,6 +363,8 @@ services:
       - sandbox-network
     restart: unless-stopped
     user: "1000:1000"
+    security_opt:
+      - no-new-privileges:true
     healthcheck:
       test: [ "CMD", "wget", "-q", "--spider", "http://127.0.0.1:3010/health" ]
       interval: 30s
@@ -397,6 +411,8 @@ services:
     networks:
       - aims-network
     user: "1000:1000"
+    security_opt:
+      - no-new-privileges:true
     deploy:
       resources:
         limits:
@@ -432,6 +448,8 @@ services:
     networks:
       - aims-network
     user: "1000:1000"
+    security_opt:
+      - no-new-privileges:true
     deploy:
       resources:
         limits:
@@ -500,6 +518,8 @@ services:
     networks:
       - aims-network
       - sandbox-network
+    security_opt:
+      - no-new-privileges:true
     deploy:
       resources:
         limits:
@@ -536,6 +556,8 @@ services:
       start_period: 20s
     restart: unless-stopped
     user: "1000:1000"
+    security_opt:
+      - no-new-privileges:true
     networks:
       - aims-network
       - sandbox-network
@@ -571,6 +593,8 @@ services:
     restart: unless-stopped
     networks:
       - aims-network
+    security_opt:
+      - no-new-privileges:true
     deploy:
       resources:
         limits:
@@ -614,6 +638,8 @@ services:
       - ii-agent-filestore:/.ii_agent
     networks:
       - aims-network
+    security_opt:
+      - no-new-privileges:true
     deploy:
       resources:
         limits:
@@ -636,6 +662,8 @@ services:
     restart: unless-stopped
     networks:
       - aims-network
+    security_opt:
+      - no-new-privileges:true
     deploy:
       resources:
         limits:
@@ -667,6 +695,8 @@ services:
       - ii-agent-filestore:/.ii_agent
     networks:
       - aims-network
+    security_opt:
+      - no-new-privileges:true
     deploy:
       resources:
         limits:
@@ -683,7 +713,8 @@ services:
     environment:
       - SERVER_HOST=0.0.0.0
       - SERVER_PORT=8100
-      - SANDBOX_DATABASE_URL=postgresql+asyncpg://${II_AGENT_DB_USER:-iiagent}:${II_AGENT_DB_PASSWORD:-iiagent}@ii-agent-postgres:5432/${II_AGENT_DB_NAME:-iiagentdev}?sslmode=disable
+      # sslmode omitted — traffic stays on internal Docker network (ii-agent-postgres not exposed)
+      - SANDBOX_DATABASE_URL=postgresql+asyncpg://${II_AGENT_DB_USER:-iiagent}:${II_AGENT_DB_PASSWORD:-iiagent}@ii-agent-postgres:5432/${II_AGENT_DB_NAME:-iiagentdev}
       - REDIS_URL=redis://:${REDIS_PASSWORD:-aims_redis_secret}@redis:6379/3
       - E2B_API_KEY=${E2B_API_KEY}
     depends_on:
@@ -699,6 +730,8 @@ services:
     restart: unless-stopped
     networks:
       - aims-network
+    security_opt:
+      - no-new-privileges:true
     deploy:
       resources:
         limits:
@@ -745,6 +778,8 @@ services:
         condition: service_healthy
     networks:
       - aims-network
+    security_opt:
+      - no-new-privileges:true
     deploy:
       resources:
         limits:
@@ -777,6 +812,8 @@ services:
     restart: unless-stopped
     networks:
       - aims-network
+    security_opt:
+      - no-new-privileges:true
     deploy:
       resources:
         limits:
@@ -820,6 +857,8 @@ services:
         condition: service_healthy
     networks:
       - aims-network
+    security_opt:
+      - no-new-privileges:true
     deploy:
       resources:
         limits:

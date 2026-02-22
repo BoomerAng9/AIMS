@@ -295,3 +295,61 @@ export const agentTransactionStore = {
     return result.total;
   },
 };
+
+// ---------------------------------------------------------------------------
+// Invoices
+// ---------------------------------------------------------------------------
+
+export interface InvoiceRecord {
+  id: string;
+  userId: string;
+  tierId: string;
+  periodStart: string;
+  periodEnd: string;
+  status: 'draft' | 'issued' | 'paid' | 'void';
+  subtotal: number;
+  tax: number;
+  total: number;
+  currency: string;
+  lineItems: string; // JSON-serialized InvoiceLineItem[]
+  stripeInvoiceId?: string;
+  paidAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export const invoiceStore = {
+  create(invoice: InvoiceRecord): void {
+    const db = getDb();
+    db.prepare(`
+      INSERT INTO invoices (id, userId, tierId, periodStart, periodEnd, status, subtotal, tax, total, currency, lineItems, stripeInvoiceId, paidAt, createdAt, updatedAt)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      invoice.id, invoice.userId, invoice.tierId, invoice.periodStart, invoice.periodEnd,
+      invoice.status, invoice.subtotal, invoice.tax, invoice.total, invoice.currency,
+      invoice.lineItems, invoice.stripeInvoiceId || null, invoice.paidAt || null,
+      invoice.createdAt, invoice.updatedAt,
+    );
+  },
+
+  get(id: string): InvoiceRecord | undefined {
+    const db = getDb();
+    return db.prepare('SELECT * FROM invoices WHERE id = ?').get(id) as InvoiceRecord | undefined;
+  },
+
+  listByUser(userId: string, limit = 50): InvoiceRecord[] {
+    const db = getDb();
+    return db.prepare('SELECT * FROM invoices WHERE userId = ? ORDER BY createdAt DESC LIMIT ?').all(userId, limit) as InvoiceRecord[];
+  },
+
+  updateStatus(id: string, status: InvoiceRecord['status'], paidAt?: string): void {
+    const db = getDb();
+    if (paidAt) {
+      db.prepare('UPDATE invoices SET status = ?, paidAt = ?, updatedAt = ? WHERE id = ?')
+        .run(status, paidAt, new Date().toISOString(), id);
+    } else {
+      db.prepare('UPDATE invoices SET status = ?, updatedAt = ? WHERE id = ?')
+        .run(status, new Date().toISOString(), id);
+    }
+  },
+};

@@ -1678,6 +1678,124 @@ app.get('/billing/provision', (req, res) => {
 });
 
 // --------------------------------------------------------------------------
+// Billing — Invoice Generation & History
+// --------------------------------------------------------------------------
+
+import { invoiceStore } from './billing/persistence';
+import { generateInvoiceLineItems } from './billing';
+
+// Generate an invoice for a user's current billing period
+app.post('/billing/invoice/generate', (req, res) => {
+  // SECURITY: Only internal callers can generate invoices
+  const caller = req.headers['x-internal-caller'];
+  if (caller !== 'acheevy' && caller !== 'uef-gateway' && caller !== 'stripe-webhook') {
+    res.status(403).json({ error: 'Forbidden — invoice generation restricted to internal services' });
+    return;
+  }
+
+  const { userId, overageTokens, p2pTransactionCount } = req.body;
+  if (!userId) {
+    res.status(400).json({ error: 'userId is required' });
+    return;
+  }
+
+  const provision = billingProvisions.get(userId);
+  const tierId = provision?.tierId || 'p2p';
+
+  const lineItems = generateInvoiceLineItems(
+    tierId,
+    overageTokens || 0,
+    p2pTransactionCount || 0,
+  );
+
+  const subtotal = lineItems.reduce((sum, item) => sum + item.total, 0);
+  const tax = 0; // Tax calculation placeholder
+  const total = Math.round((subtotal + tax) * 100) / 100;
+
+  const now = new Date();
+  const periodEnd = now.toISOString();
+  const periodStart = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString();
+
+  const invoiceId = `inv_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+  const invoiceRecord = {
+    id: invoiceId,
+    userId,
+    tierId,
+    periodStart,
+    periodEnd,
+    status: 'issued' as const,
+    subtotal,
+    tax,
+    total,
+    currency: 'usd',
+    lineItems: JSON.stringify(lineItems),
+    createdAt: now.toISOString(),
+    updatedAt: now.toISOString(),
+  };
+
+  invoiceStore.create(invoiceRecord);
+
+  logger.info({ invoiceId, userId, total, lineItemCount: lineItems.length }, '[Billing] Invoice generated');
+
+  res.json({
+    invoice: {
+      ...invoiceRecord,
+      lineItems,
+    },
+  });
+});
+
+// List a user's invoices
+app.get('/billing/invoices', (req, res) => {
+  const authUserId = req.headers['x-user-id'] as string | undefined;
+  const queryUserId = req.query.userId as string;
+  const userId = authUserId || queryUserId;
+
+  if (!userId) {
+    res.status(400).json({ error: 'userId required' });
+    return;
+  }
+
+  // SECURITY: Users can only see their own invoices
+  if (authUserId && queryUserId && authUserId !== queryUserId) {
+    res.status(403).json({ error: 'Forbidden — you can only view your own invoices' });
+    return;
+  }
+
+  const invoices = invoiceStore.listByUser(userId);
+  res.json({
+    invoices: invoices.map(inv => ({
+      ...inv,
+      lineItems: JSON.parse(inv.lineItems),
+    })),
+    count: invoices.length,
+  });
+});
+
+// Get a specific invoice
+app.get('/billing/invoice/:id', (req, res) => {
+  const invoice = invoiceStore.get(req.params.id);
+  if (!invoice) {
+    res.status(404).json({ error: 'Invoice not found' });
+    return;
+  }
+
+  // SECURITY: Verify ownership
+  const authUserId = req.headers['x-user-id'] as string | undefined;
+  if (authUserId && invoice.userId !== authUserId) {
+    res.status(403).json({ error: 'Forbidden — you do not own this invoice' });
+    return;
+  }
+
+  res.json({
+    invoice: {
+      ...invoice,
+      lineItems: JSON.parse(invoice.lineItems),
+    },
+  });
+});
+
+// --------------------------------------------------------------------------
 // Lil_Hawks — Squad profiles
 // --------------------------------------------------------------------------
 app.get('/lil-hawks', (_req, res) => {

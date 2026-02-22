@@ -310,6 +310,35 @@ const migrations: Migration[] = [
       `);
     },
   },
+  {
+    version: '007',
+    name: 'create_invoices_table',
+    up: (db: Database.Database): void => {
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS invoices (
+          id TEXT PRIMARY KEY,
+          userId TEXT NOT NULL,
+          tierId TEXT NOT NULL,
+          periodStart TEXT NOT NULL,
+          periodEnd TEXT NOT NULL,
+          status TEXT NOT NULL DEFAULT 'draft',
+          subtotal REAL NOT NULL DEFAULT 0,
+          tax REAL NOT NULL DEFAULT 0,
+          total REAL NOT NULL DEFAULT 0,
+          currency TEXT NOT NULL DEFAULT 'usd',
+          lineItems TEXT NOT NULL DEFAULT '[]',
+          stripeInvoiceId TEXT,
+          paidAt TEXT,
+          createdAt TEXT NOT NULL,
+          updatedAt TEXT NOT NULL
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_invoices_userId ON invoices(userId);
+        CREATE INDEX IF NOT EXISTS idx_invoices_status ON invoices(status);
+        CREATE INDEX IF NOT EXISTS idx_invoices_createdAt ON invoices(createdAt);
+      `);
+    },
+  },
 ];
 
 // ---------------------------------------------------------------------------
