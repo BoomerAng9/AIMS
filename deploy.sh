@@ -135,7 +135,50 @@ if [ "${ENV_WARNINGS}" -gt 0 ]; then
     error "${ENV_WARNINGS} critical variable(s) missing. Fix ${ENV_FILE} before deploying."
     exit 1
 fi
-info "Environment validation passed."
+
+# Reject known weak/default passwords in production
+header "Password Strength Check"
+WEAK_DEFAULTS=0
+check_not_default() {
+    local var_name="$1"
+    local weak_value="$2"
+    local desc="$3"
+    local val
+    val=$({ grep "^${var_name}=" "${ENV_FILE}" || true; } | cut -d'=' -f2-)
+    if [ "${val}" = "${weak_value}" ]; then
+        error "WEAK DEFAULT: ${var_name} is still set to '${weak_value}' — ${desc}"
+        WEAK_DEFAULTS=$((WEAK_DEFAULTS + 1))
+    fi
+}
+check_not_default "REDIS_PASSWORD"       "aims_redis_secret"  "Change to a strong random password (32+ chars)"
+check_not_default "N8N_AUTH_PASSWORD"     "aims-n8n-change-me" "Change to a strong random password"
+check_not_default "II_AGENT_DB_PASSWORD"  "iiagent"            "Change to a strong random password"
+check_not_default "NEXTAUTH_SECRET"       "change-me"          "Generate with: openssl rand -base64 32"
+check_not_default "INTERNAL_API_KEY"      "change-me"          "Generate with: openssl rand -hex 32"
+
+# Also check password minimum length (at least 16 chars for critical secrets)
+check_min_length() {
+    local var_name="$1"
+    local min_len="$2"
+    local desc="$3"
+    local val
+    val=$({ grep "^${var_name}=" "${ENV_FILE}" || true; } | cut -d'=' -f2-)
+    if [ -n "${val}" ] && [ ${#val} -lt ${min_len} ]; then
+        error "TOO SHORT: ${var_name} is only ${#val} chars — ${desc}"
+        WEAK_DEFAULTS=$((WEAK_DEFAULTS + 1))
+    fi
+}
+check_min_length "REDIS_PASSWORD"   16 "Must be at least 16 characters"
+check_min_length "NEXTAUTH_SECRET"  24 "Must be at least 24 characters"
+check_min_length "INTERNAL_API_KEY" 24 "Must be at least 24 characters"
+
+if [ "${WEAK_DEFAULTS}" -gt 0 ]; then
+    error "${WEAK_DEFAULTS} password(s) are weak or still set to defaults."
+    error "Generate strong passwords:  openssl rand -base64 32"
+    error "Fix ${ENV_FILE} before deploying."
+    exit 1
+fi
+info "Password strength check passed."
 
 # If domain provided, update CORS and NEXTAUTH_URL in .env.production
 if [ -n "${DOMAIN}" ]; then
