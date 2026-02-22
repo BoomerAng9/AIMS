@@ -68,6 +68,12 @@ export class InstanceLifecycle {
   async initialize(): Promise<void> {
     if (this.initialized) return;
 
+    // Load persisted instances from SQLite (survives restarts)
+    const restored = plugDeployEngine.loadFromStore();
+    if (restored > 0) {
+      logger.info({ restored }, '[InstanceLifecycle] Restored instances from database');
+    }
+
     // Load port allocator state
     await portAllocator.load();
 

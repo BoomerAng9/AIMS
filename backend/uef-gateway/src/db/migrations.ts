@@ -276,6 +276,40 @@ const migrations: Migration[] = [
       `);
     },
   },
+  {
+    version: '006',
+    name: 'create_plug_instances_table',
+    up: (db: Database.Database): void => {
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS plug_instances (
+          instanceId TEXT PRIMARY KEY,
+          plugId TEXT NOT NULL,
+          userId TEXT NOT NULL,
+          name TEXT NOT NULL,
+          status TEXT NOT NULL DEFAULT 'configuring',
+          deliveryMode TEXT NOT NULL DEFAULT 'hosted',
+          assignedPort INTEGER NOT NULL,
+          domain TEXT,
+          envOverrides TEXT NOT NULL DEFAULT '{}',
+          customizationValues TEXT NOT NULL DEFAULT '{}',
+          securityLevel TEXT NOT NULL DEFAULT 'standard',
+          dspId TEXT,
+          lucCost REAL NOT NULL DEFAULT 0,
+          uptimeSeconds INTEGER NOT NULL DEFAULT 0,
+          lastHealthCheck TEXT,
+          healthStatus TEXT NOT NULL DEFAULT 'unknown',
+          exportBundle TEXT,
+          createdAt TEXT NOT NULL,
+          startedAt TEXT,
+          stoppedAt TEXT
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_plug_instances_userId ON plug_instances(userId);
+        CREATE INDEX IF NOT EXISTS idx_plug_instances_plugId ON plug_instances(plugId);
+        CREATE INDEX IF NOT EXISTS idx_plug_instances_status ON plug_instances(status);
+      `);
+    },
+  },
 ];
 
 // ---------------------------------------------------------------------------

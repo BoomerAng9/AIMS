@@ -18,6 +18,7 @@ import logger from '../logger';
 import { plugCatalog } from './catalog';
 import { dockerRuntime } from './docker-runtime';
 import { portAllocator } from './port-allocator';
+import { instanceStore } from './instance-store';
 import type {
   PlugDefinition,
   PlugInstance,
@@ -56,6 +57,27 @@ function sanitize(name: string): string {
 export class PlugDeployEngine {
   private instances = new Map<string, PlugInstance>();
   private nextPort = BASE_PORT;
+
+  /**
+   * Hydrate the in-memory Map from SQLite on startup.
+   * Called during instanceLifecycle.initialize() so instances survive restarts.
+   */
+  loadFromStore(): number {
+    try {
+      const persisted = instanceStore.listAll();
+      for (const inst of persisted) {
+        this.instances.set(inst.instanceId, inst);
+        if (inst.assignedPort >= this.nextPort) {
+          this.nextPort = inst.assignedPort + 10;
+        }
+      }
+      logger.info({ count: persisted.length }, '[PlugDeploy] Loaded instances from SQLite');
+      return persisted.length;
+    } catch (err) {
+      logger.warn({ err }, '[PlugDeploy] Failed to load instances from SQLite — starting fresh');
+      return 0;
+    }
+  }
 
   // -----------------------------------------------------------------------
   // SPIN UP — One-click deployment
@@ -123,6 +145,7 @@ export class PlugDeployEngine {
     };
 
     this.instances.set(instanceId, instance);
+    instanceStore.upsert(instance);
 
     // 5. Handle by delivery mode
     if (request.deliveryMode === 'exported') {
@@ -380,6 +403,7 @@ export class PlugDeployEngine {
     await dockerRuntime.removeNginxConfig(instance);
 
     this.instances.delete(instanceId);
+    instanceStore.delete(instanceId);
     logger.info({ instanceId }, '[PlugDeploy] Instance fully decommissioned');
     return true;
   }
@@ -885,6 +909,7 @@ exit $?
 
   private transition(instance: PlugInstance, status: PlugInstanceStatus): void {
     instance.status = status;
+    try { instanceStore.updateStatus(instance.instanceId, status, instance); } catch (_) { /* best-effort */ }
     logger.info(
       { instanceId: instance.instanceId, status },
       `[PlugDeploy] Status → ${status}`,
