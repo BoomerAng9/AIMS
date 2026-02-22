@@ -34,7 +34,7 @@ export interface BoomerAngDefinition {
   required_quotas: Record<string, number>;
   endpoint: string;
   health_check: string;
-  status: 'registered' | 'active' | 'degraded' | 'offline';
+  status: 'registered' | 'active' | 'degraded' | 'offline' | 'pending_provision';
 }
 
 export interface BoomerAngRegistry {

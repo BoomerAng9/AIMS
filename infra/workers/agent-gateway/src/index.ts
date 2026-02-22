@@ -17,7 +17,7 @@ export interface Env {
   ORIGIN_URL: string;
   VPS_IP: string;
   GATEWAY_SECRET: string;
-  // PLUG_ROUTES: KVNamespace; // Uncomment after KV setup
+  PLUG_ROUTES: KVNamespace;
 }
 
 // ---------------------------------------------------------------------------
@@ -87,6 +87,19 @@ export default {
     }
 
     // -----------------------------------------------------------------------
+    // Route management API — UEF Gateway pushes route updates here
+    // -----------------------------------------------------------------------
+    if (url.pathname === '/_worker/routes' && request.method === 'PUT') {
+      return handleRouteUpdate(request, env);
+    }
+    if (url.pathname === '/_worker/routes' && request.method === 'DELETE') {
+      return handleRouteDelete(request, env);
+    }
+    if (url.pathname === '/_worker/routes' && request.method === 'GET') {
+      return handleRouteList(request, env);
+    }
+
+    // -----------------------------------------------------------------------
     // Plug subdomain routing (e.g., my-agent.plugmein.cloud)
     // -----------------------------------------------------------------------
     const hostname = url.hostname;
@@ -152,21 +165,61 @@ async function handleCachedRoute(
 async function handlePlugRoute(request: Request, env: Env, hostname: string): Promise<Response> {
   const subdomain = hostname.split('.')[0];
 
-  // TODO: Once KV is set up, look up the plug port mapping:
-  // const portMapping = await env.PLUG_ROUTES.get(subdomain);
-  // if (portMapping) {
-  //   const { port, protocol } = JSON.parse(portMapping);
-  //   const originUrl = `${protocol || 'http'}://${env.VPS_IP}:${port}`;
-  //   return proxyToUrl(request, originUrl);
-  // }
+  // Look up plug port mapping from KV
+  try {
+    const portMapping = await env.PLUG_ROUTES.get(subdomain);
+    if (portMapping) {
+      const { port, protocol, instanceId } = JSON.parse(portMapping) as {
+        port: number;
+        protocol?: string;
+        instanceId?: string;
+      };
+      const originUrl = `${protocol || 'http'}://${env.VPS_IP}:${port}`;
+      return proxyToUrl(request, originUrl, instanceId);
+    }
+  } catch {
+    // KV lookup failed — fall through to nginx routing
+  }
 
-  // For now, proxy to origin and let nginx handle subdomain routing
+  // Fallback: proxy to origin and let nginx handle subdomain routing
   return proxyToOrigin(request, env);
 }
 
 // ---------------------------------------------------------------------------
 // Origin proxy
 // ---------------------------------------------------------------------------
+
+async function proxyToUrl(request: Request, originUrl: string, instanceId?: string): Promise<Response> {
+  const url = new URL(request.url);
+  const target = new URL(originUrl);
+  target.pathname = url.pathname;
+  target.search = url.search;
+
+  const headers = new Headers(request.headers);
+  headers.set('X-Forwarded-For', request.headers.get('CF-Connecting-IP') || '');
+  headers.set('X-Forwarded-Proto', 'https');
+  headers.set('X-AIMS-Worker', 'agent-gateway');
+  headers.set('X-AIMS-Plug-Route', 'kv');
+  if (instanceId) {
+    headers.set('X-AIMS-Instance-Id', instanceId);
+  }
+
+  try {
+    const response = await fetch(target.toString(), {
+      method: request.method,
+      headers,
+      body: request.method !== 'GET' && request.method !== 'HEAD' ? request.body : undefined,
+    });
+
+    const responseHeaders = new Headers(response.headers);
+    responseHeaders.set('X-AIMS-Plug-Route', 'kv');
+    responseHeaders.set('X-Content-Type-Options', 'nosniff');
+
+    return new Response(response.body, { status: response.status, headers: responseHeaders });
+  } catch {
+    return json({ error: 'Plug instance unreachable', originUrl }, 502);
+  }
+}
 
 async function proxyToOrigin(request: Request, env: Env): Promise<Response> {
   const response = await fetchOrigin(request, env);
@@ -230,6 +283,82 @@ function handleCors(request: Request, env: Env): Response {
       'Access-Control-Max-Age': '86400',
     },
   });
+}
+
+// ---------------------------------------------------------------------------
+// Route management — KV CRUD for plug routes
+// ---------------------------------------------------------------------------
+
+async function authenticateManagement(request: Request, env: Env): Promise<boolean> {
+  const authHeader = request.headers.get('Authorization') || '';
+  return authHeader === `Bearer ${env.GATEWAY_SECRET}`;
+}
+
+async function handleRouteUpdate(request: Request, env: Env): Promise<Response> {
+  if (!await authenticateManagement(request, env)) {
+    return json({ error: 'Unauthorized' }, 401);
+  }
+
+  try {
+    const body = await request.json() as {
+      subdomain: string;
+      port: number;
+      protocol?: string;
+      instanceId?: string;
+    };
+
+    if (!body.subdomain || !body.port) {
+      return json({ error: 'subdomain and port are required' }, 400);
+    }
+
+    await env.PLUG_ROUTES.put(
+      body.subdomain,
+      JSON.stringify({
+        port: body.port,
+        protocol: body.protocol || 'http',
+        instanceId: body.instanceId,
+        updatedAt: new Date().toISOString(),
+      }),
+    );
+
+    return json({ ok: true, subdomain: body.subdomain, port: body.port });
+  } catch {
+    return json({ error: 'Invalid request body' }, 400);
+  }
+}
+
+async function handleRouteDelete(request: Request, env: Env): Promise<Response> {
+  if (!await authenticateManagement(request, env)) {
+    return json({ error: 'Unauthorized' }, 401);
+  }
+
+  try {
+    const body = await request.json() as { subdomain: string };
+    if (!body.subdomain) {
+      return json({ error: 'subdomain is required' }, 400);
+    }
+
+    await env.PLUG_ROUTES.delete(body.subdomain);
+    return json({ ok: true, deleted: body.subdomain });
+  } catch {
+    return json({ error: 'Invalid request body' }, 400);
+  }
+}
+
+async function handleRouteList(request: Request, env: Env): Promise<Response> {
+  if (!await authenticateManagement(request, env)) {
+    return json({ error: 'Unauthorized' }, 401);
+  }
+
+  const list = await env.PLUG_ROUTES.list();
+  const routes: Record<string, unknown> = {};
+
+  for (const key of list.keys) {
+    const value = await env.PLUG_ROUTES.get(key.name);
+    routes[key.name] = value ? JSON.parse(value) : null;
+  }
+
+  return json({ routes, count: list.keys.length });
 }
 
 // ---------------------------------------------------------------------------

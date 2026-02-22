@@ -67,8 +67,11 @@ export class PlugDeployEngine {
       throw new Error(`Plug "${request.plugId}" not found in catalog`);
     }
 
-    if (plug.comingSoon) {
-      throw new Error(`Plug "${plug.name}" is coming soon and not yet deployable`);
+    if (plug.comingSoon && !request.allowExperimental) {
+      throw new Error(
+        `Plug "${plug.name}" is marked as coming soon. ` +
+        `Set allowExperimental: true to deploy it in experimental mode.`,
+      );
     }
 
     logger.info(

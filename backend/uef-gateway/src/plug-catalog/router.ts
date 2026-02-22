@@ -109,7 +109,7 @@ plugRouter.post('/plug-catalog/needs/analyze', (req, res) => {
 
 plugRouter.post('/plug-instances/spin-up', async (req, res) => {
   try {
-    const { plugId, userId, instanceName, deliveryMode, customizations, envOverrides, securityLevel, domain } = req.body;
+    const { plugId, userId, instanceName, deliveryMode, customizations, envOverrides, securityLevel, domain, allowExperimental } = req.body;
 
     if (!plugId || !userId || !instanceName) {
       res.status(400).json({ error: 'plugId, userId, and instanceName are required' });
@@ -125,6 +125,7 @@ plugRouter.post('/plug-instances/spin-up', async (req, res) => {
       envOverrides: envOverrides || {},
       securityLevel,
       domain,
+      allowExperimental: allowExperimental || false,
     });
 
     res.json(result);

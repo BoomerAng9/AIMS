@@ -4,6 +4,7 @@
  */
 
 import { processVisionRequest } from './vision/google-vision';
+import { ttsClient } from './tts-client';
 import type { VisionGuidanceResponse } from './vision/types';
 
 // ─────────────────────────────────────────────────────────────
@@ -101,13 +102,19 @@ export async function processDIYRequest(request: DIYRequest): Promise<DIYRespons
   // Update session context
   session.projectContext += ` ${request.message}`;
 
+  // Generate TTS audio for voice+vision mode
+  let audioUrl: string | undefined;
+  if (request.mode === 'voice_vision') {
+    const ttsResult = await ttsClient.generateSpeech(reply);
+    audioUrl = ttsResult.audioUrl ?? undefined;
+  }
+
   return {
     sessionId: request.sessionId,
     reply,
+    audioUrl,
     visionAnalysis,
     suggestedActions,
-    // TODO: Generate TTS audio URL
-    // audioUrl: await generateTTS(reply),
   };
 }
 
