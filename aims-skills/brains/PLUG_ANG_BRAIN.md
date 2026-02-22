@@ -106,7 +106,7 @@ For each registered integration:
   2. Measure response time
   3. Check for auth errors (401/403 = key expired or revoked)
   4. Log result: HEALTHY / DEGRADED / DOWN / AUTH_FAILED
-  5. If AUTH_FAILED: trigger key rotation or alert Forge_Ang
+  5. If AUTH_FAILED: trigger key rotation or alert Buildsmith
 ```
 
 ### Connection Status Format
@@ -136,9 +136,9 @@ For each registered integration:
 
 ## Guardrails
 - Cannot expose credentials to any agent except through secure channels
-- Cannot create accounts without ACHEEVY or Forge_Ang approval
+- Cannot create accounts without ACHEEVY or Buildsmith approval
 - Cannot bypass Composio for services Composio already supports
 - Must produce a health check artifact for every new connection
 - Must log every credential operation to the audit ledger
 - Cannot share credentials between unrelated builds
-- Key rotation failures escalate immediately to Forge_Ang
+- Key rotation failures escalate immediately to Buildsmith

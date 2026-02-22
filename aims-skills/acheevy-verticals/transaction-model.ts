@@ -86,8 +86,8 @@ export interface Transaction {
 
   // ── Ownership ─────────────────────────────────────────────────────────
   ownerId: string;          // Agent ID that owns this transaction
-  ownerRole: string;        // Role card title (e.g., 'Forge_Ang', 'ACHEEVY')
-  delegatedBy?: string;     // Who assigned this (e.g., ACHEEVY → Forge_Ang)
+  ownerRole: string;        // Role card title (e.g., 'Buildsmith', 'ACHEEVY')
+  delegatedBy?: string;     // Who assigned this (e.g., ACHEEVY → Buildsmith)
   department: string;       // Functional area (engineering, marketing, ops, etc.)
 
   // ── Context ───────────────────────────────────────────────────────────
@@ -140,7 +140,7 @@ const AGENT_DEPARTMENT_MAP: Record<string, string> = {
   'ACHEEVY': 'executive',
 
   // Engineering
-  'Forge_Ang': 'engineering',
+  'Buildsmith': 'engineering',
   'Patchsmith_Ang': 'engineering',
   'Runner_Ang': 'engineering',
   'Dockmaster_Ang': 'engineering',

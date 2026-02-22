@@ -102,7 +102,7 @@ export const DOMAIN_SUPERVISOR_MAP: Record<CustomHawkDomain, string> = {
   data: 'Index_Ang',
   communication: 'Runner_Ang',
   creative: 'Showrunner_Ang',
-  custom: 'Forge_Ang',
+  custom: 'Buildsmith',
 };
 
 // ── Custom Hawk Record (persisted) ─────────────────────────────

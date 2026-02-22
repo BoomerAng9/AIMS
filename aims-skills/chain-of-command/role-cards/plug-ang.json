@@ -21,7 +21,7 @@
   },
   "chain_of_command": {
     "reports_to": "ACHEEVY",
-    "can_message": ["ACHEEVY", "Forge_Ang", "Buildsmith", "Patchsmith_Ang", "Chicken Hawk"],
+    "can_message": ["ACHEEVY", "Buildsmith", "Patchsmith_Ang", "Chicken Hawk"],
     "cannot_message": ["Lil_Messenger_Hawk"]
   },
   "capabilities": {
@@ -75,7 +75,7 @@
     },
     "approval": {
       "required_for_actions": ["ROTATE_CREDENTIALS", "CREATE_SERVICE_ACCOUNT"],
-      "approvers": ["ACHEEVY", "Forge_Ang"]
+      "approvers": ["ACHEEVY", "Buildsmith"]
     }
   },
   "overlay_visibility": {
@@ -93,6 +93,6 @@
   "evaluation": {
     "kpis": ["SERVICE_UPTIME_RATE", "KEY_ROTATION_COMPLIANCE", "INTEGRATION_SETUP_TIME", "CONNECTION_HEALTH_SCORE"],
     "review_cycle": "per_100_jobs",
-    "reviewed_by": ["Forge_Ang", "Betty-Ann_Ang"]
+    "reviewed_by": ["Buildsmith", "Betty-Ann_Ang"]
   }
 }

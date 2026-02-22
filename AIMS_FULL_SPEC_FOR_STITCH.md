@@ -655,7 +655,7 @@ User → ACHEEVY → Boomer_Angs → Chicken Hawk → Lil_Hawks
 ### 14 Boomer_Angs
 | Agent | Domain | Wraps |
 |-------|--------|-------|
-| Forge_Ang | Agent Runtime | ii-agent |
+| Buildsmith | Agent Runtime | ii-agent |
 | Scout_Ang | Research | ii-researcher |
 | Chronicle_Ang | Timeline | Common_Chronicle |
 | Patchsmith_Ang | Coding | codex + codex-as-mcp |

@@ -90,7 +90,7 @@ receive_manifest(manifest)
 {
   "manifest_id": "MF-001",
   "requested_by": "ACHEEVY",
-  "approved_by": "Forge_Ang",
+  "approved_by": "Buildsmith",
   "shift_id": "SFT-221",
   "plan": {
     "waves": [
@@ -220,7 +220,7 @@ Every action emits an immutable event:
   "duration_ms": 1234,
   "luc_cost_usd": 0.05,
   "policy_ref": "capability-registry.deploy_workload",
-  "approved_by": "Forge_Ang"
+  "approved_by": "Buildsmith"
 }
 ```
 

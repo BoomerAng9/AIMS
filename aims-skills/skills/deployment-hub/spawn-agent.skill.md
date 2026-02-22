@@ -168,7 +168,7 @@ ACHEEVY → DECOMMISSION_ORDER → Agent stops accepting tasks
 
 | Handle           | Wraps                        | Port  | Accent   | Status    |
 |------------------|------------------------------|-------|----------|-----------|
-| Forge_Ang        | AIMS core infra              | —     | Gold     | Active    |
+| Buildsmith        | AIMS core infra              | —     | Gold     | Active    |
 | Betty-Ann_Ang    | HR/PMO governance            | —     | Gold     | Active    |
 | AVVA NOON        | SmelterOS Overseer (System)  | 9020  | Amber    | Active    |
 | Scout_Ang        | ii-researcher                | 7010  | Cyan     | Ready     |
@@ -188,7 +188,7 @@ ACHEEVY → DECOMMISSION_ORDER → Agent stops accepting tasks
 |---------------------------|--------------------------|-------------------|
 | Lil_Intake_Scribe_Hawk    | Task intake & logging    | Scribe_Ang        |
 | Lil_Build_Surgeon_Hawk    | Code surgery & builds    | Patchsmith_Ang    |
-| Lil_Deploy_Handler_Hawk   | Deployment execution     | Forge_Ang         |
+| Lil_Deploy_Handler_Hawk   | Deployment execution     | Buildsmith         |
 | Lil_Interface_Forge_Hawk  | UI component work        | Showrunner_Ang    |
 | Lil_Motion_Tuner_Hawk     | Animation & motion       | Showrunner_Ang    |
 | Lil_Policy_Sentinel_Hawk  | Policy enforcement       | Gatekeeper_Ang    |

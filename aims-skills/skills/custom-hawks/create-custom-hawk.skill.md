@@ -74,7 +74,7 @@ ACHEEVY presents domains and auto-assigns the supervisor Boomer_Ang:
 | data | Index_Ang | Data processing, ETL, visualization |
 | communication | Runner_Ang | Email, messaging, scheduling |
 | creative | Showrunner_Ang | Design, video, audio generation |
-| custom | Forge_Ang | User-defined — anything goes |
+| custom | Buildsmith | User-defined — anything goes |
 
 ### Step 4: Select Tools
 ACHEEVY shows available tools:

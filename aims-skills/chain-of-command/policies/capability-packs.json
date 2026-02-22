@@ -13,7 +13,7 @@
       "repos": [
         {
           "repo": "ii-agent",
-          "delegated_owner": "Forge_Ang",
+          "delegated_owner": "Buildsmith",
           "role": "Agent runtime packaging + deployment",
           "wrapper_type": "SERVICE_WRAPPER"
         },

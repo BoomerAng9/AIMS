@@ -136,7 +136,7 @@ export const INTENT_MAP: IntentMapping[] = [
     keywords: ['deploy', 'host', 'hosting', 'docker', 'vercel', 'netlify', 'cloud', 'server', 'vps', 'ci', 'cd', 'pipeline', 'ssl', 'domain'],
     category: 'deployment_infra',
     primary_boomer_ang: 'Picker_Ang',
-    fallback_boomer_ang: 'Forge_Ang',
+    fallback_boomer_ang: 'Buildsmith',
   },
 
   // Hover & Interaction (technique-level)

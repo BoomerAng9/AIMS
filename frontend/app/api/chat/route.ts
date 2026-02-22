@@ -187,6 +187,10 @@ async function tryGatewayStream(
         agentId: 'acheevy-chat',
         userId,
         sessionId: `session-${userId}`,
+        // Conversational chat → MEDIUM thinking (balanced quality/cost).
+        // Model Intelligence auto-selects for agent dispatch; here we set explicitly
+        // because this is the direct LLM stream path (not via agentChat()).
+        thinking_level: 'medium',
       }),
     });
 

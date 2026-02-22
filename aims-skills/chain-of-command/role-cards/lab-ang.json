@@ -21,7 +21,7 @@
   },
   "chain_of_command": {
     "reports_to": "ACHEEVY",
-    "can_message": ["ACHEEVY", "Forge_Ang", "Index_Ang"],
+    "can_message": ["ACHEEVY", "Buildsmith", "Index_Ang"],
     "cannot_message": ["Lil_Messenger_Hawk"]
   },
   "capabilities": {
@@ -60,7 +60,7 @@
     },
     "approval": {
       "required_for_actions": ["DEPLOY_TO_PRODUCTION"],
-      "approvers": ["ACHEEVY", "Forge_Ang"]
+      "approvers": ["ACHEEVY", "Buildsmith"]
     }
   },
   "overlay_visibility": {
@@ -76,6 +76,6 @@
   "evaluation": {
     "kpis": ["EXPERIMENT_SUCCESS_RATE", "BENCHMARK_IMPROVEMENT", "BUDGET_EFFICIENCY", "REPRODUCIBILITY"],
     "review_cycle": "per_50_experiments",
-    "reviewed_by": ["Betty-Ann_Ang", "Forge_Ang"]
+    "reviewed_by": ["Betty-Ann_Ang", "Buildsmith"]
   }
 }

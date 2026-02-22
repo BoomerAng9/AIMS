@@ -626,7 +626,7 @@ Buildsmith auto-detects the scope tier from the creative brief and adjusts the p
 ```
 IF scaffold_fails:
   → Retry with clean directory
-  → If second failure: escalate to Forge_Ang
+  → If second failure: escalate to Buildsmith
 
 IF component_generation_fails:
   → Simplify component (remove animation, reduce complexity)
