@@ -21,7 +21,7 @@
   },
   "chain_of_command": {
     "reports_to": "ACHEEVY",
-    "can_message": ["ACHEEVY", "Forge_Ang", "Betty-Ann_Ang"],
+    "can_message": ["ACHEEVY", "Buildsmith", "Betty-Ann_Ang"],
     "cannot_message": []
   },
   "capabilities": {

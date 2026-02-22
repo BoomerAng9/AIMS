@@ -212,7 +212,7 @@ const MODEL_PROFILES: ModelCapabilityProfile[] = [
     },
     releaseDate: '2025-10-01',
     lastUpdated: '2026-02-22',
-    notes: 'AIMS preferred model for Buildsmith/Forge_Ang code generation and architecture. Primary for DEVELOP methodology.',
+    notes: 'AIMS preferred model for Buildsmith code generation and architecture. Primary for DEVELOP methodology.',
   },
 
   // ═══════════════════════════════════════════════════════════════════════
@@ -795,7 +795,7 @@ export interface AgentModelPreference {
 const AGENT_MODEL_PREFERENCES: AgentModelPreference[] = [
   // ── Engineering ─────────────────────────────────────────────────────────
   {
-    role: 'Forge_Ang',
+    role: 'Buildsmith',
     description: 'Code generation and architecture. Needs highest code quality.',
     primary: 'claude-opus-4.6',
     fallback: 'gemini-3.1-pro',

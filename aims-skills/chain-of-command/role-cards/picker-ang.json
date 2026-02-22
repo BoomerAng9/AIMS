@@ -21,7 +21,7 @@
   },
   "chain_of_command": {
     "reports_to": "ACHEEVY",
-    "can_message": ["ACHEEVY", "Buildsmith", "Chicken Hawk", "Patchsmith_Ang", "Forge_Ang"],
+    "can_message": ["ACHEEVY", "Buildsmith", "Chicken Hawk", "Patchsmith_Ang"],
     "cannot_message": ["Lil_Messenger_Hawk"]
   },
   "capabilities": {
@@ -63,7 +63,7 @@
     },
     "approval": {
       "required_for_actions": ["MODIFY_NTNTN_LIBRARY"],
-      "approvers": ["ACHEEVY", "Forge_Ang"]
+      "approvers": ["ACHEEVY", "Buildsmith"]
     }
   },
   "overlay_visibility": {
@@ -79,6 +79,6 @@
   "evaluation": {
     "kpis": ["SELECTION_ACCURACY", "STACK_SATISFACTION_RATE", "RECOMMENDATION_TURNAROUND", "COMPATIBILITY_HIT_RATE"],
     "review_cycle": "per_100_jobs",
-    "reviewed_by": ["Betty-Ann_Ang", "Forge_Ang"]
+    "reviewed_by": ["Betty-Ann_Ang", "Buildsmith"]
   }
 }

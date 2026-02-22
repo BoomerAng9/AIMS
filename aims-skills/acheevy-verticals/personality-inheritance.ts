@@ -219,7 +219,7 @@ const MASTER_TRAIT_LIBRARY: PersonalityTrait[] = [
 const ROLE_TRAIT_PREFERENCES: RoleTraitPreference[] = [
   // Engineering roles
   {
-    role: 'Forge_Ang',
+    role: 'Buildsmith',
     primaryTraits: ['precise', 'thorough', 'accountable', 'analytical'],
     secondaryTraits: ['efficient', 'direct', 'composed'],
     suppressedTraits: ['funny', 'provocative'],

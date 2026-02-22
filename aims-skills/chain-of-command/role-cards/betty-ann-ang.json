@@ -14,7 +14,7 @@
   },
   "chain_of_command": {
     "reports_to": "ACHEEVY",
-    "can_message": ["ACHEEVY", "Forge_Ang", "Chicken Hawk"],
+    "can_message": ["ACHEEVY", "Buildsmith", "Chicken Hawk"],
     "cannot_message": []
   },
   "capabilities": {

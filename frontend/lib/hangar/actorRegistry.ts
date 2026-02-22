@@ -60,7 +60,7 @@ export function createDefaultActors(): HangarActor[] {
     {
       id: 'boomer-ang-alpha',
       type: 'BOOMER_ANG',
-      displayName: 'Forge_Ang',
+      displayName: 'Buildsmith',
       color: ACTOR_COLORS.BOOMER_ANG.color,
       emissiveColor: ACTOR_COLORS.BOOMER_ANG.emissive,
       emissiveIntensity: 0.5,

@@ -186,11 +186,11 @@ const SKILLS_REGISTRY: SkillSME[] = [
       prerequisites: ['Model profiles loaded (automatic on import)'],
       parameters: [
         { name: 'message', type: 'string', required: true, description: 'User message or task description' },
-        { name: 'agentRole', type: 'string', required: false, description: 'AIMS agent role (e.g., Forge_Ang)', example: 'Forge_Ang' },
+        { name: 'agentRole', type: 'string', required: false, description: 'AIMS agent role (e.g., Buildsmith)', example: 'Buildsmith' },
         { name: 'budgetTier', type: 'string', required: false, description: 'Budget constraint', example: 'standard' },
         { name: 'methodology', type: 'string', required: false, description: 'Active AIMS methodology', example: 'dmaic' },
       ],
-      exampleInvocation: `const selection = modelIntelligence.selectModel({ message: 'Build a React component', agentRole: 'Forge_Ang' });`,
+      exampleInvocation: `const selection = modelIntelligence.selectModel({ message: 'Build a React component', agentRole: 'Buildsmith' });`,
     },
     triggers: ['which model', 'select model', 'model for this task', 'auto-select'],
     conditions: ['Task requires LLM inference', 'Model selection not hardcoded'],
@@ -385,7 +385,7 @@ const SKILLS_REGISTRY: SkillSME[] = [
     usage: {
       importPath: 'aims-skills/acheevy-verticals/transaction-model',
       prerequisites: ['Agent has a valid user context', 'Transaction category is valid'],
-      exampleInvocation: `const tx = transactionManager.create({ owner: 'Forge_Ang', userId: 'user-123', category: 'code_generation', description: 'Build React component', estimatedCost: 0.25 });`,
+      exampleInvocation: `const tx = transactionManager.create({ owner: 'Buildsmith', userId: 'user-123', category: 'code_generation', description: 'Build React component', estimatedCost: 0.25 });`,
     },
     triggers: ['track this action', 'create transaction', 'log this work'],
     conditions: ['Agent is performing a billable or auditable action'],
@@ -598,7 +598,7 @@ const SKILLS_REGISTRY: SkillSME[] = [
     usage: {
       importPath: 'aims-skills/acheevy-verticals/personality-inheritance',
       prerequisites: ['Role is defined in role preferences'],
-      exampleInvocation: `const personality = inheritPersonality({ role: 'Forge_Ang', context: { methodology: 'develop', urgency: 'standard' } });`,
+      exampleInvocation: `const personality = inheritPersonality({ role: 'Buildsmith', context: { methodology: 'develop', urgency: 'standard' } });`,
     },
     triggers: ['agent personality', 'how should this agent act', 'tone', 'communication style'],
     conditions: ['Agent is being initialized or reconfigured'],

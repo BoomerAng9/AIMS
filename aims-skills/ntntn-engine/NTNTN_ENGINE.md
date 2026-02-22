@@ -379,7 +379,7 @@ IF intent contains [build, create, make, design, develop, code, scaffold, genera
 | layout, grid, responsive, mobile, adaptive | Layout & Responsive | Picker_Ang → Buildsmith |
 | style, theme, dark mode, colors, typography | Styling Systems | Picker_Ang → Buildsmith |
 | component, button, form, modal, table, card | UI Component Systems | Picker_Ang → Buildsmith |
-| deploy, host, docker, server, cloud | Deployment & Infrastructure | Picker_Ang → Forge_Ang |
+| deploy, host, docker, server, cloud | Deployment & Infrastructure | Picker_Ang → Buildsmith |
 | content, blog, cms, articles, posts | CMS & Content | Picker_Ang → Buildsmith |
 | api, backend, database, auth | Backend & Fullstack | Picker_Ang → Patchsmith_Ang |
 | chart, data, visualization, graph | 3D & Visual (D3/Canvas) | Picker_Ang → Buildsmith |

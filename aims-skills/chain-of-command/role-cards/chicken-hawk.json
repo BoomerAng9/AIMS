@@ -13,8 +13,8 @@
     "communication_style": "concise"
   },
   "chain_of_command": {
-    "reports_to": "Forge_Ang",
-    "can_message": ["Forge_Ang", "Juno_Ang"],
+    "reports_to": "Buildsmith",
+    "can_message": ["Buildsmith", "Juno_Ang"],
     "cannot_message": ["ACHEEVY"]
   },
   "capabilities": {
@@ -53,7 +53,7 @@
     },
     "approval": {
       "required_for_actions": ["RUN_PRODUCTION_DEPLOY"],
-      "approvers": ["Forge_Ang"]
+      "approvers": ["Buildsmith"]
     }
   },
   "overlay_visibility": {

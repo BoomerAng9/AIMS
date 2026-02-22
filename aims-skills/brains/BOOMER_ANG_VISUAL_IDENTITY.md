@@ -83,7 +83,7 @@ Accent colors appear on:
 
 | Boomer_Ang       | Accent Color | Hex       | Helmet Style         |
 |------------------|-------------|-----------|----------------------|
-| Forge_Ang        | Gold        | #D4AF37   | Heavy-duty welding visor |
+| Buildsmith        | Gold        | #D4AF37   | Heavy-duty welding visor |
 | Scout_Ang        | Cyan        | #22D3EE   | Slim recon visor, antenna array |
 | OpsConsole_Ang   | Green       | #22C55E   | Wide panoramic visor, HUD overlay |
 | Chronicle_Ang    | Champagne   | #F6C453   | Archivist dome, data scroll motif |

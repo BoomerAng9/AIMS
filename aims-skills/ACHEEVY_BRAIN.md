@@ -608,7 +608,7 @@ Every tool and capability is **owned** by a Boomer_Ang. No raw tool access.
 
 | Boomer_Ang | Domain | Capabilities |
 |------------|--------|-------------|
-| `Forge_Ang` | Agent Runtime | Agent packaging, deployment, ii-agent |
+| `Buildsmith` | Agent Runtime | Agent packaging, deployment, ii-agent |
 | `Scout_Ang` | Research | Research agents, ii-researcher |
 | `Chronicle_Ang` | Timeline | Context → sourced timelines, Common_Chronicle |
 | `Patchsmith_Ang` | Coding | Safe terminal coding, codex |
@@ -658,7 +658,7 @@ gates, overlay visibility, and evaluation KPIs. **No agent exists without a card
 |-----------|--------|------------|-------------|
 | `acheevy.json` | ACHEEVY | Executive Office | Gold #D4AF37 |
 | `betty-ann-ang.json` | Betty-Ann_Ang | HR PMO | Gold #D4AF37 |
-| `forge-ang.json` | Forge_Ang | Digital Transformation PMO | Gold #D4AF37 |
+| `forge-ang.json` | Buildsmith | Digital Transformation PMO | Gold #D4AF37 |
 | `avva-noon.json` | AVVA NOON | SmelterOS Governance (System-Level) | Amber #F59E0B |
 | `scout-ang.json` | Scout_Ang | Intelligence & Research PMO | Cyan #22D3EE |
 | `opsconsole-ang.json` | OpsConsole_Ang | Operations & Observability PMO | Green #22C55E |
@@ -1400,8 +1400,8 @@ INITIATED → PENDING_APPROVAL → APPROVED → EXECUTING → PENDING_VERIFY →
 | Field | Purpose |
 |-------|---------|
 | `ownerId` | The agent who owns this work |
-| `ownerRole` | Role card title (Forge_Ang, ACHEEVY, etc.) |
-| `delegatedBy` | Who assigned it (ACHEEVY → Forge_Ang) |
+| `ownerRole` | Role card title (Buildsmith, ACHEEVY, etc.) |
+| `delegatedBy` | Who assigned it (ACHEEVY → Buildsmith) |
 | `department` | Functional area (engineering, marketing, ops, etc.) |
 | `category` | Type: deployment, build, research, content, automation, analysis, etc. |
 | `requiredGates` | Which gates must pass before execution |
@@ -1426,7 +1426,7 @@ INITIATED → PENDING_APPROVAL → APPROVED → EXECUTING → PENDING_VERIFY →
 | Department | Agents |
 |------------|--------|
 | **Executive** | ACHEEVY |
-| **Engineering** | Forge_Ang, Patchsmith_Ang, Runner_Ang, Dockmaster_Ang, Buildsmith, Chicken Hawk |
+| **Engineering** | Buildsmith, Patchsmith_Ang, Runner_Ang, Dockmaster_Ang, Chicken Hawk |
 | **Research** | Scout_Ang, Lab_Ang, Index_Ang |
 | **Marketing** | Chronicle_Ang, Showrunner_Ang |
 | **Content** | Scribe_Ang |
@@ -1632,7 +1632,7 @@ Traits are NOT random. Selection is based on:
 
 | Role | Primary Traits | Suppressed |
 |------|---------------|------------|
-| **Forge_Ang** | precise, thorough, accountable, analytical | funny, provocative |
+| **Buildsmith** | precise, thorough, accountable, analytical | funny, provocative |
 | **Scout_Ang** | curious, analytical, thorough, strategic | provocative, funny |
 | **Chronicle_Ang** | articulate, creative, strategic, wise | (none) |
 | **Chicken Hawk** | action-oriented, efficient, precise, accountable | funny, provocative, empathetic |
@@ -1817,7 +1817,7 @@ User Message → Task Classifier (NLP) → Model Scorer → Budget Filter → Se
 
 | Agent | Primary | Fallback | Economy |
 |-------|---------|----------|---------|
-| **Forge_Ang / Buildsmith** | Claude Opus 4.6 | Gemini 3.1 Pro | DeepSeek V3.2 |
+| **Buildsmith** | Claude Opus 4.6 | Gemini 3.1 Pro | DeepSeek V3.2 |
 | **ACHEEVY** | Claude Sonnet 4.6 | Gemini 3.1 Pro | Gemini Flash |
 | **Scout_Ang** | Gemini 3.1 Pro | Claude Sonnet 4.6 | Gemini Flash |
 | **Chronicle_Ang** | Claude Sonnet 4.6 | GPT-5.2 | Gemini Flash |
@@ -1860,7 +1860,7 @@ Gemini 3.1 Pro introduces **configurable thinking depth**. This is critical for 
 |-------|----------|-------------|-------------------|
 | **LOW** | Classification, extraction, routing, quick responses | Save 70%+ | Gateway routing, Gatekeeper_Ang, Index_Ang |
 | **MEDIUM** | Content writing, code review, conversation, planning | Save 40% | ACHEEVY chat, Chronicle_Ang, Scout_Ang research |
-| **HIGH** | Deep reasoning, architecture, complex code gen, math | Full cost | Forge_Ang builds, DMAIC deep analysis, architecture design |
+| **HIGH** | Deep reasoning, architecture, complex code gen, math | Full cost | Buildsmith builds, DMAIC deep analysis, architecture design |
 
 **⚠️ CRITICAL: Gemini 3.1 Pro defaults to HIGH (most expensive mode).**
 AIMS Model Intelligence Engine **always sets thinking level explicitly** on every call.
@@ -1884,7 +1884,7 @@ Example: 1000 daily API calls
 
 ### Superagent Deep Thinking
 
-For jobs that require **maximum reasoning depth** — Forge_Ang building full-stack applications,
+For jobs that require **maximum reasoning depth** — Buildsmith building full-stack applications,
 DMAIC deep analysis of complex systems, architecture design for enterprise deployments —
 the Model Intelligence Engine activates HIGH thinking on Gemini 3.1 Pro. This is the
 **Superagent** mode: native DeepMind reasoning applied to the hardest problems.

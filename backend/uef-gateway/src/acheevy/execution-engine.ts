@@ -223,6 +223,9 @@ export async function generateDynamicSteps(
       ],
       max_tokens: 2000,
       temperature: 0.3,
+      // Pipeline architecture is agent_orchestration — MEDIUM thinking.
+      // Not routine (LOW) but not deep math/code reasoning (HIGH).
+      thinking_level: 'medium',
     });
 
     const responseText = llmResponse.content || '';

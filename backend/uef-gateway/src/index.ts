@@ -554,12 +554,12 @@ app.get('/admin/models', (_req, res) => {
 // --------------------------------------------------------------------------
 app.post('/llm/chat', async (req, res) => {
   try {
-    const { model, messages, max_tokens, temperature, agentId, userId, sessionId } = req.body;
+    const { model, messages, max_tokens, temperature, agentId, userId, sessionId, thinking_level } = req.body;
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
       res.status(400).json({ error: 'Missing or empty messages array' });
       return;
     }
-    const result = await llmGateway.chat({ model, messages, max_tokens, temperature, agentId, userId, sessionId });
+    const result = await llmGateway.chat({ model, messages, max_tokens, temperature, agentId, userId, sessionId, thinking_level });
     res.json(result);
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'LLM chat failed';
@@ -570,13 +570,13 @@ app.post('/llm/chat', async (req, res) => {
 
 app.post('/llm/stream', async (req, res) => {
   try {
-    const { model, messages, max_tokens, temperature, agentId, userId, sessionId } = req.body;
+    const { model, messages, max_tokens, temperature, agentId, userId, sessionId, thinking_level } = req.body;
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
       res.status(400).json({ error: 'Missing or empty messages array' });
       return;
     }
 
-    const { stream, provider, model: resolvedModel } = await llmGateway.stream({ model, messages, max_tokens, temperature, agentId, userId, sessionId });
+    const { stream, provider, model: resolvedModel } = await llmGateway.stream({ model, messages, max_tokens, temperature, agentId, userId, sessionId, thinking_level });
 
     res.writeHead(200, {
       'Content-Type': 'text/event-stream',

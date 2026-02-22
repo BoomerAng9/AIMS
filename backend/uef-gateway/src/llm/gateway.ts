@@ -33,6 +33,14 @@ export interface GatewayRequest {
   userId?: string;
   /** Session ID — used for per-session usage tracking */
   sessionId?: string;
+  /**
+   * Thinking level for models that support configurable reasoning depth.
+   * Gemini 3.1 Pro: 'low' | 'medium' | 'high' (default: 'high')
+   *
+   * Set explicitly on every call — Gemini 3.1 defaults to HIGH (most expensive).
+   * 80/20 Rule: 80% of calls should use low/medium, 20% use high.
+   */
+  thinking_level?: 'low' | 'medium' | 'high';
 }
 
 export interface GatewayStreamRequest extends GatewayRequest {
@@ -61,6 +69,7 @@ class LLMGateway {
       messages: request.messages,
       max_tokens: request.max_tokens,
       temperature: request.temperature,
+      thinking_level: request.thinking_level,
     };
 
     let result: LLMResult;
@@ -154,6 +163,7 @@ class LLMGateway {
       messages: request.messages,
       max_tokens: request.max_tokens,
       temperature: request.temperature,
+      thinking_level: request.thinking_level,
     };
 
     // Try Vertex AI streaming for supported models
@@ -240,12 +250,13 @@ class LLMGateway {
 
   // ── Internal ───────────────────────────────────────────────────────
 
-  private async callOpenRouter(request: { model: string; messages: ChatMessage[]; max_tokens?: number; temperature?: number }): Promise<LLMResult> {
+  private async callOpenRouter(request: { model: string; messages: ChatMessage[]; max_tokens?: number; temperature?: number; thinking_level?: 'low' | 'medium' | 'high' }): Promise<LLMResult> {
     return openrouter.chat({
       model: request.model,
       messages: request.messages,
       max_tokens: request.max_tokens,
       temperature: request.temperature,
+      thinking_level: request.thinking_level,
     });
   }
 

@@ -302,7 +302,7 @@ Every phase produces evidence. No evidence, no next phase.
 
 | Failure | Recovery |
 |---------|----------|
-| Scaffold fails | Retry clean → If fails again: escalate to Forge_Ang |
+| Scaffold fails | Retry clean → If fails again: escalate to Buildsmith |
 | Component gen fails | Simplify (remove animation) → If still fails: placeholder + log |
 | Sandbox crash | New sandbox → Restore from Git checkpoint → Resume |
 | Deploy fails | Check errors → Fix → Retry → Try alt target → Deliver source + instructions |

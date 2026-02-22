@@ -137,7 +137,7 @@ const DMAIC: MethodologyDefinition = {
         'How will we test that the fix works?',
       ],
       deliverables: ['Solution design', 'Implementation plan', 'Pilot results', 'Before/after comparison'],
-      tools: ['Forge_Ang', 'Chicken Hawk', 'Runner_Ang', 'Dockmaster_Ang'],
+      tools: ['Buildsmith', 'Chicken Hawk', 'Runner_Ang', 'Dockmaster_Ang'],
       gateCondition: 'Solution deployed, tested, and metrics show improvement over baseline.',
     },
     {
@@ -220,7 +220,7 @@ const DMADV: MethodologyDefinition = {
         'What is the build-vs-buy decision?',
       ],
       deliverables: ['Design alternatives matrix', 'Trade-off analysis', 'Risk register', 'Recommended approach'],
-      tools: ['Scout_Ang', 'Lab_Ang', 'Forge_Ang'],
+      tools: ['Scout_Ang', 'Lab_Ang', 'Buildsmith'],
       gateCondition: 'Design approach selected with justified trade-off analysis.',
     },
     {
@@ -235,7 +235,7 @@ const DMADV: MethodologyDefinition = {
         'What is the MVP scope?',
       ],
       deliverables: ['Architecture document', 'Implementation plan', 'Test plan', 'MVP definition'],
-      tools: ['Forge_Ang', 'Chicken Hawk', 'Runner_Ang', 'Dockmaster_Ang', 'Buildsmith'],
+      tools: ['Buildsmith', 'Chicken Hawk', 'Runner_Ang', 'Dockmaster_Ang'],
       gateCondition: 'MVP built, tested, and ready for verification.',
     },
     {
@@ -315,7 +315,7 @@ const FOSTER: MethodologyDefinition = {
         'What does a successful pilot look like?',
       ],
       deliverables: ['MVP definition', 'First customer list', 'Pilot success criteria'],
-      tools: ['Chronicle_Ang', 'Forge_Ang'],
+      tools: ['Chronicle_Ang', 'Buildsmith'],
       gateCondition: 'MVP defined with first customer list.',
     },
     {
@@ -329,7 +329,7 @@ const FOSTER: MethodologyDefinition = {
         'What is the next feature that unlocks growth?',
       ],
       deliverables: ['User feedback synthesis', 'Iteration plan', 'Growth metrics'],
-      tools: ['Lab_Ang', 'Forge_Ang', 'OpsConsole_Ang'],
+      tools: ['Lab_Ang', 'Buildsmith', 'OpsConsole_Ang'],
       gateCondition: 'At least one iteration completed based on user feedback.',
     },
     {
@@ -396,7 +396,7 @@ const DEVELOP: MethodologyDefinition = {
         'What are the non-functional requirements (performance, security, scale)?',
       ],
       deliverables: ['Technical requirements document', 'Dependency map', 'Stack decision'],
-      tools: ['Forge_Ang', 'Scout_Ang', 'Lab_Ang'],
+      tools: ['Buildsmith', 'Scout_Ang', 'Lab_Ang'],
       gateCondition: 'Technical requirements documented and stack decision made.',
     },
     {
@@ -411,7 +411,7 @@ const DEVELOP: MethodologyDefinition = {
         'What is the deployment architecture?',
       ],
       deliverables: ['Architecture diagram', 'Data model', 'API contracts', 'Deployment plan'],
-      tools: ['Forge_Ang', 'Chicken Hawk', 'Buildsmith'],
+      tools: ['Buildsmith', 'Chicken Hawk'],
       gateCondition: 'Architecture reviewed and approved. API contracts defined.',
     },
     {
@@ -439,7 +439,7 @@ const DEVELOP: MethodologyDefinition = {
         'Are we on track for delivery milestones?',
       ],
       deliverables: ['Sprint deliverables', 'Progress reports', 'Blocker resolutions'],
-      tools: ['Chicken Hawk', 'Forge_Ang', 'Runner_Ang', 'OpsConsole_Ang'],
+      tools: ['Chicken Hawk', 'Buildsmith', 'Runner_Ang', 'OpsConsole_Ang'],
       gateCondition: 'All sprint deliverables complete. Integration tests passing.',
     },
     {
@@ -468,7 +468,7 @@ const DEVELOP: MethodologyDefinition = {
         'What technical debt needs addressing?',
       ],
       deliverables: ['Usage analytics', 'Optimization report', 'V2 backlog'],
-      tools: ['Lab_Ang', 'OpsConsole_Ang', 'Forge_Ang'],
+      tools: ['Lab_Ang', 'OpsConsole_Ang', 'Buildsmith'],
       gateCondition: 'Post-launch optimization cycle complete. V2 backlog prioritized.',
     },
     {
@@ -534,7 +534,7 @@ const HONE: MethodologyDefinition = {
         'What trade-offs does each improvement introduce?',
       ],
       deliverables: ['Prioritized improvement plan', 'Quick wins list', 'Long-term investment roadmap'],
-      tools: ['Forge_Ang', 'Patchsmith_Ang', 'Runner_Ang'],
+      tools: ['Buildsmith', 'Patchsmith_Ang', 'Runner_Ang'],
       gateCondition: 'Improvement plan prioritized by impact and effort.',
     },
     {
@@ -562,7 +562,7 @@ const HONE: MethodologyDefinition = {
         'How does this compare to the best in the market?',
       ],
       deliverables: ['Excellence checklist', 'Polish items', 'Market position comparison'],
-      tools: ['Forge_Ang', 'Showrunner_Ang', 'Lab_Ang'],
+      tools: ['Buildsmith', 'Showrunner_Ang', 'Lab_Ang'],
       gateCondition: 'Product/service elevated with documented quality improvements.',
     },
   ],
@@ -855,6 +855,136 @@ Collected data from previous phases: ${Object.keys(session.phaseData).length > 0
   getUserSessions(userId: string): MethodologySession[] {
     return Array.from(this.sessions.values())
       .filter(s => s.userId === userId && s.status === 'active');
+  }
+
+  // ── Thinking Level Bridge ──────────────────────────────────────────
+  // Maps (methodology + phase) → recommended Gemini 3.1 Pro thinking level.
+  //
+  // The logic: conversational/discovery phases → MEDIUM (quality without cost).
+  //            Analysis/design/reasoning phases → HIGH (deep think).
+  //            Monitoring/control/routine phases → LOW (save tokens).
+  //
+  // This feeds into Model Intelligence: when ACHEEVY is running a methodology,
+  // the thinking level is driven by WHERE we are in the methodology, not just
+  // what the task text looks like.
+
+  /**
+   * Get recommended thinking level for the current methodology phase.
+   * This overrides Model Intelligence's text-based classification when
+   * a methodology session is active — because the phase context is
+   * more precise than NLP task detection.
+   */
+  getThinkingLevelForPhase(methodSessionId: string): 'low' | 'medium' | 'high' {
+    const session = this.sessions.get(methodSessionId);
+    if (!session) return 'medium'; // Safe default
+
+    return this.getPhaseThinkingLevel(session.methodologyId, session.currentPhase);
+  }
+
+  /**
+   * Static mapping: methodology + phase index → thinking level.
+   * Used for both active sessions and pre-planning cost estimates.
+   */
+  getPhaseThinkingLevel(methodologyId: MethodologyId, phaseIndex: number): 'low' | 'medium' | 'high' {
+    const methodology = METHODOLOGIES[methodologyId];
+    if (!methodology) return 'medium';
+    const phase = methodology.phases[phaseIndex];
+    if (!phase) return 'medium';
+
+    // Phase-specific thinking level mapping:
+    //
+    // DMAIC:
+    //   Define (conversational discovery) → MEDIUM
+    //   Measure (data collection) → MEDIUM
+    //   Analyze (root cause — deep reasoning) → HIGH
+    //   Improve (build/deploy — code gen) → HIGH
+    //   Control (monitoring setup — routine) → LOW
+    //
+    // DMADV:
+    //   Define (voice of customer) → MEDIUM
+    //   Measure (market research) → MEDIUM
+    //   Analyze (trade-off analysis — deep reasoning) → HIGH
+    //   Design (architecture + implementation — code gen) → HIGH
+    //   Verify (CTQ testing — structured validation) → MEDIUM
+    //
+    // FOSTER:
+    //   Frame (idea articulation) → LOW
+    //   Observe (landscape research) → MEDIUM
+    //   Seed (MVP definition) → MEDIUM
+    //   Tend (iterate from feedback) → MEDIUM
+    //   Expand (scale planning) → HIGH
+    //   Root (strategic moats) → HIGH
+    //
+    // DEVELOP:
+    //   Discover (technical requirements) → MEDIUM
+    //   Engineer (architecture design) → HIGH
+    //   Validate (prototype testing) → MEDIUM
+    //   Execute (sprint implementation) → HIGH
+    //   Launch (deployment) → MEDIUM
+    //   Optimize (post-launch tuning) → MEDIUM
+    //   Perpetuate (handoff — routine) → LOW
+    //
+    // HONE:
+    //   Highlight (strengths inventory) → MEDIUM
+    //   Operate (surgical improvements) → HIGH
+    //   Narrow (scope reduction) → MEDIUM
+    //   Elevate (excellence polish) → HIGH
+    //
+    // LOOK-LISTEN-LEARN:
+    //   Look (document analysis) → MEDIUM
+    //   Listen (NLP intent detection) → LOW
+    //   Learn (pattern storage) → LOW
+
+    const PHASE_THINKING_MAP: Record<string, Record<string, 'low' | 'medium' | 'high'>> = {
+      dmaic: {
+        define: 'medium', measure: 'medium', analyze: 'high', improve: 'high', control: 'low',
+      },
+      dmadv: {
+        define: 'medium', measure: 'medium', analyze: 'high', design: 'high', verify: 'medium',
+      },
+      foster: {
+        frame: 'low', observe: 'medium', seed: 'medium', tend: 'medium', expand: 'high', root: 'high',
+      },
+      develop: {
+        discover: 'medium', engineer: 'high', validate: 'medium', execute: 'high',
+        launch: 'medium', optimize: 'medium', perpetuate: 'low',
+      },
+      hone: {
+        highlight: 'medium', operate: 'high', narrow: 'medium', elevate: 'high',
+      },
+      'look-listen-learn': {
+        look: 'medium', listen: 'low', learn: 'low',
+      },
+    };
+
+    const methodMap = PHASE_THINKING_MAP[methodologyId];
+    if (!methodMap) return 'medium';
+    return methodMap[phase.id] || 'medium';
+  }
+
+  /**
+   * Get cost estimate for an entire methodology run using thinking levels.
+   * Returns estimated savings vs. running everything at HIGH.
+   */
+  estimateMethodologyCost(methodologyId: MethodologyId): {
+    phases: Array<{ name: string; thinkingLevel: 'low' | 'medium' | 'high'; costMultiplier: number }>;
+    averageCostMultiplier: number;
+    estimatedSavingsPercent: number;
+  } {
+    const methodology = METHODOLOGIES[methodologyId];
+    if (!methodology) throw new Error(`Unknown methodology: ${methodologyId}`);
+
+    const costMultipliers: Record<string, number> = { low: 0.3, medium: 0.6, high: 1.0 };
+
+    const phases = methodology.phases.map((phase, i) => {
+      const level = this.getPhaseThinkingLevel(methodologyId, i);
+      return { name: phase.name, thinkingLevel: level, costMultiplier: costMultipliers[level] };
+    });
+
+    const avgMultiplier = phases.reduce((sum, p) => sum + p.costMultiplier, 0) / phases.length;
+    const savingsPercent = Math.round((1 - avgMultiplier) * 100);
+
+    return { phases, averageCostMultiplier: avgMultiplier, estimatedSavingsPercent: savingsPercent };
   }
 }
 

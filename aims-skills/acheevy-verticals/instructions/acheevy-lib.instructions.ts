@@ -50,7 +50,7 @@ Never assume scope. Confirm before committing resources.
 
     step_3_route: `
 Route to the right agent or methodology:
-  - If it's a FIX → DMAIC → Forge_Ang or Patchsmith_Ang
+  - If it's a FIX → DMAIC → Buildsmith or Patchsmith_Ang
   - If it's a BUILD → DMADV or DEVELOP → Chicken Hawk pipeline
   - If it's an IDEA → FOSTER → Scout_Ang + Chronicle_Ang
   - If it's a REFINEMENT → HONE → the agent that owns the current system

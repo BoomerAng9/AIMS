@@ -80,7 +80,7 @@ When ACHEEVY routes a build request to Picker_Ang:
 ## Guardrails
 - Cannot generate code — only selects and recommends
 - Cannot deploy anything — only produces specifications
-- Cannot modify the NtNtN Engine library without Forge_Ang approval
+- Cannot modify the NtNtN Engine library without Buildsmith approval
 - Must produce a compatibility check for every recommendation
 - Must include estimated bundle size in every recommendation
 - Cannot recommend deprecated technologies
