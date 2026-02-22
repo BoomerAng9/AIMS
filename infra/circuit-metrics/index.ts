@@ -2,7 +2,7 @@
  * Circuit Metrics - Service Health Monitor
  *
  * Collects health and performance metrics from all A.I.M.S. services.
- * Exposes Prometheus-compatible metrics endpoint.
+ * Exposes Prometheus-compatible metrics endpoint and JSON status API.
  */
 
 import express, { Request, Response } from 'express';
@@ -10,15 +10,17 @@ import express, { Request, Response } from 'express';
 const app = express();
 const PORT = parseInt(process.env.PORT || '9090', 10);
 
-// Service endpoints to monitor
-const SERVICES: Record<string, string> = {
-  frontend: process.env.FRONTEND_URL || 'http://frontend:3000',
-  uefGateway: process.env.UEF_GATEWAY_URL || 'http://uef-gateway:4000',
-  houseOfAng: process.env.HOUSE_OF_ANG_URL || 'http://house-of-ang:3002',
-  acheevy: process.env.ACHEEVY_URL || 'http://acheevy:3003',
-  agentBridge: process.env.AGENT_BRIDGE_URL || 'http://agent-bridge:3010',
-  chickenhawkCore: process.env.CHICKENHAWK_CORE_URL || 'http://chickenhawk-core:4001',
-  n8n: process.env.N8N_URL || 'http://n8n:5678',
+// All services to monitor — matches docker-compose.prod.yml
+const SERVICES: Record<string, { url: string; type: string }> = {
+  frontend:           { url: process.env.FRONTEND_URL          || 'http://frontend:3000',         type: 'core' },
+  'uef-gateway':      { url: process.env.UEF_GATEWAY_URL       || 'http://uef-gateway:4000',      type: 'core' },
+  'house-of-ang':     { url: process.env.HOUSE_OF_ANG_URL      || 'http://house-of-ang:3002',     type: 'core' },
+  acheevy:            { url: process.env.ACHEEVY_URL            || 'http://acheevy:3003',          type: 'core' },
+  'agent-bridge':     { url: process.env.AGENT_BRIDGE_URL       || 'http://agent-bridge:3010',     type: 'core' },
+  'chickenhawk-core': { url: process.env.CHICKENHAWK_CORE_URL   || 'http://chickenhawk-core:4001', type: 'core' },
+  n8n:                { url: process.env.N8N_URL                || 'http://n8n:5678',              type: 'tool' },
+  redis:              { url: process.env.REDIS_URL              || 'http://redis:6379',            type: 'infra' },
+  'ii-agent':         { url: process.env.II_AGENT_URL           || 'http://ii-agent:8000',         type: 'agent' },
 };
 
 // UEF Gateway for plug operations data
@@ -30,6 +32,7 @@ const ALERT_COOLDOWN_MS = 300_000; // 5 min between alerts per service
 
 interface ServiceHealth {
   name: string;
+  type: string;
   status: 'up' | 'down' | 'degraded';
   responseTime: number;
   lastCheck: string;
@@ -41,14 +44,42 @@ const healthHistory: Array<{ timestamp: string; services: ServiceHealth[] }> = [
 const alertCooldowns: Map<string, number> = new Map();
 const MAX_HISTORY = 2880; // 24 hours at 30s intervals
 
-async function checkServiceHealth(name: string, url: string): Promise<ServiceHealth> {
+async function checkServiceHealth(name: string, url: string, type: string): Promise<ServiceHealth> {
   const startTime = Date.now();
+
+  // Redis doesn't have an HTTP /health endpoint
+  if (name === 'redis') {
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 3000);
+      clearTimeout(timeout);
+      return {
+        name,
+        type,
+        status: 'up',
+        responseTime: Date.now() - startTime,
+        lastCheck: new Date().toISOString(),
+      };
+    } catch {
+      return {
+        name,
+        type,
+        status: 'down',
+        responseTime: Date.now() - startTime,
+        lastCheck: new Date().toISOString(),
+        error: 'Cannot reach Redis',
+      };
+    }
+  }
+
+  // n8n uses /healthz not /health
+  const healthPath = name === 'n8n' ? '/healthz' : '/health';
 
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 5000);
 
-    const response = await fetch(`${url}/health`, {
+    const response = await fetch(`${url}${healthPath}`, {
       signal: controller.signal,
     });
 
@@ -57,6 +88,7 @@ async function checkServiceHealth(name: string, url: string): Promise<ServiceHea
 
     return {
       name,
+      type,
       status: response.ok ? 'up' : 'degraded',
       responseTime,
       lastCheck: new Date().toISOString(),
@@ -64,6 +96,7 @@ async function checkServiceHealth(name: string, url: string): Promise<ServiceHea
   } catch (error) {
     return {
       name,
+      type,
       status: 'down',
       responseTime: Date.now() - startTime,
       lastCheck: new Date().toISOString(),
@@ -74,7 +107,9 @@ async function checkServiceHealth(name: string, url: string): Promise<ServiceHea
 
 async function checkAllServices(): Promise<ServiceHealth[]> {
   const results = await Promise.all(
-    Object.entries(SERVICES).map(([name, url]) => checkServiceHealth(name, url))
+    Object.entries(SERVICES).map(([name, { url, type }]) =>
+      checkServiceHealth(name, url, type)
+    )
   );
 
   results.forEach(health => {
@@ -163,20 +198,26 @@ async function fetchPlugHealthStats(): Promise<Record<string, unknown> | null> {
   }
 }
 
-// Health check endpoint
+// Health check endpoint (for this service itself)
 app.get('/health', (_req: Request, res: Response) => {
   res.json({ status: 'healthy', service: 'circuit-metrics' });
 });
 
-// All services status
+// All services status — the main endpoint Circuit Box consumes
 app.get('/status', async (_req: Request, res: Response) => {
   const results = await checkAllServices();
-  const allUp = results.every(s => s.status === 'up');
+  const upCount = results.filter(s => s.status === 'up').length;
 
   res.json({
-    overall: allUp ? 'healthy' : 'degraded',
+    overall: upCount === results.length ? 'healthy' : upCount > 0 ? 'degraded' : 'down',
     timestamp: new Date().toISOString(),
     services: results,
+    summary: {
+      total: results.length,
+      up: upCount,
+      degraded: results.filter(s => s.status === 'degraded').length,
+      down: results.filter(s => s.status === 'down').length,
+    },
   });
 });
 
@@ -189,14 +230,14 @@ app.get('/metrics', async (_req: Request, res: Response) => {
 
   results.forEach(service => {
     const value = service.status === 'up' ? 1 : 0;
-    metrics += `aims_service_up{service="${service.name}"} ${value}\n`;
+    metrics += `aims_service_up{service="${service.name}",type="${service.type}"} ${value}\n`;
   });
 
   metrics += '\n# HELP aims_service_response_time_ms Service response time in milliseconds\n';
   metrics += '# TYPE aims_service_response_time_ms gauge\n';
 
   results.forEach(service => {
-    metrics += `aims_service_response_time_ms{service="${service.name}"} ${service.responseTime}\n`;
+    metrics += `aims_service_response_time_ms{service="${service.name}",type="${service.type}"} ${service.responseTime}\n`;
   });
 
   res.set('Content-Type', 'text/plain');
@@ -293,23 +334,24 @@ app.get('/metrics/plugs', async (_req: Request, res: Response) => {
 // Individual service status
 app.get('/status/:service', async (req: Request, res: Response) => {
   const { service } = req.params;
-  const url = SERVICES[service as keyof typeof SERVICES];
+  const svc = SERVICES[service];
 
-  if (!url) {
-    return res.status(404).json({ error: 'Service not found' });
+  if (!svc) {
+    return res.status(404).json({ error: 'Service not found', available: Object.keys(SERVICES) });
   }
 
-  const health = await checkServiceHealth(service, url);
+  const health = await checkServiceHealth(service, svc.url, svc.type);
   res.json(health);
 });
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`[Circuit Metrics] Running on port ${PORT}`);
+  console.log(`[Circuit Metrics] Monitoring ${Object.keys(SERVICES).length} services`);
 
   // Initial health check
   checkAllServices().then(results => {
     console.log('[Circuit Metrics] Initial health check:');
-    results.forEach(s => console.log(`  ${s.name}: ${s.status}`));
+    results.forEach(s => console.log(`  ${s.name} (${s.type}): ${s.status}`));
   });
 
   // Periodic health checks every 30 seconds

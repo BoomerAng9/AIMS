@@ -116,67 +116,22 @@ export async function POST(req: NextRequest) {
 }
 
 /**
- * Local fallback processing when backends are unavailable
+ * Honest fallback when both ACHEEVY and UEF Gateway are offline.
+ * Does NOT fake intent analysis or action plans.
  */
-function processLocally(message: string, mode?: string): {
+function processLocally(message: string, _mode?: string): {
   reply: string;
   intent: { name: string; confidence: number; capabilities: string[] };
-  actionPlan?: Array<{ step: number; action: string; status: string }>;
 } {
-  const lower = message.toLowerCase();
-
-  // Intent detection
-  let intent = { name: "general", confidence: 0.5, capabilities: [] as string[] };
-
-  if (/deploy|launch|release|ship/.test(lower)) {
-    intent = { name: "deploy", confidence: 0.8, capabilities: ["deploy", "container"] };
-  } else if (/build|create|make|generate/.test(lower)) {
-    intent = { name: "build", confidence: 0.8, capabilities: ["code-gen", "build"] };
-  } else if (/test|validate|verify|check/.test(lower)) {
-    intent = { name: "test", confidence: 0.8, capabilities: ["test", "qa"] };
-  } else if (/research|find|search|investigate/.test(lower)) {
-    intent = { name: "research", confidence: 0.8, capabilities: ["research", "analysis"] };
-  }
-
-  // Mode-specific responses
-  const responses: Record<string, string> = {
-    recommend: `Based on your request "${message.slice(0, 50)}...", I recommend:\n\n` +
-      `1. **Hatch** - Assemble the appropriate agent squad\n` +
-      `2. **Assign** - Bind to the relevant n8n workflow\n` +
-      `3. **Launch** - Execute with verification gates\n\n` +
-      `Would you like me to proceed with this plan?`,
-
-    explain: `Let me explain how this works:\n\n` +
-      `• **ACHEEVY** (me) handles all user communication\n` +
-      `• **Boomer_Angs** supervise specialized domains\n` +
-      `• **Chicken Hawk** converts plans to job packets\n` +
-      `• **Lil_Hawks** execute bounded tasks with proofs\n\n` +
-      `Each step produces verifiable artifacts in the Evidence Locker.`,
-
-    execute: `I'm preparing to execute your request.\n\n` +
-      `✓ Intent analyzed: ${intent.name}\n` +
-      `✓ Capabilities required: ${intent.capabilities.join(", ") || "general"}\n` +
-      `○ Awaiting agent roster assembly\n` +
-      `○ Awaiting workflow binding\n\n` +
-      `Please confirm to proceed to the Hatch stage.`,
-
-    prove: `Evidence requirements for this operation:\n\n` +
-      `• **Plan Manifest** - Cryptographic hash of execution plan\n` +
-      `• **Gate Results** - Automated check results with timestamps\n` +
-      `• **Execution Logs** - Signed agent activity records\n` +
-      `• **Attestation Bundle** - Final proof package\n\n` +
-      `All artifacts will be stored in the Evidence Locker.`,
-  };
-
   return {
-    reply: responses[mode || "recommend"] || responses.recommend,
-    intent,
-    actionPlan: [
-      { step: 1, action: "Analyze intent", status: "complete" },
-      { step: 2, action: "Select agents", status: "pending" },
-      { step: 3, action: "Configure workflow", status: "pending" },
-      { step: 4, action: "Execute and verify", status: "pending" },
-    ],
+    reply:
+      `Both ACHEEVY and the UEF Gateway are currently offline. ` +
+      `Your message has been received but cannot be processed until services are restored.\n\n` +
+      `**What you can do:**\n` +
+      `- Check service health on the Environments page\n` +
+      `- Try again in a few minutes\n\n` +
+      `Your message: "${message.slice(0, 120)}${message.length > 120 ? '...' : ''}"`,
+    intent: { name: "offline", confidence: 0, capabilities: [] },
   };
 }
 

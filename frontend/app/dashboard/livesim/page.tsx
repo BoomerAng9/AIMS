@@ -3,14 +3,9 @@
 /**
  * /dashboard/livesim — LiveSim Agent Space
  *
- * Real-time autonomous agent feed. Agents work independently on a task
- * while the user observes. Supports:
- *   - Live transcript of agent activity (WebSocket or polling)
- *   - "Ask the crew" question injection
- *   - Agent status indicators
- *   - Task progress tracking
- *
- * Connects to UEF Gateway via SSE for real-time updates.
+ * Sends real tasks to ACHEEVY and displays actual orchestration results.
+ * Shows which agents ACHEEVY routes to, the real intent classification,
+ * and the actual action plan — no setTimeout theater.
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
@@ -46,17 +41,9 @@ const PlayIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-const PauseIcon = ({ className }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-    <rect x="6" y="4" width="4" height="16" />
-    <rect x="14" y="4" width="4" height="16" />
-  </svg>
-);
-
 const SendIcon = ({ className }: { className?: string }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <line x1="22" y1="2" x2="11" y2="13" />
-    <polygon points="22 2 15 22 11 13 2 9 22 2" />
+    <line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" />
   </svg>
 );
 
@@ -66,12 +53,7 @@ const SendIcon = ({ className }: { className?: string }) => (
 
 const AGENT_COLORS: Record<string, string> = {
   'acheevy': 'text-gold',
-  'research-ang': 'text-blue-400',
-  'engineer-ang': 'text-green-400',
-  'marketer-ang': 'text-purple-400',
-  'analyst-ang': 'text-cyan-400',
-  'quality-ang': 'text-orange-400',
-  'chicken-hawk': 'text-red-400',
+  'system': 'text-white/40',
   'user': 'text-white',
 };
 
@@ -85,7 +67,7 @@ const TYPE_LABELS: Record<string, { label: string; color: string }> = {
 };
 
 // ─────────────────────────────────────────────────────────────
-// LiveSim Page
+// LiveSim Page — Real ACHEEVY calls
 // ─────────────────────────────────────────────────────────────
 
 export default function LiveSimPage() {
@@ -96,115 +78,14 @@ export default function LiveSimPage() {
   const [question, setQuestion] = useState('');
   const [sessionId, setSessionId] = useState<string | null>(null);
   const logsEndRef = useRef<HTMLDivElement>(null);
-  const eventSourceRef = useRef<EventSource | null>(null);
 
   // Auto-scroll logs
   useEffect(() => {
     logsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [logs]);
 
-  // Start a LiveSim session
-  const startSession = useCallback(async () => {
-    if (!taskDescription.trim()) return;
-
-    setIsRunning(true);
-    setLogs([]);
-    setAgents([
-      { id: 'acheevy', name: 'ACHEEVY', role: 'Orchestrator', status: 'thinking' },
-      { id: 'research-ang', name: 'Research_Ang', role: 'Research Lead', status: 'idle' },
-      { id: 'engineer-ang', name: 'Engineer_Ang', role: 'Dev Lead', status: 'idle' },
-      { id: 'quality-ang', name: 'Quality_Ang', role: 'QA Lead', status: 'idle' },
-    ]);
-
-    try {
-      const res = await fetch('/api/acheevy/classify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: taskDescription }),
-      });
-      const classification = await res.json();
-
-      const newSessionId = `livesim-${Date.now()}`;
-      setSessionId(newSessionId);
-
-      // Add initial log entries
-      addLog('acheevy', 'ACHEEVY', 'thought', `Analyzing task: "${taskDescription}"`);
-
-      setTimeout(() => {
-        addLog('acheevy', 'ACHEEVY', 'coordination',
-          `Classified as: ${classification.intent || 'general'} (confidence: ${classification.confidence || 0.5})`);
-        setAgents(prev => prev.map(a => a.id === 'acheevy' ? { ...a, status: 'working' } : a));
-      }, 1200);
-
-      setTimeout(() => {
-        addLog('acheevy', 'ACHEEVY', 'action', 'Delegating to team. Research_Ang — start background research.');
-        setAgents(prev => prev.map(a => a.id === 'research-ang' ? { ...a, status: 'thinking' } : a));
-      }, 2500);
-
-      setTimeout(() => {
-        addLog('research-ang', 'Research_Ang', 'thought', `Gathering context for: ${taskDescription.slice(0, 80)}...`);
-        setAgents(prev => prev.map(a => a.id === 'research-ang' ? { ...a, status: 'working' } : a));
-      }, 4000);
-
-      setTimeout(() => {
-        addLog('research-ang', 'Research_Ang', 'result', 'Initial research complete. Handing findings to Engineer_Ang.');
-        setAgents(prev => prev.map(a =>
-          a.id === 'research-ang' ? { ...a, status: 'done' } :
-          a.id === 'engineer-ang' ? { ...a, status: 'thinking' } : a
-        ));
-      }, 7000);
-
-      setTimeout(() => {
-        addLog('engineer-ang', 'Engineer_Ang', 'thought', 'Reviewing research and planning implementation approach...');
-        setAgents(prev => prev.map(a => a.id === 'engineer-ang' ? { ...a, status: 'working' } : a));
-      }, 8500);
-
-      setTimeout(() => {
-        addLog('engineer-ang', 'Engineer_Ang', 'action', 'Building execution plan with 4 steps. Sending to Quality_Ang for review.');
-        setAgents(prev => prev.map(a =>
-          a.id === 'engineer-ang' ? { ...a, status: 'waiting' } :
-          a.id === 'quality-ang' ? { ...a, status: 'thinking' } : a
-        ));
-      }, 11000);
-
-      setTimeout(() => {
-        addLog('quality-ang', 'Quality_Ang', 'thought', 'Running ORACLE 8-gate verification on execution plan...');
-        setAgents(prev => prev.map(a => a.id === 'quality-ang' ? { ...a, status: 'working' } : a));
-      }, 13000);
-
-      setTimeout(() => {
-        addLog('quality-ang', 'Quality_Ang', 'result', 'All 8 gates passed. Plan approved for execution.');
-        addLog('acheevy', 'ACHEEVY', 'result', 'Task analysis complete. Ready for Phase B execution.');
-        setAgents(prev => prev.map(a => ({ ...a, status: 'done' })));
-        setIsRunning(false);
-      }, 16000);
-
-      // Connect SSE for real-time updates when gateway is available
-      try {
-        const sse = new EventSource(`/api/livesim/stream?sessionId=${newSessionId}`);
-        sse.onmessage = (event) => {
-          try {
-            const entry = JSON.parse(event.data) as SimLogEntry;
-            setLogs(prev => [...prev, entry]);
-            // Update agent status from event
-            setAgents(prev => prev.map(a =>
-              a.id === entry.agentId ? { ...a, status: entry.type === 'result' ? 'done' : 'working' } : a
-            ));
-          } catch { /* ignore malformed */ }
-        };
-        sse.onerror = () => sse.close();
-        eventSourceRef.current = sse;
-      } catch {
-        // SSE not available — demo mode already running above
-      }
-    } catch (err) {
-      addLog('acheevy', 'ACHEEVY', 'result', `Error starting session: ${err instanceof Error ? err.message : 'Unknown error'}`);
-      setIsRunning(false);
-    }
-  }, [taskDescription]);
-
-  // Add a log entry
-  const addLog = (agentId: string, agentName: string, type: SimLogEntry['type'], content: string) => {
+  // Helper to add a log entry
+  const addLog = useCallback((agentId: string, agentName: string, type: SimLogEntry['type'], content: string) => {
     setLogs(prev => [...prev, {
       id: `log-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       timestamp: new Date().toISOString(),
@@ -213,24 +94,151 @@ export default function LiveSimPage() {
       type,
       content,
     }]);
-  };
-
-  // Ask the crew a question
-  const askCrew = useCallback(() => {
-    if (!question.trim() || !isRunning) return;
-    addLog('user', 'You', 'user', question);
-    setQuestion('');
-
-    // Simulate crew response
-    setTimeout(() => {
-      addLog('acheevy', 'ACHEEVY', 'coordination', `Routing your question to the team: "${question.slice(0, 60)}..."`);
-    }, 800);
-  }, [question, isRunning]);
-
-  // Cleanup SSE on unmount
-  useEffect(() => {
-    return () => { eventSourceRef.current?.close(); };
   }, []);
+
+  // Start a real LiveSim session — calls ACHEEVY /chat
+  const startSession = useCallback(async () => {
+    if (!taskDescription.trim()) return;
+
+    const newSessionId = `livesim-${Date.now()}`;
+    setSessionId(newSessionId);
+    setIsRunning(true);
+    setLogs([]);
+    setAgents([
+      { id: 'acheevy', name: 'ACHEEVY', role: 'Executive Orchestrator', status: 'thinking' },
+    ]);
+
+    addLog('system', 'System', 'coordination', `Session ${newSessionId} started`);
+    addLog('user', 'You', 'user', taskDescription);
+    addLog('acheevy', 'ACHEEVY', 'thought', 'Analyzing intent and routing to House of Ang...');
+
+    try {
+      // Real API call to ACHEEVY
+      const res = await fetch('/api/acheevy/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessionId: newSessionId,
+          message: taskDescription,
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error(`ACHEEVY returned ${res.status}`);
+      }
+
+      const result = await res.json();
+
+      // Tag the source so user knows if this is real or fallback
+      if (result.source === 'local-fallback') {
+        addLog('system', 'System', 'coordination',
+          'ACHEEVY and UEF Gateway are offline — showing limited local analysis');
+      }
+
+      // Show real intent classification
+      // API returns camelCase: result.intent with .name, .confidence, .capabilities
+      const intent = result.intent;
+      if (intent) {
+        const intentName = intent.primary_intent || intent.name || 'unknown';
+        const confidence = intent.confidence ?? 0;
+        addLog('acheevy', 'ACHEEVY', 'result',
+          `Intent: **${intentName}** (confidence: ${(confidence * 100).toFixed(0)}%)`);
+        const strategy = intent.execution_strategy || intent.strategy;
+        const caps = intent.capabilities_needed || intent.capabilities || [];
+        if (strategy || caps.length) {
+          addLog('acheevy', 'ACHEEVY', 'coordination',
+            `${strategy ? `Strategy: ${strategy} | ` : ''}Capabilities: ${caps.join(', ') || 'none'}`);
+        }
+      }
+
+      // Show dispatched agents — API returns camelCase "boomerangsDispatched"
+      const dispatched = result.boomerangsDispatched || result.boomerangs_dispatched;
+      if (dispatched && dispatched.length > 0) {
+        const agentStatuses: AgentStatus[] = [
+          { id: 'acheevy', name: 'ACHEEVY', role: 'Executive Orchestrator', status: 'done' },
+          ...dispatched.map((d: { id: string; name: string; status: string }) => ({
+            id: d.id,
+            name: d.name,
+            role: d.status,
+            status: 'waiting' as const,
+          })),
+        ];
+        setAgents(agentStatuses);
+
+        addLog('acheevy', 'ACHEEVY', 'action',
+          `Dispatched ${dispatched.length} agent(s): ${dispatched.map((d: { name: string }) => d.name).join(', ')}`);
+      } else {
+        addLog('acheevy', 'ACHEEVY', 'coordination', 'No agents dispatched for this task');
+        setAgents(prev => prev.map(a => ({ ...a, status: 'done' })));
+      }
+
+      // Show action plan — API returns camelCase "actionPlan"
+      const actionPlan = result.actionPlan || result.action_plan;
+      if (actionPlan) {
+        for (const step of actionPlan) {
+          addLog('acheevy', 'ACHEEVY', 'coordination',
+            `Step ${step.step}: ${step.description || step.action} [${step.status}]`);
+        }
+      }
+
+      // Show LUC cost — API returns camelCase "lucDebit"
+      const lucDebit = result.lucDebit || result.luc_debit;
+      if (lucDebit && typeof lucDebit === 'object') {
+        const tokens = lucDebit.tokens_used || lucDebit.tokensUsed || 0;
+        const usd = lucDebit.usd_cost || lucDebit.usdCost || 0;
+        if (tokens > 0) {
+          addLog('system', 'System', 'result',
+            `Estimated cost: ${tokens} tokens ($${Number(usd).toFixed(6)})`);
+        }
+      }
+
+      // Show ACHEEVY's real response
+      if (result.reply) {
+        addLog('acheevy', 'ACHEEVY', 'result', result.reply);
+      }
+
+      setAgents(prev => prev.map(a => ({ ...a, status: 'done' })));
+    } catch (err) {
+      addLog('system', 'System', 'result',
+        `Error: ${err instanceof Error ? err.message : 'Failed to reach ACHEEVY'}`);
+      setAgents(prev => prev.map(a => ({ ...a, status: 'idle' })));
+    } finally {
+      setIsRunning(false);
+    }
+  }, [taskDescription, addLog]);
+
+  // Send a follow-up question to ACHEEVY
+  const askCrew = useCallback(async () => {
+    if (!question.trim() || !sessionId) return;
+
+    const q = question;
+    setQuestion('');
+    addLog('user', 'You', 'user', q);
+    setIsRunning(true);
+    setAgents(prev => prev.map(a => a.id === 'acheevy' ? { ...a, status: 'thinking' } : a));
+
+    try {
+      const res = await fetch('/api/acheevy/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId, message: q }),
+      });
+
+      if (!res.ok) throw new Error(`ACHEEVY returned ${res.status}`);
+      const result = await res.json();
+
+      if (result.reply) {
+        addLog('acheevy', 'ACHEEVY', 'result', result.reply);
+      }
+
+      setAgents(prev => prev.map(a => ({ ...a, status: 'done' })));
+    } catch (err) {
+      addLog('system', 'System', 'result',
+        `Error: ${err instanceof Error ? err.message : 'Unknown'}`);
+    } finally {
+      setIsRunning(false);
+    }
+  }, [question, sessionId, addLog]);
 
   return (
     <motion.div
@@ -243,7 +251,7 @@ export default function LiveSimPage() {
       <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
         <div>
           <h1 className="text-lg font-medium text-white">LiveSim</h1>
-          <p className="text-sm text-white/40">Watch your AI crew work autonomously</p>
+          <p className="text-sm text-white/40">Send real tasks to ACHEEVY and watch the orchestration</p>
         </div>
         {sessionId && (
           <span className="text-xs font-mono text-white/20">{sessionId}</span>
@@ -254,8 +262,8 @@ export default function LiveSimPage() {
       <div className="flex-1 flex overflow-hidden">
         {/* Left: Log Feed */}
         <div className="flex-1 flex flex-col">
-          {/* Task Input (when not running) */}
-          {!isRunning && logs.length === 0 && (
+          {/* Task Input (when no logs yet) */}
+          {logs.length === 0 && (
             <div className="flex-1 flex items-center justify-center p-6">
               <div className="max-w-lg w-full text-center">
                 <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gold/10 border border-gold/20 flex items-center justify-center">
@@ -263,7 +271,8 @@ export default function LiveSimPage() {
                 </div>
                 <h2 className="text-xl font-medium text-white mb-2">Start a LiveSim Session</h2>
                 <p className="text-white/40 text-sm mb-6">
-                  Describe a task and watch your AI crew analyze, plan, and execute it autonomously.
+                  Describe a task. ACHEEVY will classify it, route to real agents, and return
+                  an actual action plan with LUC cost estimates.
                 </p>
                 <div className="flex gap-2">
                   <input
@@ -276,7 +285,7 @@ export default function LiveSimPage() {
                   />
                   <button
                     onClick={startSession}
-                    disabled={!taskDescription.trim()}
+                    disabled={!taskDescription.trim() || isRunning}
                     className="px-6 py-3 rounded-xl bg-gold text-black font-medium text-sm hover:bg-gold-light disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                   >
                     Launch
@@ -287,7 +296,7 @@ export default function LiveSimPage() {
           )}
 
           {/* Log Stream */}
-          {(isRunning || logs.length > 0) && (
+          {logs.length > 0 && (
             <div className="flex-1 overflow-y-auto p-4 space-y-2">
               <AnimatePresence>
                 {logs.map((log) => {
@@ -320,8 +329,8 @@ export default function LiveSimPage() {
             </div>
           )}
 
-          {/* Ask the Crew input */}
-          {(isRunning || logs.length > 0) && (
+          {/* Follow-up input */}
+          {logs.length > 0 && (
             <div className="border-t border-white/10 p-4">
               <div className="flex gap-2">
                 <input
@@ -329,13 +338,13 @@ export default function LiveSimPage() {
                   value={question}
                   onChange={(e) => setQuestion(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && askCrew()}
-                  placeholder={isRunning ? 'Ask the crew a question...' : 'Session complete'}
-                  disabled={!isRunning}
+                  placeholder={isRunning ? 'Processing...' : 'Send a follow-up to ACHEEVY...'}
+                  disabled={isRunning}
                   className="flex-1 bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white text-sm placeholder:text-white/20 outline-none focus:border-gold/30 disabled:opacity-30"
                 />
                 <button
                   onClick={askCrew}
-                  disabled={!question.trim() || !isRunning}
+                  disabled={!question.trim() || isRunning}
                   className="p-2 rounded-lg bg-gold/10 text-gold hover:bg-gold/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                 >
                   <SendIcon className="w-4 h-4" />
@@ -346,7 +355,7 @@ export default function LiveSimPage() {
         </div>
 
         {/* Right: Agent Status Sidebar */}
-        {(isRunning || logs.length > 0) && (
+        {logs.length > 0 && (
           <div className="w-64 border-l border-white/10 p-4 space-y-3">
             <h3 className="text-xs font-medium text-white/40 uppercase tracking-wider">Crew Status</h3>
             {agents.map((agent) => (

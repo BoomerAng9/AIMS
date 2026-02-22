@@ -52,9 +52,14 @@ app.post('/chat', async (req, res) => {
 // --------------------------------------------------------------------------
 // History — Retrieve conversation
 // --------------------------------------------------------------------------
-app.get('/history/:sessionId', (req, res) => {
-  const history = getSessionHistory(req.params.sessionId);
-  res.json({ sessionId: req.params.sessionId, history });
+app.get('/history/:sessionId', async (req, res) => {
+  try {
+    const history = await getSessionHistory(req.params.sessionId);
+    res.json({ sessionId: req.params.sessionId, history });
+  } catch (err: any) {
+    console.error('[ACHEEVY] History error:', err);
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // --------------------------------------------------------------------------

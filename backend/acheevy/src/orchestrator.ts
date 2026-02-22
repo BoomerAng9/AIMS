@@ -2,6 +2,8 @@
  * ACHEEVY — Executive Orchestrator
  * Receives user requests, analyzes intent, routes to House of Ang,
  * synthesizes responses, and tracks conversation state.
+ *
+ * Sessions are persisted to Redis with 7-day TTL.
  */
 
 import { v4 as uuidv4 } from 'uuid';
@@ -14,25 +16,48 @@ import {
   ActionStep,
 } from './types';
 import { analyzeIntent, classifyNtNtN, type NtNtNClassification } from './intent-analyzer';
+import { redisGet, redisSet } from './redis';
 
 const HOUSE_OF_ANG_URL = process.env.HOUSE_OF_ANG_URL || 'http://house-of-ang:3002';
 
-// In-memory session store (replace with Firestore/Redis in production)
-const sessions = new Map<string, ConversationContext>();
+const SESSION_TTL = 7 * 24 * 60 * 60; // 7 days in seconds
+const SESSION_PREFIX = 'acheevy:session:';
 
 /**
- * Get or create a conversation context.
+ * Get or create a conversation context from Redis.
  */
-function getContext(sessionId: string): ConversationContext {
-  if (!sessions.has(sessionId)) {
-    sessions.set(sessionId, {
-      sessionId,
-      history: [],
-      onboardingComplete: false,
-      activeGoals: [],
-    });
+async function getContext(sessionId: string): Promise<ConversationContext> {
+  const key = `${SESSION_PREFIX}${sessionId}`;
+  const raw = await redisGet(key);
+
+  if (raw) {
+    try {
+      return JSON.parse(raw) as ConversationContext;
+    } catch {
+      console.warn(`[ACHEEVY] Corrupt session data for ${sessionId}, creating new`);
+    }
   }
-  return sessions.get(sessionId)!;
+
+  return {
+    sessionId,
+    history: [],
+    onboardingComplete: false,
+    activeGoals: [],
+  };
+}
+
+/**
+ * Save conversation context to Redis.
+ */
+async function saveContext(context: ConversationContext): Promise<void> {
+  const key = `${SESSION_PREFIX}${context.sessionId}`;
+
+  // Cap history at 200 messages to prevent unbounded growth
+  if (context.history.length > 200) {
+    context.history = context.history.slice(-200);
+  }
+
+  await redisSet(key, JSON.stringify(context), SESSION_TTL);
 }
 
 /**
@@ -83,7 +108,7 @@ function buildActionPlan(
 
   steps.push({
     step: steps.length + 1,
-    description: 'Run ORACLE 7-Gate verification',
+    description: 'Run ORACLE 8-Gate verification',
     boomerang_id: 'quality_ang',
     status: 'pending',
   });
@@ -116,7 +141,7 @@ function synthesizeNtNtN(
     for (const cat of matchedCategories.slice(0, 5)) {
       reply += `- **${cat.category.replace(/_/g, ' ')}**`;
       if (cat.techniqueGroup) reply += ` (${cat.techniqueGroup.replace(/_/g, ' ')})`;
-      reply += ` → routed to **${cat.primaryAng}**\n`;
+      reply += ` \u2192 routed to **${cat.primaryAng}**\n`;
     }
     reply += '\n';
   }
@@ -124,9 +149,9 @@ function synthesizeNtNtN(
   reply += '**Default stack:** Next.js 16 + Tailwind v4 + Motion v12 + shadcn/ui\n\n';
 
   if (agents.length > 0) {
-    reply += `**Execution chain:** ${agents.map(a => a.name).join(' → ')}\n\n`;
+    reply += `**Execution chain:** ${agents.map(a => a.name).join(' \u2192 ')}\n\n`;
   } else {
-    reply += '**Execution chain:** Picker_Ang → Buildsmith → Chicken Hawk → Lil_Hawks\n\n';
+    reply += '**Execution chain:** Picker_Ang \u2192 Buildsmith \u2192 Chicken Hawk \u2192 Lil_Hawks\n\n';
   }
 
   reply += 'Reply **"go"** to start the build pipeline, or refine your requirements.';
@@ -171,7 +196,7 @@ function synthesize(
  * Main orchestration method.
  */
 export async function processRequest(req: AcheevyRequest): Promise<AcheevyResponse> {
-  const context = getContext(req.sessionId);
+  const context = await getContext(req.sessionId);
 
   // 1. Analyze intent
   const intent = analyzeIntent(req.message);
@@ -180,7 +205,7 @@ export async function processRequest(req: AcheevyRequest): Promise<AcheevyRespon
   // 1b. Check for NtNtN creative build intent
   const ntntn = classifyNtNtN(req.message);
   if (ntntn.isBuildIntent) {
-    console.log(`[ACHEEVY] NtNtN build detected — scope: ${ntntn.scopeTier}, categories: ${ntntn.matchedCategories.map(c => c.category).join(', ')}`);
+    console.log(`[ACHEEVY] NtNtN build detected \u2014 scope: ${ntntn.scopeTier}, categories: ${ntntn.matchedCategories.map(c => c.category).join(', ')}`);
   }
 
   // 2. Route through House of Ang
@@ -209,7 +234,7 @@ export async function processRequest(req: AcheevyRequest): Promise<AcheevyRespon
   const estimatedTokens = 500 + agents.length * 500;
   const estimatedUsd = estimatedTokens * 0.000004; // flash model rate
 
-  // 7. Save to conversation history
+  // 7. Save to conversation history (persisted to Redis)
   const userMsg: ChatMessage = {
     role: 'user',
     content: req.message,
@@ -226,6 +251,7 @@ export async function processRequest(req: AcheevyRequest): Promise<AcheevyRespon
     },
   };
   context.history.push(userMsg, acheevyMsg);
+  await saveContext(context);
 
   return {
     sessionId: req.sessionId,
@@ -243,6 +269,7 @@ export async function processRequest(req: AcheevyRequest): Promise<AcheevyRespon
 /**
  * Retrieve conversation history for a session.
  */
-export function getSessionHistory(sessionId: string): ChatMessage[] {
-  return getContext(sessionId).history;
+export async function getSessionHistory(sessionId: string): Promise<ChatMessage[]> {
+  const context = await getContext(sessionId);
+  return context.history;
 }

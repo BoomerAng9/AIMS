@@ -1,22 +1,21 @@
 // frontend/app/dashboard/house-of-ang/page.tsx
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import type { LucideIcon } from "lucide-react";
 import {
   Building2,
   Users,
   Zap,
   Shield,
   Code,
-  Megaphone,
-  BarChart3,
   Activity,
   Brain,
   ChevronDown,
   ChevronRight,
   ArrowDown,
+  Wifi,
+  WifiOff,
 } from "lucide-react";
 import {
   DELEGATION_CHAIN,
@@ -27,105 +26,45 @@ import {
 } from "@/lib/governance";
 
 /* ------------------------------------------------------------------ */
-/*  Data                                                               */
+/*  Types                                                              */
 /* ------------------------------------------------------------------ */
 
-interface SupervisoryAng {
-  name: string;
-  title: string;
-  pmo: string;
-  status: "DEPLOYED";
-}
-
-const SUPERVISORY_ROSTER: SupervisoryAng[] = [
-  { name: "Boomer_CTO", title: "Chief Technology Officer", pmo: "TECH OFFICE", status: "DEPLOYED" },
-  { name: "Boomer_CFO", title: "Chief Financial Officer", pmo: "FINANCE OFFICE", status: "DEPLOYED" },
-  { name: "Boomer_COO", title: "Chief Operating Officer", pmo: "OPS OFFICE", status: "DEPLOYED" },
-  { name: "Boomer_CMO", title: "Chief Marketing Officer", pmo: "MARKETING OFFICE", status: "DEPLOYED" },
-  { name: "Boomer_CDO", title: "Chief Design Officer", pmo: "DESIGN OFFICE", status: "DEPLOYED" },
-  { name: "Boomer_CPO", title: "Chief Publication Officer", pmo: "PUBLISHING OFFICE", status: "DEPLOYED" },
-  { name: "DevOps Agent", title: "DevOps Specialist", pmo: "TECH OFFICE", status: "DEPLOYED" },
-  { name: "Value Agent", title: "Financial Analyst", pmo: "FINANCE OFFICE", status: "DEPLOYED" },
-  { name: "Flow Boss Agent", title: "Workflow Orchestrator", pmo: "OPS OFFICE", status: "DEPLOYED" },
-  { name: "Social Campaign Agent", title: "Campaign Manager", pmo: "MARKETING OFFICE", status: "DEPLOYED" },
-  { name: "Video Editing Agent", title: "Multimedia Producer", pmo: "DESIGN OFFICE", status: "DEPLOYED" },
-  { name: "Social Agent", title: "Content Publisher", pmo: "PUBLISHING OFFICE", status: "DEPLOYED" },
-];
-
-interface ExecutionAng {
+interface RegisteredAgent {
   id: string;
   name: string;
-  role: string;
-  icon: LucideIcon;
-  status: "DEPLOYED" | "STANDBY";
-  tasks: number;
-  successRate: number;
-  specialties: string[];
+  description: string;
+  capabilities: string[];
+  healthStatus: "online" | "offline" | "degraded";
 }
 
-const EXECUTION_ROSTER: ExecutionAng[] = [
-  {
-    id: "engineer-ang",
-    name: "Engineer_Ang",
-    role: "Full-Stack Builder",
-    icon: Code,
-    status: "DEPLOYED",
-    tasks: 12,
-    successRate: 94,
-    specialties: ["React / Next.js", "Node.js APIs", "Cloud Deploy"],
-  },
-  {
-    id: "marketer-ang",
-    name: "Marketer_Ang",
-    role: "Growth Strategist",
-    icon: Megaphone,
-    status: "DEPLOYED",
-    tasks: 8,
-    successRate: 91,
-    specialties: ["SEO Audits", "Copy Generation", "Campaign Flows"],
-  },
-  {
-    id: "analyst-ang",
-    name: "Analyst_Ang",
-    role: "Data & Intelligence",
-    icon: BarChart3,
-    status: "STANDBY",
-    tasks: 3,
-    successRate: 97,
-    specialties: ["Market Research", "Data Pipelines", "Visualization"],
-  },
-  {
-    id: "quality-ang",
-    name: "Quality_Ang",
-    role: "ORACLE Verifier",
-    icon: Shield,
-    status: "STANDBY",
-    tasks: 5,
-    successRate: 100,
-    specialties: ["7-Gate Checks", "Security Audits", "Code Review"],
-  },
-  {
-    id: "chicken-hawk",
-    name: "Chicken Hawk",
-    role: "Coordinator / Enforcer",
-    icon: Zap,
-    status: "DEPLOYED",
-    tasks: 28,
-    successRate: 96,
-    specialties: ["SOP Enforcement", "Throughput Regulation", "Escalation"],
-  },
-];
-
 /* ------------------------------------------------------------------ */
-/*  Computed Stats                                                     */
+/*  Real data hook — fetches from House of Ang registry                */
 /* ------------------------------------------------------------------ */
 
-const TOTAL_ANGS = SUPERVISORY_ROSTER.length + EXECUTION_ROSTER.length;
-const DEPLOYED = SUPERVISORY_ROSTER.filter((a) => a.status === "DEPLOYED").length +
-  EXECUTION_ROSTER.filter((a) => a.status === "DEPLOYED").length;
-const STANDBY = TOTAL_ANGS - DEPLOYED;
-const SUPERVISORY_COUNT = SUPERVISORY_ROSTER.length;
-const EXECUTION_COUNT = EXECUTION_ROSTER.length;
+function useRegisteredAgents() {
+  const [agents, setAgents] = useState<RegisteredAgent[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch("/api/circuit-box/boomerangs", { cache: "no-store" });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.agents && Array.isArray(data.agents)) {
+          setAgents(data.agents);
+        }
+      } catch {
+        // API unreachable — show empty state
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  return { agents, loading };
+}
+
 const TOTAL_LIL_HAWKS = LIL_HAWK_SQUADS.reduce((s, sq) => s + sq.hawks.length, 0);
 
 /* ------------------------------------------------------------------ */
@@ -136,6 +75,10 @@ export default function HouseOfAngPage() {
   const [spawnOpen, setSpawnOpen] = useState(false);
   const [chainOpen, setChainOpen] = useState(false);
   const [evolutionOpen, setEvolutionOpen] = useState(false);
+  const { agents, loading } = useRegisteredAgents();
+
+  const onlineAgents = agents.filter((a) => a.healthStatus === "online").length;
+  const offlineAgents = agents.filter((a) => a.healthStatus === "offline").length;
 
   return (
     <div className="space-y-6 animate-in fade-in duration-700">
@@ -180,11 +123,11 @@ export default function HouseOfAngPage() {
       {/* ---- Stats Bar ---- */}
       <div className="grid grid-cols-2 sm:grid-cols-6 gap-3">
         {[
-          { label: "Total Angs", value: TOTAL_ANGS, color: "text-white" },
-          { label: "Deployed", value: DEPLOYED, color: "text-emerald-400" },
-          { label: "Standby", value: STANDBY, color: "text-gold" },
-          { label: "Supervisory", value: SUPERVISORY_COUNT, color: "text-gold" },
-          { label: "Execution", value: EXECUTION_COUNT, color: "text-gold" },
+          { label: "Registered", value: agents.length, color: "text-white" },
+          { label: "Online", value: onlineAgents, color: "text-emerald-400" },
+          { label: "Offline", value: offlineAgents, color: "text-red-400" },
+          { label: "Registry", value: "v3.0", color: "text-gold" },
+          { label: "Source", value: "Live", color: "text-gold" },
           { label: "Lil_Hawks", value: TOTAL_LIL_HAWKS, color: "text-emerald-300" },
         ].map((stat) => (
           <div
@@ -432,83 +375,102 @@ export default function HouseOfAngPage() {
         )}
       </section>
 
-      {/* ---- Section 1: Supervisory Roster ---- */}
+      {/* ---- Section 1: Registered Agents (Live from House of Ang API) ---- */}
       <section className="rounded-3xl border border-wireframe-stroke bg-black/60 p-6 backdrop-blur-2xl">
         <div className="flex items-center gap-3 mb-1">
           <Users size={16} className="text-gold" />
           <h2 className="text-sm font-semibold uppercase tracking-widest text-white/80 font-display">
-            Supervisory Roster
+            Registered Agents
           </h2>
         </div>
         <p className="text-[0.65rem] text-white/30 uppercase tracking-wider mb-4">
-          C-Suite Boomer_Angs &amp; departmental agents — the only layer that speaks to ACHEEVY
+          Live from House of Ang registry — real agents with real containers
         </p>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="border-b border-wireframe-stroke">
-                <th className="pb-2 text-[10px] uppercase tracking-widest text-white/30 font-semibold">Agent</th>
-                <th className="pb-2 text-[10px] uppercase tracking-widest text-white/30 font-semibold">Title</th>
-                <th className="pb-2 text-[10px] uppercase tracking-widest text-white/30 font-semibold">PMO</th>
-                <th className="pb-2 text-[10px] uppercase tracking-widest text-white/30 font-semibold text-right">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {SUPERVISORY_ROSTER.map((ang) => (
-                <tr
-                  key={ang.name}
-                  className="border-b border-wireframe-stroke last:border-0 hover:bg-white/[0.02] transition-colors"
-                >
-                  <td className="py-3 text-sm font-medium text-white font-mono">{ang.name}</td>
-                  <td className="py-3 text-xs text-white/50">{ang.title}</td>
-                  <td className="py-3">
-                    <span className="rounded-full border border-wireframe-stroke bg-white/5 px-2.5 py-1 text-[10px] text-gold font-mono">
-                      {ang.pmo}
-                    </span>
-                  </td>
-                  <td className="py-3 text-right">
-                    <div className="inline-flex items-center gap-1.5">
-                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                      <span className="text-[9px] uppercase font-bold tracking-wider text-emerald-400">{ang.status}</span>
-                    </div>
-                  </td>
+        {loading ? (
+          <div className="flex items-center gap-2 py-8 justify-center">
+            <span className="h-4 w-4 animate-spin rounded-full border-2 border-gold/30 border-t-gold" />
+            <span className="text-xs text-white/30">Loading registry...</span>
+          </div>
+        ) : agents.length === 0 ? (
+          <div className="py-8 text-center">
+            <p className="text-xs text-white/30">No agents registered or House of Ang unreachable</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="border-b border-wireframe-stroke">
+                  <th className="pb-2 text-[10px] uppercase tracking-widest text-white/30 font-semibold">Agent</th>
+                  <th className="pb-2 text-[10px] uppercase tracking-widest text-white/30 font-semibold">Description</th>
+                  <th className="pb-2 text-[10px] uppercase tracking-widest text-white/30 font-semibold">Capabilities</th>
+                  <th className="pb-2 text-[10px] uppercase tracking-widest text-white/30 font-semibold text-right">Health</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {agents.map((ang) => (
+                  <tr
+                    key={ang.id}
+                    className="border-b border-wireframe-stroke last:border-0 hover:bg-white/[0.02] transition-colors"
+                  >
+                    <td className="py-3 text-sm font-medium text-white font-mono">{ang.name}</td>
+                    <td className="py-3 text-xs text-white/50 max-w-xs truncate">{ang.description}</td>
+                    <td className="py-3">
+                      <div className="flex flex-wrap gap-1">
+                        {ang.capabilities.slice(0, 3).map((cap) => (
+                          <span key={cap} className="rounded-full border border-wireframe-stroke bg-white/5 px-2 py-0.5 text-[9px] text-gold font-mono">
+                            {cap}
+                          </span>
+                        ))}
+                        {ang.capabilities.length > 3 && (
+                          <span className="text-[9px] text-white/20">+{ang.capabilities.length - 3}</span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="py-3 text-right">
+                      <div className="inline-flex items-center gap-1.5">
+                        {ang.healthStatus === "online" ? (
+                          <>
+                            <Wifi size={12} className="text-emerald-400" />
+                            <span className="text-[9px] uppercase font-bold tracking-wider text-emerald-400">Online</span>
+                          </>
+                        ) : (
+                          <>
+                            <WifiOff size={12} className="text-red-400/60" />
+                            <span className="text-[9px] uppercase font-bold tracking-wider text-red-400/60">Offline</span>
+                          </>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </section>
 
-      {/* ---- Section 2: Execution Roster ---- */}
+      {/* ---- Section 2: Agent Cards (live from registry) ---- */}
       <section>
         <div className="flex items-center gap-3 mb-1">
           <Activity size={16} className="text-gold" />
           <h2 className="text-sm font-semibold uppercase tracking-widest text-white/80 font-display">
-            Execution Roster
+            Agent Detail Cards
           </h2>
         </div>
         <p className="text-[0.65rem] text-white/30 uppercase tracking-wider mb-4">
-          Task-level Boomer_Angs &amp; Chicken Hawk — manage, train, coordinate, verify
+          Live health + capability view for each registered Boomer_Ang
         </p>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {EXECUTION_ROSTER.map((ang) => (
+          {agents.map((ang) => (
             <div
               key={ang.id}
-              className={`group relative overflow-hidden rounded-3xl border p-6 backdrop-blur-2xl transition-all hover:bg-black/80 ${
-                ang.id === "chicken-hawk"
-                  ? "border-red-400/20 bg-red-400/[0.02] hover:border-red-400/40"
-                  : "border-wireframe-stroke bg-black/60 hover:border-gold/20"
-              }`}
+              className="group relative overflow-hidden rounded-3xl border border-wireframe-stroke bg-black/60 p-6 backdrop-blur-2xl transition-all hover:bg-black/80 hover:border-gold/20"
             >
               <div className="flex items-start gap-4">
-                <div className={`flex h-12 w-12 items-center justify-center rounded-2xl transition-colors ${
-                  ang.id === "chicken-hawk"
-                    ? "bg-red-400/10 text-red-400 group-hover:bg-red-400 group-hover:text-black"
-                    : "bg-white/5 text-gold group-hover:bg-gold group-hover:text-black"
-                }`}>
-                  <ang.icon size={24} />
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/5 text-gold group-hover:bg-gold group-hover:text-black transition-colors">
+                  <Code size={24} />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
@@ -516,40 +478,29 @@ export default function HouseOfAngPage() {
                     <div className="flex items-center gap-1.5">
                       <span
                         className={`h-2 w-2 rounded-full ${
-                          ang.status === "DEPLOYED" ? "bg-emerald-400 animate-pulse" : "bg-gold"
+                          ang.healthStatus === "online" ? "bg-emerald-400 animate-pulse" : "bg-red-400/60"
                         }`}
                       />
                       <span
                         className={`text-[10px] uppercase font-bold tracking-wider ${
-                          ang.status === "DEPLOYED" ? "text-emerald-400" : "text-gold"
+                          ang.healthStatus === "online" ? "text-emerald-400" : "text-red-400/60"
                         }`}
                       >
-                        {ang.status}
+                        {ang.healthStatus}
                       </span>
                     </div>
                   </div>
-                  <p className="text-xs text-white/40 mt-0.5">{ang.role}</p>
-                </div>
-              </div>
-
-              <div className="mt-4 grid grid-cols-2 gap-3">
-                <div className="rounded-xl bg-white/5 p-3">
-                  <p className="text-[10px] uppercase tracking-widest text-white/30">Tasks</p>
-                  <p className="text-lg font-semibold text-white mt-1">{ang.tasks}</p>
-                </div>
-                <div className="rounded-xl bg-white/5 p-3">
-                  <p className="text-[10px] uppercase tracking-widest text-white/30">Success</p>
-                  <p className="text-lg font-semibold text-emerald-400 mt-1">{ang.successRate}%</p>
+                  <p className="text-xs text-white/40 mt-0.5">{ang.description}</p>
                 </div>
               </div>
 
               <div className="mt-4 flex flex-wrap gap-1.5">
-                {ang.specialties.map((s) => (
+                {ang.capabilities.map((cap) => (
                   <span
-                    key={s}
+                    key={cap}
                     className="rounded-full border border-wireframe-stroke bg-white/5 px-2.5 py-1 text-[10px] text-white/50"
                   >
-                    {s}
+                    {cap.replace(/_/g, " ")}
                   </span>
                 ))}
               </div>
