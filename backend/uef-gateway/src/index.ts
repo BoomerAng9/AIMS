@@ -19,6 +19,7 @@ import { pmoRegistry } from './pmo/registry';
 import { houseOfAng } from './pmo/house-of-ang';
 import { runCollaborationDemo, renderJSON } from './collaboration';
 import { TIER_CONFIGS, TASK_MULTIPLIERS as BILLING_MULTIPLIERS, PILLAR_CONFIGS, checkAllowance, calculatePillarAddon, checkAgentLimit } from './billing';
+import { billingProvisions } from './billing/persistence';
 import { openrouter, MODELS as LLM_MODELS, llmGateway, usageTracker } from './llm';
 import { verticalRegistry } from './verticals';
 import { projectStore, plugStore, deploymentStore, auditStore, evidenceStore, startCleanupSchedule, stopCleanupSchedule, closeDb } from './db';
@@ -50,6 +51,7 @@ import { ossModels } from './llm/oss-models';
 import { personaplex } from './llm/personaplex';
 import { N8nClient } from './n8n';
 import { plugRouter } from './plug-catalog/router';
+import { instanceLifecycle } from './plug-catalog';
 import { cloudflareRouter, markdownForAgents } from './cloudflare';
 import { paymentsRouter } from './payments';
 import { normalizeInput, getDialectStats, SLANG_ENTRY_COUNT, INTENT_PHRASE_COUNT } from './nlp';
@@ -1589,7 +1591,7 @@ app.post('/billing/check-agents', (req, res) => {
 });
 
 // Provision tier — called by Stripe webhook after checkout/subscription events
-const provisionedTiers = new Map<string, { tierId: string; tierName: string; stripeCustomerId: string; stripeSubscriptionId: string; provisionedAt: string }>();
+// Persisted to SQLite via billingProvisions (replaces in-memory Map)
 
 app.post('/billing/provision', (req, res) => {
   const { userId, tierId, tierName, stripeCustomerId, stripeSubscriptionId, provisionedAt, reason } = req.body;
@@ -1598,16 +1600,19 @@ app.post('/billing/provision', (req, res) => {
     return;
   }
 
-  provisionedTiers.set(userId, {
+  const now = new Date().toISOString();
+  billingProvisions.upsert({
+    userId,
     tierId,
     tierName: tierName || tierId,
     stripeCustomerId: stripeCustomerId || '',
     stripeSubscriptionId: stripeSubscriptionId || '',
-    provisionedAt: provisionedAt || new Date().toISOString(),
+    provisionedAt: provisionedAt || now,
+    updatedAt: now,
   });
 
-  logger.info({ userId, tierId, tierName, reason }, '[Billing] Tier provisioned');
-  res.json({ success: true, userId, tierId, tierName, provisionedAt });
+  logger.info({ userId, tierId, tierName, reason }, '[Billing] Tier provisioned (persisted)');
+  res.json({ success: true, userId, tierId, tierName, provisionedAt: provisionedAt || now });
 });
 
 app.get('/billing/provision', (req, res) => {
@@ -1616,12 +1621,13 @@ app.get('/billing/provision', (req, res) => {
     res.status(400).json({ error: 'Missing userId' });
     return;
   }
-  const tier = provisionedTiers.get(userId);
+  const tier = billingProvisions.get(userId);
   if (!tier) {
     res.json({ userId, tierId: 'p2p', tierName: 'Pay-per-Use', provisioned: false });
     return;
   }
-  res.json({ userId, ...tier, provisioned: true });
+  const { userId: _uid, ...tierData } = tier;
+  res.json({ userId, ...tierData, provisioned: true });
 });
 
 // --------------------------------------------------------------------------
@@ -2805,14 +2811,28 @@ app.post('/memory/preference', (req, res) => {
 });
 
 // --------------------------------------------------------------------------
-// Start Server
+// Start Server — initialize deploy engine lifecycle before listening
 // --------------------------------------------------------------------------
-export const server = app.listen(PORT, () => {
-  const agents = registry.list();
-  logger.info({ port: PORT, agents: agents.length }, 'UEF Gateway (Layer 2) running');
-  logger.info(`Agents online: ${agents.map(a => a.name).join(', ')}`);
-  logger.info(`ACP Ingress available at http://localhost:${PORT}/ingress/acp`);
-});
+async function startServer(): Promise<void> {
+  // Initialize plug instance lifecycle: loads port state, wires health monitor,
+  // starts background health sweeps, and reconciles with Docker state.
+  try {
+    await instanceLifecycle.initialize();
+    logger.info('[UEF] Instance lifecycle initialized — health monitor running');
+  } catch (err) {
+    logger.error({ err }, '[UEF] Instance lifecycle init failed — continuing without health monitoring');
+  }
+
+  server.listen(PORT, () => {
+    const agents = registry.list();
+    logger.info({ port: PORT, agents: agents.length }, 'UEF Gateway (Layer 2) running');
+    logger.info(`Agents online: ${agents.map(a => a.name).join(', ')}`);
+    logger.info(`ACP Ingress available at http://localhost:${PORT}/ingress/acp`);
+  });
+}
+
+export const server = require('http').createServer(app);
+startServer();
 
 // --------------------------------------------------------------------------
 // Graceful Shutdown — let Docker stop containers cleanly
@@ -2821,6 +2841,7 @@ function shutdown(signal: string) {
   logger.info({ signal }, '[UEF] Received shutdown signal, draining connections...');
   stopCleanupSchedule();
   memoryEngine.stopMaintenance();
+  instanceLifecycle.getHealthMonitor().stop();
   server.close(() => {
     closeDb();
     logger.info('[UEF] All connections drained. DB closed. Exiting.');

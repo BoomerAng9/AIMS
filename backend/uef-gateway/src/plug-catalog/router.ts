@@ -129,6 +129,22 @@ plugRouter.post('/plug-instances/spin-up', async (req, res) => {
       allowExperimental: allowExperimental || false,
     });
 
+    // Post-deploy hook: create DNS subdomain, sync KV route, register with health monitor
+    if (result.instance && result.instance.status === 'running') {
+      try {
+        await instanceLifecycle.onInstanceDeployed(result.instance.instanceId);
+        logger.info(
+          { instanceId: result.instance.instanceId, plugId },
+          '[PlugRouter] Post-deploy hook completed — DNS + KV + health registered',
+        );
+      } catch (postDeployErr) {
+        logger.warn(
+          { instanceId: result.instance.instanceId, err: postDeployErr },
+          '[PlugRouter] Post-deploy hook failed — instance running but DNS/KV may be missing',
+        );
+      }
+    }
+
     res.json(result);
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'Spin-up failed';

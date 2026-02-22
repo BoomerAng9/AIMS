@@ -15,15 +15,38 @@
  * This enables autonomous agent commerce — agents discover, pay for,
  * and consume AIMS services without human intervention.
  *
+ * Receipt validation now uses:
+ *   - Stripe PaymentIntents API for fiat receipts
+ *   - SQLite persistence for replay protection
+ *   - 24-hour receipt reuse window
+ *
  * References:
- *   - Cloudflare X402 spec
+ *   - Cloudflare X402 spec (x402.org)
  *   - Stripe Agentic Commerce Protocol (ACP)
  *   - Coinbase AgentKit wallet integration
+ *   - Stripe x402 integration (Feb 2026)
  */
 
 import { Request, Response, NextFunction } from 'express';
 import logger from '../logger';
 import { TASK_MULTIPLIERS, type TaskType } from './index';
+import { x402ReceiptStore } from './persistence';
+
+// ---------------------------------------------------------------------------
+// Stripe SDK — conditional import
+// ---------------------------------------------------------------------------
+
+let stripe: any = null;
+try {
+  const Stripe = require('stripe');
+  if (process.env.STRIPE_SECRET_KEY) {
+    stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: '2026-01-28.clover' as any,
+    });
+  }
+} catch {
+  // Stripe not available
+}
 
 // ---------------------------------------------------------------------------
 // Types
@@ -52,9 +75,6 @@ export interface X402Receipt {
   resourceId: string;
 }
 
-// In-memory receipt store (upgrade to SQLite/Redis for production)
-const receiptStore = new Map<string, X402Receipt>();
-
 // ---------------------------------------------------------------------------
 // Pricing Table — per-resource-type costs
 // ---------------------------------------------------------------------------
@@ -80,12 +100,12 @@ const RESOURCE_PRICING: Record<string, { usd: number; description: string }> = {
  *   router.post('/paid-endpoint', x402Gate('plug-deploy', 'my-plug'), handler);
  */
 export function x402Gate(resourceType: string, resourceId?: string) {
-  return (req: Request, res: Response, next: NextFunction): void => {
+  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const receiptHeader = req.headers['x-402-receipt'] as string | undefined;
 
     // If receipt provided, validate it
     if (receiptHeader) {
-      const receipt = validateReceipt(receiptHeader);
+      const receipt = await validateReceipt(receiptHeader);
       if (receipt) {
         (req as any).__x402Receipt = receipt;
         next();
@@ -167,10 +187,10 @@ function buildPaymentOffer(
 }
 
 // ---------------------------------------------------------------------------
-// Receipt Validation
+// Receipt Validation — Stripe-verified + SQLite-persisted replay protection
 // ---------------------------------------------------------------------------
 
-function validateReceipt(receiptHeader: string): X402Receipt | null {
+async function validateReceipt(receiptHeader: string): Promise<X402Receipt | null> {
   try {
     const receipt: X402Receipt = JSON.parse(
       Buffer.from(receiptHeader, 'base64').toString('utf-8'),
@@ -181,25 +201,78 @@ function validateReceipt(receiptHeader: string): X402Receipt | null {
       return null;
     }
 
-    // Check if already used (replay protection)
-    if (receiptStore.has(receipt.paymentId)) {
-      const existing = receiptStore.get(receipt.paymentId)!;
-      // Allow reuse for same resource within 24h
+    // Check SQLite store for replay protection
+    const existing = x402ReceiptStore.get(receipt.paymentId);
+    if (existing) {
+      // Allow reuse within 24h
       const age = Date.now() - new Date(existing.timestamp).getTime();
       if (age > 24 * 60 * 60 * 1000) {
         return null;
       }
-      return existing;
+      return {
+        paymentId: existing.paymentId,
+        network: existing.network,
+        amount: existing.amount,
+        currency: existing.currency,
+        timestamp: existing.timestamp,
+        resourceId: existing.resourceId,
+      };
     }
 
-    // Store for replay protection
-    receiptStore.set(receipt.paymentId, receipt);
+    // Verify with Stripe if it's a Stripe payment
+    if (receipt.network === 'stripe' && stripe) {
+      try {
+        const paymentIntent = await stripe.paymentIntents.retrieve(receipt.paymentId);
+        if (paymentIntent.status !== 'succeeded') {
+          logger.warn({
+            paymentId: receipt.paymentId,
+            status: paymentIntent.status,
+          }, '[X402] Stripe PaymentIntent not succeeded — rejecting receipt');
+          return null;
+        }
+
+        // Verify amount matches (within 1 cent tolerance)
+        const expectedCents = Math.round(receipt.amount * 100);
+        if (Math.abs(paymentIntent.amount - expectedCents) > 1) {
+          logger.warn({
+            paymentId: receipt.paymentId,
+            expected: expectedCents,
+            actual: paymentIntent.amount,
+          }, '[X402] Amount mismatch — rejecting receipt');
+          return null;
+        }
+
+        logger.info({
+          paymentId: receipt.paymentId,
+          amount: receipt.amount,
+        }, '[X402] Stripe-verified receipt accepted');
+      } catch (stripeErr: any) {
+        // If it's a pi_ ID and lookup fails, reject
+        if (receipt.paymentId.startsWith('pi_')) {
+          logger.warn({ paymentId: receipt.paymentId, err: stripeErr.message }, '[X402] Stripe verification failed');
+          return null;
+        }
+        // For non-Stripe IDs (legacy), fall through to basic acceptance
+        logger.info({ paymentId: receipt.paymentId }, '[X402] Non-Stripe payment ID — accepting with basic validation');
+      }
+    }
+
+    // Store in SQLite for replay protection
+    x402ReceiptStore.store({
+      paymentId: receipt.paymentId,
+      network: receipt.network,
+      amount: receipt.amount,
+      currency: receipt.currency,
+      resourceId: receipt.resourceId,
+      timestamp: receipt.timestamp,
+      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    });
 
     logger.info({
       paymentId: receipt.paymentId,
       network: receipt.network,
       amount: receipt.amount,
-    }, '[X402] Valid receipt accepted');
+    }, '[X402] Valid receipt accepted and persisted');
 
     return receipt;
   } catch {
@@ -227,7 +300,11 @@ export function generateReceipt(
     resourceId,
   };
 
-  receiptStore.set(paymentId, receipt);
+  // Persist to SQLite
+  x402ReceiptStore.store({
+    ...receipt,
+    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+  });
 
   return Buffer.from(JSON.stringify(receipt)).toString('base64');
 }
