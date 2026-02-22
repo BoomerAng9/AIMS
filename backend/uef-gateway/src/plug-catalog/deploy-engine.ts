@@ -17,6 +17,7 @@ import { v4 as uuidv4 } from 'uuid';
 import logger from '../logger';
 import { plugCatalog } from './catalog';
 import { dockerRuntime } from './docker-runtime';
+import { portAllocator } from './port-allocator';
 import type {
   PlugDefinition,
   PlugInstance,
@@ -95,8 +96,8 @@ export class PlugDeployEngine {
     const resolvedEnv = this.resolveEnvironment(plug, request);
     addEvent('configure', `Resolved ${Object.keys(resolvedEnv).length} environment variables`);
 
-    // 3. Assign port
-    const assignedPort = this.allocatePort();
+    // 3. Assign port (persistent allocation)
+    const assignedPort = await this.allocatePortForInstance(instanceId, plug.id, request.userId);
     addEvent('provision', `Allocated port ${assignedPort}`);
 
     // 4. Create instance record
@@ -860,9 +861,22 @@ exit $?
     return cost;
   }
 
+  /**
+   * Allocate a port for an instance. Uses the persistent PortAllocator
+   * when available, falls back to in-memory counter.
+   */
+  async allocatePortForInstance(instanceId: string, plugId: string, userId: string): Promise<number> {
+    try {
+      return await portAllocator.allocate(instanceId, plugId, userId);
+    } catch {
+      // Fallback to in-memory counter if allocator fails
+      return this.allocatePort();
+    }
+  }
+
   private allocatePort(): number {
     const port = this.nextPort;
-    this.nextPort += 10; // Leave room for multi-port plugs
+    this.nextPort += 10;
     return port;
   }
 

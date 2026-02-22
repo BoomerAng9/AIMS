@@ -28,6 +28,9 @@ import { plugCatalog } from './catalog';
 import { plugDeployEngine } from './deploy-engine';
 import { needsAnalysis } from './needs-analysis';
 import { dockerRuntime } from './docker-runtime';
+import { instanceLifecycle } from './instance-lifecycle';
+import { healthMonitor } from './health-monitor';
+import { portAllocator } from './port-allocator';
 import logger from '../logger';
 
 export const plugRouter = Router();
@@ -224,16 +227,88 @@ plugRouter.post('/plug-instances/:id/restart', async (req, res) => {
   }
 });
 
+/**
+ * Full decommission — stops container, removes DNS, releases port, cleans up.
+ * DELETE /api/plug-instances/:id
+ */
 plugRouter.delete('/plug-instances/:id', async (req, res) => {
   try {
-    const removed = await plugDeployEngine.removeInstance(req.params.id);
-    if (!removed) {
+    const result = await instanceLifecycle.decommission(req.params.id);
+    if (!result.fullyDecommissioned && result.steps[0]?.detail === 'Instance not found') {
       res.status(404).json({ error: 'Instance not found' });
       return;
     }
-    res.json({ removed: true, instanceId: req.params.id });
+    res.json(result);
   } catch (err) {
-    const msg = err instanceof Error ? err.message : 'Remove failed';
+    const msg = err instanceof Error ? err.message : 'Decommission failed';
+    res.status(500).json({ error: msg });
+  }
+});
+
+// ---------------------------------------------------------------------------
+// PaaS Operations — Lifecycle, Health, Ports
+// ---------------------------------------------------------------------------
+
+/**
+ * Platform operations dashboard.
+ * GET /api/plug-operations/stats
+ */
+plugRouter.get('/plug-operations/stats', (_req, res) => {
+  try {
+    const stats = instanceLifecycle.getStats();
+    res.json(stats);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Stats failed';
+    res.status(500).json({ error: msg });
+  }
+});
+
+/**
+ * Health monitor status and recent events.
+ * GET /api/plug-operations/health
+ */
+plugRouter.get('/plug-operations/health', (_req, res) => {
+  const stats = healthMonitor.getStats();
+  const events = healthMonitor.getRecentEvents(50);
+  const statuses = healthMonitor.getAllStatuses();
+  res.json({ stats, events, statuses, running: healthMonitor.isRunning() });
+});
+
+/**
+ * Trigger a manual health sweep.
+ * POST /api/plug-operations/health/sweep
+ */
+plugRouter.post('/plug-operations/health/sweep', async (_req, res) => {
+  try {
+    const events = await healthMonitor.sweep();
+    res.json({ events, count: events.length });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Sweep failed';
+    res.status(500).json({ error: msg });
+  }
+});
+
+/**
+ * Port allocation status.
+ * GET /api/plug-operations/ports
+ */
+plugRouter.get('/plug-operations/ports', (_req, res) => {
+  const capacity = portAllocator.getCapacity();
+  const allocations = portAllocator.getAllocations();
+  res.json({ capacity, allocations, count: allocations.length });
+});
+
+/**
+ * Reconcile port allocations with Docker state.
+ * POST /api/plug-operations/reconcile
+ */
+plugRouter.post('/plug-operations/reconcile', async (_req, res) => {
+  try {
+    await instanceLifecycle.reconcile();
+    const stats = instanceLifecycle.getStats();
+    res.json({ reconciled: true, stats });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Reconciliation failed';
     res.status(500).json({ error: msg });
   }
 });
