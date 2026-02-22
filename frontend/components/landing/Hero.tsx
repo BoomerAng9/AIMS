@@ -87,11 +87,11 @@ export function Hero() {
       {/* Hero background — domain-aware */}
       <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
         <Image
-          src={isLore ? '/images/acheevy/elder-ceremony-hero.jpeg' : '/assets/port_dock_brand.png'}
+          src={isLore ? '/images/acheevy/elder-ceremony-hero.jpeg' : '/assets/aims_cinematic_port.png'}
           alt=""
           fill
           priority
-          className={`object-cover object-center ${isLore ? 'opacity-30' : 'opacity-20'}`}
+          className={`object-cover object-center ${isLore ? 'opacity-30' : 'opacity-40'}`}
           sizes="100vw"
         />
       </div>

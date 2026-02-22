@@ -47,6 +47,7 @@ const CORE_ITEMS: NavItem[] = [
   { href: "/dashboard", label: "Overview", icon: BarChart3 },
   { href: "/dashboard/map", label: "Platform Map", icon: Map, highlight: true },
   { href: "/dashboard/deploy-dock", label: "Deploy Dock", icon: Rocket, highlight: true },
+  { href: "/dashboard/make-it-mine", label: "Make It Mine", icon: Wrench, highlight: true },
   { href: "/dashboard/your-space", label: "Your Space", icon: Users },
   { href: "/dashboard/plan", label: "Plan", icon: FolderKanban },
 ];
@@ -124,8 +125,8 @@ function NavLink({ item, pathname }: { item: NavItem; pathname: string | null })
         active
           ? "border border-gold/30 bg-gold/8 text-gold shadow-[0_0_12px_rgba(212,175,55,0.08)]"
           : item.highlight
-          ? "border border-gold/15 bg-gold/5 text-gold/80 hover:bg-gold/10 hover:border-gold/25"
-          : "border border-transparent text-white/55 hover:bg-white/5 hover:border-wireframe-stroke hover:text-white/80"
+            ? "border border-gold/15 bg-gold/5 text-gold/80 hover:bg-gold/10 hover:border-gold/25"
+            : "border border-transparent text-white/55 hover:bg-white/5 hover:border-wireframe-stroke hover:text-white/80"
       )}
     >
       <Icon

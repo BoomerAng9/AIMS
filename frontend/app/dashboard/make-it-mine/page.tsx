@@ -17,7 +17,6 @@ const PROJECT_TYPES = [
     icon: '🌐',
     href: '/dashboard/make-it-mine/web-app',
     features: ['Full-stack development', 'Deployment included', 'Custom domain'],
-    comingSoon: true,
   },
   {
     id: 'mobile-app',
@@ -26,7 +25,6 @@ const PROJECT_TYPES = [
     icon: '📱',
     href: '/dashboard/make-it-mine/mobile-app',
     features: ['Cross-platform', 'App store ready', 'Push notifications'],
-    comingSoon: true,
   },
   {
     id: 'automation',
@@ -35,7 +33,6 @@ const PROJECT_TYPES = [
     icon: '⚡',
     href: '/dashboard/make-it-mine/automation',
     features: ['n8n integration', 'API connections', 'Scheduled tasks'],
-    comingSoon: true,
   },
 ];
 
