@@ -142,11 +142,22 @@ class ImageSearchTool(BaseTool):
                 )
 
             llm_content = self._format_results(results)
-            
-            # TODO: custom the user display content
+
+            # Format results as a gallery-friendly display
+            display_items = []
+            for r in results:
+                display_items.append({
+                    "title": r.get("title", ""),
+                    "url": r.get("url", ""),
+                    "thumbnail": r.get("thumbnail", {}).get("src", r.get("url", "")),
+                    "source": r.get("source", ""),
+                    "width": r.get("properties", {}).get("width"),
+                    "height": r.get("properties", {}).get("height"),
+                })
+
             return ToolResult(
                 llm_content=llm_content,
-                user_display_content=json.dumps(results, indent=2),
+                user_display_content=json.dumps({"type": "image_gallery", "images": display_items}, indent=2),
             )
         except httpx.TimeoutException:
             return ToolResult(

@@ -323,7 +323,7 @@ async def get_all_available_models(
     models = []
 
     # Get system models from config
-    # TODO: check for subscription
+    # Subscription gating is handled at the AIMS platform level (UEF Gateway / LUC metering)
     for model_id, llm_config in config.llm_configs.items():
         models.append(
             LLMModelInfo(

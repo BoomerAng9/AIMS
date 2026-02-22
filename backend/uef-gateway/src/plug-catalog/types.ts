@@ -269,6 +269,8 @@ export interface SpinUpRequest {
   envOverrides: Record<string, string>;
   securityLevel?: SecurityLevel;
   domain?: string;
+  /** Set true to deploy a plug marked comingSoon (experimental) */
+  allowExperimental?: boolean;
 }
 
 export interface SpinUpResult {

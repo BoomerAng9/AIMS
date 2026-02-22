@@ -319,9 +319,32 @@ function fallbackPersona(angDef: BoomerAngDefinition): AngPersona {
 // AngForge — Main engine
 // ---------------------------------------------------------------------------
 
+interface ProvisionRequest {
+  placeholderId: string;
+  pmoOffice: PmoId;
+  capabilities: string[];
+  requestedAt: string;
+  requestedBy: string;
+  message: string;
+}
+
 export class AngForge {
   private forgeCount = 0;
   private forgeLog: Array<{ angId: string; bench: BenchLevel; pmo: PmoId; at: string }> = [];
+  private provisionQueue: ProvisionRequest[] = [];
+
+  /** Get pending provision requests for ACHEEVY to process. */
+  getProvisionQueue(): ProvisionRequest[] {
+    return [...this.provisionQueue];
+  }
+
+  /** Remove a request from the queue after provisioning is complete. */
+  dequeueProvision(placeholderId: string): boolean {
+    const idx = this.provisionQueue.findIndex(r => r.placeholderId === placeholderId);
+    if (idx === -1) return false;
+    this.provisionQueue.splice(idx, 1);
+    return true;
+  }
 
   /**
    * Forge a Boomer_Ang assignment for a task.
@@ -357,21 +380,36 @@ export class AngForge {
       definition = pmoFiltered.length > 0 ? pmoFiltered[0] : matched[0];
     } else {
       resolvedFromRegistry = false;
-      const placeholderId = `pending_${pmoOffice.replace('-office', '')}_ang`;
+      const officeName = pmoOffice.replace('-office', '');
+      const placeholderId = `pending_${officeName}_ang`;
       definition = {
         id: placeholderId,
-        name: `Pending_${pmoOffice.replace('-office', '').charAt(0).toUpperCase() + pmoOffice.replace('-office', '').slice(1)}_Ang`,
+        name: `Pending_${officeName.charAt(0).toUpperCase() + officeName.slice(1)}_Ang`,
         source_repo: 'aims/pending-provision',
-        description: `Pending Boomer_Ang for ${pmoOffice} — awaiting service provisioning`,
+        description: `Pending Boomer_Ang for ${pmoOffice} — awaiting service provisioning. `
+          + `Requested capabilities: ${capabilities.join(', ')}. `
+          + `ACHEEVY will queue this for deployment via the Plug Spin-Up engine.`,
         capabilities,
         required_quotas: { api_calls: 5 },
-        endpoint: `http://${placeholderId.replace(/_/g, '-')}:8200/execute`,
-        health_check: `http://${placeholderId.replace(/_/g, '-')}:8200/health`,
-        status: 'registered',
+        // Route through UEF Gateway — not directly to a non-existent container
+        endpoint: `http://uef-gateway:4000/api/ang-proxy/${placeholderId}/execute`,
+        health_check: `http://uef-gateway:4000/api/ang-proxy/${placeholderId}/health`,
+        status: 'pending_provision',
       };
+
+      // Queue for provisioning — ACHEEVY will pick this up
+      this.provisionQueue.push({
+        placeholderId,
+        pmoOffice,
+        capabilities,
+        requestedAt: new Date().toISOString(),
+        requestedBy,
+        message: message.slice(0, 500),
+      });
+
       logger.warn(
-        { placeholderId, pmoOffice, capabilities },
-        '[AngForge] No registry match — created pending provision placeholder',
+        { placeholderId, pmoOffice, capabilities, queueDepth: this.provisionQueue.length },
+        '[AngForge] No registry match — queued for provisioning',
       );
     }
 

@@ -13,7 +13,7 @@ import {
   DispatchedBoomerAng,
   ActionStep,
 } from './types';
-import { analyzeIntent } from './intent-analyzer';
+import { analyzeIntent, classifyNtNtN, type NtNtNClassification } from './intent-analyzer';
 
 const HOUSE_OF_ANG_URL = process.env.HOUSE_OF_ANG_URL || 'http://house-of-ang:3002';
 
@@ -92,6 +92,49 @@ function buildActionPlan(
 }
 
 /**
+ * Synthesize a NtNtN Engine response for creative build intents.
+ */
+function synthesizeNtNtN(
+  message: string,
+  classification: NtNtNClassification,
+  agents: Array<{ id: string; name: string }>,
+): string {
+  const { scopeTier, matchedCategories } = classification;
+
+  const scopeLabel = {
+    component: 'a component',
+    page: 'a page',
+    application: 'an application',
+    platform: 'a platform',
+  }[scopeTier];
+
+  let reply = `I understand you want to build **${scopeLabel}**. `;
+  reply += `NtNtN Engine classified this as a **${scopeTier}-tier** build.\n\n`;
+
+  if (matchedCategories.length > 0) {
+    reply += '**Matched categories:**\n';
+    for (const cat of matchedCategories.slice(0, 5)) {
+      reply += `- **${cat.category.replace(/_/g, ' ')}**`;
+      if (cat.techniqueGroup) reply += ` (${cat.techniqueGroup.replace(/_/g, ' ')})`;
+      reply += ` → routed to **${cat.primaryAng}**\n`;
+    }
+    reply += '\n';
+  }
+
+  reply += '**Default stack:** Next.js 16 + Tailwind v4 + Motion v12 + shadcn/ui\n\n';
+
+  if (agents.length > 0) {
+    reply += `**Execution chain:** ${agents.map(a => a.name).join(' → ')}\n\n`;
+  } else {
+    reply += '**Execution chain:** Picker_Ang → Buildsmith → Chicken Hawk → Lil_Hawks\n\n';
+  }
+
+  reply += 'Reply **"go"** to start the build pipeline, or refine your requirements.';
+
+  return reply;
+}
+
+/**
  * Generate a response message based on intent and routing results.
  */
 function synthesize(
@@ -134,6 +177,12 @@ export async function processRequest(req: AcheevyRequest): Promise<AcheevyRespon
   const intent = analyzeIntent(req.message);
   console.log(`[ACHEEVY] Intent: ${intent.primary_intent} (confidence: ${intent.confidence})`);
 
+  // 1b. Check for NtNtN creative build intent
+  const ntntn = classifyNtNtN(req.message);
+  if (ntntn.isBuildIntent) {
+    console.log(`[ACHEEVY] NtNtN build detected — scope: ${ntntn.scopeTier}, categories: ${ntntn.matchedCategories.map(c => c.category).join(', ')}`);
+  }
+
   // 2. Route through House of Ang
   const { agents, gaps } = intent.capabilities_needed.length > 0
     ? await routeToHouseOfAng(intent.capabilities_needed)
@@ -151,8 +200,10 @@ export async function processRequest(req: AcheevyRequest): Promise<AcheevyRespon
     status: 'queued' as const,
   }));
 
-  // 5. Synthesize response
-  const reply = synthesize(req.message, intent.primary_intent, agents, gaps);
+  // 5. Synthesize response — use NtNtN synthesis for creative builds
+  const reply = ntntn.isBuildIntent
+    ? synthesizeNtNtN(req.message, ntntn, agents)
+    : synthesize(req.message, intent.primary_intent, agents, gaps);
 
   // 6. Estimate LUC cost (heuristic: ~500 tokens per agent interaction)
   const estimatedTokens = 500 + agents.length * 500;

@@ -71,6 +71,10 @@ export interface LLMResult {
   cost: {
     usd: number;
   };
+  /** True when the response is a stub due to missing API key */
+  stub?: boolean;
+  /** The env var(s) needed to activate this provider */
+  missingConfig?: string[];
 }
 
 // ---------------------------------------------------------------------------
@@ -460,9 +464,11 @@ class OpenRouterClient {
     const userMsg = request.messages.find(m => m.role === 'user')?.content || '';
     return {
       content: `[LLM Offline] OpenRouter API key not configured. Query received (${userMsg.length} chars). Configure OPENROUTER_API_KEY to enable AI-powered responses.`,
-      model: 'stub',
+      model: 'openrouter-stub',
       tokens: { prompt: 0, completion: 0, total: 0 },
       cost: { usd: 0 },
+      stub: true,
+      missingConfig: ['OPENROUTER_API_KEY'],
     };
   }
 

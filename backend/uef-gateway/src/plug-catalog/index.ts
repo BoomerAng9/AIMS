@@ -48,5 +48,11 @@ export { NeedsAnalysisEngine, needsAnalysis } from './needs-analysis';
 // Docker Runtime
 export { DockerRuntime, dockerRuntime } from './docker-runtime';
 
+// PaaS Operations Layer
+export { PortAllocator, portAllocator } from './port-allocator';
+export { HealthMonitor, healthMonitor } from './health-monitor';
+export { InstanceLifecycle, instanceLifecycle } from './instance-lifecycle';
+export { KVSync, kvSync } from './kv-sync';
+
 // API Router
 export { plugRouter } from './router';
