@@ -52,6 +52,8 @@ import { N8nClient } from './n8n';
 import { plugRouter } from './plug-catalog/router';
 import { cloudflareRouter, markdownForAgents } from './cloudflare';
 import { paymentsRouter } from './payments';
+import { normalizeInput, getDialectStats, SLANG_ENTRY_COUNT, INTENT_PHRASE_COUNT } from './nlp';
+import { videoRouter } from './video';
 import logger from './logger';
 
 // Custom Lil_Hawks — User-Created Bots
@@ -185,6 +187,11 @@ app.use(requireApiKey);
 // Agent Payments — X402, Stripe Agent Commerce, Wallets
 // --------------------------------------------------------------------------
 app.use(paymentsRouter);
+
+// --------------------------------------------------------------------------
+// Video & Content Pipeline — KIE.ai unified video generation
+// --------------------------------------------------------------------------
+app.use('/api', videoRouter);
 
 // --------------------------------------------------------------------------
 // Agent Registry — list available agents and their profiles
@@ -1005,20 +1012,74 @@ app.post('/acheevy/classify', (req, res) => {
       },
     ];
 
-    // ── Try vertical trigger matching first ────────────────────────
+    // ── NLP Normalization (slang → standard terms) ────────────────
+    // Run BEFORE pattern matching so colloquial language maps to
+    // recognizable trigger words. "finna whip up a vid" → content-pipeline
+    const nlpResult = normalizeInput(message);
+
+    // If the normalizer found a direct intent match from a full slang
+    // phrase, return it immediately (highest priority).
+    if (nlpResult.directIntent) {
+      const di = nlpResult.directIntent;
+      // Map intent IDs that start with "vertical:" through
+      const isVertical = di.intent.startsWith('vertical:');
+      const isRefine = di.intent.startsWith('refine:');
+
+      if (isRefine) {
+        // Find the matching refinement
+        const domain = di.intent.split(':')[1];
+        const vague = VAGUE_INTENT_MAP.find(v => v.domain === domain);
+        res.json({
+          intent: di.intent,
+          confidence: di.confidence,
+          requiresAgent: false,
+          refinement: vague?.refinement || `I detected you're thinking about ${domain}. Tell me more so I can help.`,
+          domain,
+          slangDetected: true,
+          dialectsDetected: nlpResult.dialectsDetected,
+          normalized: nlpResult.normalized,
+        });
+        return;
+      }
+
+      // For vertical intents or direct action intents
+      const verticalId = isVertical ? di.intent.replace('vertical:', '') : di.intent;
+      const verticalMatch = VERTICAL_TRIGGERS.find(v => v.id === verticalId);
+
+      res.json({
+        intent: isVertical ? di.intent : `vertical:${di.intent}`,
+        verticalName: verticalMatch?.name || di.intent,
+        confidence: di.confidence,
+        requiresAgent: true,
+        slangDetected: true,
+        dialectsDetected: nlpResult.dialectsDetected,
+        normalized: nlpResult.normalized,
+      });
+      return;
+    }
+
+    // Use the normalized text for subsequent pattern matching
+    const classifyText = nlpResult.slangDetected ? nlpResult.normalized : message;
+
+    // ── Try vertical trigger matching ───────────────────────────
     for (const vertical of VERTICAL_TRIGGERS) {
-      if (vertical.patterns.some(p => p.test(message))) {
+      if (vertical.patterns.some(p => p.test(classifyText) || p.test(message))) {
         res.json({
           intent: `vertical:${vertical.id}`,
           verticalName: vertical.name,
           confidence: 0.9,
           requiresAgent: true,
+          ...(nlpResult.slangDetected ? {
+            slangDetected: true,
+            dialectsDetected: nlpResult.dialectsDetected,
+            normalized: nlpResult.normalized,
+          } : {}),
         });
         return;
       }
     }
 
-    const lower = message.toLowerCase();
+    const lower = classifyText.toLowerCase();
 
     // ── Plug fabrication (build app/site/tool) ────────────────────
     if (/\b(build|create|scaffold|deploy|generate|implement|code|develop|launch)\b/.test(lower)) {
@@ -1064,24 +1125,62 @@ app.post('/acheevy/classify', (req, res) => {
     // User's input didn't match any specific trigger. Try to detect
     // the domain they're thinking about and offer guided refinement.
     for (const vague of VAGUE_INTENT_MAP) {
-      if (vague.hints.some(h => h.test(message))) {
+      if (vague.hints.some(h => h.test(message) || h.test(classifyText))) {
         res.json({
           intent: `refine:${vague.domain}`,
           confidence: 0.6,
           requiresAgent: false,
           refinement: vague.refinement,
           domain: vague.domain,
+          ...(nlpResult.slangDetected ? {
+            slangDetected: true,
+            dialectsDetected: nlpResult.dialectsDetected,
+            normalized: nlpResult.normalized,
+          } : {}),
         });
         return;
       }
     }
 
     // Default: conversational (no agent needed, use LLM stream)
-    res.json({ intent: 'conversational', confidence: 0.5, requiresAgent: false });
+    res.json({
+      intent: 'conversational',
+      confidence: 0.5,
+      requiresAgent: false,
+      ...(nlpResult.slangDetected ? {
+        slangDetected: true,
+        dialectsDetected: nlpResult.dialectsDetected,
+        normalized: nlpResult.normalized,
+      } : {}),
+    });
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'Classification failed';
     res.status(500).json({ error: msg });
   }
+});
+
+// --------------------------------------------------------------------------
+// NLP Stats & Normalization Test Endpoint
+// --------------------------------------------------------------------------
+
+app.get('/api/nlp/stats', (_req, res) => {
+  res.json({
+    dialects: getDialectStats(),
+    totalSlangEntries: SLANG_ENTRY_COUNT,
+    totalIntentPhrases: INTENT_PHRASE_COUNT,
+    supportedLanguages: ['en'],
+    plannedLanguages: ['es', 'pt', 'fr'],
+  });
+});
+
+app.post('/api/nlp/normalize', (req, res) => {
+  const { text } = req.body;
+  if (!text || typeof text !== 'string') {
+    res.status(400).json({ error: 'text field is required' });
+    return;
+  }
+  const result = normalizeInput(text);
+  res.json(result);
 });
 
 // --------------------------------------------------------------------------
