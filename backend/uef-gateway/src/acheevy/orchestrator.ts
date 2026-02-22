@@ -23,6 +23,26 @@ import { getMemoryEngine } from '../memory';
 import type { ExecutionOutcome } from '../memory';
 import { agentChat } from '../llm';
 import logger from '../logger';
+import { liveSim } from '../livesim';
+
+// NtNtN Engine: loaded at runtime to avoid tsconfig rootDir compilation issues
+let _ntntnEngine: any = null;
+function getNtNtN(): { detectBuildIntent: (msg: string) => boolean; classifyBuildIntent: (msg: string) => any[]; detectScopeTier: (msg: string) => string; AIMS_DEFAULT_STACK: Record<string, string> } {
+  if (!_ntntnEngine) {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      _ntntnEngine = require('../../../../aims-skills/ntntn-engine');
+    } catch {
+      _ntntnEngine = {
+        detectBuildIntent: () => false,
+        classifyBuildIntent: () => [],
+        detectScopeTier: () => 'page',
+        AIMS_DEFAULT_STACK: { framework: 'Next.js 16', styling: 'Tailwind CSS v4', animation: 'Motion v12', ui_components: 'shadcn/ui', deployment: 'Docker Compose' },
+      };
+    }
+  }
+  return _ntntnEngine;
+}
 
 // Vertical definitions: pure data (no gateway imports), loaded at runtime
 // to avoid tsconfig rootDir compilation issues with cross-boundary imports.
@@ -222,7 +242,9 @@ export class AcheevyOrchestrator {
 
       let routeResponse: AcheevyExecuteResponse | null = null;
 
-      if (routedTo.startsWith('plug-factory:')) {
+      if (routedTo === 'build:ntntn' || (routedTo === 'BUILD_PLUG' && getNtNtN().detectBuildIntent(req.message))) {
+        routeResponse = await this.handleNtNtNBuild(requestId, req);
+      } else if (routedTo.startsWith('plug-factory:')) {
         routeResponse = await this.handlePlugFabrication(requestId, req);
       } else if (routedTo === 'perform-stack') {
         routeResponse = await this.handlePerformStack(requestId, req);
@@ -702,6 +724,163 @@ export class AcheevyOrchestrator {
       },
       lucUsage: { service: 'spawn_shift', amount: 1 },
     };
+  }
+
+  /**
+   * NtNtN Build Pipeline: Detect creative build intent → classify stack → dispatch to Chicken Hawk
+   * → deploy result as a Plug instance.
+   *
+   * Flow: User describes → NtNtN classifies → Picker_Ang selects stack → Buildsmith constructs
+   * → Chicken Hawk verifies → ACHEEVY deploys as running Plug instance.
+   */
+  private async handleNtNtNBuild(
+    requestId: string,
+    req: AcheevyExecuteRequest
+  ): Promise<AcheevyExecuteResponse> {
+    const message = req.message;
+
+    // 1. NtNtN Classification: detect categories and techniques
+    const ntntn = getNtNtN();
+    const classifications = ntntn.classifyBuildIntent(message);
+    const scopeTier = ntntn.detectScopeTier(message);
+    const primaryCategory = classifications[0]?.category || 'frontend_frameworks';
+    const primaryAgent = classifications[0]?.primary_boomer_ang || 'Picker_Ang';
+    const techniques = classifications
+      .filter((c: any) => c.technique_group)
+      .map((c: any) => c.technique_group!);
+
+    logger.info(
+      { requestId, scopeTier, primaryCategory, primaryAgent, techniques, matches: classifications.length },
+      '[ACHEEVY] NtNtN build intent classified'
+    );
+
+    // 2. Emit LiveSim event for real-time feed
+    liveSim.emitAgentActivity('ACHEEVY', 'ntntn_classify', `Build intent detected: ${scopeTier} scope, ${primaryCategory} category`, {
+      classifications: classifications.map((c: any) => ({ category: c.category, agent: c.primary_boomer_ang })),
+      scopeTier,
+    });
+
+    // 3. Build stack recommendation
+    const stack: Record<string, string> = {
+      ...ntntn.AIMS_DEFAULT_STACK,
+      ...(primaryCategory === '3d_visual' ? { animation: 'Three.js + React Three Fiber' } : {}),
+      ...(primaryCategory === 'animation_motion' ? { animation: 'Motion v12 + GSAP' } : {}),
+    };
+
+    // 4. Build Chicken Hawk manifest for the build
+    const buildSteps = this.generateBuildSteps(scopeTier, primaryCategory, techniques, message);
+
+    liveSim.emitAgentActivity(primaryAgent, 'stack_select', `Selected stack: ${stack.framework} + ${stack.styling} + ${stack.animation}`, {
+      stack,
+      steps: buildSteps.length,
+    });
+
+    // 5. Dispatch to Chicken Hawk
+    try {
+      const manifest = buildManifest(requestId, 'fullstack', message, req.userId, {
+        ntntn: true,
+        scopeTier,
+        primaryCategory,
+        stack,
+        techniques,
+      });
+
+      const chResult = await dispatchToChickenHawk(manifest);
+
+      liveSim.emitAgentActivity('Chicken Hawk', 'build_dispatched', `Build manifest dispatched: ${chResult.manifestId}`, {
+        manifestId: chResult.manifestId,
+        shiftId: chResult.shiftId,
+      });
+
+      return {
+        requestId,
+        status: 'dispatched',
+        reply: `Build request classified and dispatched.\n\n` +
+          `**Scope:** ${scopeTier} | **Category:** ${primaryCategory.replace(/_/g, ' ')}\n` +
+          `**Stack:** ${stack.framework}, ${stack.styling}, ${stack.animation}\n` +
+          `**Steps:** ${buildSteps.length} build phases planned\n` +
+          `**Shift ID:** ${chResult.shiftId}\n\n` +
+          `${primaryAgent} selected the stack. Chicken Hawk is executing the build. ` +
+          `Track progress in Deploy Dock or the LiveSim feed.`,
+        data: {
+          ntntn: { scopeTier, primaryCategory, stack, techniques },
+          chickenhawk: chResult,
+          buildSteps,
+        },
+        lucUsage: { service: 'container_hours', amount: scopeTier === 'platform' ? 3 : scopeTier === 'application' ? 2 : 1 },
+        taskId: chResult.manifestId,
+      };
+    } catch (err) {
+      // Chicken Hawk offline — return build plan as reference
+      logger.warn({ requestId, err }, '[ACHEEVY] NtNtN: Chicken Hawk offline, returning build plan');
+
+      return {
+        requestId,
+        status: 'completed',
+        reply: `I've analyzed your build request and prepared a plan.\n\n` +
+          `**Scope:** ${scopeTier} | **Category:** ${primaryCategory.replace(/_/g, ' ')}\n` +
+          `**Recommended Stack:**\n` +
+          `- Framework: ${stack.framework}\n` +
+          `- Styling: ${stack.styling}\n` +
+          `- Animation: ${stack.animation}\n` +
+          `- UI: ${stack.ui_components}\n\n` +
+          `**Build Steps:**\n${buildSteps.map((s, i) => `${i + 1}. ${s}`).join('\n')}\n\n` +
+          `Chicken Hawk is currently offline. The build plan is ready — it will execute when the executor comes online.`,
+        data: {
+          ntntn: { scopeTier, primaryCategory, stack, techniques },
+          buildSteps,
+          status: 'plan_ready',
+        },
+      };
+    }
+  }
+
+  /** Generate build steps based on NtNtN classification */
+  private generateBuildSteps(
+    scopeTier: string,
+    category: string,
+    techniques: string[],
+    _message: string
+  ): string[] {
+    const steps: string[] = [];
+
+    // Always: scaffold + configure
+    const defaultStack = getNtNtN().AIMS_DEFAULT_STACK;
+    steps.push(`Scaffold ${scopeTier} project with ${defaultStack.framework}`);
+    steps.push(`Configure styling with ${defaultStack.styling}`);
+
+    // Category-specific steps
+    if (category === 'animation_motion' || techniques.length > 0) {
+      steps.push(`Implement animation layer: ${techniques.join(', ') || 'micro interactions'}`);
+    }
+    if (category === '3d_visual') {
+      steps.push('Set up Three.js scene with React Three Fiber');
+      steps.push('Add lighting, materials, and camera controls');
+    }
+    if (category === 'backend_fullstack') {
+      steps.push('Generate API routes and data models');
+      steps.push('Wire authentication and session management');
+    }
+    if (category === 'scroll_interaction') {
+      steps.push('Implement scroll-driven animations and viewport reveals');
+    }
+
+    // Common steps based on scope
+    if (scopeTier === 'application' || scopeTier === 'platform') {
+      steps.push('Build component library with shadcn/ui');
+      steps.push('Implement responsive layouts and mobile breakpoints');
+    }
+    if (scopeTier === 'platform') {
+      steps.push('Set up multi-tenant data isolation');
+      steps.push('Configure admin dashboard and monitoring');
+    }
+
+    // Always: verify and deploy
+    steps.push('Run ORACLE 8-gate verification');
+    steps.push('Generate Docker Compose for deployment');
+    steps.push('Deploy as Plug instance on AIMS VPS');
+
+    return steps;
   }
 
   /**

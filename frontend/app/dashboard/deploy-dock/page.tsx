@@ -150,6 +150,24 @@ interface PlugInstance {
   assignedPort: number;
   healthStatus: string;
   deliveryMode?: string;
+  uptimeSeconds?: number;
+  lastHealthCheck?: string;
+  createdAt?: string;
+}
+
+interface ServiceHealth {
+  name: string;
+  status: "up" | "down" | "degraded";
+  responseTime: number;
+  lastCheck: string;
+}
+
+interface CircuitDashboard {
+  overall: string;
+  uptimePercent: number;
+  services: ServiceHealth[];
+  plugInstances: { totalInstances: number; runningInstances: number; stoppedInstances: number; portCapacity: { used: number; total: number; percentage: number }; healthStats: { healthy: number; unhealthy: number; unknown: number } } | null;
+  historyPoints: number;
 }
 
 interface CatalogPlug {
@@ -599,14 +617,24 @@ export default function DeployDockPage() {
   const [instances, setInstances] = useState<PlugInstance[]>([]);
   const [selectedPlugId, setSelectedPlugId] = useState<string | null>(null);
   const [deploying, setDeploying] = useState(false);
+  const [circuitData, setCircuitData] = useState<CircuitDashboard | null>(null);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
 
-  // Load catalog and instances on mount
+  // Load catalog and instances on mount + auto-refresh
   useEffect(() => {
     fetchJSON<{ plugs: CatalogPlug[] }>("/api/plug-catalog")
       .then((data) => {
         if (data?.plugs) setCatalogPlugs(data.plugs.filter(p => !p.tags?.includes("coming-soon")));
       });
     loadInstances();
+    loadCircuitMetrics();
+
+    // Poll instances and circuit metrics every 15 seconds
+    const interval = setInterval(() => {
+      loadInstances();
+      loadCircuitMetrics();
+    }, 15_000);
+    return () => clearInterval(interval);
   }, []);
 
   const loadInstances = () => {
@@ -614,6 +642,43 @@ export default function DeployDockPage() {
       .then((data) => {
         if (data?.instances) setInstances(data.instances);
       });
+  };
+
+  const loadCircuitMetrics = () => {
+    fetchJSON<CircuitDashboard>("/api/circuit-metrics/dashboard")
+      .then((data) => {
+        if (data) setCircuitData(data);
+      });
+  };
+
+  const handleInstanceAction = async (instanceId: string, action: "stop" | "restart" | "decommission") => {
+    setActionLoading(instanceId);
+    try {
+      if (action === "decommission") {
+        await fetchJSON(`/api/plug-instances/${instanceId}`, { method: "DELETE" });
+      } else {
+        await fetchJSON(`/api/plug-instances/${instanceId}/${action}`, { method: "POST" });
+      }
+      addEvent({
+        stage: action === "decommission" ? "done" : "launch",
+        title: `Instance ${action === "stop" ? "Stopped" : action === "restart" ? "Restarted" : "Decommissioned"}`,
+        description: `Action: ${action} on ${instanceId}`,
+        agent: "ACHEEVY",
+      });
+      loadInstances();
+    } catch {
+      addEvent({ stage: "verify", title: "Action Failed", description: `Failed to ${action} instance ${instanceId}`, agent: "ACHEEVY" });
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const formatUptime = (seconds?: number) => {
+    if (!seconds) return "—";
+    if (seconds < 60) return `${seconds}s`;
+    if (seconds < 3600) return `${Math.floor(seconds / 60)}m`;
+    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ${Math.floor((seconds % 3600) / 60)}m`;
+    return `${Math.floor(seconds / 86400)}d ${Math.floor((seconds % 86400) / 3600)}h`;
   };
 
   const triggerParticles = () => {
@@ -696,7 +761,7 @@ export default function DeployDockPage() {
       deploymentId?: string;
       events?: Array<{ stage: string; message: string; timestamp: string }>;
       error?: string;
-    }>("/api/plug-catalog", {
+    }>("/api/plug-instances/spin-up", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -864,35 +929,113 @@ export default function DeployDockPage() {
                   </>
                 )}
 
+                {/* Platform Health Strip */}
+                {circuitData && (
+                  <div className="mt-6 rounded-2xl border border-wireframe-stroke bg-[#0A0A0A]/60 p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className={`h-2 w-2 rounded-full ${circuitData.overall === "healthy" ? "bg-emerald-400" : "bg-amber-400"} animate-pulse`} />
+                      <span className="text-[10px] text-white/40 uppercase tracking-wider font-semibold">Platform Health</span>
+                      <span className="ml-auto text-[10px] text-white/30 font-mono">{circuitData.uptimePercent}% uptime</span>
+                    </div>
+                    <div className="grid grid-cols-4 gap-2">
+                      {circuitData.services?.slice(0, 4).map((svc) => (
+                        <div key={svc.name} className="text-center p-2 rounded-lg bg-white/5 border border-wireframe-stroke">
+                          <div className={`h-1.5 w-1.5 rounded-full mx-auto mb-1 ${svc.status === "up" ? "bg-emerald-400" : svc.status === "degraded" ? "bg-amber-400" : "bg-red-400"}`} />
+                          <p className="text-[9px] text-white/50 truncate">{svc.name}</p>
+                          <p className="text-[9px] text-white/30 font-mono">{svc.responseTime}ms</p>
+                        </div>
+                      ))}
+                    </div>
+                    {circuitData.plugInstances && (
+                      <div className="flex items-center gap-4 mt-3 text-[10px] text-white/40 font-mono">
+                        <span>{circuitData.plugInstances.runningInstances} running</span>
+                        <span className="text-white/10">|</span>
+                        <span>{circuitData.plugInstances.healthStats.healthy} healthy</span>
+                        <span className="text-white/10">|</span>
+                        <span>Ports: {circuitData.plugInstances.portCapacity.used}/{circuitData.plugInstances.portCapacity.total} ({circuitData.plugInstances.portCapacity.percentage}%)</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 {/* Running Instances */}
                 {instances.length > 0 && (
                   <>
-                    <div className="mt-6">
-                      <h2 className="text-sm font-semibold uppercase tracking-widest text-white/80">
-                        Running Instances
-                      </h2>
-                      <p className="text-xs text-white/40 mt-1">
-                        {instances.length} instance{instances.length !== 1 ? "s" : ""} active
-                      </p>
+                    <div className="mt-6 flex items-center justify-between">
+                      <div>
+                        <h2 className="text-sm font-semibold uppercase tracking-widest text-white/80">
+                          Running Instances
+                        </h2>
+                        <p className="text-xs text-white/40 mt-1">
+                          {instances.length} instance{instances.length !== 1 ? "s" : ""} managed
+                        </p>
+                      </div>
+                      <button onClick={loadInstances} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 text-white/40 text-[10px] font-semibold uppercase tracking-wider hover:bg-white/10 transition-colors">
+                        <RefreshCw size={10} /> Refresh
+                      </button>
                     </div>
                     <div className="grid gap-3 sm:grid-cols-2">
-                      {instances.map((inst) => (
-                        <div
-                          key={inst.instanceId}
-                          className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-4"
-                        >
-                          <div className="flex items-center gap-2 mb-1">
-                            <div className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                            <p className="text-sm font-semibold text-white">{inst.name || inst.plugId}</p>
+                      {instances.map((inst) => {
+                        const isRunning = inst.status === "running";
+                        const statusColor = isRunning
+                          ? "border-emerald-500/20 bg-emerald-500/5"
+                          : inst.status === "stopped"
+                          ? "border-red-500/20 bg-red-500/5"
+                          : "border-amber-500/20 bg-amber-500/5";
+                        const healthColor = inst.healthStatus === "healthy" ? "text-emerald-400" : inst.healthStatus === "unhealthy" ? "text-red-400" : "text-amber-400";
+
+                        return (
+                          <div key={inst.instanceId} className={`rounded-2xl border p-4 ${statusColor}`}>
+                            <div className="flex items-center gap-2 mb-2">
+                              <div className={`h-2 w-2 rounded-full ${isRunning ? "bg-emerald-400 animate-pulse" : "bg-red-400"}`} />
+                              <p className="text-sm font-semibold text-white truncate flex-1">{inst.name || inst.plugId}</p>
+                            </div>
+                            <div className="space-y-1 mb-3">
+                              <p className="text-[10px] text-white/40 font-mono">
+                                Port {inst.assignedPort} · {inst.status} · <span className={healthColor}>{inst.healthStatus || "checking"}</span>
+                              </p>
+                              <p className="text-[10px] text-white/30 font-mono">
+                                Uptime: {formatUptime(inst.uptimeSeconds)} · Plug: {inst.plugId}
+                              </p>
+                            </div>
+                            <div className="flex gap-1.5">
+                              {isRunning ? (
+                                <>
+                                  <button
+                                    onClick={() => handleInstanceAction(inst.instanceId, "stop")}
+                                    disabled={actionLoading === inst.instanceId}
+                                    className="flex-1 py-1.5 rounded-lg bg-amber-500/10 text-amber-400 text-[9px] font-semibold uppercase tracking-wider hover:bg-amber-500/20 transition-colors disabled:opacity-30"
+                                  >
+                                    Stop
+                                  </button>
+                                  <button
+                                    onClick={() => handleInstanceAction(inst.instanceId, "restart")}
+                                    disabled={actionLoading === inst.instanceId}
+                                    className="flex-1 py-1.5 rounded-lg bg-cyan-500/10 text-cyan-400 text-[9px] font-semibold uppercase tracking-wider hover:bg-cyan-500/20 transition-colors disabled:opacity-30"
+                                  >
+                                    Restart
+                                  </button>
+                                </>
+                              ) : (
+                                <button
+                                  onClick={() => handleInstanceAction(inst.instanceId, "restart")}
+                                  disabled={actionLoading === inst.instanceId}
+                                  className="flex-1 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 text-[9px] font-semibold uppercase tracking-wider hover:bg-emerald-500/20 transition-colors disabled:opacity-30"
+                                >
+                                  Start
+                                </button>
+                              )}
+                              <button
+                                onClick={() => handleInstanceAction(inst.instanceId, "decommission")}
+                                disabled={actionLoading === inst.instanceId}
+                                className="py-1.5 px-2 rounded-lg bg-red-500/10 text-red-400 text-[9px] font-semibold uppercase tracking-wider hover:bg-red-500/20 transition-colors disabled:opacity-30"
+                              >
+                                ×
+                              </button>
+                            </div>
                           </div>
-                          <p className="text-[10px] text-white/40 font-mono">
-                            Port {inst.assignedPort} · {inst.status} ·{" "}
-                            <span className={inst.healthStatus === "healthy" ? "text-emerald-400" : "text-amber-400"}>
-                              {inst.healthStatus || "checking"}
-                            </span>
-                          </p>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </>
                 )}

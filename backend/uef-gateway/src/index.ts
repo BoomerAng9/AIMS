@@ -57,6 +57,7 @@ import { cloudflareRouter, markdownForAgents } from './cloudflare';
 import { paymentsRouter } from './payments';
 import { normalizeInput, getDialectStats, SLANG_ENTRY_COUNT, INTENT_PHRASE_COUNT } from './nlp';
 import { videoRouter } from './video';
+import { liveSim } from './livesim';
 import logger from './logger';
 
 // Custom Lil_Hawks — User-Created Bots
@@ -2045,6 +2046,49 @@ app.use(shelfRouter);
 app.use('/api', plugRouter);
 
 // --------------------------------------------------------------------------
+// Circuit Metrics Proxy — Forward to circuit-metrics container
+// --------------------------------------------------------------------------
+const CIRCUIT_METRICS_URL = process.env.CIRCUIT_METRICS_URL || 'http://circuit-metrics:9090';
+
+app.get('/api/circuit-metrics/:path(*)', async (req, res) => {
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+    const upstream = await fetch(`${CIRCUIT_METRICS_URL}/${req.params.path}`, {
+      signal: controller.signal,
+    });
+    clearTimeout(timeout);
+    const data = await upstream.json();
+    res.status(upstream.status).json(data);
+  } catch (err) {
+    res.status(502).json({ error: 'Circuit Metrics unreachable', detail: err instanceof Error ? err.message : 'unknown' });
+  }
+});
+
+// --------------------------------------------------------------------------
+// LiveSim — Real-Time Agent Feed REST Endpoints
+// --------------------------------------------------------------------------
+
+app.get('/api/livesim/stats', (_req, res) => {
+  res.json(liveSim.getStats());
+});
+
+app.get('/api/livesim/events', (req, res) => {
+  const limit = parseInt(req.query.limit as string) || 50;
+  res.json({ events: liveSim.getRecentEvents(limit) });
+});
+
+app.post('/api/livesim/emit', (req, res) => {
+  const { type, room, data } = req.body;
+  if (!type || !room) {
+    res.status(400).json({ error: 'type and room are required' });
+    return;
+  }
+  liveSim.broadcast({ type, room, data: data || {} });
+  res.json({ emitted: true });
+});
+
+// --------------------------------------------------------------------------
 // LUC Project Service — Pricing & Effort Oracle
 // --------------------------------------------------------------------------
 app.post('/luc/project', async (req, res) => {
@@ -2384,6 +2428,51 @@ app.get('/observability/metrics', (_req, res) => {
 app.get('/observability/metrics/prometheus', (_req, res) => {
   res.set('Content-Type', 'text/plain; version=0.0.4; charset=utf-8');
   res.send(metricsExporter.exportPrometheus());
+});
+
+// Per-tenant observability: instance alerts and health for a specific user
+app.get('/observability/tenant/:userId', (req, res) => {
+  const userId = req.params.userId;
+
+  // Get user's instances
+  const { plugDeployEngine: deployEngine } = require('./plug-catalog/deploy-engine');
+  const instances = deployEngine.listByUser(userId);
+
+  // Filter alerts relevant to this user's instances
+  const instanceIds = instances.map((i: any) => i.instanceId);
+  const allActive = alertEngine.getActiveAlerts();
+  const allHistory = alertEngine.getAlertHistory(100);
+
+  const tenantAlerts = allActive.filter((a: any) =>
+    instanceIds.some((id: string) => a.metric.includes(id))
+  );
+  const tenantHistory = allHistory.filter((a: any) =>
+    instanceIds.some((id: string) => a.metric.includes(id))
+  );
+
+  // Aggregate health stats for this tenant
+  const healthSummary = {
+    total: instances.length,
+    healthy: instances.filter((i: any) => i.healthStatus === 'healthy').length,
+    unhealthy: instances.filter((i: any) => i.healthStatus === 'unhealthy').length,
+    unknown: instances.filter((i: any) => !i.healthStatus || i.healthStatus === 'unknown').length,
+  };
+
+  res.json({
+    userId,
+    instances: instances.map((i: any) => ({
+      instanceId: i.instanceId,
+      plugId: i.plugId,
+      name: i.name,
+      status: i.status,
+      healthStatus: i.healthStatus,
+      uptimeSeconds: i.uptimeSeconds,
+      lastHealthCheck: i.lastHealthCheck,
+    })),
+    healthSummary,
+    activeAlerts: tenantAlerts,
+    alertHistory: tenantHistory,
+  });
 });
 
 // --------------------------------------------------------------------------
@@ -3061,6 +3150,10 @@ async function startServer(): Promise<void> {
 }
 
 export const server = require('http').createServer(app);
+
+// Attach LiveSim WebSocket to the HTTP server
+liveSim.attach(server);
+
 startServer();
 
 // --------------------------------------------------------------------------

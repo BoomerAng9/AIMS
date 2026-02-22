@@ -27,6 +27,8 @@ import { plugDeployEngine } from './deploy-engine';
 import { plugCatalog } from './catalog';
 import { cloudflare } from '../cloudflare/client';
 import { kvSync } from './kv-sync';
+import { alertEngine } from '../observability';
+import { liveSim } from '../livesim';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -101,11 +103,44 @@ export class InstanceLifecycle {
       if (instance) {
         instance.healthStatus = healthStatus;
         instance.lastHealthCheck = new Date().toISOString();
+
+        // Wire to observability: evaluate alerts per instance
+        const metricName = `instance.${instanceId}.health`;
+        alertEngine.evaluate(metricName, healthStatus === 'healthy' ? 1 : 0);
+
+        // Wire to LiveSim: broadcast health status changes
+        liveSim.emitDeployEvent(instanceId, 'health', `Instance ${instanceId} is now ${healthStatus}`, {
+          plugId: instance.plugId,
+          userId: instance.userId,
+          healthStatus,
+        });
+
+        // Aggregate metric: total unhealthy instances
+        const allInstances = portAllocator.getAllocations();
+        let unhealthyCount = 0;
+        for (const alloc of allInstances) {
+          const inst = plugDeployEngine.getInstance(alloc.instanceId);
+          if (inst?.healthStatus === 'unhealthy') unhealthyCount++;
+        }
+        alertEngine.evaluate('plug_instances_unhealthy', unhealthyCount);
       }
     });
 
     healthMonitor.onRestart(async (instanceId) => {
       await plugDeployEngine.restartInstance(instanceId);
+      liveSim.emitAgentActivity('HealthMonitor', 'auto_restart', `Auto-restarted instance ${instanceId}`);
+    });
+
+    // Register per-instance alert templates
+    alertEngine.defineAlert({
+      id: 'plug-instances-unhealthy',
+      name: 'Unhealthy Plug Instances',
+      metric: 'plug_instances_unhealthy',
+      condition: 'gt',
+      threshold: 0,
+      window: 60,
+      severity: 'warning',
+      channel: 'log',
     });
 
     // Start health monitoring

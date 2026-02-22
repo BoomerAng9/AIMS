@@ -290,6 +290,219 @@ app.get('/metrics/plugs', async (_req: Request, res: Response) => {
   res.send(metrics);
 });
 
+// ---------------------------------------------------------------------------
+// Per-Container Resource Stats via Docker Socket
+// ---------------------------------------------------------------------------
+
+import http from 'http';
+
+function dockerGet(path: string): Promise<any> {
+  return new Promise((resolve, reject) => {
+    const options: http.RequestOptions = {
+      socketPath: '/var/run/docker.sock',
+      path,
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    };
+    const req = http.request(options, (res) => {
+      let data = '';
+      res.on('data', (chunk) => { data += chunk; });
+      res.on('end', () => {
+        try { resolve(JSON.parse(data)); } catch { resolve(null); }
+      });
+    });
+    req.on('error', reject);
+    req.setTimeout(5000, () => { req.destroy(); reject(new Error('Docker socket timeout')); });
+    req.end();
+  });
+}
+
+interface ContainerStats {
+  id: string;
+  name: string;
+  status: string;
+  state: string;
+  image: string;
+  cpuPercent: number;
+  memoryUsageMb: number;
+  memoryLimitMb: number;
+  memoryPercent: number;
+  networkRxMb: number;
+  networkTxMb: number;
+  pids: number;
+  uptime: string;
+}
+
+function parseDockerStats(stats: any, containerName: string, containerInfo: any): ContainerStats {
+  // CPU percentage calculation
+  const cpuDelta = (stats.cpu_stats?.cpu_usage?.total_usage || 0) - (stats.precpu_stats?.cpu_usage?.total_usage || 0);
+  const systemDelta = (stats.cpu_stats?.system_cpu_usage || 0) - (stats.precpu_stats?.system_cpu_usage || 0);
+  const numCpus = stats.cpu_stats?.online_cpus || stats.cpu_stats?.cpu_usage?.percpu_usage?.length || 1;
+  const cpuPercent = systemDelta > 0 ? (cpuDelta / systemDelta) * numCpus * 100 : 0;
+
+  // Memory
+  const memUsage = stats.memory_stats?.usage || 0;
+  const memLimit = stats.memory_stats?.limit || 0;
+  const memCache = stats.memory_stats?.stats?.cache || 0;
+  const actualMem = memUsage - memCache;
+
+  // Network
+  let rxBytes = 0, txBytes = 0;
+  if (stats.networks) {
+    for (const iface of Object.values(stats.networks) as any[]) {
+      rxBytes += iface.rx_bytes || 0;
+      txBytes += iface.tx_bytes || 0;
+    }
+  }
+
+  return {
+    id: containerInfo.Id?.substring(0, 12) || '',
+    name: containerName.replace(/^\//, ''),
+    status: containerInfo.Status || '',
+    state: containerInfo.State || '',
+    image: containerInfo.Image || '',
+    cpuPercent: Math.round(cpuPercent * 100) / 100,
+    memoryUsageMb: Math.round((actualMem / 1024 / 1024) * 10) / 10,
+    memoryLimitMb: Math.round((memLimit / 1024 / 1024) * 10) / 10,
+    memoryPercent: memLimit > 0 ? Math.round((actualMem / memLimit) * 10000) / 100 : 0,
+    networkRxMb: Math.round((rxBytes / 1024 / 1024) * 100) / 100,
+    networkTxMb: Math.round((txBytes / 1024 / 1024) * 100) / 100,
+    pids: stats.pids_stats?.current || 0,
+    uptime: containerInfo.Status || '',
+  };
+}
+
+// Cache for container stats (refreshed on request)
+let containerStatsCache: ContainerStats[] = [];
+let containerStatsCacheTime = 0;
+const STATS_CACHE_TTL = 10_000; // 10 seconds
+
+async function collectContainerStats(): Promise<ContainerStats[]> {
+  const now = Date.now();
+  if (now - containerStatsCacheTime < STATS_CACHE_TTL && containerStatsCache.length > 0) {
+    return containerStatsCache;
+  }
+
+  try {
+    const containers = await dockerGet('/containers/json?all=true');
+    if (!Array.isArray(containers)) return [];
+
+    const results: ContainerStats[] = [];
+    // Collect stats in parallel (limit concurrency to 5)
+    const batches = [];
+    for (let i = 0; i < containers.length; i += 5) {
+      batches.push(containers.slice(i, i + 5));
+    }
+
+    for (const batch of batches) {
+      const batchResults = await Promise.allSettled(
+        batch.map(async (c: any) => {
+          if (c.State !== 'running') {
+            return {
+              id: c.Id?.substring(0, 12) || '',
+              name: (c.Names?.[0] || '').replace(/^\//, ''),
+              status: c.Status || '',
+              state: c.State || '',
+              image: c.Image || '',
+              cpuPercent: 0,
+              memoryUsageMb: 0,
+              memoryLimitMb: 0,
+              memoryPercent: 0,
+              networkRxMb: 0,
+              networkTxMb: 0,
+              pids: 0,
+              uptime: c.Status || '',
+            } as ContainerStats;
+          }
+          const stats = await dockerGet(`/containers/${c.Id}/stats?stream=false`);
+          return parseDockerStats(stats, c.Names?.[0] || '', c);
+        })
+      );
+      for (const r of batchResults) {
+        if (r.status === 'fulfilled' && r.value) results.push(r.value);
+      }
+    }
+
+    containerStatsCache = results;
+    containerStatsCacheTime = now;
+    return results;
+  } catch (err) {
+    console.error('[Circuit Metrics] Docker stats collection failed:', err);
+    return containerStatsCache; // Return stale cache on error
+  }
+}
+
+// All container resource stats
+app.get('/containers/stats', async (_req: Request, res: Response) => {
+  try {
+    const stats = await collectContainerStats();
+    const totalCpu = stats.reduce((s, c) => s + c.cpuPercent, 0);
+    const totalMem = stats.reduce((s, c) => s + c.memoryUsageMb, 0);
+    const running = stats.filter(c => c.state === 'running').length;
+
+    res.json({
+      containers: stats,
+      summary: {
+        total: stats.length,
+        running,
+        stopped: stats.length - running,
+        totalCpuPercent: Math.round(totalCpu * 100) / 100,
+        totalMemoryMb: Math.round(totalMem * 10) / 10,
+      },
+      timestamp: new Date().toISOString(),
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to collect container stats' });
+  }
+});
+
+// Single container stats
+app.get('/containers/:id/stats', async (req: Request, res: Response) => {
+  try {
+    const stats = await collectContainerStats();
+    const container = stats.find(c => c.id === req.params.id || c.name === req.params.id);
+    if (!container) {
+      return res.status(404).json({ error: 'Container not found' });
+    }
+    res.json(container);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to get container stats' });
+  }
+});
+
+// Prometheus metrics for container resources
+app.get('/metrics/containers', async (_req: Request, res: Response) => {
+  const stats = await collectContainerStats();
+  let metrics = '';
+
+  metrics += '# HELP aims_container_cpu_percent Container CPU usage percentage\n';
+  metrics += '# TYPE aims_container_cpu_percent gauge\n';
+  for (const c of stats) {
+    metrics += `aims_container_cpu_percent{container="${c.name}"} ${c.cpuPercent}\n`;
+  }
+
+  metrics += '\n# HELP aims_container_memory_mb Container memory usage in MB\n';
+  metrics += '# TYPE aims_container_memory_mb gauge\n';
+  for (const c of stats) {
+    metrics += `aims_container_memory_mb{container="${c.name}"} ${c.memoryUsageMb}\n`;
+  }
+
+  metrics += '\n# HELP aims_container_memory_percent Container memory usage percentage\n';
+  metrics += '# TYPE aims_container_memory_percent gauge\n';
+  for (const c of stats) {
+    metrics += `aims_container_memory_percent{container="${c.name}"} ${c.memoryPercent}\n`;
+  }
+
+  metrics += '\n# HELP aims_container_pids Container process count\n';
+  metrics += '# TYPE aims_container_pids gauge\n';
+  for (const c of stats) {
+    metrics += `aims_container_pids{container="${c.name}"} ${c.pids}\n`;
+  }
+
+  res.set('Content-Type', 'text/plain');
+  res.send(metrics);
+});
+
 // Individual service status
 app.get('/status/:service', async (req: Request, res: Response) => {
   const { service } = req.params;
