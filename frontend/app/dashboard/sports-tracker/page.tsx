@@ -84,18 +84,64 @@ export default function SportsTrackerPage() {
 
   // Player loads when user searches — no auto-load
 
+  const [searchError, setSearchError] = useState<string | null>(null);
+
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!searchQuery.trim()) return;
 
     setIsSearching(true);
     setShowStats(false);
+    setSearchError(null);
 
-    // TODO: Call Brave Search API to fetch real player data
-    // For now, search is a no-op until the API is connected
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    try {
+      const res = await fetch('/api/sports/tracker', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ playerName: searchQuery.trim() }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: 'Search failed' }));
+        setSearchError(err.error || `Search failed (${res.status})`);
+        setIsSearching(false);
+        return;
+      }
+
+      const data = await res.json();
+
+      if (data.player) {
+        setPlayer({
+          name: data.player.name || searchQuery,
+          position: data.player.position || 'Unknown',
+          team: data.player.team || 'Unknown',
+          number: data.player.jerseyNumber || 0,
+          class: data.player.class || '—',
+          height: data.player.height || '—',
+          weight: data.player.weight || 0,
+          hometown: data.player.hometown || '—',
+          imageUrl: data.player.imageUrl,
+          stats: {
+            gamesPlayed: data.nixieStats?.gamesPlayed || 0,
+            gamesStarted: data.nixieStats?.gamesStarted || 0,
+            tackles: data.nixieStats?.tackles || 0,
+            interceptions: data.nixieStats?.interceptions || 0,
+            passesDefended: data.nixieStats?.passesDefended || 0,
+            forcedFumbles: 0,
+          },
+          injuryGames: data.nixieStats?.injuryGames || 0,
+          seasons: data.careerStats?.length || 1,
+        });
+        setShowStats(true);
+      } else {
+        setSearchError('No player data found. Try a more specific search (e.g., "R.J. Johnson CU Buffs").');
+      }
+    } catch (err) {
+      console.error('Sports tracker search failed:', err);
+      setSearchError('Network error — could not reach search API.');
+    }
+
     setIsSearching(false);
-    // setPlayer(result) and setShowStats(true) when API returns data
   };
 
   const nixieStats = player ? [
@@ -364,7 +410,26 @@ export default function SportsTrackerPage() {
         {isSearching && (
           <div className="flex flex-col items-center justify-center py-20">
             <div className="w-16 h-16 border-4 border-gold/30 border-t-gold rounded-full animate-spin mb-4" />
-            <p className="text-white/40">Searching player database...</p>
+            <p className="text-white/40">Searching via Brave Search + AI extraction...</p>
+          </div>
+        )}
+
+        {/* Error State */}
+        {searchError && !isSearching && (
+          <div className="flex flex-col items-center justify-center py-12">
+            <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-center max-w-md">
+              <p className="text-red-400 font-medium mb-1">Search Error</p>
+              <p className="text-red-400/60 text-sm">{searchError}</p>
+            </div>
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!player && !isSearching && !searchError && (
+          <div className="flex flex-col items-center justify-center py-20">
+            <UserIcon className="w-16 h-16 text-white/10 mb-4" />
+            <p className="text-white/30 text-lg">Search for a player to begin tracking</p>
+            <p className="text-white/15 text-sm mt-1">Try: &ldquo;R.J. Johnson CU Buffs&rdquo; or &ldquo;Travis Hunter Colorado&rdquo;</p>
           </div>
         )}
       </div>
