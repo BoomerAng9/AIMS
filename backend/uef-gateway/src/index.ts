@@ -52,11 +52,14 @@ import { ossModels } from './llm/oss-models';
 import { personaplex } from './llm/personaplex';
 import { N8nClient } from './n8n';
 import { plugRouter } from './plug-catalog/router';
-import { instanceLifecycle } from './plug-catalog';
+import { instanceLifecycle, autoScaler, cdnDeploy, tenantNetworks } from './plug-catalog';
+import { dispatchChickenHawkBuild } from './agents/cloudrun-dispatcher';
+import { triggerVerticalWorkflow } from './n8n/client';
 import { cloudflareRouter, markdownForAgents } from './cloudflare';
 import { paymentsRouter } from './payments';
 import { normalizeInput, getDialectStats, SLANG_ENTRY_COUNT, INTENT_PHRASE_COUNT } from './nlp';
 import { videoRouter } from './video';
+import { liveSim } from './livesim';
 import logger from './logger';
 
 // Custom Lil_Hawks — User-Created Bots
@@ -2045,6 +2048,221 @@ app.use(shelfRouter);
 app.use('/api', plugRouter);
 
 // --------------------------------------------------------------------------
+// Circuit Metrics Proxy — Forward to circuit-metrics container
+// --------------------------------------------------------------------------
+const CIRCUIT_METRICS_URL = process.env.CIRCUIT_METRICS_URL || 'http://circuit-metrics:9090';
+
+app.get('/api/circuit-metrics/:path(*)', async (req, res) => {
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+    const upstream = await fetch(`${CIRCUIT_METRICS_URL}/${req.params.path}`, {
+      signal: controller.signal,
+    });
+    clearTimeout(timeout);
+    const data = await upstream.json();
+    res.status(upstream.status).json(data);
+  } catch (err) {
+    res.status(502).json({ error: 'Circuit Metrics unreachable', detail: err instanceof Error ? err.message : 'unknown' });
+  }
+});
+
+// --------------------------------------------------------------------------
+// LiveSim — Real-Time Agent Feed REST Endpoints
+// --------------------------------------------------------------------------
+
+app.get('/api/livesim/stats', (_req, res) => {
+  res.json(liveSim.getStats());
+});
+
+app.get('/api/livesim/events', (req, res) => {
+  const limit = parseInt(req.query.limit as string) || 50;
+  res.json({ events: liveSim.getRecentEvents(limit) });
+});
+
+app.post('/api/livesim/emit', (req, res) => {
+  const { type, room, data } = req.body;
+  if (!type || !room) {
+    res.status(400).json({ error: 'type and room are required' });
+    return;
+  }
+  liveSim.broadcast({ type, room, data: data || {} });
+  res.json({ emitted: true });
+});
+
+/**
+ * SSE stream endpoint for the frontend LiveSim page.
+ * Clients connect via EventSource and receive real-time agent events.
+ * The frontend expects `data: JSON` per SSE spec.
+ */
+app.get('/api/livesim/stream', (req, res) => {
+  const sessionId = req.query.sessionId as string;
+
+  // Set up SSE headers
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.setHeader('X-Accel-Buffering', 'no'); // Disable nginx buffering
+  res.flushHeaders();
+
+  // Send initial connection event
+  res.write(`data: ${JSON.stringify({ id: Date.now().toString(), type: 'coordination', agent: 'ACHEEVY', content: 'LiveSim connected — streaming real-time events', timestamp: new Date().toISOString() })}\n\n`);
+
+  // Poll recent events and send new ones as SSE
+  let lastSeen = 0;
+  const pollInterval = setInterval(() => {
+    const events = liveSim.getRecentEvents(20);
+    const newEvents = events.filter((_, i) => i >= lastSeen);
+    for (const evt of newEvents) {
+      // Map LiveSim events to the frontend's SimLogEntry format
+      const logEntry = {
+        id: evt.timestamp,
+        type: evt.type === 'agent_activity' ? 'action' :
+              evt.type === 'deploy_event' ? 'result' :
+              evt.type === 'health_update' ? 'coordination' :
+              evt.type === 'vertical_step' ? 'thought' : 'coordination',
+        agent: (evt.data as any).agent || 'ACHEEVY',
+        content: (evt.data as any).detail || (evt.data as any).message || JSON.stringify(evt.data),
+        timestamp: evt.timestamp,
+        sessionId,
+      };
+      res.write(`data: ${JSON.stringify(logEntry)}\n\n`);
+    }
+    lastSeen = events.length;
+  }, 2000);
+
+  // Heartbeat to keep connection alive
+  const heartbeat = setInterval(() => {
+    res.write(': heartbeat\n\n');
+  }, 15000);
+
+  // Clean up on disconnect
+  req.on('close', () => {
+    clearInterval(pollInterval);
+    clearInterval(heartbeat);
+  });
+});
+
+// --------------------------------------------------------------------------
+// Auto-Scaler — Horizontal & Vertical Scaling for Plug Instances
+// --------------------------------------------------------------------------
+
+app.get('/api/autoscaler/stats', (_req, res) => {
+  res.json(autoScaler.getStats());
+});
+
+app.post('/api/autoscaler/policy', (req, res) => {
+  const { instanceId, ...policy } = req.body;
+  if (!instanceId) {
+    res.status(400).json({ error: 'instanceId required' });
+    return;
+  }
+  const result = autoScaler.setPolicy(instanceId, policy);
+  res.json({ policy: result });
+});
+
+app.post('/api/autoscaler/tier', (req, res) => {
+  const { instanceId, tier } = req.body;
+  if (!instanceId || !tier) {
+    res.status(400).json({ error: 'instanceId and tier required' });
+    return;
+  }
+  const result = autoScaler.applyTierLimits(instanceId, tier);
+  res.json({ policy: result });
+});
+
+app.delete('/api/autoscaler/policy/:instanceId', (req, res) => {
+  autoScaler.removePolicy(req.params.instanceId);
+  res.json({ removed: true });
+});
+
+// --------------------------------------------------------------------------
+// CDN Deploy — Static Site Hosting Pipeline
+// --------------------------------------------------------------------------
+
+app.post('/api/cdn/deploy', async (req, res) => {
+  const { projectId, userId, projectName, files, customDomain, paywallEnabled } = req.body;
+  if (!projectId || !userId || !projectName || !files) {
+    res.status(400).json({ error: 'Missing required fields: projectId, userId, projectName, files' });
+    return;
+  }
+  try {
+    const result = await cdnDeploy.deploy({ projectId, userId, projectName, files, customDomain, paywallEnabled });
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err instanceof Error ? err.message : 'Deploy failed' });
+  }
+});
+
+app.get('/api/cdn/deployments', (_req, res) => {
+  res.json({ deployments: cdnDeploy.listDeployments() });
+});
+
+app.get('/api/cdn/deployments/:slug', (req, res) => {
+  const deployment = cdnDeploy.getDeployment(req.params.slug);
+  if (!deployment) {
+    res.status(404).json({ error: 'Deployment not found' });
+    return;
+  }
+  res.json(deployment);
+});
+
+app.delete('/api/cdn/deployments/:slug', async (req, res) => {
+  const result = await cdnDeploy.decommission(req.params.slug);
+  res.json(result);
+});
+
+// --------------------------------------------------------------------------
+// Cloud Run Dispatcher — Chicken Hawk Build Jobs
+// --------------------------------------------------------------------------
+
+app.post('/api/cloudrun/dispatch', async (req, res) => {
+  const { taskId, manifestUrl, preferService } = req.body;
+  if (!taskId) {
+    res.status(400).json({ error: 'taskId required' });
+    return;
+  }
+  try {
+    const result = await dispatchChickenHawkBuild(taskId, manifestUrl, preferService);
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err instanceof Error ? err.message : 'Dispatch failed' });
+  }
+});
+
+// --------------------------------------------------------------------------
+// Tenant Network Isolation — Per-User Docker Networks
+// --------------------------------------------------------------------------
+
+app.get('/api/tenant-networks', async (_req, res) => {
+  const networks = await tenantNetworks.listTenantNetworks();
+  res.json({ networks });
+});
+
+// --------------------------------------------------------------------------
+// Vertical Workflow Triggers — n8n Integration
+// --------------------------------------------------------------------------
+
+app.post('/api/vertical/trigger', async (req, res) => {
+  const { verticalId, userId, collectedData, sessionId } = req.body;
+  if (!verticalId || !userId) {
+    res.status(400).json({ error: 'verticalId and userId required' });
+    return;
+  }
+  try {
+    const result = await triggerVerticalWorkflow({
+      verticalId,
+      userId,
+      collectedData: collectedData || {},
+      sessionId,
+    });
+    res.json(result);
+  } catch (err) {
+    res.status(502).json({ error: err instanceof Error ? err.message : 'Workflow trigger failed' });
+  }
+});
+
+// --------------------------------------------------------------------------
 // LUC Project Service — Pricing & Effort Oracle
 // --------------------------------------------------------------------------
 app.post('/luc/project', async (req, res) => {
@@ -2384,6 +2602,51 @@ app.get('/observability/metrics', (_req, res) => {
 app.get('/observability/metrics/prometheus', (_req, res) => {
   res.set('Content-Type', 'text/plain; version=0.0.4; charset=utf-8');
   res.send(metricsExporter.exportPrometheus());
+});
+
+// Per-tenant observability: instance alerts and health for a specific user
+app.get('/observability/tenant/:userId', (req, res) => {
+  const userId = req.params.userId;
+
+  // Get user's instances
+  const { plugDeployEngine: deployEngine } = require('./plug-catalog/deploy-engine');
+  const instances = deployEngine.listByUser(userId);
+
+  // Filter alerts relevant to this user's instances
+  const instanceIds = instances.map((i: any) => i.instanceId);
+  const allActive = alertEngine.getActiveAlerts();
+  const allHistory = alertEngine.getAlertHistory(100);
+
+  const tenantAlerts = allActive.filter((a: any) =>
+    instanceIds.some((id: string) => a.metric.includes(id))
+  );
+  const tenantHistory = allHistory.filter((a: any) =>
+    instanceIds.some((id: string) => a.metric.includes(id))
+  );
+
+  // Aggregate health stats for this tenant
+  const healthSummary = {
+    total: instances.length,
+    healthy: instances.filter((i: any) => i.healthStatus === 'healthy').length,
+    unhealthy: instances.filter((i: any) => i.healthStatus === 'unhealthy').length,
+    unknown: instances.filter((i: any) => !i.healthStatus || i.healthStatus === 'unknown').length,
+  };
+
+  res.json({
+    userId,
+    instances: instances.map((i: any) => ({
+      instanceId: i.instanceId,
+      plugId: i.plugId,
+      name: i.name,
+      status: i.status,
+      healthStatus: i.healthStatus,
+      uptimeSeconds: i.uptimeSeconds,
+      lastHealthCheck: i.lastHealthCheck,
+    })),
+    healthSummary,
+    activeAlerts: tenantAlerts,
+    alertHistory: tenantHistory,
+  });
 });
 
 // --------------------------------------------------------------------------
@@ -3034,7 +3297,8 @@ async function startServer(): Promise<void> {
   // starts background health sweeps, and reconciles with Docker state.
   try {
     await instanceLifecycle.initialize();
-    logger.info('[UEF] Instance lifecycle initialized — health monitor running');
+    autoScaler.start(60000); // Evaluate scaling every 60s
+    logger.info('[UEF] Instance lifecycle initialized — health monitor + auto-scaler running');
   } catch (err) {
     logger.error({ err }, '[UEF] Instance lifecycle init failed — continuing without health monitoring');
   }
@@ -3061,6 +3325,10 @@ async function startServer(): Promise<void> {
 }
 
 export const server = require('http').createServer(app);
+
+// Attach LiveSim WebSocket to the HTTP server
+liveSim.attach(server);
+
 startServer();
 
 // --------------------------------------------------------------------------

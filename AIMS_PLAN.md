@@ -1,6 +1,6 @@
 # A.I.M.S. — SOP + PRD + Implementation Roadmap
 
-> **Generated:** 2026-02-18 | **Updated:** 2026-02-21 | **AI CTO Session**
+> **Generated:** 2026-02-18 | **Updated:** 2026-02-22 | **AI CTO Session**
 
 ---
 
@@ -121,15 +121,15 @@ These requirements define A.I.M.S. as what it literally is — a platform that m
 | P0.P1 | Plug Catalog — browsable library of deployable tools/agents/platforms | **DONE** | `skills/plug-catalog/plug-catalog-browse.skill.md`, API routes defined |
 | P0.P2 | Plug Spin-Up — one-click container provisioning with auto-config | **DONE** | `skills/plug-catalog/plug-spin-up.skill.md`, deployment flow defined |
 | P0.P3 | Plug Export — self-hosting bundles (compose + env + nginx + setup) | **DONE** | `skills/plug-catalog/plug-export.skill.md`, MIM principle |
-| P0.P4 | Instance lifecycle management (provision → deploy → monitor → decommission) | **PARTIAL** | Spin-up defined, monitoring/decommission needs wiring |
-| P0.P5 | Port allocation engine (51000+ range, auto-increment) | **PARTIAL** | Defined in spin-up spec, needs implementation |
-| P0.P6 | Auto-generated nginx reverse proxy per instance | **PARTIAL** | Pattern defined, needs dynamic config generation |
-| P0.P7 | Health check engine for running instances | **PARTIAL** | Pattern defined in spin-up, needs continuous monitoring |
+| P0.P4 | Instance lifecycle management (provision → deploy → monitor → decommission) | **DONE** | Full lifecycle: provision → deploy → monitor → decommission + tenant network prune |
+| P0.P5 | Port allocation engine (51000+ range, auto-increment) | **DONE** | Persistent to `/var/lib/aims/port-allocator.json`, conflict detection |
+| P0.P6 | Auto-generated nginx reverse proxy per instance | **DONE** | Writes to `/etc/nginx/conf.d/plugs/` per instance |
+| P0.P7 | Health check engine for running instances | **DONE** | 30s sweeps, HTTP checks, auto-restart, 1000-event history |
 | P0.P8 | Needs Analysis — formal client intake before deployment | **DONE** | `skills/plug-catalog/needs-analysis.skill.md` |
 | P0.P9 | Deploy Dock — real-time instance dashboard with logs and status | **DONE** | `deploy-dock/page.tsx` (902L) |
 | P0.P10 | NtNtN Engine — NLP-driven build intent detection + execution pipeline | **DONE** | `ntntn-engine/`, Picker_Ang + Buildsmith wired |
-| P0.P11 | Chicken Hawk — autonomous build executor on Cloud Run | **PARTIAL** | Full spec exists, Cloud Run configs needed |
-| P0.P12 | ACHEEVY as service orchestrator (not just chatbot) | **PARTIAL** | Orchestrator exists, needs PaaS dispatch wiring |
+| P0.P11 | Chicken Hawk — autonomous build executor on Cloud Run | **DONE** | Cloud Run job+service YAML, dispatcher with GCP auth, orchestrator tries Cloud Run first then local fallback |
+| P0.P12 | ACHEEVY as service orchestrator (not just chatbot) | **DONE** | Orchestrator exists, PaaS dispatch wired, Cloud Run dispatch integrated |
 
 ### P1 — Core Experience
 
@@ -141,27 +141,27 @@ These requirements define A.I.M.S. as what it literally is — a platform that m
 | P1.4 | Per\|Form sports lobby | **PARTIAL** — sandbox routes exist, gridiron services built |
 | P1.5 | Deploy Dock (hangar for deployments) | **DONE** — `deploy-dock/page.tsx` (902L) |
 | P1.6 | Arena (contests/trivia) | **DONE** — full routes + schema + seed data |
-| P1.7 | Stripe 3-6-9 subscription model | **PARTIAL** — `stripe.ts` exists, keys cemented in env — needs webhook + plan setup |
-| P1.8 | n8n workflow automation | **PARTIAL** — n8n in compose, bridge code exists, workflow JSON exists |
+| P1.7 | Stripe 3-6-9 subscription model | **DONE** — checkout sessions, webhook handler, tier provisioning, LUC credits |
+| P1.8 | n8n workflow automation | **DONE** — n8n in compose, bridge wired, vertical-to-workflow mapping, auto-trigger on Phase B execution |
 
 ### P2 — Autonomy, PaaS Operations & Differentiation
 
 | # | Requirement | Status |
 |---|------------|--------|
-| P2.1 | LiveSim autonomous agent space | **PARTIAL** — vertical defined, UI spec exists |
-| P2.2 | Chicken Hawk code & deploy vertical | **PARTIAL** — `chicken-hawk.ts` (472L), squad manager, wave executor |
+| P2.1 | LiveSim autonomous agent space | **DONE** — WebSocket server at /livesim, SSE stream, event broadcast, room subscriptions |
+| P2.2 | Chicken Hawk code & deploy vertical | **DONE** — `chicken-hawk.ts` (472L), squad manager, wave executor, Cloud Run dispatch |
 | P2.3 | Boomer_Ang visual identity + 3D hangar | **DONE** — hangar components, role cards, visual identity spec |
-| P2.4 | Cloud Run autonomous jobs (Chicken Hawk execution plane) | **PARTIAL** — full spec in chicken-hawk-executor.skill.md, Cloud Run YAML defined |
-| P2.5 | CDN deploy for generated sites | **MISSING** — deploy-dock UI exists but no CDN push mechanism |
+| P2.4 | Cloud Run autonomous jobs (Chicken Hawk execution plane) | **DONE** — Cloud Run dispatcher, GCP auth, job+service YAML, orchestrator fallback |
+| P2.5 | CDN deploy for generated sites | **DONE** — cdn-deploy.ts: Cloudflare Pages → GCS → nginx-static fallback, API routes, decommission cleanup |
 | P2.6 | PersonaPlex full-duplex voice | **MISSING** — skill spec exists, no integration code |
 | P2.7 | Competitor parity (Manus/Genspark/Flow) | **DONE** — see `docs/COMPETITOR_PARITY_ANALYSIS.md` (feature matrix, gap analysis, roadmap) |
 | P2.8 | Custom Lil_Hawks (user-created bots) | **DONE** — types, engine, API routes, skill, vertical definition all wired |
 | P2.9 | Playground/Sandbox system | **DONE** — 5 playground types (code, prompt, agent, training, education), API routes wired |
 | P2.10 | Competitor parity v2 (Flowith/Agent Neo/MoltBook) | **DONE** — competitor profiles, feature matrix updated, advantage analysis |
-| P2.11 | Instance resource monitoring (CPU, memory, disk per container) | **MISSING** — Circuit Metrics exists but not wired to per-instance data |
-| P2.12 | Auto-scaling rules for plug instances | **MISSING** — needs horizontal/vertical scaling policies |
-| P2.13 | Instance decommission flow (graceful shutdown + cleanup) | **MISSING** — needs implementation |
-| P2.14 | Multi-tenant instance isolation (network + data) | **PARTIAL** — sandbox-network exists, needs per-user network segmentation |
+| P2.11 | Instance resource monitoring (CPU, memory, disk per container) | **DONE** — Circuit Metrics Docker stats, per-container CPU/memory/network, AlertEngine wiring |
+| P2.12 | Auto-scaling rules for plug instances | **DONE** — auto-scaler.ts: horizontal/vertical policies, tier limits, cooldown, metrics evaluation loop, LiveSim integration |
+| P2.13 | Instance decommission flow (graceful shutdown + cleanup) | **DONE** — graceful stop + cleanup + port release + tenant network prune in instance-lifecycle.ts |
+| P2.14 | Multi-tenant instance isolation (network + data) | **DONE** — tenant-networks.ts: per-user Docker bridge networks, agent-bridge cross-tenant, auto-prune on decommission |
 
 ---
 
@@ -200,8 +200,8 @@ These requirements define A.I.M.S. as what it literally is — a platform that m
 
 - [x] Wire vertical detection to chat flow ← DONE: `/acheevy/classify` now detects all 14 verticals via NLP trigger patterns
 - [x] Implement Phase A step progression UI ← DONE: `VerticalStepIndicator.tsx` + `useVerticalFlow.ts` wired into ChatInterface
-- [ ] Connect Phase B execution to Chicken Hawk dispatch
-- [ ] Enable n8n workflow triggers for automation verticals
+- [x] Connect Phase B execution to Chicken Hawk dispatch ← DONE: NtNtN → classifyBuildIntent → generateBuildSteps → Chicken Hawk manifest → dispatch
+- [x] Enable n8n workflow triggers for automation verticals ← DONE: triggerVerticalWorkflow() auto-fires on Phase B execution, 8 vertical-to-webhook mappings
 - [x] Per|Form Film Room — Twelve Labs video intelligence integration ← DONE: client, 8 API routes, ScoutVerify engine, Film Room UI
 - [ ] Per|Form lobby with live gridiron data
 - [x] Custom Lil_Hawks engine (types, engine, API routes, skill, vertical) ← DONE
@@ -216,15 +216,15 @@ These requirements define A.I.M.S. as what it literally is — a platform that m
 ### Phase 4: PAAS CORE — CONTAINER-AS-A-SERVICE
 **Target:** A.I.M.S. deploys and manages containerized services autonomously
 
-- [ ] Implement Plug Spin-Up deploy engine (Docker API integration for dynamic container creation)
-- [ ] Port allocation engine (51000+ auto-increment, conflict detection, release on decommission)
-- [ ] Dynamic nginx config generation per instance (reverse proxy + SSL)
-- [ ] Instance health check engine (continuous monitoring, restart policies, alerting)
-- [ ] Deploy Dock wired to live instance data (running containers, resource usage, logs)
-- [ ] Instance decommission flow (graceful stop, cleanup, port release, config removal)
-- [ ] ACHEEVY dispatch wiring for PaaS operations ("spin up X", "stop instance Y", "show me what's running")
-- [ ] Per-user instance isolation (dedicated Docker networks, tenant-scoped resources)
-- [ ] Instance resource monitoring (CPU, memory, disk, network per container)
+- [x] Implement Plug Spin-Up deploy engine (Docker API integration for dynamic container creation) ← DONE: dockerode pull/create/start/stop/remove/inspect
+- [x] Port allocation engine (51000+ auto-increment, conflict detection, release on decommission) ← DONE: persistent to `/var/lib/aims/port-allocator.json`
+- [x] Dynamic nginx config generation per instance (reverse proxy + SSL) ← DONE: writes to `/etc/nginx/conf.d/plugs/`
+- [x] Instance health check engine (continuous monitoring, restart policies, alerting) ← DONE: 30s sweeps, HTTP checks, 1000-event history, auto-restart
+- [x] Deploy Dock wired to live instance data (running containers, resource usage, logs) ← DONE: auto-refresh polling, action buttons, Circuit Metrics strip, correct API endpoint
+- [x] Instance decommission flow (graceful stop, cleanup, port release, config removal) ← DONE: full lifecycle in instance-lifecycle.ts
+- [x] ACHEEVY dispatch wiring for PaaS operations ("spin up X", "stop instance Y", "show me what's running") ← DONE: 7 paas_* intents → PlugDeployEngine
+- [x] Per-user instance isolation (dedicated Docker networks, tenant-scoped resources) ← DONE: tenant-networks.ts, per-user bridge networks, agent-bridge cross-tenant access
+- [x] Instance resource monitoring (CPU, memory, disk, network per container) ← DONE: Circuit Metrics Docker socket stats, Prometheus metrics, per-container CPU/mem/net
 - [x] Plug Catalog skill + API routes defined
 - [x] Plug Spin-Up skill + deployment flow defined
 - [x] Plug Export skill + bundle structure defined
@@ -234,24 +234,24 @@ These requirements define A.I.M.S. as what it literally is — a platform that m
 ### Phase 5: AUTONOMY + EXECUTION PLANE
 **Target:** Agents work autonomously, Chicken Hawk builds deploy to Cloud Run
 
-- [ ] Cloud Run job configs for Chicken Hawk (autonomous build executor)
-- [ ] n8n → Cloud Run job dispatch pipeline
-- [ ] CDN deploy pipeline for generated sites
-- [ ] LiveSim WebSocket real-time agent feed
+- [x] Cloud Run job configs for Chicken Hawk (autonomous build executor) ← DONE: cloudrun-dispatcher.ts, GCP auth, job+service mode, orchestrator fallback
+- [x] n8n → Cloud Run job dispatch pipeline ← DONE: triggerVerticalWorkflow(), fire-and-forget from orchestrator, vertical-to-webhook mapping
+- [x] CDN deploy pipeline for generated sites ← DONE: cdn-deploy.ts, CF Pages → GCS → nginx-static, API routes, decommission
+- [x] LiveSim WebSocket real-time agent feed ← DONE: ws at /livesim, room subscriptions, deploy/health/agent events, REST API
 - [ ] PersonaPlex voice integration
-- [ ] NtNtN Engine → Chicken Hawk → Plug instance end-to-end pipeline (describe → build → deploy → running instance)
+- [x] NtNtN Engine → Chicken Hawk → Plug instance end-to-end pipeline ← DONE: detectBuildIntent → classifyBuildIntent → generateBuildSteps → Chicken Hawk dispatch
 
 ### Phase 6: POLISH + SCALE
 **Target:** Production-grade PaaS with monitoring, billing, and multi-tenant operations
 
-- [ ] Stripe 3-6-9 subscription integration
-- [ ] ORACLE 8-gate enforcement on all deployments
-- [ ] Circuit Metrics dashboard wired to per-instance real data
-- [ ] Observability (logs, traces, alerts) per tenant and per instance
+- [x] Stripe 3-6-9 subscription integration ← DONE: checkout sessions, webhook handler, tier provisioning, LUC credits
+- [x] ORACLE 8-gate enforcement on all deployments ← DONE: Oracle.runGates() pre-flight in deploy-engine.ts, blocks on gate failure
+- [x] Circuit Metrics dashboard wired to per-instance real data ← DONE: Docker socket stats, /containers/stats, Prometheus /metrics/containers
+- [x] Observability (logs, traces, alerts) per tenant and per instance ← DONE: per-instance AlertEngine rules, LiveSim health broadcast, /observability/tenant/:userId
 - [ ] Load testing and VPS capacity planning
-- [ ] Auto-scaling policies (horizontal + vertical) for plug instances
+- [x] Auto-scaling policies (horizontal + vertical) for plug instances ← DONE: auto-scaler.ts, tier limits, evaluation loop, cooldown, LiveSim broadcast
 - [ ] Multi-VPS deployment support (instance placement across nodes)
-- [ ] Usage metering and billing per instance (LUC integration)
+- [x] Usage metering and billing per instance (LUC integration) ← DONE: meterAndRecord(), spending limits, per-transaction enforcement
 
 ---
 
@@ -276,15 +276,15 @@ P0.10 REDIS_SESSIONS             DONE
 P0.P1  PLUG_CATALOG              DONE       ← browsable tool/agent/platform library
 P0.P2  PLUG_SPIN_UP              DONE       ← one-click container provisioning spec
 P0.P3  PLUG_EXPORT               DONE       ← self-hosting bundle (compose+env+nginx+setup)
-P0.P4  INSTANCE_LIFECYCLE        PARTIAL    ← spin-up defined, monitor/decommission needs wiring
-P0.P5  PORT_ALLOCATION           PARTIAL    ← 51000+ range defined, needs implementation
-P0.P6  DYNAMIC_NGINX             PARTIAL    ← pattern defined, needs dynamic config gen
-P0.P7  HEALTH_CHECK_ENGINE       PARTIAL    ← pattern defined, needs continuous monitoring
+P0.P4  INSTANCE_LIFECYCLE        DONE       ← full lifecycle: provision → deploy → monitor → decommission
+P0.P5  PORT_ALLOCATION           DONE       ← persistent /var/lib/aims/port-allocator.json, conflict detection
+P0.P6  DYNAMIC_NGINX             DONE       ← writes to /etc/nginx/conf.d/plugs/ per instance
+P0.P7  HEALTH_CHECK_ENGINE       DONE       ← 30s sweeps, HTTP checks, auto-restart, 1000-event history
 P0.P8  NEEDS_ANALYSIS            DONE       ← 5-section client intake
 P0.P9  DEPLOY_DOCK               DONE       ← real-time instance dashboard
 P0.P10 NTNTN_ENGINE              DONE       ← NLP-driven build intent + execution pipeline
-P0.P11 CHICKEN_HAWK_EXECUTOR     PARTIAL    ← full spec, Cloud Run configs defined
-P0.P12 ACHEEVY_SERVICE_ORCH      PARTIAL    ← orchestrator exists, PaaS dispatch needs wiring
+P0.P11 CHICKEN_HAWK_EXECUTOR     DONE       ← Cloud Run dispatcher, GCP auth, job+service mode, orchestrator fallback
+P0.P12 ACHEEVY_SERVICE_ORCH      DONE       ← 7 paas_* intents route to PlugDeployEngine, Cloud Run dispatch, human-in-the-loop gates
 
 ── P1: CORE EXPERIENCE ─────────────────────────────────────────────
 P1.1  REVENUE_VERTICALS          PARTIAL    ← 16 verticals, Phase A UI complete, Phase B pending
@@ -293,28 +293,30 @@ P1.3  ONBOARDING_FLOW            PARTIAL
 P1.4  PERFORM_LOBBY              PARTIAL    ← Film Room + Twelve Labs + ScoutVerify wired
 P1.5  DEPLOY_DOCK                DONE
 P1.6  ARENA_CONTESTS             DONE
-P1.7  STRIPE_PAYMENTS            PARTIAL    ← keys cemented, needs webhook setup
-P1.8  N8N_AUTOMATION             PARTIAL
+P1.7  STRIPE_PAYMENTS            DONE       ← checkout sessions, webhook handler, tier provisioning, LUC credits
+P1.8  N8N_AUTOMATION             DONE       ← vertical-to-workflow mapping, auto-trigger on Phase B, generate/deploy/trigger APIs
 
 ── P2: AUTONOMY, PaaS OPS & DIFFERENTIATION ────────────────────────
-P2.1  LIVESIM_SPACE              PARTIAL
-P2.2  CHICKEN_HAWK_VERTICAL      PARTIAL
+P2.1  LIVESIM_SPACE              DONE       ← WebSocket server at /livesim, event broadcast, room subscriptions
+P2.2  CHICKEN_HAWK_VERTICAL      DONE       ← NtNtN → Chicken Hawk build pipeline, step routing, LiveSim integration
 P2.3  BOOMERANG_VISUAL_3D        DONE
-P2.4  CLOUD_RUN_JOBS             PARTIAL    ← spec + YAML defined, needs deployment
-P2.5  CDN_DEPLOY_PIPELINE        MISSING
+P2.4  CLOUD_RUN_JOBS             DONE       ← Cloud Run dispatcher, GCP auth, job+service YAML, orchestrator integration
+P2.5  CDN_DEPLOY_PIPELINE        DONE       ← cdn-deploy.ts: CF Pages → GCS → nginx-static, API routes, decommission
 P2.6  PERSONAPLEX_VOICE          MISSING
 P2.7  COMPETITOR_PARITY          DONE
 P2.8  CUSTOM_LIL_HAWKS           DONE       ← user-created bots system
 P2.9  PLAYGROUND_SANDBOX         DONE       ← 5-type sandbox engine
 P2.10 COMPETITOR_PARITY_V2       DONE       ← Flowith/Agent Neo/MoltBook
-P2.11 INSTANCE_MONITORING        MISSING    ← CPU/memory/disk per container
-P2.12 AUTO_SCALING               MISSING    ← horizontal/vertical scaling policies
-P2.13 INSTANCE_DECOMMISSION      MISSING    ← graceful shutdown + cleanup flow
-P2.14 MULTI_TENANT_ISOLATION     PARTIAL    ← sandbox-network exists, per-user segmentation needed
+P2.11 INSTANCE_MONITORING        DONE       ← Circuit Metrics Docker stats, per-container CPU/memory/network, AlertEngine wiring
+P2.12 AUTO_SCALING               DONE       ← auto-scaler.ts: horizontal/vertical, tier limits, evaluation loop, cooldown
+P2.13 INSTANCE_DECOMMISSION      DONE       ← graceful stop + cleanup + port release + tenant network prune in instance-lifecycle.ts
+P2.14 MULTI_TENANT_ISOLATION     DONE       ← tenant-networks.ts: per-user Docker bridge networks, agent-bridge cross-tenant, auto-prune
 ```
 
-**Score: 17 DONE / 15 PARTIAL / 4 MISSING = 47% of 36 requirements**
-**PaaS identity requirements: 5 DONE / 7 PARTIAL / 0 MISSING — the mission is defined, implementation underway**
+**Score: 37 DONE / 6 PARTIAL / 1 MISSING = 84% DONE of 44 total requirements**
+**Remaining PARTIAL: P0.7 (voice I/O needs e2e test), P0.8 (auth needs OAuth creds), P1.1-P1.4 (vertical Phase B, ACHEEVY surfaces, onboarding, Per|Form lobby)**
+**Remaining MISSING: P2.6 (PersonaPlex voice — needs GPU inference endpoint)**
+**PaaS identity requirements: 12/12 DONE — PaaS core is COMPLETE**
 
 ---
 

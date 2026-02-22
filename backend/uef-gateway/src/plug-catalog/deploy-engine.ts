@@ -19,6 +19,9 @@ import { plugCatalog } from './catalog';
 import { dockerRuntime } from './docker-runtime';
 import { portAllocator } from './port-allocator';
 import { instanceStore } from './instance-store';
+import { tenantNetworks } from './tenant-networks';
+import { liveSim } from '../livesim';
+import { Oracle } from '../oracle';
 import type {
   PlugDefinition,
   PlugInstance,
@@ -105,7 +108,40 @@ export class PlugDeployEngine {
     const events: SpinUpResult['events'] = [];
     const addEvent = (stage: string, message: string) => {
       events.push({ timestamp: now(), stage, message });
+      // Broadcast to LiveSim clients in real-time
+      liveSim.emitDeployEvent(instanceId, stage, message, {
+        plugId: plug.id,
+        plugName: plug.name,
+        userId: request.userId,
+      });
     };
+
+    // 0. ORACLE 8-gate verification — pre-flight security and governance check
+    const oracleSpec = {
+      query: `Deploy plug "${plug.name}" (${plug.id}) for user ${request.userId} in ${request.deliveryMode} mode`,
+      intent: 'BUILD_PLUG',
+      userId: request.userId,
+      budget: { maxUsd: 10 }, // Default per-deploy budget cap
+    };
+    const oracleOutput = {
+      quote: {
+        variants: [{ model: 'docker-deploy', estimate: { totalTokens: 1000, totalUsd: (plug as any).pricing?.hourlyUsd || 0.01 } }],
+      },
+    };
+    const oracleResult = await Oracle.runGates(oracleSpec, oracleOutput);
+    addEvent('oracle', `ORACLE 8-gate: ${oracleResult.passed ? 'PASS' : 'FAIL'} (score: ${oracleResult.score}/100)`);
+
+    if (!oracleResult.passed) {
+      const failures = oracleResult.gateFailures.join('; ');
+      logger.warn({ plugId: plug.id, userId: request.userId, failures }, '[PlugDeploy] ORACLE gate failed');
+      throw new Error(`Deployment blocked by ORACLE 8-gate: ${failures}`);
+    }
+
+    if (oracleResult.warnings.length > 0) {
+      for (const warning of oracleResult.warnings) {
+        addEvent('oracle-warn', warning);
+      }
+    }
 
     // 1. Validate delivery mode
     if (!plug.supportedDelivery.includes(request.deliveryMode)) {
@@ -184,6 +220,11 @@ export class PlugDeployEngine {
         events,
       };
     }
+
+    // 8.5. Ensure per-user tenant network isolation
+    const tenantNetwork = await tenantNetworks.ensureTenantNetwork(request.userId);
+    instance.envOverrides['__tenantNetwork'] = tenantNetwork;
+    addEvent('isolate', `Tenant network: ${tenantNetwork}`);
 
     // 9. Pull Docker image
     const image = plug.docker.image;

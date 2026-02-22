@@ -582,6 +582,8 @@ services:
       - HOUSE_OF_ANG_URL=http://house-of-ang:3002
       - ACHEEVY_URL=http://acheevy:3003
       - AGENT_BRIDGE_URL=http://agent-bridge:3010
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     depends_on:
       uef-gateway:
         condition: service_healthy
