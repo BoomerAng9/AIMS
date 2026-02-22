@@ -70,12 +70,22 @@ paymentsRouter.post('/api/payments/tokens/create', requireInternalCaller, (req, 
       return;
     }
 
+    // Validate ranges to prevent abuse
+    const safeTtl = typeof ttlMinutes === 'number' && ttlMinutes > 0 && ttlMinutes <= 1440 ? ttlMinutes : 60; // Max 24h, default 1h
+    const safeMaxUses = typeof maxUses === 'number' && maxUses > 0 && maxUses <= 1000 ? maxUses : 10; // Max 1000, default 10
+    const safeMaxAmount = typeof maxAmount === 'number' && maxAmount > 0 && maxAmount <= 10000 ? maxAmount : maxAmount; // Cap at $10K
+
+    if (typeof maxAmount !== 'number' || maxAmount <= 0 || maxAmount > 10000) {
+      res.status(400).json({ error: 'maxAmount must be a positive number up to 10000' });
+      return;
+    }
+
     const token = agentPayments.createPaymentToken(agentId, {
-      maxAmount,
+      maxAmount: safeMaxAmount,
       currency,
       allowedProducts,
-      ttlMinutes,
-      maxUses,
+      ttlMinutes: safeTtl,
+      maxUses: safeMaxUses,
     });
 
     res.json({ token });
@@ -117,10 +127,21 @@ paymentsRouter.post('/api/payments/purchase', (req, res) => {
 });
 
 // ---------------------------------------------------------------------------
-// Agent Wallets — Read is open (behind API key), Write is internal only
+// Agent Wallets — Read requires ownership (x-user-id == agentId) or internal caller
 // ---------------------------------------------------------------------------
 
 paymentsRouter.get('/api/payments/wallet/:agentId', (req, res) => {
+  const userId = req.headers['x-user-id'] as string | undefined;
+  const caller = req.headers['x-internal-caller'] as string | undefined;
+  const isInternal = caller === 'acheevy' || caller === 'uef-gateway' || caller === 'stripe-webhook';
+
+  // Ownership check: user can only read their own wallet
+  if (!isInternal && (!userId || userId !== req.params.agentId)) {
+    logger.warn({ agentId: req.params.agentId, requestedBy: userId }, '[Payments] SECURITY: Wallet read denied — ownership mismatch');
+    res.status(403).json({ error: 'Forbidden — you can only read your own wallet' });
+    return;
+  }
+
   const wallet = agentPayments.getWallet(req.params.agentId);
   if (!wallet) {
     const newWallet = agentPayments.getOrCreateWallet(req.params.agentId);

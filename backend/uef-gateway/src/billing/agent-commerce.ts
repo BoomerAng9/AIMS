@@ -456,6 +456,16 @@ agentCommerceRouter.get('/api/payments/agent/receipt/:sessionId', (req: Request,
     return;
   }
 
+  // Ownership check: only session owner or internal caller can retrieve receipt
+  const userId = req.headers['x-user-id'] as string | undefined;
+  const caller = req.headers['x-internal-caller'] as string | undefined;
+  const isInternal = caller === 'acheevy' || caller === 'uef-gateway';
+  if (!isInternal && session.agentId && userId && session.agentId !== userId) {
+    logger.warn({ sessionId: req.params.sessionId, requestedBy: userId, ownedBy: session.agentId }, '[AgentCommerce] SECURITY: Receipt read denied — ownership mismatch');
+    res.status(403).json({ error: 'Forbidden — you do not own this payment session' });
+    return;
+  }
+
   if (session.status !== 'completed' || !session.receipt) {
     res.status(400).json({ error: 'Payment not yet completed', status: session.status });
     return;
@@ -481,6 +491,16 @@ agentCommerceRouter.post('/api/payments/agent/usage', (req: Request, res: Respon
 
   if (!agentId || !tokens || typeof tokens !== 'number' || tokens <= 0) {
     res.status(400).json({ error: 'agentId and tokens (positive number) are required' });
+    return;
+  }
+
+  // Ownership check: user can only meter their own usage (or internal caller)
+  const userId = req.headers['x-user-id'] as string | undefined;
+  const caller = req.headers['x-internal-caller'] as string | undefined;
+  const isInternal = caller === 'acheevy' || caller === 'uef-gateway';
+  if (!isInternal && (!userId || userId !== agentId)) {
+    logger.warn({ agentId, requestedBy: userId }, '[AgentCommerce] SECURITY: Usage metering denied — ownership mismatch');
+    res.status(403).json({ error: 'Forbidden — you can only meter usage for your own agent' });
     return;
   }
 
