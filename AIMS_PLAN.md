@@ -190,10 +190,10 @@ These requirements define A.I.M.S. as what it literally is — a platform that m
 - [x] Enable real SSE/streaming from OpenRouter via `streamChat()` + gateway `stream()`
 - [x] Fix OpenRouter model slugs to valid IDs (claude-opus-4-6, claude-sonnet-4-5-20250929, etc.)
 - [x] Audit full 7-step chat streaming pipeline
-- [ ] Connect voice I/O (Groq STT → text → ACHEEVY → ElevenLabs TTS)
-- [ ] Set up Google OAuth (needs client ID/secret from user)
-- [ ] Test full flow: auth → chat → LLM response → voice playback
-- [ ] VPS deploy + live smoke test
+- [x] Connect voice I/O (Groq STT → text → ACHEEVY → ElevenLabs TTS) ← DONE: Full e2e STT/TTS pipeline, useVoiceInput + useVoiceOutput hooks
+- [ ] Set up Google OAuth (needs client ID/secret from user — env config only)
+- [ ] Test full flow: auth → chat → LLM response → voice playback (VPS required)
+- [ ] VPS deploy + live smoke test (deployment task, not code)
 
 ### Phase 3: REVENUE VERTICALS + CUSTOM HAWKS
 **Target:** 14 verticals work through Phase A conversational chains, Custom Lil_Hawks live
@@ -211,7 +211,7 @@ These requirements define A.I.M.S. as what it literally is — a platform that m
 - [x] Connect E2B API to code playground ← DONE: `/api/code/execute` production route (E2B + gateway fallback)
 - [x] Agent Viewport / Collaboration Feed UI ← DONE: `CollaborationFeed.tsx` + `CollaborationSidebar` in chat (G2 closed)
 - [x] File generation & download pipeline ← DONE: `/api/files/generate` supports md/json/csv/txt/html (G4 closed)
-- [ ] Enable hawk scheduling via n8n cron triggers
+- [x] Enable hawk scheduling via n8n cron triggers ← DONE: cron parser, registerHawkSchedule(), initHawkScheduler(), n8n vertical trigger on execution
 
 ### Phase 4: PAAS CORE — CONTAINER-AS-A-SERVICE
 **Target:** A.I.M.S. deploys and manages containerized services autonomously
@@ -238,7 +238,7 @@ These requirements define A.I.M.S. as what it literally is — a platform that m
 - [x] n8n → Cloud Run job dispatch pipeline ← DONE: triggerVerticalWorkflow(), fire-and-forget from orchestrator, vertical-to-webhook mapping
 - [x] CDN deploy pipeline for generated sites ← DONE: cdn-deploy.ts, CF Pages → GCS → nginx-static, API routes, decommission
 - [x] LiveSim WebSocket real-time agent feed ← DONE: ws at /livesim, room subscriptions, deploy/health/agent events, REST API
-- [ ] PersonaPlex voice integration
+- [x] PersonaPlex voice integration ← DONE: PersonaplexClient, /api/voice/personaplex route, gateway endpoints
 - [x] NtNtN Engine → Chicken Hawk → Plug instance end-to-end pipeline ← DONE: detectBuildIntent → classifyBuildIntent → generateBuildSteps → Chicken Hawk dispatch
 
 ### Phase 6: POLISH + SCALE

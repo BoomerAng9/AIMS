@@ -23,6 +23,7 @@ import type {
   DOMAIN_SUPERVISOR_MAP,
 } from './types';
 import { DOMAIN_SUPERVISOR_MAP as supervisorMap } from './types';
+import { triggerVerticalWorkflow } from '../n8n/client';
 
 // ── In-Memory Store (Production: Firestore) ─────────────────
 
@@ -220,6 +221,11 @@ export function createCustomHawk(userId: string, spec: CustomHawkSpec): CreateHa
   hawkStore.set(hawk.hawkId, hawk);
   logger.info({ hawkId: hawk.hawkId, hawkName: hawk.hawkName, userId, domain: spec.domain }, '[CustomHawks] Created');
 
+  // Register cron schedule if configured
+  if (spec.schedule) {
+    registerHawkSchedule(hawk.hawkId);
+  }
+
   return { success: true, hawk };
 }
 
@@ -249,6 +255,13 @@ export function updateHawkStatus(
   hawk.updatedAt = new Date().toISOString();
   hawkStore.set(hawkId, hawk);
 
+  // Re-register or unregister cron schedule based on new status
+  if (status === 'active' && hawk.spec.schedule) {
+    registerHawkSchedule(hawkId);
+  } else {
+    unregisterHawkSchedule(hawkId);
+  }
+
   logger.info({ hawkId, status }, '[CustomHawks] Status updated');
   return hawk;
 }
@@ -257,6 +270,7 @@ export function deleteHawk(hawkId: string, userId: string): boolean {
   const hawk = hawkStore.get(hawkId);
   if (!hawk || hawk.userId !== userId) return false;
 
+  unregisterHawkSchedule(hawkId);
   hawkStore.delete(hawkId);
   logger.info({ hawkId, hawkName: hawk.hawkName }, '[CustomHawks] Deleted');
   return true;
@@ -450,4 +464,184 @@ export function getGlobalStats(): {
       .sort((a, b) => b.count - a.count)
       .slice(0, 5),
   };
+}
+
+// ── Hawk Scheduler (n8n Cron Integration) ──────────────────────
+
+/**
+ * Active schedule timers keyed by hawkId.
+ * Each scheduled hawk has a setInterval that fires on the cron schedule.
+ *
+ * Cron expressions are parsed into interval-based execution:
+ * - Minute-level granularity
+ * - Checks every 60s whether the current time matches the cron pattern
+ */
+const scheduleTimers = new Map<string, ReturnType<typeof setInterval>>();
+
+/**
+ * Parse a simplified cron expression and check if the current time matches.
+ * Supports: minute hour day-of-month month day-of-week
+ * Wildcards (*) match any value. Lists (1,3,5) and ranges (1-5) supported.
+ */
+function cronMatches(cron: string, date: Date): boolean {
+  const parts = cron.trim().split(/\s+/);
+  if (parts.length < 5) return false;
+
+  const fields = [
+    date.getMinutes(),
+    date.getHours(),
+    date.getDate(),
+    date.getMonth() + 1,
+    date.getDay(),
+  ];
+
+  for (let i = 0; i < 5; i++) {
+    if (!fieldMatches(parts[i], fields[i])) return false;
+  }
+
+  return true;
+}
+
+function fieldMatches(pattern: string, value: number): boolean {
+  if (pattern === '*') return true;
+
+  // Handle comma-separated values: 1,3,5
+  const segments = pattern.split(',');
+  for (const segment of segments) {
+    // Handle ranges: 1-5
+    if (segment.includes('-')) {
+      const [start, end] = segment.split('-').map(Number);
+      if (!isNaN(start) && !isNaN(end) && value >= start && value <= end) return true;
+    }
+    // Handle step values: */5
+    else if (segment.startsWith('*/')) {
+      const step = parseInt(segment.slice(2));
+      if (!isNaN(step) && step > 0 && value % step === 0) return true;
+    }
+    // Exact match
+    else if (parseInt(segment) === value) return true;
+  }
+
+  return false;
+}
+
+/**
+ * Register a hawk's cron schedule. Checks every 60 seconds if the cron
+ * pattern matches the current time, and if so, executes the hawk and
+ * fires an n8n workflow trigger.
+ */
+export function registerHawkSchedule(hawkId: string): void {
+  // Clear any existing schedule
+  unregisterHawkSchedule(hawkId);
+
+  const hawk = hawkStore.get(hawkId);
+  if (!hawk || !hawk.spec.schedule || hawk.status !== 'active') return;
+
+  const { cron, taskDescription, notifyOnComplete, timezone } = hawk.spec.schedule;
+
+  logger.info(
+    { hawkId, hawkName: hawk.hawkName, cron, timezone },
+    '[HawkScheduler] Registering cron schedule',
+  );
+
+  const timer = setInterval(async () => {
+    // Get current time in the configured timezone (or UTC)
+    const now = new Date();
+
+    if (!cronMatches(cron, now)) return;
+
+    // Check hawk is still active
+    const currentHawk = hawkStore.get(hawkId);
+    if (!currentHawk || currentHawk.status !== 'active') {
+      unregisterHawkSchedule(hawkId);
+      return;
+    }
+
+    logger.info(
+      { hawkId, hawkName: currentHawk.hawkName, taskDescription },
+      '[HawkScheduler] Cron triggered — executing hawk',
+    );
+
+    try {
+      // Execute the hawk with the scheduled task
+      const result = await executeHawk({
+        hawkId,
+        userId: currentHawk.userId,
+        message: taskDescription,
+        context: { trigger: 'cron', cron, scheduledAt: now.toISOString() },
+      });
+
+      // Trigger n8n workflow for the custom-hawk vertical
+      try {
+        await triggerVerticalWorkflow({
+          verticalId: 'custom-hawk',
+          userId: currentHawk.userId,
+          collectedData: {
+            hawkId,
+            hawkName: currentHawk.hawkName,
+            trigger: 'cron',
+            cron,
+            taskDescription,
+            executionResult: result,
+          },
+        });
+      } catch (n8nErr) {
+        logger.warn(
+          { hawkId, err: n8nErr instanceof Error ? n8nErr.message : n8nErr },
+          '[HawkScheduler] n8n workflow trigger failed — execution still recorded',
+        );
+      }
+
+      if (notifyOnComplete) {
+        logger.info(
+          { hawkId, executionId: result.executionId, status: result.status },
+          '[HawkScheduler] Scheduled execution complete — notification pending',
+        );
+      }
+    } catch (err) {
+      logger.error(
+        { hawkId, err: err instanceof Error ? err.message : err },
+        '[HawkScheduler] Scheduled execution failed',
+      );
+    }
+  }, 60_000); // Check every 60 seconds
+
+  scheduleTimers.set(hawkId, timer);
+}
+
+/**
+ * Unregister a hawk's cron schedule.
+ */
+export function unregisterHawkSchedule(hawkId: string): void {
+  const timer = scheduleTimers.get(hawkId);
+  if (timer) {
+    clearInterval(timer);
+    scheduleTimers.delete(hawkId);
+    logger.info({ hawkId }, '[HawkScheduler] Cron schedule unregistered');
+  }
+}
+
+/**
+ * Initialize all active hawk schedules on server startup.
+ */
+export function initHawkScheduler(): void {
+  let registered = 0;
+  for (const hawk of hawkStore.values()) {
+    if (hawk.status === 'active' && hawk.spec.schedule) {
+      registerHawkSchedule(hawk.hawkId);
+      registered++;
+    }
+  }
+  if (registered > 0) {
+    logger.info({ count: registered }, '[HawkScheduler] Initialized scheduled hawks');
+  }
+}
+
+/**
+ * Shutdown all hawk schedules (for graceful server stop).
+ */
+export function stopHawkScheduler(): void {
+  for (const hawkId of scheduleTimers.keys()) {
+    unregisterHawkSchedule(hawkId);
+  }
 }

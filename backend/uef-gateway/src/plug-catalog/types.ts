@@ -280,6 +280,8 @@ export interface SpinUpRequest {
   domain?: string;
   /** Set true to deploy a plug marked comingSoon (experimental) */
   allowExperimental?: boolean;
+  /** Integration IDs to activate (e.g., ['sendgrid', 'stripe']) — env vars injected automatically */
+  integrations?: string[];
 }
 
 export interface SpinUpResult {

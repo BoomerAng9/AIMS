@@ -153,12 +153,12 @@ In-memory metrics reset on restart. Time-series data should persist to SQLite or
 
 ## DEAD CODE — NOW REDUCED
 
-After fixes, only these remain uncalled:
+All previously dead billing functions are now wired:
 | Function | File | Status |
 |----------|------|--------|
-| `checkAllowance()` | billing/index.ts | Needs monthly billing cron |
-| `calculateFees()` | billing/index.ts | Line items used in invoice generation, fees calc standalone unused |
-| `generateSavingsLedgerEntries()` | billing/index.ts | Triple-ledger savings — needs full ledger flow |
+| `checkAllowance()` | billing/index.ts | **ALIVE** — called by `/billing/check-allowance` endpoint |
+| `calculateFees()` | billing/index.ts | **ALIVE** — called during invoice generation for fee breakdown |
+| `generateSavingsLedgerEntries()` | billing/index.ts | **ALIVE** — called during invoice generation for triple-ledger savings |
 
 Previously dead functions now alive:
 - ~~`expireStaleSessions()`~~ → Now called every 5 minutes via billing cron

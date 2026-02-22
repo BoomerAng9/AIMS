@@ -339,6 +339,41 @@ const migrations: Migration[] = [
       `);
     },
   },
+  {
+    version: '008',
+    name: 'create_observability_tables',
+    up: (db: Database.Database): void => {
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS metric_snapshots (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          metric TEXT NOT NULL,
+          value REAL NOT NULL,
+          labels TEXT DEFAULT '{}',
+          recorded_at TEXT NOT NULL
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_metric_snapshots_metric ON metric_snapshots(metric);
+        CREATE INDEX IF NOT EXISTS idx_metric_snapshots_recorded_at ON metric_snapshots(recorded_at);
+
+        CREATE TABLE IF NOT EXISTS alert_history (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          alertId TEXT NOT NULL,
+          name TEXT NOT NULL,
+          metric TEXT NOT NULL,
+          value REAL NOT NULL,
+          threshold REAL NOT NULL,
+          condition TEXT NOT NULL,
+          severity TEXT NOT NULL,
+          triggered_at TEXT NOT NULL,
+          acknowledged INTEGER NOT NULL DEFAULT 0
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_alert_history_alertId ON alert_history(alertId);
+        CREATE INDEX IF NOT EXISTS idx_alert_history_triggered_at ON alert_history(triggered_at);
+        CREATE INDEX IF NOT EXISTS idx_alert_history_severity ON alert_history(severity);
+      `);
+    },
+  },
 ];
 
 // ---------------------------------------------------------------------------
