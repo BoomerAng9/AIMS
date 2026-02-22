@@ -311,14 +311,97 @@ agentCommerceRouter.post('/api/payments/agent/confirm', async (req: Request, res
       return;
     }
   } else {
-    // Coinbase / crypto verification
-    // TODO: Verify txHash on Base chain via Coinbase CDP API
+    // Coinbase / crypto verification via Base chain RPC
     if (!txHash) {
       res.status(400).json({ error: 'txHash is required for Coinbase payments' });
       return;
     }
-    verifiedPaymentId = txHash;
-    logger.info({ sessionId, txHash }, '[AgentCommerce] Coinbase payment accepted (chain verification pending)');
+
+    // Validate txHash format (0x + 64 hex chars)
+    if (!/^0x[a-fA-F0-9]{64}$/.test(txHash)) {
+      res.status(400).json({ error: 'Invalid transaction hash format' });
+      return;
+    }
+
+    // Verify transaction on Base chain via RPC
+    const baseRpcUrl = process.env.BASE_RPC_URL || 'https://mainnet.base.org';
+    const merchantWallet = (process.env.COINBASE_MERCHANT_WALLET || '').toLowerCase();
+
+    if (!merchantWallet || merchantWallet === '0x...aims-treasury') {
+      logger.error({ sessionId }, '[AgentCommerce] COINBASE_MERCHANT_WALLET not configured — rejecting');
+      res.status(503).json({ error: 'Crypto payments not configured — merchant wallet missing' });
+      return;
+    }
+
+    try {
+      // Query transaction receipt from Base chain
+      const rpcResponse = await fetch(baseRpcUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'eth_getTransactionReceipt',
+          params: [txHash],
+        }),
+      });
+
+      const rpcData = await rpcResponse.json() as { result?: { status: string; to: string; logs: Array<{ address: string; topics: string[]; data: string }> } };
+
+      if (!rpcData.result) {
+        res.status(400).json({ error: 'Transaction not found on Base chain — may be pending or invalid' });
+        return;
+      }
+
+      // Check transaction succeeded (status 0x1)
+      if (rpcData.result.status !== '0x1') {
+        res.status(400).json({ error: 'Transaction failed on-chain' });
+        return;
+      }
+
+      // For USDC transfers, verify the ERC-20 Transfer event log:
+      // - 'to' address matches our merchant wallet
+      // - Amount >= session.amount (in USDC 6-decimal format)
+      const USDC_BASE = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913'.toLowerCase(); // USDC on Base
+      const TRANSFER_TOPIC = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'; // Transfer(address,address,uint256)
+
+      const transferLog = rpcData.result.logs.find(log =>
+        log.address.toLowerCase() === USDC_BASE &&
+        log.topics[0] === TRANSFER_TOPIC &&
+        log.topics[2] && log.topics[2].toLowerCase().endsWith(merchantWallet.slice(2).toLowerCase()),
+      );
+
+      if (!transferLog) {
+        logger.warn({ sessionId, txHash, merchantWallet }, '[AgentCommerce] No USDC transfer to merchant wallet found in tx');
+        res.status(400).json({ error: 'Transaction does not contain a USDC transfer to the merchant wallet' });
+        return;
+      }
+
+      // Verify amount (USDC has 6 decimals)
+      const transferAmountRaw = BigInt(transferLog.data);
+      const transferAmountUSD = Number(transferAmountRaw) / 1e6;
+      const expectedAmount = session.amount;
+
+      // Allow 1% tolerance for gas/rounding
+      if (transferAmountUSD < expectedAmount * 0.99) {
+        logger.warn({
+          sessionId, txHash, expected: expectedAmount, received: transferAmountUSD,
+        }, '[AgentCommerce] USDC transfer amount insufficient');
+        res.status(400).json({
+          error: `Insufficient payment: expected $${expectedAmount.toFixed(2)}, received $${transferAmountUSD.toFixed(2)}`,
+        });
+        return;
+      }
+
+      verifiedPaymentId = txHash;
+      logger.info({
+        sessionId, txHash, amountUSD: transferAmountUSD,
+      }, '[AgentCommerce] Coinbase payment verified on Base chain');
+    } catch (rpcErr: any) {
+      logger.error({ err: rpcErr, sessionId, txHash }, '[AgentCommerce] Base chain RPC verification failed');
+      res.status(503).json({ error: 'On-chain verification temporarily unavailable — try again later' });
+      return;
+    }
   }
 
   if (!verifiedPaymentId) {
@@ -396,8 +479,14 @@ agentCommerceRouter.get('/api/payments/agent/receipt/:sessionId', (req: Request,
 agentCommerceRouter.post('/api/payments/agent/usage', (req: Request, res: Response) => {
   const { agentId, resourceType, tokens, taskType } = req.body;
 
-  if (!agentId || !tokens) {
-    res.status(400).json({ error: 'agentId and tokens are required' });
+  if (!agentId || !tokens || typeof tokens !== 'number' || tokens <= 0) {
+    res.status(400).json({ error: 'agentId and tokens (positive number) are required' });
+    return;
+  }
+
+  // Cap single usage record to prevent abuse
+  if (tokens > 1_000_000) {
+    res.status(400).json({ error: 'Token count exceeds maximum per request (1M)' });
     return;
   }
 
@@ -407,14 +496,54 @@ agentCommerceRouter.post('/api/payments/agent/usage', (req: Request, res: Respon
     ? (TASK_MULTIPLIERS as any)[taskType].multiplier
     : 1.0;
   const cost = (tokens / 1000) * baseRate * multiplier;
+  const lucCost = Math.ceil(cost * 100); // $1 = 100 LUC
+
+  // Check wallet balance and spending limits
+  const wallet = agentWalletStore.getOrCreate(agentId);
+  if (wallet.lucBalance < lucCost) {
+    res.status(402).json({
+      error: 'Insufficient LUC balance',
+      required: lucCost,
+      available: wallet.lucBalance,
+      topUpUrl: '/api/payments/wallet/' + agentId + '/credit',
+    });
+    return;
+  }
+
+  // Check hourly/daily limits
+  const { agentTransactionStore: txnStore } = require('./persistence');
+  const hourlySpend = txnStore.getHourlySpend(agentId);
+  if (hourlySpend + cost > wallet.limitPerHour) {
+    res.status(429).json({ error: 'Hourly spending limit reached', limit: wallet.limitPerHour, current: hourlySpend });
+    return;
+  }
+  const dailySpend = txnStore.getDailySpend(agentId);
+  if (dailySpend + cost > wallet.limitPerDay) {
+    res.status(429).json({ error: 'Daily spending limit reached', limit: wallet.limitPerDay, current: dailySpend });
+    return;
+  }
+
+  // Deduct from wallet
+  agentWalletStore.updateBalance(agentId, wallet.lucBalance - lucCost);
+
+  // Record transaction
+  const txnId = `txn_usage_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+  txnStore.create({
+    id: txnId,
+    agentId,
+    type: 'debit',
+    amount: cost,
+    currency: 'usd',
+    description: `Usage: ${tokens} tokens (${taskType || 'CODE_GEN'}, ${multiplier}x)${resourceType ? ` for ${resourceType}` : ''}`,
+    counterparty: 'aims-platform',
+    protocol: 'internal',
+    timestamp: new Date().toISOString(),
+  });
 
   logger.info({
-    agentId,
-    tokens,
-    taskType,
-    multiplier,
-    cost,
-  }, '[AgentCommerce] Usage recorded');
+    agentId, tokens, taskType, multiplier, cost, lucCost, txnId,
+    remainingBalance: wallet.lucBalance - lucCost,
+  }, '[AgentCommerce] Usage metered and persisted');
 
   res.json({
     agentId,
@@ -422,7 +551,10 @@ agentCommerceRouter.post('/api/payments/agent/usage', (req: Request, res: Respon
     taskType: taskType || 'CODE_GEN',
     multiplier,
     cost,
+    lucCost,
     currency: 'usd',
+    transactionId: txnId,
+    remainingBalance: wallet.lucBalance - lucCost,
     timestamp: new Date().toISOString(),
   });
 });
