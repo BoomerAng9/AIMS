@@ -34,6 +34,7 @@ export const TOOL_REGISTRY: readonly ToolEntry[] = [
 
   // ── Payments ────────────────────────────────────────────────────────
   { id: 'stripe', file: 'stripe.tool.md', category: 'payments', provider: 'Stripe', envVars: ['STRIPE_SECRET_KEY', 'STRIPE_PUBLISHABLE_KEY', 'STRIPE_WEBHOOK_SECRET'] },
+  { id: 'stripe-agent-toolkit', file: 'stripe.tool.md', category: 'payments', provider: 'Stripe', envVars: ['STRIPE_SECRET_KEY'] },
 
   // ── Database / Cache ────────────────────────────────────────────────
   { id: 'firebase', file: 'firebase.tool.md', category: 'database', provider: 'Google', envVars: ['FIREBASE_PROJECT_ID', 'FIREBASE_CLIENT_EMAIL', 'FIREBASE_PRIVATE_KEY'] },

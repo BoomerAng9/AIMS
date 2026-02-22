@@ -271,6 +271,7 @@ Skills inject specialized context, SOPs, and design standards into ACHEEVY's beh
 | **Brave Search** | `skills/brave-search.skill.md` | "search", "brave", "web search" | AIMS standard search — full Brave Pro AI reference with response schema |
 | **Unified Search** | `skills/unified-search.skill.md` | "search", "find", "lookup" | Provider priority: Brave > Tavily > Serper |
 | **Stripe Billing** | `skills/stripe-billing.skill.md` | "payment", "subscribe", "billing" | 3-6-9 model rules, subscription management |
+| **Stripe Agent Toolkit** | `tools/stripe.tool.md` | "agent payment", "x402", "agent commerce" | MCP server for agent billing ops, x402 micropayments, ACP protocol |
 | **Firebase Data** | `skills/firebase-data.skill.md` | "store", "firestore", "firebase" | Tenant isolation, collection patterns |
 | **Prisma Database** | `skills/prisma-database.skill.md` | "database", "schema", "query" | Schema conventions, migration workflow |
 | **GCP Services** | `skills/gcp-services.skill.md` | "gcp", "cloud storage", "vision" | GCP service selection, auth patterns |
@@ -804,7 +805,7 @@ aims-skills/
 │   ├── brave-search.tool.md          ← Web search (primary)
 │   ├── tavily.tool.md                ← Web search (fallback #1)
 │   ├── serper.tool.md                ← Web search (fallback #2)
-│   ├── stripe.tool.md                ← Payments (3-6-9 model)
+│   ├── stripe.tool.md                ← Payments (3-6-9 model + Agent Toolkit MCP + x402 + ACP)
 │   ├── firebase.tool.md              ← Firestore database
 │   ├── redis.tool.md                 ← Cache + session store
 │   ├── prisma.tool.md                ← ORM

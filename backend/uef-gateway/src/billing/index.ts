@@ -11,7 +11,9 @@
  * "Activity breeds Activity."
  */
 
+import { v4 as uuidv4 } from 'uuid';
 import logger from '../logger';
+import { agentTransactionStore, agentWalletStore } from './persistence';
 
 // ---------------------------------------------------------------------------
 // Task-Based Multipliers — applied to token consumption per action
@@ -171,6 +173,54 @@ export function meterTokens(
   }, '[Billing] Token metering');
 
   return { rawTokens, taskType, multiplier: mult, effectiveTokens, costUsd };
+}
+
+/**
+ * Meter token usage AND persist the transaction to SQLite.
+ * Wraps meterTokens() with side-effect persistence for production tracking.
+ * Returns the same MeteredUsage result plus whether persistence succeeded.
+ */
+export function meterAndRecord(
+  rawTokens: number,
+  taskType: TaskType,
+  tierId: string,
+  agentId: string,
+  description?: string,
+): MeteredUsage & { recorded: boolean } {
+  const usage = meterTokens(rawTokens, taskType, tierId);
+
+  let recorded = false;
+  try {
+    const txnId = `txn_meter_${uuidv4()}`;
+    agentTransactionStore.create({
+      id: txnId,
+      agentId,
+      type: 'debit',
+      amount: usage.costUsd,
+      currency: 'usd',
+      description: description || `Metered: ${taskType} (${usage.effectiveTokens} tokens)`,
+      counterparty: 'aims-platform',
+      protocol: 'luc-meter',
+      timestamp: new Date().toISOString(),
+    });
+
+    // Deduct LUC equivalent from wallet (100 LUC per $1 USD)
+    const lucCost = Math.floor(usage.costUsd * 100);
+    if (lucCost > 0) {
+      const wallet = agentWalletStore.getOrCreate(agentId);
+      agentWalletStore.updateBalance(agentId, Math.max(wallet.lucBalance - lucCost, 0));
+    }
+
+    recorded = true;
+    logger.info(
+      { txnId, agentId, taskType, effectiveTokens: usage.effectiveTokens, costUsd: usage.costUsd },
+      '[Billing] Metered usage recorded to SQLite',
+    );
+  } catch (err) {
+    logger.warn({ err, agentId, taskType }, '[Billing] Failed to persist metered usage — continuing');
+  }
+
+  return { ...usage, recorded };
 }
 
 /**

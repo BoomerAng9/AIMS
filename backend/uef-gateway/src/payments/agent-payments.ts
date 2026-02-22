@@ -20,6 +20,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { LUCEngine } from '../luc';
 import logger from '../logger';
+import { agentWalletStore, agentTransactionStore } from '../billing/persistence';
 import type {
   X402PaymentRequired,
   X402PaymentProof,
@@ -253,18 +254,38 @@ export class AgentPaymentEngine {
       return { purchaseId: '', status: 'failed', amount, currency: token.currency, lucCost: 0, receipt: 'Exceeds token limit' };
     }
 
-    // Deduct from token
-    token.usesRemaining--;
-    token.maxAmount -= amount;
-
     // Convert to LUC
     const rate = LUC_RATES[token.currency] || 100;
     const lucCost = Math.floor(amount * rate);
 
-    // Record transaction
+    // Enforce spending limits from persistent wallet BEFORE processing
+    const persistedWallet = agentWalletStore.getOrCreate(token.agentId);
+    if (amount > persistedWallet.limitPerTransaction) {
+      return { purchaseId: '', status: 'failed', amount, currency: token.currency, lucCost: 0, receipt: `Exceeds per-transaction limit ($${persistedWallet.limitPerTransaction})` };
+    }
+    const hourlySpend = agentTransactionStore.getHourlySpend(token.agentId);
+    if (hourlySpend + amount > persistedWallet.limitPerHour) {
+      return { purchaseId: '', status: 'failed', amount, currency: token.currency, lucCost: 0, receipt: `Exceeds hourly limit ($${persistedWallet.limitPerHour}, current: $${hourlySpend.toFixed(2)})` };
+    }
+    const dailySpend = agentTransactionStore.getDailySpend(token.agentId);
+    if (dailySpend + amount > persistedWallet.limitPerDay) {
+      return { purchaseId: '', status: 'failed', amount, currency: token.currency, lucCost: 0, receipt: `Exceeds daily limit ($${persistedWallet.limitPerDay}, current: $${dailySpend.toFixed(2)})` };
+    }
+
+    // Check LUC balance
+    if (persistedWallet.lucBalance < lucCost) {
+      return { purchaseId: '', status: 'failed', amount, currency: token.currency, lucCost, receipt: `Insufficient LUC balance (need ${lucCost}, have ${persistedWallet.lucBalance})` };
+    }
+
+    // Deduct from token
+    token.usesRemaining--;
+    token.maxAmount -= amount;
+
+    // Record transaction in memory + SQLite
     const wallet = this.getOrCreateWallet(token.agentId);
+    const txnId = `txn_${uuidv4()}`;
     const transaction: AgentTransaction = {
-      id: `txn_${uuidv4()}`,
+      id: txnId,
       type: 'debit',
       amount,
       currency: token.currency,
@@ -276,11 +297,9 @@ export class AgentPaymentEngine {
     wallet.recentTransactions.unshift(transaction);
     wallet.lucBalance -= lucCost;
 
-    // Check spending limits
-    const hourlySpend = this.getHourlySpend(wallet);
-    if (hourlySpend > wallet.spendingLimit.perHour) {
-      logger.warn({ agentId: token.agentId, hourlySpend }, '[AgentPayments] Hourly spending limit exceeded');
-    }
+    // Persist to SQLite
+    agentTransactionStore.create(transaction as any);
+    agentWalletStore.updateBalance(token.agentId, persistedWallet.lucBalance - lucCost);
 
     const purchaseId = `pur_${uuidv4()}`;
 
@@ -327,12 +346,14 @@ export class AgentPaymentEngine {
 
   /**
    * Credit LUC to an agent wallet (e.g., after receiving payment).
+   * Persists to both in-memory and SQLite.
    */
   creditWallet(agentId: string, lucAmount: number, description: string): void {
     const wallet = this.getOrCreateWallet(agentId);
     wallet.lucBalance += lucAmount;
-    wallet.recentTransactions.unshift({
-      id: `txn_${uuidv4()}`,
+    const txnId = `txn_${uuidv4()}`;
+    const txn: AgentTransaction = {
+      id: txnId,
       type: 'credit',
       amount: lucAmount,
       currency: 'LUC',
@@ -340,15 +361,22 @@ export class AgentPaymentEngine {
       counterparty: 'aims-platform',
       protocol: 'internal',
       timestamp: new Date().toISOString(),
-    });
+    };
+    wallet.recentTransactions.unshift(txn);
+
+    // Persist to SQLite
+    const persistedWallet = agentWalletStore.getOrCreate(agentId);
+    agentWalletStore.updateBalance(agentId, persistedWallet.lucBalance + lucAmount);
+    agentTransactionStore.create({ ...txn, agentId } as any);
   }
 
   /**
    * Check if an agent can afford a LUC cost.
+   * Uses persistent wallet (SQLite) as source of truth.
    */
   canAfford(agentId: string, lucCost: number): boolean {
-    const wallet = this.wallets.get(agentId);
-    if (!wallet) return true; // New wallets get starting balance
+    // Always create wallet if missing — new agents get 1000 LUC starting balance
+    const wallet = agentWalletStore.getOrCreate(agentId);
     return wallet.lucBalance >= lucCost;
   }
 

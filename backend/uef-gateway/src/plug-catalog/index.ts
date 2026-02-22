@@ -53,6 +53,7 @@ export { PortAllocator, portAllocator } from './port-allocator';
 export { HealthMonitor, healthMonitor } from './health-monitor';
 export { InstanceLifecycle, instanceLifecycle } from './instance-lifecycle';
 export { KVSync, kvSync } from './kv-sync';
+export { instanceStore } from './instance-store';
 
 // API Router
 export { plugRouter } from './router';

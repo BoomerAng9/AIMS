@@ -18,7 +18,9 @@ import { JSON_SQUAD_PROFILES } from './agents/lil-hawks/json-expert-squad';
 import { pmoRegistry } from './pmo/registry';
 import { houseOfAng } from './pmo/house-of-ang';
 import { runCollaborationDemo, renderJSON } from './collaboration';
-import { TIER_CONFIGS, TASK_MULTIPLIERS as BILLING_MULTIPLIERS, PILLAR_CONFIGS, checkAllowance, calculatePillarAddon, checkAgentLimit } from './billing';
+import { TIER_CONFIGS, TASK_MULTIPLIERS as BILLING_MULTIPLIERS, PILLAR_CONFIGS, checkAllowance, calculatePillarAddon, checkAgentLimit, meterAndRecord } from './billing';
+import { billingProvisions } from './billing/persistence';
+import { agentPayments } from './payments/agent-payments';
 import { openrouter, MODELS as LLM_MODELS, llmGateway, usageTracker } from './llm';
 import { verticalRegistry } from './verticals';
 import { projectStore, plugStore, deploymentStore, auditStore, evidenceStore, startCleanupSchedule, stopCleanupSchedule, closeDb } from './db';
@@ -50,6 +52,7 @@ import { ossModels } from './llm/oss-models';
 import { personaplex } from './llm/personaplex';
 import { N8nClient } from './n8n';
 import { plugRouter } from './plug-catalog/router';
+import { instanceLifecycle } from './plug-catalog';
 import { cloudflareRouter, markdownForAgents } from './cloudflare';
 import { paymentsRouter } from './payments';
 import { normalizeInput, getDialectStats, SLANG_ENTRY_COUNT, INTENT_PHRASE_COUNT } from './nlp';
@@ -95,6 +98,8 @@ app.use(cors({
   origin: corsOrigin.split(',').map(o => o.trim()),
   methods: ['GET', 'POST'],
 }));
+// Raw body for Stripe webhook signature verification (must be before express.json())
+app.use('/api/payments/stripe/webhook', express.raw({ type: 'application/json' }));
 app.use(express.json());
 
 // Correlation ID middleware — every request gets a trace ID
@@ -145,6 +150,12 @@ const acpLimiter = rateLimit({
 // API Key Authentication — all routes except /health require X-API-Key
 // --------------------------------------------------------------------------
 function requireApiKey(req: express.Request, res: express.Response, next: express.NextFunction): void {
+  // Stripe webhook uses its own signature verification — exempt from API key
+  if (req.path === '/api/payments/stripe/webhook') {
+    next();
+    return;
+  }
+
   // In dev without a key configured, allow requests through
   if (!INTERNAL_API_KEY && process.env.NODE_ENV !== 'production') {
     next();
@@ -1589,7 +1600,7 @@ app.post('/billing/check-agents', (req, res) => {
 });
 
 // Provision tier — called by Stripe webhook after checkout/subscription events
-const provisionedTiers = new Map<string, { tierId: string; tierName: string; stripeCustomerId: string; stripeSubscriptionId: string; provisionedAt: string }>();
+// Persisted to SQLite via billingProvisions (replaces in-memory Map)
 
 app.post('/billing/provision', (req, res) => {
   const { userId, tierId, tierName, stripeCustomerId, stripeSubscriptionId, provisionedAt, reason } = req.body;
@@ -1598,16 +1609,19 @@ app.post('/billing/provision', (req, res) => {
     return;
   }
 
-  provisionedTiers.set(userId, {
+  const now = new Date().toISOString();
+  billingProvisions.upsert({
+    userId,
     tierId,
     tierName: tierName || tierId,
     stripeCustomerId: stripeCustomerId || '',
     stripeSubscriptionId: stripeSubscriptionId || '',
-    provisionedAt: provisionedAt || new Date().toISOString(),
+    provisionedAt: provisionedAt || now,
+    updatedAt: now,
   });
 
-  logger.info({ userId, tierId, tierName, reason }, '[Billing] Tier provisioned');
-  res.json({ success: true, userId, tierId, tierName, provisionedAt });
+  logger.info({ userId, tierId, tierName, reason }, '[Billing] Tier provisioned (persisted)');
+  res.json({ success: true, userId, tierId, tierName, provisionedAt: provisionedAt || now });
 });
 
 app.get('/billing/provision', (req, res) => {
@@ -1616,12 +1630,13 @@ app.get('/billing/provision', (req, res) => {
     res.status(400).json({ error: 'Missing userId' });
     return;
   }
-  const tier = provisionedTiers.get(userId);
+  const tier = billingProvisions.get(userId);
   if (!tier) {
     res.json({ userId, tierId: 'p2p', tierName: 'Pay-per-Use', provisioned: false });
     return;
   }
-  res.json({ userId, ...tier, provisioned: true });
+  const { userId: _uid, ...tierData } = tier;
+  res.json({ userId, ...tierData, provisioned: true });
 });
 
 // --------------------------------------------------------------------------
@@ -2547,9 +2562,32 @@ app.post('/ingress/acp', acpLimiter, async (req, res) => {
 
     logger.info({ passed: oracleResult.passed, score: oracleResult.score }, '[UEF] ORACLE result');
 
-    // 5. Agent dispatch (only if ORACLE passes AND policy is cleared)
+    // 5. Pre-execution affordability check
+    const estimatedLucCost = quote.variants[0]?.estimate?.totalTokens
+      ? Math.floor((quote.variants[0].estimate.totalUsd || 0) * 100)
+      : 0;
+
+    let insufficientFunds = false;
+    const isGuest = acpReq.userId === 'guest';
+
+    // Guest users get estimates only — never full agent execution
+    if (isGuest) {
+      insufficientFunds = true;
+      logger.info({ userId: acpReq.userId }, '[UEF] Guest user — estimate only, no agent execution');
+    } else if (estimatedLucCost > 0) {
+      const affordable = agentPayments.canAfford(acpReq.userId, estimatedLucCost);
+      if (!affordable) {
+        insufficientFunds = true;
+        logger.warn(
+          { userId: acpReq.userId, estimatedLucCost },
+          '[UEF] Insufficient LUC balance — blocking execution',
+        );
+      }
+    }
+
+    // 6. Agent dispatch (only if ORACLE passes, policy cleared, AND affordable)
     let agentResult = { executed: false, agentOutputs: [] as Array<{ status: string; agentId: string; result: { summary: string; artifacts: string[] } }>, primaryAgent: null as string | null };
-    if (oracleResult.passed && prepPacket.policyManifest.cleared) {
+    if (oracleResult.passed && prepPacket.policyManifest.cleared && !insufficientFunds) {
       agentResult = await routeToAgents(
         acpReq.intent,
         acpReq.naturalLanguage,
@@ -2558,11 +2596,39 @@ app.post('/ingress/acp', acpLimiter, async (req, res) => {
       );
     }
 
-    // 6. Construct response
+    // 7. Post-execution metering — record actual token usage to SQLite
+    if (agentResult.executed && acpReq.userId !== 'guest') {
+      const taskType = acpReq.intent === 'BUILD_PLUG' ? 'DEPLOYMENT'
+        : acpReq.intent === 'RESEARCH' ? 'BIZ_INTEL'
+        : acpReq.intent === 'AGENTIC_WORKFLOW' ? 'AGENT_SWARM'
+        : 'CODE_GEN';
+      const rawTokens = quote.variants[0]?.estimate?.totalTokens || 0;
+      const provision = billingProvisions.get(acpReq.userId);
+      const tierId = provision?.tierId || 'p2p';
+
+      meterAndRecord(
+        rawTokens,
+        taskType as any,
+        tierId,
+        acpReq.userId,
+        `ACP ${acpReq.intent}: ${acpReq.naturalLanguage.slice(0, 80)}`,
+      );
+    }
+
+    // 8. Construct response
+    const acpStatus = isGuest ? 'ESTIMATE_ONLY'
+      : insufficientFunds ? 'PAYMENT_REQUIRED'
+      : (oracleResult.passed ? 'SUCCESS' : 'ERROR');
+    const acpMessage = isGuest
+      ? 'Sign in to execute tasks. Here is your cost estimate.'
+      : insufficientFunds
+      ? 'Insufficient LUC balance. Please top up your wallet to continue.'
+      : buildResponseMessage(acpReq.intent, oracleResult.passed, agentResult.executed);
+
     const response: ACPResponse = {
       reqId: acpReq.reqId,
-      status: oracleResult.passed ? 'SUCCESS' : 'ERROR',
-      message: buildResponseMessage(acpReq.intent, oracleResult.passed, agentResult.executed),
+      status: acpStatus as any,
+      message: acpMessage,
       quote: quote,
       executionPlan: executionPlan,
     };
@@ -2805,14 +2871,28 @@ app.post('/memory/preference', (req, res) => {
 });
 
 // --------------------------------------------------------------------------
-// Start Server
+// Start Server — initialize deploy engine lifecycle before listening
 // --------------------------------------------------------------------------
-export const server = app.listen(PORT, () => {
-  const agents = registry.list();
-  logger.info({ port: PORT, agents: agents.length }, 'UEF Gateway (Layer 2) running');
-  logger.info(`Agents online: ${agents.map(a => a.name).join(', ')}`);
-  logger.info(`ACP Ingress available at http://localhost:${PORT}/ingress/acp`);
-});
+async function startServer(): Promise<void> {
+  // Initialize plug instance lifecycle: loads port state, wires health monitor,
+  // starts background health sweeps, and reconciles with Docker state.
+  try {
+    await instanceLifecycle.initialize();
+    logger.info('[UEF] Instance lifecycle initialized — health monitor running');
+  } catch (err) {
+    logger.error({ err }, '[UEF] Instance lifecycle init failed — continuing without health monitoring');
+  }
+
+  server.listen(PORT, () => {
+    const agents = registry.list();
+    logger.info({ port: PORT, agents: agents.length }, 'UEF Gateway (Layer 2) running');
+    logger.info(`Agents online: ${agents.map(a => a.name).join(', ')}`);
+    logger.info(`ACP Ingress available at http://localhost:${PORT}/ingress/acp`);
+  });
+}
+
+export const server = require('http').createServer(app);
+startServer();
 
 // --------------------------------------------------------------------------
 // Graceful Shutdown — let Docker stop containers cleanly
@@ -2821,6 +2901,7 @@ function shutdown(signal: string) {
   logger.info({ signal }, '[UEF] Received shutdown signal, draining connections...');
   stopCleanupSchedule();
   memoryEngine.stopMaintenance();
+  instanceLifecycle.getHealthMonitor().stop();
   server.close(() => {
     closeDb();
     logger.info('[UEF] All connections drained. DB closed. Exiting.');

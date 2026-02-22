@@ -27,7 +27,10 @@ const BASE_PORT = 51000;
 const PORT_INCREMENT = 10;
 const MAX_PORT = 59999;
 const MAX_SLOTS = Math.floor((MAX_PORT - BASE_PORT + 1) / PORT_INCREMENT);
-const STATE_FILE = process.env.PORT_ALLOCATOR_STATE || '/tmp/aims-port-allocator.json';
+// Use data dir for persistent state — /tmp/ gets wiped on reboot.
+// Falls back to /tmp/ if data dir doesn't exist (handled in save()).
+const DATA_DIR = process.env.AIMS_DATA_DIR || '/var/lib/aims';
+const STATE_FILE = process.env.PORT_ALLOCATOR_STATE || `${DATA_DIR}/port-allocator.json`;
 
 // ---------------------------------------------------------------------------
 // Types
@@ -93,9 +96,19 @@ export class PortAllocator {
     };
 
     try {
+      // Ensure directory exists
+      const dir = STATE_FILE.substring(0, STATE_FILE.lastIndexOf('/'));
+      await fs.mkdir(dir, { recursive: true }).catch(() => { /* exists */ });
       await fs.writeFile(STATE_FILE, JSON.stringify(state, null, 2), 'utf-8');
     } catch (err) {
-      logger.error({ err }, '[PortAllocator] Failed to save state');
+      // Fallback to /tmp if persistent dir not writable
+      try {
+        const fallback = '/tmp/aims-port-allocator.json';
+        await fs.writeFile(fallback, JSON.stringify(state, null, 2), 'utf-8');
+        logger.warn({ primary: STATE_FILE, fallback }, '[PortAllocator] Saved to fallback path');
+      } catch (fallbackErr) {
+        logger.error({ err }, '[PortAllocator] Failed to save state to any path');
+      }
     }
   }
 
