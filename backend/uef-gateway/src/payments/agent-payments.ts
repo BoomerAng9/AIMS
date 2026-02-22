@@ -43,6 +43,46 @@ const LUC_RATES: Record<string, number> = {
 };
 
 // ---------------------------------------------------------------------------
+// Product Pricing Catalog (USD per unit)
+// ---------------------------------------------------------------------------
+
+const PRODUCT_PRICES: Record<string, number> = {
+  // Plug instance costs (monthly hosting)
+  'plug-instance-starter': 9.99,
+  'plug-instance-pro': 29.99,
+  'plug-instance-enterprise': 99.99,
+
+  // API usage tiers
+  'api-calls-100': 1.00,
+  'api-calls-1000': 8.00,
+  'api-calls-10000': 50.00,
+
+  // Video generation
+  'video-gen-basic': 0.50,
+  'video-gen-pro': 2.00,
+  'video-gen-4k': 5.00,
+
+  // Content pipeline
+  'content-pipeline-run': 3.00,
+  'content-pipeline-batch': 15.00,
+
+  // LUC top-ups
+  'luc-100': 1.00,
+  'luc-500': 4.50,
+  'luc-1000': 8.00,
+  'luc-5000': 35.00,
+
+  // Agent services
+  'agent-task-basic': 0.10,
+  'agent-task-complex': 1.00,
+  'agent-research-deep': 5.00,
+};
+
+function getProductPrice(productId: string): number {
+  return PRODUCT_PRICES[productId] ?? 1.00; // $1 fallback for unknown products
+}
+
+// ---------------------------------------------------------------------------
 // Agent Payment Engine
 // ---------------------------------------------------------------------------
 
@@ -206,8 +246,9 @@ export class AgentPaymentEngine {
       return { purchaseId: '', status: 'failed', amount: 0, currency: 'usd', lucCost: 0, receipt: 'Product not allowed' };
     }
 
-    // Calculate cost (simplified — in production, look up product catalog)
-    const amount = request.quantity * 1; // $1 per unit placeholder
+    // Look up product price from catalog
+    const unitPrice = getProductPrice(request.productId);
+    const amount = request.quantity * unitPrice;
     if (amount > token.maxAmount) {
       return { purchaseId: '', status: 'failed', amount, currency: token.currency, lucCost: 0, receipt: 'Exceeds token limit' };
     }

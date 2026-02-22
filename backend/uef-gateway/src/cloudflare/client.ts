@@ -220,10 +220,16 @@ export class CloudflareClient {
   }
 
   async getR2SignedUrl(key: string, expiresInSeconds: number = 3600): Promise<string | null> {
-    // For production, use Cloudflare Workers with R2 bindings for signed URLs
-    // This is a placeholder that returns the public URL if the bucket is public
+    // PRODUCTION TODO: Deploy a Cloudflare Worker with R2 bindings to generate
+    // presigned URLs. The S3-compatible R2 API requires a Worker with env.R2_BUCKET
+    // binding to call bucket.createSignedUrl(). Until then this returns the public
+    // bucket URL which only works if the bucket has public access enabled.
     const bucket = this.config.r2Bucket;
     const accountId = this.config.r2AccountId || this.config.accountId;
+    if (!bucket || !accountId) {
+      logger.warn('[Cloudflare] R2 bucket or account ID not configured');
+      return null;
+    }
     return `https://${accountId}.r2.cloudflarestorage.com/${bucket}/${key}`;
   }
 

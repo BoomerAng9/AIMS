@@ -1,7 +1,7 @@
 // frontend/app/dashboard/plug-catalog/page.tsx
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { staggerContainer, staggerItem, fadeUp } from "@/lib/motion/variants";
@@ -94,6 +94,14 @@ export default function PlugCatalogPage() {
   const [activeCategory, setActiveCategory] = useState<CategoryKey>("all");
   const [categories, setCategories] = useState<Record<string, number>>({});
 
+  // Deploy state
+  const [deploying, setDeploying] = useState<string | null>(null);
+  const [deployResult, setDeployResult] = useState<{ plugId: string; success: boolean; message: string; instanceId?: string } | null>(null);
+
+  // Instance management state
+  const [instances, setInstances] = useState<Array<{ instanceId: string; plugId: string; name: string; status: string; assignedPort: number; healthStatus: string }>>([]);
+  const [showInstances, setShowInstances] = useState(false);
+
   useEffect(() => {
     fetch("/api/plug-catalog")
       .then((res) => res.json())
@@ -104,6 +112,57 @@ export default function PlugCatalogPage() {
       .catch(() => { })
       .finally(() => setLoading(false));
   }, []);
+
+  // Load running instances
+  const loadInstances = useCallback(() => {
+    fetch("/api/plug-instances?userId=web-user")
+      .then((res) => res.json())
+      .then((data) => setInstances(data.instances || []))
+      .catch(() => { });
+  }, []);
+
+  useEffect(() => { loadInstances(); }, [loadInstances]);
+
+  // Deploy a plug
+  const handleSpinUp = async (plugId: string, plugName: string) => {
+    setDeploying(plugId);
+    setDeployResult(null);
+    try {
+      const res = await fetch("/api/plug-catalog", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          plugId,
+          userId: "web-user",
+          instanceName: `${plugName.toLowerCase().replace(/[^a-z0-9]/g, "-")}-${Date.now().toString(36).slice(-4)}`,
+          deliveryMode: "hosted",
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data.instance) {
+        setDeployResult({ plugId, success: true, message: `${plugName} deployed successfully`, instanceId: data.instance.instanceId });
+        loadInstances();
+      } else {
+        setDeployResult({ plugId, success: false, message: data.error || "Deploy failed" });
+      }
+    } catch (err) {
+      setDeployResult({ plugId, success: false, message: "Network error — gateway unreachable" });
+    } finally {
+      setDeploying(null);
+    }
+  };
+
+  // Stop an instance
+  const handleInstanceAction = async (instanceId: string, action: "stop" | "restart" | "remove") => {
+    try {
+      await fetch("/api/plug-instances", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ instanceId, action }),
+      });
+      loadInstances();
+    } catch { }
+  };
 
   // Filter
   const filtered = plugs.filter((p) => {
@@ -342,10 +401,27 @@ export default function PlugCatalogPage() {
                         </Link>
                         {plug.delivery.includes("hosted") && (
                           <button
-                            className="flex items-center justify-center gap-1.5 rounded-lg bg-gold/10 border border-gold/20 px-3 py-2 text-[0.6rem] font-mono text-gold hover:bg-gold hover:text-black transition-all"
+                            onClick={() => handleSpinUp(plug.id, plug.name)}
+                            disabled={deploying === plug.id}
+                            className={`flex items-center justify-center gap-1.5 rounded-lg border px-3 py-2 text-[0.6rem] font-mono transition-all ${
+                              deploying === plug.id
+                                ? "bg-gold/5 border-gold/10 text-gold/50 cursor-wait"
+                                : deployResult?.plugId === plug.id && deployResult.success
+                                ? "bg-emerald-400/10 border-emerald-400/20 text-emerald-400"
+                                : deployResult?.plugId === plug.id && !deployResult.success
+                                ? "bg-red-400/10 border-red-400/20 text-red-400"
+                                : "bg-gold/10 border-gold/20 text-gold hover:bg-gold hover:text-black"
+                            }`}
                           >
-                            <Cloud size={11} />
-                            Spin Up
+                            {deploying === plug.id ? (
+                              <><Zap size={11} className="animate-pulse" /> Deploying...</>
+                            ) : deployResult?.plugId === plug.id && deployResult.success ? (
+                              <><Shield size={11} /> Running</>
+                            ) : deployResult?.plugId === plug.id && !deployResult.success ? (
+                              <><Cloud size={11} /> Retry</>
+                            ) : (
+                              <><Cloud size={11} /> Spin Up</>
+                            )}
                           </button>
                         )}
                         {plug.delivery.includes("exported") && (
@@ -381,6 +457,99 @@ export default function PlugCatalogPage() {
             )}
           </motion.div>
         </AnimatePresence>
+      )}
+
+      {/* ── Deploy Result Toast ────────────────────────────────────────── */}
+      {deployResult && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className={`wireframe-card p-4 flex items-center justify-between ${
+            deployResult.success ? "border-emerald-400/20" : "border-red-400/20"
+          }`}
+        >
+          <div className="flex items-center gap-3">
+            {deployResult.success ? (
+              <Shield size={16} className="text-emerald-400" />
+            ) : (
+              <Zap size={16} className="text-red-400" />
+            )}
+            <div>
+              <p className={`text-xs font-medium ${deployResult.success ? "text-emerald-400" : "text-red-400"}`}>
+                {deployResult.message}
+              </p>
+              {deployResult.instanceId && (
+                <p className="text-[0.55rem] text-white/30 font-mono mt-0.5">
+                  Instance: {deployResult.instanceId}
+                </p>
+              )}
+            </div>
+          </div>
+          <button
+            onClick={() => setDeployResult(null)}
+            className="text-white/30 hover:text-white/60 text-xs"
+          >
+            Dismiss
+          </button>
+        </motion.div>
+      )}
+
+      {/* ── Running Instances ────────────────────────────────────────── */}
+      {instances.length > 0 && (
+        <motion.div variants={staggerItem}>
+          <button
+            onClick={() => setShowInstances(!showInstances)}
+            className="flex items-center gap-2 text-xs font-mono text-white/40 hover:text-gold transition-colors mb-3"
+          >
+            <Terminal size={12} />
+            Running Instances ({instances.length})
+            <ArrowRight size={10} className={`transition-transform ${showInstances ? "rotate-90" : ""}`} />
+          </button>
+
+          {showInstances && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {instances.map((inst) => {
+                const plug = plugs.find((p) => p.id === inst.plugId);
+                return (
+                  <div
+                    key={inst.instanceId}
+                    className="wireframe-card p-4 flex items-center justify-between"
+                  >
+                    <div>
+                      <p className="text-xs font-medium text-white">{inst.name || inst.plugId}</p>
+                      <p className="text-[0.55rem] font-mono text-white/30 mt-0.5">
+                        Port {inst.assignedPort} &middot; {inst.status} &middot;{" "}
+                        <span className={inst.healthStatus === "healthy" ? "text-emerald-400" : "text-amber-400"}>
+                          {inst.healthStatus || "unknown"}
+                        </span>
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        onClick={() => handleInstanceAction(inst.instanceId, "restart")}
+                        className="rounded border border-wireframe-stroke px-2 py-1 text-[0.5rem] font-mono text-white/40 hover:text-blue-400 hover:border-blue-400/20 transition-all"
+                      >
+                        Restart
+                      </button>
+                      <button
+                        onClick={() => handleInstanceAction(inst.instanceId, "stop")}
+                        className="rounded border border-wireframe-stroke px-2 py-1 text-[0.5rem] font-mono text-white/40 hover:text-amber-400 hover:border-amber-400/20 transition-all"
+                      >
+                        Stop
+                      </button>
+                      <button
+                        onClick={() => handleInstanceAction(inst.instanceId, "remove")}
+                        className="rounded border border-wireframe-stroke px-2 py-1 text-[0.5rem] font-mono text-white/40 hover:text-red-400 hover:border-red-400/20 transition-all"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </motion.div>
       )}
 
       {/* ── Needs Analysis CTA ─────────────────────────────────────────── */}

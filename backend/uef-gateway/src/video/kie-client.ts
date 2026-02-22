@@ -88,6 +88,8 @@ export interface KieVideoResponse {
   creditsUsed?: number;
   /** Model that was used */
   model: string;
+  /** True when response is a dev mock (no KIE_API_KEY configured) */
+  _mock?: boolean;
 }
 
 export interface KieAccountInfo {
@@ -168,12 +170,16 @@ export class KieVideoClient {
 
   async generateVideo(request: KieVideoRequest): Promise<KieVideoResponse> {
     if (!this.apiKey) {
-      logger.warn('[KIE] API key not configured — returning mock response');
+      // DEV-ONLY: Without a KIE_API_KEY env var, video generation returns a mock
+      // response so the rest of the pipeline can be tested end-to-end.
+      // Set KIE_API_KEY in .env to enable real video generation via api.kie.ai
+      logger.warn('[KIE] No KIE_API_KEY configured — returning mock response (set env var for real generation)');
       return {
         taskId: `mock_kie_${Date.now()}`,
         status: 'pending',
         estimatedTime: request.duration || 10,
         model: request.model,
+        _mock: true,
       };
     }
 
