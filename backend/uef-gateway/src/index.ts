@@ -50,6 +50,8 @@ import { ossModels } from './llm/oss-models';
 import { personaplex } from './llm/personaplex';
 import { N8nClient } from './n8n';
 import { plugRouter } from './plug-catalog/router';
+import { cloudflareRouter, markdownForAgents } from './cloudflare';
+import { paymentsRouter } from './payments';
 import logger from './logger';
 
 // Custom Lil_Hawks — User-Created Bots
@@ -169,9 +171,20 @@ app.get('/health', (_req, res) => {
 app.use(a2aRouter);
 
 // --------------------------------------------------------------------------
+// Cloudflare — LLM.txt, AI Index, and markdown-for-agents (public)
+// --------------------------------------------------------------------------
+app.use(cloudflareRouter);
+app.use(markdownForAgents);
+
+// --------------------------------------------------------------------------
 // Apply API key gate to ALL subsequent routes
 // --------------------------------------------------------------------------
 app.use(requireApiKey);
+
+// --------------------------------------------------------------------------
+// Agent Payments — X402, Stripe Agent Commerce, Wallets
+// --------------------------------------------------------------------------
+app.use(paymentsRouter);
 
 // --------------------------------------------------------------------------
 // Agent Registry — list available agents and their profiles

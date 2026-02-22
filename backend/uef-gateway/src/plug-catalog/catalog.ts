@@ -635,6 +635,11 @@ export class PlugCatalog {
   getFeatured(): PlugDefinition[] {
     return this.listAll().filter(p => p.featured && !p.comingSoon);
   }
+
+  /** Get all plugs (alias for listAll). */
+  getAll(): PlugDefinition[] {
+    return this.listAll();
+  }
 }
 
 // ---------------------------------------------------------------------------
