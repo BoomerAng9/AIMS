@@ -114,32 +114,93 @@ IDE: TRAE (The Real AI Engineer) — integrated Seed 2.0 Code
 
 ### What It Does
 
-Seedance 2.0 is ByteDance's **AI video generation model** — generates video from text
-prompts or images with character consistency, camera control, and physically plausible motion.
+Seedance 2.0 is ByteDance's **AI video generation model** — generates cinematic video from
+text, images, video, and audio input with character consistency, camera control, native audio
+synthesis, and physically plausible motion.
+
+### Version History
+
+| Version | Date | Key Milestone |
+|---|---|---|
+| Seedance 1.0 | June 2025 | Foundation. 5-8s clips, 1080p, multi-shot storytelling |
+| Seedance 1.5 Pro | Dec 2025 | Joint audio-video architecture. Lip-sync, camera control |
+| **Seedance 2.0** | **Feb 10, 2026** | Architectural leap. 2K output, ~20s clips, native audio, 12-file multimodal input |
+
+### Technical Architecture
+
+- **Dual-Branch Diffusion Transformer (DiT)**: Two dedicated transformer pathways — one for video, one for audio — synchronized throughout diffusion. Generates video + audio **simultaneously in a single pass** (no post-stitching)
+- **Quad-Modal Input System**: Accepts Text, Image, Video, and Audio as inputs via pre-trained encoders
+- **Physics-Aware Training**: Penalizes physically implausible motion (gravity, fabric, fluid, object interactions)
+- **Cross-Modal Joint Module**: Bridges audio and video branches for tight synchronization
+- **10x Inference Acceleration**: Framework that boosts generation speed vs naive approach
+
+### Specs
 
 | Spec | Value |
 |---|---|
-| Max Duration | **~20 seconds** (up from 5-8s in 1.0) |
-| Resolution | Up to **1080p** |
+| Max Duration | **4-15 seconds** per clip (chainable to ~20s coherent) |
+| Resolution | Up to **2K** (1080p standard, 2K premium) |
+| Audio | Native dialogue, ambient soundscapes, SFX — frame-synchronized |
+| Lip-Sync | Phoneme-level in **8+ languages** (EN, ZH, JP, KO, ES, PT, ID + dialects) |
 | Character Consistency | Cross-shot character preservation |
 | Camera Control | Precise pan, zoom, dolly, tracking |
 | Physics | Physically plausible motion and dynamics |
-| Prompt Adherence | Major improvement in complex prompt following |
-| Architecture | Multimodal reference system (architectural leap over 1.0) |
+| Styles | Photorealism, animation, illustration, cyberpunk, felt texture |
+
+### @ Reference System (Key Developer Feature)
+
+Seedance 2.0 accepts up to **12 simultaneous reference files** in a single prompt:
+- Up to 9 images, 3 videos, 3 audio files
+- Reference via `@image1`, `@video2`, `@audio3` syntax
+- Controls: character appearance, camera movement, choreography, audio sync
+
+### API Access
+
+| Channel | Status | Notes |
+|---|---|---|
+| **Volcano Engine** | Official API ~Feb 24, 2026 | Model ID: `doubao-seedance-2.0`. Async job-based. SDKs for Python/JS/TS |
+| **fal.ai** | Available now (v1.0) | ~$0.74/video (5s, 1080p). v2.0 expected soon |
+| **Replicate** | Available | replicate.com/bytedance |
+| **Kie AI** | Available (v2.0) | Free test credits |
+| **Jimeng AI** | Consumer (China) | Primary consumer access |
+| **CapCut** | Coming | Global reach via TikTok ecosystem |
+
+### Pricing Estimates (Seedance 2.0)
+
+| Quality | Price/minute |
+|---|---|
+| 720p Basic | ~$0.10 |
+| 1080p Standard | ~$0.30 |
+| 2K Cinema | ~$0.80 |
+
+**10-100x cheaper than Sora 2** per clip.
+
+### Integration Pattern
+```
+User Request → AIMS Plug → Seedance API (async)
+  ├─ Submit Job: POST /v1/generations
+  ├─ Poll Status: GET /v1/generations/{id}
+  ├─ Retrieve Video: GET /v1/generations/{id}/output
+  └─ Webhook callback (when available)
+```
+Generation time: 30-120 seconds depending on resolution/duration.
+
+### Copyright Warning
+
+MPA (Motion Picture Association) accused Seedance 2.0 of unauthorized copyrighted content use.
+Disney and Paramount Skydance issued cease-and-desist letters. ByteDance responded by blocking
+copyrighted character generation and suspending voice-from-image. **Any AIMS integration must
+implement content moderation on top of ByteDance's safeguards.**
 
 ### Roadmap
 - **Seedance 2.5** (mid-2026): Targeting 4K output, near-real-time generation
 
-### Access
-- **Dreamina** — ByteDance's AI creative platform (web UI)
-- **CapCut** — Integrated into CapCut video editor
-- **Volcano Engine API** — Programmatic access
-- **Jimeng** — Chinese market creative platform
-
 ### Companion Products
 | Product | Type | Description |
 |---|---|---|
-| **Seedream** | Image Generation | Text-to-image with deep thinking and online search |
+| **Seedream 4.5** | Image Generation | Up to 4K, multi-image composition, text rendering |
+| **SeedEdit 3.0** | Image Editing | Fast generative editing for real-world images |
+| **OmniHuman-1.5** | Avatar Animation | Single-image-to-video avatar with audio |
 | **CapCut** | Video Editing | AI-powered video editor (TikTok ecosystem) |
 | **Dreamina** | Creative Platform | All-in-one AI creative suite |
 
@@ -164,14 +225,17 @@ Large-scale autoregressive TTS system that generates speech **indistinguishable 
 ### Related Products
 | Model | Description |
 |---|---|
-| **Seed LiveInterpret** | Real-time simultaneous interpretation (speech-to-speech) with voice cloning |
+| **Seed LiveInterpret 2.0** | End-to-end real-time simultaneous interpretation with voice cloning |
+| **Seed Realtime Voice** | End-to-end real-time voice interaction |
+| **Seed-ASR** | LLM-based speech recognition. 20M+ hours training data. Mandarin + 13 Chinese dialects + 7 foreign languages. Context-aware |
 
 ### Comparison to AIMS Voice Stack
-| AIMS Current | Seed-TTS |
+| AIMS Current | ByteDance Equivalent |
 |---|---|
 | ElevenLabs TTS (turbo_v2_5) | Seed-TTS (not publicly available) |
 | Deepgram Aura-2 (fallback) | — |
-| PersonaPlex (planned) | Seed LiveInterpret (real-time interpretation) |
+| ElevenLabs Scribe STT | Seed-ASR (20M+ hours, dialect-aware) |
+| PersonaPlex (planned) | Seed LiveInterpret 2.0 (real-time interpretation) |
 
 **Note**: Seed-TTS is NOT publicly available (no API, no weights). ByteDance has stated
 they will not release source code or model weights due to safety concerns. Integration
@@ -200,16 +264,36 @@ Family of music generative models combining language models and diffusion models
 
 ## 5. SEED BROADER ECOSYSTEM
 
+### Models
 | Product | Domain | Description |
 |---|---|---|
-| Seed 2.0 (LLM) | Language | Frontier reasoning, coding, multimodal |
-| Seedance 2.0 | Video | Text/image-to-video, 20s @ 1080p |
-| Seedream | Image | Text-to-image with thinking + search |
-| Seed-TTS | Speech | Human-level TTS + voice cloning |
-| Seed LiveInterpret | Translation | Real-time speech-to-speech interpretation |
-| Seed-Music | Music | Controllable generation + editing |
+| Seed 2.0 (LLM) | Language | Frontier reasoning, coding, multimodal (Pro/Lite/Mini/Code) |
+| Seed 1.5-VL | Vision-Language | SOTA on 38/60 multimodal benchmarks |
+| Seed Coder | Code | Diffusion-based code generation, 2,146 tokens/sec |
+| Seedance 2.0 | Video | Text/image-to-video, 2K, ~20s, native audio |
+| Seedream 4.5 | Image | Up to 4K, multi-image composition, text rendering |
+| SeedEdit 3.0 | Image Editing | Fast generative editing for real-world images |
+| Seed-TTS | Speech | Human-level TTS + voice cloning (closed source) |
+| Seed-ASR | Speech Recognition | 20M+ hours, 13 Chinese dialects + 7 foreign languages |
+| Seed Realtime Voice | Voice | End-to-end real-time voice interaction |
+| Seed LiveInterpret 2.0 | Translation | Real-time speech-to-speech interpretation |
+| Seed-Music | Music | Controllable generation + editing across genres |
+| Seed3D 1.0 | 3D | Images to simulation-ready 3D assets with materials |
+| OmniHuman-1.5 | Avatar | Single-image-to-video avatar animation with audio |
 | Seed Biomolecular | Science | Protein structure prediction + de novo design |
-| Seed Robotics | Robotics | Vision-language-action for long-horizon tasks |
+| Seed-Prover | Math | Automated theorem proving |
+| UI-TARS / Seed Agent | GUI Agent | Native GUI agent for virtual environment tasks |
+| Doubao-Seed-Translation | Translation | 28 languages, rivaling GPT-4o and Gemini 2.5 Pro |
+
+### Platforms
+| Platform | Description |
+|---|---|
+| **Doubao** | Consumer AI chatbot — 200M+ MAU, 1.9B interactions during Spring Festival |
+| **Coze** | Zero-code/low-code AI agent platform — open-sourced (Golang + React, 10K+ GitHub stars) |
+| **Jimeng AI** | Creative AI platform (image/video generation consumer app) |
+| **CapCut** | TikTok's video editor — Seedance integration coming |
+| **TRAE** | "The Real AI Engineer" IDE — Seed 2.0 Code integrated for full dev lifecycle |
+| **Volcano Engine** | ByteDance's cloud (China: Volcengine; International: BytePlus) |
 
 ---
 
@@ -328,10 +412,15 @@ IF task requires code review quality
 
 - Seed Platform: https://seed.bytedance.com/en/
 - Seed 2.0 Launch: https://seed.bytedance.com/en/blog/seed2-0
-- Seedance 2.0: https://seed.bytedance.com/en/seedance
+- Seedance 2.0: https://seed.bytedance.com/en/seedance2_0
 - Seed Models: https://seed.bytedance.com/en/models
 - Seed-TTS Paper: https://arxiv.org/pdf/2406.02430
+- Seedance 1.5 Pro Paper: https://arxiv.org/pdf/2512.13507
 - Volcano Engine: https://www.volcengine.com
+- Seed 2.0 Model Card: https://lf3-static.bytednsdoc.com/obj/eden-cn/lapzild-tss/ljhwZthlaukjlkulzlp/seed2/0214/Seed2.0%20Model%20Card.pdf
 - TechNode Review: https://technode.com/2026/02/14/bytedance-releases-doubao-seed-2-0-positions-pro-model-against-gpt-5-2-and-gemini-3-pro/
-- Seedance Guide: https://seedancevideo.com/what-is-seedance/
+- Seedance API Guide: https://www.aifreeapi.com/en/posts/seedance-2-api-integration-guide
+- Seedance Developer Guide: https://www.sitepoint.com/introducing-seedance-2-0/
+- Coze Studio (open source): https://github.com/coze-dev/coze-studio
 - GitHub: https://github.com/ByteDance-Seed
+- HuggingFace: https://huggingface.co/ByteDance-Seed
