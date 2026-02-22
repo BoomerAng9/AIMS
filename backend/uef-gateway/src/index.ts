@@ -150,6 +150,12 @@ const acpLimiter = rateLimit({
 // API Key Authentication — all routes except /health require X-API-Key
 // --------------------------------------------------------------------------
 function requireApiKey(req: express.Request, res: express.Response, next: express.NextFunction): void {
+  // Stripe webhook uses its own signature verification — exempt from API key
+  if (req.path === '/api/payments/stripe/webhook') {
+    next();
+    return;
+  }
+
   // In dev without a key configured, allow requests through
   if (!INTERNAL_API_KEY && process.env.NODE_ENV !== 'production') {
     next();
@@ -2562,7 +2568,13 @@ app.post('/ingress/acp', acpLimiter, async (req, res) => {
       : 0;
 
     let insufficientFunds = false;
-    if (estimatedLucCost > 0 && acpReq.userId !== 'guest') {
+    const isGuest = acpReq.userId === 'guest';
+
+    // Guest users get estimates only — never full agent execution
+    if (isGuest) {
+      insufficientFunds = true;
+      logger.info({ userId: acpReq.userId }, '[UEF] Guest user — estimate only, no agent execution');
+    } else if (estimatedLucCost > 0) {
       const affordable = agentPayments.canAfford(acpReq.userId, estimatedLucCost);
       if (!affordable) {
         insufficientFunds = true;
@@ -2604,8 +2616,12 @@ app.post('/ingress/acp', acpLimiter, async (req, res) => {
     }
 
     // 8. Construct response
-    const acpStatus = insufficientFunds ? 'PAYMENT_REQUIRED' : (oracleResult.passed ? 'SUCCESS' : 'ERROR');
-    const acpMessage = insufficientFunds
+    const acpStatus = isGuest ? 'ESTIMATE_ONLY'
+      : insufficientFunds ? 'PAYMENT_REQUIRED'
+      : (oracleResult.passed ? 'SUCCESS' : 'ERROR');
+    const acpMessage = isGuest
+      ? 'Sign in to execute tasks. Here is your cost estimate.'
+      : insufficientFunds
       ? 'Insufficient LUC balance. Please top up your wallet to continue.'
       : buildResponseMessage(acpReq.intent, oracleResult.passed, agentResult.executed);
 

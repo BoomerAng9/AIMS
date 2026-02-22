@@ -375,9 +375,9 @@ export class AgentPaymentEngine {
    * Uses persistent wallet (SQLite) as source of truth.
    */
   canAfford(agentId: string, lucCost: number): boolean {
-    const persisted = agentWalletStore.get(agentId);
-    if (!persisted) return true; // New wallets get 1000 LUC starting balance
-    return persisted.lucBalance >= lucCost;
+    // Always create wallet if missing — new agents get 1000 LUC starting balance
+    const wallet = agentWalletStore.getOrCreate(agentId);
+    return wallet.lucBalance >= lucCost;
   }
 
   // -----------------------------------------------------------------------

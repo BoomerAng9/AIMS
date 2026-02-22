@@ -301,10 +301,13 @@ agentCommerceRouter.post('/api/payments/agent/confirm', async (req: Request, res
         res.status(400).json({ error: `Stripe verification failed: ${stripeErr.message}` });
         return;
       }
-    } else if (!stripe) {
-      // Stripe SDK not configured — accept with warning (dev/test mode)
+    } else if (!stripe && process.env.NODE_ENV !== 'production') {
+      // Dev mode ONLY: accept without Stripe SDK — blocked in production
       verifiedPaymentId = piId || `unverified_stripe_${sessionId}`;
-      logger.warn({ sessionId }, '[AgentCommerce] Stripe SDK not configured — accepting without verification (dev mode)');
+      logger.warn({ sessionId }, '[AgentCommerce] Stripe SDK not configured — accepting without verification (dev mode only)');
+    } else if (!stripe && process.env.NODE_ENV === 'production') {
+      res.status(503).json({ error: 'Payment processing not available — Stripe not configured' });
+      return;
     } else {
       res.status(400).json({ error: 'stripePaymentIntentId is required for Stripe payments' });
       return;
@@ -443,7 +446,7 @@ agentCommerceRouter.post('/api/payments/stripe/webhook', async (req: Request, re
 
   let event: any;
 
-  // Verify webhook signature when secret is configured
+  // Verify webhook signature — REQUIRED in production
   if (stripe && webhookSecret && sig) {
     try {
       event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
@@ -452,10 +455,14 @@ agentCommerceRouter.post('/api/payments/stripe/webhook', async (req: Request, re
       res.status(400).json({ error: `Webhook signature verification failed: ${err.message}` });
       return;
     }
-  } else if (!webhookSecret) {
-    // Dev mode: accept raw JSON body
-    event = req.body;
-    logger.warn('[StripeWebhook] No STRIPE_WEBHOOK_SECRET — accepting unverified (dev mode)');
+  } else if (!webhookSecret && process.env.NODE_ENV !== 'production') {
+    // Dev mode ONLY: accept raw JSON body — blocked in production
+    event = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+    logger.warn('[StripeWebhook] No STRIPE_WEBHOOK_SECRET — accepting unverified (dev mode only)');
+  } else if (!webhookSecret && process.env.NODE_ENV === 'production') {
+    logger.error('[StripeWebhook] STRIPE_WEBHOOK_SECRET not configured in production — rejecting');
+    res.status(500).json({ error: 'Webhook not configured' });
+    return;
   } else {
     res.status(400).json({ error: 'Missing stripe-signature header' });
     return;
