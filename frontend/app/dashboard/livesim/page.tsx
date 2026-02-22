@@ -129,17 +129,31 @@ export default function LiveSimPage() {
 
       const result = await res.json();
 
-      // Show real intent classification
-      if (result.intent) {
-        addLog('acheevy', 'ACHEEVY', 'result',
-          `Intent: **${result.intent.primary_intent}** (confidence: ${(result.intent.confidence * 100).toFixed(0)}%)`);
-        addLog('acheevy', 'ACHEEVY', 'coordination',
-          `Strategy: ${result.intent.execution_strategy} | Capabilities needed: ${result.intent.capabilities_needed?.join(', ') || 'none'}`);
+      // Tag the source so user knows if this is real or fallback
+      if (result.source === 'local-fallback') {
+        addLog('system', 'System', 'coordination',
+          'ACHEEVY and UEF Gateway are offline — showing limited local analysis');
       }
 
-      // Show real dispatched agents
-      if (result.boomerangs_dispatched && result.boomerangs_dispatched.length > 0) {
-        const dispatched = result.boomerangs_dispatched;
+      // Show real intent classification
+      // API returns camelCase: result.intent with .name, .confidence, .capabilities
+      const intent = result.intent;
+      if (intent) {
+        const intentName = intent.primary_intent || intent.name || 'unknown';
+        const confidence = intent.confidence ?? 0;
+        addLog('acheevy', 'ACHEEVY', 'result',
+          `Intent: **${intentName}** (confidence: ${(confidence * 100).toFixed(0)}%)`);
+        const strategy = intent.execution_strategy || intent.strategy;
+        const caps = intent.capabilities_needed || intent.capabilities || [];
+        if (strategy || caps.length) {
+          addLog('acheevy', 'ACHEEVY', 'coordination',
+            `${strategy ? `Strategy: ${strategy} | ` : ''}Capabilities: ${caps.join(', ') || 'none'}`);
+        }
+      }
+
+      // Show dispatched agents — API returns camelCase "boomerangsDispatched"
+      const dispatched = result.boomerangsDispatched || result.boomerangs_dispatched;
+      if (dispatched && dispatched.length > 0) {
         const agentStatuses: AgentStatus[] = [
           { id: 'acheevy', name: 'ACHEEVY', role: 'Executive Orchestrator', status: 'done' },
           ...dispatched.map((d: { id: string; name: string; status: string }) => ({
@@ -154,22 +168,28 @@ export default function LiveSimPage() {
         addLog('acheevy', 'ACHEEVY', 'action',
           `Dispatched ${dispatched.length} agent(s): ${dispatched.map((d: { name: string }) => d.name).join(', ')}`);
       } else {
-        addLog('acheevy', 'ACHEEVY', 'coordination', 'No agents available for this task type');
+        addLog('acheevy', 'ACHEEVY', 'coordination', 'No agents dispatched for this task');
         setAgents(prev => prev.map(a => ({ ...a, status: 'done' })));
       }
 
-      // Show real action plan
-      if (result.action_plan) {
-        for (const step of result.action_plan) {
+      // Show action plan — API returns camelCase "actionPlan"
+      const actionPlan = result.actionPlan || result.action_plan;
+      if (actionPlan) {
+        for (const step of actionPlan) {
           addLog('acheevy', 'ACHEEVY', 'coordination',
-            `Step ${step.step}: ${step.description} [${step.status}]`);
+            `Step ${step.step}: ${step.description || step.action} [${step.status}]`);
         }
       }
 
-      // Show real LUC cost
-      if (result.luc_debit) {
-        addLog('system', 'System', 'result',
-          `Estimated cost: ${result.luc_debit.tokens_used} tokens ($${result.luc_debit.usd_cost.toFixed(6)})`);
+      // Show LUC cost — API returns camelCase "lucDebit"
+      const lucDebit = result.lucDebit || result.luc_debit;
+      if (lucDebit && typeof lucDebit === 'object') {
+        const tokens = lucDebit.tokens_used || lucDebit.tokensUsed || 0;
+        const usd = lucDebit.usd_cost || lucDebit.usdCost || 0;
+        if (tokens > 0) {
+          addLog('system', 'System', 'result',
+            `Estimated cost: ${tokens} tokens ($${Number(usd).toFixed(6)})`);
+        }
       }
 
       // Show ACHEEVY's real response

@@ -285,16 +285,78 @@ function useServiceHealth() {
 // For backward compat — initial static reference (overridden by hook in component)
 const SERVICES = DEFAULT_SERVICES;
 
-const INTEGRATIONS: Integration[] = [
-  { id: 'claude', name: 'Claude Opus 4.6', provider: 'Anthropic', type: 'ai_model', status: 'active', apiKeySet: true, usageToday: 12500, costToday: 0.45 },
-  { id: 'kimi', name: 'KIMI K2.5', provider: 'Moonshot', type: 'ai_model', status: 'active', apiKeySet: true, usageToday: 8200, costToday: 0.12 },
-  { id: 'deepseek', name: 'DeepSeek V3.2', provider: 'DeepSeek', type: 'ai_model', status: 'active', apiKeySet: true, usageToday: 5400, costToday: 0.08 },
-  { id: 'openrouter', name: 'OpenRouter', provider: 'OpenRouter', type: 'ai_model', status: 'active', apiKeySet: true, byokAllowed: true },
-  { id: 'brave', name: 'Brave Search', provider: 'Brave', type: 'search', status: 'active', apiKeySet: true, usageToday: 340 },
-  { id: 'elevenlabs', name: 'ElevenLabs', provider: 'ElevenLabs', type: 'voice', status: 'inactive', apiKeySet: false, byokAllowed: true },
-  { id: 'deepgram', name: 'Deepgram STT', provider: 'Deepgram', type: 'voice', status: 'inactive', apiKeySet: false, byokAllowed: true },
-  { id: 'stripe', name: 'Stripe', provider: 'Stripe', type: 'payment', status: 'active', apiKeySet: true, ownerOnly: true },
-];
+/** Map UEF Gateway API key IDs to display-friendly integration entries */
+const KEY_TO_INTEGRATION: Record<string, { name: string; provider: string; type: Integration['type'] }> = {
+  OPENROUTER_API_KEY: { name: 'OpenRouter', provider: 'OpenRouter', type: 'ai_model' },
+  ANTHROPIC_API_KEY: { name: 'Anthropic (Claude)', provider: 'Anthropic', type: 'ai_model' },
+  GEMINI_API_KEY: { name: 'Gemini', provider: 'Google', type: 'ai_model' },
+  BRAVE_API_KEY: { name: 'Brave Search', provider: 'Brave', type: 'search' },
+  ELEVENLABS_API_KEY: { name: 'ElevenLabs TTS', provider: 'ElevenLabs', type: 'voice' },
+  DEEPGRAM_API_KEY: { name: 'Deepgram STT', provider: 'Deepgram', type: 'voice' },
+  STRIPE_SECRET_KEY: { name: 'Stripe', provider: 'Stripe', type: 'payment' },
+  STRIPE_PUBLISHABLE_KEY: { name: 'Stripe (Client)', provider: 'Stripe', type: 'payment' },
+  STRIPE_WEBHOOK_SECRET: { name: 'Stripe Webhooks', provider: 'Stripe', type: 'payment' },
+};
+
+/** Fetch real integration & API key status from UEF Gateway */
+function useIntegrations() {
+  const [integrations, setIntegrations] = useState<Integration[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch('/api/circuit-box/integrations', { cache: 'no-store' });
+        if (!res.ok) return;
+        const data = await res.json();
+
+        const mapped: Integration[] = [];
+
+        // Map real API key statuses into integration entries
+        if (data.keys && Array.isArray(data.keys)) {
+          for (const key of data.keys as { id: string; configured: boolean }[]) {
+            const meta = KEY_TO_INTEGRATION[key.id];
+            if (!meta) continue; // skip internal keys like NEXTAUTH_SECRET
+            mapped.push({
+              id: key.id.toLowerCase(),
+              name: meta.name,
+              provider: meta.provider,
+              type: meta.type,
+              status: key.configured ? 'active' : 'inactive',
+              apiKeySet: key.configured,
+              ownerOnly: meta.type === 'payment',
+              byokAllowed: ['voice', 'search'].includes(meta.type),
+            });
+          }
+        }
+
+        // Merge any additional integrations from registry
+        if (data.integrations && Array.isArray(data.integrations)) {
+          for (const integ of data.integrations as { id: string; name: string; provider?: string; category?: string; status?: string }[]) {
+            if (!mapped.find(m => m.id === integ.id)) {
+              mapped.push({
+                id: integ.id,
+                name: integ.name,
+                provider: integ.provider || 'Unknown',
+                type: (integ.category as Integration['type']) || 'automation',
+                status: integ.status === 'active' ? 'active' : 'inactive',
+                apiKeySet: integ.status === 'active',
+              });
+            }
+          }
+        }
+
+        setIntegrations(mapped);
+      } catch {
+        // Gateway unreachable — show empty
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  return { integrations, loading };
+}
 
 /** Fetch real Boomer_Ang roster from House of Ang */
 function useBoomerangs() {
@@ -515,12 +577,6 @@ function IntegrationRow({ integration, isOwner }: { integration: Integration; is
         </div>
       </div>
       <div className="flex items-center gap-3 flex-shrink-0">
-        {isOwner && integration.usageToday !== undefined && (
-          <div className="text-right hidden sm:block">
-            <div className="text-xs text-gray-400">{integration.usageToday.toLocaleString()} tokens</div>
-            {integration.costToday !== undefined && <div className="text-xs text-gold font-mono">${integration.costToday.toFixed(2)}</div>}
-          </div>
-        )}
         <div className="flex items-center gap-1.5">
           {integration.apiKeySet ? (
             <span className="flex items-center gap-1 text-xs text-cb-green"><LockIcon className="w-3.5 h-3.5" />Set</span>
@@ -582,33 +638,46 @@ function BoomerAngCard({ ang }: { ang: BoomerAngConfig }) {
 // Social Channels Panel
 // ─────────────────────────────────────────────────────────────
 
+/** Setup instructions per channel (static — these are real) */
+const CHANNEL_SETUP: Record<string, { steps: string[]; commands: string[] }> = {
+  telegram: {
+    steps: ['Open Telegram and search for your AIMS bot', 'Send /start to begin', 'Copy the link code provided', 'Paste it in the field below'],
+    commands: ['/start — Begin setup', '/help — Show commands', '/disconnect — Unlink account'],
+  },
+  discord: {
+    steps: ['Invite the AIMS bot to your Discord server', 'In any channel, type !link', 'Copy the link code provided', 'Paste it in the field below'],
+    commands: ['!link — Begin setup', '!help — Show commands', '!disconnect — Unlink'],
+  },
+  whatsapp: {
+    steps: [],
+    commands: [],
+  },
+};
+
 function SocialChannelsPanel({ isOwner }: { isOwner: boolean }) {
-  const channels = [
-    {
-      id: 'telegram',
-      name: 'Telegram',
-      icon: '✈',
-      status: 'connected' as const,
-      setupSteps: ['Open Telegram and search for your AIMS bot', 'Send /start to begin', 'Copy the link code provided', 'Paste it in the field below'],
-      commands: ['/start — Begin setup', '/help — Show commands', '/disconnect — Unlink account'],
-    },
-    {
-      id: 'whatsapp',
-      name: 'WhatsApp',
-      icon: '📱',
-      status: 'disconnected' as const,
-      setupSteps: ['Add the AIMS WhatsApp number to your contacts', 'Send "link" as your first message', 'Copy the link code provided', 'Paste it in the field below'],
-      commands: ['Send "link" — Begin setup', 'Send "help" — Show commands', 'Send "disconnect" — Unlink'],
-    },
-    {
-      id: 'discord',
-      name: 'Discord',
-      icon: '🎮',
-      status: 'disconnected' as const,
-      setupSteps: ['Invite the AIMS bot to your Discord server', 'In any channel, type !link', 'Copy the link code provided', 'Paste it in the field below'],
-      commands: ['!link — Begin setup', '!help — Show commands', '!disconnect — Unlink'],
-    },
-  ];
+  const [channels, setChannels] = useState<Array<{ id: string; name: string; icon: string; configured: boolean; status: string }>>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch('/api/circuit-box/social', { cache: 'no-store' });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.channels) setChannels(data.channels);
+      } catch {
+        // API unreachable
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  const statusBadge = (status: string) => {
+    if (status === 'configured') return { label: 'BOT TOKEN SET', cls: 'bg-cb-green/10 text-cb-green border-cb-green/30' };
+    if (status === 'not_built') return { label: 'NOT BUILT', cls: 'bg-cb-red/10 text-cb-red border-cb-red/30' };
+    return { label: 'TOKEN MISSING', cls: 'bg-cb-fog/10 text-cb-fog border-cb-fog/30' };
+  };
 
   return (
     <div className="space-y-4">
@@ -624,74 +693,109 @@ function SocialChannelsPanel({ isOwner }: { isOwner: boolean }) {
         <div className="p-3 rounded-xl border border-gold/20 bg-gold/5 mb-4">
           <div className="flex items-center gap-2 mb-1">
             <ShieldIcon className="w-4 h-4 text-gold" />
-            <span className="text-xs font-bold text-gold uppercase tracking-wider">Owner Controls</span>
+            <span className="text-xs font-bold text-gold uppercase tracking-wider">Channel Status</span>
           </div>
-          <p className="text-xs text-cb-fog mb-3">Enable or disable social channels globally for all users.</p>
+          <p className="text-xs text-cb-fog mb-3">Real-time status of social channel bot tokens and webhook endpoints.</p>
           <div className="grid grid-cols-3 gap-2">
-            {channels.map(ch => (
-              <div key={ch.id} className="flex items-center justify-between p-2 rounded-lg bg-ink/80 border border-wireframe-stroke">
-                <span className="text-xs text-white">{ch.icon} {ch.name}</span>
-                <ToggleOnIcon className="w-8 h-4 text-cb-green" />
-              </div>
-            ))}
+            {channels.map(ch => {
+              const badge = statusBadge(ch.status);
+              return (
+                <div key={ch.id} className="flex items-center justify-between p-2 rounded-lg bg-ink/80 border border-wireframe-stroke">
+                  <span className="text-xs text-white">{ch.icon} {ch.name}</span>
+                  {ch.configured
+                    ? <CheckCircleIcon className="w-4 h-4 text-cb-green" />
+                    : <AlertIcon className="w-4 h-4 text-cb-fog" />
+                  }
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {channels.map(ch => (
-          <div key={ch.id} className="p-cb-sm rounded-xl border border-wireframe-stroke bg-ink/80">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <span className="text-xl">{ch.icon}</span>
-                <h3 className="text-sm font-semibold text-white">{ch.name}</h3>
+      {loading ? (
+        <div className="flex items-center justify-center py-8 gap-2">
+          <span className="h-4 w-4 animate-spin rounded-full border-2 border-gold/30 border-t-gold" />
+          <span className="text-xs text-white/30">Checking channel status...</span>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          {channels.map(ch => {
+            const badge = statusBadge(ch.status);
+            const setup = CHANNEL_SETUP[ch.id];
+
+            return (
+              <div key={ch.id} className="p-cb-sm rounded-xl border border-wireframe-stroke bg-ink/80">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xl">{ch.icon}</span>
+                    <h3 className="text-sm font-semibold text-white">{ch.name}</h3>
+                  </div>
+                  <span className={`h-cb-chip flex items-center px-2.5 rounded-lg text-[10px] font-bold tracking-wider border ${badge.cls}`}>
+                    {badge.label}
+                  </span>
+                </div>
+
+                {ch.status === 'not_built' ? (
+                  <div className="py-4 text-center">
+                    <p className="text-xs text-white/30">No backend integration built yet</p>
+                    <p className="text-[10px] text-white/15 mt-1">Webhook endpoint does not exist</p>
+                  </div>
+                ) : (
+                  <>
+                    {/* Setup steps */}
+                    {setup?.steps.length > 0 && (
+                      <div className="mb-3">
+                        <h4 className="text-xs font-medium text-white/60 mb-2 uppercase tracking-wider">Setup</h4>
+                        <ol className="space-y-1">
+                          {setup.steps.map((step, i) => (
+                            <li key={i} className="flex items-start gap-2 text-xs text-cb-fog">
+                              <span className="text-gold font-mono mt-0.5">{i + 1}.</span>
+                              <span>{step}</span>
+                            </li>
+                          ))}
+                        </ol>
+                      </div>
+                    )}
+
+                    {/* Link code input — only if bot token is configured */}
+                    {ch.configured && (
+                      <div className="flex gap-2 mb-3">
+                        <input
+                          type="text"
+                          placeholder="Paste link code"
+                          className="flex-1 px-3 py-2 rounded-lg bg-black/40 border border-wireframe-stroke text-white text-xs font-mono placeholder:text-cb-fog/50 outline-none focus:border-gold/50 transition-colors duration-cb-toggle"
+                        />
+                        <button type="button" className="px-3 py-2 rounded-lg bg-gold/10 text-gold text-xs font-bold border border-gold/30 hover:bg-gold/20 transition-colors duration-cb-toggle">
+                          Link
+                        </button>
+                      </div>
+                    )}
+
+                    {!ch.configured && ch.status !== 'not_built' && (
+                      <div className="p-2 rounded-lg bg-cb-amber/5 border border-cb-amber/20 mb-3">
+                        <p className="text-[10px] text-cb-amber">Bot token not set in environment. Set <code className="font-mono">{ch.id.toUpperCase()}_BOT_TOKEN</code> to enable.</p>
+                      </div>
+                    )}
+
+                    {/* Commands */}
+                    {setup?.commands.length > 0 && (
+                      <div>
+                        <h4 className="text-xs font-medium text-white/60 mb-1.5 uppercase tracking-wider">Commands</h4>
+                        <div className="space-y-0.5">
+                          {setup.commands.map((cmd, i) => (
+                            <div key={i} className="text-[10px] text-cb-fog font-mono">{cmd}</div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
               </div>
-              <span className={`h-cb-chip flex items-center px-2.5 rounded-lg text-[10px] font-bold tracking-wider border ${
-                ch.status === 'connected'
-                  ? 'bg-cb-green/10 text-cb-green border-cb-green/30'
-                  : 'bg-cb-fog/10 text-cb-fog border-cb-fog/30'
-              }`}>
-                {ch.status === 'connected' ? 'CONNECTED' : 'NOT LINKED'}
-              </span>
-            </div>
-
-            {/* Setup steps */}
-            <div className="mb-3">
-              <h4 className="text-xs font-medium text-white/60 mb-2 uppercase tracking-wider">Setup</h4>
-              <ol className="space-y-1">
-                {ch.setupSteps.map((step, i) => (
-                  <li key={i} className="flex items-start gap-2 text-xs text-cb-fog">
-                    <span className="text-gold font-mono mt-0.5">{i + 1}.</span>
-                    <span>{step}</span>
-                  </li>
-                ))}
-              </ol>
-            </div>
-
-            {/* Link code input */}
-            <div className="flex gap-2 mb-3">
-              <input
-                type="text"
-                placeholder="Paste link code"
-                className="flex-1 px-3 py-2 rounded-lg bg-black/40 border border-wireframe-stroke text-white text-xs font-mono placeholder:text-cb-fog/50 outline-none focus:border-gold/50 transition-colors duration-cb-toggle"
-              />
-              <button type="button" className="px-3 py-2 rounded-lg bg-gold/10 text-gold text-xs font-bold border border-gold/30 hover:bg-gold/20 transition-colors duration-cb-toggle">
-                Link
-              </button>
-            </div>
-
-            {/* Commands */}
-            <div>
-              <h4 className="text-xs font-medium text-white/60 mb-1.5 uppercase tracking-wider">Commands</h4>
-              <div className="space-y-0.5">
-                {ch.commands.map((cmd, i) => (
-                  <div key={i} className="text-[10px] text-cb-fog font-mono">{cmd}</div>
-                ))}
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
@@ -923,58 +1027,28 @@ interface TopologyEdge {
   active: boolean;
 }
 
-function useTopologyTelemetry() {
-  const [latencyData, setLatencyData] = useState<Array<{ time: string; gateway: number; acheevy: number; agents: number }>>(() => {
-    return Array.from({ length: 30 }, (_, i) => ({
-      time: new Date(Date.now() - (29 - i) * 60000).toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }),
-      gateway: Math.round(8 + Math.random() * 12),
-      acheevy: Math.round(100 + Math.random() * 80),
-      agents: Math.round(30 + Math.random() * 40),
-    }));
-  });
+/**
+ * Topology data derived from circuit-metrics.
+ * Node layout positions are fixed (architectural truth).
+ * Status and latency are fetched live.
+ */
 
-  const [throughputData, setThroughputData] = useState<Array<{ time: string; ingress: number; egress: number }>>(() => {
-    return Array.from({ length: 30 }, (_, i) => ({
-      time: new Date(Date.now() - (29 - i) * 60000).toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }),
-      ingress: Math.round(40 + Math.random() * 30),
-      egress: Math.round(35 + Math.random() * 25),
-    }));
-  });
+// Static layout — these positions reflect the real architecture
+const TOPOLOGY_LAYOUT: Record<string, { label: string; category: TopologyNode['category']; x: number; y: number }> = {
+  nginx:            { label: 'Nginx',         category: 'core',     x: 50, y: 8 },
+  frontend:         { label: 'Frontend',      category: 'core',     x: 20, y: 28 },
+  'uef-gateway':    { label: 'UEF Gateway',   category: 'core',     x: 50, y: 28 },
+  acheevy:          { label: 'ACHEEVY',       category: 'core',     x: 50, y: 50 },
+  'house-of-ang':   { label: 'House of Ang',  category: 'agent',    x: 80, y: 50 },
+  'agent-bridge':   { label: 'Agent Bridge',  category: 'agent',    x: 80, y: 28 },
+  redis:            { label: 'Redis',         category: 'data',     x: 20, y: 50 },
+  n8n:              { label: 'n8n',           category: 'external',  x: 20, y: 72 },
+  'circuit-metrics':{ label: 'Metrics',       category: 'data',     x: 80, y: 72 },
+  'ii-agent':       { label: 'II Agent',      category: 'agent',    x: 50, y: 72 },
+  'chickenhawk-core':{ label: 'Chicken Hawk', category: 'core',     x: 20, y: 92 },
+};
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const time = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
-      setLatencyData(prev => [...prev.slice(1), {
-        time,
-        gateway: Math.round(8 + Math.random() * 12),
-        acheevy: Math.round(100 + Math.random() * 80),
-        agents: Math.round(30 + Math.random() * 40),
-      }]);
-      setThroughputData(prev => [...prev.slice(1), {
-        time,
-        ingress: Math.round(40 + Math.random() * 30),
-        egress: Math.round(35 + Math.random() * 25),
-      }]);
-    }, 4000);
-    return () => clearInterval(interval);
-  }, []);
-
-  return { latencyData, throughputData };
-}
-
-const TOPOLOGY_NODES: TopologyNode[] = [
-  { id: 'nginx', label: 'Nginx', category: 'core', status: 'online', x: 50, y: 8, latency: 2, rpm: 85 },
-  { id: 'frontend', label: 'Frontend', category: 'core', status: 'online', x: 20, y: 28, latency: 24, rpm: 42 },
-  { id: 'uef-gateway', label: 'UEF Gateway', category: 'core', status: 'online', x: 50, y: 28, latency: 8, rpm: 72 },
-  { id: 'acheevy', label: 'ACHEEVY', category: 'core', status: 'online', x: 50, y: 50, latency: 142, rpm: 38 },
-  { id: 'house-of-ang', label: 'House of Ang', category: 'agent', status: 'online', x: 80, y: 50, latency: 12, rpm: 24 },
-  { id: 'agent-bridge', label: 'Agent Bridge', category: 'agent', status: 'online', x: 80, y: 28, latency: 5, rpm: 56 },
-  { id: 'redis', label: 'Redis', category: 'data', status: 'online', x: 20, y: 50, latency: 1, rpm: 120 },
-  { id: 'n8n', label: 'n8n', category: 'external', status: 'degraded', x: 20, y: 72, latency: 340, rpm: 8 },
-  { id: 'circuit-metrics', label: 'Metrics', category: 'data', status: 'online', x: 80, y: 72, latency: 18, rpm: 32 },
-  { id: 'telegram', label: 'Telegram', category: 'social', status: 'online', x: 50, y: 72, latency: 89, rpm: 6 },
-];
-
+// Edges reflect real architectural connections (from docker-compose network)
 const TOPOLOGY_EDGES: TopologyEdge[] = [
   { from: 'nginx', to: 'frontend', label: 'static', active: true },
   { from: 'nginx', to: 'uef-gateway', label: 'API', active: true },
@@ -983,14 +1057,73 @@ const TOPOLOGY_EDGES: TopologyEdge[] = [
   { from: 'acheevy', to: 'house-of-ang', label: 'dispatch', active: true },
   { from: 'acheevy', to: 'redis', label: 'cache', active: true },
   { from: 'agent-bridge', to: 'house-of-ang', label: 'route', active: true },
-  { from: 'acheevy', to: 'n8n', label: 'workflow', active: false },
-  { from: 'acheevy', to: 'telegram', label: 'social', active: true },
+  { from: 'acheevy', to: 'n8n', label: 'workflow', active: true },
   { from: 'house-of-ang', to: 'circuit-metrics', label: 'telemetry', active: true },
   { from: 'uef-gateway', to: 'circuit-metrics', label: 'metrics', active: true },
+  { from: 'acheevy', to: 'ii-agent', label: 'research', active: true },
+  { from: 'acheevy', to: 'chickenhawk-core', label: 'tasks', active: true },
 ];
 
+/** Fetch live topology node data from circuit-metrics */
+function useTopologyNodes() {
+  const [nodes, setNodes] = useState<TopologyNode[]>([]);
+  const [latencyHistory, setLatencyHistory] = useState<Array<{ time: string; gateway: number; acheevy: number; agents: number }>>([]);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const poll = async () => {
+      try {
+        const res = await fetch('/api/circuit-box/services', { cache: 'no-store' });
+        if (!res.ok || !mounted) return;
+        const data = await res.json();
+        if (!data.services || !Array.isArray(data.services)) return;
+
+        const svcMap = new Map<string, { status: string; responseTime: number }>();
+        for (const svc of data.services as { name: string; status: string; responseTime: number }[]) {
+          svcMap.set(svc.name, { status: svc.status, responseTime: svc.responseTime });
+        }
+
+        // Build topology nodes from live data + static layout
+        const liveNodes: TopologyNode[] = [];
+        for (const [id, layout] of Object.entries(TOPOLOGY_LAYOUT)) {
+          const live = svcMap.get(id);
+          liveNodes.push({
+            id,
+            label: layout.label,
+            category: layout.category,
+            status: live ? (live.status === 'up' ? 'online' : live.status === 'degraded' ? 'degraded' : 'offline') : 'offline',
+            x: layout.x,
+            y: layout.y,
+            latency: live?.responseTime ?? 0,
+            rpm: 0, // we don't have real RPM data — so we show 0 instead of faking it
+          });
+        }
+        setNodes(liveNodes);
+
+        // Build latency history point
+        const time = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+        const gwLatency = svcMap.get('uef-gateway')?.responseTime ?? 0;
+        const acheevyLatency = svcMap.get('acheevy')?.responseTime ?? 0;
+        const agentAvg = (['house-of-ang', 'agent-bridge', 'ii-agent']
+          .map(id => svcMap.get(id)?.responseTime ?? 0)
+          .reduce((a, b) => a + b, 0)) / 3;
+        setLatencyHistory(prev => [...prev.slice(-29), { time, gateway: gwLatency, acheevy: acheevyLatency, agents: Math.round(agentAvg) }]);
+      } catch {
+        // keep existing data on error
+      }
+    };
+
+    poll();
+    const interval = setInterval(poll, 30000);
+    return () => { mounted = false; clearInterval(interval); };
+  }, []);
+
+  return { nodes, latencyHistory };
+}
+
 function TopologyPanel() {
-  const { latencyData, throughputData } = useTopologyTelemetry();
+  const { nodes: TOPOLOGY_NODES, latencyHistory: latencyData } = useTopologyNodes();
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
 
   const categoryColors: Record<string, { bg: string; border: string; text: string; glow: string }> = {
@@ -1011,7 +1144,6 @@ function TopologyPanel() {
           { cat: 'agent', label: 'Agents', color: '#22D3EE' },
           { cat: 'data', label: 'Data', color: '#C084FC' },
           { cat: 'external', label: 'External', color: '#F59E0B' },
-          { cat: 'social', label: 'Social', color: '#22D3EE' },
         ].map(c => (
           <span key={c.cat} className="flex items-center gap-1.5 text-[10px]" style={{ color: c.color }}>
             <span className="h-2 w-2 rounded-full" style={{ backgroundColor: c.color }} />
@@ -1070,9 +1202,8 @@ function TopologyPanel() {
                     animate={{ opacity: 1, height: 'auto' }}
                     className="mt-2 pt-2 border-t border-wireframe-stroke space-y-0.5"
                   >
-                    <div className="text-[10px] text-cb-fog">Latency: <span className={`font-mono font-bold ${node.latency > 200 ? 'text-cb-amber' : c.text}`}>{node.latency}ms</span></div>
-                    <div className="text-[10px] text-cb-fog">RPM: <span className={`font-mono font-bold ${c.text}`}>{node.rpm}</span></div>
-                    <div className="text-[10px] text-cb-fog">Status: <span className={`font-mono font-bold capitalize ${node.status === 'online' ? 'text-cb-green' : 'text-cb-amber'}`}>{node.status}</span></div>
+                    <div className="text-[10px] text-cb-fog">Latency: <span className={`font-mono font-bold ${node.latency > 200 ? 'text-cb-amber' : c.text}`}>{node.latency > 0 ? `${node.latency}ms` : '—'}</span></div>
+                    <div className="text-[10px] text-cb-fog">Status: <span className={`font-mono font-bold capitalize ${node.status === 'online' ? 'text-cb-green' : node.status === 'degraded' ? 'text-cb-amber' : 'text-cb-red'}`}>{node.status}</span></div>
                   </motion.div>
                 )}
               </div>
@@ -1120,25 +1251,17 @@ function TopologyPanel() {
           </ResponsiveContainer>
         </div>
 
-        {/* Throughput */}
+        {/* Throughput — no real RPM data available yet */}
         <div className="rounded-2xl border border-wireframe-stroke bg-black/60 p-5 backdrop-blur-xl">
           <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
             <span className="text-cb-cyan">📡</span> Throughput (req/min)
           </h3>
-          <div className="flex items-center gap-4 mb-3">
-            <span className="flex items-center gap-1 text-[10px] text-emerald-400"><span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />Ingress</span>
-            <span className="flex items-center gap-1 text-[10px] text-sky-400"><span className="h-1.5 w-1.5 rounded-full bg-sky-400" />Egress</span>
+          <div className="flex items-center justify-center py-12 text-center">
+            <div>
+              <p className="text-xs text-white/30 mb-1">Throughput monitoring not yet instrumented</p>
+              <p className="text-[10px] text-white/15">Requires request-level logging in UEF Gateway</p>
+            </div>
           </div>
-          <ResponsiveContainer width="100%" height={180}>
-            <BarChart data={throughputData} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
-              <XAxis dataKey="time" tick={{ fontSize: 9, fill: 'rgba(255,255,255,0.2)' }} tickLine={false} axisLine={false} interval={5} />
-              <YAxis tick={{ fontSize: 9, fill: 'rgba(255,255,255,0.2)' }} tickLine={false} axisLine={false} width={30} />
-              <Tooltip content={<TopoTooltip unit=" rpm" />} />
-              <Bar dataKey="ingress" name="Ingress" fill="#22C55E" opacity={0.7} radius={[2, 2, 0, 0]} />
-              <Bar dataKey="egress" name="Egress" fill="#38BDF8" opacity={0.7} radius={[2, 2, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
         </div>
       </div>
     </div>
@@ -1305,6 +1428,7 @@ function CircuitBoxContent() {
   const liveEvents = useLiveEvents();
   const { services: liveServices, refresh: refreshServices } = useServiceHealth();
   const liveBoomerangs = useBoomerangs();
+  const { integrations: liveIntegrations } = useIntegrations();
 
   // Determine role
   const userRole = (session?.user as Record<string, unknown> | undefined)?.role;
@@ -1348,7 +1472,7 @@ function CircuitBoxContent() {
   const activeBoomerangs = liveBoomerangs.length > 0 ? liveBoomerangs : BOOMERANGS;
   const visibleServices = isOwner ? activeServices : activeServices.filter(s => !s.ownerOnly);
   const onlineServices = visibleServices.filter((s) => s.status === 'online' || s.status === 'sandbox').length;
-  const visibleIntegrations = isOwner ? INTEGRATIONS : INTEGRATIONS.filter(i => !i.ownerOnly);
+  const visibleIntegrations = isOwner ? liveIntegrations : liveIntegrations.filter(i => !i.ownerOnly);
   const activeIntegrations = visibleIntegrations.filter((i) => i.status === 'active').length;
   const activeAngs = activeBoomerangs.filter((a) => a.status === 'active').length;
 

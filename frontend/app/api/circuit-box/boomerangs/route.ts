@@ -38,7 +38,9 @@ export async function GET() {
       );
     }
 
-    const agents: BoomerAng[] = await listRes.json();
+    const body = await listRes.json();
+    // House of Ang wraps the array: { boomerangs: [...] }
+    const agents: BoomerAng[] = Array.isArray(body) ? body : (body.boomerangs || []);
 
     // Check health of each agent in parallel
     const healthResults = await Promise.all(
