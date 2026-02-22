@@ -17,6 +17,9 @@
  *   - L.I.B. Instructions (Logic, Instructions, Behaviors — not "soul.md")
  *   - Look-Listen-Learn Engine (OCR, active listening, trigger detection, adaptation)
  *   - Personality Inheritance (Boomer_Ang trait index from ACHEEVY DNA)
+ *   - Enterprise Workspace (org-level container, RBAC, multi-instance)
+ *   - Enterprise Security (tenant isolation, compliance gates, network segmentation)
+ *   - Enterprise Fleet Manager (bulk spin-up, fleet health, resource pooling)
  *
  * "Activity breeds Activity — shipped beats perfect."
  */
@@ -131,6 +134,50 @@ export {
   updateCollectedData,
   completeSession,
 } from './hooks/vertical-detection.hook';
+
+// ── Enterprise Workspace ─────────────────────────────────────────────────
+export {
+  workspaceManager,
+  ENTERPRISE_PLANS,
+  ROLE_PERMISSIONS,
+} from './enterprise-workspace';
+export type {
+  EnterpriseWorkspace,
+  WorkspaceStatus,
+  WorkspaceRole,
+  WorkspaceMember,
+  WorkspacePermission,
+  WorkspaceEnvironment,
+  ComplianceProfile,
+  NetworkIsolation,
+  WorkspaceResourceLimits,
+  EnterprisePlanDefinition,
+} from './enterprise-workspace';
+
+// ── Enterprise Security ─────────────────────────────────────────────────
+export {
+  enterpriseSecurity,
+  COMPLIANCE_GATES,
+} from './enterprise-security';
+export type {
+  SecurityEvent,
+  SecuritySeverity,
+  SecurityEventCategory,
+  ComplianceGate,
+  ComplianceCheckResult,
+  NetworkSecurityRule,
+  DataBoundary,
+} from './enterprise-security';
+
+// ── Enterprise Fleet Manager ────────────────────────────────────────────
+export { fleetManager } from './enterprise-fleet';
+export type {
+  FleetInstance,
+  DeploymentManifest,
+  ManifestInstance,
+  FleetHealthSnapshot,
+  BulkOperationResult,
+} from './enterprise-fleet';
 
 // ── Types ───────────────────────────────────────────────────────────────
 export type {

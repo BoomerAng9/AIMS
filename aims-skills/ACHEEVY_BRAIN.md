@@ -1692,6 +1692,97 @@ Protects all PaaS operations with:
 
 ---
 
+## 30. Enterprise Launch — Multi-Instance Secured Environments
+
+Organizations deploy fleets, not single instances. The Enterprise Launch system
+handles the full lifecycle of an organization on A.I.M.S.
+
+### Enterprise Architecture
+
+```
+ORGANIZATION (Enterprise Workspace)
+  ├── RBAC (owner, admin, operator, developer, viewer, auditor)
+  ├── LUC Account (workspace-level billing, enterprise plan)
+  ├── Compliance Profile (SOC2, HIPAA, GDPR, PCI-DSS, ISO-27001, FEDRAMP)
+  ├── Network Isolation (VPC, ingress/egress policies, TLS)
+  ├── Data Boundaries (classification, residency, encryption)
+  │
+  ├── PRODUCTION Environment
+  │   ├── Instance: n8n-workflows (port 51000)
+  │   ├── Instance: openclaw-agents (port 51010)
+  │   └── Instance: deerflow-research (port 51020)
+  │
+  ├── STAGING Environment
+  │   ├── Instance: n8n-workflows-stg (port 51100)
+  │   └── Instance: openclaw-agents-stg (port 51110)
+  │
+  └── DEVELOPMENT Environment
+      └── Instance: sandbox (port 51200)
+```
+
+### Enterprise Plans
+
+| Plan | Instances | Members | CPU | Memory | SLA | Price |
+|------|-----------|---------|-----|--------|-----|-------|
+| **Starter** | 10 | 25 | 16 cores | 32 GB | 99.9% | $499/mo + $49/instance |
+| **Professional** | 50 | 100 | 64 cores | 128 GB | 99.95% | $1,999/mo + $39/instance |
+| **Critical** | 200 | 500 | 256 cores | 512 GB | 99.99% | $4,999/mo + $29/instance |
+
+### Enterprise Security Layer
+
+| Layer | Enforcement |
+|-------|-------------|
+| **RBAC** | 6 roles with 17 granular permissions. Owner → Admin → Operator → Developer → Viewer → Auditor. |
+| **Compliance Gates** | SOC2 (CC6.1, CC6.3, CC7.2, CC8.1), HIPAA (PHI-ACCESS, ENCRYPTION, AUDIT-TRAIL), GDPR (DATA-RESIDENCY, RIGHT-TO-DELETE, CONSENT), PCI-DSS (NETWORK-SEGMENTATION, ENCRYPTION) |
+| **Network** | VPC isolation, ingress policy (public/vpn-only/allowlist), egress policy, internal DNS, TLS enforced |
+| **Data** | Classification (public/internal/confidential/restricted), residency controls, encryption at rest + in transit, PII detection |
+| **Audit** | Every access, deployment, config change, and compliance check is logged with actor, action, outcome, and reason |
+
+### Fleet Manager
+
+The Fleet Manager handles multi-instance orchestration:
+
+| Capability | Description |
+|------------|-------------|
+| **Deployment Manifests** | YAML-like manifests that define multiple instances to deploy together with dependencies |
+| **Dependency Resolution** | Topological sort ensures instances deploy in the correct order (DB before API, API before UI) |
+| **Bulk Operations** | Start all, stop all, restart by environment, decommission by tag — all dependency-aware |
+| **Fleet Health** | Aggregate health snapshot: instances by status, environment, health; total resource utilization |
+| **Resource Pooling** | Track CPU, memory, storage usage across the fleet against workspace limits |
+| **Environment Management** | prod/staging/dev segregation with per-environment operations |
+
+### Enterprise Onboarding Flow
+
+1. **Needs Analysis** → Run the 5-section intake (business, technical, security, delivery, budget)
+2. **Plan Selection** → ACHEEVY recommends Starter/Professional/Critical based on needs
+3. **Workspace Provisioning** → Create workspace with RBAC, compliance, network config
+4. **Member Onboarding** → Owner invites team members with appropriate roles
+5. **Deployment Manifest** → Create manifest for initial fleet deployment
+6. **Validation** → Check resource limits, dependencies, compliance gates
+7. **LUC Quote** → Present total cost estimate (base + per-instance)
+8. **Approval Gate** → Human-in-the-loop sign-off
+9. **Fleet Deployment** → Bulk spin-up in dependency order
+10. **Health Verification** → Fleet health check, all instances healthy
+11. **Compliance Audit** → Run initial compliance audit against configured frameworks
+12. **Activation** → Workspace goes live
+
+### Rules
+
+1. **Every enterprise workspace is a security boundary.** No data leaks between workspaces. Ever.
+2. **Compliance gates are non-negotiable.** If HIPAA is configured, MFA is required. No exceptions.
+3. **Fleet operations respect dependencies.** Stop dependents before dependencies. Start dependencies before dependents.
+4. **Resource limits are enforced.** Can't spin up more instances than your plan allows. Upgrade or decommission.
+5. **Everything is audited.** Every access, deployment, config change, and compliance check.
+6. **Human-in-the-loop on deployment.** Enterprise deployments require explicit approval.
+7. **LUC quote before commit.** Enterprise users see total fleet cost before approving.
+
+**Files:**
+- `acheevy-verticals/enterprise-workspace.ts` — Workspace model, RBAC, member management
+- `acheevy-verticals/enterprise-security.ts` — Compliance gates, network rules, data boundaries
+- `acheevy-verticals/enterprise-fleet.ts` — Fleet manager, deployment manifests, bulk operations
+
+---
+
 > **"Activity breeds Activity — shipped beats perfect."**
 >
 > **"AI Managed Solutions is not a name. It's what we do. We manage services with AI."**
@@ -1705,5 +1796,5 @@ Protects all PaaS operations with:
 > The Transaction Model makes every action accountable. The Methodology Engine
 > makes every approach deliberate. The L.I.B. makes every interaction intentional.
 > Look-Listen-Learn makes every engagement intelligent. Personality Inheritance
-> makes every agent carry ACHEEVY's DNA.
+> makes every agent carry ACHEEVY's DNA. Enterprise Launch makes organizations possible.
 > Together, they are A.I.M.S. — managing services with AI, autonomously, with a human in the loop.
