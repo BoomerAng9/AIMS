@@ -149,8 +149,19 @@ export const paymentSessionStore = {
     const setClauses: string[] = [];
     const values: unknown[] = [];
 
+    // SECURITY: Only allow known column names to prevent SQL injection via key names
+    const ALLOWED_COLUMNS = new Set([
+      'resourceType', 'resourceId', 'amount', 'currency', 'network', 'status',
+      'agentId', 'metadata', 'receipt', 'stripePaymentIntentId',
+      'stripeCheckoutSessionId', 'createdAt', 'completedAt', 'expiresAt',
+    ]);
+
     for (const [key, value] of Object.entries(updates)) {
       if (key === 'id') continue;
+      if (!ALLOWED_COLUMNS.has(key)) {
+        logger.warn({ key }, '[BillingDB] Rejected unknown column in payment session update');
+        continue;
+      }
       setClauses.push(`${key} = ?`);
       values.push(key === 'metadata' ? JSON.stringify(value) : value);
     }

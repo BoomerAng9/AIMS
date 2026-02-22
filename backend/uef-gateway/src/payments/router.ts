@@ -3,18 +3,35 @@
  *
  * Routes:
  *   POST /api/payments/x402/verify         — Verify X402 payment proof
- *   POST /api/payments/tokens/create       — Create scoped payment token
+ *   POST /api/payments/tokens/create       — Create scoped payment token (internal only)
  *   POST /api/payments/purchase             — Process purchase with token
  *   GET  /api/payments/wallet/:agentId      — Get agent wallet
- *   POST /api/payments/wallet/:agentId/credit — Credit LUC to wallet
+ *   POST /api/payments/wallet/:agentId/credit — Credit LUC to wallet (internal only)
+ *
+ * SECURITY: Token creation and wallet credit require x-internal-caller header.
+ * All routes require INTERNAL_API_KEY via global middleware.
  */
 
-import { Router } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import { agentPayments } from './agent-payments';
 import { agentCommerceRouter } from '../billing/agent-commerce';
 import logger from '../logger';
 
 export const paymentsRouter = Router();
+
+// ---------------------------------------------------------------------------
+// Internal-only middleware — blocks external callers from privileged routes
+// ---------------------------------------------------------------------------
+
+function requireInternalCaller(req: Request, res: Response, next: NextFunction): void {
+  const caller = req.headers['x-internal-caller'];
+  if (caller !== 'acheevy' && caller !== 'uef-gateway' && caller !== 'stripe-webhook') {
+    logger.warn({ path: req.path, ip: req.ip }, '[Payments] Rejected: privileged route requires x-internal-caller header');
+    res.status(403).json({ error: 'Forbidden — this endpoint is restricted to internal services' });
+    return;
+  }
+  next();
+}
 
 // ---------------------------------------------------------------------------
 // X402 Protocol
@@ -42,10 +59,10 @@ paymentsRouter.post('/api/payments/x402/verify', (req, res) => {
 });
 
 // ---------------------------------------------------------------------------
-// Payment Tokens
+// Payment Tokens — INTERNAL ONLY (requires x-internal-caller)
 // ---------------------------------------------------------------------------
 
-paymentsRouter.post('/api/payments/tokens/create', (req, res) => {
+paymentsRouter.post('/api/payments/tokens/create', requireInternalCaller, (req, res) => {
   try {
     const { agentId, maxAmount, currency, allowedProducts, ttlMinutes, maxUses } = req.body;
     if (!agentId || !maxAmount) {
@@ -100,13 +117,12 @@ paymentsRouter.post('/api/payments/purchase', (req, res) => {
 });
 
 // ---------------------------------------------------------------------------
-// Agent Wallets
+// Agent Wallets — Read is open (behind API key), Write is internal only
 // ---------------------------------------------------------------------------
 
 paymentsRouter.get('/api/payments/wallet/:agentId', (req, res) => {
   const wallet = agentPayments.getWallet(req.params.agentId);
   if (!wallet) {
-    // Create default wallet
     const newWallet = agentPayments.getOrCreateWallet(req.params.agentId);
     res.json({ wallet: newWallet });
     return;
@@ -114,11 +130,18 @@ paymentsRouter.get('/api/payments/wallet/:agentId', (req, res) => {
   res.json({ wallet });
 });
 
-paymentsRouter.post('/api/payments/wallet/:agentId/credit', (req, res) => {
+// SECURITY: Wallet credit requires internal caller header
+paymentsRouter.post('/api/payments/wallet/:agentId/credit', requireInternalCaller, (req, res) => {
   try {
     const { amount, description } = req.body;
-    if (!amount) {
-      res.status(400).json({ error: 'amount is required' });
+    if (!amount || typeof amount !== 'number' || amount <= 0) {
+      res.status(400).json({ error: 'amount must be a positive number' });
+      return;
+    }
+
+    // Cap single credit to prevent abuse
+    if (amount > 100000) {
+      res.status(400).json({ error: 'Credit amount exceeds maximum (100000 LUC)' });
       return;
     }
 

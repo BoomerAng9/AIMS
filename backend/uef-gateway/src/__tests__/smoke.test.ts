@@ -9,6 +9,9 @@
  * before any deployment.
  */
 
+// Set test API key BEFORE importing app (which reads env at module load)
+process.env.INTERNAL_API_KEY = 'test-smoke-key-2026';
+
 import app from '../index';
 import http from 'http';
 
@@ -36,6 +39,7 @@ async function request(
     const reqBody = options.body ? JSON.stringify(options.body) : undefined;
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
+      'x-api-key': 'test-smoke-key-2026',
       ...(options.headers || {}),
     };
     if (reqBody) headers['Content-Length'] = Buffer.byteLength(reqBody).toString();

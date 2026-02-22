@@ -247,13 +247,9 @@ async function validateReceipt(receiptHeader: string): Promise<X402Receipt | nul
           amount: receipt.amount,
         }, '[X402] Stripe-verified receipt accepted');
       } catch (stripeErr: any) {
-        // If it's a pi_ ID and lookup fails, reject
-        if (receipt.paymentId.startsWith('pi_')) {
-          logger.warn({ paymentId: receipt.paymentId, err: stripeErr.message }, '[X402] Stripe verification failed');
-          return null;
-        }
-        // For non-Stripe IDs (legacy), fall through to basic acceptance
-        logger.info({ paymentId: receipt.paymentId }, '[X402] Non-Stripe payment ID — accepting with basic validation');
+        // SECURITY: Reject ALL payment IDs that fail verification — no silent acceptance
+        logger.warn({ paymentId: receipt.paymentId, err: stripeErr.message }, '[X402] Payment verification failed — rejecting');
+        return null;
       }
     }
 
