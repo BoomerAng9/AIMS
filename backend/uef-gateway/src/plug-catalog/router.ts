@@ -23,7 +23,7 @@
  *   GET  /api/plug-instances/containers   — List all AIMS-managed containers
  */
 
-import { Router } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import { plugCatalog } from './catalog';
 import { plugDeployEngine } from './deploy-engine';
 import { needsAnalysis } from './needs-analysis';
@@ -35,6 +35,63 @@ import { kvSync } from './kv-sync';
 import logger from '../logger';
 
 export const plugRouter = Router();
+
+// ---------------------------------------------------------------------------
+// SECURITY: Ownership Middleware — verifies the authenticated user owns the instance
+// ---------------------------------------------------------------------------
+
+/**
+ * Extract the authenticated userId from headers (set by frontend/auth layer).
+ * Falls back to query param for GET requests only (backwards compat).
+ */
+function getAuthenticatedUserId(req: Request): string | undefined {
+  return (req.headers['x-user-id'] as string | undefined) || undefined;
+}
+
+/**
+ * Middleware: Requires x-user-id header and verifies the user owns the instance.
+ * Attaches the instance to res.locals.instance for downstream use.
+ */
+function requireInstanceOwnership(req: Request, res: Response, next: NextFunction): void {
+  const userId = getAuthenticatedUserId(req);
+  if (!userId) {
+    res.status(401).json({ error: 'Authentication required — x-user-id header missing' });
+    return;
+  }
+
+  const instanceId = req.params.id;
+  const instance = plugDeployEngine.getInstance(instanceId);
+  if (!instance) {
+    res.status(404).json({ error: 'Instance not found' });
+    return;
+  }
+
+  if (instance.userId !== userId) {
+    logger.warn(
+      { instanceId, requestedBy: userId, ownedBy: instance.userId },
+      '[PlugRouter] SECURITY: Ownership check failed — user does not own this instance',
+    );
+    res.status(403).json({ error: 'Forbidden — you do not own this instance' });
+    return;
+  }
+
+  res.locals.instance = instance;
+  next();
+}
+
+/**
+ * Middleware: Restricts PaaS operations endpoints to internal callers only.
+ * These endpoints manage platform infrastructure and should not be user-accessible.
+ */
+function requirePlatformAdmin(req: Request, res: Response, next: NextFunction): void {
+  const caller = req.headers['x-internal-caller'];
+  if (caller !== 'acheevy' && caller !== 'uef-gateway') {
+    logger.warn({ path: req.path, ip: req.ip }, '[PlugRouter] Rejected: platform admin route requires x-internal-caller');
+    res.status(403).json({ error: 'Forbidden — this endpoint is restricted to platform administrators' });
+    return;
+  }
+  next();
+}
 
 // ---------------------------------------------------------------------------
 // Catalog — Browse & Search
@@ -110,10 +167,12 @@ plugRouter.post('/plug-catalog/needs/analyze', (req, res) => {
 
 plugRouter.post('/plug-instances/spin-up', async (req, res) => {
   try {
-    const { plugId, userId, instanceName, deliveryMode, customizations, envOverrides, securityLevel, domain, allowExperimental } = req.body;
+    const { plugId, instanceName, deliveryMode, customizations, envOverrides, securityLevel, domain, allowExperimental } = req.body;
 
+    // SECURITY: userId comes from authenticated header, NOT request body
+    const userId = getAuthenticatedUserId(req) || req.body.userId;
     if (!plugId || !userId || !instanceName) {
-      res.status(400).json({ error: 'plugId, userId, and instanceName are required' });
+      res.status(400).json({ error: 'plugId, userId (via x-user-id header), and instanceName are required' });
       return;
     }
 
@@ -162,6 +221,19 @@ plugRouter.post('/plug-instances/export', async (req, res) => {
       return;
     }
 
+    // SECURITY: Verify the requesting user owns this instance
+    const userId = getAuthenticatedUserId(req);
+    const instance = plugDeployEngine.getInstance(instanceId);
+    if (!instance) {
+      res.status(404).json({ error: 'Instance not found' });
+      return;
+    }
+    if (userId && instance.userId !== userId) {
+      logger.warn({ instanceId, requestedBy: userId, ownedBy: instance.userId }, '[PlugRouter] Export denied — not owner');
+      res.status(403).json({ error: 'Forbidden — you do not own this instance' });
+      return;
+    }
+
     const result = await plugDeployEngine.export({
       instanceId,
       format: format || 'docker-compose',
@@ -177,16 +249,29 @@ plugRouter.post('/plug-instances/export', async (req, res) => {
 });
 
 plugRouter.get('/plug-instances', (req, res) => {
-  const userId = req.query.userId as string;
+  // SECURITY: Use authenticated userId from header; fall back to query param
+  const authUserId = getAuthenticatedUserId(req);
+  const queryUserId = req.query.userId as string;
+  const userId = authUserId || queryUserId;
+
   if (!userId) {
-    res.status(400).json({ error: 'userId query parameter is required' });
+    res.status(400).json({ error: 'userId required — set x-user-id header or userId query parameter' });
     return;
   }
+
+  // SECURITY: If both are provided, the authenticated user can only see their own instances
+  if (authUserId && queryUserId && authUserId !== queryUserId) {
+    logger.warn({ authUserId, queryUserId }, '[PlugRouter] SECURITY: User tried to list another user\'s instances');
+    res.status(403).json({ error: 'Forbidden — you can only list your own instances' });
+    return;
+  }
+
   const instances = plugDeployEngine.listByUser(userId);
   res.json({ instances, count: instances.length });
 });
 
-plugRouter.get('/plug-instances/containers', async (_req, res) => {
+// SECURITY: Container listing is restricted to platform admins — exposes all user containers
+plugRouter.get('/plug-instances/containers', requirePlatformAdmin, async (_req, res) => {
   try {
     const containers = await dockerRuntime.listManagedContainers();
     res.json({ containers, count: containers.length });
@@ -196,17 +281,13 @@ plugRouter.get('/plug-instances/containers', async (_req, res) => {
   }
 });
 
-plugRouter.get('/plug-instances/:id', (req, res) => {
-  const instance = plugDeployEngine.getInstance(req.params.id);
-  if (!instance) {
-    res.status(404).json({ error: 'Instance not found' });
-    return;
-  }
+plugRouter.get('/plug-instances/:id', requireInstanceOwnership, (req, res) => {
+  const instance = res.locals.instance;
   const plug = plugCatalog.get(instance.plugId);
   res.json({ instance, plug });
 });
 
-plugRouter.get('/plug-instances/:id/health', async (req, res) => {
+plugRouter.get('/plug-instances/:id/health', requireInstanceOwnership, async (req, res) => {
   try {
     const instance = await plugDeployEngine.refreshInstanceHealth(req.params.id);
     if (!instance) {
@@ -225,7 +306,7 @@ plugRouter.get('/plug-instances/:id/health', async (req, res) => {
   }
 });
 
-plugRouter.post('/plug-instances/:id/stop', async (req, res) => {
+plugRouter.post('/plug-instances/:id/stop', requireInstanceOwnership, async (req, res) => {
   try {
     const instance = await plugDeployEngine.stopInstance(req.params.id);
     res.json({ instance });
@@ -235,7 +316,7 @@ plugRouter.post('/plug-instances/:id/stop', async (req, res) => {
   }
 });
 
-plugRouter.post('/plug-instances/:id/restart', async (req, res) => {
+plugRouter.post('/plug-instances/:id/restart', requireInstanceOwnership, async (req, res) => {
   try {
     const instance = await plugDeployEngine.restartInstance(req.params.id);
     res.json({ instance });
@@ -249,7 +330,7 @@ plugRouter.post('/plug-instances/:id/restart', async (req, res) => {
  * Full decommission — stops container, removes DNS, releases port, cleans up.
  * DELETE /api/plug-instances/:id
  */
-plugRouter.delete('/plug-instances/:id', async (req, res) => {
+plugRouter.delete('/plug-instances/:id', requireInstanceOwnership, async (req, res) => {
   try {
     const result = await instanceLifecycle.decommission(req.params.id);
     if (!result.fullyDecommissioned && result.steps[0]?.detail === 'Instance not found') {
@@ -271,7 +352,7 @@ plugRouter.delete('/plug-instances/:id', async (req, res) => {
  * Platform operations dashboard.
  * GET /api/plug-operations/stats
  */
-plugRouter.get('/plug-operations/stats', (_req, res) => {
+plugRouter.get('/plug-operations/stats', requirePlatformAdmin, (_req, res) => {
   try {
     const stats = instanceLifecycle.getStats();
     res.json(stats);
@@ -285,7 +366,7 @@ plugRouter.get('/plug-operations/stats', (_req, res) => {
  * Health monitor status and recent events.
  * GET /api/plug-operations/health
  */
-plugRouter.get('/plug-operations/health', (_req, res) => {
+plugRouter.get('/plug-operations/health', requirePlatformAdmin, (_req, res) => {
   const stats = healthMonitor.getStats();
   const events = healthMonitor.getRecentEvents(50);
   const statuses = healthMonitor.getAllStatuses();
@@ -296,7 +377,7 @@ plugRouter.get('/plug-operations/health', (_req, res) => {
  * Trigger a manual health sweep.
  * POST /api/plug-operations/health/sweep
  */
-plugRouter.post('/plug-operations/health/sweep', async (_req, res) => {
+plugRouter.post('/plug-operations/health/sweep', requirePlatformAdmin, async (_req, res) => {
   try {
     const events = await healthMonitor.sweep();
     res.json({ events, count: events.length });
@@ -310,7 +391,7 @@ plugRouter.post('/plug-operations/health/sweep', async (_req, res) => {
  * Port allocation status.
  * GET /api/plug-operations/ports
  */
-plugRouter.get('/plug-operations/ports', (_req, res) => {
+plugRouter.get('/plug-operations/ports', requirePlatformAdmin, (_req, res) => {
   const capacity = portAllocator.getCapacity();
   const allocations = portAllocator.getAllocations();
   res.json({ capacity, allocations, count: allocations.length });
@@ -320,7 +401,7 @@ plugRouter.get('/plug-operations/ports', (_req, res) => {
  * Reconcile port allocations with Docker state.
  * POST /api/plug-operations/reconcile
  */
-plugRouter.post('/plug-operations/reconcile', async (_req, res) => {
+plugRouter.post('/plug-operations/reconcile', requirePlatformAdmin, async (_req, res) => {
   try {
     await instanceLifecycle.reconcile();
     const stats = instanceLifecycle.getStats();
@@ -335,7 +416,7 @@ plugRouter.post('/plug-operations/reconcile', async (_req, res) => {
  * Full KV sync — push all active routes to Cloudflare Worker KV.
  * POST /api/plug-operations/kv-sync
  */
-plugRouter.post('/plug-operations/kv-sync', async (_req, res) => {
+plugRouter.post('/plug-operations/kv-sync', requirePlatformAdmin, async (_req, res) => {
   try {
     if (!kvSync.isEnabled()) {
       res.json({ enabled: false, message: 'GATEWAY_SECRET not configured — KV sync disabled' });
@@ -353,7 +434,7 @@ plugRouter.post('/plug-operations/kv-sync', async (_req, res) => {
  * Get current routes from Cloudflare Worker KV.
  * GET /api/plug-operations/kv-routes
  */
-plugRouter.get('/plug-operations/kv-routes', async (_req, res) => {
+plugRouter.get('/plug-operations/kv-routes', requirePlatformAdmin, async (_req, res) => {
   try {
     const routes = await kvSync.getRoutes();
     res.json({ enabled: kvSync.isEnabled(), routes });

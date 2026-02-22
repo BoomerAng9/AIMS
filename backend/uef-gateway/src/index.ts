@@ -91,12 +91,28 @@ const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY || '';
 // --------------------------------------------------------------------------
 // Security Middleware
 // --------------------------------------------------------------------------
-app.use(helmet({ contentSecurityPolicy: false }));
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"], // Frontend may need inline scripts
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", 'data:', 'https:'],
+      connectSrc: ["'self'", 'https:'],
+      fontSrc: ["'self'", 'https:', 'data:'],
+      objectSrc: ["'none'"],
+      frameAncestors: ["'none'"],
+    },
+  },
+  crossOriginEmbedderPolicy: false, // Allow loading external resources (fonts, images)
+}));
 
 const corsOrigin = process.env.CORS_ORIGIN || 'http://localhost:3000';
 app.use(cors({
   origin: corsOrigin.split(',').map(o => o.trim()),
-  methods: ['GET', 'POST'],
+  methods: ['GET', 'POST', 'DELETE', 'PUT', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'x-api-key', 'x-user-id', 'x-internal-caller', 'Authorization'],
+  credentials: true,
 }));
 // Raw body for Stripe webhook signature verification (must be before express.json())
 app.use('/api/payments/stripe/webhook', express.raw({ type: 'application/json' }));
@@ -1604,7 +1620,16 @@ app.post('/billing/check-agents', (req, res) => {
 // Provision tier — called by Stripe webhook after checkout/subscription events
 // Persisted to SQLite via billingProvisions (replaces in-memory Map)
 
+// SECURITY: Billing provision is a privileged operation — requires internal caller
 app.post('/billing/provision', (req, res) => {
+  // Only internal services (Stripe webhook, ACHEEVY) should set billing tiers
+  const caller = req.headers['x-internal-caller'];
+  if (caller !== 'acheevy' && caller !== 'uef-gateway' && caller !== 'stripe-webhook') {
+    logger.warn({ path: req.path, ip: req.ip }, '[Billing] Rejected: provision requires x-internal-caller header');
+    res.status(403).json({ error: 'Forbidden — billing provision is restricted to internal services' });
+    return;
+  }
+
   const { userId, tierId, tierName, stripeCustomerId, stripeSubscriptionId, provisionedAt, reason } = req.body;
   if (!userId || !tierId) {
     res.status(400).json({ error: 'Missing userId or tierId' });
@@ -1627,11 +1652,22 @@ app.post('/billing/provision', (req, res) => {
 });
 
 app.get('/billing/provision', (req, res) => {
-  const userId = req.query.userId as string;
+  const queryUserId = req.query.userId as string;
+  const authUserId = req.headers['x-user-id'] as string | undefined;
+  const userId = authUserId || queryUserId;
+
   if (!userId) {
     res.status(400).json({ error: 'Missing userId' });
     return;
   }
+
+  // SECURITY: Users can only query their own billing provision
+  if (authUserId && queryUserId && authUserId !== queryUserId) {
+    logger.warn({ authUserId, queryUserId }, '[Billing] SECURITY: User tried to read another user\'s provision');
+    res.status(403).json({ error: 'Forbidden — you can only view your own billing status' });
+    return;
+  }
+
   const tier = billingProvisions.get(userId);
   if (!tier) {
     res.json({ userId, tierId: 'p2p', tierName: 'Pay-per-Use', provisioned: false });

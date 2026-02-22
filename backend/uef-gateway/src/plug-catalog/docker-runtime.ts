@@ -118,10 +118,23 @@ export class DockerRuntime {
         exposedPorts[containerPort] = {};
       });
 
-      // Environment variables
-      const env = Object.entries(instance.envOverrides).map(
-        ([key, val]) => `${key}=${val}`,
-      );
+      // Environment variables — SECURITY: validate key names to prevent injection
+      const ENV_KEY_PATTERN = /^[A-Z_][A-Z0-9_]*$/i;
+      const env: string[] = [];
+      for (const [key, val] of Object.entries(instance.envOverrides)) {
+        if (key.startsWith('__')) continue; // Skip internal flags (e.g., __isolated)
+        if (!ENV_KEY_PATTERN.test(key)) {
+          logger.warn({ key, instanceId: instance.instanceId }, '[DockerRuntime] SECURITY: Rejected invalid env var key');
+          continue;
+        }
+        // Prevent overriding critical Docker/system env vars
+        const BLOCKED_KEYS = new Set(['PATH', 'HOME', 'USER', 'SHELL', 'LD_PRELOAD', 'LD_LIBRARY_PATH', 'DOCKER_HOST']);
+        if (BLOCKED_KEYS.has(key.toUpperCase())) {
+          logger.warn({ key, instanceId: instance.instanceId }, '[DockerRuntime] SECURITY: Blocked system env var override');
+          continue;
+        }
+        env.push(`${key}=${val}`);
+      }
       env.push('NODE_ENV=production');
 
       // Volumes
@@ -149,6 +162,10 @@ export class DockerRuntime {
           Memory: parseMemoryLimit(plug.resources.memoryLimit),
           NanoCpus: parseCpuLimit(plug.resources.cpuLimit),
           NetworkMode: plug.networkPolicy.isolatedSandbox ? SANDBOX_NETWORK : AIMS_NETWORK,
+          // SECURITY: Container hardening
+          SecurityOpt: ['no-new-privileges:true'],
+          PidsLimit: 256,
+          ReadonlyRootfs: false, // Many images need writable root; enforce via seccomp instead
         },
         Healthcheck: {
           Test: ['CMD', 'wget', '--no-verbose', '--tries=1', '--spider',
