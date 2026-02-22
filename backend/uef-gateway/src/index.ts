@@ -49,6 +49,7 @@ import { allShelfTools } from './shelves/mcp-tools';
 import { ossModels } from './llm/oss-models';
 import { personaplex } from './llm/personaplex';
 import { N8nClient } from './n8n';
+import { plugRouter } from './plug-catalog/router';
 import logger from './logger';
 
 // Custom Lil_Hawks — User-Created Bots
@@ -1635,6 +1636,11 @@ app.post('/playground/:sessionId/files', (req, res) => {
 // runs, logs, assets
 // --------------------------------------------------------------------------
 app.use(shelfRouter);
+
+// --------------------------------------------------------------------------
+// Plug Catalog & Instance Management — PaaS Operations
+// --------------------------------------------------------------------------
+app.use('/api', plugRouter);
 
 // --------------------------------------------------------------------------
 // LUC Project Service — Pricing & Effort Oracle

@@ -16,6 +16,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import logger from '../logger';
 import { plugCatalog } from './catalog';
+import { dockerRuntime } from './docker-runtime';
 import type {
   PlugDefinition,
   PlugInstance,
@@ -59,7 +60,7 @@ export class PlugDeployEngine {
   // SPIN UP — One-click deployment
   // -----------------------------------------------------------------------
 
-  spinUp(request: SpinUpRequest): SpinUpResult {
+  async spinUp(request: SpinUpRequest): Promise<SpinUpResult> {
     const plug = plugCatalog.get(request.plugId);
     if (!plug) {
       throw new Error(`Plug "${request.plugId}" not found in catalog`);
@@ -124,40 +125,114 @@ export class PlugDeployEngine {
       return this.handleExport(instance, plug, events);
     }
 
-    // 6. HOSTED: Generate Docker Compose
+    // 6. HOSTED: Generate Docker Compose (kept for reference/export)
     const composeYml = this.generatePlugCompose(plug, instance);
     addEvent('build', `Generated Docker Compose (${composeYml.length} bytes)`);
     this.transition(instance, 'building');
 
-    // 7. Generate nginx reverse proxy
+    // 7. Generate nginx reverse proxy config
     const nginxConf = this.generatePlugNginx(plug, instance);
     addEvent('provision', `Generated nginx config for ${instance.domain || `${sanitize(instance.name)}.${AIMS_DOMAIN}`}`);
 
-    // 8. Simulate container start (production would exec docker compose)
+    // 8. Check Docker daemon availability
+    const dockerAvailable = await dockerRuntime.isAvailable();
+    if (!dockerAvailable) {
+      // Fallback: store configs but mark as provisioning (will deploy when Docker is available)
+      this.transition(instance, 'provisioning');
+      addEvent('warn', 'Docker daemon not reachable — instance queued for deployment');
+      instance.exportBundle = {
+        composeFile: composeYml,
+        envTemplate: this.generateEnvTemplate(plug, instance),
+        readmeContent: this.generateReadme(plug, instance),
+        setupScript: this.generateSetupScript(plug, instance),
+        generatedAt: now(),
+      };
+
+      const lucQuote = this.estimateLucCost(plug);
+      return {
+        instance,
+        deploymentId: instanceId,
+        estimatedReadyTime: 'Queued — Docker unavailable',
+        lucQuote,
+        events,
+      };
+    }
+
+    // 9. Pull Docker image
+    const image = plug.docker.image;
+    if (image) {
+      this.transition(instance, 'provisioning');
+      addEvent('pull', `Pulling image: ${image}`);
+      const pullResult = await dockerRuntime.pullImage(image);
+      if (!pullResult.pulled) {
+        addEvent('warn', `Image pull failed: ${pullResult.error}. Attempting to use local image.`);
+      } else {
+        addEvent('pull', `Image pulled successfully: ${image}`);
+      }
+    }
+
+    // 10. Create and start container via Docker API
     this.transition(instance, 'starting');
-    addEvent('deploy', `Starting container on port ${assignedPort}`);
+    addEvent('deploy', `Creating container on port ${assignedPort}`);
 
-    // 9. Health check
-    const healthUrl = `http://localhost:${assignedPort}${plug.healthCheck.endpoint}`;
-    addEvent('health', `Health check endpoint: ${healthUrl}`);
+    const createResult = await dockerRuntime.createContainer(plug, instance);
+    if (!createResult.started) {
+      this.transition(instance, 'failed');
+      addEvent('error', `Container failed to start: ${createResult.error}`);
+      logger.error(
+        { instanceId, error: createResult.error },
+        '[PlugDeploy] Container start failed',
+      );
+      return {
+        instance,
+        deploymentId: instanceId,
+        estimatedReadyTime: 'Failed',
+        lucQuote: 0,
+        events,
+      };
+    }
 
-    // 10. Running
-    this.transition(instance, 'running');
-    instance.startedAt = now();
-    addEvent('ready', `Plug "${plug.name}" is running at port ${assignedPort}`);
+    addEvent('deploy', `Container started (${createResult.containerId.slice(0, 12)})`);
 
-    // 11. Estimate LUC cost
+    // 11. Deploy nginx reverse proxy config
+    const nginxResult = await dockerRuntime.deployNginxConfig(plug, instance, nginxConf);
+    if (nginxResult.deployed) {
+      addEvent('provision', 'Nginx reverse proxy config deployed');
+    } else {
+      addEvent('warn', `Nginx config deploy skipped: ${nginxResult.error}`);
+    }
+
+    // 12. Poll health check
+    addEvent('health', `Polling health at http://127.0.0.1:${assignedPort}${plug.healthCheck.endpoint}`);
+
+    const healthResult = await dockerRuntime.pollHealth(instance, plug);
+    if (healthResult.healthy) {
+      this.transition(instance, 'running');
+      instance.startedAt = now();
+      instance.healthStatus = 'healthy';
+      instance.lastHealthCheck = now();
+      addEvent('ready', `Plug "${plug.name}" is healthy after ${healthResult.attempts} checks`);
+    } else {
+      // Container is running but health check didn't pass yet — still mark as running
+      this.transition(instance, 'running');
+      instance.startedAt = now();
+      instance.healthStatus = 'unhealthy';
+      instance.lastHealthCheck = now();
+      addEvent('warn', `Health check did not pass after ${healthResult.attempts} attempts — container is running but may need time`);
+    }
+
+    // 13. Estimate LUC cost
     const lucQuote = this.estimateLucCost(plug);
 
     logger.info(
-      { instanceId, plugId: plug.id, port: assignedPort },
+      { instanceId, plugId: plug.id, port: assignedPort, containerId: createResult.containerId.slice(0, 12) },
       '[PlugDeploy] Spin-up complete',
     );
 
     return {
       instance,
       deploymentId: instanceId,
-      estimatedReadyTime: '30-60 seconds',
+      estimatedReadyTime: healthResult.healthy ? 'Ready' : '30-60 seconds',
       lucQuote,
       events,
     };
@@ -167,7 +242,7 @@ export class PlugDeployEngine {
   // EXPORT — Package for self-hosting
   // -----------------------------------------------------------------------
 
-  export(request: ExportRequest): ExportResult {
+  async export(request: ExportRequest): Promise<ExportResult> {
     const instance = this.instances.get(request.instanceId);
     if (!instance) {
       throw new Error(`Instance "${request.instanceId}" not found`);
@@ -203,10 +278,16 @@ export class PlugDeployEngine {
     // 6. Health check script
     files['healthcheck.sh'] = this.generateHealthCheckScript(plug);
 
+    const bundleId = uuidv4();
+
+    // Write files to disk
+    const writeResult = await dockerRuntime.writeExportBundle(bundleId, files);
+
     const result: ExportResult = {
-      bundleId: uuidv4(),
+      bundleId,
       files,
       instructions: `1. Copy all files to your server\n2. cp .env.example .env && edit .env with your keys\n3. chmod +x setup.sh && ./setup.sh\n4. Access at http://localhost:${instance.assignedPort}`,
+      downloadUrl: writeResult.dir ? `/api/plugs/export/${bundleId}` : undefined,
       generatedAt: now(),
     };
 
@@ -221,8 +302,8 @@ export class PlugDeployEngine {
     };
 
     logger.info(
-      { bundleId: result.bundleId, fileCount: Object.keys(files).length },
-      '[PlugDeploy] Export complete',
+      { bundleId, fileCount: Object.keys(files).length, dir: writeResult.dir },
+      '[PlugDeploy] Export complete — files written to disk',
     );
 
     return result;
@@ -240,34 +321,84 @@ export class PlugDeployEngine {
     return Array.from(this.instances.values()).filter(i => i.userId === userId);
   }
 
-  stopInstance(instanceId: string): PlugInstance {
+  async stopInstance(instanceId: string): Promise<PlugInstance> {
     const instance = this.requireInstance(instanceId);
+
+    // Stop real container
+    const result = await dockerRuntime.stopContainer(instance);
+    if (!result.stopped) {
+      logger.warn({ instanceId, error: result.error }, '[PlugDeploy] Docker stop failed, updating status anyway');
+    }
+
     this.transition(instance, 'stopped');
     instance.stoppedAt = now();
     logger.info({ instanceId }, '[PlugDeploy] Instance stopped');
     return instance;
   }
 
-  restartInstance(instanceId: string): PlugInstance {
+  async restartInstance(instanceId: string): Promise<PlugInstance> {
     const instance = this.requireInstance(instanceId);
+    const plug = plugCatalog.get(instance.plugId);
+
+    // Stop then recreate
+    await dockerRuntime.stopContainer(instance);
     this.transition(instance, 'starting');
-    this.transition(instance, 'running');
-    instance.startedAt = now();
-    logger.info({ instanceId }, '[PlugDeploy] Instance restarted');
+
+    if (plug) {
+      const createResult = await dockerRuntime.createContainer(plug, instance);
+      if (createResult.started) {
+        this.transition(instance, 'running');
+        instance.startedAt = now();
+        logger.info({ instanceId }, '[PlugDeploy] Instance restarted via Docker');
+      } else {
+        this.transition(instance, 'failed');
+        logger.error({ instanceId, error: createResult.error }, '[PlugDeploy] Restart failed');
+      }
+    } else {
+      this.transition(instance, 'running');
+      instance.startedAt = now();
+    }
+
     return instance;
   }
 
-  removeInstance(instanceId: string): boolean {
+  async removeInstance(instanceId: string): Promise<boolean> {
     const instance = this.instances.get(instanceId);
     if (!instance) return false;
 
-    if (instance.status === 'running') {
-      this.transition(instance, 'stopped');
+    // Remove real container
+    const result = await dockerRuntime.removeContainer(instance);
+    if (!result.removed) {
+      logger.warn({ instanceId, error: result.error }, '[PlugDeploy] Docker remove failed');
     }
 
+    // Remove nginx config
+    await dockerRuntime.removeNginxConfig(instance);
+
     this.instances.delete(instanceId);
-    logger.info({ instanceId }, '[PlugDeploy] Instance removed');
+    logger.info({ instanceId }, '[PlugDeploy] Instance fully decommissioned');
     return true;
+  }
+
+  // -----------------------------------------------------------------------
+  // Instance health refresh — poll real container status
+  // -----------------------------------------------------------------------
+
+  async refreshInstanceHealth(instanceId: string): Promise<PlugInstance | undefined> {
+    const instance = this.instances.get(instanceId);
+    if (!instance || instance.status !== 'running') return instance;
+
+    const status = await dockerRuntime.inspectContainer(instance);
+    instance.healthStatus = status.healthy ? 'healthy' : status.running ? 'unhealthy' : 'unknown';
+    instance.uptimeSeconds = status.uptime;
+    instance.lastHealthCheck = now();
+
+    if (!status.running && instance.status === 'running') {
+      this.transition(instance, 'stopped');
+      instance.stoppedAt = now();
+    }
+
+    return instance;
   }
 
   // -----------------------------------------------------------------------
@@ -649,14 +780,14 @@ exit $?
   // Private helpers
   // -----------------------------------------------------------------------
 
-  private handleExport(
+  private async handleExport(
     instance: PlugInstance,
     plug: PlugDefinition,
     events: SpinUpResult['events'],
-  ): SpinUpResult {
+  ): Promise<SpinUpResult> {
     events.push({ timestamp: now(), stage: 'export', message: 'Generating export bundle...' });
 
-    const exportResult = this.export({
+    const exportResult = await this.export({
       instanceId: instance.instanceId,
       format: 'docker-compose',
       includeData: false,
@@ -665,7 +796,8 @@ exit $?
     events.push({
       timestamp: now(),
       stage: 'ready',
-      message: `Export bundle ready (${Object.keys(exportResult.files).length} files)`,
+      message: `Export bundle ready (${Object.keys(exportResult.files).length} files)` +
+        (exportResult.downloadUrl ? ` — download at ${exportResult.downloadUrl}` : ''),
     });
 
     return {
