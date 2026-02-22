@@ -136,6 +136,15 @@ export const MODELS: Record<string, ModelSpec> = {
     contextWindow: 1000000,
     tier: 'standard',
   },
+  'gemini-3.1-pro': {
+    id: 'google/gemini-3.1-pro',
+    name: 'Gemini 3.1 Pro',
+    provider: 'Google',
+    inputPer1M: 1.25,
+    outputPer1M: 10.0,
+    contextWindow: 2000000,
+    tier: 'standard',
+  },
 
   // ── Fast Tier ────────────────────────────────────────────────────────
   'gemini-3.0-flash': {

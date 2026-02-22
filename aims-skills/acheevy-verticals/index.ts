@@ -20,6 +20,8 @@
  *   - Enterprise Workspace (org-level container, RBAC, multi-instance)
  *   - Enterprise Security (tenant isolation, compliance gates, network segmentation)
  *   - Enterprise Fleet Manager (bulk spin-up, fleet health, resource pooling)
+ *   - Model Intelligence Engine (autonomous LLM selection, NLP task classification, model routing)
+ *   - Skills SME Registry (subject matter expert documentation for every tool/service)
  *
  * "Activity breeds Activity — shipped beats perfect."
  */
@@ -178,6 +180,24 @@ export type {
   FleetHealthSnapshot,
   BulkOperationResult,
 } from './enterprise-fleet';
+
+// ── Model Intelligence Engine ──────────────────────────────────────────
+export { modelIntelligence, MODEL_PROFILES, AGENT_MODEL_PREFERENCES } from './model-intelligence';
+export type {
+  ModelCapabilityProfile,
+  ModelStrength,
+  TaskType,
+  ModelSelection,
+  AgentModelPreference,
+} from './model-intelligence';
+
+// ── Skills SME Registry ───────────────────────────────────────────────
+export { skillsSME, SKILLS_REGISTRY } from './skills-sme';
+export type {
+  SkillSME,
+  SkillParameter,
+  SkillCategory,
+} from './skills-sme';
 
 // ── Types ───────────────────────────────────────────────────────────────
 export type {

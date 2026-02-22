@@ -1783,6 +1783,143 @@ The Fleet Manager handles multi-instance orchestration:
 
 ---
 
+## 31. Model Intelligence Engine (Autonomous LLM Selection)
+
+Not every job needs the same brain. A classification task doesn't need Opus.
+A complex architecture design doesn't belong on Flash. The Model Intelligence
+Engine does what a smart CTO would do: analyze the task, match to the best
+model, set fallbacks, and learn from outcomes.
+
+### How It Works
+
+```
+User Message → Task Classifier (NLP) → Model Scorer → Budget Filter → Selection Result
+                    ↓                       ↓                ↓
+              21 task types          7+ model profiles    3 budget tiers
+              (code_gen, research,   (capability scores,  (premium, standard,
+               classification, ...)  methodology fit)      economy)
+```
+
+### Model Profiles (Subject Matter Expert Level)
+
+| Model | Provider | Best For | AIMS Alignment | Notes |
+|-------|----------|----------|----------------|-------|
+| **Claude Opus 4.6** | Anthropic | Code gen (98), Architecture (98), Reasoning (98) | Logic: 98, Code: 98 | Buildsmith/Forge primary. DEVELOP methodology. |
+| **Gemini 3.1 Pro** | Google | Research (96), Reasoning (96), Math (95), Context (2M) | Logic: 96, Context: 98, Cost: 92 | **Native logic built into architecture — not memorization.** DMAIC methodology. Buildsmith fallback. |
+| **Claude Sonnet 4.6** | Anthropic | Content (92), Conversation (92), Balance | Instruction: 92, Consistency: 92 | ACHEEVY conversation primary. HONE methodology. |
+| **Gemini 3.0 Flash** | Google | Classification (88), Quick (95), Volume | Cost: 98 | Gateway default. 80% of routing calls. |
+| **Claude Haiku 4.5** | Anthropic | Extraction (88), Tool use (85), Dispatch | Tool use: 85, Cost: 90 | Agent dispatch and parsing. |
+| **GPT-5.2** | OpenAI | Creative (92), Conversation (90) | Creative: 88 | Creative content and ideation. |
+| **DeepSeek V3.2** | DeepSeek | Math (85), Code (80) at economy cost | Cost: 95 | Budget batch processing. |
+| **Kimi K2.5** | Moonshot | Image (95), Video, Agent swarm (90) | Multimodal leader | LOOK phase primary. |
+
+### Agent-to-Model Defaults
+
+| Agent | Primary | Fallback | Economy |
+|-------|---------|----------|---------|
+| **Forge_Ang / Buildsmith** | Claude Opus 4.6 | Gemini 3.1 Pro | DeepSeek V3.2 |
+| **ACHEEVY** | Claude Sonnet 4.6 | Gemini 3.1 Pro | Gemini Flash |
+| **Scout_Ang** | Gemini 3.1 Pro | Claude Sonnet 4.6 | Gemini Flash |
+| **Chronicle_Ang** | Claude Sonnet 4.6 | GPT-5.2 | Gemini Flash |
+| **Runner_Ang / Gatekeeper** | Claude Haiku 4.5 | Gemini Flash | Gemini Flash |
+| **LOOK Phase** | Kimi K2.5 | Gemini 3.1 Pro | Gemini Flash |
+
+### Selection Logic
+
+1. **Classify task** from message (21 NLP patterns → task type + confidence)
+2. **Check agent preference** (if agent role specified)
+3. **Score all models** against detected task type (affinity scores)
+4. **Apply budget filter** (premium → no filter, standard → penalize premium, economy → heavy penalty)
+5. **Apply methodology bonus** (DMAIC → logic models, DEVELOP → code models, etc.)
+6. **Return chain**: primary → fallback → economy
+
+### Gemini 3.1 Pro Alignment
+
+Gemini 3.1 uses **native logic** — reasoning is built into the model architecture,
+not bolted on through prompt engineering or memorization. This aligns directly with
+AIMS' methodology engine:
+- **DMAIC** (Define-Measure-Analyze-Improve-Control) → Logic-first improvement
+- **FOSTER** (Find-Organize-Shape-Tighten-Evaluate-Review) → Structured nurturing
+- **Look-Listen-Learn** → Continuous engagement intelligence
+
+The stronger the language model's native reasoning, the stronger our actors perform.
+Model Intelligence ensures AIMS always uses the best brain for the job.
+
+### Rules
+
+1. **Never hardcode model IDs.** Always go through Model Intelligence Engine.
+2. **Classify before calling.** Every LLM call should know what task type it is.
+3. **Respect budget tiers.** Economy users get economy models. Premium gets premium.
+4. **Learn from outcomes.** Record performance after every call. Over time, selections improve.
+5. **Fallback chains are mandatory.** Primary fails → fallback → economy. Never zero-model.
+
+**Files:**
+- `acheevy-verticals/model-intelligence.ts` — Model profiles, task classifier, selection engine
+
+---
+
+## 32. Skills SME Registry (Subject Matter Expert Documentation)
+
+Every tool, service, and capability in A.I.M.S. has a formal Skills SME entry.
+This is NOT documentation for humans. This is documentation FOR AGENTS.
+
+A mechanic doesn't just own wrenches. They know which wrench, which torque,
+which sequence, and why. The Skills SME Registry gives every agent that same
+level of expertise for every tool in the platform.
+
+### What Each SME Entry Contains
+
+| Section | Purpose |
+|---------|---------|
+| **What** | Purpose, capabilities, limitations |
+| **How** | API endpoints, import paths, parameters, example invocations |
+| **When** | NLP triggers, conditions, decision logic |
+| **When NOT** | Anti-patterns, conflicts, cost considerations |
+| **Connections** | Dependencies, consumers, data flow |
+| **AIMS Integration** | Related methodology, L.I.B. section, recommended model, LUC key |
+| **Files** | Source files, skill markdown, Brain section reference |
+
+### Current SME Coverage
+
+| Skill | Category | Status |
+|-------|----------|--------|
+| **OpenRouter LLM** | llm | Active |
+| **Model Intelligence** | llm | Active |
+| **Plug Catalog** | deployment | Active |
+| **Plug Spin-Up** | deployment | Active |
+| **Methodology Engine** | methodology | Active |
+| **Transaction Model** | agent | Active |
+| **Look-Listen-Learn** | methodology | Active |
+| **Enterprise Workspace** | enterprise | Active |
+| **Enterprise Security** | security | Active |
+| **Enterprise Fleet** | enterprise | Active |
+| **Personality Inheritance** | agent | Active |
+| **L.I.B.** | agent | Active |
+| **Unified Search** | search | Active |
+| **Voice Pipeline** | voice | Partial |
+| **Needs Analysis** | deployment | Active |
+
+### How Agents Use SME Data
+
+1. **Task arrives** → ACHEEVY receives user message
+2. **Skills matched** → `skillsSME.matchSkills(message)` finds relevant skills
+3. **Context built** → `skillsSME.buildSkillsContext(message)` generates focused briefing
+4. **Agent dispatched** → Agent receives SME briefing + task + personality + methodology
+5. **Expert execution** → Agent uses SME data to make expert-level decisions about tool usage
+
+### Rules
+
+1. **Every new tool gets an SME entry.** No exceptions.
+2. **Anti-patterns are mandatory.** If you know how it breaks, document it.
+3. **Decision logic must be actionable.** Not "use when appropriate" — specific conditions.
+4. **Recommended model must be set.** Model Intelligence depends on this.
+5. **Data flow must be traced.** From input to output, every step.
+
+**Files:**
+- `acheevy-verticals/skills-sme.ts` — SME registry, matching engine, briefing builder
+
+---
+
 > **"Activity breeds Activity — shipped beats perfect."**
 >
 > **"AI Managed Solutions is not a name. It's what we do. We manage services with AI."**
@@ -1797,4 +1934,5 @@ The Fleet Manager handles multi-instance orchestration:
 > makes every approach deliberate. The L.I.B. makes every interaction intentional.
 > Look-Listen-Learn makes every engagement intelligent. Personality Inheritance
 > makes every agent carry ACHEEVY's DNA. Enterprise Launch makes organizations possible.
+> Model Intelligence makes every LLM call deliberate. Skills SME makes every agent an expert.
 > Together, they are A.I.M.S. — managing services with AI, autonomously, with a human in the loop.
