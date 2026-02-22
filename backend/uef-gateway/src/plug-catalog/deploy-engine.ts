@@ -22,6 +22,7 @@ import { instanceStore } from './instance-store';
 import { tenantNetworks } from './tenant-networks';
 import { liveSim } from '../livesim';
 import { Oracle } from '../oracle';
+import { integrationRegistry } from '../integrations';
 import type {
   PlugDefinition,
   PlugInstance,
@@ -156,6 +157,14 @@ export class PlugDeployEngine {
     // 2. Resolve customizations → env overrides
     const resolvedEnv = this.resolveEnvironment(plug, request);
     addEvent('configure', `Resolved ${Object.keys(resolvedEnv).length} environment variables`);
+
+    // Log activated integrations
+    if (request.integrations && request.integrations.length > 0) {
+      const names = request.integrations
+        .map(id => integrationRegistry.get(id)?.name || id)
+        .join(', ');
+      addEvent('integrations', `Activated integrations: ${names}`);
+    }
 
     // 3. Assign port (persistent allocation)
     const assignedPort = await this.allocatePortForInstance(instanceId, plug.id, request.userId);
@@ -898,7 +907,24 @@ exit $?
       }
     }
 
-    // Apply explicit overrides (highest priority)
+    // Inject integration env vars (e.g., SENDGRID_API_KEY, STRIPE_SECRET_KEY)
+    // Only keys present in envOverrides are injected — the registry tells us
+    // which keys each integration needs, and the user supplies the values.
+    if (request.integrations && request.integrations.length > 0) {
+      const requiredKeys = integrationRegistry.getRequiredEnvKeys(request.integrations);
+      for (const key of requiredKeys) {
+        // Only inject if the user has provided a value via envOverrides
+        if (request.envOverrides[key]) {
+          env[key] = request.envOverrides[key];
+        }
+      }
+      logger.info(
+        { integrations: request.integrations, requiredKeys: requiredKeys.length },
+        '[PlugDeploy] Integration env vars resolved',
+      );
+    }
+
+    // Apply explicit overrides (highest priority — can override integration defaults)
     for (const [key, value] of Object.entries(request.envOverrides)) {
       env[key] = value;
     }

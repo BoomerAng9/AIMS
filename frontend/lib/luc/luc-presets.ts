@@ -237,10 +237,10 @@ export function getPresetsByCategory(category: PresetCategory): IndustryPreset[]
 export function createAccountFromPreset(
   userId: string,
   presetId: string,
-  planId: string = 'free'
+  planId: string = 'p2p'
 ): LUCAccountRecord {
   const preset = getPreset(presetId);
-  const plan = LUC_PLANS[planId] || LUC_PLANS.free;
+  const plan = LUC_PLANS[planId] || LUC_PLANS.p2p;
 
   const now = new Date();
   const nextMonth = new Date(now);
