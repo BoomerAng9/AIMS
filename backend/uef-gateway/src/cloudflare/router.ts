@@ -125,6 +125,63 @@ cloudflareRouter.delete('/api/cloudflare/dns', async (req, res) => {
 });
 
 /**
+ * Worker health status.
+ * GET /api/cloudflare/workers/status
+ */
+cloudflareRouter.get('/api/cloudflare/workers/status', async (_req, res) => {
+  try {
+    const health = await cloudflare.checkWorkerHealth();
+    const configured = await cloudflare.isConfigured();
+    res.json({ configured, workers: health });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Worker status check failed';
+    res.status(500).json({ error: msg });
+  }
+});
+
+/**
+ * Generate a signed download URL for an R2 object.
+ * POST /api/cloudflare/r2/sign
+ * { key, expiresIn? }
+ */
+cloudflareRouter.post('/api/cloudflare/r2/sign', async (req, res) => {
+  try {
+    const { key, expiresIn } = req.body;
+    if (!key) {
+      res.status(400).json({ error: 'key is required' });
+      return;
+    }
+
+    const url = await cloudflare.getR2SignedUrl(key, expiresIn);
+    if (!url) {
+      res.status(500).json({ error: 'Failed to generate signed URL' });
+      return;
+    }
+
+    res.json({ url, key });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'R2 sign failed';
+    res.status(500).json({ error: msg });
+  }
+});
+
+/**
+ * List R2 objects.
+ * GET /api/cloudflare/r2/list?prefix=xxx&limit=100
+ */
+cloudflareRouter.get('/api/cloudflare/r2/list', async (req, res) => {
+  try {
+    const prefix = req.query.prefix as string | undefined;
+    const limit = parseInt(req.query.limit as string) || 100;
+    const objects = await cloudflare.listR2Objects(prefix, limit);
+    res.json({ objects, count: objects.length });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'R2 list failed';
+    res.status(500).json({ error: msg });
+  }
+});
+
+/**
  * Create subdomain for a plug instance.
  * POST /api/cloudflare/plug-subdomain
  * { instanceName, domain, targetIp }

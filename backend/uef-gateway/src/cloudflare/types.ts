@@ -8,6 +8,9 @@ export interface CloudflareConfig {
   zoneIds: string[];         // One per managed domain
   r2Bucket: string;
   r2AccountId?: string;      // If different from main account
+  r2SignerUrl?: string;      // R2 Signer Worker URL
+  r2SignerSecret?: string;   // Shared secret for Worker auth
+  agentGatewayUrl?: string;  // Agent Gateway Worker URL
 }
 
 export interface DnsRecord {
