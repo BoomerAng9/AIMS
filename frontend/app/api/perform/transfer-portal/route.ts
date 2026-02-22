@@ -48,11 +48,9 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(entries);
   } catch (err) {
     console.error('[TransferPortal] DB query failed:', err);
-
-    // Return empty results on error
-    if (stats) {
-      return NextResponse.json({ total: 0, inPortal: 0, committed: 0, withdrawn: 0, signed: 0 });
-    }
-    return NextResponse.json([]);
+    return NextResponse.json(
+      { error: 'Database unavailable', entries: [] },
+      { status: 503 }
+    );
   }
 }

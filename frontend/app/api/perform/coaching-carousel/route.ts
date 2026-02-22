@@ -42,11 +42,9 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(changes);
   } catch (err) {
     console.error('[CoachingCarousel] DB query failed:', err);
-
-    // Return empty results on error
-    if (stats) {
-      return NextResponse.json({ total: 0, hired: 0, fired: 0, resigned: 0, retired: 0, interim: 0 });
-    }
-    return NextResponse.json([]);
+    return NextResponse.json(
+      { error: 'Database unavailable', changes: [] },
+      { status: 503 }
+    );
   }
 }

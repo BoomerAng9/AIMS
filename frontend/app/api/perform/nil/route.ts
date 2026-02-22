@@ -61,11 +61,9 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(rankings);
   } catch (err) {
     console.error('[NIL] DB query failed:', err);
-
-    // Return empty results on error
-    if (view === 'stats') {
-      return NextResponse.json({ totalDeals: 0, totalValue: 0, avgDealValue: 0, activeDealCount: 0 });
-    }
-    return NextResponse.json([]);
+    return NextResponse.json(
+      { error: 'Database unavailable', deals: [] },
+      { status: 503 }
+    );
   }
 }

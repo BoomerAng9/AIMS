@@ -14,29 +14,11 @@ export async function GET(req: NextRequest) {
   const githubToken = req.headers.get("x-github-token");
 
   if (!githubToken) {
-    // Return sample data when no token is provided
     return NextResponse.json({
       connected: false,
       message: "GitHub account not connected. Connect via Connected Accounts to see live data.",
-      sampleData: {
-        repos: [
-          { name: "A.I.M.S", language: "TypeScript", stars: 0, updatedAt: new Date().toISOString() },
-        ],
-        recentCommits: [
-          {
-            sha: "0ecab3c",
-            message: "feat: wire LUC calculator with seed data and persistent storage",
-            date: new Date().toISOString(),
-            repo: "A.I.M.S",
-          },
-        ],
-        stats: {
-          totalRepos: 1,
-          totalCommits: 34,
-          totalStars: 0,
-          languages: ["TypeScript", "Python", "CSS"],
-        },
-      },
+      repos: [],
+      recentEvents: [],
     });
   }
 
