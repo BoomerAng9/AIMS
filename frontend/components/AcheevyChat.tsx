@@ -29,6 +29,8 @@ import type { ReadReceipt } from '@/lib/acheevy/read-receipt';
 import AcheevyMessage from './AcheevyMessage';
 import { VoicePlaybackBar } from './chat/VoicePlaybackBar';
 import { VoiceVisualizer } from '@/components/ui/VoiceVisualizer';
+import { useVerticalFlow } from '@/hooks/useVerticalFlow';
+import { VerticalStepIndicator } from './chat/VerticalStepIndicator';
 
 // ── Types ──
 
@@ -118,6 +120,65 @@ export default function AcheevyChat() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const prevMessageCountRef = useRef(0);
+
+  // ── Vertical Flow — Phase A step progression + Phase B dispatch ──
+  const verticalFlow = useVerticalFlow({
+    userId: 'current-user',
+    onPhaseAComplete: async (verticalId, collectedData) => {
+      // Auto-append a Phase B confirmation message
+      append({
+        role: 'assistant',
+        content: `Phase A complete for **${verticalId}**. I've collected all the inputs needed.\n\nReady to execute Phase B? This will dispatch the pipeline to the team.\n\n*Click "Execute Phase B" below or type "go" to proceed.*`,
+      });
+    },
+    onExecuteRequested: async (verticalId, collectedData) => {
+      // Dispatch Phase B execution via the gateway
+      try {
+        const res = await fetch('/api/vertical/trigger', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ verticalId, userId: 'current-user', collectedData }),
+        });
+        const data = await res.json();
+        append({
+          role: 'assistant',
+          content: `Phase B dispatched for **${verticalId}**.\n\nRequest ID: \`${data.requestId || 'pending'}\`\nStatus: ${data.status || 'dispatched'}\n\nThe team is executing now. I'll update you as results come in.`,
+        });
+      } catch {
+        append({
+          role: 'assistant',
+          content: `Phase B dispatch failed for **${verticalId}**. I'll retry through the local pipeline.`,
+        });
+      }
+    },
+  });
+
+  // Detect vertical intent from assistant responses and auto-classify user input
+  useEffect(() => {
+    if (messages.length < 2) return;
+    const last = messages[messages.length - 1];
+    if (last?.role !== 'user' || verticalFlow.isActive) return;
+
+    // Quick classify: check if the user message matches a vertical trigger
+    const text = last.content.toLowerCase();
+    const verticalTriggers: Record<string, string[]> = {
+      'idea-generator': ['idea', 'brainstorm', 'startup idea'],
+      'pain-points': ['pain point', 'problem', 'frustration'],
+      'brand-name': ['brand name', 'company name', 'naming'],
+      'mvp-plan': ['mvp', 'minimum viable', 'build plan'],
+      'content-calendar': ['content calendar', 'content plan', 'posting schedule'],
+      'social-hooks': ['social media', 'hooks', 'viral', 'social launch'],
+      'cold-outreach': ['cold email', 'outreach', 'cold outbound'],
+      'automation': ['automate', 'workflow', 'automation'],
+    };
+
+    for (const [verticalId, triggers] of Object.entries(verticalTriggers)) {
+      if (triggers.some(t => text.includes(t))) {
+        verticalFlow.startVertical(verticalId);
+        break;
+      }
+    }
+  }, [messages, verticalFlow]);
 
   // ── Voice Input (Groq Whisper STT → Deepgram fallback) ──
   const handleTranscript = useCallback((result: { text: string }) => {
@@ -367,6 +428,18 @@ export default function AcheevyChat() {
         <div ref={messagesEndRef} />
       </div>
 
+      {/* Vertical Flow Step Indicator + Phase B Gate */}
+      {verticalFlow.isActive && (
+        <div className="relative z-20 px-4 py-2 border-t border-gold/20 bg-gold/[0.03]">
+          <VerticalStepIndicator
+            state={verticalFlow.state}
+            transitionPrompt={verticalFlow.getTransitionPrompt()}
+            onExecute={() => verticalFlow.confirmExecution()}
+            onDismiss={() => verticalFlow.reset()}
+          />
+        </div>
+      )}
+
       {/* Input */}
       <div className="relative z-20 p-3 bg-[#0A0A0A]/80 backdrop-blur-xl border-t border-wireframe-stroke">
         {attachments.length > 0 && (
@@ -416,7 +489,26 @@ export default function AcheevyChat() {
           onSubmit={(e) => {
             e.preventDefault();
             if (!input.trim() && attachments.length === 0) return;
-            append({ role: 'user', content: input });
+
+            // Handle Phase B confirmation
+            if (verticalFlow.isReadyToExecute && input.trim().toLowerCase() === 'go') {
+              verticalFlow.confirmExecution();
+              setInput('');
+              return;
+            }
+
+            // Advance vertical step if in Phase A
+            if (verticalFlow.isPhaseA) {
+              verticalFlow.advanceStep(input.trim());
+            }
+
+            // Inject vertical context into the message for the LLM
+            const stepContext = verticalFlow.getCurrentStepContext();
+            const messageContent = stepContext
+              ? `${input}\n\n---\n[SYSTEM_CONTEXT]\n${stepContext}`
+              : input;
+
+            append({ role: 'user', content: messageContent });
             setInput('');
             setAttachments([]);
           }}

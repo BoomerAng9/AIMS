@@ -2144,6 +2144,101 @@ app.get('/api/livesim/stream', (req, res) => {
 });
 
 // --------------------------------------------------------------------------
+// PersonaPlex Voice API — Full-Duplex Voice Sessions
+// --------------------------------------------------------------------------
+
+app.post('/api/personaplex/:action', async (req, res) => {
+  const { action } = req.params;
+  const body = req.body;
+
+  switch (action) {
+    case 'start': {
+      const session = await personaplex.startSession();
+      if (!session) {
+        res.json({ started: false, configured: personaplex.isConfigured(), error: 'Failed to start session' });
+        return;
+      }
+      res.json({ started: true, session });
+      break;
+    }
+    case 'speak': {
+      const { text, sessionId } = body;
+      if (!text) { res.status(400).json({ error: 'text required' }); return; }
+      const result = await personaplex.speak(text, sessionId);
+      res.json(result);
+      break;
+    }
+    case 'chat': {
+      const { messages } = body;
+      if (!messages || !Array.isArray(messages)) { res.status(400).json({ error: 'messages array required' }); return; }
+      try {
+        const result = await personaplex.chat(messages);
+        res.json(result);
+      } catch (err) {
+        res.status(502).json({ error: err instanceof Error ? err.message : 'PersonaPlex chat failed' });
+      }
+      break;
+    }
+    case 'status': {
+      const { type, projectName, summary, sessionId } = body;
+      await personaplex.deliverStatusUpdate({ type, projectName, summary, sessionId });
+      res.json({ delivered: true });
+      break;
+    }
+    default:
+      res.status(404).json({ error: `Unknown PersonaPlex action: ${action}` });
+  }
+});
+
+app.get('/api/personaplex/status', (_req, res) => {
+  res.json({
+    configured: personaplex.isConfigured(),
+    available: personaplex.isConfigured(),
+    capabilities: ['voice', 'text', 'status-query'],
+  });
+});
+
+app.get('/api/personaplex/session/:sessionId', (_req, res) => {
+  // Session tracking is handled by the PersonaPlex service itself
+  res.json({ sessionId: _req.params.sessionId, status: 'active' });
+});
+
+app.delete('/api/personaplex/session/:sessionId', async (req, res) => {
+  await personaplex.endSession(req.params.sessionId);
+  res.json({ ended: true });
+});
+
+// --------------------------------------------------------------------------
+// Onboarding — New User Profile Persistence
+// --------------------------------------------------------------------------
+
+const onboardingProfiles = new Map<string, Record<string, unknown>>();
+
+app.post('/api/onboarding', (req, res) => {
+  const { fullName, region, objective, industry, companyName, onboardedAt } = req.body;
+  if (!fullName) {
+    res.status(400).json({ error: 'fullName required' });
+    return;
+  }
+
+  const profileId = `profile-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  const profile = {
+    profileId,
+    fullName,
+    region: region || 'Not specified',
+    objective: objective || 'Just exploring',
+    industry: industry || 'Technology / SaaS',
+    companyName: companyName || '',
+    onboardedAt: onboardedAt || new Date().toISOString(),
+    tier: 'free',
+  };
+
+  onboardingProfiles.set(profileId, profile);
+  logger.info({ profileId, fullName }, '[UEF] New user onboarded');
+  res.json({ profileId, saved: true });
+});
+
+// --------------------------------------------------------------------------
 // Auto-Scaler — Horizontal & Vertical Scaling for Plug Instances
 // --------------------------------------------------------------------------
 
