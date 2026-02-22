@@ -33,11 +33,12 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(runs);
   } catch (err) {
-    console.warn('[Automation] DB query failed, returning empty array:', err);
+    console.error('[Automation] DB query failed:', err);
+    return NextResponse.json(
+      { error: 'Database unavailable', runs: [] },
+      { status: 503 }
+    );
   }
-
-  // ── Fallback: empty array ─────────────────────────────────
-  return NextResponse.json([]);
 }
 
 export async function POST(req: NextRequest) {

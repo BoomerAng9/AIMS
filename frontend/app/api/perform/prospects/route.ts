@@ -118,5 +118,5 @@ export async function GET(req: NextRequest) {
   if (id || slug) {
     return NextResponse.json({ error: 'Prospect not found' }, { status: 404 });
   }
-  return NextResponse.json([]);
+  return NextResponse.json({ prospects: [], count: 0, source: 'none' });
 }
