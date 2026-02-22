@@ -11,9 +11,35 @@ from ii_agent.db.models import Session
 logger = logging.getLogger(__name__)
 
 
-# Model context window limits
+# Model context window limits (tokens)
 CONTEXT_WINDOWS = {
-    # TODO: Populate with actual model context windows
+    # Claude models
+    "claude-opus-4-6": 200_000,
+    "claude-sonnet-4-6": 200_000,
+    "claude-haiku-4-5-20251001": 200_000,
+    "claude-3-5-sonnet-20241022": 200_000,
+    "claude-3-5-haiku-20241022": 200_000,
+    # OpenAI models
+    "gpt-4o": 128_000,
+    "gpt-4o-mini": 128_000,
+    "gpt-4-turbo": 128_000,
+    "gpt-4": 8_192,
+    "o1": 200_000,
+    "o1-mini": 128_000,
+    "o3-mini": 200_000,
+    # Google models
+    "gemini-2.0-flash": 1_048_576,
+    "gemini-2.0-pro": 1_048_576,
+    "gemini-1.5-pro": 2_097_152,
+    "gemini-1.5-flash": 1_048_576,
+    # Open models
+    "deepseek-r1": 64_000,
+    "deepseek-v3": 64_000,
+    "llama-3.3-70b": 128_000,
+    "mistral-large": 128_000,
+    "qwen-2.5-72b": 128_000,
+    # Kimi
+    "kimi-k2.5": 128_000,
 }
 
 

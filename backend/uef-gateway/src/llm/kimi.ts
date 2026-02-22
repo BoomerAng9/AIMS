@@ -234,6 +234,8 @@ class KimiClient {
       provider: 'together',
       tokens: { prompt: 0, completion: 0, total: 0 },
       cost: { usd: 0 },
+      stub: true,
+      missingConfig: ['TOGETHER_API_KEY', 'FIREWORKS_API_KEY'],
     };
   }
 }

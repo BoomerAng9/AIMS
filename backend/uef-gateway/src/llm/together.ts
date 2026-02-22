@@ -152,6 +152,8 @@ class TogetherClient {
       model: 'together-stub',
       tokens: { prompt: 0, completion: 0, total: 0 },
       cost: { usd: 0 },
+      stub: true,
+      missingConfig: ['TOGETHER_API_KEY'],
     };
   }
 }

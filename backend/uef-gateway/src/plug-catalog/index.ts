@@ -52,6 +52,7 @@ export { DockerRuntime, dockerRuntime } from './docker-runtime';
 export { PortAllocator, portAllocator } from './port-allocator';
 export { HealthMonitor, healthMonitor } from './health-monitor';
 export { InstanceLifecycle, instanceLifecycle } from './instance-lifecycle';
+export { KVSync, kvSync } from './kv-sync';
 
 // API Router
 export { plugRouter } from './router';

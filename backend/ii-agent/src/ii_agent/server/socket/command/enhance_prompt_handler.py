@@ -39,16 +39,18 @@ class EnhancePromptHandler(CommandHandler):
         try:
             enhance_content = EnhancePromptContent(**content)
 
-            # Create LLM client
-            user_id: Optional[str] = None  # TODO: Get actual user ID from session
+            # Create LLM client — use session user ID when available
+            user_id: Optional[str] = getattr(session_info, 'user_id', None)
             settings_store = await FileSettingsStore.get_instance(config, user_id)
             settings = await settings_store.load()
 
             if not settings:
                 raise ValueError("Settings not found for user")
 
-            # TODO: what model should be used for enhancement?
+            # Use the model specified in the request, fall back to first available config
             llm_config = settings.llm_configs.get(enhance_content.model_name)
+            if not llm_config and settings.llm_configs:
+                llm_config = next(iter(settings.llm_configs.values()))
             if not llm_config:
                 raise ValueError(
                     f"LLM config not found for model: {enhance_content.model_name}"

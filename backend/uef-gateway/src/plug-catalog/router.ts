@@ -31,6 +31,7 @@ import { dockerRuntime } from './docker-runtime';
 import { instanceLifecycle } from './instance-lifecycle';
 import { healthMonitor } from './health-monitor';
 import { portAllocator } from './port-allocator';
+import { kvSync } from './kv-sync';
 import logger from '../logger';
 
 export const plugRouter = Router();
@@ -310,6 +311,38 @@ plugRouter.post('/plug-operations/reconcile', async (_req, res) => {
     res.json({ reconciled: true, stats });
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'Reconciliation failed';
+    res.status(500).json({ error: msg });
+  }
+});
+
+/**
+ * Full KV sync — push all active routes to Cloudflare Worker KV.
+ * POST /api/plug-operations/kv-sync
+ */
+plugRouter.post('/plug-operations/kv-sync', async (_req, res) => {
+  try {
+    if (!kvSync.isEnabled()) {
+      res.json({ enabled: false, message: 'GATEWAY_SECRET not configured — KV sync disabled' });
+      return;
+    }
+    const result = await kvSync.fullSync();
+    res.json({ enabled: true, ...result });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'KV sync failed';
+    res.status(500).json({ error: msg });
+  }
+});
+
+/**
+ * Get current routes from Cloudflare Worker KV.
+ * GET /api/plug-operations/kv-routes
+ */
+plugRouter.get('/plug-operations/kv-routes', async (_req, res) => {
+  try {
+    const routes = await kvSync.getRoutes();
+    res.json({ enabled: kvSync.isEnabled(), routes });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'KV routes fetch failed';
     res.status(500).json({ error: msg });
   }
 });

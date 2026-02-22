@@ -1,0 +1,85 @@
+# =============================================================================
+# Chicken Hawk — Cloud Run Job (Batch Builds)
+# =============================================================================
+# For queued/scheduled builds triggered by n8n, ACHEEVY dispatch, or API events.
+# Unlike the service (always-on), jobs run once and exit.
+#
+# Create:
+#   gcloud run jobs replace infra/gcp/chicken-hawk-cloudrun-job.yaml \
+#     --region us-central1 --project ai-managed-services
+#
+# Execute:
+#   gcloud run jobs execute chicken-hawk-build \
+#     --region us-central1 \
+#     --update-env-vars="TASK_ID=<task-id>,MANIFEST_URL=<url>"
+#
+# Execute via API (for n8n/ACHEEVY):
+#   curl -X POST \
+#     "https://us-central1-run.googleapis.com/apis/run.googleapis.com/v1/namespaces/ai-managed-services/jobs/chicken-hawk-build:run" \
+#     -H "Authorization: Bearer $(gcloud auth print-access-token)" \
+#     -H "Content-Type: application/json" \
+#     -d '{"overrides":{"containerOverrides":[{"env":[{"name":"TASK_ID","value":"CH-001"}]}]}}'
+# =============================================================================
+
+apiVersion: run.googleapis.com/v1
+kind: Job
+metadata:
+  name: chicken-hawk-build
+  labels:
+    aims.service: chicken-hawk
+    aims.tier: build-execution
+    aims.type: batch-job
+  annotations:
+    run.googleapis.com/launch-stage: GA
+spec:
+  template:
+    metadata:
+      annotations:
+        run.googleapis.com/vpc-access-connector: aims-vpc-connector
+        run.googleapis.com/execution-environment: gen2
+    spec:
+      template:
+        spec:
+          maxRetries: 1                           # Retry once on failure
+          timeoutSeconds: 3600                    # 60 min max
+          serviceAccountName: chicken-hawk@ai-managed-services.iam.gserviceaccount.com
+          containers:
+            - image: us-central1-docker.pkg.dev/ai-managed-services/aims/chicken-hawk:latest
+              command: ["node"]
+              args: ["dist/index.js", "--mode=job"]
+              env:
+                - name: NODE_ENV
+                  value: production
+                - name: EXECUTION_MODE
+                  value: job
+                - name: FIREBASE_PROJECT_ID
+                  value: ai-managed-services
+                - name: BYTEROUTER_ENDPOINT
+                  value: http://byterover.internal:7000
+                - name: LUC_ENGINE_URL
+                  value: http://luc-engine.internal:9010
+                - name: UEF_GATEWAY_URL
+                  value: https://plugmein.cloud/api
+                # TASK_ID and MANIFEST_URL are passed at execution time
+                - name: TASK_ID
+                  value: ""
+                - name: MANIFEST_URL
+                  value: ""
+                - name: OPENROUTER_API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: openrouter-api-key
+                      key: latest
+                - name: CHICKENHAWK_GATEWAY_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: chickenhawk-gateway-token
+                      key: latest
+              resources:
+                limits:
+                  memory: 4Gi
+                  cpu: "4"
+              securityContext:
+                runAsUser: 1001
+                runAsGroup: 1001
+                allowPrivilegeEscalation: false

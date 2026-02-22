@@ -26,6 +26,7 @@ import { dockerRuntime } from './docker-runtime';
 import { plugDeployEngine } from './deploy-engine';
 import { plugCatalog } from './catalog';
 import { cloudflare } from '../cloudflare/client';
+import { kvSync } from './kv-sync';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -149,6 +150,12 @@ export class InstanceLifecycle {
       }
     }
 
+    // Sync route to Cloudflare KV for edge routing
+    if (instance.domain || instance.name) {
+      const subdomain = (instance.domain || instance.name).split('.')[0].toLowerCase().replace(/[^a-z0-9-]/g, '-');
+      await kvSync.pushRoute(subdomain, instance.assignedPort, instanceId);
+    }
+
     logger.info({ instanceId, plugId: plug.id }, '[InstanceLifecycle] Post-deploy setup complete');
   }
 
@@ -207,7 +214,16 @@ export class InstanceLifecycle {
       steps.push({ step: 'remove-container', success: false, detail: String(err) });
     }
 
-    // 5. Release port
+    // 5. Remove KV route (edge routing cleanup)
+    try {
+      const subdomain = (instance.domain || instance.name).split('.')[0].toLowerCase().replace(/[^a-z0-9-]/g, '-');
+      const kvRemoved = await kvSync.removeRoute(subdomain);
+      steps.push({ step: 'remove-kv-route', success: kvRemoved || !kvSync.isEnabled(), detail: subdomain });
+    } catch (err) {
+      steps.push({ step: 'remove-kv-route', success: false, detail: String(err) });
+    }
+
+    // 6. Release port
     try {
       const releasedPort = await portAllocator.release(instanceId);
       steps.push({ step: 'release-port', success: true, detail: `Port ${releasedPort}` });
@@ -215,7 +231,7 @@ export class InstanceLifecycle {
       steps.push({ step: 'release-port', success: false, detail: String(err) });
     }
 
-    // 6. Remove from deploy engine
+    // 7. Remove from deploy engine
     try {
       plugDeployEngine.removeInstance(instanceId);
       steps.push({ step: 'remove-record', success: true });
