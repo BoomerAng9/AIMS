@@ -3,7 +3,7 @@
 > **Generated:** 2026-02-22 | **Updated:** 2026-02-22 (post-security hardening)
 > **Source:** 4 independent code audits + build verification + 3 security audit agents
 > **Build:** TypeScript clean, Next.js 199 pages, 260/261 tests pass
-> **Commits:** 4 security/completion commits pushed to branch
+> **Commits:** 6 security/completion commits pushed to branch
 
 ---
 
@@ -11,11 +11,13 @@
 
 After the initial audit revealed significant issues, the following has been **fixed and committed**:
 
-### Committed Fixes (4 commits)
+### Committed Fixes (6 commits)
 1. `078f310` — Eliminate 6 critical vulnerabilities in billing and auth
 2. `5825178` — Fix command injection and SQL column injection vulnerabilities
 3. `b3e8eda` — Enforce multi-tenant ownership and harden container deployment
 4. `2490536` — Complete payment system (Coinbase verification, usage metering, invoicing)
+5. `bdbd24e` — Update HONEST_STATUS.md after security hardening and payment completion
+6. `9ceda5d` — Harden Docker infrastructure (non-root containers, no-new-privileges, password validation)
 
 ---
 
@@ -65,10 +67,13 @@ After the initial audit revealed significant issues, the following has been **fi
 | SQL injection prevention | Column name whitelist in payment session updates (FIXED) |
 | Command injection prevention | Package name regex validation in supply-chain (FIXED) |
 | Env var injection prevention | Docker env key validation + system var blocklist (FIXED) |
-| Container security | no-new-privileges, PID limits (FIXED) |
-| CSP headers | Content Security Policy enabled (was fully disabled) (FIXED) |
+| Container security | no-new-privileges on ALL 15 containers, PID limits on plugs (FIXED) |
+| Non-root containers | USER directives in 13/15 Dockerfiles (ii-agent upstream excluded) (FIXED) |
+| CSP headers | Strict CSP — explicit domains, removed Vercel refs, tightened connect-src (FIXED) |
 | CORS hardening | Explicit allowed headers, credentials support (FIXED) |
 | Internal caller gates | Token creation, wallet credit, billing provision, platform ops (FIXED) |
+| Deploy password gates | deploy.sh rejects weak defaults + enforces minimum password length (FIXED) |
+| PostgreSQL SSL | Removed explicit sslmode=disable (internal Docker network only) (FIXED) |
 
 ### ACHEEVY Orchestrator — FULLY WIRED
 | Component | Evidence |
@@ -171,12 +176,12 @@ Previously dead functions now alive:
 |----------|------|---------|-------|---------|
 | Plug Engine | 12 | 0 | 3 | 0 |
 | Billing/Payments | 15 | 0 | 8 | 0 |
-| Security | 10 | 0 | 10 | 0 |
+| Security | 13 | 0 | 13 | 0 |
 | Frontend | 15 | 2 | 0 | 0 |
 | Backend Core | 12 | 1 | 0 | 0 |
 | ACHEEVY Orchestrator | 8 | 1 | 0 | 0 |
 | Revenue Verticals | 6 | 1 | 0 | 0 |
-| **Total** | **78** | **5** | **21** | **0** |
+| **Total** | **81** | **5** | **24** | **0** |
 
 **Overall: ~90% real/working, ~6% partial (need env config), ~4% configuration-only gaps**
 
