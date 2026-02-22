@@ -29,7 +29,7 @@ import { motion } from 'framer-motion';
 import { MessageSquare, LayoutDashboard, Rocket, ArrowRight, Brain, GitBranch, Cpu, CheckCircle2 } from 'lucide-react';
 
 // Cross-domain URLs
-const APP_DOMAIN = process.env.NEXT_PUBLIC_APP_URL || 'https://plugmein.cloud';
+const APP_DOMAIN = process.env.NEXT_PUBLIC_APP_URL || 'https://aimanagedsolutions.cloud';
 
 // ── Domain Detection (hydration-safe) ──
 

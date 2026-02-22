@@ -8,7 +8,7 @@ import clsx from "clsx";
 import { motion, AnimatePresence } from "framer-motion";
 
 // Domain constants
-const APP_DOMAIN = process.env.NEXT_PUBLIC_APP_URL || 'https://plugmein.cloud';
+const APP_DOMAIN = process.env.NEXT_PUBLIC_APP_URL || 'https://aimanagedsolutions.cloud';
 const LANDING_DOMAIN = process.env.NEXT_PUBLIC_LANDING_URL || 'https://plugmein.cloud';
 
 // Navigation for the LANDING domain (plugmein.cloud — lore, learn, explore)
