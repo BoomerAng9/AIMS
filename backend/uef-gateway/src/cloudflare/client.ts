@@ -20,6 +20,9 @@ export class CloudflareClient {
       accountId: config?.accountId || process.env.CLOUDFLARE_ACCOUNT_ID || '',
       zoneIds: config?.zoneIds || (process.env.CLOUDFLARE_ZONE_IDS || '').split(',').filter(Boolean),
       r2Bucket: config?.r2Bucket || process.env.CLOUDFLARE_R2_BUCKET || 'aims-exports',
+      r2SignerUrl: config?.r2SignerUrl || process.env.CLOUDFLARE_R2_SIGNER_URL || '',
+      r2SignerSecret: config?.r2SignerSecret || process.env.CLOUDFLARE_R2_SIGNER_SECRET || '',
+      agentGatewayUrl: config?.agentGatewayUrl || process.env.CLOUDFLARE_AGENT_GATEWAY_URL || '',
     };
   }
 
@@ -192,11 +195,15 @@ export class CloudflareClient {
   // -----------------------------------------------------------------------
 
   async uploadToR2(key: string, data: Buffer | string, contentType?: string): Promise<{ uploaded: boolean; error?: string }> {
+    // Prefer the R2 Signer Worker (handles R2 bindings natively at the edge)
+    if (this.config.r2SignerUrl) {
+      return this.uploadViaWorker(key, data, contentType);
+    }
+
+    // Fallback: direct S3-compatible API (requires separate S3 credentials)
     try {
       const bucket = this.config.r2Bucket;
       const accountId = this.config.r2AccountId || this.config.accountId;
-
-      // R2 uses the S3-compatible API endpoint
       const url = `https://${accountId}.r2.cloudflarestorage.com/${bucket}/${key}`;
 
       const res = await fetch(url, {
@@ -219,11 +226,75 @@ export class CloudflareClient {
     }
   }
 
+  private async uploadViaWorker(key: string, data: Buffer | string, contentType?: string): Promise<{ uploaded: boolean; error?: string }> {
+    try {
+      const res = await fetch(`${this.config.r2SignerUrl}/upload`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.config.r2SignerSecret}`,
+          'Content-Type': contentType || 'application/octet-stream',
+          'X-R2-Key': key,
+        },
+        body: typeof data === 'string' ? data : new Uint8Array(data),
+      });
+
+      const result = await res.json() as any;
+      if (result.uploaded) {
+        logger.info({ key, size: result.size }, '[Cloudflare] R2 upload via Worker successful');
+        return { uploaded: true };
+      }
+
+      return { uploaded: false, error: result.error || 'Worker upload failed' };
+    } catch (err) {
+      logger.error({ err, key }, '[Cloudflare] R2 Worker upload failed, falling back to direct');
+      return this.uploadToR2Direct(key, data, contentType);
+    }
+  }
+
+  private async uploadToR2Direct(key: string, data: Buffer | string, contentType?: string): Promise<{ uploaded: boolean; error?: string }> {
+    const bucket = this.config.r2Bucket;
+    const accountId = this.config.r2AccountId || this.config.accountId;
+    const url = `https://${accountId}.r2.cloudflarestorage.com/${bucket}/${key}`;
+
+    const res = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${this.config.apiToken}`,
+        'Content-Type': contentType || 'application/octet-stream',
+      },
+      body: typeof data === 'string' ? data : new Uint8Array(data),
+    });
+
+    if (res.ok) return { uploaded: true };
+    return { uploaded: false, error: `R2 direct upload failed: ${res.status}` };
+  }
+
   async getR2SignedUrl(key: string, expiresInSeconds: number = 3600): Promise<string | null> {
-    // PRODUCTION TODO: Deploy a Cloudflare Worker with R2 bindings to generate
-    // presigned URLs. The S3-compatible R2 API requires a Worker with env.R2_BUCKET
-    // binding to call bucket.createSignedUrl(). Until then this returns the public
-    // bucket URL which only works if the bucket has public access enabled.
+    // Use the R2 Signer Worker to generate HMAC-signed download URLs
+    if (this.config.r2SignerUrl && this.config.r2SignerSecret) {
+      try {
+        const res = await fetch(`${this.config.r2SignerUrl}/sign`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${this.config.r2SignerSecret}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ key, expiresIn: expiresInSeconds }),
+        });
+
+        const result = await res.json() as any;
+        if (result.url) {
+          logger.info({ key, expiresAt: result.expiresAt }, '[Cloudflare] R2 signed URL generated via Worker');
+          return result.url;
+        }
+
+        logger.warn({ key, error: result.error }, '[Cloudflare] Worker sign request failed');
+      } catch (err) {
+        logger.error({ err, key }, '[Cloudflare] R2 Signer Worker unreachable');
+      }
+    }
+
+    // Fallback: return direct bucket URL (requires public access on bucket)
     const bucket = this.config.r2Bucket;
     const accountId = this.config.r2AccountId || this.config.accountId;
     if (!bucket || !accountId) {
@@ -231,6 +302,70 @@ export class CloudflareClient {
       return null;
     }
     return `https://${accountId}.r2.cloudflarestorage.com/${bucket}/${key}`;
+  }
+
+  async deleteFromR2(key: string): Promise<boolean> {
+    if (this.config.r2SignerUrl && this.config.r2SignerSecret) {
+      try {
+        const res = await fetch(`${this.config.r2SignerUrl}/delete`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${this.config.r2SignerSecret}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ key }),
+        });
+        const result = await res.json() as any;
+        return !!result.deleted;
+      } catch (err) {
+        logger.error({ err, key }, '[Cloudflare] R2 Worker delete failed');
+        return false;
+      }
+    }
+    return false;
+  }
+
+  async listR2Objects(prefix?: string, limit?: number): Promise<{ key: string; size: number }[]> {
+    if (this.config.r2SignerUrl && this.config.r2SignerSecret) {
+      try {
+        const res = await fetch(`${this.config.r2SignerUrl}/list`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${this.config.r2SignerSecret}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ prefix, limit }),
+        });
+        const result = await res.json() as any;
+        return result.objects || [];
+      } catch (err) {
+        logger.error({ err, prefix }, '[Cloudflare] R2 Worker list failed');
+        return [];
+      }
+    }
+    return [];
+  }
+
+  // -----------------------------------------------------------------------
+  // Worker health checks
+  // -----------------------------------------------------------------------
+
+  async checkWorkerHealth(): Promise<{ r2Signer: string; agentGateway: string }> {
+    const check = async (url: string | undefined, name: string): Promise<string> => {
+      if (!url) return 'not configured';
+      try {
+        const res = await fetch(`${url}/health`, { signal: AbortSignal.timeout(5000) });
+        if (res.ok) return 'healthy';
+        return `unhealthy (${res.status})`;
+      } catch {
+        return 'unreachable';
+      }
+    };
+
+    return {
+      r2Signer: await check(this.config.r2SignerUrl, 'r2-signer'),
+      agentGateway: await check(this.config.agentGatewayUrl, 'agent-gateway'),
+    };
   }
 
   // -----------------------------------------------------------------------
