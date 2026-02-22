@@ -239,6 +239,317 @@ export async function createAutomationRun(data: {
   });
 }
 
+// ─────────────────────────────────────────────────────────────
+// Seeding — NCAA Data Ingest
+// ─────────────────────────────────────────────────────────────
+
+/** Resolve a team abbreviation to its PerformTeam.id, or null */
+async function resolveTeamId(abbrev: string | null): Promise<string | null> {
+  if (!abbrev) return null;
+  const team = await prisma.performTeam.findFirst({ where: { abbreviation: abbrev } });
+  return team?.id || null;
+}
+
+export async function seedCoachingChanges(entries: Array<{
+  coachName: string;
+  previousRole: string | null;
+  newRole: string | null;
+  previousTeamAbbrev: string | null;
+  newTeamAbbrev: string | null;
+  changeType: string;
+  season: number;
+  effectiveDate: string;
+  contractYears?: number | null;
+  contractValue?: string | null;
+  buyout?: string;
+  record?: string;
+  notes?: string;
+  verified: boolean;
+  verifiedBy: string | null;
+}>) {
+  let created = 0;
+  let skipped = 0;
+
+  for (const entry of entries) {
+    const previousTeamId = await resolveTeamId(entry.previousTeamAbbrev);
+    const newTeamId = await resolveTeamId(entry.newTeamAbbrev);
+
+    // Skip if already exists (same coach + season + changeType)
+    const existing = await prisma.coachingChange.findFirst({
+      where: { coachName: entry.coachName, season: entry.season, changeType: entry.changeType },
+    });
+    if (existing) { skipped++; continue; }
+
+    await prisma.coachingChange.create({
+      data: {
+        coachName: entry.coachName,
+        previousRole: entry.previousRole,
+        newRole: entry.newRole,
+        previousTeamId,
+        newTeamId,
+        changeType: entry.changeType,
+        season: entry.season,
+        effectiveDate: new Date(entry.effectiveDate),
+        contractYears: entry.contractYears ?? null,
+        contractValue: entry.contractValue ?? null,
+        buyout: entry.buyout ?? null,
+        record: entry.record ?? null,
+        notes: entry.notes ?? null,
+        verified: entry.verified,
+        verifiedBy: entry.verifiedBy,
+        verifiedAt: entry.verified ? new Date() : null,
+        source: 'seed-ncaa-data',
+      },
+    });
+    created++;
+  }
+
+  return { created, skipped };
+}
+
+export async function seedTransferPortalEntries(entries: Array<{
+  playerName: string;
+  position: string;
+  eligibility: string;
+  previousTeamAbbrev: string;
+  newTeamAbbrev: string | null;
+  status: string;
+  season: number;
+  enteredDate: string;
+  committedDate?: string;
+  stars: number;
+  previousStats: Record<string, number>;
+  nilValuation: string;
+  paiScore: number;
+  tier: string;
+  transferWindow: string;
+  verified: boolean;
+  verifiedBy: string | null;
+}>) {
+  let created = 0;
+  let skipped = 0;
+
+  for (const entry of entries) {
+    const previousTeamId = await resolveTeamId(entry.previousTeamAbbrev);
+    const newTeamId = await resolveTeamId(entry.newTeamAbbrev);
+
+    const existing = await prisma.transferPortalEntry.findFirst({
+      where: { playerName: entry.playerName, season: entry.season },
+    });
+    if (existing) { skipped++; continue; }
+
+    await prisma.transferPortalEntry.create({
+      data: {
+        playerName: entry.playerName,
+        position: entry.position,
+        eligibility: entry.eligibility,
+        previousTeamId,
+        newTeamId,
+        status: entry.status,
+        season: entry.season,
+        enteredDate: new Date(entry.enteredDate),
+        committedDate: entry.committedDate ? new Date(entry.committedDate) : null,
+        stars: entry.stars,
+        previousStats: JSON.stringify(entry.previousStats),
+        nilValuation: entry.nilValuation,
+        paiScore: entry.paiScore,
+        tier: entry.tier,
+        transferWindow: entry.transferWindow,
+        verified: entry.verified,
+        verifiedBy: entry.verifiedBy,
+        verifiedAt: entry.verified ? new Date() : null,
+        source: 'seed-ncaa-data',
+      },
+    });
+    created++;
+  }
+
+  return { created, skipped };
+}
+
+export async function seedNilDeals(entries: Array<{
+  playerName: string;
+  teamAbbrev: string;
+  position: string;
+  dealType: string;
+  brandOrCollective: string;
+  estimatedValue: number;
+  duration: string;
+  status: string;
+  announcedDate: string;
+  season: number;
+}>) {
+  let created = 0;
+  let skipped = 0;
+
+  for (const entry of entries) {
+    const teamId = await resolveTeamId(entry.teamAbbrev);
+
+    const existing = await prisma.nilDeal.findFirst({
+      where: { playerName: entry.playerName, brandOrCollective: entry.brandOrCollective, season: entry.season },
+    });
+    if (existing) { skipped++; continue; }
+
+    await prisma.nilDeal.create({
+      data: {
+        playerName: entry.playerName,
+        teamId,
+        position: entry.position,
+        dealType: entry.dealType,
+        brandOrCollective: entry.brandOrCollective,
+        estimatedValue: entry.estimatedValue,
+        duration: entry.duration,
+        status: entry.status,
+        announcedDate: new Date(entry.announcedDate),
+        season: entry.season,
+        verified: true,
+        verifiedBy: 'seed-ncaa-data',
+        verifiedAt: new Date(),
+        source: 'seed-ncaa-data',
+      },
+    });
+    created++;
+  }
+
+  return { created, skipped };
+}
+
+export async function seedNilTeamRankings(entries: Array<{
+  teamAbbrev: string;
+  rank: number;
+  totalNilValue: number;
+  avgPerPlayer: number;
+  topDealValue: number;
+  dealCount: number;
+  collectiveCount: number;
+  trend: string;
+  previousRank: number;
+}>, season: number = 2025) {
+  let created = 0;
+  let skipped = 0;
+
+  for (const entry of entries) {
+    const teamId = await resolveTeamId(entry.teamAbbrev);
+    if (!teamId) { skipped++; continue; }
+
+    await prisma.nilTeamRanking.upsert({
+      where: { teamId_season: { teamId, season } },
+      update: {
+        rank: entry.rank,
+        totalNilValue: entry.totalNilValue,
+        avgPerPlayer: entry.avgPerPlayer,
+        topDealValue: entry.topDealValue,
+        dealCount: entry.dealCount,
+        collectiveCount: entry.collectiveCount,
+        trend: entry.trend,
+        previousRank: entry.previousRank,
+        lastCalculated: new Date(),
+      },
+      create: {
+        teamId,
+        season,
+        rank: entry.rank,
+        totalNilValue: entry.totalNilValue,
+        avgPerPlayer: entry.avgPerPlayer,
+        topDealValue: entry.topDealValue,
+        dealCount: entry.dealCount,
+        collectiveCount: entry.collectiveCount,
+        trend: entry.trend,
+        previousRank: entry.previousRank,
+      },
+    });
+    created++;
+  }
+
+  return { created, skipped };
+}
+
+export async function seedSchoolBudgets(entries: Array<{
+  teamAbbrev: string;
+  totalRevenue: number;
+  footballRevenue: number;
+  nilBudget: number;
+  nilSpent: number;
+  coachingSalary: number;
+  operatingBudget: number;
+  tvRevenue: number;
+  ticketRevenue: number;
+  donorRevenue: number;
+  merchandiseRev: number;
+  conferenceShare: number;
+  spendingTier: string;
+  rosterSize: number;
+}>, season: number = 2025) {
+  let created = 0;
+  let skipped = 0;
+
+  for (const entry of entries) {
+    const teamId = await resolveTeamId(entry.teamAbbrev);
+    if (!teamId) { skipped++; continue; }
+
+    const capSpace = entry.nilBudget - entry.nilSpent;
+
+    await prisma.schoolRevenueBudget.upsert({
+      where: { teamId_season: { teamId, season } },
+      update: {
+        totalRevenue: entry.totalRevenue,
+        footballRevenue: entry.footballRevenue,
+        nilBudget: entry.nilBudget,
+        nilSpent: entry.nilSpent,
+        nilRemaining: capSpace,
+        coachingSalary: entry.coachingSalary,
+        operatingBudget: entry.operatingBudget,
+        capSpace,
+        spendingTier: entry.spendingTier,
+        tvRevenue: entry.tvRevenue,
+        ticketRevenue: entry.ticketRevenue,
+        donorRevenue: entry.donorRevenue,
+        merchandiseRev: entry.merchandiseRev,
+        conferenceShare: entry.conferenceShare,
+        rosterSize: entry.rosterSize,
+        lastUpdated: new Date(),
+        updatedBy: 'seed-ncaa-data',
+      },
+      create: {
+        teamId,
+        season,
+        totalRevenue: entry.totalRevenue,
+        footballRevenue: entry.footballRevenue,
+        nilBudget: entry.nilBudget,
+        nilSpent: entry.nilSpent,
+        nilRemaining: capSpace,
+        coachingSalary: entry.coachingSalary,
+        operatingBudget: entry.operatingBudget,
+        scholarships: 85,
+        rosterSize: entry.rosterSize,
+        capSpace,
+        spendingTier: entry.spendingTier,
+        tvRevenue: entry.tvRevenue,
+        ticketRevenue: entry.ticketRevenue,
+        donorRevenue: entry.donorRevenue,
+        merchandiseRev: entry.merchandiseRev,
+        conferenceShare: entry.conferenceShare,
+        updatedBy: 'seed-ncaa-data',
+      },
+    });
+    created++;
+  }
+
+  // Calculate cap ranks
+  const budgets = await prisma.schoolRevenueBudget.findMany({
+    where: { season },
+    orderBy: { capSpace: 'desc' },
+  });
+  for (let i = 0; i < budgets.length; i++) {
+    await prisma.schoolRevenueBudget.update({
+      where: { id: budgets[i].id },
+      data: { capRank: i + 1 },
+    });
+  }
+
+  return { created, skipped };
+}
+
 export async function completeAutomationRun(id: string, result: {
   status: string;
   recordsScanned?: number;
