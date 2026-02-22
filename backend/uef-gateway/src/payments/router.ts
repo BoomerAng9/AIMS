@@ -11,6 +11,7 @@
 
 import { Router } from 'express';
 import { agentPayments } from './agent-payments';
+import { agentCommerceRouter } from '../billing/agent-commerce';
 import logger from '../logger';
 
 export const paymentsRouter = Router();
@@ -134,3 +135,8 @@ paymentsRouter.post('/api/payments/wallet/:agentId/credit', (req, res) => {
     res.status(500).json({ error: msg });
   }
 });
+
+// ---------------------------------------------------------------------------
+// Agent Commerce (X402 checkout flow + Stripe/Coinbase)
+// ---------------------------------------------------------------------------
+paymentsRouter.use(agentCommerceRouter);
