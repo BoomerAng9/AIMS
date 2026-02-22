@@ -18,8 +18,9 @@ import { JSON_SQUAD_PROFILES } from './agents/lil-hawks/json-expert-squad';
 import { pmoRegistry } from './pmo/registry';
 import { houseOfAng } from './pmo/house-of-ang';
 import { runCollaborationDemo, renderJSON } from './collaboration';
-import { TIER_CONFIGS, TASK_MULTIPLIERS as BILLING_MULTIPLIERS, PILLAR_CONFIGS, checkAllowance, calculatePillarAddon, checkAgentLimit } from './billing';
+import { TIER_CONFIGS, TASK_MULTIPLIERS as BILLING_MULTIPLIERS, PILLAR_CONFIGS, checkAllowance, calculatePillarAddon, checkAgentLimit, meterAndRecord } from './billing';
 import { billingProvisions } from './billing/persistence';
+import { agentPayments } from './payments/agent-payments';
 import { openrouter, MODELS as LLM_MODELS, llmGateway, usageTracker } from './llm';
 import { verticalRegistry } from './verticals';
 import { projectStore, plugStore, deploymentStore, auditStore, evidenceStore, startCleanupSchedule, stopCleanupSchedule, closeDb } from './db';
@@ -97,6 +98,8 @@ app.use(cors({
   origin: corsOrigin.split(',').map(o => o.trim()),
   methods: ['GET', 'POST'],
 }));
+// Raw body for Stripe webhook signature verification (must be before express.json())
+app.use('/api/payments/stripe/webhook', express.raw({ type: 'application/json' }));
 app.use(express.json());
 
 // Correlation ID middleware — every request gets a trace ID
@@ -2553,9 +2556,26 @@ app.post('/ingress/acp', acpLimiter, async (req, res) => {
 
     logger.info({ passed: oracleResult.passed, score: oracleResult.score }, '[UEF] ORACLE result');
 
-    // 5. Agent dispatch (only if ORACLE passes AND policy is cleared)
+    // 5. Pre-execution affordability check
+    const estimatedLucCost = quote.variants[0]?.estimate?.totalTokens
+      ? Math.floor((quote.variants[0].estimate.totalUsd || 0) * 100)
+      : 0;
+
+    let insufficientFunds = false;
+    if (estimatedLucCost > 0 && acpReq.userId !== 'guest') {
+      const affordable = agentPayments.canAfford(acpReq.userId, estimatedLucCost);
+      if (!affordable) {
+        insufficientFunds = true;
+        logger.warn(
+          { userId: acpReq.userId, estimatedLucCost },
+          '[UEF] Insufficient LUC balance — blocking execution',
+        );
+      }
+    }
+
+    // 6. Agent dispatch (only if ORACLE passes, policy cleared, AND affordable)
     let agentResult = { executed: false, agentOutputs: [] as Array<{ status: string; agentId: string; result: { summary: string; artifacts: string[] } }>, primaryAgent: null as string | null };
-    if (oracleResult.passed && prepPacket.policyManifest.cleared) {
+    if (oracleResult.passed && prepPacket.policyManifest.cleared && !insufficientFunds) {
       agentResult = await routeToAgents(
         acpReq.intent,
         acpReq.naturalLanguage,
@@ -2564,11 +2584,35 @@ app.post('/ingress/acp', acpLimiter, async (req, res) => {
       );
     }
 
-    // 6. Construct response
+    // 7. Post-execution metering — record actual token usage to SQLite
+    if (agentResult.executed && acpReq.userId !== 'guest') {
+      const taskType = acpReq.intent === 'BUILD_PLUG' ? 'DEPLOYMENT'
+        : acpReq.intent === 'RESEARCH' ? 'BIZ_INTEL'
+        : acpReq.intent === 'AGENTIC_WORKFLOW' ? 'AGENT_SWARM'
+        : 'CODE_GEN';
+      const rawTokens = quote.variants[0]?.estimate?.totalTokens || 0;
+      const provision = billingProvisions.get(acpReq.userId);
+      const tierId = provision?.tierId || 'p2p';
+
+      meterAndRecord(
+        rawTokens,
+        taskType as any,
+        tierId,
+        acpReq.userId,
+        `ACP ${acpReq.intent}: ${acpReq.naturalLanguage.slice(0, 80)}`,
+      );
+    }
+
+    // 8. Construct response
+    const acpStatus = insufficientFunds ? 'PAYMENT_REQUIRED' : (oracleResult.passed ? 'SUCCESS' : 'ERROR');
+    const acpMessage = insufficientFunds
+      ? 'Insufficient LUC balance. Please top up your wallet to continue.'
+      : buildResponseMessage(acpReq.intent, oracleResult.passed, agentResult.executed);
+
     const response: ACPResponse = {
       reqId: acpReq.reqId,
-      status: oracleResult.passed ? 'SUCCESS' : 'ERROR',
-      message: buildResponseMessage(acpReq.intent, oracleResult.passed, agentResult.executed),
+      status: acpStatus as any,
+      message: acpMessage,
       quote: quote,
       executionPlan: executionPlan,
     };

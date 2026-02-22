@@ -21,7 +21,7 @@
 import { Router, Request, Response } from 'express';
 import { generateReceipt, getAllPricing, getResourcePricing } from './x402';
 import { TASK_MULTIPLIERS } from './index';
-import { paymentSessionStore } from './persistence';
+import { paymentSessionStore, billingProvisions, agentWalletStore } from './persistence';
 import logger from '../logger';
 
 // ---------------------------------------------------------------------------
@@ -424,4 +424,171 @@ agentCommerceRouter.post('/api/payments/agent/usage', (req: Request, res: Respon
     currency: 'usd',
     timestamp: new Date().toISOString(),
   });
+});
+
+// ---------------------------------------------------------------------------
+// POST /api/payments/stripe/webhook — Backend Stripe Webhook Receiver
+//
+// Handles subscription lifecycle events directly on the backend:
+//   - checkout.session.completed → provision tier + credit LUC
+//   - customer.subscription.updated → update tier
+//   - customer.subscription.deleted → de-provision
+//   - invoice.paid → credit LUC for renewal
+//   - payment_intent.succeeded → mark agent commerce sessions complete
+// ---------------------------------------------------------------------------
+
+agentCommerceRouter.post('/api/payments/stripe/webhook', async (req: Request, res: Response) => {
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  const sig = req.headers['stripe-signature'] as string;
+
+  let event: any;
+
+  // Verify webhook signature when secret is configured
+  if (stripe && webhookSecret && sig) {
+    try {
+      event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
+    } catch (err: any) {
+      logger.warn({ err: err.message }, '[StripeWebhook] Signature verification failed');
+      res.status(400).json({ error: `Webhook signature verification failed: ${err.message}` });
+      return;
+    }
+  } else if (!webhookSecret) {
+    // Dev mode: accept raw JSON body
+    event = req.body;
+    logger.warn('[StripeWebhook] No STRIPE_WEBHOOK_SECRET — accepting unverified (dev mode)');
+  } else {
+    res.status(400).json({ error: 'Missing stripe-signature header' });
+    return;
+  }
+
+  const eventType = event.type;
+  const data = event.data?.object;
+
+  logger.info({ eventType, eventId: event.id }, '[StripeWebhook] Received event');
+
+  try {
+    switch (eventType) {
+      // ── Checkout completed → provision tier ─────────────────────────
+      case 'checkout.session.completed': {
+        const userId = data.metadata?.userId || data.client_reference_id;
+        const tierId = data.metadata?.tierId;
+        const customerId = data.customer;
+        const subscriptionId = data.subscription;
+
+        if (userId && tierId) {
+          const now = new Date().toISOString();
+          billingProvisions.upsert({
+            userId,
+            tierId,
+            tierName: data.metadata?.tierName || tierId,
+            stripeCustomerId: customerId || '',
+            stripeSubscriptionId: subscriptionId || '',
+            provisionedAt: now,
+            updatedAt: now,
+          });
+          logger.info({ userId, tierId, customerId }, '[StripeWebhook] Tier provisioned');
+        }
+
+        // Also check if this is an agent commerce session
+        const aimsSessionId = data.metadata?.aimsSessionId;
+        if (aimsSessionId) {
+          const session = paymentSessionStore.get(aimsSessionId);
+          if (session && session.status === 'pending') {
+            const receipt = generateReceipt(
+              data.payment_intent || data.id,
+              'stripe',
+              session.amount,
+              session.currency,
+              session.resourceId,
+            );
+            paymentSessionStore.update(aimsSessionId, {
+              status: 'completed',
+              completedAt: new Date().toISOString(),
+              receipt,
+              stripePaymentIntentId: data.payment_intent,
+              stripeCheckoutSessionId: data.id,
+            });
+            logger.info({ aimsSessionId }, '[StripeWebhook] Agent commerce session completed via webhook');
+          }
+        }
+        break;
+      }
+
+      // ── Subscription updated → update tier ─────────────────────────
+      case 'customer.subscription.updated': {
+        const userId = data.metadata?.userId;
+        const tierId = data.metadata?.tierId;
+        if (userId && tierId) {
+          const existing = billingProvisions.get(userId);
+          if (existing) {
+            billingProvisions.upsert({
+              ...existing,
+              tierId,
+              tierName: data.metadata?.tierName || tierId,
+              updatedAt: new Date().toISOString(),
+            });
+            logger.info({ userId, tierId }, '[StripeWebhook] Subscription updated');
+          }
+        }
+        break;
+      }
+
+      // ── Subscription deleted → de-provision ────────────────────────
+      case 'customer.subscription.deleted': {
+        const userId = data.metadata?.userId;
+        if (userId) {
+          billingProvisions.delete(userId);
+          logger.info({ userId }, '[StripeWebhook] Subscription cancelled — de-provisioned');
+        }
+        break;
+      }
+
+      // ── Invoice paid → credit LUC for subscription renewal ─────────
+      case 'invoice.paid': {
+        const userId = data.metadata?.userId || data.subscription_details?.metadata?.userId;
+        const amountPaid = (data.amount_paid || 0) / 100; // cents → dollars
+        if (userId && amountPaid > 0) {
+          const lucCredit = Math.floor(amountPaid * 100); // $1 = 100 LUC
+          const wallet = agentWalletStore.getOrCreate(userId);
+          agentWalletStore.updateBalance(userId, wallet.lucBalance + lucCredit);
+          logger.info({ userId, amountPaid, lucCredit }, '[StripeWebhook] Invoice paid — LUC credited');
+        }
+        break;
+      }
+
+      // ── Payment intent succeeded → mark sessions ───────────────────
+      case 'payment_intent.succeeded': {
+        const aimsSessionId = data.metadata?.aimsSessionId;
+        if (aimsSessionId) {
+          const session = paymentSessionStore.get(aimsSessionId);
+          if (session && session.status === 'pending') {
+            const receipt = generateReceipt(
+              data.id,
+              'stripe',
+              session.amount,
+              session.currency,
+              session.resourceId,
+            );
+            paymentSessionStore.update(aimsSessionId, {
+              status: 'completed',
+              completedAt: new Date().toISOString(),
+              receipt,
+              stripePaymentIntentId: data.id,
+            });
+            logger.info({ aimsSessionId, piId: data.id }, '[StripeWebhook] PaymentIntent succeeded — session completed');
+          }
+        }
+        break;
+      }
+
+      default:
+        logger.debug({ eventType }, '[StripeWebhook] Unhandled event type');
+    }
+  } catch (handlerErr: any) {
+    logger.error({ err: handlerErr, eventType }, '[StripeWebhook] Handler error');
+    // Still return 200 to prevent Stripe retries on handler errors
+  }
+
+  // Always return 200 to acknowledge receipt (Stripe retries on non-2xx)
+  res.json({ received: true });
 });
