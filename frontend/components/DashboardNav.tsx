@@ -21,7 +21,7 @@ import {
   FlaskConical, FolderKanban, Users, Boxes,
   Trophy, Activity, Mic, Theater, BookOpen,
   Coins, CircleDot, TrendingUp, Building, Layers,
-  Store, ShoppingCart, Calculator,
+  Store, ShoppingCart, Calculator, Map,
 } from "lucide-react";
 
 // ── Types ──
@@ -45,6 +45,7 @@ const PRIMARY_ACTIONS: NavItem[] = [
 // Core pages — always visible
 const CORE_ITEMS: NavItem[] = [
   { href: "/dashboard", label: "Overview", icon: BarChart3 },
+  { href: "/dashboard/map", label: "Platform Map", icon: Map, highlight: true },
   { href: "/dashboard/deploy-dock", label: "Deploy Dock", icon: Rocket, highlight: true },
   { href: "/dashboard/your-space", label: "Your Space", icon: Users },
   { href: "/dashboard/plan", label: "Plan", icon: FolderKanban },
