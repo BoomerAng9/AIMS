@@ -371,6 +371,8 @@ function VoiceVisionMode({
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [messages, setMessages] = useState<VoiceMessage[]>([
@@ -454,11 +456,18 @@ function VoiceVisionMode({
         };
         setMessages(prev => [...prev, acheevyMessage]);
 
-        // TODO: Play TTS audio if available
+        // Play TTS audio if available
         if (data.audioUrl) {
           setIsSpeaking(true);
-          // Play audio...
-          setTimeout(() => setIsSpeaking(false), 3000);
+          if (audioRef.current) {
+            audioRef.current.pause();
+            audioRef.current = null;
+          }
+          const audio = new Audio(data.audioUrl);
+          audioRef.current = audio;
+          audio.onended = () => setIsSpeaking(false);
+          audio.onerror = () => setIsSpeaking(false);
+          audio.play().catch(() => setIsSpeaking(false));
         }
       }
     } catch (err) {
@@ -466,10 +475,37 @@ function VoiceVisionMode({
     }
   }, [project.id, captureFrame]);
 
-  // Toggle voice listening
+  // Toggle voice listening via Web Speech API
   const toggleListening = () => {
-    setIsListening(!isListening);
-    // TODO: Implement Web Speech API recognition
+    if (isListening) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+      return;
+    }
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      console.error('Web Speech API not supported in this browser');
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = 'en-US';
+
+    recognition.onresult = (event: SpeechRecognitionEvent) => {
+      const transcript = event.results[0]?.[0]?.transcript;
+      if (transcript) {
+        sendMessage(transcript, true);
+      }
+    };
+    recognition.onerror = () => setIsListening(false);
+    recognition.onend = () => setIsListening(false);
+
+    recognitionRef.current = recognition;
+    recognition.start();
+    setIsListening(true);
   };
 
   useEffect(() => {
@@ -480,6 +516,13 @@ function VoiceVisionMode({
         const stream = videoRef.current.srcObject as MediaStream;
         stream.getTracks().forEach(track => track.stop());
       }
+      // Cleanup: stop audio playback
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+      // Cleanup: stop speech recognition
+      recognitionRef.current?.stop();
     };
   }, [startCamera]);
 
