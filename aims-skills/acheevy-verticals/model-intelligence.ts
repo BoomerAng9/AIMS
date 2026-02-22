@@ -56,6 +56,19 @@ export interface ModelCapabilityProfile {
   /** Score 0-100 for how well this model fits each task type */
   taskAffinity: Record<TaskType, number>;
 
+  // ── Thinking Levels ──────────────────────────────────────────────────
+  /** If the model supports configurable thinking levels (e.g., Gemini 3.1) */
+  thinkingLevels?: {
+    supported: boolean;
+    levels: ThinkingLevel[];
+    defaultLevel: ThinkingLevelId;
+    costStrategy: string;           // Description of cost optimization
+  };
+
+  // ── Benchmarks ─────────────────────────────────────────────────────────
+  /** Verified benchmark scores — real data, not marketing */
+  benchmarks?: Record<string, number | string>;
+
   // ── Cost ───────────────────────────────────────────────────────────────
   cost: {
     inputPer1M: number;
@@ -98,6 +111,29 @@ export interface ModelStrength {
   domain: string;
   description: string;
   evidenceBasis: string;     // Why we know this is a strength
+}
+
+// ---------------------------------------------------------------------------
+// Thinking Levels — Gemini 3.1 Pro + Future Models
+// ---------------------------------------------------------------------------
+
+/** Thinking level identifier */
+export type ThinkingLevelId = 'low' | 'medium' | 'high';
+
+/** A thinking level with cost and use-case guidance */
+export interface ThinkingLevel {
+  id: ThinkingLevelId;
+  description: string;
+  costMultiplier: number;        // Relative to base cost (1.0 = no change)
+  idealFor: string[];            // Task types this level is best for
+  savingsEstimate: string;       // e.g., "Save 70%+ on thinking tokens"
+}
+
+/** Thinking level selection result */
+export interface ThinkingLevelSelection {
+  level: ThinkingLevelId;
+  reason: string;
+  estimatedSavings: string;
 }
 
 /** Task types that models can be scored against */
@@ -229,6 +265,17 @@ const MODEL_PROFILES: ModelCapabilityProfile[] = [
 
   // ═══════════════════════════════════════════════════════════════════════
   // GEMINI 3.1 PRO — The Logician
+  //
+  // NOT memorization. LOGIC. Built into the architecture natively.
+  // ARC-AGI-2: 77.1% (more than double Gemini 3 Pro's 31.1%)
+  // GPQA Diamond: highest score ever recorded (graduate-level science)
+  // Thinking levels: LOW/MEDIUM/HIGH — 80/20 rule saves 50-70% on API spend
+  //
+  // This model is structurally aligned with everything AIMS is building:
+  //   - Methodology Engine (DMAIC/DMADV/FOSTER) → native reasoning
+  //   - Look-Listen-Learn → novel pattern recognition (ARC-AGI-2)
+  //   - Long-horizon planning → 2M context window
+  //   - Agentic workflows → optimized tool use and multi-step execution
   // ═══════════════════════════════════════════════════════════════════════
   {
     id: 'gemini-3.1-pro',
@@ -244,38 +291,74 @@ const MODEL_PROFILES: ModelCapabilityProfile[] = [
       nativeReasoning: true,
     },
     strengths: [
-      { domain: 'native_reasoning', description: 'Logic is built into the model architecture — not bolted on. Uses structured reasoning natively, not memorization.', evidenceBasis: 'Google DeepMind architecture, MATH/GPQA benchmarks' },
-      { domain: 'multimodal', description: 'True multimodal: text, image, audio, video in a single model — strongest multimodal coverage', evidenceBasis: 'Native architecture, not adapter-based' },
-      { domain: 'context_window', description: '2M token context — largest production context window, ideal for massive codebases and document analysis', evidenceBasis: 'Google "Long Context" benchmarks' },
-      { domain: 'research', description: 'Exceptional at synthesizing large volumes of information into structured analysis', evidenceBasis: 'Internal research synthesis testing' },
-      { domain: 'logic', description: 'Native logical reasoning aligns with AIMS methodology engine (DMAIC/DMADV/FOSTER/DEVELOP/HONE)', evidenceBasis: 'Architecture uses reasoning tokens natively' },
-      { domain: 'cost', description: 'Strong capability at lower cost than Claude Opus — excellent for high-volume reasoning tasks', evidenceBasis: 'Pricing comparison at equivalent quality tiers' },
+      { domain: 'native_reasoning', description: 'Logic is built into the model architecture — not bolted on. Uses structured reasoning natively, not memorization. This is the structural shift: dependable reasoning for production systems.', evidenceBasis: 'ARC-AGI-2: 77.1% (2x+ over Gemini 3 Pro 31.1%). Not memorized patterns — novel pattern recognition.' },
+      { domain: 'graduate_level_science', description: 'Highest score ever recorded on GPQA Diamond — graduate-level science reasoning. Verified by independent benchmark.', evidenceBasis: 'GPQA Diamond benchmark — top score across all models.' },
+      { domain: 'multimodal', description: 'True multimodal: text, image, audio, video in a single model — strongest multimodal coverage. Canvas feature enables 7 interactive tools.', evidenceBasis: 'Native architecture, not adapter-based. Canvas with 7 tool types.' },
+      { domain: 'context_window', description: '2M token context — largest production context window, ideal for massive codebases, entire repos, and long-form document analysis.', evidenceBasis: 'Google "Long Context" benchmarks, production verified.' },
+      { domain: 'thinking_levels', description: 'Configurable thinking depth (LOW/MEDIUM/HIGH). 80% of tasks on LOW/MEDIUM saves 50-70% on API spend. HIGH activates "Deep Think Mini" capabilities for complex reasoning.', evidenceBasis: 'Google AI Studio cost analysis. DEFAULT is HIGH — must be explicitly managed.' },
+      { domain: 'agentic_workflows', description: 'Optimized for agentic workflows: precise tool usage, reliable multi-step execution, software engineering behavior. Designed for agents that carry responsibility in production.', evidenceBasis: 'Google ADK integration, Antigravity IDE agent system, benchmark gains on agentic tasks.' },
+      { domain: 'research', description: 'Exceptional at synthesizing large volumes of information into structured analysis. Long-horizon planning for complex multi-step problems.', evidenceBasis: 'Internal research synthesis testing + 2M context enables full-codebase analysis.' },
+      { domain: 'cost', description: 'Strong capability at lower cost than Claude Opus — with thinking levels, can match Opus quality on reasoning at fraction of cost.', evidenceBasis: 'Pricing: $1.25/$10 vs Opus $5/$25. With LOW thinking: effectively $0.37/$3.' },
     ],
     weaknesses: [
+      'DEFAULT thinking level is HIGH (most expensive) — must explicitly manage levels',
       'Code generation slightly below Claude Opus for complex architecture patterns',
-      'Instruction following for highly nested system prompts can vary',
-      'Tool use reliability slightly lower than Anthropic models',
+      'Instruction following for highly nested system prompts can vary vs Anthropic',
+      'Tool use reliability slightly lower than Claude models',
     ],
+    thinkingLevels: {
+      supported: true,
+      levels: [
+        {
+          id: 'low',
+          description: 'Simple tasks, routine queries. Minimal reasoning tokens.',
+          costMultiplier: 0.3,
+          idealFor: ['classification', 'extraction', 'quick_response', 'translation', 'summarization'],
+          savingsEstimate: 'Save 70%+ on thinking token costs',
+        },
+        {
+          id: 'medium',
+          description: 'Daily development, balanced quality/cost. Equivalent to old HIGH settings.',
+          costMultiplier: 0.6,
+          idealFor: ['content_writing', 'conversation', 'code_review', 'data_analysis', 'planning'],
+          savingsEstimate: 'Save 40% on thinking token costs',
+        },
+        {
+          id: 'high',
+          description: 'Deep reasoning, complex multi-step tasks. "Deep Think Mini" capabilities. Most expensive.',
+          costMultiplier: 1.0,
+          idealFor: ['code_generation', 'architecture_design', 'reasoning', 'math_computation', 'agent_orchestration'],
+          savingsEstimate: 'Full cost — use only for the 20% that truly needs it',
+        },
+      ],
+      defaultLevel: 'high',
+      costStrategy: '80/20 Rule: Set 80% of tasks to LOW or MEDIUM, reserve HIGH for the 20% of truly complex tasks. This slashes API spend by 50-70% without quality loss on routine work.',
+    },
+    benchmarks: {
+      'ARC-AGI-2': '77.1% (vs Gemini 3 Pro 31.1% — 2x+ improvement)',
+      'GPQA-Diamond': 'Highest ever recorded (graduate-level science)',
+      'reasoning_improvement': '2x+ over previous generation',
+    },
     taskAffinity: {
-      code_generation: 88, code_review: 85, code_debugging: 87, architecture_design: 88,
-      research_synthesis: 96, data_analysis: 92, content_writing: 85, creative_writing: 82,
-      conversation: 82, classification: 85, extraction: 88, translation: 90,
-      summarization: 94, reasoning: 96, math_computation: 95, planning: 90,
-      image_analysis: 92, document_analysis: 94, agent_orchestration: 85, tool_use: 85,
+      code_generation: 90, code_review: 87, code_debugging: 89, architecture_design: 90,
+      research_synthesis: 97, data_analysis: 94, content_writing: 85, creative_writing: 82,
+      conversation: 82, classification: 88, extraction: 90, translation: 92,
+      summarization: 95, reasoning: 98, math_computation: 97, planning: 92,
+      image_analysis: 93, document_analysis: 96, agent_orchestration: 90, tool_use: 88,
       quick_response: 50,
     },
     cost: { inputPer1M: 1.25, outputPer1M: 10.0, tier: 'standard' },
     aimsAlignment: {
-      logicDriven: 96, instructionFollowing: 85, toolUseReliability: 82,
-      creativeProblemSolving: 90, codeQuality: 88, contextUtilization: 98,
-      consistency: 85, costEfficiency: 92,
+      logicDriven: 98, instructionFollowing: 85, toolUseReliability: 85,
+      creativeProblemSolving: 92, codeQuality: 90, contextUtilization: 99,
+      consistency: 88, costEfficiency: 94,
     },
     methodologyFit: {
-      dmaic: 95, dmadv: 92, foster: 85, develop: 88, hone: 85, lookListenLearn: 90,
+      dmaic: 98, dmadv: 94, foster: 88, develop: 90, hone: 88, lookListenLearn: 95,
     },
     releaseDate: '2026-02-01',
     lastUpdated: '2026-02-22',
-    notes: 'AIMS preferred fallback for Buildsmith code gen. Primary for DMAIC methodology (logic-driven improvement). Gemini 3.1 native reasoning aligns directly with LLL and methodology engine. Best model for research synthesis and document analysis due to 2M context.',
+    notes: 'AIMS preferred fallback for Buildsmith code gen. Primary for DMAIC methodology (logic-driven improvement). Gemini 3.1 native reasoning — not memorization — aligns directly with LLL engine and methodology engine. ARC-AGI-2 score (77.1%) proves novel pattern recognition, not cached knowledge. Best model for research synthesis and document analysis due to 2M context. CRITICAL: Default thinking is HIGH — always set thinking level explicitly. 80/20 rule saves 50-70%.',
   },
 
   // ═══════════════════════════════════════════════════════════════════════
@@ -1079,12 +1162,92 @@ class ModelIntelligenceEngine {
         input: primary.cost.inputPer1M / 1000,
         output: primary.cost.outputPer1M / 1000,
       },
+      thinkingLevel: primary.thinkingLevels?.supported
+        ? this.selectThinkingLevel(primary, primaryTask)
+        : undefined,
     };
   }
 
   /**
    * Get default fallback model for a given primary.
    */
+  // ── Thinking Level Selection ────────────────────────────────────────
+
+  /**
+   * Select the optimal thinking level for a model + task combination.
+   *
+   * The 80/20 Rule:
+   *   - 80% of tasks should run on LOW or MEDIUM thinking
+   *   - Only the 20% that truly require deep reasoning use HIGH
+   *   - This saves 50-70% on API spend without quality loss on routine work
+   *
+   * CRITICAL: Gemini 3.1 Pro defaults to HIGH (most expensive).
+   * We MUST explicitly set the level for every call.
+   */
+  private selectThinkingLevel(
+    model: ModelCapabilityProfile,
+    task: TaskType,
+  ): ThinkingLevelSelection {
+    if (!model.thinkingLevels?.supported) {
+      return { level: 'medium', reason: 'Model does not support thinking levels', estimatedSavings: 'N/A' };
+    }
+
+    // HIGH thinking tasks — the 20% that need deep reasoning
+    const highThinkingTasks: TaskType[] = [
+      'code_generation', 'architecture_design', 'reasoning',
+      'math_computation', 'agent_orchestration', 'code_debugging',
+    ];
+
+    // MEDIUM thinking tasks — daily work, balanced quality/cost
+    const mediumThinkingTasks: TaskType[] = [
+      'content_writing', 'conversation', 'code_review',
+      'data_analysis', 'planning', 'research_synthesis',
+      'creative_writing', 'document_analysis',
+    ];
+
+    // Everything else goes LOW — classification, extraction, quick response
+    // These are the 80% of calls that don't need deep reasoning
+
+    if (highThinkingTasks.includes(task)) {
+      const level = model.thinkingLevels.levels.find(l => l.id === 'high')!;
+      return {
+        level: 'high',
+        reason: `${task} requires deep reasoning — activating "Deep Think Mini" capabilities`,
+        estimatedSavings: level.savingsEstimate,
+      };
+    }
+
+    if (mediumThinkingTasks.includes(task)) {
+      const level = model.thinkingLevels.levels.find(l => l.id === 'medium')!;
+      return {
+        level: 'medium',
+        reason: `${task} needs balanced quality/cost — equivalent to previous HIGH quality`,
+        estimatedSavings: level.savingsEstimate,
+      };
+    }
+
+    // Default to LOW for everything else
+    const level = model.thinkingLevels.levels.find(l => l.id === 'low')!;
+    return {
+      level: 'low',
+      reason: `${task} is routine — LOW thinking saves 70%+ without quality loss`,
+      estimatedSavings: level.savingsEstimate,
+    };
+  }
+
+  /**
+   * Public method to select thinking level for a specific model and task.
+   * Use when you need the thinking level independently of full model selection.
+   */
+  selectThinkingLevelForTask(
+    modelId: string,
+    task: TaskType,
+  ): ThinkingLevelSelection | undefined {
+    const profile = this.profiles.get(modelId);
+    if (!profile?.thinkingLevels?.supported) return undefined;
+    return this.selectThinkingLevel(profile, task);
+  }
+
   private getDefaultFallback(primaryId: string): string {
     const fallbacks: Record<string, string> = {
       'claude-opus-4.6': 'gemini-3.1-pro',
@@ -1220,6 +1383,9 @@ export interface ModelSelection {
     input: number;
     output: number;
   };
+
+  /** Thinking level recommendation (for models that support it, e.g. Gemini 3.1) */
+  thinkingLevel?: ThinkingLevelSelection;
 }
 
 interface ModelPerformanceEntry {

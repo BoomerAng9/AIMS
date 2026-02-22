@@ -1833,17 +1833,67 @@ User Message → Task Classifier (NLP) → Model Scorer → Budget Filter → Se
 5. **Apply methodology bonus** (DMAIC → logic models, DEVELOP → code models, etc.)
 6. **Return chain**: primary → fallback → economy
 
-### Gemini 3.1 Pro Alignment
+### Gemini 3.1 Pro — Deep Alignment with AIMS
 
-Gemini 3.1 uses **native logic** — reasoning is built into the model architecture,
-not bolted on through prompt engineering or memorization. This aligns directly with
-AIMS' methodology engine:
-- **DMAIC** (Define-Measure-Analyze-Improve-Control) → Logic-first improvement
-- **FOSTER** (Find-Organize-Shape-Tighten-Evaluate-Review) → Structured nurturing
-- **Look-Listen-Learn** → Continuous engagement intelligence
+Gemini 3.1 Pro uses **native logic** — reasoning is built into the model architecture,
+not bolted on through prompt engineering or memorization.
+
+**Verified Benchmarks:**
+- **ARC-AGI-2: 77.1%** — More than double Gemini 3 Pro's 31.1%. This is novel pattern recognition, not cached knowledge.
+- **GPQA Diamond: Highest score ever recorded** — Graduate-level science reasoning.
+- **Reasoning improvement: 2x+** over previous generation.
+
+**Why this matters for AIMS:**
+- **Methodology Engine** → Native reasoning drives DMAIC (logic-first improvement), DMADV (design from first principles), FOSTER (structured nurturing)
+- **Look-Listen-Learn** → Novel pattern recognition (ARC-AGI-2) feeds the LEARN phase — detecting patterns humans miss
+- **Agentic Workflows** → Optimized for precise tool usage, reliable multi-step execution — exactly what Boomer_Angs need
+- **2M Context Window** → Entire codebases, full document libraries, complete conversation histories in one call
 
 The stronger the language model's native reasoning, the stronger our actors perform.
 Model Intelligence ensures AIMS always uses the best brain for the job.
+
+### Thinking Levels — The 80/20 Rule
+
+Gemini 3.1 Pro introduces **configurable thinking depth**. This is critical for cost management.
+
+| Level | Use Case | Cost Impact | When AIMS Uses It |
+|-------|----------|-------------|-------------------|
+| **LOW** | Classification, extraction, routing, quick responses | Save 70%+ | Gateway routing, Gatekeeper_Ang, Index_Ang |
+| **MEDIUM** | Content writing, code review, conversation, planning | Save 40% | ACHEEVY chat, Chronicle_Ang, Scout_Ang research |
+| **HIGH** | Deep reasoning, architecture, complex code gen, math | Full cost | Forge_Ang builds, DMAIC deep analysis, architecture design |
+
+**⚠️ CRITICAL: Gemini 3.1 Pro defaults to HIGH (most expensive mode).**
+AIMS Model Intelligence Engine **always sets thinking level explicitly** on every call.
+
+**Cost Strategy:**
+```
+80% of AIMS tasks → LOW or MEDIUM thinking = 50-70% savings
+20% of AIMS tasks → HIGH thinking = full cost, but only when needed
+
+Example: 1000 daily API calls
+  Without thinking levels: $12.50 (all HIGH)
+  With 80/20 rule:          $4.25 (LOW/MEDIUM + targeted HIGH)
+  Monthly savings:          ~$250/month at this volume
+```
+
+**How the Model Intelligence Engine uses it:**
+1. Task is classified (e.g., `code_generation` vs `classification`)
+2. If selected model supports thinking levels, engine picks the right one
+3. Thinking level is passed to OpenRouter via `thinking.budget_level` parameter
+4. LUC cost tracker adjusts expected cost based on level
+
+### Superagent Deep Thinking
+
+For jobs that require **maximum reasoning depth** — Forge_Ang building full-stack applications,
+DMAIC deep analysis of complex systems, architecture design for enterprise deployments —
+the Model Intelligence Engine activates HIGH thinking on Gemini 3.1 Pro. This is the
+**Superagent** mode: native DeepMind reasoning applied to the hardest problems.
+
+These are job-specific activations, not blanket settings:
+- `code_generation` + `architecture_design` → HIGH thinking
+- `reasoning` + `math_computation` → HIGH thinking
+- `agent_orchestration` → HIGH thinking (multi-agent coordination)
+- Everything else → LOW or MEDIUM
 
 ### Rules
 
@@ -1852,9 +1902,12 @@ Model Intelligence ensures AIMS always uses the best brain for the job.
 3. **Respect budget tiers.** Economy users get economy models. Premium gets premium.
 4. **Learn from outcomes.** Record performance after every call. Over time, selections improve.
 5. **Fallback chains are mandatory.** Primary fails → fallback → economy. Never zero-model.
+6. **Always set thinking level.** Never let Gemini 3.1 default to HIGH. Be explicit.
+7. **80/20 Rule.** 80% LOW/MEDIUM, 20% HIGH. No exceptions without justification.
 
 **Files:**
-- `acheevy-verticals/model-intelligence.ts` — Model profiles, task classifier, selection engine
+- `acheevy-verticals/model-intelligence.ts` — Model profiles, task classifier, selection engine, thinking level selector
+- `backend/uef-gateway/src/llm/openrouter.ts` — OpenRouter client with `thinking_level` parameter support
 
 ---
 

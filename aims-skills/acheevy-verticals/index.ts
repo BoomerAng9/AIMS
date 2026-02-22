@@ -189,6 +189,9 @@ export type {
   TaskType,
   ModelSelection,
   AgentModelPreference,
+  ThinkingLevelId,
+  ThinkingLevel,
+  ThinkingLevelSelection,
 } from './model-intelligence';
 
 // ── Skills SME Registry ───────────────────────────────────────────────
