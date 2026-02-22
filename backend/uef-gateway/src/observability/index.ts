@@ -6,13 +6,15 @@
  *   2. CorrelationManager — distributed trace IDs via Express middleware
  *   3. MetricsExporter    — Prometheus + JSON metrics exposition
  *
- * All data is held in-memory. A time-series DB or external alerting
- * service (PagerDuty, OpsGenie) can be wired in later.
+ * Data is held in-memory for hot-path performance and periodically flushed
+ * to SQLite for persistence across restarts. On startup, recent metrics and
+ * alert history are restored from the database.
  */
 
 import { Request, Response, NextFunction } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import logger from '../logger';
+import { getDb } from '../db';
 
 // ---------------------------------------------------------------------------
 // Alert Types
@@ -140,6 +142,9 @@ export class AlertEngine {
           this.alertHistory.push(event);
           triggered.push(event);
 
+          // Persist to SQLite for restart survival
+          this.persistAlert(event);
+
           // Dispatch via configured channel
           this.dispatch(config, event);
         }
@@ -263,6 +268,61 @@ export class AlertEngine {
       .catch(err => {
         logger.error({ alertId: event.alertId, err: err instanceof Error ? err.message : err }, '[Observability] Email dispatch error');
       });
+  }
+
+  /**
+   * Persist an alert event to SQLite for survival across restarts.
+   */
+  private persistAlert(event: AlertEvent): void {
+    try {
+      const db = getDb();
+      db.prepare(`
+        INSERT INTO alert_history (alertId, name, metric, value, threshold, condition, severity, triggered_at, acknowledged)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `).run(
+        event.alertId, event.name, event.metric, event.value,
+        event.threshold, event.condition, event.severity,
+        event.triggeredAt, event.acknowledged ? 1 : 0,
+      );
+    } catch (err) {
+      logger.warn({ err }, '[Observability] Failed to persist alert — continuing in-memory');
+    }
+  }
+
+  /**
+   * Restore alert history from SQLite on startup.
+   */
+  restoreFromDb(): void {
+    try {
+      const db = getDb();
+      const rows = db.prepare(
+        `SELECT * FROM alert_history ORDER BY triggered_at DESC LIMIT 1000`
+      ).all() as Array<{
+        alertId: string; name: string; metric: string; value: number;
+        threshold: number; condition: string; severity: string;
+        triggered_at: string; acknowledged: number;
+      }>;
+
+      for (const row of rows) {
+        this.alertHistory.push({
+          alertId: row.alertId,
+          name: row.name,
+          metric: row.metric,
+          value: row.value,
+          threshold: row.threshold,
+          condition: row.condition as AlertCondition,
+          severity: row.severity as AlertSeverity,
+          triggeredAt: row.triggered_at,
+          acknowledged: row.acknowledged === 1,
+        });
+      }
+
+      if (rows.length > 0) {
+        logger.info({ count: rows.length }, '[Observability] Restored alert history from SQLite');
+      }
+    } catch (err) {
+      logger.warn({ err }, '[Observability] Could not restore alert history — starting fresh');
+    }
   }
 
   /**
@@ -499,6 +559,96 @@ export class MetricsExporter {
     };
   }
 
+  /**
+   * Flush recent metrics to SQLite. Only persists the latest snapshot per
+   * metric (not every data point) to keep the DB lean. Called periodically.
+   */
+  flushToDb(): void {
+    try {
+      const db = getDb();
+      const insert = db.prepare(`
+        INSERT INTO metric_snapshots (metric, value, labels, recorded_at)
+        VALUES (?, ?, ?, ?)
+      `);
+
+      const tx = db.transaction(() => {
+        let flushed = 0;
+        for (const [name, dataPoints] of this.metrics.entries()) {
+          if (dataPoints.length === 0) continue;
+          const latest = dataPoints[dataPoints.length - 1];
+          insert.run(name, latest.value, JSON.stringify(latest.labels || {}), latest.timestamp);
+          flushed++;
+        }
+        return flushed;
+      });
+
+      const count = tx();
+      if (count > 0) {
+        logger.debug({ count }, '[Observability] Flushed metric snapshots to SQLite');
+      }
+    } catch (err) {
+      logger.warn({ err }, '[Observability] Failed to flush metrics — continuing in-memory');
+    }
+  }
+
+  /**
+   * Restore metric history from SQLite on startup.
+   * Loads the most recent 100 snapshots per metric.
+   */
+  restoreFromDb(): void {
+    try {
+      const db = getDb();
+      const rows = db.prepare(`
+        SELECT metric, value, labels, recorded_at
+        FROM metric_snapshots
+        ORDER BY recorded_at DESC
+        LIMIT 5000
+      `).all() as Array<{ metric: string; value: number; labels: string; recorded_at: string }>;
+
+      // Group by metric name and insert in chronological order
+      const grouped = new Map<string, MetricDataPoint[]>();
+      for (const row of rows) {
+        const points = grouped.get(row.metric) || [];
+        points.push({
+          value: row.value,
+          timestamp: row.recorded_at,
+          labels: JSON.parse(row.labels),
+        });
+        grouped.set(row.metric, points);
+      }
+
+      for (const [metric, points] of grouped.entries()) {
+        // Reverse so they're in chronological order
+        const sorted = points.reverse();
+        for (const point of sorted) {
+          this.record(metric, point.value, point.labels);
+        }
+      }
+
+      if (rows.length > 0) {
+        logger.info({ snapshotCount: rows.length, metricCount: grouped.size }, '[Observability] Restored metrics from SQLite');
+      }
+    } catch (err) {
+      logger.warn({ err }, '[Observability] Could not restore metrics — starting fresh');
+    }
+  }
+
+  /**
+   * Prune metric snapshots older than the given number of days.
+   */
+  pruneOldSnapshots(maxAgeDays: number = 7): void {
+    try {
+      const db = getDb();
+      const cutoff = new Date(Date.now() - maxAgeDays * 24 * 60 * 60 * 1000).toISOString();
+      const result = db.prepare(`DELETE FROM metric_snapshots WHERE recorded_at < ?`).run(cutoff);
+      if (result.changes > 0) {
+        logger.info({ deleted: result.changes, maxAgeDays }, '[Observability] Pruned old metric snapshots');
+      }
+    } catch (err) {
+      logger.warn({ err }, '[Observability] Failed to prune metric snapshots');
+    }
+  }
+
   // -----------------------------------------------------------------------
   // Private
   // -----------------------------------------------------------------------
@@ -570,3 +720,29 @@ export class MetricsExporter {
 export const alertEngine = new AlertEngine();
 export const correlationManager = new CorrelationManager();
 export const metricsExporter = new MetricsExporter();
+
+// ---------------------------------------------------------------------------
+// Startup Restore + Periodic Flush
+// ---------------------------------------------------------------------------
+
+/**
+ * Initialize observability persistence: restore from SQLite and start
+ * periodic flush. Call once after DB is initialized.
+ */
+export function initObservabilityPersistence(): void {
+  // Restore historical data
+  alertEngine.restoreFromDb();
+  metricsExporter.restoreFromDb();
+
+  // Flush metrics to SQLite every 5 minutes
+  setInterval(() => {
+    metricsExporter.flushToDb();
+  }, 5 * 60 * 1000);
+
+  // Prune old snapshots daily (keep 7 days)
+  setInterval(() => {
+    metricsExporter.pruneOldSnapshots(7);
+  }, 24 * 60 * 60 * 1000);
+
+  logger.info('[Observability] Persistence initialized — flush every 5m, prune every 24h');
+}

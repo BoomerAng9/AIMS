@@ -144,21 +144,41 @@ Verticals and Hawks can be triggered by n8n, but the n8n → UEF Gateway integra
 Docker containers share a network. For strict multi-tenant isolation, each user should get a dedicated Docker network. The `isolatedSandbox` flag exists in plug config but dedicated per-user networks aren't implemented.
 
 ### Integration Activation
-15 integration definitions exist (SendGrid, Resend, Stripe, PayPal, etc.) but are catalog entries only — no actual env injection into running instances.
+~~15 integration definitions exist but are catalog entries only — no actual env injection into running instances.~~
+**FIXED:** IntegrationRegistry env vars now injected via `resolveEnvironment()` during Plug spin-up.
+`SpinUpRequest.integrations[]` activates integrations; env keys resolved from registry.
 
 ### Observability Persistence
-In-memory metrics reset on restart. Time-series data should persist to SQLite or external store.
+~~In-memory metrics reset on restart.~~
+**FIXED:** Migration 008 adds `metric_snapshots` + `alert_history` tables. MetricsExporter flushes to
+SQLite every 5 minutes, restores on startup, prunes after 7 days. AlertEngine persists every fired alert.
+
+### LUC Plan Fallback Crash
+~~`LUC_PLANS[planId] || LUC_PLANS.free` crashes because `free` plan doesn't exist.~~
+**FIXED:** All 4 occurrences now default to `p2p` (the actual lowest-tier plan ID).
+
+### Deploy Dock Ownership
+~~Any authenticated user could manage any other user's deployments (no ownership check).~~
+**FIXED:** All deploy-dock action handlers now verify `deployment.userId === session.user.email`.
+
+### Kling AI Gateway Bypass
+~~Frontend `kling-video.ts` made direct API calls to `api.klingai.com`, bypassing rate limiting and audit.~~
+**FIXED:** Now routes through UEF Gateway when `UEF_GATEWAY_URL` is configured. Direct fallback only in dev.
+
+### Subscription Token Usage
+~~`tokensUsed` always returned 0 in `/api/stripe/subscription` due to broken self-fetch.~~
+**FIXED:** Now fetches usage from UEF Gateway `/billing/check-allowance` endpoint.
 
 ---
 
 ## DEAD CODE — NOW REDUCED
 
-After fixes, only these remain uncalled:
+All previously dead billing functions are now wired:
 | Function | File | Status |
 |----------|------|--------|
-| `checkAllowance()` | billing/index.ts | Needs monthly billing cron |
-| `calculateFees()` | billing/index.ts | Line items used in invoice generation, fees calc standalone unused |
-| `generateSavingsLedgerEntries()` | billing/index.ts | Triple-ledger savings — needs full ledger flow |
+| `checkAllowance()` | billing/index.ts | **ALIVE** — called by `/billing/check-allowance` endpoint |
+| `calculateFees()` | billing/index.ts | **ALIVE** — called during invoice generation for fee breakdown |
+| `generateSavingsLedgerEntries()` | billing/index.ts | **ALIVE** — called during invoice generation for triple-ledger savings |
 
 Previously dead functions now alive:
 - ~~`expireStaleSessions()`~~ → Now called every 5 minutes via billing cron

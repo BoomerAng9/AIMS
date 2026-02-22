@@ -342,7 +342,7 @@ export class LUCAccountManager {
   /**
    * Get or create account for user
    */
-  async getOrCreateAccount(userId: string, planId: string = 'free'): Promise<LUCAccountRecord> {
+  async getOrCreateAccount(userId: string, planId: string = 'p2p'): Promise<LUCAccountRecord> {
     let account = await this.storage.getAccount(userId);
 
     if (!account) {

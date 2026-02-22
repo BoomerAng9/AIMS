@@ -38,7 +38,7 @@ import { secrets } from './secrets';
 import { supplyChain } from './supply-chain';
 import { sandboxEnforcer } from './sandbox';
 import { securityTester } from './security';
-import { alertEngine, correlationManager, metricsExporter } from './observability';
+import { alertEngine, correlationManager, metricsExporter, initObservabilityPersistence } from './observability';
 import { releaseManager } from './release';
 import { backupManager } from './backup';
 import { incidentManager } from './backup/incident-runbook';
@@ -67,6 +67,7 @@ import {
   createCustomHawk, listUserHawks, getHawk, updateHawkStatus, deleteHawk,
   executeHawk, getAvailableDomains, getAvailableTools, getHawkExecutionHistory,
   getGlobalStats as getHawkGlobalStats,
+  initHawkScheduler, stopHawkScheduler,
 } from './custom-hawks';
 import type { CustomHawkSpec, HawkExecutionRequest } from './custom-hawks';
 
@@ -1685,7 +1686,7 @@ app.get('/billing/provision', (req, res) => {
 // --------------------------------------------------------------------------
 
 import { invoiceStore } from './billing/persistence';
-import { generateInvoiceLineItems } from './billing';
+import { generateInvoiceLineItems, calculateFees, generateSavingsLedgerEntries } from './billing';
 
 // Generate an invoice for a user's current billing period
 app.post('/billing/invoice/generate', (req, res) => {
@@ -1711,8 +1712,17 @@ app.post('/billing/invoice/generate', (req, res) => {
     p2pTransactionCount || 0,
   );
 
+  // Calculate fees breakdown for ledger entries
+  const isP2p = tierId === 'p2p';
+  const feeBreakdown = calculateFees(isP2p, p2pTransactionCount || 0);
+
   const subtotal = lineItems.reduce((sum, item) => sum + item.total, 0);
-  const tax = 0; // Tax calculation placeholder
+  // Tax rate from env (default 0 — set BILLING_TAX_RATE for jurisdictions that require it)
+  const taxRate = parseFloat(process.env.BILLING_TAX_RATE || '0');
+  const taxableAmount = lineItems
+    .filter(i => i.category !== 'savings_credit')
+    .reduce((sum, i) => sum + i.total, 0);
+  const tax = Math.round(taxableAmount * taxRate * 100) / 100;
   const total = Math.round((subtotal + tax) * 100) / 100;
 
   const now = new Date();
@@ -1738,13 +1748,28 @@ app.post('/billing/invoice/generate', (req, res) => {
 
   invoiceStore.create(invoiceRecord);
 
-  logger.info({ invoiceId, userId, total, lineItemCount: lineItems.length }, '[Billing] Invoice generated');
+  // Generate triple-ledger savings entries from fee events
+  const savingsLedger = [];
+  if (feeBreakdown.maintenanceFee > 0) {
+    savingsLedger.push(...generateSavingsLedgerEntries(userId, 'maintenance_fee', feeBreakdown.maintenanceFee));
+  }
+  if (feeBreakdown.transactionFee > 0) {
+    savingsLedger.push(...generateSavingsLedgerEntries(userId, 'transaction_fee', feeBreakdown.transactionFee));
+  }
+
+  logger.info({
+    invoiceId, userId, total, lineItemCount: lineItems.length,
+    feeBreakdown: { maintenance: feeBreakdown.maintenanceFee, transaction: feeBreakdown.transactionFee },
+    savingsEntries: savingsLedger.length,
+  }, '[Billing] Invoice generated with fee breakdown and savings ledger');
 
   res.json({
     invoice: {
       ...invoiceRecord,
       lineItems,
     },
+    feeBreakdown,
+    savingsLedger,
   });
 });
 
@@ -3398,6 +3423,12 @@ async function startServer(): Promise<void> {
     logger.error({ err }, '[UEF] Instance lifecycle init failed — continuing without health monitoring');
   }
 
+  // ── Observability Persistence (restore + periodic flush) ────────────────
+  initObservabilityPersistence();
+
+  // ── Hawk Scheduler (register cron schedules for active hawks) ──────────
+  initHawkScheduler();
+
   // ── Billing Maintenance Cron (every 5 minutes) ──────────────────────────
   setInterval(() => {
     try {
@@ -3431,6 +3462,8 @@ startServer();
 // --------------------------------------------------------------------------
 function shutdown(signal: string) {
   logger.info({ signal }, '[UEF] Received shutdown signal, draining connections...');
+  metricsExporter.flushToDb(); // Persist metrics before shutdown
+  stopHawkScheduler(); // Stop all hawk cron schedules
   stopCleanupSchedule();
   memoryEngine.stopMaintenance();
   instanceLifecycle.getHealthMonitor().stop();
