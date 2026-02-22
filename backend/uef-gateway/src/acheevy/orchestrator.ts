@@ -771,100 +771,185 @@ export class AcheevyOrchestrator {
       };
     }
 
-    // ── Route PaaS intents to execution ──────────────────────────────
-    const paasTaskMap: Record<string, { type: IIAgentTask['type']; prompt: string }> = {
-      paas_deploy: {
-        type: 'fullstack',
-        prompt: `Deploy plug instance. Plug: ${plugId || 'user-specified'}. Request: ${req.message}. Execute: validate → allocate port (51000+ range) → generate docker-compose → configure nginx → start container → health check → return URL.`,
-      },
-      paas_status: {
-        type: 'research',
-        prompt: `Check instance status. ${instanceId ? `Instance: ${instanceId}.` : ''} Request: ${req.message}. Return: running instances, health status, resource usage, uptime.`,
-      },
-      paas_decommission: {
-        type: 'code',
-        prompt: `Decommission instance ${instanceId}. Execute: stop container → release port → remove nginx config → archive data → seal audit trail.`,
-      },
-      paas_scale: {
-        type: 'code',
-        prompt: `Scale instance. ${instanceId ? `Instance: ${instanceId}.` : ''} Request: ${req.message}. Adjust resources as requested.`,
-      },
-      paas_export: {
-        type: 'code',
-        prompt: `Export instance as self-hosting bundle. ${instanceId ? `Instance: ${instanceId}.` : ''} Generate: docker-compose.yml, .env.example, nginx.conf, setup.sh, healthcheck.sh, README.md. Follow MIM principle (identical structure for every plug).`,
-      },
-      paas_catalog: {
-        type: 'research',
-        prompt: `Browse the Plug Catalog. Request: ${req.message}. Return available tools grouped by category: Agent Frameworks, Code Execution, Workflow Automation, Research Agents, Computer Use, Voice Agents, Content Engines, Data Pipelines, Custom Verticals.`,
-      },
-      paas_needs_analysis: {
-        type: 'research',
-        prompt: `Run needs analysis for the user. Request: ${req.message}. Assess: Business needs, Technical requirements, Security level, Delivery mode preference, Budget. Recommend plugs and tiers.`,
-      },
-    };
+    // ── Direct PaaS execution via Plug Deploy Engine ──────────────────
+    // These operations are handled directly — no need for II-Agent/Chicken Hawk.
+    // The Plug Deploy Engine talks to Docker API, generates configs, and manages
+    // the full instance lifecycle in-process.
 
-    const taskConfig = paasTaskMap[paasIntent] || {
-      type: 'research' as const,
-      prompt: `PaaS operation: ${req.message}`,
-    };
+    const { plugDeployEngine, plugCatalog, dockerRuntime } = await import('../plug-catalog');
 
-    const iiTask: IIAgentTask = {
-      type: taskConfig.type,
-      prompt: taskConfig.prompt,
-      context: {
-        userId: req.userId,
-        sessionId: req.conversationId,
-      },
-      options: { streaming: false, timeout: paasIntent === 'paas_deploy' ? 600000 : 300000 },
-    };
-
-    // Try II-Agent → Chicken Hawk → queued
     try {
-      const result = await this.iiAgent.executeTask(iiTask);
-      return {
-        requestId,
-        status: result.status === 'completed' ? 'completed' : 'dispatched',
-        reply: result.output || `PaaS operation "${paasIntent}" completed.`,
-        data: {
-          paasIntent,
-          plugId,
-          instanceId,
-          artifacts: result.artifacts,
-          glass_box_event: paasIntent === 'paas_deploy' ? 'DELIVERABLE_READY' : 'STATUS_UPDATE',
-        },
-        lucUsage: {
-          service: paasIntent === 'paas_deploy' ? 'container_hours' : 'api_calls',
-          amount: paasIntent === 'paas_deploy' ? 1 : 0,
-        },
-        taskId: result.id,
-      };
-    } catch {
-      logger.info({ requestId, paasIntent }, '[ACHEEVY] II-Agent offline for PaaS, dispatching to Chicken Hawk');
-    }
+      switch (paasIntent) {
+        case 'paas_catalog': {
+          const searchResult = plugCatalog.search({ q: req.message });
+          const plugList = searchResult.plugs
+            .map(p => `- **${p.name}** (${p.category}) — ${p.tagline}${p.comingSoon ? ' *(coming soon)*' : ''}`)
+            .join('\n');
+          return {
+            requestId,
+            status: 'completed',
+            reply: [
+              `Here's what's available in the Plug Catalog (${searchResult.total} tools):`,
+              '',
+              plugList,
+              '',
+              `Tell me which one you'd like to deploy, or describe what you need and I'll recommend the best fit.`,
+            ].join('\n'),
+            data: { paasIntent, catalog: searchResult, glass_box_event: 'STATUS_UPDATE' },
+          };
+        }
 
-    // Fallback: Chicken Hawk
-    try {
-      const manifest = buildManifest(requestId, taskConfig.type, taskConfig.prompt, req.userId, {
-        paasIntent,
-        plugId,
-        instanceId,
-      });
-      const chResult = await dispatchToChickenHawk(manifest);
+        case 'paas_deploy': {
+          if (!plugId) {
+            return {
+              requestId,
+              status: 'completed',
+              reply: 'Which plug would you like to deploy? Tell me the name or describe what you need.',
+              data: { paasIntent, awaiting: 'plug_selection' },
+            };
+          }
+
+          const result = await plugDeployEngine.spinUp({
+            plugId,
+            userId: req.userId,
+            instanceName: (req.context?.instanceName as string) || `${plugId}-${Date.now()}`,
+            deliveryMode: (req.context?.deliveryMode as any) || 'hosted',
+            customizations: (req.context?.customizations as any) || {},
+            envOverrides: (req.context?.envOverrides as any) || {},
+            domain: req.context?.domain as string,
+          });
+
+          const eventLog = result.events.map(e => `[${e.stage}] ${e.message}`).join('\n');
+          const statusMsg = result.instance.status === 'running'
+            ? `Your "${result.instance.name}" instance is live on port ${result.instance.assignedPort}.`
+            : result.instance.status === 'provisioning'
+              ? `Instance queued — Docker is starting up. It will be deployed automatically.`
+              : `Instance created with status: ${result.instance.status}.`;
+
+          return {
+            requestId,
+            status: 'completed',
+            reply: [
+              statusMsg,
+              '',
+              `Deployment log:`,
+              eventLog,
+              '',
+              result.lucQuote > 0 ? `Estimated LUC cost: $${result.lucQuote}/month` : '',
+            ].filter(Boolean).join('\n'),
+            data: {
+              paasIntent,
+              instance: result.instance,
+              deploymentId: result.deploymentId,
+              events: result.events,
+              glass_box_event: 'DELIVERABLE_READY',
+            },
+            lucUsage: { service: 'container_hours', amount: 1 },
+            taskId: result.deploymentId,
+          };
+        }
+
+        case 'paas_status': {
+          if (instanceId) {
+            const instance = await plugDeployEngine.refreshInstanceHealth(instanceId);
+            if (!instance) {
+              return { requestId, status: 'completed', reply: `Instance "${instanceId}" not found.` };
+            }
+            const plug = plugCatalog.get(instance.plugId);
+            return {
+              requestId,
+              status: 'completed',
+              reply: [
+                `**${plug?.name || instance.plugId}** — ${instance.name}`,
+                `Status: ${instance.status} | Health: ${instance.healthStatus}`,
+                `Port: ${instance.assignedPort} | Uptime: ${Math.floor(instance.uptimeSeconds / 60)}min`,
+                instance.lastHealthCheck ? `Last check: ${instance.lastHealthCheck}` : '',
+              ].filter(Boolean).join('\n'),
+              data: { paasIntent, instance, glass_box_event: 'STATUS_UPDATE' },
+            };
+          }
+
+          // List all instances for user
+          const instances = plugDeployEngine.listByUser(req.userId);
+          if (instances.length === 0) {
+            return {
+              requestId,
+              status: 'completed',
+              reply: 'You have no running plug instances. Would you like to deploy something from the catalog?',
+              data: { paasIntent, instances: [], glass_box_event: 'STATUS_UPDATE' },
+            };
+          }
+
+          const list = instances.map(i => {
+            const plug = plugCatalog.get(i.plugId);
+            return `- **${plug?.name || i.plugId}** (${i.name}) — ${i.status} on port ${i.assignedPort}`;
+          }).join('\n');
+
+          return {
+            requestId,
+            status: 'completed',
+            reply: `Your plug instances (${instances.length}):\n\n${list}`,
+            data: { paasIntent, instances, glass_box_event: 'STATUS_UPDATE' },
+          };
+        }
+
+        case 'paas_decommission': {
+          if (!instanceId) {
+            return { requestId, status: 'completed', reply: 'Which instance would you like to decommission? Provide the instance ID.' };
+          }
+          const removed = await plugDeployEngine.removeInstance(instanceId);
+          return {
+            requestId,
+            status: 'completed',
+            reply: removed
+              ? `Instance "${instanceId}" has been decommissioned. Container stopped, port released, nginx config removed.`
+              : `Instance "${instanceId}" not found.`,
+            data: { paasIntent, instanceId, removed, glass_box_event: 'DELIVERABLE_READY' },
+          };
+        }
+
+        case 'paas_export': {
+          if (!instanceId) {
+            return { requestId, status: 'completed', reply: 'Which instance would you like to export? Provide the instance ID.' };
+          }
+          const exportResult = await plugDeployEngine.export({
+            instanceId,
+            format: 'docker-compose',
+            includeData: false,
+          });
+          return {
+            requestId,
+            status: 'completed',
+            reply: [
+              `Export bundle ready (${Object.keys(exportResult.files).length} files):`,
+              Object.keys(exportResult.files).map(f => `- ${f}`).join('\n'),
+              '',
+              exportResult.downloadUrl ? `Download: ${exportResult.downloadUrl}` : '',
+              '',
+              exportResult.instructions,
+            ].filter(Boolean).join('\n'),
+            data: { paasIntent, instanceId, exportResult, glass_box_event: 'DELIVERABLE_READY' },
+          };
+        }
+
+        default: {
+          // Unknown PaaS intent — try to handle via LLM
+          const dockerStatus = await dockerRuntime.isAvailable();
+          return {
+            requestId,
+            status: 'completed',
+            reply: `I can help with that. Docker is ${dockerStatus ? 'available' : 'not reachable'}. What would you like to do? Deploy, check status, export, or browse the catalog?`,
+            data: { paasIntent, dockerAvailable: dockerStatus },
+          };
+        }
+      }
+    } catch (err: any) {
+      logger.error({ err, requestId, paasIntent }, '[ACHEEVY] PaaS operation failed');
       return {
         requestId,
-        status: 'dispatched',
-        reply: `PaaS operation "${paasIntent}" dispatched to execution engine. Shift ID: ${chResult.shiftId}. Monitor progress in Deploy Dock.`,
-        data: { paasIntent, plugId, instanceId, chickenhawk: chResult },
-        lucUsage: { service: 'container_hours', amount: paasIntent === 'paas_deploy' ? 1 : 0 },
-        taskId: chResult.manifestId,
-      };
-    } catch (chErr: any) {
-      logger.error({ err: chErr, requestId, paasIntent }, '[ACHEEVY] Chicken Hawk also offline for PaaS');
-      return {
-        requestId,
-        status: 'queued',
-        reply: `PaaS operation "${paasIntent}" has been queued. Execution engines are starting up — your request will be processed shortly.`,
-        taskId: `queued_paas_${requestId}`,
+        status: 'completed',
+        reply: `PaaS operation failed: ${err.message || 'Unknown error'}. Let me know if you want to retry or try a different approach.`,
+        data: { paasIntent, error: err.message },
       };
     }
   }

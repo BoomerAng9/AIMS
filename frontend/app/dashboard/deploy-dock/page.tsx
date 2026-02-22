@@ -129,12 +129,39 @@ const pulseGlow = {
 };
 
 // ─────────────────────────────────────────────────────────────
-// Initial Data — populated from House of Ang API at runtime
+// API Helpers
 // ─────────────────────────────────────────────────────────────
 
-const INITIAL_ROSTER: AgentRoster[] = [];
+async function fetchJSON<T = any>(url: string, init?: RequestInit): Promise<T | null> {
+  try {
+    const res = await fetch(url, init);
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
+    return null;
+  }
+}
 
-const INITIAL_EVENTS: DeploymentEvent[] = [];
+interface PlugInstance {
+  instanceId: string;
+  plugId: string;
+  name: string;
+  status: string;
+  assignedPort: number;
+  healthStatus: string;
+  deliveryMode?: string;
+}
+
+interface CatalogPlug {
+  id: string;
+  name: string;
+  tagline: string;
+  category: string;
+  tier: string;
+  tags: string[];
+  delivery: string[];
+  resources: { cpu: string; memory: string; gpu: boolean };
+}
 
 // ─────────────────────────────────────────────────────────────
 // Sub-Components
@@ -306,22 +333,33 @@ function AcheevyPanel() {
   const handleSubmit = async () => {
     if (!input.trim()) return;
 
-    setMessages((prev) => [...prev, { role: "user", content: input }]);
+    const userMessage = input;
+    setMessages((prev) => [...prev, { role: "user", content: userMessage }]);
     setInput("");
     setIsProcessing(true);
 
-    // Simulate ACHEEVY response
-    setTimeout(() => {
-      const responses: Record<AcheevyMode, string> = {
-        recommend: `Based on your request, I recommend a 3-stage deployment:\n\n1. **Hatch** - Assemble Code_Ang and Quality_Ang\n2. **Assign** - Bind to n8n workflow #auth-deploy-v2\n3. **Launch** - Execute with rollback gates\n\nEstimated LUC cost: 150 tokens. Shall I proceed?`,
-        explain: `The deployment process follows the ACHEEVY delegation model:\n\n• I handle all user communication\n• Boomer_Angs supervise specialized work\n• Chicken Hawk converts plans to job packets\n• Lil_Hawks execute bounded tasks with proofs\n\nEach step produces verifiable artifacts.`,
-        execute: `Initiating deployment sequence...\n\n✓ Job packet created: JP-2026-0210-AUTH\n✓ Gates configured: pre-deploy, health-check, rollback\n✓ LUC budget locked: 150 tokens\n\nAwaiting your approval to proceed to Hatch stage.`,
-        prove: `Evidence bundle for current deployment:\n\n• Plan Manifest: sha256:a8f3e2...\n• Quote Document: QT-2026-0210\n• Agent Roster: 5 agents assigned\n• Gate Config: 3 approval gates\n\nAll artifacts are cryptographically signed.`,
-      };
+    try {
+      const data = await fetchJSON<{
+        reply?: string;
+        intent?: { name: string; confidence: number };
+        actionPlan?: Array<{ step: number; action: string; status: string }>;
+        source?: string;
+      }>("/api/acheevy/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: userMessage,
+          context: { mode },
+        }),
+      });
 
-      setMessages((prev) => [...prev, { role: "acheevy", content: responses[mode] }]);
+      const reply = data?.reply || "I received your request. The backend services may be starting up — please try again in a moment.";
+      setMessages((prev) => [...prev, { role: "acheevy", content: reply }]);
+    } catch {
+      setMessages((prev) => [...prev, { role: "acheevy", content: "Connection to ACHEEVY failed. Please check that services are running." }]);
+    } finally {
       setIsProcessing(false);
-    }, 1500);
+    }
   };
 
   useEffect(() => {
@@ -547,64 +585,40 @@ function TransferView({ stage }: { stage: "idle" | "plan" | "quote" | "hatch" | 
 export default function DeployDockPage() {
   const [activeTab, setActiveTab] = useState<DeployTab>("hatch");
   const [deploymentStage, setDeploymentStage] = useState<
-    "plan" | "quote" | "hatch" | "assign" | "launch" | "done"
-  >("plan");
-  const [isHatching, setIsHatching] = useState(false); // Controls particle effect
+    "idle" | "plan" | "quote" | "hatch" | "assign" | "launch" | "done"
+  >("idle");
+  const [isHatching, setIsHatching] = useState(false);
 
   const [roster, setRoster] = useState<AgentRoster[]>([]);
-  const [events, setEvents] = useState<DeploymentEvent[]>(INITIAL_EVENTS);
+  const [events, setEvents] = useState<DeploymentEvent[]>([]);
   const [selectedAgent, setSelectedAgent] = useState<string | null>(null);
-
   const [jobPackets, setJobPackets] = useState<JobPacket[]>([]);
 
-  // Trigger particle effect for 3s
+  // Real data from APIs
+  const [catalogPlugs, setCatalogPlugs] = useState<CatalogPlug[]>([]);
+  const [instances, setInstances] = useState<PlugInstance[]>([]);
+  const [selectedPlugId, setSelectedPlugId] = useState<string | null>(null);
+  const [deploying, setDeploying] = useState(false);
+
+  // Load catalog and instances on mount
+  useEffect(() => {
+    fetchJSON<{ plugs: CatalogPlug[] }>("/api/plug-catalog")
+      .then((data) => {
+        if (data?.plugs) setCatalogPlugs(data.plugs.filter(p => !p.tags?.includes("coming-soon")));
+      });
+    loadInstances();
+  }, []);
+
+  const loadInstances = () => {
+    fetchJSON<{ instances: PlugInstance[] }>("/api/plug-instances?userId=web-user")
+      .then((data) => {
+        if (data?.instances) setInstances(data.instances);
+      });
+  };
+
   const triggerParticles = () => {
     setIsHatching(true);
     setTimeout(() => setIsHatching(false), 3000);
-  };
-
-  const handleHatchAgent = (agentId: string) => {
-    triggerParticles();
-    setRoster((prev) =>
-      prev.map((a) =>
-        a.id === agentId ? { ...a, status: "active" } : a
-      )
-    );
-    addEvent({
-      stage: "hatch",
-      title: "Agent Hatched",
-      description: `${roster.find((a) => a.id === agentId)?.name} has been activated`,
-      agent: "ACHEEVY",
-    });
-  };
-
-  const hatchAgents = async () => {
-    triggerParticles();
-    setDeploymentStage("hatch");
-    // Simulate API call
-    setTimeout(() => {
-      setRoster(INITIAL_ROSTER);
-      addEvent({
-        stage: "hatch",
-        title: "Agents Hatched",
-        description: "5 agents instantiated from templates",
-        agent: "ACHEEVY",
-      });
-      setDeploymentStage("assign");
-    }, 2500);
-  };
-
-  const launchDeployment = async () => {
-    triggerParticles();
-    setDeploymentStage("launch");
-    addEvent({
-      stage: "launch",
-      title: "Launch Sequence Initiated",
-      description: "Deployment pipeline started",
-      agent: "Chicken Hawk",
-    });
-    // Simulate completion
-    setTimeout(() => setDeploymentStage("done"), 5000);
   };
 
   const addEvent = (partial: Partial<DeploymentEvent>) => {
@@ -619,8 +633,115 @@ export default function DeployDockPage() {
     };
     setEvents((prev) => [newEvent, ...prev]);
   };
-  // The original handleHatchAgent is replaced by hatchAgents and addEvent
-  // The original handleHatchAgent function is removed as per the instruction's implied change.
+
+  const handleHatchAgent = (agentId: string) => {
+    triggerParticles();
+    setRoster((prev) =>
+      prev.map((a) => (a.id === agentId ? { ...a, status: "active" } : a))
+    );
+    addEvent({
+      stage: "hatch",
+      title: "Agent Hatched",
+      description: `${roster.find((a) => a.id === agentId)?.name} has been activated`,
+      agent: "ACHEEVY",
+    });
+  };
+
+  // Select a plug from catalog → populate agent roster from its config
+  const selectPlug = (plugId: string) => {
+    const plug = catalogPlugs.find((p) => p.id === plugId);
+    if (!plug) return;
+
+    setSelectedPlugId(plugId);
+    triggerParticles();
+    setDeploymentStage("hatch");
+
+    // Create agent roster from the plug's requirements
+    const agents: AgentRoster[] = [
+      { id: "acheevy-deploy", name: "ACHEEVY", role: "Orchestrator", type: "boomer_ang", status: "active", capabilities: ["deploy", "monitor", "verify"] },
+      { id: "code-ang", name: "Code_Ang", role: "Build & Config", type: "chicken_hawk", status: "idle", capabilities: ["docker", "compose", "nginx"] },
+      { id: "quality-ang", name: "Quality_Ang", role: "Health & Verify", type: "lil_hawk", status: "idle", capabilities: ["health-check", "port-scan", "verify"] },
+    ];
+    if (plug.resources.gpu) {
+      agents.push({ id: "gpu-ang", name: "GPU_Ang", role: "GPU Config", type: "lil_hawk", status: "idle", capabilities: ["cuda", "vertex-ai", "inference"] });
+    }
+
+    setRoster(agents);
+    addEvent({
+      stage: "hatch",
+      title: `Preparing ${plug.name}`,
+      description: `${agents.length} agents assembled for ${plug.name} deployment`,
+      agent: "ACHEEVY",
+    });
+  };
+
+  // Real deployment via API
+  const launchDeployment = async () => {
+    if (!selectedPlugId) return;
+    const plug = catalogPlugs.find((p) => p.id === selectedPlugId);
+    if (!plug) return;
+
+    triggerParticles();
+    setDeploying(true);
+    setDeploymentStage("launch");
+    addEvent({
+      stage: "launch",
+      title: "Launch Sequence Initiated",
+      description: `Deploying ${plug.name} via Port Authority`,
+      agent: "ACHEEVY",
+    });
+
+    const data = await fetchJSON<{
+      instance?: PlugInstance;
+      deploymentId?: string;
+      events?: Array<{ stage: string; message: string; timestamp: string }>;
+      error?: string;
+    }>("/api/plug-catalog", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        plugId: selectedPlugId,
+        userId: "web-user",
+        instanceName: `${plug.name.toLowerCase().replace(/[^a-z0-9]/g, "-")}-${Date.now().toString(36).slice(-4)}`,
+        deliveryMode: "hosted",
+      }),
+    });
+
+    setDeploying(false);
+
+    if (data?.instance) {
+      setDeploymentStage("done");
+      addEvent({
+        stage: "done",
+        title: `${plug.name} Deployed`,
+        description: `Instance ${data.instance.instanceId} — status: ${data.instance.status}`,
+        agent: "ACHEEVY",
+        proof: data.deploymentId
+          ? { type: "manifest", label: "Deployment ID", value: data.deploymentId }
+          : undefined,
+      });
+      // Log any deployment events from the API
+      if (data.events) {
+        for (const evt of data.events) {
+          addEvent({
+            stage: evt.stage as DeploymentEvent["stage"],
+            title: evt.stage,
+            description: evt.message,
+            agent: "ACHEEVY",
+          });
+        }
+      }
+      loadInstances();
+    } else {
+      setDeploymentStage("hatch");
+      addEvent({
+        stage: "verify",
+        title: "Deployment Issue",
+        description: data?.error || "Deployment did not complete — check gateway connectivity",
+        agent: "ACHEEVY",
+      });
+    }
+  };
 
   return (
     <motion.div
@@ -655,35 +776,126 @@ export default function DeployDockPage() {
                 exit="exit"
                 className="space-y-4"
               >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h2 className="text-sm font-semibold uppercase tracking-widest text-white/80">
-                      Agent Roster
-                    </h2>
-                    <p className="text-xs text-white/40 mt-1">
-                      Assemble your deployment squad from House of Ang
-                    </p>
-                  </div>
-                  <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gold/10 text-gold text-[10px] font-semibold uppercase tracking-wider hover:bg-gold/20 transition-colors">
-                    <Plus size={12} />
-                    Add Agent
-                  </button>
+                {/* Step 1: Select a Plug to Deploy */}
+                <div>
+                  <h2 className="text-sm font-semibold uppercase tracking-widest text-white/80">
+                    Select a Plug to Deploy
+                  </h2>
+                  <p className="text-xs text-white/40 mt-1">
+                    Choose from the catalog — ACHEEVY will assemble the right agents
+                  </p>
                 </div>
 
-                <motion.div
-                  variants={staggerContainer}
-                  initial="hidden"
-                  animate="visible"
-                  className="grid gap-4 sm:grid-cols-2"
-                >
-                  {roster.map((agent) => (
-                    <AgentCard
-                      key={agent.id}
-                      agent={agent}
-                      onActivate={() => handleHatchAgent(agent.id)}
-                    />
-                  ))}
-                </motion.div>
+                {catalogPlugs.length === 0 ? (
+                  <div className="text-center py-8 rounded-2xl border border-wireframe-stroke bg-[#0A0A0A]/60">
+                    <Loader2 size={24} className="animate-spin text-gold/40 mx-auto" />
+                    <p className="mt-2 text-xs text-white/30">Loading catalog...</p>
+                  </div>
+                ) : (
+                  <motion.div
+                    variants={staggerContainer}
+                    initial="hidden"
+                    animate="visible"
+                    className="grid gap-3 sm:grid-cols-2"
+                  >
+                    {catalogPlugs.filter(p => !p.tags?.includes("coming-soon") && p.delivery?.includes("hosted")).map((plug) => (
+                      <motion.button
+                        key={plug.id}
+                        variants={staggerItem}
+                        whileHover={{ scale: 1.02 }}
+                        onClick={() => selectPlug(plug.id)}
+                        className={`text-left rounded-2xl border p-4 backdrop-blur-xl transition-all ${
+                          selectedPlugId === plug.id
+                            ? "border-gold/40 bg-gold/10 ring-1 ring-gold/20"
+                            : "border-wireframe-stroke bg-[#0A0A0A]/60 hover:border-gold/20"
+                        }`}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className="h-10 w-10 shrink-0 rounded-xl bg-white/5 border border-wireframe-stroke flex items-center justify-center">
+                            <Container size={18} className={selectedPlugId === plug.id ? "text-gold" : "text-white/30"} />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold text-white truncate">{plug.name}</p>
+                            <p className="text-[10px] text-white/40 mt-0.5 line-clamp-2">{plug.tagline}</p>
+                            <div className="flex items-center gap-2 mt-2 text-[9px] text-white/30 font-mono">
+                              <span>{plug.resources?.cpu || "1"} CPU</span>
+                              <span className="text-white/10">|</span>
+                              <span>{plug.resources?.memory || "1G"}</span>
+                              {plug.resources?.gpu && <span className="text-amber-400">GPU</span>}
+                            </div>
+                          </div>
+                          {selectedPlugId === plug.id && (
+                            <CheckCircle2 size={16} className="text-gold shrink-0" />
+                          )}
+                        </div>
+                      </motion.button>
+                    ))}
+                  </motion.div>
+                )}
+
+                {/* Step 2: Agent Roster (shown after plug selected) */}
+                {roster.length > 0 && (
+                  <>
+                    <div className="flex items-center justify-between mt-6">
+                      <div>
+                        <h2 className="text-sm font-semibold uppercase tracking-widest text-white/80">
+                          Agent Roster
+                        </h2>
+                        <p className="text-xs text-white/40 mt-1">
+                          Agents assigned for this deployment
+                        </p>
+                      </div>
+                    </div>
+
+                    <motion.div
+                      variants={staggerContainer}
+                      initial="hidden"
+                      animate="visible"
+                      className="grid gap-4 sm:grid-cols-2"
+                    >
+                      {roster.map((agent) => (
+                        <AgentCard
+                          key={agent.id}
+                          agent={agent}
+                          onActivate={() => handleHatchAgent(agent.id)}
+                        />
+                      ))}
+                    </motion.div>
+                  </>
+                )}
+
+                {/* Running Instances */}
+                {instances.length > 0 && (
+                  <>
+                    <div className="mt-6">
+                      <h2 className="text-sm font-semibold uppercase tracking-widest text-white/80">
+                        Running Instances
+                      </h2>
+                      <p className="text-xs text-white/40 mt-1">
+                        {instances.length} instance{instances.length !== 1 ? "s" : ""} active
+                      </p>
+                    </div>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      {instances.map((inst) => (
+                        <div
+                          key={inst.instanceId}
+                          className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-4"
+                        >
+                          <div className="flex items-center gap-2 mb-1">
+                            <div className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                            <p className="text-sm font-semibold text-white">{inst.name || inst.plugId}</p>
+                          </div>
+                          <p className="text-[10px] text-white/40 font-mono">
+                            Port {inst.assignedPort} · {inst.status} ·{" "}
+                            <span className={inst.healthStatus === "healthy" ? "text-emerald-400" : "text-amber-400"}>
+                              {inst.healthStatus || "checking"}
+                            </span>
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
               </motion.div>
             )}
 
@@ -786,6 +998,21 @@ export default function DeployDockPage() {
 
                 {/* Launch Panel */}
                 <div className="rounded-2xl border border-wireframe-stroke bg-[#0A0A0A]/60 p-6 backdrop-blur-xl">
+                  {/* Selected plug info */}
+                  {selectedPlugId && (
+                    <div className="flex items-center gap-3 mb-6 p-3 rounded-xl bg-gold/5 border border-gold/20">
+                      <Container size={20} className="text-gold" />
+                      <div>
+                        <p className="text-sm font-semibold text-white">
+                          {catalogPlugs.find((p) => p.id === selectedPlugId)?.name || selectedPlugId}
+                        </p>
+                        <p className="text-[10px] text-white/40">
+                          {catalogPlugs.find((p) => p.id === selectedPlugId)?.tagline}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
                   <div className="grid gap-4 sm:grid-cols-3 mb-6">
                     <div className="p-4 rounded-xl bg-white/5 border border-wireframe-stroke">
                       <p className="text-[10px] text-white/30 uppercase tracking-wider">Agents Ready</p>
@@ -794,22 +1021,21 @@ export default function DeployDockPage() {
                       </p>
                     </div>
                     <div className="p-4 rounded-xl bg-white/5 border border-wireframe-stroke">
-                      <p className="text-[10px] text-white/30 uppercase tracking-wider">LUC Budget</p>
-                      <p className="text-2xl font-bold text-emerald-400 mt-1">150</p>
+                      <p className="text-[10px] text-white/30 uppercase tracking-wider">Instances</p>
+                      <p className="text-2xl font-bold text-emerald-400 mt-1">{instances.length}</p>
                     </div>
                     <div className="p-4 rounded-xl bg-white/5 border border-wireframe-stroke">
-                      <p className="text-[10px] text-white/30 uppercase tracking-wider">Gates</p>
-                      <p className="text-2xl font-bold text-cyan-400 mt-1">3</p>
+                      <p className="text-[10px] text-white/30 uppercase tracking-wider">Catalog</p>
+                      <p className="text-2xl font-bold text-cyan-400 mt-1">{catalogPlugs.length}</p>
                     </div>
                   </div>
 
                   {/* Pre-launch checklist */}
                   <div className="space-y-2 mb-6">
                     {[
+                      { label: "Plug selected from catalog", done: !!selectedPlugId },
                       { label: "Agent roster assembled", done: roster.some((a) => a.status === "active") },
-                      { label: "Workflows bound", done: deploymentStage === "assign" || deploymentStage === "launch" },
-                      { label: "LUC budget approved", done: true },
-                      { label: "Gates configured", done: true },
+                      { label: "Ready to deploy", done: !!selectedPlugId && roster.length > 0 },
                     ].map((item, i) => (
                       <div key={i} className="flex items-center gap-2 text-xs">
                         <div className={`h-4 w-4 rounded-full flex items-center justify-center ${
@@ -824,12 +1050,30 @@ export default function DeployDockPage() {
 
                   <button
                     onClick={launchDeployment}
-                    disabled={deploymentStage !== "assign"}
+                    disabled={!selectedPlugId || deploying || deploymentStage === "done"}
                     className="w-full flex items-center justify-center gap-3 py-4 rounded-xl bg-emerald-500/20 text-emerald-400 text-sm font-bold uppercase tracking-wider border border-emerald-500/30 hover:bg-emerald-500/30 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                   >
-                    <Rocket size={18} />
-                    Initiate Launch Sequence
+                    {deploying ? (
+                      <><Loader2 size={18} className="animate-spin" /> Deploying...</>
+                    ) : deploymentStage === "done" ? (
+                      <><CheckCircle2 size={18} /> Deployed</>
+                    ) : (
+                      <><Rocket size={18} /> Deploy {catalogPlugs.find((p) => p.id === selectedPlugId)?.name || "Selected Plug"}</>
+                    )}
                   </button>
+
+                  {deploymentStage === "done" && (
+                    <button
+                      onClick={() => {
+                        setSelectedPlugId(null);
+                        setRoster([]);
+                        setDeploymentStage("idle");
+                      }}
+                      className="w-full mt-3 flex items-center justify-center gap-2 py-3 rounded-xl bg-white/5 text-white/50 text-xs font-semibold uppercase tracking-wider border border-wireframe-stroke hover:bg-white/10 transition-all"
+                    >
+                      <Plus size={14} /> Deploy Another
+                    </button>
+                  )}
                 </div>
               </motion.div>
             )}

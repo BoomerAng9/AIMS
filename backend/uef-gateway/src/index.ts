@@ -49,6 +49,11 @@ import { allShelfTools } from './shelves/mcp-tools';
 import { ossModels } from './llm/oss-models';
 import { personaplex } from './llm/personaplex';
 import { N8nClient } from './n8n';
+import { plugRouter } from './plug-catalog/router';
+import { cloudflareRouter, markdownForAgents } from './cloudflare';
+import { paymentsRouter } from './payments';
+import { normalizeInput, getDialectStats, SLANG_ENTRY_COUNT, INTENT_PHRASE_COUNT } from './nlp';
+import { videoRouter } from './video';
 import logger from './logger';
 
 // Custom Lil_Hawks — User-Created Bots
@@ -168,9 +173,25 @@ app.get('/health', (_req, res) => {
 app.use(a2aRouter);
 
 // --------------------------------------------------------------------------
+// Cloudflare — LLM.txt, AI Index, and markdown-for-agents (public)
+// --------------------------------------------------------------------------
+app.use(cloudflareRouter);
+app.use(markdownForAgents);
+
+// --------------------------------------------------------------------------
 // Apply API key gate to ALL subsequent routes
 // --------------------------------------------------------------------------
 app.use(requireApiKey);
+
+// --------------------------------------------------------------------------
+// Agent Payments — X402, Stripe Agent Commerce, Wallets
+// --------------------------------------------------------------------------
+app.use(paymentsRouter);
+
+// --------------------------------------------------------------------------
+// Video & Content Pipeline — KIE.ai unified video generation
+// --------------------------------------------------------------------------
+app.use('/api', videoRouter);
 
 // --------------------------------------------------------------------------
 // Agent Registry — list available agents and their profiles
@@ -886,22 +907,179 @@ app.post('/acheevy/classify', (req, res) => {
           /social\s*media\s*plan/i,
         ],
       },
+
+      // ── PaaS / Plug Operations ──────────────────────────────────────
+      {
+        id: 'paas-catalog',
+        name: 'Browse Plug Catalog',
+        patterns: [
+          /what\s*(tools?|plugs?|agents?)\s*(do\s*you|are|can)/i,
+          /show\s*me.*catalog/i,
+          /browse.*tools/i,
+          /what\s*can\s*(you|i)\s*(deploy|use|install|set\s*up)/i,
+          /available\s*(tools?|services?|plugs?)/i,
+        ],
+      },
+      {
+        id: 'paas-deploy',
+        name: 'Deploy Plug Instance',
+        patterns: [
+          /deploy\s*(a|an|the)?\s*(plug|tool|agent|instance|container)/i,
+          /spin\s*up/i,
+          /install\s*(a|an|the)?\s*(tool|agent|service)/i,
+          /set\s*up\s*(a|an)?\s*(tool|agent|service|n8n|openclaw)/i,
+          /launch\s*(a|an)?\s*(tool|agent|container)/i,
+          /\brun\s*(a|an)?\s*(tool|agent|service)\b/i,
+        ],
+      },
+      {
+        id: 'paas-status',
+        name: 'Check Instance Status',
+        patterns: [
+          /status\s*of\s*my/i,
+          /what('s|\s*is)\s*running/i,
+          /my\s*(instances?|services?|containers?)/i,
+          /check\s*(on|up\s*on)?\s*my/i,
+          /how('s|\s*is)\s*my.*doing/i,
+        ],
+      },
+
+      // ── Content / Video / UGC Pipeline ──────────────────────────────
+      {
+        id: 'content-pipeline',
+        name: 'Content Generation Pipeline',
+        patterns: [
+          /make.*video/i,
+          /generate.*video/i,
+          /create.*content/i,
+          /ugc/i,
+          /product\s*(video|ad|content)/i,
+          /turn.*into.*(video|content|ad)/i,
+          /amazon.*link.*video/i,
+          /seedance/i,
+          /marketing\s*(video|content|campaign)/i,
+          /ad\s*(creative|video|content)/i,
+          /social\s*(media\s*)?(video|content|ad)/i,
+        ],
+      },
+
+      // ── Automation / Workflow Pipeline ───────────────────────────────
+      {
+        id: 'workflow-pipeline',
+        name: 'Automation Pipeline Builder',
+        patterns: [
+          /whenever.*then/i,
+          /when.*happens.*do/i,
+          /automatically/i,
+          /every\s*(day|hour|week|morning|night)/i,
+          /schedule/i,
+          /trigger\s*when/i,
+          /if\s*this\s*then\s*that/i,
+          /connect.*to/i,
+          /integrate.*with/i,
+        ],
+      },
     ];
 
-    // ── Try vertical trigger matching first ────────────────────────
+    // ── Vague Intent Refinement ───────────────────────────────────
+    // When input is too vague for keyword matching, detect the DOMAIN
+    // the user is thinking about and offer guided clarification.
+    const VAGUE_INTENT_MAP: Array<{ domain: string; hints: RegExp[]; refinement: string }> = [
+      {
+        domain: 'creation',
+        hints: [/i\s*want\s*to\s*make/i, /i\s*need\s*to\s*create/i, /help\s*me\s*(make|build|create)/i, /can\s*you\s*(make|build|create)/i],
+        refinement: 'I can help you create that. Are you looking to: (1) Build an app/website, (2) Generate content/videos, (3) Set up an automation, or (4) Deploy an AI tool?',
+      },
+      {
+        domain: 'money',
+        hints: [/make\s*money/i, /earn/i, /income/i, /revenue/i, /profit/i, /sell/i, /charge/i],
+        refinement: 'I can help with monetization. Are you looking to: (1) Launch a product/service, (2) Set up payment processing, (3) Build a business plan, or (4) Automate sales/outreach?',
+      },
+      {
+        domain: 'growth',
+        hints: [/grow/i, /scale/i, /more\s*(users|customers|traffic)/i, /marketing/i, /get\s*the\s*word\s*out/i],
+        refinement: 'Let\'s grow your reach. Are you looking to: (1) Create marketing content, (2) Automate outreach, (3) Build a content calendar, or (4) Set up analytics?',
+      },
+      {
+        domain: 'frustration',
+        hints: [/too\s*slow/i, /wasting\s*time/i, /takes\s*forever/i, /boring\s*task/i, /hate\s*doing/i, /repetitive/i],
+        refinement: 'Sounds like you need automation. Tell me what task is eating your time and I\'ll set up a workflow to handle it.',
+      },
+      {
+        domain: 'curiosity',
+        hints: [/what\s*can\s*you\s*do/i, /how\s*does\s*this\s*work/i, /what\s*is\s*this/i, /tell\s*me\s*about/i],
+        refinement: 'I\'m ACHEEVY — I deploy AI tools, build apps, automate workflows, and manage infrastructure. What are you working on? I\'ll match you with the right tools.',
+      },
+    ];
+
+    // ── NLP Normalization (slang → standard terms) ────────────────
+    // Run BEFORE pattern matching so colloquial language maps to
+    // recognizable trigger words. "finna whip up a vid" → content-pipeline
+    const nlpResult = normalizeInput(message);
+
+    // If the normalizer found a direct intent match from a full slang
+    // phrase, return it immediately (highest priority).
+    if (nlpResult.directIntent) {
+      const di = nlpResult.directIntent;
+      // Map intent IDs that start with "vertical:" through
+      const isVertical = di.intent.startsWith('vertical:');
+      const isRefine = di.intent.startsWith('refine:');
+
+      if (isRefine) {
+        // Find the matching refinement
+        const domain = di.intent.split(':')[1];
+        const vague = VAGUE_INTENT_MAP.find(v => v.domain === domain);
+        res.json({
+          intent: di.intent,
+          confidence: di.confidence,
+          requiresAgent: false,
+          refinement: vague?.refinement || `I detected you're thinking about ${domain}. Tell me more so I can help.`,
+          domain,
+          slangDetected: true,
+          dialectsDetected: nlpResult.dialectsDetected,
+          normalized: nlpResult.normalized,
+        });
+        return;
+      }
+
+      // For vertical intents or direct action intents
+      const verticalId = isVertical ? di.intent.replace('vertical:', '') : di.intent;
+      const verticalMatch = VERTICAL_TRIGGERS.find(v => v.id === verticalId);
+
+      res.json({
+        intent: isVertical ? di.intent : `vertical:${di.intent}`,
+        verticalName: verticalMatch?.name || di.intent,
+        confidence: di.confidence,
+        requiresAgent: true,
+        slangDetected: true,
+        dialectsDetected: nlpResult.dialectsDetected,
+        normalized: nlpResult.normalized,
+      });
+      return;
+    }
+
+    // Use the normalized text for subsequent pattern matching
+    const classifyText = nlpResult.slangDetected ? nlpResult.normalized : message;
+
+    // ── Try vertical trigger matching ───────────────────────────
     for (const vertical of VERTICAL_TRIGGERS) {
-      if (vertical.patterns.some(p => p.test(message))) {
+      if (vertical.patterns.some(p => p.test(classifyText) || p.test(message))) {
         res.json({
           intent: `vertical:${vertical.id}`,
           verticalName: vertical.name,
           confidence: 0.9,
           requiresAgent: true,
+          ...(nlpResult.slangDetected ? {
+            slangDetected: true,
+            dialectsDetected: nlpResult.dialectsDetected,
+            normalized: nlpResult.normalized,
+          } : {}),
         });
         return;
       }
     }
 
-    const lower = message.toLowerCase();
+    const lower = classifyText.toLowerCase();
 
     // ── Plug fabrication (build app/site/tool) ────────────────────
     if (/\b(build|create|scaffold|deploy|generate|implement|code|develop|launch)\b/.test(lower)) {
@@ -943,12 +1121,66 @@ app.post('/acheevy/classify', (req, res) => {
       return;
     }
 
+    // ── Vague intent refinement ─────────────────────────────────
+    // User's input didn't match any specific trigger. Try to detect
+    // the domain they're thinking about and offer guided refinement.
+    for (const vague of VAGUE_INTENT_MAP) {
+      if (vague.hints.some(h => h.test(message) || h.test(classifyText))) {
+        res.json({
+          intent: `refine:${vague.domain}`,
+          confidence: 0.6,
+          requiresAgent: false,
+          refinement: vague.refinement,
+          domain: vague.domain,
+          ...(nlpResult.slangDetected ? {
+            slangDetected: true,
+            dialectsDetected: nlpResult.dialectsDetected,
+            normalized: nlpResult.normalized,
+          } : {}),
+        });
+        return;
+      }
+    }
+
     // Default: conversational (no agent needed, use LLM stream)
-    res.json({ intent: 'conversational', confidence: 0.5, requiresAgent: false });
+    res.json({
+      intent: 'conversational',
+      confidence: 0.5,
+      requiresAgent: false,
+      ...(nlpResult.slangDetected ? {
+        slangDetected: true,
+        dialectsDetected: nlpResult.dialectsDetected,
+        normalized: nlpResult.normalized,
+      } : {}),
+    });
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'Classification failed';
     res.status(500).json({ error: msg });
   }
+});
+
+// --------------------------------------------------------------------------
+// NLP Stats & Normalization Test Endpoint
+// --------------------------------------------------------------------------
+
+app.get('/api/nlp/stats', (_req, res) => {
+  res.json({
+    dialects: getDialectStats(),
+    totalSlangEntries: SLANG_ENTRY_COUNT,
+    totalIntentPhrases: INTENT_PHRASE_COUNT,
+    supportedLanguages: ['en'],
+    plannedLanguages: ['es', 'pt', 'fr'],
+  });
+});
+
+app.post('/api/nlp/normalize', (req, res) => {
+  const { text } = req.body;
+  if (!text || typeof text !== 'string') {
+    res.status(400).json({ error: 'text field is required' });
+    return;
+  }
+  const result = normalizeInput(text);
+  res.json(result);
 });
 
 // --------------------------------------------------------------------------
@@ -1635,6 +1867,11 @@ app.post('/playground/:sessionId/files', (req, res) => {
 // runs, logs, assets
 // --------------------------------------------------------------------------
 app.use(shelfRouter);
+
+// --------------------------------------------------------------------------
+// Plug Catalog & Instance Management — PaaS Operations
+// --------------------------------------------------------------------------
+app.use('/api', plugRouter);
 
 // --------------------------------------------------------------------------
 // LUC Project Service — Pricing & Effort Oracle

@@ -1,6 +1,13 @@
 /**
  * Kling.ai Video Generation Service
- * Integrates with Kling API for AI video generation
+ *
+ * Now routes through KIE.ai unified API (api.kie.ai) which provides
+ * access to 17+ video models including Kling 3.0, Seedance 2.0, Veo 3,
+ * Sora 2, Runway Gen-4, and more. KIE_API_KEY is the primary credential.
+ *
+ * Legacy: Falls back to direct Kling API (api.klingai.com) if KIE key not set.
+ * Preferred: Use the backend /api/video/generate endpoint which handles
+ * all model routing through KIE.ai.
  */
 
 export interface KlingVideoRequest {

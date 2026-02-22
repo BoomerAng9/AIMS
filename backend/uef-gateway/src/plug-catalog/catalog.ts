@@ -521,6 +521,82 @@ const PLUG_REGISTRY: PlugDefinition[] = [
     comingSoon: true,
     addedAt: '2026-02-21',
   },
+
+  // ── Seedance 2.0 — Video Generation ──────────────────────────────────
+  {
+    id: 'seedance',
+    name: 'Seedance 2.0',
+    tagline: 'AI video generation — product URLs to UGC-style marketing videos',
+    description: 'Autonomous video generation pipeline powered by KIE.ai. Feed it a product link and it produces platform-ready UGC content. Handles asset extraction, creative brief generation, video synthesis via Seedance 2.0 (ByteDance), and multi-platform formatting. Supports 2K output, native audio, and multimodal input.',
+    category: 'content-engine',
+    tags: ['video', 'ugc', 'content', 'marketing', 'automation', 'ai-video', 'tiktok', 'ads', 'kie', 'seedance'],
+    tier: 'pro',
+    version: '2.0.0',
+    sourceUrl: 'https://kie.ai/seedance-2-0',
+    license: 'Commercial API (via KIE.ai)',
+    docker: { image: 'aims-seedance-pipeline:latest' },
+    resources: { cpuLimit: '2', memoryLimit: '4G', gpuRequired: false },
+    ports: [{ internal: 8080, description: 'Seedance API', protocol: 'http' }],
+    volumes: [
+      { name: 'seedance-output', mountPath: '/output', description: 'Generated video files', persistent: true },
+      { name: 'seedance-assets', mountPath: '/assets', description: 'Extracted product assets', persistent: true },
+    ],
+    healthCheck: { endpoint: '/health', interval: '30s', timeout: '10s', retries: 3, startPeriod: '30s' },
+    envVars: [
+      { key: 'KIE_API_KEY', description: 'KIE.ai API key (routes to Seedance 2.0)', required: true, sensitive: true, category: 'api-key' },
+      { key: 'OPENROUTER_API_KEY', description: 'LLM for creative brief generation', required: true, sensitive: true, category: 'llm' },
+    ],
+    networkPolicy: { internetAccess: true, allowedEgress: ['*'], isolatedSandbox: false, bridgeToAims: true },
+    securityLevel: 'standard',
+    customizations: [
+      { id: 'style', label: 'Video Style', description: 'UGC style preset', type: 'select', options: ['ugc-review', 'product-showcase', 'unboxing', 'testimonial', 'comparison'], default: 'ugc-review' },
+      { id: 'platforms', label: 'Target Platforms', description: 'Output format optimization', type: 'multi-select', options: ['tiktok', 'instagram-reels', 'youtube-shorts', 'meta-ads', 'twitter'], default: 'tiktok' },
+      { id: 'duration', label: 'Video Duration', description: 'Target length in seconds', type: 'select', options: ['15', '30', '60', '90'], default: '30' },
+    ],
+    dependencies: [],
+    supportedDelivery: ['hosted', 'exported'],
+    defaultDelivery: 'hosted',
+    icon: 'Video',
+    accentColor: '#ef4444',
+    featured: true,
+    comingSoon: false,
+    addedAt: '2026-02-22',
+  },
+
+  // ── Kling — Advanced Video AI ────────────────────────────────────────
+  {
+    id: 'kling-video',
+    name: 'Kling Video AI',
+    tagline: 'Professional AI video generation with motion control and lip sync',
+    description: 'Production-grade video generation via KIE.ai — supports Kling 3.0, 2.6 Motion Control, 2.5 Turbo, and O1. Advanced motion control, lip sync, and scene composition. Integrates with the AIMS content pipeline for high-quality marketing material.',
+    category: 'content-engine',
+    tags: ['video', 'ai-video', 'motion', 'lip-sync', 'production', 'ads', 'kie', 'kling'],
+    tier: 'pro',
+    version: '3.0.0',
+    license: 'Commercial API (via KIE.ai)',
+    docker: { image: 'aims-kling-pipeline:latest' },
+    resources: { cpuLimit: '2', memoryLimit: '4G', gpuRequired: false },
+    ports: [{ internal: 8080, description: 'Kling API Proxy', protocol: 'http' }],
+    volumes: [{ name: 'kling-output', mountPath: '/output', description: 'Generated videos', persistent: true }],
+    healthCheck: { endpoint: '/health', interval: '30s', timeout: '10s', retries: 3, startPeriod: '20s' },
+    envVars: [
+      { key: 'KIE_API_KEY', description: 'KIE.ai API key (routes to Kling models)', required: true, sensitive: true, category: 'api-key' },
+    ],
+    networkPolicy: { internetAccess: true, allowedEgress: ['api.kie.ai'], isolatedSandbox: false, bridgeToAims: true },
+    securityLevel: 'standard',
+    customizations: [
+      { id: 'model', label: 'Model Version', description: 'Kling model to use', type: 'select', options: ['kling-3.0', 'kling-2.6', 'kling-2.5-turbo', 'kling-o1'], default: 'kling-3.0' },
+      { id: 'aspect', label: 'Aspect Ratio', description: 'Output aspect ratio', type: 'select', options: ['16:9', '9:16', '1:1'], default: '9:16' },
+    ],
+    dependencies: [],
+    supportedDelivery: ['hosted'],
+    defaultDelivery: 'hosted',
+    icon: 'Film',
+    accentColor: '#8b5cf6',
+    featured: false,
+    comingSoon: false,
+    addedAt: '2026-02-22',
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -634,6 +710,11 @@ export class PlugCatalog {
   /** Get featured plugs. */
   getFeatured(): PlugDefinition[] {
     return this.listAll().filter(p => p.featured && !p.comingSoon);
+  }
+
+  /** Get all plugs (alias for listAll). */
+  getAll(): PlugDefinition[] {
+    return this.listAll();
   }
 }
 

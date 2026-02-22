@@ -44,3 +44,9 @@ export { PlugDeployEngine, plugDeployEngine } from './deploy-engine';
 
 // Needs Analysis
 export { NeedsAnalysisEngine, needsAnalysis } from './needs-analysis';
+
+// Docker Runtime
+export { DockerRuntime, dockerRuntime } from './docker-runtime';
+
+// API Router
+export { plugRouter } from './router';
