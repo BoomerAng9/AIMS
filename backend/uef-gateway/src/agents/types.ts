@@ -21,6 +21,7 @@ export type AgentId =
   | 'research-ang'
   | 'router-ang'
   | 'node-trigger-ang'
+  | 'composio-ang'
   | 'workflow-smith-squad'
   | 'vision-scout-squad'
   | 'json-expert-squad'

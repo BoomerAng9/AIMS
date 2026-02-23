@@ -16,6 +16,7 @@ dist/
 .DS_Store
 .claude/*
 !.claude/skills/
+.mcp.json
 .data/
 *.pem
 *.key
