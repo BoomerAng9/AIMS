@@ -47,6 +47,7 @@ const CORE_ITEMS: NavItem[] = [
   { href: "/dashboard", label: "Overview", icon: BarChart3 },
   { href: "/dashboard/map", label: "Platform Map", icon: Map, highlight: true },
   { href: "/dashboard/deploy-dock", label: "Deploy Dock", icon: Rocket, highlight: true },
+  { href: "/dashboard/automations", label: "Automations", icon: Zap, highlight: true },
   { href: "/dashboard/make-it-mine", label: "Make It Mine", icon: Wrench, highlight: true },
   { href: "/dashboard/your-space", label: "Your Space", icon: Users },
   { href: "/dashboard/plan", label: "Plan", icon: FolderKanban },

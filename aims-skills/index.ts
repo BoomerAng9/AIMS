@@ -9,6 +9,7 @@ export * from './types';
 // Skills
 export { OnboardingSopSkill } from './skills/onboarding-sop.skill';
 export { IdeaValidationSkill } from './skills/idea-validation.skill';
+export { AutomationsSkill } from './skills/automations.skill';
 
 // Hooks
 export { OnboardingFlowHook } from './hooks/onboarding-flow.hook';
@@ -23,6 +24,7 @@ export type { LucPlan, LucUsage, LucInvoice } from './luc/types';
 export const ACHEEVY_SKILLS = [
   OnboardingSopSkill,
   IdeaValidationSkill,
+  AutomationsSkill,
 ];
 
 // Chain of Command
@@ -70,6 +72,36 @@ export type {
   BuildPhase,
   ExecutionPipelineStatus,
 } from './ntntn-engine';
+
+// Research: mHC (Manifold-Constrained Hyper-Connections)
+export {
+  sinkhornKnopp,
+  verifyDoublyStochastic,
+  createMHCModelEntry,
+  MHC_MODEL_VARIANTS,
+  MHC_KEY_INSIGHTS,
+} from './research/mhc';
+export type {
+  MHCConfig,
+  MHCLayerStats,
+  MHCBenchmarkResult,
+  MHCModelVariant,
+  ModelGardenEntry,
+} from './research/mhc';
+
+// Automations Types
+export {
+  SCHEDULE_PRESETS,
+  EVENT_SOURCES,
+  AUTOMATION_TEMPLATES,
+} from './types/automations';
+export type {
+  AutomationDefinition,
+  AutomationTrigger,
+  AutomationRun,
+  AutomationTemplate,
+  MCPServerConfig,
+} from './types/automations';
 
 // Hook Registry
 export const ACHEEVY_HOOKS = [

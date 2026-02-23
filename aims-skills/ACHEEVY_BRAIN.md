@@ -101,6 +101,10 @@ Lil_Hawks  (Workers — execute tasks, ship artifacts)
 | `EXPORT_INSTANCE` | Package a running instance as a self-hosting bundle |
 | `BROWSE_CATALOG` | Present the Plug Catalog to the user |
 | `RUN_NEEDS_ANALYSIS` | Execute formal client intake before deployment |
+| `CREATE_AUTOMATION` | Create a new automation (from scratch or template) |
+| `MANAGE_AUTOMATION` | Pause, resume, edit, or archive an existing automation |
+| `RUN_AUTOMATION` | Manually trigger an automation run |
+| `VIEW_AUTOMATION_HISTORY` | Show run history, stats, and LUC costs for automations |
 
 ### Forbidden
 | Action | Why |
