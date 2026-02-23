@@ -343,7 +343,7 @@ function DraftPageContent() {
               {/* Analysts Split Screen */}
               <div className="grid grid-cols-2 divide-x divide-white/5">
                 {/* BULL ANALYST — Boomer_Ang */}
-                <div className={`p-6 transition-all duration-500 ${debatePhase === 'bull' ? 'bg-red-950/20' : 'bg-transparent opacity-60'
+                <div className={`p-6 transition-all duration-500 ${debatePhase === 'bull' ? 'bg-red-50' : 'bg-transparent opacity-60'
                   }`}>
                   <div className="flex items-center gap-3 mb-4">
                     <div className="relative h-12 w-12 rounded-full overflow-hidden border-2 border-gold/40 shrink-0">
@@ -375,7 +375,7 @@ function DraftPageContent() {
                 </div>
 
                 {/* BEAR ANALYST — Lil_Hawk */}
-                <div className={`p-6 transition-all duration-500 ${debatePhase === 'bear' ? 'bg-blue-950/20' : 'bg-transparent opacity-60'
+                <div className={`p-6 transition-all duration-500 ${debatePhase === 'bear' ? 'bg-blue-50' : 'bg-transparent opacity-60'
                   }`}>
                   <div className="flex items-center gap-3 mb-4">
                     <div className="relative h-12 w-12 rounded-full overflow-hidden border-2 border-cyan-400/40 shrink-0">
