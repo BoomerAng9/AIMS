@@ -137,31 +137,43 @@ export async function GET() {
       return NextResponse.json(P2P_RESPONSE);
     }
 
-    // Fetch token usage from UEF Gateway billing endpoint
+    // Fetch actual token usage from UEF Gateway usage tracker
     let tokensUsed = 0;
     try {
       const gatewayUrl = process.env.UEF_GATEWAY_URL || process.env.NEXT_PUBLIC_UEF_GATEWAY_URL || 'http://uef-gateway:4000';
+
+      // Step 1: Get real token usage from the LLM usage tracker
       const usageRes = await fetch(
-        `${gatewayUrl}/billing/check-allowance`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-internal-caller': 'uef-gateway',
-          },
-          body: JSON.stringify({
-            tierId: tierInfo.tierId,
-            monthlyUsedTokens: 0, // Will be returned by the endpoint
-          }),
-        }
+        `${gatewayUrl}/llm/usage?userId=${encodeURIComponent(session.user.email)}`,
+        { headers: { 'x-internal-caller': 'uef-gateway' } }
       );
       if (usageRes.ok) {
-        const allowanceData = await usageRes.json();
-        // The allowance endpoint returns { within, remaining, overage }
-        // Overage represents tokens over the ceiling, so used = ceiling - remaining
-        if (allowanceData.remaining !== undefined) {
-          const ceiling = (tierInfo.tokensIncluded || 0) + (allowanceData.remaining || 0) + (allowanceData.overage || 0);
-          tokensUsed = Math.max(0, ceiling - (allowanceData.remaining || 0));
+        const usageData = await usageRes.json();
+        tokensUsed = usageData.totalTokens || 0;
+      }
+
+      // Step 2: Check allowance with real usage to get overage info
+      if (tokensUsed > 0) {
+        const allowanceRes = await fetch(
+          `${gatewayUrl}/billing/check-allowance`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-internal-caller': 'uef-gateway',
+            },
+            body: JSON.stringify({
+              tierId: tierInfo.tierId,
+              monthlyUsedTokens: tokensUsed,
+            }),
+          }
+        );
+        if (allowanceRes.ok) {
+          const allowanceData = await allowanceRes.json();
+          // If user is in overage, surface total including overage
+          if (allowanceData.overage > 0) {
+            tokensUsed = (tierInfo.tokensIncluded || 0) + allowanceData.overage;
+          }
         }
       }
     } catch {

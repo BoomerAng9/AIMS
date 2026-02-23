@@ -13,6 +13,7 @@
  * All powered by ACHEEVY's autonomous agent pipeline.
  */
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { staggerContainer, staggerItem } from '@/lib/motion';
@@ -103,7 +104,34 @@ const STATUS_BADGE = {
   'coming-soon': { label: 'SOON', className: 'bg-white/10 text-white/40 border-white/20' },
 } as const;
 
+interface PerFormStats {
+  prospectsTracked: number;
+  filmHoursAnalyzed: number;
+  reportsGenerated: number;
+  activeDebates: number;
+}
+
+function formatNumber(n: number): string {
+  return n >= 1000 ? n.toLocaleString() : String(n);
+}
+
 export default function PerFormLobbyPage() {
+  const [stats, setStats] = useState<PerFormStats>({
+    prospectsTracked: 0,
+    filmHoursAnalyzed: 0,
+    reportsGenerated: 0,
+    activeDebates: 0,
+  });
+
+  useEffect(() => {
+    fetch('/api/perform/stats')
+      .then((res) => res.ok ? res.json() : null)
+      .then((data) => {
+        if (data) setStats(data);
+      })
+      .catch(() => { /* stats stay at 0 — non-blocking */ });
+  }, []);
+
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-8">
       {/* Hero */}
@@ -184,10 +212,10 @@ export default function PerFormLobbyPage() {
         className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-4 border-t border-wireframe-stroke"
       >
         {[
-          { label: 'Prospects Tracked', value: '851' },
-          { label: 'Film Hours Analyzed', value: '1,247' },
-          { label: 'Reports Generated', value: '328' },
-          { label: 'Active Debates', value: '12' },
+          { label: 'Prospects Tracked', value: formatNumber(stats.prospectsTracked) },
+          { label: 'Film Hours Analyzed', value: formatNumber(stats.filmHoursAnalyzed) },
+          { label: 'Reports Generated', value: formatNumber(stats.reportsGenerated) },
+          { label: 'Active Debates', value: formatNumber(stats.activeDebates) },
         ].map((stat) => (
           <div key={stat.label} className="px-4 py-3 rounded-lg bg-white/[0.02] border border-wireframe-stroke">
             <p className="text-lg font-display text-white">{stat.value}</p>
