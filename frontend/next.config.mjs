@@ -3,9 +3,12 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+const isVercel = !!process.env.VERCEL;
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'standalone',
+  // 'standalone' is for Docker; Vercel uses its own build output
+  ...(isVercel ? {} : { output: 'standalone' }),
   images: {
     unoptimized: true,
   },
