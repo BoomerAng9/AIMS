@@ -88,9 +88,9 @@ export function LucPanel({ workspaceId, mode = "simulate", onModeChange }: LucPa
   if (loading) {
     return (
       <div className="p-6 space-y-4">
-        <div className="h-8 w-48 bg-white/5 rounded animate-pulse" />
-        <div className="h-32 bg-white/5 rounded animate-pulse" />
-        <div className="h-64 bg-white/5 rounded animate-pulse" />
+        <div className="h-8 w-48 bg-slate-50 rounded animate-pulse" />
+        <div className="h-32 bg-slate-50 rounded animate-pulse" />
+        <div className="h-64 bg-slate-50 rounded animate-pulse" />
       </div>
     );
   }
@@ -100,8 +100,8 @@ export function LucPanel({ workspaceId, mode = "simulate", onModeChange }: LucPa
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-white">LUC Calculator</h2>
-          <p className="text-sm text-white/50 mt-1">
+          <h2 className="text-xl font-semibold text-slate-800">LUC Calculator</h2>
+          <p className="text-sm text-slate-500 mt-1">
             Ledger Usage Calculator - Track and estimate resource consumption
           </p>
         </div>
@@ -111,7 +111,7 @@ export function LucPanel({ workspaceId, mode = "simulate", onModeChange }: LucPa
             className={`px-3 py-1.5 text-sm rounded-lg border transition-colors ${
               mode === "simulate"
                 ? "bg-gold/10 border-gold/40 text-gold"
-                : "border-wireframe-stroke/30 text-white/50 hover:text-white/70"
+                : "border-wireframe-stroke/30 text-slate-500 hover:text-slate-600"
             }`}
           >
             Simulate
@@ -121,7 +121,7 @@ export function LucPanel({ workspaceId, mode = "simulate", onModeChange }: LucPa
             className={`px-3 py-1.5 text-sm rounded-lg border transition-colors ${
               mode === "live"
                 ? "bg-green-500/10 border-green-500/40 text-green-400"
-                : "border-wireframe-stroke/30 text-white/50 hover:text-white/70"
+                : "border-wireframe-stroke/30 text-slate-500 hover:text-slate-600"
             }`}
           >
             Live
@@ -134,22 +134,22 @@ export function LucPanel({ workspaceId, mode = "simulate", onModeChange }: LucPa
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="p-4 rounded-xl bg-black/30 border border-wireframe-stroke/30"
+          className="p-4 rounded-xl bg-slate-100/40 border border-wireframe-stroke/30"
         >
           <div className="flex items-center justify-between mb-4">
             <div>
-              <span className="text-xs font-mono text-white/40 uppercase tracking-wider">
+              <span className="text-xs font-mono text-slate-400 uppercase tracking-wider">
                 Plan
               </span>
-              <p className="text-lg font-medium text-white capitalize">
+              <p className="text-lg font-medium text-slate-800 capitalize">
                 {summary.planId}
               </p>
             </div>
             <div className="text-right">
-              <span className="text-xs font-mono text-white/40 uppercase tracking-wider">
+              <span className="text-xs font-mono text-slate-400 uppercase tracking-wider">
                 Period Ends
               </span>
-              <p className="text-sm text-white/70">
+              <p className="text-sm text-slate-600">
                 {new Date(summary.periodEnd).toLocaleDateString()} ({summary.daysRemaining}d)
               </p>
             </div>
@@ -158,12 +158,12 @@ export function LucPanel({ workspaceId, mode = "simulate", onModeChange }: LucPa
           {/* Overall usage bar */}
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-white/60">Overall Usage</span>
+              <span className="text-slate-500">Overall Usage</span>
               <span className={getWarningColor(summary.overallWarningLevel)}>
                 {formatPercent(summary.overallPercentUsed)}
               </span>
             </div>
-            <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+            <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${Math.min(summary.overallPercentUsed, 100)}%` }}
@@ -184,7 +184,7 @@ export function LucPanel({ workspaceId, mode = "simulate", onModeChange }: LucPa
           {/* Estimated cost */}
           <div className="mt-4 pt-4 border-t border-wireframe-stroke/20">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-white/50">Estimated Cost</span>
+              <span className="text-sm text-slate-500">Estimated Cost</span>
               <span className="text-lg font-mono text-gold">
                 {formatCost(summary.totalEstimatedCost)}
               </span>
@@ -194,17 +194,17 @@ export function LucPanel({ workspaceId, mode = "simulate", onModeChange }: LucPa
       )}
 
       {/* Calculator */}
-      <div className="p-4 rounded-xl bg-black/30 border border-wireframe-stroke/30">
-        <h3 className="text-sm font-medium text-white/80 mb-4">Estimate Impact</h3>
+      <div className="p-4 rounded-xl bg-slate-100/40 border border-wireframe-stroke/30">
+        <h3 className="text-sm font-medium text-slate-700 mb-4">Estimate Impact</h3>
 
         <div className="grid grid-cols-2 gap-4 mb-4">
           {/* Service selector */}
           <div>
-            <label className="block text-xs text-white/40 mb-1">Service</label>
+            <label className="block text-xs text-slate-400 mb-1">Service</label>
             <select
               value={selectedService}
               onChange={(e) => setSelectedService(e.target.value as ServiceKey)}
-              className="w-full px-3 py-2 bg-black/40 border border-wireframe-stroke/30 rounded-lg text-white text-sm focus:outline-none focus:border-gold/40"
+              className="w-full px-3 py-2 bg-slate-100/60 border border-wireframe-stroke/30 rounded-lg text-slate-800 text-sm focus:outline-none focus:border-gold/40"
             >
               <option value="">Select service...</option>
               {Object.entries(servicesByCategory).map(([category, keys]) => (
@@ -224,10 +224,10 @@ export function LucPanel({ workspaceId, mode = "simulate", onModeChange }: LucPa
 
           {/* Units input */}
           <div>
-            <label className="block text-xs text-white/40 mb-1">
+            <label className="block text-xs text-slate-400 mb-1">
               Units{" "}
               {selectedService && (
-                <span className="text-white/30">
+                <span className="text-slate-400">
                   ({getServiceDisplayInfo(selectedService as ServiceKey).unitPlural})
                 </span>
               )}
@@ -237,7 +237,7 @@ export function LucPanel({ workspaceId, mode = "simulate", onModeChange }: LucPa
               min="0"
               value={units}
               onChange={(e) => setUnits(Number(e.target.value))}
-              className="w-full px-3 py-2 bg-black/40 border border-wireframe-stroke/30 rounded-lg text-white text-sm focus:outline-none focus:border-gold/40"
+              className="w-full px-3 py-2 bg-slate-100/60 border border-wireframe-stroke/30 rounded-lg text-slate-800 text-sm focus:outline-none focus:border-gold/40"
               placeholder="Enter amount"
             />
           </div>
@@ -263,7 +263,7 @@ export function LucPanel({ workspaceId, mode = "simulate", onModeChange }: LucPa
               {estimate.items.map((item) => (
                 <div key={item.serviceKey} className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-white/70">
+                    <span className="text-sm text-slate-600">
                       {getServiceDisplayInfo(item.serviceKey).name}
                     </span>
                     <span className="text-sm font-mono text-gold">
@@ -271,8 +271,8 @@ export function LucPanel({ workspaceId, mode = "simulate", onModeChange }: LucPa
                     </span>
                   </div>
                   <div className="flex items-center justify-between text-xs">
-                    <span className="text-white/40">Quota remaining</span>
-                    <span className={item.wouldExceed ? "text-red-400" : "text-white/60"}>
+                    <span className="text-slate-400">Quota remaining</span>
+                    <span className={item.wouldExceed ? "text-red-400" : "text-slate-500"}>
                       {item.quotaRemaining <= 0
                         ? "Metered"
                         : item.quotaRemaining.toLocaleString()}
@@ -297,8 +297,8 @@ export function LucPanel({ workspaceId, mode = "simulate", onModeChange }: LucPa
 
       {/* Quota Breakdown */}
       {summary && summary.quotas.length > 0 && (
-        <div className="p-4 rounded-xl bg-black/30 border border-wireframe-stroke/30">
-          <h3 className="text-sm font-medium text-white/80 mb-4">Quota Breakdown</h3>
+        <div className="p-4 rounded-xl bg-slate-100/40 border border-wireframe-stroke/30">
+          <h3 className="text-sm font-medium text-slate-700 mb-4">Quota Breakdown</h3>
           <div className="space-y-3">
             {summary.quotas
               .filter((q) => q.limit > 0) // Hide metered-only quotas (no included allocation)
@@ -306,7 +306,7 @@ export function LucPanel({ workspaceId, mode = "simulate", onModeChange }: LucPa
               .map((quota) => (
                 <div key={quota.serviceKey} className="space-y-1">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="text-white/60">{quota.serviceName}</span>
+                    <span className="text-slate-500">{quota.serviceName}</span>
                     <span className={getWarningColor(quota.warningLevel)}>
                       {formatQuota({
                         serviceKey: quota.serviceKey as ServiceKey,
@@ -317,7 +317,7 @@ export function LucPanel({ workspaceId, mode = "simulate", onModeChange }: LucPa
                       })}
                     </span>
                   </div>
-                  <div className="h-1 bg-white/10 rounded-full overflow-hidden">
+                  <div className="h-1 bg-slate-100 rounded-full overflow-hidden">
                     <div
                       className={`h-full rounded-full transition-all ${
                         quota.warningLevel === "none"

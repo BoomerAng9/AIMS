@@ -59,14 +59,14 @@ export function MinimalSidebar() {
   return (
     <>
       {/* Desktop Sidebar (always visible) */}
-      <aside className="hidden lg:flex flex-col w-48 h-screen fixed left-0 top-0 border-r border-white/[0.06] bg-black/40 backdrop-blur-xl">
+      <aside className="hidden lg:flex flex-col w-48 h-screen fixed left-0 top-0 border-r border-slate-200 bg-slate-100/60 backdrop-blur-xl">
         {/* Logo */}
         <div className="p-6">
           <Link href="/dashboard" className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-gold to-gold flex items-center justify-center shadow-lg shadow-gold/20">
               <span className="text-sm font-bold text-black">A</span>
             </div>
-            <span className="text-base font-semibold text-white tracking-tight">A.I.M.S.</span>
+            <span className="text-base font-semibold text-slate-800 tracking-tight">A.I.M.S.</span>
           </Link>
         </div>
 
@@ -87,8 +87,8 @@ export function MinimalSidebar() {
                     px-3 py-2.5 rounded-lg text-[15px] font-normal
                     transition-colors duration-200
                     ${isActive
-                      ? 'text-white'
-                      : 'text-gray-400 hover:text-white'
+                      ? 'text-slate-800'
+                      : 'text-gray-400 hover:text-slate-800'
                     }
                   `}
                   whileHover={{ x: 2 }}
@@ -98,7 +98,7 @@ export function MinimalSidebar() {
                   {isActive && (
                     <motion.div
                       layoutId="activeNav"
-                      className="absolute inset-0 bg-white/[0.08] rounded-lg"
+                      className="absolute inset-0 bg-slate-50 rounded-lg"
                       transition={{ type: 'spring', stiffness: 350, damping: 30 }}
                     />
                   )}
@@ -110,13 +110,13 @@ export function MinimalSidebar() {
         </nav>
 
         {/* Footer */}
-        <div className="p-4 border-t border-white/[0.06]">
+        <div className="p-4 border-t border-slate-200">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gold to-gold flex items-center justify-center">
               <span className="text-xs font-medium text-black">U</span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm text-white truncate">User</p>
+              <p className="text-sm text-slate-800 truncate">User</p>
               <p className="text-xs text-gray-500 truncate">Free tier</p>
             </div>
           </div>
@@ -126,9 +126,9 @@ export function MinimalSidebar() {
       {/* Mobile Menu Button */}
       <button
         onClick={() => setIsOpen(true)}
-        className="lg:hidden fixed top-4 left-4 z-40 p-2 rounded-lg bg-black/60 backdrop-blur-xl border border-wireframe-stroke"
+        className="lg:hidden fixed top-4 left-4 z-40 p-2 rounded-lg bg-slate-50/70 backdrop-blur-xl border border-wireframe-stroke"
       >
-        <MenuIcon className="w-5 h-5 text-white" />
+        <MenuIcon className="w-5 h-5 text-slate-800" />
       </button>
 
       {/* Mobile Sidebar */}
@@ -141,7 +141,7 @@ export function MinimalSidebar() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsOpen(false)}
-              className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+              className="lg:hidden fixed inset-0 bg-slate-50/70 backdrop-blur-sm z-40"
             />
 
             {/* Drawer */}
@@ -150,7 +150,7 @@ export function MinimalSidebar() {
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-              className="lg:hidden fixed left-0 top-0 w-64 h-screen bg-[#0a0a0a] border-r border-wireframe-stroke z-50"
+              className="lg:hidden fixed left-0 top-0 w-64 h-screen bg-white border-r border-wireframe-stroke z-50"
             >
               {/* Header */}
               <div className="flex items-center justify-between p-4 border-b border-wireframe-stroke">
@@ -158,11 +158,11 @@ export function MinimalSidebar() {
                   <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-gold to-gold flex items-center justify-center">
                     <span className="text-sm font-bold text-black">A</span>
                   </div>
-                  <span className="text-base font-semibold text-white">A.I.M.S.</span>
+                  <span className="text-base font-semibold text-slate-800">A.I.M.S.</span>
                 </div>
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+                  className="p-2 rounded-lg hover:bg-slate-100 transition-colors"
                 >
                   <CloseIcon className="w-5 h-5 text-gray-400" />
                 </button>
@@ -188,8 +188,8 @@ export function MinimalSidebar() {
                           block px-4 py-3 rounded-xl text-[15px] font-normal
                           transition-colors
                           ${isActive
-                            ? 'bg-gold/20 text-white'
-                            : 'text-gray-400 hover:text-white hover:bg-white/5'
+                            ? 'bg-gold/20 text-slate-800'
+                            : 'text-gray-400 hover:text-slate-800 hover:bg-slate-50'
                           }
                         `}
                       >

@@ -245,7 +245,7 @@ export default function VeritasPage() {
                   value={projectName}
                   onChange={e => setProjectName(e.target.value)}
                   placeholder="e.g., Q2 Expansion Analysis"
-                  className="w-full px-3 py-2 bg-black/40 border border-zinc-700/50 rounded-lg text-sm text-zinc-200 outline-none focus:border-red-500/30"
+                  className="w-full px-3 py-2 bg-slate-100/60 border border-zinc-700/50 rounded-lg text-sm text-zinc-200 outline-none focus:border-red-500/30"
                 />
               </div>
               <div>
@@ -254,7 +254,7 @@ export default function VeritasPage() {
                   value={documentName}
                   onChange={e => setDocumentName(e.target.value)}
                   placeholder="e.g., business-plan.pdf"
-                  className="w-full px-3 py-2 bg-black/40 border border-zinc-700/50 rounded-lg text-sm text-zinc-200 outline-none focus:border-red-500/30"
+                  className="w-full px-3 py-2 bg-slate-100/60 border border-zinc-700/50 rounded-lg text-sm text-zinc-200 outline-none focus:border-red-500/30"
                 />
               </div>
             </div>
@@ -265,7 +265,7 @@ export default function VeritasPage() {
                 value={documentText}
                 onChange={e => setDocumentText(e.target.value)}
                 placeholder="Paste the text content of your business plan, pitch deck, or research document here. Veritas will extract and verify every numerical claim."
-                className="w-full h-64 bg-black/40 border border-zinc-700/50 rounded-lg p-3 text-sm text-zinc-200 font-mono outline-none focus:border-red-500/30 resize-y"
+                className="w-full h-64 bg-slate-100/60 border border-zinc-700/50 rounded-lg p-3 text-sm text-zinc-200 font-mono outline-none focus:border-red-500/30 resize-y"
               />
               <p className="text-[10px] text-zinc-600 mt-1">
                 {documentText.length.toLocaleString()} characters &middot; Paste text from PDF, pitch deck, or business plan

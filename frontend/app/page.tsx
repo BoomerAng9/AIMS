@@ -168,7 +168,7 @@ export default function HomePage() {
               >
                 <Link
                   href="/chat"
-                  className="h-14 px-10 bg-amber-600 text-white font-bold uppercase tracking-widest text-xs rounded-xl inline-flex items-center justify-center gap-3 hover:bg-amber-700 hover:shadow-lg hover:shadow-amber-200/50 transition-all group"
+                  className="h-14 px-10 bg-amber-600 text-slate-800 font-bold uppercase tracking-widest text-xs rounded-xl inline-flex items-center justify-center gap-3 hover:bg-amber-700 hover:shadow-lg hover:shadow-amber-200/50 transition-all group"
                 >
                   Initiate Chat <Zap size={18} className="group-hover:scale-125 transition-transform" />
                 </Link>
@@ -234,7 +234,7 @@ function SiteNav() {
           </Link>
           <Link
             href="/(auth)/sign-in"
-            className="h-10 px-6 border border-amber-200 rounded-lg bg-amber-50 text-amber-700 text-xs font-bold uppercase tracking-widest hover:bg-amber-600 hover:text-white hover:border-amber-600 transition-all"
+            className="h-10 px-6 border border-amber-200 rounded-lg bg-amber-50 text-amber-700 text-xs font-bold uppercase tracking-widest hover:bg-amber-600 hover:text-slate-800 hover:border-amber-600 transition-all"
           >
             Unlock
           </Link>
@@ -343,7 +343,7 @@ function FinalCTA() {
           </p>
 
           <div className="relative z-10 flex flex-col sm:flex-row gap-6 justify-center">
-            <Link href="/chat" className="h-16 px-12 bg-amber-600 text-white font-bold uppercase tracking-widest text-xs rounded-2xl inline-flex items-center justify-center gap-3 hover:bg-amber-700 hover:shadow-lg hover:shadow-amber-200/50 transition-all">
+            <Link href="/chat" className="h-16 px-12 bg-amber-600 text-slate-800 font-bold uppercase tracking-widest text-xs rounded-2xl inline-flex items-center justify-center gap-3 hover:bg-amber-700 hover:shadow-lg hover:shadow-amber-200/50 transition-all">
               Initiate Protocols
             </Link>
             <Link href="/(auth)/sign-up" className="h-16 px-12 border border-slate-200 hover:border-amber-200 bg-white text-slate-700 font-bold uppercase tracking-widest text-xs rounded-2xl inline-flex items-center justify-center gap-3 transition-all hover:shadow-sm">

@@ -21,12 +21,12 @@ export function GlobalNav() {
           </div>
         </Link>
 
-        <div className="h-6 w-px bg-white/10 mx-2" />
+        <div className="h-6 w-px bg-slate-100 mx-2" />
 
         {/* Home Button */}
         <Link 
           href="/" 
-          className="flex items-center gap-2 px-4 py-2 rounded-full border border-wireframe-stroke bg-black/40 backdrop-blur-md text-white/70 hover:text-white hover:border-gold/30 transition-all text-xs font-semibold uppercase tracking-widest"
+          className="flex items-center gap-2 px-4 py-2 rounded-full border border-wireframe-stroke bg-slate-100/60 backdrop-blur-md text-slate-600 hover:text-slate-800 hover:border-gold/30 transition-all text-xs font-semibold uppercase tracking-widest"
         >
           <Home size={14} />
           <span>Home</span>
@@ -36,10 +36,10 @@ export function GlobalNav() {
         <button 
           onClick={() => router.back()}
           disabled={pathname === "/"}
-          className={`flex items-center gap-2 px-4 py-2 rounded-full border border-wireframe-stroke bg-black/40 backdrop-blur-md text-xs font-semibold uppercase tracking-widest transition-all ${
+          className={`flex items-center gap-2 px-4 py-2 rounded-full border border-wireframe-stroke bg-slate-100/60 backdrop-blur-md text-xs font-semibold uppercase tracking-widest transition-all ${
             pathname === "/" 
-              ? "opacity-50 cursor-not-allowed text-white/20" 
-              : "text-white/70 hover:text-white hover:border-gold/30"
+              ? "opacity-50 cursor-not-allowed text-slate-300" 
+              : "text-slate-600 hover:text-slate-800 hover:border-gold/30"
           }`}
         >
           <ArrowLeft size={14} />
@@ -49,7 +49,7 @@ export function GlobalNav() {
 
       <div className="pointer-events-auto">
          {/* Account Placeholder */}
-         <div className="h-8 w-8 rounded-full bg-white/10 flex items-center justify-center text-xs border border-white/20">
+         <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-xs border border-slate-200">
             👤
          </div>
       </div>

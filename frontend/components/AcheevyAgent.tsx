@@ -126,8 +126,8 @@ function AudioLevelBar({ stream, active, label, levelOverride }: { stream?: Medi
 
   return (
     <div>
-      <p className="text-[9px] text-white/30 font-mono uppercase mb-1">{label}</p>
-      <div className="h-16 flex items-end justify-center gap-0.5 rounded-lg bg-white/[0.02] px-2 py-1">
+      <p className="text-[9px] text-slate-400 font-mono uppercase mb-1">{label}</p>
+      <div className="h-16 flex items-end justify-center gap-0.5 rounded-lg bg-white px-2 py-1">
         {Array.from({ length: 24 }).map((_, i) => {
           const barHeight = active ? Math.max(4, (level * 64) * Math.sin((i / 24) * Math.PI)) : 4;
           return (
@@ -395,13 +395,13 @@ export default function AcheevyAgent() {
   const OfficeIcon = pmo ? (PMO_OFFICE_ICONS[pmo.pmoOffice] || Building2) : Building2;
 
   return (
-    <div className="flex flex-col h-full bg-[#0a0a0a] text-white overflow-hidden">
+    <div className="flex flex-col h-full bg-white text-slate-800 overflow-hidden">
       {/* Header */}
-      <div className="border-b border-wireframe-stroke bg-black/80 backdrop-blur-xl px-4 py-3">
+      <div className="border-b border-wireframe-stroke bg-white/80 backdrop-blur-xl px-4 py-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="relative">
-              <div className="w-10 h-10 rounded-xl bg-white/5 border border-gold/20 flex items-center justify-center overflow-hidden">
+              <div className="w-10 h-10 rounded-xl bg-slate-50 border border-gold/20 flex items-center justify-center overflow-hidden">
                 <Image
                   src="/images/acheevy/acheevy-helmet.png"
                   alt="ACHEEVY"
@@ -410,12 +410,12 @@ export default function AcheevyAgent() {
                   className="object-contain"
                 />
               </div>
-              <div className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-[#0a0a0a] ${
+              <div className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white ${
                 isConnected ? 'bg-emerald-400 animate-pulse' : 'bg-gray-500'
               }`} />
             </div>
             <div>
-              <h2 className="font-bold text-sm text-white">ACHEEVY Voice</h2>
+              <h2 className="font-bold text-sm text-slate-800">ACHEEVY Voice</h2>
               <div className="flex items-center gap-1 text-[10px] font-mono uppercase tracking-widest">
                 {isConnected ? (
                   <span className="text-emerald-400"><Zap className="w-2.5 h-2.5 inline" /> Live</span>
@@ -434,7 +434,7 @@ export default function AcheevyAgent() {
             onClick={() => setTextMode(!textMode)}
             title={textMode ? 'Switch to voice' : 'Switch to text'}
             className={`p-2 rounded-lg transition-colors ${
-              textMode ? 'bg-gold/10 text-gold' : 'bg-white/5 text-white/50 hover:text-white/80'
+              textMode ? 'bg-gold/10 text-gold' : 'bg-slate-50 text-slate-500 hover:text-slate-700'
             }`}
           >
             <MessageSquare className="w-4 h-4" />
@@ -459,7 +459,7 @@ export default function AcheevyAgent() {
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
         {transcript.length === 0 && !isConnected && (
           <div className="text-center py-12">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-white/5 border border-gold/20 flex items-center justify-center overflow-hidden">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-slate-50 border border-gold/20 flex items-center justify-center overflow-hidden">
               <Image
                 src="/images/acheevy/acheevy-helmet.png"
                 alt="ACHEEVY"
@@ -468,8 +468,8 @@ export default function AcheevyAgent() {
                 className="object-contain"
               />
             </div>
-            <h3 className="text-lg font-bold text-white mb-2">ACHEEVY Voice</h3>
-            <p className="text-white/30 text-sm max-w-sm mx-auto">
+            <h3 className="text-lg font-bold text-slate-800 mb-2">ACHEEVY Voice</h3>
+            <p className="text-slate-400 text-sm max-w-sm mx-auto">
               Start a session to speak with ACHEEVY in real-time.
               Your voice commands will be processed instantly.
             </p>
@@ -483,8 +483,8 @@ export default function AcheevyAgent() {
           >
             <div className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
               entry.role === 'user'
-                ? 'bg-gold/20 text-white rounded-tr-sm'
-                : 'bg-white/[0.03] text-white/90 rounded-tl-sm border border-wireframe-stroke'
+                ? 'bg-gold/20 text-slate-800 rounded-tr-sm'
+                : 'bg-white text-slate-800 rounded-tl-sm border border-wireframe-stroke'
             }`}>
               {entry.text}
             </div>
@@ -493,7 +493,7 @@ export default function AcheevyAgent() {
 
         {(isSpeaking || fallbackProcessing) && (
           <div className="flex gap-3">
-            <div className="px-4 py-2.5 bg-white/[0.03] rounded-2xl rounded-tl-sm border border-wireframe-stroke flex items-center gap-1.5">
+            <div className="px-4 py-2.5 bg-white rounded-2xl rounded-tl-sm border border-wireframe-stroke flex items-center gap-1.5">
               <div className="w-1.5 h-1.5 bg-gold/50 rounded-full animate-bounce [animation-delay:-0.3s]" />
               <div className="w-1.5 h-1.5 bg-gold/50 rounded-full animate-bounce [animation-delay:-0.15s]" />
               <div className="w-1.5 h-1.5 bg-gold/50 rounded-full animate-bounce" />
@@ -511,7 +511,7 @@ export default function AcheevyAgent() {
             {isElevenLabsConnected ? (
               <>
                 <div>
-                  <p className="text-[9px] text-white/30 font-mono uppercase mb-1">You</p>
+                  <p className="text-[9px] text-slate-400 font-mono uppercase mb-1">You</p>
                   <AudioVisualizer
                     getFrequencyData={conversation.getInputByteFrequencyData}
                     active={isConnected && !muted}
@@ -519,7 +519,7 @@ export default function AcheevyAgent() {
                   />
                 </div>
                 <div>
-                  <p className="text-[9px] text-white/30 font-mono uppercase mb-1">ACHEEVY</p>
+                  <p className="text-[9px] text-slate-400 font-mono uppercase mb-1">ACHEEVY</p>
                   <AudioVisualizer
                     getFrequencyData={conversation.getOutputByteFrequencyData}
                     active={conversation.isSpeaking}
@@ -554,7 +554,7 @@ export default function AcheevyAgent() {
               onChange={e => setTextInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleSendText()}
               placeholder="Type a message..."
-              className="flex-1 bg-white/5 border border-wireframe-stroke rounded-lg px-3 py-2 text-sm text-white placeholder:text-white/20 outline-none focus:border-gold/30"
+              className="flex-1 bg-slate-50 border border-wireframe-stroke rounded-lg px-3 py-2 text-sm text-slate-800 placeholder:text-slate-300 outline-none focus:border-gold/30"
             />
             <button
               type="button"
@@ -570,7 +570,7 @@ export default function AcheevyAgent() {
       )}
 
       {/* Controls */}
-      <div className="px-4 py-4 bg-black/80 backdrop-blur-xl border-t border-wireframe-stroke">
+      <div className="px-4 py-4 bg-white/80 backdrop-blur-xl border-t border-wireframe-stroke">
         <div className="flex items-center justify-center gap-4">
           {/* Mute */}
           {isConnected && (
@@ -581,7 +581,7 @@ export default function AcheevyAgent() {
               className={`p-3 rounded-full transition-all ${
                 muted
                   ? 'bg-red-500/20 text-red-400'
-                  : 'bg-white/5 text-white/60 hover:text-white'
+                  : 'bg-slate-50 text-slate-500 hover:text-slate-800'
               }`}
             >
               {muted ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
@@ -594,7 +594,7 @@ export default function AcheevyAgent() {
               type="button"
               onClick={handleEndSession}
               title="End session"
-              className="p-4 rounded-full bg-red-500 text-white hover:bg-red-400 transition-colors shadow-lg shadow-red-500/30"
+              className="p-4 rounded-full bg-red-500 text-slate-800 hover:bg-red-400 transition-colors shadow-lg shadow-red-500/30"
             >
               <PhoneOff className="w-6 h-6" />
             </button>
@@ -620,14 +620,14 @@ export default function AcheevyAgent() {
               type="button"
               onClick={handleToggleVolume}
               title={volumeOn ? 'Mute output' : 'Unmute output'}
-              className="p-3 rounded-full bg-white/5 text-white/60 hover:text-white transition-colors"
+              className="p-3 rounded-full bg-slate-50 text-slate-500 hover:text-slate-800 transition-colors"
             >
               {volumeOn ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
             </button>
           )}
         </div>
 
-        <p className="text-center mt-3 text-[9px] font-mono text-white/15 uppercase tracking-[0.2em]">
+        <p className="text-center mt-3 text-[9px] font-mono text-slate-300 uppercase tracking-[0.2em]">
           A.I.M.S. Voice Agent
         </p>
       </div>

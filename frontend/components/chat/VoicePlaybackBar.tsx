@@ -32,7 +32,7 @@ export function VoicePlaybackBar({ voiceOutput }: { voiceOutput: VoiceOutputInte
   if (!voiceOutput.isPlaying && !voiceOutput.isPaused && progress === 0) return null;
 
   return (
-    <div className="w-full h-0.5 bg-white/5 rounded-full overflow-hidden">
+    <div className="w-full h-0.5 bg-slate-50 rounded-full overflow-hidden">
       <div
         className="h-full bg-gold/60 rounded-full transition-all duration-200"
         style={{ width: `${progress * 100}%` }}

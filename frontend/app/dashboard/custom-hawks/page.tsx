@@ -92,7 +92,7 @@ function HawkCard({ hawk, onActivate, onPause, onDelete }: {
 }) {
   const domain = DOMAINS.find(d => d.id === hawk.spec.domain);
   const statusColor = {
-    draft: 'text-white/30 bg-white/5',
+    draft: 'text-slate-400 bg-slate-50',
     active: 'text-green-400 bg-green-500/10',
     paused: 'text-yellow-400 bg-yellow-500/10',
     retired: 'text-red-400 bg-red-500/10',
@@ -102,16 +102,16 @@ function HawkCard({ hawk, onActivate, onPause, onDelete }: {
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="wireframe-card rounded-xl p-4 hover:border-white/10 transition-all"
+      className="wireframe-card rounded-xl p-4 hover:border-slate-200 transition-all"
     >
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-3">
-          <div className={`w-10 h-10 rounded-xl border flex items-center justify-center ${domain?.color || 'bg-white/5'}`}>
+          <div className={`w-10 h-10 rounded-xl border flex items-center justify-center ${domain?.color || 'bg-slate-50'}`}>
             <span className="text-sm font-bold">{domain?.icon || '?'}</span>
           </div>
           <div>
-            <h3 className="text-sm font-medium text-white/80">{hawk.hawkName}</h3>
-            <p className="text-[10px] text-white/30">{hawk.spec.purpose}</p>
+            <h3 className="text-sm font-medium text-slate-700">{hawk.hawkName}</h3>
+            <p className="text-[10px] text-slate-400">{hawk.spec.purpose}</p>
           </div>
         </div>
         <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${statusColor}`}>
@@ -120,7 +120,7 @@ function HawkCard({ hawk, onActivate, onPause, onDelete }: {
       </div>
 
       {/* Stats */}
-      <div className="flex items-center gap-4 mb-3 text-[10px] text-white/30 font-mono">
+      <div className="flex items-center gap-4 mb-3 text-[10px] text-slate-400 font-mono">
         <span>{hawk.stats.totalRuns} runs</span>
         <span className="text-green-400/60">{hawk.stats.successfulRuns} ok</span>
         {hawk.stats.failedRuns > 0 && <span className="text-red-400/60">{hawk.stats.failedRuns} fail</span>}
@@ -130,17 +130,17 @@ function HawkCard({ hawk, onActivate, onPause, onDelete }: {
       {/* Tools badges */}
       <div className="flex flex-wrap gap-1 mb-3">
         {hawk.spec.tools.slice(0, 5).map(t => (
-          <span key={t} className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-white/30">
+          <span key={t} className="text-[10px] px-1.5 py-0.5 rounded bg-slate-50 text-slate-400">
             {AVAILABLE_TOOLS.find(at => at.id === t)?.name || t}
           </span>
         ))}
         {hawk.spec.tools.length > 5 && (
-          <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-white/20">+{hawk.spec.tools.length - 5}</span>
+          <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-50 text-slate-300">+{hawk.spec.tools.length - 5}</span>
         )}
       </div>
 
       {/* Actions */}
-      <div className="flex items-center gap-2 pt-2 border-t border-white/5">
+      <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
         {hawk.status !== 'active' && (
           <button onClick={onActivate} className="text-[10px] px-3 py-1 rounded-lg bg-green-500/10 text-green-400 hover:bg-green-500/20 transition-colors">
             Activate
@@ -154,7 +154,7 @@ function HawkCard({ hawk, onActivate, onPause, onDelete }: {
         <button onClick={onDelete} className="text-[10px] px-3 py-1 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors ml-auto">
           Delete
         </button>
-        <span className="text-[10px] text-white/15">{hawk.supervisorAng}</span>
+        <span className="text-[10px] text-slate-300">{hawk.supervisorAng}</span>
       </div>
     </motion.div>
   );
@@ -207,13 +207,13 @@ function HawkCreator({ onCreated, onCancel }: { onCreated: () => void; onCancel:
   return (
     <div className="wireframe-card rounded-xl overflow-hidden">
       {/* Progress steps */}
-      <div className="flex items-center gap-0 border-b border-white/5">
+      <div className="flex items-center gap-0 border-b border-slate-100">
         {['Domain', 'Name & Purpose', 'Tools', 'Configure'].map((label, i) => (
           <button
             key={label}
             onClick={() => { if (i < step) setStep(i); }}
             className={`flex-1 px-4 py-3 text-xs font-medium transition-colors
-              ${i === step ? 'text-gold bg-gold/5 border-b-2 border-gold' : i < step ? 'text-white/50 hover:text-white/70' : 'text-white/20'}
+              ${i === step ? 'text-gold bg-gold/5 border-b-2 border-gold' : i < step ? 'text-slate-500 hover:text-slate-600' : 'text-slate-300'}
             `}
           >
             {i + 1}. {label}
@@ -226,19 +226,19 @@ function HawkCreator({ onCreated, onCancel }: { onCreated: () => void; onCancel:
           {/* Step 0: Domain */}
           {step === 0 && (
             <motion.div key="domain" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              <h3 className="text-sm font-medium text-white/70 mb-4">What domain should your hawk specialize in?</h3>
+              <h3 className="text-sm font-medium text-slate-600 mb-4">What domain should your hawk specialize in?</h3>
               <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
                 {DOMAINS.map(d => (
                   <button
                     key={d.id}
                     onClick={() => { setDomain(d.id); setStep(1); }}
                     className={`p-3 rounded-xl border transition-all text-left
-                      ${domain === d.id ? d.color + ' border' : 'border-white/5 hover:border-white/10 bg-white/[0.02]'}
+                      ${domain === d.id ? d.color + ' border' : 'border-slate-100 hover:border-slate-200 bg-white'}
                     `}
                   >
                     <span className="text-lg font-bold">{d.icon}</span>
-                    <p className="text-xs font-medium text-white/60 mt-1">{d.name}</p>
-                    <p className="text-[10px] text-white/20 mt-0.5">{d.examples.join(', ')}</p>
+                    <p className="text-xs font-medium text-slate-500 mt-1">{d.name}</p>
+                    <p className="text-[10px] text-slate-300 mt-0.5">{d.examples.join(', ')}</p>
                   </button>
                 ))}
               </div>
@@ -249,18 +249,18 @@ function HawkCreator({ onCreated, onCancel }: { onCreated: () => void; onCancel:
           {step === 1 && (
             <motion.div key="name" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
               <div>
-                <label className="text-[10px] text-white/30 uppercase tracking-wider font-medium">Hawk Name</label>
+                <label className="text-[10px] text-slate-400 uppercase tracking-wider font-medium">Hawk Name</label>
                 <div className="flex items-center gap-2 mt-1">
-                  <span className="text-sm text-white/30 font-mono">Lil_</span>
+                  <span className="text-sm text-slate-400 font-mono">Lil_</span>
                   <input
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Increase_My_Money"
                     maxLength={40}
-                    className="flex-1 bg-white/[0.03] border border-white/5 rounded-lg px-3 py-2 text-sm text-white/70 outline-none focus:border-gold/30"
+                    className="flex-1 bg-white border border-slate-100 rounded-lg px-3 py-2 text-sm text-slate-600 outline-none focus:border-gold/30"
                   />
-                  <span className="text-sm text-white/30 font-mono">_Hawk</span>
+                  <span className="text-sm text-slate-400 font-mono">_Hawk</span>
                 </div>
                 {hawkName && (
                   <p className="text-[10px] text-gold/50 mt-1 font-mono">{hawkName}</p>
@@ -268,14 +268,14 @@ function HawkCreator({ onCreated, onCancel }: { onCreated: () => void; onCancel:
               </div>
 
               <div>
-                <label className="text-[10px] text-white/30 uppercase tracking-wider font-medium">Purpose</label>
+                <label className="text-[10px] text-slate-400 uppercase tracking-wider font-medium">Purpose</label>
                 <textarea
                   value={purpose}
                   onChange={(e) => setPurpose(e.target.value)}
                   placeholder="Describe what this hawk should do in plain English..."
                   rows={3}
                   maxLength={500}
-                  className="w-full mt-1 bg-white/[0.03] border border-white/5 rounded-lg px-3 py-2 text-sm text-white/70 outline-none resize-none focus:border-gold/30"
+                  className="w-full mt-1 bg-white border border-slate-100 rounded-lg px-3 py-2 text-sm text-slate-600 outline-none resize-none focus:border-gold/30"
                 />
               </div>
 
@@ -292,7 +292,7 @@ function HawkCreator({ onCreated, onCancel }: { onCreated: () => void; onCancel:
           {/* Step 2: Tools */}
           {step === 2 && (
             <motion.div key="tools" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              <h3 className="text-sm font-medium text-white/70 mb-4">What tools can {hawkName || 'your hawk'} use?</h3>
+              <h3 className="text-sm font-medium text-slate-600 mb-4">What tools can {hawkName || 'your hawk'} use?</h3>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                 {AVAILABLE_TOOLS.map(tool => (
                   <button
@@ -301,12 +301,12 @@ function HawkCreator({ onCreated, onCancel }: { onCreated: () => void; onCancel:
                     className={`p-3 rounded-xl border transition-all text-left
                       ${tools.includes(tool.id)
                         ? 'border-gold/30 bg-gold/5'
-                        : 'border-white/5 hover:border-white/10 bg-white/[0.02]'
+                        : 'border-slate-100 hover:border-slate-200 bg-white'
                       }
                     `}
                   >
-                    <p className="text-xs font-medium text-white/60">{tool.name}</p>
-                    <p className="text-[10px] text-white/20 mt-0.5">{tool.description}</p>
+                    <p className="text-xs font-medium text-slate-500">{tool.name}</p>
+                    <p className="text-[10px] text-slate-300 mt-0.5">{tool.description}</p>
                   </button>
                 ))}
               </div>
@@ -324,7 +324,7 @@ function HawkCreator({ onCreated, onCancel }: { onCreated: () => void; onCancel:
           {step === 3 && (
             <motion.div key="config" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
               <div>
-                <label className="text-[10px] text-white/30 uppercase tracking-wider font-medium">Autonomy Level</label>
+                <label className="text-[10px] text-slate-400 uppercase tracking-wider font-medium">Autonomy Level</label>
                 <div className="flex gap-2 mt-1">
                   {([
                     { id: 'manual' as const, label: 'Manual', desc: 'Approve each action' },
@@ -335,18 +335,18 @@ function HawkCreator({ onCreated, onCancel }: { onCreated: () => void; onCancel:
                       key={a.id}
                       onClick={() => setAutonomy(a.id)}
                       className={`flex-1 p-3 rounded-xl border transition-all text-center
-                        ${autonomy === a.id ? 'border-gold/30 bg-gold/5' : 'border-white/5 bg-white/[0.02]'}
+                        ${autonomy === a.id ? 'border-gold/30 bg-gold/5' : 'border-slate-100 bg-white'}
                       `}
                     >
-                      <p className="text-xs font-medium text-white/60">{a.label}</p>
-                      <p className="text-[10px] text-white/20">{a.desc}</p>
+                      <p className="text-xs font-medium text-slate-500">{a.label}</p>
+                      <p className="text-[10px] text-slate-300">{a.desc}</p>
                     </button>
                   ))}
                 </div>
               </div>
 
               <div>
-                <label className="text-[10px] text-white/30 uppercase tracking-wider font-medium">
+                <label className="text-[10px] text-slate-400 uppercase tracking-wider font-medium">
                   Budget Cap: ${budget}/run
                 </label>
                 <input
@@ -357,28 +357,28 @@ function HawkCreator({ onCreated, onCancel }: { onCreated: () => void; onCancel:
                   onChange={(e) => setBudget(Number(e.target.value))}
                   className="w-full mt-1"
                 />
-                <div className="flex justify-between text-[10px] text-white/20">
+                <div className="flex justify-between text-[10px] text-slate-300">
                   <span>$1</span>
                   <span>$50</span>
                 </div>
               </div>
 
               {/* Summary */}
-              <div className="wireframe-card rounded-xl p-4 bg-white/[0.02]">
-                <p className="text-xs text-white/30 uppercase tracking-wider font-medium mb-2">Summary</p>
-                <div className="space-y-1 text-sm text-white/60">
-                  <p><span className="text-white/30">Name:</span> <span className="font-mono text-gold">{hawkName}</span></p>
-                  <p><span className="text-white/30">Domain:</span> {DOMAINS.find(d => d.id === domain)?.name}</p>
-                  <p><span className="text-white/30">Tools:</span> {tools.length} selected</p>
-                  <p><span className="text-white/30">Autonomy:</span> {autonomy}</p>
-                  <p><span className="text-white/30">Budget:</span> ${budget}/run</p>
+              <div className="wireframe-card rounded-xl p-4 bg-white">
+                <p className="text-xs text-slate-400 uppercase tracking-wider font-medium mb-2">Summary</p>
+                <div className="space-y-1 text-sm text-slate-500">
+                  <p><span className="text-slate-400">Name:</span> <span className="font-mono text-gold">{hawkName}</span></p>
+                  <p><span className="text-slate-400">Domain:</span> {DOMAINS.find(d => d.id === domain)?.name}</p>
+                  <p><span className="text-slate-400">Tools:</span> {tools.length} selected</p>
+                  <p><span className="text-slate-400">Autonomy:</span> {autonomy}</p>
+                  <p><span className="text-slate-400">Budget:</span> ${budget}/run</p>
                 </div>
               </div>
 
               <div className="flex gap-2">
                 <button
                   onClick={onCancel}
-                  className="px-4 py-2 rounded-lg border border-white/10 text-white/40 text-sm hover:text-white/60 transition-colors"
+                  className="px-4 py-2 rounded-lg border border-slate-200 text-slate-400 text-sm hover:text-slate-500 transition-colors"
                 >
                   Cancel
                 </button>
@@ -446,8 +446,8 @@ export default function CustomHawksPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-lg font-semibold text-white/90">Custom Lil_Hawks</h1>
-          <p className="text-xs text-white/30 mt-0.5">Create your own AI agents with custom names, tools, and specialties</p>
+          <h1 className="text-lg font-semibold text-slate-800">Custom Lil_Hawks</h1>
+          <p className="text-xs text-slate-400 mt-0.5">Create your own AI agents with custom names, tools, and specialties</p>
         </div>
         <button
           onClick={() => setShowCreator(true)}
@@ -479,15 +479,15 @@ export default function CustomHawksPage() {
       {loading ? (
         <div className="text-center py-12">
           <div className="w-8 h-8 mx-auto border-2 border-gold border-t-transparent rounded-full animate-spin" />
-          <p className="text-sm text-white/30 mt-3">Loading hawks...</p>
+          <p className="text-sm text-slate-400 mt-3">Loading hawks...</p>
         </div>
       ) : hawks.length === 0 && !showCreator ? (
         <div className="wireframe-card rounded-xl p-12 text-center">
           <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gold/10 border border-gold/20 flex items-center justify-center">
             <span className="text-2xl font-bold text-gold">H</span>
           </div>
-          <h3 className="text-base font-medium text-white/70 mb-2">No Custom Hawks Yet</h3>
-          <p className="text-sm text-white/40 mb-6 max-w-sm mx-auto">
+          <h3 className="text-base font-medium text-slate-600 mb-2">No Custom Hawks Yet</h3>
+          <p className="text-sm text-slate-400 mb-6 max-w-sm mx-auto">
             Create your first custom Lil_Hawk to automate tasks, run research, generate content, and more.
           </p>
           <button

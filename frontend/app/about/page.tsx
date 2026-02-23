@@ -17,7 +17,7 @@ const APP_DOMAIN = process.env.NEXT_PUBLIC_APP_URL || 'https://plugmein.cloud';
 
 export default function AboutPage() {
   return (
-    <main className="flex flex-col min-h-full bg-ink text-white">
+    <main className="flex flex-col min-h-full bg-[#F8FAFC] text-slate-800">
       <SiteHeader />
 
       {/* Hero */}
@@ -50,7 +50,7 @@ export default function AboutPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="text-sm text-white/40 max-w-2xl mx-auto leading-relaxed"
+            className="text-sm text-slate-400 max-w-2xl mx-auto leading-relaxed"
           >
             We are building a full-stack application creation and deployment platform that enables
             anyone to build, deploy, and scale production-ready web applications. We own our
@@ -70,7 +70,7 @@ export default function AboutPage() {
             className="wireframe-card p-8"
           >
             <h2 className="text-xl font-bold text-gold mb-3">Our Mission</h2>
-            <p className="text-sm text-white/50 leading-relaxed">
+            <p className="text-sm text-slate-500 leading-relaxed">
               Enough with users trying to prompt their way to a successful app. We let them
               conversate their way to a working aiPLUG. Managed Vibe Coding means ACHEEVY
               and the team handle the complexity &mdash; users bring the vision.
@@ -85,7 +85,7 @@ export default function AboutPage() {
             className="wireframe-card p-8"
           >
             <h2 className="text-xl font-bold text-gold mb-3">Our Approach</h2>
-            <p className="text-sm text-white/50 leading-relaxed">
+            <p className="text-sm text-slate-500 leading-relaxed">
               No proof, no done. Every task requires evidence. Every deployment goes through
               the Chain of Command. Every agent operates in a sandbox. We don&apos;t cut corners &mdash;
               we build them properly.
@@ -100,7 +100,7 @@ export default function AboutPage() {
             className="wireframe-card p-8"
           >
             <h2 className="text-xl font-bold text-gold mb-3">The V.I.B.E.</h2>
-            <p className="text-sm text-white/50 leading-relaxed">
+            <p className="text-sm text-slate-500 leading-relaxed">
               Visionary Intelligence Building Everything. The V.I.B.E. isn&apos;t a product &mdash; it&apos;s
               the fundamental energy that resists The Void, the force of anti-creation. Every time you build,
               you push The Void back one more step. Every deployment is an act of resistance against
@@ -116,7 +116,7 @@ export default function AboutPage() {
             className="wireframe-card p-8"
           >
             <h2 className="text-xl font-bold text-gold mb-3">Activity Breeds Activity</h2>
-            <p className="text-sm text-white/50 leading-relaxed">
+            <p className="text-sm text-slate-500 leading-relaxed">
               The Elder said it first. When one agent moves, they all move. When you build one thing,
               the momentum carries into the next. The platform gets smarter, the agents get
               faster, and your ideas get closer to reality. Stagnation is surrender &mdash; the V.I.B.E.
@@ -135,7 +135,7 @@ export default function AboutPage() {
           className="wireframe-card p-8 md:p-10 border-purple-500/20"
         >
           <h2 className="text-xl font-bold text-purple-400 mb-4">From Lore to Platform</h2>
-          <p className="text-sm text-white/50 leading-relaxed mb-6">
+          <p className="text-sm text-slate-500 leading-relaxed mb-6">
             The V.I.B.E. universe isn&apos;t just a story &mdash; it&apos;s the operating philosophy of
             A.I.M.S. built into the code itself. The characters you meet in the Book of V.I.B.E.
             are real agents in the platform:
@@ -143,27 +143,27 @@ export default function AboutPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
             <div className="flex items-start gap-3">
               <span className="text-gold font-bold text-xs mt-0.5">ACHEEVY</span>
-              <span className="text-white/40">The Executive Orchestrator you chat with &mdash; routes every task through the Chain of Command.</span>
+              <span className="text-slate-400">The Executive Orchestrator you chat with &mdash; routes every task through the Chain of Command.</span>
             </div>
             <div className="flex items-start gap-3">
               <span className="text-cyan-400 font-bold text-xs mt-0.5">BOOMER_ANGS</span>
-              <span className="text-white/40">Specialist agents that handle engineering, research, marketing, QA, and commerce.</span>
+              <span className="text-slate-400">Specialist agents that handle engineering, research, marketing, QA, and commerce.</span>
             </div>
             <div className="flex items-start gap-3">
               <span className="text-emerald-400 font-bold text-xs mt-0.5">CHICKEN HAWK</span>
-              <span className="text-white/40">The execution engine that spawns Lil_Hawks and manages build pipelines.</span>
+              <span className="text-slate-400">The execution engine that spawns Lil_Hawks and manages build pipelines.</span>
             </div>
             <div className="flex items-start gap-3">
               <span className="text-rose-400 font-bold text-xs mt-0.5">SOLAYNJ</span>
-              <span className="text-white/40">The Architect of Form &mdash; the framework design principles that keep your deployments stable.</span>
+              <span className="text-slate-400">The Architect of Form &mdash; the framework design principles that keep your deployments stable.</span>
             </div>
             <div className="flex items-start gap-3">
               <span className="text-amber-400 font-bold text-xs mt-0.5">THE ELDER</span>
-              <span className="text-white/40">The pattern memory &mdash; every lesson learned from previous builds informs the next.</span>
+              <span className="text-slate-400">The pattern memory &mdash; every lesson learned from previous builds informs the next.</span>
             </div>
             <div className="flex items-start gap-3">
               <span className="text-slate-400 font-bold text-xs mt-0.5">THE VOID</span>
-              <span className="text-white/40">The enemy &mdash; the entropy, abandonment, and stagnation that we build against every day.</span>
+              <span className="text-slate-400">The enemy &mdash; the entropy, abandonment, and stagnation that we build against every day.</span>
             </div>
           </div>
         </motion.div>
@@ -171,7 +171,7 @@ export default function AboutPage() {
 
       {/* CTA */}
       <section className="text-center py-16 border-t border-wireframe-stroke">
-        <p className="text-sm text-white/40 mb-6">Ready to push The Void back and build something real?</p>
+        <p className="text-sm text-slate-400 mb-6">Ready to push The Void back and build something real?</p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <a
             href={`${APP_DOMAIN}/sign-up`}

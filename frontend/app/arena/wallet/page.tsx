@@ -57,11 +57,11 @@ export default function WalletPage() {
             <Wallet size={20} className="text-gold" />
           </div>
           <div>
-            <h1 className="text-2xl font-display text-white tracking-tight">Wallet</h1>
-            <p className="text-[0.55rem] font-mono text-white/30 uppercase tracking-widest">Balance & Transactions</p>
+            <h1 className="text-2xl font-display text-slate-800 tracking-tight">Wallet</h1>
+            <p className="text-[0.55rem] font-mono text-slate-400 uppercase tracking-widest">Balance & Transactions</p>
           </div>
         </div>
-        <Link href="/arena" className="flex items-center gap-2 text-sm text-white/40 hover:text-gold transition-colors">
+        <Link href="/arena" className="flex items-center gap-2 text-sm text-slate-400 hover:text-gold transition-colors">
           <ArrowLeft size={14} />
           <span className="font-mono text-[0.6rem] uppercase tracking-widest">Lobby</span>
         </Link>
@@ -69,28 +69,28 @@ export default function WalletPage() {
 
       {/* Balance Card */}
       <motion.div variants={fadeUp} className="wireframe-card rounded-3xl p-8 shadow-[0_0_30px_rgba(212,175,55,0.06)]">
-        <p className="text-[0.55rem] font-mono uppercase tracking-widest text-white/30 mb-2">Available Balance</p>
+        <p className="text-[0.55rem] font-mono uppercase tracking-widest text-slate-400 mb-2">Available Balance</p>
         <p className="text-5xl font-display text-gold mb-6">{formatCurrency(balance)}</p>
 
         <div className="grid grid-cols-3 gap-4">
-          <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5 text-center">
+          <div className="p-3 rounded-xl bg-white border border-slate-100 text-center">
             <p className="text-sm font-display text-emerald-400">{formatCurrency(totalDeposited)}</p>
-            <p className="text-[0.5rem] font-mono text-white/20 uppercase">Deposited</p>
+            <p className="text-[0.5rem] font-mono text-slate-300 uppercase">Deposited</p>
           </div>
-          <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5 text-center">
+          <div className="p-3 rounded-xl bg-white border border-slate-100 text-center">
             <p className="text-sm font-display text-gold">{formatCurrency(totalWon)}</p>
-            <p className="text-[0.5rem] font-mono text-white/20 uppercase">Won</p>
+            <p className="text-[0.5rem] font-mono text-slate-300 uppercase">Won</p>
           </div>
-          <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5 text-center">
-            <p className="text-sm font-display text-white/40">{formatCurrency(totalSpent)}</p>
-            <p className="text-[0.5rem] font-mono text-white/20 uppercase">Spent</p>
+          <div className="p-3 rounded-xl bg-white border border-slate-100 text-center">
+            <p className="text-sm font-display text-slate-400">{formatCurrency(totalSpent)}</p>
+            <p className="text-[0.5rem] font-mono text-slate-300 uppercase">Spent</p>
           </div>
         </div>
       </motion.div>
 
       {/* Deposit Section */}
       <motion.div variants={fadeUp} className="wireframe-card rounded-2xl p-6 space-y-4">
-        <h2 className="text-xs uppercase tracking-widest text-white/30 font-mono flex items-center gap-2">
+        <h2 className="text-xs uppercase tracking-widest text-slate-400 font-mono flex items-center gap-2">
           <Plus size={12} /> Add Funds
         </h2>
 
@@ -102,7 +102,7 @@ export default function WalletPage() {
               className={`py-3 rounded-xl text-sm font-display transition-all ${
                 selectedAmount === amount
                   ? 'bg-gold/10 border-2 border-gold/30 text-gold'
-                  : 'bg-white/[0.02] border border-white/10 text-white/50 hover:border-gold/15 hover:text-white/70'
+                  : 'bg-white border border-slate-200 text-slate-500 hover:border-gold/15 hover:text-slate-600'
               }`}
             >
               {formatCurrency(amount)}
@@ -115,14 +115,14 @@ export default function WalletPage() {
           className={`w-full flex items-center justify-center gap-2 py-3.5 rounded-xl text-sm font-medium transition-all ${
             selectedAmount
               ? 'bg-gold/10 border border-gold/20 text-gold hover:bg-gold/15'
-              : 'bg-white/5 border border-white/10 text-white/20 cursor-not-allowed'
+              : 'bg-slate-50 border border-slate-200 text-slate-300 cursor-not-allowed'
           }`}
         >
           <CreditCard size={16} />
           {selectedAmount ? `Deposit ${formatCurrency(selectedAmount)} via Stripe` : 'Select an amount'}
         </button>
 
-        <div className="flex items-center gap-2 text-[0.55rem] text-white/20 font-mono">
+        <div className="flex items-center gap-2 text-[0.55rem] text-slate-300 font-mono">
           <Shield size={10} />
           <span>Secured by Stripe. Funds are available immediately.</span>
         </div>
@@ -130,13 +130,13 @@ export default function WalletPage() {
 
       {/* Transaction History */}
       <motion.div variants={fadeUp} className="wireframe-card rounded-2xl overflow-hidden">
-        <div className="px-5 py-4 border-b border-white/[0.06] flex items-center justify-between">
-          <h2 className="text-xs uppercase tracking-widest text-white/30 font-mono flex items-center gap-2">
+        <div className="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
+          <h2 className="text-xs uppercase tracking-widest text-slate-400 font-mono flex items-center gap-2">
             <Clock size={12} /> Transaction History
           </h2>
         </div>
 
-        <div className="divide-y divide-white/[0.04]">
+        <div className="divide-y divide-slate-200">
           {DEMO_TRANSACTIONS.map(tx => {
             const style = TX_STYLES[tx.type] || TX_STYLES.DEPOSIT;
             const IconComp = style.icon;
@@ -146,16 +146,16 @@ export default function WalletPage() {
                   <IconComp size={14} className={style.color} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm text-white/60">{tx.description}</p>
-                  <p className="text-[0.5rem] text-white/20 font-mono">
+                  <p className="text-sm text-slate-500">{tx.description}</p>
+                  <p className="text-[0.5rem] text-slate-300 font-mono">
                     {new Date(tx.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className={`text-sm font-display ${tx.amount > 0 ? style.color : 'text-white/40'}`}>
+                  <p className={`text-sm font-display ${tx.amount > 0 ? style.color : 'text-slate-400'}`}>
                     {style.prefix}{formatCurrency(Math.abs(tx.amount))}
                   </p>
-                  <p className="text-[0.45rem] text-white/15 font-mono">
+                  <p className="text-[0.45rem] text-slate-300 font-mono">
                     Bal: {formatCurrency(tx.balanceAfter)}
                   </p>
                 </div>
@@ -170,7 +170,7 @@ export default function WalletPage() {
         <AlertCircle size={16} className="text-amber-400 flex-shrink-0 mt-0.5" />
         <div>
           <p className="text-xs text-amber-400 font-medium">Withdrawals</p>
-          <p className="text-[0.6rem] text-white/30 mt-1">
+          <p className="text-[0.6rem] text-slate-400 mt-1">
             Withdraw to your bank account or PayPal. Minimum withdrawal: $25.
             Processing time: 1-3 business days. Go to Settings to add a payout method.
           </p>

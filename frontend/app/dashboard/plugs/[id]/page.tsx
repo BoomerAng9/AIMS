@@ -129,7 +129,7 @@ export default function PlugDetailPage() {
       {/* Header */}
       <header className="flex flex-col md:flex-row md:items-start justify-between gap-4">
         <div className="flex items-start gap-4">
-          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/5 text-amber-200">
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-slate-50 text-amber-200">
             <ArchetypeIcon size={28} />
           </div>
           <div>
@@ -137,7 +137,7 @@ export default function PlugDetailPage() {
               <h1 className="text-2xl font-bold tracking-tight text-amber-50 font-display">
                 {plug.name}
               </h1>
-              <span className="rounded-full border border-white/5 bg-white/5 px-3 py-0.5 text-[10px] font-medium text-amber-100/60 uppercase tracking-wider">
+              <span className="rounded-full border border-slate-100 bg-slate-50 px-3 py-0.5 text-[10px] font-medium text-amber-100/60 uppercase tracking-wider">
                 {plug.archetype}
               </span>
             </div>
@@ -161,7 +161,7 @@ export default function PlugDetailPage() {
         {/* Actions */}
         <div className="flex items-center gap-2">
           {isLive && (
-            <button className="flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-xs font-medium text-amber-100/60 transition-all hover:border-amber-300/30 hover:text-amber-50">
+            <button className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs font-medium text-amber-100/60 transition-all hover:border-amber-300/30 hover:text-amber-50">
               <RefreshCw size={12} /> Redeploy
             </button>
           )}
@@ -182,7 +182,7 @@ export default function PlugDetailPage() {
             <Trash2 size={12} /> Delete
           </button>
           {isLive && (
-            <button className="flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-xs font-medium text-amber-100/60 transition-all hover:border-amber-300/30 hover:text-amber-50">
+            <button className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs font-medium text-amber-100/60 transition-all hover:border-amber-300/30 hover:text-amber-50">
               <Terminal size={12} /> View Logs
             </button>
           )}
@@ -201,11 +201,11 @@ export default function PlugDetailPage() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowDeleteConfirm(false)}
-              className="rounded-lg border border-white/10 px-3 py-1.5 text-[10px] text-amber-100/60 hover:text-amber-50 transition-colors"
+              className="rounded-lg border border-slate-200 px-3 py-1.5 text-[10px] text-amber-100/60 hover:text-amber-50 transition-colors"
             >
               Cancel
             </button>
-            <button className="rounded-lg bg-red-500 px-3 py-1.5 text-[10px] font-bold text-white hover:bg-red-600 transition-colors">
+            <button className="rounded-lg bg-red-500 px-3 py-1.5 text-[10px] font-bold text-slate-800 hover:bg-red-600 transition-colors">
               Confirm Delete
             </button>
           </div>
@@ -213,7 +213,7 @@ export default function PlugDetailPage() {
       )}
 
       {/* Pipeline Progress */}
-      <div className="rounded-3xl border border-white/10 bg-black/60 p-6 backdrop-blur-2xl">
+      <div className="rounded-3xl border border-slate-200 bg-slate-50/70 p-6 backdrop-blur-2xl">
         <p className="text-[10px] uppercase tracking-wider text-amber-100/40 mb-4">
           Build Pipeline
         </p>
@@ -227,7 +227,7 @@ export default function PlugDetailPage() {
                       ? "border-emerald-400/30 bg-emerald-500/20 text-emerald-400"
                       : i === currentStageIndex
                         ? "border-amber-300/30 bg-amber-400/10 text-amber-300 shadow-[0_0_15px_rgba(251,191,36,0.15)]"
-                        : "border-white/10 bg-white/5 text-amber-100/30"
+                        : "border-slate-200 bg-slate-50 text-amber-100/30"
                   }`}
                 >
                   {i < currentStageIndex ? <Check size={14} /> : i + 1}
@@ -248,7 +248,7 @@ export default function PlugDetailPage() {
                 <div className="flex-1 mx-1">
                   <div
                     className={`h-[2px] rounded-full ${
-                      i < currentStageIndex ? "bg-emerald-400/40" : "bg-white/5"
+                      i < currentStageIndex ? "bg-emerald-400/40" : "bg-slate-50"
                     }`}
                   />
                 </div>
@@ -259,12 +259,12 @@ export default function PlugDetailPage() {
 
         {/* Building Progress Bar */}
         {plug.status === "building" && plug.progress !== undefined && (
-          <div className="mt-4 pt-4 border-t border-white/5">
+          <div className="mt-4 pt-4 border-t border-slate-100">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[10px] text-amber-100/40">Build Progress</span>
               <span className="text-xs font-mono text-blue-400">{plug.progress}%</span>
             </div>
-            <div className="h-2 rounded-full bg-white/5 overflow-hidden">
+            <div className="h-2 rounded-full bg-slate-50 overflow-hidden">
               <div
                 className="h-full rounded-full bg-gradient-to-r from-blue-500 to-blue-400 transition-all"
                 style={{ width: `${plug.progress}%` }}
@@ -308,7 +308,7 @@ export default function PlugDetailPage() {
           ].map((stat) => (
             <div
               key={stat.label}
-              className="rounded-2xl border border-white/10 bg-black/60 p-5 backdrop-blur-2xl"
+              className="rounded-2xl border border-slate-200 bg-slate-50/70 p-5 backdrop-blur-2xl"
             >
               <div className="flex items-center gap-2 mb-2">
                 <stat.icon size={12} className="text-amber-100/30" />
@@ -324,13 +324,13 @@ export default function PlugDetailPage() {
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* File Manifest */}
-        <div className="rounded-3xl border border-white/10 bg-black/60 p-6 backdrop-blur-2xl">
+        <div className="rounded-3xl border border-slate-200 bg-slate-50/70 p-6 backdrop-blur-2xl">
           <div className="flex items-center gap-2 mb-4">
             <File size={14} className="text-amber-200" />
             <h2 className="text-sm font-semibold uppercase tracking-widest text-amber-200/90 font-display">
               File Manifest
             </h2>
-            <span className="rounded-full bg-white/5 border border-white/5 px-2 py-0.5 text-[9px] text-amber-100/40 ml-auto">
+            <span className="rounded-full bg-slate-50 border border-slate-100 px-2 py-0.5 text-[9px] text-amber-100/40 ml-auto">
               {plug.files.length} items
             </span>
           </div>
@@ -338,7 +338,7 @@ export default function PlugDetailPage() {
             {plug.files.map((file) => (
               <div
                 key={file.path}
-                className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs hover:bg-white/[0.03] transition-colors"
+                className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs hover:bg-white transition-colors"
               >
                 {file.type === "folder" ? (
                   <Folder size={12} className="text-amber-300/60 shrink-0" />
@@ -363,7 +363,7 @@ export default function PlugDetailPage() {
         <div className="space-y-6">
           {/* Deployment Info */}
           {isLive && (
-            <div className="rounded-3xl border border-white/10 bg-black/60 p-6 backdrop-blur-2xl">
+            <div className="rounded-3xl border border-slate-200 bg-slate-50/70 p-6 backdrop-blur-2xl">
               <div className="flex items-center gap-2 mb-4">
                 <Globe size={14} className="text-amber-200" />
                 <h2 className="text-sm font-semibold uppercase tracking-widest text-amber-200/90 font-display">
@@ -372,7 +372,7 @@ export default function PlugDetailPage() {
               </div>
               <div className="space-y-3">
                 {plug.domain && (
-                  <div className="flex items-center justify-between rounded-xl bg-white/[0.03] p-3">
+                  <div className="flex items-center justify-between rounded-xl bg-white p-3">
                     <div>
                       <p className="text-[9px] uppercase tracking-wider text-amber-100/30">
                         URL
@@ -391,7 +391,7 @@ export default function PlugDetailPage() {
                 )}
                 <div className="grid grid-cols-2 gap-3">
                   {plug.containerId && (
-                    <div className="rounded-xl bg-white/[0.03] p-3">
+                    <div className="rounded-xl bg-white p-3">
                       <p className="text-[9px] uppercase tracking-wider text-amber-100/30">
                         Container ID
                       </p>
@@ -401,7 +401,7 @@ export default function PlugDetailPage() {
                     </div>
                   )}
                   {plug.port && (
-                    <div className="rounded-xl bg-white/[0.03] p-3">
+                    <div className="rounded-xl bg-white p-3">
                       <p className="text-[9px] uppercase tracking-wider text-amber-100/30">
                         Port
                       </p>
@@ -411,7 +411,7 @@ export default function PlugDetailPage() {
                     </div>
                   )}
                 </div>
-                <div className="rounded-xl bg-white/[0.03] p-3">
+                <div className="rounded-xl bg-white p-3">
                   <p className="text-[9px] uppercase tracking-wider text-amber-100/30">
                     Domain
                   </p>
@@ -424,13 +424,13 @@ export default function PlugDetailPage() {
           )}
 
           {/* Integrations */}
-          <div className="rounded-3xl border border-white/10 bg-black/60 p-6 backdrop-blur-2xl">
+          <div className="rounded-3xl border border-slate-200 bg-slate-50/70 p-6 backdrop-blur-2xl">
             <div className="flex items-center gap-2 mb-4">
               <Zap size={14} className="text-amber-200" />
               <h2 className="text-sm font-semibold uppercase tracking-widest text-amber-200/90 font-display">
                 Integrations
               </h2>
-              <span className="rounded-full bg-white/5 border border-white/5 px-2 py-0.5 text-[9px] text-amber-100/40 ml-auto">
+              <span className="rounded-full bg-slate-50 border border-slate-100 px-2 py-0.5 text-[9px] text-amber-100/40 ml-auto">
                 {plug.integrations.length}
               </span>
             </div>
@@ -439,7 +439,7 @@ export default function PlugDetailPage() {
                 {plug.integrations.map((integration) => (
                   <div
                     key={integration.name}
-                    className="flex items-center justify-between rounded-xl bg-white/[0.03] p-3"
+                    className="flex items-center justify-between rounded-xl bg-white p-3"
                   >
                     <div className="flex items-center gap-2">
                       <Wifi size={12} className="text-amber-100/30" />

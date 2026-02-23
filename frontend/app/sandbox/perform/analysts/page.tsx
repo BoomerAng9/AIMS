@@ -174,20 +174,20 @@ const INFRA_AGENTS = [
 
 export default function AnalystsPage() {
     return (
-        <div className="min-h-screen bg-[#0a0a0a] text-white pb-24">
+        <div className="min-h-screen bg-white text-slate-800 pb-24">
 
             {/* ── NAV ─────────────────────────────────────────────────── */}
-            <nav className="sticky top-0 z-50 border-b border-white/5 bg-[#0a0a0a]/95 backdrop-blur-xl h-14 flex items-center">
+            <nav className="sticky top-0 z-50 border-b border-slate-100 bg-white/95 backdrop-blur-xl h-14 flex items-center">
                 <div className="max-w-[1400px] mx-auto px-6 w-full flex items-center justify-between">
-                    <Link href="/sandbox/perform" className="flex items-center gap-2 text-[0.65rem] text-white/30 hover:text-white transition-colors font-mono uppercase tracking-widest">
+                    <Link href="/sandbox/perform" className="flex items-center gap-2 text-[0.65rem] text-slate-400 hover:text-slate-800 transition-colors font-mono uppercase tracking-widest">
                         <ArrowLeft size={13} /> Per|Form
                     </Link>
-                    <span className="text-[0.6rem] font-mono uppercase tracking-[0.3em] text-white/20">Analyst Roster</span>
+                    <span className="text-[0.6rem] font-mono uppercase tracking-[0.3em] text-slate-300">Analyst Roster</span>
                 </div>
             </nav>
 
             {/* ── HERO ─────────────────────────────────────────────────── */}
-            <section className="relative overflow-hidden border-b border-white/5 pb-16 pt-20">
+            <section className="relative overflow-hidden border-b border-slate-100 pb-16 pt-20">
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(212,175,55,0.06)_0%,transparent_60%)]" />
                 <div className="relative z-10 max-w-[1400px] mx-auto px-6">
                     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-4 max-w-2xl">
@@ -195,14 +195,14 @@ export default function AnalystsPage() {
                             <Star size={20} className="text-gold" />
                             <span className="text-[0.65rem] font-mono tracking-[0.4em] uppercase text-gold/70">Per|Form Analyst Team</span>
                         </div>
-                        <h1 className="text-5xl md:text-6xl font-black tracking-tighter text-white">
+                        <h1 className="text-5xl md:text-6xl font-black tracking-tighter text-slate-800">
                             Meet the Analysts
                         </h1>
-                        <p className="text-lg text-white/50 leading-relaxed max-w-xl">
+                        <p className="text-lg text-slate-500 leading-relaxed max-w-xl">
                             AI-powered analyst personas built from the best minds in football evaluation.
                             Each one delivers real P.A.I. grades with a personality that makes the data come alive.
                         </p>
-                        <p className="text-xs font-mono text-white/25 uppercase tracking-widest">
+                        <p className="text-xs font-mono text-slate-400 uppercase tracking-widest">
                             All grades come from the P.A.I. formula · Personality is the wrapper · The formula is the truth
                         </p>
                     </motion.div>
@@ -230,9 +230,9 @@ export default function AnalystsPage() {
                                     <div className={`w-3 h-3 rounded-full ${analyst.color.dot} animate-pulse`} />
                                     <span className={`text-[0.65rem] font-mono tracking-[0.35em] uppercase ${analyst.color.accent}`}>Lead Analyst</span>
                                 </div>
-                                <h2 className="text-5xl font-black text-white tracking-tight mb-2">{analyst.name}</h2>
+                                <h2 className="text-5xl font-black text-slate-800 tracking-tight mb-2">{analyst.name}</h2>
                                 <p className={`text-sm font-mono uppercase tracking-widest ${analyst.color.accent} opacity-70 mb-5`}>{analyst.subtitle}</p>
-                                <p className="text-base text-white/60 leading-relaxed mb-6">{analyst.bio}</p>
+                                <p className="text-base text-slate-500 leading-relaxed mb-6">{analyst.bio}</p>
                                 <blockquote className={`border-l-2 border-gold/40 pl-4 italic text-sm ${analyst.color.accent} opacity-80`}>
                                     {analyst.catchphrase}
                                 </blockquote>
@@ -245,8 +245,8 @@ export default function AnalystsPage() {
 
                             <div className="space-y-4">
                                 {analyst.stats.map(s => (
-                                    <div key={s.label} className="p-5 rounded-2xl bg-black/30 border border-white/5">
-                                        <div className="text-3xl font-black text-white mb-1">{s.val}</div>
+                                    <div key={s.label} className="p-5 rounded-2xl bg-slate-100/40 border border-slate-100">
+                                        <div className="text-3xl font-black text-slate-800 mb-1">{s.val}</div>
                                         <div className={`text-[0.6rem] font-mono uppercase tracking-widest ${analyst.color.accent} opacity-60`}>{s.label}</div>
                                     </div>
                                 ))}
@@ -258,8 +258,8 @@ export default function AnalystsPage() {
                 {/* ── COLOR ANALYSTS GRID ───────────────────────────────── */}
                 <div>
                     <div className="mb-8">
-                        <h2 className="text-2xl font-black tracking-tight text-white">Color Analysts</h2>
-                        <p className="text-xs text-white/30 font-mono mt-1">Each with a distinct voice · All grounded in P.A.I. data</p>
+                        <h2 className="text-2xl font-black tracking-tight text-slate-800">Color Analysts</h2>
+                        <p className="text-xs text-slate-400 font-mono mt-1">Each with a distinct voice · All grounded in P.A.I. data</p>
                     </div>
 
                     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -275,26 +275,26 @@ export default function AnalystsPage() {
 
                                 {/* Header */}
                                 <div className="flex items-start justify-between mb-4">
-                                    <div className={`w-10 h-10 rounded-xl bg-white/5 border ${analyst.color.border} flex items-center justify-center`}>
+                                    <div className={`w-10 h-10 rounded-xl bg-slate-50 border ${analyst.color.border} flex items-center justify-center`}>
                                         <analyst.icon size={18} className={analyst.color.accent} />
                                     </div>
                                     <div className={`w-2 h-2 rounded-full mt-2 ${analyst.color.dot} animate-pulse`} />
                                 </div>
 
-                                <h3 className="text-xl font-black text-white mb-0.5">{analyst.name}</h3>
+                                <h3 className="text-xl font-black text-slate-800 mb-0.5">{analyst.name}</h3>
                                 <p className={`text-[0.6rem] font-mono uppercase tracking-widest ${analyst.color.accent} opacity-70 mb-3`}>{analyst.title}</p>
-                                <p className="text-xs text-white/50 leading-relaxed mb-4 flex-1">{analyst.bio}</p>
+                                <p className="text-xs text-slate-500 leading-relaxed mb-4 flex-1">{analyst.bio}</p>
 
                                 <blockquote className={`text-[0.7rem] italic ${analyst.color.accent} opacity-70 border-l border-current pl-3 mb-4`}>
                                     {analyst.catchphrase}
                                 </blockquote>
 
                                 {/* Stats row */}
-                                <div className="grid grid-cols-3 gap-2 pt-4 border-t border-white/5">
+                                <div className="grid grid-cols-3 gap-2 pt-4 border-t border-slate-100">
                                     {analyst.stats.map(s => (
                                         <div key={s.label} className="text-center">
                                             <div className={`text-sm font-black ${analyst.color.accent}`}>{s.val}</div>
-                                            <div className="text-[0.5rem] font-mono text-white/20 uppercase tracking-widest mt-0.5">{s.label}</div>
+                                            <div className="text-[0.5rem] font-mono text-slate-300 uppercase tracking-widest mt-0.5">{s.label}</div>
                                         </div>
                                     ))}
                                 </div>
@@ -313,12 +313,12 @@ export default function AnalystsPage() {
                 {/* ── WAR ROOM CTA ──────────────────────────────────────── */}
                 <div className="rounded-2xl border border-red-500/20 bg-gradient-to-br from-red-950/20 to-transparent p-8 flex flex-col md:flex-row items-center justify-between gap-6">
                     <div>
-                        <h3 className="text-xl font-black text-white mb-1">See them in action</h3>
-                        <p className="text-sm text-white/40">Watch the analysts debate in real time. Bull vs Bear. Every prospect argued from both sides.</p>
+                        <h3 className="text-xl font-black text-slate-800 mb-1">See them in action</h3>
+                        <p className="text-sm text-slate-400">Watch the analysts debate in real time. Bull vs Bear. Every prospect argued from both sides.</p>
                     </div>
                     <Link
                         href="/sandbox/perform/war-room"
-                        className="flex-shrink-0 flex items-center gap-2 px-8 py-4 bg-red-600 hover:bg-red-500 text-white font-bold text-sm rounded-xl transition-colors whitespace-nowrap"
+                        className="flex-shrink-0 flex items-center gap-2 px-8 py-4 bg-red-600 hover:bg-red-500 text-slate-800 font-bold text-sm rounded-xl transition-colors whitespace-nowrap"
                     >
                         Enter the War Room →
                     </Link>
@@ -327,8 +327,8 @@ export default function AnalystsPage() {
                 {/* ── INFRASTRUCTURE AGENTS ─────────────────────────────── */}
                 <div>
                     <div className="mb-6">
-                        <h2 className="text-2xl font-black tracking-tight text-white">Behind the Scenes</h2>
-                        <p className="text-xs text-white/30 font-mono mt-1">Specialist agents that power the research pipeline — not public-facing</p>
+                        <h2 className="text-2xl font-black tracking-tight text-slate-800">Behind the Scenes</h2>
+                        <p className="text-xs text-slate-400 font-mono mt-1">Specialist agents that power the research pipeline — not public-facing</p>
                     </div>
 
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
@@ -338,16 +338,16 @@ export default function AnalystsPage() {
                                 initial={{ opacity: 0, scale: 0.97 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 transition={{ delay: i * 0.04 }}
-                                className="p-4 rounded-xl border border-white/[0.04] bg-[#0f0f0f] hover:border-white/10 transition-colors"
+                                className="p-4 rounded-xl border border-slate-200 bg-[#0f0f0f] hover:border-slate-200 transition-colors"
                             >
                                 <div className="text-2xl mb-2">{agent.icon}</div>
-                                <p className="text-xs font-mono font-bold text-white/70">{agent.name}</p>
-                                <p className="text-[0.6rem] text-white/30 font-mono mt-0.5 leading-relaxed">{agent.role}</p>
+                                <p className="text-xs font-mono font-bold text-slate-600">{agent.name}</p>
+                                <p className="text-[0.6rem] text-slate-400 font-mono mt-0.5 leading-relaxed">{agent.role}</p>
                             </motion.div>
                         ))}
                     </div>
 
-                    <p className="text-[0.6rem] font-mono text-white/20 text-center mt-6 uppercase tracking-widest">
+                    <p className="text-[0.6rem] font-mono text-slate-300 text-center mt-6 uppercase tracking-widest">
                         Infrastructure agents are internal · Not public-facing · Managed by ACHEEVY
                     </p>
                 </div>
@@ -356,16 +356,16 @@ export default function AnalystsPage() {
                 <div className="border border-gold/20 rounded-2xl p-8 bg-gradient-to-br from-gold/5 to-transparent text-center relative overflow-hidden">
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(212,175,55,0.05)_0%,transparent_70%)]" />
                     <div className="relative z-10 max-w-xl mx-auto">
-                        <h3 className="text-2xl font-black text-white mb-3 tracking-tight">One Formula. Many Voices.</h3>
-                        <p className="text-sm text-white/50 leading-relaxed">
-                            No matter how wild or entertaining an analyst&apos;s takes get, their grades and rankings <strong className="text-white/80">always</strong> come from the P.A.I. + grading system.
+                        <h3 className="text-2xl font-black text-slate-800 mb-3 tracking-tight">One Formula. Many Voices.</h3>
+                        <p className="text-sm text-slate-500 leading-relaxed">
+                            No matter how wild or entertaining an analyst&apos;s takes get, their grades and rankings <strong className="text-slate-700">always</strong> come from the P.A.I. + grading system.
                             The personality is the wrapper. The formula is the truth.
                         </p>
                         <div className="flex gap-3 justify-center mt-6">
                             <Link href="/sandbox/perform" className="px-6 py-3 bg-gold text-black font-bold text-xs rounded-xl hover:bg-yellow-400 transition-colors uppercase tracking-widest">
                                 View Per|Form Hub
                             </Link>
-                            <Link href="/sandbox/perform/big-board" className="px-6 py-3 bg-white/5 border border-white/10 text-white text-xs rounded-xl hover:bg-white/10 transition-colors">
+                            <Link href="/sandbox/perform/big-board" className="px-6 py-3 bg-slate-50 border border-slate-200 text-slate-800 text-xs rounded-xl hover:bg-slate-100 transition-colors">
                                 See the Grades
                             </Link>
                         </div>

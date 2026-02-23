@@ -10,14 +10,14 @@ export default function WorkspaceLucPage() {
   const [activeTab, setActiveTab] = useState<"calculator" | "flip">("calculator");
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black">
+    <div className="min-h-screen bg-gradient-to-br from-white via-gray-900 to-white">
       {/* Header */}
-      <header className="border-b border-wireframe-stroke/20 bg-black/50 backdrop-blur-xl">
+      <header className="border-b border-wireframe-stroke/20 bg-slate-50/60 backdrop-blur-xl">
         <div className="max-w-6xl mx-auto px-6 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-white">LUC</h1>
-              <p className="text-sm text-white/50 mt-1">
+              <h1 className="text-2xl font-bold text-slate-800">LUC</h1>
+              <p className="text-sm text-slate-500 mt-1">
                 Ledger Usage Calculator - Track and manage your resource consumption
               </p>
             </div>
@@ -27,7 +27,7 @@ export default function WorkspaceLucPage() {
                 className={`px-4 py-2 text-sm rounded-lg border transition-colors ${
                   activeTab === "calculator"
                     ? "bg-gold/10 border-gold/40 text-gold"
-                    : "border-wireframe-stroke/30 text-white/50 hover:text-white/70"
+                    : "border-wireframe-stroke/30 text-slate-500 hover:text-slate-600"
                 }`}
               >
                 Calculator
@@ -37,7 +37,7 @@ export default function WorkspaceLucPage() {
                 className={`px-4 py-2 text-sm rounded-lg border transition-colors ${
                   activeTab === "flip"
                     ? "bg-gold/10 border-gold/40 text-gold"
-                    : "border-wireframe-stroke/30 text-white/50 hover:text-white/70"
+                    : "border-wireframe-stroke/30 text-slate-500 hover:text-slate-600"
                 }`}
               >
                 Flip Preset
@@ -74,13 +74,13 @@ function FlipPresetTab() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold text-white">Real Estate Flip Calculator</h2>
-        <p className="text-sm text-white/50 mt-1">
+        <h2 className="text-xl font-semibold text-slate-800">Real Estate Flip Calculator</h2>
+        <p className="text-sm text-slate-500 mt-1">
           Calculate potential profits using the Flip Secrets methodology
         </p>
       </div>
 
-      <div className="p-6 rounded-xl bg-black/30 border border-wireframe-stroke/30">
+      <div className="p-6 rounded-xl bg-slate-100/40 border border-wireframe-stroke/30">
         <div className="text-center py-12">
           <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gold/10 flex items-center justify-center">
             <svg
@@ -97,8 +97,8 @@ function FlipPresetTab() {
               />
             </svg>
           </div>
-          <h3 className="text-lg font-medium text-white mb-2">Flip Preset Coming Soon</h3>
-          <p className="text-sm text-white/50 max-w-md mx-auto">
+          <h3 className="text-lg font-medium text-slate-800 mb-2">Flip Preset Coming Soon</h3>
+          <p className="text-sm text-slate-500 max-w-md mx-auto">
             The Real Estate Flip preset is being extracted from the Flip Secrets
             spreadsheets. This will provide a full property flip calculator with
             all formulas ported to our headless engine.
@@ -120,13 +120,13 @@ function FlipPresetTab() {
           "Closing Costs",
           "Financing Costs",
         ].map((field) => (
-          <div key={field} className="p-4 rounded-lg bg-black/20 border border-wireframe-stroke/20">
-            <label className="block text-xs text-white/30 mb-2">{field}</label>
+          <div key={field} className="p-4 rounded-lg bg-slate-50/30 border border-wireframe-stroke/20">
+            <label className="block text-xs text-slate-400 mb-2">{field}</label>
             <input
               type="text"
               disabled
               placeholder="Coming soon..."
-              className="w-full px-3 py-2 bg-black/30 border border-wireframe-stroke/20 rounded text-white/30 text-sm cursor-not-allowed"
+              className="w-full px-3 py-2 bg-slate-100/40 border border-wireframe-stroke/20 rounded text-slate-400 text-sm cursor-not-allowed"
             />
           </div>
         ))}

@@ -57,20 +57,20 @@ export default function LeaderboardPage() {
             <Crown size={20} className="text-gold" />
           </div>
           <div>
-            <h1 className="text-2xl font-display text-white tracking-tight">Leaderboard</h1>
-            <p className="text-[0.55rem] font-mono text-white/30 uppercase tracking-widest">
+            <h1 className="text-2xl font-display text-slate-800 tracking-tight">Leaderboard</h1>
+            <p className="text-[0.55rem] font-mono text-slate-400 uppercase tracking-widest">
               {totalPlayers} active players
             </p>
           </div>
         </div>
-        <Link href="/arena" className="flex items-center gap-2 text-sm text-white/40 hover:text-gold transition-colors">
+        <Link href="/arena" className="flex items-center gap-2 text-sm text-slate-400 hover:text-gold transition-colors">
           <ArrowLeft size={14} />
           <span className="font-mono text-[0.6rem] uppercase tracking-widest">Lobby</span>
         </Link>
       </motion.div>
 
       {/* Period Tabs */}
-      <motion.div variants={fadeUp} className="flex items-center gap-1 p-1 rounded-xl bg-white/[0.03] border border-white/5 w-fit">
+      <motion.div variants={fadeUp} className="flex items-center gap-1 p-1 rounded-xl bg-white border border-slate-100 w-fit">
         {PERIOD_OPTIONS.map(opt => (
           <button
             key={opt.value}
@@ -78,7 +78,7 @@ export default function LeaderboardPage() {
             className={`px-4 py-2 rounded-lg text-[0.6rem] font-mono uppercase tracking-wider transition-all ${
               period === opt.value
                 ? 'bg-gold/10 text-gold border border-gold/20'
-                : 'text-white/30 hover:text-white/50 hover:bg-white/5'
+                : 'text-slate-400 hover:text-slate-500 hover:bg-slate-50'
             }`}
           >
             {opt.label}
@@ -95,12 +95,12 @@ export default function LeaderboardPage() {
               <Medal size={24} className="text-zinc-300" />
             </div>
             <span className="text-2xl font-display text-zinc-300">2nd</span>
-            <p className="text-sm font-medium text-white mt-2">{entries[1]?.player?.displayName}</p>
+            <p className="text-sm font-medium text-slate-800 mt-2">{entries[1]?.player?.displayName}</p>
             <div className={`mt-2 px-2 py-0.5 rounded-md text-[0.5rem] font-mono ${TIER_CONFIG[entries[1]?.player?.tier]?.bg} ${TIER_CONFIG[entries[1]?.player?.tier]?.color}`}>
               {TIER_CONFIG[entries[1]?.player?.tier]?.label}
             </div>
             <p className="text-lg font-display text-emerald-400 mt-3">{formatCurrency(entries[1]?.earnings || 0)}</p>
-            <p className="text-[0.5rem] font-mono text-white/20 uppercase">Earnings</p>
+            <p className="text-[0.5rem] font-mono text-slate-300 uppercase">Earnings</p>
           </div>
 
           {/* 1st Place */}
@@ -109,12 +109,12 @@ export default function LeaderboardPage() {
               <Crown size={28} className="text-gold" />
             </div>
             <span className="text-3xl font-display text-gold">1st</span>
-            <p className="text-base font-medium text-white mt-2">{entries[0]?.player?.displayName}</p>
+            <p className="text-base font-medium text-slate-800 mt-2">{entries[0]?.player?.displayName}</p>
             <div className={`mt-2 px-2 py-0.5 rounded-md text-[0.5rem] font-mono ${TIER_CONFIG[entries[0]?.player?.tier]?.bg} ${TIER_CONFIG[entries[0]?.player?.tier]?.color}`}>
               {TIER_CONFIG[entries[0]?.player?.tier]?.label}
             </div>
             <p className="text-xl font-display text-emerald-400 mt-3">{formatCurrency(entries[0]?.earnings || 0)}</p>
-            <p className="text-[0.5rem] font-mono text-white/20 uppercase">Earnings</p>
+            <p className="text-[0.5rem] font-mono text-slate-300 uppercase">Earnings</p>
           </div>
 
           {/* 3rd Place */}
@@ -123,12 +123,12 @@ export default function LeaderboardPage() {
               <Medal size={20} className="text-amber-600" />
             </div>
             <span className="text-xl font-display text-amber-600">3rd</span>
-            <p className="text-sm font-medium text-white mt-2">{entries[2]?.player?.displayName}</p>
+            <p className="text-sm font-medium text-slate-800 mt-2">{entries[2]?.player?.displayName}</p>
             <div className={`mt-2 px-2 py-0.5 rounded-md text-[0.5rem] font-mono ${TIER_CONFIG[entries[2]?.player?.tier]?.bg} ${TIER_CONFIG[entries[2]?.player?.tier]?.color}`}>
               {TIER_CONFIG[entries[2]?.player?.tier]?.label}
             </div>
             <p className="text-lg font-display text-emerald-400 mt-3">{formatCurrency(entries[2]?.earnings || 0)}</p>
-            <p className="text-[0.5rem] font-mono text-white/20 uppercase">Earnings</p>
+            <p className="text-[0.5rem] font-mono text-slate-300 uppercase">Earnings</p>
           </div>
         </motion.div>
       )}
@@ -136,7 +136,7 @@ export default function LeaderboardPage() {
       {/* Full Table */}
       <motion.div variants={fadeUp} className="wireframe-card rounded-2xl overflow-hidden">
         {/* Table Header */}
-        <div className="grid grid-cols-12 gap-2 px-5 py-3 border-b border-white/[0.06] text-[0.5rem] font-mono uppercase tracking-widest text-white/25">
+        <div className="grid grid-cols-12 gap-2 px-5 py-3 border-b border-slate-200 text-[0.5rem] font-mono uppercase tracking-widest text-slate-400">
           <div className="col-span-1 text-center">Rank</div>
           <div className="col-span-3">Player</div>
           <div className="col-span-1 text-center hidden md:block">Tier</div>
@@ -156,8 +156,8 @@ export default function LeaderboardPage() {
           return (
             <div
               key={entry.id}
-              className={`grid grid-cols-12 gap-2 px-5 py-3.5 items-center transition-colors hover:bg-white/[0.02] ${
-                i < entries.length - 1 ? 'border-b border-white/[0.04]' : ''
+              className={`grid grid-cols-12 gap-2 px-5 py-3.5 items-center transition-colors hover:bg-white ${
+                i < entries.length - 1 ? 'border-b border-slate-200' : ''
               }`}
             >
               {/* Rank */}
@@ -167,7 +167,7 @@ export default function LeaderboardPage() {
                     {entry.rank}
                   </span>
                 ) : (
-                  <span className="text-sm font-display text-white/30">{entry.rank}</span>
+                  <span className="text-sm font-display text-slate-400">{entry.rank}</span>
                 )}
               </div>
 
@@ -177,8 +177,8 @@ export default function LeaderboardPage() {
                   {tierConfig.icon}
                 </div>
                 <div>
-                  <p className="text-sm text-white font-medium">{player.displayName}</p>
-                  <p className="text-[0.5rem] font-mono text-white/20">Lvl {player.level}</p>
+                  <p className="text-sm text-slate-800 font-medium">{player.displayName}</p>
+                  <p className="text-[0.5rem] font-mono text-slate-300">Lvl {player.level}</p>
                 </div>
               </div>
 
@@ -196,12 +196,12 @@ export default function LeaderboardPage() {
 
               {/* Contests */}
               <div className="col-span-2 text-center hidden md:block">
-                <span className="text-sm font-mono text-white/40">{entry.entries}</span>
+                <span className="text-sm font-mono text-slate-400">{entry.entries}</span>
               </div>
 
               {/* Accuracy */}
               <div className="col-span-1 text-center">
-                <span className={`text-sm font-display ${entry.accuracy >= 50 ? 'text-emerald-400' : 'text-white/40'}`}>
+                <span className={`text-sm font-display ${entry.accuracy >= 50 ? 'text-emerald-400' : 'text-slate-400'}`}>
                   {entry.accuracy.toFixed(1)}%
                 </span>
               </div>
@@ -214,7 +214,7 @@ export default function LeaderboardPage() {
                     <span className="text-sm font-display text-amber-400">{player.streak}</span>
                   </>
                 ) : (
-                  <span className="text-sm text-white/15">—</span>
+                  <span className="text-sm text-slate-300">—</span>
                 )}
               </div>
 
@@ -229,7 +229,7 @@ export default function LeaderboardPage() {
         {loading && (
           <div className="text-center py-12">
             <div className="inline-block h-6 w-6 border-2 border-gold/30 border-t-gold rounded-full animate-spin" />
-            <p className="text-xs text-white/30 mt-3 font-mono">Loading rankings...</p>
+            <p className="text-xs text-slate-400 mt-3 font-mono">Loading rankings...</p>
           </div>
         )}
       </motion.div>

@@ -23,7 +23,7 @@ export default function ShowroomPage() {
           <div className="inline-block px-4 py-1 rounded-full border border-gold/30 bg-gold/5 text-gold text-xs font-display tracking-widest uppercase mb-4">
             System Design v2.0
           </div>
-          <h1 className="text-6xl font-display font-medium text-white tracking-tighter drop-shadow-2xl">
+          <h1 className="text-6xl font-display font-medium text-slate-800 tracking-tighter drop-shadow-2xl">
             A.I.M.S. <span className="text-gold text-shadow-gold">Showroom</span>
           </h1>
           <p className="text-muted text-lg max-w-2xl mx-auto font-light">
@@ -37,9 +37,9 @@ export default function ShowroomPage() {
         <section className="space-y-6">
           <h2 className="text-2xl font-light border-b border-wireframe-stroke pb-2">01. Chromatic Array</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <ColorCard name="Obsidian" hex="#0A0A0A" bg="bg-obsidian" text="text-white" />
+            <ColorCard name="Obsidian" hex="#0A0A0A" bg="bg-obsidian" text="text-slate-800" />
             <ColorCard name="Gold (Primary)" hex="#D4AF37" bg="bg-gold" text="text-black" />
-            <ColorCard name="Gunmetal" hex="#2A2A2A" bg="bg-gunmetal" text="text-white" />
+            <ColorCard name="Gunmetal" hex="#2A2A2A" bg="bg-gunmetal" text="text-slate-800" />
             <ColorCard name="Signal Green" hex="#10B981" bg="bg-signal-green" text="text-black" />
           </div>
         </section>
@@ -64,13 +64,13 @@ export default function ShowroomPage() {
             </div>
             <div className="space-y-4">
               <p className="text-sm text-gold font-mono uppercase">Human Annotation (Permanent Marker)</p>
-              <p className="font-marker text-xl text-white/80 -rotate-1">
+              <p className="font-marker text-xl text-slate-700 -rotate-1">
                 "Check the neural configurations before deployment!"
               </p>
             </div>
             <div className="space-y-4">
               <p className="text-sm text-gold font-mono uppercase">Code / Data (Doto)</p>
-              <div className="font-mono text-sm bg-black/50 p-4 rounded border border-wireframe-stroke text-green-400">
+              <div className="font-mono text-sm bg-slate-50/60 p-4 rounded border border-wireframe-stroke text-green-400">
                 {`> SYSTEM.INIT(CORE_V2)\n> CONNECTING TO NEURAL HUB... [OK]`}
               </div>
             </div>
@@ -85,13 +85,13 @@ export default function ShowroomPage() {
             {/* Standard Glass Panel */}
             <div className="glass-panel p-6 rounded-xl flex flex-col justify-between h-64 hover-glow-border group">
               <div>
-                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center mb-4 group-hover:bg-gold transition-colors">
+                <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center mb-4 group-hover:bg-gold transition-colors">
                   <span className="font-display font-bold">01</span>
                 </div>
                 <h3 className="text-xl font-medium mb-2">Standard Glass</h3>
                 <p className="text-muted text-sm">Used for secondary modules and list items. Lightweight blur.</p>
               </div>
-              <div className="text-xs font-mono text-white/40">.glass-panel</div>
+              <div className="text-xs font-mono text-slate-400">.glass-panel</div>
             </div>
 
             {/* Premium Glass Panel */}
@@ -101,8 +101,8 @@ export default function ShowroomPage() {
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gold to-yellow-600 flex items-center justify-center mb-4 text-black shadow-lg shadow-gold/20">
                   <span className="font-display font-bold">02</span>
                 </div>
-                <h3 className="text-xl font-medium mb-2 text-white">Premium Glass</h3>
-                <p className="text-white/70 text-sm">High-fidelity surface for primary dashboards and active states. Includes gold radial tint.</p>
+                <h3 className="text-xl font-medium mb-2 text-slate-800">Premium Glass</h3>
+                <p className="text-slate-600 text-sm">High-fidelity surface for primary dashboards and active states. Includes gold radial tint.</p>
               </div>
               <div className="text-xs font-mono text-gold/60">.glass-premium</div>
             </div>
@@ -114,7 +114,7 @@ export default function ShowroomPage() {
                 <h3 className="text-xl font-medium mb-2">System Active</h3>
                 <p className="text-muted text-sm">Example of a state-driven card variant (Online/Active).</p>
               </div>
-              <button className="w-full py-2 bg-white/5 hover:bg-white/10 rounded text-xs uppercase tracking-wider transition-colors border border-wireframe-stroke">
+              <button className="w-full py-2 bg-slate-50 hover:bg-slate-100 rounded text-xs uppercase tracking-wider transition-colors border border-wireframe-stroke">
                 View Logs
               </button>
             </div>
@@ -132,10 +132,10 @@ export default function ShowroomPage() {
               <button className="px-6 py-3 bg-gold hover:bg-gold-light text-black font-semibold rounded-lg shadow-neon-gold transition-all transform hover:-translate-y-0.5">
                 Primary Action
               </button>
-              <button className="px-6 py-3 bg-transparent border border-white/20 text-white hover:bg-white hover:text-black rounded-lg transition-all">
+              <button className="px-6 py-3 bg-transparent border border-slate-200 text-slate-800 hover:bg-white hover:text-black rounded-lg transition-all">
                 Secondary Action
               </button>
-              <button className="px-6 py-3 text-gold hover:text-white transition-colors relative group">
+              <button className="px-6 py-3 text-gold hover:text-slate-800 transition-colors relative group">
                 <span className="relative z-10">Ghost Link</span>
                 <span className="absolute bottom-2 left-0 w-0 h-[1px] bg-gold group-hover:w-full transition-all duration-300"></span>
               </button>
@@ -148,12 +148,12 @@ export default function ShowroomPage() {
                 <input 
                   type="text" 
                   placeholder="AG-001" 
-                  className="w-full bg-black/40 border-b border-white/20 p-3 text-white focus:outline-none focus:border-gold focus:bg-black/60 transition-colors font-mono"
+                  className="w-full bg-slate-100/60 border-b border-slate-200 p-3 text-slate-800 focus:outline-none focus:border-gold focus:bg-slate-50/70 transition-colors font-mono"
                 />
               </div>
               <div className="space-y-2">
                 <label className="text-xs uppercase tracking-widest text-muted">Directive</label>
-                <select className="w-full bg-black/40 border-b border-white/20 p-3 text-white focus:outline-none focus:border-gold transition-colors font-sans appearance-none">
+                <select className="w-full bg-slate-100/60 border-b border-slate-200 p-3 text-slate-800 focus:outline-none focus:border-gold transition-colors font-sans appearance-none">
                   <option>Autonomous Execution</option>
                   <option>Human Oversight</option>
                   <option>System Diagnostics</option>
@@ -173,10 +173,10 @@ function ColorCard({ name, hex, bg, text }: { name: string, hex: string, bg: str
   return (
     <div className="glass-panel rounded-lg overflow-hidden group">
       <div className={`h-24 ${bg} relative`}>
-        <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors" />
+        <div className="absolute inset-0 bg-white/0 group-hover:bg-slate-100 transition-colors" />
       </div>
       <div className="p-4">
-        <p className={`font-medium ${text === 'text-black' ? 'text-white' : 'text-white'}`}>{name}</p>
+        <p className={`font-medium ${text === 'text-black' ? 'text-slate-800' : 'text-slate-800'}`}>{name}</p>
         <p className="text-xs font-mono text-muted mt-1">{hex}</p>
       </div>
     </div>

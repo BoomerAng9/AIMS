@@ -28,7 +28,7 @@ export default function MoneyMovesPage() {
             <Coins size={20} />
           </div>
           <div>
-            <h1 className="text-2xl font-display text-white tracking-tight">
+            <h1 className="text-2xl font-display text-slate-800 tracking-tight">
               Money Moves Monday
             </h1>
             <p className="text-xs text-emerald-400/60 font-mono">
@@ -36,7 +36,7 @@ export default function MoneyMovesPage() {
             </p>
           </div>
         </div>
-        <p className="text-sm text-white/40 max-w-lg">
+        <p className="text-sm text-slate-400 max-w-lg">
           Money_Ang checks in every week. Quick spending review, celebrate
           wins, and one small action to move forward. Not a scary dashboard —
           just one tiny move.
@@ -54,7 +54,7 @@ export default function MoneyMovesPage() {
         >
           <Mic size={32} />
         </button>
-        <p className="text-sm text-white/40">
+        <p className="text-sm text-slate-400">
           &quot;Let&apos;s do my 15-minute check-in&quot;
         </p>
       </motion.div>
@@ -75,11 +75,11 @@ export default function MoneyMovesPage() {
 
         {/* Spending snapshot */}
         <div className="grid gap-3 md:grid-cols-3">
-          <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5">
-            <p className="text-[0.55rem] font-mono uppercase text-white/30 mb-1">
+          <div className="p-4 rounded-xl bg-white border border-slate-100">
+            <p className="text-[0.55rem] font-mono uppercase text-slate-400 mb-1">
               Eating Out
             </p>
-            <p className="text-xl font-display text-white">$127</p>
+            <p className="text-xl font-display text-slate-800">$127</p>
             <div className="flex items-center gap-1 mt-1">
               <TrendingUp size={10} className="text-red-400" />
               <span className="text-[0.55rem] font-mono text-red-400/80">
@@ -87,23 +87,23 @@ export default function MoneyMovesPage() {
               </span>
             </div>
           </div>
-          <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5">
-            <p className="text-[0.55rem] font-mono uppercase text-white/30 mb-1">
+          <div className="p-4 rounded-xl bg-white border border-slate-100">
+            <p className="text-[0.55rem] font-mono uppercase text-slate-400 mb-1">
               Subscriptions
             </p>
-            <p className="text-xl font-display text-white">$64</p>
+            <p className="text-xl font-display text-slate-800">$64</p>
             <div className="flex items-center gap-1 mt-1">
-              <TrendingDown size={10} className="text-white/20" />
-              <span className="text-[0.55rem] font-mono text-white/30">
+              <TrendingDown size={10} className="text-slate-300" />
+              <span className="text-[0.55rem] font-mono text-slate-400">
                 No change
               </span>
             </div>
           </div>
-          <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5">
-            <p className="text-[0.55rem] font-mono uppercase text-white/30 mb-1">
+          <div className="p-4 rounded-xl bg-white border border-slate-100">
+            <p className="text-[0.55rem] font-mono uppercase text-slate-400 mb-1">
               Groceries
             </p>
-            <p className="text-xl font-display text-white">$89</p>
+            <p className="text-xl font-display text-slate-800">$89</p>
             <div className="flex items-center gap-1 mt-1">
               <TrendingDown size={10} className="text-emerald-400" />
               <span className="text-[0.55rem] font-mono text-emerald-400/80">
@@ -118,7 +118,7 @@ export default function MoneyMovesPage() {
           <p className="text-[0.55rem] text-emerald-400/60 font-mono uppercase mb-1">
             This Week&apos;s Win
           </p>
-          <p className="text-sm text-white/60">
+          <p className="text-sm text-slate-500">
             &quot;Found a $15 refund from that subscription app!&quot;
           </p>
         </div>
@@ -131,7 +131,7 @@ export default function MoneyMovesPage() {
               Your One Move This Week
             </p>
           </div>
-          <p className="text-sm text-white/60">
+          <p className="text-sm text-slate-500">
             &quot;Cancel your Hulu trial before Thursday — it auto-renews at
             $17.99&quot;
           </p>
@@ -144,7 +144,7 @@ export default function MoneyMovesPage() {
             </button>
             <button
               type="button"
-              className="flex items-center gap-2 px-4 py-2 rounded-xl border border-white/10 text-xs text-white/40 hover:text-white hover:border-white/20 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 text-xs text-slate-400 hover:text-slate-800 hover:border-slate-200 transition-colors"
             >
               <Bell size={12} />
               Remind Me Thursday

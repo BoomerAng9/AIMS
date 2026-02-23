@@ -258,7 +258,7 @@ export function DashboardShell({ children }: Props) {
                   onClick={() => setShowAccountMenu(!showAccountMenu)}
                   className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-600 hover:border-slate-300 transition-colors"
                 >
-                  <span className="h-6 w-6 rounded-full bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center text-[10px] font-bold text-white">
+                  <span className="h-6 w-6 rounded-full bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center text-[10px] font-bold text-slate-800">
                     {userName.charAt(0).toUpperCase()}
                   </span>
                   <span className="hidden sm:inline">{userName}</span>

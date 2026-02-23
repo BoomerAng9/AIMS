@@ -10,7 +10,7 @@ import { ACTOR_COLORS } from '@/lib/hangar/actorRegistry';
 import type { ActorType } from '@/lib/hangar/actorRegistry';
 
 const STATE_BADGES: Record<string, { label: string; color: string }> = {
-  IDLE: { label: 'Idle', color: 'bg-white/20' },
+  IDLE: { label: 'Idle', color: 'bg-slate-100' },
   LISTENING: { label: 'Listening', color: 'bg-blue-500/60' },
   ASSIGNED: { label: 'Assigned', color: 'bg-purple-500/60' },
   EXECUTING: { label: 'Executing', color: 'bg-orange-500/60' },
@@ -34,13 +34,13 @@ export default function ActorCardPanel() {
   const selectActor = useHangarStore((s) => s.selectActor);
 
   return (
-    <div className="h-full bg-black/40 backdrop-blur-md border border-white/10 rounded-xl flex flex-col overflow-hidden">
+    <div className="h-full bg-slate-100/60 backdrop-blur-md border border-slate-200 rounded-xl flex flex-col overflow-hidden">
       {/* Header */}
-      <div className="px-4 py-3 border-b border-white/10 shrink-0">
+      <div className="px-4 py-3 border-b border-slate-200 shrink-0">
         <div className="text-xs text-[#C6A74E] uppercase tracking-widest font-medium">
           Actors
         </div>
-        <div className="text-[10px] text-white/30 mt-0.5">
+        <div className="text-[10px] text-slate-400 mt-0.5">
           {actors.length} active
         </div>
       </div>
@@ -58,16 +58,16 @@ export default function ActorCardPanel() {
               className={`w-full text-left px-3 py-2 rounded-lg border transition-colors ${
                 isSelected
                   ? 'border-[#C6A74E]/50 bg-[#C6A74E]/10'
-                  : 'border-white/5 bg-white/5 hover:bg-white/10'
+                  : 'border-slate-100 bg-slate-50 hover:bg-slate-100'
               }`}
               whileTap={{ scale: 0.98 }}
             >
               <div className="flex items-center gap-2">
                 <ActorTypeIcon type={actor.type} />
-                <span className="text-xs font-medium text-white/80 truncate">
+                <span className="text-xs font-medium text-slate-700 truncate">
                   {actor.displayName}
                 </span>
-                <div className={`ml-auto text-[9px] px-1.5 py-0.5 rounded-full ${badge.color} text-white/80`}>
+                <div className={`ml-auto text-[9px] px-1.5 py-0.5 rounded-full ${badge.color} text-slate-700`}>
                   {badge.label}
                 </div>
               </div>
@@ -75,7 +75,7 @@ export default function ActorCardPanel() {
                 <motion.div
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: 'auto', opacity: 1 }}
-                  className="mt-2 text-[10px] text-white/30 space-y-0.5"
+                  className="mt-2 text-[10px] text-slate-400 space-y-0.5"
                 >
                   <div>Type: {actor.type}</div>
                   <div>ID: {actor.id}</div>

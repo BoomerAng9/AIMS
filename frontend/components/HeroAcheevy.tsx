@@ -12,7 +12,7 @@ export function HeroAcheevy() {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
-        className="flex-1 rounded-[40px] border border-wireframe-stroke bg-black/60 p-8 backdrop-blur-xl md:p-12 space-y-4"
+        className="flex-1 rounded-[40px] border border-wireframe-stroke bg-slate-50/70 p-8 backdrop-blur-xl md:p-12 space-y-4"
       >
         <motion.p
           variants={heroItem}
@@ -22,7 +22,7 @@ export function HeroAcheevy() {
         </motion.p>
         <motion.h1
           variants={heroItem}
-          className="text-4xl font-semibold tracking-tight text-white md:text-5xl font-display leading-[1.1]"
+          className="text-4xl font-semibold tracking-tight text-slate-800 md:text-5xl font-display leading-[1.1]"
         >
           Think it. Prompt it.
           <br />
@@ -73,7 +73,7 @@ export function HeroAcheevy() {
           >
             <Link
               href="/chat"
-              className="inline-flex rounded-full border border-wireframe-stroke bg-white/5 px-6 py-3 text-sm text-white backdrop-blur-sm hover:bg-white/10 transition-all"
+              className="inline-flex rounded-full border border-wireframe-stroke bg-slate-50 px-6 py-3 text-sm text-slate-800 backdrop-blur-sm hover:bg-slate-100 transition-all"
             >
               Chat w/ACHEEVY
             </Link>

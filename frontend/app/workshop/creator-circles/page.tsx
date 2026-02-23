@@ -62,7 +62,7 @@ export default function CreatorCirclesPage() {
             <CircleDot size={20} />
           </div>
           <div>
-            <h1 className="text-2xl font-display text-white tracking-tight">
+            <h1 className="text-2xl font-display text-slate-800 tracking-tight">
               Creator Circles
             </h1>
             <p className="text-xs text-gold/60 font-mono">
@@ -70,7 +70,7 @@ export default function CreatorCirclesPage() {
             </p>
           </div>
         </div>
-        <p className="text-sm text-white/40 max-w-lg">
+        <p className="text-sm text-slate-400 max-w-lg">
           Host 3–5 person creative sessions with a Boomer_Ang facilitator who
           keeps time, captures ideas, and produces the artifact. AI is the
           quiet producer in the room, not the star.
@@ -79,7 +79,7 @@ export default function CreatorCirclesPage() {
 
       {/* Facilitator selection */}
       <motion.section variants={staggerItem} className="space-y-4">
-        <h2 className="text-xs uppercase tracking-widest text-white/30 font-mono">
+        <h2 className="text-xs uppercase tracking-widest text-slate-400 font-mono">
           Choose Your Facilitator
         </h2>
         <div className="grid gap-4 md:grid-cols-3">
@@ -91,11 +91,11 @@ export default function CreatorCirclesPage() {
             >
               <div className="flex items-center gap-3 mb-3">
                 <span className="text-2xl">{f.emoji}</span>
-                <span className="text-sm font-medium text-white">
+                <span className="text-sm font-medium text-slate-800">
                   {f.name}
                 </span>
               </div>
-              <p className="text-xs text-white/40">{f.vibe}</p>
+              <p className="text-xs text-slate-400">{f.vibe}</p>
             </button>
           ))}
         </div>
@@ -103,7 +103,7 @@ export default function CreatorCirclesPage() {
 
       {/* Session types */}
       <motion.section variants={staggerItem} className="space-y-4">
-        <h2 className="text-xs uppercase tracking-widest text-white/30 font-mono">
+        <h2 className="text-xs uppercase tracking-widest text-slate-400 font-mono">
           What Are We Making?
         </h2>
         <div className="flex flex-wrap gap-2">
@@ -111,7 +111,7 @@ export default function CreatorCirclesPage() {
             <button
               key={t}
               type="button"
-              className="px-4 py-2 rounded-xl border border-white/5 bg-white/[0.02] text-xs text-white/50 hover:text-gold hover:border-gold/20 transition-colors"
+              className="px-4 py-2 rounded-xl border border-slate-100 bg-white text-xs text-slate-500 hover:text-gold hover:border-gold/20 transition-colors"
             >
               {t}
             </button>
@@ -129,8 +129,8 @@ export default function CreatorCirclesPage() {
             Circle Lobby — Preview
           </h2>
           <div className="flex items-center gap-2">
-            <Clock size={12} className="text-white/30" />
-            <span className="text-[0.55rem] font-mono text-white/30">
+            <Clock size={12} className="text-slate-400" />
+            <span className="text-[0.55rem] font-mono text-slate-400">
               25 min session
             </span>
           </div>
@@ -147,17 +147,17 @@ export default function CreatorCirclesPage() {
               <div
                 className={`relative h-14 w-14 rounded-full border flex items-center justify-center ${
                   p.active
-                    ? "bg-white/5 border-white/10"
-                    : "bg-white/[0.02] border-white/5"
+                    ? "bg-slate-50 border-slate-200"
+                    : "bg-white border-slate-100"
                 }`}
               >
-                <Users size={20} className="text-white/30" />
+                <Users size={20} className="text-slate-400" />
                 {p.active && (
-                  <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-emerald-400 border-2 border-[#0A0A0A]" />
+                  <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-emerald-400 border-2 border-white" />
                 )}
               </div>
-              <p className="text-[0.6rem] text-white/50 mt-1">{p.name}</p>
-              <p className="text-[0.5rem] text-white/20">{p.role}</p>
+              <p className="text-[0.6rem] text-slate-500 mt-1">{p.name}</p>
+              <p className="text-[0.5rem] text-slate-300">{p.role}</p>
             </div>
           ))}
 
@@ -166,26 +166,26 @@ export default function CreatorCirclesPage() {
             type="button"
             className="text-center"
           >
-            <div className="h-14 w-14 rounded-full border border-dashed border-white/10 flex items-center justify-center hover:border-gold/30 transition-colors">
-              <Plus size={16} className="text-white/20" />
+            <div className="h-14 w-14 rounded-full border border-dashed border-slate-200 flex items-center justify-center hover:border-gold/30 transition-colors">
+              <Plus size={16} className="text-slate-300" />
             </div>
-            <p className="text-[0.6rem] text-white/30 mt-1">Invite</p>
+            <p className="text-[0.6rem] text-slate-400 mt-1">Invite</p>
           </button>
         </div>
 
         {/* Progress bar */}
         <div>
-          <div className="h-2 rounded-full bg-white/5 overflow-hidden">
+          <div className="h-2 rounded-full bg-slate-50 overflow-hidden">
             <div className="h-full w-[48%] rounded-full bg-gradient-to-r from-gold/60 to-gold" />
           </div>
-          <p className="text-[0.55rem] font-mono text-white/30 mt-1">
+          <p className="text-[0.55rem] font-mono text-slate-400 mt-1">
             12:30 remaining
           </p>
         </div>
 
         {/* Live ideas */}
         <div className="space-y-2">
-          <p className="text-[0.6rem] font-mono uppercase tracking-widest text-white/20">
+          <p className="text-[0.6rem] font-mono uppercase tracking-widest text-slate-300">
             Live Ideas
           </p>
           {[
@@ -195,12 +195,12 @@ export default function CreatorCirclesPage() {
           ].map((idea, i) => (
             <div
               key={idea}
-              className="flex items-start gap-3 px-3 py-2 rounded-lg bg-white/[0.02]"
+              className="flex items-start gap-3 px-3 py-2 rounded-lg bg-white"
             >
               <span className="text-[0.55rem] font-mono text-gold/40 mt-0.5">
                 {i + 1}.
               </span>
-              <span className="text-xs text-white/50">&quot;{idea}&quot;</span>
+              <span className="text-xs text-slate-500">&quot;{idea}&quot;</span>
             </div>
           ))}
           <div className="px-3 py-2 rounded-lg bg-gold/5 border border-gold/10">
@@ -221,7 +221,7 @@ export default function CreatorCirclesPage() {
           </button>
           <button
             type="button"
-            className="px-4 py-2 rounded-xl border border-white/10 text-xs text-white/40 hover:text-white hover:border-white/20 transition-colors"
+            className="px-4 py-2 rounded-xl border border-slate-200 text-xs text-slate-400 hover:text-slate-800 hover:border-slate-200 transition-colors"
           >
             Add 10 min
           </button>

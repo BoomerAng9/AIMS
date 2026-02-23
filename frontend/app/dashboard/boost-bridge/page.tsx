@@ -274,7 +274,7 @@ export default function BoostBridgePage() {
                       value={productName}
                       onChange={e => setProductName(e.target.value)}
                       placeholder="e.g., FitCheck — AI Style Advisor"
-                      className="w-full px-3 py-2 bg-black/40 border border-zinc-700/50 rounded-lg text-sm text-zinc-200 outline-none focus:border-blue-500/30"
+                      className="w-full px-3 py-2 bg-slate-100/60 border border-zinc-700/50 rounded-lg text-sm text-zinc-200 outline-none focus:border-blue-500/30"
                     />
                   </div>
                   <div>
@@ -283,7 +283,7 @@ export default function BoostBridgePage() {
                       value={targetDemo}
                       onChange={e => setTargetDemo(e.target.value)}
                       placeholder="e.g., Gen Z consumers, 18-28, urban, fashion-forward"
-                      className="w-full px-3 py-2 bg-black/40 border border-zinc-700/50 rounded-lg text-sm text-zinc-200 outline-none focus:border-blue-500/30"
+                      className="w-full px-3 py-2 bg-slate-100/60 border border-zinc-700/50 rounded-lg text-sm text-zinc-200 outline-none focus:border-blue-500/30"
                     />
                   </div>
                 </div>
@@ -294,7 +294,7 @@ export default function BoostBridgePage() {
                     value={productDescription}
                     onChange={e => setProductDescription(e.target.value)}
                     placeholder="Describe your product or idea in 2-5 sentences. What does it do? Who is it for? What problem does it solve? The more specific, the better the simulation."
-                    className="w-full h-48 bg-black/40 border border-zinc-700/50 rounded-lg p-3 text-sm text-zinc-200 font-mono outline-none focus:border-blue-500/30 resize-y"
+                    className="w-full h-48 bg-slate-100/60 border border-zinc-700/50 rounded-lg p-3 text-sm text-zinc-200 font-mono outline-none focus:border-blue-500/30 resize-y"
                   />
                 </div>
 
@@ -460,7 +460,7 @@ export default function BoostBridgePage() {
                   {badges.map(b => {
                     const emoji = b.tier === 'sensei' ? '👑' : b.tier === 'black' ? '🥋' : b.tier === 'blue' ? '🔵' : '⚪';
                     return (
-                      <div key={b.badgeId} className="flex items-center gap-3 p-3 bg-black/30 rounded-lg border border-zinc-800/50">
+                      <div key={b.badgeId} className="flex items-center gap-3 p-3 bg-slate-100/40 rounded-lg border border-zinc-800/50">
                         <span className="text-2xl">{emoji}</span>
                         <div className="flex-1">
                           <p className="text-sm font-medium">{b.recipientName}</p>
@@ -574,7 +574,7 @@ function CrowdReportViewer({ report }: { report: CrowdReport }) {
               : 'text-red-400';
 
             return (
-              <div key={i} className="p-3 bg-black/30 rounded-lg border border-zinc-800/50">
+              <div key={i} className="p-3 bg-slate-100/40 rounded-lg border border-zinc-800/50">
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-xs font-medium text-zinc-300">
                     {persona?.name || r.personaId} &middot; {persona?.age}, {persona?.occupation}

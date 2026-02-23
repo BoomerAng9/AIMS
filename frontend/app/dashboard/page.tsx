@@ -224,7 +224,7 @@ export default function DashboardPage() {
               <div className="flex items-center gap-2">
                 <Link
                   href="/dashboard/build"
-                  className="flex items-center gap-2 rounded-xl bg-amber-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-amber-700"
+                  className="flex items-center gap-2 rounded-xl bg-amber-600 px-5 py-2.5 text-sm font-medium text-slate-800 transition-colors hover:bg-amber-700"
                 >
                   Launch Builder <ArrowRight size={14} />
                 </Link>
@@ -268,7 +268,7 @@ export default function DashboardPage() {
               <div className={`
                 mb-4 flex h-10 w-10 items-center justify-center rounded-xl border transition-colors
                 ${tile.highlight
-                  ? 'bg-amber-600 text-white border-amber-600'
+                  ? 'bg-amber-600 text-slate-800 border-amber-600'
                   : 'bg-slate-50 border-slate-200 text-slate-500 group-hover:text-amber-600 group-hover:border-amber-200'}
               `}>
                 <tile.icon size={20} />

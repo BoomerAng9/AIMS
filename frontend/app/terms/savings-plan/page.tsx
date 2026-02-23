@@ -16,12 +16,12 @@ export const metadata: Metadata = {
 
 export default function SavingsPlanTermsPage() {
   return (
-    <main className="min-h-screen bg-obsidian text-white">
+    <main className="min-h-screen bg-obsidian text-slate-800">
       <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-8">
         <h1 className="text-3xl font-bold tracking-tight mb-2">
           A.I.M.S. Savings Plan
         </h1>
-        <p className="text-sm text-white/50 mb-10">
+        <p className="text-sm text-slate-500 mb-10">
           Terms &amp; Conditions — Effective February 2026
         </p>
 
@@ -30,7 +30,7 @@ export default function SavingsPlanTermsPage() {
           <h2 className="text-xl font-semibold text-gold mb-3">
             1. Overview
           </h2>
-          <p className="text-sm text-white/70 leading-relaxed">
+          <p className="text-sm text-slate-600 leading-relaxed">
             The A.I.M.S. Savings Plan (&quot;Plan&quot;) is a mandatory
             fee-sharing program applied to all active accounts on the
             plugmein.cloud platform. The Plan ensures that a majority share
@@ -46,23 +46,23 @@ export default function SavingsPlanTermsPage() {
             2. Fee Structure
           </h2>
           <div className="space-y-4">
-            <div className="rounded-xl border border-wireframe-stroke bg-black/40 p-4">
-              <h3 className="text-sm font-semibold text-white mb-1">
+            <div className="rounded-xl border border-wireframe-stroke bg-slate-100/60 p-4">
+              <h3 className="text-sm font-semibold text-slate-800 mb-1">
                 Platform Maintenance Fee
               </h3>
-              <p className="text-sm text-white/70">
-                A <span className="text-white font-semibold">$5.00</span>{" "}
+              <p className="text-sm text-slate-600">
+                A <span className="text-slate-800 font-semibold">$5.00</span>{" "}
                 maintenance fee is applied to every invoice generated on the
                 platform. This fee covers infrastructure upkeep, security
                 monitoring, and service continuity.
               </p>
             </div>
-            <div className="rounded-xl border border-wireframe-stroke bg-black/40 p-4">
-              <h3 className="text-sm font-semibold text-white mb-1">
+            <div className="rounded-xl border border-wireframe-stroke bg-slate-100/60 p-4">
+              <h3 className="text-sm font-semibold text-slate-800 mb-1">
                 Pay-per-Use Transaction Fee
               </h3>
-              <p className="text-sm text-white/70">
-                A <span className="text-white font-semibold">$0.99</span>{" "}
+              <p className="text-sm text-slate-600">
+                A <span className="text-slate-800 font-semibold">$0.99</span>{" "}
                 transaction fee is applied to each Pay-per-Use (P2P)
                 execution. This fee applies only to metered, on-demand
                 transactions outside of subscription allocations.
@@ -76,7 +76,7 @@ export default function SavingsPlanTermsPage() {
           <h2 className="text-xl font-semibold text-gold mb-3">
             3. Savings Split
           </h2>
-          <p className="text-sm text-white/70 leading-relaxed mb-4">
+          <p className="text-sm text-slate-600 leading-relaxed mb-4">
             The two fees described in Section 2 — the $5.00 Platform
             Maintenance Fee and the $0.99 Pay-per-Use Transaction Fee —
             are split between the user and the platform as follows:
@@ -84,18 +84,18 @@ export default function SavingsPlanTermsPage() {
           <div className="grid grid-cols-2 gap-4">
             <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-4 text-center">
               <p className="text-3xl font-bold text-emerald-400">70%</p>
-              <p className="text-xs text-white/50 mt-1 uppercase tracking-wider">
+              <p className="text-xs text-slate-500 mt-1 uppercase tracking-wider">
                 Credited to Your Savings
               </p>
             </div>
-            <div className="rounded-xl border border-wireframe-stroke bg-black/40 p-4 text-center">
-              <p className="text-3xl font-bold text-white/60">30%</p>
-              <p className="text-xs text-white/50 mt-1 uppercase tracking-wider">
+            <div className="rounded-xl border border-wireframe-stroke bg-slate-100/60 p-4 text-center">
+              <p className="text-3xl font-bold text-slate-500">30%</p>
+              <p className="text-xs text-slate-500 mt-1 uppercase tracking-wider">
                 Retained by Platform
               </p>
             </div>
           </div>
-          <p className="text-sm text-white/50 mt-4 leading-relaxed">
+          <p className="text-sm text-slate-500 mt-4 leading-relaxed">
             The user&apos;s 70% savings portion is credited to their account
             savings balance within the same billing cycle. Savings accrue
             automatically and are visible in the LUC dashboard under
@@ -108,10 +108,10 @@ export default function SavingsPlanTermsPage() {
           <h2 className="text-xl font-semibold text-gold mb-3">
             4. Savings Usage
           </h2>
-          <p className="text-sm text-white/70 leading-relaxed">
+          <p className="text-sm text-slate-600 leading-relaxed">
             Accumulated savings may be applied toward:
           </p>
-          <ul className="mt-3 space-y-2 text-sm text-white/70">
+          <ul className="mt-3 space-y-2 text-sm text-slate-600">
             <li className="flex items-start gap-2">
               <span className="text-gold mt-0.5">&#9670;</span>
               <span>Future token usage and overage charges</span>
@@ -129,7 +129,7 @@ export default function SavingsPlanTermsPage() {
               <span>Add-on services and pillar upgrades</span>
             </li>
           </ul>
-          <p className="text-sm text-white/50 mt-4">
+          <p className="text-sm text-slate-500 mt-4">
             Savings cannot be withdrawn as cash and have no monetary value
             outside the A.I.M.S. platform.
           </p>
@@ -140,15 +140,15 @@ export default function SavingsPlanTermsPage() {
           <h2 className="text-xl font-semibold text-gold mb-3">
             5. Ledger Transparency
           </h2>
-          <p className="text-sm text-white/70 leading-relaxed">
+          <p className="text-sm text-slate-600 leading-relaxed">
             All fee charges and savings credits are recorded in three
             concurrent audit ledgers:
           </p>
-          <ul className="mt-3 space-y-2 text-sm text-white/70">
+          <ul className="mt-3 space-y-2 text-sm text-slate-600">
             <li className="flex items-start gap-2">
               <span className="text-gold mt-0.5">1.</span>
               <span>
-                <span className="text-white font-semibold">User Ledger</span>{" "}
+                <span className="text-slate-800 font-semibold">User Ledger</span>{" "}
                 — Your personal record of all charges, credits, and savings
                 balance.
               </span>
@@ -156,7 +156,7 @@ export default function SavingsPlanTermsPage() {
             <li className="flex items-start gap-2">
               <span className="text-gold mt-0.5">2.</span>
               <span>
-                <span className="text-white font-semibold">
+                <span className="text-slate-800 font-semibold">
                   Platform Ledger
                 </span>{" "}
                 — Internal operations record for audit compliance and
@@ -166,7 +166,7 @@ export default function SavingsPlanTermsPage() {
             <li className="flex items-start gap-2">
               <span className="text-gold mt-0.5">3.</span>
               <span>
-                <span className="text-white font-semibold">
+                <span className="text-slate-800 font-semibold">
                   Web3 Ledger
                 </span>{" "}
                 — SHA-256 hash chain providing immutable, verifiable records
@@ -181,7 +181,7 @@ export default function SavingsPlanTermsPage() {
           <h2 className="text-xl font-semibold text-gold mb-3">
             6. Account Closure
           </h2>
-          <p className="text-sm text-white/70 leading-relaxed">
+          <p className="text-sm text-slate-600 leading-relaxed">
             Upon account closure or cancellation, any remaining savings
             balance will be applied as a credit toward final invoice charges.
             Unused savings after final settlement are forfeited.
@@ -193,7 +193,7 @@ export default function SavingsPlanTermsPage() {
           <h2 className="text-xl font-semibold text-gold mb-3">
             7. Modifications
           </h2>
-          <p className="text-sm text-white/70 leading-relaxed">
+          <p className="text-sm text-slate-600 leading-relaxed">
             A.I.M.S. reserves the right to modify the fee amounts and
             savings split ratio with 30 days&apos; written notice to active
             subscribers. Changes will not apply retroactively to savings
@@ -202,7 +202,7 @@ export default function SavingsPlanTermsPage() {
         </section>
 
         <div className="mt-16 pt-8 border-t border-wireframe-stroke">
-          <p className="text-xs text-white/30">
+          <p className="text-xs text-slate-400">
             A.I.M.S. — AI Managed Solutions | plugmein.cloud |
             Last updated: February 2026
           </p>

@@ -10,7 +10,7 @@ import { useHangarStore } from '@/lib/hangar/store';
 import type { TelemetryEntry } from '@/lib/hangar/store';
 
 const TYPE_COLORS: Record<TelemetryEntry['type'], string> = {
-  info: 'text-white/50',
+  info: 'text-slate-500',
   action: 'text-[#2BD4FF]',
   complete: 'text-[#C6A74E]',
   error: 'text-red-400',
@@ -35,13 +35,13 @@ export default function TelemetryPanel() {
   }, [telemetry.length]);
 
   return (
-    <div className="h-full bg-black/40 backdrop-blur-md border border-white/10 rounded-xl flex flex-col overflow-hidden">
+    <div className="h-full bg-slate-100/60 backdrop-blur-md border border-slate-200 rounded-xl flex flex-col overflow-hidden">
       {/* Header */}
-      <div className="px-4 py-3 border-b border-white/10 shrink-0">
+      <div className="px-4 py-3 border-b border-slate-200 shrink-0">
         <div className="text-xs text-[#C6A74E] uppercase tracking-widest font-medium">
           Telemetry
         </div>
-        <div className="text-[10px] text-white/30 mt-0.5">
+        <div className="text-[10px] text-slate-400 mt-0.5">
           {telemetry.length} events
         </div>
       </div>
@@ -63,11 +63,11 @@ export default function TelemetryPanel() {
                 <div className={`text-xs font-medium ${TYPE_COLORS[entry.type]}`}>
                   {entry.label}
                 </div>
-                <div className="text-[10px] text-white/25 truncate">
+                <div className="text-[10px] text-slate-400 truncate">
                   {entry.detail}
                 </div>
               </div>
-              <div className="text-[9px] text-white/20 ml-auto shrink-0">
+              <div className="text-[9px] text-slate-300 ml-auto shrink-0">
                 {new Date(entry.timestamp).toLocaleTimeString([], {
                   hour: '2-digit',
                   minute: '2-digit',
@@ -79,7 +79,7 @@ export default function TelemetryPanel() {
         </AnimatePresence>
 
         {telemetry.length === 0 && (
-          <div className="text-xs text-white/20 text-center py-8">
+          <div className="text-xs text-slate-300 text-center py-8">
             Waiting for events...
           </div>
         )}

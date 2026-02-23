@@ -25,8 +25,8 @@ function ResetPasswordContent() {
           </div>
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-white">Invalid Reset Link</h1>
-          <p className="mt-2 text-sm text-white/50">
+          <h1 className="text-2xl font-bold text-slate-800">Invalid Reset Link</h1>
+          <p className="mt-2 text-sm text-slate-500">
             This reset link is missing or invalid. Please request a new one.
           </p>
         </div>
@@ -83,8 +83,8 @@ function ResetPasswordContent() {
           </div>
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-white">Password Reset</h1>
-          <p className="mt-2 text-sm text-white/50">
+          <h1 className="text-2xl font-bold text-slate-800">Password Reset</h1>
+          <p className="mt-2 text-sm text-slate-500">
             Your password has been updated. You can now sign in with your new password.
           </p>
         </div>
@@ -101,8 +101,8 @@ function ResetPasswordContent() {
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h1 className="text-2xl font-bold text-white">Set New Password</h1>
-        <p className="mt-2 text-sm text-white/50">
+        <h1 className="text-2xl font-bold text-slate-800">Set New Password</h1>
+        <p className="mt-2 text-sm text-slate-500">
           Enter your new password below.
         </p>
       </div>
@@ -157,7 +157,7 @@ function ResetPasswordContent() {
           )}
         </button>
 
-        <p className="text-center text-sm text-white/40">
+        <p className="text-center text-sm text-slate-400">
           <Link
             href="/sign-in"
             className="text-gold hover:text-gold-light transition-colors inline-flex items-center gap-1"

@@ -161,16 +161,16 @@ export function FloatingACHEEVY() {
             exit={{ opacity: 0, scale: 0.8, y: 20 }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
             onClick={() => setOpen(true)}
-            className="fixed z-50 flex items-center gap-2.5 rounded-full bg-gradient-to-r from-amber-600 to-amber-700 px-5 py-3 text-white font-semibold text-sm shadow-[0_4px_24px_rgba(217,119,6,0.25)] hover:shadow-[0_8px_32px_rgba(217,119,6,0.35)] hover:scale-105 active:scale-95 transition-all duration-200"
+            className="fixed z-50 flex items-center gap-2.5 rounded-full bg-gradient-to-r from-amber-600 to-amber-700 px-5 py-3 text-slate-800 font-semibold text-sm shadow-[0_4px_24px_rgba(217,119,6,0.25)] hover:shadow-[0_8px_32px_rgba(217,119,6,0.35)] hover:scale-105 active:scale-95 transition-all duration-200"
             style={{ bottom: 'calc(var(--frame-inset, 12px) + 20px)', right: 'calc(var(--frame-inset, 12px) + 20px)' }}
             title="Chat w/ACHEEVY (Ctrl+J)"
           >
             <img
               src="/images/acheevy/acheevy-helmet.png"
               alt=""
-              className="w-6 h-6 rounded-md border border-white/20"
+              className="w-6 h-6 rounded-md border border-slate-200"
             />
-            <span className="font-doto tracking-[0.2em] uppercase text-white font-bold">chat w/ A C H E E V Y</span>
+            <span className="font-doto tracking-[0.2em] uppercase text-slate-800 font-bold">chat w/ A C H E E V Y</span>
           </motion.button>
         )}
       </AnimatePresence>
@@ -281,7 +281,7 @@ export function FloatingACHEEVY() {
                 <button
                   onClick={sendMessage}
                   disabled={!input.trim() || loading}
-                  className="p-1.5 rounded-lg bg-amber-600 text-white hover:bg-amber-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors flex-shrink-0"
+                  className="p-1.5 rounded-lg bg-amber-600 text-slate-800 hover:bg-amber-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors flex-shrink-0"
                   title="Send message"
                 >
                   <SendIcon className="w-3.5 h-3.5" />

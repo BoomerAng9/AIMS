@@ -148,9 +148,9 @@ export function Footer() {
 
             {/* Tagline */}
             <p className="text-gray-400 mb-6 max-w-xs">
-              <span className="font-semibold text-white">Think It. Prompt It.</span>
+              <span className="font-semibold text-slate-800">Think It. Prompt It.</span>
               <br />
-              <span className="font-semibold text-white">Let&apos;s Build It.</span>
+              <span className="font-semibold text-slate-800">Let&apos;s Build It.</span>
             </p>
             <p className="text-sm text-gray-500 mb-4">
               AI-managed platform orchestrated by ACHEEVY.
@@ -171,7 +171,7 @@ export function Footer() {
                   <li key={link.label}>
                     <Link
                       href={link.href}
-                      className="text-sm text-gray-400 hover:text-white transition-colors"
+                      className="text-sm text-gray-400 hover:text-slate-800 transition-colors"
                     >
                       {link.label}
                     </Link>
@@ -194,7 +194,7 @@ export function Footer() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="GitHub"
-              className="text-gray-400 hover:text-white transition-colors"
+              className="text-gray-400 hover:text-slate-800 transition-colors"
             >
               <GitHubIcon className="w-6 h-6" />
             </a>
@@ -203,7 +203,7 @@ export function Footer() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="X (Twitter)"
-              className="text-gray-400 hover:text-white transition-colors"
+              className="text-gray-400 hover:text-slate-800 transition-colors"
             >
               <XIcon className="w-6 h-6" />
             </a>
@@ -212,7 +212,7 @@ export function Footer() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="LinkedIn"
-              className="text-gray-400 hover:text-white transition-colors"
+              className="text-gray-400 hover:text-slate-800 transition-colors"
             >
               <LinkedInIcon className="w-6 h-6" />
             </a>
@@ -221,7 +221,7 @@ export function Footer() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Discord"
-              className="text-gray-400 hover:text-white transition-colors"
+              className="text-gray-400 hover:text-slate-800 transition-colors"
             >
               <DiscordIcon className="w-6 h-6" />
             </a>
@@ -230,7 +230,7 @@ export function Footer() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Instagram"
-              className="text-gray-400 hover:text-white transition-colors"
+              className="text-gray-400 hover:text-slate-800 transition-colors"
             >
               <InstagramIcon className="w-6 h-6" />
             </a>
@@ -238,19 +238,19 @@ export function Footer() {
 
           {/* Related Links */}
           <div className="flex items-center gap-4 text-sm flex-wrap">
-            <Link href="/workshop" className="text-gray-400 hover:text-white transition-colors">
+            <Link href="/workshop" className="text-gray-400 hover:text-slate-800 transition-colors">
               Workshop
             </Link>
             <span className="text-gray-600">·</span>
-            <Link href="/sandbox" className="text-gray-400 hover:text-white transition-colors">
+            <Link href="/sandbox" className="text-gray-400 hover:text-slate-800 transition-colors">
               Sandbox
             </Link>
             <span className="text-gray-600">·</span>
-            <Link href={`${APP_DOMAIN}/dashboard`} className="text-gray-400 hover:text-white transition-colors">
+            <Link href={`${APP_DOMAIN}/dashboard`} className="text-gray-400 hover:text-slate-800 transition-colors">
               ACHEEVY
             </Link>
             <span className="text-gray-600">·</span>
-            <Link href={`${APP_DOMAIN}/dashboard/circuit-box`} className="text-gray-400 hover:text-white transition-colors">
+            <Link href={`${APP_DOMAIN}/dashboard/circuit-box`} className="text-gray-400 hover:text-slate-800 transition-colors">
               Circuit Box
             </Link>
           </div>

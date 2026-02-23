@@ -179,8 +179,8 @@ function MessageBubble({ message, onSpeak, onCopy, isLast }: MessageBubbleProps)
           className={`
             inline-block rounded-2xl px-4 py-3 text-[15px] leading-relaxed
             ${isUser
-              ? 'bg-gold/10 text-white rounded-tr-sm border border-gold/20'
-              : 'wireframe-card text-white/90 rounded-tl-sm'
+              ? 'bg-gold/10 text-slate-800 rounded-tr-sm border border-gold/20'
+              : 'wireframe-card text-slate-800 rounded-tl-sm'
             }
           `}
         >
@@ -196,21 +196,21 @@ function MessageBubble({ message, onSpeak, onCopy, isLast }: MessageBubbleProps)
                     const isInline = !className;
                     if (isInline) {
                       return (
-                        <code className="bg-black/40 px-1.5 py-0.5 rounded text-gold text-[13px]" {...props}>
+                        <code className="bg-slate-100/60 px-1.5 py-0.5 rounded text-gold text-[13px]" {...props}>
                           {children}
                         </code>
                       );
                     }
                     return (
                       <div className="relative group my-3">
-                        <pre className="bg-black/60 rounded-lg p-4 overflow-x-auto border border-wireframe-stroke">
+                        <pre className="bg-slate-50/70 rounded-lg p-4 overflow-x-auto border border-wireframe-stroke">
                           <code className={`${className} text-[13px]`} {...props}>
                             {children}
                           </code>
                         </pre>
                         <button
                           onClick={() => navigator.clipboard.writeText(String(children))}
-                          className="absolute top-2 right-2 p-1.5 rounded bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="absolute top-2 right-2 p-1.5 rounded bg-slate-100 opacity-0 group-hover:opacity-100 transition-opacity"
                         >
                           <CopyIcon className="w-4 h-4" />
                         </button>
@@ -243,7 +243,7 @@ function MessageBubble({ message, onSpeak, onCopy, isLast }: MessageBubbleProps)
           <div className="flex items-center gap-2 mt-2 opacity-0 hover:opacity-100 transition-opacity">
             <button
               onClick={handleCopy}
-              className="p-1.5 rounded hover:bg-white/10 text-white/30 hover:text-white/70 transition-colors"
+              className="p-1.5 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
               title="Copy"
             >
               {copied ? (
@@ -254,7 +254,7 @@ function MessageBubble({ message, onSpeak, onCopy, isLast }: MessageBubbleProps)
             </button>
             <button
               onClick={() => onSpeak?.(message.content)}
-              className="p-1.5 rounded hover:bg-white/10 text-white/30 hover:text-white/70 transition-colors"
+              className="p-1.5 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
               title="Read aloud"
             >
               <SpeakerIcon className="w-4 h-4" />
@@ -299,7 +299,7 @@ function VoiceInputButton({ isListening, isProcessing, stream, onStart, onStop }
           relative p-3 rounded-xl transition-all
           ${isListening
             ? 'bg-red-500/20 text-red-400'
-            : 'bg-white/5 text-white/50 hover:bg-white/10 hover:text-white'
+            : 'bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-800'
           }
           ${isProcessing ? 'opacity-50 cursor-not-allowed' : ''}
         `}
@@ -646,7 +646,7 @@ export function ChatInterface({
   };
 
   return (
-    <div className="relative flex flex-col h-full bg-[#0A0A0A] aims-page-bg">
+    <div className="relative flex flex-col h-full bg-white aims-page-bg">
       {/* Messages Area */}
       <div className="flex-1 overflow-y-auto px-4 py-6">
         <div className="max-w-3xl mx-auto space-y-6">
@@ -670,7 +670,7 @@ export function ChatInterface({
               {/* Persona Selector (Main View) — only show when multiple personas exist */}
               {PERSONAS.length > 1 && (
                 <div className="flex justify-center mb-4">
-                  <div className="flex items-center gap-2 bg-white/5 rounded-full px-1 py-1 border border-white/10">
+                  <div className="flex items-center gap-2 bg-slate-50 rounded-full px-1 py-1 border border-slate-200">
                     {PERSONAS.map(p => (
                       <button
                         key={p.id}
@@ -679,7 +679,7 @@ export function ChatInterface({
                         px-3 py-1.5 rounded-full text-xs font-medium transition-all
                         ${selectedPersona === p.id
                             ? 'bg-gold text-black shadow-lg shadow-gold/20'
-                            : 'text-white/50 hover:text-white hover:bg-white/5'}
+                            : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'}
                       `}
                       >
                         {p.name}
@@ -696,7 +696,7 @@ export function ChatInterface({
                   </h2>
                 </div>
               </div>
-              <p className="text-white/40 max-w-md mx-auto">{welcomeMessage}</p>
+              <p className="text-slate-400 max-w-md mx-auto">{welcomeMessage}</p>
             </motion.div>
           )}
 
@@ -728,7 +728,7 @@ export function ChatInterface({
       </div>
 
       {/* Input Area */}
-      <div className="border-t border-wireframe-stroke bg-[#0A0A0A]/80 backdrop-blur-xl px-4 py-4">
+      <div className="border-t border-wireframe-stroke bg-white/80 backdrop-blur-xl px-4 py-4">
         <div className="max-w-3xl mx-auto">
           {/* Vertical Step Indicator — Phase A progression */}
           {verticalFlow.isActive && (
@@ -745,7 +745,7 @@ export function ChatInterface({
             <div className="flex justify-center mb-3">
               <button
                 onClick={regenerate}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-white/40 hover:text-white hover:bg-white/5 transition-colors"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-slate-400 hover:text-slate-800 hover:bg-slate-50 transition-colors"
               >
                 <RegenerateIcon className="w-4 h-4" />
                 Regenerate response
@@ -756,16 +756,16 @@ export function ChatInterface({
           {/* Input Container */}
           <div className="flex justify-end mb-2 gap-2">
             {/* Model Selector */}
-            <div className="flex items-center gap-1 bg-white/5 rounded-lg px-2 py-1 text-xs text-white/50 hover:bg-white/10 transition-colors">
+            <div className="flex items-center gap-1 bg-slate-50 rounded-lg px-2 py-1 text-xs text-slate-500 hover:bg-slate-100 transition-colors">
               <BrainCircuitIcon className="w-3 h-3" />
               <select
                 value={selectedModel}
                 onChange={(e) => setSelectedModel(e.target.value)}
-                className="bg-transparent border-none outline-none text-white/70 text-xs cursor-pointer appearance-none pr-4"
+                className="bg-transparent border-none outline-none text-slate-600 text-xs cursor-pointer appearance-none pr-4"
                 title="Select AI Model"
               >
                 {AI_MODELS.map(m => (
-                  <option key={m.key} value={m.key} className="bg-[#0A0A0A]">
+                  <option key={m.key} value={m.key} className="bg-white">
                     {m.label}{m.tag ? ` (${m.tag})` : ''}
                   </option>
                 ))}
@@ -774,16 +774,16 @@ export function ChatInterface({
 
             {/* Voice/Persona Selector — only show when multiple personas exist */}
             {PERSONAS.length > 1 && (
-              <div className="flex items-center gap-1 bg-white/5 rounded-lg px-2 py-1 text-xs text-white/50 hover:bg-white/10 transition-colors">
+              <div className="flex items-center gap-1 bg-slate-50 rounded-lg px-2 py-1 text-xs text-slate-500 hover:bg-slate-100 transition-colors">
                 <SpeakerIcon className="w-3 h-3" />
                 <select
                   value={selectedPersona}
                   onChange={(e) => setSelectedPersona(e.target.value)}
-                  className="bg-transparent border-none outline-none text-white/70 text-xs cursor-pointer appearance-none pr-4"
+                  className="bg-transparent border-none outline-none text-slate-600 text-xs cursor-pointer appearance-none pr-4"
                   title="Select Voice Persona"
                 >
                   {PERSONAS.map(p => (
-                    <option key={p.id} value={p.id} className="bg-[#0A0A0A]">
+                    <option key={p.id} value={p.id} className="bg-white">
                       {p.name}
                     </option>
                   ))}
@@ -792,19 +792,19 @@ export function ChatInterface({
             )}
 
             {/* Language Selector */}
-            <div className="flex items-center gap-1 bg-white/5 rounded-lg px-2 py-1 text-xs text-white/50 hover:bg-white/10 transition-colors">
+            <div className="flex items-center gap-1 bg-slate-50 rounded-lg px-2 py-1 text-xs text-slate-500 hover:bg-slate-100 transition-colors">
               <GlobeIcon className="w-3 h-3" />
               <select
                 value={selectedLanguage}
                 onChange={(e) => setSelectedLanguage(e.target.value)}
-                className="bg-transparent border-none outline-none text-white/70 text-xs cursor-pointer appearance-none"
+                className="bg-transparent border-none outline-none text-slate-600 text-xs cursor-pointer appearance-none"
               >
-                <option value="en" className="bg-[#0A0A0A]">EN</option>
-                <option value="es" className="bg-[#0A0A0A]">ES</option>
-                <option value="fr" className="bg-[#0A0A0A]">FR</option>
-                <option value="de" className="bg-[#0A0A0A]">DE</option>
-                <option value="zh" className="bg-[#0A0A0A]">ZH</option>
-                <option value="ja" className="bg-[#0A0A0A]">JA</option>
+                <option value="en" className="bg-white">EN</option>
+                <option value="es" className="bg-white">ES</option>
+                <option value="fr" className="bg-white">FR</option>
+                <option value="de" className="bg-white">DE</option>
+                <option value="zh" className="bg-white">ZH</option>
+                <option value="ja" className="bg-white">JA</option>
               </select>
             </div>
           </div>
@@ -816,7 +816,7 @@ export function ChatInterface({
               <span>Voice transcript ready — review and press Enter to send</span>
               <button
                 onClick={() => { setInputValue(''); setVoiceTranscriptReady(false); }}
-                className="ml-auto text-white/30 hover:text-white/60 transition-colors"
+                className="ml-auto text-slate-400 hover:text-slate-500 transition-colors"
               >
                 Clear
               </button>
@@ -842,14 +842,14 @@ export function ChatInterface({
               placeholder={placeholder}
               disabled={isStreaming}
               rows={1}
-              className="flex-1 bg-transparent text-white placeholder:text-white/20 resize-none outline-none text-[15px] leading-relaxed max-h-[200px] py-2"
+              className="flex-1 bg-transparent text-slate-800 placeholder:text-slate-300 resize-none outline-none text-[15px] leading-relaxed max-h-[200px] py-2"
             />
 
             {/* Agent Viewport Toggle */}
             {showOrchestration && (
               <button
                 onClick={() => setShowCollabFeed(true)}
-                className="p-3 rounded-xl bg-white/5 text-white/50 hover:bg-white/10 hover:text-white transition-colors"
+                className="p-3 rounded-xl bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors"
                 title="View Agent Viewport"
               >
                 <GlobeIcon className="w-5 h-5" />
@@ -860,7 +860,7 @@ export function ChatInterface({
             {showOrchestration && (
               <button
                 onClick={() => setShowBoard(true)}
-                className="p-3 rounded-xl bg-white/5 text-white/50 hover:bg-white/10 hover:text-white transition-colors"
+                className="p-3 rounded-xl bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors"
                 title="View Department Board"
               >
                 <BoardIcon className="w-5 h-5" />
@@ -883,7 +883,7 @@ export function ChatInterface({
                   p-3 rounded-xl transition-all
                   ${inputValue.trim()
                     ? 'bg-gold text-black hover:bg-gold-light'
-                    : 'bg-white/5 text-white/20 cursor-not-allowed'
+                    : 'bg-slate-50 text-slate-300 cursor-not-allowed'
                   }
                 `}
               >
@@ -898,7 +898,7 @@ export function ChatInterface({
 
           {/* Voice Output Status */}
           {voiceOutput.isPlaying && (
-            <div className="flex items-center justify-center gap-2 mt-3 text-sm text-white/40">
+            <div className="flex items-center justify-center gap-2 mt-3 text-sm text-slate-400">
               <div className="flex gap-1">
                 {[...Array(3)].map((_, i) => (
                   <div
@@ -919,7 +919,7 @@ export function ChatInterface({
           )}
 
           {/* Footer */}
-          <p className="text-center text-xs text-white/20 mt-3">
+          <p className="text-center text-xs text-slate-300 mt-3">
             ACHEEVY may produce inaccurate information. Voice powered by ElevenLabs.
           </p>
         </div>
@@ -981,7 +981,7 @@ export function ChatInterface({
       {/* Change Order Cost Tracker (bottom-left) */}
       {changeOrder.totalCost > 0 && (
         <div className="fixed bottom-4 left-4 px-3 py-2 wireframe-card text-xs z-40">
-          <p className="text-white/40">Change Orders</p>
+          <p className="text-slate-400">Change Orders</p>
           <p className="text-gold font-mono font-medium">
             {formatCurrency(changeOrder.totalCost)} ({changeOrder.totalTokensUsed.toLocaleString()} tokens)
           </p>

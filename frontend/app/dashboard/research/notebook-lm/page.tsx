@@ -94,7 +94,7 @@ function AudioPlayer({ src, title }: { src: string; title: string }) {
   const [playing, setPlaying] = useState(false);
 
   return (
-    <div className="flex items-center gap-4 rounded-2xl border border-wireframe-stroke bg-black/40 p-4 backdrop-blur-xl">
+    <div className="flex items-center gap-4 rounded-2xl border border-wireframe-stroke bg-slate-100/60 p-4 backdrop-blur-xl">
       <button
         type="button"
         onClick={() => {
@@ -114,8 +114,8 @@ function AudioPlayer({ src, title }: { src: string; title: string }) {
         {playing ? <Pause size={18} /> : <Play size={18} />}
       </button>
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-semibold text-white">{title}</p>
-        <p className="text-xs text-white/40">Audio Playbook</p>
+        <p className="truncate text-sm font-semibold text-slate-800">{title}</p>
+        <p className="text-xs text-slate-400">Audio Playbook</p>
       </div>
       <audio
         id="notebook-audio"
@@ -141,7 +141,7 @@ export default function NotebookLMPage() {
       <motion.section variants={staggerItem}>
         <Link
           href="/dashboard/research"
-          className="mb-4 inline-flex items-center gap-2 text-sm text-white/40 transition hover:text-gold"
+          className="mb-4 inline-flex items-center gap-2 text-sm text-slate-400 transition hover:text-gold"
         >
           <ArrowLeft size={14} />
           Back to Research Hub
@@ -152,10 +152,10 @@ export default function NotebookLMPage() {
             <BookOpen size={22} className="text-gold" />
           </div>
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-white font-display">
+            <h1 className="text-2xl font-semibold tracking-tight text-slate-800 font-display">
               NotebookLM Research
             </h1>
-            <p className="text-sm text-white/50">
+            <p className="text-sm text-slate-500">
               AI-powered research synthesis on the Agentic Web in 2026
             </p>
           </div>
@@ -165,7 +165,7 @@ export default function NotebookLMPage() {
       {/* ── Embedded Video ──────────────────────────────────── */}
       <motion.section
         variants={staggerItem}
-        className="relative overflow-hidden rounded-3xl border border-wireframe-stroke bg-black/60 backdrop-blur-2xl"
+        className="relative overflow-hidden rounded-3xl border border-wireframe-stroke bg-slate-50/70 backdrop-blur-2xl"
       >
         <div className="relative aspect-video w-full">
           <video
@@ -181,8 +181,8 @@ export default function NotebookLMPage() {
             Your browser does not support the video element.
           </video>
           {/* Overlay title */}
-          <div className="pointer-events-none absolute inset-0 flex flex-col items-start justify-end rounded-3xl bg-gradient-to-t from-black/80 via-transparent to-transparent p-6 md:p-8">
-            <h2 className="text-xl font-display font-bold uppercase tracking-wider text-white md:text-2xl">
+          <div className="pointer-events-none absolute inset-0 flex flex-col items-start justify-end rounded-3xl bg-gradient-to-t from-white/80 via-transparent to-transparent p-6 md:p-8">
+            <h2 className="text-xl font-display font-bold uppercase tracking-wider text-slate-800 md:text-2xl">
               The Agentic Web — 2026 Overview
             </h2>
             <p className="mt-1 text-sm text-gold/80">
@@ -198,7 +198,7 @@ export default function NotebookLMPage() {
           <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-gold/20 bg-gold/10">
             <Headphones size={14} className="text-gold" />
           </div>
-          <h2 className="text-sm font-semibold uppercase tracking-widest text-white/80 font-display">
+          <h2 className="text-sm font-semibold uppercase tracking-widest text-slate-700 font-display">
             Audio Deep-Dive
           </h2>
         </div>
@@ -210,17 +210,17 @@ export default function NotebookLMPage() {
 
       {/* ── PDF Report Card ────────────────────────────────── */}
       <motion.section variants={staggerItem}>
-        <div className="rounded-3xl border border-wireframe-stroke bg-black/60 p-6 backdrop-blur-2xl">
+        <div className="rounded-3xl border border-wireframe-stroke bg-slate-50/70 p-6 backdrop-blur-2xl">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-gold/20 bg-gold/10">
                 <FileText size={18} className="text-gold" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-white font-display">
+                <h3 className="text-lg font-semibold text-slate-800 font-display">
                   Agentic Web 2026 — Technical &amp; Strategic Report
                 </h3>
-                <p className="text-xs text-white/40">
+                <p className="text-xs text-slate-400">
                   Comprehensive PDF report generated from NotebookLM research
                 </p>
               </div>
@@ -239,7 +239,7 @@ export default function NotebookLMPage() {
           <div className="mt-4 overflow-hidden rounded-2xl border border-wireframe-stroke">
             <iframe
               src="/media/research/agentic-web-report.pdf"
-              className="h-[400px] w-full bg-white/5"
+              className="h-[400px] w-full bg-slate-50"
               title="Agentic Web 2026 Report"
             />
           </div>
@@ -248,10 +248,10 @@ export default function NotebookLMPage() {
 
       {/* ── Key Findings ───────────────────────────────────── */}
       <motion.section variants={staggerItem}>
-        <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-white/80 font-display">
+        <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-slate-700 font-display">
           Key Findings
         </h2>
-        <div className="rounded-3xl border border-wireframe-stroke bg-black/60 p-6 backdrop-blur-2xl">
+        <div className="rounded-3xl border border-wireframe-stroke bg-slate-50/70 p-6 backdrop-blur-2xl">
           <div className="space-y-5">
             {keyFindings.map((finding, i) => (
               <div key={i} className="flex items-start gap-4">
@@ -259,10 +259,10 @@ export default function NotebookLMPage() {
                   <finding.icon size={18} className="text-gold" />
                 </div>
                 <div className="min-w-0">
-                  <h3 className="text-sm font-semibold text-white">
+                  <h3 className="text-sm font-semibold text-slate-800">
                     {finding.title}
                   </h3>
-                  <p className="mt-1 text-xs leading-relaxed text-white/50">
+                  <p className="mt-1 text-xs leading-relaxed text-slate-500">
                     {finding.description}
                   </p>
                 </div>
@@ -274,23 +274,23 @@ export default function NotebookLMPage() {
 
       {/* ── Research Sources ───────────────────────────────── */}
       <motion.section variants={staggerItem}>
-        <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-white/80 font-display">
+        <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-slate-700 font-display">
           Research Sources
         </h2>
-        <div className="rounded-3xl border border-wireframe-stroke bg-black/60 p-6 backdrop-blur-2xl">
+        <div className="rounded-3xl border border-wireframe-stroke bg-slate-50/70 p-6 backdrop-blur-2xl">
           <div className="space-y-3">
             {researchSources.map((source) => (
               <div
                 key={source.name}
-                className="flex items-center justify-between rounded-2xl border border-wireframe-stroke bg-white/5 px-4 py-3"
+                className="flex items-center justify-between rounded-2xl border border-wireframe-stroke bg-slate-50 px-4 py-3"
               >
                 <div className="flex items-center gap-3 min-w-0">
                   <Library size={14} className="flex-shrink-0 text-gold/60" />
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-white truncate">
+                    <p className="text-sm font-medium text-slate-800 truncate">
                       {source.name}
                     </p>
-                    <p className="text-xs text-white/40 truncate">
+                    <p className="text-xs text-slate-400 truncate">
                       {source.description}
                     </p>
                   </div>

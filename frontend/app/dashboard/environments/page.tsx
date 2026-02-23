@@ -115,16 +115,16 @@ export default function EnvironmentsPage() {
           <p className="text-[10px] uppercase tracking-[0.3em] text-gold/50 mb-1">
             Infrastructure
           </p>
-          <h1 className="text-3xl font-bold tracking-tight text-white font-display">
+          <h1 className="text-3xl font-bold tracking-tight text-slate-800 font-display">
             ENVIRONMENTS
           </h1>
-          <p className="mt-1 text-sm text-white/40">
+          <p className="mt-1 text-sm text-slate-400">
             Live service health from circuit-metrics — real-time monitoring.
           </p>
         </div>
         <div className="flex items-center gap-3">
           {lastRefresh && (
-            <span className="text-[10px] text-white/20 font-mono">
+            <span className="text-[10px] text-slate-300 font-mono">
               Updated {lastRefresh}
             </span>
           )}
@@ -140,15 +140,15 @@ export default function EnvironmentsPage() {
       </header>
 
       {/* ---- Production Environment Card ---- */}
-      <section className="rounded-3xl border border-gold/20 bg-black/60 p-6 backdrop-blur-2xl">
+      <section className="rounded-3xl border border-gold/20 bg-slate-50/70 p-6 backdrop-blur-2xl">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-gold/20 to-gold/10 text-gold">
               <Globe size={20} />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-white">Production</h2>
-              <p className="text-xs text-white/30 font-mono">76.13.96.107 / plugmein.cloud</p>
+              <h2 className="text-lg font-semibold text-slate-800">Production</h2>
+              <p className="text-xs text-slate-400 font-mono">76.13.96.107 / plugmein.cloud</p>
             </div>
           </div>
           {healthData && (
@@ -166,16 +166,16 @@ export default function EnvironmentsPage() {
         {healthData?.summary && (
           <div className="grid grid-cols-4 gap-3 mb-6">
             {[
-              { label: "Total Services", value: healthData.summary.total, color: "text-white" },
+              { label: "Total Services", value: healthData.summary.total, color: "text-slate-800" },
               { label: "Up", value: healthData.summary.up, color: "text-emerald-400" },
               { label: "Degraded", value: healthData.summary.degraded, color: "text-yellow-400" },
               { label: "Down", value: healthData.summary.down, color: "text-red-400" },
             ].map((stat) => (
               <div
                 key={stat.label}
-                className="rounded-xl border border-wireframe-stroke bg-black/40 p-3 text-center"
+                className="rounded-xl border border-wireframe-stroke bg-slate-100/60 p-3 text-center"
               >
-                <p className="text-[10px] uppercase tracking-widest text-white/30">
+                <p className="text-[10px] uppercase tracking-widest text-slate-400">
                   {stat.label}
                 </p>
                 <p className={`text-2xl font-semibold mt-1 ${stat.color}`}>
@@ -189,12 +189,12 @@ export default function EnvironmentsPage() {
         {loading ? (
           <div className="flex items-center justify-center py-12 gap-2">
             <span className="h-4 w-4 animate-spin rounded-full border-2 border-gold/30 border-t-gold" />
-            <span className="text-xs text-white/30">Connecting to circuit-metrics...</span>
+            <span className="text-xs text-slate-400">Connecting to circuit-metrics...</span>
           </div>
         ) : services.length === 0 ? (
           <div className="py-12 text-center">
-            <WifiOff size={24} className="mx-auto text-white/20 mb-2" />
-            <p className="text-xs text-white/30">Circuit metrics unreachable</p>
+            <WifiOff size={24} className="mx-auto text-slate-300 mb-2" />
+            <p className="text-xs text-slate-400">Circuit metrics unreachable</p>
           </div>
         ) : (
           <div className="space-y-6">
@@ -244,14 +244,14 @@ export default function EnvironmentsPage() {
       </section>
 
       {/* ---- Deployment Info ---- */}
-      <section className="rounded-3xl border border-wireframe-stroke bg-black/60 p-6 backdrop-blur-2xl">
+      <section className="rounded-3xl border border-wireframe-stroke bg-slate-50/70 p-6 backdrop-blur-2xl">
         <div className="flex items-center justify-between mb-1">
-          <h2 className="text-sm font-semibold uppercase tracking-widest text-white/80 font-display">
+          <h2 className="text-sm font-semibold uppercase tracking-widest text-slate-700 font-display">
             Deployment Configuration
           </h2>
           <Activity size={16} className="text-gold/40" />
         </div>
-        <p className="text-[0.65rem] text-white/30 uppercase tracking-wider mb-4">
+        <p className="text-[0.65rem] text-slate-400 uppercase tracking-wider mb-4">
           Real infrastructure details from deploy.sh and docker-compose.prod.yml
         </p>
 
@@ -281,7 +281,7 @@ function ServiceCard({ service }: { service: ServiceHealth }) {
     .replace(/\b\w/g, (c) => c.toUpperCase());
 
   return (
-    <div className="rounded-2xl border border-wireframe-stroke bg-black/40 p-4 transition-all hover:border-gold/10">
+    <div className="rounded-2xl border border-wireframe-stroke bg-slate-100/60 p-4 transition-all hover:border-gold/10">
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
           {service.status === "up" ? (
@@ -291,19 +291,19 @@ function ServiceCard({ service }: { service: ServiceHealth }) {
           ) : (
             <WifiOff size={14} className="text-red-400/60" />
           )}
-          <span className="text-sm font-medium text-white">{displayName}</span>
+          <span className="text-sm font-medium text-slate-800">{displayName}</span>
         </div>
         <span
           className={`h-2.5 w-2.5 rounded-full ${status.dot}`}
         />
       </div>
 
-      <div className="flex items-center gap-3 text-[10px] text-white/30">
+      <div className="flex items-center gap-3 text-[10px] text-slate-400">
         <span className={`rounded-full border px-2 py-0.5 font-bold uppercase tracking-wider ${status.badge}`}>
           {status.label}
         </span>
         <span className="font-mono">{service.responseTime}ms</span>
-        <span className="text-white/15">{service.type}</span>
+        <span className="text-slate-300">{service.type}</span>
       </div>
 
       {service.error && (
@@ -315,8 +315,8 @@ function ServiceCard({ service }: { service: ServiceHealth }) {
 
 function InfoCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl border border-wireframe-stroke bg-black/40 p-3">
-      <p className="text-[10px] uppercase tracking-wider text-white/30">{label}</p>
+    <div className="rounded-xl border border-wireframe-stroke bg-slate-100/60 p-3">
+      <p className="text-[10px] uppercase tracking-wider text-slate-400">{label}</p>
       <p className="text-xs font-mono text-gold mt-0.5">{value}</p>
     </div>
   );

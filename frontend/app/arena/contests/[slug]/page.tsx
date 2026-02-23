@@ -71,7 +71,7 @@ export default function ContestDetailPage({ params }: { params: Promise<{ slug: 
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
           <div className="inline-block h-8 w-8 border-2 border-gold/30 border-t-gold rounded-full animate-spin" />
-          <p className="text-xs text-white/30 mt-4 font-mono">Loading contest...</p>
+          <p className="text-xs text-slate-400 mt-4 font-mono">Loading contest...</p>
         </div>
       </div>
     );
@@ -80,9 +80,9 @@ export default function ContestDetailPage({ params }: { params: Promise<{ slug: 
   if (!contest) {
     return (
       <div className="max-w-2xl mx-auto px-6 py-20 text-center">
-        <AlertCircle size={40} className="text-white/20 mx-auto mb-4" />
-        <h2 className="text-xl font-display text-white mb-2">Contest Not Found</h2>
-        <p className="text-sm text-white/40 mb-6">This contest may have ended or doesn't exist.</p>
+        <AlertCircle size={40} className="text-slate-300 mx-auto mb-4" />
+        <h2 className="text-xl font-display text-slate-800 mb-2">Contest Not Found</h2>
+        <p className="text-sm text-slate-400 mb-6">This contest may have ended or doesn't exist.</p>
         <Link href="/arena" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gold/10 border border-gold/20 text-gold text-sm">
           <ArrowLeft size={14} /> Back to Lobby
         </Link>
@@ -126,7 +126,7 @@ export default function ContestDetailPage({ params }: { params: Promise<{ slug: 
       <motion.div initial="hidden" animate="visible" variants={{ visible: { transition: { staggerChildren: 0.08 } } }} className="max-w-4xl mx-auto px-4 md:px-6 py-8 space-y-8">
         {/* Back Link */}
         <motion.div variants={fadeUp}>
-          <Link href="/arena" className="inline-flex items-center gap-2 text-sm text-white/40 hover:text-gold transition-colors">
+          <Link href="/arena" className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-gold transition-colors">
             <ArrowLeft size={14} /> Back to Lobby
           </Link>
         </motion.div>
@@ -141,10 +141,10 @@ export default function ContestDetailPage({ params }: { params: Promise<{ slug: 
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   <span className={`text-[0.55rem] font-mono uppercase tracking-wider ${typeStyle.color}`}>{typeStyle.label}</span>
-                  <span className="text-white/10">/</span>
+                  <span className="text-slate-300">/</span>
                   <span className={`text-[0.55rem] font-mono ${diffStyle.color}`}>{diffStyle.label}</span>
                 </div>
-                <h1 className="text-2xl md:text-3xl font-display text-white tracking-tight">{contest.title}</h1>
+                <h1 className="text-2xl md:text-3xl font-display text-slate-800 tracking-tight">{contest.title}</h1>
               </div>
             </div>
             <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full ${statusStyle.bg}`}>
@@ -153,25 +153,25 @@ export default function ContestDetailPage({ params }: { params: Promise<{ slug: 
             </div>
           </div>
 
-          <p className="text-sm text-white/40 leading-relaxed max-w-2xl mb-8">{contest.description}</p>
+          <p className="text-sm text-slate-400 leading-relaxed max-w-2xl mb-8">{contest.description}</p>
 
           {/* Stats Row */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 text-center">
+            <div className="p-4 rounded-xl bg-white border border-slate-100 text-center">
               <p className="text-xl font-display text-gold">{contest.entryFee === 0 ? 'FREE' : formatCurrency(contest.entryFee)}</p>
-              <p className="text-[0.5rem] font-mono text-white/25 uppercase mt-1">Entry Fee</p>
+              <p className="text-[0.5rem] font-mono text-slate-400 uppercase mt-1">Entry Fee</p>
             </div>
-            <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 text-center">
+            <div className="p-4 rounded-xl bg-white border border-slate-100 text-center">
               <p className="text-xl font-display text-emerald-400">{contest.prizePool > 0 ? formatCurrency(contest.prizePool) : 'Grows'}</p>
-              <p className="text-[0.5rem] font-mono text-white/25 uppercase mt-1">Prize Pool</p>
+              <p className="text-[0.5rem] font-mono text-slate-400 uppercase mt-1">Prize Pool</p>
             </div>
-            <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 text-center">
-              <p className="text-xl font-display text-white/60">{contest.currentEntries}/{contest.maxEntries}</p>
-              <p className="text-[0.5rem] font-mono text-white/25 uppercase mt-1">Entries</p>
+            <div className="p-4 rounded-xl bg-white border border-slate-100 text-center">
+              <p className="text-xl font-display text-slate-500">{contest.currentEntries}/{contest.maxEntries}</p>
+              <p className="text-[0.5rem] font-mono text-slate-400 uppercase mt-1">Entries</p>
             </div>
-            <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 text-center">
+            <div className="p-4 rounded-xl bg-white border border-slate-100 text-center">
               <p className="text-xl font-display text-blue-400">{getTimeRemaining(contest.status === 'LIVE' ? contest.endsAt : contest.startsAt)}</p>
-              <p className="text-[0.5rem] font-mono text-white/25 uppercase mt-1">{contest.status === 'LIVE' ? 'Ends In' : 'Starts In'}</p>
+              <p className="text-[0.5rem] font-mono text-slate-400 uppercase mt-1">{contest.status === 'LIVE' ? 'Ends In' : 'Starts In'}</p>
             </div>
           </div>
 
@@ -196,14 +196,14 @@ export default function ContestDetailPage({ params }: { params: Promise<{ slug: 
             ) : (
               <button
                 disabled
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white/30 text-sm font-display cursor-not-allowed"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-400 text-sm font-display cursor-not-allowed"
               >
                 <Lock size={18} />
                 Contest Ended
               </button>
             )}
             {contest.entryFee > 0 && (
-              <p className="text-[0.6rem] text-white/25 font-mono">
+              <p className="text-[0.6rem] text-slate-400 font-mono">
                 {formatCurrency(contest.entryFee)} will be deducted from your wallet upon entry
               </p>
             )}
@@ -214,17 +214,17 @@ export default function ContestDetailPage({ params }: { params: Promise<{ slug: 
         <div className="grid gap-6 md:grid-cols-2">
           {/* Rules */}
           <motion.div variants={fadeUp} className="wireframe-card rounded-2xl p-6">
-            <h2 className="text-xs uppercase tracking-widest text-white/30 font-mono mb-4">Rules</h2>
+            <h2 className="text-xs uppercase tracking-widest text-slate-400 font-mono mb-4">Rules</h2>
             <ul className="space-y-2">
               {(contest.contestData.rules || []).map((rule, i) => (
-                <li key={i} className="flex items-start gap-2 text-sm text-white/50">
+                <li key={i} className="flex items-start gap-2 text-sm text-slate-500">
                   <ChevronRight size={12} className="text-gold/40 mt-0.5 flex-shrink-0" />
                   <span>{rule}</span>
                 </li>
               ))}
             </ul>
             {totalQuestions > 0 && (
-              <p className="text-[0.55rem] font-mono text-white/20 mt-4 pt-3 border-t border-white/[0.04]">
+              <p className="text-[0.55rem] font-mono text-slate-300 mt-4 pt-3 border-t border-slate-200">
                 {totalQuestions} questions &middot; {contest.contestData.timeLimit || 15}s per question
               </p>
             )}
@@ -232,17 +232,17 @@ export default function ContestDetailPage({ params }: { params: Promise<{ slug: 
 
           {/* Prize Structure */}
           <motion.div variants={fadeUp} className="wireframe-card rounded-2xl p-6">
-            <h2 className="text-xs uppercase tracking-widest text-white/30 font-mono mb-4">Prizes</h2>
+            <h2 className="text-xs uppercase tracking-widest text-slate-400 font-mono mb-4">Prizes</h2>
             {prizeEntries.length > 0 ? (
               <div className="space-y-2">
                 {prizeEntries.map(([place, pct]) => (
-                  <div key={place} className="flex items-center justify-between px-3 py-2 rounded-lg bg-white/[0.02]">
+                  <div key={place} className="flex items-center justify-between px-3 py-2 rounded-lg bg-white">
                     <div className="flex items-center gap-2">
                       {place === '1' && <Trophy size={14} className="text-gold" />}
                       {place === '2' && <Award size={14} className="text-zinc-300" />}
                       {place === '3' && <Award size={14} className="text-amber-600" />}
-                      {Number(place) > 3 && <Star size={14} className="text-white/20" />}
-                      <span className="text-sm text-white/60 font-mono">
+                      {Number(place) > 3 && <Star size={14} className="text-slate-300" />}
+                      <span className="text-sm text-slate-500 font-mono">
                         {place === '1' ? '1st' : place === '2' ? '2nd' : place === '3' ? '3rd' : `${place}th`}
                       </span>
                     </div>
@@ -255,7 +255,7 @@ export default function ContestDetailPage({ params }: { params: Promise<{ slug: 
                 <Award size={20} className="text-amber-400" />
                 <div>
                   <p className="text-sm text-amber-400 font-medium">XP Reward</p>
-                  <p className="text-[0.6rem] text-white/30">Earn XP and climb the leaderboard</p>
+                  <p className="text-[0.6rem] text-slate-400">Earn XP and climb the leaderboard</p>
                 </div>
               </div>
             )}
@@ -280,11 +280,11 @@ export default function ContestDetailPage({ params }: { params: Promise<{ slug: 
       <div className="max-w-2xl mx-auto px-4 md:px-6 py-8 space-y-6">
         {/* Progress */}
         <div className="space-y-2">
-          <div className="flex items-center justify-between text-[0.55rem] font-mono text-white/30">
+          <div className="flex items-center justify-between text-[0.55rem] font-mono text-slate-400">
             <span>Question {currentQuestion + 1} of {totalQuestions}</span>
             <span className="text-gold">{score} pts</span>
           </div>
-          <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+          <div className="h-1 bg-slate-50 rounded-full overflow-hidden">
             <motion.div
               className="h-full bg-gradient-to-r from-gold/40 to-gold/70 rounded-full"
               initial={{ width: 0 }}
@@ -312,14 +312,14 @@ export default function ContestDetailPage({ params }: { params: Promise<{ slug: 
           className="wireframe-card rounded-2xl p-8"
         >
           <div className="flex items-center gap-2 mb-4">
-            <span className={`text-[0.5rem] font-mono uppercase tracking-wider ${DIFFICULTY_STYLES[q.difficulty.toUpperCase() as keyof typeof DIFFICULTY_STYLES]?.color || 'text-white/30'}`}>
+            <span className={`text-[0.5rem] font-mono uppercase tracking-wider ${DIFFICULTY_STYLES[q.difficulty.toUpperCase() as keyof typeof DIFFICULTY_STYLES]?.color || 'text-slate-400'}`}>
               {q.difficulty}
             </span>
-            <span className="text-white/10">/</span>
-            <span className="text-[0.5rem] font-mono text-white/30">{q.category}</span>
+            <span className="text-slate-300">/</span>
+            <span className="text-[0.5rem] font-mono text-slate-400">{q.category}</span>
           </div>
 
-          <h2 className="text-lg md:text-xl text-white font-medium leading-relaxed mb-8">
+          <h2 className="text-lg md:text-xl text-slate-800 font-medium leading-relaxed mb-8">
             {q.question}
           </h2>
 
@@ -328,10 +328,10 @@ export default function ContestDetailPage({ params }: { params: Promise<{ slug: 
               <button
                 key={i}
                 onClick={() => handleAnswer(answer)}
-                className="w-full text-left px-5 py-4 rounded-xl border border-white/10 bg-white/[0.02] text-sm text-white/70 hover:bg-gold/5 hover:border-gold/20 hover:text-white transition-all group"
+                className="w-full text-left px-5 py-4 rounded-xl border border-slate-200 bg-white text-sm text-slate-600 hover:bg-gold/5 hover:border-gold/20 hover:text-slate-800 transition-all group"
               >
                 <div className="flex items-center gap-3">
-                  <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/5 text-[0.6rem] font-mono text-white/30 group-hover:bg-gold/10 group-hover:text-gold transition-colors">
+                  <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-50 text-[0.6rem] font-mono text-slate-400 group-hover:bg-gold/10 group-hover:text-gold transition-colors">
                     {String.fromCharCode(65 + i)}
                   </span>
                   <span>{answer}</span>
@@ -357,27 +357,27 @@ export default function ContestDetailPage({ params }: { params: Promise<{ slug: 
             <Trophy size={36} className="text-gold" />
           </div>
         </div>
-        <h2 className="text-3xl font-display text-white mb-2">Contest Complete!</h2>
-        <p className="text-white/40 text-sm mb-8">{contest.title}</p>
+        <h2 className="text-3xl font-display text-slate-800 mb-2">Contest Complete!</h2>
+        <p className="text-slate-400 text-sm mb-8">{contest.title}</p>
 
         <div className="grid grid-cols-3 gap-4 mb-8">
-          <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5">
+          <div className="p-4 rounded-xl bg-white border border-slate-100">
             <p className="text-3xl font-display text-gold">{score}</p>
-            <p className="text-[0.5rem] font-mono text-white/25 uppercase mt-1">Points</p>
+            <p className="text-[0.5rem] font-mono text-slate-400 uppercase mt-1">Points</p>
           </div>
-          <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5">
+          <div className="p-4 rounded-xl bg-white border border-slate-100">
             <p className="text-3xl font-display text-emerald-400">{correctCount}/{totalQuestions}</p>
-            <p className="text-[0.5rem] font-mono text-white/25 uppercase mt-1">Correct</p>
+            <p className="text-[0.5rem] font-mono text-slate-400 uppercase mt-1">Correct</p>
           </div>
-          <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5">
+          <div className="p-4 rounded-xl bg-white border border-slate-100">
             <p className="text-3xl font-display text-blue-400">{accuracy}%</p>
-            <p className="text-[0.5rem] font-mono text-white/25 uppercase mt-1">Accuracy</p>
+            <p className="text-[0.5rem] font-mono text-slate-400 uppercase mt-1">Accuracy</p>
           </div>
         </div>
 
         {/* Answer Review */}
         <div className="text-left space-y-2 mb-8">
-          <h3 className="text-[0.6rem] font-mono uppercase tracking-wider text-white/25 mb-3">Answer Review</h3>
+          <h3 className="text-[0.6rem] font-mono uppercase tracking-wider text-slate-400 mb-3">Answer Review</h3>
           {questions.map((q, i) => {
             const isCorrect = answers[i] === q.correctAnswer;
             return (
@@ -386,7 +386,7 @@ export default function ContestDetailPage({ params }: { params: Promise<{ slug: 
                   {isCorrect ? <Check size={12} /> : <X size={12} />}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs text-white/50 truncate">{q.question}</p>
+                  <p className="text-xs text-slate-500 truncate">{q.question}</p>
                   {!isCorrect && (
                     <p className="text-[0.55rem] text-emerald-400/60 mt-0.5">Correct: {q.correctAnswer}</p>
                   )}
@@ -406,7 +406,7 @@ export default function ContestDetailPage({ params }: { params: Promise<{ slug: 
           </Link>
           <Link
             href="/arena/leaderboard"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-white/5 border border-white/10 text-white/60 text-sm font-medium hover:bg-white/10 transition-all"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-500 text-sm font-medium hover:bg-slate-100 transition-all"
           >
             View Leaderboard
           </Link>

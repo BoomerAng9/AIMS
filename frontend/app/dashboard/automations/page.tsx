@@ -454,7 +454,7 @@ export default function AutomationsPage() {
             Run coding agents on a schedule or triggered by events. Automate bug fixes, documentation updates, security scans, and technical debt — all without lifting a finger.
           </p>
         </div>
-        <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-600 text-white font-medium text-sm hover:bg-amber-700 transition-colors shadow-sm">
+        <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-600 text-slate-800 font-medium text-sm hover:bg-amber-700 transition-colors shadow-sm">
           <Plus className="w-4 h-4" />
           New Automation
         </button>

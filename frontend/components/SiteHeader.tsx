@@ -52,7 +52,7 @@ export function SiteHeader() {
       <div className="flex h-full items-center px-4 md:px-6 lg:px-8 max-w-7xl mx-auto">
         {/* Brand */}
         <Link className="flex items-center gap-2 flex-shrink-0" href="/">
-          <div className="relative w-8 h-8 rounded-lg bg-white/5 border border-gold/20 flex items-center justify-center overflow-hidden">
+          <div className="relative w-8 h-8 rounded-lg bg-slate-50 border border-gold/20 flex items-center justify-center overflow-hidden">
             <img
               src="/images/acheevy/acheevy-helmet.png"
               className="object-contain"
@@ -72,7 +72,7 @@ export function SiteHeader() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="relative rounded-lg px-3 py-1.5 text-xs font-medium transition-colors text-white/70 hover:text-white"
+                className="relative rounded-lg px-3 py-1.5 text-xs font-medium transition-colors text-slate-600 hover:text-slate-800"
               >
                 {active && (
                   <motion.div
@@ -86,7 +86,7 @@ export function SiteHeader() {
               </Link>
             );
           })}
-          <div className="ml-4 flex items-center border-l border-white/10 pl-4">
+          <div className="ml-4 flex items-center border-l border-slate-200 pl-4">
             <motion.a
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
@@ -108,7 +108,7 @@ export function SiteHeader() {
           </a>
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="p-1.5 rounded-lg text-white/60 hover:text-white bg-white/5 border border-wireframe-stroke"
+            className="p-1.5 rounded-lg text-slate-500 hover:text-slate-800 bg-slate-50 border border-wireframe-stroke"
             aria-label="Toggle menu"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -142,7 +142,7 @@ export function SiteHeader() {
                     "block rounded-xl px-4 py-3 text-sm font-medium transition-colors border",
                     active
                       ? "bg-gold/10 text-gold border-gold/20"
-                      : "text-white/70 hover:text-white bg-white/5 border-transparent hover:border-white/10"
+                      : "text-slate-600 hover:text-slate-800 bg-slate-50 border-transparent hover:border-slate-200"
                   )}
                 >
                   {link.label}
