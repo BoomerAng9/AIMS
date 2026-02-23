@@ -1,0 +1,80 @@
+version: "3.8"
+name: aims-node
+
+# =============================================================================
+# A.I.M.S. Secondary Node — Plug Instance Runner
+# =============================================================================
+# This compose file runs on secondary VPS nodes. It provides:
+#   - A lightweight nginx proxy for routing to plug instances
+#   - A node agent that reports health to the primary VPS
+#   - Dynamic plug instance containers (created by the placement engine)
+#
+# Core services (frontend, gateway, acheevy, etc.) run ONLY on the primary.
+# This node only runs plug instances and a health reporter.
+#
+# Usage:
+#   docker compose up -d                 # start node agent
+#   docker compose logs -f node-agent    # monitor agent
+# =============================================================================
+
+services:
+  # ---------------------------------------------------------------------------
+  # Node Agent — Reports health metrics to primary VPS
+  # ---------------------------------------------------------------------------
+  node-agent:
+    image: curlimages/curl:latest
+    container_name: aims-node-agent
+    environment:
+      - NODE_ID=${NODE_ID:-worker-1}
+      - PRIMARY_HOST=${PRIMARY_VPS_HOST:-76.13.96.107}
+      - REPORT_INTERVAL=30
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        echo "AIMS Node Agent starting — node=$${NODE_ID}"
+        while true; do
+          # Gather metrics
+          CONTAINERS=$$(docker ps --format '{{.Names}}' 2>/dev/null | grep -c '^aims-plug-' || echo 0)
+          MEM_TOTAL=$$(cat /proc/meminfo | grep MemTotal | awk '{print $$2}')
+          MEM_FREE=$$(cat /proc/meminfo | grep MemAvailable | awk '{print $$2}')
+          MEM_USED=$$(( (MEM_TOTAL - MEM_FREE) * 100 / MEM_TOTAL ))
+          LOAD=$$(cat /proc/loadavg | awk '{print $$1}')
+
+          # Report to primary
+          curl -sf -X POST "http://$${PRIMARY_HOST}:3001/api/nodes/heartbeat" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"nodeId\": \"$${NODE_ID}\",
+              \"plugCount\": $${CONTAINERS},
+              \"memUsedPct\": $${MEM_USED},
+              \"loadAvg\": $${LOAD},
+              \"timestamp\": \"$$(date -Iseconds)\"
+            }" 2>/dev/null || echo "Heartbeat failed — primary unreachable"
+
+          sleep $${REPORT_INTERVAL:-30}
+        done
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /proc/meminfo:/proc/meminfo:ro
+      - /proc/loadavg:/proc/loadavg:ro
+    restart: always
+    networks:
+      - aims-node-network
+
+  # ---------------------------------------------------------------------------
+  # Node Nginx — Local reverse proxy for plug instances on this node
+  # ---------------------------------------------------------------------------
+  node-nginx:
+    image: nginx:alpine
+    container_name: aims-node-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx:/etc/nginx/conf.d:ro
+    restart: always
+    networks:
+      - aims-node-network
+
+networks:
+  aims-node-network:
+    driver: bridge
