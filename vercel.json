@@ -4,7 +4,7 @@
   "installCommand": "cd frontend && npm install",
   "buildCommand": "cd frontend && npm run build",
   "outputDirectory": "frontend/.next",
-  "regions": ["iad1", "sfo1", "cdg1", "hnd1", "gru1"],
+  "regions": ["iad1"],
   "headers": [
     {
       "source": "/api/edge/(.*)",
