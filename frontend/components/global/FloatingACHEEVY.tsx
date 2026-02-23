@@ -106,7 +106,11 @@ export function FloatingACHEEVY() {
         body: JSON.stringify({
           message: text,
           sessionId,
-          context: { mode: 'recommend' },
+          context: {
+            mode: 'recommend',
+            capabilities: ['automations', 'plug_catalog', 'deploy_dock'],
+            currentPath: typeof window !== 'undefined' ? window.location.pathname : '',
+          },
         }),
       });
 

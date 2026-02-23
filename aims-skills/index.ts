@@ -14,6 +14,7 @@ export { AutomationsSkill } from './skills/automations.skill';
 // Hooks
 export { OnboardingFlowHook } from './hooks/onboarding-flow.hook';
 export { ConversationStateHook } from './hooks/conversation-state.hook';
+export { AutomationsLifecycleHook, AUTOMATION_ACTIONS } from './hooks/automations.hook';
 
 // LUC (LUKE) ADK
 export { LucAdk } from './luc/luc-adk';
@@ -107,4 +108,5 @@ export type {
 export const ACHEEVY_HOOKS = [
   OnboardingFlowHook,
   ConversationStateHook,
+  AutomationsLifecycleHook,
 ];

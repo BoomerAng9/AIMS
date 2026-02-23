@@ -158,6 +158,38 @@ When the user's intent is a service management action:
 └────────────────────────────────────────────────────────────────┘
 ```
 
+### Automations Loop (Cross-Cutting Capability)
+
+Automations are NOT a standalone feature — they are a **peripheral capability** available
+to every actor in the system. Any interaction can spawn, trigger, or benefit from an automation.
+
+```
+┌────────────────────────────────────────────────────────────────┐
+│  DETECT:     Recognize repetitive pattern in user workflow      │
+│  SUGGEST:    "Would you like me to automate this?"              │
+│  CREATE:     Build automation (schedule + event trigger + MCP)  │
+│  EXECUTE:    Run agent in sandbox with repo access + MCP        │
+│  REPORT:     Deliver results (PRs, messages, tickets, metrics)  │
+│  LEARN:      Track success rate, adjust, improve                │
+└────────────────────────────────────────────────────────────────┘
+```
+
+**Who can interact with Automations:**
+| Actor | Capabilities |
+|-------|-------------|
+| **ACHEEVY** | Full CRUD — create, update, pause, archive, run, view history |
+| **Boomer_Angs** | Trigger existing automations, suggest new ones |
+| **Chicken Hawk** | Trigger automations as part of execution pipelines |
+| **Lil_Hawks** | Read-only — can query which automations are relevant |
+| **User** | Create via UI, manage via dashboard, triggered by events |
+
+**Automation lifecycle hook (`automations_lifecycle`)** runs at priority 70:
+- Injects automation awareness into every ACHEEVY response
+- Detects automatable patterns in user requests
+- Offers "automate this" after manual task completion
+- Fires automation events after deploys, builds, and health checks
+- Enforces RBAC on automation actions
+
 ### Voice-First Q&A Loop (Universal Interaction Contract)
 
 Every conversation follows this loop — no exceptions:
