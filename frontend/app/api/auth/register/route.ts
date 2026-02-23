@@ -43,6 +43,15 @@ export async function POST(req: NextRequest) {
     // ── Hash password ────────────────────────────────────
     const passwordHash = await bcrypt.hash(password, 12);
 
+    // ── Build metadata JSON for business/region info ─────
+    const meta: Record<string, string> = {};
+    if (businessName) meta.businessName = businessName;
+    if (businessType) meta.businessType = businessType;
+    if (country) meta.country = country;
+    if (state) meta.state = state;
+    if (city) meta.city = city;
+    if (postalCode) meta.postalCode = postalCode;
+
     // ── Create user ──────────────────────────────────────
     const name = [firstName, lastName].filter(Boolean).join(' ');
     const user = await prisma.user.create({
@@ -52,12 +61,9 @@ export async function POST(req: NextRequest) {
         passwordHash,
         role: 'MEMBER',
         status: 'ACTIVE',
+        metadata: Object.keys(meta).length > 0 ? JSON.stringify(meta) : null,
       },
     });
-
-    // ── Optionally store business/region metadata ────────
-    // TODO: When workspace model supports metadata, store businessName,
-    // businessType, country, state, city, postalCode as workspace config.
 
     return NextResponse.json(
       { success: true, userId: user.id },

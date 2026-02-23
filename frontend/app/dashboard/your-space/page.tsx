@@ -1,22 +1,59 @@
 // frontend/app/dashboard/your-space/page.tsx
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { User, Camera, Settings, Activity, Users, Building2 } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { User, Camera, Settings, Activity, Users, Building2, Loader2 } from "lucide-react";
+
+interface UserStats {
+  tasksCompleted: number;
+  activeAgents: number;
+  projects: number;
+  uptime: string;
+}
 
 export default function YourSpacePage() {
+  const { data: session, status } = useSession();
   const [bio, setBio] = useState(
     "Builder, operator, and orchestrator. Leveraging AI agents to ship faster and think bigger."
   );
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
+  const [userStats, setUserStats] = useState<UserStats>({
+    tasksCompleted: 0,
+    activeAgents: 0,
+    projects: 0,
+    uptime: "—",
+  });
+
+  // Fetch live project count
+  useEffect(() => {
+    async function fetchStats() {
+      try {
+        const res = await fetch("/api/projects");
+        if (res.ok) {
+          const data = await res.json();
+          const projects = data.projects || [];
+          const completed = projects.filter((p: any) => p.status === "completed" || p.status === "deployed").length;
+          setUserStats(prev => ({
+            ...prev,
+            projects: projects.length,
+            tasksCompleted: completed,
+          }));
+        }
+      } catch {
+        // Silent fallback
+      }
+    }
+    fetchStats();
+  }, []);
 
   const stats = [
-    { label: "Tasks Completed", value: "47", icon: Activity },
-    { label: "Active Agents", value: "5", icon: Users },
-    { label: "PMO Offices", value: "6", icon: Building2 },
-    { label: "Uptime", value: "99.8%" , icon: Activity },
+    { label: "Tasks Completed", value: String(userStats.tasksCompleted), icon: Activity },
+    { label: "Active Agents", value: String(userStats.activeAgents || "—"), icon: Users },
+    { label: "Projects", value: String(userStats.projects), icon: Building2 },
+    { label: "Uptime", value: userStats.uptime, icon: Activity },
   ];
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
@@ -47,11 +84,24 @@ export default function YourSpacePage() {
     }
   };
 
+  const userName = session?.user?.name || "ACHEEVY Operator";
+  const userEmail = session?.user?.email || "";
+  const userRole = (session?.user as any)?.role || "USER";
+  const memberSince = session?.user ? "Member" : "—";
+
+  if (status === "loading") {
+    return (
+      <div className="flex items-center justify-center py-20 animate-in fade-in">
+        <Loader2 size={24} className="animate-spin text-gold" />
+      </div>
+    );
+  }
+
   return (
     <div className="animate-in fade-in duration-700">
       {/* Two-column layout: profile info left, hero image right */}
       <div className="flex flex-col-reverse lg:flex-row gap-6 lg:gap-8">
-        {/* ─── Left Column: Profile Info ─── */}
+        {/* Left Column: Profile Info */}
         <div className="w-full lg:w-[45%] space-y-6">
           {/* Header */}
           <header>
@@ -71,17 +121,27 @@ export default function YourSpacePage() {
               </div>
               <div>
                 <h2 className="text-lg font-semibold text-white">
-                  ACHEEVY Operator
+                  {userName}
                 </h2>
-                <p className="text-xs text-white/40 font-mono">@operator</p>
+                <p className="text-xs text-white/40 font-mono">
+                  {userEmail || `@${userName.toLowerCase().replace(/\s+/g, '')}`}
+                </p>
               </div>
             </div>
 
-            <div className="space-y-1">
-              <p className="text-[10px] uppercase tracking-wider text-white/30">
-                Member Since
-              </p>
-              <p className="text-sm text-white/50">January 2025</p>
+            <div className="flex items-center gap-4">
+              <div className="space-y-1">
+                <p className="text-[10px] uppercase tracking-wider text-white/30">
+                  Role
+                </p>
+                <p className="text-sm text-white/50">{userRole === "OWNER" ? "Platform Owner" : "Member"}</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-[10px] uppercase tracking-wider text-white/30">
+                  Status
+                </p>
+                <p className="text-sm text-emerald-400">{memberSince}</p>
+              </div>
             </div>
 
             <div className="space-y-2">
@@ -142,7 +202,7 @@ export default function YourSpacePage() {
           </div>
         </div>
 
-        {/* ─── Right Column: Hero Profile Image ─── */}
+        {/* Right Column: Hero Profile Image */}
         <div className="w-full lg:w-[55%]">
           <div
             onDragOver={(e) => {

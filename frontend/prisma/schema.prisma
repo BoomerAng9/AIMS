@@ -24,6 +24,13 @@ model User {
   role          String    @default("MEMBER")
   status        String    @default("ACTIVE")
 
+  // Password reset
+  resetToken       String?   @unique
+  resetTokenExpiry DateTime?
+
+  // Business / onboarding metadata (JSON blob for flexibility)
+  metadata      String?
+
   // Workspace membership
   workspaces    WorkspaceMember[]
 
