@@ -30,7 +30,7 @@ export default function PerFormLayout({ children }: { children: React.ReactNode 
   const pathname = usePathname();
 
   return (
-    <main className="min-h-screen bg-obsidian text-slate-800">
+    <main className="min-h-screen bg-[#F8FAFC] text-slate-800">
       <SiteHeader />
 
       {/* ── Per|Form Sub-Navigation ─────────────────────────── */}

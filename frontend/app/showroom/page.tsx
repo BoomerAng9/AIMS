@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function ShowroomPage() {
   return (
-    <div className="min-h-screen w-full bg-obsidian text-frosty-white overflow-hidden relative">
+    <div className="min-h-screen w-full bg-[#F8FAFC] text-slate-800 overflow-hidden relative">
       {/* Background Grid */}
       <div className="absolute inset-0 bg-grid-pattern opacity-30 pointer-events-none" />
       
@@ -26,7 +26,7 @@ export default function ShowroomPage() {
           <h1 className="text-6xl font-display font-medium text-slate-800 tracking-tighter drop-shadow-2xl">
             A.I.M.S. <span className="text-gold text-shadow-gold">Showroom</span>
           </h1>
-          <p className="text-muted text-lg max-w-2xl mx-auto font-light">
+          <p className="text-slate-500 text-lg max-w-2xl mx-auto font-light">
             Operational interface standards for the AI Managed Systems platform.
             <br />
             <span className="font-marker text-gold/80 text-sm rotate-3 inline-block mt-2">Certified for Production</span>
@@ -56,7 +56,7 @@ export default function ShowroomPage() {
             </div>
             <div className="space-y-4">
               <p className="text-sm text-gold font-mono uppercase">Sans / Body (Inter)</p>
-              <p className="text-lg leading-relaxed text-muted">
+              <p className="text-lg leading-relaxed text-slate-500">
                 The quick brown fox jumps over the lazy dog. Used for primary content, 
                 documentation, and chat interfaces. optimized for long-form readability 
                 in low-light environments.
@@ -89,7 +89,7 @@ export default function ShowroomPage() {
                   <span className="font-display font-bold">01</span>
                 </div>
                 <h3 className="text-xl font-medium mb-2">Standard Glass</h3>
-                <p className="text-muted text-sm">Used for secondary modules and list items. Lightweight blur.</p>
+                <p className="text-slate-500 text-sm">Used for secondary modules and list items. Lightweight blur.</p>
               </div>
               <div className="text-xs font-mono text-slate-400">.glass-panel</div>
             </div>
@@ -112,7 +112,7 @@ export default function ShowroomPage() {
               <div>
                 <div className="w-2 h-2 rounded-full bg-signal-green shadow-[0_0_10px_#10B981] mb-6 animate-pulse"></div>
                 <h3 className="text-xl font-medium mb-2">System Active</h3>
-                <p className="text-muted text-sm">Example of a state-driven card variant (Online/Active).</p>
+                <p className="text-slate-500 text-sm">Example of a state-driven card variant (Online/Active).</p>
               </div>
               <button className="w-full py-2 bg-slate-50 hover:bg-slate-100 rounded text-xs uppercase tracking-wider transition-colors border border-wireframe-stroke">
                 View Logs
@@ -144,7 +144,7 @@ export default function ShowroomPage() {
             {/* Inputs */}
             <div className="grid md:grid-cols-2 gap-6 max-w-2xl">
               <div className="space-y-2">
-                <label className="text-xs uppercase tracking-widest text-muted">Agent ID</label>
+                <label className="text-xs uppercase tracking-widest text-slate-500">Agent ID</label>
                 <input 
                   type="text" 
                   placeholder="AG-001" 
@@ -152,7 +152,7 @@ export default function ShowroomPage() {
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-xs uppercase tracking-widest text-muted">Directive</label>
+                <label className="text-xs uppercase tracking-widest text-slate-500">Directive</label>
                 <select className="w-full bg-slate-100/60 border-b border-slate-200 p-3 text-slate-800 focus:outline-none focus:border-gold transition-colors font-sans appearance-none">
                   <option>Autonomous Execution</option>
                   <option>Human Oversight</option>
@@ -177,7 +177,7 @@ function ColorCard({ name, hex, bg, text }: { name: string, hex: string, bg: str
       </div>
       <div className="p-4">
         <p className={`font-medium ${text === 'text-black' ? 'text-slate-800' : 'text-slate-800'}`}>{name}</p>
-        <p className="text-xs font-mono text-muted mt-1">{hex}</p>
+        <p className="text-xs font-mono text-slate-500 mt-1">{hex}</p>
       </div>
     </div>
   );

@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 
 export default function SavingsPlanTermsPage() {
   return (
-    <main className="min-h-screen bg-obsidian text-slate-800">
+    <main className="min-h-screen bg-[#F8FAFC] text-slate-800">
       <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-8">
         <h1 className="text-3xl font-bold tracking-tight mb-2">
           A.I.M.S. Savings Plan

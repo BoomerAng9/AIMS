@@ -26,6 +26,8 @@ import { agentChat } from '../llm';
 import logger from '../logger';
 import { liveSim } from '../livesim';
 import { dispatchChickenHawkBuild } from '../agents/cloudrun-dispatcher';
+import { getFactoryController } from '../factory/controller';
+import type { FactoryEvent, FactoryEventSource } from '../factory/types';
 
 // NtNtN Engine: loaded at runtime to avoid tsconfig rootDir compilation issues
 let _ntntnEngine: any = null;
@@ -277,6 +279,8 @@ export class AcheevyOrchestrator {
         routeResponse = await this.handleDeploymentHub(requestId, req);
       } else if (routedTo.startsWith('paas_')) {
         routeResponse = await this.handlePaaSOperations(requestId, req);
+      } else if (routedTo === 'manage_it' || routedTo.startsWith('factory:')) {
+        routeResponse = await this.handleFactoryController(requestId, req);
       }
 
       if (routeResponse) {
@@ -754,6 +758,155 @@ export class AcheevyOrchestrator {
       },
       lucUsage: { service: 'spawn_shift', amount: 1 },
     };
+  }
+
+  /**
+   * Factory Controller: Always-on orchestration via FDH pipeline.
+   * Handles "Manage It" requests and factory:* intents.
+   * Creates FDH manifests, auto-approves or gates for human approval.
+   */
+  private async handleFactoryController(
+    requestId: string,
+    req: AcheevyExecuteRequest,
+  ): Promise<AcheevyExecuteResponse> {
+    const factory = getFactoryController();
+    const intent = req.intent;
+
+    // Factory status report
+    if (intent === 'factory:status') {
+      const status = factory.getStatus();
+      return {
+        requestId,
+        status: 'completed',
+        reply: [
+          `**Factory Controller:** ${status.status}`,
+          `Active FDH runs: ${status.activeFdhRuns}`,
+          `Pending approvals: ${status.pendingApprovals}`,
+          `Active chambers: ${status.activeChambers}`,
+          `Period cost: $${status.periodCost.totalUsd.toFixed(2)} / $${status.periodCost.budgetCapUsd.toFixed(2)} (${status.periodCost.utilizationPct.toFixed(0)}%)`,
+          status.recentCompletions.length > 0
+            ? `\nRecent completions:\n${status.recentCompletions.map(c => `- ${c.scope} (ORACLE: ${c.oracleScore}/8)`).join('\n')}`
+            : '',
+        ].filter(Boolean).join('\n'),
+        data: { factoryStatus: status },
+      };
+    }
+
+    // Approve a pending run
+    if (intent === 'factory:approve' && req.context?.runId) {
+      try {
+        const run = await factory.approveRun(req.context.runId as string);
+        return {
+          requestId,
+          status: 'completed',
+          reply: `FDH run approved and executing. Status: ${run.status}. ORACLE score: ${run.phaseResults.hone?.oracleScore ?? 'pending'}/8.`,
+          data: { fdhRun: { id: run.id, status: run.status } },
+          lucUsage: { service: 'factory_run', amount: run.lucActual.totalTokens },
+        };
+      } catch (err: any) {
+        return { requestId, status: 'error', reply: `Approval failed: ${err.message}`, error: err.message };
+      }
+    }
+
+    // Pause/resume factory
+    if (intent === 'factory:pause') {
+      factory.pause();
+      return { requestId, status: 'completed', reply: 'Factory controller paused. No new events will be processed until resumed.' };
+    }
+    if (intent === 'factory:resume') {
+      factory.resume();
+      return { requestId, status: 'completed', reply: 'Factory controller resumed. Processing events.' };
+    }
+
+    // Default: "Manage It" — create an FDH run from user request
+    const event: FactoryEvent = {
+      id: `evt_${requestId}`,
+      source: (req.context?.eventSource as FactoryEventSource) || 'user',
+      type: intent === 'manage_it' ? 'manage_it' : 'factory_request',
+      payload: {
+        message: req.message,
+        scope: req.context?.scope || req.message,
+        context: req.context || {},
+      },
+      chamberId: req.context?.chamberId as string,
+      userId: req.userId,
+      timestamp: new Date().toISOString(),
+      priority: (req.context?.priority as FactoryEvent['priority']) || 'normal',
+    };
+
+    try {
+      const result = await factory.ingestEvent(event);
+
+      if (!result.accepted) {
+        return {
+          requestId,
+          status: 'completed',
+          reply: `Factory controller: ${result.reason}`,
+          data: { factoryResult: result },
+        };
+      }
+
+      if (result.awaitingApproval) {
+        const run = factory.getRun(result.runId!);
+        return {
+          requestId,
+          status: 'completed',
+          reply: [
+            `I've created an execution plan for this. Here's the summary:`,
+            ``,
+            `**Scope:** ${run.manifest.scope}`,
+            `**Estimated cost:** $${run.manifest.lucEstimate.totalUsd.toFixed(2)}`,
+            `**Pipeline:** Foster → Develop → Hone (${run.manifest.plan.develop.steps.length} build steps)`,
+            `**Agents:** ${[...run.manifest.plan.foster.agents, ...run.manifest.plan.develop.agents].join(', ')}`,
+            ``,
+            `Approve to proceed, or adjust the scope.`,
+          ].join('\n'),
+          data: {
+            factoryResult: result,
+            fdhManifest: run.manifest,
+            awaiting: 'fdh_approval',
+            glass_box_event: 'APPROVAL_REQUESTED',
+          },
+          lucUsage: { service: 'factory_run', amount: 0 },
+          taskId: result.runId,
+        };
+      }
+
+      // Auto-approved — running
+      const run = factory.getRun(result.runId!);
+      const oracleScore = run.phaseResults.hone?.oracleScore;
+
+      return {
+        requestId,
+        status: run.status === 'completed' ? 'completed' : 'dispatched',
+        reply: run.status === 'completed'
+          ? [
+              `Done. The team executed and verified your request.`,
+              ``,
+              `**ORACLE Score:** ${oracleScore}/8`,
+              `**LUC Cost:** $${run.lucActual.totalUsd.toFixed(2)}`,
+              `**Receipt:** ${run.receipt?.receiptId || 'sealed'}`,
+              ``,
+              `${run.phaseResults.develop?.artifacts.length || 0} artifacts produced across ${run.phaseResults.develop?.wavesCompleted || 0} waves.`,
+            ].join('\n')
+          : `Task accepted — ACHEEVY is managing it. Status: ${run.status}. You'll be notified at key milestones.`,
+        data: {
+          factoryResult: result,
+          fdhRun: { id: run.id, status: run.status, oracleScore },
+          glass_box_event: run.status === 'completed' ? 'DELIVERABLE_READY' : 'PHASE_CHANGE',
+        },
+        lucUsage: { service: 'factory_run', amount: run.lucActual.totalTokens },
+        taskId: result.runId,
+      };
+    } catch (err: any) {
+      logger.error({ err, requestId }, '[ACHEEVY] Factory Controller error');
+      return {
+        requestId,
+        status: 'error',
+        reply: `Factory controller error: ${err.message}`,
+        error: err.message,
+      };
+    }
   }
 
   /**

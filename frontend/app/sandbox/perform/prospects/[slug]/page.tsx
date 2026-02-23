@@ -21,7 +21,7 @@ function RadialScore({ label, value, icon: Icon }: { label: string; value: numbe
   const strokeDasharray = `${pct} 100`;
 
   return (
-    <div className="flex flex-col items-center justify-center p-6 bg-[#0f0f0f] border border-slate-100 rounded-2xl relative overflow-hidden group hover:border-gold/30 transition-colors">
+    <div className="flex flex-col items-center justify-center p-6 bg-white border border-slate-200 rounded-2xl relative overflow-hidden group hover:border-gold/30 transition-colors">
       <div className="absolute top-4 right-4 text-slate-300 group-hover:text-gold/20 transition-colors">
         <Icon size={24} />
       </div>
@@ -207,7 +207,7 @@ export default function ProspectProfilePage() {
         </motion.div>
 
         {/* AGI BREAKDOWN TABLE */}
-        <motion.div variants={staggerItem} className="bg-[#0f0f0f] border border-slate-100 rounded-2xl p-8">
+        <motion.div variants={staggerItem} className="bg-white border border-slate-200 rounded-2xl p-8">
           <div className="flex items-center gap-3 mb-8">
             <div className="h-6 w-1 bg-gold rounded-full" />
             <h2 className="text-lg font-display font-bold uppercase tracking-widest">AGI Breakdown</h2>
@@ -237,7 +237,7 @@ export default function ProspectProfilePage() {
         </motion.div>
 
         {/* ACHEEVY'S TAKE */}
-        <motion.div variants={staggerItem} className="relative bg-[#0f0f0f] border border-slate-100 rounded-2xl p-8 overflow-hidden">
+        <motion.div variants={staggerItem} className="relative bg-white border border-slate-200 rounded-2xl p-8 overflow-hidden">
           <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-gold" />
           <h3 className="text-[0.65rem] font-mono font-bold uppercase tracking-widest text-gold mb-4">ACHEEVY's Exclusive Take</h3>
           <p className="text-xl md:text-2xl font-serif italic text-slate-800 leading-relaxed font-light">
@@ -259,17 +259,17 @@ export default function ProspectProfilePage() {
           <h2 className="text-center text-[0.7rem] font-mono uppercase tracking-widest text-slate-400">Boomer_Ang AI Analyst Perspectives</h2>
 
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-[#0f0f0f] border border-slate-100 rounded-2xl p-6 relative">
-              <div className="absolute top-6 right-6 text-emerald-400">
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 relative shadow-sm">
+              <div className="absolute top-6 right-6 text-emerald-500">
                 <TrendingUp size={16} />
               </div>
               <div className="flex items-center gap-3 mb-4">
-                <div className="h-10 w-10 rounded-full bg-zinc-800 border-2 border-emerald-400/30 flex items-center justify-center">
-                  <span className="text-[0.6rem] font-mono text-emerald-400">PT</span>
+                <div className="h-10 w-10 rounded-full bg-emerald-50 border-2 border-emerald-200 flex items-center justify-center">
+                  <span className="text-[0.6rem] font-mono text-emerald-600">PT</span>
                 </div>
                 <div>
                   <div className="text-sm font-bold text-slate-800">PrimeTime Jr.</div>
-                  <div className="text-[0.55rem] font-mono text-emerald-400 uppercase tracking-widest bg-emerald-400/10 px-1.5 py-0.5 inline-block rounded mt-1">Bull Case</div>
+                  <div className="text-[0.55rem] font-mono text-emerald-600 uppercase tracking-widest bg-emerald-50 px-1.5 py-0.5 inline-block rounded mt-1">Bull Case</div>
                 </div>
               </div>
               <p className="text-sm text-slate-500 leading-relaxed italic">
@@ -277,13 +277,13 @@ export default function ProspectProfilePage() {
               </p>
             </div>
 
-            <div className="bg-[#0f0f0f] border border-slate-100 rounded-2xl p-6 relative">
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 relative shadow-sm">
               <div className="absolute top-6 right-6 text-red-400">
                 <TrendingUp size={16} className="rotate-180" />
               </div>
               <div className="flex items-center gap-3 mb-4">
-                <div className="h-10 w-10 rounded-full bg-zinc-800 border-2 border-red-400/30 flex items-center justify-center">
-                  <span className="text-[0.6rem] font-mono text-red-400">Prof</span>
+                <div className="h-10 w-10 rounded-full bg-red-50 border-2 border-red-200 flex items-center justify-center">
+                  <span className="text-[0.6rem] font-mono text-red-500">Prof</span>
                 </div>
                 <div>
                   <div className="text-sm font-bold text-slate-800">The Professor</div>
@@ -300,7 +300,7 @@ export default function ProspectProfilePage() {
         {/* CROSS PLATFORM BENCHMARK (Mock Display) */}
         <motion.div variants={staggerItem} className="space-y-4">
           <h2 className="text-[0.7rem] inline-block px-3 py-1 bg-slate-50 border border-slate-200 rounded font-mono uppercase tracking-widest text-slate-500">Benchmark Comparison</h2>
-          <div className="w-full bg-[#0f0f0f] border border-slate-100 rounded-2xl overflow-hidden">
+          <div className="w-full bg-white border border-slate-200 rounded-2xl overflow-hidden">
             <div className="grid grid-cols-5 px-6 py-4 bg-white border-b border-slate-100 text-[0.6rem] font-mono uppercase tracking-widest text-slate-400">
               <div className="col-span-2">Platform</div>
               <div className="text-center">Overall Grade</div>

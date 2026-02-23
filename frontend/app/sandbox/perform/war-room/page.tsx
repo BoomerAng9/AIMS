@@ -212,7 +212,7 @@ export default function WarRoomPage() {
                                         disabled={loading && activeSeed === i}
                                         className={`group text-left p-5 rounded-2xl border transition-all ${activeSeed === i
                                             ? 'border-gold/40 bg-gold/5 shadow-[0_0_20px_rgba(212,175,55,0.1)]'
-                                            : 'border-slate-200 bg-[#0f0f0f] hover:border-red-500/30 hover:bg-red-500/5'
+                                            : 'border-slate-200 bg-white hover:border-red-500/30 hover:bg-red-500/5'
                                             }`}
                                     >
                                         <div className="flex items-start gap-3">
@@ -242,7 +242,7 @@ export default function WarRoomPage() {
                                 className="space-y-2"
                             >
                                 {newsItems.length === 0 ? (
-                                    <div className="p-12 text-center border border-slate-100 rounded-2xl bg-[#0f0f0f]">
+                                    <div className="p-12 text-center border border-slate-100 rounded-2xl bg-white">
                                         <Radio size={24} className="text-slate-300 mx-auto mb-3" />
                                         <p className="text-sm text-slate-400 font-mono">No live news items available. Check back during Combine week.</p>
                                     </div>
@@ -253,7 +253,7 @@ export default function WarRoomPage() {
                                         disabled={loading && activeSeed === 100 + i}
                                         className={`w-full text-left flex items-center gap-4 p-4 rounded-xl border transition-all ${activeSeed === 100 + i
                                             ? 'border-gold/30 bg-gold/5'
-                                            : 'border-slate-200 bg-[#0f0f0f] hover:border-red-500/20'
+                                            : 'border-slate-200 bg-white hover:border-red-500/20'
                                             }`}
                                     >
                                         <div className="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center text-red-400 flex-shrink-0">
@@ -285,7 +285,7 @@ export default function WarRoomPage() {
                                         onChange={e => setCustomTopic(e.target.value)}
                                         onKeyDown={e => e.key === 'Enter' && triggerCustomDebate()}
                                         placeholder="e.g. 'Is Abdul Carter worth a top-3 pick?'"
-                                        className="flex-1 bg-[#0f0f0f] border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 placeholder:text-slate-300 focus:outline-none focus:border-gold/40 font-mono"
+                                        className="flex-1 bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 placeholder:text-slate-300 focus:outline-none focus:border-gold/40 font-mono"
                                     />
                                     <button
                                         onClick={triggerCustomDebate}
@@ -346,7 +346,7 @@ export default function WarRoomPage() {
                             {/* Bull vs Bear */}
                             <div className="grid md:grid-cols-2 gap-4">
                                 {/* BULL */}
-                                <div className="relative rounded-2xl bg-gradient-to-b from-red-950/40 to-[#0f0f0f] border border-red-500/30 overflow-hidden p-6">
+                                <div className="relative rounded-2xl bg-gradient-to-b from-red-50 to-white border border-red-500/30 overflow-hidden p-6">
                                     <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-red-500 to-transparent" />
                                     <div className="flex items-center gap-3 mb-4">
                                         <div className="w-8 h-8 rounded-lg bg-red-500/20 border border-red-500/30 flex items-center justify-center">
@@ -364,7 +364,7 @@ export default function WarRoomPage() {
                                 </div>
 
                                 {/* BEAR */}
-                                <div className="relative rounded-2xl bg-gradient-to-b from-blue-950/40 to-[#0f0f0f] border border-blue-500/30 overflow-hidden p-6">
+                                <div className="relative rounded-2xl bg-gradient-to-b from-blue-50 to-white border border-blue-500/30 overflow-hidden p-6">
                                     <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-blue-500 to-transparent" />
                                     <div className="flex items-center gap-3 mb-4">
                                         <div className="w-8 h-8 rounded-lg bg-blue-500/20 border border-blue-500/30 flex items-center justify-center">

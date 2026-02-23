@@ -105,6 +105,14 @@ Lil_Hawks  (Workers — execute tasks, ship artifacts)
 | `MANAGE_AUTOMATION` | Pause, resume, edit, or archive an existing automation |
 | `RUN_AUTOMATION` | Manually trigger an automation run |
 | `VIEW_AUTOMATION_HISTORY` | Show run history, stats, and LUC costs for automations |
+| `START_FACTORY_RUN` | Initiate an FDH pipeline from an event or user "Manage It" request |
+| `OVERSEE_FACTORY_RUN` | Monitor an active FDH run (poll or delegate to Boomer_Ang) |
+| `AUTO_APPROVE_FDH` | Auto-approve an FDH manifest within Deploy It lane policy |
+| `ESCALATE_FACTORY_STALL` | Escalate a stalled FDH run to human |
+| `PAUSE_FACTORY` | Temporarily halt all factory operations |
+| `RESUME_FACTORY` | Resume factory operations after pause |
+| `SET_FACTORY_POLICY` | Update Circuit Box factory policy (owner only) |
+| `FACTORY_STATUS_REPORT` | Generate factory status report for user |
 
 ### Forbidden
 | Action | Why |
@@ -116,7 +124,7 @@ Lil_Hawks  (Workers — execute tasks, ship artifacts)
 | `DECOMMISSION_WITHOUT_CONFIRM` | Instance shutdown requires explicit user confirmation |
 
 ### Allowed Tools
-`UEF_GATEWAY`, `LUC`, `AUDIT_LOG`, `N8N_BRIDGE`, `PLUG_ENGINE`, `DOCKER_API`, `NGINX_CONFIG`
+`UEF_GATEWAY`, `LUC`, `AUDIT_LOG`, `N8N_BRIDGE`, `PLUG_ENGINE`, `DOCKER_API`, `NGINX_CONFIG`, `FACTORY_CONTROLLER`, `FDH_PIPELINE`
 
 ### Forbidden Tools
 `SHELL_RUNNER`, `SECRET_STORE_RAW_DUMP`
@@ -182,6 +190,49 @@ to every actor in the system. Any interaction can spawn, trigger, or benefit fro
 | **Chicken Hawk** | Trigger automations as part of execution pipelines |
 | **Lil_Hawks** | Read-only — can query which automations are relevant |
 | **User** | Create via UI, manage via dashboard, triggered by events |
+
+### Factory Controller Loop (Always-On Orchestration)
+
+ACHEEVY operates as a **persistent Factory Controller** — not just reacting to user messages,
+but watching events and auto-initiating FDH (Foster→Develop→Hone) runs. The user shifts from
+"commanding tools" to **approver of plans and releases**.
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│  FACTORY CONTROLLER LOOP (Always-On)                                     │
+│                                                                          │
+│  1. WATCH    → Poll event sources (git, specs, tickets, telemetry)       │
+│  2. DETECT   → Classify event as actionable                              │
+│  3. PLAN     → Generate FDH manifest (Foster → Develop → Hone)           │
+│  4. APPROVE  → HITL gate (Guide Me) OR auto-approve (Deploy It lane)     │
+│  5. EXECUTE  → Kick FDH pipeline — Boomer_Angs + Chicken Hawk            │
+│  6. OVERSEE  → Monitor via OpsConsole_Ang or polling loop                │
+│  7. VERIFY   → ORACLE 8-gate + security scans                            │
+│  8. RECEIPT  → Seal BAMARAM receipt with proof artifacts                  │
+│  9. DELIVER  → Notify human + deploy if approved                         │
+│  10. LEARN   → Log to audit ledger, update ByteRover RAG                 │
+│  LOOP BACK TO 1 — always on for active chambers                          │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+**FDH Pipeline Phases:**
+| Phase | Purpose | Agents | Exit Gate |
+|-------|---------|--------|-----------|
+| **Foster** | Ingest context + requirements, generate manifest | Scout_Ang, Chronicle_Ang | Manifest approved |
+| **Develop** | Build code/config, wire workflows, produce artifacts | Buildsmith, Patchsmith_Ang, Chicken Hawk | All waves complete |
+| **Hone** | ORACLE 8-gate verification, security scans, QA | Gatekeeper_Ang, OpsConsole_Ang | ORACLE pass + BAMARAM receipt |
+
+**Two Execution Lanes:**
+| Lane | When | Approval |
+|------|------|----------|
+| **Deploy It** | Low cost, no new integrations, standard ops, health remediation | Auto-approved |
+| **Guide Me** | High cost, new integrations, production impact, critical priority | Human must approve FDH manifest |
+
+**Machine-Job Billing:**
+FDH runs are billed as machine jobs — no human hours, pure token utilization:
+`FDH Cost = Σ(phase_tokens × model_rate) + compute_hours + storage`
+
+See: `skills/factory-controller.skill.md`, `skills/fdh-pipeline.skill.md`, `skills/factory-swarm.skill.md`
 
 **Automation lifecycle hook (`automations_lifecycle`)** runs at priority 70:
 - Injects automation awareness into every ACHEEVY response
@@ -314,6 +365,14 @@ Skills inject specialized context, SOPs, and design standards into ACHEEVY's beh
 | **Auth Flow** | `skills/auth-flow.skill.md` | "login", "auth", "sign in" | Authentication flow rules |
 | **Three.js 3D** | `skills/threejs-3d.skill.md` | "3d", "three", "webgl" | When/how to use 3D, performance constraints |
 | **Analytics Tracking** | `skills/analytics-tracking.skill.md` | "track", "analytics", "event" | Event tracking, privacy rules |
+
+#### Factory Controller Skills
+
+| Skill | File | Triggers | Purpose |
+|-------|------|----------|---------|
+| **Factory Controller** | `skills/factory-controller.skill.md` | "manage it", "always on", "factory", "run to completion" | Persistent always-on orchestration — watches events, auto-kicks FDH runs |
+| **FDH Pipeline** | `skills/fdh-pipeline.skill.md` | "fdh", "foster develop hone", "pipeline" | Foster → Develop → Hone CI-like pipeline per chamber |
+| **Factory Swarm** | `skills/factory-swarm.skill.md` | "factory swarm", "auto wire", "continuous ops" | Boomer_Ang collective for auto-wiring n8n workflows and detecting drift |
 
 #### Design Skills (`skills/design/`)
 
@@ -589,9 +648,20 @@ ACHEEVY dispatches work via these tools (defined in `acheevy-tools.json`):
 | `plug_export` | delivery | Package instance as self-hosting bundle (compose + env + nginx + setup + README) |
 | `plug_needs_analysis` | consulting | Formal 5-section client intake before recommending/deploying tools |
 
+### Factory Controller Tools
+| Tool | Category | Description |
+|------|----------|-------------|
+| `start_factory_run` | factory | Initiate FDH pipeline from event or "Manage It" request |
+| `oversee_factory_run` | factory | Monitor active FDH run — check progress, detect stalls |
+| `approve_fdh_run` | factory | Approve pending FDH manifest (HITL gate in Guide Me lane) |
+| `factory_status_report` | factory | Generate status report — active runs, costs, completions |
+| `pause_factory` | factory | Temporarily halt all factory operations |
+| `resume_factory` | factory | Resume factory operations after pause |
+| `set_factory_policy` | factory | Update Circuit Box factory policy (owner only) |
+
 ### Two Lanes
-- **"Deploy It"** — pre-approved, low OEI, no new integrations, no secrets expansion, standard Plug spin-ups
-- **"Guide Me"** — high uncertainty, new integrations, production impact, secrets expansion, enterprise deployments, anomalies
+- **"Deploy It"** — pre-approved, low OEI, no new integrations, no secrets expansion, standard Plug spin-ups, auto-approved FDH runs within budget
+- **"Guide Me"** — high uncertainty, new integrations, production impact, secrets expansion, enterprise deployments, anomalies, FDH runs requiring human approval
 
 ---
 
@@ -636,6 +706,13 @@ These are repetitive functions ACHEEVY runs automatically at defined intervals o
 | **Kill Switch** | Critical failure or security breach | Execute `emergency_kill_switch` |
 | **User Onboarding** | New user (no profile) | Activate onboarding flow hook |
 | **Revenue Signal** | Vertical Phase A completes OR Plug deployed | Present transition prompt to convert to paid service |
+| **Factory Event Ingested** | Git push, spec change, ticket update, telemetry alert | Factory Controller creates FDH manifest → auto-approve or HITL gate |
+| **FDH Foster Complete** | Foster phase produces manifest | Advance to Develop phase (or await approval) |
+| **FDH Develop Complete** | All waves completed, artifacts produced | Advance to Hone phase (ORACLE verification) |
+| **FDH Hone Pass** | ORACLE 8-gate verification passes | Seal BAMARAM receipt → deliver results → notify user |
+| **FDH Hone Fail** | ORACLE gates fail | Cycle back to Develop with gate feedback (max 3 cycles) |
+| **Factory Stall Detected** | FDH run shows no progress for > stall timeout | Escalate to human → retry or rollback |
+| **Factory Budget Alert** | Monthly spend approaches or exceeds cap | Throttle factory + notify owner |
 
 ---
 
@@ -793,6 +870,9 @@ aims-skills/
 │   ├── best-practices.md
 │   ├── stitch-nano-design.skill.md
 │   ├── ui-interaction-motion.skill.md
+│   ├── factory-controller.skill.md ← Factory Controller — always-on orchestration
+│   ├── fdh-pipeline.skill.md      ← FDH Pipeline — Foster/Develop/Hone
+│   ├── factory-swarm.skill.md     ← Factory Swarm — auto-wiring n8n workflows
 │   ├── scale-with-acheevy/        ← Business builder skills
 │   ├── design/                    ← Design operating system
 │   │   ├── design-first-builder.md      ← Full design pipeline + teardown rules
@@ -946,6 +1026,13 @@ backend/uef-gateway/src/acheevy/
 ├── router.ts                      ← Express router
 └── execution-engine.ts            ← Vertical execution + governance
 
+backend/uef-gateway/src/factory/
+├── index.ts                       ← Factory Controller barrel export
+├── types.ts                       ← FactoryEvent, FDHManifest, BAMARAMReceipt types
+├── controller.ts                  ← Persistent factory controller (watches events, manages FDH)
+├── fdh-pipeline.ts                ← FDH pipeline engine (Foster → Develop → Hone)
+└── router.ts                      ← Express router for /factory/* endpoints
+
 backend/uef-gateway/src/deployment-hub/
 ├── index.ts                       ← Public API (spawn, decommission, roster, cards)
 ├── types.ts                       ← SpawnRequest, SpawnRecord, RoleCard, VisualIdentity types
@@ -1046,6 +1133,7 @@ aims-skills/tasks/<name>.md
 |------|---------|----------|
 | **Default** | General conversation | Professional, direct, result-oriented |
 | **Service Manager** | PaaS operations (deploy, monitor, scale, decommission) | Infrastructure-focused. Status reports. Resource awareness. Deployment confidence. Manages running services with precision. |
+| **Factory Controller** | "Manage It" selected, FDH pipeline active, event-driven | Always-on mode. Watches events, auto-kicks FDH runs, drives to completion. Reports at milestones. Human approves at gates only. |
 | **Business Builder** | Vertical Phase A match | Hormozi-style. Push for specifics. Action-first. No fluff. |
 | **Growth Advisor** | Growth-related vertical | Data-first scaling. Systems thinker. Metrics-driven. |
 | **DIY Mode** | Voice + camera input | Hands-on project guidance with Vision + TTS |

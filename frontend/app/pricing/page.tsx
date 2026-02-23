@@ -109,7 +109,7 @@ export default function PricingPage() {
   };
 
   return (
-    <main className="min-h-screen bg-obsidian text-slate-800">
+    <main className="min-h-screen bg-[#F8FAFC] text-slate-800">
       <SiteHeader />
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         {/* ──────────────────────── Header ──────────────────────── */}

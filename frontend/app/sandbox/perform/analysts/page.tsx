@@ -25,7 +25,7 @@ const COLOR_ANALYSTS = [
         catchphrase: '"The tape knows. The formula confirms. ACHEEVY decides."',
         tags: ['Orchestrator', 'Scouting Director', 'Editorial Lead'],
         color: {
-            gradient: 'from-yellow-900/30 to-[#0f0f0f]',
+            gradient: 'from-yellow-900/30 to-white',
             border: 'border-gold/30',
             accent: 'text-gold',
             badge: 'bg-gold/20 text-gold border-gold/30',
@@ -49,7 +49,7 @@ const COLOR_ANALYSTS = [
         catchphrase: '"That boy DIFFERENT. I knew it before everybody knew it."',
         tags: ['Skill Positions', 'Draft Risers', 'Bold Predictions'],
         color: {
-            gradient: 'from-red-950/30 to-[#0f0f0f]',
+            gradient: 'from-red-50 to-white',
             border: 'border-red-500/30',
             accent: 'text-red-400',
             badge: 'bg-red-500/15 text-red-400 border-red-500/30',
@@ -72,7 +72,7 @@ const COLOR_ANALYSTS = [
         catchphrase: '"Watch the tape. The film doesn\'t lie."',
         tags: ['Film Breakdowns', 'Technique Analysis', 'Player Comps'],
         color: {
-            gradient: 'from-blue-950/30 to-[#0f0f0f]',
+            gradient: 'from-blue-50 to-white',
             border: 'border-blue-500/30',
             accent: 'text-blue-400',
             badge: 'bg-blue-500/15 text-blue-400 border-blue-500/30',
@@ -95,7 +95,7 @@ const COLOR_ANALYSTS = [
         catchphrase: '"It\'s about the fit. Look at the scheme demands."',
         tags: ['Scheme Fit', 'Team Needs', 'Coaching Impact'],
         color: {
-            gradient: 'from-emerald-950/30 to-[#0f0f0f]',
+            gradient: 'from-emerald-50 to-white',
             border: 'border-emerald-500/30',
             accent: 'text-emerald-400',
             badge: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
@@ -118,7 +118,7 @@ const COLOR_ANALYSTS = [
         catchphrase: '"Let me tell you something! I BEEN saying this since DAY ONE."',
         tags: ['Hot Takes', 'Draft Controversies', 'Player Storytelling'],
         color: {
-            gradient: 'from-orange-950/30 to-[#0f0f0f]',
+            gradient: 'from-orange-50 to-white',
             border: 'border-orange-500/30',
             accent: 'text-orange-400',
             badge: 'bg-orange-500/15 text-orange-400 border-orange-500/30',
@@ -141,7 +141,7 @@ const COLOR_ANALYSTS = [
         catchphrase: '"Let\'s look at this from both sides. Here\'s what the data actually says."',
         tags: ['Debate Moderation', 'Balanced Analysis', 'Summaries'],
         color: {
-            gradient: 'from-slate-900/30 to-[#0f0f0f]',
+            gradient: 'from-slate-900/30 to-white',
             border: 'border-slate-500/30',
             accent: 'text-slate-400',
             badge: 'bg-slate-500/15 text-slate-400 border-slate-500/30',
@@ -311,7 +311,7 @@ export default function AnalystsPage() {
                 </div>
 
                 {/* ── WAR ROOM CTA ──────────────────────────────────────── */}
-                <div className="rounded-2xl border border-red-500/20 bg-gradient-to-br from-red-950/20 to-transparent p-8 flex flex-col md:flex-row items-center justify-between gap-6">
+                <div className="rounded-2xl border border-red-500/20 bg-gradient-to-br from-red-50 to-transparent p-8 flex flex-col md:flex-row items-center justify-between gap-6">
                     <div>
                         <h3 className="text-xl font-black text-slate-800 mb-1">See them in action</h3>
                         <p className="text-sm text-slate-400">Watch the analysts debate in real time. Bull vs Bear. Every prospect argued from both sides.</p>
@@ -338,7 +338,7 @@ export default function AnalystsPage() {
                                 initial={{ opacity: 0, scale: 0.97 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 transition={{ delay: i * 0.04 }}
-                                className="p-4 rounded-xl border border-slate-200 bg-[#0f0f0f] hover:border-slate-200 transition-colors"
+                                className="p-4 rounded-xl border border-slate-200 bg-white hover:border-slate-300 transition-colors"
                             >
                                 <div className="text-2xl mb-2">{agent.icon}</div>
                                 <p className="text-xs font-mono font-bold text-slate-600">{agent.name}</p>

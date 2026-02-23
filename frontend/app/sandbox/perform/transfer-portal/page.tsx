@@ -110,7 +110,7 @@ export default function TransferPortalPage() {
                             value={search}
                             onChange={e => setSearch(e.target.value)}
                             placeholder="Search player, school, or position..."
-                            className="w-full pl-9 pr-4 py-2.5 bg-[#0f0f0f] border border-slate-200 rounded-xl text-sm text-slate-800 placeholder:text-slate-300 focus:outline-none focus:border-cyan-400/40 font-mono"
+                            className="w-full pl-9 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 placeholder:text-slate-300 focus:outline-none focus:border-cyan-400/40 font-mono"
                         />
                     </div>
 
@@ -155,7 +155,7 @@ export default function TransferPortalPage() {
 
                 {/* Empty State */}
                 {!loading && entries.length === 0 && (
-                    <motion.div variants={staggerItem} className="bg-[#0f0f0f] border border-cyan-400/10 rounded-2xl p-16 text-center">
+                    <motion.div variants={staggerItem} className="bg-white border border-cyan-400/10 rounded-2xl p-16 text-center">
                         <Shuffle size={36} className="text-cyan-400/20 mx-auto mb-4" />
                         <h3 className="text-xl font-display font-bold text-slate-500 mb-3">Transfer Portal Not Yet Indexed</h3>
                         <p className="text-sm text-slate-400 font-mono max-w-lg mx-auto mb-8 leading-relaxed">
@@ -187,7 +187,7 @@ export default function TransferPortalPage() {
                                     'text-emerald-400 border-emerald-400/30 bg-emerald-400/10';
 
                             return (
-                                <div key={player.id} className="bg-[#0f0f0f] border border-slate-100 rounded-2xl overflow-hidden hover:border-cyan-400/20 transition-all shadow-xl">
+                                <div key={player.id} className="bg-white border border-slate-100 rounded-2xl overflow-hidden hover:border-cyan-400/20 transition-all shadow-xl">
                                     <button
                                         onClick={() => setExpanded(isExpanded ? null : player.id)}
                                         className="w-full p-6 flex flex-col md:flex-row md:items-center gap-4 text-left"

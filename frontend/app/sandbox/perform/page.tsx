@@ -257,7 +257,7 @@ export default function PerFormHub() {
             >
               <Link
                 href={tile.href}
-                className={`group flex flex-col gap-3 p-5 rounded-2xl bg-[#0f0f0f] border border-slate-200 ${tile.border} transition-all duration-200 hover:bg-[#141414] h-full`}
+                className={`group flex flex-col gap-3 p-5 rounded-2xl bg-white border border-slate-200 ${tile.border} transition-all duration-200 hover:bg-[#F8FAFC] h-full`}
               >
                 <div className={`h-10 w-10 rounded-xl ${tile.bg} border ${tile.border.replace('hover:', '')} flex items-center justify-center ${tile.color}`}>
                   <tile.icon size={18} />
@@ -301,7 +301,7 @@ export default function PerFormHub() {
                 >
                   <Link
                     href={`/sandbox/perform/prospects/${getProspectSlug(prospect)}`}
-                    className="group flex items-center gap-5 p-5 rounded-2xl bg-[#0f0f0f] border border-slate-200 hover:border-gold/20 hover:bg-[#141414] transition-all"
+                    className="group flex items-center gap-5 p-5 rounded-2xl bg-white border border-slate-200 hover:border-gold/20 hover:bg-[#F8FAFC] transition-all"
                   >
                     {/* Rank */}
                     <span className="text-3xl font-black text-slate-300 w-10 text-center flex-shrink-0 group-hover:text-slate-300 transition-colors">
@@ -520,7 +520,7 @@ export default function PerFormHub() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 }}
-                className="group p-5 rounded-2xl bg-[#0f0f0f] border border-slate-200 hover:border-slate-200 transition-all cursor-pointer"
+                className="group p-5 rounded-2xl bg-white border border-slate-200 hover:border-slate-300 transition-all cursor-pointer"
               >
                 <div className="flex items-center gap-2 mb-3">
                   <span className="px-2 py-0.5 rounded text-[0.55rem] font-mono font-bold uppercase tracking-widest bg-gold/10 text-gold/80 border border-gold/20">

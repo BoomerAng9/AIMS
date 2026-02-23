@@ -47,7 +47,7 @@ export const AgentLoopVisualizer: React.FC<AgentLoopVisualizerProps> = ({ curren
                 className={`
                   w-16 h-16 rounded-full border-2 flex items-center justify-center
                   ${step.bg} 
-                  ${isActive || isCompleted ? step.color : 'border-gray-700 bg-obsidian'}
+                  ${isActive || isCompleted ? step.color : 'border-slate-300 bg-slate-100'}
                   transition-colors duration-300 z-10
                 `}
               >

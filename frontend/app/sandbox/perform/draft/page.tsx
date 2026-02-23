@@ -322,10 +322,10 @@ function DraftPageContent() {
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.9, y: 30 }}
               transition={{ type: 'spring', damping: 20, stiffness: 200 }}
-              className="relative w-[90vw] max-w-[800px] bg-[#0c0c0c] border border-slate-200 rounded-3xl overflow-hidden shadow-[0_0_80px_rgba(218,165,32,0.15)]"
+              className="relative w-[90vw] max-w-[800px] bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-[0_0_80px_rgba(218,165,32,0.15)]"
             >
               {/* Header */}
-              <div className="flex items-center justify-between px-6 py-3 bg-gradient-to-r from-red-900/30 via-[#0c0c0c] to-blue-900/30 border-b border-slate-200">
+              <div className="flex items-center justify-between px-6 py-3 bg-gradient-to-r from-red-100/50 via-white to-blue-100/50 border-b border-slate-200">
                 <div className="flex items-center gap-2">
                   <Swords size={16} className="text-gold" />
                   <span className="text-[0.6rem] font-mono uppercase tracking-[0.2em] text-gold font-bold">War Room Debate</span>
@@ -343,7 +343,7 @@ function DraftPageContent() {
               {/* Analysts Split Screen */}
               <div className="grid grid-cols-2 divide-x divide-white/5">
                 {/* BULL ANALYST — Boomer_Ang */}
-                <div className={`p-6 transition-all duration-500 ${debatePhase === 'bull' ? 'bg-red-950/20' : 'bg-transparent opacity-60'
+                <div className={`p-6 transition-all duration-500 ${debatePhase === 'bull' ? 'bg-red-50' : 'bg-transparent opacity-60'
                   }`}>
                   <div className="flex items-center gap-3 mb-4">
                     <div className="relative h-12 w-12 rounded-full overflow-hidden border-2 border-gold/40 shrink-0">
@@ -375,7 +375,7 @@ function DraftPageContent() {
                 </div>
 
                 {/* BEAR ANALYST — Lil_Hawk */}
-                <div className={`p-6 transition-all duration-500 ${debatePhase === 'bear' ? 'bg-blue-950/20' : 'bg-transparent opacity-60'
+                <div className={`p-6 transition-all duration-500 ${debatePhase === 'bear' ? 'bg-blue-50' : 'bg-transparent opacity-60'
                   }`}>
                   <div className="flex items-center gap-3 mb-4">
                     <div className="relative h-12 w-12 rounded-full overflow-hidden border-2 border-cyan-400/40 shrink-0">
@@ -543,7 +543,7 @@ function DraftPageContent() {
             NEWS CAROUSEL — 3-Second Auto-Scroll
             ═══════════════════════════════════════════════════════════ */}
         {newsItems.length > 0 && (
-          <motion.div variants={staggerItem} className="border-y border-slate-100 bg-[#0c0c0c]">
+          <motion.div variants={staggerItem} className="border-y border-slate-100 bg-[#F8FAFC]">
             <div className="max-w-[1400px] mx-auto px-6">
               <div className="flex items-stretch min-h-[72px]">
                 {/* Label */}
@@ -601,7 +601,7 @@ function DraftPageContent() {
           <motion.div variants={staggerItem} className="grid gap-4 sm:grid-cols-3">
             <Link
               href="/sandbox/perform/draft/mock"
-              className="group relative overflow-hidden rounded-2xl border border-slate-100 bg-[#0f0f0f] hover:border-gold/20 transition-all"
+              className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white hover:border-gold/20 transition-all"
             >
               <div className="relative h-40 w-full overflow-hidden">
                 <Image
@@ -610,7 +610,7 @@ function DraftPageContent() {
                   fill
                   className="object-cover object-top group-hover:scale-105 transition-transform duration-500"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0f0f0f] via-[#0f0f0f]/40 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-white via-white/40 to-transparent" />
               </div>
               <div className="p-5 relative">
                 <div className="flex items-center gap-2 mb-2">
@@ -624,7 +624,7 @@ function DraftPageContent() {
 
             <Link
               href="/sandbox/perform/draft/simulator"
-              className="group relative overflow-hidden rounded-2xl border border-slate-100 bg-[#0f0f0f] hover:border-emerald-400/20 transition-all"
+              className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white hover:border-emerald-400/20 transition-all"
             >
               <div className="relative h-40 w-full overflow-hidden">
                 <Image
@@ -633,7 +633,7 @@ function DraftPageContent() {
                   fill
                   className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0f0f0f] via-[#0f0f0f]/40 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-white via-white/40 to-transparent" />
               </div>
               <div className="p-5 relative">
                 <div className="flex items-center gap-2 mb-2">
@@ -647,9 +647,9 @@ function DraftPageContent() {
 
             <Link
               href="/sandbox/perform/big-board"
-              className="group relative overflow-hidden rounded-2xl border border-slate-100 bg-[#0f0f0f] hover:border-blue-400/20 transition-all"
+              className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white hover:border-blue-400/20 transition-all"
             >
-              <div className="relative h-40 w-full bg-gradient-to-br from-blue-950 via-[#0f0f0f] to-[#0f0f0f] overflow-hidden">
+              <div className="relative h-40 w-full bg-gradient-to-br from-blue-100 via-white to-white overflow-hidden">
                 <div className="absolute inset-0 flex items-center justify-center">
                   <Users size={48} className="text-blue-400/10" />
                 </div>
@@ -686,7 +686,7 @@ function DraftPageContent() {
                   placeholder="Search prospects..."
                   value={search}
                   onChange={e => setSearch(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2.5 text-sm bg-[#0f0f0f] border border-slate-200 rounded-xl text-slate-800 placeholder:text-slate-300 focus:outline-none focus:border-gold/30 transition-colors font-mono"
+                  className="w-full pl-9 pr-4 py-2.5 text-sm bg-white border border-slate-200 rounded-xl text-slate-800 placeholder:text-slate-300 focus:outline-none focus:border-gold/30 transition-colors font-mono"
                 />
               </div>
               <div className="flex gap-1.5 overflow-x-auto pb-1">
@@ -715,7 +715,7 @@ function DraftPageContent() {
 
             {/* Empty State */}
             {!loading && filtered.length === 0 && (
-              <div className="bg-[#0f0f0f] border border-slate-100 rounded-2xl p-12 text-center">
+              <div className="bg-white border border-slate-200 rounded-2xl p-12 text-center">
                 <Radar size={32} className="text-gold/20 mx-auto mb-4" />
                 <h3 className="text-lg font-display text-slate-500 mb-2">No Prospects Indexed</h3>
                 <p className="text-xs text-slate-400 font-mono max-w-md mx-auto mb-6">
@@ -733,8 +733,8 @@ function DraftPageContent() {
 
             {/* Prospect Table */}
             {!loading && filtered.length > 0 && (
-              <div className="bg-[#0f0f0f] border border-slate-100 rounded-2xl overflow-hidden">
-                <div className="hidden md:grid grid-cols-[60px_1fr_140px_80px_80px_100px_80px] gap-2 px-5 py-3 border-b border-slate-200 bg-white">
+              <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
+                <div className="hidden md:grid grid-cols-[60px_1fr_140px_80px_80px_100px_80px] gap-2 px-5 py-3 border-b border-slate-200 bg-[#F8FAFC]">
                   <span className="text-[0.55rem] font-mono text-slate-400 uppercase tracking-widest">Rank</span>
                   <span className="text-[0.55rem] font-mono text-slate-400 uppercase tracking-widest">Prospect</span>
                   <span className="text-[0.55rem] font-mono text-slate-400 uppercase tracking-widest">College</span>
@@ -827,7 +827,7 @@ function DraftPageContent() {
                 </Link>
               </div>
 
-              <div className="bg-[#0f0f0f] border border-slate-100 rounded-2xl overflow-hidden">
+              <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
                 {mockDraft.picks.slice(0, 10).map((pick: any) => {
                   const tierStyle = DRAFT_TIER_STYLES[pick.prospect?.tier as DraftTier] || DRAFT_TIER_STYLES.DAY_3;
                   return (

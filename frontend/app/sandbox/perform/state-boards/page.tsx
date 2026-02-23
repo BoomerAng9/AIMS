@@ -227,7 +227,7 @@ export default function StateBoardsPage() {
                             value={search}
                             onChange={e => setSearch(e.target.value)}
                             placeholder="Search states, players, or positions..."
-                            className="w-full pl-9 pr-4 py-2.5 bg-[#0f0f0f] border border-slate-200 rounded-xl text-sm text-slate-800 placeholder:text-slate-300 focus:outline-none focus:border-purple-400/40 font-mono"
+                            className="w-full pl-9 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 placeholder:text-slate-300 focus:outline-none focus:border-purple-400/40 font-mono"
                         />
                     </div>
 
@@ -245,7 +245,7 @@ export default function StateBoardsPage() {
                                 <div className="text-lg font-mono font-black">{st.code}</div>
                                 <div className="text-[0.5rem] font-mono opacity-70">{st.count}</div>
                                 {/* Tooltip */}
-                                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-[#1a1a1a] border border-slate-200 rounded-lg text-left min-w-[160px] opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-20 shadow-2xl">
+                                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-white border border-slate-200 rounded-lg text-left min-w-[160px] opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-20 shadow-2xl">
                                     <div className="text-xs font-display font-bold text-slate-800">{st.name}</div>
                                     <div className="text-[0.55rem] font-mono text-slate-400 mt-1">{st.count} prospects indexed</div>
                                     <div className="text-[0.55rem] font-mono text-purple-400 mt-0.5">{st.topProducer}</div>
@@ -262,7 +262,7 @@ export default function StateBoardsPage() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: 20 }}
-                            className="bg-[#0f0f0f] border border-purple-400/20 rounded-2xl overflow-hidden shadow-[0_0_40px_rgba(168,85,247,0.08)]"
+                            className="bg-white border border-purple-400/20 rounded-2xl overflow-hidden shadow-[0_0_40px_rgba(168,85,247,0.08)]"
                         >
                             <div className="p-6 border-b border-slate-100 flex items-center justify-between">
                                 <div className="flex items-center gap-4">
@@ -373,7 +373,7 @@ export default function StateBoardsPage() {
                                 animate={{ scale: 1, opacity: 1 }}
                                 exit={{ scale: 0.95, opacity: 0 }}
                                 onClick={e => e.stopPropagation()}
-                                className="bg-[#0f0f0f] border border-purple-500/20 rounded-2xl p-8 max-w-lg w-full shadow-[0_0_60px_rgba(168,85,247,0.1)] relative"
+                                className="bg-white border border-purple-500/20 rounded-2xl p-8 max-w-lg w-full shadow-[0_0_60px_rgba(168,85,247,0.1)] relative"
                             >
                                 <button onClick={() => setShowSubmitForm(false)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-800">
                                     <X size={20} />
