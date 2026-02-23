@@ -61,7 +61,7 @@ export const INDUSTRY_PRESETS: IndustryPreset[] = [
       { key: 'webhooks', name: 'Webhooks', unit: 'delivery', overageRate: 0.0005, description: 'Webhook deliveries', defaultQuota: 50000 },
       { key: 'email_sends', name: 'Emails', unit: 'email', overageRate: 0.001, description: 'Transactional emails', defaultQuota: 10000 },
     ],
-    recommendedPlan: 'professional',
+    recommendedPlan: 'pro',
     useCases: ['B2B SaaS', 'Developer tools', 'Internal platforms', 'API services'],
   },
 
@@ -103,7 +103,7 @@ export const INDUSTRY_PRESETS: IndustryPreset[] = [
       { key: 'api_calls', name: 'API Calls', unit: 'call', overageRate: 0.0001, description: 'Storefront API calls', defaultQuota: 50000 },
       { key: 'email_sends', name: 'Emails', unit: 'email', overageRate: 0.001, description: 'Order notifications', defaultQuota: 5000 },
     ],
-    recommendedPlan: 'starter',
+    recommendedPlan: 'coffee',
     useCases: ['Shopify stores', 'WooCommerce', 'Custom e-commerce', 'Marketplaces'],
   },
 
@@ -124,7 +124,7 @@ export const INDUSTRY_PRESETS: IndustryPreset[] = [
       { key: 'ai_captions', name: 'Auto Captions', unit: 'minute', overageRate: 0.01, description: 'AI-generated captions', defaultQuota: 300 },
       { key: 'thumbnails', name: 'Thumbnails', unit: 'image', overageRate: 0.005, description: 'Generated thumbnails', defaultQuota: 500 },
     ],
-    recommendedPlan: 'professional',
+    recommendedPlan: 'pro',
     useCases: ['YouTubers', 'Course creators', 'Podcasters', 'Streamers'],
   },
 
@@ -145,7 +145,7 @@ export const INDUSTRY_PRESETS: IndustryPreset[] = [
       { key: 'email_campaigns', name: 'Email Campaigns', unit: 'campaign', overageRate: 2.00, description: 'Marketing campaigns', defaultQuota: 10 },
       { key: 'market_reports', name: 'Market Reports', unit: 'report', overageRate: 0.50, description: 'CMA reports', defaultQuota: 20 },
     ],
-    recommendedPlan: 'starter',
+    recommendedPlan: 'coffee',
     useCases: ['Agents', 'Brokerages', 'Property managers', 'Real estate tech'],
   },
 
@@ -166,7 +166,7 @@ export const INDUSTRY_PRESETS: IndustryPreset[] = [
       { key: 'ad_campaigns', name: 'Ad Campaigns', unit: 'campaign', overageRate: 1.00, description: 'Amazon Ads campaigns', defaultQuota: 20 },
       { key: 'royalty_calcs', name: 'Royalty Calculations', unit: 'calc', overageRate: 0.01, description: 'Royalty projections', defaultQuota: 500 },
     ],
-    recommendedPlan: 'starter',
+    recommendedPlan: 'coffee',
     useCases: ['Self-publishers', 'KDP authors', 'Publishing houses', 'Ghostwriters'],
   },
 
@@ -187,7 +187,7 @@ export const INDUSTRY_PRESETS: IndustryPreset[] = [
       { key: 'social_posts', name: 'Social Posts', unit: 'post', overageRate: 0.10, description: 'Scheduled posts', defaultQuota: 500 },
       { key: 'team_seats', name: 'Team Seats', unit: 'seat', overageRate: 15.00, description: 'Team members', defaultQuota: 5 },
     ],
-    recommendedPlan: 'professional',
+    recommendedPlan: 'pro',
     useCases: ['Digital agencies', 'Social media managers', 'PR firms', 'Consultants'],
   },
 
@@ -208,7 +208,7 @@ export const INDUSTRY_PRESETS: IndustryPreset[] = [
       { key: 'invoices', name: 'Invoices', unit: 'invoice', overageRate: 0.25, description: 'Generated invoices', defaultQuota: 20 },
       { key: 'storage_gb', name: 'Storage', unit: 'GB', overageRate: 0.05, description: 'Project files', defaultQuota: 10 },
     ],
-    recommendedPlan: 'free',
+    recommendedPlan: 'p2p',
     useCases: ['Web developers', 'Designers', 'Writers', 'Consultants'],
   },
 ];

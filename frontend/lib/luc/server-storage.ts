@@ -179,7 +179,7 @@ export class ServerStorageAdapter {
     return result;
   }
 
-  async getOrCreateAccount(userId: string, planId: string = 'starter'): Promise<LUCAccountRecord> {
+  async getOrCreateAccount(userId: string, planId: string = 'p2p'): Promise<LUCAccountRecord> {
     let account = await this.getAccount(userId);
 
     if (!account) {
@@ -333,7 +333,7 @@ export class LUCServerAccountManager {
   /**
    * Get or create account for user
    */
-  async getOrCreateAccount(userId: string, planId: string = 'starter'): Promise<LUCAccountRecord> {
+  async getOrCreateAccount(userId: string, planId: string = 'p2p'): Promise<LUCAccountRecord> {
     return this.storage.getOrCreateAccount(userId, planId);
   }
 
