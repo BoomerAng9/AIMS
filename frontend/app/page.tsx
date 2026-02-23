@@ -3,17 +3,14 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   MessageSquare,
   Trophy,
   Hammer,
   Bird,
-  Sparkles,
   ArrowRight,
   ChevronRight,
-  Users,
-  Code2,
   Workflow,
   Shield,
   Zap,
@@ -96,7 +93,7 @@ function StatusBadge({ status }: { status: string }) {
     planned: "bg-slate-50 text-slate-500 border-slate-200",
   };
   return (
-    <span className={`inline-flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-[0.2em] rounded-full px-2.5 py-0.5 border ${styles[status as keyof typeof styles] || styles.planned}`}>
+    <span className={`inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-[0.15em] rounded-full px-2.5 py-0.5 border ${styles[status as keyof typeof styles] || styles.planned}`}>
       {status === "live" && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />}
       {status}
     </span>
@@ -229,11 +226,11 @@ function SiteNav() {
         </Link>
 
         <div className="flex items-center gap-6">
-          <Link href="/chat" className="text-[11px] font-mono uppercase tracking-widest text-slate-400 hover:text-amber-600 transition-colors hidden md:block">
+          <Link href="/chat" className="text-xs font-mono uppercase tracking-widest text-slate-400 hover:text-amber-600 transition-colors hidden md:block">
             Connect
           </Link>
           <Link
-            href="/(auth)/sign-in"
+            href="/sign-in"
             className="h-10 px-6 border border-amber-200 rounded-lg bg-amber-50 text-amber-700 text-xs font-bold uppercase tracking-widest hover:bg-amber-600 hover:text-slate-800 hover:border-amber-600 transition-all"
           >
             Unlock
@@ -277,7 +274,7 @@ function ExperienceGateway() {
               <div className="relative z-10 mt-auto space-y-4">
                 <h3 className="text-2xl font-bold text-slate-800 leading-tight">{exp.title}</h3>
                 <p className="text-slate-500 text-sm leading-relaxed font-light">{exp.description}</p>
-                <div className={`flex items-center gap-2 text-[11px] font-mono uppercase tracking-widest ${exp.accent} opacity-60 group-hover:opacity-100 transition-opacity`}>
+                <div className={`flex items-center gap-2 text-xs font-mono uppercase tracking-widest ${exp.accent} opacity-60 group-hover:opacity-100 transition-opacity`}>
                   Initialize <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
                 </div>
               </div>
@@ -346,7 +343,7 @@ function FinalCTA() {
             <Link href="/chat" className="h-16 px-12 bg-amber-600 text-slate-800 font-bold uppercase tracking-widest text-xs rounded-2xl inline-flex items-center justify-center gap-3 hover:bg-amber-700 hover:shadow-lg hover:shadow-amber-200/50 transition-all">
               Initiate Protocols
             </Link>
-            <Link href="/(auth)/sign-up" className="h-16 px-12 border border-slate-200 hover:border-amber-200 bg-white text-slate-700 font-bold uppercase tracking-widest text-xs rounded-2xl inline-flex items-center justify-center gap-3 transition-all hover:shadow-sm">
+            <Link href="/sign-up" className="h-16 px-12 border border-slate-200 hover:border-amber-200 bg-white text-slate-700 font-bold uppercase tracking-widest text-xs rounded-2xl inline-flex items-center justify-center gap-3 transition-all hover:shadow-sm">
               Establish Identity
             </Link>
           </div>
@@ -359,7 +356,7 @@ function FinalCTA() {
 function SiteFooter() {
   return (
     <footer className="py-16 border-t border-slate-200 px-6 relative z-10 bg-white">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8 text-slate-400 text-[10px] font-mono tracking-[0.3em] uppercase">
+      <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8 text-slate-400 text-xs font-mono tracking-[0.2em] uppercase">
         <p>&copy; {new Date().getFullYear()} ACHIEVEMOR &middot; A.I.M.S. Operations Protocol v2.5</p>
         <div className="flex gap-10">
           <Link href="/terms" className="hover:text-amber-600 transition-colors">Terms of Service</Link>
