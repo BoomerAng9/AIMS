@@ -202,8 +202,9 @@ These requirements define A.I.M.S. as what it literally is — a platform that m
 - [x] Implement Phase A step progression UI ← DONE: `VerticalStepIndicator.tsx` + `useVerticalFlow.ts` wired into ChatInterface
 - [x] Connect Phase B execution to Chicken Hawk dispatch ← DONE: NtNtN → classifyBuildIntent → generateBuildSteps → Chicken Hawk manifest → dispatch
 - [x] Enable n8n workflow triggers for automation verticals ← DONE: triggerVerticalWorkflow() auto-fires on Phase B execution, 8 vertical-to-webhook mappings
+- [x] Dedicated n8n workflow templates for all 8 verticals ← DONE: infra/n8n/workflows/vertical-*.json (automation, content-calendar, social-launch, cold-outreach, mvp-build, code-deploy, custom-hawk, livesim)
 - [x] Per|Form Film Room — Twelve Labs video intelligence integration ← DONE: client, 8 API routes, ScoutVerify engine, Film Room UI
-- [ ] Per|Form lobby with live gridiron data
+- [x] Per|Form lobby with live gridiron data ← DONE: Big Board page at /perform with conference grid, KPI strip, stadium leaderboard, search + tier filters
 - [x] Custom Lil_Hawks engine (types, engine, API routes, skill, vertical) ← DONE
 - [x] Playground/Sandbox engine (5 types, API routes, skill, vertical) ← DONE
 - [x] Wire Custom Hawks creation flow into dashboard UI ← DONE: `/dashboard/custom-hawks` with 4-step creator wizard

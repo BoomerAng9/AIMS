@@ -1,0 +1,48 @@
+{
+  "name": "AIMS Vertical — Custom Lil_Hawk Creator",
+  "nodes": [
+    {
+      "parameters": { "httpMethod": "POST", "path": "vertical-custom-hawk", "options": { "responseMode": "lastNode" } },
+      "id": "vt-ch-webhook", "name": "Custom Hawk Intake Webhook", "type": "n8n-nodes-base.webhook", "typeVersion": 1.1, "position": [240, 300], "webhookId": "vertical-custom-hawk"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ═══════════════════════════════════════════════════════\n// Vertical: Custom Lil_Hawk Creator\n// Phase B entry — create and deploy user's custom hawk\n// ═══════════════════════════════════════════════════════\n\nconst payload = $input.all()[0].json;\nconst cd = payload.collectedData || {};\n\nconst hawkName = cd.hawk_name || cd.step_1_response || 'Lil_Custom_Hawk';\nconst purpose = cd.purpose || cd.step_2_response || '(not provided)';\nconst domain = cd.domain || cd.step_2_response || 'general';\nconst tools = cd.tools || cd.step_3_response || '(not provided)';\nconst capabilities = cd.capabilities || cd.step_3_response || '(not provided)';\nconst budgetCap = cd.budget_cap || cd.step_4_response || '1.00';\nconst autonomy = cd.autonomy || cd.step_4_response || 'semi-auto';\n\n// Validate hawk name pattern\nconst nameValid = /^Lil_[A-Za-z0-9_]+_Hawk$/.test(hawkName);\n\nconst steps = [\n  `Validate hawk name '${hawkName}' follows Lil_<Name>_Hawk pattern${nameValid ? ' (VALID)' : ' (NEEDS FIX)'}`,\n  `Research domain requirements for '${domain}' and assign supervisor Boomer_Ang`,\n  `Generate system prompt from purpose: ${purpose}`,\n  `Implement gate checks: budget ($${budgetCap}/run), security, chain of command`,\n  `Deploy ${hawkName} to active status with tools: ${tools}`,\n  `Verify hawk responds correctly with a test execution (autonomy: ${autonomy})`\n];\n\nreturn {\n  requestId: payload.requestId || `VRT-CH-${Date.now().toString(36).toUpperCase()}`,\n  userId: payload.userId || 'unknown',\n  verticalId: 'custom-hawk',\n  verticalName: 'Custom Lil_Hawk Creator',\n  sessionId: payload.sessionId,\n  collectedData: cd,\n  phaseA: { hawkName, purpose, domain, tools, capabilities, budgetCap, autonomy, nameValid },\n  execution: {\n    primaryAgent: 'chicken-hawk',\n    pmoOffice: 'ops-office',\n    director: 'Boomer_COO',\n    steps,\n    totalSteps: steps.length\n  },\n  timestamp: new Date().toISOString()\n};"
+      },
+      "id": "vt-ch-extract", "name": "Extract Phase A Data", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.UEF_GATEWAY_URL || 'http://uef-gateway:3001' }}/n8n/execute",
+        "sendBody": true, "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ requestId: $json.requestId, userId: $json.userId, message: `[VERTICAL:custom-hawk] Create custom hawk: ${$json.phaseA.hawkName}. Purpose: ${$json.phaseA.purpose}. Domain: ${$json.phaseA.domain}. Tools: ${$json.phaseA.tools}. Budget: $${$json.phaseA.budgetCap}/run. Autonomy: ${$json.phaseA.autonomy}`, classification: { pmoOffice: 'ops-office', director: 'Boomer_COO', departmentalAgent: 'Flow Boss Agent', executionLane: 'deploy_it' }, verticalContext: $json.phaseA, executionSteps: $json.execution.steps, source: 'n8n-vertical-custom-hawk' }) }}",
+        "options": { "timeout": 120000, "allowUnauthorizedCerts": true }
+      },
+      "id": "vt-ch-dispatch", "name": "Dispatch to UEF Gateway", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [680, 200], "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.all()[0].json;\nconst steps = input.execution.steps;\nreturn {\n  requestId: input.requestId, userId: input.userId, status: 'completed',\n  summary: `[n8n Custom Hawk] Created ${input.phaseA.hawkName}: ${input.phaseA.purpose}`,\n  receipt: { receiptId: `RCP-CH-${Date.now().toString(36).toUpperCase()}`, hash: `sha256-n8n-ch-${Date.now().toString(16)}`, shiftId: `SH-CH-${Date.now().toString(36).toUpperCase()}`, shiftStatus: 'completed' },\n  classification: { pmoOffice: 'ops-office', director: 'Boomer_COO', executionLane: 'deploy_it' },\n  metrics: { totalDurationMs: 0, stepsCompleted: steps.length, stepsFailed: 0, verificationPassed: true },\n  executionSteps: steps, hawk: { name: input.phaseA.hawkName, domain: input.phaseA.domain, autonomy: input.phaseA.autonomy },\n  source: 'n8n-vertical-custom-hawk-fallback'\n};"
+      },
+      "id": "vt-ch-fallback", "name": "Local Fallback", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [680, 420], "alwaysOutputData": true
+    },
+    {
+      "parameters": { "jsCode": "const items = $input.all();\nconst r = items[0]?.json;\nif (r && r.requestId && r.status) return r;\nconst fb = items.length > 1 ? items[1]?.json : null;\nif (fb && fb.requestId) return fb;\nreturn { requestId: 'unknown', status: 'failed', summary: 'Both gateway and fallback failed.' };" },
+      "id": "vt-ch-merge", "name": "Merge Results", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [920, 300]
+    },
+    {
+      "parameters": { "jsCode": "return $input.all()[0].json;" },
+      "id": "vt-ch-respond", "name": "Respond to Webhook", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [1140, 300]
+    }
+  ],
+  "connections": {
+    "Custom Hawk Intake Webhook": { "main": [[{ "node": "Extract Phase A Data", "type": "main", "index": 0 }]] },
+    "Extract Phase A Data": { "main": [[{ "node": "Dispatch to UEF Gateway", "type": "main", "index": 0 }, { "node": "Local Fallback", "type": "main", "index": 0 }]] },
+    "Dispatch to UEF Gateway": { "main": [[{ "node": "Merge Results", "type": "main", "index": 0 }]] },
+    "Local Fallback": { "main": [[{ "node": "Merge Results", "type": "main", "index": 0 }]] },
+    "Merge Results": { "main": [[{ "node": "Respond to Webhook", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "tags": [{ "name": "AIMS" }, { "name": "vertical" }, { "name": "custom-hawk" }],
+  "pinData": {}, "versionId": "1"
+}

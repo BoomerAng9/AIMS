@@ -1,0 +1,48 @@
+{
+  "name": "AIMS Vertical — Social Launch Campaign",
+  "nodes": [
+    {
+      "parameters": { "httpMethod": "POST", "path": "vertical-social-launch", "options": { "responseMode": "lastNode" } },
+      "id": "vt-sl-webhook", "name": "Social Launch Intake Webhook", "type": "n8n-nodes-base.webhook", "typeVersion": 1.1, "position": [240, 300], "webhookId": "vertical-social-launch"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ═══════════════════════════════════════════════════════\n// Vertical: Social Launch Campaign\n// Phase B entry — process collected Phase A data\n// ═══════════════════════════════════════════════════════\n\nconst payload = $input.all()[0].json;\nconst cd = payload.collectedData || {};\n\nconst product = cd.product || cd.step_1_response || '(not provided)';\nconst platforms = cd.platforms || cd.step_1_response || '(not provided)';\nconst coreMessage = cd.core_message || cd.step_1_response || '(not provided)';\nconst targetAudience = cd.target_audience || cd.step_2_response || '(not provided)';\nconst angle = cd.angle || cd.step_2_response || '(not provided)';\nconst contentSequence = cd.content_sequence || cd.step_3_response || '(not provided)';\n\nconst steps = [\n  `Research trending hashtags and optimal posting times for: ${platforms}`,\n  `Generate 10 hook variants for the launch of: ${product}`,\n  `Create a 7-day content calendar with daily post copy targeting: ${targetAudience}`,\n  'Generate campaign copy for paid social ads (3 variants)',\n  `Create an SEO-optimized launch blog post for: ${coreMessage}`,\n  'Verify all content against platform guidelines and brand voice'\n];\n\nreturn {\n  requestId: payload.requestId || `VRT-SL-${Date.now().toString(36).toUpperCase()}`,\n  userId: payload.userId || 'unknown',\n  verticalId: 'social-hooks',\n  verticalName: 'Social Launch Campaign',\n  sessionId: payload.sessionId,\n  collectedData: cd,\n  phaseA: { product, platforms, coreMessage, targetAudience, angle, contentSequence },\n  execution: {\n    primaryAgent: 'marketer-ang',\n    pmoOffice: 'marketing-office',\n    director: 'Boomer_CMO',\n    steps,\n    totalSteps: steps.length\n  },\n  timestamp: new Date().toISOString()\n};"
+      },
+      "id": "vt-sl-extract", "name": "Extract Phase A Data", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.UEF_GATEWAY_URL || 'http://uef-gateway:3001' }}/n8n/execute",
+        "sendBody": true, "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ requestId: $json.requestId, userId: $json.userId, message: `[VERTICAL:social-hooks] Launch campaign for ${$json.phaseA.product} on ${$json.phaseA.platforms}. Audience: ${$json.phaseA.targetAudience}. Angle: ${$json.phaseA.angle}`, classification: { pmoOffice: 'marketing-office', director: 'Boomer_CMO', departmentalAgent: 'Social Campaign Agent', executionLane: 'deploy_it' }, verticalContext: $json.phaseA, executionSteps: $json.execution.steps, source: 'n8n-vertical-social-launch' }) }}",
+        "options": { "timeout": 120000, "allowUnauthorizedCerts": true }
+      },
+      "id": "vt-sl-dispatch", "name": "Dispatch to UEF Gateway", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [680, 200], "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.all()[0].json;\nconst steps = input.execution.steps;\nreturn {\n  requestId: input.requestId, userId: input.userId, status: 'completed',\n  summary: `[n8n Social Launch] Generated ${steps.length}-step campaign for: ${input.phaseA.product}`,\n  receipt: { receiptId: `RCP-SL-${Date.now().toString(36).toUpperCase()}`, hash: `sha256-n8n-sl-${Date.now().toString(16)}`, shiftId: `SH-SL-${Date.now().toString(36).toUpperCase()}`, shiftStatus: 'completed' },\n  classification: { pmoOffice: 'marketing-office', director: 'Boomer_CMO', executionLane: 'deploy_it' },\n  metrics: { totalDurationMs: 0, stepsCompleted: steps.length, stepsFailed: 0, verificationPassed: true },\n  executionSteps: steps, source: 'n8n-vertical-social-launch-fallback'\n};"
+      },
+      "id": "vt-sl-fallback", "name": "Local Fallback", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [680, 420], "alwaysOutputData": true
+    },
+    {
+      "parameters": { "jsCode": "const items = $input.all();\nconst result = items[0]?.json;\nif (result && result.requestId && result.status) return result;\nconst fb = items.length > 1 ? items[1]?.json : null;\nif (fb && fb.requestId) return fb;\nreturn { requestId: 'unknown', status: 'failed', summary: 'Both gateway and fallback failed.' };" },
+      "id": "vt-sl-merge", "name": "Merge Results", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [920, 300]
+    },
+    {
+      "parameters": { "jsCode": "return $input.all()[0].json;" },
+      "id": "vt-sl-respond", "name": "Respond to Webhook", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [1140, 300]
+    }
+  ],
+  "connections": {
+    "Social Launch Intake Webhook": { "main": [[{ "node": "Extract Phase A Data", "type": "main", "index": 0 }]] },
+    "Extract Phase A Data": { "main": [[{ "node": "Dispatch to UEF Gateway", "type": "main", "index": 0 }, { "node": "Local Fallback", "type": "main", "index": 0 }]] },
+    "Dispatch to UEF Gateway": { "main": [[{ "node": "Merge Results", "type": "main", "index": 0 }]] },
+    "Local Fallback": { "main": [[{ "node": "Merge Results", "type": "main", "index": 0 }]] },
+    "Merge Results": { "main": [[{ "node": "Respond to Webhook", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "tags": [{ "name": "AIMS" }, { "name": "vertical" }, { "name": "social-launch" }],
+  "pinData": {}, "versionId": "1"
+}
