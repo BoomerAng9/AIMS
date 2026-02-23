@@ -9,11 +9,8 @@ import {
   Trophy,
   Hammer,
   Bird,
-  Sparkles,
   ArrowRight,
   ChevronRight,
-  Users,
-  Code2,
   Workflow,
   Shield,
   Zap,
@@ -105,7 +102,7 @@ function StatusBadge({ status }: { status: string }) {
     planned: "bg-slate-50 text-slate-500 border-slate-200",
   };
   return (
-    <span className={`inline-flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-[0.2em] rounded-full px-2.5 py-0.5 border ${styles[status as keyof typeof styles] || styles.planned}`}>
+    <span className={`inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-[0.15em] rounded-full px-2.5 py-0.5 border ${styles[status as keyof typeof styles] || styles.planned}`}>
       {status === "live" && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />}
       {status}
     </span>
@@ -293,7 +290,7 @@ function SiteNav() {
         </Link>
 
         <div className="flex items-center gap-6">
-          <Link href="/chat" className="text-[11px] font-mono uppercase tracking-widest text-slate-400 hover:text-amber-600 transition-colors hidden md:block">
+          <Link href="/chat" className="text-xs font-mono uppercase tracking-widest text-slate-400 hover:text-amber-600 transition-colors hidden md:block">
             Connect
           </Link>
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
@@ -473,7 +470,7 @@ function FinalCTA() {
 function SiteFooter() {
   return (
     <footer className="py-16 border-t border-slate-200 px-6 relative z-10 bg-white">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8 text-slate-400 text-[10px] font-mono tracking-[0.3em] uppercase">
+      <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8 text-slate-400 text-xs font-mono tracking-[0.2em] uppercase">
         <p>&copy; {new Date().getFullYear()} ACHIEVEMOR &middot; A.I.M.S. Operations Protocol v2.5</p>
         <div className="flex gap-10">
           <Link href="/terms" className="hover:text-amber-600 transition-colors">Terms of Service</Link>
