@@ -60,6 +60,7 @@ import { paymentsRouter } from './payments';
 import { normalizeInput, getDialectStats, SLANG_ENTRY_COUNT, INTENT_PHRASE_COUNT } from './nlp';
 import { videoRouter } from './video';
 import { liveSim } from './livesim';
+import { composioRouter } from './composio';
 import logger from './logger';
 
 // Custom Lil_Hawks — User-Created Bots
@@ -2071,6 +2072,12 @@ app.use(shelfRouter);
 // Plug Catalog & Instance Management — PaaS Operations
 // --------------------------------------------------------------------------
 app.use('/api', plugRouter);
+
+// --------------------------------------------------------------------------
+// Composio Integration — Cross-Platform Actions (alongside n8n)
+// Composio = real-time, on-demand actions | n8n = scheduled pipelines
+// --------------------------------------------------------------------------
+app.use('/composio', composioRouter);
 
 // --------------------------------------------------------------------------
 // Circuit Metrics Proxy — Forward to circuit-metrics container
