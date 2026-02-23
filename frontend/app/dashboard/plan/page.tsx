@@ -1,40 +1,42 @@
 // frontend/app/dashboard/plan/page.tsx
 "use client";
 
-import React from "react";
-import { Target, ArrowRight, Clock, CheckCircle2, Circle, Loader2 } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { Target, ArrowRight, Clock, CheckCircle2, Circle, Loader2, RefreshCw } from "lucide-react";
 
-const missions = [
-  {
-    id: "m-001",
-    title: "CRM Plug for Real Estate Agents",
-    status: "in_progress" as const,
-    progress: 45,
-    steps: [
-      { label: "Intent Analysis (AVVA NOON)", done: true },
-      { label: "Schema Design (Engineer_Ang)", done: true },
-      { label: "API Endpoints", done: false },
-      { label: "Frontend Dashboard", done: false },
-      { label: "ORACLE Verification", done: false },
-    ],
-    estimatedCost: "$18.40",
-    created: "2026-02-03",
-  },
-  {
-    id: "m-002",
-    title: "Automated Outreach Sequence",
-    status: "pending" as const,
-    progress: 0,
-    steps: [
-      { label: "Campaign Strategy (Marketer_Ang)", done: false },
-      { label: "Copy Generation", done: false },
-      { label: "Scheduling Integration", done: false },
-      { label: "Analytics Hook-up", done: false },
-    ],
-    estimatedCost: "$7.20",
-    created: "2026-02-04",
-  },
-];
+interface PipelineStep {
+  stage: string;
+  status: string;
+}
+
+interface Project {
+  id: string;
+  name: string;
+  description: string;
+  status: string;
+  createdAt: string;
+  pipeline?: {
+    currentStage: string;
+    stages: PipelineStep[];
+    progress: number;
+  } | null;
+}
+
+function projectStatus(p: Project): "completed" | "in_progress" | "pending" {
+  if (p.status === "completed" || p.status === "deployed") return "completed";
+  if (p.status === "in_progress" || p.status === "building") return "in_progress";
+  return "pending";
+}
+
+function projectProgress(p: Project): number {
+  if (!p.pipeline?.stages?.length) {
+    if (p.status === "completed" || p.status === "deployed") return 100;
+    if (p.status === "in_progress" || p.status === "building") return 50;
+    return 0;
+  }
+  const done = p.pipeline.stages.filter(s => s.status === "complete" || s.status === "done").length;
+  return Math.round((done / p.pipeline.stages.length) * 100);
+}
 
 function StatusBadge({ status }: { status: "in_progress" | "pending" | "completed" }) {
   const config = {
@@ -52,6 +54,26 @@ function StatusBadge({ status }: { status: "in_progress" | "pending" | "complete
 }
 
 export default function PlanPage() {
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchProjects = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/projects");
+      if (res.ok) {
+        const data = await res.json();
+        setProjects(data.projects || []);
+      }
+    } catch {
+      // Silent — show empty state
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { fetchProjects(); }, []);
+
   return (
     <div className="space-y-6 animate-in fade-in duration-700">
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-4">
@@ -63,93 +85,123 @@ export default function PlanPage() {
             Track active objectives orchestrated by ACHEEVY and executed by your Boomer_Ang team.
           </p>
         </div>
-        <button
-          onClick={() => {
-            const input = document.querySelector<HTMLInputElement>('input[placeholder*="ACHEEVY"]');
-            if (input) { input.focus(); }
-          }}
-          className="flex items-center gap-2 rounded-full bg-gold px-5 py-2.5 text-xs font-bold text-black shadow-[0_0_15px_rgba(251,191,36,0.3)] transition-all hover:scale-105 active:scale-95"
-        >
-          <Target size={14} />
-          New Mission
-        </button>
-      </header>
-
-      <div className="space-y-4">
-        {missions.map((mission) => (
-          <div
-            key={mission.id}
-            className="group rounded-3xl border border-wireframe-stroke bg-black/60 p-6 backdrop-blur-2xl transition-all hover:border-gold/20"
+        <div className="flex gap-2">
+          <button
+            onClick={fetchProjects}
+            disabled={loading}
+            className="flex items-center gap-2 rounded-full border border-wireframe-stroke px-4 py-2.5 text-xs font-semibold text-white/50 transition-all hover:border-gold/20 hover:text-gold"
           >
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 text-gold">
-                  <Target size={20} />
-                </div>
-                <div>
-                  <h3 className="text-sm font-semibold text-white">{mission.title}</h3>
-                  <p className="text-[10px] text-white/30 mt-0.5">
-                    Created {mission.created} &middot; Est. {mission.estimatedCost}
-                  </p>
-                </div>
-              </div>
-              <StatusBadge status={mission.status} />
-            </div>
-
-            {/* Progress Bar */}
-            <div className="mt-5">
-              <div className="flex justify-between text-[10px] mb-1.5">
-                <span className="text-white/40 uppercase tracking-wider">Progress</span>
-                <span className="text-gold font-semibold">{mission.progress}%</span>
-              </div>
-              <div className="h-1.5 w-full rounded-full bg-white/5 overflow-hidden">
-                <div
-                  className="h-full rounded-full bg-gradient-to-r from-gold to-gold transition-all"
-                  style={{ width: `${mission.progress}%` }}
-                />
-              </div>
-            </div>
-
-            {/* Steps */}
-            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-              {mission.steps.map((step, i) => (
-                <div
-                  key={i}
-                  className={`flex items-center gap-2 rounded-xl p-2.5 text-xs ${
-                    step.done
-                      ? "bg-emerald-400/5 text-emerald-400"
-                      : "bg-white/5 text-white/40"
-                  }`}
-                >
-                  {step.done ? (
-                    <CheckCircle2 size={14} className="flex-shrink-0" />
-                  ) : (
-                    <Circle size={14} className="flex-shrink-0" />
-                  )}
-                  {step.label}
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
-
-        {/* Empty state CTA */}
-        <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-wireframe-stroke bg-black/20 p-10 text-center">
-          <Target size={32} className="text-white/20" />
-          <p className="mt-3 text-sm text-white/30">
-            Start a conversation with ACHEEVY to create your next mission plan.
-          </p>
+            <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
+            Refresh
+          </button>
           <button
             onClick={() => {
               const input = document.querySelector<HTMLInputElement>('input[placeholder*="ACHEEVY"]');
               if (input) { input.focus(); }
             }}
-            className="mt-4 flex items-center gap-2 rounded-full border border-gold/20 px-5 py-2 text-xs font-semibold text-gold hover:bg-gold/10 transition-colors"
+            className="flex items-center gap-2 rounded-full bg-gold px-5 py-2.5 text-xs font-bold text-black shadow-[0_0_15px_rgba(251,191,36,0.3)] transition-all hover:scale-105 active:scale-95"
           >
-            Open Chat <ArrowRight size={12} />
+            <Target size={14} />
+            New Mission
           </button>
         </div>
-      </div>
+      </header>
+
+      {loading ? (
+        <div className="flex items-center justify-center py-20">
+          <Loader2 size={24} className="animate-spin text-gold" />
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {projects.map((project) => {
+            const status = projectStatus(project);
+            const progress = projectProgress(project);
+            const steps = project.pipeline?.stages || [];
+
+            return (
+              <div
+                key={project.id}
+                className="group rounded-3xl border border-wireframe-stroke bg-black/60 p-6 backdrop-blur-2xl transition-all hover:border-gold/20"
+              >
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 text-gold">
+                      <Target size={20} />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-semibold text-white">{project.name}</h3>
+                      <p className="text-[10px] text-white/30 mt-0.5">
+                        Created {new Date(project.createdAt).toLocaleDateString()}
+                        {project.description && ` · ${project.description.slice(0, 60)}${project.description.length > 60 ? '...' : ''}`}
+                      </p>
+                    </div>
+                  </div>
+                  <StatusBadge status={status} />
+                </div>
+
+                {/* Progress Bar */}
+                <div className="mt-5">
+                  <div className="flex justify-between text-[10px] mb-1.5">
+                    <span className="text-white/40 uppercase tracking-wider">Progress</span>
+                    <span className="text-gold font-semibold">{progress}%</span>
+                  </div>
+                  <div className="h-1.5 w-full rounded-full bg-white/5 overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-gradient-to-r from-gold to-gold transition-all"
+                      style={{ width: `${progress}%` }}
+                    />
+                  </div>
+                </div>
+
+                {/* Pipeline Steps */}
+                {steps.length > 0 && (
+                  <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                    {steps.map((step, i) => {
+                      const done = step.status === "complete" || step.status === "done";
+                      return (
+                        <div
+                          key={i}
+                          className={`flex items-center gap-2 rounded-xl p-2.5 text-xs ${
+                            done
+                              ? "bg-emerald-400/5 text-emerald-400"
+                              : "bg-white/5 text-white/40"
+                          }`}
+                        >
+                          {done ? (
+                            <CheckCircle2 size={14} className="flex-shrink-0" />
+                          ) : (
+                            <Circle size={14} className="flex-shrink-0" />
+                          )}
+                          {step.stage}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+
+          {/* Empty state CTA */}
+          {projects.length === 0 && (
+            <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-wireframe-stroke bg-black/20 p-10 text-center">
+              <Target size={32} className="text-white/20" />
+              <p className="mt-3 text-sm text-white/30">
+                Start a conversation with ACHEEVY to create your next mission plan.
+              </p>
+              <button
+                onClick={() => {
+                  const input = document.querySelector<HTMLInputElement>('input[placeholder*="ACHEEVY"]');
+                  if (input) { input.focus(); }
+                }}
+                className="mt-4 flex items-center gap-2 rounded-full border border-gold/20 px-5 py-2 text-xs font-semibold text-gold hover:bg-gold/10 transition-colors"
+              >
+                Open Chat <ArrowRight size={12} />
+              </button>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
