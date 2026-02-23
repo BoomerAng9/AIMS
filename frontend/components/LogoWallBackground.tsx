@@ -11,15 +11,17 @@ type Props = {
 };
 
 /**
- * LogoWallBackground — Clean branded environment
+ * LogoWallBackground — Clean branded environment with embossed logo
  *
- * Light, minimal background with optional subtle logo watermark.
+ * Light, minimal background with a subtle raised/embossed AIMS logo watermark.
  * Professional SaaS feel with warm accent touches.
  */
 export function LogoWallBackground({ mode = "hero", children }: Props) {
+  const showLogo = mode === "hero" || mode === "auth" || mode === "dashboard";
+
   return (
     <div className={clsx(
-      "relative",
+      "relative overflow-hidden",
       mode === "dashboard" ? "h-full bg-[#F8FAFC]" : "min-h-full bg-[#F8FAFC]"
     )}>
       {/* Subtle warm gradient accent — top-left */}
@@ -39,6 +41,28 @@ export function LogoWallBackground({ mode = "hero", children }: Props) {
         }}
         aria-hidden="true"
       />
+
+      {/* Embossed logo watermark — subtle raised/debossed effect */}
+      {showLogo && (
+        <div
+          className="pointer-events-none absolute z-[1]"
+          style={{
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: mode === "auth" ? '500px' : '700px',
+            height: mode === "auth" ? '500px' : '700px',
+            backgroundImage: 'url(/assets/aims_transparent_logo.svg)',
+            backgroundSize: 'contain',
+            backgroundRepeat: 'no-repeat',
+            backgroundPosition: 'center',
+            opacity: 0.035,
+            filter: 'drop-shadow(1px 1px 0 rgba(255,255,255,0.8)) drop-shadow(-1px -1px 0 rgba(0,0,0,0.04)) drop-shadow(2px 2px 1px rgba(217,119,6,0.06))',
+            mixBlendMode: 'multiply',
+          }}
+          aria-hidden="true"
+        />
+      )}
 
       {/* Content */}
       <main className={clsx(

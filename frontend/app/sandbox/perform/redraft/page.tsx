@@ -129,11 +129,11 @@ export default function RedraftHubPage() {
                 ) : (
                     <motion.div variants={staggerItem} className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         {redraftCards.map((card) => (
-                            <div key={card.id} className="bg-[#0f0f0f] border border-slate-200 rounded-2xl overflow-hidden hover:border-gold/30 transition-colors group flex flex-col h-full shadow-2xl">
+                            <div key={card.id} className="bg-white border border-slate-200 rounded-2xl overflow-hidden hover:border-gold/30 transition-colors group flex flex-col h-full shadow-sm">
 
                                 {/* Visual Header Mock (Color blocks mimicking jerseys) */}
                                 <div className="h-32 relative flex items-end p-4 border-b border-slate-100">
-                                    <div className="absolute inset-0 bg-gradient-to-t from-[#0f0f0f] to-transparent z-10" />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-white to-transparent z-10" />
                                     {/* Abstract bg color mapping based on team */}
                                     <div className={`absolute inset-0 opacity-20 ${card.nflTeam.includes('Titans') ? 'bg-sky-500' :
                                             card.nflTeam.includes('Jaguars') ? 'bg-teal-500' : 'bg-orange-800'
@@ -164,7 +164,7 @@ export default function RedraftHubPage() {
                                 </div>
 
                                 {/* Card Content */}
-                                <div className="p-6 flex flex-col flex-1 bg-[#0f0f0f]">
+                                <div className="p-6 flex flex-col flex-1 bg-white">
                                     <div className="mb-4">
                                         <h2 className="text-2xl font-display font-bold text-slate-800 tracking-tight">{card.name} | <span className="text-slate-400">{card.position}</span></h2>
                                         <p className="text-[0.65rem] font-mono text-slate-400 uppercase tracking-widest mt-1">&middot; {card.nflTeam} Selection</p>

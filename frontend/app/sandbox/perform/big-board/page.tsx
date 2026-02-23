@@ -128,7 +128,7 @@ export default function BigBoardPage() {
         </motion.div>
 
         {/* Big Board Table */}
-        <motion.div variants={staggerItem} className="bg-[#0f0f0f] border border-slate-100 rounded-2xl overflow-hidden shadow-2xl">
+        <motion.div variants={staggerItem} className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
           {/* Table Header */}
           <div className="hidden md:grid grid-cols-[80px_2fr_100px_1fr_1fr_120px_100px_100px_40px] gap-4 px-6 py-4 border-b border-slate-100 text-[0.6rem] font-mono font-bold uppercase tracking-widest text-slate-400 bg-white">
             <span>Rank</span>
@@ -186,8 +186,8 @@ export default function BigBoardPage() {
 
                     {/* Player */}
                     <div className="flex items-center gap-4">
-                      <div className="h-10 w-10 bg-zinc-800 rounded-md overflow-hidden relative border border-slate-200 shrink-0 flex items-center justify-center">
-                        <span className="text-slate-300 text-xs font-display">{prospect.firstName[0]}{prospect.lastName[0]}</span>
+                      <div className="h-10 w-10 bg-slate-100 rounded-md overflow-hidden relative border border-slate-200 shrink-0 flex items-center justify-center">
+                        <span className="text-slate-500 text-xs font-display">{prospect.firstName[0]}{prospect.lastName[0]}</span>
                       </div>
                       <div>
                         <div className="text-base text-slate-800 font-semibold flex items-center gap-2">
@@ -273,7 +273,7 @@ export default function BigBoardPage() {
 
         {/* Dashboard Widgets Row */}
         <motion.div variants={staggerItem} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="bg-[#0f0f0f] border border-slate-100 rounded-xl p-6 relative overflow-hidden">
+          <div className="bg-white border border-slate-200 rounded-xl p-6 relative overflow-hidden">
             <h3 className="text-[0.65rem] font-bold font-mono text-gold uppercase tracking-widest mb-4">P.A.I. Scoring Guide</h3>
             <div className="space-y-3">
               <div className="flex justify-between items-center text-xs font-mono">
@@ -295,7 +295,7 @@ export default function BigBoardPage() {
             </div>
           </div>
 
-          <div className="bg-[#0f0f0f] border border-gold/10 rounded-xl p-6 relative flex flex-col justify-center">
+          <div className="bg-white border border-gold/10 rounded-xl p-6 relative flex flex-col justify-center">
             <div className="absolute inset-0 bg-gold/5 opacity-50 pointer-events-none" />
             <div className="flex items-start gap-4 mb-4">
               <div className="h-10 w-10 rounded bg-gold/20 border border-gold/30 flex items-center justify-center shrink-0">
@@ -311,7 +311,7 @@ export default function BigBoardPage() {
             </p>
           </div>
 
-          <div className="bg-[#0f0f0f] border border-slate-100 rounded-xl p-6 flex flex-col items-center justify-center text-center">
+          <div className="bg-white border border-slate-200 rounded-xl p-6 flex flex-col items-center justify-center text-center">
             <h3 className="text-[0.65rem] font-bold font-mono text-slate-400 uppercase tracking-widest mb-2">Platform Stability</h3>
             <div className="text-4xl font-display font-black text-emerald-400 mb-1">99.9%</div>
             <div className="flex items-center gap-1.5 text-[0.6rem] text-emerald-400/50 font-mono uppercase tracking-widest">

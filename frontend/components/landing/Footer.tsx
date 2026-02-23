@@ -116,7 +116,7 @@ export function Footer() {
     <footer
       className="relative z-20 mt-0 py-8 px-6"
       style={{
-        backgroundColor: '#0f1219',
+        backgroundColor: '#F1F5F9',
         borderTop: `1px solid ${AIMS_CIRCUIT_COLORS.dimLine}`,
         clear: 'both',
       }}
