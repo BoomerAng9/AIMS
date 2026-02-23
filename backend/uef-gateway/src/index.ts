@@ -685,6 +685,14 @@ app.get('/llm/usage', (req, res) => {
 });
 
 // --------------------------------------------------------------------------
+// Factory Controller — Always-On Orchestration (FDH Pipeline)
+// Persistent factory loop: watches events → auto-kicks FDH → drives to completion
+// Integrates with Manage It / Guide Me paths for human-in-the-loop gates
+// --------------------------------------------------------------------------
+import { factoryRouter } from './factory';
+app.use('/factory', factoryRouter);
+
+// --------------------------------------------------------------------------
 // ACHEEVY Orchestrator — Intent classification → agent dispatch
 // This is the PRIMARY execution path for the chat interface.
 // Frontend sends: { userId, message, intent, context }

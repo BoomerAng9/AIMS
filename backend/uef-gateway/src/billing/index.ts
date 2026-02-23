@@ -22,18 +22,27 @@ import { agentTransactionStore, agentWalletStore } from './persistence';
 export type TaskType =
   | 'CODE_GEN' | 'CODE_REVIEW' | 'ARCHITECTURE'
   | 'AGENT_SWARM' | 'SECURITY_AUDIT' | 'DEPLOYMENT'
-  | 'WORKFLOW_AUTO' | 'BIZ_INTEL' | 'FULL_AUTONOMOUS';
+  | 'WORKFLOW_AUTO' | 'BIZ_INTEL' | 'FULL_AUTONOMOUS'
+  | 'BUILD' | 'FDH_FOSTER' | 'FDH_DEVELOP' | 'FDH_HONE'
+  | 'FACTORY_RUN' | 'HEALTH_REMEDIATION';
 
 export const TASK_MULTIPLIERS: Record<TaskType, { multiplier: number; label: string }> = {
-  CODE_GEN:        { multiplier: 1.0,  label: 'Code Generation' },
-  CODE_REVIEW:     { multiplier: 1.2,  label: 'Code Review' },
-  WORKFLOW_AUTO:   { multiplier: 1.3,  label: 'Workflow Automation' },
-  SECURITY_AUDIT:  { multiplier: 1.45, label: 'Security Audit' },
-  ARCHITECTURE:    { multiplier: 1.5,  label: 'Architecture Planning' },
-  BIZ_INTEL:       { multiplier: 1.6,  label: 'Business Intelligence' },
-  DEPLOYMENT:      { multiplier: 1.1,  label: 'Deployment Jobs' },
-  AGENT_SWARM:     { multiplier: 2.0,  label: 'Multi-Agent Orchestration' },
-  FULL_AUTONOMOUS: { multiplier: 3.0,  label: 'Full Autonomous Swarm' },
+  CODE_GEN:            { multiplier: 1.0,  label: 'Code Generation' },
+  CODE_REVIEW:         { multiplier: 1.2,  label: 'Code Review' },
+  WORKFLOW_AUTO:       { multiplier: 1.3,  label: 'Workflow Automation' },
+  SECURITY_AUDIT:      { multiplier: 1.45, label: 'Security Audit' },
+  ARCHITECTURE:        { multiplier: 1.5,  label: 'Architecture Planning' },
+  BIZ_INTEL:           { multiplier: 1.6,  label: 'Business Intelligence' },
+  DEPLOYMENT:          { multiplier: 1.1,  label: 'Deployment Jobs' },
+  AGENT_SWARM:         { multiplier: 2.0,  label: 'Multi-Agent Orchestration' },
+  FULL_AUTONOMOUS:     { multiplier: 3.0,  label: 'Full Autonomous Swarm' },
+  // Factory Controller / FDH Machine-Job Types
+  BUILD:               { multiplier: 1.5,  label: 'Build Pipeline (NtNtN)' },
+  FDH_FOSTER:          { multiplier: 0.3,  label: 'FDH Foster — Context Ingestion' },
+  FDH_DEVELOP:         { multiplier: 1.5,  label: 'FDH Develop — Build Execution' },
+  FDH_HONE:            { multiplier: 0.5,  label: 'FDH Hone — ORACLE Verification' },
+  FACTORY_RUN:         { multiplier: 1.8,  label: 'Factory Run (Full FDH Pipeline)' },
+  HEALTH_REMEDIATION:  { multiplier: 0.2,  label: 'Health Remediation (Auto)' },
 };
 
 // ---------------------------------------------------------------------------
