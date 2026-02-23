@@ -393,6 +393,7 @@ Skills inject specialized context, SOPs, and design standards into ACHEEVY's beh
 | **Voice (ElevenLabs + Deepgram)** | `skills/integrations/voice-elevenlabs-deepgram.md` | "voice", "tts", "stt", "waveform" | Voice-first UX: live waveform, editable transcript, TTS playback controls |
 | **NVIDIA PersonaPlex** | `skills/integrations/nvidia-personaplex.skill.md` | "personaplex", "full duplex voice", "nvidia voice" | Full-duplex speech-to-speech: 7B model, 0.07s switch latency, WebSocket |
 | **NVIDIA Parakeet** | `skills/integrations/nvidia-parakeet.skill.md` | "parakeet", "nvidia asr", "nvidia transcription" | State-of-the-art ASR: 6.05% WER, 3,386x real-time, CC-BY-4.0 |
+| **Paperform** | `skills/integrations/paperform.skill.md` | "paperform", "form", "intake form", "questionnaire", "survey", "client intake", "needs analysis form" | Form builder via Pipedream MCP — create forms, process submissions, automate intake for all verticals |
 
 #### Security Skills (`skills/security/`)
 
@@ -738,7 +739,7 @@ Every tool and capability is **owned** by a Boomer_Ang. No raw tool access.
 | `Licensing_Ang` | Compliance | AGPL/license quarantine, PPTist |
 | `Picker_Ang` | Component Selection | NtNtN Engine navigation, stack curation, creative intent analysis |
 | `Buildsmith` | Construction | Web builds, component assembly, creative execution (special: no _Ang suffix) |
-| `Plug_Ang` | Integration & MCP | API key management, account creation, MCP wiring, Composio gateway |
+| `Plug_Ang` | Integration & MCP | API key management, account creation, MCP wiring, Composio gateway, Pipedream MCP bridge (Paperform + 3,000+ apps) |
 
 ### Boomer_Ang Brain Files
 Each Boomer_Ang wrapping an Intelligent Internet repo has a dedicated brain file in `aims-skills/brains/`.

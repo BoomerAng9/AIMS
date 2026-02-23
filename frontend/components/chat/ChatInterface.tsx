@@ -267,6 +267,35 @@ function MessageBubble({ message, onSpeak, onCopy, isLast }: MessageBubbleProps)
 }
 
 // ─────────────────────────────────────────────────────────────
+// Isolated Voice Visual Components (prevent 60fps parent re-renders)
+// ─────────────────────────────────────────────────────────────
+
+function VoicePingEffect({ stream, isListening }: { stream: MediaStream | null; isListening: boolean }) {
+  const audioLevel = useAudioLevel(stream, isListening);
+  return (
+    <div
+      className="absolute inset-0 rounded-xl border-2 border-red-400 animate-ping"
+      style={{ opacity: audioLevel * 0.5 }}
+    />
+  );
+}
+
+function VoiceEqualizer({ stream, isListening }: { stream: MediaStream | null; isListening: boolean }) {
+  const audioLevel = useAudioLevel(stream, isListening);
+  return (
+    <div className="flex gap-0.5 items-end h-4">
+      {[0.3, 0.6, 1, 0.7, 0.4].map((scale, i) => (
+        <div
+          key={i}
+          className="w-0.5 bg-red-400/60 rounded-full transition-all duration-75"
+          style={{ height: `${Math.max(4, audioLevel * scale * 16)}px` }}
+        />
+      ))}
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
 // Voice Input Button Component
 // ─────────────────────────────────────────────────────────────
 
@@ -279,7 +308,6 @@ interface VoiceInputButtonProps {
 }
 
 function VoiceInputButton({ isListening, isProcessing, stream, onStart, onStop }: VoiceInputButtonProps) {
-  const audioLevel = useAudioLevel(stream, isListening);
   const [elapsed, setElapsed] = useState(0);
 
   useEffect(() => {
@@ -304,13 +332,8 @@ function VoiceInputButton({ isListening, isProcessing, stream, onStart, onStop }
           ${isProcessing ? 'opacity-50 cursor-not-allowed' : ''}
         `}
       >
-        {/* Audio level ring */}
-        {isListening && (
-          <div
-            className="absolute inset-0 rounded-xl border-2 border-red-400 animate-ping"
-            style={{ opacity: audioLevel * 0.5 }}
-          />
-        )}
+        {/* Audio level ring — isolated to prevent 60fps re-renders */}
+        {isListening && <VoicePingEffect stream={stream} isListening={isListening} />}
 
         {isProcessing ? (
           <div className="w-5 h-5 border-2 border-gold border-t-transparent rounded-full animate-spin" />
@@ -324,15 +347,7 @@ function VoiceInputButton({ isListening, isProcessing, stream, onStart, onStop }
         <div className="flex items-center gap-1.5">
           <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
           <span className="text-xs font-mono text-red-400">{fmt(elapsed)}</span>
-          <div className="flex gap-0.5 items-end h-4">
-            {[0.3, 0.6, 1, 0.7, 0.4].map((scale, i) => (
-              <div
-                key={i}
-                className="w-0.5 bg-red-400/60 rounded-full transition-all duration-75"
-                style={{ height: `${Math.max(4, audioLevel * scale * 16)}px` }}
-              />
-            ))}
-          </div>
+          <VoiceEqualizer stream={stream} isListening={isListening} />
         </div>
       )}
 

@@ -157,6 +157,25 @@
           "wrapper_type": "JOB_RUNNER_WRAPPER"
         }
       ]
+    },
+    {
+      "pack_id": "G",
+      "name": "MCP Bridge Integrations",
+      "primary": "Third-party services wired through MCP bridge gateways (Pipedream, Composio).",
+      "repos": [
+        {
+          "repo": "pipedream-mcp",
+          "delegated_owner": "Plug_Ang",
+          "role": "Hosted MCP server platform — 3,000+ app integrations via SSE",
+          "wrapper_type": "MCP_BRIDGE_WRAPPER"
+        },
+        {
+          "repo": "paperform",
+          "delegated_owner": "Plug_Ang",
+          "role": "Form builder — client intake, needs analysis, surveys, bookings via Pipedream MCP",
+          "wrapper_type": "MCP_BRIDGE_WRAPPER"
+        }
+      ]
     }
   ],
 

@@ -64,6 +64,8 @@ export const TOOL_REGISTRY: readonly ToolEntry[] = [
   // ── Workflow / Automation ───────────────────────────────────────────
   { id: 'agent-zero', file: 'agent-zero.tool.md', category: 'workflow', provider: 'Agent Zero', envVars: ['OPENROUTER_API_KEY'] },
   { id: 'composio', file: 'composio.tool.md', category: 'workflow', provider: 'Composio', envVars: ['COMPOSIO_API_KEY'] },
+  { id: 'pipedream-mcp', file: 'pipedream-mcp.tool.md', category: 'workflow', provider: 'Pipedream', envVars: ['PIPEDREAM_API_KEY', 'PIPEDREAM_MCP_URL'] },
+  { id: 'paperform', file: 'paperform.tool.md', category: 'workflow', provider: 'Paperform', envVars: ['PIPEDREAM_API_KEY'] },
 
   // ── Web Tools ───────────────────────────────────────────────────────
   { id: 'firecrawl', file: 'firecrawl.tool.md', category: 'web', provider: 'Firecrawl', envVars: ['FIRECRAWL_API_KEY'] },
