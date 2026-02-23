@@ -7,61 +7,61 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Surfaces (dark legacy)
-        obsidian: '#0A0A0A',
-        surface: '#111111',
-        'surface-raised': '#161616',
-        charcoal: '#111111',
-        leather: '#1A1A1A',
-        gunmetal: '#2A2A2A',
-        ink: '#0B0E14',
+        // Light Surfaces
+        obsidian: '#F8FAFC',
+        surface: '#FFFFFF',
+        'surface-raised': '#F1F5F9',
+        charcoal: '#F8FAFC',
+        leather: '#F1F5F9',
+        gunmetal: '#E2E8F0',
+        ink: '#F8FAFC',
 
-        // Warm Loft Palette (showroom redesign)
+        // Warm Loft Palette — updated for light theme
         loft: {
-          bg: '#1C1410',         // deep warm brown (page base)
-          floor: '#3B2E22',      // hardwood floor brown
-          brick: '#8B4D3B',      // exposed brick red-brown
-          leather: '#6B4226',    // leather sofa brown
-          tan: '#C8A882',        // warm tan accent
-          cream: '#F5EDE0',      // light cream text
-          wall: '#2A2118',       // dark wall panel
+          bg: '#F8FAFC',
+          floor: '#F1F5F9',
+          brick: '#D97706',
+          leather: '#B45309',
+          tan: '#F59E0B',
+          cream: '#0F172A',
+          wall: '#F1F5F9',
         },
 
-        // Wireframe border system
+        // Border system — light
         wireframe: {
-          stroke: 'rgba(255,255,255,0.10)',
-          glow: 'rgba(255,255,255,0.04)',
-          hover: 'rgba(255,255,255,0.20)',
+          stroke: '#E2E8F0',
+          glow: '#F1F5F9',
+          hover: '#CBD5E1',
         },
 
-        // Gold accent — A.I.M.S. brand
+        // Accent — modernized amber/gold
         gold: {
-          DEFAULT: '#D4AF37',
-          light: '#E8D48A',
-          dark: '#B5952F',
-          dim: 'rgba(212, 175, 55, 0.1)',
+          DEFAULT: '#D97706',
+          light: '#F59E0B',
+          dark: '#B45309',
+          dim: 'rgba(217, 119, 6, 0.08)',
         },
-        champagne: '#F6C453',
+        champagne: '#F59E0B',
 
         // Status signals
         signal: {
-          green: '#22C55E',
-          amber: '#F59E0B',
-          red: '#EF4444',
-          blue: '#3B82F6',
-          cyan: '#22D3EE',
+          green: '#16A34A',
+          amber: '#D97706',
+          red: '#DC2626',
+          blue: '#2563EB',
+          cyan: '#0891B2',
         },
 
-        // Circuit Box status
-        'cb-cyan': '#22D3EE',
-        'cb-green': '#22C55E',
-        'cb-amber': '#F59E0B',
-        'cb-red': '#EF4444',
-        'cb-fog': '#6B7280',
+        // Circuit Box status — adjusted for light bg
+        'cb-cyan': '#0891B2',
+        'cb-green': '#16A34A',
+        'cb-amber': '#D97706',
+        'cb-red': '#DC2626',
+        'cb-fog': '#94A3B8',
 
         // Text
-        'frosty-white': '#EDEDED',
-        muted: '#A1A1AA',
+        'frosty-white': '#0F172A',
+        muted: '#64748B',
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
@@ -72,29 +72,33 @@ module.exports = {
         handwriting: ['var(--font-caveat)', 'Caveat', 'cursive'],
       },
       borderRadius: {
-        'card': '20px',
-        'card-lg': '28px',
+        'card': '16px',
+        'card-lg': '20px',
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'glass-shine': 'linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.04) 50%, transparent 70%)',
-        'subtle-grid': 'linear-gradient(to right, #1a1a1a 1px, transparent 1px), linear-gradient(to bottom, #1a1a1a 1px, transparent 1px)',
-        'dot-matrix': 'radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px)',
-        'grid-fine': 'linear-gradient(to right, rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.025) 1px, transparent 1px)',
+        'glass-shine': 'linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.6) 50%, transparent 70%)',
+        'subtle-grid': 'linear-gradient(to right, #F1F5F9 1px, transparent 1px), linear-gradient(to bottom, #F1F5F9 1px, transparent 1px)',
+        'dot-matrix': 'radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px)',
+        'grid-fine': 'linear-gradient(to right, rgba(0,0,0,0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(0,0,0,0.03) 1px, transparent 1px)',
       },
       backgroundSize: {
         'dot-matrix': '24px 24px',
         'grid-fine': '48px 48px',
       },
       boxShadow: {
-        'glass': '0 4px 30px rgba(0, 0, 0, 0.1)',
-        'neon-gold': '0 0 20px rgba(212, 175, 55, 0.3)',
-        'neon-blue': '0 0 20px rgba(59, 130, 246, 0.3)',
-        'glow-gold': '0 0 24px rgba(212, 175, 55, 0.15)',
-        'glow-gold-soft': '0 0 40px rgba(212, 175, 55, 0.08)',
-        'wireframe-inner': 'inset 0 1px 1px rgba(255,255,255,0.06), inset 0 -1px 1px rgba(255,255,255,0.02)',
-        'card-lift': '0 8px 32px rgba(0,0,0,0.5), 0 2px 8px rgba(0,0,0,0.3)',
-        'glow-controlled': '0 0 40px rgba(212, 175, 55, 0.06)',
+        'glass': '0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04)',
+        'neon-gold': '0 4px 14px rgba(217, 119, 6, 0.15)',
+        'neon-blue': '0 4px 14px rgba(37, 99, 235, 0.15)',
+        'glow-gold': '0 4px 14px rgba(217, 119, 6, 0.1)',
+        'glow-gold-soft': '0 2px 8px rgba(217, 119, 6, 0.06)',
+        'wireframe-inner': '0 1px 2px rgba(0,0,0,0.04)',
+        'card-lift': '0 4px 16px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04)',
+        'glow-controlled': '0 2px 8px rgba(217, 119, 6, 0.04)',
+        'card-sm': '0 1px 2px rgba(0,0,0,0.04)',
+        'card-md': '0 2px 8px rgba(0,0,0,0.06)',
+        'card-lg': '0 8px 24px rgba(0,0,0,0.08)',
+        'card-xl': '0 16px 48px rgba(0,0,0,0.1)',
       },
       spacing: {
         'cb-xs': '8px',
@@ -119,8 +123,8 @@ module.exports = {
           to: { opacity: '1', transform: 'translateY(0)' },
         },
         pulse_gold: {
-          '0%, 100%': { opacity: '1', boxShadow: '0 0 10px rgba(212,175,55,0.15)' },
-          '50%': { opacity: '0.85', boxShadow: '0 0 24px rgba(212,175,55,0.35)' },
+          '0%, 100%': { opacity: '1', boxShadow: '0 0 6px rgba(217,119,6,0.1)' },
+          '50%': { opacity: '0.85', boxShadow: '0 0 16px rgba(217,119,6,0.2)' },
         },
         connector_pulse: {
           '0%, 100%': { opacity: '0.3' },

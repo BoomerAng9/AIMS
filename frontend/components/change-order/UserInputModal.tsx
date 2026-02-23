@@ -202,7 +202,7 @@ function VoiceInputPanel({ onCapture }: VoiceInputPanelProps) {
       {isTranscribing ? (
         <div className="text-center">
           <div className="w-12 h-12 border-3 border-gold border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-white/70">Transcribing...</p>
+          <p className="text-slate-600">Transcribing...</p>
         </div>
       ) : (
         <>
@@ -219,7 +219,7 @@ function VoiceInputPanel({ onCapture }: VoiceInputPanelProps) {
             <MicIcon className={`w-8 h-8 ${isRecording ? 'text-red-400' : 'text-gold'}`} />
           </button>
 
-          <p className="mt-4 text-sm text-white/70">
+          <p className="mt-4 text-sm text-slate-600">
             {isRecording ? (
               <span className="text-red-400">Recording: {formatTime(duration)}</span>
             ) : (
@@ -228,7 +228,7 @@ function VoiceInputPanel({ onCapture }: VoiceInputPanelProps) {
           </p>
 
           {isRecording && (
-            <p className="mt-2 text-xs text-white/40">
+            <p className="mt-2 text-xs text-slate-400">
               Click again to stop and transcribe
             </p>
           )}
@@ -291,7 +291,7 @@ function ImageInputPanel({ onCapture }: ImageInputPanelProps) {
           border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all
           ${isDragging
             ? 'border-gold bg-gold/10'
-            : 'border-white/20 hover:border-white/40'
+            : 'border-slate-200 hover:border-slate-300'
           }
         `}
       >
@@ -299,9 +299,9 @@ function ImageInputPanel({ onCapture }: ImageInputPanelProps) {
           <img src={preview} alt="Preview" className="max-h-48 mx-auto rounded-lg" />
         ) : (
           <>
-            <ImageIcon className="w-12 h-12 mx-auto text-white/30 mb-3" />
-            <p className="text-white/70">Drop an image here or click to browse</p>
-            <p className="text-xs text-white/30 mt-2">PNG, JPG, GIF up to 10MB</p>
+            <ImageIcon className="w-12 h-12 mx-auto text-slate-400 mb-3" />
+            <p className="text-slate-600">Drop an image here or click to browse</p>
+            <p className="text-xs text-slate-400 mt-2">PNG, JPG, GIF up to 10MB</p>
           </>
         )}
       </div>
@@ -368,20 +368,20 @@ function FileInputPanel({ onCapture }: FileInputPanelProps) {
           border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all
           ${isDragging
             ? 'border-gold bg-gold/10'
-            : 'border-white/20 hover:border-white/40'
+            : 'border-slate-200 hover:border-slate-300'
           }
         `}
       >
         {fileName ? (
           <div className="flex items-center justify-center gap-3">
             <FileIcon className="w-8 h-8 text-gold" />
-            <span className="text-white">{fileName}</span>
+            <span className="text-slate-800">{fileName}</span>
           </div>
         ) : (
           <>
-            <FileIcon className="w-12 h-12 mx-auto text-white/30 mb-3" />
-            <p className="text-white/70">Drop a file here or click to browse</p>
-            <p className="text-xs text-white/30 mt-2">PDF, DOC, TXT, CSV, JSON up to 25MB</p>
+            <FileIcon className="w-12 h-12 mx-auto text-slate-400 mb-3" />
+            <p className="text-slate-600">Drop a file here or click to browse</p>
+            <p className="text-xs text-slate-400 mt-2">PDF, DOC, TXT, CSV, JSON up to 25MB</p>
           </>
         )}
       </div>
@@ -435,10 +435,10 @@ function CodeInputPanel({ onCapture }: CodeInputPanelProps) {
         <select
           value={language}
           onChange={(e) => setLanguage(e.target.value)}
-          className="h-10 px-3 rounded-lg bg-black/40 border border-wireframe-stroke text-white text-sm focus:border-gold outline-none"
+          className="h-10 px-3 rounded-lg bg-slate-100/60 border border-wireframe-stroke text-slate-800 text-sm focus:border-gold outline-none"
         >
           {LANGUAGES.map(lang => (
-            <option key={lang} value={lang} className="bg-black">
+            <option key={lang} value={lang} className="bg-white">
               {lang.charAt(0).toUpperCase() + lang.slice(1)}
             </option>
           ))}
@@ -449,7 +449,7 @@ function CodeInputPanel({ onCapture }: CodeInputPanelProps) {
           value={filename}
           onChange={(e) => setFilename(e.target.value)}
           placeholder="Filename (optional)"
-          className="flex-1 h-10 px-3 rounded-lg bg-black/40 border border-wireframe-stroke text-white text-sm placeholder:text-white/20 focus:border-gold outline-none"
+          className="flex-1 h-10 px-3 rounded-lg bg-slate-100/60 border border-wireframe-stroke text-slate-800 text-sm placeholder:text-slate-300 focus:border-gold outline-none"
         />
       </div>
 
@@ -457,11 +457,11 @@ function CodeInputPanel({ onCapture }: CodeInputPanelProps) {
         value={code}
         onChange={(e) => setCode(e.target.value)}
         placeholder="Paste or type your code here..."
-        className="w-full h-48 p-4 rounded-xl bg-black/60 border border-wireframe-stroke text-white font-mono text-sm placeholder:text-white/20 focus:border-gold outline-none resize-none"
+        className="w-full h-48 p-4 rounded-xl bg-slate-50/70 border border-wireframe-stroke text-slate-800 font-mono text-sm placeholder:text-slate-300 focus:border-gold outline-none resize-none"
       />
 
       <div className="flex justify-between items-center">
-        <span className="text-xs text-white/30">
+        <span className="text-xs text-slate-400">
           {code.split('\n').length} lines
         </span>
         <button
@@ -504,11 +504,11 @@ function TextInputPanel({ onCapture }: TextInputPanelProps) {
         value={text}
         onChange={(e) => setText(e.target.value)}
         placeholder="Type your clarification or additional information here..."
-        className="w-full h-40 p-4 rounded-xl bg-black/40 border border-wireframe-stroke text-white text-sm placeholder:text-white/20 focus:border-gold outline-none resize-none"
+        className="w-full h-40 p-4 rounded-xl bg-slate-100/60 border border-wireframe-stroke text-slate-800 text-sm placeholder:text-slate-300 focus:border-gold outline-none resize-none"
       />
 
       <div className="flex justify-between items-center">
-        <span className="text-xs text-white/30">
+        <span className="text-xs text-slate-400">
           {text.trim() ? text.trim().split(/\s+/).length : 0} words
         </span>
         <button
@@ -549,15 +549,15 @@ function InputPreview({ input, onRemove }: { input: ChangeOrderInput; onRemove: 
   };
 
   return (
-    <div className="flex items-center gap-2 px-3 py-2 bg-white/5 rounded-lg border border-wireframe-stroke">
+    <div className="flex items-center gap-2 px-3 py-2 bg-slate-50 rounded-lg border border-wireframe-stroke">
       <span className="text-gold">{getIcon()}</span>
-      <span className="flex-1 text-sm text-white truncate">{getLabel()}</span>
-      <span className="text-xs text-white/30">
+      <span className="flex-1 text-sm text-slate-800 truncate">{getLabel()}</span>
+      <span className="text-xs text-slate-400">
         ~{estimateInputTokens(input)} tokens
       </span>
       <button
         onClick={onRemove}
-        className="p-1 hover:bg-white/10 rounded text-white/40 hover:text-red-400 transition-colors"
+        className="p-1 hover:bg-slate-100 rounded text-slate-400 hover:text-red-400 transition-colors"
       >
         <XIcon className="w-4 h-4" />
       </button>
@@ -634,7 +634,7 @@ export function UserInputModal({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50"
+            className="fixed inset-0 bg-slate-50/80 backdrop-blur-sm z-50"
           />
 
           {/* Modal */}
@@ -642,7 +642,7 @@ export function UserInputModal({
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-xl bg-[#0A0A0A] border border-wireframe-stroke rounded-2xl shadow-2xl z-50 overflow-hidden"
+            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-xl bg-white border border-wireframe-stroke rounded-2xl shadow-2xl z-50 overflow-hidden"
           >
             {/* Header */}
             <div className="px-6 py-4 border-b border-wireframe-stroke">
@@ -653,21 +653,21 @@ export function UserInputModal({
                       CHANGE ORDER
                     </span>
                   </div>
-                  <h2 className="text-lg font-semibold text-white mt-2">
+                  <h2 className="text-lg font-semibold text-slate-800 mt-2">
                     Input Required
                   </h2>
-                  <p className="text-sm text-white/40 mt-1">{triggerQuestion}</p>
+                  <p className="text-sm text-slate-400 mt-1">{triggerQuestion}</p>
                 </div>
                 <button
                   onClick={onClose}
-                  className="p-2 hover:bg-white/10 rounded-lg text-white/40 hover:text-white transition-colors"
+                  className="p-2 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-800 transition-colors"
                 >
                   <XIcon className="w-5 h-5" />
                 </button>
               </div>
 
               {/* Requesting agent */}
-              <p className="text-xs text-white/30 mt-3">
+              <p className="text-xs text-slate-400 mt-3">
                 Requested by <span className="text-gold">{requestingAgent}</span> from {department}
               </p>
             </div>
@@ -683,7 +683,7 @@ export function UserInputModal({
                       flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all
                       ${activeTab === type
                         ? 'bg-gold/20 text-gold border border-gold/30'
-                        : 'text-white/40 hover:text-white hover:bg-white/5'
+                        : 'text-slate-400 hover:text-slate-800 hover:bg-slate-50'
                       }
                     `}
                   >
@@ -706,7 +706,7 @@ export function UserInputModal({
             {/* Collected Inputs */}
             {inputs.length > 0 && (
               <div className="px-6 py-4 border-t border-wireframe-stroke">
-                <p className="text-xs text-white/30 mb-2">Collected Inputs ({inputs.length})</p>
+                <p className="text-xs text-slate-400 mb-2">Collected Inputs ({inputs.length})</p>
                 <div className="space-y-2 max-h-32 overflow-y-auto">
                   {inputs.map((input, i) => (
                     <InputPreview
@@ -720,9 +720,9 @@ export function UserInputModal({
             )}
 
             {/* Footer */}
-            <div className="px-6 py-4 border-t border-wireframe-stroke bg-white/[0.02]">
+            <div className="px-6 py-4 border-t border-wireframe-stroke bg-white">
               <div className="flex items-center justify-between">
-                <div className="text-xs text-white/40">
+                <div className="text-xs text-slate-400">
                   <span>Est. tokens: {totalTokens.toLocaleString()}</span>
                   <span className="mx-2">•</span>
                   <span>Est. cost: {formatCurrency(estimatedCost)}</span>
@@ -731,7 +731,7 @@ export function UserInputModal({
                 <div className="flex gap-3">
                   <button
                     onClick={onClose}
-                    className="px-4 py-2 rounded-lg border border-wireframe-stroke text-white/70 hover:bg-white/5 transition-colors"
+                    className="px-4 py-2 rounded-lg border border-wireframe-stroke text-slate-600 hover:bg-slate-50 transition-colors"
                   >
                     Cancel
                   </button>

@@ -227,7 +227,7 @@ export function AIMSNav({
                   </AnimatePresence>
                   <button
                     onClick={() => setSearchOpen(!searchOpen)}
-                    className="p-2 rounded-lg transition-colors hover:bg-white/5"
+                    className="p-2 rounded-lg transition-colors hover:bg-slate-50"
                     style={{ color: AIMS_CIRCUIT_COLORS.secondary }}
                   >
                     <SearchIcon className="w-5 h-5" />
@@ -238,7 +238,7 @@ export function AIMSNav({
               {/* Notifications */}
               {showNotifications && (
                 <button
-                  className="relative p-2 rounded-lg transition-colors hover:bg-white/5"
+                  className="relative p-2 rounded-lg transition-colors hover:bg-slate-50"
                   style={{ color: AIMS_CIRCUIT_COLORS.secondary }}
                 >
                   <BellIcon className="w-5 h-5" />
@@ -288,7 +288,7 @@ export function AIMSNav({
               {/* Mobile menu button */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="md:hidden p-2 rounded-lg transition-colors hover:bg-white/5"
+                className="md:hidden p-2 rounded-lg transition-colors hover:bg-slate-50"
                 style={{ color: AIMS_CIRCUIT_COLORS.secondary }}
               >
                 {mobileMenuOpen ? (
@@ -436,7 +436,7 @@ function NavLink({ item, isActive }: NavLinkProps) {
               <Link
                 key={child.href}
                 href={child.href}
-                className="block px-4 py-2 text-sm transition-colors hover:bg-white/5"
+                className="block px-4 py-2 text-sm transition-colors hover:bg-slate-50"
                 style={{ color: AIMS_CIRCUIT_COLORS.secondary }}
               >
                 {child.label}
@@ -545,7 +545,7 @@ export function SidebarNav({
         {onToggleCollapse && (
           <button
             onClick={onToggleCollapse}
-            className="p-4 border-t transition-colors hover:bg-white/5"
+            className="p-4 border-t transition-colors hover:bg-slate-50"
             style={{
               borderColor: AIMS_CIRCUIT_COLORS.dimLine,
               color: AIMS_CIRCUIT_COLORS.secondary,

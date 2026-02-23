@@ -109,7 +109,7 @@ export default function AutonomousDashboardPage() {
         
         {/* Header Section */}
         <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-display font-medium text-white mb-4">
+            <h1 className="text-4xl md:text-5xl font-display font-medium text-slate-800 mb-4">
                Mission Control
             </h1>
             <p className="text-xl text-gray-400 font-sans max-w-2xl mx-auto">

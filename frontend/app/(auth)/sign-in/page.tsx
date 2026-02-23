@@ -88,8 +88,8 @@ function SignInContent() {
     <div className="space-y-6">
       {/* Header */}
       <div className="text-center">
-        <h1 className="text-2xl font-bold text-white">Sign in to A.I.M.S.</h1>
-        <p className="mt-2 text-sm text-white/50">
+        <h1 className="text-2xl font-bold text-slate-800">Sign in to A.I.M.S.</h1>
+        <p className="mt-2 text-sm text-slate-500">
           Your AI team is waiting
         </p>
       </div>
@@ -106,7 +106,7 @@ function SignInContent() {
         <button
           onClick={() => handleOAuthSignIn("google")}
           disabled={isLoading !== null}
-          className="group relative flex w-full items-center justify-center gap-3 h-11 rounded-xl border border-white/10 bg-white/[0.04] text-sm text-white/90 hover:border-white/20 hover:bg-white/[0.07] transition-all disabled:opacity-50"
+          className="group relative flex w-full items-center justify-center gap-3 h-11 rounded-xl border border-slate-200 bg-white text-sm text-slate-800 hover:border-slate-200 hover:bg-slate-50 transition-all disabled:opacity-50"
         >
           {isLoading === "google" ? (
             <Loader2 className="w-4 h-4 animate-spin text-gold" />
@@ -126,7 +126,7 @@ function SignInContent() {
         <button
           onClick={() => handleOAuthSignIn("discord")}
           disabled={isLoading !== null}
-          className="group relative flex w-full items-center justify-center gap-3 h-11 rounded-xl border border-white/10 bg-white/[0.04] text-sm text-white/90 hover:border-[#5865F2]/30 hover:bg-[#5865F2]/10 transition-all disabled:opacity-50"
+          className="group relative flex w-full items-center justify-center gap-3 h-11 rounded-xl border border-slate-200 bg-white text-sm text-slate-800 hover:border-[#5865F2]/30 hover:bg-[#5865F2]/10 transition-all disabled:opacity-50"
         >
           {isLoading === "discord" ? (
             <Loader2 className="w-4 h-4 animate-spin text-[#5865F2]" />
@@ -148,7 +148,7 @@ function SignInContent() {
       {/* Divider */}
       <div className="flex items-center gap-4">
         <div className="divider flex-1" />
-        <span className="text-[11px] uppercase tracking-widest text-white/25">
+        <span className="text-[11px] uppercase tracking-widest text-slate-400">
           or
         </span>
         <div className="divider flex-1" />
@@ -170,12 +170,12 @@ function SignInContent() {
 
         <div>
           <div className="flex items-center justify-between mb-1.5">
-            <label className="text-xs font-medium text-white/60">
+            <label className="text-xs font-medium text-slate-500">
               Password
             </label>
             <Link
               href="/forgot-password"
-              className="text-xs text-white/40 hover:text-gold transition-colors"
+              className="text-xs text-slate-400 hover:text-gold transition-colors"
             >
               Forgot?
             </Link>
@@ -210,7 +210,7 @@ function SignInContent() {
       </form>
 
       {/* Sign up link */}
-      <p className="text-center text-sm text-white/40">
+      <p className="text-center text-sm text-slate-400">
         Don&apos;t have an account?{" "}
         <Link
           href="/sign-up"

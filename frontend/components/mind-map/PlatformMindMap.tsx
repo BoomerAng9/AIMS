@@ -62,11 +62,11 @@ const STATUS_STYLES = {
     labelColor: "text-gold",
   },
   planned: {
-    ring: "ring-white/10",
-    bg: "bg-white/5",
+    ring: "ring-slate-200",
+    bg: "bg-slate-50",
     dot: "bg-white/30",
     label: "Planned",
-    labelColor: "text-white/30",
+    labelColor: "text-slate-400",
   },
 };
 
@@ -509,21 +509,21 @@ export function PlatformMindMap() {
       <div className="absolute top-4 right-4 z-20 flex items-center gap-1.5">
         <button
           onClick={zoomIn}
-          className="p-2 rounded-lg border border-wireframe-stroke bg-black/60 text-white/50 hover:text-gold hover:border-gold/30 transition-all backdrop-blur-md"
+          className="p-2 rounded-lg border border-wireframe-stroke bg-slate-50/70 text-slate-500 hover:text-gold hover:border-gold/30 transition-all backdrop-blur-md"
           title="Zoom In"
         >
           <ZoomIn size={16} />
         </button>
         <button
           onClick={zoomOut}
-          className="p-2 rounded-lg border border-wireframe-stroke bg-black/60 text-white/50 hover:text-gold hover:border-gold/30 transition-all backdrop-blur-md"
+          className="p-2 rounded-lg border border-wireframe-stroke bg-slate-50/70 text-slate-500 hover:text-gold hover:border-gold/30 transition-all backdrop-blur-md"
           title="Zoom Out"
         >
           <ZoomOut size={16} />
         </button>
         <button
           onClick={resetView}
-          className="p-2 rounded-lg border border-wireframe-stroke bg-black/60 text-white/50 hover:text-gold hover:border-gold/30 transition-all backdrop-blur-md"
+          className="p-2 rounded-lg border border-wireframe-stroke bg-slate-50/70 text-slate-500 hover:text-gold hover:border-gold/30 transition-all backdrop-blur-md"
           title="Fit to View"
         >
           <Maximize2 size={16} />
@@ -548,7 +548,7 @@ export function PlatformMindMap() {
         ] as const).map(([key, label, border]) => (
           <div key={key} className="flex items-center gap-1.5">
             <span className={`w-3 h-3 rounded border-2 ${border} bg-transparent`} />
-            <span className="text-white/40">{label}</span>
+            <span className="text-slate-400">{label}</span>
           </div>
         ))}
       </div>
@@ -705,7 +705,7 @@ export function PlatformMindMap() {
                     <div className="flex items-center justify-center w-full h-full">
                       <Icon
                         size={18}
-                        className={node.status === "planned" ? "text-white/20" : ""}
+                        className={node.status === "planned" ? "text-slate-300" : ""}
                         style={node.status !== "planned" ? { color: node.accentColor } : undefined}
                       />
                     </div>
@@ -784,7 +784,7 @@ export function PlatformMindMap() {
               if (!node) return null;
               const style = STATUS_STYLES[node.status];
               return (
-                <div className="rounded-xl border border-wireframe-stroke bg-black/80 backdrop-blur-md px-5 py-3 flex items-center gap-4 shadow-2xl">
+                <div className="rounded-xl border border-wireframe-stroke bg-white/80 backdrop-blur-md px-5 py-3 flex items-center gap-4 shadow-2xl">
                   <div
                     className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border"
                     style={{
@@ -796,13 +796,13 @@ export function PlatformMindMap() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-white">{node.label}</span>
+                      <span className="text-sm font-medium text-slate-800">{node.label}</span>
                       <span className={`flex items-center gap-1 text-[10px] font-mono uppercase ${style.labelColor}`}>
                         <span className={`w-1.5 h-1.5 rounded-full ${style.dot}`} />
                         {style.label}
                       </span>
                     </div>
-                    <p className="text-xs text-white/50 mt-0.5 truncate">{node.description}</p>
+                    <p className="text-xs text-slate-500 mt-0.5 truncate">{node.description}</p>
                   </div>
                   {node.href && (
                     <ArrowRight size={14} className="text-gold/60 shrink-0" />

@@ -231,7 +231,7 @@ export default function FilmRoomPage() {
   // ─── Render ──────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white p-6 space-y-6">
+    <div className="min-h-screen bg-zinc-950 text-slate-800 p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -267,7 +267,7 @@ export default function FilmRoomPage() {
             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
               activeTab === tab
                 ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
-                : 'text-zinc-400 hover:text-white hover:bg-zinc-800'
+                : 'text-zinc-400 hover:text-slate-800 hover:bg-zinc-800'
             }`}
           >
             {tab === 'search' ? 'Semantic Search' :
@@ -288,7 +288,7 @@ export default function FilmRoomPage() {
               <select
                 value={selectedIndex}
                 onChange={e => setSelectedIndex(e.target.value)}
-                className="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white"
+                className="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-slate-800"
               >
                 <option value="">Select index...</option>
                 {indexes.map(idx => (
@@ -300,13 +300,13 @@ export default function FilmRoomPage() {
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 placeholder="Describe what you're looking for..."
-                className="flex-1 bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-sm text-white placeholder-zinc-500"
+                className="flex-1 bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-sm text-slate-800 placeholder-zinc-500"
                 onKeyDown={e => e.key === 'Enter' && handleSearch()}
               />
               <button
                 onClick={handleSearch}
                 disabled={loading || !selectedIndex || !searchQuery}
-                className="px-6 py-2 bg-cyan-500 hover:bg-cyan-600 disabled:bg-zinc-700 disabled:text-zinc-500 text-white rounded-lg text-sm font-medium transition-colors"
+                className="px-6 py-2 bg-cyan-500 hover:bg-cyan-600 disabled:bg-zinc-700 disabled:text-zinc-500 text-slate-800 rounded-lg text-sm font-medium transition-colors"
               >
                 {loading ? 'Searching...' : 'Search'}
               </button>
@@ -344,12 +344,12 @@ export default function FilmRoomPage() {
                   value={indexName}
                   onChange={e => setIndexName(e.target.value)}
                   placeholder="Index name (e.g., 2026-hs-prospects)"
-                  className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white placeholder-zinc-500"
+                  className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-slate-800 placeholder-zinc-500"
                 />
                 <button
                   onClick={handleCreateIndex}
                   disabled={loading || !indexName}
-                  className="w-full px-4 py-2 bg-cyan-500 hover:bg-cyan-600 disabled:bg-zinc-700 disabled:text-zinc-500 text-white rounded-lg text-sm font-medium transition-colors"
+                  className="w-full px-4 py-2 bg-cyan-500 hover:bg-cyan-600 disabled:bg-zinc-700 disabled:text-zinc-500 text-slate-800 rounded-lg text-sm font-medium transition-colors"
                 >
                   Create Index
                 </button>
@@ -360,7 +360,7 @@ export default function FilmRoomPage() {
                 <select
                   value={selectedIndex}
                   onChange={e => setSelectedIndex(e.target.value)}
-                  className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white"
+                  className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-slate-800"
                 >
                   <option value="">Select index...</option>
                   {indexes.map(idx => (
@@ -372,12 +372,12 @@ export default function FilmRoomPage() {
                   value={videoUrl}
                   onChange={e => setVideoUrl(e.target.value)}
                   placeholder="Video URL (MP4, YouTube, etc.)"
-                  className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white placeholder-zinc-500"
+                  className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-slate-800 placeholder-zinc-500"
                 />
                 <button
                   onClick={handleIndexVideo}
                   disabled={loading || !selectedIndex || !videoUrl}
-                  className="w-full px-4 py-2 bg-cyan-500 hover:bg-cyan-600 disabled:bg-zinc-700 disabled:text-zinc-500 text-white rounded-lg text-sm font-medium transition-colors"
+                  className="w-full px-4 py-2 bg-cyan-500 hover:bg-cyan-600 disabled:bg-zinc-700 disabled:text-zinc-500 text-slate-800 rounded-lg text-sm font-medium transition-colors"
                 >
                   {loading ? 'Submitting...' : 'Index Video'}
                 </button>
@@ -394,7 +394,7 @@ export default function FilmRoomPage() {
                   {indexes.map(idx => (
                     <div key={idx.id} className="bg-zinc-800/30 border border-zinc-700/30 rounded-lg px-4 py-3 flex items-center justify-between">
                       <div>
-                        <span className="text-white font-medium">{idx.name}</span>
+                        <span className="text-slate-800 font-medium">{idx.name}</span>
                         <span className="text-zinc-500 text-sm ml-3">ID: {idx.id}</span>
                       </div>
                       <span className="text-zinc-400 text-sm">{idx.videoCount ?? '?'} videos</span>
@@ -419,34 +419,34 @@ export default function FilmRoomPage() {
                 value={prospectName}
                 onChange={e => setProspectName(e.target.value)}
                 placeholder="Prospect name *"
-                className="bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-sm text-white placeholder-zinc-500"
+                className="bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-sm text-slate-800 placeholder-zinc-500"
               />
               <input
                 type="text"
                 value={prospectPosition}
                 onChange={e => setProspectPosition(e.target.value)}
                 placeholder="Position (e.g., QB, WR)"
-                className="bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-sm text-white placeholder-zinc-500"
+                className="bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-sm text-slate-800 placeholder-zinc-500"
               />
               <input
                 type="text"
                 value={prospectSchool}
                 onChange={e => setProspectSchool(e.target.value)}
                 placeholder="School"
-                className="bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-sm text-white placeholder-zinc-500"
+                className="bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-sm text-slate-800 placeholder-zinc-500"
               />
               <input
                 type="url"
                 value={verifyVideoUrl}
                 onChange={e => setVerifyVideoUrl(e.target.value)}
                 placeholder="Highlight reel URL (optional)"
-                className="bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-sm text-white placeholder-zinc-500"
+                className="bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-sm text-slate-800 placeholder-zinc-500"
               />
             </div>
             <button
               onClick={handleScoutVerify}
               disabled={loading || !prospectName}
-              className="px-6 py-2 bg-emerald-500 hover:bg-emerald-600 disabled:bg-zinc-700 disabled:text-zinc-500 text-white rounded-lg text-sm font-medium transition-colors"
+              className="px-6 py-2 bg-emerald-500 hover:bg-emerald-600 disabled:bg-zinc-700 disabled:text-zinc-500 text-slate-800 rounded-lg text-sm font-medium transition-colors"
             >
               {loading ? 'Verifying...' : 'Run ScoutVerify'}
             </button>
@@ -551,12 +551,12 @@ export default function FilmRoomPage() {
                 value={reportVideoId}
                 onChange={e => setReportVideoId(e.target.value)}
                 placeholder="Twelve Labs Video ID"
-                className="flex-1 bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-sm text-white placeholder-zinc-500"
+                className="flex-1 bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-sm text-slate-800 placeholder-zinc-500"
               />
               <button
                 onClick={handleGenerateReport}
                 disabled={loading || !reportVideoId}
-                className="px-6 py-2 bg-cyan-500 hover:bg-cyan-600 disabled:bg-zinc-700 disabled:text-zinc-500 text-white rounded-lg text-sm font-medium transition-colors"
+                className="px-6 py-2 bg-cyan-500 hover:bg-cyan-600 disabled:bg-zinc-700 disabled:text-zinc-500 text-slate-800 rounded-lg text-sm font-medium transition-colors"
               >
                 {loading ? 'Generating...' : 'Generate Report'}
               </button>

@@ -36,31 +36,31 @@ export default function LabPage() {
   return (
     <div className="space-y-6 animate-in fade-in duration-700">
       <header>
-        <h1 className="text-2xl font-semibold tracking-tight text-white font-display">
+        <h1 className="text-2xl font-semibold tracking-tight text-slate-800 font-display">
           WORKBENCH
         </h1>
-        <p className="text-sm text-white/50">
+        <p className="text-sm text-slate-500">
           Your sandbox and playground. Test your ideas, preview Plugs, and see real results before you deploy.
         </p>
       </header>
 
       {/* Request Builder */}
-      <section className="rounded-3xl border border-wireframe-stroke bg-black/60 p-6 backdrop-blur-2xl">
+      <section className="rounded-3xl border border-wireframe-stroke bg-slate-50/70 p-6 backdrop-blur-2xl">
         <div className="flex items-center gap-2 mb-4">
           <FlaskConical size={16} className="text-gold" />
-          <h2 className="text-sm font-semibold uppercase tracking-widest text-white/80 font-display">
+          <h2 className="text-sm font-semibold uppercase tracking-widest text-slate-700 font-display">
             Describe What You Want to Build
           </h2>
         </div>
 
         <div className="space-y-4">
           <div className="space-y-2">
-            <label className="text-xs text-white/50 uppercase tracking-wider">Tell us your idea</label>
+            <label className="text-xs text-slate-500 uppercase tracking-wider">Tell us your idea</label>
             <textarea
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="e.g. Build a landing page for a fitness SaaS with pricing tiers and email capture..."
-              className="w-full h-28 rounded-xl border border-wireframe-stroke bg-black/80 p-3 text-sm text-white outline-none focus:border-gold/30 transition-colors placeholder:text-white/20 resize-none"
+              className="w-full h-28 rounded-xl border border-wireframe-stroke bg-white/80 p-3 text-sm text-slate-800 outline-none focus:border-gold/30 transition-colors placeholder:text-slate-300 resize-none"
             />
           </div>
 
@@ -75,7 +75,7 @@ export default function LabPage() {
             </button>
             <button
               onClick={() => { setQuery(""); setResult(null); }}
-              className="flex items-center gap-2 rounded-full border border-wireframe-stroke px-4 py-2.5 text-xs text-white/50 hover:text-white hover:border-white/20 transition-colors"
+              className="flex items-center gap-2 rounded-full border border-wireframe-stroke px-4 py-2.5 text-xs text-slate-500 hover:text-slate-800 hover:border-slate-200 transition-colors"
             >
               <RotateCcw size={12} />
               Reset
@@ -86,14 +86,14 @@ export default function LabPage() {
 
       {/* Response Inspector */}
       {result && (
-        <section className="rounded-3xl border border-wireframe-stroke bg-black/60 p-6 backdrop-blur-2xl animate-in slide-in-from-bottom-4 duration-500">
+        <section className="rounded-3xl border border-wireframe-stroke bg-slate-50/70 p-6 backdrop-blur-2xl animate-in slide-in-from-bottom-4 duration-500">
           <div className="flex items-center gap-2 mb-4">
             {result.status === "SUCCESS" ? (
               <CheckCircle2 size={16} className="text-emerald-400" />
             ) : (
               <AlertTriangle size={16} className="text-red-400" />
             )}
-            <h2 className="text-sm font-semibold uppercase tracking-widest text-white/80 font-display">
+            <h2 className="text-sm font-semibold uppercase tracking-widest text-slate-700 font-display">
               Results
             </h2>
             <span className={`ml-auto text-[10px] uppercase font-bold tracking-wider ${
@@ -103,8 +103,8 @@ export default function LabPage() {
             </span>
           </div>
 
-          <div className="rounded-xl bg-black/80 border border-wireframe-stroke p-4 overflow-x-auto">
-            <pre className="text-xs text-white/70 font-mono whitespace-pre-wrap">
+          <div className="rounded-xl bg-white/80 border border-wireframe-stroke p-4 overflow-x-auto">
+            <pre className="text-xs text-slate-600 font-mono whitespace-pre-wrap">
               {JSON.stringify(result, null, 2)}
             </pre>
           </div>
@@ -112,15 +112,15 @@ export default function LabPage() {
           {result.quote?.variants && (
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               {result.quote.variants.map((v: any, i: number) => (
-                <div key={i} className="rounded-xl border border-wireframe-stroke bg-white/5 p-4">
+                <div key={i} className="rounded-xl border border-wireframe-stroke bg-slate-50 p-4">
                   <p className="text-xs font-semibold text-gold mb-2">{v.name}</p>
                   <div className="flex justify-between text-xs">
-                    <span className="text-white/40">Cost</span>
-                    <span className="font-mono text-white">${v.estimate.totalUsd.toFixed(4)}</span>
+                    <span className="text-slate-400">Cost</span>
+                    <span className="font-mono text-slate-800">${v.estimate.totalUsd.toFixed(4)}</span>
                   </div>
                   <div className="flex justify-between text-xs mt-1">
-                    <span className="text-white/40">Tokens</span>
-                    <span className="font-mono text-white">{v.estimate.totalTokens.toLocaleString()}</span>
+                    <span className="text-slate-400">Tokens</span>
+                    <span className="font-mono text-slate-800">{v.estimate.totalTokens.toLocaleString()}</span>
                   </div>
                 </div>
               ))}
@@ -130,8 +130,8 @@ export default function LabPage() {
       )}
 
       {/* Quick Templates */}
-      <section className="rounded-3xl border border-wireframe-stroke bg-black/60 p-6 backdrop-blur-2xl">
-        <h2 className="text-sm font-semibold uppercase tracking-widest text-white/80 font-display mb-4">
+      <section className="rounded-3xl border border-wireframe-stroke bg-slate-50/70 p-6 backdrop-blur-2xl">
+        <h2 className="text-sm font-semibold uppercase tracking-widest text-slate-700 font-display mb-4">
           Try One of These
         </h2>
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
@@ -146,7 +146,7 @@ export default function LabPage() {
             <button
               key={tpl}
               onClick={() => setQuery(tpl)}
-              className="rounded-xl border border-wireframe-stroke bg-white/5 p-3 text-left text-xs text-white/50 hover:border-gold/20 hover:text-white/50 transition-all"
+              className="rounded-xl border border-wireframe-stroke bg-slate-50 p-3 text-left text-xs text-slate-500 hover:border-gold/20 hover:text-slate-500 transition-all"
             >
               {tpl}
             </button>

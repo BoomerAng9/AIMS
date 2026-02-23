@@ -97,13 +97,13 @@ function useLucBalance() {
 function statusDotClass(status: HealthStatus): string {
   switch (status) {
     case "healthy":
-      return "bg-emerald-400 shadow-[0_0_8px_rgba(74,222,128,0.6)]";
+      return "bg-emerald-500";
     case "degraded":
-      return "bg-gold shadow-[0_0_8px_rgba(251,191,36,0.5)]";
+      return "bg-amber-500";
     case "unhealthy":
-      return "bg-red-400 shadow-[0_0_8px_rgba(248,113,113,0.5)]";
+      return "bg-red-500";
     default:
-      return "bg-white/30 animate-pulse";
+      return "bg-slate-300 animate-pulse";
   }
 }
 
@@ -163,18 +163,18 @@ export function DashboardShell({ children }: Props) {
       <DemoBanner />
 
       <div className={`flex min-h-full ${IS_DEMO ? "pt-9" : "pt-[env(safe-area-inset-top)]"}`}>
-        {/* Left rail — wireframe glass sidebar */}
-        <aside className="hidden w-64 flex-shrink-0 flex-col border-r border-wireframe-stroke bg-[#0A0A0A]/90 backdrop-blur-xl lg:flex z-30 sticky top-0 h-screen">
+        {/* Left rail — clean light sidebar */}
+        <aside className="hidden w-64 flex-shrink-0 flex-col border-r border-slate-200 bg-white lg:flex z-30 sticky top-0 h-screen">
           <div className="px-4 py-5">
             <div className="flex flex-col">
-              <span className="font-display text-sm uppercase tracking-wider text-white">
+              <span className="font-display text-sm uppercase tracking-wider text-slate-900">
                 A.I.M.S.
               </span>
-              <span className="text-[0.5rem] uppercase tracking-[0.12em] text-white/55 -mt-0.5">
+              <span className="text-[0.5rem] uppercase tracking-[0.12em] text-slate-400 -mt-0.5">
                 AI Managed Solutions
               </span>
             </div>
-            <p className="mt-1 text-[0.65rem] text-white/55">
+            <p className="mt-1 text-[0.65rem] text-slate-400">
               ACHEEVY command center
             </p>
           </div>
@@ -185,19 +185,19 @@ export function DashboardShell({ children }: Props) {
           </div>
 
           {/* Live status card */}
-          <div className="mx-3 mb-3 wireframe-card px-3 py-3 text-[0.75rem] text-white/70">
+          <div className="mx-3 mb-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-[0.75rem] text-slate-600">
             <div className="flex items-center gap-2">
               <span
                 className={`h-2 w-2 rounded-full ${statusDotClass(health.status)}`}
               />
-              <p className="text-[0.6rem] uppercase tracking-[0.18em] text-gold/60 font-mono">
+              <p className="text-[0.6rem] uppercase tracking-[0.18em] text-amber-600/70 font-mono">
                 {statusLabel(health.status)}
               </p>
             </div>
             <p className="mt-1">{statusMessage(health.status)}</p>
 
             {/* LUC usage widget — compact sidebar mode */}
-            <div className="mt-3 border-t border-wireframe-stroke pt-3">
+            <div className="mt-3 border-t border-slate-200 pt-3">
               <LucUsageWidget compact />
             </div>
           </div>
@@ -211,82 +211,82 @@ export function DashboardShell({ children }: Props) {
         {/* Main column */}
         <div className="flex flex-1 flex-col min-h-full relative z-10">
           {/* Top bar */}
-          <header className="sticky top-0 flex items-center justify-between border-b border-wireframe-stroke bg-[#0A0A0A]/90 px-4 py-3 backdrop-blur-xl sm:px-6 lg:px-8 xl:px-12 z-20 shadow-lg shadow-black/20">
+          <header className="sticky top-0 flex items-center justify-between border-b border-slate-200 bg-white/80 px-4 py-3 backdrop-blur-xl sm:px-6 lg:px-8 xl:px-12 z-20 shadow-sm">
             <div className="flex items-center gap-5">
-              {/* Navigation Controls - Enhanced 'Pop' Style */}
+              {/* Navigation Controls */}
               <div className="flex items-center gap-2 -ml-2">
-                <button 
+                <button
                   onClick={() => router.back()}
-                  className="p-2.5 text-white/70 hover:text-gold hover:bg-gold/10 hover:shadow-[0_0_15px_rgba(212,175,55,0.2)] rounded-xl transition-all duration-300 border border-transparent hover:border-gold/20"
+                  className="p-2.5 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-xl transition-all duration-200 border border-transparent hover:border-amber-200"
                   title="Go Back"
                 >
                   <ArrowLeft className="w-5 h-5" />
                 </button>
-                <Link 
+                <Link
                   href="/"
-                  className="p-2.5 text-white/70 hover:text-gold hover:bg-gold/10 hover:shadow-[0_0_15px_rgba(212,175,55,0.2)] rounded-xl transition-all duration-300 border border-transparent hover:border-gold/20"
+                  className="p-2.5 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-xl transition-all duration-200 border border-transparent hover:border-amber-200"
                   title="Return Home"
                 >
                   <Home className="w-5 h-5" />
                 </Link>
-                {/* Separator - Glowing Gold Line */}
-                <div className="w-px h-6 bg-gradient-to-b from-transparent via-gold/30 to-transparent mx-1" />
+                {/* Separator */}
+                <div className="w-px h-6 bg-slate-200 mx-1" />
               </div>
 
               <div className="flex flex-col">
-                <span className="text-[0.65rem] uppercase tracking-[0.18em] text-gold/60 font-mono">
+                <span className="text-[0.65rem] uppercase tracking-[0.18em] text-amber-600/70 font-mono">
                   Dashboard
                 </span>
-                <span className="text-xs text-white/65">
+                <span className="text-xs text-slate-500">
                   Think it. Prompt it. Let ACHEEVY manage it.
                 </span>
               </div>
             </div>
             <div className="flex items-center gap-3">
               {/* LUC pill */}
-              <div className="hidden items-center gap-2 rounded-lg border border-wireframe-stroke bg-black/60 px-3 py-1.5 text-xs text-white/70 sm:flex">
+              <div className="hidden items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-600 sm:flex">
                 <span
                   className={`h-2 w-2 rounded-full ${statusDotClass(health.status)}`}
                 />
                 <span className="font-mono text-[0.65rem]">LUC</span>
-                <span className="text-gold font-semibold">{balance}</span>
+                <span className="text-amber-600 font-semibold">{balance}</span>
               </div>
               {/* User chip — functional with session */}
               <div className="relative">
                 <button
                   type="button"
                   onClick={() => setShowAccountMenu(!showAccountMenu)}
-                  className="flex items-center gap-2 rounded-lg border border-wireframe-stroke bg-black/60 px-2.5 py-1.5 text-xs text-white/70 hover:border-white/20 transition-colors"
+                  className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-600 hover:border-slate-300 transition-colors"
                 >
-                  <span className="h-6 w-6 rounded-full bg-gradient-to-br from-gold to-gold-dark flex items-center justify-center text-[10px] font-bold text-black">
+                  <span className="h-6 w-6 rounded-full bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center text-[10px] font-bold text-slate-800">
                     {userName.charAt(0).toUpperCase()}
                   </span>
                   <span className="hidden sm:inline">{userName}</span>
-                  <ChevronDown className="w-3 h-3 text-white/55" />
+                  <ChevronDown className="w-3 h-3 text-slate-400" />
                 </button>
 
                 {/* Account Dropdown */}
                 {showAccountMenu && (
                   <>
                     <div className="fixed inset-0 z-30" onClick={() => setShowAccountMenu(false)} />
-                    <div className="absolute right-0 top-full mt-2 w-56 rounded-xl border border-wireframe-stroke bg-[#0A0A0A]/95 backdrop-blur-xl shadow-2xl z-40 overflow-hidden">
-                      <div className="px-4 py-3 border-b border-wireframe-stroke">
-                        <p className="text-sm text-white font-medium truncate">{userName}</p>
-                        <p className="text-[11px] text-white/55 truncate">{userEmail}</p>
-                        <span className="inline-block mt-1 text-[9px] px-1.5 py-0.5 rounded border border-gold/20 bg-gold/10 text-gold/80 font-mono uppercase">
+                    <div className="absolute right-0 top-full mt-2 w-56 rounded-xl border border-slate-200 bg-white shadow-lg shadow-slate-200/50 z-40 overflow-hidden">
+                      <div className="px-4 py-3 border-b border-slate-100">
+                        <p className="text-sm text-slate-900 font-medium truncate">{userName}</p>
+                        <p className="text-[11px] text-slate-400 truncate">{userEmail}</p>
+                        <span className="inline-block mt-1 text-[9px] px-1.5 py-0.5 rounded border border-amber-200 bg-amber-50 text-amber-700 font-mono uppercase">
                           {userRole}
                         </span>
                       </div>
                       <div className="py-1">
                         <button
                           onClick={() => { setShowAccountMenu(false); router.push('/dashboard/circuit-box?tab=settings'); }}
-                          className="w-full text-left px-4 py-2 text-sm text-white/70 hover:bg-white/5 hover:text-white transition-colors"
+                          className="w-full text-left px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
                         >
                           Settings
                         </button>
                         <button
                           onClick={() => signOut({ callbackUrl: '/sign-in' })}
-                          className="w-full text-left px-4 py-2 text-sm text-red-400/80 hover:bg-red-500/10 hover:text-red-400 transition-colors flex items-center gap-2"
+                          className="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-50 hover:text-red-600 transition-colors flex items-center gap-2"
                         >
                           <LogOut className="w-3.5 h-3.5" />
                           Sign Out

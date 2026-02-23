@@ -16,12 +16,12 @@ export default function TokenMeter() {
   const phaseIndex = currentPhase ? PHASE_ORDER.indexOf(currentPhase) : -1;
 
   return (
-    <div className="bg-black/40 backdrop-blur-md border border-white/10 rounded-xl px-6 py-3 min-w-[400px]">
+    <div className="bg-slate-100/60 backdrop-blur-md border border-slate-200 rounded-xl px-6 py-3 min-w-[400px]">
       <div className="flex items-center justify-between mb-2">
-        <div className="text-[10px] text-white/30 uppercase tracking-widest">
+        <div className="text-[10px] text-slate-400 uppercase tracking-widest">
           Orchestration Pipeline
         </div>
-        <div className="text-[10px] text-white/30">
+        <div className="text-[10px] text-slate-400">
           {events.length} events processed
         </div>
       </div>
@@ -40,8 +40,8 @@ export default function TokenMeter() {
                   isComplete
                     ? 'bg-[#C6A74E]'
                     : isActive
-                    ? 'bg-white/10'
-                    : 'bg-white/5'
+                    ? 'bg-slate-100'
+                    : 'bg-slate-50'
                 }`}
                 title={label}
               >
@@ -55,7 +55,7 @@ export default function TokenMeter() {
               </motion.div>
               {i < PHASE_ORDER.length - 1 && (
                 <div className={`w-1 h-1 rounded-full mx-0.5 ${
-                  isComplete ? 'bg-[#C6A74E]' : 'bg-white/10'
+                  isComplete ? 'bg-[#C6A74E]' : 'bg-slate-100'
                 }`} />
               )}
             </div>
@@ -65,8 +65,8 @@ export default function TokenMeter() {
 
       {/* Labels */}
       <div className="flex justify-between mt-1.5">
-        <div className="text-[9px] text-white/20">Prompt</div>
-        <div className="text-[9px] text-white/20">Deploy</div>
+        <div className="text-[9px] text-slate-300">Prompt</div>
+        <div className="text-[9px] text-slate-300">Deploy</div>
       </div>
     </div>
   );

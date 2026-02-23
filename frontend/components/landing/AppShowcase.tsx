@@ -106,8 +106,8 @@ function AppCard({ app }: { app: AppShowcaseItem }) {
               {app.icon}
             </div>
             <div>
-              <h3 className="text-base font-medium text-white">{app.name}</h3>
-              <p className="text-xs text-white/40">{app.tagline}</p>
+              <h3 className="text-base font-medium text-slate-800">{app.name}</h3>
+              <p className="text-xs text-slate-400">{app.tagline}</p>
             </div>
           </div>
           <span className={`px-2 py-0.5 rounded text-[0.6rem] font-mono uppercase ${
@@ -115,19 +115,19 @@ function AppCard({ app }: { app: AppShowcaseItem }) {
               ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
               : app.status === 'demo'
               ? 'bg-gold/10 text-gold border border-gold/20'
-              : 'bg-white/5 text-white/30 border border-wireframe-stroke'
+              : 'bg-slate-50 text-slate-400 border border-wireframe-stroke'
           }`}>
             {app.status === 'live' ? 'LIVE' : app.status === 'demo' ? 'DEMO' : 'SOON'}
           </span>
         </div>
 
         {/* Description */}
-        <p className="text-sm text-white/40 mb-4 leading-relaxed">{app.description}</p>
+        <p className="text-sm text-slate-400 mb-4 leading-relaxed">{app.description}</p>
 
         {/* Features */}
         <div className="space-y-1.5 mb-5">
           {app.features.map((feature, i) => (
-            <div key={i} className="flex items-center gap-2 text-sm text-white/50">
+            <div key={i} className="flex items-center gap-2 text-sm text-slate-500">
               <span className="w-1 h-1 rounded-full bg-gold/60 flex-shrink-0" />
               {feature}
             </div>
@@ -138,7 +138,7 @@ function AppCard({ app }: { app: AppShowcaseItem }) {
         <div className="flex items-center justify-between pt-4 border-t border-wireframe-stroke">
           <div className="flex items-center gap-1.5">
             <Zap className="w-3.5 h-3.5 text-gold/60" />
-            <span className="text-xs text-white/30">
+            <span className="text-xs text-slate-400">
               Built in <span className="text-gold/80 font-medium">{app.builtIn}</span>
             </span>
           </div>
@@ -161,7 +161,7 @@ function AppCard({ app }: { app: AppShowcaseItem }) {
 
 export function AppShowcase() {
   return (
-    <section className="py-20 px-4 md:px-6 lg:px-8 xl:px-12 bg-[#0A0A0A]">
+    <section className="py-20 px-4 md:px-6 lg:px-8 xl:px-12 bg-white">
       <div className="max-w-6xl mx-auto">
         {/* Section Header */}
         <motion.div
@@ -177,10 +177,10 @@ export function AppShowcase() {
 
           <h2 className="font-display text-3xl md:text-4xl uppercase tracking-wider mb-4">
             <span className="text-gold">Real Apps.</span>{' '}
-            <span className="text-white">Built Fast.</span>
+            <span className="text-slate-800">Built Fast.</span>
           </h2>
 
-          <p className="text-white/40 max-w-2xl mx-auto">
+          <p className="text-slate-400 max-w-2xl mx-auto">
             These aren&apos;t mockups. Production-ready applications built with
             A.I.M.S. in under an hour.
           </p>
@@ -206,10 +206,10 @@ export function AppShowcase() {
           viewport={{ once: true }}
           className="wireframe-card text-center p-8"
         >
-          <h3 className="font-display text-xl uppercase tracking-wider text-white mb-2">
+          <h3 className="font-display text-xl uppercase tracking-wider text-slate-800 mb-2">
             What Will You Build?
           </h3>
-          <p className="text-sm text-white/40 mb-6 max-w-xl mx-auto">
+          <p className="text-sm text-slate-400 mb-6 max-w-xl mx-auto">
             Tell ACHEEVY what you need. A.I.M.S. will build it. No coding required.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -223,7 +223,7 @@ export function AppShowcase() {
             <Link
               href="https://github.com/BoomerAng9/AIMS"
               target="_blank"
-              className="inline-flex items-center gap-2 rounded-xl border border-wireframe-stroke px-6 py-3 text-sm text-white/60 transition-colors hover:bg-white/5 hover:text-white"
+              className="inline-flex items-center gap-2 rounded-xl border border-wireframe-stroke px-6 py-3 text-sm text-slate-500 transition-colors hover:bg-slate-50 hover:text-slate-800"
             >
               View on GitHub
             </Link>
@@ -263,7 +263,7 @@ export function BuildPrompts() {
   ];
 
   return (
-    <section className="py-16 px-4 md:px-6 lg:px-8 xl:px-12 bg-[#0A0A0A]">
+    <section className="py-16 px-4 md:px-6 lg:px-8 xl:px-12 bg-white">
       <div className="max-w-4xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -271,10 +271,10 @@ export function BuildPrompts() {
           viewport={{ once: true }}
           className="text-center mb-12"
         >
-          <h2 className="font-display text-2xl md:text-3xl uppercase tracking-wider text-white mb-2">
+          <h2 className="font-display text-2xl md:text-3xl uppercase tracking-wider text-slate-800 mb-2">
             Just Tell ACHEEVY What You Need
           </h2>
-          <p className="text-white/40">No technical jargon required. Speak naturally.</p>
+          <p className="text-slate-400">No technical jargon required. Speak naturally.</p>
         </motion.div>
 
         <motion.div
@@ -295,10 +295,10 @@ export function BuildPrompts() {
                     <Zap className="w-4 h-4 text-gold/60" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-medium text-white mb-1 group-hover:text-gold transition-colors">
+                    <h4 className="text-sm font-medium text-slate-800 mb-1 group-hover:text-gold transition-colors">
                       &ldquo;{prompt.title}&rdquo;
                     </h4>
-                    <p className="text-xs text-white/40 mb-2">{prompt.description}</p>
+                    <p className="text-xs text-slate-400 mb-2">{prompt.description}</p>
                     <span className="text-[0.6rem] text-gold/60 font-mono uppercase">
                       Creates: {prompt.result}
                     </span>

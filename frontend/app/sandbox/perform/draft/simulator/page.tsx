@@ -131,7 +131,7 @@ export default function SimulatorPage() {
         <motion.div variants={staggerItem}>
           <Link
             href="/sandbox/perform/draft"
-            className="inline-flex items-center gap-1.5 text-xs text-white/30 hover:text-gold font-mono uppercase tracking-wider transition-colors"
+            className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-gold font-mono uppercase tracking-wider transition-colors"
           >
             <ArrowLeft className="h-3 w-3" />
             Draft Hub
@@ -140,8 +140,8 @@ export default function SimulatorPage() {
 
         <motion.div variants={staggerItem} className="wireframe-card rounded-2xl p-10 text-center max-w-lg mx-auto">
           <Gamepad2 className="h-12 w-12 text-emerald-400/50 mx-auto mb-4" />
-          <h1 className="text-2xl font-display text-white mb-2">Draft Simulator</h1>
-          <p className="text-sm text-white/40 mb-6">
+          <h1 className="text-2xl font-display text-slate-800 mb-2">Draft Simulator</h1>
+          <p className="text-sm text-slate-400 mb-6">
             Take control of every pick. You decide which prospect goes to each team.
             Build the perfect draft — or create chaos.
           </p>
@@ -169,21 +169,21 @@ export default function SimulatorPage() {
         <div>
           <Link
             href="/sandbox/perform/draft"
-            className="inline-flex items-center gap-1.5 text-xs text-white/30 hover:text-gold font-mono uppercase tracking-wider transition-colors mb-2"
+            className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-gold font-mono uppercase tracking-wider transition-colors mb-2"
           >
             <ArrowLeft className="h-3 w-3" />
             Draft Hub
           </Link>
-          <h1 className="text-2xl font-display text-white tracking-tight">Draft Simulator</h1>
+          <h1 className="text-2xl font-display text-slate-800 tracking-tight">Draft Simulator</h1>
         </div>
         <div className="flex items-center gap-3 text-right">
           <div>
-            <div className="text-[0.55rem] font-mono text-white/25 uppercase">Round</div>
+            <div className="text-[0.55rem] font-mono text-slate-400 uppercase">Round</div>
             <div className="text-lg font-mono text-gold font-bold">{currentRound}</div>
           </div>
           <div>
-            <div className="text-[0.55rem] font-mono text-white/25 uppercase">Pick</div>
-            <div className="text-lg font-mono text-white font-bold">#{currentPick}</div>
+            <div className="text-[0.55rem] font-mono text-slate-400 uppercase">Pick</div>
+            <div className="text-lg font-mono text-slate-800 font-bold">#{currentPick}</div>
           </div>
         </div>
       </motion.div>
@@ -199,12 +199,12 @@ export default function SimulatorPage() {
           >
             <div className="flex items-center gap-3">
               <Check className="h-5 w-5 text-emerald-400" />
-              <span className="text-sm text-white">
-                <span className="text-white/50">{justPicked.teamName} select</span>{' '}
+              <span className="text-sm text-slate-800">
+                <span className="text-slate-500">{justPicked.teamName} select</span>{' '}
                 <span className="font-medium">
                   {justPicked.prospect?.firstName} {justPicked.prospect?.lastName}
                 </span>{' '}
-                <span className="text-white/50">({justPicked.prospect?.position}, {justPicked.prospect?.college})</span>
+                <span className="text-slate-500">({justPicked.prospect?.position}, {justPicked.prospect?.college})</span>
               </span>
             </div>
           </motion.div>
@@ -221,12 +221,12 @@ export default function SimulatorPage() {
                 <Clock className="h-5 w-5 text-gold animate-pulse" />
                 <div>
                   <div className="text-[0.55rem] font-mono text-gold/50 uppercase">On the Clock</div>
-                  <div className="text-lg font-display text-white">{onTheClock.teamName}</div>
+                  <div className="text-lg font-display text-slate-800">{onTheClock.teamName}</div>
                 </div>
                 <div className="ml-auto text-right">
-                  <div className="text-[0.55rem] font-mono text-white/25">PICK #{currentPick}</div>
+                  <div className="text-[0.55rem] font-mono text-slate-400">PICK #{currentPick}</div>
                   {onTheClock.needs && (
-                    <div className="text-[0.5rem] font-mono text-white/20">
+                    <div className="text-[0.5rem] font-mono text-slate-300">
                       Needs: {Object.entries(JSON.parse(onTheClock.needs))
                         .filter(([, v]) => (v as number) === 1)
                         .map(([k]) => k)
@@ -240,13 +240,13 @@ export default function SimulatorPage() {
 
           {/* Search */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300" />
             <input
               type="text"
               placeholder="Search available prospects..."
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 text-sm bg-white/[0.03] border border-white/10 rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-gold/30 transition-colors"
+              className="w-full pl-9 pr-4 py-2 text-sm bg-white border border-slate-200 rounded-lg text-slate-800 placeholder:text-slate-300 focus:outline-none focus:border-gold/30 transition-colors"
             />
           </div>
 
@@ -260,21 +260,21 @@ export default function SimulatorPage() {
                 <button
                   key={p.id}
                   onClick={() => setSelectedProspect(isSelected ? null : p)}
-                  className={`w-full flex items-center gap-3 px-4 py-3 border-b border-white/[0.04] text-left transition-colors ${
+                  className={`w-full flex items-center gap-3 px-4 py-3 border-b border-slate-200 text-left transition-colors ${
                     isSelected
                       ? 'bg-gold/[0.05] border-l-2 border-l-gold'
-                      : 'hover:bg-white/[0.02]'
+                      : 'hover:bg-white'
                   }`}
                 >
-                  <span className="text-sm font-mono text-white/30 w-8">#{p.overallRank}</span>
+                  <span className="text-sm font-mono text-slate-400 w-8">#{p.overallRank}</span>
                   <span className={`text-[0.6rem] font-mono px-1.5 py-0.5 rounded ${tierStyle.bg} ${tierStyle.border} ${tierStyle.text} border`}>
                     {p.position}
                   </span>
                   <div className="flex-1 min-w-0">
-                    <span className="text-sm text-white font-medium">
+                    <span className="text-sm text-slate-800 font-medium">
                       {p.firstName} {p.lastName}
                     </span>
-                    <span className="text-xs text-white/30 ml-2">{p.college}</span>
+                    <span className="text-xs text-slate-400 ml-2">{p.college}</span>
                   </div>
                   <span className={`text-sm font-mono font-bold ${getScoreColor(p.paiScore)}`}>
                     {p.paiScore}
@@ -303,14 +303,14 @@ export default function SimulatorPage() {
         <motion.div variants={staggerItem} className="space-y-3">
           <div className="flex items-center gap-2">
             <Trophy className="h-4 w-4 text-gold" />
-            <h2 className="text-sm font-display text-white">Picks Made</h2>
-            <span className="text-[0.55rem] font-mono text-white/25">{picks.length}</span>
+            <h2 className="text-sm font-display text-slate-800">Picks Made</h2>
+            <span className="text-[0.55rem] font-mono text-slate-400">{picks.length}</span>
           </div>
 
           <div className="wireframe-card rounded-2xl overflow-hidden max-h-[700px] overflow-y-auto">
             {picks.length === 0 ? (
               <div className="p-6 text-center">
-                <p className="text-xs text-white/30 font-mono">No picks yet — select a prospect</p>
+                <p className="text-xs text-slate-400 font-mono">No picks yet — select a prospect</p>
               </div>
             ) : (
               [...picks].reverse().map((pick: any, i) => {
@@ -319,17 +319,17 @@ export default function SimulatorPage() {
                 return (
                   <div
                     key={pick.id || i}
-                    className="flex items-center gap-2 px-3 py-2 border-b border-white/[0.04] last:border-b-0"
+                    className="flex items-center gap-2 px-3 py-2 border-b border-slate-200 last:border-b-0"
                   >
-                    <span className="text-xs font-mono text-white/25 w-7">#{pick.overall}</span>
+                    <span className="text-xs font-mono text-slate-400 w-7">#{pick.overall}</span>
                     <span className={`text-[0.5rem] font-mono px-1 py-0.5 rounded ${tierStyle.bg} ${tierStyle.text} border ${tierStyle.border}`}>
                       {prospect?.position}
                     </span>
                     <div className="flex-1 min-w-0">
-                      <div className="text-xs text-white truncate">
+                      <div className="text-xs text-slate-800 truncate">
                         {prospect?.firstName} {prospect?.lastName}
                       </div>
-                      <div className="text-[0.5rem] text-white/20 truncate">{pick.teamName}</div>
+                      <div className="text-[0.5rem] text-slate-300 truncate">{pick.teamName}</div>
                     </div>
                     <span className={`text-[0.6rem] font-mono font-bold ${getScoreColor(prospect?.paiScore || 0)}`}>
                       {prospect?.paiScore}

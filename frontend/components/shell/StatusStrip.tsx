@@ -142,7 +142,7 @@ export function StatusStrip({ className = '', position = 'bottom' }: StatusStrip
           <div className="flex items-center gap-4">
             <button
               onClick={() => setExpanded(!expanded)}
-              className="flex items-center gap-2 px-3 py-1 rounded-lg transition-colors hover:bg-white/5"
+              className="flex items-center gap-2 px-3 py-1 rounded-lg transition-colors hover:bg-slate-50"
             >
               <BotIcon className="w-4 h-4" style={{ color: AIMS_CIRCUIT_COLORS.primary }} />
               <span className="text-xs font-medium" style={{ color: AIMS_CIRCUIT_COLORS.secondary }}>
@@ -187,7 +187,7 @@ export function StatusStrip({ className = '', position = 'bottom' }: StatusStrip
           {/* Right: LUC Status & Link */}
           <Link
             href="/dashboard/luc"
-            className="flex items-center gap-3 px-3 py-1 rounded-lg transition-colors hover:bg-white/5 group"
+            className="flex items-center gap-3 px-3 py-1 rounded-lg transition-colors hover:bg-slate-50 group"
           >
             <ChartIcon className="w-4 h-4" style={{ color: AIMS_CIRCUIT_COLORS.primary }} />
 
@@ -227,7 +227,7 @@ export function StatusStrip({ className = '', position = 'bottom' }: StatusStrip
               <span className="text-xs text-gray-500">Loading...</span>
             )}
 
-            <ChevronRightIcon className="w-4 h-4 text-gray-500 group-hover:text-white transition-colors" />
+            <ChevronRightIcon className="w-4 h-4 text-gray-500 group-hover:text-slate-800 transition-colors" />
           </Link>
         </div>
       </div>
@@ -249,7 +249,7 @@ export function StatusStrip({ className = '', position = 'bottom' }: StatusStrip
                 {boomerAngs.map((agent) => (
                   <div
                     key={agent.id}
-                    className="p-3 rounded-lg bg-white/[0.03]"
+                    className="p-3 rounded-lg bg-white"
                     style={{
                       border: `1px solid ${
                         agent.status === 'running'
@@ -273,7 +273,7 @@ export function StatusStrip({ className = '', position = 'bottom' }: StatusStrip
                               : 'bg-gray-500'
                           }`}
                         />
-                        <span className="text-sm font-medium text-white">{agent.name}</span>
+                        <span className="text-sm font-medium text-slate-800">{agent.name}</span>
                       </div>
                       <span
                         className={`px-2 py-0.5 rounded text-xs ${
@@ -346,7 +346,7 @@ export function StatusStripCompact({ className = '' }: { className?: string }) {
   return (
     <Link
       href="/dashboard/luc"
-      className={`flex items-center gap-2 px-3 py-1.5 rounded-lg transition-colors hover:bg-white/5 ${className}`}
+      className={`flex items-center gap-2 px-3 py-1.5 rounded-lg transition-colors hover:bg-slate-50 ${className}`}
       style={{
         backgroundColor: AIMS_CIRCUIT_COLORS.background,
         border: `1px solid ${AIMS_CIRCUIT_COLORS.dimLine}`,

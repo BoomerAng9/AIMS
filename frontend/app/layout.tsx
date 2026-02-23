@@ -91,17 +91,17 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en">
       <body
         className={`
           ${doto.variable} ${permanentMarker.variable} ${caveat.variable}
           ${patrickHand.variable} ${nabla.variable}
-          antialiased bg-[#0A0A0A] text-white/[0.92] font-sans overflow-x-hidden
+          antialiased bg-[#F8FAFC] text-slate-900 font-sans overflow-x-hidden
         `}
       >
         <Providers>
           {/* Subtle background texture — never blocks content */}
-          <div className="fixed inset-0 bg-grid pointer-events-none opacity-40 z-0" />
+          <div className="fixed inset-0 bg-grid pointer-events-none opacity-20 z-0" />
           <div className="fixed inset-0 vignette-overlay z-0" />
 
           {/* Main content */}

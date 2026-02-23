@@ -42,7 +42,7 @@ export default function LifeScenesPage() {
             <Theater size={20} />
           </div>
           <div>
-            <h1 className="text-2xl font-display text-white tracking-tight">
+            <h1 className="text-2xl font-display text-slate-800 tracking-tight">
               Life Scenes
             </h1>
             <p className="text-xs text-cyan-400/60 font-mono">
@@ -50,7 +50,7 @@ export default function LifeScenesPage() {
             </p>
           </div>
         </div>
-        <p className="text-sm text-white/40 max-w-lg">
+        <p className="text-sm text-slate-400 max-w-lg">
           Practice hard conversations before they happen. Your Coach_Ang plays
           the other person, gives you feedback, and builds a confidence
           checklist when you&apos;re done.
@@ -71,14 +71,14 @@ export default function LifeScenesPage() {
             >
               <Mic size={32} />
             </button>
-            <p className="text-sm text-white/40">
+            <p className="text-sm text-slate-400">
               Press and hold to describe what you need to practice
             </p>
           </motion.div>
 
           {/* Starters */}
           <motion.div variants={staggerItem} className="space-y-3">
-            <p className="text-xs text-white/20 font-mono uppercase tracking-widest">
+            <p className="text-xs text-slate-300 font-mono uppercase tracking-widest">
               Or start with one of these
             </p>
             <div className="space-y-2">
@@ -87,7 +87,7 @@ export default function LifeScenesPage() {
                   key={s}
                   type="button"
                   onClick={() => setSession("setup")}
-                  className="block w-full text-left px-4 py-3 rounded-xl border border-white/5 bg-white/[0.02] text-sm text-white/50 hover:text-gold hover:border-gold/20 transition-colors"
+                  className="block w-full text-left px-4 py-3 rounded-xl border border-slate-100 bg-white text-sm text-slate-500 hover:text-gold hover:border-gold/20 transition-colors"
                 >
                   &quot;{s}&quot;
                 </button>
@@ -104,10 +104,10 @@ export default function LifeScenesPage() {
           animate="visible"
           className="wireframe-card p-6 rounded-2xl space-y-6"
         >
-          <h2 className="text-sm font-medium text-white">
+          <h2 className="text-sm font-medium text-slate-800">
             Setting the Scene
           </h2>
-          <p className="text-xs text-white/40">
+          <p className="text-xs text-slate-400">
             Coach_Ang is listening. Describe who you need to talk to, what the
             conversation is about, and what&apos;s at stake.
           </p>
@@ -121,8 +121,8 @@ export default function LifeScenesPage() {
           </div>
 
           {/* Simulated transcript */}
-          <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 min-h-[100px]">
-            <p className="text-xs text-white/30 italic">
+          <div className="p-4 rounded-xl bg-white border border-slate-100 min-h-[100px]">
+            <p className="text-xs text-slate-400 italic">
               Your words will appear here as you speak...
             </p>
           </div>
@@ -138,7 +138,7 @@ export default function LifeScenesPage() {
             <button
               type="button"
               onClick={() => setSession("idle")}
-              className="px-4 py-2 rounded-xl border border-white/10 text-xs text-white/50 hover:text-white hover:border-white/20 transition-colors"
+              className="px-4 py-2 rounded-xl border border-slate-200 text-xs text-slate-500 hover:text-slate-800 hover:border-slate-200 transition-colors"
             >
               Cancel
             </button>
@@ -157,15 +157,15 @@ export default function LifeScenesPage() {
           <div className="grid gap-4 md:grid-cols-2">
             {/* Your side */}
             <div className="wireframe-card p-5 rounded-2xl space-y-4">
-              <p className="text-[0.6rem] font-mono uppercase tracking-widest text-white/30">
+              <p className="text-[0.6rem] font-mono uppercase tracking-widest text-slate-400">
                 You
               </p>
               <div className="flex justify-center py-4">
-                <div className="h-16 w-16 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
-                  <Mic size={24} className="text-white/30" />
+                <div className="h-16 w-16 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center">
+                  <Mic size={24} className="text-slate-400" />
                 </div>
               </div>
-              <div className="h-6 rounded bg-white/[0.03] flex items-center px-2 gap-0.5">
+              <div className="h-6 rounded bg-white flex items-center px-2 gap-0.5">
                 {Array.from({ length: 20 }).map((_, i) => (
                   <div
                     key={i}
@@ -174,8 +174,8 @@ export default function LifeScenesPage() {
                   />
                 ))}
               </div>
-              <div className="p-3 rounded-lg bg-white/[0.02] min-h-[60px]">
-                <p className="text-xs text-white/40 italic">
+              <div className="p-3 rounded-lg bg-white min-h-[60px]">
+                <p className="text-xs text-slate-400 italic">
                   Speak your part...
                 </p>
               </div>
@@ -191,7 +191,7 @@ export default function LifeScenesPage() {
                   <span className="text-2xl">🎭</span>
                 </div>
               </div>
-              <div className="h-6 rounded bg-white/[0.03] flex items-center px-2 gap-0.5">
+              <div className="h-6 rounded bg-white flex items-center px-2 gap-0.5">
                 {Array.from({ length: 20 }).map((_, i) => (
                   <div
                     key={i}
@@ -201,7 +201,7 @@ export default function LifeScenesPage() {
                 ))}
               </div>
               <div className="p-3 rounded-lg bg-cyan-400/5 min-h-[60px]">
-                <p className="text-xs text-white/50">
+                <p className="text-xs text-slate-500">
                   &quot;I understand you want to talk about this. Tell me
                   more about what&apos;s been on your mind...&quot;
                 </p>
@@ -214,7 +214,7 @@ export default function LifeScenesPage() {
             <p className="text-[0.55rem] text-gold/60 font-mono uppercase mb-1">
               Coach Tip
             </p>
-            <p className="text-xs text-white/40">
+            <p className="text-xs text-slate-400">
               &quot;Great opening. Now state what you need clearly — use
               &apos;I need...&apos; not &apos;You should...&apos;&quot;
             </p>
@@ -222,19 +222,19 @@ export default function LifeScenesPage() {
 
           {/* Controls */}
           <div className="flex items-center justify-between">
-            <span className="text-xs text-white/30 font-mono">
+            <span className="text-xs text-slate-400 font-mono">
               Round 1 of 3
             </span>
             <div className="flex gap-2">
               <button
                 type="button"
-                className="p-2 rounded-lg border border-white/10 text-white/40 hover:text-white transition-colors"
+                className="p-2 rounded-lg border border-slate-200 text-slate-400 hover:text-slate-800 transition-colors"
               >
                 <Pause size={16} />
               </button>
               <button
                 type="button"
-                className="p-2 rounded-lg border border-white/10 text-white/40 hover:text-white transition-colors"
+                className="p-2 rounded-lg border border-slate-200 text-slate-400 hover:text-slate-800 transition-colors"
               >
                 <SkipForward size={16} />
               </button>
@@ -257,13 +257,13 @@ export default function LifeScenesPage() {
           animate="visible"
           className="wireframe-card p-6 rounded-2xl space-y-6"
         >
-          <h2 className="text-sm font-medium text-white">
+          <h2 className="text-sm font-medium text-slate-800">
             Session Complete
           </h2>
 
           {/* Confidence check */}
           <div className="space-y-3">
-            <p className="text-xs text-white/40">
+            <p className="text-xs text-slate-400">
               How ready do you feel? (1–5)
             </p>
             <div className="flex gap-2">
@@ -271,7 +271,7 @@ export default function LifeScenesPage() {
                 <button
                   key={n}
                   type="button"
-                  className="h-10 w-10 rounded-xl border border-white/10 text-white/50 hover:border-gold/30 hover:text-gold transition-colors text-sm font-display"
+                  className="h-10 w-10 rounded-xl border border-slate-200 text-slate-500 hover:border-gold/30 hover:text-gold transition-colors text-sm font-display"
                 >
                   {n}
                 </button>
@@ -280,14 +280,14 @@ export default function LifeScenesPage() {
           </div>
 
           {/* Artifact preview */}
-          <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 space-y-2">
+          <div className="p-4 rounded-xl bg-white border border-slate-100 space-y-2">
             <p className="text-xs text-gold/60 font-mono uppercase">
               Your Artifact
             </p>
-            <p className="text-sm text-white/60">
+            <p className="text-sm text-slate-500">
               Script PDF + Confidence Checklist
             </p>
-            <ul className="text-xs text-white/40 space-y-1 ml-4 list-disc">
+            <ul className="text-xs text-slate-400 space-y-1 ml-4 list-disc">
               <li>Opening script (3 versions)</li>
               <li>Key talking points</li>
               <li>Confidence checklist</li>
@@ -305,7 +305,7 @@ export default function LifeScenesPage() {
             <button
               type="button"
               onClick={() => setSession("idle")}
-              className="px-4 py-2 rounded-xl border border-white/10 text-xs text-white/50 hover:text-white hover:border-white/20 transition-colors"
+              className="px-4 py-2 rounded-xl border border-slate-200 text-xs text-slate-500 hover:text-slate-800 hover:border-slate-200 transition-colors"
             >
               Start New Session
             </button>

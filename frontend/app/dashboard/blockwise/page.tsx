@@ -477,7 +477,7 @@ function CurrencyInput({ label, value, onChange, highlight }: {
           className={`w-full pl-7 pr-3 py-2 rounded-lg text-sm font-mono outline-none transition-colors ${
             highlight
               ? 'bg-emerald-500/5 border border-emerald-500/20 text-emerald-300 focus:border-emerald-500/40'
-              : 'bg-black/40 border border-zinc-700/50 text-zinc-200 focus:border-zinc-500'
+              : 'bg-slate-100/60 border border-zinc-700/50 text-zinc-200 focus:border-zinc-500'
           }`}
         />
       </div>
@@ -497,7 +497,7 @@ function PercentInput({ label, value, onChange }: {
           value={value || ''}
           onChange={e => onChange(e.target.value)}
           step="0.5"
-          className="w-full pl-3 pr-7 py-2 bg-black/40 border border-zinc-700/50 rounded-lg text-sm font-mono text-zinc-200 outline-none focus:border-zinc-500 transition-colors"
+          className="w-full pl-3 pr-7 py-2 bg-slate-100/60 border border-zinc-700/50 rounded-lg text-sm font-mono text-zinc-200 outline-none focus:border-zinc-500 transition-colors"
         />
         <span className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-600 text-sm">%</span>
       </div>
@@ -515,7 +515,7 @@ function NumberInput({ label, value, onChange }: {
         type="number"
         value={value || ''}
         onChange={e => onChange(e.target.value)}
-        className="w-full px-3 py-2 bg-black/40 border border-zinc-700/50 rounded-lg text-sm font-mono text-zinc-200 outline-none focus:border-zinc-500 transition-colors"
+        className="w-full px-3 py-2 bg-slate-100/60 border border-zinc-700/50 rounded-lg text-sm font-mono text-zinc-200 outline-none focus:border-zinc-500 transition-colors"
       />
     </div>
   );

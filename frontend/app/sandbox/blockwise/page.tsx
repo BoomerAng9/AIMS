@@ -59,7 +59,7 @@ export default function BlockwiseSandbox() {
             <Zap size={20} />
           </div>
           <div>
-            <h1 className="text-2xl md:text-3xl font-display text-white tracking-tight">
+            <h1 className="text-2xl md:text-3xl font-display text-slate-800 tracking-tight">
               Blockwise AI
             </h1>
             <p className="text-xs text-gold/60 font-mono">
@@ -67,7 +67,7 @@ export default function BlockwiseSandbox() {
             </p>
           </div>
         </div>
-        <p className="text-sm text-white/40 max-w-xl">
+        <p className="text-sm text-slate-400 max-w-xl">
           AI finds deals BEFORE Zillow. Know your numbers, fund with OPM (Other
           People&apos;s Money), close in 90 days. From renter to landlord.
         </p>
@@ -85,10 +85,10 @@ export default function BlockwiseSandbox() {
           <Mic size={24} />
         </button>
         <div>
-          <p className="text-sm text-white/70">
+          <p className="text-sm text-slate-600">
             &quot;I have $50K. Find me a deal in Atlanta.&quot;
           </p>
-          <p className="text-[0.55rem] text-white/30 font-mono uppercase tracking-wider">
+          <p className="text-[0.55rem] text-slate-400 font-mono uppercase tracking-wider">
             Voice-driven deal discovery — say your budget and market
           </p>
         </div>
@@ -103,11 +103,11 @@ export default function BlockwiseSandbox() {
           {["DISCOVER", "ANALYZE", "FUND PATH", "TIMELINE", "ARTIFACT"].map(
             (stage, i) => (
               <span key={stage} className="flex items-center gap-2">
-                <span className="px-3 py-1.5 rounded-lg bg-white/[0.03] border border-white/5 text-white/40">
+                <span className="px-3 py-1.5 rounded-lg bg-white border border-slate-100 text-slate-400">
                   {stage}
                 </span>
                 {i < 4 && (
-                  <ArrowRight size={10} className="text-white/15" />
+                  <ArrowRight size={10} className="text-slate-300" />
                 )}
               </span>
             )
@@ -117,7 +117,7 @@ export default function BlockwiseSandbox() {
 
       {/* Deal Grid */}
       <motion.section variants={staggerContainer} className="space-y-4">
-        <h2 className="text-xs uppercase tracking-widest text-white/30 font-mono">
+        <h2 className="text-xs uppercase tracking-widest text-slate-400 font-mono">
           Active Deals
         </h2>
 
@@ -132,40 +132,40 @@ export default function BlockwiseSandbox() {
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   <MapPin size={12} className="text-gold/60" />
-                  <h3 className="text-sm font-medium text-white">
+                  <h3 className="text-sm font-medium text-slate-800">
                     {deal.address}
                   </h3>
                 </div>
-                <p className="text-[0.6rem] text-white/40 font-mono ml-5">
+                <p className="text-[0.6rem] text-slate-400 font-mono ml-5">
                   {deal.city}
                 </p>
               </div>
 
               {/* Property placeholder */}
-              <div className="h-28 rounded-xl bg-white/[0.02] border border-white/5 flex items-center justify-center">
-                <Building size={32} className="text-white/10" />
+              <div className="h-28 rounded-xl bg-white border border-slate-100 flex items-center justify-center">
+                <Building size={32} className="text-slate-300" />
               </div>
 
               {/* Metrics */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <p className="text-[0.5rem] font-mono uppercase text-white/30">
+                  <p className="text-[0.5rem] font-mono uppercase text-slate-400">
                     ARV
                   </p>
-                  <p className="text-sm font-display text-white">
+                  <p className="text-sm font-display text-slate-800">
                     {formatCurrency(deal.arv)}
                   </p>
                 </div>
                 <div>
-                  <p className="text-[0.5rem] font-mono uppercase text-white/30">
+                  <p className="text-[0.5rem] font-mono uppercase text-slate-400">
                     Rehab
                   </p>
-                  <p className="text-sm font-display text-white">
+                  <p className="text-sm font-display text-slate-800">
                     {formatCurrency(deal.rehab)}
                   </p>
                 </div>
                 <div>
-                  <p className="text-[0.5rem] font-mono uppercase text-white/30">
+                  <p className="text-[0.5rem] font-mono uppercase text-slate-400">
                     Cash-on-Cash
                   </p>
                   <p className="text-sm font-display text-emerald-400">
@@ -173,20 +173,20 @@ export default function BlockwiseSandbox() {
                   </p>
                 </div>
                 <div>
-                  <p className="text-[0.5rem] font-mono uppercase text-white/30">
+                  <p className="text-[0.5rem] font-mono uppercase text-slate-400">
                     Asking
                   </p>
-                  <p className="text-sm font-display text-white">
+                  <p className="text-sm font-display text-slate-800">
                     {formatCurrency(deal.askingPrice)}
                   </p>
                 </div>
               </div>
 
               {/* Grades */}
-              <div className="flex items-center justify-between pt-3 border-t border-white/5">
+              <div className="flex items-center justify-between pt-3 border-t border-slate-100">
                 <div className="flex items-center gap-3">
                   <div>
-                    <span className="text-[0.5rem] font-mono text-white/30 uppercase">
+                    <span className="text-[0.5rem] font-mono text-slate-400 uppercase">
                       OPM{" "}
                     </span>
                     <span
@@ -196,7 +196,7 @@ export default function BlockwiseSandbox() {
                     </span>
                   </div>
                   <div>
-                    <span className="text-[0.5rem] font-mono text-white/30 uppercase">
+                    <span className="text-[0.5rem] font-mono text-slate-400 uppercase">
                       Risk{" "}
                     </span>
                     <span
@@ -228,9 +228,9 @@ export default function BlockwiseSandbox() {
         <h2 className="text-xs uppercase tracking-widest text-gold/50 font-mono mb-4">
           OPM Funding Paths
         </h2>
-        <div className="grid gap-4 md:grid-cols-3 text-xs text-white/40">
-          <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5">
-            <p className="text-white/60 font-medium mb-1 flex items-center gap-2">
+        <div className="grid gap-4 md:grid-cols-3 text-xs text-slate-400">
+          <div className="p-4 rounded-xl bg-white border border-slate-100">
+            <p className="text-slate-500 font-medium mb-1 flex items-center gap-2">
               <DollarSign size={14} className="text-gold/60" />
               Hard Money Lender
             </p>
@@ -239,8 +239,8 @@ export default function BlockwiseSandbox() {
               offset by speed. Best for flips.
             </p>
           </div>
-          <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5">
-            <p className="text-white/60 font-medium mb-1 flex items-center gap-2">
+          <div className="p-4 rounded-xl bg-white border border-slate-100">
+            <p className="text-slate-500 font-medium mb-1 flex items-center gap-2">
               <DollarSign size={14} className="text-gold/60" />
               Private Money
             </p>
@@ -249,8 +249,8 @@ export default function BlockwiseSandbox() {
               Best for buy-and-hold.
             </p>
           </div>
-          <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5">
-            <p className="text-white/60 font-medium mb-1 flex items-center gap-2">
+          <div className="p-4 rounded-xl bg-white border border-slate-100">
+            <p className="text-slate-500 font-medium mb-1 flex items-center gap-2">
               <DollarSign size={14} className="text-gold/60" />
               Seller Financing
             </p>

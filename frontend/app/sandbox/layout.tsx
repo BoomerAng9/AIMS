@@ -13,10 +13,10 @@ export default function SandboxLayout({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-full flex flex-col">
       {/* Sandbox top bar */}
-      <nav className="flex items-center justify-between px-6 py-4 border-b border-wireframe-stroke bg-black/40 backdrop-blur-xl">
+      <nav className="flex items-center justify-between px-6 py-4 border-b border-wireframe-stroke bg-slate-100/60 backdrop-blur-xl">
         <Link
           href="/"
-          className="flex items-center gap-2 text-sm text-white/50 hover:text-gold transition-colors"
+          className="flex items-center gap-2 text-sm text-slate-500 hover:text-gold transition-colors"
         >
           <ArrowLeft size={14} />
           <span className="font-mono text-[0.6rem] uppercase tracking-widest">

@@ -36,9 +36,9 @@ const platforms: Platform[] = [
     id: "github",
     name: "GitHub",
     icon: Github,
-    color: "text-white",
-    borderColor: "border-white/20",
-    bgColor: "bg-white/10",
+    color: "text-slate-800",
+    borderColor: "border-slate-200",
+    bgColor: "bg-slate-100",
     description: "Connect repositories, track commits, and monitor contributions.",
     features: ["Repository sync", "Commit tracking", "Contribution graph", "Pull request activity"],
     oauthUrl: "/api/auth/signin?provider=github",
@@ -108,7 +108,7 @@ function AccountCard({ platform }: { platform: Platform }) {
   return (
     <motion.div
       variants={staggerItem}
-      className={`rounded-2xl border ${connected ? platform.borderColor : "border-wireframe-stroke"} bg-black/40 p-5 backdrop-blur-xl transition`}
+      className={`rounded-2xl border ${connected ? platform.borderColor : "border-wireframe-stroke"} bg-slate-100/60 p-5 backdrop-blur-xl transition`}
     >
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
@@ -116,10 +116,10 @@ function AccountCard({ platform }: { platform: Platform }) {
             <Icon size={22} className={platform.color} />
           </div>
           <div>
-            <h3 className="text-base font-semibold text-white">{platform.name}</h3>
+            <h3 className="text-base font-semibold text-slate-800">{platform.name}</h3>
             <div className="flex items-center gap-2 mt-0.5">
-              <span className={`h-2 w-2 rounded-full ${connected ? "bg-emerald-400 animate-pulse" : "bg-white/20"}`} />
-              <span className="text-xs text-white/40">{connected ? "Connected" : "Not connected"}</span>
+              <span className={`h-2 w-2 rounded-full ${connected ? "bg-emerald-400 animate-pulse" : "bg-slate-100"}`} />
+              <span className="text-xs text-slate-400">{connected ? "Connected" : "Not connected"}</span>
             </div>
           </div>
         </div>
@@ -127,7 +127,7 @@ function AccountCard({ platform }: { platform: Platform }) {
           <button
             type="button"
             onClick={handleSync}
-            className="flex items-center gap-1.5 rounded-lg border border-wireframe-stroke bg-white/5 px-3 py-1.5 text-xs text-white/60 transition hover:bg-white/10"
+            className="flex items-center gap-1.5 rounded-lg border border-wireframe-stroke bg-slate-50 px-3 py-1.5 text-xs text-slate-500 transition hover:bg-slate-100"
           >
             <RefreshCw size={12} className={syncing ? "animate-spin" : ""} />
             Sync
@@ -135,12 +135,12 @@ function AccountCard({ platform }: { platform: Platform }) {
         )}
       </div>
 
-      <p className="text-xs text-white/50 leading-relaxed mb-4">{platform.description}</p>
+      <p className="text-xs text-slate-500 leading-relaxed mb-4">{platform.description}</p>
 
       {/* Features */}
       <div className="flex flex-wrap gap-1.5 mb-4">
         {platform.features.map((f) => (
-          <span key={f} className="rounded-full border border-wireframe-stroke bg-white/5 px-2.5 py-0.5 text-[10px] text-white/40">
+          <span key={f} className="rounded-full border border-wireframe-stroke bg-slate-50 px-2.5 py-0.5 text-[10px] text-slate-400">
             {f}
           </span>
         ))}
@@ -149,13 +149,13 @@ function AccountCard({ platform }: { platform: Platform }) {
       {/* Stats (when connected) */}
       {connected && (
         <div className="grid grid-cols-2 gap-2 mb-4">
-          <div className="rounded-lg border border-wireframe-stroke bg-white/5 p-2 text-center">
-            <p className="text-lg font-bold text-white">—</p>
-            <p className="text-[10px] text-white/30">Posts</p>
+          <div className="rounded-lg border border-wireframe-stroke bg-slate-50 p-2 text-center">
+            <p className="text-lg font-bold text-slate-800">—</p>
+            <p className="text-[10px] text-slate-400">Posts</p>
           </div>
-          <div className="rounded-lg border border-wireframe-stroke bg-white/5 p-2 text-center">
-            <p className="text-lg font-bold text-white">—</p>
-            <p className="text-[10px] text-white/30">Engagement</p>
+          <div className="rounded-lg border border-wireframe-stroke bg-slate-50 p-2 text-center">
+            <p className="text-lg font-bold text-slate-800">—</p>
+            <p className="text-[10px] text-slate-400">Engagement</p>
           </div>
         </div>
       )}
@@ -194,29 +194,29 @@ export default function ConnectedAccountsPage() {
       className="space-y-6 animate-in fade-in duration-700"
     >
       {/* Back link */}
-      <Link href="/dashboard/research" className="inline-flex items-center gap-2 text-xs text-white/40 hover:text-gold transition">
+      <Link href="/dashboard/research" className="inline-flex items-center gap-2 text-xs text-slate-400 hover:text-gold transition">
         <ArrowLeft size={14} />
         Back to R&D Hub
       </Link>
 
       {/* Header */}
       <motion.header variants={staggerItem}>
-        <h1 className="text-2xl font-semibold tracking-tight text-white font-display">
+        <h1 className="text-2xl font-semibold tracking-tight text-slate-800 font-display">
           Connected Accounts
         </h1>
-        <p className="text-sm text-white/50">
+        <p className="text-sm text-slate-500">
           Link your social and developer accounts to track activity across platforms.
         </p>
       </motion.header>
 
       {/* Status bar */}
-      <motion.div variants={staggerItem} className="flex items-center gap-4 rounded-2xl border border-wireframe-stroke bg-black/40 p-4 backdrop-blur-xl">
+      <motion.div variants={staggerItem} className="flex items-center gap-4 rounded-2xl border border-wireframe-stroke bg-slate-100/60 p-4 backdrop-blur-xl">
         <div className="flex items-center gap-2">
           <Check size={14} className="text-emerald-400" />
-          <span className="text-xs text-white/60">0 of {platforms.length} accounts connected</span>
+          <span className="text-xs text-slate-500">0 of {platforms.length} accounts connected</span>
         </div>
         <div className="flex-1" />
-        <span className="text-[10px] text-white/30">Connect accounts to enable the Activity Feed</span>
+        <span className="text-[10px] text-slate-400">Connect accounts to enable the Activity Feed</span>
       </motion.div>
 
       {/* Platform grid */}
@@ -227,8 +227,8 @@ export default function ConnectedAccountsPage() {
       </motion.div>
 
       {/* Privacy note */}
-      <motion.div variants={staggerItem} className="rounded-2xl border border-wireframe-stroke bg-white/[0.02] p-4 text-center">
-        <p className="text-xs text-white/30">
+      <motion.div variants={staggerItem} className="rounded-2xl border border-wireframe-stroke bg-white p-4 text-center">
+        <p className="text-xs text-slate-400">
           A.I.M.S. only reads public data from connected accounts. You can disconnect at any time.
           We never post on your behalf without explicit permission.
         </p>

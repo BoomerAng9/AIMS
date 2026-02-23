@@ -64,7 +64,7 @@ export default function ArenaLobby() {
                 <Trophy size={24} className="text-gold" />
               </div>
               <div>
-                <h1 className="text-3xl md:text-5xl font-display text-white tracking-tight">
+                <h1 className="text-3xl md:text-5xl font-display text-slate-800 tracking-tight">
                   THE ARENA
                 </h1>
                 <p className="text-[0.6rem] font-mono uppercase tracking-[0.3em] text-gold/60">
@@ -72,7 +72,7 @@ export default function ArenaLobby() {
                 </p>
               </div>
             </div>
-            <p className="text-sm md:text-base text-white/40 leading-relaxed max-w-lg">
+            <p className="text-sm md:text-base text-slate-400 leading-relaxed max-w-lg">
               Test your knowledge. Make your picks. Climb the ranks.
               Daily AI-generated contests across trivia, sports, and Per|Form prospect analysis.
               Free and paid entries. Real prizes. Pure skill.
@@ -87,7 +87,7 @@ export default function ArenaLobby() {
               </Link>
               <Link
                 href="/arena/how-it-works"
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white/60 text-sm font-medium hover:bg-white/10 transition-all"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-500 text-sm font-medium hover:bg-slate-100 transition-all"
               >
                 How It Works
               </Link>
@@ -105,12 +105,12 @@ export default function ArenaLobby() {
           { icon: Flame, label: 'Longest Streak', value: '25', color: 'text-amber-400' },
         ].map(stat => (
           <div key={stat.label} className="wireframe-card rounded-2xl p-4 flex items-center gap-3">
-            <div className={`flex h-10 w-10 items-center justify-center rounded-xl bg-white/[0.03] border border-white/5 ${stat.color}`}>
+            <div className={`flex h-10 w-10 items-center justify-center rounded-xl bg-white border border-slate-100 ${stat.color}`}>
               <stat.icon size={18} />
             </div>
             <div>
               <p className={`text-lg font-display ${stat.color}`}>{stat.value}</p>
-              <p className="text-[0.5rem] font-mono text-white/25 uppercase tracking-wider">{stat.label}</p>
+              <p className="text-[0.5rem] font-mono text-slate-400 uppercase tracking-wider">{stat.label}</p>
             </div>
           </div>
         ))}
@@ -156,7 +156,7 @@ export default function ArenaLobby() {
               <Clock size={14} className="text-blue-400" />
               <h2 className="text-xs uppercase tracking-widest text-blue-400/60 font-mono">Upcoming</h2>
             </div>
-            <span className="text-[0.5rem] font-mono text-white/20">
+            <span className="text-[0.5rem] font-mono text-slate-300">
               {upcomingContests.length} contest{upcomingContests.length !== 1 ? 's' : ''}
             </span>
           </div>
@@ -178,10 +178,10 @@ export default function ArenaLobby() {
             <Crown size={18} />
           </div>
           <div className="flex-1">
-            <p className="text-sm font-medium text-white group-hover:text-gold transition-colors">Leaderboard</p>
-            <p className="text-[0.55rem] text-white/30 font-mono">Top players and rankings</p>
+            <p className="text-sm font-medium text-slate-800 group-hover:text-gold transition-colors">Leaderboard</p>
+            <p className="text-[0.55rem] text-slate-400 font-mono">Top players and rankings</p>
           </div>
-          <ArrowRight size={14} className="text-white/15 group-hover:text-gold/40 transition-colors" />
+          <ArrowRight size={14} className="text-slate-300 group-hover:text-gold/40 transition-colors" />
         </Link>
 
         <Link
@@ -192,10 +192,10 @@ export default function ArenaLobby() {
             <Target size={18} />
           </div>
           <div className="flex-1">
-            <p className="text-sm font-medium text-white group-hover:text-emerald-400 transition-colors">Per|Form Hub</p>
-            <p className="text-[0.55rem] text-white/30 font-mono">AI scouting + P.A.I. grades</p>
+            <p className="text-sm font-medium text-slate-800 group-hover:text-emerald-400 transition-colors">Per|Form Hub</p>
+            <p className="text-[0.55rem] text-slate-400 font-mono">AI scouting + P.A.I. grades</p>
           </div>
-          <ArrowRight size={14} className="text-white/15 group-hover:text-emerald-400/40 transition-colors" />
+          <ArrowRight size={14} className="text-slate-300 group-hover:text-emerald-400/40 transition-colors" />
         </Link>
 
         <Link
@@ -206,10 +206,10 @@ export default function ArenaLobby() {
             <Brain size={18} />
           </div>
           <div className="flex-1">
-            <p className="text-sm font-medium text-white group-hover:text-purple-400 transition-colors">How It Works</p>
-            <p className="text-[0.55rem] text-white/30 font-mono">Rules, payouts, and FAQ</p>
+            <p className="text-sm font-medium text-slate-800 group-hover:text-purple-400 transition-colors">How It Works</p>
+            <p className="text-[0.55rem] text-slate-400 font-mono">Rules, payouts, and FAQ</p>
           </div>
-          <ArrowRight size={14} className="text-white/15 group-hover:text-purple-400/40 transition-colors" />
+          <ArrowRight size={14} className="text-slate-300 group-hover:text-purple-400/40 transition-colors" />
         </Link>
       </motion.section>
 
@@ -217,7 +217,7 @@ export default function ArenaLobby() {
       {loading && (
         <div className="text-center py-16">
           <div className="inline-block h-8 w-8 border-2 border-gold/30 border-t-gold rounded-full animate-spin" />
-          <p className="text-xs text-white/30 mt-4 font-mono">Loading contests...</p>
+          <p className="text-xs text-slate-400 mt-4 font-mono">Loading contests...</p>
         </div>
       )}
     </motion.div>
@@ -267,10 +267,10 @@ function ContestCard({ contest, featured }: { contest: ArenaContest; featured?: 
 
       {/* Title */}
       <div>
-        <h3 className="text-sm font-medium text-white group-hover:text-gold transition-colors leading-tight">
+        <h3 className="text-sm font-medium text-slate-800 group-hover:text-gold transition-colors leading-tight">
           {contest.title}
         </h3>
-        <p className="text-[0.65rem] text-white/30 mt-1 line-clamp-2 leading-relaxed">
+        <p className="text-[0.65rem] text-slate-400 mt-1 line-clamp-2 leading-relaxed">
           {contest.description}
         </p>
       </div>
@@ -281,14 +281,14 @@ function ContestCard({ contest, featured }: { contest: ArenaContest; featured?: 
           <p className="text-lg font-display text-gold">
             {contest.entryFee === 0 ? 'FREE' : formatCurrency(contest.entryFee)}
           </p>
-          <p className="text-[0.5rem] font-mono text-white/20 uppercase">Entry</p>
+          <p className="text-[0.5rem] font-mono text-slate-300 uppercase">Entry</p>
         </div>
         {(contest.prizePool > 0 || contest.entryFee > 0) && (
           <div className="text-right">
             <p className="text-lg font-display text-emerald-400">
               {contest.prizePool > 0 ? formatCurrency(contest.prizePool) : 'TBD'}
             </p>
-            <p className="text-[0.5rem] font-mono text-white/20 uppercase">Prize Pool</p>
+            <p className="text-[0.5rem] font-mono text-slate-300 uppercase">Prize Pool</p>
           </div>
         )}
         {contest.entryFee === 0 && contest.prizePool === 0 && (
@@ -297,18 +297,18 @@ function ContestCard({ contest, featured }: { contest: ArenaContest; featured?: 
               <Award size={14} />
               <span className="text-sm font-display">XP</span>
             </div>
-            <p className="text-[0.5rem] font-mono text-white/20 uppercase">Reward</p>
+            <p className="text-[0.5rem] font-mono text-slate-300 uppercase">Reward</p>
           </div>
         )}
       </div>
 
       {/* Fill Bar */}
       <div className="space-y-1.5">
-        <div className="flex items-center justify-between text-[0.5rem] font-mono text-white/25">
+        <div className="flex items-center justify-between text-[0.5rem] font-mono text-slate-400">
           <span>{contest.currentEntries} entered</span>
           <span>{spotsLeft} spots left</span>
         </div>
-        <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+        <div className="h-1 bg-slate-50 rounded-full overflow-hidden">
           <div
             className="h-full bg-gradient-to-r from-gold/40 to-gold/60 rounded-full transition-all duration-500"
             style={{ width: `${Math.min(fillPercent, 100)}%` }}
@@ -317,8 +317,8 @@ function ContestCard({ contest, featured }: { contest: ArenaContest; featured?: 
       </div>
 
       {/* Time */}
-      <div className="flex items-center justify-between pt-1 border-t border-white/[0.04]">
-        <div className="flex items-center gap-1.5 text-white/25">
+      <div className="flex items-center justify-between pt-1 border-t border-slate-200">
+        <div className="flex items-center gap-1.5 text-slate-400">
           <Clock size={10} />
           <span className="text-[0.5rem] font-mono">
             {contest.status === 'LIVE'
@@ -326,7 +326,7 @@ function ContestCard({ contest, featured }: { contest: ArenaContest; featured?: 
               : `Starts in ${getTimeRemaining(contest.startsAt)}`}
           </span>
         </div>
-        <ArrowRight size={12} className="text-white/10 group-hover:text-gold/30 transition-colors" />
+        <ArrowRight size={12} className="text-slate-300 group-hover:text-gold/30 transition-colors" />
       </div>
     </Link>
   );

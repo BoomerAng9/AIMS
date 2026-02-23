@@ -106,17 +106,17 @@ export default function WorkshopHub() {
             className="relative flex h-20 w-20 items-center justify-center rounded-full bg-gold/10 border-2 border-gold/30 text-gold hover:bg-gold/20 transition-colors animate-pulse-gold"
           >
             <Mic size={32} />
-            <span className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full bg-emerald-400 border-2 border-[#0A0A0A]">
+            <span className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full bg-emerald-400 border-2 border-white">
               <span className="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-40" />
             </span>
           </button>
         </div>
 
         <div className="space-y-2">
-          <h1 className="text-3xl md:text-4xl font-display text-white tracking-tight">
+          <h1 className="text-3xl md:text-4xl font-display text-slate-800 tracking-tight">
             The Workshop
           </h1>
-          <p className="text-sm text-white/40 max-w-md mx-auto">
+          <p className="text-sm text-slate-400 max-w-md mx-auto">
             Voice-first companions. Say what&apos;s on your mind and leave with
             something real.
           </p>
@@ -131,13 +131,13 @@ export default function WorkshopHub() {
           ].map((v) => (
             <div
               key={v.verb}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl border border-white/5 bg-white/[0.02]"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-100 bg-white"
             >
               <v.icon size={14} className="text-gold/60" />
-              <span className="text-xs text-white/60 font-medium">
+              <span className="text-xs text-slate-500 font-medium">
                 {v.verb}
               </span>
-              <span className="text-[0.55rem] text-white/25">
+              <span className="text-[0.55rem] text-slate-400">
                 — {v.desc}
               </span>
             </div>
@@ -166,14 +166,14 @@ export default function WorkshopHub() {
                 {/* Content */}
                 <div className="flex-1 space-y-3">
                   <div>
-                    <h3 className="text-base font-medium text-white group-hover:text-gold transition-colors">
+                    <h3 className="text-base font-medium text-slate-800 group-hover:text-gold transition-colors">
                       {flow.name}
                     </h3>
                     <p className="text-xs text-gold/50 font-mono">
                       {flow.tagline}
                     </p>
                   </div>
-                  <p className="text-sm text-white/40 leading-relaxed">
+                  <p className="text-sm text-slate-400 leading-relaxed">
                     {flow.description}
                   </p>
 
@@ -182,7 +182,7 @@ export default function WorkshopHub() {
                     {flow.examples.map((ex) => (
                       <span
                         key={ex}
-                        className="px-3 py-1 rounded-full text-[0.6rem] font-mono bg-white/[0.03] border border-white/5 text-white/30"
+                        className="px-3 py-1 rounded-full text-[0.6rem] font-mono bg-white border border-slate-100 text-slate-400"
                       >
                         &quot;{ex}&quot;
                       </span>
@@ -203,9 +203,9 @@ export default function WorkshopHub() {
       {/* Companion note */}
       <motion.div
         variants={staggerItem}
-        className="text-center py-8 border-t border-white/5"
+        className="text-center py-8 border-t border-slate-100"
       >
-        <p className="text-xs text-white/20 max-w-sm mx-auto">
+        <p className="text-xs text-slate-300 max-w-sm mx-auto">
           Your Boomer_Angs are companions, not replacements. Every flow is
           designed to make real life feel lighter, not weirder.
         </p>

@@ -492,7 +492,7 @@ function ServiceLatencyBar({ latency }: { latency: number }) {
   const pct = Math.min((latency / 500) * 100, 100);
   const color = latency > 300 ? 'bg-cb-amber' : latency > 100 ? 'bg-gold' : 'bg-cb-green';
   return (
-    <div className="w-full h-1 rounded-full bg-white/5 overflow-hidden">
+    <div className="w-full h-1 rounded-full bg-slate-50 overflow-hidden">
       <motion.div
         initial={{ width: 0 }}
         animate={{ width: `${pct}%` }}
@@ -527,12 +527,12 @@ function ServiceCard({ service, isOwner }: { service: ServiceStatus; isOwner: bo
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.2 }}
-      className={`p-cb-sm rounded-xl border ${s.border} ${s.bg} hover:ring-2 hover:ring-white/10 transition-all duration-cb-panel cursor-default`}
+      className={`p-cb-sm rounded-xl border ${s.border} ${s.bg} hover:ring-2 hover:ring-slate-200 transition-all duration-cb-panel cursor-default`}
     >
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
           <StatusDot status={service.status} />
-          <h3 className="text-sm font-semibold text-white">{service.name}</h3>
+          <h3 className="text-sm font-semibold text-slate-800">{service.name}</h3>
         </div>
         <span className={`text-[10px] px-2 py-0.5 rounded-lg font-medium ${s.bg} ${s.text}`}>{service.type.toUpperCase()}</span>
       </div>
@@ -542,7 +542,7 @@ function ServiceCard({ service, isOwner }: { service: ServiceStatus; isOwner: bo
       {service.features && (
         <div className="flex flex-wrap gap-1 mb-2">
           {service.features.map((f) => (
-            <span key={f} className="px-1.5 py-0.5 rounded text-[10px] bg-black/40 text-gray-300">{f}</span>
+            <span key={f} className="px-1.5 py-0.5 rounded text-[10px] bg-slate-100/60 text-gray-300">{f}</span>
           ))}
         </div>
       )}
@@ -568,11 +568,11 @@ function IntegrationRow({ integration, isOwner }: { integration: Integration; is
   if (!isOwner && integration.ownerOnly) return null;
 
   return (
-    <div className="flex items-center justify-between p-3 rounded-xl bg-ink/80 border border-wireframe-stroke hover:border-white/15 transition-all duration-cb-toggle h-cb-row">
+    <div className="flex items-center justify-between p-3 rounded-xl bg-[#F8FAFC]/80 border border-wireframe-stroke hover:border-slate-200 transition-all duration-cb-toggle h-cb-row">
       <div className="flex items-center gap-3 min-w-0">
         <StatusDot status={integration.status} />
         <div className="min-w-0">
-          <div className="text-sm font-medium text-white truncate">{integration.name}</div>
+          <div className="text-sm font-medium text-slate-800 truncate">{integration.name}</div>
           <div className="text-xs text-cb-fog">{integration.provider}</div>
         </div>
       </div>
@@ -585,7 +585,7 @@ function IntegrationRow({ integration, isOwner }: { integration: Integration; is
           ) : (
             <span className="text-xs text-cb-red font-medium">No Key</span>
           )}
-          <button type="button" className="p-1 rounded-lg hover:bg-white/10 transition-colors duration-cb-toggle">
+          <button type="button" className="p-1 rounded-lg hover:bg-slate-100 transition-colors duration-cb-toggle">
             <SettingsIcon className="w-3.5 h-3.5 text-cb-fog" />
           </button>
         </div>
@@ -600,14 +600,14 @@ function BoomerAngCard({ ang }: { ang: BoomerAngConfig }) {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
-      className="p-cb-sm rounded-xl bg-ink/80 border border-wireframe-stroke hover:border-gold/20 transition-all duration-cb-panel"
+      className="p-cb-sm rounded-xl bg-[#F8FAFC]/80 border border-wireframe-stroke hover:border-gold/20 transition-all duration-cb-panel"
     >
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-lg overflow-hidden border border-gold/20 bg-gold/10 flex items-center justify-center">
             <Image src="/images/acheevy/acheevy-helmet.png" alt={ang.name} width={20} height={20} className="w-5 h-5 object-cover" />
           </div>
-          <h4 className="text-sm font-semibold text-white">{ang.name}</h4>
+          <h4 className="text-sm font-semibold text-slate-800">{ang.name}</h4>
         </div>
         <div className="flex items-center gap-1.5">
           <StatusDot status={ang.status} />
@@ -626,8 +626,8 @@ function BoomerAngCard({ ang }: { ang: BoomerAngConfig }) {
           {ang.sandboxed && <span className="flex items-center gap-1 text-[10px] text-cb-cyan"><ShieldIcon className="w-3.5 h-3.5" />Sandboxed</span>}
         </div>
         <div className="flex gap-1.5">
-          <button type="button" className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors duration-cb-toggle"><SettingsIcon className="w-3.5 h-3.5 text-cb-fog" /></button>
-          <button type="button" className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors duration-cb-toggle"><PowerIcon className="w-3.5 h-3.5 text-cb-fog" /></button>
+          <button type="button" className="p-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors duration-cb-toggle"><SettingsIcon className="w-3.5 h-3.5 text-cb-fog" /></button>
+          <button type="button" className="p-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors duration-cb-toggle"><PowerIcon className="w-3.5 h-3.5 text-cb-fog" /></button>
         </div>
       </div>
     </motion.div>
@@ -700,8 +700,8 @@ function SocialChannelsPanel({ isOwner }: { isOwner: boolean }) {
             {channels.map(ch => {
               const badge = statusBadge(ch.status);
               return (
-                <div key={ch.id} className="flex items-center justify-between p-2 rounded-lg bg-ink/80 border border-wireframe-stroke">
-                  <span className="text-xs text-white">{ch.icon} {ch.name}</span>
+                <div key={ch.id} className="flex items-center justify-between p-2 rounded-lg bg-[#F8FAFC]/80 border border-wireframe-stroke">
+                  <span className="text-xs text-slate-800">{ch.icon} {ch.name}</span>
                   {ch.configured
                     ? <CheckCircleIcon className="w-4 h-4 text-cb-green" />
                     : <AlertIcon className="w-4 h-4 text-cb-fog" />
@@ -716,7 +716,7 @@ function SocialChannelsPanel({ isOwner }: { isOwner: boolean }) {
       {loading ? (
         <div className="flex items-center justify-center py-8 gap-2">
           <span className="h-4 w-4 animate-spin rounded-full border-2 border-gold/30 border-t-gold" />
-          <span className="text-xs text-white/30">Checking channel status...</span>
+          <span className="text-xs text-slate-400">Checking channel status...</span>
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -725,11 +725,11 @@ function SocialChannelsPanel({ isOwner }: { isOwner: boolean }) {
             const setup = CHANNEL_SETUP[ch.id];
 
             return (
-              <div key={ch.id} className="p-cb-sm rounded-xl border border-wireframe-stroke bg-ink/80">
+              <div key={ch.id} className="p-cb-sm rounded-xl border border-wireframe-stroke bg-[#F8FAFC]/80">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
                     <span className="text-xl">{ch.icon}</span>
-                    <h3 className="text-sm font-semibold text-white">{ch.name}</h3>
+                    <h3 className="text-sm font-semibold text-slate-800">{ch.name}</h3>
                   </div>
                   <span className={`h-cb-chip flex items-center px-2.5 rounded-lg text-[10px] font-bold tracking-wider border ${badge.cls}`}>
                     {badge.label}
@@ -740,7 +740,7 @@ function SocialChannelsPanel({ isOwner }: { isOwner: boolean }) {
                     {/* Setup steps */}
                     {setup?.steps && setup.steps.length > 0 && (
                       <div className="mb-3">
-                        <h4 className="text-xs font-medium text-white/60 mb-2 uppercase tracking-wider">Setup</h4>
+                        <h4 className="text-xs font-medium text-slate-500 mb-2 uppercase tracking-wider">Setup</h4>
                         <ol className="space-y-1">
                           {setup.steps.map((step, i) => (
                             <li key={i} className="flex items-start gap-2 text-xs text-cb-fog">
@@ -758,7 +758,7 @@ function SocialChannelsPanel({ isOwner }: { isOwner: boolean }) {
                         <input
                           type="text"
                           placeholder="Paste link code"
-                          className="flex-1 px-3 py-2 rounded-lg bg-black/40 border border-wireframe-stroke text-white text-xs font-mono placeholder:text-cb-fog/50 outline-none focus:border-gold/50 transition-colors duration-cb-toggle"
+                          className="flex-1 px-3 py-2 rounded-lg bg-slate-100/60 border border-wireframe-stroke text-slate-800 text-xs font-mono placeholder:text-cb-fog/50 outline-none focus:border-gold/50 transition-colors duration-cb-toggle"
                         />
                         <button type="button" className="px-3 py-2 rounded-lg bg-gold/10 text-gold text-xs font-bold border border-gold/30 hover:bg-gold/20 transition-colors duration-cb-toggle">
                           Link
@@ -775,7 +775,7 @@ function SocialChannelsPanel({ isOwner }: { isOwner: boolean }) {
                     {/* Commands */}
                     {setup?.commands && setup.commands.length > 0 && (
                       <div>
-                        <h4 className="text-xs font-medium text-white/60 mb-1.5 uppercase tracking-wider">Commands</h4>
+                        <h4 className="text-xs font-medium text-slate-500 mb-1.5 uppercase tracking-wider">Commands</h4>
                         <div className="space-y-0.5">
                           {setup.commands.map((cmd, i) => (
                             <div key={i} className="text-[10px] text-cb-fog font-mono">{cmd}</div>
@@ -810,11 +810,11 @@ function ControlPlanePanel() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* 1. Autonomy Mode */}
-        <div className="p-cb-sm rounded-xl border border-wireframe-stroke bg-ink/80">
+        <div className="p-cb-sm rounded-xl border border-wireframe-stroke bg-[#F8FAFC]/80">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               <BotIcon className="w-4 h-4 text-gold" />
-              <h3 className="text-sm font-semibold text-white">Autonomy Mode</h3>
+              <h3 className="text-sm font-semibold text-slate-800">Autonomy Mode</h3>
             </div>
             <span className="h-cb-chip flex items-center px-2.5 rounded-lg text-[10px] font-bold tracking-wider bg-gold/15 text-gold border border-gold/30">
               SUPERVISED
@@ -834,7 +834,7 @@ function ControlPlanePanel() {
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               <ShieldIcon className="w-4 h-4 text-cb-green" />
-              <h3 className="text-sm font-semibold text-white">Sandbox Required</h3>
+              <h3 className="text-sm font-semibold text-slate-800">Sandbox Required</h3>
             </div>
             <div className="flex items-center gap-1.5">
               <LockIcon className="w-3.5 h-3.5 text-cb-green" />
@@ -858,7 +858,7 @@ function ControlPlanePanel() {
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               <PowerIcon className="w-4 h-4 text-cb-red" />
-              <h3 className="text-sm font-semibold text-white">Kill Switch</h3>
+              <h3 className="text-sm font-semibold text-slate-800">Kill Switch</h3>
             </div>
             <span className="h-cb-chip flex items-center px-2.5 rounded-lg text-[10px] font-bold tracking-wider bg-cb-red/15 text-cb-red border border-cb-red/30 animate-cb-breathe">
               ARMED
@@ -878,10 +878,10 @@ function ControlPlanePanel() {
         </div>
 
         {/* 4. Tool Permissions */}
-        <div className="p-cb-sm rounded-xl border border-wireframe-stroke bg-ink/80">
+        <div className="p-cb-sm rounded-xl border border-wireframe-stroke bg-[#F8FAFC]/80">
           <div className="flex items-center gap-2 mb-2">
             <SettingsIcon className="w-4 h-4 text-cb-fog" />
-            <h3 className="text-sm font-semibold text-white">Tool Permissions</h3>
+            <h3 className="text-sm font-semibold text-slate-800">Tool Permissions</h3>
           </div>
           <p className="text-xs text-cb-fog mb-3">
             External tool access status and API key health.
@@ -902,7 +902,7 @@ function ControlPlanePanel() {
                   tool.status === 'warn' ? 'bg-cb-amber shadow-cb-amber/50' : 'bg-cb-green shadow-cb-green/50'
                 }`} />
                 <div>
-                  <div className="text-xs font-medium text-white">{tool.name}</div>
+                  <div className="text-xs font-medium text-slate-800">{tool.name}</div>
                   <div className={`text-[10px] font-mono ${tool.status === 'warn' ? 'text-cb-amber' : 'text-cb-green'}`}>{tool.label}</div>
                 </div>
               </div>
@@ -911,11 +911,11 @@ function ControlPlanePanel() {
         </div>
 
         {/* 5. Budget Cap */}
-        <div className="p-cb-sm rounded-xl border border-wireframe-stroke bg-ink/80">
+        <div className="p-cb-sm rounded-xl border border-wireframe-stroke bg-[#F8FAFC]/80">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               <CircuitIcon className="w-4 h-4 text-gold" />
-              <h3 className="text-sm font-semibold text-white">Budget Cap</h3>
+              <h3 className="text-sm font-semibold text-slate-800">Budget Cap</h3>
             </div>
             <span className="text-sm font-mono font-bold text-gold">$50.00 / day</span>
           </div>
@@ -927,7 +927,7 @@ function ControlPlanePanel() {
               <span className="text-cb-fog">Spent today</span>
               <span className="text-gold font-mono">$6.00 (12%)</span>
             </div>
-            <div className="w-full h-2 rounded-full bg-black/50 border border-wireframe-stroke overflow-hidden">
+            <div className="w-full h-2 rounded-full bg-slate-50/60 border border-wireframe-stroke overflow-hidden">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: '12%' }}
@@ -939,27 +939,27 @@ function ControlPlanePanel() {
         </div>
 
         {/* 6. Persona Mode */}
-        <div className="p-cb-sm rounded-xl border border-wireframe-stroke bg-ink/80">
+        <div className="p-cb-sm rounded-xl border border-wireframe-stroke bg-[#F8FAFC]/80">
           <div className="flex items-center gap-2 mb-2">
             <AlertIcon className="w-4 h-4 text-gold" />
-            <h3 className="text-sm font-semibold text-white">Persona Mode</h3>
+            <h3 className="text-sm font-semibold text-slate-800">Persona Mode</h3>
           </div>
           <p className="text-xs text-cb-fog mb-3">
             Controls ACHEEVY&apos;s communication style.
           </p>
           <div className="flex items-center gap-2">
             <button type="button" className="h-cb-chip px-3 rounded-lg text-xs font-bold tracking-wider bg-gold/15 text-gold border border-gold/30">SMOOTH</button>
-            <button type="button" className="h-cb-chip px-3 rounded-lg text-xs font-medium tracking-wider bg-ink text-cb-fog border border-wireframe-stroke hover:text-white transition-colors duration-cb-toggle">CORPORATE</button>
+            <button type="button" className="h-cb-chip px-3 rounded-lg text-xs font-medium tracking-wider bg-[#F8FAFC] text-cb-fog border border-wireframe-stroke hover:text-slate-800 transition-colors duration-cb-toggle">CORPORATE</button>
           </div>
         </div>
       </div>
 
       {/* Chicken Hawk Status — full width */}
-      <div className="p-cb-sm rounded-xl border border-wireframe-stroke bg-ink/80">
+      <div className="p-cb-sm rounded-xl border border-wireframe-stroke bg-[#F8FAFC]/80">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
             <RefreshIcon className="w-4 h-4 text-gold" />
-            <h3 className="text-sm font-semibold text-white">Chicken Hawk Status</h3>
+            <h3 className="text-sm font-semibold text-slate-800">Chicken Hawk Status</h3>
           </div>
           <div className="flex items-center gap-2">
             <span className="relative flex h-2.5 w-2.5">
@@ -972,7 +972,7 @@ function ControlPlanePanel() {
         <p className="text-xs text-cb-fog mb-3">
           Live status from the Chicken Hawk execution engine.
         </p>
-        <div className="p-3 rounded-lg bg-black/50 border border-wireframe-stroke font-mono text-xs text-gray-300">
+        <div className="p-3 rounded-lg bg-slate-50/60 border border-wireframe-stroke font-mono text-xs text-gray-300">
           <span className="text-cb-cyan">chicken-hawk-core</span>: polling...
         </div>
       </div>
@@ -987,8 +987,8 @@ function ControlPlanePanel() {
 function TopoTooltip({ active, payload, label, unit = '' }: { active?: boolean; payload?: Array<{ value: number; name: string; color: string }>; label?: string; unit?: string }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-lg border border-wireframe-stroke bg-black/95 backdrop-blur-xl px-3 py-2 shadow-xl">
-      <p className="text-[10px] text-white/40 mb-1 font-mono">{label}</p>
+    <div className="rounded-lg border border-wireframe-stroke bg-white/95 backdrop-blur-xl px-3 py-2 shadow-xl">
+      <p className="text-[10px] text-slate-400 mb-1 font-mono">{label}</p>
       {payload.map((entry, i) => (
         <p key={i} className="text-xs font-semibold" style={{ color: entry.color }}>
           {entry.name}: {entry.value}{unit}
@@ -1146,7 +1146,7 @@ function TopologyPanel() {
       </div>
 
       {/* Topology Map */}
-      <div className="rounded-2xl border border-wireframe-stroke bg-black/60 p-6 backdrop-blur-xl relative overflow-hidden" style={{ minHeight: '380px' }}>
+      <div className="rounded-2xl border border-wireframe-stroke bg-slate-50/70 p-6 backdrop-blur-xl relative overflow-hidden" style={{ minHeight: '380px' }}>
         {/* SVG Connection Lines */}
         <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ minHeight: '380px' }}>
           {TOPOLOGY_EDGES.map((edge) => {
@@ -1208,8 +1208,8 @@ function TopologyPanel() {
       {/* Telemetry Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Latency by service tier */}
-        <div className="rounded-2xl border border-wireframe-stroke bg-black/60 p-5 backdrop-blur-xl">
-          <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
+        <div className="rounded-2xl border border-wireframe-stroke bg-slate-50/70 p-5 backdrop-blur-xl">
+          <h3 className="text-sm font-semibold text-slate-800 mb-4 flex items-center gap-2">
             <span className="text-gold">⚡</span> Service Latency (ms)
           </h3>
           <div className="flex items-center gap-4 mb-3">
@@ -1245,14 +1245,14 @@ function TopologyPanel() {
         </div>
 
         {/* Throughput — no real RPM data available yet */}
-        <div className="rounded-2xl border border-wireframe-stroke bg-black/60 p-5 backdrop-blur-xl">
-          <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
+        <div className="rounded-2xl border border-wireframe-stroke bg-slate-50/70 p-5 backdrop-blur-xl">
+          <h3 className="text-sm font-semibold text-slate-800 mb-4 flex items-center gap-2">
             <span className="text-cb-cyan">📡</span> Throughput (req/min)
           </h3>
           <div className="flex items-center justify-center py-12 text-center">
             <div>
-              <p className="text-xs text-white/30 mb-1">Throughput monitoring not yet instrumented</p>
-              <p className="text-[10px] text-white/15">Requires request-level logging in UEF Gateway</p>
+              <p className="text-xs text-slate-400 mb-1">Throughput monitoring not yet instrumented</p>
+              <p className="text-[10px] text-slate-300">Requires request-level logging in UEF Gateway</p>
             </div>
           </div>
         </div>
@@ -1292,7 +1292,7 @@ function LiveEventsPanel({ events }: { events: LiveEvent[] }) {
       </div>
 
       {/* Scanline overlay */}
-      <div className="relative rounded-xl border border-wireframe-stroke bg-ink/80 overflow-hidden">
+      <div className="relative rounded-xl border border-wireframe-stroke bg-[#F8FAFC]/80 overflow-hidden">
         <div className="absolute inset-0 pointer-events-none opacity-[0.03]">
           <div className="w-full h-8 bg-gradient-to-b from-cb-cyan/20 to-transparent animate-cb-scan" />
         </div>
@@ -1307,7 +1307,7 @@ function LiveEventsPanel({ events }: { events: LiveEvent[] }) {
                 initial={i === 0 ? { opacity: 0, x: -10 } : false}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.15 }}
-                className="flex items-start gap-3 px-4 py-2.5 border-b border-wireframe-stroke/50 hover:bg-white/[0.02] transition-colors"
+                className="flex items-start gap-3 px-4 py-2.5 border-b border-wireframe-stroke/50 hover:bg-white transition-colors"
               >
                 <span className={`inline-block w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${style.dot} shadow-[0_0_6px] ${style.dot}/50`} />
                 <div className="min-w-0 flex-1">
@@ -1315,7 +1315,7 @@ function LiveEventsPanel({ events }: { events: LiveEvent[] }) {
                     <span className="text-[10px] text-cb-fog font-mono">{time}</span>
                     <span className={`text-[10px] font-bold uppercase tracking-wider ${style.text}`}>{evt.type}</span>
                   </div>
-                  <div className="text-xs text-white">
+                  <div className="text-xs text-slate-800">
                     <span className="text-gold font-medium">{evt.source}</span>
                     <span className="text-cb-fog mx-1.5">—</span>
                     <span className="text-gray-300">{evt.message}</span>
@@ -1352,9 +1352,9 @@ function SecurityPanel({ isOwner }: { isOwner: boolean }) {
             { label: 'Rate Limiting', value: '100 req/min' },
             { label: 'Network Isolation', value: 'Active' },
           ].map((item) => (
-            <div key={item.label} className="p-3 rounded-lg bg-ink/80">
+            <div key={item.label} className="p-3 rounded-lg bg-[#F8FAFC]/80">
               <CheckCircleIcon className="w-4 h-4 text-cb-green mb-1.5" />
-              <div className="text-xs text-white">{item.label}</div>
+              <div className="text-xs text-slate-800">{item.label}</div>
               <div className="text-[10px] text-cb-fog">{item.value}</div>
             </div>
           ))}
@@ -1362,8 +1362,8 @@ function SecurityPanel({ isOwner }: { isOwner: boolean }) {
       </div>
 
       {isOwner && (
-        <div className="p-5 rounded-xl border border-wireframe-stroke bg-ink/80">
-          <h3 className="text-sm font-medium text-white mb-3">Security Rules</h3>
+        <div className="p-5 rounded-xl border border-wireframe-stroke bg-[#F8FAFC]/80">
+          <h3 className="text-sm font-medium text-slate-800 mb-3">Security Rules</h3>
           <div className="space-y-3">
             <div className="p-3 rounded-lg bg-cb-red/10 border border-cb-red/30">
               <h4 className="text-xs font-medium text-cb-red mb-1.5">BLOCKED Operations</h4>
@@ -1499,7 +1499,7 @@ function CircuitBoxContent() {
                   OWNER
                 </span>
               )}
-              <button onClick={handleRefresh} className="flex items-center gap-2 px-3 py-2 rounded-lg border border-wireframe-stroke bg-white/[0.02] hover:bg-white/5 transition-colors duration-cb-toggle">
+              <button onClick={handleRefresh} className="flex items-center gap-2 px-3 py-2 rounded-lg border border-wireframe-stroke bg-white hover:bg-slate-50 transition-colors duration-cb-toggle">
                 <RefreshIcon className={`w-4 h-4 text-cb-fog ${refreshing ? 'animate-spin' : ''}`} />
                 <span className="text-xs text-gray-300 hidden sm:inline">Refresh</span>
               </button>
@@ -1508,19 +1508,19 @@ function CircuitBoxContent() {
 
           {/* Stats Bar */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
-            <button type="button" onClick={() => setActiveTab('services')} className={`p-3 rounded-xl border transition-all duration-cb-panel text-left ${activeTab === 'services' ? 'border-cb-green/30 bg-cb-green/5' : 'border-wireframe-stroke bg-white/[0.02] hover:border-cb-green/20'}`}>
+            <button type="button" onClick={() => setActiveTab('services')} className={`p-3 rounded-xl border transition-all duration-cb-panel text-left ${activeTab === 'services' ? 'border-cb-green/30 bg-cb-green/5' : 'border-wireframe-stroke bg-white hover:border-cb-green/20'}`}>
               <div className="text-2xl font-bold text-cb-green">{onlineServices}/{visibleServices.length}</div>
               <div className="text-[10px] text-cb-fog mt-0.5 uppercase tracking-wider">Services Online</div>
             </button>
-            <button type="button" onClick={() => setActiveTab('integrations')} className={`p-3 rounded-xl border transition-all duration-cb-panel text-left ${activeTab === 'integrations' ? 'border-gold/30 bg-gold/5' : 'border-wireframe-stroke bg-white/[0.02] hover:border-gold/20'}`}>
+            <button type="button" onClick={() => setActiveTab('integrations')} className={`p-3 rounded-xl border transition-all duration-cb-panel text-left ${activeTab === 'integrations' ? 'border-gold/30 bg-gold/5' : 'border-wireframe-stroke bg-white hover:border-gold/20'}`}>
               <div className="text-2xl font-bold text-gold">{activeIntegrations}</div>
               <div className="text-[10px] text-cb-fog mt-0.5 uppercase tracking-wider">Integrations</div>
             </button>
-            <button type="button" onClick={() => setActiveTab('boomerangs')} className={`p-3 rounded-xl border transition-all duration-cb-panel text-left ${activeTab === 'boomerangs' ? 'border-cb-cyan/30 bg-cb-cyan/5' : 'border-wireframe-stroke bg-white/[0.02] hover:border-cb-cyan/20'}`}>
+            <button type="button" onClick={() => setActiveTab('boomerangs')} className={`p-3 rounded-xl border transition-all duration-cb-panel text-left ${activeTab === 'boomerangs' ? 'border-cb-cyan/30 bg-cb-cyan/5' : 'border-wireframe-stroke bg-white hover:border-cb-cyan/20'}`}>
               <div className="text-2xl font-bold text-cb-cyan">{activeAngs}</div>
               <div className="text-[10px] text-cb-fog mt-0.5 uppercase tracking-wider">Boomer_Angs</div>
             </button>
-            <button type="button" onClick={() => setActiveTab('security')} className={`p-3 rounded-xl border transition-all duration-cb-panel text-left ${activeTab === 'security' ? 'border-cb-green/30 bg-cb-green/5' : 'border-wireframe-stroke bg-white/[0.02] hover:border-cb-green/20'}`}>
+            <button type="button" onClick={() => setActiveTab('security')} className={`p-3 rounded-xl border transition-all duration-cb-panel text-left ${activeTab === 'security' ? 'border-cb-green/30 bg-cb-green/5' : 'border-wireframe-stroke bg-white hover:border-cb-green/20'}`}>
               <div className="flex items-center gap-1.5">
                 <ShieldIcon className="w-5 h-5 text-cb-green" />
                 <span className="text-lg font-bold text-cb-green">SECURE</span>
@@ -1539,7 +1539,7 @@ function CircuitBoxContent() {
                   <div className="w-px h-6 bg-wireframe-stroke mx-1.5 flex-shrink-0" />
                 )}
                 <div className="flex items-center gap-0.5">
-                  <span className="text-[9px] uppercase tracking-widest text-white/20 font-mono mr-1.5 hidden lg:inline">{section.label}</span>
+                  <span className="text-[9px] uppercase tracking-widest text-slate-300 font-mono mr-1.5 hidden lg:inline">{section.label}</span>
                   {section.tabs.map((tab) => (
                     <button
                       key={tab.id}
@@ -1547,7 +1547,7 @@ function CircuitBoxContent() {
                       className={`flex items-center gap-1.5 px-3 py-2 rounded-lg transition-all duration-cb-toggle whitespace-nowrap text-xs font-medium border ${
                         activeTab === tab.id
                           ? 'border-gold/40 bg-gold/10 text-gold'
-                          : 'border-transparent text-white/50 hover:bg-white/5 hover:text-white/80'
+                          : 'border-transparent text-slate-500 hover:bg-slate-50 hover:text-slate-700'
                       }`}
                     >
                       <span className="text-sm">{tab.icon}</span>
@@ -1582,25 +1582,25 @@ function CircuitBoxContent() {
             {activeTab === 'integrations' && (
               <div className="space-y-5">
                 <div>
-                  <h3 className="text-sm font-medium text-white mb-2">AI Models</h3>
+                  <h3 className="text-sm font-medium text-slate-800 mb-2">AI Models</h3>
                   <div className="space-y-2">
                     {visibleIntegrations.filter((i) => i.type === 'ai_model').map((i) => <IntegrationRow key={i.id} integration={i} isOwner={isOwner} />)}
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-white mb-2">Voice</h3>
+                  <h3 className="text-sm font-medium text-slate-800 mb-2">Voice</h3>
                   <div className="space-y-2">
                     {visibleIntegrations.filter((i) => i.type === 'voice').map((i) => <IntegrationRow key={i.id} integration={i} isOwner={isOwner} />)}
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-white mb-2">Tools & Services</h3>
+                  <h3 className="text-sm font-medium text-slate-800 mb-2">Tools & Services</h3>
                   <div className="space-y-2">
                     {visibleIntegrations.filter((i) => !['ai_model', 'voice'].includes(i.type)).map((i) => <IntegrationRow key={i.id} integration={i} isOwner={isOwner} />)}
                   </div>
                 </div>
                 {isOwner && (
-                  <button className="w-full p-3 rounded-xl border border-dashed border-white/15 text-cb-fog text-sm hover:border-gold/20 hover:text-gold transition-all duration-cb-toggle">+ Add New Integration</button>
+                  <button className="w-full p-3 rounded-xl border border-dashed border-slate-200 text-cb-fog text-sm hover:border-gold/20 hover:text-gold transition-all duration-cb-toggle">+ Add New Integration</button>
                 )}
               </div>
             )}
@@ -1615,7 +1615,7 @@ function CircuitBoxContent() {
                   {activeBoomerangs.map((ang) => <BoomerAngCard key={ang.id} ang={ang} />)}
                 </div>
                 {isOwner && (
-                  <button className="w-full mt-3 p-3 rounded-xl border border-dashed border-white/15 text-cb-fog text-sm hover:border-gold/20 hover:text-gold transition-all duration-cb-toggle">+ Spawn New Boomer_Ang</button>
+                  <button className="w-full mt-3 p-3 rounded-xl border border-dashed border-slate-200 text-cb-fog text-sm hover:border-gold/20 hover:text-gold transition-all duration-cb-toggle">+ Spawn New Boomer_Ang</button>
                 )}
               </div>
             )}

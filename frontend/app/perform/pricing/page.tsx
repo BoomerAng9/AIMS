@@ -113,11 +113,11 @@ export default function PerFormPricingPage() {
           >
             Per|Form Pricing
           </h1>
-          <p className="mt-3 text-sm md:text-base text-white/70 max-w-2xl mx-auto leading-relaxed">
+          <p className="mt-3 text-sm md:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
             For sports content creators, schools, parents, and power users.
             Choose your plan, pick your commitment, and select the usage level that fits your workflow.
           </p>
-          <p className="mt-3 text-xs text-white/40">
+          <p className="mt-3 text-xs text-slate-400">
             Looking for the full A.I.M.S. platform pricing?{" "}
             <Link href="/pricing" className="text-gold hover:text-gold/80 underline underline-offset-2">
               View Platform Plans
@@ -130,8 +130,8 @@ export default function PerFormPricingPage() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10">
             {/* Commitment Toggle */}
             <div className="text-center">
-              <p className="text-xs md:text-sm uppercase tracking-wider text-white/50 mb-2">Commitment</p>
-              <div className="inline-flex rounded-lg border border-wireframe-stroke bg-black/60 p-1">
+              <p className="text-xs md:text-sm uppercase tracking-wider text-slate-500 mb-2">Commitment</p>
+              <div className="inline-flex rounded-lg border border-wireframe-stroke bg-slate-50/70 p-1">
                 {commitmentOptions.map((opt) => (
                   <button
                     key={opt.term}
@@ -139,7 +139,7 @@ export default function PerFormPricingPage() {
                     className={`relative rounded-md px-4 py-2 text-sm font-semibold transition-all ${
                       selectedTerm === opt.term
                         ? "bg-gold/10 text-gold border border-gold/30"
-                        : "text-white/60 hover:text-white/80 border border-transparent"
+                        : "text-slate-500 hover:text-slate-700 border border-transparent"
                     }`}
                   >
                     {opt.label}
@@ -158,8 +158,8 @@ export default function PerFormPricingPage() {
 
             {/* Token Tier Toggle */}
             <div className="text-center">
-              <p className="text-xs md:text-sm uppercase tracking-wider text-white/50 mb-2">Usage Level</p>
-              <div className="inline-flex rounded-lg border border-wireframe-stroke bg-black/60 p-1">
+              <p className="text-xs md:text-sm uppercase tracking-wider text-slate-500 mb-2">Usage Level</p>
+              <div className="inline-flex rounded-lg border border-wireframe-stroke bg-slate-50/70 p-1">
                 {TOKEN_TIERS.map((tier) => (
                   <button
                     key={tier.id}
@@ -167,14 +167,14 @@ export default function PerFormPricingPage() {
                     className={`rounded-md px-4 py-2 text-sm font-semibold transition-all ${
                       selectedTokenTier === tier.id
                         ? "bg-gold/10 text-gold border border-gold/30"
-                        : "text-white/60 hover:text-white/80 border border-transparent"
+                        : "text-slate-500 hover:text-slate-700 border border-transparent"
                     }`}
                   >
                     {tier.name}
                   </button>
                 ))}
               </div>
-              <p className="mt-1.5 text-xs md:text-sm text-white/50">
+              <p className="mt-1.5 text-xs md:text-sm text-slate-500">
                 {formatTokens(currentTokenTier.tokensPerMonth)} tokens/mo
                 {currentTokenTier.monthlyAddon > 0 && (
                   <> &middot; +${currentTokenTier.monthlyAddon.toFixed(2)}/mo</>
@@ -202,8 +202,8 @@ export default function PerFormPricingPage() {
                   key={model.id}
                   className={`relative flex flex-col rounded-xl border p-4 md:p-6 backdrop-blur-md transition-all ${
                     isAllInOne
-                      ? "border-gold/30 bg-gradient-to-br from-gold/5 to-black/80 shadow-[0_0_30px_rgba(212,175,55,0.08)]"
-                      : "border-white/10 bg-black/60"
+                      ? "border-gold/30 bg-gradient-to-br from-gold/5 to-white/80 shadow-[0_0_30px_rgba(212,175,55,0.08)]"
+                      : "border-slate-200 bg-slate-50/70"
                   }`}
                 >
                   {/* Recommended badge for All-In-One */}
@@ -219,8 +219,8 @@ export default function PerFormPricingPage() {
                       {MODEL_ICONS[model.icon]}
                     </div>
                     <div>
-                      <h3 className="text-base md:text-lg font-bold text-white">{model.name}</h3>
-                      <p className="text-xs md:text-sm text-white/50">{model.tagline}</p>
+                      <h3 className="text-base md:text-lg font-bold text-slate-800">{model.name}</h3>
+                      <p className="text-xs md:text-sm text-slate-500">{model.tagline}</p>
                     </div>
                   </div>
 
@@ -229,29 +229,29 @@ export default function PerFormPricingPage() {
                     {price ? (
                       <>
                         <div className="flex items-baseline gap-1">
-                          <span className={`text-3xl font-bold font-display ${isAllInOne ? "text-gold" : "text-white"}`}>
+                          <span className={`text-3xl font-bold font-display ${isAllInOne ? "text-gold" : "text-slate-800"}`}>
                             ${price.total.toFixed(2)}
                           </span>
-                          <span className="text-sm text-white/50">/mo</span>
+                          <span className="text-sm text-slate-500">/mo</span>
                         </div>
                         {price.tokenAddon > 0 && (
-                          <p className="text-xs md:text-sm text-white/40 mt-1">
+                          <p className="text-xs md:text-sm text-slate-400 mt-1">
                             ${price.base.toFixed(2)} base + ${price.tokenAddon.toFixed(2)} {currentTokenTier.name} usage
                           </p>
                         )}
                         {priceTerm && (
-                          <p className="text-xs md:text-sm text-white/40 mt-0.5">{priceTerm.savings}</p>
+                          <p className="text-xs md:text-sm text-slate-400 mt-0.5">{priceTerm.savings}</p>
                         )}
                       </>
                     ) : (
-                      <p className="text-sm text-white/40">Select a commitment term</p>
+                      <p className="text-sm text-slate-400">Select a commitment term</p>
                     )}
                   </div>
 
                   {/* Feature List */}
                   <ul className="space-y-2 mb-4 flex-1">
                     {visibleFeatures.map((feature, i) => (
-                      <li key={i} className="flex items-start gap-2 text-xs md:text-sm text-white/70 leading-relaxed">
+                      <li key={i} className="flex items-start gap-2 text-xs md:text-sm text-slate-600 leading-relaxed">
                         <Check className={`w-4 h-4 shrink-0 mt-0.5 ${colors.text}`} />
                         {feature}
                       </li>
@@ -262,7 +262,7 @@ export default function PerFormPricingPage() {
                   {hasMore && (
                     <button
                       onClick={() => toggleCardExpansion(model.id)}
-                      className="flex items-center gap-1 text-xs md:text-sm text-white/50 hover:text-white/70 transition-colors mb-4"
+                      className="flex items-center gap-1 text-xs md:text-sm text-slate-500 hover:text-slate-600 transition-colors mb-4"
                     >
                       {isExpanded ? (
                         <>Show less <ChevronUp className="w-3 h-3" /></>
@@ -274,11 +274,11 @@ export default function PerFormPricingPage() {
 
                   {/* Not included (subtle) */}
                   {model.excludes.length > 0 && (
-                    <div className="mb-4 border-t border-white/5 pt-3">
-                      <p className="text-xs text-white/30 mb-1.5">Not included:</p>
+                    <div className="mb-4 border-t border-slate-100 pt-3">
+                      <p className="text-xs text-slate-400 mb-1.5">Not included:</p>
                       <ul className="space-y-1">
                         {model.excludes.slice(0, 2).map((ex, i) => (
-                          <li key={i} className="flex items-start gap-2 text-xs text-white/30">
+                          <li key={i} className="flex items-start gap-2 text-xs text-slate-400">
                             <X className="w-3 h-3 shrink-0 mt-0.5" />
                             {ex}
                           </li>
@@ -304,17 +304,17 @@ export default function PerFormPricingPage() {
           </div>
 
           {/* Pay-per-Use note */}
-          <div className="mt-4 rounded-xl border border-wireframe-stroke bg-black/60 p-4 md:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="mt-4 rounded-xl border border-wireframe-stroke bg-slate-50/70 p-4 md:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div>
-              <p className="text-sm md:text-base font-semibold text-white">Pay-per-Use</p>
-              <p className="text-xs md:text-sm text-white/50 mt-0.5">
+              <p className="text-sm md:text-base font-semibold text-slate-800">Pay-per-Use</p>
+              <p className="text-xs md:text-sm text-slate-500 mt-0.5">
                 No commitment required. Perfect for trying things out.
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-4 text-xs md:text-sm">
-              <span className="text-white/70">$0.10/alert</span>
-              <span className="text-white/70">$0.50/graphic</span>
-              <span className="text-white/70">$1.00/film breakdown</span>
+              <span className="text-slate-600">$0.10/alert</span>
+              <span className="text-slate-600">$0.50/graphic</span>
+              <span className="text-slate-600">$1.00/film breakdown</span>
             </div>
           </div>
         </section>
@@ -332,11 +332,11 @@ export default function PerFormPricingPage() {
             <div className="h-px flex-1 bg-gradient-to-l from-gold/20 to-transparent" />
           </div>
 
-          <div className="overflow-x-auto rounded-xl border border-wireframe-stroke bg-black/60 backdrop-blur-md">
+          <div className="overflow-x-auto rounded-xl border border-wireframe-stroke bg-slate-50/70 backdrop-blur-md">
             <table className="w-full min-w-[600px]">
               <thead>
                 <tr className="border-b border-wireframe-stroke">
-                  <th className="p-3 md:p-4 text-left text-xs md:text-sm uppercase tracking-wider text-white/40 w-2/5">
+                  <th className="p-3 md:p-4 text-left text-xs md:text-sm uppercase tracking-wider text-slate-400 w-2/5">
                     Feature
                   </th>
                   <th className="p-3 md:p-4 text-center text-xs md:text-sm uppercase tracking-wider text-emerald-400">Creator</th>
@@ -347,34 +347,34 @@ export default function PerFormPricingPage() {
               </thead>
               <tbody>
                 {COMPARISON_FEATURES.map((row, i) => (
-                  <tr key={i} className="border-t border-wireframe-stroke hover:bg-white/[0.02]">
-                    <td className="p-3 md:p-4 text-xs md:text-sm text-white/70">{row.label}</td>
+                  <tr key={i} className="border-t border-wireframe-stroke hover:bg-white">
+                    <td className="p-3 md:p-4 text-xs md:text-sm text-slate-600">{row.label}</td>
                     <td className="p-3 md:p-4 text-center">
                       {row.creator ? (
                         <Check className="w-4 h-4 text-emerald-400 mx-auto" />
                       ) : (
-                        <X className="w-4 h-4 text-white/20 mx-auto" />
+                        <X className="w-4 h-4 text-slate-300 mx-auto" />
                       )}
                     </td>
                     <td className="p-3 md:p-4 text-center">
                       {row.partner ? (
                         <Check className="w-4 h-4 text-blue-400 mx-auto" />
                       ) : (
-                        <X className="w-4 h-4 text-white/20 mx-auto" />
+                        <X className="w-4 h-4 text-slate-300 mx-auto" />
                       )}
                     </td>
                     <td className="p-3 md:p-4 text-center">
                       {row.families ? (
                         <Check className="w-4 h-4 text-amber-400 mx-auto" />
                       ) : (
-                        <X className="w-4 h-4 text-white/20 mx-auto" />
+                        <X className="w-4 h-4 text-slate-300 mx-auto" />
                       )}
                     </td>
                     <td className="p-3 md:p-4 text-center bg-gold/[0.03]">
                       {row.all_in_one ? (
                         <Check className="w-4 h-4 text-gold mx-auto" />
                       ) : (
-                        <X className="w-4 h-4 text-white/20 mx-auto" />
+                        <X className="w-4 h-4 text-slate-300 mx-auto" />
                       )}
                     </td>
                   </tr>
@@ -383,7 +383,7 @@ export default function PerFormPricingPage() {
             </table>
           </div>
 
-          <p className="mt-3 text-xs md:text-sm text-white/30 text-center">
+          <p className="mt-3 text-xs md:text-sm text-slate-400 text-center">
             Scroll horizontally on mobile to see all plans
           </p>
         </section>
@@ -411,11 +411,11 @@ export default function PerFormPricingPage() {
                   className={`text-left rounded-xl border p-4 md:p-6 backdrop-blur-md transition-all ${
                     isSelected
                       ? "border-gold/30 bg-gold/5 ring-1 ring-gold/20"
-                      : "border-white/10 bg-black/60 hover:border-white/20"
+                      : "border-slate-200 bg-slate-50/70 hover:border-slate-200"
                   }`}
                 >
                   <div className="flex items-center justify-between mb-3">
-                    <h3 className={`text-base md:text-lg font-bold ${isSelected ? "text-gold" : "text-white"}`}>
+                    <h3 className={`text-base md:text-lg font-bold ${isSelected ? "text-gold" : "text-slate-800"}`}>
                       {tier.name}
                     </h3>
                     {tier.monthlyAddon === 0 ? (
@@ -429,16 +429,16 @@ export default function PerFormPricingPage() {
                     )}
                   </div>
 
-                  <p className="text-2xl md:text-3xl font-bold font-display text-white mb-2">
+                  <p className="text-2xl md:text-3xl font-bold font-display text-slate-800 mb-2">
                     {formatTokens(tier.tokensPerMonth)}
-                    <span className="text-sm md:text-base text-white/40 font-normal ml-1">tokens/mo</span>
+                    <span className="text-sm md:text-base text-slate-400 font-normal ml-1">tokens/mo</span>
                   </p>
 
-                  <p className="text-xs md:text-sm text-white/50 leading-relaxed mb-3">{tier.description}</p>
+                  <p className="text-xs md:text-sm text-slate-500 leading-relaxed mb-3">{tier.description}</p>
 
-                  <div className="border-t border-white/5 pt-3">
-                    <p className="text-xs md:text-sm text-white/40">
-                      Overage: <span className="text-white/60 font-semibold">${tier.overageRatePer1K}/1K tokens</span>
+                  <div className="border-t border-slate-100 pt-3">
+                    <p className="text-xs md:text-sm text-slate-400">
+                      Overage: <span className="text-slate-500 font-semibold">${tier.overageRatePer1K}/1K tokens</span>
                     </p>
                   </div>
                 </button>
@@ -451,7 +451,7 @@ export default function PerFormPricingPage() {
             <p className="text-sm md:text-base font-semibold text-emerald-400 mb-1">
               Powered by advanced AI — no extra cost for standard use
             </p>
-            <p className="text-xs md:text-sm text-white/60 leading-relaxed">
+            <p className="text-xs md:text-sm text-slate-500 leading-relaxed">
               All plans include access to our AI engine for chat, content generation, film analysis, and data visualization.
               Standard operations use free-tier language models, keeping your costs low.
               Heavy research and deep analysis tasks use premium models and consume more tokens.
@@ -476,12 +476,12 @@ export default function PerFormPricingPage() {
             {Object.entries(ANNUAL_COST_BREAKDOWN).map(([key, desc]) => (
               <div
                 key={key}
-                className="rounded-xl border border-white/10 bg-black/60 backdrop-blur-md p-4 md:p-5"
+                className="rounded-xl border border-slate-200 bg-slate-50/70 backdrop-blur-md p-4 md:p-5"
               >
-                <p className="text-sm md:text-base font-semibold text-white capitalize mb-1">
+                <p className="text-sm md:text-base font-semibold text-slate-800 capitalize mb-1">
                   {key.replace(/([A-Z])/g, " $1").trim()}
                 </p>
-                <p className="text-xs md:text-sm text-white/50 leading-relaxed">{desc}</p>
+                <p className="text-xs md:text-sm text-slate-500 leading-relaxed">{desc}</p>
               </div>
             ))}
           </div>
@@ -495,25 +495,25 @@ export default function PerFormPricingPage() {
           >
             The Frequency Philosophy
           </p>
-          <p className="text-sm md:text-base text-white/70 max-w-xl mx-auto leading-relaxed">
+          <p className="text-sm md:text-base text-slate-600 max-w-xl mx-auto leading-relaxed">
             The 3-6-9 model aligns with Tesla&apos;s vortex mathematics.
-            <strong className="text-white/90"> 3</strong> is the entry point.
-            <strong className="text-white/90"> 6</strong> is the axis of balance.
-            <strong className="text-white/90"> 9</strong> is completion &mdash;
+            <strong className="text-slate-800"> 3</strong> is the entry point.
+            <strong className="text-slate-800"> 6</strong> is the axis of balance.
+            <strong className="text-slate-800"> 9</strong> is completion &mdash;
             V.I.B.E. (Vibration, Intelligence, Balance, Energy).
             Pay for 9, receive 12. Activity breeds Activity.
           </p>
         </section>
 
         {/* ──────────────────────── CTA Footer ──────────────────────── */}
-        <section className="rounded-xl border border-gold/30 bg-gradient-to-br from-gold/5 to-black/80 p-6 md:p-8 text-center shadow-[0_0_40px_rgba(212,175,55,0.06)]">
+        <section className="rounded-xl border border-gold/30 bg-gradient-to-br from-gold/5 to-white/80 p-6 md:p-8 text-center shadow-[0_0_40px_rgba(212,175,55,0.06)]">
           <h2
-            className="text-xl md:text-2xl font-bold text-white mb-2"
+            className="text-xl md:text-2xl font-bold text-slate-800 mb-2"
             style={{ fontFamily: markerFont }}
           >
             Ready to Per|Form?
           </h2>
-          <p className="text-sm md:text-base text-white/60 mb-6 max-w-lg mx-auto">
+          <p className="text-sm md:text-base text-slate-500 mb-6 max-w-lg mx-auto">
             Join creators, schools, and families already using Per|Form to level up their recruiting game.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

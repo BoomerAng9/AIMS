@@ -56,7 +56,7 @@ export const AgentLoopVisualizer: React.FC<AgentLoopVisualizerProps> = ({ curren
 
               {/* Label */}
               <div className={`text-center transition-opacity duration-300 ${isActive || isCompleted ? 'opacity-100' : 'opacity-50'}`}>
-                <h3 className={`font-display font-medium ${isActive ? 'text-white' : 'text-gray-500'}`}>{step.label}</h3>
+                <h3 className={`font-display font-medium ${isActive ? 'text-slate-800' : 'text-gray-500'}`}>{step.label}</h3>
                 {isActive && (
                    <motion.span 
                     initial={{ opacity: 0 }} 

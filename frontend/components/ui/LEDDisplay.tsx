@@ -158,7 +158,7 @@ export function LEDPanel({ children, className = '', showScrews = true }: LEDPan
     <div
       className={`
         relative rounded-xl p-4
-        bg-gradient-to-b from-zinc-900/95 to-black
+        bg-gradient-to-b from-zinc-900/95 to-white
         border border-zinc-700/50
         ${className}
       `}

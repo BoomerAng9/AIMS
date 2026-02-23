@@ -71,7 +71,7 @@ export default function ContentFeedPage() {
       <motion.div variants={staggerItem} className="space-y-4">
         <Link
           href="/sandbox/perform"
-          className="inline-flex items-center gap-2 text-xs text-white/30 hover:text-gold transition-colors font-mono uppercase tracking-wider"
+          className="inline-flex items-center gap-2 text-xs text-slate-400 hover:text-gold transition-colors font-mono uppercase tracking-wider"
         >
           <ArrowLeft size={12} />
           Per|Form
@@ -82,10 +82,10 @@ export default function ContentFeedPage() {
             <FileText size={20} className="text-blue-400" />
           </div>
           <div>
-            <h1 className="text-2xl md:text-3xl font-display text-white tracking-tight">
+            <h1 className="text-2xl md:text-3xl font-display text-slate-800 tracking-tight">
               Content Feed
             </h1>
-            <p className="text-xs text-white/40 font-mono">
+            <p className="text-xs text-slate-400 font-mono">
               Scouting Reports &middot; Debates &middot; Rankings &middot; Analysis
             </p>
           </div>
@@ -105,7 +105,7 @@ export default function ContentFeedPage() {
                   ? style
                     ? `${style.bg} ${style.color} border border-current/20`
                     : 'bg-gold/15 text-gold border border-gold/30'
-                  : 'bg-white/[0.03] text-white/40 border border-white/5 hover:text-white/60'
+                  : 'bg-white text-slate-400 border border-slate-100 hover:text-slate-500'
               }`}
             >
               {type === 'ALL' ? 'All' : style?.label || type}
@@ -118,7 +118,7 @@ export default function ContentFeedPage() {
       {loading ? (
         <div className="text-center py-20">
           <div className="inline-block h-6 w-6 border-2 border-gold/30 border-t-gold rounded-full animate-spin" />
-          <p className="text-xs text-white/30 mt-3 font-mono">Loading content...</p>
+          <p className="text-xs text-slate-400 mt-3 font-mono">Loading content...</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -144,26 +144,26 @@ export default function ContentFeedPage() {
                       <span className={`text-[0.55rem] font-mono uppercase ${typeStyle.color}`}>
                         {typeStyle.label}
                       </span>
-                      <span className="text-white/10">&middot;</span>
-                      <span className="text-[0.55rem] font-mono text-white/20">
+                      <span className="text-slate-300">&middot;</span>
+                      <span className="text-[0.55rem] font-mono text-slate-300">
                         {formatDate(article.generatedAt)}
                       </span>
-                      <span className="text-white/10">&middot;</span>
-                      <span className="text-[0.55rem] font-mono text-white/20">
+                      <span className="text-slate-300">&middot;</span>
+                      <span className="text-[0.55rem] font-mono text-slate-300">
                         {article.readTimeMin} min {article.type === 'PODCAST' ? 'listen' : 'read'}
                       </span>
                     </div>
 
-                    <h2 className="text-base font-medium text-white group-hover:text-gold transition-colors">
+                    <h2 className="text-base font-medium text-slate-800 group-hover:text-gold transition-colors">
                       {article.title}
                     </h2>
 
-                    <p className="text-sm text-white/40 leading-relaxed">
+                    <p className="text-sm text-slate-400 leading-relaxed">
                       {article.excerpt}
                     </p>
 
                     <div className="flex items-center gap-3 pt-1">
-                      <span className="text-[0.5rem] font-mono text-white/15 uppercase">
+                      <span className="text-[0.5rem] font-mono text-slate-300 uppercase">
                         by {article.generatedBy}
                       </span>
                       {article.prospectId && (
@@ -183,7 +183,7 @@ export default function ContentFeedPage() {
           })}
 
           {filtered.length === 0 && (
-            <div className="text-center py-12 text-white/20 text-sm">
+            <div className="text-center py-12 text-slate-300 text-sm">
               No content matches this filter.
             </div>
           )}

@@ -79,7 +79,7 @@ function AgentNode({ agent, isActive, onClick }: {
         w-full p-3 rounded-xl border text-left transition-all
         ${isActive
           ? 'bg-gold/10 border-gold/30'
-          : 'bg-white/[0.02] border-wireframe-stroke hover:border-wireframe-stroke'
+          : 'bg-white border-wireframe-stroke hover:border-wireframe-stroke'
         }
       `}
     >
@@ -88,18 +88,18 @@ function AgentNode({ agent, isActive, onClick }: {
         <div className={`
           w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold
           ${agent.role === 'acheevy' ? 'bg-gradient-to-br from-gold to-amber-600 text-black' : ''}
-          ${agent.role === 'manager' ? 'bg-gradient-to-br from-cyan-500 to-blue-600 text-white' : ''}
-          ${agent.role === 'boomerang' ? 'bg-gradient-to-br from-purple-500 to-indigo-600 text-white' : ''}
+          ${agent.role === 'manager' ? 'bg-gradient-to-br from-cyan-500 to-blue-600 text-slate-800' : ''}
+          ${agent.role === 'boomerang' ? 'bg-gradient-to-br from-purple-500 to-indigo-600 text-slate-800' : ''}
         `}>
           {agent.name[0]}
         </div>
 
         {/* Info */}
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-white/50 truncate">
+          <p className="text-sm font-medium text-slate-500 truncate">
             {agent.name}
           </p>
-          <p className="text-xs text-white/40 truncate">
+          <p className="text-xs text-slate-400 truncate">
             {agent.specialty || ('department' in agent ? agent.department : '')}
           </p>
         </div>
@@ -114,13 +114,13 @@ function AgentNode({ agent, isActive, onClick }: {
           {agent.capabilities.slice(0, 3).map(cap => (
             <span
               key={cap}
-              className="px-1.5 py-0.5 text-[9px] bg-white/5 text-white/30 rounded"
+              className="px-1.5 py-0.5 text-[9px] bg-slate-50 text-slate-400 rounded"
             >
               {cap}
             </span>
           ))}
           {agent.capabilities.length > 3 && (
-            <span className="px-1.5 py-0.5 text-[9px] text-white/20">
+            <span className="px-1.5 py-0.5 text-[9px] text-slate-300">
               +{agent.capabilities.length - 3}
             </span>
           )}
@@ -152,34 +152,34 @@ function DepartmentCard({
     <div className={`
       rounded-2xl border overflow-hidden transition-all
       ${isActive
-        ? 'bg-white/[0.03] border-gold/20'
-        : 'bg-white/[0.01] border-wireframe-stroke'
+        ? 'bg-white border-gold/20'
+        : 'bg-white border-wireframe-stroke'
       }
     `}>
       {/* Header */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full px-4 py-3 flex items-center justify-between hover:bg-white/[0.02] transition-colors"
+        className="w-full px-4 py-3 flex items-center justify-between hover:bg-white transition-colors"
       >
         <div className="flex items-center gap-3">
           <div className={`
             w-8 h-8 rounded-lg flex items-center justify-center text-sm
-            ${isActive ? 'bg-gold/10' : 'bg-white/5'}
+            ${isActive ? 'bg-gold/10' : 'bg-slate-50'}
           `}>
             {department.name[0]}
           </div>
           <div className="text-left">
-            <p className="text-sm font-medium text-white/50">
+            <p className="text-sm font-medium text-slate-500">
               {department.name}
             </p>
-            <p className="text-xs text-white/30">
+            <p className="text-xs text-slate-400">
               {department.angs.length} agents • {activeAngsCount} active
             </p>
           </div>
         </div>
         <motion.span
           animate={{ rotate: isExpanded ? 180 : 0 }}
-          className="text-white/30"
+          className="text-slate-400"
         >
           ▼
         </motion.span>
@@ -198,7 +198,7 @@ function DepartmentCard({
             <div className="px-4 pb-4 space-y-3">
               {/* Manager */}
               <div>
-                <p className="text-[10px] uppercase tracking-wider text-white/20 mb-2">
+                <p className="text-[10px] uppercase tracking-wider text-slate-300 mb-2">
                   Department Lead
                 </p>
                 <AgentNode agent={department.manager} isActive={isActive} />
@@ -206,7 +206,7 @@ function DepartmentCard({
 
               {/* Boomer_Angs */}
               <div>
-                <p className="text-[10px] uppercase tracking-wider text-white/20 mb-2">
+                <p className="text-[10px] uppercase tracking-wider text-slate-300 mb-2">
                   Team Members
                 </p>
                 <div className="space-y-2">
@@ -234,7 +234,7 @@ function DepartmentCard({
 function ChainOfCommand({ state }: { state: OrchestrationState }) {
   return (
     <div className="space-y-3">
-      <p className="text-[10px] uppercase tracking-wider text-white/20">
+      <p className="text-[10px] uppercase tracking-wider text-slate-300">
         Chain of Command
       </p>
 
@@ -246,7 +246,7 @@ function ChainOfCommand({ state }: { state: OrchestrationState }) {
               {state.userName?.[0] || 'U'}
             </span>
           </div>
-          <span className="text-[9px] text-white/30 mt-1">
+          <span className="text-[9px] text-slate-400 mt-1">
             {state.userName || 'User'}
           </span>
         </div>
@@ -262,7 +262,7 @@ function ChainOfCommand({ state }: { state: OrchestrationState }) {
           <div className="w-12 h-12 rounded-full bg-gradient-to-br from-gold to-amber-600 flex items-center justify-center">
             <span className="text-black font-bold">A</span>
           </div>
-          <span className="text-[9px] text-white/30 mt-1">ACHEEVY</span>
+          <span className="text-[9px] text-slate-400 mt-1">ACHEEVY</span>
         </div>
 
         {state.activeManager && (
@@ -276,11 +276,11 @@ function ChainOfCommand({ state }: { state: OrchestrationState }) {
             {/* Manager */}
             <div className="flex flex-col items-center">
               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center">
-                <span className="text-white font-medium text-sm">
+                <span className="text-slate-800 font-medium text-sm">
                   {state.activeManager.name[0]}
                 </span>
               </div>
-              <span className="text-[9px] text-white/30 mt-1 truncate max-w-[60px]">
+              <span className="text-[9px] text-slate-400 mt-1 truncate max-w-[60px]">
                 {state.activeManager.name}
               </span>
             </div>
@@ -301,14 +301,14 @@ function ChainOfCommand({ state }: { state: OrchestrationState }) {
                       className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center border-2 border-black"
                       style={{ zIndex: 3 - i }}
                     >
-                      <span className="text-white font-medium text-xs">
+                      <span className="text-slate-800 font-medium text-xs">
                         {ang.name[0]}
                       </span>
                     </div>
                   ))}
                   {state.activeAngs.length > 3 && (
-                    <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center border-2 border-black">
-                      <span className="text-white/60 text-xs">
+                    <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center border-2 border-black">
+                      <span className="text-slate-500 text-xs">
                         +{state.activeAngs.length - 3}
                       </span>
                     </div>
@@ -330,7 +330,7 @@ function ChainOfCommand({ state }: { state: OrchestrationState }) {
 function OperationsLog({ events }: { events: HandoffEvent[] }) {
   return (
     <div className="space-y-2">
-      <p className="text-[10px] uppercase tracking-wider text-white/20">
+      <p className="text-[10px] uppercase tracking-wider text-slate-300">
         Operations Log
       </p>
 
@@ -338,12 +338,12 @@ function OperationsLog({ events }: { events: HandoffEvent[] }) {
         {events.slice().reverse().map(event => (
           <div
             key={event.id}
-            className="flex items-start gap-2 p-2 rounded-lg bg-white/[0.02] hover:bg-white/[0.04] transition-colors"
+            className="flex items-start gap-2 p-2 rounded-lg bg-white hover:bg-white transition-colors"
           >
-            <span className="text-[10px] text-white/20 whitespace-nowrap">
+            <span className="text-[10px] text-slate-300 whitespace-nowrap">
               {new Date(event.timestamp).toLocaleTimeString()}
             </span>
-            <p className="text-xs text-white/50 flex-1">
+            <p className="text-xs text-slate-500 flex-1">
               {event.message}
             </p>
           </div>
@@ -377,7 +377,7 @@ export function DepartmentBoard({ state, isOpen, onClose }: DepartmentBoardProps
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+            className="fixed inset-0 bg-slate-50/70 backdrop-blur-sm z-50"
           />
 
           {/* Drawer */}
@@ -386,21 +386,21 @@ export function DepartmentBoard({ state, isOpen, onClose }: DepartmentBoardProps
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-            className="fixed right-0 top-0 bottom-0 w-full max-w-lg bg-[#0A0A0A] border-l border-wireframe-stroke z-50 overflow-hidden"
+            className="fixed right-0 top-0 bottom-0 w-full max-w-lg bg-white border-l border-wireframe-stroke z-50 overflow-hidden"
           >
             {/* Header */}
             <div className="px-6 py-4 border-b border-wireframe-stroke flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-semibold text-white">
+                <h2 className="text-lg font-semibold text-slate-800">
                   Department Board
                 </h2>
-                <p className="text-xs text-white/40">
+                <p className="text-xs text-slate-400">
                   Full orchestration visibility
                 </p>
               </div>
               <button
                 onClick={onClose}
-                className="p-2 rounded-lg hover:bg-white/10 text-white/40 hover:text-white/50 transition-colors"
+                className="p-2 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-500 transition-colors"
               >
                 ✕
               </button>
@@ -411,16 +411,16 @@ export function DepartmentBoard({ state, isOpen, onClose }: DepartmentBoardProps
               {/* User Context */}
               {state.userName && (
                 <div className="p-4 rounded-xl bg-gold/10 border border-gold/20">
-                  <p className="text-sm text-white/50">
+                  <p className="text-sm text-slate-500">
                     Working for: <span className="font-medium text-gold">{state.userName}</span>
                   </p>
                   {state.projectTitle && (
-                    <p className="text-xs text-white/50 mt-1">
+                    <p className="text-xs text-slate-500 mt-1">
                       Project: {state.projectTitle}
                     </p>
                   )}
                   {state.projectObjective && (
-                    <p className="text-xs text-white/40 mt-1">
+                    <p className="text-xs text-slate-400 mt-1">
                       {state.projectObjective}
                     </p>
                   )}
@@ -432,7 +432,7 @@ export function DepartmentBoard({ state, isOpen, onClose }: DepartmentBoardProps
 
               {/* Departments */}
               <div className="space-y-3">
-                <p className="text-[10px] uppercase tracking-wider text-white/20">
+                <p className="text-[10px] uppercase tracking-wider text-slate-300">
                   Departments
                 </p>
                 {DEPARTMENTS.map(dept => (

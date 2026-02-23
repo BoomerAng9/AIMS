@@ -327,7 +327,7 @@ export function QuickSwitcher() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsOpen(false)}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+              className="fixed inset-0 bg-slate-50/70 backdrop-blur-sm z-50"
             />
 
             {/* Switcher Panel */}
@@ -335,7 +335,7 @@ export function QuickSwitcher() {
               initial={{ opacity: 0, scale: 0.95, y: -20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: -20 }}
-              className="fixed top-[20%] left-1/2 -translate-x-1/2 w-full max-w-lg bg-[#0a0a0a] border border-wireframe-stroke rounded-xl shadow-2xl overflow-hidden z-50"
+              className="fixed top-[20%] left-1/2 -translate-x-1/2 w-full max-w-lg bg-white border border-wireframe-stroke rounded-xl shadow-2xl overflow-hidden z-50"
             >
               {/* Search Input */}
               <div className="flex items-center gap-3 px-4 py-3 border-b border-wireframe-stroke">
@@ -347,9 +347,9 @@ export function QuickSwitcher() {
                   onChange={(e) => setSearch(e.target.value)}
                   onKeyDown={handleInputKeyDown}
                   placeholder="Search pages, actions..."
-                  className="flex-1 bg-transparent text-white placeholder:text-gray-500 outline-none text-sm"
+                  className="flex-1 bg-transparent text-slate-800 placeholder:text-gray-500 outline-none text-sm"
                 />
-                <kbd className="px-2 py-1 text-[10px] text-gray-500 bg-white/5 rounded">ESC</kbd>
+                <kbd className="px-2 py-1 text-[10px] text-gray-500 bg-slate-50 rounded">ESC</kbd>
               </div>
 
               {/* Results */}
@@ -379,8 +379,8 @@ export function QuickSwitcher() {
                               onMouseEnter={() => setSelectedIndex(globalIndex)}
                               className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors ${
                                 isSelected
-                                  ? 'bg-gold/20 text-white'
-                                  : 'text-gray-300 hover:bg-white/5'
+                                  ? 'bg-gold/20 text-slate-800'
+                                  : 'text-gray-300 hover:bg-slate-50'
                               } ${isActive ? 'border-l-2 border-gold' : ''}`}
                             >
                               <span className={isSelected ? 'text-gold' : 'text-gray-500'}>
@@ -421,8 +421,8 @@ export function QuickSwitcher() {
                                 onMouseEnter={() => setSelectedIndex(globalIndex)}
                                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors ${
                                   isSelected
-                                    ? 'bg-gold/20 text-white'
-                                    : 'text-gray-300 hover:bg-white/5'
+                                    ? 'bg-gold/20 text-slate-800'
+                                    : 'text-gray-300 hover:bg-slate-50'
                                 }`}
                               >
                                 <span className={isSelected ? 'text-gold' : 'text-gray-500'}>
@@ -446,8 +446,8 @@ export function QuickSwitcher() {
               {/* Footer */}
               <div className="flex items-center justify-between px-4 py-2 border-t border-wireframe-stroke text-[10px] text-gray-600">
                 <div className="flex items-center gap-4">
-                  <span><kbd className="px-1 py-0.5 bg-white/5 rounded">↑↓</kbd> Navigate</span>
-                  <span><kbd className="px-1 py-0.5 bg-white/5 rounded">↵</kbd> Select</span>
+                  <span><kbd className="px-1 py-0.5 bg-slate-50 rounded">↑↓</kbd> Navigate</span>
+                  <span><kbd className="px-1 py-0.5 bg-slate-50 rounded">↵</kbd> Select</span>
                 </div>
                 <span>A.I.M.S.</span>
               </div>

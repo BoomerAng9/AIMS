@@ -33,22 +33,22 @@ function UsageBar({ label, used, quota, unit }: UsageBarProps) {
   const pct = quota > 0 ? Math.min((used / quota) * 100, 100) : 0;
   const color =
     pct >= 90
-      ? "bg-red-400"
+      ? "bg-red-500"
       : pct >= 70
-        ? "bg-gold"
-        : "bg-emerald-400";
+        ? "bg-amber-500"
+        : "bg-emerald-500";
 
   return (
     <div className="space-y-1">
       <div className="flex items-center justify-between text-[0.6rem] font-mono">
-        <span className="text-white/50">{label}</span>
-        <span className="text-white/40">
+        <span className="text-slate-500">{label}</span>
+        <span className="text-slate-400">
           {used}
           {unit ? unit : ""} / {quota}
           {unit ? unit : ""}
         </span>
       </div>
-      <div className="h-1 w-full rounded-full bg-white/[0.06]">
+      <div className="h-1 w-full rounded-full bg-slate-100">
         <motion.div
           className={`h-full rounded-full ${color}`}
           initial={{ width: 0 }}
@@ -77,10 +77,10 @@ export function LucUsageWidget({ compact = false }: LucUsageWidgetProps) {
   if (!data) {
     return (
       <div className="space-y-2 animate-pulse">
-        <div className="h-3 w-20 rounded bg-white/5" />
-        <div className="h-1 w-full rounded bg-white/5" />
-        <div className="h-1 w-full rounded bg-white/5" />
-        <div className="h-1 w-full rounded bg-white/5" />
+        <div className="h-3 w-20 rounded bg-slate-100" />
+        <div className="h-1 w-full rounded bg-slate-100" />
+        <div className="h-1 w-full rounded bg-slate-100" />
+        <div className="h-1 w-full rounded bg-slate-100" />
       </div>
     );
   }
@@ -95,10 +95,10 @@ export function LucUsageWidget({ compact = false }: LucUsageWidgetProps) {
       >
         {/* Tier + balance */}
         <div className="flex items-center justify-between">
-          <span className="text-[0.6rem] uppercase tracking-[0.15em] text-gold/60 font-mono">
+          <span className="text-[0.6rem] uppercase tracking-[0.15em] text-amber-600/70 font-mono">
             {data.name}
           </span>
-          <span className="text-[0.65rem] font-semibold text-gold">
+          <span className="text-[0.65rem] font-semibold text-amber-600">
             {data.balance}
           </span>
         </div>
@@ -135,23 +135,23 @@ export function LucUsageWidget({ compact = false }: LucUsageWidgetProps) {
       {/* Header row */}
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-[0.6rem] uppercase tracking-[0.18em] text-gold/60 font-mono">
+          <p className="text-[0.6rem] uppercase tracking-[0.18em] text-amber-600/70 font-mono">
             LUC Usage
           </p>
-          <p className="text-sm font-medium text-white mt-0.5">{data.name}</p>
+          <p className="text-sm font-medium text-slate-900 mt-0.5">{data.name}</p>
         </div>
         <div className="text-right">
-          <p className="text-[0.55rem] uppercase tracking-[0.12em] text-white/40 font-mono">
+          <p className="text-[0.55rem] uppercase tracking-[0.12em] text-slate-400 font-mono">
             Balance
           </p>
-          <p className="text-sm font-semibold text-gold">{data.balance}</p>
+          <p className="text-sm font-semibold text-amber-600">{data.balance}</p>
         </div>
       </div>
 
       {/* Tier badge */}
-      <div className="inline-flex items-center gap-1.5 rounded-md border border-wireframe-stroke bg-white/[0.02] px-2 py-0.5">
-        <span className="h-1.5 w-1.5 rounded-full bg-gold/60" />
-        <span className="text-[0.55rem] uppercase tracking-[0.12em] text-white/50 font-mono">
+      <div className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-slate-50 px-2 py-0.5">
+        <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+        <span className="text-[0.55rem] uppercase tracking-[0.12em] text-slate-500 font-mono">
           {data.tier} tier
         </span>
       </div>

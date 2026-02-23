@@ -195,14 +195,14 @@ export default function PlugCatalogPage() {
             Plug Catalog
           </p>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl md:text-3xl font-display uppercase tracking-wider text-white">
+            <h1 className="text-2xl md:text-3xl font-display uppercase tracking-wider text-slate-800">
               Plug It In
             </h1>
             <span className="flex h-5 min-w-5 items-center justify-center rounded border border-gold/20 bg-gold/5 px-1.5 text-[0.6rem] font-mono text-gold">
               {availableCount}
             </span>
           </div>
-          <p className="mt-1 text-xs text-white/40">
+          <p className="mt-1 text-xs text-slate-400">
             Browse AI tools, agents, and platforms. One click to spin up. One click to ship.
           </p>
         </div>
@@ -218,7 +218,7 @@ export default function PlugCatalogPage() {
       {/* ── Stats Strip ────────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: "Available Tools", value: availableCount, color: "text-white" },
+          { label: "Available Tools", value: availableCount, color: "text-slate-800" },
           { label: "Featured", value: featuredPlugs.length, color: "text-gold" },
           { label: "Categories", value: Object.keys(categories).length, color: "text-blue-400" },
           { label: "Coming Soon", value: plugs.filter((p) => p.comingSoon).length, color: "text-violet-400" },
@@ -229,7 +229,7 @@ export default function PlugCatalogPage() {
             whileHover={{ scale: 1.03, borderColor: "rgba(212,168,67,0.3)" }}
             className="wireframe-card p-4 text-center"
           >
-            <p className="text-[0.55rem] uppercase tracking-widest text-white/30 font-mono">
+            <p className="text-[0.55rem] uppercase tracking-widest text-slate-400 font-mono">
               {stat.label}
             </p>
             <p className={`text-xl font-display mt-1 ${stat.color}`}>{stat.value}</p>
@@ -241,7 +241,7 @@ export default function PlugCatalogPage() {
       <motion.div variants={staggerItem} className="flex flex-col sm:flex-row gap-3">
         {/* Search */}
         <div className="relative flex-1">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/25" />
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
             value={searchQuery}
@@ -253,7 +253,7 @@ export default function PlugCatalogPage() {
 
         {/* Category pills */}
         <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-thin pb-1">
-          <Filter size={12} className="text-white/20 shrink-0" />
+          <Filter size={12} className="text-slate-300 shrink-0" />
           {(["all", ...Object.keys(CATEGORY_LABELS).filter((k) => k !== "all")] as CategoryKey[]).map(
             (cat) => {
               const isActive = activeCategory === cat;
@@ -265,12 +265,12 @@ export default function PlugCatalogPage() {
                   onClick={() => setActiveCategory(cat)}
                   className={`shrink-0 flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-[0.6rem] font-mono uppercase tracking-wider transition-all ${isActive
                       ? "bg-gold/10 border border-gold/30 text-gold"
-                      : "border border-wireframe-stroke text-white/40 hover:border-white/20 hover:text-white/60"
+                      : "border border-wireframe-stroke text-slate-400 hover:border-slate-200 hover:text-slate-500"
                     }`}
                 >
                   {CATEGORY_LABELS[cat] || cat}
                   {count > 0 && (
-                    <span className={`text-[0.5rem] ${isActive ? "text-gold/60" : "text-white/20"}`}>
+                    <span className={`text-[0.5rem] ${isActive ? "text-gold/60" : "text-slate-300"}`}>
                       {count}
                     </span>
                   )}
@@ -287,14 +287,14 @@ export default function PlugCatalogPage() {
           {[1, 2, 3, 4, 5, 6].map((i) => (
             <div key={i} className="wireframe-card p-6 animate-pulse">
               <div className="flex items-center gap-3 mb-4">
-                <div className="h-10 w-10 rounded-xl bg-white/5" />
+                <div className="h-10 w-10 rounded-xl bg-slate-50" />
                 <div className="flex-1 space-y-2">
-                  <div className="h-3 w-24 bg-white/5 rounded" />
-                  <div className="h-2 w-16 bg-white/5 rounded" />
+                  <div className="h-3 w-24 bg-slate-50 rounded" />
+                  <div className="h-2 w-16 bg-slate-50 rounded" />
                 </div>
               </div>
-              <div className="h-2 w-full bg-white/5 rounded mb-2" />
-              <div className="h-2 w-2/3 bg-white/5 rounded" />
+              <div className="h-2 w-full bg-slate-50 rounded mb-2" />
+              <div className="h-2 w-2/3 bg-slate-50 rounded" />
             </div>
           ))}
         </div>
@@ -336,7 +336,7 @@ export default function PlugCatalogPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <h3 className="text-sm font-medium text-white truncate">
+                        <h3 className="text-sm font-medium text-slate-800 truncate">
                           {plug.name}
                         </h3>
                         {plug.comingSoon && (
@@ -352,7 +352,7 @@ export default function PlugCatalogPage() {
                   </div>
 
                   {/* Tagline */}
-                  <p className="text-xs text-white/50 mb-3 flex-1">
+                  <p className="text-xs text-slate-500 mb-3 flex-1">
                     {plug.tagline}
                   </p>
 
@@ -361,7 +361,7 @@ export default function PlugCatalogPage() {
                     {plug.tags.slice(0, 4).map((tag) => (
                       <span
                         key={tag}
-                        className="rounded border border-wireframe-stroke px-1.5 py-0.5 text-[0.5rem] font-mono text-white/30"
+                        className="rounded border border-wireframe-stroke px-1.5 py-0.5 text-[0.5rem] font-mono text-slate-400"
                       >
                         {tag}
                       </span>
@@ -369,13 +369,13 @@ export default function PlugCatalogPage() {
                   </div>
 
                   {/* Resources + Delivery */}
-                  <div className="flex items-center gap-3 mb-4 text-[0.55rem] text-white/30 font-mono">
+                  <div className="flex items-center gap-3 mb-4 text-[0.55rem] text-slate-400 font-mono">
                     <span>{plug.resources.cpu} CPU</span>
-                    <span className="text-white/10">|</span>
+                    <span className="text-slate-300">|</span>
                     <span>{plug.resources.memory}</span>
                     {plug.resources.gpu && (
                       <>
-                        <span className="text-white/10">|</span>
+                        <span className="text-slate-300">|</span>
                         <span className="text-amber-400">GPU</span>
                       </>
                     )}
@@ -386,7 +386,7 @@ export default function PlugCatalogPage() {
                     {plug.comingSoon ? (
                       <button
                         disabled
-                        className="flex-1 flex items-center justify-center gap-2 rounded-lg border border-wireframe-stroke px-3 py-2 text-[0.6rem] font-mono text-white/30 cursor-not-allowed"
+                        className="flex-1 flex items-center justify-center gap-2 rounded-lg border border-wireframe-stroke px-3 py-2 text-[0.6rem] font-mono text-slate-400 cursor-not-allowed"
                       >
                         <Sparkles size={11} />
                         Coming Soon
@@ -395,7 +395,7 @@ export default function PlugCatalogPage() {
                       <>
                         <Link
                           href={`/dashboard/plug-catalog/${plug.id}`}
-                          className="flex-1 flex items-center justify-center gap-1.5 rounded-lg border border-wireframe-stroke px-3 py-2 text-[0.6rem] font-mono text-white/50 hover:border-gold/20 hover:text-gold transition-all"
+                          className="flex-1 flex items-center justify-center gap-1.5 rounded-lg border border-wireframe-stroke px-3 py-2 text-[0.6rem] font-mono text-slate-500 hover:border-gold/20 hover:text-gold transition-all"
                         >
                           Details <ArrowRight size={10} />
                         </Link>
@@ -426,7 +426,7 @@ export default function PlugCatalogPage() {
                         )}
                         {plug.delivery.includes("exported") && (
                           <button
-                            className="flex items-center justify-center gap-1.5 rounded-lg border border-wireframe-stroke px-3 py-2 text-[0.6rem] font-mono text-white/40 hover:border-emerald-400/20 hover:text-emerald-400 transition-all"
+                            className="flex items-center justify-center gap-1.5 rounded-lg border border-wireframe-stroke px-3 py-2 text-[0.6rem] font-mono text-slate-400 hover:border-emerald-400/20 hover:text-emerald-400 transition-all"
                             title="Export for self-hosting"
                           >
                             <Download size={11} />
@@ -442,8 +442,8 @@ export default function PlugCatalogPage() {
             {/* Empty filter state */}
             {filtered.length === 0 && (
               <div className="col-span-full wireframe-card border-dashed p-10 text-center">
-                <Search size={24} className="mx-auto text-white/15 mb-3" />
-                <p className="text-sm text-white/40">No tools match your search</p>
+                <Search size={24} className="mx-auto text-slate-300 mb-3" />
+                <p className="text-sm text-slate-400">No tools match your search</p>
                 <button
                   onClick={() => {
                     setSearchQuery("");
@@ -479,7 +479,7 @@ export default function PlugCatalogPage() {
                 {deployResult.message}
               </p>
               {deployResult.instanceId && (
-                <p className="text-[0.55rem] text-white/30 font-mono mt-0.5">
+                <p className="text-[0.55rem] text-slate-400 font-mono mt-0.5">
                   Instance: {deployResult.instanceId}
                 </p>
               )}
@@ -487,7 +487,7 @@ export default function PlugCatalogPage() {
           </div>
           <button
             onClick={() => setDeployResult(null)}
-            className="text-white/30 hover:text-white/60 text-xs"
+            className="text-slate-400 hover:text-slate-500 text-xs"
           >
             Dismiss
           </button>
@@ -499,7 +499,7 @@ export default function PlugCatalogPage() {
         <motion.div variants={staggerItem}>
           <button
             onClick={() => setShowInstances(!showInstances)}
-            className="flex items-center gap-2 text-xs font-mono text-white/40 hover:text-gold transition-colors mb-3"
+            className="flex items-center gap-2 text-xs font-mono text-slate-400 hover:text-gold transition-colors mb-3"
           >
             <Terminal size={12} />
             Running Instances ({instances.length})
@@ -516,8 +516,8 @@ export default function PlugCatalogPage() {
                     className="wireframe-card p-4 flex items-center justify-between"
                   >
                     <div>
-                      <p className="text-xs font-medium text-white">{inst.name || inst.plugId}</p>
-                      <p className="text-[0.55rem] font-mono text-white/30 mt-0.5">
+                      <p className="text-xs font-medium text-slate-800">{inst.name || inst.plugId}</p>
+                      <p className="text-[0.55rem] font-mono text-slate-400 mt-0.5">
                         Port {inst.assignedPort} &middot; {inst.status} &middot;{" "}
                         <span className={inst.healthStatus === "healthy" ? "text-emerald-400" : "text-amber-400"}>
                           {inst.healthStatus || "unknown"}
@@ -527,19 +527,19 @@ export default function PlugCatalogPage() {
                     <div className="flex items-center gap-1.5">
                       <button
                         onClick={() => handleInstanceAction(inst.instanceId, "restart")}
-                        className="rounded border border-wireframe-stroke px-2 py-1 text-[0.5rem] font-mono text-white/40 hover:text-blue-400 hover:border-blue-400/20 transition-all"
+                        className="rounded border border-wireframe-stroke px-2 py-1 text-[0.5rem] font-mono text-slate-400 hover:text-blue-400 hover:border-blue-400/20 transition-all"
                       >
                         Restart
                       </button>
                       <button
                         onClick={() => handleInstanceAction(inst.instanceId, "stop")}
-                        className="rounded border border-wireframe-stroke px-2 py-1 text-[0.5rem] font-mono text-white/40 hover:text-amber-400 hover:border-amber-400/20 transition-all"
+                        className="rounded border border-wireframe-stroke px-2 py-1 text-[0.5rem] font-mono text-slate-400 hover:text-amber-400 hover:border-amber-400/20 transition-all"
                       >
                         Stop
                       </button>
                       <button
                         onClick={() => handleInstanceAction(inst.instanceId, "remove")}
-                        className="rounded border border-wireframe-stroke px-2 py-1 text-[0.5rem] font-mono text-white/40 hover:text-red-400 hover:border-red-400/20 transition-all"
+                        className="rounded border border-wireframe-stroke px-2 py-1 text-[0.5rem] font-mono text-slate-400 hover:text-red-400 hover:border-red-400/20 transition-all"
                       >
                         Remove
                       </button>
@@ -557,18 +557,18 @@ export default function PlugCatalogPage() {
         variants={staggerItem}
         className="wireframe-card border-dashed p-8 text-center hover:border-gold/15 transition-colors group"
       >
-        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl border border-dashed border-white/15 text-white/20 group-hover:border-gold/30 group-hover:text-gold transition-all">
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl border border-dashed border-slate-200 text-slate-300 group-hover:border-gold/30 group-hover:text-gold transition-all">
           <Shield size={20} />
         </div>
-        <p className="mt-3 text-sm text-white/50 group-hover:text-white/70 transition-colors">
+        <p className="mt-3 text-sm text-slate-500 group-hover:text-slate-600 transition-colors">
           Not sure which tools you need?
         </p>
-        <p className="mt-1 text-xs text-white/30">
+        <p className="mt-1 text-xs text-slate-400">
           Our Needs Analysis will assess your business, security, and delivery requirements.
         </p>
         <Link
           href="/dashboard/needs-analysis"
-          className="mt-4 inline-flex items-center gap-2 rounded-xl border border-wireframe-stroke bg-white/5 px-5 py-2 text-xs text-white/60 hover:bg-gold hover:text-black hover:border-gold transition-all"
+          className="mt-4 inline-flex items-center gap-2 rounded-xl border border-wireframe-stroke bg-slate-50 px-5 py-2 text-xs text-slate-500 hover:bg-gold hover:text-black hover:border-gold transition-all"
         >
           Start Needs Analysis <ArrowRight size={12} />
         </Link>

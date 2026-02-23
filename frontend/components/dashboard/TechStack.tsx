@@ -158,7 +158,7 @@ function TechCard({ item, delay }: { item: TechItem; delay: number }) {
       />
 
       <div className="flex-1">
-        <div className="text-sm font-medium text-white">{item.name}</div>
+        <div className="text-sm font-medium text-slate-800">{item.name}</div>
         <div className="text-xs text-gray-400">{item.description}</div>
       </div>
 

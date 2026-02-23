@@ -258,7 +258,7 @@ function DraftPageContent() {
   const activeNews = newsItems[activeNewsIdx];
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white selection:bg-gold/30 relative">
+    <div className="min-h-screen bg-white text-slate-800 selection:bg-gold/30 relative">
       <StudioArena />
 
       {/* ═══════════════════════════════════════════════════════════
@@ -271,25 +271,25 @@ function DraftPageContent() {
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: 400, opacity: 0 }}
             transition={{ type: 'spring', damping: 25, stiffness: 250 }}
-            className="fixed top-24 right-6 z-[60] w-[360px] bg-[#111] border border-gold/30 rounded-2xl shadow-[0_0_40px_rgba(218,165,32,0.12)] overflow-hidden"
+            className="fixed top-24 right-6 z-[60] w-[360px] bg-white border border-gold/30 rounded-2xl shadow-[0_0_40px_rgba(218,165,32,0.12)] overflow-hidden"
           >
             <div className="flex items-center gap-2 px-4 py-2.5 bg-gold/10 border-b border-gold/20">
               <div className="h-2 w-2 bg-red-500 rounded-full animate-pulse" />
               <span className="text-[0.6rem] font-mono uppercase tracking-[0.2em] text-gold font-bold">Breaking Update</span>
               <button
                 onClick={() => setShowUpdatePanel(false)}
-                className="ml-auto text-white/30 hover:text-white transition-colors"
+                className="ml-auto text-slate-400 hover:text-slate-800 transition-colors"
               >
                 <X size={14} />
               </button>
             </div>
             <div className="p-4 space-y-2">
-              <p className="text-sm text-white leading-relaxed font-sans">{latestUpdate.headline}</p>
-              <div className="flex items-center justify-between text-[0.55rem] font-mono text-white/30">
+              <p className="text-sm text-slate-800 leading-relaxed font-sans">{latestUpdate.headline}</p>
+              <div className="flex items-center justify-between text-[0.55rem] font-mono text-slate-400">
                 <span>{latestUpdate.source}</span>
                 <span className={`px-1.5 py-0.5 rounded uppercase tracking-widest font-bold ${latestUpdate.type === 'combine' ? 'bg-blue-400/10 text-blue-400' :
                   latestUpdate.type === 'projection' ? 'bg-gold/10 text-gold' :
-                    'bg-white/5 text-white/40'
+                    'bg-slate-50 text-slate-400'
                   }`}>
                   {latestUpdate.type.replace('_', ' ')}
                 </span>
@@ -314,7 +314,7 @@ function DraftPageContent() {
             className="fixed inset-0 z-[70] flex items-center justify-center"
           >
             {/* Backdrop */}
-            <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setShowDebate(false)} />
+            <div className="absolute inset-0 bg-white/80 backdrop-blur-sm" onClick={() => setShowDebate(false)} />
 
             {/* Debate Card */}
             <motion.div
@@ -322,22 +322,22 @@ function DraftPageContent() {
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.9, y: 30 }}
               transition={{ type: 'spring', damping: 20, stiffness: 200 }}
-              className="relative w-[90vw] max-w-[800px] bg-[#0c0c0c] border border-white/10 rounded-3xl overflow-hidden shadow-[0_0_80px_rgba(218,165,32,0.15)]"
+              className="relative w-[90vw] max-w-[800px] bg-[#0c0c0c] border border-slate-200 rounded-3xl overflow-hidden shadow-[0_0_80px_rgba(218,165,32,0.15)]"
             >
               {/* Header */}
-              <div className="flex items-center justify-between px-6 py-3 bg-gradient-to-r from-red-900/30 via-[#0c0c0c] to-blue-900/30 border-b border-white/10">
+              <div className="flex items-center justify-between px-6 py-3 bg-gradient-to-r from-red-900/30 via-[#0c0c0c] to-blue-900/30 border-b border-slate-200">
                 <div className="flex items-center gap-2">
                   <Swords size={16} className="text-gold" />
                   <span className="text-[0.6rem] font-mono uppercase tracking-[0.2em] text-gold font-bold">War Room Debate</span>
                 </div>
-                <button onClick={() => setShowDebate(false)} className="text-white/20 hover:text-white transition-colors">
+                <button onClick={() => setShowDebate(false)} className="text-slate-300 hover:text-slate-800 transition-colors">
                   <X size={16} />
                 </button>
               </div>
 
               {/* Topic */}
-              <div className="px-6 py-3 bg-white/[0.02] border-b border-white/5">
-                <p className="text-xs text-white/50 font-mono truncate">{debate.topic}</p>
+              <div className="px-6 py-3 bg-white border-b border-slate-100">
+                <p className="text-xs text-slate-500 font-mono truncate">{debate.topic}</p>
               </div>
 
               {/* Analysts Split Screen */}
@@ -361,13 +361,13 @@ function DraftPageContent() {
                       <motion.p
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="text-sm text-white/80 leading-relaxed font-serif italic"
+                        className="text-sm text-slate-700 leading-relaxed font-serif italic"
                       >
                         &ldquo;{debate.bull.take}&rdquo;
                       </motion.p>
                     )}
                     {debatePhase !== 'bull' && (
-                      <p className="text-xs text-white/30 leading-relaxed font-serif italic line-clamp-3">
+                      <p className="text-xs text-slate-400 leading-relaxed font-serif italic line-clamp-3">
                         &ldquo;{debate.bull.take}&rdquo;
                       </p>
                     )}
@@ -393,18 +393,18 @@ function DraftPageContent() {
                       <motion.p
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="text-sm text-white/80 leading-relaxed font-serif italic"
+                        className="text-sm text-slate-700 leading-relaxed font-serif italic"
                       >
                         &ldquo;{debate.bear.take}&rdquo;
                       </motion.p>
                     )}
                     {debatePhase !== 'bear' && debatePhase !== 'bull' && (
-                      <p className="text-xs text-white/30 leading-relaxed font-serif italic line-clamp-3">
+                      <p className="text-xs text-slate-400 leading-relaxed font-serif italic line-clamp-3">
                         &ldquo;{debate.bear.take}&rdquo;
                       </p>
                     )}
                     {debatePhase === 'bull' && (
-                      <p className="text-xs text-white/10 font-mono uppercase tracking-widest">Awaiting response...</p>
+                      <p className="text-xs text-slate-300 font-mono uppercase tracking-widest">Awaiting response...</p>
                     )}
                   </AnimatePresence>
                 </div>
@@ -424,20 +424,20 @@ function DraftPageContent() {
                         Chicken Hawk — Mediation Verdict
                       </span>
                     </div>
-                    <p className="text-sm text-white/70 font-sans leading-relaxed">{debate.verdict}</p>
+                    <p className="text-sm text-slate-600 font-sans leading-relaxed">{debate.verdict}</p>
                   </motion.div>
                 )}
               </AnimatePresence>
 
               {/* Phase indicators */}
-              <div className="flex items-center justify-center gap-3 py-3 bg-white/[0.01] border-t border-white/5">
+              <div className="flex items-center justify-center gap-3 py-3 bg-white border-t border-slate-100">
                 {(['bull', 'bear', 'verdict'] as const).map(phase => (
                   <div
                     key={phase}
-                    className={`flex items-center gap-1.5 text-[0.5rem] font-mono uppercase tracking-widest transition-colors ${debatePhase === phase ? 'text-gold' : 'text-white/15'
+                    className={`flex items-center gap-1.5 text-[0.5rem] font-mono uppercase tracking-widest transition-colors ${debatePhase === phase ? 'text-gold' : 'text-slate-300'
                       }`}
                   >
-                    <div className={`h-1.5 w-1.5 rounded-full transition-colors ${debatePhase === phase ? 'bg-gold animate-pulse' : 'bg-white/10'
+                    <div className={`h-1.5 w-1.5 rounded-full transition-colors ${debatePhase === phase ? 'bg-gold animate-pulse' : 'bg-slate-100'
                       }`} />
                     {phase === 'bull' ? '🐂 Bull' : phase === 'bear' ? '🐻 Bear' : '⚖️ Verdict'}
                   </div>
@@ -451,16 +451,16 @@ function DraftPageContent() {
       {/* ═══════════════════════════════════════════════════════════
           STICKY NAV
           ═══════════════════════════════════════════════════════════ */}
-      <nav className="border-b border-white/5 bg-[#0a0a0a]/80 backdrop-blur-xl sticky top-0 z-50">
+      <nav className="border-b border-slate-100 bg-white/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-[1400px] mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/sandbox/perform" className="flex items-center gap-2 text-[0.65rem] text-white/40 hover:text-gold transition-colors font-mono uppercase tracking-widest">
+          <Link href="/sandbox/perform" className="flex items-center gap-2 text-[0.65rem] text-slate-400 hover:text-gold transition-colors font-mono uppercase tracking-widest">
             <ArrowLeft size={14} /> Per|Form Hub
           </Link>
           <div className="flex items-center gap-4">
             {newsItems.length > 0 && (
               <button
                 onClick={() => setShowUpdatePanel(!showUpdatePanel)}
-                className="relative text-white/30 hover:text-gold transition-colors"
+                className="relative text-slate-400 hover:text-gold transition-colors"
               >
                 <Bell size={16} />
                 <span className="absolute -top-1 -right-1 h-2 w-2 bg-red-500 rounded-full" />
@@ -489,8 +489,8 @@ function DraftPageContent() {
               className="object-cover object-center"
               priority
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent" />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a]/80 via-transparent to-[#0a0a0a]/40" />
+            <div className="absolute inset-0 bg-gradient-to-t from-white via-white/60 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-r from-white/80 via-transparent to-white/40" />
 
             {/* Hero Content */}
             <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12 max-w-[1400px] mx-auto">
@@ -498,11 +498,11 @@ function DraftPageContent() {
                 <div className="h-1.5 w-1.5 bg-red-500 rounded-full animate-pulse" />
                 <span className="text-[0.6rem] font-mono uppercase tracking-[0.25em] text-red-400/80">Live Coverage</span>
               </div>
-              <h1 className="text-4xl md:text-6xl font-display font-black tracking-tighter text-white leading-[0.95] mb-4">
+              <h1 className="text-4xl md:text-6xl font-display font-black tracking-tighter text-slate-800 leading-[0.95] mb-4">
                 NFL Draft<br />
                 <span className="text-gold">Command Center</span>
               </h1>
-              <p className="text-sm md:text-base text-white/60 max-w-xl font-sans leading-relaxed mb-6">
+              <p className="text-sm md:text-base text-slate-500 max-w-xl font-sans leading-relaxed mb-6">
                 AI-scored prospects. Automated mock drafts. Interactive simulator.
                 Every pick is backed by the A.I.M.S. Scoring &amp; Grading System.
               </p>
@@ -528,7 +528,7 @@ function DraftPageContent() {
                     </button>
                     <Link
                       href="/sandbox/perform/draft/simulator"
-                      className="px-5 py-3 bg-white/5 border border-white/10 text-white/70 hover:text-white hover:bg-white/10 text-xs font-mono font-bold uppercase tracking-widest rounded-lg transition-all flex items-center gap-2"
+                      className="px-5 py-3 bg-slate-50 border border-slate-200 text-slate-600 hover:text-slate-800 hover:bg-slate-100 text-xs font-mono font-bold uppercase tracking-widest rounded-lg transition-all flex items-center gap-2"
                     >
                       <Gamepad2 size={13} /> Be The GM
                     </Link>
@@ -543,11 +543,11 @@ function DraftPageContent() {
             NEWS CAROUSEL — 3-Second Auto-Scroll
             ═══════════════════════════════════════════════════════════ */}
         {newsItems.length > 0 && (
-          <motion.div variants={staggerItem} className="border-y border-white/5 bg-[#0c0c0c]">
+          <motion.div variants={staggerItem} className="border-y border-slate-100 bg-[#0c0c0c]">
             <div className="max-w-[1400px] mx-auto px-6">
               <div className="flex items-stretch min-h-[72px]">
                 {/* Label */}
-                <div className="flex items-center gap-2 pr-6 border-r border-white/5">
+                <div className="flex items-center gap-2 pr-6 border-r border-slate-100">
                   <TrendingUp size={14} className="text-gold" />
                   <span className="text-[0.55rem] font-mono uppercase tracking-[0.2em] text-gold font-bold whitespace-nowrap">Draft Intel</span>
                 </div>
@@ -567,24 +567,24 @@ function DraftPageContent() {
                         <span className={`shrink-0 px-1.5 py-0.5 rounded text-[0.5rem] font-mono uppercase tracking-widest font-bold ${activeNews.type === 'combine' ? 'bg-blue-400/10 text-blue-400 border border-blue-400/20' :
                           activeNews.type === 'projection' ? 'bg-gold/10 text-gold border border-gold/20' :
                             activeNews.type === 'general' ? 'bg-emerald-400/10 text-emerald-400 border border-emerald-400/20' :
-                              'bg-white/5 text-white/40 border border-white/10'
+                              'bg-slate-50 text-slate-400 border border-slate-200'
                           }`}>
                           {activeNews.type.replace('_', ' ')}
                         </span>
-                        <p className="text-sm text-white/80 font-sans truncate flex-1">{activeNews.headline}</p>
-                        <span className="text-[0.5rem] font-mono text-white/20 whitespace-nowrap shrink-0">{activeNews.source}</span>
+                        <p className="text-sm text-slate-700 font-sans truncate flex-1">{activeNews.headline}</p>
+                        <span className="text-[0.5rem] font-mono text-slate-300 whitespace-nowrap shrink-0">{activeNews.source}</span>
                       </motion.div>
                     )}
                   </AnimatePresence>
                 </div>
 
                 {/* Counter */}
-                <div className="flex items-center gap-1 pl-4 border-l border-white/5">
+                <div className="flex items-center gap-1 pl-4 border-l border-slate-100">
                   {newsItems.map((_, idx) => (
                     <button
                       key={idx}
                       onClick={() => setActiveNewsIdx(idx)}
-                      className={`h-1.5 rounded-full transition-all ${idx === activeNewsIdx ? 'w-4 bg-gold' : 'w-1.5 bg-white/10 hover:bg-white/20'
+                      className={`h-1.5 rounded-full transition-all ${idx === activeNewsIdx ? 'w-4 bg-gold' : 'w-1.5 bg-slate-100 hover:bg-slate-200'
                         }`}
                     />
                   ))}
@@ -601,7 +601,7 @@ function DraftPageContent() {
           <motion.div variants={staggerItem} className="grid gap-4 sm:grid-cols-3">
             <Link
               href="/sandbox/perform/draft/mock"
-              className="group relative overflow-hidden rounded-2xl border border-white/5 bg-[#0f0f0f] hover:border-gold/20 transition-all"
+              className="group relative overflow-hidden rounded-2xl border border-slate-100 bg-[#0f0f0f] hover:border-gold/20 transition-all"
             >
               <div className="relative h-40 w-full overflow-hidden">
                 <Image
@@ -615,16 +615,16 @@ function DraftPageContent() {
               <div className="p-5 relative">
                 <div className="flex items-center gap-2 mb-2">
                   <BarChart3 size={16} className="text-gold" />
-                  <h3 className="text-lg font-display font-bold text-white">Mock Drafts</h3>
+                  <h3 className="text-lg font-display font-bold text-slate-800">Mock Drafts</h3>
                 </div>
-                <p className="text-xs text-white/40 font-mono leading-relaxed">Full 7-round projections ranked using the A.I.M.S. Scoring &amp; Grading System with adversarial debate analysis.</p>
-                <ChevronRight size={16} className="absolute top-5 right-5 text-white/10 group-hover:text-gold transition-colors" />
+                <p className="text-xs text-slate-400 font-mono leading-relaxed">Full 7-round projections ranked using the A.I.M.S. Scoring &amp; Grading System with adversarial debate analysis.</p>
+                <ChevronRight size={16} className="absolute top-5 right-5 text-slate-300 group-hover:text-gold transition-colors" />
               </div>
             </Link>
 
             <Link
               href="/sandbox/perform/draft/simulator"
-              className="group relative overflow-hidden rounded-2xl border border-white/5 bg-[#0f0f0f] hover:border-emerald-400/20 transition-all"
+              className="group relative overflow-hidden rounded-2xl border border-slate-100 bg-[#0f0f0f] hover:border-emerald-400/20 transition-all"
             >
               <div className="relative h-40 w-full overflow-hidden">
                 <Image
@@ -638,16 +638,16 @@ function DraftPageContent() {
               <div className="p-5 relative">
                 <div className="flex items-center gap-2 mb-2">
                   <Gamepad2 size={16} className="text-emerald-400" />
-                  <h3 className="text-lg font-display font-bold text-white">Draft Simulator</h3>
+                  <h3 className="text-lg font-display font-bold text-slate-800">Draft Simulator</h3>
                 </div>
-                <p className="text-xs text-white/40 font-mono leading-relaxed">Step into the war room. You make the picks — AI (Artificial General Intelligence) evaluates every move.</p>
-                <ChevronRight size={16} className="absolute top-5 right-5 text-white/10 group-hover:text-emerald-400 transition-colors" />
+                <p className="text-xs text-slate-400 font-mono leading-relaxed">Step into the war room. You make the picks — AI (Artificial General Intelligence) evaluates every move.</p>
+                <ChevronRight size={16} className="absolute top-5 right-5 text-slate-300 group-hover:text-emerald-400 transition-colors" />
               </div>
             </Link>
 
             <Link
               href="/sandbox/perform/big-board"
-              className="group relative overflow-hidden rounded-2xl border border-white/5 bg-[#0f0f0f] hover:border-blue-400/20 transition-all"
+              className="group relative overflow-hidden rounded-2xl border border-slate-100 bg-[#0f0f0f] hover:border-blue-400/20 transition-all"
             >
               <div className="relative h-40 w-full bg-gradient-to-br from-blue-950 via-[#0f0f0f] to-[#0f0f0f] overflow-hidden">
                 <div className="absolute inset-0 flex items-center justify-center">
@@ -657,10 +657,10 @@ function DraftPageContent() {
               <div className="p-5 relative">
                 <div className="flex items-center gap-2 mb-2">
                   <Users size={16} className="text-blue-400" />
-                  <h3 className="text-lg font-display font-bold text-white">Prospect Board</h3>
+                  <h3 className="text-lg font-display font-bold text-slate-800">Prospect Board</h3>
                 </div>
-                <p className="text-xs text-white/40 font-mono leading-relaxed">Top prospects ranked by pure production using the A.I.M.S. Scoring &amp; Grading System.</p>
-                <ChevronRight size={16} className="absolute top-5 right-5 text-white/10 group-hover:text-blue-400 transition-colors" />
+                <p className="text-xs text-slate-400 font-mono leading-relaxed">Top prospects ranked by pure production using the A.I.M.S. Scoring &amp; Grading System.</p>
+                <ChevronRight size={16} className="absolute top-5 right-5 text-slate-300 group-hover:text-blue-400 transition-colors" />
               </div>
             </Link>
           </motion.div>
@@ -672,21 +672,21 @@ function DraftPageContent() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Trophy className="h-5 w-5 text-gold" />
-                <h2 className="text-xl font-display font-bold text-white tracking-tight">Draft Big Board</h2>
-                <span className="text-[0.55rem] font-mono text-white/25 ml-1">{filtered.length} prospects</span>
+                <h2 className="text-xl font-display font-bold text-slate-800 tracking-tight">Draft Big Board</h2>
+                <span className="text-[0.55rem] font-mono text-slate-400 ml-1">{filtered.length} prospects</span>
               </div>
             </div>
 
             {/* Filters */}
             <div className="flex flex-col sm:flex-row gap-3">
               <div className="relative flex-1 max-w-md">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300" />
                 <input
                   type="text"
                   placeholder="Search prospects..."
                   value={search}
                   onChange={e => setSearch(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2.5 text-sm bg-[#0f0f0f] border border-white/10 rounded-xl text-white placeholder:text-white/20 focus:outline-none focus:border-gold/30 transition-colors font-mono"
+                  className="w-full pl-9 pr-4 py-2.5 text-sm bg-[#0f0f0f] border border-slate-200 rounded-xl text-slate-800 placeholder:text-slate-300 focus:outline-none focus:border-gold/30 transition-colors font-mono"
                 />
               </div>
               <div className="flex gap-1.5 overflow-x-auto pb-1">
@@ -696,7 +696,7 @@ function DraftPageContent() {
                     onClick={() => setPosFilter(pos)}
                     className={`px-3 py-1.5 text-[0.6rem] font-mono uppercase tracking-widest rounded-lg border whitespace-nowrap transition-colors ${posFilter === pos
                       ? 'bg-gold/15 text-gold border-gold/30 font-bold'
-                      : 'bg-white/[0.03] text-white/40 border-white/5 hover:border-white/10'
+                      : 'bg-white text-slate-400 border-slate-100 hover:border-slate-200'
                       }`}
                   >
                     {pos}
@@ -709,16 +709,16 @@ function DraftPageContent() {
             {loading && (
               <div className="flex flex-col items-center justify-center py-20 gap-3">
                 <div className="h-8 w-8 border-2 border-gold/30 border-t-gold rounded-full animate-spin" />
-                <span className="text-xs font-mono text-white/30">Loading Draft Board...</span>
+                <span className="text-xs font-mono text-slate-400">Loading Draft Board...</span>
               </div>
             )}
 
             {/* Empty State */}
             {!loading && filtered.length === 0 && (
-              <div className="bg-[#0f0f0f] border border-white/5 rounded-2xl p-12 text-center">
+              <div className="bg-[#0f0f0f] border border-slate-100 rounded-2xl p-12 text-center">
                 <Radar size={32} className="text-gold/20 mx-auto mb-4" />
-                <h3 className="text-lg font-display text-white/60 mb-2">No Prospects Indexed</h3>
-                <p className="text-xs text-white/30 font-mono max-w-md mx-auto mb-6">
+                <h3 className="text-lg font-display text-slate-500 mb-2">No Prospects Indexed</h3>
+                <p className="text-xs text-slate-400 font-mono max-w-md mx-auto mb-6">
                   The draft board is empty. Initialize the database with prospect data to populate the board.
                 </p>
                 <button
@@ -733,15 +733,15 @@ function DraftPageContent() {
 
             {/* Prospect Table */}
             {!loading && filtered.length > 0 && (
-              <div className="bg-[#0f0f0f] border border-white/5 rounded-2xl overflow-hidden">
-                <div className="hidden md:grid grid-cols-[60px_1fr_140px_80px_80px_100px_80px] gap-2 px-5 py-3 border-b border-white/[0.06] bg-white/[0.01]">
-                  <span className="text-[0.55rem] font-mono text-white/30 uppercase tracking-widest">Rank</span>
-                  <span className="text-[0.55rem] font-mono text-white/30 uppercase tracking-widest">Prospect</span>
-                  <span className="text-[0.55rem] font-mono text-white/30 uppercase tracking-widest">College</span>
-                  <span className="text-[0.55rem] font-mono text-white/30 uppercase tracking-widest">Tier</span>
-                  <span className="text-[0.55rem] font-mono text-white/30 uppercase tracking-widest">A.I.M.S. Score</span>
-                  <span className="text-[0.55rem] font-mono text-white/30 uppercase tracking-widest">Projected</span>
-                  <span className="text-[0.55rem] font-mono text-white/30 uppercase tracking-widest">Trend</span>
+              <div className="bg-[#0f0f0f] border border-slate-100 rounded-2xl overflow-hidden">
+                <div className="hidden md:grid grid-cols-[60px_1fr_140px_80px_80px_100px_80px] gap-2 px-5 py-3 border-b border-slate-200 bg-white">
+                  <span className="text-[0.55rem] font-mono text-slate-400 uppercase tracking-widest">Rank</span>
+                  <span className="text-[0.55rem] font-mono text-slate-400 uppercase tracking-widest">Prospect</span>
+                  <span className="text-[0.55rem] font-mono text-slate-400 uppercase tracking-widest">College</span>
+                  <span className="text-[0.55rem] font-mono text-slate-400 uppercase tracking-widest">Tier</span>
+                  <span className="text-[0.55rem] font-mono text-slate-400 uppercase tracking-widest">A.I.M.S. Score</span>
+                  <span className="text-[0.55rem] font-mono text-slate-400 uppercase tracking-widest">Projected</span>
+                  <span className="text-[0.55rem] font-mono text-slate-400 uppercase tracking-widest">Trend</span>
                 </div>
 
                 {filtered.map((p: any) => {
@@ -751,13 +751,13 @@ function DraftPageContent() {
                   return (
                     <div
                       key={p.id}
-                      className="grid grid-cols-1 md:grid-cols-[60px_1fr_140px_80px_80px_100px_80px] gap-2 px-5 py-3.5 border-b border-white/[0.04] hover:bg-white/[0.02] transition-colors items-center group"
+                      className="grid grid-cols-1 md:grid-cols-[60px_1fr_140px_80px_80px_100px_80px] gap-2 px-5 py-3.5 border-b border-slate-200 hover:bg-white transition-colors items-center group"
                     >
                       <div className="flex items-center gap-2 md:block">
-                        <span className="text-sm font-mono text-white/40 md:text-base group-hover:text-gold transition-colors">
+                        <span className="text-sm font-mono text-slate-400 md:text-base group-hover:text-gold transition-colors">
                           #{p.overallRank}
                         </span>
-                        <span className="md:hidden text-sm text-white font-display font-bold">
+                        <span className="md:hidden text-sm text-slate-800 font-display font-bold">
                           {p.firstName} {p.lastName}
                         </span>
                       </div>
@@ -767,32 +767,32 @@ function DraftPageContent() {
                           {p.position}
                         </span>
                         <div className="hidden md:block">
-                          <span className="text-sm text-white font-display font-medium group-hover:text-gold transition-colors">
+                          <span className="text-sm text-slate-800 font-display font-medium group-hover:text-gold transition-colors">
                             {p.firstName} {p.lastName}
                           </span>
                         </div>
                       </div>
 
                       <div>
-                        <span className="md:hidden text-[0.55rem] font-mono text-white/25 uppercase mr-2">College</span>
-                        <span className="text-xs text-white/50">{p.college}</span>
+                        <span className="md:hidden text-[0.55rem] font-mono text-slate-400 uppercase mr-2">College</span>
+                        <span className="text-xs text-slate-500">{p.college}</span>
                       </div>
 
                       <div>
-                        <span className="md:hidden text-[0.55rem] font-mono text-white/25 uppercase mr-2">Tier</span>
+                        <span className="md:hidden text-[0.55rem] font-mono text-slate-400 uppercase mr-2">Tier</span>
                         <span className={`text-[0.6rem] font-mono ${tierStyle.text}`}>{tierStyle.label}</span>
                       </div>
 
                       <div>
-                        <span className="md:hidden text-[0.55rem] font-mono text-white/25 uppercase mr-2">A.I.M.S.</span>
+                        <span className="md:hidden text-[0.55rem] font-mono text-slate-400 uppercase mr-2">A.I.M.S.</span>
                         <span className={`text-sm font-mono font-bold ${getScoreColor(p.paiScore)}`}>
                           {p.paiScore}
                         </span>
                       </div>
 
                       <div>
-                        <span className="md:hidden text-[0.55rem] font-mono text-white/25 uppercase mr-2">Proj</span>
-                        <span className="text-xs font-mono text-white/40">
+                        <span className="md:hidden text-[0.55rem] font-mono text-slate-400 uppercase mr-2">Proj</span>
+                        <span className="text-xs font-mono text-slate-400">
                           {p.projectedRound ? `Rd ${p.projectedRound}${p.projectedPick ? ` (#${p.projectedPick})` : ''}` : '—'}
                         </span>
                       </div>
@@ -817,7 +817,7 @@ function DraftPageContent() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <BarChart3 className="h-5 w-5 text-emerald-400" />
-                  <h2 className="text-xl font-display font-bold text-white tracking-tight">Latest Mock Draft</h2>
+                  <h2 className="text-xl font-display font-bold text-slate-800 tracking-tight">Latest Mock Draft</h2>
                 </div>
                 <Link
                   href="/sandbox/perform/draft/mock"
@@ -827,25 +827,25 @@ function DraftPageContent() {
                 </Link>
               </div>
 
-              <div className="bg-[#0f0f0f] border border-white/5 rounded-2xl overflow-hidden">
+              <div className="bg-[#0f0f0f] border border-slate-100 rounded-2xl overflow-hidden">
                 {mockDraft.picks.slice(0, 10).map((pick: any) => {
                   const tierStyle = DRAFT_TIER_STYLES[pick.prospect?.tier as DraftTier] || DRAFT_TIER_STYLES.DAY_3;
                   return (
                     <div
                       key={pick.id}
-                      className="flex items-center gap-4 px-5 py-3 border-b border-white/[0.04] last:border-b-0 hover:bg-white/[0.02] transition-colors group"
+                      className="flex items-center gap-4 px-5 py-3 border-b border-slate-200 last:border-b-0 hover:bg-white transition-colors group"
                     >
-                      <span className="text-sm font-mono text-white/30 w-10 group-hover:text-gold transition-colors">
+                      <span className="text-sm font-mono text-slate-400 w-10 group-hover:text-gold transition-colors">
                         #{pick.overall}
                       </span>
-                      <span className="text-xs text-white/50 w-36 truncate">{pick.teamName}</span>
+                      <span className="text-xs text-slate-500 w-36 truncate">{pick.teamName}</span>
                       <span className={`text-[0.6rem] font-mono px-1.5 py-0.5 rounded ${tierStyle.bg} ${tierStyle.border} ${tierStyle.text} border`}>
                         {pick.prospect?.position}
                       </span>
-                      <span className="text-sm text-white font-display font-medium flex-1">
+                      <span className="text-sm text-slate-800 font-display font-medium flex-1">
                         {pick.prospect?.firstName} {pick.prospect?.lastName}
                       </span>
-                      <span className="text-xs text-white/30 hidden sm:block">{pick.prospect?.college}</span>
+                      <span className="text-xs text-slate-400 hidden sm:block">{pick.prospect?.college}</span>
                       <span className={`text-xs font-mono font-bold ${getScoreColor(pick.prospect?.paiScore || 0)}`}>
                         {pick.prospect?.paiScore}
                       </span>
@@ -864,7 +864,7 @@ function DraftPageContent() {
           then resumes scrolling with merged data.
           ═══════════════════════════════════════════════════════════ */}
       {newsItems.length > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#111]/95 backdrop-blur-lg border-t border-gold/20">
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-lg border-t border-gold/20">
           <div className="flex items-center h-10">
             {/* Label */}
             <div className="px-4 h-full flex items-center gap-2 bg-gold shrink-0">
@@ -883,7 +883,7 @@ function DraftPageContent() {
                   className="h-full flex items-center gap-2 px-4 bg-red-600 shrink-0 overflow-hidden"
                 >
                   <div className="h-2 w-2 bg-white rounded-full animate-pulse" />
-                  <span className="text-[0.55rem] font-mono uppercase tracking-[0.2em] text-white font-black whitespace-nowrap">UPDATE</span>
+                  <span className="text-[0.55rem] font-mono uppercase tracking-[0.2em] text-slate-800 font-black whitespace-nowrap">UPDATE</span>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -902,8 +902,8 @@ function DraftPageContent() {
                     className="flex items-center gap-3 h-10 px-4"
                   >
                     <span className="text-red-400 font-mono font-bold text-[0.6rem] uppercase tracking-widest animate-pulse">NEW →</span>
-                    <span className="text-sm text-white font-sans">{tickerInterrupt.headline}</span>
-                    <span className="text-[0.5rem] font-mono text-white/30 ml-2">{tickerInterrupt.source}</span>
+                    <span className="text-sm text-slate-800 font-sans">{tickerInterrupt.headline}</span>
+                    <span className="text-[0.5rem] font-mono text-slate-400 ml-2">{tickerInterrupt.source}</span>
                   </motion.div>
                 ) : (
                   /* Normal: scrolling headlines */
@@ -921,12 +921,12 @@ function DraftPageContent() {
                         <span className={`font-mono font-bold uppercase tracking-wider ${item.type === 'combine' ? 'text-blue-400' :
                           item.type === 'projection' ? 'text-gold' :
                             item.type === 'general' ? 'text-emerald-400' :
-                              'text-white/50'
+                              'text-slate-500'
                           }`}>
                           {item.type === 'projection' ? '📊' : item.type === 'combine' ? '🏋️' : '📰'}
                         </span>
-                        <span className="text-white/80">{item.headline}</span>
-                        <span className="text-white/20 font-mono text-[0.5rem]">{item.source}</span>
+                        <span className="text-slate-700">{item.headline}</span>
+                        <span className="text-slate-300 font-mono text-[0.5rem]">{item.source}</span>
                         <span className="text-gold/30">•</span>
                       </span>
                     ))}

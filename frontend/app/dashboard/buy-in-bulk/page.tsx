@@ -99,7 +99,7 @@ function ShoppingListBuilder({
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <ShoppingCart className="w-5 h-5 text-gold" />
-          <h2 className="text-lg font-semibold text-white">Shopping List</h2>
+          <h2 className="text-lg font-semibold text-slate-800">Shopping List</h2>
         </div>
         <button
           onClick={onAdd}
@@ -112,9 +112,9 @@ function ShoppingListBuilder({
 
       {items.length === 0 ? (
         <div className="text-center py-8">
-          <ShoppingCart className="w-10 h-10 text-white/15 mx-auto mb-3" />
-          <p className="text-sm text-white/40">Add items for Boomer_Angs to scout</p>
-          <p className="text-xs text-white/25 mt-1">They&apos;ll find the best prices across retailers</p>
+          <ShoppingCart className="w-10 h-10 text-slate-300 mx-auto mb-3" />
+          <p className="text-sm text-slate-400">Add items for Boomer_Angs to scout</p>
+          <p className="text-xs text-slate-400 mt-1">They&apos;ll find the best prices across retailers</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -132,33 +132,33 @@ function ShoppingListBuilder({
                   value={item.name}
                   onChange={(e) => onUpdate(item.id, { name: e.target.value })}
                   placeholder="Product name or description..."
-                  className="w-full bg-transparent text-sm text-white outline-none placeholder:text-white/25"
+                  className="w-full bg-transparent text-sm text-slate-800 outline-none placeholder:text-slate-400"
                 />
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
-                <div className="flex items-center gap-1 bg-white/5 rounded-lg px-2 py-1">
-                  <span className="text-[10px] text-white/30">Qty</span>
+                <div className="flex items-center gap-1 bg-slate-50 rounded-lg px-2 py-1">
+                  <span className="text-[10px] text-slate-400">Qty</span>
                   <input
                     type="number"
                     value={item.quantity}
                     onChange={(e) => onUpdate(item.id, { quantity: Math.max(1, parseInt(e.target.value) || 1) })}
                     min="1"
-                    className="w-10 bg-transparent text-sm text-white text-center outline-none"
+                    className="w-10 bg-transparent text-sm text-slate-800 text-center outline-none"
                   />
                 </div>
-                <div className="flex items-center gap-1 bg-white/5 rounded-lg px-2 py-1">
-                  <DollarSign className="w-3 h-3 text-white/30" />
+                <div className="flex items-center gap-1 bg-slate-50 rounded-lg px-2 py-1">
+                  <DollarSign className="w-3 h-3 text-slate-400" />
                   <input
                     type="number"
                     value={item.maxPrice || ''}
                     onChange={(e) => onUpdate(item.id, { maxPrice: parseFloat(e.target.value) || null })}
                     placeholder="Max"
-                    className="w-16 bg-transparent text-sm text-white outline-none placeholder:text-white/25"
+                    className="w-16 bg-transparent text-sm text-slate-800 outline-none placeholder:text-slate-400"
                   />
                 </div>
                 <button
                   onClick={() => onRemove(item.id)}
-                  className="p-1.5 text-white/30 hover:text-red-400 transition-colors"
+                  className="p-1.5 text-slate-400 hover:text-red-400 transition-colors"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -190,20 +190,20 @@ function MissionPreferences({
     <div className="wireframe-card p-6">
       <div className="flex items-center gap-2 mb-4">
         <Settings className="w-5 h-5 text-gold" />
-        <h2 className="text-lg font-semibold text-white">Mission Preferences</h2>
+        <h2 className="text-lg font-semibold text-slate-800">Mission Preferences</h2>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Budget */}
         <div>
-          <label className="block text-xs text-white/40 mb-2">Total Budget</label>
+          <label className="block text-xs text-slate-400 mb-2">Total Budget</label>
           <div className="flex items-center gap-2 bg-white/3 border border-wireframe-stroke rounded-lg px-3 py-2">
             <DollarSign className="w-4 h-4 text-gold/60" />
             <input
               type="number"
               value={budget}
               onChange={(e) => setBudget(Math.max(0, parseFloat(e.target.value) || 0))}
-              className="w-full bg-transparent text-white text-sm outline-none"
+              className="w-full bg-transparent text-slate-800 text-sm outline-none"
               placeholder="500.00"
             />
           </div>
@@ -211,7 +211,7 @@ function MissionPreferences({
 
         {/* Shipping Speed */}
         <div>
-          <label className="block text-xs text-white/40 mb-2">Shipping</label>
+          <label className="block text-xs text-slate-400 mb-2">Shipping</label>
           <div className="flex gap-1">
             {([
               { value: 'fastest', label: 'Fastest', icon: Zap },
@@ -224,7 +224,7 @@ function MissionPreferences({
                 className={`flex-1 flex flex-col items-center gap-1 py-2 px-1 rounded-lg text-xs transition-all ${
                   shippingSpeed === opt.value
                     ? 'bg-gold/10 text-gold border border-gold/30'
-                    : 'bg-white/3 text-white/40 border border-wireframe-stroke hover:bg-white/5'
+                    : 'bg-white/3 text-slate-400 border border-wireframe-stroke hover:bg-slate-50'
                 }`}
               >
                 <opt.icon className="w-3.5 h-3.5" />
@@ -236,7 +236,7 @@ function MissionPreferences({
 
         {/* Quality */}
         <div>
-          <label className="block text-xs text-white/40 mb-2">Quality</label>
+          <label className="block text-xs text-slate-400 mb-2">Quality</label>
           <div className="flex gap-1">
             {([
               { value: 'budget', label: 'Budget' },
@@ -249,7 +249,7 @@ function MissionPreferences({
                 className={`flex-1 py-2 rounded-lg text-xs transition-all ${
                   quality === opt.value
                     ? 'bg-gold/10 text-gold border border-gold/30'
-                    : 'bg-white/3 text-white/40 border border-wireframe-stroke hover:bg-white/5'
+                    : 'bg-white/3 text-slate-400 border border-wireframe-stroke hover:bg-slate-50'
                 }`}
               >
                 {opt.label}
@@ -267,7 +267,7 @@ function RetailerPanel() {
     <div className="wireframe-card p-6">
       <div className="flex items-center gap-2 mb-4">
         <Package className="w-5 h-5 text-gold" />
-        <h2 className="text-lg font-semibold text-white">Supported Retailers</h2>
+        <h2 className="text-lg font-semibold text-slate-800">Supported Retailers</h2>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -283,9 +283,9 @@ function RetailerPanel() {
             <div className="flex items-center gap-3 mb-3">
               <span className="text-2xl">{retailer.icon}</span>
               <div>
-                <h3 className="text-sm font-medium text-white">{retailer.name}</h3>
+                <h3 className="text-sm font-medium text-slate-800">{retailer.name}</h3>
                 <span className={`text-[10px] font-mono uppercase ${
-                  retailer.enabled ? 'text-emerald-400' : 'text-white/30'
+                  retailer.enabled ? 'text-emerald-400' : 'text-slate-400'
                 }`}>
                   {retailer.enabled ? 'Active' : 'Coming Soon'}
                 </span>
@@ -293,7 +293,7 @@ function RetailerPanel() {
             </div>
             <div className="space-y-1">
               {retailer.features.map((feat, i) => (
-                <div key={i} className="flex items-center gap-1.5 text-xs text-white/50">
+                <div key={i} className="flex items-center gap-1.5 text-xs text-slate-500">
                   <CheckCircle className="w-3 h-3 text-emerald-500/60 flex-shrink-0" />
                   {feat}
                 </div>
@@ -311,8 +311,8 @@ function DealScout() {
     <div className="wireframe-card p-6">
       <div className="flex items-center gap-2 mb-4">
         <TrendingDown className="w-5 h-5 text-emerald-400" />
-        <h2 className="text-lg font-semibold text-white">Deal Scout</h2>
-        <span className="ml-auto text-xs text-white/30">AI-discovered deals</span>
+        <h2 className="text-lg font-semibold text-slate-800">Deal Scout</h2>
+        <span className="ml-auto text-xs text-slate-400">AI-discovered deals</span>
       </div>
 
       <div className="space-y-3">
@@ -323,9 +323,9 @@ function DealScout() {
           >
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1">
-                <h3 className="text-sm font-medium text-white">{deal.product}</h3>
+                <h3 className="text-sm font-medium text-slate-800">{deal.product}</h3>
                 <div className="flex items-center gap-2 mt-1">
-                  <span className="text-xs text-white/40">{deal.retailer}</span>
+                  <span className="text-xs text-slate-400">{deal.retailer}</span>
                   {deal.prime && (
                     <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">Prime</span>
                   )}
@@ -336,7 +336,7 @@ function DealScout() {
                 </div>
               </div>
               <div className="text-right flex-shrink-0">
-                <div className="text-sm text-white/40 line-through">${deal.originalPrice.toFixed(2)}</div>
+                <div className="text-sm text-slate-400 line-through">${deal.originalPrice.toFixed(2)}</div>
                 <div className="text-lg font-bold text-emerald-400">${deal.salePrice.toFixed(2)}</div>
                 <div className="text-xs font-medium text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">
                   {deal.discount}% off
@@ -357,8 +357,8 @@ function SecurityBanner() {
         <Shield className="w-5 h-5 text-emerald-400 flex-shrink-0" />
         <div>
           <h3 className="text-sm font-medium text-emerald-400">Secure by Design</h3>
-          <p className="text-xs text-white/40 mt-0.5">
-            Boomer_Angs <strong className="text-white/60">never</strong> access payment info. They scout, compare, and report.
+          <p className="text-xs text-slate-400 mt-0.5">
+            Boomer_Angs <strong className="text-slate-500">never</strong> access payment info. They scout, compare, and report.
             ACHEEVY handles all payments with your explicit approval.
           </p>
         </div>
@@ -384,7 +384,7 @@ function MissionLauncher({
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-semibold text-gold">Ready to Scout?</h2>
-          <p className="text-xs text-white/40 mt-1">
+          <p className="text-xs text-slate-400 mt-1">
             {validItems.length} items | Budget: ${budget.toFixed(2)} | Boomer_Angs will find the best deals
           </p>
         </div>
@@ -394,7 +394,7 @@ function MissionLauncher({
           className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-medium transition-all ${
             canLaunch
               ? 'bg-gold text-black hover:bg-gold/90 shadow-[0_0_20px_rgba(212,175,55,0.3)]'
-              : 'bg-white/10 text-white/30 cursor-not-allowed'
+              : 'bg-slate-100 text-slate-400 cursor-not-allowed'
           }`}
         >
           <Search className="w-4 h-4" />
@@ -456,11 +456,11 @@ export default function BuyInBulkPage() {
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-[0_0_20px_rgba(16,185,129,0.3)]">
-            <ShoppingCart className="w-6 h-6 text-white" />
+            <ShoppingCart className="w-6 h-6 text-slate-800" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-white">Buy in Bulk</h1>
-            <p className="text-sm text-white/40">AI shopping assistant — deals at scale</p>
+            <h1 className="text-2xl font-bold text-slate-800">Buy in Bulk</h1>
+            <p className="text-sm text-slate-400">AI shopping assistant — deals at scale</p>
           </div>
         </div>
 
@@ -488,7 +488,7 @@ export default function BuyInBulkPage() {
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
               activeTab === tab.id
                 ? 'bg-gold/10 text-gold border border-gold/30'
-                : 'text-white/50 border border-transparent hover:bg-white/5'
+                : 'text-slate-500 border border-transparent hover:bg-slate-50'
             }`}
           >
             <tab.icon className="w-4 h-4" />
@@ -528,20 +528,20 @@ export default function BuyInBulkPage() {
               >
                 <Users className="w-8 h-8 text-gold" />
               </motion.div>
-              <h2 className="text-xl font-bold text-white mb-2">Mission Launched!</h2>
-              <p className="text-sm text-white/40 max-w-md mx-auto mb-6">
+              <h2 className="text-xl font-bold text-slate-800 mb-2">Mission Launched!</h2>
+              <p className="text-sm text-slate-400 max-w-md mx-auto mb-6">
                 Boomer_Angs are scouting {items.filter(i => i.name.trim()).length} items across {RETAILERS.filter(r => r.enabled).length} retailers.
                 They&apos;ll report back with the best deals and bulk pricing options.
               </p>
               <div className="flex items-center justify-center gap-4">
-                <div className="flex items-center gap-2 text-sm text-white/40">
+                <div className="flex items-center gap-2 text-sm text-slate-400">
                   <div className="w-2 h-2 rounded-full bg-gold animate-pulse" />
                   Scouting in progress...
                 </div>
               </div>
               <button
                 onClick={() => setMissionLaunched(false)}
-                className="mt-6 px-4 py-2 rounded-lg text-sm text-white/50 hover:text-white border border-wireframe-stroke hover:bg-white/5 transition-all"
+                className="mt-6 px-4 py-2 rounded-lg text-sm text-slate-500 hover:text-slate-800 border border-wireframe-stroke hover:bg-slate-50 transition-all"
               >
                 Start New Mission
               </button>
@@ -556,9 +556,9 @@ export default function BuyInBulkPage() {
 
       {activeTab === 'alerts' && (
         <div className="wireframe-card p-8 text-center">
-          <Bell className="w-12 h-12 text-white/20 mx-auto mb-4" />
-          <h2 className="text-lg font-medium text-white mb-2">Price Alerts</h2>
-          <p className="text-sm text-white/40 max-w-md mx-auto mb-6">
+          <Bell className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+          <h2 className="text-lg font-medium text-slate-800 mb-2">Price Alerts</h2>
+          <p className="text-sm text-slate-400 max-w-md mx-auto mb-6">
             Set alerts for products you&apos;re watching. Boomer_Angs will notify you when prices drop to your target.
           </p>
           <button className="px-6 py-3 rounded-xl bg-gold text-black text-sm font-medium hover:bg-gold/90 transition-colors">
@@ -569,9 +569,9 @@ export default function BuyInBulkPage() {
 
       {activeTab === 'history' && (
         <div className="wireframe-card p-8 text-center">
-          <Clock className="w-12 h-12 text-white/20 mx-auto mb-4" />
-          <h2 className="text-lg font-medium text-white mb-2">Mission History</h2>
-          <p className="text-sm text-white/40 max-w-md mx-auto">
+          <Clock className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+          <h2 className="text-lg font-medium text-slate-800 mb-2">Mission History</h2>
+          <p className="text-sm text-slate-400 max-w-md mx-auto">
             Your completed shopping missions will appear here. Launch your first mission to get started!
           </p>
         </div>

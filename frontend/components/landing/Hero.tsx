@@ -83,7 +83,7 @@ export function Hero() {
   const isLore = useIsLandingDomain();
 
   return (
-    <section className="relative flex flex-col items-center bg-ink min-h-[90vh]">
+    <section className="relative flex flex-col items-center bg-[#F8FAFC] min-h-[90vh]">
       {/* Hero background — domain-aware */}
       <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
         <Image
@@ -135,7 +135,7 @@ export function Hero() {
 
           {/* A.I.M.S. — Permanent Marker font (embossed wordmark) */}
           <h1
-            className="text-6xl md:text-8xl lg:text-9xl mb-4 text-white/90 tracking-[0.08em]"
+            className="text-6xl md:text-8xl lg:text-9xl mb-4 text-slate-800 tracking-[0.08em]"
             style={{
               fontFamily: 'var(--font-marker), "Permanent Marker", cursive',
               textShadow: '0 2px 40px rgba(212,168,67,0.2), 0 0 60px rgba(212,168,67,0.08)',
@@ -154,7 +154,7 @@ export function Hero() {
             AI Managed Solutions
           </h2>
 
-          <p className="text-base md:text-xl text-white/75 max-w-lg mx-auto leading-relaxed">
+          <p className="text-base md:text-xl text-slate-600 max-w-lg mx-auto leading-relaxed">
             I&apos;m ACHEEVY, at your service.<br />
             {isLore ? 'What will we deploy today?' : 'Your AI-managed operations platform.'}
           </p>
@@ -200,13 +200,13 @@ export function Hero() {
                         >
                           {step.label}
                         </h4>
-                        <p className="text-xs md:text-sm text-white/55">{step.desc}</p>
+                        <p className="text-xs md:text-sm text-slate-2005">{step.desc}</p>
                       </div>
                     </Link>
                     {/* Connector arrow (hidden on last) */}
                     {i < ACTION_CHAIN.length - 1 && (
                       <div className="hidden md:flex absolute -right-3 top-1/2 -translate-y-1/2 z-10">
-                        <ArrowRight className="w-4 h-4 text-white/30" />
+                        <ArrowRight className="w-4 h-4 text-slate-400" />
                       </div>
                     )}
                   </motion.div>
@@ -240,12 +240,12 @@ export function Hero() {
                     />
                   </div>
                   <h3
-                    className="text-2xl md:text-3xl font-bold text-white mb-3 group-hover:text-gold transition-colors"
+                    className="text-2xl md:text-3xl font-bold text-slate-800 mb-3 group-hover:text-gold transition-colors"
                     style={{ fontFamily: 'var(--font-display, "Doto", monospace)' }}
                   >
                     Chat w/ACHEEVY
                   </h3>
-                  <p className="text-base md:text-lg text-white/65 mb-4 max-w-md mx-auto">
+                  <p className="text-base md:text-lg text-slate-500 mb-4 max-w-md mx-auto">
                     Your AI executive orchestrator. Tell ACHEEVY what you need — the team handles the rest.
                   </p>
                   <span
@@ -269,12 +269,12 @@ export function Hero() {
                     </div>
                     <div>
                       <h3
-                        className="text-lg md:text-xl font-bold text-white mb-1.5 group-hover:text-gold transition-colors"
+                        className="text-lg md:text-xl font-bold text-slate-800 mb-1.5 group-hover:text-gold transition-colors"
                         style={{ fontFamily: 'var(--font-display, "Doto", monospace)' }}
                       >
                         Mission Control
                       </h3>
-                      <p className="text-sm md:text-base text-white/60 leading-relaxed">
+                      <p className="text-sm md:text-base text-slate-500 leading-relaxed">
                         Your operational dashboard. Monitor services, deploy apps, manage your AI fleet.
                       </p>
                     </div>
@@ -291,12 +291,12 @@ export function Hero() {
                     </div>
                     <div>
                       <h3
-                        className="text-lg md:text-xl font-bold text-white mb-1.5 group-hover:text-emerald-400 transition-colors"
+                        className="text-lg md:text-xl font-bold text-slate-800 mb-1.5 group-hover:text-emerald-400 transition-colors"
                         style={{ fontFamily: 'var(--font-display, "Doto", monospace)' }}
                       >
                         Deploy Your Apps
                       </h3>
-                      <p className="text-sm md:text-base text-white/60 leading-relaxed">
+                      <p className="text-sm md:text-base text-slate-500 leading-relaxed">
                         Managed Vibe Coding. Conversate your way to a working aiPLUG.
                       </p>
                     </div>
@@ -318,12 +318,12 @@ export function Hero() {
                     <div className="wireframe-card p-4 text-center hover:border-gold/30 hover:shadow-[0_0_20px_rgba(212,175,55,0.05)] transition-all duration-500">
                       <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">{cap.icon}</div>
                       <h4
-                        className="text-sm font-bold text-white/80 mb-0.5 group-hover:text-gold transition-colors"
+                        className="text-sm font-bold text-slate-700 mb-0.5 group-hover:text-gold transition-colors"
                         style={{ fontFamily: 'var(--font-display, "Doto", monospace)' }}
                       >
                         {cap.label}
                       </h4>
-                      <p className="text-xs text-white/50">{cap.desc}</p>
+                      <p className="text-xs text-slate-500">{cap.desc}</p>
                     </div>
                   </Link>
                 ))}
@@ -366,12 +366,12 @@ export function Hero() {
                     />
                   </div>
                   <h3
-                    className="text-2xl md:text-3xl font-bold text-white mb-3 group-hover:text-gold transition-colors"
+                    className="text-2xl md:text-3xl font-bold text-slate-800 mb-3 group-hover:text-gold transition-colors"
                     style={{ fontFamily: 'var(--font-display, "Doto", monospace)' }}
                   >
                     Chat w/ACHEEVY
                   </h3>
-                  <p className="text-base md:text-lg text-white/65 mb-4">
+                  <p className="text-base md:text-lg text-slate-500 mb-4">
                     Your AI executive orchestrator. Tell ACHEEVY what you need — the team handles the rest.
                   </p>
                   <span
@@ -389,7 +389,7 @@ export function Hero() {
               <motion.div variants={staggerItem}>
                 <a href={`${APP_DOMAIN}/dashboard`} className="group block h-full">
                   <div className="wireframe-card p-6 md:p-7 flex items-center gap-5 hover:border-gold/30 hover:shadow-[0_0_30px_rgba(212,175,55,0.06)] transition-all duration-500 h-full">
-                    <div className="w-20 h-20 md:w-24 md:h-24 rounded-xl overflow-hidden flex-shrink-0 border border-white/[0.06] group-hover:border-gold/20 transition-colors">
+                    <div className="w-20 h-20 md:w-24 md:h-24 rounded-xl overflow-hidden flex-shrink-0 border border-slate-200 group-hover:border-gold/20 transition-colors">
                       <Image
                         src="/images/boomerangs/ACHEEVY and the Boomer_Angs in a Hanger.png"
                         alt="Boomer_Angs, Chicken Hawk and Lil_Hawks"
@@ -400,12 +400,12 @@ export function Hero() {
                     </div>
                     <div>
                       <h3
-                        className="text-lg md:text-xl font-bold text-white mb-1.5 group-hover:text-gold transition-colors"
+                        className="text-lg md:text-xl font-bold text-slate-800 mb-1.5 group-hover:text-gold transition-colors"
                         style={{ fontFamily: 'var(--font-display, "Doto", monospace)' }}
                       >
                         Automate Everything
                       </h3>
-                      <p className="text-sm md:text-base text-white/60 leading-relaxed">
+                      <p className="text-sm md:text-base text-slate-500 leading-relaxed">
                         Deploy Boomer_Angs, Chicken Hawk &amp; Lil_Hawks to orchestrate your workflows.
                       </p>
                     </div>
@@ -416,7 +416,7 @@ export function Hero() {
               <motion.div variants={staggerItem}>
                 <a href={`${APP_DOMAIN}/chat`} className="group block h-full">
                   <div className="wireframe-card p-6 md:p-7 flex items-center gap-5 hover:border-gold/30 hover:shadow-[0_0_30px_rgba(212,175,55,0.06)] transition-all duration-500 h-full">
-                    <div className="w-20 h-20 md:w-24 md:h-24 rounded-xl overflow-hidden flex-shrink-0 border border-white/[0.06] group-hover:border-gold/20 transition-colors">
+                    <div className="w-20 h-20 md:w-24 md:h-24 rounded-xl overflow-hidden flex-shrink-0 border border-slate-200 group-hover:border-gold/20 transition-colors">
                       <Image
                         src="/images/boomerangs/Boomer_ang on Assignment.JPG"
                         alt="Boomer_Angs at the port"
@@ -427,12 +427,12 @@ export function Hero() {
                     </div>
                     <div>
                       <h3
-                        className="text-lg md:text-xl font-bold text-white mb-1.5 group-hover:text-gold transition-colors"
+                        className="text-lg md:text-xl font-bold text-slate-800 mb-1.5 group-hover:text-gold transition-colors"
                         style={{ fontFamily: 'var(--font-display, "Doto", monospace)' }}
                       >
                         Deploy Your Apps
                       </h3>
-                      <p className="text-sm md:text-base text-white/60 leading-relaxed">
+                      <p className="text-sm md:text-base text-slate-500 leading-relaxed">
                         Managed Vibe Coding. Conversate your way to a working aiPLUG.
                       </p>
                     </div>
@@ -445,7 +445,7 @@ export function Hero() {
             <motion.div variants={staggerItem} className="flex items-center gap-3 w-full max-w-4xl mt-6">
               <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
               <span
-                className="text-sm tracking-[0.3em] uppercase text-white/50"
+                className="text-sm tracking-[0.3em] uppercase text-slate-500"
                 style={{ fontFamily: 'var(--font-doto), "Doto", monospace' }}
               >
                 Explore
@@ -459,12 +459,12 @@ export function Hero() {
                   <div className="wireframe-card p-6 text-center hover:border-purple-500/30 hover:shadow-[0_0_30px_rgba(147,51,234,0.06)] transition-all duration-500 h-full">
                     <div className="text-4xl mb-3">📖</div>
                     <h3
-                      className="text-base md:text-lg font-bold text-white mb-1.5 group-hover:text-purple-400 transition-colors"
+                      className="text-base md:text-lg font-bold text-slate-800 mb-1.5 group-hover:text-purple-400 transition-colors"
                       style={{ fontFamily: 'var(--font-display, "Doto", monospace)' }}
                     >
                       The Book of V.I.B.E.
                     </h3>
-                    <p className="text-sm text-white/55">
+                    <p className="text-sm text-slate-2005">
                       An Afrofuturist saga of Achievmor &mdash; the canonical origin of the V.I.B.E. universe. 12 chapters.
                     </p>
                   </div>
@@ -476,12 +476,12 @@ export function Hero() {
                   <div className="wireframe-card p-6 text-center hover:border-cyan-500/30 hover:shadow-[0_0_30px_rgba(6,182,212,0.06)] transition-all duration-500 h-full">
                     <div className="text-4xl mb-3">🖼</div>
                     <h3
-                      className="text-base md:text-lg font-bold text-white mb-1.5 group-hover:text-cyan-400 transition-colors"
+                      className="text-base md:text-lg font-bold text-slate-800 mb-1.5 group-hover:text-cyan-400 transition-colors"
                       style={{ fontFamily: 'var(--font-display, "Doto", monospace)' }}
                     >
                       Character Gallery
                     </h3>
-                    <p className="text-sm text-white/55">
+                    <p className="text-sm text-slate-2005">
                       Aether Vos, The Elder, ACHEEVY &mdash; the full V.I.B.E. roster and the seven peoples of Achievmor.
                     </p>
                   </div>
@@ -493,12 +493,12 @@ export function Hero() {
                   <div className="wireframe-card p-6 text-center hover:border-gold/30 hover:shadow-[0_0_30px_rgba(212,175,55,0.06)] transition-all duration-500 h-full">
                     <div className="text-4xl mb-3">🛍</div>
                     <h3
-                      className="text-base md:text-lg font-bold text-white mb-1.5 group-hover:text-gold transition-colors"
+                      className="text-base md:text-lg font-bold text-slate-800 mb-1.5 group-hover:text-gold transition-colors"
                       style={{ fontFamily: 'var(--font-display, "Doto", monospace)' }}
                     >
                       Merch Store
                     </h3>
-                    <p className="text-sm text-white/55">
+                    <p className="text-sm text-slate-2005">
                       Rep the V.I.B.E. &mdash; apparel, gear, and collectibles from the Aether.
                     </p>
                   </div>

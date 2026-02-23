@@ -194,7 +194,7 @@ export function NixieTubeDisplay({
   return (
     <div className="flex flex-col items-center gap-2">
       {label && (
-        <span className="text-xs uppercase tracking-wider text-white/40 font-medium">
+        <span className="text-xs uppercase tracking-wider text-slate-400 font-medium">
           {label}
         </span>
       )}
@@ -264,7 +264,7 @@ export function NixieStatsPanel({ stats, size = 'sm', className = '' }: NixieSta
     <div
       className={`
         flex flex-wrap gap-6 p-4 rounded-xl
-        bg-gradient-to-b from-zinc-900/95 to-black
+        bg-gradient-to-b from-zinc-900/95 to-white
         border border-zinc-800/50
         backdrop-blur-sm
         ${className}

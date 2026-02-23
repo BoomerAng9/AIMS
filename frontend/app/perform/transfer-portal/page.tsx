@@ -64,11 +64,11 @@ function KpiCard({
   color: string;
 }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-black/60 backdrop-blur-md p-4 flex items-center gap-3">
+    <div className="rounded-xl border border-slate-200 bg-slate-50/70 backdrop-blur-md p-4 flex items-center gap-3">
       <div className={`rounded-lg p-2 ${color}`}>{icon}</div>
       <div>
-        <p className="text-2xl font-bold text-white">{value}</p>
-        <p className="text-xs text-white/50 uppercase tracking-wider">{label}</p>
+        <p className="text-2xl font-bold text-slate-800">{value}</p>
+        <p className="text-xs text-slate-500 uppercase tracking-wider">{label}</p>
       </div>
     </div>
   );
@@ -81,7 +81,7 @@ function StarRating({ count }: { count: number }) {
         <Star
           key={i}
           className={`w-3.5 h-3.5 ${
-            i < count ? "text-gold fill-gold" : "text-white/15"
+            i < count ? "text-gold fill-gold" : "text-slate-300"
           }`}
         />
       ))}
@@ -91,14 +91,14 @@ function StarRating({ count }: { count: number }) {
 
 function SkeletonRow() {
   return (
-    <div className="rounded-xl border border-white/10 bg-black/60 backdrop-blur-md p-4 md:p-5 animate-pulse">
+    <div className="rounded-xl border border-slate-200 bg-slate-50/70 backdrop-blur-md p-4 md:p-5 animate-pulse">
       <div className="flex items-center gap-4">
-        <div className="h-10 w-10 rounded-full bg-white/10" />
+        <div className="h-10 w-10 rounded-full bg-slate-100" />
         <div className="flex-1 space-y-2">
-          <div className="h-4 w-1/2 rounded bg-white/10" />
-          <div className="h-3 w-3/4 rounded bg-white/5" />
+          <div className="h-4 w-1/2 rounded bg-slate-100" />
+          <div className="h-3 w-3/4 rounded bg-slate-50" />
         </div>
-        <div className="h-6 w-20 rounded-full bg-white/10" />
+        <div className="h-6 w-20 rounded-full bg-slate-100" />
       </div>
     </div>
   );
@@ -154,7 +154,7 @@ export default function TransferPortalPage() {
         >
           Transfer Portal
         </h1>
-        <p className="mt-2 text-sm md:text-base text-white/50 max-w-xl mx-auto">
+        <p className="mt-2 text-sm md:text-base text-slate-500 max-w-xl mx-auto">
           Every portal entry, commitment, and withdrawal tracked in real time across all NCAA D1 programs.
         </p>
       </div>
@@ -165,7 +165,7 @@ export default function TransferPortalPage() {
           label="Total Entries"
           value={stats?.total ?? 0}
           icon={<ArrowRightLeft className="w-5 h-5" />}
-          color="bg-white/10 text-white"
+          color="bg-slate-100 text-slate-800"
         />
         <KpiCard
           label="In Portal"
@@ -200,15 +200,15 @@ export default function TransferPortalPage() {
           <select
             value={season}
             onChange={(e) => setSeason(Number(e.target.value))}
-            className="appearance-none rounded-lg border border-white/10 bg-black/60 backdrop-blur-md px-4 py-2 pr-8 text-sm text-white/80 focus:outline-none focus:border-gold/40 transition-colors cursor-pointer"
+            className="appearance-none rounded-lg border border-slate-200 bg-slate-50/70 backdrop-blur-md px-4 py-2 pr-8 text-sm text-slate-700 focus:outline-none focus:border-gold/40 transition-colors cursor-pointer"
           >
             {SEASONS.map((s) => (
-              <option key={s} value={s} className="bg-[#0A0A0A]">
+              <option key={s} value={s} className="bg-white">
                 {s} Season
               </option>
             ))}
           </select>
-          <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/40 pointer-events-none" />
+          <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
         </div>
 
         {/* Status */}
@@ -216,15 +216,15 @@ export default function TransferPortalPage() {
           <select
             value={status}
             onChange={(e) => setStatus(e.target.value)}
-            className="appearance-none rounded-lg border border-white/10 bg-black/60 backdrop-blur-md px-4 py-2 pr-8 text-sm text-white/80 focus:outline-none focus:border-gold/40 transition-colors cursor-pointer"
+            className="appearance-none rounded-lg border border-slate-200 bg-slate-50/70 backdrop-blur-md px-4 py-2 pr-8 text-sm text-slate-700 focus:outline-none focus:border-gold/40 transition-colors cursor-pointer"
           >
             {STATUSES.map((s) => (
-              <option key={s.value} value={s.value} className="bg-[#0A0A0A]">
+              <option key={s.value} value={s.value} className="bg-white">
                 {s.label}
               </option>
             ))}
           </select>
-          <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/40 pointer-events-none" />
+          <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
         </div>
 
         {/* Position */}
@@ -232,16 +232,16 @@ export default function TransferPortalPage() {
           <select
             value={position}
             onChange={(e) => setPosition(e.target.value)}
-            className="appearance-none rounded-lg border border-white/10 bg-black/60 backdrop-blur-md px-4 py-2 pr-8 text-sm text-white/80 focus:outline-none focus:border-gold/40 transition-colors cursor-pointer"
+            className="appearance-none rounded-lg border border-slate-200 bg-slate-50/70 backdrop-blur-md px-4 py-2 pr-8 text-sm text-slate-700 focus:outline-none focus:border-gold/40 transition-colors cursor-pointer"
           >
-            <option value="" className="bg-[#0A0A0A]">All Positions</option>
+            <option value="" className="bg-white">All Positions</option>
             {POSITIONS.filter(Boolean).map((p) => (
-              <option key={p} value={p} className="bg-[#0A0A0A]">
+              <option key={p} value={p} className="bg-white">
                 {p}
               </option>
             ))}
           </select>
-          <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/40 pointer-events-none" />
+          <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
         </div>
 
         {/* Transfer Window */}
@@ -249,18 +249,18 @@ export default function TransferPortalPage() {
           <select
             value={window}
             onChange={(e) => setWindow(e.target.value)}
-            className="appearance-none rounded-lg border border-white/10 bg-black/60 backdrop-blur-md px-4 py-2 pr-8 text-sm text-white/80 focus:outline-none focus:border-gold/40 transition-colors cursor-pointer"
+            className="appearance-none rounded-lg border border-slate-200 bg-slate-50/70 backdrop-blur-md px-4 py-2 pr-8 text-sm text-slate-700 focus:outline-none focus:border-gold/40 transition-colors cursor-pointer"
           >
             {WINDOWS.map((w) => (
-              <option key={w.value} value={w.value} className="bg-[#0A0A0A]">
+              <option key={w.value} value={w.value} className="bg-white">
                 {w.label}
               </option>
             ))}
           </select>
-          <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/40 pointer-events-none" />
+          <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
         </div>
 
-        <span className="text-xs text-white/30 ml-auto">
+        <span className="text-xs text-slate-400 ml-auto">
           {entries.length} player{entries.length !== 1 ? "s" : ""}
         </span>
       </div>
@@ -273,14 +273,14 @@ export default function TransferPortalPage() {
           ))}
         </div>
       ) : entries.length === 0 ? (
-        <div className="rounded-xl border border-white/10 bg-black/60 backdrop-blur-md p-12 text-center">
-          <FileText className="w-10 h-10 text-white/20 mx-auto mb-3" />
-          <p className="text-white/50 text-sm">No portal entries found for the selected filters.</p>
+        <div className="rounded-xl border border-slate-200 bg-slate-50/70 backdrop-blur-md p-12 text-center">
+          <FileText className="w-10 h-10 text-slate-300 mx-auto mb-3" />
+          <p className="text-slate-500 text-sm">No portal entries found for the selected filters.</p>
         </div>
       ) : (
         <div className="space-y-3">
           {/* Table header (hidden on mobile) */}
-          <div className="hidden md:grid md:grid-cols-12 gap-3 px-5 py-2 text-xs uppercase tracking-wider text-white/30">
+          <div className="hidden md:grid md:grid-cols-12 gap-3 px-5 py-2 text-xs uppercase tracking-wider text-slate-400">
             <div className="col-span-3">Player</div>
             <div className="col-span-1">Pos</div>
             <div className="col-span-1">Stars</div>
@@ -297,13 +297,13 @@ export default function TransferPortalPage() {
             return (
               <div
                 key={entry.id}
-                className="rounded-xl border border-white/10 bg-black/60 backdrop-blur-md p-4 md:px-5 md:py-4 hover:border-white/20 transition-all"
+                className="rounded-xl border border-slate-200 bg-slate-50/70 backdrop-blur-md p-4 md:px-5 md:py-4 hover:border-slate-200 transition-all"
               >
                 {/* Mobile Layout */}
                 <div className="md:hidden space-y-3">
                   <div className="flex items-start justify-between">
                     <div>
-                      <h3 className="text-base font-bold text-white">{entry.playerName}</h3>
+                      <h3 className="text-base font-bold text-slate-800">{entry.playerName}</h3>
                       <div className="flex items-center gap-2 mt-1">
                         <span className="text-xs font-semibold text-gold/80 bg-gold/10 rounded px-1.5 py-0.5">
                           {entry.position}
@@ -319,25 +319,25 @@ export default function TransferPortalPage() {
                   </div>
 
                   <div className="flex items-center gap-2 text-sm">
-                    <span className="text-white/70">
+                    <span className="text-slate-600">
                       {entry.previousTeam?.commonName ?? "--"}
                     </span>
                     <ArrowRight className="w-3.5 h-3.5 text-gold/60 shrink-0" />
-                    <span className="text-white/70">
+                    <span className="text-slate-600">
                       {entry.newTeam?.commonName ?? "TBD"}
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between text-xs border-t border-white/5 pt-2">
+                  <div className="flex items-center justify-between text-xs border-t border-slate-100 pt-2">
                     <div className="flex items-center gap-3">
                       {entry.paiScore != null && (
-                        <span className="text-white/50">
-                          PAI: <span className="font-bold text-white">{entry.paiScore.toFixed(1)}</span>
+                        <span className="text-slate-500">
+                          PAI: <span className="font-bold text-slate-800">{entry.paiScore.toFixed(1)}</span>
                         </span>
                       )}
                       {entry.nilValuation && (
-                        <span className="text-white/50">
-                          NIL: <span className="font-bold text-white">{entry.nilValuation}</span>
+                        <span className="text-slate-500">
+                          NIL: <span className="font-bold text-slate-800">{entry.nilValuation}</span>
                         </span>
                       )}
                     </div>
@@ -359,9 +359,9 @@ export default function TransferPortalPage() {
                   {/* Player Name */}
                   <div className="col-span-3 flex items-center gap-2 min-w-0">
                     <div className="min-w-0">
-                      <p className="text-sm font-bold text-white truncate">{entry.playerName}</p>
+                      <p className="text-sm font-bold text-slate-800 truncate">{entry.playerName}</p>
                       {entry.eligibility && (
-                        <p className="text-xs text-white/40">{entry.eligibility}</p>
+                        <p className="text-xs text-slate-400">{entry.eligibility}</p>
                       )}
                     </div>
                     {entry.verified && (
@@ -378,16 +378,16 @@ export default function TransferPortalPage() {
 
                   {/* Stars */}
                   <div className="col-span-1">
-                    {entry.stars ? <StarRating count={entry.stars} /> : <span className="text-white/20">--</span>}
+                    {entry.stars ? <StarRating count={entry.stars} /> : <span className="text-slate-300">--</span>}
                   </div>
 
                   {/* Transfer From -> To */}
                   <div className="col-span-3 flex items-center gap-2 text-sm min-w-0">
-                    <span className="text-white/70 truncate">
+                    <span className="text-slate-600 truncate">
                       {entry.previousTeam?.commonName ?? "--"}
                     </span>
                     <ArrowRight className="w-3.5 h-3.5 text-gold/60 shrink-0" />
-                    <span className="text-white/70 truncate">
+                    <span className="text-slate-600 truncate">
                       {entry.newTeam?.commonName ?? "TBD"}
                     </span>
                     {windowStyle && (
@@ -400,18 +400,18 @@ export default function TransferPortalPage() {
                   {/* PAI Score */}
                   <div className="col-span-1 text-right">
                     {entry.paiScore != null ? (
-                      <span className="text-sm font-bold text-white">{entry.paiScore.toFixed(1)}</span>
+                      <span className="text-sm font-bold text-slate-800">{entry.paiScore.toFixed(1)}</span>
                     ) : (
-                      <span className="text-white/20 text-sm">--</span>
+                      <span className="text-slate-300 text-sm">--</span>
                     )}
                   </div>
 
                   {/* NIL Valuation */}
                   <div className="col-span-1 text-right">
                     {entry.nilValuation ? (
-                      <span className="text-sm font-bold text-white">{entry.nilValuation}</span>
+                      <span className="text-sm font-bold text-slate-800">{entry.nilValuation}</span>
                     ) : (
-                      <span className="text-white/20 text-sm">--</span>
+                      <span className="text-slate-300 text-sm">--</span>
                     )}
                   </div>
 

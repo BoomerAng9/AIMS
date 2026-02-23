@@ -634,7 +634,7 @@ function ModelCard({
       <div className="flex items-start justify-between mb-2">
         <div>
           {/* User-friendly name first, technical name smaller */}
-          <h3 className="text-lg font-semibold text-white">{model.friendlyName}</h3>
+          <h3 className="text-lg font-semibold text-slate-800">{model.friendlyName}</h3>
           <p className="text-xs text-gray-500">{model.name} • {model.provider}</p>
         </div>
         <button
@@ -644,7 +644,7 @@ function ModelCard({
           }`}
         >
           {enabled ? (
-            <CheckIcon className="w-5 h-5 text-white" />
+            <CheckIcon className="w-5 h-5 text-slate-800" />
           ) : (
             <PlusIcon className="w-5 h-5 text-gray-300" />
           )}
@@ -710,7 +710,7 @@ function ToolCard({
     >
       <div className="flex items-start justify-between mb-3">
         <div>
-          <h3 className="text-lg font-semibold text-white">{tool.name}</h3>
+          <h3 className="text-lg font-semibold text-slate-800">{tool.name}</h3>
           <p className="text-sm text-gray-400">{tool.provider}</p>
         </div>
         <button
@@ -720,7 +720,7 @@ function ToolCard({
           }`}
         >
           {enabled ? (
-            <CheckIcon className="w-5 h-5 text-white" />
+            <CheckIcon className="w-5 h-5 text-slate-800" />
           ) : (
             <PlusIcon className="w-5 h-5 text-gray-300" />
           )}
@@ -771,7 +771,7 @@ function ConsumptionCard({ model }: { model: ConsumptionModel }) {
         </div>
       )}
 
-      <h3 className="text-lg font-semibold text-white mb-2">{model.name}</h3>
+      <h3 className="text-lg font-semibold text-slate-800 mb-2">{model.name}</h3>
       <p className="text-sm text-gray-400 mb-4">{model.description}</p>
 
       <ul className="space-y-2">
@@ -940,7 +940,7 @@ export default function ModelGardenPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search models or providers..."
-                className="w-full pl-12 pr-4 py-3 rounded-lg bg-gray-800 border border-gray-700 text-white placeholder:text-gray-500 focus:border-gold/30 outline-none"
+                className="w-full pl-12 pr-4 py-3 rounded-lg bg-gray-800 border border-gray-700 text-slate-800 placeholder:text-gray-500 focus:border-gold/30 outline-none"
               />
             </div>
 
@@ -1127,7 +1127,7 @@ export default function ModelGardenPage() {
                     className="p-4 rounded-xl text-center"
                     style={{ backgroundColor: '#0f172a', border: '1px solid rgba(255,255,255,0.08)' }}
                   >
-                    <div className="text-lg font-medium text-white">Infrastructure</div>
+                    <div className="text-lg font-medium text-slate-800">Infrastructure</div>
                     <div className="text-sm text-gray-400">
                       OpenRouter Gateway • Cloudflare Workers • Edge Deployment
                     </div>

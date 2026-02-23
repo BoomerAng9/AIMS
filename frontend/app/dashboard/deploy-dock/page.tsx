@@ -205,7 +205,7 @@ function TabButton({
       className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-medium uppercase tracking-wider transition-all ${
         active
           ? "bg-gold/10 text-gold border border-gold/30 shadow-[0_0_15px_rgba(212,168,67,0.15)]"
-          : "text-white/40 border border-transparent hover:text-white/60 hover:bg-white/5"
+          : "text-slate-400 border border-transparent hover:text-slate-500 hover:bg-slate-50"
       }`}
     >
       <Icon size={14} />
@@ -233,14 +233,14 @@ function GlassBoxEvent({ event }: { event: DeploymentEvent }) {
       className="relative pl-6 pb-6 border-l border-wireframe-stroke last:pb-0"
     >
       {/* Timeline dot */}
-      <div className={`absolute -left-[5px] top-0 h-2.5 w-2.5 rounded-full border-2 ${stageColors[event.stage] || "bg-white/20 border-white/30"}`} />
+      <div className={`absolute -left-[5px] top-0 h-2.5 w-2.5 rounded-full border-2 ${stageColors[event.stage] || "bg-slate-100 border-slate-200"}`} />
 
       <div className="space-y-2">
         <div className="flex items-center gap-2 flex-wrap">
           <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider border ${stageColors[event.stage]}`}>
             {event.stage}
           </span>
-          <span className="text-[10px] text-white/30 font-mono">
+          <span className="text-[10px] text-slate-400 font-mono">
             {event.timestamp.toLocaleTimeString()}
           </span>
           {event.agent && (
@@ -250,14 +250,14 @@ function GlassBoxEvent({ event }: { event: DeploymentEvent }) {
           )}
         </div>
 
-        <p className="text-sm font-medium text-white">{event.title}</p>
-        <p className="text-xs text-white/40">{event.description}</p>
+        <p className="text-sm font-medium text-slate-800">{event.title}</p>
+        <p className="text-xs text-slate-400">{event.description}</p>
 
         {event.proof && (
           <div className="flex items-center gap-2 mt-2">
-            <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-white/5 border border-wireframe-stroke text-[10px]">
+            <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-slate-50 border border-wireframe-stroke text-[10px]">
               <FileCheck size={10} className="text-emerald-400" />
-              <span className="text-white/60">{event.proof.label}:</span>
+              <span className="text-slate-500">{event.proof.label}:</span>
               <code className="text-gold font-mono">{event.proof.value}</code>
             </div>
           </div>
@@ -275,7 +275,7 @@ function AgentCard({ agent, onActivate }: { agent: AgentRoster; onActivate?: () 
   };
 
   const statusColors = {
-    idle: "bg-white/20",
+    idle: "bg-slate-100",
     active: "bg-emerald-400 animate-pulse",
     complete: "bg-emerald-400",
   };
@@ -290,23 +290,23 @@ function AgentCard({ agent, onActivate }: { agent: AgentRoster; onActivate?: () 
       <div className={`absolute top-3 right-3 h-2 w-2 rounded-full ${statusColors[agent.status]}`} />
 
       <div className="flex items-start gap-3">
-        <div className="h-10 w-10 rounded-xl bg-white/5 border border-wireframe-stroke flex items-center justify-center overflow-hidden">
+        <div className="h-10 w-10 rounded-xl bg-slate-50 border border-wireframe-stroke flex items-center justify-center overflow-hidden">
           {agent.image ? (
             <img src={agent.image} alt={agent.name} className="h-full w-full object-cover" />
           ) : (
-            <Users size={18} className="text-white/30" />
+            <Users size={18} className="text-slate-400" />
           )}
         </div>
 
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-white truncate">{agent.name}</p>
-          <p className="text-[10px] text-white/40 uppercase tracking-wider">{agent.role}</p>
+          <p className="text-sm font-semibold text-slate-800 truncate">{agent.name}</p>
+          <p className="text-[10px] text-slate-400 uppercase tracking-wider">{agent.role}</p>
 
           <div className="flex flex-wrap gap-1 mt-2">
             {agent.capabilities.slice(0, 3).map((cap) => (
               <span
                 key={cap}
-                className="px-1.5 py-0.5 rounded text-[8px] font-mono uppercase bg-white/5 text-white/40 border border-wireframe-stroke"
+                className="px-1.5 py-0.5 rounded text-[8px] font-mono uppercase bg-slate-50 text-slate-400 border border-wireframe-stroke"
               >
                 {cap}
               </span>
@@ -389,7 +389,7 @@ function AcheevyPanel() {
       variants={materialize}
       initial="hidden"
       animate="visible"
-      className="rounded-2xl border border-gold/20 bg-[#0A0A0A]/80 backdrop-blur-2xl overflow-hidden"
+      className="rounded-2xl border border-gold/20 bg-white/80 backdrop-blur-2xl overflow-hidden"
     >
       {/* Header */}
       <div className="px-4 py-3 border-b border-gold/10 bg-gold/5">
@@ -418,7 +418,7 @@ function AcheevyPanel() {
               className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-[10px] font-semibold uppercase tracking-wider transition-all ${
                 mode === m
                   ? "text-gold bg-gold/10 border-b-2 border-gold"
-                  : "text-white/40 hover:text-white/60 hover:bg-white/5"
+                  : "text-slate-400 hover:text-slate-500 hover:bg-slate-50"
               }`}
             >
               <Icon size={12} />
@@ -439,7 +439,7 @@ function AcheevyPanel() {
               className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm ${
                 msg.role === "user"
                   ? "bg-gold/10 text-gold border border-gold/20"
-                  : "bg-white/5 text-white/80 border border-wireframe-stroke"
+                  : "bg-slate-50 text-slate-700 border border-wireframe-stroke"
               }`}
             >
               <p className="whitespace-pre-wrap">{msg.content}</p>
@@ -448,9 +448,9 @@ function AcheevyPanel() {
         ))}
         {isProcessing && (
           <div className="flex justify-start">
-            <div className="bg-white/5 border border-wireframe-stroke rounded-2xl px-4 py-3 flex items-center gap-2">
+            <div className="bg-slate-50 border border-wireframe-stroke rounded-2xl px-4 py-3 flex items-center gap-2">
               <Loader2 size={14} className="animate-spin text-gold" />
-              <span className="text-xs text-white/40">ACHEEVY is processing...</span>
+              <span className="text-xs text-slate-400">ACHEEVY is processing...</span>
             </div>
           </div>
         )}
@@ -466,7 +466,7 @@ function AcheevyPanel() {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
             placeholder={modeConfig[mode].placeholder}
-            className="flex-1 px-4 py-2.5 rounded-xl bg-black/60 border border-wireframe-stroke text-sm text-white placeholder:text-white/30 outline-none focus:border-gold/40 transition-colors"
+            className="flex-1 px-4 py-2.5 rounded-xl bg-slate-50/70 border border-wireframe-stroke text-sm text-slate-800 placeholder:text-slate-400 outline-none focus:border-gold/40 transition-colors"
           />
           <button
             onClick={handleSubmit}
@@ -505,7 +505,7 @@ function TransferView({ stage }: { stage: "idle" | "plan" | "quote" | "hatch" | 
   }, [stage]);
 
   return (
-    <div className="relative h-48 rounded-2xl border border-wireframe-stroke bg-[#0A0A0A]/60 overflow-hidden">
+    <div className="relative h-48 rounded-2xl border border-wireframe-stroke bg-white/60 overflow-hidden">
       {/* Lo-fi grain overlay */}
       <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: "url('/images/textures/grain.png')", backgroundSize: "128px" }} />
 
@@ -518,8 +518,8 @@ function TransferView({ stage }: { stage: "idle" | "plan" | "quote" | "hatch" | 
       <div className="absolute inset-0 flex items-center justify-center">
         {stage === "idle" && (
           <div className="text-center">
-            <Ship size={40} className="text-white/10 mx-auto" />
-            <p className="mt-2 text-xs text-white/20 uppercase tracking-wider">Deploy Dock Ready</p>
+            <Ship size={40} className="text-slate-300 mx-auto" />
+            <p className="mt-2 text-xs text-slate-300 uppercase tracking-wider">Deploy Dock Ready</p>
           </div>
         )}
 
@@ -580,11 +580,11 @@ function TransferView({ stage }: { stage: "idle" | "plan" | "quote" | "hatch" | 
 
       {/* Stage label */}
       <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
-        <span className="text-[10px] text-white/30 uppercase tracking-wider font-mono">
+        <span className="text-[10px] text-slate-400 uppercase tracking-wider font-mono">
           Transfer View
         </span>
         <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider ${
-          stage === "idle" ? "bg-white/10 text-white/30" :
+          stage === "idle" ? "bg-slate-100 text-slate-400" :
           stage === "hatch" ? "bg-cyan-500/20 text-cyan-400" :
           stage === "assign" ? "bg-gold/20 text-gold" :
           "bg-emerald-500/20 text-emerald-400"
@@ -812,7 +812,7 @@ export default function DeployDockPage() {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="min-h-screen pb-20 text-white/80 font-sans selection:bg-gold/30"
+      className="min-h-screen pb-20 text-slate-700 font-sans selection:bg-gold/30"
     >
       <ParticleLazer isActive={isHatching} />
       
@@ -843,18 +843,18 @@ export default function DeployDockPage() {
               >
                 {/* Step 1: Select a Plug to Deploy */}
                 <div>
-                  <h2 className="text-sm font-semibold uppercase tracking-widest text-white/80">
+                  <h2 className="text-sm font-semibold uppercase tracking-widest text-slate-700">
                     Select a Plug to Deploy
                   </h2>
-                  <p className="text-xs text-white/40 mt-1">
+                  <p className="text-xs text-slate-400 mt-1">
                     Choose from the catalog — ACHEEVY will assemble the right agents
                   </p>
                 </div>
 
                 {catalogPlugs.length === 0 ? (
-                  <div className="text-center py-8 rounded-2xl border border-wireframe-stroke bg-[#0A0A0A]/60">
+                  <div className="text-center py-8 rounded-2xl border border-wireframe-stroke bg-white/60">
                     <Loader2 size={24} className="animate-spin text-gold/40 mx-auto" />
-                    <p className="mt-2 text-xs text-white/30">Loading catalog...</p>
+                    <p className="mt-2 text-xs text-slate-400">Loading catalog...</p>
                   </div>
                 ) : (
                   <motion.div
@@ -872,19 +872,19 @@ export default function DeployDockPage() {
                         className={`text-left rounded-2xl border p-4 backdrop-blur-xl transition-all ${
                           selectedPlugId === plug.id
                             ? "border-gold/40 bg-gold/10 ring-1 ring-gold/20"
-                            : "border-wireframe-stroke bg-[#0A0A0A]/60 hover:border-gold/20"
+                            : "border-wireframe-stroke bg-white/60 hover:border-gold/20"
                         }`}
                       >
                         <div className="flex items-start gap-3">
-                          <div className="h-10 w-10 shrink-0 rounded-xl bg-white/5 border border-wireframe-stroke flex items-center justify-center">
-                            <Container size={18} className={selectedPlugId === plug.id ? "text-gold" : "text-white/30"} />
+                          <div className="h-10 w-10 shrink-0 rounded-xl bg-slate-50 border border-wireframe-stroke flex items-center justify-center">
+                            <Container size={18} className={selectedPlugId === plug.id ? "text-gold" : "text-slate-400"} />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold text-white truncate">{plug.name}</p>
-                            <p className="text-[10px] text-white/40 mt-0.5 line-clamp-2">{plug.tagline}</p>
-                            <div className="flex items-center gap-2 mt-2 text-[9px] text-white/30 font-mono">
+                            <p className="text-sm font-semibold text-slate-800 truncate">{plug.name}</p>
+                            <p className="text-[10px] text-slate-400 mt-0.5 line-clamp-2">{plug.tagline}</p>
+                            <div className="flex items-center gap-2 mt-2 text-[9px] text-slate-400 font-mono">
                               <span>{plug.resources?.cpu || "1"} CPU</span>
-                              <span className="text-white/10">|</span>
+                              <span className="text-slate-300">|</span>
                               <span>{plug.resources?.memory || "1G"}</span>
                               {plug.resources?.gpu && <span className="text-amber-400">GPU</span>}
                             </div>
@@ -903,10 +903,10 @@ export default function DeployDockPage() {
                   <>
                     <div className="flex items-center justify-between mt-6">
                       <div>
-                        <h2 className="text-sm font-semibold uppercase tracking-widest text-white/80">
+                        <h2 className="text-sm font-semibold uppercase tracking-widest text-slate-700">
                           Agent Roster
                         </h2>
-                        <p className="text-xs text-white/40 mt-1">
+                        <p className="text-xs text-slate-400 mt-1">
                           Agents assigned for this deployment
                         </p>
                       </div>
@@ -931,27 +931,27 @@ export default function DeployDockPage() {
 
                 {/* Platform Health Strip */}
                 {circuitData && (
-                  <div className="mt-6 rounded-2xl border border-wireframe-stroke bg-[#0A0A0A]/60 p-4">
+                  <div className="mt-6 rounded-2xl border border-wireframe-stroke bg-white/60 p-4">
                     <div className="flex items-center gap-2 mb-3">
                       <div className={`h-2 w-2 rounded-full ${circuitData.overall === "healthy" ? "bg-emerald-400" : "bg-amber-400"} animate-pulse`} />
-                      <span className="text-[10px] text-white/40 uppercase tracking-wider font-semibold">Platform Health</span>
-                      <span className="ml-auto text-[10px] text-white/30 font-mono">{circuitData.uptimePercent}% uptime</span>
+                      <span className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Platform Health</span>
+                      <span className="ml-auto text-[10px] text-slate-400 font-mono">{circuitData.uptimePercent}% uptime</span>
                     </div>
                     <div className="grid grid-cols-4 gap-2">
                       {circuitData.services?.slice(0, 4).map((svc) => (
-                        <div key={svc.name} className="text-center p-2 rounded-lg bg-white/5 border border-wireframe-stroke">
+                        <div key={svc.name} className="text-center p-2 rounded-lg bg-slate-50 border border-wireframe-stroke">
                           <div className={`h-1.5 w-1.5 rounded-full mx-auto mb-1 ${svc.status === "up" ? "bg-emerald-400" : svc.status === "degraded" ? "bg-amber-400" : "bg-red-400"}`} />
-                          <p className="text-[9px] text-white/50 truncate">{svc.name}</p>
-                          <p className="text-[9px] text-white/30 font-mono">{svc.responseTime}ms</p>
+                          <p className="text-[9px] text-slate-500 truncate">{svc.name}</p>
+                          <p className="text-[9px] text-slate-400 font-mono">{svc.responseTime}ms</p>
                         </div>
                       ))}
                     </div>
                     {circuitData.plugInstances && (
-                      <div className="flex items-center gap-4 mt-3 text-[10px] text-white/40 font-mono">
+                      <div className="flex items-center gap-4 mt-3 text-[10px] text-slate-400 font-mono">
                         <span>{circuitData.plugInstances.runningInstances} running</span>
-                        <span className="text-white/10">|</span>
+                        <span className="text-slate-300">|</span>
                         <span>{circuitData.plugInstances.healthStats.healthy} healthy</span>
-                        <span className="text-white/10">|</span>
+                        <span className="text-slate-300">|</span>
                         <span>Ports: {circuitData.plugInstances.portCapacity.used}/{circuitData.plugInstances.portCapacity.total} ({circuitData.plugInstances.portCapacity.percentage}%)</span>
                       </div>
                     )}
@@ -963,14 +963,14 @@ export default function DeployDockPage() {
                   <>
                     <div className="mt-6 flex items-center justify-between">
                       <div>
-                        <h2 className="text-sm font-semibold uppercase tracking-widest text-white/80">
+                        <h2 className="text-sm font-semibold uppercase tracking-widest text-slate-700">
                           Running Instances
                         </h2>
-                        <p className="text-xs text-white/40 mt-1">
+                        <p className="text-xs text-slate-400 mt-1">
                           {instances.length} instance{instances.length !== 1 ? "s" : ""} managed
                         </p>
                       </div>
-                      <button onClick={loadInstances} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 text-white/40 text-[10px] font-semibold uppercase tracking-wider hover:bg-white/10 transition-colors">
+                      <button onClick={loadInstances} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-50 text-slate-400 text-[10px] font-semibold uppercase tracking-wider hover:bg-slate-100 transition-colors">
                         <RefreshCw size={10} /> Refresh
                       </button>
                     </div>
@@ -988,13 +988,13 @@ export default function DeployDockPage() {
                           <div key={inst.instanceId} className={`rounded-2xl border p-4 ${statusColor}`}>
                             <div className="flex items-center gap-2 mb-2">
                               <div className={`h-2 w-2 rounded-full ${isRunning ? "bg-emerald-400 animate-pulse" : "bg-red-400"}`} />
-                              <p className="text-sm font-semibold text-white truncate flex-1">{inst.name || inst.plugId}</p>
+                              <p className="text-sm font-semibold text-slate-800 truncate flex-1">{inst.name || inst.plugId}</p>
                             </div>
                             <div className="space-y-1 mb-3">
-                              <p className="text-[10px] text-white/40 font-mono">
+                              <p className="text-[10px] text-slate-400 font-mono">
                                 Port {inst.assignedPort} · {inst.status} · <span className={healthColor}>{inst.healthStatus || "checking"}</span>
                               </p>
-                              <p className="text-[10px] text-white/30 font-mono">
+                              <p className="text-[10px] text-slate-400 font-mono">
                                 Uptime: {formatUptime(inst.uptimeSeconds)} · Plug: {inst.plugId}
                               </p>
                             </div>
@@ -1052,22 +1052,22 @@ export default function DeployDockPage() {
                 className="space-y-4"
               >
                 <div>
-                  <h2 className="text-sm font-semibold uppercase tracking-widest text-white/80">
+                  <h2 className="text-sm font-semibold uppercase tracking-widest text-slate-700">
                     Workflow Assignment
                   </h2>
-                  <p className="text-xs text-white/40 mt-1">
+                  <p className="text-xs text-slate-400 mt-1">
                     Bind roles and runbooks through n8n protocols
                   </p>
                 </div>
 
-                <div className="rounded-2xl border border-wireframe-stroke bg-[#0A0A0A]/60 p-6 backdrop-blur-xl">
+                <div className="rounded-2xl border border-wireframe-stroke bg-white/60 p-6 backdrop-blur-xl">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="h-10 w-10 rounded-xl bg-orange-500/10 border border-orange-500/30 flex items-center justify-center">
                       <Workflow size={20} className="text-orange-400" />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-white">n8n Workflow Binding</p>
-                      <p className="text-[10px] text-white/40">Connect to automation protocols</p>
+                      <p className="text-sm font-semibold text-slate-800">n8n Workflow Binding</p>
+                      <p className="text-[10px] text-slate-400">Connect to automation protocols</p>
                     </div>
                   </div>
 
@@ -1075,11 +1075,11 @@ export default function DeployDockPage() {
                     {["auth-deploy-v2", "build-pipeline", "health-check", "rollback-trigger"].map((workflow, i) => (
                       <div
                         key={workflow}
-                        className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-wireframe-stroke"
+                        className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-wireframe-stroke"
                       >
                         <div className="flex items-center gap-2">
                           <Network size={14} className="text-orange-400" />
-                          <span className="text-sm text-white/80">{workflow}</span>
+                          <span className="text-sm text-slate-700">{workflow}</span>
                         </div>
                         <button
                           onClick={() => setDeploymentStage("assign")}
@@ -1093,21 +1093,21 @@ export default function DeployDockPage() {
                 </div>
 
                 {/* Job Packets */}
-                <div className="rounded-2xl border border-wireframe-stroke bg-[#0A0A0A]/60 p-6 backdrop-blur-xl">
+                <div className="rounded-2xl border border-wireframe-stroke bg-white/60 p-6 backdrop-blur-xl">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="h-10 w-10 rounded-xl bg-violet-500/10 border border-violet-500/30 flex items-center justify-center">
                       <Package size={20} className="text-violet-400" />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-white">Job Packets</p>
-                      <p className="text-[10px] text-white/40">Deterministic task bundles with gates</p>
+                      <p className="text-sm font-semibold text-slate-800">Job Packets</p>
+                      <p className="text-[10px] text-slate-400">Deterministic task bundles with gates</p>
                     </div>
                   </div>
 
                   {jobPackets.length === 0 ? (
                     <div className="text-center py-8">
-                      <Package size={32} className="text-white/10 mx-auto" />
-                      <p className="mt-2 text-xs text-white/30">No job packets created yet</p>
+                      <Package size={32} className="text-slate-300 mx-auto" />
+                      <p className="mt-2 text-xs text-slate-400">No job packets created yet</p>
                       <button className="mt-3 px-4 py-2 rounded-lg bg-violet-500/10 text-violet-400 text-xs font-semibold hover:bg-violet-500/20 transition-colors">
                         Create Job Packet
                       </button>
@@ -1131,25 +1131,25 @@ export default function DeployDockPage() {
                 className="space-y-4"
               >
                 <div>
-                  <h2 className="text-sm font-semibold uppercase tracking-widest text-white/80">
+                  <h2 className="text-sm font-semibold uppercase tracking-widest text-slate-700">
                     Launch Control
                   </h2>
-                  <p className="text-xs text-white/40 mt-1">
+                  <p className="text-xs text-slate-400 mt-1">
                     Deploy through Port Authority gateway
                   </p>
                 </div>
 
                 {/* Launch Panel */}
-                <div className="rounded-2xl border border-wireframe-stroke bg-[#0A0A0A]/60 p-6 backdrop-blur-xl">
+                <div className="rounded-2xl border border-wireframe-stroke bg-white/60 p-6 backdrop-blur-xl">
                   {/* Selected plug info */}
                   {selectedPlugId && (
                     <div className="flex items-center gap-3 mb-6 p-3 rounded-xl bg-gold/5 border border-gold/20">
                       <Container size={20} className="text-gold" />
                       <div>
-                        <p className="text-sm font-semibold text-white">
+                        <p className="text-sm font-semibold text-slate-800">
                           {catalogPlugs.find((p) => p.id === selectedPlugId)?.name || selectedPlugId}
                         </p>
-                        <p className="text-[10px] text-white/40">
+                        <p className="text-[10px] text-slate-400">
                           {catalogPlugs.find((p) => p.id === selectedPlugId)?.tagline}
                         </p>
                       </div>
@@ -1157,18 +1157,18 @@ export default function DeployDockPage() {
                   )}
 
                   <div className="grid gap-4 sm:grid-cols-3 mb-6">
-                    <div className="p-4 rounded-xl bg-white/5 border border-wireframe-stroke">
-                      <p className="text-[10px] text-white/30 uppercase tracking-wider">Agents Ready</p>
+                    <div className="p-4 rounded-xl bg-slate-50 border border-wireframe-stroke">
+                      <p className="text-[10px] text-slate-400 uppercase tracking-wider">Agents Ready</p>
                       <p className="text-2xl font-bold text-gold mt-1">
                         {roster.filter((a) => a.status === "active").length}/{roster.length}
                       </p>
                     </div>
-                    <div className="p-4 rounded-xl bg-white/5 border border-wireframe-stroke">
-                      <p className="text-[10px] text-white/30 uppercase tracking-wider">Instances</p>
+                    <div className="p-4 rounded-xl bg-slate-50 border border-wireframe-stroke">
+                      <p className="text-[10px] text-slate-400 uppercase tracking-wider">Instances</p>
                       <p className="text-2xl font-bold text-emerald-400 mt-1">{instances.length}</p>
                     </div>
-                    <div className="p-4 rounded-xl bg-white/5 border border-wireframe-stroke">
-                      <p className="text-[10px] text-white/30 uppercase tracking-wider">Catalog</p>
+                    <div className="p-4 rounded-xl bg-slate-50 border border-wireframe-stroke">
+                      <p className="text-[10px] text-slate-400 uppercase tracking-wider">Catalog</p>
                       <p className="text-2xl font-bold text-cyan-400 mt-1">{catalogPlugs.length}</p>
                     </div>
                   </div>
@@ -1182,11 +1182,11 @@ export default function DeployDockPage() {
                     ].map((item, i) => (
                       <div key={i} className="flex items-center gap-2 text-xs">
                         <div className={`h-4 w-4 rounded-full flex items-center justify-center ${
-                          item.done ? "bg-emerald-500/20 text-emerald-400" : "bg-white/5 text-white/30"
+                          item.done ? "bg-emerald-500/20 text-emerald-400" : "bg-slate-50 text-slate-400"
                         }`}>
                           {item.done && <CheckCircle2 size={10} />}
                         </div>
-                        <span className={item.done ? "text-white/80" : "text-white/30"}>{item.label}</span>
+                        <span className={item.done ? "text-slate-700" : "text-slate-400"}>{item.label}</span>
                       </div>
                     ))}
                   </div>
@@ -1212,7 +1212,7 @@ export default function DeployDockPage() {
                         setRoster([]);
                         setDeploymentStage("idle");
                       }}
-                      className="w-full mt-3 flex items-center justify-center gap-2 py-3 rounded-xl bg-white/5 text-white/50 text-xs font-semibold uppercase tracking-wider border border-wireframe-stroke hover:bg-white/10 transition-all"
+                      className="w-full mt-3 flex items-center justify-center gap-2 py-3 rounded-xl bg-slate-50 text-slate-500 text-xs font-semibold uppercase tracking-wider border border-wireframe-stroke hover:bg-slate-100 transition-all"
                     >
                       <Plus size={14} /> Deploy Another
                     </button>
@@ -1232,20 +1232,20 @@ export default function DeployDockPage() {
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <h2 className="text-sm font-semibold uppercase tracking-widest text-white/80">
+                    <h2 className="text-sm font-semibold uppercase tracking-widest text-slate-700">
                       Glass Box Events
                     </h2>
-                    <p className="text-xs text-white/40 mt-1">
+                    <p className="text-xs text-slate-400 mt-1">
                       Proof-linked status feed
                     </p>
                   </div>
-                  <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 text-white/40 text-[10px] font-semibold uppercase tracking-wider hover:bg-white/10 hover:text-white/60 transition-colors">
+                  <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-50 text-slate-400 text-[10px] font-semibold uppercase tracking-wider hover:bg-slate-100 hover:text-slate-500 transition-colors">
                     <RefreshCw size={12} />
                     Refresh
                   </button>
                 </div>
 
-                <div className="rounded-2xl border border-wireframe-stroke bg-[#0A0A0A]/60 p-6 backdrop-blur-xl">
+                <div className="rounded-2xl border border-wireframe-stroke bg-white/60 p-6 backdrop-blur-xl">
                   <motion.div
                     variants={staggerContainer}
                     initial="hidden"
@@ -1254,8 +1254,8 @@ export default function DeployDockPage() {
                   >
                     {events.length === 0 ? (
                       <div className="text-center py-8">
-                        <Terminal size={32} className="text-white/10 mx-auto" />
-                        <p className="mt-2 text-xs text-white/30">No deployment events yet</p>
+                        <Terminal size={32} className="text-slate-300 mx-auto" />
+                        <p className="mt-2 text-xs text-slate-400">No deployment events yet</p>
                       </div>
                     ) : (
                       events.map((event) => (
