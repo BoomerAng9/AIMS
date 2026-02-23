@@ -124,21 +124,21 @@ function NavLink({ item, pathname }: { item: NavItem; pathname: string | null })
       className={clsx(
         "flex items-center gap-2.5 rounded-lg px-3 py-2 transition-all text-sm",
         active
-          ? "border border-gold/30 bg-gold/8 text-gold shadow-[0_0_12px_rgba(212,175,55,0.08)]"
+          ? "border border-amber-200 bg-amber-50 text-amber-800 shadow-sm"
           : item.highlight
-            ? "border border-gold/15 bg-gold/5 text-gold/80 hover:bg-gold/10 hover:border-gold/25"
-            : "border border-transparent text-white/55 hover:bg-white/5 hover:border-wireframe-stroke hover:text-white/80"
+            ? "border border-amber-100 bg-amber-50/50 text-amber-700 hover:bg-amber-50 hover:border-amber-200"
+            : "border border-transparent text-slate-500 hover:bg-slate-50 hover:border-slate-200 hover:text-slate-700"
       )}
     >
       <Icon
         className={clsx(
           "w-4 h-4 flex-shrink-0",
-          active ? "text-gold" : item.highlight ? "text-gold/60" : "text-white/30"
+          active ? "text-amber-600" : item.highlight ? "text-amber-500" : "text-slate-400"
         )}
       />
       <span className="truncate">{item.label}</span>
       {item.highlight && !active && (
-        <span className="ml-auto w-1.5 h-1.5 rounded-full bg-gold/60 animate-pulse" />
+        <span className="ml-auto w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
       )}
     </Link>
   );
@@ -148,7 +148,7 @@ function NavLink({ item, pathname }: { item: NavItem; pathname: string | null })
 
 function SectionLabel({ label, icon: Icon }: { label: string; icon: typeof MessageSquare }) {
   return (
-    <div className="flex items-center gap-2 px-3 py-1.5 text-white/30">
+    <div className="flex items-center gap-2 px-3 py-1.5 text-slate-400">
       <Icon className="w-3.5 h-3.5 flex-shrink-0" />
       <span className="font-mono uppercase tracking-[0.15em] text-[10px]">{label}</span>
     </div>
@@ -172,7 +172,7 @@ export function DashboardNav() {
         ))}
       </div>
 
-      <div className="mx-2 border-t border-wireframe-stroke" />
+      <div className="mx-2 border-t border-slate-200" />
 
       {/* Core Pages */}
       <div className="mt-2 space-y-0.5">
@@ -183,7 +183,7 @@ export function DashboardNav() {
       </div>
 
       {/* Live Apps — Direct access tools */}
-      <div className="mx-2 mt-2 border-t border-emerald-500/15" />
+      <div className="mx-2 mt-2 border-t border-emerald-200/50" />
       <div className="mt-1 space-y-0.5">
         <SectionLabel label="Live Apps" icon={Rocket} />
         {LIVE_APPS.map((item) => (
@@ -191,7 +191,7 @@ export function DashboardNav() {
         ))}
       </div>
 
-      <div className="mx-2 mt-2 border-t border-gold/10" />
+      <div className="mx-2 mt-2 border-t border-amber-200/50" />
 
       {/* Circuit Box — Consolidated Hub */}
       <div className="mt-2 space-y-0.5">
@@ -201,13 +201,13 @@ export function DashboardNav() {
           className={clsx(
             "flex items-center gap-2.5 rounded-lg px-3 py-2 transition-all text-sm",
             pathname === "/dashboard/circuit-box" && !new URLSearchParams(typeof window !== "undefined" ? window.location.search : "").get("tab")
-              ? "border border-gold/30 bg-gold/8 text-gold shadow-[0_0_12px_rgba(212,175,55,0.08)]"
-              : "border border-gold/15 bg-gold/5 text-gold/80 hover:bg-gold/10 hover:border-gold/25"
+              ? "border border-amber-200 bg-amber-50 text-amber-800 shadow-sm"
+              : "border border-amber-100 bg-amber-50/50 text-amber-700 hover:bg-amber-50 hover:border-amber-200"
           )}
         >
-          <Shield className="w-4 h-4 text-gold/60" />
+          <Shield className="w-4 h-4 text-amber-500" />
           <span className="truncate">System Panel</span>
-          <span className="ml-auto w-1.5 h-1.5 rounded-full bg-gold/60 animate-pulse" />
+          <span className="ml-auto w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
         </Link>
         {CIRCUIT_BOX_TABS.map((item) => (
           <NavLink key={item.href} item={item} pathname={pathname} />
@@ -215,7 +215,7 @@ export function DashboardNav() {
       </div>
 
       {/* Workshop — Voice-First Companion Flows */}
-      <div className="mx-2 mt-2 border-t border-cyan-500/10" />
+      <div className="mx-2 mt-2 border-t border-cyan-200/50" />
       <div className="mt-1 space-y-0.5">
         <SectionLabel label="Workshop" icon={Mic} />
         {WORKSHOP_ITEMS.map((item) => (
@@ -224,7 +224,7 @@ export function DashboardNav() {
       </div>
 
       {/* Sandbox — Autonomous Projects */}
-      <div className="mx-2 mt-2 border-t border-emerald-500/10" />
+      <div className="mx-2 mt-2 border-t border-emerald-200/50" />
       <div className="mt-1 space-y-0.5">
         <SectionLabel label="Sandbox" icon={Layers} />
         {SANDBOX_ITEMS.map((item) => (
@@ -233,7 +233,7 @@ export function DashboardNav() {
       </div>
 
       {/* Per|Form — Sports Analytics & N.I.L. */}
-      <div className="mx-2 mt-2 border-t border-amber-500/10" />
+      <div className="mx-2 mt-2 border-t border-amber-200/50" />
       <div className="mt-1 space-y-0.5">
         <SectionLabel label="Per|Form" icon={Trophy} />
         {PERFORM_ITEMS.map((item) => (
@@ -244,7 +244,7 @@ export function DashboardNav() {
       {/* Owner-Only Tabs */}
       {isOwner && (
         <>
-          <div className="mx-2 mt-2 border-t border-red-500/15" />
+          <div className="mx-2 mt-2 border-t border-red-200/50" />
           <div className="mt-1 space-y-0.5">
             <SectionLabel label="Owner Only" icon={Shield} />
             {OWNER_TABS.map((item) => (
@@ -255,8 +255,8 @@ export function DashboardNav() {
               className={clsx(
                 "flex items-center gap-2.5 rounded-lg px-3 py-2 transition-all text-sm",
                 pathname === "/dashboard/admin"
-                  ? "border border-red-500/30 bg-red-500/10 text-red-300"
-                  : "border border-transparent text-red-400/40 hover:bg-red-500/5 hover:border-red-500/15 hover:text-red-300"
+                  ? "border border-red-200 bg-red-50 text-red-700"
+                  : "border border-transparent text-red-400 hover:bg-red-50 hover:border-red-200 hover:text-red-600"
               )}
             >
               <Shield className="w-4 h-4" />
