@@ -16,6 +16,9 @@ import {
     TrendingDown, Zap, ChevronRight, RefreshCw, MessageSquare
 } from 'lucide-react';
 import { staggerContainer, staggerItem } from '@/lib/motion/variants';
+import { WarRoomSet } from '@/components/perform/broadcast/shows/WarRoomSet';
+import { NetworkBug, LowerThird } from '@/components/perform/broadcast/graphics';
+import type { BroadcastSegment } from '@/components/perform/broadcast/engine';
 
 const CURRENT_YEAR = new Date().getFullYear();
 
@@ -47,6 +50,16 @@ export default function WarRoomPage() {
     const [newsItems, setNewsItems] = useState<any[]>([]);
     const [customTopic, setCustomTopic] = useState('');
     const [activeTab, setActiveTab] = useState<'featured' | 'live' | 'custom'>('featured');
+    const [showBroadcastSet, setShowBroadcastSet] = useState(false);
+
+    const warRoomSegment: BroadcastSegment = {
+        id: 'war-room-preview',
+        type: 'WAR_ROOM_DEBATE',
+        title: 'War Room Debate',
+        durationSeconds: 30,
+        host: 'BOOMER_ANG',
+        topic: 'Bull vs. Bear: Breaking down the top Draft storylines',
+    };
 
     // Fetch live draft news for debate topics
     useEffect(() => {
@@ -131,9 +144,22 @@ export default function WarRoomPage() {
                     <Link href="/sandbox/perform" className="flex items-center gap-2 text-[0.65rem] text-slate-400 hover:text-slate-800 transition-colors font-mono uppercase tracking-widest">
                         <ArrowLeft size={13} /> Per|Form
                     </Link>
-                    <div className="flex items-center gap-3">
-                        <motion.div animate={{ opacity: [1, 0.3, 1] }} transition={{ repeat: Infinity, duration: 1.5 }} className="w-2 h-2 rounded-full bg-red-500" />
-                        <span className="text-[0.6rem] font-mono uppercase tracking-[0.3em] text-red-400/70">War Room Live</span>
+                    <div className="flex items-center gap-4">
+                        <button
+                            onClick={() => setShowBroadcastSet(!showBroadcastSet)}
+                            className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-[0.6rem] font-bold tracking-[0.2em] uppercase transition-all ${
+                                showBroadcastSet
+                                    ? 'bg-red-600/10 text-red-500 border-red-500/40 hover:bg-red-600/20'
+                                    : 'bg-gold/10 text-gold border-gold/30 hover:bg-gold/20'
+                            }`}
+                        >
+                            <Radio size={12} className={showBroadcastSet ? 'animate-pulse text-red-500' : 'text-gold'} />
+                            {showBroadcastSet ? 'Hide Broadcast' : 'Watch Debate Set'}
+                        </button>
+                        <div className="flex items-center gap-2">
+                            <motion.div animate={{ opacity: [1, 0.3, 1] }} transition={{ repeat: Infinity, duration: 1.5 }} className="w-2 h-2 rounded-full bg-red-500" />
+                            <span className="text-[0.6rem] font-mono uppercase tracking-[0.3em] text-red-400/70">War Room Live</span>
+                        </div>
                     </div>
                 </div>
             </nav>
@@ -175,6 +201,40 @@ export default function WarRoomPage() {
                     </motion.div>
                 </div>
             </section>
+
+            {/* ── BROADCAST SET — WarRoomSet Visual Preview ────────────── */}
+            <AnimatePresence>
+                {showBroadcastSet && (
+                    <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                        className="overflow-hidden"
+                    >
+                        <div className="relative border-b border-slate-100">
+                            {/* Network Bug overlay */}
+                            <div className="absolute top-4 right-4 z-20 scale-75 origin-top-right pointer-events-none">
+                                <NetworkBug />
+                            </div>
+
+                            {/* WarRoomSet broadcast visual */}
+                            <div className="h-[600px] bg-white relative overflow-hidden">
+                                <WarRoomSet segment={warRoomSegment} />
+                            </div>
+
+                            {/* Lower Third overlay */}
+                            <div className="relative pointer-events-none">
+                                <LowerThird
+                                    title={warRoomSegment.title}
+                                    topic={warRoomSegment.topic}
+                                    host={warRoomSegment.host}
+                                />
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             <div className="max-w-[1400px] mx-auto px-6 py-10 space-y-10">
 

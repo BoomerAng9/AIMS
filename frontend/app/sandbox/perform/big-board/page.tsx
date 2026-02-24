@@ -9,17 +9,31 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { Search, Download, Settings, ChevronLeft, ChevronRight, CheckCircle2, TrendingUp, ArrowLeft } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Search, Download, Settings, ChevronLeft, ChevronRight, CheckCircle2, TrendingUp, ArrowLeft, Radio, Eye, EyeOff } from 'lucide-react';
 import type { Prospect } from '@/lib/perform/types';
 import { TIER_STYLES, getProspectSlug } from '@/lib/perform/types';
 import { staggerContainer, staggerItem } from '@/lib/motion/variants';
+import { BigBoardSet } from '@/components/perform/broadcast/shows/BigBoardSet';
+import { NetworkBug } from '@/components/perform/broadcast/graphics';
+import type { BroadcastSegment } from '@/components/perform/broadcast/engine';
 
 export default function BigBoardPage() {
   const [prospects, setProspects] = useState<Prospect[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [posFilter, setPosFilter] = useState<string>('ALL');
+  const [showBroadcastSpotlight, setShowBroadcastSpotlight] = useState(false);
+
+  // A synthetic segment for BigBoardSet to render in standalone preview mode
+  const bigBoardSegment: BroadcastSegment = {
+    id: 'big-board-spotlight',
+    type: 'BIG_BOARD',
+    title: 'Top Prospects',
+    durationSeconds: 30,
+    host: 'ACHEEVY',
+    topic: `Breaking down the consensus Top 5 entering the ${new Date().getFullYear()} Draft`,
+  };
 
   useEffect(() => {
     fetch('/api/perform/prospects')
@@ -66,8 +80,21 @@ export default function BigBoardPage() {
               <Link href="/sandbox/perform/draft" className="text-slate-500 hover:text-slate-800 transition-colors">MOCK DRAFT</Link>
             </div>
           </div>
-          <div className="hidden md:flex items-center gap-4 text-[0.6rem] font-mono tracking-widest text-gold/50">
-            POWERED BY AGI — A.I.M.S. HIGH-LEVEL ANALYSIS
+          <div className="hidden md:flex items-center gap-4">
+            <button
+              onClick={() => setShowBroadcastSpotlight(!showBroadcastSpotlight)}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-[0.6rem] font-bold tracking-[0.2em] uppercase transition-all ${
+                showBroadcastSpotlight
+                  ? 'bg-red-600/10 text-red-500 border-red-500/40 hover:bg-red-600/20'
+                  : 'bg-gold/10 text-gold border-gold/30 hover:bg-gold/20'
+              }`}
+            >
+              <Radio size={12} className={showBroadcastSpotlight ? 'animate-pulse text-red-500' : 'text-gold'} />
+              {showBroadcastSpotlight ? 'Hide Spotlight' : 'Top 5 Spotlight'}
+            </button>
+            <span className="text-[0.6rem] font-mono tracking-widest text-gold/50">
+              POWERED BY AGI — A.I.M.S. HIGH-LEVEL ANALYSIS
+            </span>
           </div>
         </div>
       </nav>
@@ -90,6 +117,17 @@ export default function BigBoardPage() {
             </p>
           </div>
           <div className="flex items-center gap-3">
+            <button
+              onClick={() => setShowBroadcastSpotlight(!showBroadcastSpotlight)}
+              className={`flex items-center gap-2 px-4 py-2.5 border rounded-lg text-xs font-mono uppercase tracking-wider transition-all ${
+                showBroadcastSpotlight
+                  ? 'bg-red-500/10 text-red-500 border-red-500/30 hover:bg-red-500/20'
+                  : 'bg-gold/10 text-gold border-gold/30 hover:bg-gold/20'
+              }`}
+            >
+              {showBroadcastSpotlight ? <EyeOff size={14} /> : <Radio size={14} />}
+              {showBroadcastSpotlight ? 'Exit Spotlight' : 'Broadcast Spotlight'}
+            </button>
             <button className="flex items-center gap-2 px-4 py-2.5 bg-gold/10 hover:bg-gold/20 border border-gold/30 rounded-lg text-gold text-xs font-mono uppercase tracking-wider transition-colors">
               <Download size={14} /> Export Data
             </button>
@@ -98,6 +136,39 @@ export default function BigBoardPage() {
             </button>
           </div>
         </motion.div>
+
+        {/* Broadcast Spotlight — BigBoardSet Preview */}
+        <AnimatePresence>
+          {showBroadcastSpotlight && (
+            <motion.div
+              variants={staggerItem}
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+              className="overflow-hidden"
+            >
+              <div className="relative bg-white border border-gold/20 rounded-2xl overflow-hidden shadow-[0_0_40px_rgba(218,165,32,0.08)]">
+                {/* Network Bug overlay */}
+                <div className="absolute top-4 right-4 z-20 scale-75 origin-top-right pointer-events-none">
+                  <NetworkBug />
+                </div>
+
+                {/* Broadcast header bar */}
+                <div className="flex items-center gap-2 px-5 py-2.5 bg-[#F8FAFC] border-b border-slate-100">
+                  <div className="h-2 w-2 bg-red-500 rounded-full animate-pulse" />
+                  <span className="text-[0.55rem] font-mono uppercase tracking-[0.25em] text-gold font-bold">Broadcast Preview</span>
+                  <span className="text-[0.55rem] font-mono uppercase tracking-[0.2em] text-slate-400 ml-auto">Top 5 Spotlight</span>
+                </div>
+
+                {/* BigBoardSet in a contained preview */}
+                <div className="h-[500px] bg-white">
+                  <BigBoardSet segment={bigBoardSegment} />
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Search & Filters */}
         <motion.div variants={staggerItem} className="flex flex-col md:flex-row gap-4 items-center">

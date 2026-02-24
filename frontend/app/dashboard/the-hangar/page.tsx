@@ -20,6 +20,7 @@
  */
 
 import React, { useState, useRef, useEffect } from "react";
+import dynamic from "next/dynamic";
 import { motion, useScroll, useTransform, useInView, AnimatePresence } from "framer-motion";
 import {
   Crown,
@@ -57,6 +58,24 @@ import {
   BOOMER_ANG_PERSONALITIES,
   ROLE_DEFINITIONS,
 } from "@/lib/governance";
+
+// Dynamic import for 3D Hangar scene — SSR must be disabled for R3F / Three.js
+const HangarRoot = dynamic(
+  () => import("@/components/hangar/HangarRoot"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-full flex items-center justify-center bg-[#F8FAFC] rounded-2xl">
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-[#C6A74E] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+          <div className="text-xs text-slate-400 uppercase tracking-widest">
+            Loading 3D Scene
+          </div>
+        </div>
+      </div>
+    ),
+  }
+);
 
 // ─────────────────────────────────────────────────────────────
 // Types & Data
@@ -872,6 +891,26 @@ export default function TheHangarPage() {
               transition={{ duration: 0.4 }}
               className="space-y-8"
             >
+              {/* 3D Hangar Scene — Live orchestration visualization */}
+              <ScrollSection>
+                <div className="rounded-3xl border border-wireframe-stroke bg-slate-50/60 backdrop-blur-xl overflow-hidden">
+                  <div className="px-6 pt-6 sm:px-8 sm:pt-8 flex items-center gap-3 mb-4">
+                    <Radar size={16} className="text-gold" />
+                    <div>
+                      <h2 className="text-sm font-semibold uppercase tracking-widest text-slate-700 font-display">
+                        3D Orchestration View
+                      </h2>
+                      <p className="text-[10px] text-slate-400 uppercase tracking-wider">
+                        Real-time visualization of the AIMS build pipeline
+                      </p>
+                    </div>
+                  </div>
+                  <div className="relative w-full h-[480px] sm:h-[540px]">
+                    <HangarRoot mode="demo" />
+                  </div>
+                </div>
+              </ScrollSection>
+
               {/* Full Hierarchy Visual */}
               <ScrollSection>
                 <div className="rounded-3xl border border-wireframe-stroke bg-slate-50/60 backdrop-blur-xl p-6 sm:p-8">

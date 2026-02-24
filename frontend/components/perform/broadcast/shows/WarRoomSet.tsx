@@ -37,7 +37,7 @@ export function WarRoomSet({ segment }: { segment: BroadcastSegment }) {
                             <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
                             The Bull Case
                         </h4>
-                        <p className="text-slate-700 text-lg leading-relaxed mix-blend-screen">
+                        <p className="text-slate-700 text-lg leading-relaxed">
                             "When healthy, McCoy is the best CB in this class. ACL recovery is routine now — 12+ months out. The ball skills and athleticism are elite."
                         </p>
                     </div>
@@ -81,7 +81,7 @@ export function WarRoomSet({ segment }: { segment: BroadcastSegment }) {
                             <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
                             The Bear Case
                         </h4>
-                        <p className="text-slate-700 text-lg leading-relaxed mix-blend-screen text-right">
+                        <p className="text-slate-700 text-lg leading-relaxed text-right">
                             "Missed entire 2025 season. ACL tears change athletes. Teams drafting in the top 15 can't afford medical risks."
                         </p>
                     </div>

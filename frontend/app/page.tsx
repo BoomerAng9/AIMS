@@ -24,6 +24,8 @@ import {
   heroItem,
   viewportMargin,
 } from "@/lib/motion";
+import { DelayedSignUpModal } from "@/components/DelayedSignUpModal";
+import { AppShowcase, BuildPrompts } from "@/components/landing/AppShowcase";
 
 /* ═══════════════════════════════════════════════════════════
    A.I.M.S. Landing Page — Modern Light SaaS
@@ -248,9 +250,12 @@ export default function HomePage() {
         </section>
 
         <ExperienceGateway />
+        <AppShowcase />
+        <BuildPrompts />
         <PlatformPillars />
         <FinalCTA />
         <SiteFooter />
+        <DelayedSignUpModal />
       </div>
     </main>
   );
