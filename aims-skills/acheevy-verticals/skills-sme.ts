@@ -214,6 +214,107 @@ const SKILLS_REGISTRY: SkillSME[] = [
   },
 
   // ═══════════════════════════════════════════════════════════════════════
+  // Forms & Data Collection (Paperform Stepper)
+  // ═══════════════════════════════════════════════════════════════════════
+  {
+    id: 'paperform-stepper',
+    name: 'Paperform Stepper (Multi-Step Forms via Pipedream MCP)',
+    category: 'workflow',
+    status: 'active',
+    purpose: 'Multi-step, conditionally-branching form builder for client intake, needs analysis, booking, feedback, and payment collection. Paperform is accessed exclusively through the Pipedream MCP bridge — never direct API calls. Forms use page-based steppers with conditional logic, calculated fields, progress bars, and partial submission tracking. This is the primary data collection tool for every A.I.M.S. vertical.',
+    capabilities: [
+      'Create multi-step (paged) forms with conditional page routing',
+      'Conditional field visibility — show/hide fields based on prior answers',
+      'Calculated fields — auto-compute tier, path, priority score, LUC estimate',
+      'Progress bar and partial submission tracking for lead recovery',
+      'Stripe-connected payment fields for one-off service collection',
+      'Date/time booking fields for consultation scheduling',
+      'Form CRUD via Pipedream MCP tools (list, get, create, update, delete)',
+      'Submission management (list, get, delete) for GDPR compliance',
+      'Event triggers: new_submission and partial_submission for automation',
+      'Custom themes (A.I.M.S. light theme: #F8FAFC bg, #F59E0B accent, Inter font)',
+      'Auto-redirect to plugmein.cloud/chat on submission',
+      'Webhook-driven submission pipeline: validate → Firestore → Notion → Drive → Gmail → Calendar → ACHEEVY notify',
+    ],
+    limitations: [
+      'Cannot call Paperform API directly — must go through Pipedream MCP bridge',
+      'API key (PAPERFORM_API_KEY) is stored inside Pipedream, never exposed to agents',
+      'Cannot embed forms natively in Next.js — requires external link or iframe',
+      'Rate limits depend on Paperform plan tier',
+      'Form creation requires title and at least one field',
+      'Calculated field logic is defined in Paperform, not in A.I.M.S. code',
+      'No real-time form editing collaboration (single-author model)',
+      'Cannot delete forms without HITL approval (destructive action)',
+    ],
+    usage: {
+      apiEndpoint: 'Pipedream MCP: https://mcp.pipedream.net/v2 (tools: paperform_*)',
+      importPath: undefined,
+      envVars: ['PIPEDREAM_API_KEY', 'PIPEDREAM_MCP_URL'],
+      prerequisites: [
+        'PIPEDREAM_API_KEY must be set',
+        'PAPERFORM_API_KEY must be configured inside Pipedream (encrypted at rest)',
+        'Pipedream MCP bridge must be active at https://mcp.pipedream.net/v2',
+      ],
+      parameters: [
+        { name: 'title', type: 'string', required: true, description: 'Form title displayed to users', example: 'Let\'s Get Started — A.I.M.S.' },
+        { name: 'slug', type: 'string', required: false, description: 'URL-friendly form identifier', example: 'aims-onboarding-needs-analysis' },
+        { name: 'fields', type: 'FormField[]', required: true, description: 'Array of form fields with type, key, label, required, options' },
+        { name: 'pages', type: 'FormPage[]', required: false, description: 'Multi-step page definitions with conditional routing logic' },
+        { name: 'theme', type: 'object', required: false, description: 'Visual theme (background, accent, font, button colors)', example: '{ background: "#F8FAFC", accent: "#F59E0B", font: "Inter" }' },
+        { name: 'settings', type: 'object', required: false, description: 'Progress bar, partial submissions, redirect URL, success message' },
+        { name: 'calculated_fields', type: 'CalculatedField[]', required: false, description: 'Hidden fields with auto-compute logic (tier, path, priority, LUC estimate)' },
+      ],
+      exampleInvocation: `// Via Pipedream MCP tool call:
+// Tool: paperform_create_form
+// Args: { title: "Client Intake", slug: "client-intake", fields: [...], settings: { show_progress_bar: true, allow_partial_submissions: true } }
+//
+// List submissions:
+// Tool: paperform_list_submissions
+// Args: { form_id: "abc123" }`,
+    },
+    triggers: [
+      'create a form', 'intake form', 'questionnaire', 'survey', 'client onboarding form',
+      'needs analysis form', 'booking form', 'feedback form', 'multi-step form', 'stepper form',
+      'get form submissions', 'form responses', 'onboarding form', 'sign up form',
+      'data collection', 'client intake', 'NPS survey', 'support request form',
+    ],
+    conditions: [
+      'PIPEDREAM_API_KEY is configured',
+      'PAPERFORM_API_KEY is stored inside Pipedream',
+      'Task requires structured data collection from a user or client',
+    ],
+    decisionLogic: 'Use Paperform Stepper for ANY structured data collection: client intake, needs analysis, booking, feedback, support requests, payment collection. Use multi-step pages when the form has 5+ fields or spans multiple concern areas. Use conditional page routing when user answers determine which questions to ask next. Use calculated fields to auto-compute tier, path, priority, and cost estimates. For simple yes/no or single-field collection, use in-chat conversation instead.',
+    antiPatterns: [
+      'Calling Paperform API directly instead of through Pipedream MCP',
+      'Exposing PAPERFORM_API_KEY to any agent (it lives in Pipedream only)',
+      'Revealing "Paperform" to users — always say "your intake form" or "your questionnaire"',
+      'Creating single-page forms for complex multi-section intake (use stepper pages)',
+      'Deleting forms without HITL approval',
+      'Storing raw submission data outside tenant-scoped Firestore',
+      'Not setting up partial submission tracking for lead recovery',
+      'Skipping calculated fields when tier/path/cost estimation is useful',
+    ],
+    conflicts: [],
+    costConsiderations: 'Form creation and management is free (API calls only). Submission processing costs depend on downstream actions (Firestore writes, Notion pages, Gmail sends, Calendar events). Paperform plan tier determines API rate limits and feature availability (e.g., conditional logic, calculated fields, Stripe integration).',
+    dependencies: ['unified-search'],
+    consumers: ['needs-analysis', 'plug-spinup', 'acheevy-chat'],
+    dataFlow: 'User Intent → ACHEEVY classifies as form task → Plug_Ang (via Pipedream MCP) → paperform_create_form / paperform_list_submissions → Form URL to user → User fills multi-step form → Paperform webhook → Pipedream → n8n automation → Validate → Firestore (tenant-scoped) → Notion (project page) → Google Drive (client folder) → Gmail (welcome email) → Calendar (if consultation booked) → ACHEEVY chat notification',
+    relatedMethodology: 'foster',
+    relatedLIBSection: 'instructions',
+    recommendedModel: 'claude-haiku-4.5',
+    lucServiceKey: 'form_management',
+    sourceFiles: [
+      'aims-skills/tools/paperform.tool.md',
+      'aims-skills/skills/integrations/paperform.skill.md',
+      'aims-skills/skills/integrations/onboarding-needs-analysis-form.skill.md',
+      'aims-skills/brains/PLUG_ANG_BRAIN.md',
+      'aims-skills/tools/pipedream-mcp.tool.md',
+    ],
+    skillFile: 'aims-skills/skills/integrations/paperform.skill.md',
+    brainSection: 'Section 33: MCP Capabilities — Paperform via Pipedream',
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════
   // Deployment & PaaS
   // ═══════════════════════════════════════════════════════════════════════
   {

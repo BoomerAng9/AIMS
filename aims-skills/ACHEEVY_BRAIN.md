@@ -2077,6 +2077,7 @@ level of expertise for every tool in the platform.
 | **Unified Search** | search | Active |
 | **Voice Pipeline** | voice | Partial |
 | **Needs Analysis** | deployment | Active |
+| **Paperform Stepper** | workflow | Active |
 
 ### How Agents Use SME Data
 
