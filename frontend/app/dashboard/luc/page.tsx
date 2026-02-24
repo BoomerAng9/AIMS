@@ -162,7 +162,7 @@ function StatusBar({ percent, status }: { percent: number; status: string }) {
   const color = colors[status as keyof typeof colors] || colors.ok;
 
   return (
-    <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+    <div className="w-full h-2 bg-[#1F1F23] rounded-full overflow-hidden">
       <motion.div
         initial={{ width: 0 }}
         animate={{ width: `${Math.min(percent, 100)}%` }}
@@ -200,7 +200,7 @@ function ServiceCard({
     >
       <div className="flex items-start justify-between mb-3">
         <div>
-          <h3 className="text-slate-800 font-medium">{service.name}</h3>
+          <h3 className="text-zinc-100 font-medium">{service.name}</h3>
           <p className="text-xs text-gray-400">{bucket?.description}</p>
         </div>
         {service.status !== 'ok' && (
@@ -311,7 +311,7 @@ function QuoteCalculator({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-slate-50/70 flex items-center justify-center p-4 z-50"
+      className="fixed inset-0 bg-[#18181B]/70 flex items-center justify-center p-4 z-50"
       onClick={onClose}
     >
       <motion.div
@@ -323,8 +323,8 @@ function QuoteCalculator({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-slate-800">Quote Calculator</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-slate-800">
+          <h2 className="text-xl font-bold text-zinc-100">Quote Calculator</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-zinc-100">
             <XCircleIcon className="w-6 h-6" />
           </button>
         </div>
@@ -336,7 +336,7 @@ function QuoteCalculator({
               className="px-4 py-3 rounded-lg"
               style={{ backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0' }}
             >
-              <div className="text-slate-800 font-medium">{bucket.name}</div>
+              <div className="text-zinc-100 font-medium">{bucket.name}</div>
               <div className="text-xs text-gray-500">{bucket.description}</div>
             </div>
           </div>
@@ -350,7 +350,7 @@ function QuoteCalculator({
               value={amount}
               onChange={(e) => setAmount(Math.max(0, parseInt(e.target.value) || 0))}
               min="0"
-              className="w-full px-4 py-3 rounded-lg text-slate-800 outline-none"
+              className="w-full px-4 py-3 rounded-lg text-zinc-100 outline-none"
               style={{
                 backgroundColor: '#F8FAFC',
                 border: `1px solid ${AIMS_CIRCUIT_COLORS.primary}40`,
@@ -365,11 +365,11 @@ function QuoteCalculator({
             >
               <div className="flex justify-between text-sm">
                 <span className="text-gray-500">Current Usage</span>
-                <span className="text-slate-800">{quote.currentUsed.toLocaleString()} / {quote.limit.toLocaleString()}</span>
+                <span className="text-zinc-100">{quote.currentUsed.toLocaleString()} / {quote.limit.toLocaleString()}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-500">After Operation</span>
-                <span className="text-slate-800">{(quote.currentUsed + amount).toLocaleString()}</span>
+                <span className="text-zinc-100">{(quote.currentUsed + amount).toLocaleString()}</span>
               </div>
               {quote.wouldExceed && (
                 <>
@@ -383,7 +383,7 @@ function QuoteCalculator({
                   </div>
                 </>
               )}
-              <div className="pt-3 border-t border-slate-200 flex items-center gap-2">
+              <div className="pt-3 border-t border-white/10 flex items-center gap-2">
                 {quote.allowed ? (
                   <>
                     <CheckCircleIcon className="w-5 h-5 text-green-500" />
@@ -430,7 +430,7 @@ function IndustryPresetSelector({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-slate-50/70 flex items-center justify-center p-4 z-50"
+      className="fixed inset-0 bg-[#18181B]/70 flex items-center justify-center p-4 z-50"
       onClick={onClose}
     >
       <motion.div
@@ -443,12 +443,12 @@ function IndustryPresetSelector({
       >
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-xl font-bold text-slate-800">Industry Presets</h2>
+            <h2 className="text-xl font-bold text-zinc-100">Industry Presets</h2>
             <p className="text-sm text-gray-400 mt-1">
               Select a preset to configure LUC for your industry
             </p>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-slate-800">
+          <button onClick={onClose} className="text-gray-400 hover:text-zinc-100">
             <XCircleIcon className="w-6 h-6" />
           </button>
         </div>
@@ -462,7 +462,7 @@ function IndustryPresetSelector({
               className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
                 selectedCategory === cat.id
                   ? 'bg-gold/10 text-gold border border-gold/30'
-                  : 'bg-white text-gray-500 border border-slate-200 hover:bg-slate-50'
+                  : 'bg-[#111113] text-gray-500 border border-white/10 hover:bg-white/5'
               }`}
             >
               {cat.label}
@@ -485,13 +485,13 @@ function IndustryPresetSelector({
                 <div className="flex items-start gap-3">
                   <span className="text-3xl">{preset.icon}</span>
                   <div className="flex-1">
-                    <h3 className="text-slate-800 font-medium">{preset.name}</h3>
+                    <h3 className="text-zinc-100 font-medium">{preset.name}</h3>
                     <p className="text-xs text-gray-400 mt-1">{preset.description}</p>
                     <div className="flex flex-wrap gap-1 mt-2">
                       {preset.useCases.slice(0, 3).map((useCase, i) => (
                         <span
                           key={i}
-                          className="px-2 py-0.5 rounded text-xs bg-slate-100 text-slate-600"
+                          className="px-2 py-0.5 rounded text-xs bg-[#1F1F23] text-zinc-300"
                         >
                           {useCase}
                         </span>
@@ -526,7 +526,7 @@ function UsageHistoryPanel({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-slate-50/70 flex items-center justify-center p-4 z-50"
+      className="fixed inset-0 bg-[#18181B]/70 flex items-center justify-center p-4 z-50"
       onClick={onClose}
     >
       <motion.div
@@ -540,9 +540,9 @@ function UsageHistoryPanel({
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <HistoryIcon className="w-6 h-6 text-gold" />
-            <h2 className="text-xl font-bold text-slate-800">Usage History</h2>
+            <h2 className="text-xl font-bold text-zinc-100">Usage History</h2>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-slate-800">
+          <button onClick={onClose} className="text-gray-400 hover:text-zinc-100">
             <XCircleIcon className="w-6 h-6" />
           </button>
         </div>
@@ -567,7 +567,7 @@ function UsageHistoryPanel({
                       }`}
                     />
                     <div>
-                      <div className="text-slate-800 text-sm font-medium">
+                      <div className="text-zinc-100 text-sm font-medium">
                         {entry.service.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
                       </div>
                       <div className="text-xs text-gray-400">
@@ -669,7 +669,7 @@ function ImportExportPanel({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-slate-50/70 flex items-center justify-center p-4 z-50"
+      className="fixed inset-0 bg-[#18181B]/70 flex items-center justify-center p-4 z-50"
       onClick={onClose}
     >
       <motion.div
@@ -681,8 +681,8 @@ function ImportExportPanel({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-slate-800">Import / Export</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-slate-800">
+          <h2 className="text-xl font-bold text-zinc-100">Import / Export</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-zinc-100">
             <XCircleIcon className="w-6 h-6" />
           </button>
         </div>
@@ -695,7 +695,7 @@ function ImportExportPanel({
           >
             <div className="flex items-center gap-2 mb-3">
               <DownloadIcon className="w-5 h-5 text-gold" />
-              <h3 className="text-slate-800 font-medium">Export Data</h3>
+              <h3 className="text-zinc-100 font-medium">Export Data</h3>
             </div>
             <p className="text-xs text-gray-400 mb-3">
               Download your account data and usage history
@@ -735,7 +735,7 @@ function ImportExportPanel({
           >
             <div className="flex items-center gap-2 mb-3">
               <UploadIcon className="w-5 h-5 text-gold" />
-              <h3 className="text-slate-800 font-medium">Import Data</h3>
+              <h3 className="text-zinc-100 font-medium">Import Data</h3>
             </div>
             <p className="text-xs text-gray-400 mb-3">
               Restore from a previous JSON export
@@ -999,7 +999,7 @@ export default function LUCWorkspacePage() {
                 style={{ backgroundColor: '#FFFFFF', border: '1px solid #E2E8F0' }}
               >
                 <div className="text-sm text-gray-400 mb-1">Billing Cycle Ends</div>
-                <div className="text-xl font-bold text-slate-800">
+                <div className="text-xl font-bold text-zinc-100">
                   {new Date(summary.billingCycleEnd).toLocaleDateString()}
                 </div>
               </div>
@@ -1013,12 +1013,12 @@ export default function LUCWorkspacePage() {
               >
                 <div className="flex items-center gap-2 mb-4">
                   <ChartIcon className="w-5 h-5 text-gold" />
-                  <h3 className="text-slate-800 font-medium">Usage Statistics</h3>
+                  <h3 className="text-zinc-100 font-medium">Usage Statistics</h3>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div>
                     <div className="text-xs text-gray-400">Total Operations</div>
-                    <div className="text-lg font-bold text-slate-800">{stats.totalUsage.toLocaleString()}</div>
+                    <div className="text-lg font-bold text-zinc-100">{stats.totalUsage.toLocaleString()}</div>
                   </div>
                   <div>
                     <div className="text-xs text-gray-400">Total Cost</div>
@@ -1029,7 +1029,7 @@ export default function LUCWorkspacePage() {
                       <div className="text-xs text-gray-400 mb-1">Top Services</div>
                       <div className="flex flex-wrap gap-2">
                         {stats.topServices.map((svc, i) => (
-                          <span key={i} className="px-2 py-1 rounded text-xs bg-slate-100 text-slate-600">
+                          <span key={i} className="px-2 py-1 rounded text-xs bg-[#1F1F23] text-zinc-300">
                             {svc.service.replace(/_/g, ' ')} (${svc.cost.toFixed(2)})
                           </span>
                         ))}
@@ -1062,7 +1062,7 @@ export default function LUCWorkspacePage() {
 
             {/* Plan Selector */}
             <div className="mb-8">
-              <h2 className="text-lg font-semibold text-slate-800 mb-4">Change Plan</h2>
+              <h2 className="text-lg font-semibold text-zinc-100 mb-4">Change Plan</h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {Object.values(LUC_PLANS).map((plan) => (
                   <button
@@ -1071,7 +1071,7 @@ export default function LUCWorkspacePage() {
                     className={`p-4 rounded-xl text-left transition-all ${
                       summary.planName === plan.name
                         ? 'ring-2'
-                        : 'hover:bg-slate-50'
+                        : 'hover:bg-white/5'
                     }`}
                     style={{
                       backgroundColor: '#FFFFFF',
@@ -1079,7 +1079,7 @@ export default function LUCWorkspacePage() {
                       '--tw-ring-color': summary.planName === plan.name ? AIMS_CIRCUIT_COLORS.accent : undefined,
                     } as React.CSSProperties}
                   >
-                    <div className="text-slate-800 font-medium">{plan.name}</div>
+                    <div className="text-zinc-100 font-medium">{plan.name}</div>
                     <div className="text-2xl font-bold mt-1" style={{ color: AIMS_CIRCUIT_COLORS.accent }}>
                       ${plan.monthlyPrice}
                       <span className="text-sm text-gray-400 font-normal">/mo</span>
@@ -1094,7 +1094,7 @@ export default function LUCWorkspacePage() {
 
             {/* Service Cards */}
             <div className="mb-8">
-              <h2 className="text-lg font-semibold text-slate-800 mb-4">Service Quotas</h2>
+              <h2 className="text-lg font-semibold text-zinc-100 mb-4">Service Quotas</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {summary.services.map((service) => (
                   <ServiceCard
@@ -1111,12 +1111,12 @@ export default function LUCWorkspacePage() {
               className="p-6 rounded-xl"
               style={{ backgroundColor: '#FFFFFF', border: '1px solid #E2E8F0' }}
             >
-              <h2 className="text-lg font-semibold text-slate-800 mb-4">Rate Card</h2>
+              <h2 className="text-lg font-semibold text-zinc-100 mb-4">Rate Card</h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                 {Object.values(SERVICE_BUCKETS).slice(0, 8).map((bucket) => (
                   <div key={bucket.key}>
                     <div className="text-sm text-gray-400">{bucket.name}</div>
-                    <div className="text-slate-800 font-mono">
+                    <div className="text-zinc-100 font-mono">
                       ${bucket.overageRate.toFixed(4)} / {bucket.unit}
                     </div>
                   </div>

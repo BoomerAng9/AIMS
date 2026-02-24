@@ -165,7 +165,7 @@ const LOBBY_CARDS: LobbyCard[] = [
 const STATUS_BADGE = {
   'live': { label: 'LIVE', className: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' },
   'beta': { label: 'BETA', className: 'bg-gold/20 text-gold border-gold/30' },
-  'coming-soon': { label: 'SOON', className: 'bg-slate-100 text-slate-400 border-slate-200' },
+  'coming-soon': { label: 'SOON', className: 'bg-[#1F1F23] text-zinc-500 border-white/10' },
 } as const;
 
 const CHANGE_TYPE_COLORS: Record<string, string> = {
@@ -179,7 +179,7 @@ const CHANGE_TYPE_COLORS: Record<string, string> = {
 const PORTAL_STATUS_COLORS: Record<string, string> = {
   IN_PORTAL: 'text-amber-400',
   COMMITTED: 'text-emerald-400',
-  WITHDRAWN: 'text-slate-400',
+  WITHDRAWN: 'text-zinc-500',
   SIGNED: 'text-gold',
 };
 
@@ -241,8 +241,8 @@ export default function PerFormLobbyPage() {
             <Trophy className="w-7 h-7 text-gold" />
           </div>
           <div>
-            <h1 className="text-3xl font-display text-slate-800">Per|Form</h1>
-            <p className="text-sm text-slate-400 font-mono uppercase tracking-widest">
+            <h1 className="text-3xl font-display text-zinc-100">Per|Form</h1>
+            <p className="text-sm text-zinc-500 font-mono uppercase tracking-widest">
               Autonomous Sports Intelligence Platform
             </p>
           </div>
@@ -252,14 +252,14 @@ export default function PerFormLobbyPage() {
             <TrendingUp className="w-3.5 h-3.5 text-emerald-400" />
             <span className="text-xs text-emerald-400 font-medium">Pipeline Active</span>
           </div>
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-50 border border-wireframe-stroke">
-            <Users className="w-3.5 h-3.5 text-slate-400" />
-            <span className="text-xs text-slate-400 font-medium">5 Agent Roles Assigned</span>
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#18181B] border border-wireframe-stroke">
+            <Users className="w-3.5 h-3.5 text-zinc-500" />
+            <span className="text-xs text-zinc-500 font-medium">5 Agent Roles Assigned</span>
           </div>
           {gridiron?.updatedAt && (
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-50 border border-wireframe-stroke ml-auto">
-              <Clock className="w-3.5 h-3.5 text-slate-400" />
-              <span className="text-[10px] text-slate-400 font-mono">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#18181B] border border-wireframe-stroke ml-auto">
+              <Clock className="w-3.5 h-3.5 text-zinc-500" />
+              <span className="text-[10px] text-zinc-500 font-mono">
                 {new Date(gridiron.updatedAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
               </span>
             </div>
@@ -278,9 +278,9 @@ export default function PerFormLobbyPage() {
           { label: 'Reports Generated', value: formatNumber(stats.reportsGenerated), color: 'text-emerald-400' },
           { label: 'Active Debates', value: formatNumber(stats.activeDebates), color: 'text-red-400' },
         ].map((stat) => (
-          <div key={stat.label} className="px-4 py-3 rounded-xl bg-white border border-wireframe-stroke">
+          <div key={stat.label} className="px-4 py-3 rounded-xl bg-[#111113] border border-wireframe-stroke">
             <p className={`text-xl font-display ${stat.color}`}>{stat.value}</p>
-            <p className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">{stat.label}</p>
+            <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider">{stat.label}</p>
           </div>
         ))}
       </motion.div>
@@ -298,7 +298,7 @@ export default function PerFormLobbyPage() {
                 transition={{ repeat: Infinity, duration: 1.2 }}
                 className="w-2 h-2 rounded-full bg-red-500"
               />
-              <span className="text-[11px] font-mono font-bold uppercase tracking-[0.3em] text-slate-500">Live Gridiron Data</span>
+              <span className="text-[11px] font-mono font-bold uppercase tracking-[0.3em] text-zinc-400">Live Gridiron Data</span>
             </div>
             <div className="flex-1 h-px bg-wireframe-stroke" />
           </div>
@@ -307,36 +307,36 @@ export default function PerFormLobbyPage() {
 
             {/* ── Scoreboard ────────────────────────────────── */}
             {hasScoreboard && (
-              <div className="rounded-xl border border-wireframe-stroke bg-slate-100/40 overflow-hidden">
+              <div className="rounded-xl border border-wireframe-stroke bg-[#1F1F23]/40 overflow-hidden">
                 <div className="px-4 py-3 border-b border-wireframe-stroke flex items-center justify-between">
-                  <span className="text-xs font-mono font-bold uppercase tracking-widest text-slate-500">Scoreboard</span>
-                  <span className="text-[10px] font-mono text-slate-400">{gridiron!.scoreboard.length} games</span>
+                  <span className="text-xs font-mono font-bold uppercase tracking-widest text-zinc-400">Scoreboard</span>
+                  <span className="text-[10px] font-mono text-zinc-500">{gridiron!.scoreboard.length} games</span>
                 </div>
                 <div className="divide-y divide-wireframe-stroke max-h-[300px] overflow-y-auto">
                   {gridiron!.scoreboard.map((game, i) => (
-                    <div key={i} className="px-4 py-2.5 flex items-center gap-3 hover:bg-white transition-colors">
+                    <div key={i} className="px-4 py-2.5 flex items-center gap-3 hover:bg-[#111113] transition-colors">
                       <span className={`text-[9px] font-mono uppercase tracking-wider px-1.5 py-0.5 rounded ${
                         game.status === 'LIVE' ? 'bg-red-500/20 text-red-400' :
-                        game.status === 'FINAL' ? 'bg-slate-50 text-slate-400' :
+                        game.status === 'FINAL' ? 'bg-[#18181B] text-zinc-500' :
                         'bg-blue-500/10 text-blue-400'
                       }`}>
                         {game.status}
                       </span>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
-                          <span className="text-xs font-medium text-slate-800 truncate">{game.awayTeam}</span>
-                          <span className={`text-sm font-bold ${game.result === 'AWAY' ? 'text-gold' : 'text-slate-500'}`}>
+                          <span className="text-xs font-medium text-zinc-100 truncate">{game.awayTeam}</span>
+                          <span className={`text-sm font-bold ${game.result === 'AWAY' ? 'text-gold' : 'text-zinc-400'}`}>
                             {game.awayScore ?? '—'}
                           </span>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-xs font-medium text-slate-800 truncate">{game.homeTeam}</span>
-                          <span className={`text-sm font-bold ${game.result === 'HOME' ? 'text-gold' : 'text-slate-500'}`}>
+                          <span className="text-xs font-medium text-zinc-100 truncate">{game.homeTeam}</span>
+                          <span className={`text-sm font-bold ${game.result === 'HOME' ? 'text-gold' : 'text-zinc-400'}`}>
                             {game.homeScore ?? '—'}
                           </span>
                         </div>
                       </div>
-                      <span className="text-[9px] font-mono text-slate-300 flex-shrink-0">{game.sport}</span>
+                      <span className="text-[9px] font-mono text-zinc-600 flex-shrink-0">{game.sport}</span>
                     </div>
                   ))}
                 </div>
@@ -345,23 +345,23 @@ export default function PerFormLobbyPage() {
 
             {/* ── Conference Standings ──────────────────────── */}
             {hasStandings && (
-              <div className="rounded-xl border border-wireframe-stroke bg-slate-100/40 overflow-hidden">
+              <div className="rounded-xl border border-wireframe-stroke bg-[#1F1F23]/40 overflow-hidden">
                 <div className="px-4 py-3 border-b border-wireframe-stroke flex items-center justify-between">
-                  <span className="text-xs font-mono font-bold uppercase tracking-widest text-slate-500">Standings</span>
-                  <span className="text-[10px] font-mono text-slate-400">Top 25</span>
+                  <span className="text-xs font-mono font-bold uppercase tracking-widest text-zinc-400">Standings</span>
+                  <span className="text-[10px] font-mono text-zinc-500">Top 25</span>
                 </div>
                 <div className="divide-y divide-wireframe-stroke max-h-[300px] overflow-y-auto">
                   {gridiron!.standings.map((team, i) => (
-                    <div key={i} className="px-4 py-2 flex items-center gap-3 hover:bg-white transition-colors">
-                      <span className="text-[10px] font-bold text-slate-300 w-5 text-right">
+                    <div key={i} className="px-4 py-2 flex items-center gap-3 hover:bg-[#111113] transition-colors">
+                      <span className="text-[10px] font-bold text-zinc-600 w-5 text-right">
                         {team.apRank || team.cfpRank || i + 1}
                       </span>
                       <div className="flex-1 min-w-0">
-                        <span className="text-xs font-medium text-slate-800 truncate block">{team.team}</span>
-                        <span className="text-[10px] font-mono text-slate-400">{team.conference}</span>
+                        <span className="text-xs font-medium text-zinc-100 truncate block">{team.team}</span>
+                        <span className="text-[10px] font-mono text-zinc-500">{team.conference}</span>
                       </div>
-                      <span className="text-xs font-mono text-slate-500">{team.wins}-{team.losses}</span>
-                      <span className="text-[10px] font-mono text-slate-400">({team.confWins}-{team.confLosses})</span>
+                      <span className="text-xs font-mono text-zinc-400">{team.wins}-{team.losses}</span>
+                      <span className="text-[10px] font-mono text-zinc-500">({team.confWins}-{team.confLosses})</span>
                       {team.bowlGame && (
                         <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded ${
                           team.bowlResult === 'W' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'
@@ -377,10 +377,10 @@ export default function PerFormLobbyPage() {
 
             {/* ── Transfer Portal Feed ─────────────────────── */}
             {hasPortal && (
-              <div className="rounded-xl border border-wireframe-stroke bg-slate-100/40 overflow-hidden">
+              <div className="rounded-xl border border-wireframe-stroke bg-[#1F1F23]/40 overflow-hidden">
                 <div className="px-4 py-3 border-b border-wireframe-stroke flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <span className="text-xs font-mono font-bold uppercase tracking-widest text-slate-500">Portal Feed</span>
+                    <span className="text-xs font-mono font-bold uppercase tracking-widest text-zinc-400">Portal Feed</span>
                     {gridiron!.portalSummary.total > 0 && (
                       <span className="text-[10px] font-mono text-amber-400/70 bg-amber-500/10 px-2 py-0.5 rounded-full">
                         {gridiron!.portalSummary.inPortal} active
@@ -393,16 +393,16 @@ export default function PerFormLobbyPage() {
                 </div>
                 <div className="divide-y divide-wireframe-stroke max-h-[300px] overflow-y-auto">
                   {gridiron!.portalMoves.map((move, i) => (
-                    <div key={i} className="px-4 py-2.5 hover:bg-white transition-colors">
+                    <div key={i} className="px-4 py-2.5 hover:bg-[#111113] transition-colors">
                       <div className="flex items-center gap-2">
-                        <Circle className={`w-2 h-2 flex-shrink-0 ${PORTAL_STATUS_COLORS[move.status] || 'text-slate-300'}`} fill="currentColor" />
-                        <span className="text-xs font-medium text-slate-800 truncate">{move.playerName}</span>
-                        <span className="text-[10px] font-mono text-slate-400 flex-shrink-0">{move.position}</span>
+                        <Circle className={`w-2 h-2 flex-shrink-0 ${PORTAL_STATUS_COLORS[move.status] || 'text-zinc-600'}`} fill="currentColor" />
+                        <span className="text-xs font-medium text-zinc-100 truncate">{move.playerName}</span>
+                        <span className="text-[10px] font-mono text-zinc-500 flex-shrink-0">{move.position}</span>
                         {move.paiScore && (
                           <span className="text-[10px] font-mono text-gold/50 ml-auto flex-shrink-0">P.A.I. {move.paiScore}</span>
                         )}
                       </div>
-                      <div className="flex items-center gap-1.5 mt-1 text-[10px] font-mono text-slate-400">
+                      <div className="flex items-center gap-1.5 mt-1 text-[10px] font-mono text-zinc-500">
                         <span>{move.fromAbbr}</span>
                         <ArrowRight className="w-2.5 h-2.5" />
                         <span className={move.to ? 'text-emerald-400/70' : 'text-amber-400/50'}>
@@ -420,30 +420,30 @@ export default function PerFormLobbyPage() {
 
             {/* ── Coaching Carousel ────────────────────────── */}
             {hasCoaching && (
-              <div className="rounded-xl border border-wireframe-stroke bg-slate-100/40 overflow-hidden">
+              <div className="rounded-xl border border-wireframe-stroke bg-[#1F1F23]/40 overflow-hidden">
                 <div className="px-4 py-3 border-b border-wireframe-stroke flex items-center justify-between">
-                  <span className="text-xs font-mono font-bold uppercase tracking-widest text-slate-500">Coaching Carousel</span>
+                  <span className="text-xs font-mono font-bold uppercase tracking-widest text-zinc-400">Coaching Carousel</span>
                   <Link href="/perform/coaching-carousel" className="text-[10px] font-mono text-gold/50 hover:text-gold transition-colors">
                     Full List →
                   </Link>
                 </div>
                 <div className="divide-y divide-wireframe-stroke max-h-[300px] overflow-y-auto">
                   {gridiron!.coachingChanges.map((change, i) => (
-                    <div key={i} className="px-4 py-2.5 hover:bg-white transition-colors">
+                    <div key={i} className="px-4 py-2.5 hover:bg-[#111113] transition-colors">
                       <div className="flex items-center gap-2">
                         <span className={`text-[9px] font-mono font-bold uppercase px-1.5 py-0.5 rounded border ${
-                          CHANGE_TYPE_COLORS[change.changeType] || 'text-slate-400 bg-slate-50 border-slate-200'
+                          CHANGE_TYPE_COLORS[change.changeType] || 'text-zinc-500 bg-[#18181B] border-white/10'
                         }`}>
                           {change.changeType}
                         </span>
-                        <span className="text-xs font-medium text-slate-800 truncate">{change.coachName}</span>
+                        <span className="text-xs font-medium text-zinc-100 truncate">{change.coachName}</span>
                       </div>
-                      <div className="flex items-center gap-2 mt-1 text-[10px] font-mono text-slate-400">
+                      <div className="flex items-center gap-2 mt-1 text-[10px] font-mono text-zinc-500">
                         {change.previousTeam && <span>{change.previousTeam}</span>}
                         {change.previousTeam && change.newTeam && <ArrowRight className="w-2.5 h-2.5" />}
                         {change.newTeam && <span className="text-emerald-400/70">{change.newTeam}</span>}
                         {change.contractValue && <span className="ml-auto text-green-400/50">{change.contractValue}</span>}
-                        {change.record && <span className="text-slate-300">({change.record})</span>}
+                        {change.record && <span className="text-zinc-600">({change.record})</span>}
                       </div>
                     </div>
                   ))}
@@ -453,25 +453,25 @@ export default function PerFormLobbyPage() {
 
             {/* ── Draft Board ──────────────────────────────── */}
             {hasDraft && (
-              <div className="rounded-xl border border-wireframe-stroke bg-slate-100/40 overflow-hidden">
+              <div className="rounded-xl border border-wireframe-stroke bg-[#1F1F23]/40 overflow-hidden">
                 <div className="px-4 py-3 border-b border-wireframe-stroke flex items-center justify-between">
-                  <span className="text-xs font-mono font-bold uppercase tracking-widest text-slate-500">Draft Board</span>
+                  <span className="text-xs font-mono font-bold uppercase tracking-widest text-zinc-400">Draft Board</span>
                   <Link href="/sandbox/perform/draft" className="text-[10px] font-mono text-gold/50 hover:text-gold transition-colors">
                     Full Board →
                   </Link>
                 </div>
                 <div className="divide-y divide-wireframe-stroke max-h-[300px] overflow-y-auto">
                   {gridiron!.draftBoard.map((prospect, i) => (
-                    <div key={i} className="px-4 py-2.5 flex items-center gap-3 hover:bg-white transition-colors">
-                      <span className="text-lg font-bold text-slate-300 w-6 text-right flex-shrink-0">{prospect.overallRank}</span>
+                    <div key={i} className="px-4 py-2.5 flex items-center gap-3 hover:bg-[#111113] transition-colors">
+                      <span className="text-lg font-bold text-zinc-600 w-6 text-right flex-shrink-0">{prospect.overallRank}</span>
                       <div className="w-8 h-8 rounded-lg bg-gold/10 border border-gold/20 flex items-center justify-center text-[10px] font-bold text-gold flex-shrink-0">
                         {prospect.position}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs font-medium text-slate-800 truncate">{prospect.name}</p>
-                        <p className="text-[10px] font-mono text-slate-400">{prospect.college}</p>
+                        <p className="text-xs font-medium text-zinc-100 truncate">{prospect.name}</p>
+                        <p className="text-[10px] font-mono text-zinc-500">{prospect.college}</p>
                       </div>
-                      <span className="text-[10px] text-slate-300">{TREND_ARROW[prospect.trend] || '—'}</span>
+                      <span className="text-[10px] text-zinc-600">{TREND_ARROW[prospect.trend] || '—'}</span>
                       {prospect.combineInvite && (
                         <span className="text-[9px] font-mono bg-cyan-500/10 text-cyan-400/60 px-1.5 py-0.5 rounded">CMB</span>
                       )}
@@ -484,25 +484,25 @@ export default function PerFormLobbyPage() {
 
             {/* ── NIL Leaderboard ──────────────────────────── */}
             {hasNil && (
-              <div className="rounded-xl border border-wireframe-stroke bg-slate-100/40 overflow-hidden">
+              <div className="rounded-xl border border-wireframe-stroke bg-[#1F1F23]/40 overflow-hidden">
                 <div className="px-4 py-3 border-b border-wireframe-stroke flex items-center justify-between">
-                  <span className="text-xs font-mono font-bold uppercase tracking-widest text-slate-500">NIL Leaderboard</span>
+                  <span className="text-xs font-mono font-bold uppercase tracking-widest text-zinc-400">NIL Leaderboard</span>
                   <Link href="/dashboard/nil" className="text-[10px] font-mono text-gold/50 hover:text-gold transition-colors">
                     Full Rankings →
                   </Link>
                 </div>
                 <div className="divide-y divide-wireframe-stroke max-h-[300px] overflow-y-auto">
                   {gridiron!.nilLeaders.map((entry, i) => (
-                    <div key={i} className="px-4 py-2.5 flex items-center gap-3 hover:bg-white transition-colors">
-                      <span className="text-[10px] font-bold text-slate-300 w-5 text-right">#{entry.rank}</span>
+                    <div key={i} className="px-4 py-2.5 flex items-center gap-3 hover:bg-[#111113] transition-colors">
+                      <span className="text-[10px] font-bold text-zinc-600 w-5 text-right">#{entry.rank}</span>
                       <div className="flex-1 min-w-0">
-                        <span className="text-xs font-medium text-slate-800 truncate block">{entry.team}</span>
-                        <span className="text-[10px] font-mono text-slate-300">{entry.dealCount} deals</span>
+                        <span className="text-xs font-medium text-zinc-100 truncate block">{entry.team}</span>
+                        <span className="text-[10px] font-mono text-zinc-600">{entry.dealCount} deals</span>
                       </div>
-                      <span className="text-[10px] text-slate-300">{TREND_ARROW[entry.trend] || '—'}</span>
+                      <span className="text-[10px] text-zinc-600">{TREND_ARROW[entry.trend] || '—'}</span>
                       <div className="text-right flex-shrink-0">
                         <p className="text-xs font-bold text-green-400">{formatCurrency(entry.totalNilValue)}</p>
-                        <p className="text-[9px] font-mono text-slate-300">{formatCurrency(entry.avgPerPlayer)}/player</p>
+                        <p className="text-[9px] font-mono text-zinc-600">{formatCurrency(entry.avgPerPlayer)}/player</p>
                       </div>
                     </div>
                   ))}
@@ -513,14 +513,14 @@ export default function PerFormLobbyPage() {
 
           {/* ── Portal Summary Bar ─────────────────────────── */}
           {gridiron && gridiron.portalSummary.total > 0 && (
-            <div className="flex items-center gap-4 px-4 py-3 rounded-xl bg-white border border-wireframe-stroke">
+            <div className="flex items-center gap-4 px-4 py-3 rounded-xl bg-[#111113] border border-wireframe-stroke">
               <ArrowRightLeft className="w-4 h-4 text-purple-400/50 flex-shrink-0" />
-              <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400">Portal Summary</span>
+              <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-zinc-500">Portal Summary</span>
               <div className="flex items-center gap-4 ml-auto text-[11px] font-mono">
-                <span className="text-amber-400">{gridiron.portalSummary.inPortal} <span className="text-slate-300">active</span></span>
-                <span className="text-emerald-400">{gridiron.portalSummary.committed} <span className="text-slate-300">committed</span></span>
-                <span className="text-gold">{gridiron.portalSummary.signed} <span className="text-slate-300">signed</span></span>
-                <span className="text-slate-400">{gridiron.portalSummary.total} total</span>
+                <span className="text-amber-400">{gridiron.portalSummary.inPortal} <span className="text-zinc-600">active</span></span>
+                <span className="text-emerald-400">{gridiron.portalSummary.committed} <span className="text-zinc-600">committed</span></span>
+                <span className="text-gold">{gridiron.portalSummary.signed} <span className="text-zinc-600">signed</span></span>
+                <span className="text-zinc-500">{gridiron.portalSummary.total} total</span>
               </div>
             </div>
           )}
@@ -530,7 +530,7 @@ export default function PerFormLobbyPage() {
       {/* ── Navigation Cards Grid ─────────────────────────────── */}
       <div className="space-y-3">
         <div className="flex items-center gap-3">
-          <span className="text-[11px] font-mono font-bold uppercase tracking-[0.3em] text-slate-400">Platform</span>
+          <span className="text-[11px] font-mono font-bold uppercase tracking-[0.3em] text-zinc-500">Platform</span>
           <div className="flex-1 h-px bg-wireframe-stroke" />
         </div>
 
@@ -547,18 +547,18 @@ export default function PerFormLobbyPage() {
             return (
               <motion.div key={card.title} variants={staggerItem}>
                 <Link href={card.href}>
-                  <div className="group rounded-xl border border-wireframe-stroke bg-slate-100/60 hover:bg-slate-50/70 hover:border-gold/20 transition-all p-5 h-full flex flex-col gap-3 cursor-pointer">
+                  <div className="group rounded-xl border border-wireframe-stroke bg-[#1F1F23]/60 hover:bg-white/5/70 hover:border-gold/20 transition-all p-5 h-full flex flex-col gap-3 cursor-pointer">
                     <div className="flex items-start justify-between">
-                      <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${card.accentColor} border border-slate-200 flex items-center justify-center group-hover:border-gold/20 transition-colors`}>
-                        <Icon className="w-5 h-5 text-slate-600 group-hover:text-gold transition-colors" />
+                      <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${card.accentColor} border border-white/10 flex items-center justify-center group-hover:border-gold/20 transition-colors`}>
+                        <Icon className="w-5 h-5 text-zinc-300 group-hover:text-gold transition-colors" />
                       </div>
                       <span className={`text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full border ${badge.className}`}>
                         {badge.label}
                       </span>
                     </div>
                     <div>
-                      <h3 className="text-sm font-medium text-slate-800 group-hover:text-gold transition-colors">{card.title}</h3>
-                      <p className="text-xs text-slate-400 mt-1 leading-relaxed">{card.description}</p>
+                      <h3 className="text-sm font-medium text-zinc-100 group-hover:text-gold transition-colors">{card.title}</h3>
+                      <p className="text-xs text-zinc-500 mt-1 leading-relaxed">{card.description}</p>
                     </div>
                   </div>
                 </Link>

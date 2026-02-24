@@ -130,7 +130,7 @@ export default function ProtocolsPage() {
       <motion.section variants={staggerItem}>
         <Link
           href="/dashboard/research"
-          className="mb-4 inline-flex items-center gap-2 text-sm text-slate-400 transition hover:text-gold"
+          className="mb-4 inline-flex items-center gap-2 text-sm text-zinc-500 transition hover:text-gold"
         >
           <ArrowLeft size={14} />
           Back to Research Hub
@@ -141,10 +141,10 @@ export default function ProtocolsPage() {
             <Network size={22} className="text-gold" />
           </div>
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-slate-800 font-display">
+            <h1 className="text-2xl font-semibold tracking-tight text-zinc-100 font-display">
               Agentic Protocols
             </h1>
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-zinc-400">
               Communication standards powering the A.I.M.S. agent ecosystem
             </p>
           </div>
@@ -153,7 +153,7 @@ export default function ProtocolsPage() {
 
       {/* ── Protocol Cards Grid ────────────────────────────── */}
       <motion.section variants={staggerItem}>
-        <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-slate-700 font-display">
+        <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-200 font-display">
           Protocol Registry
         </h2>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -161,7 +161,7 @@ export default function ProtocolsPage() {
             <motion.div
               key={protocol.id}
               whileHover={{ y: -4 }}
-              className="rounded-3xl border border-wireframe-stroke bg-slate-50/70 p-6 backdrop-blur-2xl"
+              className="rounded-3xl border border-wireframe-stroke bg-[#18181B]/70 p-6 backdrop-blur-2xl"
             >
               {/* Icon + Name + Status */}
               <div className="mb-4 flex items-start justify-between">
@@ -170,10 +170,10 @@ export default function ProtocolsPage() {
                     <protocol.icon size={18} className="text-gold" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-slate-800 font-display">
+                    <h3 className="text-lg font-semibold text-zinc-100 font-display">
                       {protocol.name}
                     </h3>
-                    <p className="text-xs text-slate-400">{protocol.fullName}</p>
+                    <p className="text-xs text-zinc-500">{protocol.fullName}</p>
                   </div>
                 </div>
                 <span
@@ -185,7 +185,7 @@ export default function ProtocolsPage() {
               </div>
 
               {/* Description */}
-              <p className="mb-4 text-sm leading-relaxed text-slate-500">
+              <p className="mb-4 text-sm leading-relaxed text-zinc-400">
                 {protocol.description}
               </p>
 
@@ -198,7 +198,7 @@ export default function ProtocolsPage() {
                   {protocol.agents.map((agent) => (
                     <span
                       key={agent}
-                      className="rounded-lg border border-wireframe-stroke bg-slate-50 px-2.5 py-1 text-xs text-slate-600"
+                      className="rounded-lg border border-wireframe-stroke bg-[#18181B] px-2.5 py-1 text-xs text-zinc-300"
                     >
                       {agent}
                     </span>
@@ -215,7 +215,7 @@ export default function ProtocolsPage() {
                   {protocol.features.map((feature) => (
                     <li
                       key={feature}
-                      className="flex items-start gap-2 text-xs text-slate-500"
+                      className="flex items-start gap-2 text-xs text-zinc-400"
                     >
                       <CheckCircle2
                         size={12}
@@ -233,11 +233,11 @@ export default function ProtocolsPage() {
 
       {/* ── Protocol Stack ─────────────────────────────────── */}
       <motion.section variants={staggerItem}>
-        <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-slate-700 font-display">
+        <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-200 font-display">
           Protocol Stack
         </h2>
-        <div className="rounded-3xl border border-wireframe-stroke bg-slate-50/70 p-6 backdrop-blur-2xl">
-          <p className="mb-6 text-sm text-slate-500">
+        <div className="rounded-3xl border border-wireframe-stroke bg-[#18181B]/70 p-6 backdrop-blur-2xl">
+          <p className="mb-6 text-sm text-zinc-400">
             How the three protocols layer within the A.I.M.S. architecture, from
             application logic down to transport.
           </p>
@@ -263,7 +263,7 @@ export default function ProtocolsPage() {
                         >
                           {layer.label}
                         </p>
-                        <p className="text-xs text-slate-400">{layer.description}</p>
+                        <p className="text-xs text-zinc-500">{layer.description}</p>
                       </div>
                     </div>
                     <span
@@ -282,7 +282,7 @@ export default function ProtocolsPage() {
                 {/* Arrow Between Layers */}
                 {i < stackLayers.length - 1 && (
                   <div className="flex justify-center py-1">
-                    <ArrowDown size={16} className="text-slate-300" />
+                    <ArrowDown size={16} className="text-zinc-600" />
                   </div>
                 )}
               </div>
@@ -291,15 +291,15 @@ export default function ProtocolsPage() {
 
           {/* Legend */}
           <div className="mt-6 flex flex-wrap items-center justify-center gap-6 border-t border-wireframe-stroke pt-4">
-            <div className="flex items-center gap-2 text-xs text-slate-400">
+            <div className="flex items-center gap-2 text-xs text-zinc-500">
               <Shield size={12} className="text-gold" />
               <span>Security boundary at every layer</span>
             </div>
-            <div className="flex items-center gap-2 text-xs text-slate-400">
+            <div className="flex items-center gap-2 text-xs text-zinc-500">
               <MessageSquare size={12} className="text-blue-400" />
               <span>Structured message passing</span>
             </div>
-            <div className="flex items-center gap-2 text-xs text-slate-400">
+            <div className="flex items-center gap-2 text-xs text-zinc-500">
               <RefreshCw size={12} className="text-gold" />
               <span>Retry & circuit-breaking at ACP layer</span>
             </div>

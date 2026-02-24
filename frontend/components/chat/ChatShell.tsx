@@ -16,7 +16,7 @@ export function ChatShell({ children }: Props) {
             🛡️
           </div>
           <div>
-            <h1 className="text-xl font-semibold text-slate-800 font-display tracking-wider">
+            <h1 className="text-xl font-semibold text-zinc-100 font-display tracking-wider">
               ACHEEVY
             </h1>
             <p className="text-[10px] uppercase tracking-widest text-emerald-400 font-bold">
@@ -37,7 +37,7 @@ export function ChatShell({ children }: Props) {
             <div className="h-16 w-16 rounded-full border border-dashed border-gold/20 flex items-center justify-center text-2xl">
               ?
             </div>
-            <p className="text-lg font-handwriting text-slate-800">
+            <p className="text-lg font-handwriting text-zinc-100">
               Think it. Speak it. ACHEEVY builds it.
             </p>
             <p className="text-[10px] uppercase tracking-widest max-w-xs">
@@ -49,18 +49,18 @@ export function ChatShell({ children }: Props) {
 
       {/* Input Area */}
       <footer className="p-4 md:p-6">
-        <div className="rounded-3xl border border-wireframe-stroke bg-slate-100/60 p-2 backdrop-blur-2xl shadow-xl flex items-center gap-2 focus-within:border-gold/30 transition-all">
-          <button disabled className="p-3 text-slate-300 hover:text-slate-800 transition-colors">
+        <div className="rounded-3xl border border-wireframe-stroke bg-[#111113] p-2 backdrop-blur-2xl shadow-xl flex items-center gap-2 focus-within:border-gold/30 transition-all">
+          <button disabled className="p-3 text-zinc-600 hover:text-zinc-100 transition-colors">
             <Paperclip size={20} />
           </button>
           <input 
             type="text" 
             placeholder="Speak or type your mission directive..." 
-            className="flex-1 bg-transparent py-3 px-2 text-sm text-slate-800 outline-none placeholder:text-slate-300"
+            className="flex-1 bg-transparent py-3 px-2 text-sm text-zinc-100 outline-none placeholder:text-zinc-600"
             disabled
           />
           <div className="flex items-center gap-1 pr-1">
-            <button disabled className="p-3 rounded-full bg-slate-50 text-slate-300 hover:text-slate-800 transition-colors">
+            <button disabled className="p-3 rounded-full bg-[#18181B] text-zinc-600 hover:text-zinc-100 transition-colors">
               <Mic size={20} />
             </button>
             <button disabled className="p-3 rounded-full bg-gold/10 text-gold/20">

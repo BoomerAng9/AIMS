@@ -275,8 +275,8 @@ function formatTimestamp(iso: string): string {
 function ChartTooltip({ active, payload, label, unit = "" }: { active?: boolean; payload?: Array<{ value: number; name: string; color: string }>; label?: string; unit?: string }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-xl border border-wireframe-stroke bg-white/95 backdrop-blur-xl px-3 py-2 shadow-xl">
-      <p className="text-[10px] text-slate-400 mb-1 font-mono">{label}</p>
+    <div className="rounded-xl border border-wireframe-stroke bg-[#111113]/95 backdrop-blur-xl px-3 py-2 shadow-xl">
+      <p className="text-[10px] text-zinc-500 mb-1 font-mono">{label}</p>
       {payload.map((entry, i) => (
         <p key={i} className="text-xs font-semibold" style={{ color: entry.color }}>
           {entry.name}: {entry.value}{unit}
@@ -328,7 +328,7 @@ function RadialGauge({ value, max, label, color, icon: Icon }: { value: number; 
           <span className="text-lg font-bold mt-0.5" style={{ color: thresholdColor }}>{pct}%</span>
         </div>
       </div>
-      <span className="text-[10px] text-slate-400 mt-1 uppercase tracking-wider">{label}</span>
+      <span className="text-[10px] text-zinc-500 mt-1 uppercase tracking-wider">{label}</span>
     </div>
   );
 }
@@ -396,31 +396,31 @@ function ServiceHealthGrid({ services }: { services: ServiceHealth[] }) {
           <motion.div
             key={svc.name}
             whileHover={{ scale: 1.02 }}
-            className={`rounded-xl border ${borderColor} bg-slate-100/60 p-3 cursor-default transition-all hover:bg-white`}
+            className={`rounded-xl border ${borderColor} bg-[#1F1F23]/60 p-3 cursor-default transition-all hover:bg-[#111113]`}
           >
             <div className="flex items-center gap-2 mb-2">
               <span className={`h-2 w-2 rounded-full ${dotColor} ${svc.status !== "healthy" ? "animate-pulse" : ""}`} />
-              <span className="text-xs font-semibold text-slate-800 truncate">{svc.name}</span>
+              <span className="text-xs font-semibold text-zinc-100 truncate">{svc.name}</span>
             </div>
             <div className="grid grid-cols-2 gap-x-3 gap-y-1">
               <div>
-                <p className="text-[9px] text-slate-400">Latency</p>
+                <p className="text-[9px] text-zinc-500">Latency</p>
                 <p className={`text-xs font-mono font-semibold ${svc.latency > 200 ? "text-gold" : statusColor}`}>{svc.latency}ms</p>
               </div>
               <div>
-                <p className="text-[9px] text-slate-400">Uptime</p>
+                <p className="text-[9px] text-zinc-500">Uptime</p>
                 <p className={`text-xs font-mono font-semibold ${statusColor}`}>{svc.uptime}%</p>
               </div>
               <div>
-                <p className="text-[9px] text-slate-400">Req/hr</p>
-                <p className="text-xs font-mono text-slate-500">{svc.requests.toLocaleString()}</p>
+                <p className="text-[9px] text-zinc-500">Req/hr</p>
+                <p className="text-xs font-mono text-zinc-400">{svc.requests.toLocaleString()}</p>
               </div>
               <div>
-                <p className="text-[9px] text-slate-400">Errors</p>
-                <p className={`text-xs font-mono ${svc.errors > 5 ? "text-red-400" : "text-slate-400"}`}>{svc.errors}</p>
+                <p className="text-[9px] text-zinc-500">Errors</p>
+                <p className={`text-xs font-mono ${svc.errors > 5 ? "text-red-400" : "text-zinc-500"}`}>{svc.errors}</p>
               </div>
             </div>
-            <p className="text-[8px] text-slate-300 mt-2 text-right">{svc.lastCheck}</p>
+            <p className="text-[8px] text-zinc-600 mt-2 text-right">{svc.lastCheck}</p>
           </motion.div>
         );
       })}
@@ -475,30 +475,30 @@ export default function OperationsPage() {
               <Activity size={18} className="text-gold" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-slate-800 font-display">Operations Command</h1>
-              <p className="text-[10px] text-slate-400 uppercase tracking-widest">Platform Telemetry &amp; Observability</p>
+              <h1 className="text-xl font-bold text-zinc-100 font-display">Operations Command</h1>
+              <p className="text-[10px] text-zinc-500 uppercase tracking-widest">Platform Telemetry &amp; Observability</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
             {/* Live indicator */}
-            <button onClick={() => setIsLive(!isLive)} className="flex items-center gap-2 rounded-lg border border-wireframe-stroke bg-slate-100/60 px-3 py-1.5 transition-all hover:border-gold/20">
+            <button onClick={() => setIsLive(!isLive)} className="flex items-center gap-2 rounded-lg border border-wireframe-stroke bg-[#1F1F23]/60 px-3 py-1.5 transition-all hover:border-gold/20">
               <span className={`relative flex h-2 w-2 ${isLive ? "" : "opacity-30"}`}>
                 {isLive && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />}
                 <span className={`relative inline-flex rounded-full h-2 w-2 ${isLive ? "bg-emerald-400" : "bg-white/30"}`} />
               </span>
-              <span className={`text-[10px] font-bold uppercase tracking-widest ${isLive ? "text-emerald-400" : "text-slate-400"}`}>
+              <span className={`text-[10px] font-bold uppercase tracking-widest ${isLive ? "text-emerald-400" : "text-zinc-500"}`}>
                 {isLive ? "LIVE" : "PAUSED"}
               </span>
             </button>
 
             {/* Time range selector */}
-            <div className="flex items-center rounded-lg border border-wireframe-stroke bg-slate-100/60 p-0.5">
+            <div className="flex items-center rounded-lg border border-wireframe-stroke bg-[#1F1F23]/60 p-0.5">
               {(["1h", "6h", "24h", "7d", "30d"] as TimeRange[]).map((range) => (
                 <button
                   key={range}
                   onClick={() => setTimeRange(range)}
                   className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all ${
-                    timeRange === range ? "bg-gold/10 text-gold border border-gold/20" : "text-slate-400 hover:text-slate-500"
+                    timeRange === range ? "bg-gold/10 text-gold border border-gold/20" : "text-zinc-500 hover:text-zinc-400"
                   }`}
                 >
                   {range}
@@ -569,10 +569,10 @@ export default function OperationsPage() {
           <motion.div
             key={kpi.label}
             variants={staggerItem}
-            className="rounded-xl border border-wireframe-stroke bg-slate-50/70 p-4 backdrop-blur-xl hover:border-slate-200 transition-all"
+            className="rounded-xl border border-wireframe-stroke bg-[#18181B]/70 p-4 backdrop-blur-xl hover:border-white/10 transition-all"
           >
             <div className="flex items-center justify-between mb-1">
-              <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">{kpi.label}</p>
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-zinc-500">{kpi.label}</p>
               <kpi.icon size={14} style={{ color: kpi.color }} />
             </div>
             <p className="text-2xl font-bold" style={{ color: kpi.color }}>{kpi.value}</p>
@@ -582,9 +582,9 @@ export default function OperationsPage() {
               ) : kpi.trend < 0 ? (
                 <ArrowDownRight size={10} className="text-emerald-400" />
               ) : (
-                <Activity size={10} className="text-slate-300" />
+                <Activity size={10} className="text-zinc-600" />
               )}
-              <span className="text-[10px] text-slate-400">{kpi.trendLabel}</span>
+              <span className="text-[10px] text-zinc-500">{kpi.trendLabel}</span>
             </div>
             <div className="mt-2 -mx-1">
               <Sparkline data={kpi.sparkData} color={kpi.color} />
@@ -607,14 +607,14 @@ export default function OperationsPage() {
             className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold uppercase tracking-wider transition-all border-b-2 -mb-[1px] ${
               activeTab === tab.key
                 ? "border-gold text-gold"
-                : "border-transparent text-slate-400 hover:text-slate-500"
+                : "border-transparent text-zinc-500 hover:text-zinc-400"
             }`}
           >
             <tab.icon size={14} />
             {tab.label}
             {tab.count !== undefined && (
               <span className={`rounded-full px-1.5 py-0.5 text-[9px] font-bold ${
-                activeTab === tab.key ? "bg-gold/10 text-gold" : "bg-slate-50 text-slate-300"
+                activeTab === tab.key ? "bg-gold/10 text-gold" : "bg-[#18181B] text-zinc-600"
               }`}>
                 {tab.count}
               </span>
@@ -638,13 +638,13 @@ export default function OperationsPage() {
               {/* Charts Row */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {/* Response Time Chart */}
-                <div className="rounded-2xl border border-wireframe-stroke bg-slate-50/70 p-5 backdrop-blur-xl">
+                <div className="rounded-2xl border border-wireframe-stroke bg-[#18181B]/70 p-5 backdrop-blur-xl">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
                       <Clock size={14} className="text-gold" />
-                      <h3 className="text-sm font-semibold text-slate-800">Response Time (p50)</h3>
+                      <h3 className="text-sm font-semibold text-zinc-100">Response Time (p50)</h3>
                     </div>
-                    <span className="text-xs text-slate-400 font-mono">{timeRange}</span>
+                    <span className="text-xs text-zinc-500 font-mono">{timeRange}</span>
                   </div>
                   <ResponsiveContainer width="100%" height={200}>
                     <AreaChart data={responseTimeData} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
@@ -664,11 +664,11 @@ export default function OperationsPage() {
                 </div>
 
                 {/* Request Rate Chart */}
-                <div className="rounded-2xl border border-wireframe-stroke bg-slate-50/70 p-5 backdrop-blur-xl">
+                <div className="rounded-2xl border border-wireframe-stroke bg-[#18181B]/70 p-5 backdrop-blur-xl">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
                       <BarChart3 size={14} className="text-cb-cyan" />
-                      <h3 className="text-sm font-semibold text-slate-800">Request Rate (by Status)</h3>
+                      <h3 className="text-sm font-semibold text-zinc-100">Request Rate (by Status)</h3>
                     </div>
                     <div className="flex items-center gap-3">
                       <span className="flex items-center gap-1 text-[9px] text-emerald-400"><Circle size={6} fill="#22C55E" />2xx</span>
@@ -693,15 +693,15 @@ export default function OperationsPage() {
               {/* Service Health + System Gauges Row */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 {/* Service Health Grid */}
-                <div className="lg:col-span-2 rounded-2xl border border-wireframe-stroke bg-slate-50/70 p-5 backdrop-blur-xl">
+                <div className="lg:col-span-2 rounded-2xl border border-wireframe-stroke bg-[#18181B]/70 p-5 backdrop-blur-xl">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
                       <Server size={14} className="text-emerald-400" />
-                      <h3 className="text-sm font-semibold text-slate-800">Service Health Matrix</h3>
+                      <h3 className="text-sm font-semibold text-zinc-100">Service Health Matrix</h3>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-[10px] text-slate-400">{healthyCount}/{services.length} services healthy</span>
-                      <RefreshCw size={12} className="text-slate-300 animate-spin" style={{ animationDuration: "3s" }} />
+                      <span className="text-[10px] text-zinc-500">{healthyCount}/{services.length} services healthy</span>
+                      <RefreshCw size={12} className="text-zinc-600 animate-spin" style={{ animationDuration: "3s" }} />
                     </div>
                   </div>
                   <ServiceHealthGrid services={services} />
@@ -710,8 +710,8 @@ export default function OperationsPage() {
                 {/* System Gauges + Status Distribution */}
                 <div className="space-y-4">
                   {/* Radial Gauges */}
-                  <div className="rounded-2xl border border-wireframe-stroke bg-slate-50/70 p-5 backdrop-blur-xl">
-                    <h3 className="text-sm font-semibold text-slate-800 mb-4 flex items-center gap-2">
+                  <div className="rounded-2xl border border-wireframe-stroke bg-[#18181B]/70 p-5 backdrop-blur-xl">
+                    <h3 className="text-sm font-semibold text-zinc-100 mb-4 flex items-center gap-2">
                       <Cpu size={14} className="text-gold" />
                       Resource Utilization
                     </h3>
@@ -723,8 +723,8 @@ export default function OperationsPage() {
                   </div>
 
                   {/* Status Distribution Donut */}
-                  <div className="rounded-2xl border border-wireframe-stroke bg-slate-50/70 p-5 backdrop-blur-xl">
-                    <h3 className="text-sm font-semibold text-slate-800 mb-3 flex items-center gap-2">
+                  <div className="rounded-2xl border border-wireframe-stroke bg-[#18181B]/70 p-5 backdrop-blur-xl">
+                    <h3 className="text-sm font-semibold text-zinc-100 mb-3 flex items-center gap-2">
                       <BarChart3 size={14} className="text-cb-cyan" />
                       Response Distribution
                     </h3>
@@ -753,7 +753,7 @@ export default function OperationsPage() {
                           <div key={entry.name} className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
                               <span className="h-2 w-2 rounded-full" style={{ backgroundColor: entry.color }} />
-                              <span className="text-xs text-slate-500">{entry.name}</span>
+                              <span className="text-xs text-zinc-400">{entry.name}</span>
                             </div>
                             <span className="text-xs font-mono font-semibold" style={{ color: entry.color }}>
                               {entry.value.toLocaleString()}
@@ -769,11 +769,11 @@ export default function OperationsPage() {
               {/* Live Event Stream + Error Rate */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 {/* Live Event Feed */}
-                <div className="lg:col-span-2 rounded-2xl border border-wireframe-stroke bg-slate-50/70 backdrop-blur-xl overflow-hidden">
+                <div className="lg:col-span-2 rounded-2xl border border-wireframe-stroke bg-[#18181B]/70 backdrop-blur-xl overflow-hidden">
                   <div className="flex items-center justify-between p-4 border-b border-wireframe-stroke">
                     <div className="flex items-center gap-2">
                       <Radio size={14} className="text-cb-cyan" />
-                      <h3 className="text-sm font-semibold text-slate-800">Live Event Stream</h3>
+                      <h3 className="text-sm font-semibold text-zinc-100">Live Event Stream</h3>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="relative flex h-2 w-2">
@@ -802,17 +802,17 @@ export default function OperationsPage() {
                           key={evt.id}
                           initial={i === 0 ? { opacity: 0, x: -8 } : false}
                           animate={{ opacity: 1, x: 0 }}
-                          className="flex items-start gap-3 px-4 py-2.5 border-b border-wireframe-stroke/30 hover:bg-white transition-colors"
+                          className="flex items-start gap-3 px-4 py-2.5 border-b border-wireframe-stroke/30 hover:bg-[#111113] transition-colors"
                         >
                           <span className={`h-2 w-2 rounded-full mt-1.5 flex-shrink-0 ${dotColors[evt.severity]}`} />
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2">
-                              <span className="text-[10px] text-slate-300 font-mono">{evt.time}</span>
+                              <span className="text-[10px] text-zinc-600 font-mono">{evt.time}</span>
                               <span className={`text-[9px] font-bold uppercase tracking-wider ${sevColors[evt.severity]}`}>{evt.type}</span>
                             </div>
-                            <p className="text-xs text-slate-600 mt-0.5">
+                            <p className="text-xs text-zinc-300 mt-0.5">
                               <span className="text-gold font-medium">{evt.source}</span>
-                              <span className="text-slate-300 mx-1.5">—</span>
+                              <span className="text-zinc-600 mx-1.5">—</span>
                               {evt.message}
                             </p>
                           </div>
@@ -823,10 +823,10 @@ export default function OperationsPage() {
                 </div>
 
                 {/* Error Rate Chart */}
-                <div className="rounded-2xl border border-wireframe-stroke bg-slate-50/70 p-5 backdrop-blur-xl">
+                <div className="rounded-2xl border border-wireframe-stroke bg-[#18181B]/70 p-5 backdrop-blur-xl">
                   <div className="flex items-center gap-2 mb-4">
                     <AlertTriangle size={14} className="text-red-400" />
-                    <h3 className="text-sm font-semibold text-slate-800">Error Rate</h3>
+                    <h3 className="text-sm font-semibold text-zinc-100">Error Rate</h3>
                   </div>
                   <ResponsiveContainer width="100%" height={240}>
                     <AreaChart data={errorRateData} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
@@ -850,16 +850,16 @@ export default function OperationsPage() {
 
           {/* ═══ ALERTS TAB ═══ */}
           {activeTab === "alerts" && (
-            <div className="rounded-2xl border border-wireframe-stroke bg-slate-50/70 p-5 backdrop-blur-xl">
+            <div className="rounded-2xl border border-wireframe-stroke bg-[#18181B]/70 p-5 backdrop-blur-xl">
               <div className="flex items-center gap-2 mb-4">
                 <AlertTriangle size={14} className="text-gold" />
-                <h2 className="text-sm font-semibold uppercase tracking-widest text-slate-700">Active Alerts</h2>
+                <h2 className="text-sm font-semibold uppercase tracking-widest text-zinc-200">Active Alerts</h2>
               </div>
               {ACTIVE_ALERTS.length === 0 ? (
                 <div className="rounded-2xl border border-dashed border-emerald-400/20 bg-emerald-400/5 p-8 text-center">
                   <CheckCircle2 size={24} className="text-emerald-400 mx-auto mb-2" />
                   <p className="text-sm text-emerald-400">No active alerts</p>
-                  <p className="text-[10px] text-slate-300 mt-1">All metrics within thresholds</p>
+                  <p className="text-[10px] text-zinc-600 mt-1">All metrics within thresholds</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
@@ -867,23 +867,23 @@ export default function OperationsPage() {
                     <thead>
                       <tr className="border-b border-wireframe-stroke">
                         {["ID", "Severity", "Metric", "Threshold", "Current", "Fired"].map(h => (
-                          <th key={h} className="p-3 text-left text-[10px] uppercase tracking-widest text-slate-400 font-semibold">{h}</th>
+                          <th key={h} className="p-3 text-left text-[10px] uppercase tracking-widest text-zinc-500 font-semibold">{h}</th>
                         ))}
                       </tr>
                     </thead>
                     <tbody>
                       {ACTIVE_ALERTS.map((alert) => (
-                        <tr key={alert.id} className="border-t border-wireframe-stroke hover:bg-white transition-colors">
+                        <tr key={alert.id} className="border-t border-wireframe-stroke hover:bg-[#111113] transition-colors">
                           <td className="p-3"><code className="text-[10px] font-mono text-gold">{alert.id}</code></td>
                           <td className="p-3"><SeverityBadge severity={alert.severity} /></td>
-                          <td className="p-3 text-xs font-medium text-slate-800">{alert.metric}</td>
-                          <td className="p-3"><code className="rounded bg-slate-50/70 border border-wireframe-stroke px-2 py-0.5 text-[10px] font-mono text-slate-400">{alert.threshold}</code></td>
+                          <td className="p-3 text-xs font-medium text-zinc-100">{alert.metric}</td>
+                          <td className="p-3"><code className="rounded bg-[#18181B]/70 border border-wireframe-stroke px-2 py-0.5 text-[10px] font-mono text-zinc-500">{alert.threshold}</code></td>
                           <td className="p-3">
-                            <code className={`rounded bg-slate-50/70 border border-wireframe-stroke px-2 py-0.5 text-[10px] font-mono ${
+                            <code className={`rounded bg-[#18181B]/70 border border-wireframe-stroke px-2 py-0.5 text-[10px] font-mono ${
                               alert.severity === "critical" ? "text-red-400" : alert.severity === "warning" ? "text-gold" : "text-sky-400"
                             }`}>{alert.current}</code>
                           </td>
-                          <td className="p-3 text-[10px] text-slate-400">{formatTimestamp(alert.fired)}</td>
+                          <td className="p-3 text-[10px] text-zinc-500">{formatTimestamp(alert.fired)}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -895,10 +895,10 @@ export default function OperationsPage() {
 
           {/* ═══ INCIDENTS TAB ═══ */}
           {activeTab === "incidents" && (
-            <div className="rounded-2xl border border-wireframe-stroke bg-slate-50/70 p-5 backdrop-blur-xl">
+            <div className="rounded-2xl border border-wireframe-stroke bg-[#18181B]/70 p-5 backdrop-blur-xl">
               <div className="flex items-center gap-2 mb-4">
                 <Bell size={14} className="text-gold" />
-                <h2 className="text-sm font-semibold uppercase tracking-widest text-slate-700">Incident Timeline</h2>
+                <h2 className="text-sm font-semibold uppercase tracking-widest text-zinc-200">Incident Timeline</h2>
               </div>
               {/* Timeline view */}
               <div className="relative pl-6 space-y-4">
@@ -910,19 +910,19 @@ export default function OperationsPage() {
                       <div className={`absolute left-[-17px] top-3 h-3 w-3 rounded-full border-2 ${
                         isOpen ? "border-red-400 bg-red-400/20 animate-pulse" : "border-emerald-400 bg-emerald-400/20"
                       }`} />
-                      <div className={`rounded-xl border ${isOpen ? "border-red-500/20 bg-red-500/5" : "border-wireframe-stroke bg-slate-100/60"} p-4`}>
+                      <div className={`rounded-xl border ${isOpen ? "border-red-500/20 bg-red-500/5" : "border-wireframe-stroke bg-[#1F1F23]/60"} p-4`}>
                         <div className="flex items-center justify-between flex-wrap gap-2 mb-2">
                           <div className="flex items-center gap-2">
                             <code className="text-[10px] font-mono text-gold">{inc.id}</code>
                             <IncidentBadge severity={inc.severity} />
                             <StatusBadge status={inc.status} />
                           </div>
-                          <div className="flex items-center gap-3 text-[10px] text-slate-400">
-                            {inc.duration && <span>Duration: <span className="text-slate-500 font-mono">{inc.duration}</span></span>}
+                          <div className="flex items-center gap-3 text-[10px] text-zinc-500">
+                            {inc.duration && <span>Duration: <span className="text-zinc-400 font-mono">{inc.duration}</span></span>}
                             <span>{formatTimestamp(inc.created)}</span>
                           </div>
                         </div>
-                        <p className="text-sm text-slate-800">{inc.title}</p>
+                        <p className="text-sm text-zinc-100">{inc.title}</p>
                       </div>
                     </div>
                   );
@@ -933,17 +933,17 @@ export default function OperationsPage() {
 
           {/* ═══ TRACES TAB ═══ */}
           {activeTab === "traces" && (
-            <div className="rounded-2xl border border-wireframe-stroke bg-slate-50/70 p-5 backdrop-blur-xl">
+            <div className="rounded-2xl border border-wireframe-stroke bg-[#18181B]/70 p-5 backdrop-blur-xl">
               <div className="flex items-center gap-2 mb-4">
                 <TrendingUp size={14} className="text-gold" />
-                <h2 className="text-sm font-semibold uppercase tracking-widest text-slate-700">Request Traces</h2>
+                <h2 className="text-sm font-semibold uppercase tracking-widest text-zinc-200">Request Traces</h2>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-wireframe-stroke">
                       {["Correlation ID", "Time", "Method", "Path", "Status", "Duration"].map(h => (
-                        <th key={h} className={`p-3 text-[10px] uppercase tracking-widest text-slate-400 font-semibold ${h === "Status" || h === "Duration" ? "text-center" : "text-left"}`}>{h}</th>
+                        <th key={h} className={`p-3 text-[10px] uppercase tracking-widest text-zinc-500 font-semibold ${h === "Status" || h === "Duration" ? "text-center" : "text-left"}`}>{h}</th>
                       ))}
                     </tr>
                   </thead>
@@ -956,12 +956,12 @@ export default function OperationsPage() {
                       const durPct = Math.min((dur / 3000) * 100, 100);
 
                       return (
-                        <tr key={trace.correlationId} className="border-t border-wireframe-stroke hover:bg-white transition-colors">
+                        <tr key={trace.correlationId} className="border-t border-wireframe-stroke hover:bg-[#111113] transition-colors">
                           <td className="p-3">
-                            <code className="rounded bg-slate-50/70 border border-wireframe-stroke px-2 py-0.5 text-[10px] font-mono text-gold">{trace.correlationId}</code>
+                            <code className="rounded bg-[#18181B]/70 border border-wireframe-stroke px-2 py-0.5 text-[10px] font-mono text-gold">{trace.correlationId}</code>
                           </td>
                           <td className="p-3">
-                            <span className="text-[10px] font-mono text-slate-400">{trace.timestamp}</span>
+                            <span className="text-[10px] font-mono text-zinc-500">{trace.timestamp}</span>
                           </td>
                           <td className="p-3">
                             <span className={`rounded-full border px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${
@@ -972,13 +972,13 @@ export default function OperationsPage() {
                               {trace.method}
                             </span>
                           </td>
-                          <td className="p-3"><code className="text-xs font-mono text-slate-500">{trace.path}</code></td>
+                          <td className="p-3"><code className="text-xs font-mono text-zinc-400">{trace.path}</code></td>
                           <td className="p-3 text-center">
                             <span className={`text-xs font-bold font-mono ${statusColor}`}>{trace.statusCode}</span>
                           </td>
                           <td className="p-3">
                             <div className="flex items-center gap-2">
-                              <div className="flex-1 h-1.5 rounded-full bg-slate-50 overflow-hidden">
+                              <div className="flex-1 h-1.5 rounded-full bg-[#18181B] overflow-hidden">
                                 <div className={`h-full rounded-full ${dur > 2000 ? "bg-red-400" : dur > 500 ? "bg-gold" : "bg-emerald-400"}`} style={{ width: `${durPct}%` }} />
                               </div>
                               <span className={`text-xs font-mono font-semibold min-w-[50px] text-right ${durColor}`}>{trace.duration}</span>

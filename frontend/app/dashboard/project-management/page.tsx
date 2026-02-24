@@ -117,15 +117,15 @@ export default function ProjectManagementPage() {
           <p className="text-[10px] uppercase tracking-[0.3em] text-gold/50 mb-1">
             Governance &middot; Strategy &middot; Execution
           </p>
-          <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-800 font-display">
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-zinc-100 font-display">
             PROJECT MANAGEMENT
           </h1>
-          <p className="text-sm text-slate-500 mt-2 max-w-lg">
+          <p className="text-sm text-zinc-400 mt-2 max-w-lg">
             PMO Offices &mdash; 9 C-Suite Boomer_Ang directors governing all operations.
             Every request flows through the command chain before reaching execution.
           </p>
         </div>
-        <div className="flex items-center gap-2 rounded-full border border-wireframe-stroke bg-slate-50/70 px-4 py-2">
+        <div className="flex items-center gap-2 rounded-full border border-wireframe-stroke bg-[#18181B]/70 px-4 py-2">
           <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
           <span className="text-[10px] uppercase font-bold text-emerald-400/80 tracking-widest">
             {PMO_OFFICES.length} OFFICES ONLINE
@@ -138,15 +138,15 @@ export default function ProjectManagementPage() {
         {PMO_OFFICES.map((office) => (
           <div
             key={office.id}
-            className="group relative overflow-hidden rounded-3xl border border-wireframe-stroke bg-slate-50/70 p-6 backdrop-blur-2xl transition-all hover:border-gold/20 hover:bg-white/80"
+            className="group relative overflow-hidden rounded-3xl border border-wireframe-stroke bg-[#18181B]/70 p-6 backdrop-blur-2xl transition-all hover:border-gold/20 hover:bg-white/80"
           >
             {/* Office Header */}
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-semibold text-slate-800 font-display">
+                <h3 className="text-lg font-semibold text-zinc-100 font-display">
                   {office.code}
                 </h3>
-                <p className="text-[10px] uppercase tracking-wider text-slate-400 mt-0.5">
+                <p className="text-[10px] uppercase tracking-wider text-zinc-500 mt-0.5">
                   {office.fullName}
                 </p>
               </div>
@@ -159,38 +159,38 @@ export default function ProjectManagementPage() {
             </div>
 
             {/* Mission */}
-            <p className="mt-3 text-xs text-slate-500 leading-relaxed">
+            <p className="mt-3 text-xs text-zinc-400 leading-relaxed">
               {office.mission}
             </p>
 
             {/* Director */}
-            <div className="mt-4 rounded-xl bg-slate-50 p-3">
-              <p className="text-[10px] uppercase tracking-widest text-slate-700 font-semibold">
+            <div className="mt-4 rounded-xl bg-[#18181B] p-3">
+              <p className="text-[10px] uppercase tracking-widest text-zinc-200 font-semibold">
                 Director
               </p>
-              <p className="text-sm font-medium text-slate-800 mt-1 font-mono">
+              <p className="text-sm font-medium text-zinc-100 mt-1 font-mono">
                 {office.director.name}
               </p>
-              <p className="text-[10px] text-slate-400 mt-0.5">
+              <p className="text-[10px] text-zinc-500 mt-0.5">
                 {office.director.title}
               </p>
-              <p className="text-[10px] text-slate-400 italic mt-0.5">
+              <p className="text-[10px] text-zinc-500 italic mt-0.5">
                 {office.director.scope}
               </p>
             </div>
 
             {/* Departmental Agent */}
             <div className="mt-3">
-              <p className="text-[10px] uppercase tracking-widest text-slate-700 font-semibold mb-2">
+              <p className="text-[10px] uppercase tracking-widest text-zinc-200 font-semibold mb-2">
                 Departmental Agent
               </p>
-              <div className="flex items-center justify-between rounded-lg border border-wireframe-stroke bg-slate-100/60 px-3 py-2">
+              <div className="flex items-center justify-between rounded-lg border border-wireframe-stroke bg-[#1F1F23]/60 px-3 py-2">
                 <div>
-                  <p className="text-xs font-medium text-slate-800 font-mono">
+                  <p className="text-xs font-medium text-zinc-100 font-mono">
                     {office.departmentalAgent.name}
                   </p>
                 </div>
-                <p className="text-[9px] text-slate-300 max-w-[160px] text-right">
+                <p className="text-[9px] text-zinc-600 max-w-[160px] text-right">
                   {office.departmentalAgent.role}
                 </p>
               </div>
@@ -201,7 +201,7 @@ export default function ProjectManagementPage() {
               {office.kpis.map((kpi) => (
                 <span
                   key={kpi}
-                  className="rounded-full border border-wireframe-stroke bg-slate-50 px-2.5 py-1 text-[9px] text-slate-500 uppercase tracking-wider"
+                  className="rounded-full border border-wireframe-stroke bg-[#18181B] px-2.5 py-1 text-[9px] text-zinc-400 uppercase tracking-wider"
                 >
                   {kpi}
                 </span>
@@ -213,18 +213,18 @@ export default function ProjectManagementPage() {
 
       {/* ---- ACHEEVY Command Chain Banner ---- */}
       <section className="rounded-3xl border border-gold/20 bg-gradient-to-r from-gold/10 to-transparent p-1 transition-all">
-        <div className="rounded-[21px] bg-white/80 p-6 md:p-8">
-          <h2 className="text-sm font-semibold uppercase tracking-widest text-slate-700 font-display">
+        <div className="rounded-[21px] bg-[#111113]/80 p-6 md:p-8">
+          <h2 className="text-sm font-semibold uppercase tracking-widest text-zinc-200 font-display">
             ACHEEVY Command Chain
           </h2>
-          <p className="mt-1 text-[10px] text-slate-400 uppercase tracking-wider">
+          <p className="mt-1 text-[10px] text-zinc-500 uppercase tracking-wider">
             Request lifecycle from user intent to execution
           </p>
 
           <div className="mt-6 flex flex-wrap items-center justify-center gap-2 md:gap-0">
             {COMMAND_CHAIN.map((step, i) => (
               <React.Fragment key={step}>
-                <div className="flex items-center justify-center rounded-xl border border-wireframe-stroke bg-slate-50 px-4 py-2.5 text-xs font-semibold text-slate-800 font-mono">
+                <div className="flex items-center justify-center rounded-xl border border-wireframe-stroke bg-[#18181B] px-4 py-2.5 text-xs font-semibold text-zinc-100 font-mono">
                   {step}
                 </div>
                 {i < COMMAND_CHAIN.length - 1 && (
@@ -236,7 +236,7 @@ export default function ProjectManagementPage() {
             ))}
           </div>
 
-          <p className="mt-5 text-center text-[10px] text-slate-300 italic">
+          <p className="mt-5 text-center text-[10px] text-zinc-600 italic">
             Every request is routed through the governance layer before reaching execution agents.
           </p>
         </div>

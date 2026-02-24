@@ -42,7 +42,7 @@ export default function PlugCatalogPage() {
         <div className="mb-10">
           <div className="flex items-center gap-3 mb-2">
             <Zap className="h-6 w-6 text-gold" />
-            <h1 className="text-3xl font-display text-slate-800 tracking-wide">Plug Catalog</h1>
+            <h1 className="text-3xl font-display text-zinc-100 tracking-wide">Plug Catalog</h1>
           </div>
           <p className="text-zinc-400 max-w-2xl">
             Browse deployable AI micro-products. Each Plug snaps into the Locale infrastructure
@@ -55,7 +55,7 @@ export default function PlugCatalogPage() {
           {Object.entries(TIER_LABELS).map(([key, { label, price }]) => (
             <span
               key={key}
-              className="inline-flex items-center gap-2 rounded-full border border-wireframe-stroke bg-slate-50 px-3 py-1 text-[10px] uppercase tracking-[0.15em] text-zinc-400"
+              className="inline-flex items-center gap-2 rounded-full border border-wireframe-stroke bg-[#18181B] px-3 py-1 text-[10px] uppercase tracking-[0.15em] text-zinc-400"
             >
               {label} <span className="text-gold font-display">{price}</span>
             </span>
@@ -73,7 +73,7 @@ export default function PlugCatalogPage() {
             return (
               <Card
                 key={plug.id}
-                className={`group relative hover:bg-slate-50 transition-all ${isActive ? colors.glow : "opacity-75"}`}
+                className={`group relative hover:bg-white/5 transition-all ${isActive ? colors.glow : "opacity-75"}`}
               >
                 {/* Priority Badge */}
                 {plug.priority === "critical" && (
@@ -88,7 +88,7 @@ export default function PlugCatalogPage() {
                       <Icon className={`h-6 w-6 ${colors.text}`} />
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-[9px] uppercase tracking-wider text-zinc-500 bg-slate-50 px-2 py-0.5 rounded-full">
+                      <span className="text-[9px] uppercase tracking-wider text-zinc-500 bg-[#18181B] px-2 py-0.5 rounded-full">
                         {tier.label}
                       </span>
                       {isActive ? (
@@ -114,7 +114,7 @@ export default function PlugCatalogPage() {
                     {plug.features.slice(0, 3).map((f) => (
                       <span
                         key={f}
-                        className="text-[10px] bg-slate-50 border border-wireframe-stroke text-zinc-500 rounded px-1.5 py-0.5"
+                        className="text-[10px] bg-[#18181B] border border-wireframe-stroke text-zinc-500 rounded px-1.5 py-0.5"
                       >
                         {f}
                       </span>

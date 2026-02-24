@@ -113,7 +113,7 @@ function SignInContent() {
           />
         </svg>
       ),
-      hoverClass: "hover:bg-slate-50",
+      hoverClass: "hover:bg-[#18181B] hover:border-white/15",
     },
     discord: {
       icon: (
@@ -129,7 +129,7 @@ function SignInContent() {
           <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z" />
         </svg>
       ),
-      hoverClass: "hover:bg-slate-50",
+      hoverClass: "hover:bg-[#18181B] hover:border-white/15",
     },
   };
 
@@ -137,15 +137,15 @@ function SignInContent() {
     <div className="space-y-6">
       {/* Header */}
       <div className="text-center">
-        <h1 className="text-2xl font-bold text-slate-800">Sign in to A.I.M.S.</h1>
-        <p className="mt-2 text-sm text-slate-500">
+        <h1 className="text-2xl font-bold text-zinc-50">Sign in to A.I.M.S.</h1>
+        <p className="mt-2 text-sm text-zinc-400">
           Your AI team is waiting
         </p>
       </div>
 
       {/* Error */}
       {activeError && (
-        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+        <div className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">
           {activeError}
         </div>
       )}
@@ -161,7 +161,7 @@ function SignInContent() {
                   key={provider.id}
                   onClick={() => handleOAuthSignIn(provider.id)}
                   disabled={isLoading !== null}
-                  className={`group relative flex w-full items-center justify-center gap-3 h-11 rounded-xl border border-slate-200 bg-white text-sm text-slate-800 transition-all disabled:opacity-50 ${style?.hoverClass || "hover:bg-slate-50"}`}
+                  className={`group relative flex w-full items-center justify-center gap-3 h-11 rounded-xl border border-white/8 bg-[#111113] text-sm text-zinc-300 transition-all disabled:opacity-50 ${style?.hoverClass || "hover:bg-[#18181B] hover:border-white/15"}`}
                 >
                   {isLoading === provider.id ? (
                     <Loader2 className="w-4 h-4 animate-spin text-amber-600" />
@@ -178,11 +178,11 @@ function SignInContent() {
 
           {/* Divider */}
           <div className="flex items-center gap-4">
-            <div className="h-px flex-1 bg-slate-200" />
-            <span className="text-[11px] uppercase tracking-widest text-slate-400">
+            <div className="h-px flex-1 bg-white/8" />
+            <span className="text-[11px] uppercase tracking-widest text-zinc-500">
               or
             </span>
-            <div className="h-px flex-1 bg-slate-200" />
+            <div className="h-px flex-1 bg-white/8" />
           </div>
         </>
       )}
@@ -190,12 +190,12 @@ function SignInContent() {
       {/* Email / Password Form */}
       <form onSubmit={handleEmailSignIn} className="space-y-4">
         <div>
-          <label className="block text-xs font-medium text-slate-500 mb-1.5">Email</label>
+          <label className="block text-xs font-medium text-zinc-400 mb-1.5">Email</label>
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full h-11 rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-800 placeholder-slate-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-100 focus:outline-none transition-all"
+            className="w-full h-11 rounded-xl border border-white/8 bg-[#111113] px-4 text-sm text-zinc-100 placeholder-zinc-500 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/15 focus:outline-none transition-all"
             placeholder="you@example.com"
             autoComplete="email"
           />
@@ -203,12 +203,12 @@ function SignInContent() {
 
         <div>
           <div className="flex items-center justify-between mb-1.5">
-            <label className="text-xs font-medium text-slate-500">
+            <label className="text-xs font-medium text-zinc-400">
               Password
             </label>
             <Link
               href="/forgot-password"
-              className="text-xs text-slate-400 hover:text-amber-600 transition-colors"
+              className="text-xs text-zinc-500 hover:text-amber-400 transition-colors"
             >
               Forgot?
             </Link>
@@ -217,7 +217,7 @@ function SignInContent() {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full h-11 rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-800 placeholder-slate-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-100 focus:outline-none transition-all"
+            className="w-full h-11 rounded-xl border border-white/8 bg-[#111113] px-4 text-sm text-zinc-100 placeholder-zinc-500 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/15 focus:outline-none transition-all"
             placeholder="Enter your password"
             autoComplete="current-password"
           />
@@ -226,7 +226,7 @@ function SignInContent() {
         <button
           type="submit"
           disabled={isLoading !== null}
-          className="w-full h-11 rounded-xl bg-amber-600 text-white text-sm font-semibold flex items-center justify-center gap-2 hover:bg-amber-700 transition-colors disabled:opacity-50"
+          className="w-full h-11 rounded-xl bg-amber-500 text-black text-sm font-semibold flex items-center justify-center gap-2 hover:bg-amber-400 transition-colors disabled:opacity-50"
         >
           {isLoading === "credentials" ? (
             <>
@@ -243,11 +243,11 @@ function SignInContent() {
       </form>
 
       {/* Sign up link */}
-      <p className="text-center text-sm text-slate-400">
+      <p className="text-center text-sm text-zinc-400">
         Don&apos;t have an account?{" "}
         <Link
           href="/sign-up"
-          className="text-amber-600 hover:text-amber-700 transition-colors font-medium"
+          className="text-amber-500 hover:text-amber-400 transition-colors font-medium"
         >
           Sign up
         </Link>
