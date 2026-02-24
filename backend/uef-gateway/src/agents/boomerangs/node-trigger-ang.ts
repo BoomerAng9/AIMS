@@ -1,12 +1,12 @@
 /**
- * Node_Trigger_Ang — n8n Workflow Specialist Boomer_Ang
+ * Node_Trigger_Ang — Automation Workflow Specialist Boomer_Ang
  *
- * The master of n8n workflows, triggers, and automation pipelines.
+ * The master of workflow automation, triggers, and pipelines.
  * Handles: workflow creation, webhook configuration, trigger management,
  * node wiring, credential setup, and workflow debugging.
  *
  * PMO Office: ops-office (Boomer_COO)
- * Specialties: n8n workflow design, webhook triggers, node configuration,
+ * Specialties: workflow design, webhook triggers, node configuration,
  *              workflow debugging, API integration, cron scheduling
  *
  * Doctrine: "Every trigger fires precisely — no misfires, no orphaned nodes."
@@ -20,9 +20,9 @@ import { Agent, AgentTaskInput, AgentTaskOutput, makeOutput, failOutput } from '
 const profile = {
   id: 'node-trigger-ang' as const,
   name: 'Node_Trigger_Ang',
-  role: 'n8n Workflow Architect',
+  role: 'Automation Workflow Architect',
   capabilities: [
-    { name: 'n8n-workflow-design', weight: 0.98 },
+    { name: 'workflow-design', weight: 0.98 },
     { name: 'webhook-triggers', weight: 0.95 },
     { name: 'node-configuration', weight: 0.93 },
     { name: 'cron-scheduling', weight: 0.90 },
@@ -34,57 +34,56 @@ const profile = {
   maxConcurrency: 4,
 };
 
-// ── n8n-specific system prompt ──────────────────────────────────
+// ── Automation system prompt ──────────────────────────────────
 
-const N8N_SYSTEM_PROMPT = `You are Node_Trigger_Ang, the n8n Workflow Architect for A.I.M.S.
+const WORKFLOW_SYSTEM_PROMPT = `You are Node_Trigger_Ang, the Automation Workflow Architect for A.I.M.S.
 
 Your expertise:
-- Designing n8n workflows from user requirements
+- Designing automation workflows from user requirements
 - Configuring webhook triggers (POST/GET, authentication, headers)
-- Wiring nodes together (HTTP Request, Function, IF, Switch, Code, Set)
+- Wiring pipeline steps together (HTTP Request, Transform, Condition, Code)
 - Setting up cron/interval triggers for scheduled automations
 - Debugging workflow execution errors
 - Managing credentials (API keys, OAuth tokens, database connections)
-- JSON data transformation between nodes
-- Error handling with Error Trigger and retry logic
+- JSON data transformation between steps
+- Error handling with retry logic and fallback paths
 
 When creating workflows, always:
-1. Start with a clear trigger node (Webhook, Cron, or Manual)
+1. Start with a clear trigger (Webhook, Cron, or Manual)
 2. Add error handling paths
-3. Include logging/audit nodes
-4. Use Set nodes for data shaping between steps
-5. End with a response or notification node
+3. Include logging/audit steps
+4. Use transform steps for data shaping between stages
+5. End with a response or notification step
 
-Output valid n8n workflow JSON when asked to create workflows.
-Use the standard n8n node types (n8n-nodes-base.*).`;
+Output workflow definitions as structured JSON with steps, triggers, and conditions.`;
 
-// ── n8n Workflow Templates ──────────────────────────────────────
+// ── Workflow Templates ──────────────────────────────────────
 
 const WORKFLOW_TEMPLATES: Record<string, { description: string; nodes: string[] }> = {
   'webhook-to-action': {
     description: 'Receive webhook, process data, execute action',
-    nodes: ['Webhook Trigger', 'Set (Data Shape)', 'HTTP Request', 'Respond to Webhook'],
+    nodes: ['Webhook Trigger', 'Data Transform', 'HTTP Request', 'Response'],
   },
   'scheduled-report': {
     description: 'Cron trigger, gather data, format report, send notification',
-    nodes: ['Cron Trigger', 'HTTP Request (Gather)', 'Code (Format)', 'Email/Slack Send'],
+    nodes: ['Cron Trigger', 'HTTP Request (Gather)', 'Transform (Format)', 'Email/Slack Send'],
   },
   'data-pipeline': {
     description: 'Ingest data, transform, validate, store',
-    nodes: ['Webhook/Cron Trigger', 'HTTP Request (Source)', 'Code (Transform)', 'IF (Validate)', 'HTTP Request (Store)'],
+    nodes: ['Webhook/Cron Trigger', 'HTTP Request (Source)', 'Transform', 'Validate', 'HTTP Request (Store)'],
   },
   'multi-step-approval': {
     description: 'Request arrives, needs human approval before execution',
-    nodes: ['Webhook Trigger', 'Set (Context)', 'Wait (Approval)', 'IF (Approved)', 'HTTP Request (Execute)'],
+    nodes: ['Webhook Trigger', 'Set Context', 'Wait (Approval)', 'Condition (Approved)', 'HTTP Request (Execute)'],
   },
   'error-recovery': {
     description: 'Monitor for errors, retry with backoff, alert on failure',
-    nodes: ['Error Trigger', 'Code (Classify)', 'Wait (Backoff)', 'HTTP Request (Retry)', 'Slack/Email (Alert)'],
+    nodes: ['Error Trigger', 'Classify', 'Wait (Backoff)', 'HTTP Request (Retry)', 'Alert (Slack/Email)'],
   },
 };
 
 async function execute(input: AgentTaskInput): Promise<AgentTaskOutput> {
-  logger.info({ taskId: input.taskId }, '[Node_Trigger_Ang] Starting n8n workflow task');
+  logger.info({ taskId: input.taskId }, '[Node_Trigger_Ang] Starting automation workflow task');
 
   try {
     // 1. Retrieve reusable workflow patterns
@@ -101,10 +100,10 @@ async function execute(input: AgentTaskInput): Promise<AgentTaskOutput> {
 
     // 3. LLM-powered workflow analysis/generation
     const contextParts = [
-      N8N_SYSTEM_PROMPT,
+      WORKFLOW_SYSTEM_PROMPT,
       ctx.patterns.length > 0 ? `Reusable patterns: ${ctx.patterns.join(', ')}` : '',
-      templateMatch ? `Suggested template: ${templateMatch.description} → Nodes: ${templateMatch.nodes.join(' → ')}` : '',
-      `Available n8n workflow templates: ${Object.entries(WORKFLOW_TEMPLATES).map(([k, v]) => `${k}: ${v.description}`).join('; ')}`,
+      templateMatch ? `Suggested template: ${templateMatch.description} → Steps: ${templateMatch.nodes.join(' → ')}` : '',
+      `Available workflow templates: ${Object.entries(WORKFLOW_TEMPLATES).map(([k, v]) => `${k}: ${v.description}`).join('; ')}`,
     ].filter(Boolean).join('\n');
 
     const llmResult = await agentChat({
@@ -123,7 +122,7 @@ async function execute(input: AgentTaskInput): Promise<AgentTaskOutput> {
         'node-trigger-ang',
         llmResult.content,
         [
-          `[n8n-workflow] ${templateMatch?.description || 'Custom workflow design'}`,
+          `[automation-workflow] ${templateMatch?.description || 'Custom workflow design'}`,
           ...(templateMatch ? [`[template] ${templateMatch.nodes.join(' → ')}`] : []),
         ],
         logs,
@@ -135,23 +134,23 @@ async function execute(input: AgentTaskInput): Promise<AgentTaskOutput> {
     // Fallback: template-based response
     if (templateMatch) {
       const summary = [
-        `n8n Workflow Design: ${templateMatch.description}`,
+        `Automation Workflow Design: ${templateMatch.description}`,
         '',
-        'Recommended Node Pipeline:',
+        'Recommended Pipeline:',
         ...templateMatch.nodes.map((n, i) => `  ${i + 1}. ${n}`),
         '',
         'Implementation notes:',
         '- Configure webhook authentication (API key or HMAC)',
-        '- Add error handling branch with Error Trigger node',
-        '- Set appropriate timeout values for HTTP Request nodes',
-        '- Use Set nodes between steps for data shape consistency',
+        '- Add error handling branch with retry logic',
+        '- Set appropriate timeout values for HTTP Request steps',
+        '- Use transform steps between stages for data shape consistency',
       ].join('\n');
 
       return makeOutput(
         input.taskId,
         'node-trigger-ang',
         summary,
-        [`[n8n-template] ${templateMatch.description}`],
+        [`[automation-template] ${templateMatch.description}`],
         logs,
       );
     }
@@ -159,8 +158,8 @@ async function execute(input: AgentTaskInput): Promise<AgentTaskOutput> {
     return makeOutput(
       input.taskId,
       'node-trigger-ang',
-      `n8n workflow analysis for: ${input.query}\n\nRecommended approach: Start with a Webhook Trigger node, add data transformation with Code/Set nodes, and end with the appropriate action node. Use Error Trigger for error handling.`,
-      ['[n8n-analysis] Workflow architecture recommendation'],
+      `Automation workflow analysis for: ${input.query}\n\nRecommended approach: Start with a Webhook Trigger, add data transformation steps, and end with the appropriate action step. Include error handling with retry logic.`,
+      ['[automation-analysis] Workflow architecture recommendation'],
       logs,
     );
   } catch (err) {

@@ -393,6 +393,7 @@ Skills inject specialized context, SOPs, and design standards into ACHEEVY's beh
 | **Voice (ElevenLabs + Deepgram)** | `skills/integrations/voice-elevenlabs-deepgram.md` | "voice", "tts", "stt", "waveform" | Voice-first UX: live waveform, editable transcript, TTS playback controls |
 | **NVIDIA PersonaPlex** | `skills/integrations/nvidia-personaplex.skill.md` | "personaplex", "full duplex voice", "nvidia voice" | Full-duplex speech-to-speech: 7B model, 0.07s switch latency, WebSocket |
 | **NVIDIA Parakeet** | `skills/integrations/nvidia-parakeet.skill.md` | "parakeet", "nvidia asr", "nvidia transcription" | State-of-the-art ASR: 6.05% WER, 3,386x real-time, CC-BY-4.0 |
+| **Paperform** | `skills/integrations/paperform.skill.md` | "paperform", "form", "intake form", "questionnaire", "survey", "client intake", "needs analysis form" | Form builder via Pipedream MCP — create forms, process submissions, automate intake for all verticals |
 
 #### Security Skills (`skills/security/`)
 
@@ -738,7 +739,7 @@ Every tool and capability is **owned** by a Boomer_Ang. No raw tool access.
 | `Licensing_Ang` | Compliance | AGPL/license quarantine, PPTist |
 | `Picker_Ang` | Component Selection | NtNtN Engine navigation, stack curation, creative intent analysis |
 | `Buildsmith` | Construction | Web builds, component assembly, creative execution (special: no _Ang suffix) |
-| `Plug_Ang` | Integration & MCP | API key management, account creation, MCP wiring, Composio gateway |
+| `Plug_Ang` | Integration & MCP | API key management, account creation, MCP wiring, Composio gateway, Pipedream MCP bridge (Paperform + 3,000+ apps) |
 
 ### Boomer_Ang Brain Files
 Each Boomer_Ang wrapping an Intelligent Internet repo has a dedicated brain file in `aims-skills/brains/`.
@@ -2098,6 +2099,59 @@ level of expertise for every tool in the platform.
 
 ---
 
+## 33. MCP Capabilities (External Service Connections)
+
+A.I.M.S. connects to external services through **Model Context Protocol (MCP)** servers.
+Every MCP connection is a capability that ACHEEVY and the chain of command can invoke
+to interact with the real world — files, email, calendars, code, containers, forms.
+
+**All MCP calls flow through Port Authority (UEF Gateway).** No agent directly touches
+credentials. MCP servers handle auth, and Port Authority meters usage via LUC.
+
+**Master Reference:** `aims-skills/tools/MCP_CAPABILITIES.md`
+
+### Connected MCP Servers (10)
+
+| # | MCP Server | Owner | Category | Doc |
+|---|-----------|-------|----------|-----|
+| 1 | **Google Drive** | Scout_Ang | Productivity | `tools/google-drive-mcp.tool.md` |
+| 2 | **GitHub** | Patchsmith_Ang | Source Control | `tools/github-mcp.tool.md` |
+| 3 | **Notion** | Scribe_Ang | Knowledge Base | `tools/notion-mcp.tool.md` |
+| 4 | **Gmail** | Plug_Ang | Communication | `tools/gmail-mcp.tool.md` |
+| 5 | **Google Calendar** | OpsConsole_Ang | Scheduling | `tools/google-calendar-mcp.tool.md` |
+| 6 | **Browser Rendering** | Scout_Ang | Web/Scraping | `tools/cloudflare-browser-mcp.tool.md` |
+| 7 | **CF Containers** | Runner_Ang | Edge Compute | `tools/cloudflare-containers-mcp.tool.md` |
+| 8 | **Workers** | Buildsmith | Edge Functions | `tools/cloudflare-workers-mcp.tool.md` |
+| 9 | **Workers Builds** | Buildsmith | Edge CI/CD | `tools/cloudflare-builds-mcp.tool.md` |
+| 10 | **Pipedream (Paperform)** | Plug_Ang | Forms/Intake | `tools/pipedream-mcp.tool.md` |
+
+### MCP Allowed Tools (add to ACHEEVY's tool dispatch)
+
+`GOOGLE_DRIVE_MCP`, `GITHUB_MCP`, `NOTION_MCP`, `GMAIL_MCP`, `GOOGLE_CALENDAR_MCP`,
+`CF_BROWSER_MCP`, `CF_CONTAINERS_MCP`, `CF_WORKERS_MCP`, `CF_BUILDS_MCP`, `PIPEDREAM_MCP`
+
+### HITL-Gated MCP Actions (ALWAYS require human approval)
+
+| MCP | Action | Risk |
+|-----|--------|------|
+| Gmail | Send/forward email | Outbound communication |
+| Calendar | Event with external attendees | Visible to others |
+| GitHub | Merge PR, force push | Production code change |
+| Notion | Delete page/database | Irreversible |
+| Drive | Delete file, share externally | Data loss / exposure |
+| CF Containers | Delete container | Service disruption |
+| Workers | Delete Worker | Service disruption |
+| Paperform | Delete form | Data loss |
+
+### Key Integration Pipelines Using MCPs
+
+**Onboarding:** Paperform → Notion (project page) → Drive (client folder) → Gmail (welcome) → Calendar (booking)
+**Deployment:** GitHub (PR merge) → Builds (build) → Browser (screenshot) → Notion (deploy log) → Gmail (notify)
+**Research:** Notion (knowledge base) → Drive (documents) → Browser (web scraping) → Notion (store findings)
+**FDH Factory:** GitHub (read changes) → Builds (build) → Containers (deploy) → Browser (verify) → GitHub (PR) → Notion (log)
+
+---
+
 > **"Activity breeds Activity — shipped beats perfect."**
 >
 > **"AI Managed Solutions is not a name. It's what we do. We manage services with AI."**
@@ -2113,4 +2167,71 @@ level of expertise for every tool in the platform.
 > Look-Listen-Learn makes every engagement intelligent. Personality Inheritance
 > makes every agent carry ACHEEVY's DNA. Enterprise Launch makes organizations possible.
 > Model Intelligence makes every LLM call deliberate. Skills SME makes every agent an expert.
+> MCP Capabilities make every external service reachable.
+> The Design System makes every interface professional and consistent.
+> The Communication Modes make every interaction appropriate to the audience.
 > Together, they are A.I.M.S. — managing services with AI, autonomously, with a human in the loop.
+
+---
+
+## 34. UI Archetype & Design System Skills
+
+ACHEEVY and all agents building frontend UI MUST follow the design skill system.
+The platform has 11 specialized UI skills that define how every page type looks and behaves.
+
+### Archetype Skills (`.claude/skills/`)
+
+| Skill | File | When Active | Purpose |
+|-------|------|-------------|---------|
+| **UI Archetypes** | `.claude/skills/aims-ui-archetypes/SKILL.md` | Any frontend page edit | Auto-select correct layout archetype |
+| **Animated Web** | `.claude/skills/aims-animated-web/SKILL.md` | Landing, marketing, showcases | Huly.io-quality scroll animations, parallax, 3D, glow borders |
+| **Global UI** | `.claude/skills/aims-global-ui/SKILL.md` | Always | Colors (#F8FAFC base, amber accents), spacing, typography, brand rules |
+| **Landing UI** | `.claude/skills/aims-landing-ui/SKILL.md` | `app/page.tsx`, marketing | Hero, CTA flow, below-fold sections |
+| **Auth UI** | `.claude/skills/aims-auth-onboarding-ui/SKILL.md` | `app/(auth)/**` | Sign-in, sign-up, onboarding — glass cards, centered |
+| **Chat UI** | `.claude/skills/aims-chat-ui/SKILL.md` | `app/chat/**` | Chat with ACHEEVY — message stream, input bar |
+| **CRM UI** | `.claude/skills/aims-crm-ui/SKILL.md` | CRM pages | Sidebar, list/Kanban, detail panels |
+| **Command Center** | `.claude/skills/aims-command-center-ui/SKILL.md` | Dashboard pages | Agent controls, status monitoring |
+| **Finance UI** | `.claude/skills/aims-finance-analytics-ui/SKILL.md` | LUC, analytics | KPI strips, charts, breakdowns |
+| **Workflow UI** | `.claude/skills/aims-workflow-ui/SKILL.md` | Automations | Step lists, canvas editor, run logs |
+| **Content Tools** | `.claude/skills/aims-content-tools-ui/SKILL.md` | Research, tools | Input/output panels, history, export |
+
+### Motion System
+
+All animations use the centralized motion library:
+
+- **Tokens:** `frontend/lib/motion/tokens.ts` — durations, easing, springs, stagger, scroll presets
+- **Variants:** `frontend/lib/motion/variants.ts` — 22+ reusable variants (fade, slide, scale, scroll reveal, hero stagger)
+- **Components:** `frontend/components/motion/` — 7 reusable components:
+  - `ScrollReveal` — viewport-triggered fade/slide reveal
+  - `GlowBorder` — Huly.io rotating gradient border (gold/emerald/violet)
+  - `ScrollProgress` — fixed scroll progress bar
+  - `TiltCard` — mouse-tracking 3D perspective
+  - `TypeReveal` — character-by-character stagger
+  - `ParallaxSection` — scroll-driven depth layers
+  - `BentoGrid` / `BentoItem` — asymmetric feature grid
+
+**Rule:** NO animation magic numbers. ALL timing uses motion tokens. ALL components respect `prefers-reduced-motion`.
+
+---
+
+## 35. Communication Modes (PRIVATE vs PUBLIC)
+
+ACHEEVY communicates differently based on who it's talking to:
+
+### PRIVATE Mode (Owner / Admin)
+- Full technical vocabulary
+- Agent names visible (Boomer_Ang, Lil_Hawk, Chicken Hawk)
+- Infrastructure details (Docker, nginx, ports, containers)
+- Developer tools and raw controls exposed
+- Direct and surgical communication
+
+### PUBLIC Mode (Customer)
+- Plain, friendly language
+- No agent names — say "my team" or "your AI team"
+- No infrastructure jargon — say "launch" not "deploy", "tool" not "container"
+- Outcome-focused communication
+- Simplified UI with curated features
+
+**Terminology map:** `frontend/lib/terminology.ts` — `t(key, mode)` function for mode-aware labels.
+**Platform mode:** `frontend/lib/platform-mode.tsx` — `usePlatformMode()` hook for detecting PRIVATE/PUBLIC.
+**Developer Mode toggle:** Owner gets a toggle to switch between views (useful for testing customer experience).

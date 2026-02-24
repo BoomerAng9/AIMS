@@ -104,7 +104,7 @@ router.get('/capabilities', (_req: Request, res: Response) => {
       { pattern: 'perform-stack', description: 'Sports analytics and scouting' },
       { pattern: 'skill:remotion', description: 'Video composition generation' },
       { pattern: 'skill:gemini-research', description: 'Deep research with Gemini' },
-      { pattern: 'skill:n8n-workflow', description: 'Workflow automation' },
+      { pattern: 'skill:automation-workflow', description: 'Workflow automation' },
       { pattern: 'skill:stitch', description: 'Design system generation' },
       { pattern: 'skill:best-practices', description: 'PRD/SOP/KPI generation' },
       { pattern: 'scaffolding', description: 'Platform cloning and scaffolding via Make It Mine' },

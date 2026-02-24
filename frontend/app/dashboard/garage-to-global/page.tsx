@@ -254,7 +254,7 @@ function GrowthJourneyMap({ currentStage, onStageSelect }: { currentStage: Selle
     <div className="wireframe-card p-6">
       <div className="flex items-center gap-2 mb-6">
         <TrendingUp className="w-5 h-5 text-gold" />
-        <h2 className="text-lg font-semibold text-slate-800">Growth Journey</h2>
+        <h2 className="text-lg font-semibold text-zinc-100">Growth Journey</h2>
         <span className="ml-auto text-xs font-mono text-gold/60 uppercase">
           Current: {STAGES[currentStage].name}
         </span>
@@ -277,23 +277,23 @@ function GrowthJourneyMap({ currentStage, onStageSelect }: { currentStage: Selle
                     ? 'bg-gold/10 border border-gold/30 shadow-[0_0_20px_rgba(212,175,55,0.15)]'
                     : isPast
                     ? 'bg-emerald-500/10 border border-emerald-500/20 hover:bg-emerald-500/15'
-                    : 'bg-white/3 border border-wireframe-stroke hover:bg-slate-50'
+                    : 'bg-white/3 border border-wireframe-stroke hover:bg-white/5'
                 }`}
               >
                 <div
                   className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                    isActive ? 'bg-gold/20 text-gold' : isPast ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-100 text-slate-400'
+                    isActive ? 'bg-gold/20 text-gold' : isPast ? 'bg-emerald-500/20 text-emerald-400' : 'bg-[#1F1F23] text-zinc-500'
                   }`}
                 >
                   {isPast ? <CheckCircle className="w-5 h-5" /> : info.icon}
                 </div>
-                <span className={`text-xs font-medium ${isActive ? 'text-gold' : isPast ? 'text-emerald-400' : 'text-slate-500'}`}>
+                <span className={`text-xs font-medium ${isActive ? 'text-gold' : isPast ? 'text-emerald-400' : 'text-zinc-400'}`}>
                   {info.name}
                 </span>
-                <span className="text-[10px] text-slate-400">{info.productsRange}</span>
+                <span className="text-[10px] text-zinc-500">{info.productsRange}</span>
               </button>
               {idx < stages.length - 1 && (
-                <div className={`w-4 h-px flex-shrink-0 ${isPast ? 'bg-emerald-500/40' : 'bg-slate-100'}`} />
+                <div className={`w-4 h-px flex-shrink-0 ${isPast ? 'bg-emerald-500/40' : 'bg-[#1F1F23]'}`} />
               )}
             </div>
           );
@@ -303,10 +303,10 @@ function GrowthJourneyMap({ currentStage, onStageSelect }: { currentStage: Selle
       {/* Active stage details */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="p-4 rounded-xl bg-white/3 border border-wireframe-stroke">
-          <h3 className="text-sm font-medium text-slate-800 mb-2">Features at {STAGES[currentStage].name}</h3>
+          <h3 className="text-sm font-medium text-zinc-100 mb-2">Features at {STAGES[currentStage].name}</h3>
           <ul className="space-y-1.5">
             {STAGES[currentStage].features.map((feat, i) => (
-              <li key={i} className="flex items-center gap-2 text-sm text-slate-500">
+              <li key={i} className="flex items-center gap-2 text-sm text-zinc-400">
                 <span className="w-1.5 h-1.5 rounded-full bg-gold/60" />
                 {feat}
               </li>
@@ -314,11 +314,11 @@ function GrowthJourneyMap({ currentStage, onStageSelect }: { currentStage: Selle
           </ul>
         </div>
         <div className="p-4 rounded-xl bg-white/3 border border-wireframe-stroke">
-          <h3 className="text-sm font-medium text-slate-800 mb-2">Next Milestone Requirements</h3>
+          <h3 className="text-sm font-medium text-zinc-100 mb-2">Next Milestone Requirements</h3>
           <ul className="space-y-1.5">
             {STAGES[currentStage].requirements.map((req, i) => (
-              <li key={i} className="flex items-center gap-2 text-sm text-slate-500">
-                <Target className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
+              <li key={i} className="flex items-center gap-2 text-sm text-zinc-400">
+                <Target className="w-3.5 h-3.5 text-zinc-500 flex-shrink-0" />
                 {req}
               </li>
             ))}
@@ -334,8 +334,8 @@ function MarketplaceGrid({ onSelect }: { onSelect: (mp: MarketplaceType) => void
     <div className="wireframe-card p-6">
       <div className="flex items-center gap-2 mb-6">
         <ShoppingBag className="w-5 h-5 text-gold" />
-        <h2 className="text-lg font-semibold text-slate-800">Marketplaces</h2>
-        <span className="ml-auto text-xs text-slate-400">Connect & sell across platforms</span>
+        <h2 className="text-lg font-semibold text-zinc-100">Marketplaces</h2>
+        <span className="ml-auto text-xs text-zinc-500">Connect & sell across platforms</span>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
@@ -351,12 +351,12 @@ function MarketplaceGrid({ onSelect }: { onSelect: (mp: MarketplaceType) => void
               <span className="text-2xl">{mp.icon}</span>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <h3 className="text-sm font-medium text-slate-800 group-hover:text-gold transition-colors">{mp.name}</h3>
+                  <h3 className="text-sm font-medium text-zinc-100 group-hover:text-gold transition-colors">{mp.name}</h3>
                 </div>
-                <p className="text-xs text-slate-400 mt-1 line-clamp-2">{mp.description}</p>
+                <p className="text-xs text-zinc-500 mt-1 line-clamp-2">{mp.description}</p>
                 <div className="flex flex-wrap gap-1 mt-2">
                   {mp.bestFor.slice(0, 2).map((tag, i) => (
-                    <span key={i} className="px-1.5 py-0.5 rounded text-[10px] bg-slate-50 text-slate-500">{tag}</span>
+                    <span key={i} className="px-1.5 py-0.5 rounded text-[10px] bg-[#18181B] text-zinc-400">{tag}</span>
                   ))}
                 </div>
               </div>
@@ -365,7 +365,7 @@ function MarketplaceGrid({ onSelect }: { onSelect: (mp: MarketplaceType) => void
         ))}
 
         {/* Add Marketplace CTA */}
-        <button className="p-4 rounded-xl border-2 border-dashed border-wireframe-stroke hover:border-gold/30 transition-all flex flex-col items-center justify-center gap-2 text-slate-400 hover:text-gold/60">
+        <button className="p-4 rounded-xl border-2 border-dashed border-wireframe-stroke hover:border-gold/30 transition-all flex flex-col items-center justify-center gap-2 text-zinc-500 hover:text-gold/60">
           <Plus className="w-6 h-6" />
           <span className="text-xs">Connect New</span>
         </button>
@@ -385,7 +385,7 @@ function BestPracticesEngine({ selectedMarketplace }: { selectedMarketplace: Mar
   const impactColors = {
     high: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
     medium: 'text-gold bg-gold/10 border-gold/20',
-    low: 'text-slate-500 bg-slate-50 border-wireframe-stroke',
+    low: 'text-zinc-400 bg-[#18181B] border-wireframe-stroke',
   };
 
   const effortColors = {
@@ -398,7 +398,7 @@ function BestPracticesEngine({ selectedMarketplace }: { selectedMarketplace: Mar
     <div className="wireframe-card p-6">
       <div className="flex items-center gap-2 mb-4">
         <Zap className="w-5 h-5 text-gold" />
-        <h2 className="text-lg font-semibold text-slate-800">AI Best Practices</h2>
+        <h2 className="text-lg font-semibold text-zinc-100">AI Best Practices</h2>
       </div>
 
       {/* Filters */}
@@ -411,7 +411,7 @@ function BestPracticesEngine({ selectedMarketplace }: { selectedMarketplace: Mar
               className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
                 filter === f
                   ? 'bg-gold/10 text-gold border border-gold/30'
-                  : 'bg-slate-50 text-slate-500 border border-wireframe-stroke hover:bg-slate-100'
+                  : 'bg-[#18181B] text-zinc-400 border border-wireframe-stroke hover:bg-white/8'
               }`}
             >
               {f === 'all' ? 'All' : f === 'general' ? 'General' : f.charAt(0).toUpperCase() + f.slice(1)}
@@ -431,13 +431,13 @@ function BestPracticesEngine({ selectedMarketplace }: { selectedMarketplace: Mar
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-xs font-mono text-slate-400 uppercase">{bp.category}</span>
+                  <span className="text-xs font-mono text-zinc-500 uppercase">{bp.category}</span>
                   {bp.marketplace !== 'general' && (
-                    <span className="text-xs px-1.5 py-0.5 rounded bg-slate-50 text-slate-400">{bp.marketplace}</span>
+                    <span className="text-xs px-1.5 py-0.5 rounded bg-[#18181B] text-zinc-500">{bp.marketplace}</span>
                   )}
                 </div>
-                <h3 className="text-sm font-medium text-slate-800">{bp.title}</h3>
-                <p className="text-xs text-slate-400 mt-1">{bp.description}</p>
+                <h3 className="text-sm font-medium text-zinc-100">{bp.title}</h3>
+                <p className="text-xs text-zinc-500 mt-1">{bp.description}</p>
               </div>
               <div className="flex flex-col items-end gap-1 flex-shrink-0">
                 <span className={`px-2 py-0.5 rounded text-[10px] font-medium border ${impactColors[bp.impact]}`}>
@@ -468,10 +468,10 @@ function QuickMetrics() {
       {metrics.map((m, i) => (
         <div key={i} className="wireframe-card p-4">
           <div className="flex items-center gap-2 mb-2">
-            <m.icon className="w-4 h-4 text-slate-400" />
-            <span className="text-xs text-slate-400">{m.label}</span>
+            <m.icon className="w-4 h-4 text-zinc-500" />
+            <span className="text-xs text-zinc-500">{m.label}</span>
           </div>
-          <div className="text-xl font-bold text-slate-800">{m.value}</div>
+          <div className="text-xl font-bold text-zinc-100">{m.value}</div>
         </div>
       ))}
     </div>
@@ -489,7 +489,7 @@ function MarketplaceDetailModal({ marketplace, onClose }: { marketplace: Marketp
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-slate-50/70 flex items-center justify-center p-4 z-50"
+      className="fixed inset-0 bg-[#18181B]/70 flex items-center justify-center p-4 z-50"
       onClick={onClose}
     >
       <motion.div
@@ -505,8 +505,8 @@ function MarketplaceDetailModal({ marketplace, onClose }: { marketplace: Marketp
           <div className="flex items-center gap-4">
             <span className="text-4xl">{mp.icon}</span>
             <div>
-              <h2 className="text-xl font-bold text-slate-800">{mp.name}</h2>
-              <p className="text-sm text-slate-400">{mp.description}</p>
+              <h2 className="text-xl font-bold text-zinc-100">{mp.name}</h2>
+              <p className="text-sm text-zinc-500">{mp.description}</p>
             </div>
           </div>
           <div className="flex gap-2 mt-4">
@@ -520,7 +520,7 @@ function MarketplaceDetailModal({ marketplace, onClose }: { marketplace: Marketp
 
         {/* Tips for this marketplace */}
         <div className="flex-1 overflow-y-auto p-6">
-          <h3 className="text-sm font-medium text-slate-800 mb-4">Best Practices for {mp.name}</h3>
+          <h3 className="text-sm font-medium text-zinc-100 mb-4">Best Practices for {mp.name}</h3>
           <div className="space-y-3">
             {tips.map((tip) => (
               <div key={tip.id} className="p-3 rounded-lg bg-white/3 border border-wireframe-stroke">
@@ -532,8 +532,8 @@ function MarketplaceDetailModal({ marketplace, onClose }: { marketplace: Marketp
                     {tip.impact} impact
                   </span>
                 </div>
-                <h4 className="text-sm text-slate-800 font-medium">{tip.title}</h4>
-                <p className="text-xs text-slate-400 mt-1">{tip.description}</p>
+                <h4 className="text-sm text-zinc-100 font-medium">{tip.title}</h4>
+                <p className="text-xs text-zinc-500 mt-1">{tip.description}</p>
               </div>
             ))}
           </div>
@@ -541,7 +541,7 @@ function MarketplaceDetailModal({ marketplace, onClose }: { marketplace: Marketp
           {/* Getting Started CTA */}
           <div className="mt-6 p-4 rounded-xl bg-gold/5 border border-gold/20">
             <h4 className="text-sm font-medium text-gold mb-2">Ready to connect {mp.name}?</h4>
-            <p className="text-xs text-slate-400 mb-3">
+            <p className="text-xs text-zinc-500 mb-3">
               ACHEEVY will help you set up your {mp.name} integration with AI-optimized listings.
             </p>
             <button className="px-4 py-2 rounded-lg bg-gold text-black text-sm font-medium hover:bg-gold/90 transition-colors">
@@ -552,7 +552,7 @@ function MarketplaceDetailModal({ marketplace, onClose }: { marketplace: Marketp
 
         {/* Close */}
         <div className="p-4 border-t border-wireframe-stroke flex justify-end">
-          <button onClick={onClose} className="px-4 py-2 rounded-lg text-sm text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-colors">
+          <button onClick={onClose} className="px-4 py-2 rounded-lg text-sm text-zinc-400 hover:text-zinc-100 hover:bg-white/5 transition-colors">
             Close
           </button>
         </div>
@@ -579,8 +579,8 @@ export default function GarageToGlobalPage() {
             <Store className="w-6 h-6 text-black" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-slate-800">Garage to Global</h1>
-            <p className="text-sm text-slate-400">AI-powered e-commerce seller suite</p>
+            <h1 className="text-2xl font-bold text-zinc-100">Garage to Global</h1>
+            <p className="text-sm text-zinc-500">AI-powered e-commerce seller suite</p>
           </div>
         </div>
 
@@ -605,7 +605,7 @@ export default function GarageToGlobalPage() {
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
               activeTab === tab.id
                 ? 'bg-gold/10 text-gold border border-gold/30'
-                : 'text-slate-500 border border-transparent hover:bg-slate-50'
+                : 'text-zinc-400 border border-transparent hover:bg-white/5'
             }`}
           >
             <tab.icon className="w-4 h-4" />
@@ -627,15 +627,15 @@ export default function GarageToGlobalPage() {
         <div className="space-y-6">
           <MarketplaceGrid onSelect={setSelectedMarketplace} />
           <div className="wireframe-card p-6">
-            <h2 className="text-lg font-semibold text-slate-800 mb-4">Marketplace Comparison</h2>
+            <h2 className="text-lg font-semibold text-zinc-100 mb-4">Marketplace Comparison</h2>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-wireframe-stroke">
-                    <th className="text-left py-3 px-4 text-slate-400 font-medium">Platform</th>
-                    <th className="text-left py-3 px-4 text-slate-400 font-medium">Best For</th>
-                    <th className="text-left py-3 px-4 text-slate-400 font-medium">Startup Cost</th>
-                    <th className="text-left py-3 px-4 text-slate-400 font-medium">Fee Structure</th>
+                    <th className="text-left py-3 px-4 text-zinc-500 font-medium">Platform</th>
+                    <th className="text-left py-3 px-4 text-zinc-500 font-medium">Best For</th>
+                    <th className="text-left py-3 px-4 text-zinc-500 font-medium">Startup Cost</th>
+                    <th className="text-left py-3 px-4 text-zinc-500 font-medium">Fee Structure</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -648,10 +648,10 @@ export default function GarageToGlobalPage() {
                     { name: 'Walmart', bestFor: 'Bulk & Value', cost: 'Free (approved)', fees: '6-15% referral' },
                   ].map((row, i) => (
                     <tr key={i} className="border-b border-wireframe-stroke/50">
-                      <td className="py-3 px-4 text-slate-800 font-medium">{row.name}</td>
-                      <td className="py-3 px-4 text-slate-500">{row.bestFor}</td>
-                      <td className="py-3 px-4 text-slate-500">{row.cost}</td>
-                      <td className="py-3 px-4 text-slate-500">{row.fees}</td>
+                      <td className="py-3 px-4 text-zinc-100 font-medium">{row.name}</td>
+                      <td className="py-3 px-4 text-zinc-400">{row.bestFor}</td>
+                      <td className="py-3 px-4 text-zinc-400">{row.cost}</td>
+                      <td className="py-3 px-4 text-zinc-400">{row.fees}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -667,9 +667,9 @@ export default function GarageToGlobalPage() {
 
       {activeTab === 'analytics' && (
         <div className="wireframe-card p-8 text-center">
-          <BarChart3 className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-          <h2 className="text-lg font-medium text-slate-800 mb-2">Analytics Coming Soon</h2>
-          <p className="text-sm text-slate-400 max-w-md mx-auto mb-6">
+          <BarChart3 className="w-12 h-12 text-zinc-600 mx-auto mb-4" />
+          <h2 className="text-lg font-medium text-zinc-100 mb-2">Analytics Coming Soon</h2>
+          <p className="text-sm text-zinc-500 max-w-md mx-auto mb-6">
             Connect a marketplace to start seeing real-time sales analytics, competitor tracking, and AI-powered growth recommendations.
           </p>
           <button

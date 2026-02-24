@@ -46,9 +46,9 @@ export default function ForgotPasswordPage() {
           </div>
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">Check your email</h1>
-          <p className="mt-2 text-sm text-slate-500">
-            If an account exists for <strong className="text-slate-600">{email}</strong>,
+          <h1 className="text-2xl font-bold text-zinc-50">Check your email</h1>
+          <p className="mt-2 text-sm text-zinc-400">
+            If an account exists for <strong className="text-zinc-200">{email}</strong>,
             we&apos;ve sent password reset instructions.
           </p>
         </div>
@@ -64,8 +64,8 @@ export default function ForgotPasswordPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="text-center">
-        <h1 className="text-2xl font-bold text-slate-800">Reset your password</h1>
-        <p className="mt-2 text-sm text-slate-500">
+        <h1 className="text-2xl font-bold text-zinc-50">Reset your password</h1>
+        <p className="mt-2 text-sm text-zinc-400">
           Enter your email and we&apos;ll send you a reset link.
         </p>
       </div>
@@ -106,7 +106,7 @@ export default function ForgotPasswordPage() {
           )}
         </button>
 
-        <p className="text-center text-sm text-slate-400">
+        <p className="text-center text-sm text-zinc-400">
           Remember your password?{" "}
           <Link
             href="/sign-in"

@@ -406,10 +406,10 @@ export default function DeploymentHangarPage() {
           <p className="text-[0.6rem] uppercase tracking-[0.25em] text-gold/50 mb-1 font-mono">
             n8n Workflow Engine
           </p>
-          <h1 className="text-2xl md:text-3xl font-display uppercase tracking-wider text-slate-800">
+          <h1 className="text-2xl md:text-3xl font-display uppercase tracking-wider text-zinc-100">
             Deployment Hangar
           </h1>
-          <p className="mt-1 text-xs text-slate-400">
+          <p className="mt-1 text-xs text-zinc-500">
             Real workflows. Real execution. Juno_Ang + Workflow Smith Squad.
           </p>
         </div>
@@ -421,7 +421,7 @@ export default function DeploymentHangarPage() {
               ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-400"
               : n8nHealthy === false
                 ? "border-red-400/30 bg-red-400/10 text-red-400"
-                : "border-slate-200 bg-slate-50 text-slate-400"
+                : "border-white/10 bg-[#18181B] text-zinc-500"
           }`}>
             <div className={`w-1.5 h-1.5 rounded-full ${
               n8nHealthy === true ? "bg-emerald-400 animate-pulse" : n8nHealthy === false ? "bg-red-400" : "bg-white/30"
@@ -430,7 +430,7 @@ export default function DeploymentHangarPage() {
           </div>
           <button
             onClick={() => { checkN8nHealth(); fetchWorkflows(); fetchExecutions(); }}
-            className="p-2 rounded-xl border border-wireframe-stroke bg-white/60 text-slate-400 hover:text-gold hover:border-gold/20 transition-all"
+            className="p-2 rounded-xl border border-wireframe-stroke bg-[#111113]/60 text-zinc-500 hover:text-gold hover:border-gold/20 transition-all"
           >
             <RefreshCw size={14} />
           </button>
@@ -438,7 +438,7 @@ export default function DeploymentHangarPage() {
       </header>
 
       {/* Tab Navigation */}
-      <div className="flex gap-1 rounded-2xl border border-wireframe-stroke bg-white/60 p-1.5 backdrop-blur-2xl">
+      <div className="flex gap-1 rounded-2xl border border-wireframe-stroke bg-[#111113]/60 p-1.5 backdrop-blur-2xl">
         {tabs.map((tab) => (
           <button
             key={tab.id}
@@ -446,7 +446,7 @@ export default function DeploymentHangarPage() {
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-medium transition-all ${
               activeTab === tab.id
                 ? "bg-gold text-black shadow-[0_0_15px_rgba(251,191,36,0.2)]"
-                : "text-slate-400 hover:text-slate-800 hover:bg-slate-50"
+                : "text-zinc-500 hover:text-zinc-100 hover:bg-white/5"
             }`}
           >
             <tab.icon size={14} />
@@ -473,24 +473,24 @@ export default function DeploymentHangarPage() {
           <motion.div key="workflows" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="space-y-6">
             {/* Template Gallery */}
             <div>
-              <h2 className="text-sm font-semibold uppercase tracking-widest text-slate-700 mb-4">
+              <h2 className="text-sm font-semibold uppercase tracking-widest text-zinc-200 mb-4">
                 Workflow Templates
               </h2>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {WORKFLOW_TEMPLATES.map((template) => (
                   <div
                     key={template.id}
-                    className="group relative overflow-hidden rounded-3xl border border-wireframe-stroke bg-white/60 p-6 backdrop-blur-2xl hover:border-gold/20 transition-all"
+                    className="group relative overflow-hidden rounded-3xl border border-wireframe-stroke bg-[#111113]/60 p-6 backdrop-blur-2xl hover:border-gold/20 transition-all"
                   >
                     <div className="flex items-center justify-between mb-3">
                       <span className={`rounded-full border px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${CATEGORY_COLORS[template.category]}`}>
                         {template.category}
                       </span>
-                      <span className="text-[10px] text-slate-400 font-mono">{template.nodeCount} nodes</span>
+                      <span className="text-[10px] text-zinc-500 font-mono">{template.nodeCount} nodes</span>
                     </div>
 
-                    <h3 className="text-sm font-semibold text-slate-800 mb-2">{template.name}</h3>
-                    <p className="text-xs text-slate-400 leading-relaxed mb-4">{template.description}</p>
+                    <h3 className="text-sm font-semibold text-zinc-100 mb-2">{template.name}</h3>
+                    <p className="text-xs text-zinc-500 leading-relaxed mb-4">{template.description}</p>
 
                     {/* Crew */}
                     <div className="flex flex-wrap gap-1 mb-4">
@@ -530,13 +530,13 @@ export default function DeploymentHangarPage() {
             {/* Live n8n Workflows */}
             <div>
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-sm font-semibold uppercase tracking-widest text-slate-700">
+                <h2 className="text-sm font-semibold uppercase tracking-widest text-zinc-200">
                   Live n8n Workflows
                 </h2>
                 <button
                   onClick={fetchWorkflows}
                   disabled={loading}
-                  className="flex items-center gap-1.5 text-[10px] text-slate-400 hover:text-gold transition-colors"
+                  className="flex items-center gap-1.5 text-[10px] text-zinc-500 hover:text-gold transition-colors"
                 >
                   <RefreshCw size={10} className={loading ? "animate-spin" : ""} />
                   Refresh
@@ -544,7 +544,7 @@ export default function DeploymentHangarPage() {
               </div>
 
               {loading ? (
-                <div className="flex items-center justify-center py-12 text-slate-300">
+                <div className="flex items-center justify-center py-12 text-zinc-600">
                   <Loader2 size={20} className="animate-spin" />
                 </div>
               ) : workflows.length > 0 ? (
@@ -552,22 +552,22 @@ export default function DeploymentHangarPage() {
                   {workflows.map((wf) => (
                     <div
                       key={wf.id}
-                      className="flex items-center justify-between rounded-2xl border border-wireframe-stroke bg-white/60 px-5 py-3.5 backdrop-blur-2xl hover:border-gold/10 transition-all"
+                      className="flex items-center justify-between rounded-2xl border border-wireframe-stroke bg-[#111113]/60 px-5 py-3.5 backdrop-blur-2xl hover:border-gold/10 transition-all"
                     >
                       <div className="flex items-center gap-3">
-                        <div className={`w-2 h-2 rounded-full ${wf.active ? "bg-emerald-400 animate-pulse" : "bg-slate-100"}`} />
+                        <div className={`w-2 h-2 rounded-full ${wf.active ? "bg-emerald-400 animate-pulse" : "bg-[#1F1F23]"}`} />
                         <div>
-                          <p className="text-sm font-medium text-slate-800">{wf.name}</p>
-                          <p className="text-[10px] text-slate-400 font-mono">ID: {wf.id}</p>
+                          <p className="text-sm font-medium text-zinc-100">{wf.name}</p>
+                          <p className="text-[10px] text-zinc-500 font-mono">ID: {wf.id}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-3">
                         <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${
-                          wf.active ? "border-emerald-400/30 text-emerald-400 bg-emerald-400/10" : "border-slate-200 text-slate-400 bg-slate-50"
+                          wf.active ? "border-emerald-400/30 text-emerald-400 bg-emerald-400/10" : "border-white/10 text-zinc-500 bg-[#18181B]"
                         }`}>
                           {wf.active ? "Active" : "Inactive"}
                         </span>
-                        <span className="text-[10px] text-slate-300 font-mono">
+                        <span className="text-[10px] text-zinc-600 font-mono">
                           {new Date(wf.updatedAt).toLocaleDateString()}
                         </span>
                       </div>
@@ -575,10 +575,10 @@ export default function DeploymentHangarPage() {
                   ))}
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center py-12 text-slate-300">
-                  <Workflow size={32} className="mb-3 text-slate-300" />
+                <div className="flex flex-col items-center justify-center py-12 text-zinc-600">
+                  <Workflow size={32} className="mb-3 text-zinc-600" />
                   <p className="text-sm">No workflows found on n8n</p>
-                  <p className="text-xs text-slate-300 mt-1">
+                  <p className="text-xs text-zinc-600 mt-1">
                     {n8nHealthy === false ? "n8n is offline — check your VPS" : "Deploy a template to get started"}
                   </p>
                 </div>
@@ -590,14 +590,14 @@ export default function DeploymentHangarPage() {
         {/* ── BUILDER TAB ── */}
         {activeTab === "builder" && (
           <motion.div key="builder" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="space-y-6">
-            <div className="rounded-3xl border border-wireframe-stroke bg-white/60 p-6 backdrop-blur-2xl">
+            <div className="rounded-3xl border border-wireframe-stroke bg-[#111113]/60 p-6 backdrop-blur-2xl">
               <div className="flex items-center gap-3 mb-4">
                 <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gold/10 text-gold">
                   <FileJson size={20} />
                 </div>
                 <div>
-                  <h2 className="text-sm font-semibold text-slate-800">Workflow Builder</h2>
-                  <p className="text-[10px] text-slate-400">
+                  <h2 className="text-sm font-semibold text-zinc-100">Workflow Builder</h2>
+                  <p className="text-[10px] text-zinc-500">
                     Powered by Juno_Ang + Workflow Smith Squad (AUTHOR → VALIDATE → FAILURE → GATE)
                   </p>
                 </div>
@@ -610,7 +610,7 @@ export default function DeploymentHangarPage() {
                   onChange={(e) => setBuilderQuery(e.target.value)}
                   placeholder="Describe the workflow you need... e.g. 'Ingest CSV athlete data, enrich with Brave Search, grade and rank, then publish cards to CDN'"
                   rows={3}
-                  className="w-full rounded-xl border border-wireframe-stroke bg-white/80 p-4 text-sm text-slate-800 outline-none focus:border-gold/40 placeholder:text-slate-300 resize-none"
+                  className="w-full rounded-xl border border-wireframe-stroke bg-[#111113]/80 p-4 text-sm text-zinc-100 outline-none focus:border-gold/40 placeholder:text-zinc-600 resize-none"
                 />
               </div>
 
@@ -635,27 +635,27 @@ export default function DeploymentHangarPage() {
                 className="space-y-4"
               >
                 {/* Manifest */}
-                <div className="rounded-3xl border border-wireframe-stroke bg-white/60 p-6 backdrop-blur-2xl">
-                  <h3 className="text-sm font-semibold text-slate-800 mb-4 flex items-center gap-2">
+                <div className="rounded-3xl border border-wireframe-stroke bg-[#111113]/60 p-6 backdrop-blur-2xl">
+                  <h3 className="text-sm font-semibold text-zinc-100 mb-4 flex items-center gap-2">
                     <FileJson size={14} className="text-gold" />
                     {generatedWorkflow.manifest.name}
                   </h3>
 
                   <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-4">
                     <div>
-                      <p className="text-[10px] uppercase tracking-wider text-slate-400">Nodes</p>
-                      <p className="text-sm text-slate-800 font-mono">{generatedWorkflow.manifest.nodeCount}</p>
+                      <p className="text-[10px] uppercase tracking-wider text-zinc-500">Nodes</p>
+                      <p className="text-sm text-zinc-100 font-mono">{generatedWorkflow.manifest.nodeCount}</p>
                     </div>
                     <div>
-                      <p className="text-[10px] uppercase tracking-wider text-slate-400">Dependencies</p>
-                      <p className="text-sm text-slate-800 font-mono">{generatedWorkflow.manifest.dependencies.join(", ") || "None"}</p>
+                      <p className="text-[10px] uppercase tracking-wider text-zinc-500">Dependencies</p>
+                      <p className="text-sm text-zinc-100 font-mono">{generatedWorkflow.manifest.dependencies.join(", ") || "None"}</p>
                     </div>
                     <div>
-                      <p className="text-[10px] uppercase tracking-wider text-slate-400">Secrets Required</p>
-                      <p className="text-sm text-slate-800 font-mono">{generatedWorkflow.manifest.secretsRequired.join(", ") || "None"}</p>
+                      <p className="text-[10px] uppercase tracking-wider text-zinc-500">Secrets Required</p>
+                      <p className="text-sm text-zinc-100 font-mono">{generatedWorkflow.manifest.secretsRequired.join(", ") || "None"}</p>
                     </div>
                     <div>
-                      <p className="text-[10px] uppercase tracking-wider text-slate-400">Gate Status</p>
+                      <p className="text-[10px] uppercase tracking-wider text-zinc-500">Gate Status</p>
                       <p className={`text-sm font-mono font-bold ${generatedWorkflow.gate.approved ? "text-emerald-400" : "text-red-400"}`}>
                         {generatedWorkflow.gate.approved ? "APPROVED" : "BLOCKED"}
                       </p>
@@ -693,11 +693,11 @@ export default function DeploymentHangarPage() {
 
                   {/* JSON Preview */}
                   <details className="group">
-                    <summary className="flex items-center gap-2 cursor-pointer text-xs text-slate-400 hover:text-gold transition-colors">
+                    <summary className="flex items-center gap-2 cursor-pointer text-xs text-zinc-500 hover:text-gold transition-colors">
                       <ChevronRight size={12} className="group-open:rotate-90 transition-transform" />
                       View Workflow JSON
                     </summary>
-                    <pre className="mt-3 rounded-xl bg-white/80 border border-wireframe-stroke p-4 text-xs text-slate-500 font-mono overflow-x-auto max-h-64">
+                    <pre className="mt-3 rounded-xl bg-[#111113]/80 border border-wireframe-stroke p-4 text-xs text-zinc-400 font-mono overflow-x-auto max-h-64">
                       {JSON.stringify(generatedWorkflow.workflowJson, null, 2)}
                     </pre>
                   </details>
@@ -739,12 +739,12 @@ export default function DeploymentHangarPage() {
         {activeTab === "executions" && (
           <motion.div key="executions" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="space-y-4">
             <div className="flex items-center justify-between mb-2">
-              <h2 className="text-sm font-semibold uppercase tracking-widest text-slate-700">
+              <h2 className="text-sm font-semibold uppercase tracking-widest text-zinc-200">
                 Recent Executions
               </h2>
               <button
                 onClick={fetchExecutions}
-                className="flex items-center gap-1.5 text-[10px] text-slate-400 hover:text-gold transition-colors"
+                className="flex items-center gap-1.5 text-[10px] text-zinc-500 hover:text-gold transition-colors"
               >
                 <RefreshCw size={10} /> Refresh
               </button>
@@ -755,18 +755,18 @@ export default function DeploymentHangarPage() {
                 {executions.map((exec) => (
                   <div
                     key={exec.id}
-                    className="flex items-center justify-between rounded-2xl border border-wireframe-stroke bg-white/60 px-5 py-3.5 backdrop-blur-2xl"
+                    className="flex items-center justify-between rounded-2xl border border-wireframe-stroke bg-[#111113]/60 px-5 py-3.5 backdrop-blur-2xl"
                   >
                     <div className="flex items-center gap-3">
                       <div className={`w-2.5 h-2.5 rounded-full ${
                         exec.status === "success" ? "bg-emerald-400"
                           : exec.status === "running" ? "bg-gold animate-pulse"
                           : exec.status === "error" ? "bg-red-400"
-                          : "bg-slate-100"
+                          : "bg-[#1F1F23]"
                       }`} />
                       <div>
-                        <p className="text-sm font-mono text-slate-800">Execution #{exec.id}</p>
-                        <p className="text-[10px] text-slate-400">Workflow: {exec.workflowId}</p>
+                        <p className="text-sm font-mono text-zinc-100">Execution #{exec.id}</p>
+                        <p className="text-[10px] text-zinc-500">Workflow: {exec.workflowId}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
@@ -774,11 +774,11 @@ export default function DeploymentHangarPage() {
                         exec.status === "success" ? "border-emerald-400/30 text-emerald-400 bg-emerald-400/10"
                           : exec.status === "running" ? "border-gold/30 text-gold bg-gold/10"
                           : exec.status === "error" ? "border-red-400/30 text-red-400 bg-red-400/10"
-                          : "border-slate-200 text-slate-400 bg-slate-50"
+                          : "border-white/10 text-zinc-500 bg-[#18181B]"
                       }`}>
                         {exec.status}
                       </span>
-                      <span className="text-[10px] text-slate-300 font-mono">
+                      <span className="text-[10px] text-zinc-600 font-mono">
                         {new Date(exec.startedAt).toLocaleString()}
                       </span>
                     </div>
@@ -786,10 +786,10 @@ export default function DeploymentHangarPage() {
                 ))}
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center py-12 text-slate-300">
-                <Activity size={32} className="mb-3 text-slate-300" />
+              <div className="flex flex-col items-center justify-center py-12 text-zinc-600">
+                <Activity size={32} className="mb-3 text-zinc-600" />
                 <p className="text-sm">No recent executions</p>
-                <p className="text-xs text-slate-300 mt-1">Trigger a workflow to see execution history</p>
+                <p className="text-xs text-zinc-600 mt-1">Trigger a workflow to see execution history</p>
               </div>
             )}
           </motion.div>
@@ -801,28 +801,28 @@ export default function DeploymentHangarPage() {
             {CREW_HIERARCHY.map((tier) => (
               <div key={tier.tier}>
                 <div className="flex items-center gap-3 mb-3">
-                  <h2 className="text-sm font-semibold uppercase tracking-widest text-slate-700">
+                  <h2 className="text-sm font-semibold uppercase tracking-widest text-zinc-200">
                     {tier.tier}
                   </h2>
-                  <span className="text-[10px] text-slate-300 font-mono">{tier.role}</span>
+                  <span className="text-[10px] text-zinc-600 font-mono">{tier.role}</span>
                 </div>
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                   {tier.members.map((member) => (
                     <div
                       key={member.id}
-                      className="flex items-center gap-3 rounded-2xl border border-wireframe-stroke bg-white/60 px-4 py-3 backdrop-blur-2xl"
+                      className="flex items-center gap-3 rounded-2xl border border-wireframe-stroke bg-[#111113]/60 px-4 py-3 backdrop-blur-2xl"
                     >
                       <div className={`w-2 h-2 rounded-full ${
-                        member.status === "active" ? "bg-emerald-400 animate-pulse" : "bg-slate-100"
+                        member.status === "active" ? "bg-emerald-400 animate-pulse" : "bg-[#1F1F23]"
                       }`} />
                       <div>
-                        <p className="text-sm font-medium text-slate-800">{member.name}</p>
-                        <p className="text-[10px] text-slate-400">{member.office}</p>
+                        <p className="text-sm font-medium text-zinc-100">{member.name}</p>
+                        <p className="text-[10px] text-zinc-500">{member.office}</p>
                       </div>
                       <span className={`ml-auto text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${
                         member.status === "active"
                           ? "border-emerald-400/30 text-emerald-400 bg-emerald-400/10"
-                          : "border-slate-200 text-slate-400 bg-slate-50"
+                          : "border-white/10 text-zinc-500 bg-[#18181B]"
                       }`}>
                         {member.status}
                       </span>

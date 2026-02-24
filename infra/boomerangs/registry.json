@@ -74,6 +74,28 @@
       "endpoint": "http://router-ang:3021/execute",
       "health_check": "http://router-ang:3021/health",
       "status": "registered"
+    },
+    {
+      "id": "sme_ang",
+      "name": "SME_Ang",
+      "source_repo": "aims/mcp-specialist",
+      "description": "Subject Matter Expert — MCP Integration Specialist. Routes requests to correct MCP connections, ingests all MCP skill documentation, and provides expert guidance on tool capabilities.",
+      "capabilities": [
+        "mcp_dispatch",
+        "integration_knowledge",
+        "tool_routing",
+        "skill_ingestion",
+        "data_query",
+        "workflow_trigger",
+        "ui_component_generation",
+        "credential_management"
+      ],
+      "required_quotas": {
+        "api_calls": 20
+      },
+      "endpoint": "http://sme-ang:8500/execute",
+      "health_check": "http://sme-ang:8500/health",
+      "status": "registered"
     }
   ],
   "capability_index": {
@@ -93,8 +115,14 @@
     "task_decomposition": ["router_ang"],
     "agent_spawning": ["router_ang"],
     "result_synthesis": ["router_ang"],
-    "parallel_execution": ["router_ang"]
+    "parallel_execution": ["router_ang"],
+    "mcp_dispatch": ["sme_ang"],
+    "integration_knowledge": ["sme_ang"],
+    "tool_routing": ["sme_ang"],
+    "skill_ingestion": ["sme_ang"],
+    "ui_component_generation": ["sme_ang"],
+    "credential_management": ["sme_ang"]
   },
-  "version": "3.0.0",
-  "last_updated": "2026-02-22T00:00:00Z"
+  "version": "3.1.0",
+  "last_updated": "2026-02-24T00:00:00Z"
 }

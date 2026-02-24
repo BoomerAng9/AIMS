@@ -10,7 +10,7 @@
 export interface ToolEntry {
   readonly id: string;
   readonly file: string;
-  readonly category: 'ai' | 'voice' | 'search' | 'payments' | 'database' | 'email' | 'messaging' | 'infra' | 'cloud' | 'video' | 'workflow' | 'web' | 'auth' | 'ui' | 'analytics';
+  readonly category: 'ai' | 'voice' | 'search' | 'payments' | 'database' | 'email' | 'messaging' | 'infra' | 'cloud' | 'video' | 'workflow' | 'web' | 'auth' | 'ui' | 'analytics' | 'mcp';
   readonly provider: string;
   readonly envVars: readonly string[];
 }
@@ -58,12 +58,25 @@ export const TOOL_REGISTRY: readonly ToolEntry[] = [
   { id: 'gcp-cloud', file: 'gcp-cloud.tool.md', category: 'cloud', provider: 'Google Cloud', envVars: ['GOOGLE_APPLICATION_CREDENTIALS', 'GOOGLE_CLOUD_PROJECT'] },
   { id: 'google-oauth', file: 'google-oauth.tool.md', category: 'cloud', provider: 'Google', envVars: ['GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET'] },
 
+  // ── MCP Connectors (OAuth-authenticated via Claude Code Connectors) ─
+  { id: 'google-drive-mcp', file: 'google-drive-mcp.tool.md', category: 'mcp', provider: 'Google', envVars: [] },
+  { id: 'github-mcp', file: 'github-mcp.tool.md', category: 'mcp', provider: 'GitHub', envVars: [] },
+  { id: 'notion-mcp', file: 'notion-mcp.tool.md', category: 'mcp', provider: 'Notion', envVars: [] },
+  { id: 'gmail-mcp', file: 'gmail-mcp.tool.md', category: 'mcp', provider: 'Google', envVars: [] },
+  { id: 'google-calendar-mcp', file: 'google-calendar-mcp.tool.md', category: 'mcp', provider: 'Google', envVars: [] },
+  { id: 'cloudflare-browser-mcp', file: 'cloudflare-browser-mcp.tool.md', category: 'mcp', provider: 'Cloudflare', envVars: [] },
+  { id: 'cloudflare-containers-mcp', file: 'cloudflare-containers-mcp.tool.md', category: 'mcp', provider: 'Cloudflare', envVars: [] },
+  { id: 'cloudflare-workers-mcp', file: 'cloudflare-workers-mcp.tool.md', category: 'mcp', provider: 'Cloudflare', envVars: [] },
+  { id: 'cloudflare-builds-mcp', file: 'cloudflare-builds-mcp.tool.md', category: 'mcp', provider: 'Cloudflare', envVars: [] },
+
   // ── Video / Media ───────────────────────────────────────────────────
   { id: 'kling-ai', file: 'kling-ai.tool.md', category: 'video', provider: 'Kling AI', envVars: ['KLING_API_KEY'] },
 
   // ── Workflow / Automation ───────────────────────────────────────────
   { id: 'agent-zero', file: 'agent-zero.tool.md', category: 'workflow', provider: 'Agent Zero', envVars: ['OPENROUTER_API_KEY'] },
   { id: 'composio', file: 'composio.tool.md', category: 'workflow', provider: 'Composio', envVars: ['COMPOSIO_API_KEY'] },
+  { id: 'pipedream-mcp', file: 'pipedream-mcp.tool.md', category: 'workflow', provider: 'Pipedream', envVars: ['PIPEDREAM_API_KEY', 'PIPEDREAM_MCP_URL'] },
+  { id: 'paperform', file: 'paperform.tool.md', category: 'workflow', provider: 'Paperform', envVars: ['PIPEDREAM_API_KEY'] },
 
   // ── Web Tools ───────────────────────────────────────────────────────
   { id: 'firecrawl', file: 'firecrawl.tool.md', category: 'web', provider: 'Firecrawl', envVars: ['FIRECRAWL_API_KEY'] },

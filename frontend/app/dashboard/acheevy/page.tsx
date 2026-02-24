@@ -16,7 +16,7 @@ export default function AcheevyChatPage() {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className="h-[calc(100vh-64px)] rounded-2xl border border-slate-200 bg-slate-50/70 backdrop-blur-xl overflow-hidden"
+      className="h-[calc(100vh-64px)] rounded-2xl border border-white/10 bg-[#18181B]/70 backdrop-blur-xl overflow-hidden"
     >
       <ChatInterface
         model="nano-banana"

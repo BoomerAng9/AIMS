@@ -8,7 +8,7 @@
  * Inspired by Claude, ChatGPT, and Kimi interfaces
  */
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -139,7 +139,7 @@ interface MessageBubbleProps {
   isLast?: boolean;
 }
 
-function MessageBubble({ message, onSpeak, onCopy, isLast }: MessageBubbleProps) {
+const MessageBubble = memo(function MessageBubble({ message, onSpeak, onCopy, isLast }: MessageBubbleProps) {
   const [copied, setCopied] = useState(false);
   const isUser = message.role === 'user';
   const isStreaming = message.isStreaming;
@@ -282,6 +282,35 @@ function MessageBubble({ message, onSpeak, onCopy, isLast }: MessageBubbleProps)
       </div>
     </motion.div>
   );
+});
+
+// ─────────────────────────────────────────────────────────────
+// Isolated Voice Visual Components (prevent 60fps parent re-renders)
+// ─────────────────────────────────────────────────────────────
+
+function VoicePingEffect({ stream, isListening }: { stream: MediaStream | null; isListening: boolean }) {
+  const audioLevel = useAudioLevel(stream, isListening);
+  return (
+    <div
+      className="absolute inset-0 rounded-xl border-2 border-red-400 animate-ping"
+      style={{ opacity: audioLevel * 0.5 }}
+    />
+  );
+}
+
+function VoiceEqualizer({ stream, isListening }: { stream: MediaStream | null; isListening: boolean }) {
+  const audioLevel = useAudioLevel(stream, isListening);
+  return (
+    <div className="flex gap-0.5 items-end h-4">
+      {[0.3, 0.6, 1, 0.7, 0.4].map((scale, i) => (
+        <div
+          key={i}
+          className="w-0.5 bg-red-400/60 rounded-full transition-all duration-75"
+          style={{ height: `${Math.max(4, audioLevel * scale * 16)}px` }}
+        />
+      ))}
+    </div>
+  );
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -297,7 +326,6 @@ interface VoiceInputButtonProps {
 }
 
 function VoiceInputButton({ isListening, isProcessing, stream, onStart, onStop }: VoiceInputButtonProps) {
-  const audioLevel = useAudioLevel(stream, isListening);
   const [elapsed, setElapsed] = useState(0);
 
   useEffect(() => {
@@ -322,13 +350,8 @@ function VoiceInputButton({ isListening, isProcessing, stream, onStart, onStop }
           ${isProcessing ? 'opacity-50 cursor-not-allowed' : ''}
         `}
       >
-        {/* Audio level ring */}
-        {isListening && (
-          <div
-            className="absolute inset-0 rounded-xl border-2 border-red-400 animate-ping"
-            style={{ opacity: audioLevel * 0.5 }}
-          />
-        )}
+        {/* Audio level ring — isolated to prevent 60fps re-renders */}
+        {isListening && <VoicePingEffect stream={stream} isListening={isListening} />}
 
         {isProcessing ? (
           <div className="w-5 h-5 border-2 border-gold border-t-transparent rounded-full animate-spin" />
@@ -342,15 +365,7 @@ function VoiceInputButton({ isListening, isProcessing, stream, onStart, onStop }
         <div className="flex items-center gap-1.5">
           <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
           <span className="text-xs font-mono text-red-400">{fmt(elapsed)}</span>
-          <div className="flex gap-0.5 items-end h-4">
-            {[0.3, 0.6, 1, 0.7, 0.4].map((scale, i) => (
-              <div
-                key={i}
-                className="w-0.5 bg-red-400/60 rounded-full transition-all duration-75"
-                style={{ height: `${Math.max(4, audioLevel * scale * 16)}px` }}
-              />
-            ))}
-          </div>
+          <VoiceEqualizer stream={stream} isListening={isListening} />
         </div>
       )}
 
@@ -542,6 +557,12 @@ export function ChatInterface({
     },
   });
 
+  // Memoize handleSpeak to prevent re-renders of MessageBubble
+  const { speak } = voiceOutput;
+  const handleSpeak = useCallback((text: string) => {
+    speak(text);
+  }, [speak]);
+
   // ─────────────────────────────────────────────────────────
   // Department/Ang Selection Helpers
   // ─────────────────────────────────────────────────────────
@@ -591,6 +612,29 @@ export function ChatInterface({
   // Send Message Handler
   // ─────────────────────────────────────────────────────────
 
+  // Classify message for vertical match (non-blocking)
+  // Uses the gateway /acheevy/classify endpoint which returns { intent, confidence, requiresAgent }
+  const classifyForVertical = useCallback(async (message: string) => {
+    try {
+      const res = await fetch('/api/acheevy/classify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message }),
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      // The gateway returns intent as 'vertical:<id>' (e.g. 'vertical:idea-generator')
+      if (data.requiresAgent && data.confidence > 0.6 && data.intent) {
+        const intent = data.intent as string;
+        if (intent.startsWith('vertical:')) {
+          verticalFlow.startVertical(intent.replace('vertical:', ''));
+        }
+      }
+    } catch {
+      // Classification is non-blocking — silent fail
+    }
+  }, [verticalFlow]);
+
   const handleSend = useCallback(async (text?: string) => {
     const messageText = text || inputValue;
     if (!messageText.trim() || isStreaming || isLoading) return;
@@ -627,30 +671,7 @@ export function ChatInterface({
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
     }
-  }, [inputValue, isStreaming, isLoading, sendMessage, showOrchestration, orchestration, verticalFlow]);
-
-  // Classify message for vertical match (non-blocking)
-  // Uses the gateway /acheevy/classify endpoint which returns { intent, confidence, requiresAgent }
-  const classifyForVertical = useCallback(async (message: string) => {
-    try {
-      const res = await fetch('/api/acheevy/classify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message }),
-      });
-      if (!res.ok) return;
-      const data = await res.json();
-      // The gateway returns intent as 'vertical:<id>' (e.g. 'vertical:idea-generator')
-      if (data.requiresAgent && data.confidence > 0.6 && data.intent) {
-        const intent = data.intent as string;
-        if (intent.startsWith('vertical:')) {
-          verticalFlow.startVertical(intent.replace('vertical:', ''));
-        }
-      }
-    } catch {
-      // Classification is non-blocking — silent fail
-    }
-  }, [verticalFlow]);
+  }, [inputValue, isStreaming, isLoading, sendMessage, showOrchestration, orchestration, verticalFlow, classifyForVertical]);
 
   // ─────────────────────────────────────────────────────────
   // Keyboard Handling
@@ -728,7 +749,7 @@ export function ChatInterface({
                 key={message.id}
                 message={message}
                 isLast={index === messages.length - 1}
-                onSpeak={(text) => voiceOutput.speak(text)}
+                onSpeak={handleSpeak}
               />
             ))}
           </AnimatePresence>

@@ -101,28 +101,28 @@ export default function PlatformMapPage() {
       {/* Header */}
       <motion.header
         variants={staggerItem}
-        className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-slate-100"
+        className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-white/8"
       >
         <div>
           <p className="text-xs uppercase tracking-[0.25em] text-gold/50 mb-1 font-mono">
             Antigravity
           </p>
-          <h1 className="text-2xl md:text-3xl font-display text-slate-800 tracking-tight">
+          <h1 className="text-2xl md:text-3xl font-display text-zinc-100 tracking-tight">
             Platform Map
           </h1>
-          <p className="mt-1 text-sm text-slate-400">
+          <p className="mt-1 text-sm text-zinc-500">
             Every surface in A.I.M.S. — click any live node to navigate.
           </p>
         </div>
 
         {/* View toggle */}
-        <div className="flex items-center gap-1 p-1 rounded-lg border border-wireframe-stroke bg-slate-100/60">
+        <div className="flex items-center gap-1 p-1 rounded-lg border border-wireframe-stroke bg-[#1F1F23]/60">
           <button
             onClick={() => setViewMode("map")}
             className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-mono transition-all ${
               viewMode === "map"
                 ? "bg-gold/10 text-gold border border-gold/30"
-                : "text-slate-400 border border-transparent hover:text-slate-500"
+                : "text-zinc-500 border border-transparent hover:text-zinc-400"
             }`}
           >
             <Map size={12} /> Map
@@ -132,7 +132,7 @@ export default function PlatformMapPage() {
             className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-mono transition-all ${
               viewMode === "list"
                 ? "bg-gold/10 text-gold border border-gold/30"
-                : "text-slate-400 border border-transparent hover:text-slate-500"
+                : "text-zinc-500 border border-transparent hover:text-zinc-400"
             }`}
           >
             <List size={12} /> List
@@ -142,7 +142,7 @@ export default function PlatformMapPage() {
 
       {/* Content */}
       {viewMode === "map" ? (
-        <motion.div variants={staggerItem} className="flex-1 mt-4 rounded-xl border border-wireframe-stroke bg-slate-100/40 overflow-hidden relative">
+        <motion.div variants={staggerItem} className="flex-1 mt-4 rounded-xl border border-wireframe-stroke bg-[#1F1F23]/40 overflow-hidden relative">
           <PlatformMindMap />
         </motion.div>
       ) : (
@@ -160,8 +160,8 @@ export default function PlatformMapPage() {
             >
               <div className="flex items-center gap-2 mb-3">
                 <span className={`w-2 h-2 rounded-full ${section.dot}`} />
-                <h2 className="text-sm font-medium text-slate-800">{section.title}</h2>
-                <span className="text-xs text-slate-300 font-mono">{section.items.length}</span>
+                <h2 className="text-sm font-medium text-zinc-100">{section.title}</h2>
+                <span className="text-xs text-zinc-600 font-mono">{section.items.length}</span>
               </div>
               <div className="space-y-1.5">
                 {section.items.map((item) => (
@@ -169,12 +169,12 @@ export default function PlatformMapPage() {
                     <Link
                       key={item.label}
                       href={item.href}
-                      className="group flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-all hover:bg-slate-50 border border-transparent hover:border-wireframe-stroke"
+                      className="group flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-all hover:bg-white/5 border border-transparent hover:border-wireframe-stroke"
                     >
                       <span className={`w-1.5 h-1.5 rounded-full ${
-                        item.status === "live" ? "bg-emerald-400" : "bg-slate-100"
+                        item.status === "live" ? "bg-emerald-400" : "bg-[#1F1F23]"
                       }`} />
-                      <span className="flex-1 text-slate-600 group-hover:text-slate-800 transition-colors">
+                      <span className="flex-1 text-zinc-300 group-hover:text-zinc-100 transition-colors">
                         {item.label}
                       </span>
                       <ArrowRight size={12} className="text-transparent group-hover:text-gold/60 transition-all" />
@@ -184,9 +184,9 @@ export default function PlatformMapPage() {
                       key={item.label}
                       className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm opacity-40"
                     >
-                      <span className="w-1.5 h-1.5 rounded-full bg-slate-100" />
-                      <span className="flex-1 text-slate-400">{item.label}</span>
-                      <span className="text-[10px] font-mono text-slate-300">PLANNED</span>
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#1F1F23]" />
+                      <span className="flex-1 text-zinc-500">{item.label}</span>
+                      <span className="text-[10px] font-mono text-zinc-600">PLANNED</span>
                     </div>
                   )
                 ))}

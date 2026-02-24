@@ -4,13 +4,15 @@ import Link from "next/link";
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#F8FAFC] px-4 py-8">
+    <div className="flex min-h-screen items-center justify-center bg-[#09090B] px-4 py-8">
       {/* Background effects */}
-      <div className="fixed inset-0 bg-grid pointer-events-none opacity-15" />
-      <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_center,rgba(217,119,6,0.03)_0%,transparent_60%)] pointer-events-none" />
+      <div className="fixed inset-0 bg-grid pointer-events-none" />
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] glow-orb glow-orb-amber opacity-40" />
+      </div>
 
       <div className="relative z-10 w-full max-w-[420px]">
-        {/* Logo — links home */}
+        {/* Logo */}
         <div className="flex justify-center mb-8">
           <Link href="/">
             <Image
@@ -30,8 +32,8 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
         </section>
 
         {/* Footer */}
-        <p className="mt-6 text-center text-[11px] text-slate-400">
-          Powered by ACHEEVY &middot; plugmein.cloud
+        <p className="mt-6 text-center text-[11px] text-zinc-500">
+          Powered by A.I.M.S. &middot; plugmein.cloud
         </p>
       </div>
     </div>

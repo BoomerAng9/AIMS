@@ -92,10 +92,10 @@ export default function OnboardingPage() {
         transition={{ delay: 0.1, duration: 0.4 }}
         className="absolute top-0 left-0 p-6 z-20 flex items-center gap-4"
       >
-        <Link href="/auth/sign-in" className="text-slate-400 hover:text-gold transition-colors">
+        <Link href="/auth/sign-in" className="text-zinc-500 hover:text-gold transition-colors">
           <ArrowLeft className="h-6 w-6" />
         </Link>
-        <Link href="/" className="font-display text-slate-800 uppercase tracking-widest hover:text-gold transition-colors">
+        <Link href="/" className="font-display text-zinc-100 uppercase tracking-widest hover:text-gold transition-colors">
           A.I.M.S. Home
         </Link>
       </motion.div>
@@ -120,7 +120,7 @@ export default function OnboardingPage() {
           className="relative z-10 w-full max-w-2xl"
         >
           {step === 1 ? (
-            <Card className="rounded-2xl border border-wireframe-stroke bg-slate-50/70 backdrop-blur-xl shadow-[0_0_80px_rgba(212,168,67,0.08)]">
+            <Card className="rounded-2xl border border-wireframe-stroke bg-[#18181B]/70 backdrop-blur-xl shadow-[0_0_80px_rgba(212,168,67,0.08)]">
               <CardHeader>
                 <motion.div
                   variants={staggerContainer}
@@ -137,12 +137,12 @@ export default function OnboardingPage() {
                     </h2>
                   </motion.div>
                   <motion.div variants={staggerItem}>
-                    <CardTitle className="text-3xl font-display text-slate-800">
+                    <CardTitle className="text-3xl font-display text-zinc-100">
                       Initialize Your Profile
                     </CardTitle>
                   </motion.div>
                   <motion.div variants={staggerItem}>
-                    <CardDescription className="text-slate-400">
+                    <CardDescription className="text-zinc-500">
                       ACHEEVY needs basic parameters to calibrate your dashboard and recommend the right tools.
                     </CardDescription>
                   </motion.div>
@@ -158,51 +158,51 @@ export default function OnboardingPage() {
                 >
                   <motion.div variants={staggerItem} className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <label className="text-xs font-medium uppercase tracking-wider text-slate-400 flex items-center gap-2 font-mono">
+                      <label className="text-xs font-medium uppercase tracking-wider text-zinc-500 flex items-center gap-2 font-mono">
                         <User className="h-3 w-3 text-gold/60" /> Full Name *
                       </label>
                       <Input
                         placeholder="John Doe"
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
-                        className="border-wireframe-stroke bg-slate-50 focus:border-gold/40 focus:ring-1 focus:ring-gold/20 transition-all"
+                        className="border-wireframe-stroke bg-[#18181B] focus:border-gold/40 focus:ring-1 focus:ring-gold/20 transition-all"
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-xs font-medium uppercase tracking-wider text-slate-400 flex items-center gap-2 font-mono">
+                      <label className="text-xs font-medium uppercase tracking-wider text-zinc-500 flex items-center gap-2 font-mono">
                         <Briefcase className="h-3 w-3 text-gold/60" /> Company (optional)
                       </label>
                       <Input
                         placeholder="Acme Inc."
                         value={companyName}
                         onChange={(e) => setCompanyName(e.target.value)}
-                        className="border-wireframe-stroke bg-slate-50 focus:border-gold/40 focus:ring-1 focus:ring-gold/20 transition-all"
+                        className="border-wireframe-stroke bg-[#18181B] focus:border-gold/40 focus:ring-1 focus:ring-gold/20 transition-all"
                       />
                     </div>
                   </motion.div>
 
                   <motion.div variants={staggerItem} className="space-y-2">
-                    <label className="text-xs font-medium uppercase tracking-wider text-slate-400 flex items-center gap-2 font-mono">
+                    <label className="text-xs font-medium uppercase tracking-wider text-zinc-500 flex items-center gap-2 font-mono">
                       <Flag className="h-3 w-3 text-gold/60" /> Region / Country
                     </label>
                     <Input
                       placeholder="United States"
                       value={region}
                       onChange={(e) => setRegion(e.target.value)}
-                      className="border-wireframe-stroke bg-slate-50 focus:border-gold/40 focus:ring-1 focus:ring-gold/20 transition-all"
+                      className="border-wireframe-stroke bg-[#18181B] focus:border-gold/40 focus:ring-1 focus:ring-gold/20 transition-all"
                     />
                   </motion.div>
 
                   <motion.div variants={staggerItem} className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <label className="text-xs font-medium uppercase tracking-wider text-slate-400 flex items-center gap-2 font-mono">
+                      <label className="text-xs font-medium uppercase tracking-wider text-zinc-500 flex items-center gap-2 font-mono">
                         <Target className="h-3 w-3 text-gold/60" /> Primary Objective
                       </label>
                       <select
                         aria-label="Primary Objective"
                         value={objective}
                         onChange={(e) => setObjective(e.target.value)}
-                        className="flex h-11 w-full rounded-xl border border-wireframe-stroke bg-slate-50 px-3 py-2 text-sm text-slate-800 focus:border-gold/40 focus:ring-1 focus:ring-gold/20 outline-none transition-all"
+                        className="flex h-11 w-full rounded-xl border border-wireframe-stroke bg-[#18181B] px-3 py-2 text-sm text-zinc-100 focus:border-gold/40 focus:ring-1 focus:ring-gold/20 outline-none transition-all"
                       >
                         {OBJECTIVES.map((o) => (
                           <option key={o} value={o}>{o}</option>
@@ -210,14 +210,14 @@ export default function OnboardingPage() {
                       </select>
                     </div>
                     <div className="space-y-2">
-                      <label className="text-xs font-medium uppercase tracking-wider text-slate-400 flex items-center gap-2 font-mono">
+                      <label className="text-xs font-medium uppercase tracking-wider text-zinc-500 flex items-center gap-2 font-mono">
                         <Mail className="h-3 w-3 text-gold/60" /> Industry
                       </label>
                       <select
                         aria-label="Industry"
                         value={industry}
                         onChange={(e) => setIndustry(e.target.value)}
-                        className="flex h-11 w-full rounded-xl border border-wireframe-stroke bg-slate-50 px-3 py-2 text-sm text-slate-800 focus:border-gold/40 focus:ring-1 focus:ring-gold/20 outline-none transition-all"
+                        className="flex h-11 w-full rounded-xl border border-wireframe-stroke bg-[#18181B] px-3 py-2 text-sm text-zinc-100 focus:border-gold/40 focus:ring-1 focus:ring-gold/20 outline-none transition-all"
                       >
                         {INDUSTRIES.map((i) => (
                           <option key={i} value={i}>{i}</option>
@@ -254,7 +254,7 @@ export default function OnboardingPage() {
               </CardContent>
             </Card>
           ) : (
-            <Card className="rounded-2xl border border-gold/30 bg-slate-50/70 backdrop-blur-xl shadow-[0_0_80px_rgba(212,168,67,0.15)]">
+            <Card className="rounded-2xl border border-gold/30 bg-[#18181B]/70 backdrop-blur-xl shadow-[0_0_80px_rgba(212,168,67,0.15)]">
               <CardContent className="flex flex-col items-center justify-center py-16 gap-4">
                 <motion.div
                   initial={{ scale: 0 }}
@@ -267,7 +267,7 @@ export default function OnboardingPage() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 }}
-                  className="text-2xl font-display text-slate-800"
+                  className="text-2xl font-display text-zinc-100"
                 >
                   Welcome, {fullName.split(" ")[0]}
                 </motion.h2>
@@ -275,7 +275,7 @@ export default function OnboardingPage() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.4 }}
-                  className="text-slate-400 text-sm"
+                  className="text-zinc-500 text-sm"
                 >
                   Calibrating your ACHEEVY instance...
                 </motion.p>

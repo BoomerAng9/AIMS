@@ -140,22 +140,22 @@ export default function YourSpacePage() {
             <p className="text-[10px] uppercase tracking-[0.3em] text-gold/50 mb-1">
               Profile &amp; Identity
             </p>
-            <h1 className="text-3xl font-bold tracking-tight text-slate-800 font-display">
+            <h1 className="text-3xl font-bold tracking-tight text-zinc-100 font-display">
               YOUR SPACE
             </h1>
           </header>
 
           {/* User Info Card */}
-          <section className="rounded-3xl border border-wireframe-stroke bg-slate-50/70 p-6 backdrop-blur-2xl space-y-5">
+          <section className="rounded-3xl border border-wireframe-stroke bg-[#18181B]/70 p-6 backdrop-blur-2xl space-y-5">
             <div className="flex items-center gap-3 mb-2">
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gold/10 text-gold">
                 <User size={22} />
               </div>
               <div>
-                <h2 className="text-lg font-semibold text-slate-800">
+                <h2 className="text-lg font-semibold text-zinc-100">
                   {userName}
                 </h2>
-                <p className="text-xs text-slate-400 font-mono">
+                <p className="text-xs text-zinc-500 font-mono">
                   {userEmail || `@${userName.toLowerCase().replace(/\s+/g, '')}`}
                 </p>
               </div>
@@ -163,13 +163,13 @@ export default function YourSpacePage() {
 
             <div className="flex items-center gap-4">
               <div className="space-y-1">
-                <p className="text-[10px] uppercase tracking-wider text-slate-400">
+                <p className="text-[10px] uppercase tracking-wider text-zinc-500">
                   Role
                 </p>
-                <p className="text-sm text-slate-500">{userRole === "OWNER" ? "Platform Owner" : "Member"}</p>
+                <p className="text-sm text-zinc-400">{userRole === "OWNER" ? "Platform Owner" : "Member"}</p>
               </div>
               <div className="space-y-1">
-                <p className="text-[10px] uppercase tracking-wider text-slate-400">
+                <p className="text-[10px] uppercase tracking-wider text-zinc-500">
                   Status
                 </p>
                 <p className="text-sm text-emerald-400">{memberSince}</p>
@@ -177,14 +177,14 @@ export default function YourSpacePage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] uppercase tracking-wider text-slate-400">
+              <label className="text-[10px] uppercase tracking-wider text-zinc-500">
                 Bio
               </label>
               <textarea
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
                 rows={3}
-                className="w-full rounded-xl border border-wireframe-stroke bg-white/80 p-3 text-sm text-slate-800 outline-none focus:border-gold/30 transition-colors resize-none leading-relaxed"
+                className="w-full rounded-xl border border-wireframe-stroke bg-[#111113]/80 p-3 text-sm text-zinc-100 outline-none focus:border-gold/30 transition-colors resize-none leading-relaxed"
               />
             </div>
           </section>
@@ -194,15 +194,15 @@ export default function YourSpacePage() {
             {stats.map((stat) => (
               <div
                 key={stat.label}
-                className="rounded-2xl border border-wireframe-stroke bg-slate-50/70 p-4 backdrop-blur-xl"
+                className="rounded-2xl border border-wireframe-stroke bg-[#18181B]/70 p-4 backdrop-blur-xl"
               >
                 <div className="flex items-center gap-2 mb-2">
                   <stat.icon size={13} className="text-gold" />
-                  <p className="text-[10px] uppercase tracking-wider text-slate-400">
+                  <p className="text-[10px] uppercase tracking-wider text-zinc-500">
                     {stat.label}
                   </p>
                 </div>
-                <p className="text-2xl font-bold text-slate-800 font-display">
+                <p className="text-2xl font-bold text-zinc-100 font-display">
                   {stat.value}
                 </p>
               </div>
@@ -228,7 +228,7 @@ export default function YourSpacePage() {
 
           {/* Motto */}
           <div className="pt-2 pb-4">
-            <p className="text-sm italic text-slate-300 tracking-wide">
+            <p className="text-sm italic text-zinc-600 tracking-wide">
               &ldquo;Activity breeds Activity.&rdquo;
             </p>
           </div>
@@ -261,18 +261,18 @@ export default function YourSpacePage() {
             <div
               className={`absolute inset-0 flex flex-col items-center justify-center gap-4 transition-opacity ${
                 profileImage
-                  ? "opacity-0 hover:opacity-100 bg-slate-50/70"
+                  ? "opacity-0 hover:opacity-100 bg-[#18181B]/70"
                   : "opacity-100"
               }`}
             >
-              <div className="flex h-16 w-16 items-center justify-center rounded-full border border-gold/20 bg-slate-100/60 backdrop-blur-sm">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full border border-gold/20 bg-[#1F1F23]/60 backdrop-blur-sm">
                 <Camera size={28} className="text-gold/80" />
               </div>
               <div className="text-center">
-                <p className="text-sm font-semibold text-slate-800">
+                <p className="text-sm font-semibold text-zinc-100">
                   {profileImage ? "Change Image" : "Upload Profile Image"}
                 </p>
-                <p className="mt-1 text-xs text-slate-400">
+                <p className="mt-1 text-xs text-zinc-500">
                   Drop your image here or click to browse
                 </p>
               </div>

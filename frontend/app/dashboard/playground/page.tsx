@@ -106,18 +106,18 @@ function CodeEditor({
   return (
     <div className="flex flex-col h-full">
       {/* Toolbar */}
-      <div className="flex items-center justify-between px-4 py-2 border-b border-slate-100">
+      <div className="flex items-center justify-between px-4 py-2 border-b border-white/8">
         <div className="flex items-center gap-3">
           <select
             value={language}
             onChange={(e) => setLanguage(e.target.value)}
-            className="text-xs bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-slate-600 outline-none"
+            className="text-xs bg-[#18181B] border border-white/10 rounded-lg px-3 py-1.5 text-zinc-300 outline-none"
           >
             <option value="python">Python</option>
             <option value="node">Node.js</option>
             <option value="bash">Bash</option>
           </select>
-          <span className="text-[10px] text-slate-300 font-mono">{code.split('\n').length} lines</span>
+          <span className="text-[10px] text-zinc-600 font-mono">{code.split('\n').length} lines</span>
         </div>
         <button
           onClick={() => onExecute(code, language)}
@@ -125,7 +125,7 @@ function CodeEditor({
           className={`
             flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-medium transition-all
             ${isExecuting
-              ? 'bg-slate-50 text-slate-400 cursor-wait'
+              ? 'bg-[#18181B] text-zinc-500 cursor-wait'
               : 'bg-green-500/20 text-green-400 hover:bg-green-500/30 border border-green-500/20'
             }
           `}
@@ -154,33 +154,33 @@ function CodeEditor({
             value={code}
             onChange={(e) => setCode(e.target.value)}
             spellCheck={false}
-            className="w-full h-full bg-transparent text-slate-700 font-mono text-sm p-4 outline-none resize-none leading-relaxed"
+            className="w-full h-full bg-transparent text-zinc-200 font-mono text-sm p-4 outline-none resize-none leading-relaxed"
             placeholder={`# ${language === 'python' ? 'Python' : language === 'node' ? 'JavaScript' : 'Bash'} code here...`}
           />
         </div>
 
         {/* Output Panel */}
         <div className="flex-1 min-h-0 flex flex-col">
-          <div className="px-4 py-2 border-b border-slate-100 flex items-center gap-2">
-            <span className="text-xs text-slate-400 font-medium">Output</span>
+          <div className="px-4 py-2 border-b border-white/8 flex items-center gap-2">
+            <span className="text-xs text-zinc-500 font-medium">Output</span>
             {result && (
               <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono ${result.success ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
                 exit: {result.exitCode}
               </span>
             )}
             {result?.engine && (
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-50 text-slate-300 font-mono">
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#18181B] text-zinc-600 font-mono">
                 {result.engine}
               </span>
             )}
           </div>
           <div className="flex-1 overflow-auto p-4 font-mono text-sm">
             {!result && !isExecuting && (
-              <p className="text-slate-300 italic">Run your code to see output here</p>
+              <p className="text-zinc-600 italic">Run your code to see output here</p>
             )}
             {isExecuting && (
-              <div className="flex items-center gap-2 text-slate-400">
-                <div className="w-3 h-3 border-2 border-slate-200 border-t-white/50 rounded-full animate-spin" />
+              <div className="flex items-center gap-2 text-zinc-500">
+                <div className="w-3 h-3 border-2 border-white/10 border-t-white/50 rounded-full animate-spin" />
                 Executing in sandbox...
               </div>
             )}
@@ -248,25 +248,25 @@ function PromptPlayground() {
   return (
     <div className="flex flex-col h-full">
       {/* System Prompt */}
-      <div className="px-4 py-3 border-b border-slate-100">
-        <label className="text-[10px] text-slate-400 uppercase tracking-wider font-medium">System Prompt</label>
+      <div className="px-4 py-3 border-b border-white/8">
+        <label className="text-[10px] text-zinc-500 uppercase tracking-wider font-medium">System Prompt</label>
         <textarea
           value={systemPrompt}
           onChange={(e) => setSystemPrompt(e.target.value)}
           rows={2}
-          className="w-full mt-1 bg-white border border-slate-100 rounded-lg px-3 py-2 text-sm text-slate-600 outline-none resize-none"
+          className="w-full mt-1 bg-[#111113] border border-white/8 rounded-lg px-3 py-2 text-sm text-zinc-300 outline-none resize-none"
         />
       </div>
 
       {/* User Prompt + Run */}
-      <div className="px-4 py-3 border-b border-slate-100">
+      <div className="px-4 py-3 border-b border-white/8">
         <div className="flex gap-3">
           <textarea
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             placeholder="Enter your prompt to test across models..."
             rows={3}
-            className="flex-1 bg-white border border-slate-100 rounded-lg px-3 py-2 text-sm text-slate-600 outline-none resize-none"
+            className="flex-1 bg-[#111113] border border-white/8 rounded-lg px-3 py-2 text-sm text-zinc-300 outline-none resize-none"
           />
           <button
             onClick={runPrompt}
@@ -281,7 +281,7 @@ function PromptPlayground() {
       {/* Model Responses */}
       <div className="flex-1 overflow-auto p-4">
         {responses.length === 0 ? (
-          <div className="text-center py-12 text-slate-300">
+          <div className="text-center py-12 text-zinc-600">
             <p className="text-sm">Enter a prompt and click Compare to test across models</p>
           </div>
         ) : (
@@ -289,10 +289,10 @@ function PromptPlayground() {
             {responses.map((r, i) => (
               <div key={i} className="wireframe-card rounded-xl p-4">
                 <div className="flex items-center gap-2 mb-3">
-                  <span className="text-xs font-medium text-slate-500">{r.model}</span>
+                  <span className="text-xs font-medium text-zinc-400">{r.model}</span>
                   {r.loading && <div className="w-3 h-3 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />}
                 </div>
-                <div className="text-sm text-slate-600 leading-relaxed whitespace-pre-wrap">
+                <div className="text-sm text-zinc-300 leading-relaxed whitespace-pre-wrap">
                   {r.loading ? 'Generating...' : r.response || 'No response'}
                 </div>
               </div>
@@ -313,9 +313,9 @@ function ComingSoonPanel({ type }: { type: typeof PLAYGROUND_TYPES[number] }) {
         <div className={`w-16 h-16 mx-auto mb-6 rounded-2xl border flex items-center justify-center ${type.bg}`}>
           <span className={`text-xl font-bold ${type.color}`}>{type.icon}</span>
         </div>
-        <h3 className="text-lg font-medium text-slate-700 mb-2">{type.name}</h3>
-        <p className="text-sm text-slate-400 mb-6">{type.description}</p>
-        <span className="text-xs px-3 py-1.5 rounded-full bg-slate-50 text-slate-400 border border-slate-200">
+        <h3 className="text-lg font-medium text-zinc-200 mb-2">{type.name}</h3>
+        <p className="text-sm text-zinc-500 mb-6">{type.description}</p>
+        <span className="text-xs px-3 py-1.5 rounded-full bg-[#18181B] text-zinc-500 border border-white/10">
           Coming Soon
         </span>
       </div>
@@ -367,18 +367,18 @@ export default function PlaygroundPage() {
       className="h-[calc(100vh-64px)] flex flex-col"
     >
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+      <div className="flex items-center justify-between px-6 py-4 border-b border-white/8">
         <div>
-          <h1 className="text-lg font-semibold text-slate-800">Playground</h1>
-          <p className="text-xs text-slate-400 mt-0.5">Sandbox environments for code, prompts, agents, and training</p>
+          <h1 className="text-lg font-semibold text-zinc-100">Playground</h1>
+          <p className="text-xs text-zinc-500 mt-0.5">Sandbox environments for code, prompts, agents, and training</p>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-[10px] text-slate-300 font-mono">{sessions.length} sessions</span>
+          <span className="text-[10px] text-zinc-600 font-mono">{sessions.length} sessions</span>
         </div>
       </div>
 
       {/* Type Tabs */}
-      <div className="flex items-center gap-1 px-6 py-3 border-b border-slate-100 overflow-x-auto">
+      <div className="flex items-center gap-1 px-6 py-3 border-b border-white/8 overflow-x-auto">
         {PLAYGROUND_TYPES.map((type) => (
           <button
             key={type.id}
@@ -387,7 +387,7 @@ export default function PlaygroundPage() {
               flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap
               ${activeType === type.id
                 ? `${type.bg} ${type.color} border`
-                : 'text-slate-400 hover:text-slate-500 hover:bg-slate-50'
+                : 'text-zinc-500 hover:text-zinc-400 hover:bg-white/5'
               }
             `}
           >
@@ -398,7 +398,7 @@ export default function PlaygroundPage() {
       </div>
 
       {/* Content */}
-      <div className="flex-1 min-h-0 bg-white">
+      <div className="flex-1 min-h-0 bg-[#111113]">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeType}

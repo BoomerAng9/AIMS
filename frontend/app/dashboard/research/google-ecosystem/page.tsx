@@ -167,7 +167,7 @@ export default function GoogleEcosystemPage() {
       <motion.section variants={staggerItem}>
         <Link
           href="/dashboard/research"
-          className="mb-4 inline-flex items-center gap-2 text-sm text-slate-400 transition hover:text-gold"
+          className="mb-4 inline-flex items-center gap-2 text-sm text-zinc-500 transition hover:text-gold"
         >
           <ArrowLeft size={14} />
           Back to Research Hub
@@ -178,10 +178,10 @@ export default function GoogleEcosystemPage() {
             <Globe size={22} className="text-gold" />
           </div>
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-slate-800 font-display">
+            <h1 className="text-2xl font-semibold tracking-tight text-zinc-100 font-display">
               Google Ecosystem
             </h1>
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-zinc-400">
               Google Cloud integrations powering the A.I.M.S. infrastructure
             </p>
           </div>
@@ -190,7 +190,7 @@ export default function GoogleEcosystemPage() {
 
       {/* ── Service Cards ──────────────────────────────────── */}
       <motion.section variants={staggerItem}>
-        <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-slate-700 font-display">
+        <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-200 font-display">
           Integrated Services
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -198,7 +198,7 @@ export default function GoogleEcosystemPage() {
             <motion.div
               key={service.id}
               whileHover={{ y: -4 }}
-              className="rounded-3xl border border-wireframe-stroke bg-slate-50/70 p-6 backdrop-blur-2xl"
+              className="rounded-3xl border border-wireframe-stroke bg-[#18181B]/70 p-6 backdrop-blur-2xl"
             >
               {/* Header */}
               <div className="mb-4 flex items-start justify-between">
@@ -206,7 +206,7 @@ export default function GoogleEcosystemPage() {
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-gold/20 bg-gold/10">
                     <service.icon size={18} className="text-gold" />
                   </div>
-                  <h3 className="text-lg font-semibold text-slate-800 font-display">
+                  <h3 className="text-lg font-semibold text-zinc-100 font-display">
                     {service.name}
                   </h3>
                 </div>
@@ -219,7 +219,7 @@ export default function GoogleEcosystemPage() {
               </div>
 
               {/* Description */}
-              <p className="mb-4 text-sm leading-relaxed text-slate-500">
+              <p className="mb-4 text-sm leading-relaxed text-zinc-400">
                 {service.description}
               </p>
 
@@ -228,12 +228,12 @@ export default function GoogleEcosystemPage() {
                 {service.metrics.map((metric) => (
                   <div
                     key={metric.label}
-                    className="rounded-xl border border-wireframe-stroke bg-slate-50 px-3 py-2"
+                    className="rounded-xl border border-wireframe-stroke bg-[#18181B] px-3 py-2"
                   >
                     <p className="text-[10px] font-medium uppercase tracking-wider text-gold/50">
                       {metric.label}
                     </p>
-                    <p className="text-sm font-semibold text-slate-800">
+                    <p className="text-sm font-semibold text-zinc-100">
                       {metric.value}
                     </p>
                   </div>
@@ -245,7 +245,7 @@ export default function GoogleEcosystemPage() {
                 {service.highlights.map((h) => (
                   <li
                     key={h}
-                    className="flex items-start gap-2 text-xs text-slate-500"
+                    className="flex items-start gap-2 text-xs text-zinc-400"
                   >
                     <CheckCircle2
                       size={12}
@@ -262,11 +262,11 @@ export default function GoogleEcosystemPage() {
 
       {/* ── CI/CD Pipeline ─────────────────────────────────── */}
       <motion.section variants={staggerItem}>
-        <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-slate-700 font-display">
+        <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-200 font-display">
           A.I.M.S. CI/CD Pipeline
         </h2>
-        <div className="rounded-3xl border border-wireframe-stroke bg-slate-50/70 p-6 backdrop-blur-2xl">
-          <p className="mb-6 text-sm text-slate-500">
+        <div className="rounded-3xl border border-wireframe-stroke bg-[#18181B]/70 p-6 backdrop-blur-2xl">
+          <p className="mb-6 text-sm text-zinc-400">
             End-to-end deployment flow from code commit to live production on
             the A.I.M.S. VPS.
           </p>
@@ -298,20 +298,20 @@ export default function GoogleEcosystemPage() {
                   >
                     {stage.label}
                   </p>
-                  <p className="mt-1 text-xs text-slate-400">{stage.detail}</p>
+                  <p className="mt-1 text-xs text-zinc-500">{stage.detail}</p>
                 </div>
 
                 {/* Arrow */}
                 {i < pipelineStages.length - 1 && (
                   <div className="hidden md:flex items-center px-2">
-                    <ArrowRight size={18} className="text-slate-300" />
+                    <ArrowRight size={18} className="text-zinc-600" />
                   </div>
                 )}
                 {i < pipelineStages.length - 1 && (
                   <div className="flex md:hidden justify-center py-1">
                     <ArrowRight
                       size={16}
-                      className="rotate-90 text-slate-300"
+                      className="rotate-90 text-zinc-600"
                     />
                   </div>
                 )}
@@ -321,15 +321,15 @@ export default function GoogleEcosystemPage() {
 
           {/* Pipeline Details */}
           <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-wireframe-stroke pt-4">
-            <div className="flex items-center gap-3 text-xs text-slate-400">
+            <div className="flex items-center gap-3 text-xs text-zinc-500">
               <Clock size={14} className="text-gold/60" />
               <span>Average pipeline: ~5 minutes end-to-end</span>
             </div>
-            <div className="flex items-center gap-3 text-xs text-slate-400">
+            <div className="flex items-center gap-3 text-xs text-zinc-500">
               <CheckCircle2 size={14} className="text-emerald-400/60" />
               <span>Automated rollback on health check failure</span>
             </div>
-            <div className="flex items-center gap-3 text-xs text-slate-400">
+            <div className="flex items-center gap-3 text-xs text-zinc-500">
               <TrendingUp size={14} className="text-blue-400/60" />
               <span>47 successful deployments this month</span>
             </div>

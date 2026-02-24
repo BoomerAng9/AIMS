@@ -45,8 +45,8 @@ export default function OnboardingStepPage() {
         return (
           <OnboardingShell title="Identity" subtitle="Who are we building for? This helps ACHEEVY tune the architectural tone.">
             <div className="space-y-4 max-w-sm mx-auto">
-              <input type="text" placeholder="Workspace Name" className="w-full rounded-full border border-slate-200 bg-slate-100/60 p-3 text-sm outline-none focus:border-gold transition-all px-6" />
-              <select className="w-full rounded-full border border-slate-200 bg-slate-100/60 p-3 text-sm outline-none focus:border-gold transition-all px-6">
+              <input type="text" placeholder="Workspace Name" className="w-full rounded-full border border-white/10 bg-[#1F1F23]/60 p-3 text-sm outline-none focus:border-gold transition-all px-6" />
+              <select className="w-full rounded-full border border-white/10 bg-[#1F1F23]/60 p-3 text-sm outline-none focus:border-gold transition-all px-6">
                 <option>Solopreneur / Founder</option>
                 <option>SME / Agency</option>
                 <option>Enterprise Architect</option>
@@ -59,7 +59,7 @@ export default function OnboardingStepPage() {
           <OnboardingShell title="Objective" subtitle="What is the primary mission for this hybrid workspace?">
              <div className="grid grid-cols-1 gap-3 max-w-md mx-auto">
                {["Automated Outreach", "Full-Stack Deployment", "Data Orchestration", "Customer Success Agents"].map(g => (
-                 <button key={g} className="rounded-2xl border border-slate-100 bg-slate-50 p-4 text-left text-sm hover:border-gold/30 hover:bg-slate-100 transition-all">
+                 <button key={g} className="rounded-2xl border border-white/8 bg-[#18181B] p-4 text-left text-sm hover:border-gold/30 hover:bg-white/8 transition-all">
                    {g}
                  </button>
                ))}
@@ -79,7 +79,7 @@ export default function OnboardingStepPage() {
                <div className="h-24 w-24 rounded-full border-2 border-gold/20 bg-gold/10 flex items-center justify-center animate-pulse">
                   <span className="text-3xl text-gold">🛡️</span>
                </div>
-               <p className="text-xs text-slate-400 text-center px-8">
+               <p className="text-xs text-zinc-500 text-center px-8">
                  By clicking Finish, you acknowledge the LUC resource rates. Your obsidian-grade workspace will be provisioned instantly.
                </p>
              </div>
@@ -97,7 +97,7 @@ export default function OnboardingStepPage() {
       </div>
 
       <footer className="mt-12 flex justify-between">
-        <button onClick={handleBack} className="text-xs font-semibold uppercase tracking-widest text-slate-400 hover:text-slate-800 transition-colors">
+        <button onClick={handleBack} className="text-xs font-semibold uppercase tracking-widest text-zinc-500 hover:text-zinc-100 transition-colors">
           {step === "profile" ? "Cancel" : "Back"}
         </button>
         <button onClick={handleNext} className="rounded-full bg-gold px-8 py-2.5 text-xs font-bold uppercase tracking-widest text-black hover:shadow-[0_0_15px_rgba(251,191,36,0.5)] transition-all">

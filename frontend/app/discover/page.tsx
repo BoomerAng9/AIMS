@@ -81,7 +81,7 @@ const COLOR_MAP: Record<string, { bg: string; text: string; border: string; glow
 
 export default function DiscoverPage() {
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-slate-900">
+    <div className="min-h-screen bg-[#F8FAFC] text-zinc-100">
       {/* Hero */}
       <section className="relative overflow-hidden px-6 py-20 md:py-32">
         <div className="absolute inset-0 bg-gradient-to-b from-amber-500/5 via-transparent to-transparent" />
@@ -107,7 +107,7 @@ export default function DiscoverPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="text-lg text-slate-500 mt-6 max-w-2xl mx-auto"
+            className="text-lg text-zinc-400 mt-6 max-w-2xl mx-auto"
           >
             Fact-check business plans. Find real estate deals. Scout athlete talent.
             Build customer personas. All autonomous. All verified. All yours.
@@ -126,7 +126,7 @@ export default function DiscoverPage() {
             </Link>
             <Link
               href="/dashboard/blockwise"
-              className="px-6 py-3 bg-slate-100 text-slate-600 border border-slate-200 rounded-xl font-medium hover:bg-slate-200 transition-all"
+              className="px-6 py-3 bg-[#1F1F23] text-zinc-300 border border-white/10 rounded-xl font-medium hover:bg-[#1F1F23] transition-all"
             >
               Analyze a Deal
             </Link>
@@ -146,15 +146,15 @@ export default function DiscoverPage() {
             <span className="px-2 py-1 text-[10px] font-mono rounded bg-red-500/15 text-red-400 border border-red-500/20">
               CASE STUDY
             </span>
-            <span className="text-xs text-slate-500">Veritas Research Verification</span>
+            <span className="text-xs text-zinc-400">Veritas Research Verification</span>
           </div>
           <h2 className="text-2xl md:text-3xl font-bold mb-4">
             How We Caught a <span className="text-red-400">$180 Million</span> Error
           </h2>
-          <p className="text-slate-500 text-lg mb-6 max-w-3xl">
+          <p className="text-zinc-400 text-lg mb-6 max-w-3xl">
             A client&apos;s expansion report claimed $4,000 Customer Lifetime Value over 7 years.
             Our agents cross-referenced 47 data sources and found the actual weighted average was
-            <strong className="text-slate-900"> $485</strong> — an
+            <strong className="text-zinc-100"> $485</strong> — an
             <strong className="text-red-400"> 824% overestimation</strong> that inflated
             the entire market projection by $180M.
           </p>
@@ -167,12 +167,12 @@ export default function DiscoverPage() {
           <div className="flex items-center gap-3">
             <div className="flex gap-1">
               {['EXTRACT', 'VERIFY', 'ASSESS', 'REPORT'].map((step, i) => (
-                <span key={step} className="px-2 py-1 text-[9px] font-mono rounded bg-slate-100 text-slate-500">
+                <span key={step} className="px-2 py-1 text-[9px] font-mono rounded bg-[#1F1F23] text-zinc-400">
                   {i + 1}. {step}
                 </span>
               ))}
             </div>
-            <span className="text-xs text-slate-500 ml-auto">Fully autonomous. Human reviewed only the final report.</span>
+            <span className="text-xs text-zinc-400 ml-auto">Fully autonomous. Human reviewed only the final report.</span>
           </div>
         </motion.div>
       </section>
@@ -181,7 +181,7 @@ export default function DiscoverPage() {
       <section className="px-6 py-16 max-w-5xl mx-auto">
         <div className="text-center mb-12">
           <h2 className="text-2xl md:text-3xl font-bold">Deploy a Boomer_Ang for Any Vertical</h2>
-          <p className="text-slate-500 mt-2">Each agent runs autonomously. You approve the output.</p>
+          <p className="text-zinc-400 mt-2">Each agent runs autonomously. You approve the output.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -198,7 +198,7 @@ export default function DiscoverPage() {
                 <Link href={v.href}>
                   <div className={`group relative p-6 rounded-xl border ${c.border} ${c.bg} hover:shadow-lg ${c.glow} transition-all cursor-pointer h-full`}>
                     {v.status === 'coming' && (
-                      <span className="absolute top-4 right-4 text-[9px] font-mono px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 border border-slate-200">
+                      <span className="absolute top-4 right-4 text-[9px] font-mono px-1.5 py-0.5 rounded bg-[#1F1F23] text-zinc-400 border border-white/10">
                         SOON
                       </span>
                     )}
@@ -208,8 +208,8 @@ export default function DiscoverPage() {
                       </span>
                     )}
                     <h3 className={`text-lg font-bold ${c.text} mb-1`}>{v.name}</h3>
-                    <p className="text-sm text-slate-600 font-medium mb-2">{v.tagline}</p>
-                    <p className="text-xs text-slate-500 leading-relaxed">{v.description}</p>
+                    <p className="text-sm text-zinc-300 font-medium mb-2">{v.tagline}</p>
+                    <p className="text-xs text-zinc-400 leading-relaxed">{v.description}</p>
                   </div>
                 </Link>
               </motion.div>
@@ -219,35 +219,35 @@ export default function DiscoverPage() {
       </section>
 
       {/* Architecture Strip */}
-      <section className="px-6 py-16 border-t border-slate-200">
+      <section className="px-6 py-16 border-t border-white/10">
         <div className="max-w-5xl mx-auto text-center">
-          <p className="text-xs font-mono text-slate-500 mb-4 tracking-widest">THE BOSS-GRUNT ARCHITECTURE</p>
+          <p className="text-xs font-mono text-zinc-400 mb-4 tracking-widest">THE BOSS-GRUNT ARCHITECTURE</p>
           <div className="flex flex-col md:flex-row items-center justify-center gap-4 text-sm">
             <div className="px-4 py-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400">
               <p className="font-bold">The Boss</p>
-              <p className="text-xs text-slate-500">Claude Opus — Strategy + Review</p>
+              <p className="text-xs text-zinc-400">Claude Opus — Strategy + Review</p>
             </div>
-            <span className="text-slate-500 text-lg">→</span>
-            <div className="px-4 py-3 rounded-lg bg-slate-100 border border-slate-200 text-slate-600">
+            <span className="text-zinc-400 text-lg">→</span>
+            <div className="px-4 py-3 rounded-lg bg-[#1F1F23] border border-white/10 text-zinc-300">
               <p className="font-bold">The Grunts</p>
-              <p className="text-xs text-slate-500">Sonar + Brave — Data Retrieval</p>
+              <p className="text-xs text-zinc-400">Sonar + Brave — Data Retrieval</p>
             </div>
-            <span className="text-slate-500 text-lg">→</span>
+            <span className="text-zinc-400 text-lg">→</span>
             <div className="px-4 py-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
               <p className="font-bold">The Guardrails</p>
-              <p className="text-xs text-slate-500">Variance Check — No Hallucinations</p>
+              <p className="text-xs text-zinc-400">Variance Check — No Hallucinations</p>
             </div>
           </div>
-          <p className="text-slate-500 text-xs mt-6">
+          <p className="text-zinc-400 text-xs mt-6">
             Opus writes the prompts. Cheap models do the work. Python enforces the rules. You approve the output.
           </p>
         </div>
       </section>
 
       {/* CTA */}
-      <section className="px-6 py-20 text-center border-t border-slate-200">
+      <section className="px-6 py-20 text-center border-t border-white/10">
         <h2 className="text-2xl font-bold mb-2">Ready for production?</h2>
-        <p className="text-slate-500 mb-6">Deploy these agents on plugmein.cloud</p>
+        <p className="text-zinc-400 mb-6">Deploy these agents on plugmein.cloud</p>
         <Link
           href="/dashboard/chat"
           className="inline-block px-8 py-4 bg-amber-500/15 text-amber-400 border border-amber-500/25 rounded-xl font-medium hover:bg-amber-500/25 transition-all text-lg"
@@ -262,10 +262,10 @@ export default function DiscoverPage() {
 function StatPill({ label, value, color }: { label: string; value: string; color?: string }) {
   return (
     <div className="text-center">
-      <p className={`text-xl md:text-2xl font-mono font-bold ${color === 'red' ? 'text-red-400' : 'text-slate-900'}`}>
+      <p className={`text-xl md:text-2xl font-mono font-bold ${color === 'red' ? 'text-red-400' : 'text-zinc-100'}`}>
         {value}
       </p>
-      <p className="text-[10px] text-slate-500 mt-0.5">{label}</p>
+      <p className="text-[10px] text-zinc-400 mt-0.5">{label}</p>
     </div>
   );
 }

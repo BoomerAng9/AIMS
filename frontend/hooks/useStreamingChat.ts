@@ -124,12 +124,14 @@ export function useStreamingChat(options: UseStreamingChatOptions = {}): UseStre
                 if (typeof text === 'string') {
                   currentMessageRef.current += text;
                   setMessages(prev => {
-                    const updated = [...prev];
-                    const lastMsg = updated[updated.length - 1];
+                    const lastIdx = prev.length - 1;
+                    if (lastIdx < 0) return prev;
+                    const lastMsg = prev[lastIdx];
                     if (lastMsg.role === 'assistant' && lastMsg.isStreaming) {
-                      lastMsg.content = currentMessageRef.current;
+                      const newMsg = { ...lastMsg, content: currentMessageRef.current };
+                      return [...prev.slice(0, lastIdx), newMsg];
                     }
-                    return [...updated];
+                    return prev;
                   });
                 }
               } catch {
@@ -139,13 +141,15 @@ export function useStreamingChat(options: UseStreamingChatOptions = {}): UseStre
               // Vercel AI SDK finish signal
               setIsStreaming(false);
               setMessages(prev => {
-                const updated = [...prev];
-                const lastMsg = updated[updated.length - 1];
+                const lastIdx = prev.length - 1;
+                if (lastIdx < 0) return prev;
+                const lastMsg = prev[lastIdx];
                 if (lastMsg.role === 'assistant') {
-                  lastMsg.isStreaming = false;
-                  onMessageComplete?.(lastMsg);
+                  const newMsg = { ...lastMsg, isStreaming: false };
+                  onMessageComplete?.(newMsg);
+                  return [...prev.slice(0, lastIdx), newMsg];
                 }
-                return updated;
+                return prev;
               });
               return;
             }
@@ -159,13 +163,15 @@ export function useStreamingChat(options: UseStreamingChatOptions = {}): UseStre
             if (data === '[DONE]') {
               setIsStreaming(false);
               setMessages(prev => {
-                const updated = [...prev];
-                const lastMsg = updated[updated.length - 1];
+                const lastIdx = prev.length - 1;
+                if (lastIdx < 0) return prev;
+                const lastMsg = prev[lastIdx];
                 if (lastMsg.role === 'assistant') {
-                  lastMsg.isStreaming = false;
-                  onMessageComplete?.(lastMsg);
+                  const newMsg = { ...lastMsg, isStreaming: false };
+                  onMessageComplete?.(newMsg);
+                  return [...prev.slice(0, lastIdx), newMsg];
                 }
-                return updated;
+                return prev;
               });
               return;
             }
@@ -176,12 +182,14 @@ export function useStreamingChat(options: UseStreamingChatOptions = {}): UseStre
               if (parsed.content) {
                 currentMessageRef.current += parsed.content;
                 setMessages(prev => {
-                  const updated = [...prev];
-                  const lastMsg = updated[updated.length - 1];
+                  const lastIdx = prev.length - 1;
+                  if (lastIdx < 0) return prev;
+                  const lastMsg = prev[lastIdx];
                   if (lastMsg.role === 'assistant' && lastMsg.isStreaming) {
-                    lastMsg.content = currentMessageRef.current;
+                    const newMsg = { ...lastMsg, content: currentMessageRef.current };
+                    return [...prev.slice(0, lastIdx), newMsg];
                   }
-                  return [...updated];
+                  return prev;
                 });
               }
             } catch {
@@ -195,26 +203,33 @@ export function useStreamingChat(options: UseStreamingChatOptions = {}): UseStre
       if (currentMessageRef.current) {
         setIsStreaming(false);
         setMessages(prev => {
-          const updated = [...prev];
-          const lastMsg = updated[updated.length - 1];
+          const lastIdx = prev.length - 1;
+          if (lastIdx < 0) return prev;
+          const lastMsg = prev[lastIdx];
           if (lastMsg.role === 'assistant' && lastMsg.isStreaming) {
-            lastMsg.isStreaming = false;
-            onMessageComplete?.(lastMsg);
+            const newMsg = { ...lastMsg, isStreaming: false };
+            onMessageComplete?.(newMsg);
+            return [...prev.slice(0, lastIdx), newMsg];
           }
-          return updated;
+          return prev;
         });
       }
     } catch (err: any) {
       if (err.name === 'AbortError') {
         // User cancelled
         setMessages(prev => {
-          const updated = [...prev];
-          const lastMsg = updated[updated.length - 1];
+          const lastIdx = prev.length - 1;
+          if (lastIdx < 0) return prev;
+          const lastMsg = prev[lastIdx];
           if (lastMsg.role === 'assistant') {
-            lastMsg.isStreaming = false;
-            lastMsg.content = currentMessageRef.current || '(cancelled)';
+            const newMsg = {
+              ...lastMsg,
+              isStreaming: false,
+              content: currentMessageRef.current || '(cancelled)'
+            };
+            return [...prev.slice(0, lastIdx), newMsg];
           }
-          return updated;
+          return prev;
         });
       } else {
         const errorMsg = err.message || 'Unknown error';

@@ -1,4 +1,8 @@
 {
+  "name": "aims-platform",
+  "version": "1.0.0",
+  "license": "PROPRIETARY",
+  "private": true,
   "dependencies": {
     "dotenv": "^17.2.3"
   }

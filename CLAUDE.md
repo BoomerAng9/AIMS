@@ -34,7 +34,7 @@ of "achieving" — it must fully accomplish what its name represents.
 These rules determine WHERE every piece of code deploys. Apply them to every task:
 
 ```
-IF core platform service (ACHEEVY API, UEF Gateway, Per|Form, House of Ang, Redis, n8n)
+IF core platform service (ACHEEVY API, UEF Gateway, Per|Form, House of Ang, Redis)
   THEN → AIMS Core VPS (76.13.96.107 / srv1328075.hstgr.cloud) in Docker
   Files: infra/docker-compose.prod.yml, deploy.sh
   Deploy: ./deploy.sh --domain plugmein.cloud --landing-domain aimanagedsolutions.cloud
@@ -54,7 +54,7 @@ IF GPU-accelerated AI inference (PersonaPlex / Nemotron model serving)
 
 IF autonomous build/execution job (Chicken Hawk builds, scheduled tasks)
   THEN → GCP Cloud Run Jobs (sandboxed, scale-to-zero, 60 min timeout)
-  Triggered by: n8n workflows, ACHEEVY dispatch, or API events
+  Triggered by: ACHEEVY dispatch, automation pipelines, or API events
   VPC connector to reach Firestore, ByteRover, LUC on internal network
 
 IF CI pipeline (image builds on push to main)
@@ -95,7 +95,7 @@ See **`AIMS_PLAN.md`** for the full SOP, PRD, implementation roadmap, and AIMS_R
 - **CI Pipeline**: GitHub Actions → Cloud Build → Artifact Registry (build+push only)
 
 ### VPS Services (default deploy, no profiles)
-nginx, frontend, demo-frontend, uef-gateway, house-of-ang, acheevy, redis, agent-bridge, chickenhawk-core, n8n, circuit-metrics, ii-agent, ii-agent-postgres, ii-agent-tools, ii-agent-sandbox (15 containers)
+nginx, frontend, demo-frontend, uef-gateway, house-of-ang, acheevy, redis, agent-bridge, chickenhawk-core, circuit-metrics, ii-agent, ii-agent-postgres, ii-agent-tools, ii-agent-sandbox (14 containers)
 SSL: host certbot (apt) — certs at /etc/letsencrypt, bind-mounted into nginx container
 
 ### User-Deployed Plug Instances (dynamic, on-demand)
@@ -107,6 +107,62 @@ nginx reverse proxy config, health check, and lifecycle management via ACHEEVY.
 - `--profile tier1-agents` → research-ang, router-ang
 - `--profile ii-agents` → agent-zero
 - `--profile perform` → scout-hub, film-room, war-room (Per|Form / Gridiron)
+
+## A.I.M.S. GATEWAY SYSTEM
+
+The A.I.M.S. GATEWAY SYSTEM (formerly DEOM Gateway System) is the multi-channel access,
+security, and service delivery layer for the entire platform. It governs WHO can access WHAT
+and HOW they interact with the platform.
+
+### History
+The original DEOM Gateway System was built for Saudi Arabia — connecting businesses to the
+General Authority of Zakat and VAT through secure one-way API tokens, ERP reporting, and
+subscription-based compliance services. The A.I.M.S. GATEWAY SYSTEM inherits that lineage
+but is re-engineered for global use.
+
+### Multi-Channel Access
+
+**Admin Channel** — `admin.aimanagedsolutions.cloud`
+- Owner/Developer access to both `plugmein.cloud` and `aimanagedsolutions.cloud`
+- Developer-mode interface — full visibility into all agents
+- Boomer_Ang management (create, configure, assign, monitor)
+- Lil_Hawk management (deploy, task assignment, status tracking)
+- Chicken Hawk management (safety policies, audit logs, compliance gates)
+- ACHEEVY remains the orchestrator, but the owner can manage all agent layers directly
+- Infrastructure, Docker, deployment, and monitoring tools fully exposed
+
+**User Channel** — `plugmein.cloud` (main domain)
+- Customer-facing access — simplified, clean UI
+- Users interact ONLY with ACHEEVY — no agent names exposed
+- No developer access, no infrastructure visibility
+- Paywalled features, managed service experience
+- White-label version may grant developer access later (not now)
+
+### Security Layer
+Security features and parameters are enabled by default for BOTH admin and user channels:
+- Secure Drop Tokens (SDTs) for artifact delivery
+- Evidence Locker with chain-of-custody tracking
+- Certification gates for Plug marketplace
+- Role-based access (OWNER, ADMIN, CUSTOMER, DEMO_USER)
+- Audit trail on all Gateway events
+
+### LUC (Locale Universal Calculator) Integration
+The Gateway System integrates LUC as the universal calculation engine:
+- **Foundation**: Built from the Flip Secrets real estate calculator (`aims-tools/luc/presets/real-estate-flip/`)
+- **K1 Taxation**: Real estate K1 reporting — critical for investors and enterprise users
+- **Zakat/VAT**: Saudi market plug-in for ERP integration and Zakat reporting
+- **North America**: K1 taxation, real estate taxes, business tax calculation
+- **Customizable**: Base LUC engine can be customized per customer use case via CLI tooling
+- **Billing**: All calculations metered through LUC usage tracking
+
+### Gateway Services (aims-skills/gateway/)
+- **SDT Service** — Issue, revoke, rotate, validate Secure Drop Tokens
+- **Evidence Locker** — Artifact storage with SHA-256 integrity and custody chain
+- **Certification Gate** — Plug certification pipeline (review, check, certify, exception)
+- **Submission Service** — Form-based submissions to external parties
+- **Compliance Packs** — Region/industry compliance bundles
+- **Operations Engine** — Job packets, LUC quotes, operations feed
+- **Event Bus** — 24+ event types for full audit trail
 
 ## Key Rules
 1. All tool access goes through Port Authority (UEF Gateway) — no direct service exposure
@@ -124,9 +180,119 @@ nginx reverse proxy config, health check, and lifecycle management via ACHEEVY.
 3. Update the brain file to reflect changes
 4. Export new modules from the relevant index.ts
 
+## Agent Naming Conventions — MANDATORY
+
+### Spelling
+- **ACHEEVY** — NOT "ACHEVY", NOT "Achevy". Double-E, double-V-Y.
+- **A.I.M.S. GATEWAY SYSTEM** — Formerly "DEOM Gateway System". NOT "DEON", NOT "DM Gateway", NOT "Dion Gateway". Always "A.I.M.S. GATEWAY SYSTEM"
+
+### Agent Hierarchy Names
+- **Boomer_Ang** — Manager-level agents. Name format: `Name_Ang` (e.g., SME_Ang, Researcher_Ang, Quality_Ang). NOT "boomerang".
+- **Lil_Hawk** — Worker-level agents. Name format: `Lil_X_Hawk` where X is a short nickname (e.g., Lil_Creddy_Hawk, Lil_Scout_Hawk). NEVER "Name_Hawk" without "Lil_" prefix.
+- **Chicken Hawk** — Coordinator/safety bot. Always "Chicken Hawk" (two words).
+
+### Examples of WRONG naming
+```
+WRONG: Credential_Hawk    → CORRECT: Lil_Creddy_Hawk
+WRONG: Scout_Hawk         → CORRECT: Lil_Scout_Hawk
+WRONG: boomerang          → CORRECT: Boomer_Ang
+WRONG: ACHEVY             → CORRECT: ACHEEVY
+WRONG: DM Gateway         → CORRECT: A.I.M.S. GATEWAY SYSTEM
+WRONG: DEON Gateway       → CORRECT: A.I.M.S. GATEWAY SYSTEM (historical name was DEOM, now renamed)
+```
+
+## Documented Mistakes (Learn From These)
+
+1. Named a Lil_Hawk as "Credential_Hawk" instead of "Lil_Creddy_Hawk" — Lil_Hawks ALWAYS follow `Lil_X_Hawk` pattern
+2. Spelled ACHEEVY as "ACHEVY" — must be double-E
+3. Called A.I.M.S. GATEWAY SYSTEM by wrong names ("DM Gateway", "DEON Gateway") — the original system was DEOM Gateway System, now renamed to A.I.M.S. GATEWAY SYSTEM
+4. Wrapped entire sections in ScrollReveal, causing IntersectionObserver collapse (opacity:0) — only use per-element ScrollReveal
+5. ACHEEVY chat was told it could see images — it cannot, text-only backend
+6. Internal agent names exposed in public-facing UI — only ACHEEVY speaks to users
+7. Design skills exist but were never auto-triggered during builds
+8. MIT license was applied — this is proprietary, not open source
+9. Called Boomer_Ang agents "boomerangs" — the correct name is always **Boomer_Ang** (with underscore). Never "boomerang", "boomerangs", or "Boomerang"
+
 ## Testing
 ```bash
 cd frontend && npm run build    # Frontend build check
 cd backend/uef-gateway && npm run build  # Backend build check
 cd aims-skills && npm test      # Skills/hooks tests
 ```
+
+## Design System Auto-Trigger (MANDATORY)
+
+When building or modifying ANY frontend page, you MUST follow these rules:
+
+1. **Classify the page** using the archetype mapping below
+2. **Read the matching skill file** BEFORE writing any code
+3. **For landing/marketing pages**, ALSO apply `aims-animated-web` skill
+4. **ALL animation timing** MUST use tokens from `frontend/lib/motion/tokens.ts` — NO magic numbers
+5. **ALL animation variants** MUST come from `frontend/lib/motion/variants.ts`
+6. **Reusable components** live in `frontend/components/motion/` — use them before writing custom animations
+7. **ALWAYS apply** `aims-global-ui` rules (colors, spacing, typography, light theme) in addition to the archetype
+
+### Path → Archetype Mapping
+
+| Path Pattern | Archetype Skill | Extra Skills |
+|---|---|---|
+| `app/page.tsx`, `app/landing/**` | `.claude/skills/aims-landing-ui/SKILL.md` | + `aims-animated-web` |
+| `app/(auth)/**`, `app/onboarding/**` | `.claude/skills/aims-auth-onboarding-ui/SKILL.md` | — |
+| `app/chat/**`, `app/dashboard/chat/**` | `.claude/skills/aims-chat-ui/SKILL.md` | — |
+| `app/dashboard/**` (general) | `.claude/skills/aims-command-center-ui/SKILL.md` | — |
+| `app/crm/**`, `app/project-management/**` | `.claude/skills/aims-crm-ui/SKILL.md` | — |
+| `app/dashboard/luc/**`, `app/finance/**` | `.claude/skills/aims-finance-analytics-ui/SKILL.md` | — |
+| `app/dashboard/automations/**`, `app/workstreams/**` | `.claude/skills/aims-workflow-ui/SKILL.md` | — |
+| `app/dashboard/research/**`, `app/tools/**` | `.claude/skills/aims-content-tools-ui/SKILL.md` | — |
+| `app/halalhub/**` | `.claude/skills/aims-landing-ui/SKILL.md` (emerald variant) | + `aims-animated-web` |
+| **Global (always)** | `.claude/skills/aims-global-ui/SKILL.md` | — |
+
+### Motion Component Library
+
+Before writing custom animations, check `frontend/components/motion/`:
+- `ScrollReveal` — viewport-triggered fade/slide reveal
+- `ParallaxSection` — scroll-driven depth layers
+- `TiltCard` — mouse-tracking 3D perspective
+- `TypeReveal` — character-by-character stagger
+- `ScrollProgress` — fixed progress bar
+- `GlowBorder` — Huly.io-style rotating gradient border
+- `BentoGrid` — asymmetric feature grid with stagger
+
+## Dual-Layer Access (PRIVATE vs PUBLIC)
+
+A.I.M.S. has two interaction modes, enforced by the A.I.M.S. GATEWAY SYSTEM:
+
+- **PRIVATE mode** (Owner/Admin via `admin.aimanagedsolutions.cloud`): Full technical vocabulary, all agents visible (Boomer_Ang, Lil_Hawks, Chicken Hawk), all integrations exposed, developer tools, raw ACHEEVY. Owner can manage all agent layers directly.
+- **PUBLIC mode** (Customer via `plugmein.cloud`): Simplified UI, plain language labels, no agent names, paywalled features. Users interact ONLY with ACHEEVY.
+
+Use `usePlatformMode()` from `frontend/lib/platform-mode.tsx` to detect mode.
+Use `t(key, mode)` from `frontend/lib/terminology.ts` for mode-aware labels.
+
+**Never expose to PUBLIC users:** Agent names (Boomer_Ang, Lil_Hawk, Chicken Hawk), Docker terminology, infrastructure details. Only "ACHEEVY" and "your AI team".
+
+## Mistakes & Lessons Learned
+
+Every recurring mistake is documented here. Read this BEFORE making changes. Add new entries when mistakes are discovered.
+
+### Architecture Mistakes
+1. **Role mismatch** — Prisma schema used "MEMBER" as default, auth.ts used "USER". Always use canonical `UserRole` types: OWNER, ADMIN, CUSTOMER, DEMO_USER.
+2. **Two Chicken Hawk implementations** — In-process agent (`agents/chicken-hawk.ts`) AND standalone service (`services/chicken-hawk/`). The in-process version should proxy to standalone when `CHICKENHAWK_URL` is available.
+3. **Design skills not auto-triggered** — Skills in `.claude/skills/aims-*-ui/` are reference docs. They are NOT enforced by code. Follow the archetype-router mapping above every time.
+4. **Antigravity destructive changes** — External agents (Gemini/Antigravity) have deleted critical files when adding new features. Always review diffs before merging branches from other agents.
+
+### UI Mistakes
+5. **Magic animation numbers** — Never hard-code duration, easing, or spring values. Import from `@/lib/motion/tokens.ts`.
+6. **Missing reduced-motion** — Every animation component MUST respect `prefers-reduced-motion`. Test with DevTools.
+7. **Dark theme when not requested** — Default A.I.M.S. is LIGHT (#F8FAFC background). Only use dark backgrounds if explicitly requested.
+8. **Exposing agent names to public** — Customer-facing UI must NEVER show "Boomer_Ang", "Lil_Hawk", "Chicken Hawk". Only "ACHEEVY" and "your team".
+9. **Ignoring existing motion library** — `frontend/lib/motion/` has tokens.ts and variants.ts with 22+ reusable presets. Use them.
+
+### Deployment Mistakes
+10. **Pushing without permission** — Never push to remote without explicit owner request.
+11. **Skipping build verification** — Always run `cd frontend && npm run build` before considering frontend work complete.
+12. **License violations** — This is PROPRIETARY software. Never add MIT/Apache/GPL headers to A.I.M.S. code files. `backend/ii-agent/` is an exception (third-party fork with its own MIT license).
+
+### Security Mistakes
+13. **Sensitive data in logs** — Never log API keys, user passwords, or session tokens.
+14. **No auth on destructive actions** — Deploy, scale, decommission actions MUST check user role via `requireRole()` middleware before executing.
+15. **Prisma v7 breaking change** — Prisma v7 removed `url` from schema `datasource`. Use Prisma v5 CLI (`npx prisma@5 generate`) until migration complete.

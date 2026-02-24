@@ -74,7 +74,54 @@ const result = await composio.executeAction('github_create_repo', {
 | **Analytics** | Google Analytics, Mixpanel, PostHog | Track events, query metrics |
 | **Design** | Figma, Canva | Read designs, export assets |
 
-### Direct MCP Connections (Non-Composio)
+### Pipedream MCP Bridge (Secondary Gateway)
+
+Pipedream is the A.I.M.S. secondary MCP gateway — 3,000+ app integrations with 10,000+ prebuilt tools
+via a hosted MCP server. Used for services not available through Composio (e.g., Paperform).
+
+```
+MCP Server URL: https://mcp.pipedream.net/v2
+Transport: SSE (Server-Sent Events)
+Auth: PIPEDREAM_API_KEY
+```
+
+**What Pipedream handles:**
+- Hosted MCP servers for every connected app
+- Credential isolation (API keys encrypted at rest, never exposed to AI models)
+- OAuth management for user-authenticated connections
+- Revocable access — users can disconnect apps at any time
+- Per-app tool discovery via `https://mcp.pipedream.com/app/{slug}`
+
+**Routing Rule:** Plug_Ang checks Composio first. If unavailable, route through Pipedream MCP.
+
+#### Apps Connected via Pipedream MCP
+
+| App | Slug | Purpose | Tool Doc |
+|-----|------|---------|----------|
+| **Paperform** | `paperform` | Form creation, submission management, client intake | `tools/paperform.tool.md` |
+
+> Add new Pipedream-connected apps to this table as they are wired.
+
+#### Paperform Capabilities (via Pipedream MCP)
+
+Paperform provides form building, submission management, and automated data collection.
+ACHEEVY and the full chain of command use it for:
+
+| Capability | MCP Tool | Purpose |
+|-----------|----------|---------|
+| List forms | `paperform_list_forms` | Browse available intake forms |
+| Get form details | `paperform_get_form` | Inspect form structure |
+| Create form | `paperform_create_form` | Auto-generate intake forms for verticals |
+| Update form | `paperform_update_form` | Modify form fields, logic, settings |
+| List submissions | `paperform_list_submissions` | Pull client responses for processing |
+| Get submission | `paperform_get_submission` | Retrieve individual intake data |
+| New submission trigger | `paperform_new_submission` | Auto-process intake via n8n webhook |
+| Partial submission trigger | `paperform_partial_submission` | Follow up on abandoned intake forms |
+
+**Full reference:** `aims-skills/tools/paperform.tool.md`
+**Behavioral rules:** `aims-skills/skills/integrations/paperform.skill.md`
+
+### Direct MCP Connections (Non-Composio, Non-Pipedream)
 Some services connect via dedicated MCP servers:
 
 | Service | MCP Server | Purpose |

@@ -53,8 +53,8 @@ const SendIcon = ({ className }: { className?: string }) => (
 
 const AGENT_COLORS: Record<string, string> = {
   'acheevy': 'text-gold',
-  'system': 'text-slate-400',
-  'user': 'text-slate-800',
+  'system': 'text-zinc-500',
+  'user': 'text-zinc-100',
 };
 
 const TYPE_LABELS: Record<string, { label: string; color: string }> = {
@@ -63,7 +63,7 @@ const TYPE_LABELS: Record<string, { label: string; color: string }> = {
   result: { label: 'RESULT', color: 'bg-gold/20 text-gold' },
   coordination: { label: 'COORD', color: 'bg-purple-500/20 text-purple-400' },
   question: { label: 'ASK', color: 'bg-orange-500/20 text-orange-400' },
-  user: { label: 'USER', color: 'bg-slate-100 text-slate-800' },
+  user: { label: 'USER', color: 'bg-[#1F1F23] text-zinc-100' },
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -248,13 +248,13 @@ export default function LiveSimPage() {
       className="h-[calc(100vh-64px)] flex flex-col"
     >
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
+      <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
         <div>
-          <h1 className="text-lg font-medium text-slate-800">LiveSim</h1>
-          <p className="text-sm text-slate-400">Send real tasks to ACHEEVY and watch the orchestration</p>
+          <h1 className="text-lg font-medium text-zinc-100">LiveSim</h1>
+          <p className="text-sm text-zinc-500">Send real tasks to ACHEEVY and watch the orchestration</p>
         </div>
         {sessionId && (
-          <span className="text-xs font-mono text-slate-300">{sessionId}</span>
+          <span className="text-xs font-mono text-zinc-600">{sessionId}</span>
         )}
       </div>
 
@@ -269,8 +269,8 @@ export default function LiveSimPage() {
                 <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gold/10 border border-gold/20 flex items-center justify-center">
                   <PlayIcon className="w-8 h-8 text-gold" />
                 </div>
-                <h2 className="text-xl font-medium text-slate-800 mb-2">Start a LiveSim Session</h2>
-                <p className="text-slate-400 text-sm mb-6">
+                <h2 className="text-xl font-medium text-zinc-100 mb-2">Start a LiveSim Session</h2>
+                <p className="text-zinc-500 text-sm mb-6">
                   Describe a task. ACHEEVY will classify it, route to real agents, and return
                   an actual action plan with LUC cost estimates.
                 </p>
@@ -281,7 +281,7 @@ export default function LiveSimPage() {
                     onChange={(e) => setTaskDescription(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && startSession()}
                     placeholder="e.g., Research competitors for a SaaS launch..."
-                    className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 text-sm placeholder:text-slate-300 outline-none focus:border-gold/30"
+                    className="flex-1 bg-[#18181B] border border-white/10 rounded-xl px-4 py-3 text-zinc-100 text-sm placeholder:text-zinc-600 outline-none focus:border-gold/30"
                   />
                   <button
                     onClick={startSession}
@@ -301,7 +301,7 @@ export default function LiveSimPage() {
               <AnimatePresence>
                 {logs.map((log) => {
                   const typeInfo = TYPE_LABELS[log.type] || TYPE_LABELS.action;
-                  const agentColor = AGENT_COLORS[log.agentId] || 'text-slate-600';
+                  const agentColor = AGENT_COLORS[log.agentId] || 'text-zinc-300';
 
                   return (
                     <motion.div
@@ -311,7 +311,7 @@ export default function LiveSimPage() {
                       transition={{ duration: 0.2 }}
                       className="flex gap-3 items-start text-sm"
                     >
-                      <span className="text-slate-300 font-mono text-xs min-w-[60px] pt-0.5">
+                      <span className="text-zinc-600 font-mono text-xs min-w-[60px] pt-0.5">
                         {new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                       </span>
                       <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${typeInfo.color}`}>
@@ -320,7 +320,7 @@ export default function LiveSimPage() {
                       <span className={`font-medium min-w-[100px] ${agentColor}`}>
                         {log.agentName}
                       </span>
-                      <span className="text-slate-600 flex-1">{log.content}</span>
+                      <span className="text-zinc-300 flex-1">{log.content}</span>
                     </motion.div>
                   );
                 })}
@@ -331,7 +331,7 @@ export default function LiveSimPage() {
 
           {/* Follow-up input */}
           {logs.length > 0 && (
-            <div className="border-t border-slate-200 p-4">
+            <div className="border-t border-white/10 p-4">
               <div className="flex gap-2">
                 <input
                   type="text"
@@ -340,7 +340,7 @@ export default function LiveSimPage() {
                   onKeyDown={(e) => e.key === 'Enter' && askCrew()}
                   placeholder={isRunning ? 'Processing...' : 'Send a follow-up to ACHEEVY...'}
                   disabled={isRunning}
-                  className="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-slate-800 text-sm placeholder:text-slate-300 outline-none focus:border-gold/30 disabled:opacity-30"
+                  className="flex-1 bg-[#18181B] border border-white/10 rounded-lg px-4 py-2 text-zinc-100 text-sm placeholder:text-zinc-600 outline-none focus:border-gold/30 disabled:opacity-30"
                 />
                 <button
                   onClick={askCrew}
@@ -356,36 +356,36 @@ export default function LiveSimPage() {
 
         {/* Right: Agent Status Sidebar */}
         {logs.length > 0 && (
-          <div className="w-64 border-l border-slate-200 p-4 space-y-3">
-            <h3 className="text-xs font-medium text-slate-400 uppercase tracking-wider">Crew Status</h3>
+          <div className="w-64 border-l border-white/10 p-4 space-y-3">
+            <h3 className="text-xs font-medium text-zinc-500 uppercase tracking-wider">Crew Status</h3>
             {agents.map((agent) => (
-              <div key={agent.id} className="p-3 rounded-lg bg-slate-50 border border-slate-200">
+              <div key={agent.id} className="p-3 rounded-lg bg-[#18181B] border border-white/10">
                 <div className="flex items-center gap-2 mb-1">
                   <div
                     className={`w-2 h-2 rounded-full ${
-                      agent.status === 'idle' ? 'bg-slate-100' :
+                      agent.status === 'idle' ? 'bg-[#1F1F23]' :
                       agent.status === 'thinking' ? 'bg-blue-400 animate-pulse' :
                       agent.status === 'working' ? 'bg-green-400 animate-pulse' :
                       agent.status === 'waiting' ? 'bg-orange-400' :
                       'bg-gold'
                     }`}
                   />
-                  <span className={`text-sm font-medium ${AGENT_COLORS[agent.id] || 'text-slate-600'}`}>
+                  <span className={`text-sm font-medium ${AGENT_COLORS[agent.id] || 'text-zinc-300'}`}>
                     {agent.name}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-xs text-slate-400">{agent.role}</span>
-                  <span className="text-[10px] text-slate-300 uppercase">{agent.status}</span>
+                  <span className="text-xs text-zinc-500">{agent.role}</span>
+                  <span className="text-[10px] text-zinc-600 uppercase">{agent.status}</span>
                 </div>
               </div>
             ))}
 
             {/* Task summary */}
             {taskDescription && (
-              <div className="mt-4 pt-4 border-t border-slate-200">
-                <h3 className="text-xs font-medium text-slate-400 uppercase tracking-wider mb-2">Current Task</h3>
-                <p className="text-xs text-slate-500">{taskDescription}</p>
+              <div className="mt-4 pt-4 border-t border-white/10">
+                <h3 className="text-xs font-medium text-zinc-500 uppercase tracking-wider mb-2">Current Task</h3>
+                <p className="text-xs text-zinc-400">{taskDescription}</p>
               </div>
             )}
           </div>
