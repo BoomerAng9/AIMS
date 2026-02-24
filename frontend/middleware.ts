@@ -35,6 +35,7 @@ const ALLOWED_ORIGINS = IS_PRODUCTION
       'https://luc.plugmein.cloud',
       'https://aimanagedsolutions.cloud',
       'https://www.aimanagedsolutions.cloud',
+      'https://hh.aimanagedsolutions.cloud',
     ]
   : [
       'http://localhost:3000',
@@ -90,7 +91,7 @@ const CSP_DIRECTIVES = IS_PRODUCTION ? [
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' https://fonts.gstatic.com",
   "img-src 'self' data: https: blob:",
-  "connect-src 'self' https://plugmein.cloud https://api.aims.plugmein.cloud https://api.anthropic.com https://generativelanguage.googleapis.com https://api.moonshot.cn https://api.groq.com https://api.openai.com https://api.elevenlabs.io wss://plugmein.cloud wss://api.aims.plugmein.cloud",
+  "connect-src 'self' https://plugmein.cloud https://api.aims.plugmein.cloud https://aimanagedsolutions.cloud https://hh.aimanagedsolutions.cloud https://api.anthropic.com https://generativelanguage.googleapis.com https://api.moonshot.cn https://api.groq.com https://api.openai.com https://api.elevenlabs.io wss://plugmein.cloud wss://api.aims.plugmein.cloud",
   "media-src 'self' blob:",
   "object-src 'none'",
   "frame-ancestors 'none'",

@@ -85,6 +85,7 @@ const SANDBOX_ITEMS: NavItem[] = [
 
 // Live Apps — Standalone tools accessible without diving into verticals
 const LIVE_APPS: NavItem[] = [
+  { href: "/halalhub", label: "HalalHub", icon: Store, highlight: true },
   { href: "/dashboard/luc", label: "LUC Calculator", icon: Calculator, highlight: true },
   { href: "/dashboard/garage-to-global", label: "Garage to Global", icon: Store, highlight: true },
   { href: "/dashboard/buy-in-bulk", label: "Buy in Bulk", icon: ShoppingCart, highlight: true },
