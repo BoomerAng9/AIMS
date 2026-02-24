@@ -22,6 +22,7 @@ import {
   Trophy, Activity, Mic, Theater, BookOpen,
   Coins, CircleDot, TrendingUp, Building, Layers,
   Store, ShoppingCart, Calculator, Map, Plug,
+  Code, Eye,
 } from "lucide-react";
 
 // ── Types ──
@@ -87,7 +88,7 @@ const PLUG_ITEMS: NavItem[] = [
 ];
 
 // Live Apps — Standalone tools accessible without diving into verticals
-const LIVE_APPS: NavItem[] = [
+const PRIVATE_LIVE_APPS: NavItem[] = [
   { href: "/dashboard/luc", label: "LUC Calculator", icon: Calculator, highlight: true },
   { href: "/dashboard/garage-to-global", label: "Garage to Global", icon: Store, highlight: true },
   { href: "/dashboard/buy-in-bulk", label: "Buy in Bulk", icon: ShoppingCart, highlight: true },
@@ -123,7 +124,8 @@ const PUBLIC_CORE: NavItem[] = [
 ];
 
 const PUBLIC_APPS: NavItem[] = [
-  { href: "/halalhub", label: "HalalHub", icon: Store, highlight: true },
+  { href: "/dashboard/plug-catalog", label: "Tool Catalog", icon: Store, highlight: true },
+  { href: "/halalhub", label: "HalalHub", icon: Store },
   { href: "/dashboard/luc", label: "Usage Credits", icon: Calculator },
 ];
 
