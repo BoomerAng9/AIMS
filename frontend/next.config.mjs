@@ -10,7 +10,8 @@ const nextConfig = {
   // 'standalone' is for Docker; Vercel uses its own build output
   ...(isVercel ? {} : { output: 'standalone' }),
   images: {
-    unoptimized: true,
+    // Vercel has native image optimization; Docker needs unoptimized
+    unoptimized: !isVercel,
   },
   eslint: {
     // ESLint checked separately in CI; don't block production builds

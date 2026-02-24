@@ -1,6 +1,8 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "git": {
-    "deploymentEnabled": false
-  }
+  "framework": "nextjs",
+  "buildCommand": "cd frontend && npm run build",
+  "installCommand": "cd frontend && npm ci --legacy-peer-deps",
+  "outputDirectory": "frontend/.next",
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- frontend/ aims-tools/"
 }
