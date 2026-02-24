@@ -21,7 +21,7 @@ import {
   FlaskConical, FolderKanban, Users, Boxes,
   Trophy, Activity, Mic, Theater, BookOpen,
   Coins, CircleDot, TrendingUp, Building, Layers,
-  Store, ShoppingCart, Calculator, Map,
+  Store, ShoppingCart, Calculator, Map, Plug,
 } from "lucide-react";
 
 // ── Types ──
@@ -81,6 +81,12 @@ const SANDBOX_ITEMS: NavItem[] = [
   { href: "/sandbox/perform", label: "Per|Form", icon: TrendingUp },
   { href: "/sandbox/blockwise", label: "Blockwise AI", icon: Building },
   { href: "/sandbox/verticals", label: "Verticals", icon: Shield },
+];
+
+// Plugs — Catalog + My Plugs
+const PLUG_ITEMS: NavItem[] = [
+  { href: "/dashboard/plug-catalog", label: "Plug Catalog", icon: Store, highlight: true },
+  { href: "/dashboard/plugs", label: "My Plugs", icon: Boxes, highlight: true },
 ];
 
 // Live Apps — Standalone tools accessible without diving into verticals
@@ -178,6 +184,15 @@ export function DashboardNav() {
       <div className="mt-2 space-y-0.5">
         <SectionLabel label="Command" icon={BarChart3} />
         {CORE_ITEMS.map((item) => (
+          <NavLink key={item.href} item={item} pathname={pathname} />
+        ))}
+      </div>
+
+      {/* Plugs — Catalog & Deployed */}
+      <div className="mx-2 mt-2 border-t border-violet-200/50" />
+      <div className="mt-1 space-y-0.5">
+        <SectionLabel label="Plugs" icon={Plug} />
+        {PLUG_ITEMS.map((item) => (
           <NavLink key={item.href} item={item} pathname={pathname} />
         ))}
       </div>
