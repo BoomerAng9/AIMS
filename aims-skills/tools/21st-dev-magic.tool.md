@@ -95,10 +95,28 @@ Fetch existing component data from 21st.dev library for inspiration.
 ### 3. `logo_search`
 Search and retrieve SVG logos and brand assets via SVGL integration.
 
+**Input Schema:**
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `queries` | string[] | Yes | List of company names (e.g., ["discord", "github"]) |
+| `format` | enum | Yes | One of "JSX", "TSX", or "SVG" |
+
 **Use Cases:**
 - Company logos in JSX/TSX/SVG format
 - Brand icons for dashboards
 - Professional asset integration
+
+### 4. `refine_ui`
+Refine and improve existing UI components through AI-assisted enhancement.
+
+**Input Schema:**
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `absolutePathToCurrentFile` | string | Yes | Absolute path to the file being refined |
+| `absolutePathToProjectDirectory` | string | Yes | Absolute path to the project root |
+| `standaloneRequestQuery` | string | Yes | Description of desired changes |
+
+**Output:** Enhanced component code with applied improvements.
 
 ## Component Library (1000+ components)
 
