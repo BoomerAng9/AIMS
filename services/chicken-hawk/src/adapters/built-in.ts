@@ -51,26 +51,23 @@ export const healthCheckAdapter: ToolAdapter = {
 };
 
 /**
- * run_n8n_workflow — MCP_BRIDGE_WRAPPER → n8n API
+ * run_pipeline_workflow — MCP_BRIDGE_WRAPPER → Pipeline API
  */
-export const runN8nWorkflowAdapter: ToolAdapter = {
-  id: "run_n8n_workflow",
+export const runPipelineWorkflowAdapter: ToolAdapter = {
+  id: "run_pipeline_workflow",
   wrapper_type: "MCP_BRIDGE_WRAPPER",
-  required_permissions: ["run_n8n_workflow"],
+  required_permissions: ["run_pipeline_workflow"],
   luc_metered: true,
   async execute(params: Record<string, unknown>, ctx: ExecutionContext) {
     const { workflow_id, payload } = params;
-    console.log(`[adapter:run_n8n_workflow] ${ctx.lil_hawk_id} triggering workflow ${workflow_id}`);
-    const n8nUrl = process.env.N8N_URL || "http://n8n:5678";
-    const res = await fetch(`${n8nUrl}/api/v1/workflows/${workflow_id}/execute`, {
+    console.log(`[adapter:run_pipeline_workflow] ${ctx.lil_hawk_id} triggering workflow ${workflow_id}`);
+    const gatewayUrl = process.env.UEF_GATEWAY_URL || "http://uef-gateway:3001";
+    const res = await fetch(`${gatewayUrl}/api/pipeline/execute`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Basic ${Buffer.from(`${process.env.N8N_AUTH_USER}:${process.env.N8N_AUTH_PASSWORD}`).toString("base64")}`,
-      },
-      body: JSON.stringify(payload),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ workflow_id, payload, shift_id: ctx.shift_id }),
     });
-    if (!res.ok) throw new Error(`n8n workflow failed: ${res.status}`);
+    if (!res.ok) throw new Error(`Pipeline workflow failed: ${res.status}`);
     return res.json();
   },
 };
@@ -217,7 +214,7 @@ export function getBuiltInAdapters(): ToolAdapter[] {
   return [
     deployWorkloadAdapter,
     healthCheckAdapter,
-    runN8nWorkflowAdapter,
+    runPipelineWorkflowAdapter,
     sendNotificationAdapter,
     gitOperationsAdapter,
     fileOperationsAdapter,

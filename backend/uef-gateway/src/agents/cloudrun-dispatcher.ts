@@ -12,7 +12,7 @@
  *   - Execution tracking and status polling
  *   - Fallback to local Chicken Hawk when Cloud Run is unavailable
  *
- * Called by: ACHEEVY orchestrator, n8n workflows, deployment-hub
+ * Called by: ACHEEVY orchestrator, pipeline workflows, deployment-hub
  */
 
 import logger from '../logger';
@@ -144,7 +144,7 @@ async function createSignedJwt(keyJson: { client_email: string; private_key: str
 
 /**
  * Dispatch a Chicken Hawk build as a Cloud Run Job.
- * Used for queued/scheduled builds triggered by n8n or ACHEEVY.
+ * Used for queued/scheduled builds triggered by pipeline or ACHEEVY.
  */
 export async function dispatchCloudRunJob(request: CloudRunJobRequest): Promise<CloudRunJobResult> {
   const token = await getAccessToken();

@@ -23,7 +23,7 @@ import type {
   DOMAIN_SUPERVISOR_MAP,
 } from './types';
 import { DOMAIN_SUPERVISOR_MAP as supervisorMap } from './types';
-import { triggerVerticalWorkflow } from '../n8n/client';
+import { triggerVerticalWorkflow } from '../pipeline/client';
 
 // ── In-Memory Store (Production: Firestore) ─────────────────
 

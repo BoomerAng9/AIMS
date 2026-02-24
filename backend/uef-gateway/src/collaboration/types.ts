@@ -14,7 +14,7 @@
 
 import type { BenchLevel } from '../pmo/persona-types';
 import type { PmoId, DirectorId } from '../pmo/types';
-import type { ChainStep, ExecutionLane, ShiftStatus } from '../n8n/types';
+import type { ChainStep, ExecutionLane, ShiftStatus } from '../pipeline/types';
 
 // ---------------------------------------------------------------------------
 // Agent Identity — who is speaking in the feed

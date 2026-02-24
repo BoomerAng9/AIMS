@@ -1,8 +1,8 @@
 /**
  * Deploy Dock Pipeline Client — Local Execution
  *
- * Replaces the n8n webhook-based deploy dock stages with direct
- * local pipeline execution. No external workflow engine needed.
+ * Direct local pipeline execution for deploy dock stages.
+ * No external workflow engine needed.
  */
 
 import { v4 as uuidv4 } from 'uuid';
@@ -18,7 +18,7 @@ export interface DeployDockStageResult {
   message: string;
 }
 
-export interface N8nExecution {
+export interface PipelineExecution {
   finished: boolean;
   status: 'success' | 'failed' | 'running';
 }
@@ -43,7 +43,7 @@ export async function triggerDeployDockStage(
 }
 
 // ---------------------------------------------------------------------------
-// Pipeline Client — backward-compatible shim
+// Pipeline Client
 // ---------------------------------------------------------------------------
 
 class PipelineClient {
@@ -55,14 +55,14 @@ class PipelineClient {
     _executionId: string,
     _maxWaitMs = 30000,
     _pollIntervalMs = 3000,
-  ): Promise<N8nExecution> {
+  ): Promise<PipelineExecution> {
     return { finished: true, status: 'success' };
   }
 }
 
 let _client: PipelineClient | null = null;
 
-export function getN8nClient(): PipelineClient {
+export function getPipelineClient(): PipelineClient {
   if (!_client) _client = new PipelineClient();
   return _client;
 }

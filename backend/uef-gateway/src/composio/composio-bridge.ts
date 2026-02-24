@@ -2,10 +2,10 @@
  * Composio Bridge — SDK wrapper for A.I.M.S. Composio integration
  *
  * This is the low-level bridge between A.I.M.S. agents and the Composio
- * platform (500+ integrations). Works alongside n8n:
+ * platform (500+ integrations). Works alongside companion workflows:
  *
- *   n8n  = scheduled / event-driven workflows (cron, webhooks, pipelines)
- *   Composio = on-demand, LLM-directed cross-platform actions (real-time)
+ *   Companion = scheduled / event-driven workflows (cron, webhooks, pipelines)
+ *   Composio  = on-demand, LLM-directed cross-platform actions (real-time)
  *
  * Both are orchestrated by ACHEEVY through the UEF Gateway.
  */
@@ -237,13 +237,13 @@ export class ComposioBridge {
     }
   }
 
-  // ── n8n Interop ─────────────────────────────────────────────────
+  // ── Pipeline Interop ────────────────────────────────────────────
 
   /**
-   * Generate an n8n-compatible webhook payload from a Composio action result.
-   * This allows Composio actions to feed into n8n workflows seamlessly.
+   * Generate a webhook-compatible payload from a Composio action result.
+   * This allows Composio actions to feed into workflow pipelines seamlessly.
    */
-  formatForN8n(actionName: string, result: ComposioActionResult): Record<string, unknown> {
+  formatForPipeline(actionName: string, result: ComposioActionResult): Record<string, unknown> {
     return {
       source: 'composio',
       action: actionName,

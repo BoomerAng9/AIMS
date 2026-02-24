@@ -6,7 +6,7 @@
  *
  * Provides endpoints for:
  * - Factory status and control
- * - Event ingestion (from webhooks, n8n, UI)
+ * - Event ingestion (from webhooks, pipelines, UI)
  * - FDH run management (approve, reject, pause, resume)
  * - Chamber management
  * - Policy management (owner only)
@@ -83,7 +83,7 @@ router.post('/resume', (_req: Request, res: Response) => {
 
 /**
  * POST /factory/event
- * Ingest an event from any source (webhooks, n8n, UI).
+ * Ingest an event from any source (webhooks, pipelines, UI).
  * This is the primary entry point for the factory loop.
  */
 router.post('/event', async (req: Request, res: Response) => {
