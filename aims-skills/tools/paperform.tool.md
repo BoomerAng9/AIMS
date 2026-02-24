@@ -58,6 +58,24 @@ Paperform uses a **Bearer API key** for authentication:
 **Note:** The `PAPERFORM_API_KEY` is stored **inside Pipedream** (encrypted at rest).
 A.I.M.S. agents never see or handle this key directly — Pipedream proxies the calls.
 
+## Important: API is Read-Heavy
+
+The Paperform public API (v1) is primarily **read-only**. Form design and creation happens in the
+Paperform editor UI — NOT via API. The API provides:
+- **Standard API** (Essentials/Pro): Read forms, fields, submissions, partial submissions; delete submissions
+- **Business API** (Business/Agency): All Standard API + programmatic webhook creation
+
+There is **no public endpoint to create or modify forms** programmatically. The `paperform_create_form`
+and `paperform_update_form` tools listed below may be available through Pipedream's abstraction layer
+but are NOT part of the documented Paperform REST API.
+
+## Stepper (Companion Product)
+
+**Stepper** (stepper.io) is a separate AI-native workflow automation platform by the Paperform founders.
+It is NOT a form feature — it's a standalone Zapier/Make competitor. Use Stepper to automate what happens
+AFTER a form submission (e.g., create Notion page → send email → book calendar → notify Slack).
+See `aims-skills/acheevy-verticals/skills-sme.ts` for the full Stepper SME entry.
+
 ## Available MCP Tools
 
 ### Form Management
@@ -66,8 +84,8 @@ A.I.M.S. agents never see or handle this key directly — Pipedream proxies the 
 |------|-------------|-----------------|
 | `paperform_list_forms` | List all forms in the account | Browse available intake forms |
 | `paperform_get_form` | Get form details by ID/slug | Inspect form structure before sharing |
-| `paperform_create_form` | Create a new form programmatically | Auto-generate intake forms for new verticals |
-| `paperform_update_form` | Update form fields, logic, or settings | Modify forms based on vertical requirements |
+| `paperform_create_form` | Create a new form (Pipedream abstraction — NOT in Paperform public API) | Auto-generate intake forms for new verticals |
+| `paperform_update_form` | Update form (Pipedream abstraction — NOT in Paperform public API) | Modify forms based on vertical requirements |
 | `paperform_delete_form` | Delete a form | Clean up deprecated intake forms |
 
 ### Submission Management
