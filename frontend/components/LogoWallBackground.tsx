@@ -22,7 +22,7 @@ export function LogoWallBackground({ mode = "hero", children }: Props) {
   return (
     <div className={clsx(
       "relative overflow-hidden",
-      mode === "dashboard" ? "h-full bg-[#F8FAFC]" : "min-h-full bg-[#F8FAFC]"
+      mode === "dashboard" ? "h-full bg-[#09090B]" : "min-h-full bg-[#09090B]"
     )}>
       {/* Subtle warm gradient accent — top-left */}
       <div
@@ -57,8 +57,8 @@ export function LogoWallBackground({ mode = "hero", children }: Props) {
             backgroundRepeat: 'no-repeat',
             backgroundPosition: 'center',
             opacity: 0.035,
-            filter: 'drop-shadow(1px 1px 0 rgba(255,255,255,0.8)) drop-shadow(-1px -1px 0 rgba(0,0,0,0.04)) drop-shadow(2px 2px 1px rgba(217,119,6,0.06))',
-            mixBlendMode: 'multiply',
+            filter: 'drop-shadow(1px 1px 0 rgba(255,255,255,0.02)) drop-shadow(-1px -1px 0 rgba(0,0,0,0.2)) drop-shadow(2px 2px 1px rgba(245,158,11,0.04))',
+            mixBlendMode: 'screen',
           }}
           aria-hidden="true"
         />

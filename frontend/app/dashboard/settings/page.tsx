@@ -88,10 +88,10 @@ export default function SettingsPage() {
           <p className="text-[0.6rem] uppercase tracking-[0.25em] text-gold/50 mb-1 font-mono">
             Configuration
           </p>
-          <h1 className="text-2xl md:text-3xl font-display uppercase tracking-wider text-slate-800">
+          <h1 className="text-2xl md:text-3xl font-display uppercase tracking-wider text-zinc-100">
             Settings
           </h1>
-          <p className="mt-1 text-xs text-slate-400">
+          <p className="mt-1 text-xs text-zinc-500">
             Workspace and team configuration.
           </p>
         </div>
@@ -121,13 +121,13 @@ export default function SettingsPage() {
         <motion.section variants={staggerItem} className="wireframe-card p-6">
           <div className="flex items-center gap-2 mb-4">
             <Globe size={16} className="text-gold" />
-            <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500 font-mono">
+            <h2 className="text-xs font-semibold uppercase tracking-widest text-zinc-400 font-mono">
               Workspace Identity
             </h2>
           </div>
           <div className="space-y-4">
             <div className="space-y-2">
-              <label className="text-[0.6rem] uppercase tracking-[0.2em] text-slate-400 font-mono">
+              <label className="text-[0.6rem] uppercase tracking-[0.2em] text-zinc-500 font-mono">
                 Workspace Name
               </label>
               <input
@@ -135,18 +135,18 @@ export default function SettingsPage() {
                 value={settings.workspaceName}
                 onChange={(e) => updateField("workspaceName", e.target.value)}
                 aria-label="Workspace Name"
-                className="w-full rounded-xl border border-wireframe-stroke bg-slate-50 p-3 text-sm text-slate-800 outline-none focus:border-gold/40 focus:ring-1 focus:ring-gold/20 transition-all"
+                className="w-full rounded-xl border border-wireframe-stroke bg-[#18181B] p-3 text-sm text-zinc-100 outline-none focus:border-gold/40 focus:ring-1 focus:ring-gold/20 transition-all"
               />
             </div>
             <div className="space-y-2">
-              <label className="text-[0.6rem] uppercase tracking-[0.2em] text-slate-400 font-mono">
+              <label className="text-[0.6rem] uppercase tracking-[0.2em] text-zinc-500 font-mono">
                 Industry
               </label>
               <select
                 value={settings.industry}
                 onChange={(e) => updateField("industry", e.target.value)}
                 aria-label="Industry"
-                className="w-full rounded-xl border border-wireframe-stroke bg-slate-50 p-3 text-sm text-slate-800 outline-none focus:border-gold/40 transition-all"
+                className="w-full rounded-xl border border-wireframe-stroke bg-[#18181B] p-3 text-sm text-zinc-100 outline-none focus:border-gold/40 transition-all"
               >
                 <option>Technology / SaaS</option>
                 <option>Real Estate</option>
@@ -158,14 +158,14 @@ export default function SettingsPage() {
               </select>
             </div>
             <div className="space-y-2">
-              <label className="text-[0.6rem] uppercase tracking-[0.2em] text-slate-400 font-mono">
+              <label className="text-[0.6rem] uppercase tracking-[0.2em] text-zinc-500 font-mono">
                 Timezone
               </label>
               <select
                 value={settings.timezone}
                 onChange={(e) => updateField("timezone", e.target.value)}
                 aria-label="Timezone"
-                className="w-full rounded-xl border border-wireframe-stroke bg-slate-50 p-3 text-sm text-slate-800 outline-none focus:border-gold/40 transition-all"
+                className="w-full rounded-xl border border-wireframe-stroke bg-[#18181B] p-3 text-sm text-zinc-100 outline-none focus:border-gold/40 transition-all"
               >
                 <option>America/New_York (EST)</option>
                 <option>America/Chicago (CST)</option>
@@ -182,15 +182,15 @@ export default function SettingsPage() {
         <motion.section variants={staggerItem} className="wireframe-card p-6">
           <div className="flex items-center gap-2 mb-4">
             <Shield size={16} className="text-gold" />
-            <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500 font-mono">
+            <h2 className="text-xs font-semibold uppercase tracking-widest text-zinc-400 font-mono">
               Security
             </h2>
           </div>
           <div className="space-y-4">
-            <div className="flex items-center justify-between rounded-xl border border-wireframe-stroke bg-white p-4 hover:border-gold/20 transition-all">
+            <div className="flex items-center justify-between rounded-xl border border-wireframe-stroke bg-[#111113] p-4 hover:border-gold/20 transition-all">
               <div>
-                <p className="text-sm font-medium text-slate-800">Two-Factor Authentication</p>
-                <p className="text-xs text-slate-400">Add an extra layer of security.</p>
+                <p className="text-sm font-medium text-zinc-100">Two-Factor Authentication</p>
+                <p className="text-xs text-zinc-500">Add an extra layer of security.</p>
               </div>
               <motion.button
                 type="button"
@@ -201,16 +201,16 @@ export default function SettingsPage() {
                 Enable
               </motion.button>
             </div>
-            <div className="flex items-center justify-between rounded-xl border border-wireframe-stroke bg-white p-4 hover:border-gold/20 transition-all">
+            <div className="flex items-center justify-between rounded-xl border border-wireframe-stroke bg-[#111113] p-4 hover:border-gold/20 transition-all">
               <div>
-                <p className="text-sm font-medium text-slate-800">Session Timeout</p>
-                <p className="text-xs text-slate-400">Auto-lock after inactivity.</p>
+                <p className="text-sm font-medium text-zinc-100">Session Timeout</p>
+                <p className="text-xs text-zinc-500">Auto-lock after inactivity.</p>
               </div>
               <select
                 value={settings.sessionTimeout}
                 onChange={(e) => updateField("sessionTimeout", e.target.value)}
                 aria-label="Session Timeout"
-                className="rounded-xl border border-wireframe-stroke bg-slate-50 px-3 py-1.5 text-xs text-slate-800 outline-none focus:border-gold/40 transition-all"
+                className="rounded-xl border border-wireframe-stroke bg-[#18181B] px-3 py-1.5 text-xs text-zinc-100 outline-none focus:border-gold/40 transition-all"
               >
                 <option>30 minutes</option>
                 <option>1 hour</option>
@@ -225,7 +225,7 @@ export default function SettingsPage() {
         <motion.section variants={staggerItem} className="wireframe-card p-6">
           <div className="flex items-center gap-2 mb-4">
             <Key size={16} className="text-gold" />
-            <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500 font-mono">
+            <h2 className="text-xs font-semibold uppercase tracking-widest text-zinc-400 font-mono">
               API Keys
             </h2>
           </div>
@@ -238,14 +238,14 @@ export default function SettingsPage() {
               <motion.div
                 key={key.label}
                 whileHover={{ borderColor: "rgba(212,168,67,0.2)" }}
-                className="flex items-center justify-between rounded-xl border border-wireframe-stroke bg-white p-4 transition-all"
+                className="flex items-center justify-between rounded-xl border border-wireframe-stroke bg-[#111113] p-4 transition-all"
               >
                 <div>
-                  <p className="text-sm font-medium text-slate-800">{key.label}</p>
-                  <p className="font-mono text-xs text-slate-400">{key.value}</p>
+                  <p className="text-sm font-medium text-zinc-100">{key.label}</p>
+                  <p className="font-mono text-xs text-zinc-500">{key.value}</p>
                 </div>
                 <span className={`text-[10px] uppercase font-bold tracking-wider font-mono ${
-                  key.status === "Active" ? "text-emerald-400" : "text-slate-300"
+                  key.status === "Active" ? "text-emerald-400" : "text-zinc-600"
                 }`}>
                   {key.status}
                 </span>
@@ -258,7 +258,7 @@ export default function SettingsPage() {
         <motion.section variants={staggerItem} className="wireframe-card p-6">
           <div className="flex items-center gap-2 mb-4">
             <Bell size={16} className="text-gold" />
-            <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500 font-mono">
+            <h2 className="text-xs font-semibold uppercase tracking-widest text-zinc-400 font-mono">
               Notifications
             </h2>
           </div>
@@ -269,23 +269,23 @@ export default function SettingsPage() {
               { key: "oracleFailures", label: "ORACLE Gate Failures", desc: "Notify on verification failures." },
               { key: "weeklyDigest", label: "Weekly Usage Digest", desc: "Email summary of platform usage." },
             ].map((pref) => (
-              <div key={pref.key} className="flex items-center justify-between rounded-xl border border-wireframe-stroke bg-white p-4 hover:border-gold/20 transition-all">
+              <div key={pref.key} className="flex items-center justify-between rounded-xl border border-wireframe-stroke bg-[#111113] p-4 hover:border-gold/20 transition-all">
                 <div>
-                  <p className="text-sm font-medium text-slate-800">{pref.label}</p>
-                  <p className="text-xs text-slate-400">{pref.desc}</p>
+                  <p className="text-sm font-medium text-zinc-100">{pref.label}</p>
+                  <p className="text-xs text-zinc-500">{pref.desc}</p>
                 </div>
                 <button
                   type="button"
                   onClick={() => toggleNotification(pref.key)}
                   title={`Toggle ${pref.label}`}
                   className={`h-6 w-11 rounded-full p-0.5 transition-colors cursor-pointer ${
-                    settings.notifications[pref.key] ? "bg-gold" : "bg-slate-100"
+                    settings.notifications[pref.key] ? "bg-gold" : "bg-[#1F1F23]"
                   }`}
                 >
                   <motion.div
                     animate={{ x: settings.notifications[pref.key] ? 20 : 0 }}
                     transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                    className="h-5 w-5 rounded-full bg-white"
+                    className="h-5 w-5 rounded-full bg-[#111113]"
                   />
                 </button>
               </div>
@@ -304,8 +304,8 @@ export default function SettingsPage() {
         </h2>
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-slate-800">Delete Workspace</p>
-            <p className="text-xs text-slate-400">
+            <p className="text-sm font-medium text-zinc-100">Delete Workspace</p>
+            <p className="text-xs text-zinc-500">
               Permanently remove this workspace and all associated data. This cannot be undone.
             </p>
           </div>

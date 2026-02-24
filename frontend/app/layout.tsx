@@ -54,7 +54,7 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: "A.I.M.S. | AI Managed Solutions",
   description:
-    "The Hybrid Business Architect. ACHEEVY orchestrates expert AI agents to run your business operations — CRM, automation, finance, and more.",
+    "Deploy anything. AI handles the rest. One-click deployment of open source tools, AI agents, and full-stack platforms — managed autonomously.",
   keywords: [
     "AI",
     "automation",
@@ -96,12 +96,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         className={`
           ${doto.variable} ${permanentMarker.variable} ${caveat.variable}
           ${patrickHand.variable} ${nabla.variable}
-          antialiased bg-[#F8FAFC] text-slate-900 font-sans overflow-x-hidden
+          antialiased bg-[#09090B] text-zinc-100 font-sans overflow-x-hidden
         `}
       >
         <Providers>
-          {/* Subtle background texture — never blocks content */}
-          <div className="fixed inset-0 bg-grid pointer-events-none opacity-20 z-0" />
+          {/* Subtle background texture — dark grid */}
+          <div className="fixed inset-0 bg-grid pointer-events-none opacity-100 z-0" />
           <div className="fixed inset-0 vignette-overlay z-0" />
 
           {/* Main content */}

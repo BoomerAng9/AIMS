@@ -70,7 +70,7 @@ const TIER_COLORS: Record<string, string> = {
   BLUE_CHIP: 'text-cyan-400 bg-cyan-400/10 border-cyan-400/30',
   PROSPECT: 'text-emerald-400 bg-emerald-400/10 border-emerald-400/30',
   SLEEPER: 'text-purple-400 bg-purple-400/10 border-purple-400/30',
-  DEVELOPMENTAL: 'text-slate-500 bg-slate-100 border-slate-300',
+  DEVELOPMENTAL: 'text-zinc-400 bg-[#1F1F23] border-white/15',
 };
 
 const TREND_ICONS: Record<string, string> = {
@@ -143,15 +143,15 @@ export default function WarRoomPage() {
 
   return (
     <OwnerGate>
-      <div className="min-h-screen bg-[#F8FAFC] text-slate-900 p-6 space-y-6">
+      <div className="min-h-screen bg-[#F8FAFC] text-zinc-100 p-6 space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold tracking-tight">
               War Room
-              <span className="ml-2 text-sm font-normal text-slate-500">Gridiron Sandbox</span>
+              <span className="ml-2 text-sm font-normal text-zinc-400">Gridiron Sandbox</span>
             </h1>
-            <p className="text-slate-500 text-sm mt-1">
+            <p className="text-zinc-400 text-sm mt-1">
               Autonomous sports analytics pipeline — Per|Form Platform
             </p>
           </div>
@@ -207,7 +207,7 @@ export default function WarRoomPage() {
         )}
 
         {/* Rankings Table */}
-        <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-4">
+        <div className="bg-[#111113] border border-white/10 shadow-[0_1px_2px_rgba(0,0,0,0.3)] rounded-xl p-4">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold">Per|Form Rankings</h2>
             <div className="flex gap-2">
@@ -218,7 +218,7 @@ export default function WarRoomPage() {
                   className={`px-3 py-1 text-xs rounded-md border transition-colors ${
                     activePool === pool
                       ? 'bg-amber-500/20 text-amber-400 border-amber-500/30'
-                      : 'bg-slate-100 text-slate-500 border-slate-200 hover:border-slate-300'
+                      : 'bg-[#1F1F23] text-zinc-400 border-white/10 hover:border-white/15'
                   }`}
                 >
                   {pool === 'all' ? 'All' : pool === 'highSchool' ? 'HS Top 300' : 'College Top 551'}
@@ -228,7 +228,7 @@ export default function WarRoomPage() {
           </div>
 
           {rankings.length === 0 ? (
-            <div className="text-center py-12 text-slate-500">
+            <div className="text-center py-12 text-zinc-400">
               <p className="text-lg">No rankings yet</p>
               <p className="text-sm mt-1">Trigger a scout run to start building rankings</p>
             </div>
@@ -236,7 +236,7 @@ export default function WarRoomPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-slate-500 border-b border-slate-200">
+                  <tr className="text-zinc-400 border-b border-white/10">
                     <th className="text-left py-2 pr-4">#</th>
                     <th className="text-left py-2 pr-4">Prospect</th>
                     <th className="text-left py-2 pr-4">Pos</th>
@@ -248,10 +248,10 @@ export default function WarRoomPage() {
                 </thead>
                 <tbody>
                   {rankings.map(r => (
-                    <tr key={`${r.prospectName}-${r.rank}`} className="border-b border-slate-100 hover:bg-slate-50">
-                      <td className="py-2 pr-4 font-mono text-slate-500">{r.rank}</td>
+                    <tr key={`${r.prospectName}-${r.rank}`} className="border-b border-white/8 hover:bg-white/5">
+                      <td className="py-2 pr-4 font-mono text-zinc-400">{r.rank}</td>
                       <td className="py-2 pr-4 font-medium">{r.prospectName}</td>
-                      <td className="py-2 pr-4 text-slate-500">{r.position}</td>
+                      <td className="py-2 pr-4 text-zinc-400">{r.position}</td>
                       <td className="py-2 pr-4 font-mono font-bold">{r.grade}</td>
                       <td className="py-2 pr-4">
                         <span className={`px-2 py-0.5 rounded text-xs border ${TIER_COLORS[r.tier] || TIER_COLORS.DEVELOPMENTAL}`}>
@@ -259,11 +259,11 @@ export default function WarRoomPage() {
                         </span>
                       </td>
                       <td className="py-2 pr-4">
-                        <span className={r.trend === 'UP' ? 'text-emerald-400' : r.trend === 'DOWN' ? 'text-red-400' : 'text-slate-500'}>
+                        <span className={r.trend === 'UP' ? 'text-emerald-400' : r.trend === 'DOWN' ? 'text-red-400' : 'text-zinc-400'}>
                           {TREND_ICONS[r.trend] || ''} {r.trend}
                         </span>
                       </td>
-                      <td className="py-2 text-slate-500">{r.pool}</td>
+                      <td className="py-2 text-zinc-400">{r.pool}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -273,17 +273,17 @@ export default function WarRoomPage() {
         </div>
 
         {/* Content Feed */}
-        <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-4">
+        <div className="bg-[#111113] border border-white/10 shadow-[0_1px_2px_rgba(0,0,0,0.3)] rounded-xl p-4">
           <h2 className="text-lg font-semibold mb-4">Content Feed</h2>
           {content.length === 0 ? (
-            <div className="text-center py-8 text-slate-500">
+            <div className="text-center py-8 text-zinc-400">
               <p>No content generated yet</p>
               <p className="text-sm mt-1">Boomer_Angs produce blogs and podcasts after scout runs</p>
             </div>
           ) : (
             <div className="space-y-3">
               {content.map((item, i) => (
-                <div key={`${item.title}-${i}`} className="flex items-start gap-3 p-3 bg-slate-50 rounded-lg border border-slate-200">
+                <div key={`${item.title}-${i}`} className="flex items-start gap-3 p-3 bg-[#18181B] rounded-lg border border-white/10">
                   <span className={`px-2 py-0.5 rounded text-xs font-medium shrink-0 ${
                     item.type === 'BLOG' ? 'bg-cyan-500/20 text-cyan-400' :
                     item.type === 'PODCAST' ? 'bg-purple-500/20 text-purple-400' :
@@ -293,7 +293,7 @@ export default function WarRoomPage() {
                   </span>
                   <div className="min-w-0">
                     <p className="text-sm font-medium truncate">{item.title}</p>
-                    <p className="text-xs text-slate-500 mt-0.5">
+                    <p className="text-xs text-zinc-400 mt-0.5">
                       {item.generatedBy} &middot; {new Date(item.generatedAt).toLocaleString()}
                     </p>
                   </div>
@@ -305,7 +305,7 @@ export default function WarRoomPage() {
 
         {/* Connection Status */}
         {status && (
-          <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-4">
+          <div className="bg-[#111113] border border-white/10 shadow-[0_1px_2px_rgba(0,0,0,0.3)] rounded-xl p-4">
             <h2 className="text-lg font-semibold mb-3">Connections</h2>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
               <ConnectionBadge label="Film Room" url={status.connections.filmRoom} />
@@ -334,23 +334,23 @@ function ServiceCard({ name, subtitle, port, health, detail }: {
 }) {
   const isUp = health?.status === 'ok';
   return (
-    <div className={`p-4 rounded-xl border ${isUp ? 'bg-white border-slate-200' : 'bg-red-50 border-red-200'}`}>
+    <div className={`p-4 rounded-xl border ${isUp ? 'bg-[#111113] border-white/10' : 'bg-red-500/10 border-red-500/20'}`}>
       <div className="flex items-center gap-2">
         <div className={`w-2 h-2 rounded-full ${isUp ? 'bg-emerald-400 animate-pulse' : 'bg-red-500'}`} />
         <h3 className="font-semibold">{name}</h3>
-        <span className="text-xs text-slate-500">:{port}</span>
+        <span className="text-xs text-zinc-400">:{port}</span>
       </div>
-      <p className="text-xs text-slate-500 mt-1">{subtitle}</p>
-      <p className="text-sm font-mono text-slate-600 mt-2">{detail}</p>
+      <p className="text-xs text-zinc-400 mt-1">{subtitle}</p>
+      <p className="text-sm font-mono text-zinc-300 mt-2">{detail}</p>
     </div>
   );
 }
 
 function StatBox({ label, value }: { label: string; value: number }) {
   return (
-    <div className="bg-white border border-slate-200 shadow-sm rounded-lg p-3 text-center">
+    <div className="bg-[#111113] border border-white/10 shadow-[0_1px_2px_rgba(0,0,0,0.3)] rounded-lg p-3 text-center">
       <p className="text-2xl font-mono font-bold text-amber-400">{value}</p>
-      <p className="text-xs text-slate-500 mt-1">{label}</p>
+      <p className="text-xs text-zinc-400 mt-1">{label}</p>
     </div>
   );
 }
@@ -359,9 +359,9 @@ function ConnectionBadge({ label, url }: { label: string; url: string }) {
   const isConfigured = !url.includes('NOT');
   return (
     <div className="flex items-center gap-2 text-xs">
-      <div className={`w-1.5 h-1.5 rounded-full ${isConfigured ? 'bg-emerald-400' : 'bg-slate-300'}`} />
-      <span className="text-slate-500">{label}:</span>
-      <span className={isConfigured ? 'text-slate-600' : 'text-slate-500'}>{url}</span>
+      <div className={`w-1.5 h-1.5 rounded-full ${isConfigured ? 'bg-emerald-400' : 'bg-zinc-600'}`} />
+      <span className="text-zinc-400">{label}:</span>
+      <span className={isConfigured ? 'text-zinc-300' : 'text-zinc-400'}>{url}</span>
     </div>
   );
 }

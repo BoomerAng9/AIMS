@@ -150,16 +150,16 @@ function NavLink({ item, pathname }: { item: NavItem; pathname: string | null })
       className={clsx(
         "flex items-center gap-2.5 rounded-lg px-3 py-2 transition-all text-sm",
         active
-          ? "border border-amber-200 bg-amber-50 text-amber-800 shadow-sm"
+          ? "border border-amber-500/20 bg-amber-500/10 text-amber-400 shadow-sm"
           : item.highlight
-            ? "border border-amber-100 bg-amber-50/50 text-amber-700 hover:bg-amber-50 hover:border-amber-200"
-            : "border border-transparent text-slate-500 hover:bg-slate-50 hover:border-slate-200 hover:text-slate-700"
+            ? "border border-amber-500/10 bg-amber-500/5 text-amber-500 hover:bg-amber-500/10 hover:border-amber-500/20"
+            : "border border-transparent text-zinc-400 hover:bg-white/5 hover:border-white/10 hover:text-zinc-200"
       )}
     >
       <Icon
         className={clsx(
           "w-4 h-4 flex-shrink-0",
-          active ? "text-amber-600" : item.highlight ? "text-amber-500" : "text-slate-400"
+          active ? "text-amber-400" : item.highlight ? "text-amber-500" : "text-zinc-500"
         )}
       />
       <span className="truncate">{item.label}</span>
@@ -174,7 +174,7 @@ function NavLink({ item, pathname }: { item: NavItem; pathname: string | null })
 
 function SectionLabel({ label, icon: Icon }: { label: string; icon: typeof MessageSquare }) {
   return (
-    <div className="flex items-center gap-2 px-3 py-1.5 text-slate-400">
+    <div className="flex items-center gap-2 px-3 py-1.5 text-zinc-500">
       <Icon className="w-3.5 h-3.5 flex-shrink-0" />
       <span className="font-mono uppercase tracking-[0.15em] text-[10px]">{label}</span>
     </div>
@@ -285,7 +285,7 @@ export function DashboardNav() {
         ))}
       </div>
 
-      <div className="mx-2 border-t border-slate-200" />
+      <div className="mx-2 border-t border-white/10" />
 
       {/* Core Pages */}
       <div className="mt-2 space-y-0.5">
@@ -296,7 +296,7 @@ export function DashboardNav() {
       </div>
 
       {/* Plugs — Catalog & Deployed */}
-      <div className="mx-2 mt-2 border-t border-violet-200/50" />
+      <div className="mx-2 mt-2 border-t border-white/8" />
       <div className="mt-1 space-y-0.5">
         <SectionLabel label="Plugs" icon={Plug} />
         {PLUG_ITEMS.map((item) => (

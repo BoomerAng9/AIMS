@@ -157,10 +157,10 @@ export default function NeedsAnalysisPage() {
           <p className="text-[0.6rem] uppercase tracking-[0.25em] text-gold/50 mb-1 font-mono">
             Analysis Complete
           </p>
-          <h1 className="text-2xl md:text-3xl font-display uppercase tracking-wider text-slate-800">
+          <h1 className="text-2xl md:text-3xl font-display uppercase tracking-wider text-zinc-100">
             Your AIMS Blueprint
           </h1>
-          <p className="mt-1 text-xs text-slate-400">
+          <p className="mt-1 text-xs text-zinc-500">
             Based on your responses, here is our recommended configuration for {result.companyName}.
           </p>
         </motion.div>
@@ -169,24 +169,24 @@ export default function NeedsAnalysisPage() {
         <motion.div variants={staggerItem} className="wireframe-card p-6 space-y-4">
           <div className="flex items-center gap-2 mb-4">
             <CheckCircle2 size={16} className="text-emerald-400" />
-            <h2 className="text-sm font-medium text-slate-800">Recommendation Summary</h2>
+            <h2 className="text-sm font-medium text-zinc-100">Recommendation Summary</h2>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <div className="space-y-1">
-              <p className="text-[0.55rem] uppercase tracking-widest text-slate-400 font-mono">Tier</p>
+              <p className="text-[0.55rem] uppercase tracking-widest text-zinc-500 font-mono">Tier</p>
               <p className={`text-sm font-medium ${tier.color}`}>{tier.label}</p>
             </div>
             <div className="space-y-1">
-              <p className="text-[0.55rem] uppercase tracking-widest text-slate-400 font-mono">Security</p>
+              <p className="text-[0.55rem] uppercase tracking-widest text-zinc-500 font-mono">Security</p>
               <p className={`text-sm font-medium ${security.color}`}>{security.label}</p>
             </div>
             <div className="space-y-1">
-              <p className="text-[0.55rem] uppercase tracking-widest text-slate-400 font-mono">Delivery</p>
-              <p className="text-sm font-medium text-slate-700 capitalize">{result.recommendedDelivery}</p>
+              <p className="text-[0.55rem] uppercase tracking-widest text-zinc-500 font-mono">Delivery</p>
+              <p className="text-sm font-medium text-zinc-200 capitalize">{result.recommendedDelivery}</p>
             </div>
             <div className="space-y-1">
-              <p className="text-[0.55rem] uppercase tracking-widest text-slate-400 font-mono">Risk Level</p>
+              <p className="text-[0.55rem] uppercase tracking-widest text-zinc-500 font-mono">Risk Level</p>
               <div className="flex items-center gap-1.5">
                 <span className={`h-1.5 w-1.5 rounded-full ${risk.dot}`} />
                 <p className={`text-sm font-medium ${risk.color}`}>{risk.label}</p>
@@ -196,9 +196,9 @@ export default function NeedsAnalysisPage() {
 
           <div className="pt-3 border-t border-wireframe-stroke">
             <div className="flex items-baseline gap-2">
-              <p className="text-[0.55rem] uppercase tracking-widest text-slate-400 font-mono">Est. Monthly</p>
+              <p className="text-[0.55rem] uppercase tracking-widest text-zinc-500 font-mono">Est. Monthly</p>
               <p className="text-xl font-display text-gold">${result.estimatedMonthlyCost}</p>
-              <p className="text-[0.55rem] text-slate-400 font-mono">/month</p>
+              <p className="text-[0.55rem] text-zinc-500 font-mono">/month</p>
             </div>
           </div>
         </motion.div>
@@ -207,7 +207,7 @@ export default function NeedsAnalysisPage() {
         <motion.div variants={staggerItem} className="wireframe-card p-6">
           <div className="flex items-center gap-2 mb-4">
             <Package size={16} className="text-gold" />
-            <h2 className="text-sm font-medium text-slate-800">Recommended Tools</h2>
+            <h2 className="text-sm font-medium text-zinc-100">Recommended Tools</h2>
           </div>
           <div className="space-y-2">
             {result.recommendedPlugs.map((plugId) => (
@@ -217,14 +217,14 @@ export default function NeedsAnalysisPage() {
                 className="flex items-center justify-between rounded-lg border border-wireframe-stroke px-4 py-3 hover:border-gold/20 transition-all group"
               >
                 <div className="flex items-center gap-3">
-                  <div className="h-8 w-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 group-hover:text-gold transition-colors">
+                  <div className="h-8 w-8 rounded-lg bg-[#18181B] flex items-center justify-center text-zinc-500 group-hover:text-gold transition-colors">
                     <Zap size={14} />
                   </div>
-                  <span className="text-sm text-slate-600 font-mono group-hover:text-slate-800 transition-colors">
+                  <span className="text-sm text-zinc-300 font-mono group-hover:text-zinc-100 transition-colors">
                     {plugId}
                   </span>
                 </div>
-                <ChevronRight size={14} className="text-slate-300 group-hover:text-gold transition-colors" />
+                <ChevronRight size={14} className="text-zinc-600 group-hover:text-gold transition-colors" />
               </Link>
             ))}
           </div>
@@ -235,7 +235,7 @@ export default function NeedsAnalysisPage() {
           <motion.div variants={staggerItem} className="wireframe-card p-6">
             <div className="flex items-center gap-2 mb-3">
               <Shield size={16} className="text-amber-400" />
-              <h2 className="text-sm font-medium text-slate-800">Compliance Requirements</h2>
+              <h2 className="text-sm font-medium text-zinc-100">Compliance Requirements</h2>
             </div>
             <div className="flex flex-wrap gap-2">
               {result.complianceRequirements.map((req) => (
@@ -247,8 +247,8 @@ export default function NeedsAnalysisPage() {
                 </span>
               ))}
             </div>
-            <p className="mt-3 text-[0.6rem] text-slate-400">
-              Data classification: <span className="text-slate-500 capitalize">{result.dataClassification}</span>
+            <p className="mt-3 text-[0.6rem] text-zinc-500">
+              Data classification: <span className="text-zinc-400 capitalize">{result.dataClassification}</span>
             </p>
           </motion.div>
         )}
@@ -268,7 +268,7 @@ export default function NeedsAnalysisPage() {
               setActiveSection(0);
               setAnswers({});
             }}
-            className="flex-1 flex items-center justify-center gap-2 rounded-xl border border-wireframe-stroke px-5 py-3 text-sm text-slate-500 hover:border-gold/20 hover:text-gold transition-all"
+            className="flex-1 flex items-center justify-center gap-2 rounded-xl border border-wireframe-stroke px-5 py-3 text-sm text-zinc-400 hover:border-gold/20 hover:text-gold transition-all"
           >
             <ArrowLeft size={14} />
             Start Over
@@ -285,17 +285,17 @@ export default function NeedsAnalysisPage() {
       <header>
         <Link
           href="/dashboard/plug-catalog"
-          className="inline-flex items-center gap-1 text-[0.6rem] uppercase tracking-widest text-slate-400 hover:text-gold transition-colors font-mono mb-3"
+          className="inline-flex items-center gap-1 text-[0.6rem] uppercase tracking-widest text-zinc-500 hover:text-gold transition-colors font-mono mb-3"
         >
           <ArrowLeft size={10} /> Plug Catalog
         </Link>
         <p className="text-[0.6rem] uppercase tracking-[0.25em] text-gold/50 mb-1 font-mono">
           Business Client Intake
         </p>
-        <h1 className="text-2xl md:text-3xl font-display uppercase tracking-wider text-slate-800">
+        <h1 className="text-2xl md:text-3xl font-display uppercase tracking-wider text-zinc-100">
           Needs Analysis
         </h1>
-        <p className="mt-1 text-xs text-slate-400">
+        <p className="mt-1 text-xs text-zinc-500">
           Tell us about your business and we will recommend the right tools, security level, and delivery method.
         </p>
       </header>
@@ -318,7 +318,7 @@ export default function NeedsAnalysisPage() {
                     ? "bg-gold/10 border border-gold/30 text-gold"
                     : isDone
                     ? "border border-emerald-400/20 text-emerald-400"
-                    : "border border-wireframe-stroke text-slate-400"
+                    : "border border-wireframe-stroke text-zinc-500"
                 }`}
               >
                 {isDone ? <Check size={12} /> : <SectionIcon size={12} />}
@@ -331,10 +331,10 @@ export default function NeedsAnalysisPage() {
 
       {/* Section Header */}
       <motion.div variants={staggerItem}>
-        <h2 className="text-lg font-display text-slate-800 uppercase tracking-wider">
+        <h2 className="text-lg font-display text-zinc-100 uppercase tracking-wider">
           {SECTIONS[activeSection]?.label}
         </h2>
-        <p className="text-xs text-slate-400">{SECTIONS[activeSection]?.description}</p>
+        <p className="text-xs text-zinc-500">{SECTIONS[activeSection]?.description}</p>
       </motion.div>
 
       {/* Loading */}
@@ -342,8 +342,8 @@ export default function NeedsAnalysisPage() {
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
             <div key={i} className="wireframe-card p-6 animate-pulse">
-              <div className="h-3 w-48 bg-slate-50 rounded mb-4" />
-              <div className="h-10 w-full bg-slate-50 rounded" />
+              <div className="h-3 w-48 bg-[#18181B] rounded mb-4" />
+              <div className="h-10 w-full bg-[#18181B] rounded" />
             </div>
           ))}
         </div>
@@ -367,7 +367,7 @@ export default function NeedsAnalysisPage() {
                   {q.required && <span className="text-gold">*</span>}
                 </label>
                 {q.helpText && (
-                  <p className="text-[0.55rem] text-slate-400 mb-3">{q.helpText}</p>
+                  <p className="text-[0.55rem] text-zinc-500 mb-3">{q.helpText}</p>
                 )}
 
                 {/* Text Input */}
@@ -393,7 +393,7 @@ export default function NeedsAnalysisPage() {
                           className={`rounded-lg px-3 py-2 text-xs font-mono transition-all ${
                             isSelected
                               ? "bg-gold/10 border border-gold/30 text-gold"
-                              : "border border-wireframe-stroke text-slate-400 hover:border-slate-200 hover:text-slate-500"
+                              : "border border-wireframe-stroke text-zinc-500 hover:border-white/10 hover:text-zinc-400"
                           }`}
                         >
                           {opt.replace(/-/g, " ")}
@@ -415,7 +415,7 @@ export default function NeedsAnalysisPage() {
                           className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-mono transition-all ${
                             selected
                               ? "bg-gold/10 border border-gold/30 text-gold"
-                              : "border border-wireframe-stroke text-slate-400 hover:border-slate-200"
+                              : "border border-wireframe-stroke text-zinc-500 hover:border-white/10"
                           }`}
                         >
                           {selected && <Check size={10} />}
@@ -439,7 +439,7 @@ export default function NeedsAnalysisPage() {
                           className={`rounded-lg px-5 py-2 text-xs font-mono transition-all ${
                             isSelected
                               ? "bg-gold/10 border border-gold/30 text-gold"
-                              : "border border-wireframe-stroke text-slate-400 hover:border-slate-200"
+                              : "border border-wireframe-stroke text-zinc-500 hover:border-white/10"
                           }`}
                         >
                           {opt}
@@ -459,7 +459,7 @@ export default function NeedsAnalysisPage() {
         <button
           onClick={() => setActiveSection(Math.max(0, activeSection - 1))}
           disabled={activeSection === 0}
-          className="flex items-center gap-2 rounded-xl border border-wireframe-stroke px-5 py-2.5 text-sm text-slate-500 hover:border-gold/20 hover:text-gold transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+          className="flex items-center gap-2 rounded-xl border border-wireframe-stroke px-5 py-2.5 text-sm text-zinc-400 hover:border-gold/20 hover:text-gold transition-all disabled:opacity-30 disabled:cursor-not-allowed"
         >
           <ArrowLeft size={14} /> Back
         </button>

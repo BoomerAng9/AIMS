@@ -1,335 +1,181 @@
-'use client';
+"use client";
 
-import React from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import {
-  ShieldCheck,
-  MapPin,
-  Store,
-  Star,
-  ArrowRight,
-  Sparkles,
-  Users,
-  BadgeCheck,
-  Heart,
-  TrendingUp,
-} from 'lucide-react';
-import { motion } from 'framer-motion';
-import { ScrollReveal, GlowBorder, ScrollProgress } from '@/components/motion';
-
-/* ─── HalalHub Landing Page ────────────────────────────────────────────────
-   AIMS Landing UI Archetype: Hero + Features + Trust + CTA
-   Colors: Emerald primary, Gold accent, Slate neutrals on #F8FAFC base
-   Mobile-first, single-column → 2-column hero from md up
-   ──────────────────────────────────────────────────────────────────────── */
-
-import { scrollTransition, stagger } from '@/lib/motion/tokens';
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 24 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: i * stagger.normal, ...scrollTransition.reveal },
-  }),
-};
+import { useRef } from "react";
+import Link from "next/link";
+import { motion, useInView, useScroll, useTransform } from "framer-motion";
+import { ShieldCheck, Truck, Store, Star, Search, ArrowRight } from "lucide-react";
 
 const CATEGORIES = [
-  { name: 'Meat & Poultry', icon: '🥩', count: 240, color: 'bg-red-50 text-red-600' },
-  { name: 'Groceries', icon: '🛒', count: 520, color: 'bg-emerald-50 text-emerald-600' },
-  { name: 'Restaurants', icon: '🍽️', count: 180, color: 'bg-amber-50 text-amber-600' },
-  { name: 'Catering', icon: '🎉', count: 95, color: 'bg-violet-50 text-violet-600' },
-  { name: 'Bakery', icon: '🍞', count: 110, color: 'bg-orange-50 text-orange-600' },
-  { name: 'Services', icon: '⭐', count: 75, color: 'bg-blue-50 text-blue-600' },
+  { name: "Meat & Poultry", slug: "meat-poultry", icon: "\u{1F969}", count: "200+ products" },
+  { name: "Pantry & Spices", slug: "pantry", icon: "\u{1FAD9}", count: "350+ products" },
+  { name: "Bakery & Sweets", slug: "bakery", icon: "\u{1F35E}", count: "150+ products" },
+  { name: "Beverages", slug: "beverages", icon: "\u{1F375}", count: "100+ products" },
+  { name: "Ready-to-Eat", slug: "ready-to-eat", icon: "\u{1F372}", count: "80+ products" },
+  { name: "Personal Care", slug: "personal-care", icon: "\u{1F9F4}", count: "120+ products" },
 ];
 
-const TRUST_ITEMS = [
-  {
-    icon: ShieldCheck,
-    title: 'Verified Halal',
-    desc: 'Every vendor verified with documentation. Certification badges displayed transparently.',
-  },
-  {
-    icon: MapPin,
-    title: 'Local First',
-    desc: 'Discover halal businesses in your area. Support your local community.',
-  },
-  {
-    icon: BadgeCheck,
-    title: 'Escrow Protection',
-    desc: 'Payments held securely until delivery is confirmed. Dispute resolution built in.',
-  },
-  {
-    icon: Users,
-    title: 'Community Driven',
-    desc: 'Reviews from real customers. Barakat referral program rewards the community.',
-  },
+const TRUST = [
+  { icon: ShieldCheck, title: "Halal Certified", desc: "Every product verified by certified halal authorities" },
+  { icon: Store, title: "Verified Vendors", desc: "Background-checked and continuously monitored vendors" },
+  { icon: Truck, title: "Fresh Delivery", desc: "Temperature-controlled logistics for quality guarantee" },
+  { icon: Star, title: "Community Rated", desc: "Real reviews from our growing community of shoppers" },
 ];
 
-const STATS = [
-  { value: '500+', label: 'Verified Vendors' },
-  { value: '10K+', label: 'Products Listed' },
-  { value: '50+', label: 'Cities Served' },
-  { value: '4.8', label: 'Avg. Rating' },
-];
-
-export default function HalalHubLanding() {
+function FadeIn({ children, className = "", delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-80px" });
   return (
-    <div className="flex flex-col">
-      <ScrollProgress color="bg-emerald-500" height={2} zIndex={60} />
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 20 }}
+      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+      transition={{ duration: 0.5, delay, ease: [0.16, 1, 0.3, 1] }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
 
-      {/* ─── Hero ──────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-50 via-white to-amber-50/30" />
-        <div className="relative mx-auto max-w-7xl px-4 pb-16 pt-12 sm:px-6 md:pb-24 md:pt-20 lg:px-8">
-          <div className="grid items-center gap-10 md:grid-cols-2 md:gap-16">
-            {/* Copy */}
-            <motion.div
-              initial="hidden"
-              animate="visible"
-              className="flex flex-col gap-6"
-            >
-              <motion.div variants={fadeUp} custom={0}>
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
-                  <Sparkles className="h-3.5 w-3.5" />
-                  Trusted Halal Marketplace
-                </span>
-              </motion.div>
-              <motion.h1
-                variants={fadeUp}
-                custom={1}
-                className="text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl lg:text-6xl"
-              >
-                Your local halal
-                <span className="block text-emerald-600">marketplace.</span>
-              </motion.h1>
-              <motion.p
-                variants={fadeUp}
-                custom={2}
-                className="max-w-lg text-lg text-slate-600 leading-relaxed"
-              >
-                Discover verified halal food, groceries, restaurants, and services
-                in your community. Shop with confidence — every vendor is certified
-                and every transaction is protected.
-              </motion.p>
-              <motion.div variants={fadeUp} custom={3} className="flex flex-wrap gap-3">
-                <GlowBorder theme="emerald" rounded="rounded-xl">
-                  <Link
-                    href="/halalhub/shop"
-                    className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-600/20 transition-all hover:bg-emerald-700 hover:shadow-xl hover:shadow-emerald-600/30"
-                  >
-                    Start Shopping
-                    <ArrowRight className="h-4 w-4" />
-                  </Link>
-                </GlowBorder>
-                <Link
-                  href="/halalhub/(auth)/signup/vendor"
-                  className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-700 transition-all hover:border-emerald-200 hover:bg-emerald-50"
-                >
-                  <Store className="h-4 w-4" />
-                  Become a Vendor
-                </Link>
-              </motion.div>
-              {/* Stats strip */}
-              <motion.div
-                variants={fadeUp}
-                custom={4}
-                className="mt-4 flex flex-wrap gap-6"
-              >
-                {STATS.map((stat) => (
-                  <div key={stat.label} className="flex flex-col">
-                    <span className="text-2xl font-bold text-slate-900">{stat.value}</span>
-                    <span className="text-xs font-medium text-slate-500">{stat.label}</span>
-                  </div>
-                ))}
-              </motion.div>
-            </motion.div>
+export default function HalalHubPage() {
+  const { scrollYProgress } = useScroll();
 
-            {/* Hero Image */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.3, duration: 0.6 }}
-              className="relative"
-            >
-              <div className="relative aspect-[3/4] sm:aspect-[4/5] overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-100 to-emerald-50 shadow-2xl shadow-emerald-600/10">
-                <Image
-                  src="/assets/halalhub_storefront.jpg"
-                  alt="HalalHub — Verified halal marketplace"
-                  fill
-                  className="object-contain"
-                  priority
-                />
-                {/* Floating badge */}
-                <div className="absolute bottom-4 left-4 flex items-center gap-2 rounded-xl bg-white/90 px-3 py-2 backdrop-blur-sm shadow-lg">
-                  <ShieldCheck className="h-5 w-5 text-emerald-600" />
-                  <div>
-                    <p className="text-xs font-semibold text-slate-900">100% Verified</p>
-                    <p className="text-[10px] text-slate-500">All vendors certified</p>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </div>
+  return (
+    <div className="relative">
+      {/* Scroll progress bar — emerald */}
+      <motion.div
+        className="fixed top-0 left-0 right-0 h-[2px] bg-emerald-500 origin-left z-[60]"
+        style={{ scaleX: scrollYProgress }}
+      />
+
+      {/* Hero */}
+      <section className="relative min-h-[85vh] flex items-center justify-center px-4 md:px-6 overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-emerald-500/8 blur-[120px]" />
+        </div>
+        <div className="relative z-10 max-w-4xl mx-auto text-center">
+          <FadeIn>
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/5 mb-8">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-xs font-medium text-emerald-400">Now Open</span>
+            </div>
+          </FadeIn>
+          <FadeIn delay={0.1}>
+            <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight leading-[1.1] mb-6">
+              Your Trusted
+              <br />
+              <span className="text-emerald-400">Halal Marketplace</span>
+            </h1>
+          </FadeIn>
+          <FadeIn delay={0.2}>
+            <p className="text-lg md:text-xl text-zinc-400 max-w-2xl mx-auto mb-10 leading-relaxed">
+              Certified halal products from verified vendors. Fresh delivery to your door. The marketplace built on trust.
+            </p>
+          </FadeIn>
+          <FadeIn delay={0.3}>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link
+                href="/halalhub/shop"
+                className="h-12 px-8 rounded-xl bg-emerald-600 text-white font-semibold flex items-center gap-2 hover:bg-emerald-500 transition-all hover:shadow-lg hover:shadow-emerald-500/20"
+              >
+                Start Shopping <ArrowRight className="w-4 h-4" />
+              </Link>
+              <Link
+                href="/halalhub/signup/vendor"
+                className="h-12 px-8 rounded-xl border border-white/10 text-zinc-300 font-medium flex items-center gap-2 hover:border-white/20 hover:bg-white/5 transition-all"
+              >
+                Become a Vendor
+              </Link>
+            </div>
+          </FadeIn>
+          {/* Search bar */}
+          <FadeIn delay={0.4}>
+            <div className="mt-12 max-w-xl mx-auto relative">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500" />
+              <input
+                type="text"
+                placeholder="Search halal products..."
+                className="w-full h-12 pl-12 pr-4 rounded-xl bg-[#111113] border border-white/10 text-zinc-100 placeholder-zinc-500 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none transition-all"
+              />
+            </div>
+          </FadeIn>
         </div>
       </section>
 
-      {/* ─── Categories ───────────────────────────────────────── */}
-      <section className="border-t border-slate-200/60 bg-white py-16 md:py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">
-              Browse by Category
-            </h2>
-            <p className="mt-2 text-base text-slate-500">
-              Find exactly what you need from verified halal vendors.
-            </p>
-          </div>
-          <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+      {/* Categories */}
+      <section className="py-24 px-4 md:px-6">
+        <div className="max-w-7xl mx-auto">
+          <FadeIn>
+            <div className="text-center mb-16">
+              <p className="text-sm font-medium text-emerald-400 mb-2">Categories</p>
+              <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Browse by Category</h2>
+            </div>
+          </FadeIn>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {CATEGORIES.map((cat, i) => (
-              <ScrollReveal key={cat.name} speed="pop" delay={i * 0.05} distance={16}>
+              <FadeIn key={cat.slug} delay={i * 0.05}>
                 <Link
-                  href={`/halalhub/shop?category=${cat.name.toLowerCase()}`}
-                  className="group flex flex-col items-center gap-3 rounded-2xl border border-slate-100 bg-white p-5 text-center transition-all hover:border-emerald-200 hover:shadow-lg hover:shadow-emerald-600/5"
+                  href={`/halalhub/shop/${cat.slug}`}
+                  className="group relative p-6 rounded-2xl border border-white/8 bg-[#111113] hover:border-emerald-500/30 hover:bg-[#111113]/80 transition-all"
                 >
-                  <span className={`flex h-12 w-12 items-center justify-center rounded-xl text-2xl ${cat.color}`}>
-                    {cat.icon}
-                  </span>
-                  <div>
-                    <p className="text-sm font-semibold text-slate-900 group-hover:text-emerald-700">
-                      {cat.name}
-                    </p>
-                    <p className="mt-0.5 text-xs text-slate-400">{cat.count} listings</p>
-                  </div>
+                  <span className="text-3xl mb-3 block">{cat.icon}</span>
+                  <h3 className="text-base font-semibold text-zinc-100 mb-1">{cat.name}</h3>
+                  <p className="text-sm text-zinc-500">{cat.count}</p>
+                  <ArrowRight className="absolute top-6 right-6 w-4 h-4 text-zinc-600 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" />
                 </Link>
-              </ScrollReveal>
+              </FadeIn>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ─── Trust & Safety ───────────────────────────────────── */}
-      <section className="py-16 md:py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">
-              Built on Trust
-            </h2>
-            <p className="mt-2 text-base text-slate-500">
-              Every aspect of HalalHub is designed to protect buyers and sellers.
-            </p>
-          </div>
-          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {TRUST_ITEMS.map((item, i) => (
-              <ScrollReveal key={item.title} speed="pop" delay={i * 0.08} distance={16}>
-                <div className="rounded-2xl border border-slate-100 bg-white p-6 transition-all hover:border-emerald-200 hover:shadow-lg hover:shadow-emerald-600/5">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600">
-                    <item.icon className="h-5 w-5" />
+      {/* Trust / Why HalalHub */}
+      <section className="py-24 px-4 md:px-6 border-y border-white/8 bg-[#0D0D10]">
+        <div className="max-w-7xl mx-auto">
+          <FadeIn>
+            <div className="text-center mb-16">
+              <p className="text-sm font-medium text-emerald-400 mb-2">Why HalalHub</p>
+              <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Built on Trust</h2>
+            </div>
+          </FadeIn>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {TRUST.map((item, i) => (
+              <FadeIn key={item.title} delay={i * 0.08}>
+                <div className="p-6 rounded-2xl border border-white/8 bg-[#111113]">
+                  <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-4">
+                    <item.icon className="w-6 h-6 text-emerald-400" />
                   </div>
-                  <h3 className="mt-4 text-base font-semibold text-slate-900">{item.title}</h3>
-                  <p className="mt-2 text-sm text-slate-500 leading-relaxed">{item.desc}</p>
+                  <h3 className="text-base font-semibold text-zinc-100 mb-2">{item.title}</h3>
+                  <p className="text-sm text-zinc-500 leading-relaxed">{item.desc}</p>
                 </div>
-              </ScrollReveal>
+              </FadeIn>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ─── How It Works ─────────────────────────────────────── */}
-      <section className="border-t border-slate-200/60 bg-white py-16 md:py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">
-              How It Works
-            </h2>
-          </div>
-          <div className="mt-10 grid gap-8 md:grid-cols-3">
-            {[
-              {
-                step: '01',
-                title: 'Browse & Discover',
-                desc: 'Search by category, location, or keyword. Filter by certification, rating, and delivery options.',
-                icon: '🔍',
-              },
-              {
-                step: '02',
-                title: 'Order with Confidence',
-                desc: 'Add to cart and checkout securely. Payment is held in escrow until you confirm delivery.',
-                icon: '🛒',
-              },
-              {
-                step: '03',
-                title: 'Enjoy & Review',
-                desc: 'Receive your order, confirm delivery to release payment. Leave a review to help the community.',
-                icon: '⭐',
-              },
-            ].map((item, i) => (
-              <ScrollReveal key={item.step} speed="pop" delay={i * 0.1} distance={16}>
-                <div className="relative flex flex-col items-center text-center">
-                  <span className="text-4xl">{item.icon}</span>
-                  <span className="mt-3 text-xs font-bold text-emerald-600 tracking-widest uppercase">
-                    Step {item.step}
-                  </span>
-                  <h3 className="mt-2 text-lg font-semibold text-slate-900">{item.title}</h3>
-                  <p className="mt-2 text-sm text-slate-500 leading-relaxed max-w-xs">{item.desc}</p>
-                </div>
-              </ScrollReveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ─── Vendor CTA ───────────────────────────────────────── */}
-      <section className="py-16 md:py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-600 to-emerald-700 p-8 md:p-14">
-            <div className="absolute right-0 top-0 -mr-20 -mt-20 h-60 w-60 rounded-full bg-emerald-500/30 blur-3xl" />
-            <div className="absolute bottom-0 left-0 -mb-20 -ml-20 h-60 w-60 rounded-full bg-amber-400/20 blur-3xl" />
-            <div className="relative grid items-center gap-8 md:grid-cols-2">
-              <div>
-                <h2 className="text-2xl font-bold text-white sm:text-3xl">
-                  Grow Your Halal Business
-                </h2>
-                <p className="mt-3 text-base text-emerald-100 leading-relaxed">
-                  Join HalalHub as a verified vendor. Reach thousands of customers in
-                  your area, manage orders effortlessly, and grow with the Barakat
-                  referral program.
-                </p>
-                <div className="mt-6 flex flex-wrap gap-3">
-                  <Link
-                    href="/halalhub/(auth)/signup/vendor"
-                    className="inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-semibold text-emerald-700 shadow-lg transition-all hover:bg-emerald-50"
-                  >
-                    <Store className="h-4 w-4" />
-                    Apply as Vendor
-                  </Link>
-                  <Link
-                    href="/halalhub/shop?view=barakat"
-                    className="inline-flex items-center gap-2 rounded-xl border border-emerald-400/30 px-6 py-3 text-sm font-semibold text-white transition-all hover:bg-emerald-500/20"
-                  >
-                    <Heart className="h-4 w-4" />
-                    Barakat Program
-                  </Link>
-                </div>
+      {/* Vendor CTA */}
+      <section id="vendors" className="py-24 px-4 md:px-6">
+        <div className="max-w-3xl mx-auto text-center">
+          <FadeIn>
+            <div className="p-10 md:p-16 rounded-3xl border border-emerald-500/20 bg-gradient-to-b from-emerald-500/5 to-transparent relative overflow-hidden">
+              <div className="absolute inset-0 pointer-events-none">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[400px] rounded-full bg-emerald-500/5 blur-[80px]" />
               </div>
-              <div className="flex flex-col gap-4">
-                {[
-                  { icon: TrendingUp, label: '7% platform fee — lower than competitors' },
-                  { icon: ShieldCheck, label: 'Escrow payments — guaranteed settlement' },
-                  { icon: Star, label: 'Featured placement for premium vendors' },
-                  { icon: Users, label: 'Barakat affiliate — earn from referrals' },
-                ].map((perk) => (
-                  <div key={perk.label} className="flex items-center gap-3">
-                    <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-emerald-500/30 text-white">
-                      <perk.icon className="h-4 w-4" />
-                    </div>
-                    <p className="text-sm text-emerald-50">{perk.label}</p>
-                  </div>
-                ))}
+              <div className="relative z-10">
+                <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">Become a Vendor</h2>
+                <p className="text-zinc-400 mb-8 max-w-lg mx-auto leading-relaxed">
+                  Join our growing marketplace. Reach thousands of customers looking for certified halal products. Easy setup, powerful tools.
+                </p>
+                <Link
+                  href="/halalhub/signup/vendor"
+                  className="h-12 px-8 rounded-xl bg-emerald-600 text-white font-semibold inline-flex items-center gap-2 hover:bg-emerald-500 transition-all hover:shadow-lg hover:shadow-emerald-500/20"
+                >
+                  Apply Now <ArrowRight className="w-4 h-4" />
+                </Link>
               </div>
             </div>
-          </div>
+          </FadeIn>
         </div>
       </section>
     </div>

@@ -7,61 +7,62 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Light Surfaces
-        obsidian: '#F8FAFC',
-        surface: '#FFFFFF',
-        'surface-raised': '#F1F5F9',
-        charcoal: '#F8FAFC',
-        leather: '#F1F5F9',
-        gunmetal: '#E2E8F0',
-        ink: '#F8FAFC',
+        // Dark Surfaces
+        obsidian: '#09090B',
+        surface: '#111113',
+        'surface-raised': '#18181B',
+        'surface-elevated': '#1F1F23',
+        charcoal: '#111113',
+        leather: '#18181B',
+        gunmetal: '#27272A',
+        ink: '#09090B',
 
-        // Warm Loft Palette — updated for light theme
+        // Warm Loft Palette — dark theme
         loft: {
-          bg: '#F8FAFC',
-          floor: '#F1F5F9',
-          brick: '#D97706',
-          leather: '#B45309',
-          tan: '#F59E0B',
-          cream: '#0F172A',
-          wall: '#F1F5F9',
+          bg: '#09090B',
+          floor: '#111113',
+          brick: '#F59E0B',
+          leather: '#D97706',
+          tan: '#FBBF24',
+          cream: '#FAFAFA',
+          wall: '#18181B',
         },
 
-        // Border system — light
+        // Border system — dark
         wireframe: {
-          stroke: '#E2E8F0',
-          glow: '#F1F5F9',
-          hover: '#CBD5E1',
+          stroke: 'rgba(255, 255, 255, 0.08)',
+          glow: 'rgba(255, 255, 255, 0.04)',
+          hover: 'rgba(255, 255, 255, 0.15)',
         },
 
-        // Accent — modernized amber/gold
+        // Accent — amber/gold optimized for dark
         gold: {
-          DEFAULT: '#D97706',
-          light: '#F59E0B',
-          dark: '#B45309',
-          dim: 'rgba(217, 119, 6, 0.08)',
+          DEFAULT: '#F59E0B',
+          light: '#FBBF24',
+          dark: '#D97706',
+          dim: 'rgba(245, 158, 11, 0.08)',
         },
-        champagne: '#F59E0B',
+        champagne: '#FBBF24',
 
-        // Status signals
+        // Status signals — brighter for dark bg
         signal: {
-          green: '#16A34A',
-          amber: '#D97706',
-          red: '#DC2626',
-          blue: '#2563EB',
-          cyan: '#0891B2',
+          green: '#22C55E',
+          amber: '#F59E0B',
+          red: '#EF4444',
+          blue: '#3B82F6',
+          cyan: '#06B6D4',
         },
 
-        // Circuit Box status — adjusted for light bg
-        'cb-cyan': '#0891B2',
-        'cb-green': '#16A34A',
-        'cb-amber': '#D97706',
-        'cb-red': '#DC2626',
-        'cb-fog': '#94A3B8',
+        // Circuit Box status — dark bg
+        'cb-cyan': '#06B6D4',
+        'cb-green': '#22C55E',
+        'cb-amber': '#F59E0B',
+        'cb-red': '#EF4444',
+        'cb-fog': '#71717A',
 
         // Text
-        'frosty-white': '#0F172A',
-        muted: '#64748B',
+        'frosty-white': '#FAFAFA',
+        muted: '#A1A1AA',
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
@@ -77,28 +78,28 @@ module.exports = {
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'glass-shine': 'linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.6) 50%, transparent 70%)',
-        'subtle-grid': 'linear-gradient(to right, #F1F5F9 1px, transparent 1px), linear-gradient(to bottom, #F1F5F9 1px, transparent 1px)',
-        'dot-matrix': 'radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px)',
-        'grid-fine': 'linear-gradient(to right, rgba(0,0,0,0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(0,0,0,0.03) 1px, transparent 1px)',
+        'glass-shine': 'linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.06) 50%, transparent 70%)',
+        'subtle-grid': 'linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px)',
+        'dot-matrix': 'radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px)',
+        'grid-fine': 'linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px)',
       },
       backgroundSize: {
         'dot-matrix': '24px 24px',
         'grid-fine': '48px 48px',
       },
       boxShadow: {
-        'glass': '0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04)',
-        'neon-gold': '0 4px 14px rgba(217, 119, 6, 0.15)',
-        'neon-blue': '0 4px 14px rgba(37, 99, 235, 0.15)',
-        'glow-gold': '0 4px 14px rgba(217, 119, 6, 0.1)',
-        'glow-gold-soft': '0 2px 8px rgba(217, 119, 6, 0.06)',
-        'wireframe-inner': '0 1px 2px rgba(0,0,0,0.04)',
-        'card-lift': '0 4px 16px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04)',
-        'glow-controlled': '0 2px 8px rgba(217, 119, 6, 0.04)',
-        'card-sm': '0 1px 2px rgba(0,0,0,0.04)',
-        'card-md': '0 2px 8px rgba(0,0,0,0.06)',
-        'card-lg': '0 8px 24px rgba(0,0,0,0.08)',
-        'card-xl': '0 16px 48px rgba(0,0,0,0.1)',
+        'glass': '0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2)',
+        'neon-gold': '0 4px 14px rgba(245, 158, 11, 0.2)',
+        'neon-blue': '0 4px 14px rgba(59, 130, 246, 0.2)',
+        'glow-gold': '0 4px 14px rgba(245, 158, 11, 0.15)',
+        'glow-gold-soft': '0 2px 8px rgba(245, 158, 11, 0.08)',
+        'wireframe-inner': '0 1px 2px rgba(0,0,0,0.3)',
+        'card-lift': '0 4px 16px rgba(0,0,0,0.4), 0 1px 4px rgba(0,0,0,0.3)',
+        'glow-controlled': '0 2px 8px rgba(245, 158, 11, 0.06)',
+        'card-sm': '0 1px 2px rgba(0,0,0,0.3)',
+        'card-md': '0 2px 8px rgba(0,0,0,0.4)',
+        'card-lg': '0 8px 24px rgba(0,0,0,0.5)',
+        'card-xl': '0 16px 48px rgba(0,0,0,0.6)',
       },
       spacing: {
         'cb-xs': '8px',
@@ -123,8 +124,8 @@ module.exports = {
           to: { opacity: '1', transform: 'translateY(0)' },
         },
         pulse_gold: {
-          '0%, 100%': { opacity: '1', boxShadow: '0 0 6px rgba(217,119,6,0.1)' },
-          '50%': { opacity: '0.85', boxShadow: '0 0 16px rgba(217,119,6,0.2)' },
+          '0%, 100%': { opacity: '1', boxShadow: '0 0 6px rgba(245,158,11,0.1)' },
+          '50%': { opacity: '0.85', boxShadow: '0 0 16px rgba(245,158,11,0.25)' },
         },
         connector_pulse: {
           '0%, 100%': { opacity: '0.3' },

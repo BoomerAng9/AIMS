@@ -178,14 +178,14 @@ function getIcon(name: string) {
 
 function StatusBadge({ status }: { status: AutomationStatus }) {
   const styles: Record<AutomationStatus, string> = {
-    active: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-    paused: 'bg-amber-50 text-amber-700 border-amber-200',
-    draft: 'bg-slate-50 text-slate-500 border-slate-200',
-    archived: 'bg-slate-50 text-slate-400 border-slate-200',
+    active: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+    paused: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+    draft: 'bg-[#18181B] text-zinc-400 border-white/10',
+    archived: 'bg-[#18181B] text-zinc-500 border-white/10',
   };
   return (
     <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-medium rounded-full border ${styles[status]}`}>
-      <span className={`w-1.5 h-1.5 rounded-full ${status === 'active' ? 'bg-emerald-500 animate-pulse' : status === 'paused' ? 'bg-amber-500' : 'bg-slate-300'}`} />
+      <span className={`w-1.5 h-1.5 rounded-full ${status === 'active' ? 'bg-emerald-500 animate-pulse' : status === 'paused' ? 'bg-amber-500' : 'bg-zinc-600'}`} />
       {status.charAt(0).toUpperCase() + status.slice(1)}
     </span>
   );
@@ -197,13 +197,13 @@ function RunStatusIcon({ status }: { status: RunStatus }) {
     case 'failure': return <XCircle className="w-4 h-4 text-red-500" />;
     case 'running': return <Loader2 className="w-4 h-4 text-blue-500 animate-spin" />;
     case 'timeout': return <Clock className="w-4 h-4 text-amber-500" />;
-    case 'cancelled': return <XCircle className="w-4 h-4 text-slate-300" />;
+    case 'cancelled': return <XCircle className="w-4 h-4 text-zinc-600" />;
   }
 }
 
 function TriggerBadge({ trigger }: { trigger: AutomationTrigger }) {
   return (
-    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 text-xs rounded-md bg-slate-50 text-slate-500 border border-slate-200">
+    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 text-xs rounded-md bg-[#18181B] text-zinc-400 border border-white/10">
       {trigger.type === 'scheduled' ? <CalendarClock className="w-3 h-3" /> : <Radio className="w-3 h-3" />}
       {trigger.label}
     </span>
@@ -221,22 +221,22 @@ function AutomationsList({ automations, onSelect }: { automations: Automation[];
         <button
           key={auto.id}
           onClick={() => onSelect(auto.id)}
-          className="w-full text-left p-4 rounded-xl bg-white border border-slate-200 hover:border-amber-200 hover:shadow-sm transition-all group"
+          className="w-full text-left p-4 rounded-xl bg-[#111113] border border-white/10 hover:border-amber-500/20 hover:shadow-[0_1px_2px_rgba(0,0,0,0.3)] transition-all group"
         >
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-3 mb-1.5">
-                <h3 className="text-sm font-medium text-slate-800 truncate">{auto.name}</h3>
+                <h3 className="text-sm font-medium text-zinc-100 truncate">{auto.name}</h3>
                 <StatusBadge status={auto.status} />
               </div>
               <div className="flex items-center gap-2 flex-wrap">
                 {auto.triggers.map((t, i) => <TriggerBadge key={i} trigger={t} />)}
                 {auto.tags.map(tag => (
-                  <span key={tag} className="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-400">{tag}</span>
+                  <span key={tag} className="text-[10px] px-1.5 py-0.5 rounded bg-[#1F1F23] text-zinc-500">{tag}</span>
                 ))}
               </div>
             </div>
-            <div className="flex items-center gap-4 text-xs text-slate-400 shrink-0">
+            <div className="flex items-center gap-4 text-xs text-zinc-500 shrink-0">
               <div className="text-right">
                 <div className="flex items-center gap-1">
                   {auto.lastRunStatus && <RunStatusIcon status={auto.lastRunStatus} />}
@@ -246,10 +246,10 @@ function AutomationsList({ automations, onSelect }: { automations: Automation[];
                   <span className="text-emerald-600">{auto.runsSuccess}</span>
                   <span className="mx-0.5">/</span>
                   <span className={auto.runsFailed > 0 ? 'text-red-500' : ''}>{auto.runsFailed}</span>
-                  <span className="ml-1 text-slate-300">runs</span>
+                  <span className="ml-1 text-zinc-600">runs</span>
                 </div>
               </div>
-              <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-amber-500 transition-colors" />
+              <ChevronRight className="w-4 h-4 text-zinc-600 group-hover:text-amber-500 transition-colors" />
             </div>
           </div>
         </button>
@@ -266,27 +266,27 @@ function TemplateGrid({ templates, onUse }: { templates: AutomationTemplate[]; o
         return (
           <div
             key={tpl.id}
-            className="p-4 rounded-xl bg-white border border-slate-200 hover:border-amber-200 hover:shadow-sm transition-all group"
+            className="p-4 rounded-xl bg-[#111113] border border-white/10 hover:border-amber-500/20 hover:shadow-[0_1px_2px_rgba(0,0,0,0.3)] transition-all group"
           >
             <div className="flex items-start gap-3">
-              <div className="w-9 h-9 rounded-lg bg-amber-50 flex items-center justify-center shrink-0">
-                <Icon className="w-4 h-4 text-amber-600" />
+              <div className="w-9 h-9 rounded-lg bg-amber-500/10 flex items-center justify-center shrink-0">
+                <Icon className="w-4 h-4 text-amber-500" />
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="text-sm font-medium text-slate-800 mb-1">{tpl.name}</h3>
-                <p className="text-xs text-slate-500 line-clamp-2 mb-3">{tpl.description}</p>
+                <h3 className="text-sm font-medium text-zinc-100 mb-1">{tpl.name}</h3>
+                <p className="text-xs text-zinc-400 line-clamp-2 mb-3">{tpl.description}</p>
                 <div className="flex items-center gap-2 flex-wrap mb-3">
                   {tpl.defaultTriggers.map((t, i) => <TriggerBadge key={i} trigger={t} />)}
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex gap-1">
                     {tpl.requiredServers.map(s => (
-                      <span key={s} className="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-400 capitalize">{s}</span>
+                      <span key={s} className="text-[10px] px-1.5 py-0.5 rounded bg-[#1F1F23] text-zinc-500 capitalize">{s}</span>
                     ))}
                   </div>
                   <button
                     onClick={() => onUse(tpl.id)}
-                    className="text-xs px-3 py-1 rounded-full bg-amber-50 text-amber-700 hover:bg-amber-100 transition-colors font-medium border border-amber-200"
+                    className="text-xs px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 hover:bg-amber-500/15 transition-colors font-medium border border-amber-500/20"
                   >
                     Use template
                   </button>
@@ -306,22 +306,22 @@ function RunHistory({ runs }: { runs: AutomationRun[] }) {
       {runs.map(run => (
         <div
           key={run.id}
-          className="flex items-center gap-4 p-3 rounded-lg bg-white border border-slate-200"
+          className="flex items-center gap-4 p-3 rounded-lg bg-[#111113] border border-white/10"
         >
           <RunStatusIcon status={run.status} />
           <div className="flex-1 min-w-0">
-            <div className="text-sm text-slate-700 truncate">{run.summary}</div>
-            <div className="text-xs text-slate-400 mt-0.5">
+            <div className="text-sm text-zinc-200 truncate">{run.summary}</div>
+            <div className="text-xs text-zinc-500 mt-0.5">
               Triggered by: {run.triggeredBy}
             </div>
           </div>
-          <div className="text-right text-xs text-slate-400 shrink-0">
+          <div className="text-right text-xs text-zinc-500 shrink-0">
             <div>{timeAgo(run.startedAt)}</div>
             <div className="mt-0.5">
               {run.prsCreated > 0 && <span className="text-emerald-600">{run.prsCreated} PR{run.prsCreated > 1 ? 's' : ''}</span>}
               {run.prsCreated > 0 && run.messagesPosted > 0 && <span className="mx-1">|</span>}
               {run.messagesPosted > 0 && <span>{run.messagesPosted} msg</span>}
-              <span className="ml-2 text-amber-600/60">{run.lucCost.toFixed(2)} LUC</span>
+              <span className="ml-2 text-amber-500/60">{run.lucCost.toFixed(2)} LUC</span>
             </div>
           </div>
         </div>
@@ -346,26 +346,26 @@ function AutomationDetail({
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <button onClick={onClose} className="text-xs text-slate-400 hover:text-slate-600 mb-2 flex items-center gap-1">
+          <button onClick={onClose} className="text-xs text-zinc-500 hover:text-zinc-300 mb-2 flex items-center gap-1">
             <ChevronRight className="w-3 h-3 rotate-180" /> Back to Automations
           </button>
-          <h2 className="text-lg font-semibold text-slate-800">{automation.name}</h2>
+          <h2 className="text-lg font-semibold text-zinc-100">{automation.name}</h2>
           <div className="flex items-center gap-2 mt-2">
             <StatusBadge status={automation.status} />
             {automation.triggers.map((t, i) => <TriggerBadge key={i} trigger={t} />)}
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <button className="p-2 rounded-lg bg-slate-50 text-slate-500 hover:bg-slate-100 transition-colors border border-slate-200">
+          <button className="p-2 rounded-lg bg-[#18181B] text-zinc-400 hover:bg-white/8 transition-colors border border-white/10">
             <Play className="w-4 h-4" />
           </button>
-          <button className="p-2 rounded-lg bg-slate-50 text-slate-500 hover:bg-slate-100 transition-colors border border-slate-200">
+          <button className="p-2 rounded-lg bg-[#18181B] text-zinc-400 hover:bg-white/8 transition-colors border border-white/10">
             <Pause className="w-4 h-4" />
           </button>
-          <button className="p-2 rounded-lg bg-slate-50 text-slate-500 hover:bg-slate-100 transition-colors border border-slate-200">
+          <button className="p-2 rounded-lg bg-[#18181B] text-zinc-400 hover:bg-white/8 transition-colors border border-white/10">
             <Settings className="w-4 h-4" />
           </button>
-          <button className="p-2 rounded-lg bg-slate-50 text-slate-500 hover:bg-slate-100 transition-colors border border-slate-200">
+          <button className="p-2 rounded-lg bg-[#18181B] text-zinc-400 hover:bg-white/8 transition-colors border border-white/10">
             <MoreHorizontal className="w-4 h-4" />
           </button>
         </div>
@@ -379,24 +379,24 @@ function AutomationDetail({
           { label: 'Last Run', value: automation.lastRunAt ? timeAgo(automation.lastRunAt) : 'Never' },
           { label: 'Total LUC', value: runs.filter(r => r.automationId === automation.id).reduce((a, b) => a + b.lucCost, 0).toFixed(2) },
         ].map(stat => (
-          <div key={stat.label} className="p-3 rounded-lg bg-white border border-slate-200">
-            <div className="text-[10px] text-slate-400 uppercase tracking-wider">{stat.label}</div>
-            <div className="text-lg font-semibold text-slate-800 mt-0.5">{stat.value}</div>
+          <div key={stat.label} className="p-3 rounded-lg bg-[#111113] border border-white/10">
+            <div className="text-[10px] text-zinc-500 uppercase tracking-wider">{stat.label}</div>
+            <div className="text-lg font-semibold text-zinc-100 mt-0.5">{stat.value}</div>
           </div>
         ))}
       </div>
 
       {/* Instructions */}
       <div>
-        <h3 className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">Instructions</h3>
-        <div className="p-4 rounded-lg bg-slate-50 border border-slate-200">
-          <pre className="text-sm text-slate-600 whitespace-pre-wrap font-mono">{automation.instructions}</pre>
+        <h3 className="text-xs font-medium text-zinc-400 uppercase tracking-wider mb-2">Instructions</h3>
+        <div className="p-4 rounded-lg bg-[#18181B] border border-white/10">
+          <pre className="text-sm text-zinc-300 whitespace-pre-wrap font-mono">{automation.instructions}</pre>
         </div>
       </div>
 
       {/* Run History */}
       <div>
-        <h3 className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">Recent Runs</h3>
+        <h3 className="text-xs font-medium text-zinc-400 uppercase tracking-wider mb-2">Recent Runs</h3>
         <RunHistory runs={runs.filter(r => r.automationId === automation.id)} />
       </div>
     </div>
@@ -445,23 +445,23 @@ export default function AutomationsPage() {
       <div className="flex items-start justify-between mb-8">
         <div>
           <div className="flex items-center gap-3 mb-1">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-100 to-amber-50 flex items-center justify-center border border-amber-200">
-              <Zap className="w-5 h-5 text-amber-600" />
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-100 to-amber-50 flex items-center justify-center border border-amber-500/20">
+              <Zap className="w-5 h-5 text-amber-500" />
             </div>
-            <h1 className="text-2xl font-bold text-slate-800">Automations</h1>
+            <h1 className="text-2xl font-bold text-zinc-100">Automations</h1>
           </div>
-          <p className="text-sm text-slate-500 mt-2 max-w-xl">
+          <p className="text-sm text-zinc-400 mt-2 max-w-xl">
             Run coding agents on a schedule or triggered by events. Automate bug fixes, documentation updates, security scans, and technical debt — all without lifting a finger.
           </p>
         </div>
-        <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-600 text-slate-800 font-medium text-sm hover:bg-amber-700 transition-colors shadow-sm">
+        <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-600 text-zinc-100 font-medium text-sm hover:bg-amber-700 transition-colors shadow-[0_1px_2px_rgba(0,0,0,0.3)]">
           <Plus className="w-4 h-4" />
           New Automation
         </button>
       </div>
 
       {/* Tab Bar */}
-      <div className="flex items-center gap-1 mb-6 border-b border-slate-200 pb-px">
+      <div className="flex items-center gap-1 mb-6 border-b border-white/10 pb-px">
         {tabs.map(tab => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.key;
@@ -471,14 +471,14 @@ export default function AutomationsPage() {
               onClick={() => { setActiveTab(tab.key); setSelectedId(null); }}
               className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-t-lg transition-colors ${
                 isActive
-                  ? 'text-amber-700 border-b-2 border-amber-600 bg-amber-50/50'
-                  : 'text-slate-400 hover:text-slate-600'
+                  ? 'text-amber-400 border-b-2 border-amber-600 bg-amber-500/10/50'
+                  : 'text-zinc-500 hover:text-zinc-300'
               }`}
             >
               <Icon className="w-4 h-4" />
               {tab.label}
               {tab.count !== undefined && (
-                <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${isActive ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-400'}`}>
+                <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${isActive ? 'bg-amber-500/15 text-amber-400' : 'bg-[#1F1F23] text-zinc-500'}`}>
                   {tab.count}
                 </span>
               )}
@@ -501,25 +501,25 @@ export default function AutomationsPage() {
               {/* Filter Bar */}
               <div className="flex items-center gap-3 mb-4">
                 <div className="relative flex-1 max-w-xs">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-600" />
                   <input
                     type="text"
                     placeholder="Search automations..."
                     value={searchQuery}
                     onChange={e => setSearchQuery(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 text-sm bg-white border border-slate-200 rounded-lg text-slate-800 placeholder:text-slate-400 outline-none focus:border-amber-300 focus:ring-2 focus:ring-amber-100"
+                    className="w-full pl-9 pr-3 py-2 text-sm bg-[#111113] border border-white/10 rounded-lg text-zinc-100 placeholder:text-zinc-500 outline-none focus:border-amber-300 focus:ring-2 focus:ring-amber-500/20"
                   />
                 </div>
                 <div className="flex items-center gap-1">
-                  <Filter className="w-4 h-4 text-slate-300" />
+                  <Filter className="w-4 h-4 text-zinc-600" />
                   {(['all', 'active', 'paused', 'draft'] as const).map(s => (
                     <button
                       key={s}
                       onClick={() => setStatusFilter(s)}
                       className={`px-2.5 py-1 text-xs rounded-md transition-colors ${
                         statusFilter === s
-                          ? 'bg-amber-50 text-amber-700 border border-amber-200'
-                          : 'text-slate-400 hover:text-slate-600 border border-transparent'
+                          ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                          : 'text-zinc-500 hover:text-zinc-300 border border-transparent'
                       }`}
                     >
                       {s === 'all' ? 'All' : s.charAt(0).toUpperCase() + s.slice(1)}
@@ -532,9 +532,9 @@ export default function AutomationsPage() {
                 <AutomationsList automations={filteredAutomations} onSelect={setSelectedId} />
               ) : (
                 <div className="text-center py-16">
-                  <Zap className="w-10 h-10 text-slate-200 mx-auto mb-3" />
-                  <p className="text-slate-400 text-sm">No automations found</p>
-                  <button className="mt-4 text-sm text-amber-600 hover:text-amber-700 transition-colors">
+                  <Zap className="w-10 h-10 text-zinc-300 mx-auto mb-3" />
+                  <p className="text-zinc-500 text-sm">No automations found</p>
+                  <button className="mt-4 text-sm text-amber-500 hover:text-amber-400 transition-colors">
                     Browse templates to get started
                   </button>
                 </div>

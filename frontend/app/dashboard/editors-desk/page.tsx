@@ -58,7 +58,7 @@ const TIER_BADGE: Record<string, string> = {
   BLUE_CHIP: 'bg-cyan-500/15 text-cyan-400 border-cyan-500/25',
   PROSPECT: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/25',
   SLEEPER: 'bg-purple-500/15 text-purple-400 border-purple-500/25',
-  DEVELOPMENTAL: 'bg-slate-400/15 text-slate-500 border-slate-400/25',
+  DEVELOPMENTAL: 'bg-zinc-500/15 text-zinc-400 border-white/20/25',
 };
 
 const TYPE_BADGE: Record<string, string> = {
@@ -188,7 +188,7 @@ export default function EditorsDesk() {
 
   return (
     <OwnerGate>
-      <div className="min-h-screen bg-[#F8FAFC] text-slate-900 p-6">
+      <div className="min-h-screen bg-[#F8FAFC] text-zinc-100 p-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
@@ -198,18 +198,18 @@ export default function EditorsDesk() {
                 GATE 2
               </span>
             </h1>
-            <p className="text-slate-500 text-sm mt-1">
+            <p className="text-zinc-400 text-sm mt-1">
               Commander approval — Ship, Reject, or Edit before publication
             </p>
           </div>
 
           <div className="flex items-center gap-3">
             <div className="text-right">
-              <p className="text-xs text-slate-500 font-mono">THREE-GATE SYSTEM</p>
+              <p className="text-xs text-zinc-400 font-mono">THREE-GATE SYSTEM</p>
               <div className="flex gap-2 mt-1">
                 <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400">G1 Auto</span>
                 <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-400 ring-1 ring-amber-500/30">G2 You</span>
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-400/15 text-slate-500">G3 Monitor</span>
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-500/15 text-zinc-400">G3 Monitor</span>
               </div>
             </div>
           </div>
@@ -223,7 +223,7 @@ export default function EditorsDesk() {
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex gap-2 mb-4 border-b border-slate-200 pb-3">
+        <div className="flex gap-2 mb-4 border-b border-white/10 pb-3">
           {(['pending', 'approved', 'rejected'] as const).map(tab => (
             <button
               key={tab}
@@ -231,7 +231,7 @@ export default function EditorsDesk() {
               className={`px-4 py-2 text-sm rounded-lg transition-all ${
                 activeTab === tab
                   ? 'bg-amber-500/15 text-amber-400 border border-amber-500/25'
-                  : 'text-slate-500 hover:text-slate-600 border border-transparent'
+                  : 'text-zinc-400 hover:text-zinc-300 border border-transparent'
               }`}
             >
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -246,14 +246,14 @@ export default function EditorsDesk() {
         {loading ? (
           <div className="text-center py-20">
             <div className="w-6 h-6 border-2 border-amber-500/30 border-t-amber-400 rounded-full animate-spin mx-auto mb-3" />
-            <p className="text-slate-500 text-sm">Loading content queue...</p>
+            <p className="text-zinc-400 text-sm">Loading content queue...</p>
           </div>
         ) : filteredQueue.length === 0 ? (
           <div className="text-center py-20">
-            <p className="text-slate-500 text-lg">
+            <p className="text-zinc-400 text-lg">
               {activeTab === 'pending' ? 'No content awaiting review' : `No ${activeTab} content`}
             </p>
-            <p className="text-slate-500 text-sm mt-1">
+            <p className="text-zinc-400 text-sm mt-1">
               {activeTab === 'pending' ? 'Trigger a scout run in War Room to generate content' : ''}
             </p>
           </div>
@@ -267,11 +267,11 @@ export default function EditorsDesk() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.2 }}
-                  className="bg-white border border-slate-200 shadow-sm rounded-xl overflow-hidden"
+                  className="bg-[#111113] border border-white/10 shadow-[0_1px_2px_rgba(0,0,0,0.3)] rounded-xl overflow-hidden"
                 >
                   {/* Card Header */}
                   <div
-                    className="flex items-center gap-3 p-4 cursor-pointer hover:bg-slate-50 transition-colors"
+                    className="flex items-center gap-3 p-4 cursor-pointer hover:bg-white/5 transition-colors"
                     onClick={() => setExpandedId(expandedId === item.id ? null : item.id)}
                   >
                     {/* Type Badge */}
@@ -282,7 +282,7 @@ export default function EditorsDesk() {
                     {/* Title & Meta */}
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-sm truncate">{item.title}</p>
-                      <p className="text-xs text-slate-500 mt-0.5">
+                      <p className="text-xs text-zinc-400 mt-0.5">
                         {item.prospectName} &middot; {item.generatedBy} &middot; {new Date(item.generatedAt).toLocaleString()}
                       </p>
                     </div>
@@ -299,7 +299,7 @@ export default function EditorsDesk() {
                         </button>
                         <button
                           onClick={() => startEditing(item)}
-                          className="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 text-slate-600 border border-slate-300 hover:bg-slate-200 transition-all"
+                          className="px-3 py-1.5 text-xs font-medium rounded-lg bg-[#1F1F23] text-zinc-300 border border-white/15 hover:bg-[#1F1F23] transition-all"
                         >
                           Edit
                         </button>
@@ -326,7 +326,7 @@ export default function EditorsDesk() {
 
                     {/* Expand arrow */}
                     <svg
-                      className={`w-4 h-4 text-slate-500 transition-transform ${expandedId === item.id ? 'rotate-180' : ''}`}
+                      className={`w-4 h-4 text-zinc-400 transition-transform ${expandedId === item.id ? 'rotate-180' : ''}`}
                       fill="none" viewBox="0 0 24 24" stroke="currentColor"
                     >
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -341,14 +341,14 @@ export default function EditorsDesk() {
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.2 }}
-                        className="border-t border-slate-200"
+                        className="border-t border-white/10"
                       >
                         {editingId === item.id ? (
                           <div className="p-4">
                             <textarea
                               value={editContent}
                               onChange={e => setEditContent(e.target.value)}
-                              className="w-full h-64 bg-white border border-slate-200 rounded-lg p-3 text-sm text-slate-900 font-mono resize-y outline-none focus:border-amber-500/50"
+                              className="w-full h-64 bg-[#111113] border border-white/10 rounded-lg p-3 text-sm text-zinc-100 font-mono resize-y outline-none focus:border-amber-500/50"
                             />
                             <div className="flex gap-2 mt-3">
                               <button
@@ -359,7 +359,7 @@ export default function EditorsDesk() {
                               </button>
                               <button
                                 onClick={() => { setEditingId(null); setEditContent(''); }}
-                                className="px-4 py-2 text-xs font-medium rounded-lg bg-slate-100 text-slate-500 hover:bg-slate-200 transition-all"
+                                className="px-4 py-2 text-xs font-medium rounded-lg bg-[#1F1F23] text-zinc-400 hover:bg-[#1F1F23] transition-all"
                               >
                                 Cancel
                               </button>
@@ -368,13 +368,13 @@ export default function EditorsDesk() {
                         ) : (
                           <div className="p-4">
                             {item.type === 'PODCAST' ? (
-                              <div className="bg-slate-50 rounded-lg p-4">
-                                <p className="text-xs text-slate-500 font-mono mb-2">PODCAST SCRIPT / AUDIO</p>
-                                <p className="text-sm text-slate-600 whitespace-pre-wrap">{item.content}</p>
+                              <div className="bg-[#18181B] rounded-lg p-4">
+                                <p className="text-xs text-zinc-400 font-mono mb-2">PODCAST SCRIPT / AUDIO</p>
+                                <p className="text-sm text-zinc-300 whitespace-pre-wrap">{item.content}</p>
                               </div>
                             ) : (
-                              <div className="prose prose-invert prose-sm max-w-none prose-headings:text-slate-900 prose-p:text-slate-500 prose-strong:text-slate-900 prose-code:text-amber-400">
-                                <pre className="bg-slate-50 rounded-lg p-4 text-xs text-slate-600 whitespace-pre-wrap overflow-x-auto">
+                              <div className="prose prose-invert prose-sm max-w-none prose-headings:text-zinc-100 prose-p:text-zinc-400 prose-strong:text-zinc-100 prose-code:text-amber-400">
+                                <pre className="bg-[#18181B] rounded-lg p-4 text-xs text-zinc-300 whitespace-pre-wrap overflow-x-auto">
                                   {item.content}
                                 </pre>
                               </div>
@@ -395,13 +395,13 @@ export default function EditorsDesk() {
           <div className="mt-8">
             <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
               Active Dossiers
-              <span className="text-xs font-mono text-slate-500">{dossiers.length}</span>
+              <span className="text-xs font-mono text-zinc-400">{dossiers.length}</span>
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {dossiers.slice(0, 12).map((d: DossierSummary) => (
                 <div
                   key={d.dossierId}
-                  className="bg-white border border-slate-200 shadow-sm rounded-xl p-4"
+                  className="bg-[#111113] border border-white/10 shadow-[0_1px_2px_rgba(0,0,0,0.3)] rounded-xl p-4"
                 >
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="font-medium text-sm truncate">{d.prospectName}</h3>
@@ -411,10 +411,10 @@ export default function EditorsDesk() {
                   </div>
                   <div className="flex items-center gap-3 mb-2">
                     <span className="text-2xl font-mono font-bold text-amber-400">{d.preliminaryGrade}</span>
-                    <span className="text-slate-500 text-xs">/100</span>
+                    <span className="text-zinc-400 text-xs">/100</span>
                     <span className={`text-xs ml-auto ${
                       d.debateWinner === 'BULL' ? 'text-emerald-400' :
-                      d.debateWinner === 'BEAR' ? 'text-red-400' : 'text-slate-500'
+                      d.debateWinner === 'BEAR' ? 'text-red-400' : 'text-zinc-400'
                     }`}>
                       {d.debateWinner === 'BULL' ? 'Bull Won' : d.debateWinner === 'BEAR' ? 'Bear Won' : 'Split'}
                     </span>
@@ -428,14 +428,14 @@ export default function EditorsDesk() {
                       { label: 'C', value: d.grocScore.competitionLevel },
                     ].map(comp => (
                       <div key={comp.label} className="flex items-center gap-2">
-                        <span className="text-[10px] font-mono text-slate-500 w-3">{comp.label}</span>
-                        <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                        <span className="text-[10px] font-mono text-zinc-400 w-3">{comp.label}</span>
+                        <div className="flex-1 h-1.5 bg-[#1F1F23] rounded-full overflow-hidden">
                           <div
                             className="h-full bg-amber-500/60 rounded-full transition-all"
                             style={{ width: `${comp.value}%` }}
                           />
                         </div>
-                        <span className="text-[10px] font-mono text-slate-500 w-6 text-right">{comp.value}</span>
+                        <span className="text-[10px] font-mono text-zinc-400 w-6 text-right">{comp.value}</span>
                       </div>
                     ))}
                   </div>
@@ -464,7 +464,7 @@ function StatCard({ label, value, color }: { label: string; value: number; color
   return (
     <div className={`rounded-xl border p-4 text-center ${colorMap[color]}`}>
       <p className="text-3xl font-mono font-bold">{value}</p>
-      <p className="text-xs text-slate-500 mt-1">{label}</p>
+      <p className="text-xs text-zinc-400 mt-1">{label}</p>
     </div>
   );
 }

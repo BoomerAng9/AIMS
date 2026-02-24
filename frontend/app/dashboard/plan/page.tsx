@@ -41,7 +41,7 @@ function projectProgress(p: Project): number {
 function StatusBadge({ status }: { status: "in_progress" | "pending" | "completed" }) {
   const config = {
     in_progress: { icon: Loader2, label: "In Progress", color: "text-gold bg-gold/10 border-gold/20", spin: true },
-    pending: { icon: Clock, label: "Queued", color: "text-slate-400 bg-slate-50 border-wireframe-stroke", spin: false },
+    pending: { icon: Clock, label: "Queued", color: "text-zinc-500 bg-[#18181B] border-wireframe-stroke", spin: false },
     completed: { icon: CheckCircle2, label: "Complete", color: "text-emerald-400 bg-emerald-400/10 border-emerald-400/30", spin: false },
   };
   const c = config[status];
@@ -78,10 +78,10 @@ export default function PlanPage() {
     <div className="space-y-6 animate-in fade-in duration-700">
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-800 font-display">
+          <h1 className="text-2xl font-semibold tracking-tight text-zinc-100 font-display">
             MISSION PLAN
           </h1>
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-zinc-400">
             Track active objectives orchestrated by ACHEEVY and executed by your Boomer_Ang team.
           </p>
         </div>
@@ -89,7 +89,7 @@ export default function PlanPage() {
           <button
             onClick={fetchProjects}
             disabled={loading}
-            className="flex items-center gap-2 rounded-full border border-wireframe-stroke px-4 py-2.5 text-xs font-semibold text-slate-500 transition-all hover:border-gold/20 hover:text-gold"
+            className="flex items-center gap-2 rounded-full border border-wireframe-stroke px-4 py-2.5 text-xs font-semibold text-zinc-400 transition-all hover:border-gold/20 hover:text-gold"
           >
             <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
             Refresh
@@ -121,16 +121,16 @@ export default function PlanPage() {
             return (
               <div
                 key={project.id}
-                className="group rounded-3xl border border-wireframe-stroke bg-slate-50/70 p-6 backdrop-blur-2xl transition-all hover:border-gold/20"
+                className="group rounded-3xl border border-wireframe-stroke bg-[#18181B]/70 p-6 backdrop-blur-2xl transition-all hover:border-gold/20"
               >
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-50 text-gold">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#18181B] text-gold">
                       <Target size={20} />
                     </div>
                     <div>
-                      <h3 className="text-sm font-semibold text-slate-800">{project.name}</h3>
-                      <p className="text-[10px] text-slate-400 mt-0.5">
+                      <h3 className="text-sm font-semibold text-zinc-100">{project.name}</h3>
+                      <p className="text-[10px] text-zinc-500 mt-0.5">
                         Created {new Date(project.createdAt).toLocaleDateString()}
                         {project.description && ` · ${project.description.slice(0, 60)}${project.description.length > 60 ? '...' : ''}`}
                       </p>
@@ -142,10 +142,10 @@ export default function PlanPage() {
                 {/* Progress Bar */}
                 <div className="mt-5">
                   <div className="flex justify-between text-[10px] mb-1.5">
-                    <span className="text-slate-400 uppercase tracking-wider">Progress</span>
+                    <span className="text-zinc-500 uppercase tracking-wider">Progress</span>
                     <span className="text-gold font-semibold">{progress}%</span>
                   </div>
-                  <div className="h-1.5 w-full rounded-full bg-slate-50 overflow-hidden">
+                  <div className="h-1.5 w-full rounded-full bg-[#18181B] overflow-hidden">
                     <div
                       className="h-full rounded-full bg-gradient-to-r from-gold to-gold transition-all"
                       style={{ width: `${progress}%` }}
@@ -164,7 +164,7 @@ export default function PlanPage() {
                           className={`flex items-center gap-2 rounded-xl p-2.5 text-xs ${
                             done
                               ? "bg-emerald-400/5 text-emerald-400"
-                              : "bg-slate-50 text-slate-400"
+                              : "bg-[#18181B] text-zinc-500"
                           }`}
                         >
                           {done ? (
@@ -184,9 +184,9 @@ export default function PlanPage() {
 
           {/* Empty state CTA */}
           {projects.length === 0 && (
-            <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-wireframe-stroke bg-slate-50/30 p-10 text-center">
-              <Target size={32} className="text-slate-300" />
-              <p className="mt-3 text-sm text-slate-400">
+            <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-wireframe-stroke bg-[#18181B]/30 p-10 text-center">
+              <Target size={32} className="text-zinc-600" />
+              <p className="mt-3 text-sm text-zinc-500">
                 Start a conversation with ACHEEVY to create your next mission plan.
               </p>
               <button

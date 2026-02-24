@@ -634,19 +634,19 @@ function ModelCard({
       <div className="flex items-start justify-between mb-2">
         <div>
           {/* User-friendly name first, technical name smaller */}
-          <h3 className="text-lg font-semibold text-slate-800">{model.friendlyName}</h3>
+          <h3 className="text-lg font-semibold text-zinc-100">{model.friendlyName}</h3>
           <p className="text-xs text-gray-500">{model.name} • {model.provider}</p>
         </div>
         <button
           onClick={onToggle}
           className={`w-10 h-10 rounded-lg flex items-center justify-center transition-all ${
-            enabled ? 'bg-green-500' : 'bg-slate-100 hover:bg-slate-200'
+            enabled ? 'bg-green-500' : 'bg-[#1F1F23] hover:bg-[#1F1F23]'
           }`}
         >
           {enabled ? (
-            <CheckIcon className="w-5 h-5 text-slate-800" />
+            <CheckIcon className="w-5 h-5 text-zinc-100" />
           ) : (
-            <PlusIcon className="w-5 h-5 text-slate-500" />
+            <PlusIcon className="w-5 h-5 text-zinc-400" />
           )}
         </button>
       </div>
@@ -678,7 +678,7 @@ function ModelCard({
       </div>
 
       {(model.inputCost || model.outputCost) && (
-        <div className="mt-3 pt-3 border-t border-slate-200 flex justify-between text-xs text-gray-500">
+        <div className="mt-3 pt-3 border-t border-white/10 flex justify-between text-xs text-gray-500">
           <span>Input: {model.inputCost}</span>
           <span>Output: {model.outputCost}</span>
         </div>
@@ -710,19 +710,19 @@ function ToolCard({
     >
       <div className="flex items-start justify-between mb-3">
         <div>
-          <h3 className="text-lg font-semibold text-slate-800">{tool.name}</h3>
+          <h3 className="text-lg font-semibold text-zinc-100">{tool.name}</h3>
           <p className="text-sm text-gray-400">{tool.provider}</p>
         </div>
         <button
           onClick={onToggle}
           className={`w-10 h-10 rounded-lg flex items-center justify-center transition-all ${
-            enabled ? 'bg-green-500' : 'bg-slate-100 hover:bg-slate-200'
+            enabled ? 'bg-green-500' : 'bg-[#1F1F23] hover:bg-[#1F1F23]'
           }`}
         >
           {enabled ? (
-            <CheckIcon className="w-5 h-5 text-slate-800" />
+            <CheckIcon className="w-5 h-5 text-zinc-100" />
           ) : (
-            <PlusIcon className="w-5 h-5 text-slate-500" />
+            <PlusIcon className="w-5 h-5 text-zinc-400" />
           )}
         </button>
       </div>
@@ -771,14 +771,14 @@ function ConsumptionCard({ model }: { model: ConsumptionModel }) {
         </div>
       )}
 
-      <h3 className="text-lg font-semibold text-slate-800 mb-2">{model.name}</h3>
+      <h3 className="text-lg font-semibold text-zinc-100 mb-2">{model.name}</h3>
       <p className="text-sm text-gray-400 mb-4">{model.description}</p>
 
       <ul className="space-y-2">
         {model.features.map((feature) => (
           <li key={feature} className="flex items-center gap-2 text-sm">
             <SparkleIcon className="w-4 h-4" style={{ color: AIMS_CIRCUIT_COLORS.primary }} />
-            <span className="text-slate-500">{feature}</span>
+            <span className="text-zinc-400">{feature}</span>
           </li>
         ))}
       </ul>
@@ -940,7 +940,7 @@ export default function ModelGardenPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search models or providers..."
-                className="w-full pl-12 pr-4 py-3 rounded-lg bg-white border border-slate-200 text-slate-800 placeholder:text-gray-400 focus:border-gold/30 outline-none"
+                className="w-full pl-12 pr-4 py-3 rounded-lg bg-[#111113] border border-white/10 text-zinc-100 placeholder:text-gray-400 focus:border-gold/30 outline-none"
               />
             </div>
 
@@ -1127,7 +1127,7 @@ export default function ModelGardenPage() {
                     className="p-4 rounded-xl text-center"
                     style={{ backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0' }}
                   >
-                    <div className="text-lg font-medium text-slate-800">Infrastructure</div>
+                    <div className="text-lg font-medium text-zinc-100">Infrastructure</div>
                     <div className="text-sm text-gray-400">
                       OpenRouter Gateway • Cloudflare Workers • Edge Deployment
                     </div>

@@ -184,7 +184,7 @@ export default function PlugPage() {
         <main className="flex-1 container max-w-4xl py-16 px-4 text-center">
           <Card className="p-12">
             <Trophy className="h-16 w-16 text-zinc-600 mx-auto mb-4" />
-            <h1 className="text-2xl font-display text-slate-800 mb-2">Plug Not Available</h1>
+            <h1 className="text-2xl font-display text-zinc-100 mb-2">Plug Not Available</h1>
             <p className="text-zinc-400 mb-6">
               This plug is currently in development. Check back soon.
             </p>
@@ -208,7 +208,7 @@ export default function PlugPage() {
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
           <div className="flex items-center gap-4">
             <Link href="/plugs">
-              <Button variant="ghost" size="icon" className="text-zinc-400 hover:text-slate-800">
+              <Button variant="ghost" size="icon" className="text-zinc-400 hover:text-zinc-100">
                 <ArrowLeft className="h-5 w-5" />
               </Button>
             </Link>
@@ -216,7 +216,7 @@ export default function PlugPage() {
               <Trophy className="h-7 w-7 text-gold" />
             </div>
             <div>
-              <h1 className="text-2xl font-display text-slate-800 tracking-wide">Perform</h1>
+              <h1 className="text-2xl font-display text-zinc-100 tracking-wide">Perform</h1>
               <p className="text-zinc-500 text-sm">Sports Analytics &middot; Scouting Platform</p>
             </div>
           </div>
@@ -229,7 +229,7 @@ export default function PlugPage() {
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex gap-1 mb-6 overflow-x-auto border-b border-slate-100 pb-px">
+        <div className="flex gap-1 mb-6 overflow-x-auto border-b border-white/8 pb-px">
           {TABS.map((tab) => (
             <button
               key={tab.key}
@@ -237,8 +237,8 @@ export default function PlugPage() {
               className={cn(
                 "flex items-center gap-2 px-4 py-2.5 text-sm transition-all rounded-t-lg",
                 activeTab === tab.key
-                  ? "bg-slate-50 text-gold border-b-2 border-gold"
-                  : "text-zinc-500 hover:text-zinc-300 hover:bg-slate-50"
+                  ? "bg-[#18181B] text-gold border-b-2 border-gold"
+                  : "text-zinc-500 hover:text-zinc-300 hover:bg-white/5"
               )}
             >
               <tab.icon className="h-4 w-4" />
@@ -272,9 +272,9 @@ export default function PlugPage() {
                           const pct = total > 0 ? (count / total) * 100 : 0;
                           return (
                             <div key={stage.key} className="flex-1 text-center">
-                              <div className="text-2xl font-display text-slate-800 mb-1">{count}</div>
+                              <div className="text-2xl font-display text-zinc-100 mb-1">{count}</div>
                               <div className="text-[9px] uppercase tracking-wider text-zinc-500 mb-2">{stage.label}</div>
-                              <div className="h-1.5 rounded-full bg-slate-50 overflow-hidden">
+                              <div className="h-1.5 rounded-full bg-[#18181B] overflow-hidden">
                                 <div className={`h-full ${stage.color} rounded-full`} style={{ width: `${Math.max(pct, 8)}%` }} />
                               </div>
                             </div>
@@ -302,7 +302,7 @@ export default function PlugPage() {
                         .map((ath, i) => (
                           <div
                             key={ath.id}
-                            className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer"
+                            className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
                             onClick={() => {
                               setSelectedAthlete(ath);
                               setActiveTab("athletes");
@@ -310,7 +310,7 @@ export default function PlugPage() {
                           >
                             <span className="text-xs text-zinc-600 w-4 font-display">{i + 1}</span>
                             <div className="flex-1 min-w-0">
-                              <p className="text-sm text-slate-800 truncate">
+                              <p className="text-sm text-zinc-100 truncate">
                                 {ath.firstName} {ath.lastName}
                               </p>
                               <p className="text-[10px] text-zinc-500">
@@ -338,13 +338,13 @@ export default function PlugPage() {
                       {recentReports.map((rpt) => (
                         <div
                           key={rpt.id}
-                          className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50 transition-colors"
+                          className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors"
                         >
                           <div className={cn("h-8 w-8 rounded-lg flex items-center justify-center font-display text-sm font-bold", gradeBg(rpt.overallGrade), "text-black")}>
                             {rpt.overallGrade}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm text-slate-800 truncate">{rpt.athleteName}</p>
+                            <p className="text-sm text-zinc-100 truncate">{rpt.athleteName}</p>
                             <p className="text-[10px] text-zinc-500 capitalize">
                               {rpt.event} &middot; {rpt.date}
                             </p>
@@ -358,7 +358,7 @@ export default function PlugPage() {
                 {/* Quick Stats */}
                 <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
                   {[
-                    { label: "Total Athletes", value: athletes.length, color: "text-slate-800" },
+                    { label: "Total Athletes", value: athletes.length, color: "text-zinc-100" },
                     { label: "Avg Grade", value: athletes.length > 0 ? Math.round(athletes.reduce((s, a) => s + a.scoutingGrade, 0) / athletes.length) : 0, color: "text-gold" },
                     { label: "Reports Filed", value: recentReports.length, color: "text-cyan-400" },
                     { label: "Active Scouts", value: 3, color: "text-emerald-400" },
@@ -381,7 +381,7 @@ export default function PlugPage() {
                     <Card
                       key={ath.id}
                       className={cn(
-                        "cursor-pointer transition-all hover:bg-slate-50",
+                        "cursor-pointer transition-all hover:bg-white/5",
                         selectedAthlete?.id === ath.id && "border-gold/30 bg-gold/5"
                       )}
                       onClick={() => {
@@ -406,7 +406,7 @@ export default function PlugPage() {
                           {/* Info */}
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1">
-                              <p className="text-base text-slate-800 font-medium">
+                              <p className="text-base text-zinc-100 font-medium">
                                 {ath.firstName} {ath.lastName}
                               </p>
                               <span className={cn("text-[9px] uppercase tracking-wider px-2 py-0.5 rounded-full border", STATUS_COLORS[ath.recruitmentStatus] || "bg-zinc-500/20 text-zinc-400 border-zinc-500/30")}>
@@ -418,7 +418,7 @@ export default function PlugPage() {
                             </p>
                             <div className="flex gap-1.5 mt-2">
                               {ath.tags.map((tag) => (
-                                <span key={tag} className="text-[9px] bg-slate-50 text-zinc-500 rounded px-1.5 py-0.5">
+                                <span key={tag} className="text-[9px] bg-[#18181B] text-zinc-500 rounded px-1.5 py-0.5">
                                   {tag}
                                 </span>
                               ))}
@@ -428,15 +428,15 @@ export default function PlugPage() {
                           {/* Measurables */}
                           <div className="hidden md:flex gap-4 text-center">
                             <div>
-                              <div className="text-sm font-display text-slate-800">{ath.height}</div>
+                              <div className="text-sm font-display text-zinc-100">{ath.height}</div>
                               <div className="text-[9px] text-zinc-600 uppercase">Height</div>
                             </div>
                             <div>
-                              <div className="text-sm font-display text-slate-800">{ath.weight}</div>
+                              <div className="text-sm font-display text-zinc-100">{ath.weight}</div>
                               <div className="text-[9px] text-zinc-600 uppercase">Weight</div>
                             </div>
                             <div>
-                              <div className="text-sm font-display text-slate-800">{ath.gpa}</div>
+                              <div className="text-sm font-display text-zinc-100">{ath.gpa}</div>
                               <div className="text-[9px] text-zinc-600 uppercase">GPA</div>
                             </div>
                           </div>
@@ -461,16 +461,16 @@ export default function PlugPage() {
                         </CardHeader>
                         <CardContent className="space-y-4">
                           <div className="grid grid-cols-3 gap-2 text-center">
-                            <div className="bg-slate-50 rounded-lg p-2">
-                              <div className="text-lg font-display text-slate-800">{selectedAthlete.age}</div>
+                            <div className="bg-[#18181B] rounded-lg p-2">
+                              <div className="text-lg font-display text-zinc-100">{selectedAthlete.age}</div>
                               <div className="text-[9px] text-zinc-500 uppercase">Age</div>
                             </div>
-                            <div className="bg-slate-50 rounded-lg p-2">
-                              <div className="text-lg font-display text-slate-800">{selectedAthlete.height}</div>
+                            <div className="bg-[#18181B] rounded-lg p-2">
+                              <div className="text-lg font-display text-zinc-100">{selectedAthlete.height}</div>
                               <div className="text-[9px] text-zinc-500 uppercase">Height</div>
                             </div>
-                            <div className="bg-slate-50 rounded-lg p-2">
-                              <div className="text-lg font-display text-slate-800">{selectedAthlete.weight}</div>
+                            <div className="bg-[#18181B] rounded-lg p-2">
+                              <div className="text-lg font-display text-zinc-100">{selectedAthlete.weight}</div>
                               <div className="text-[9px] text-zinc-500 uppercase">lbs</div>
                             </div>
                           </div>
@@ -517,7 +517,7 @@ export default function PlugPage() {
                                   <div key={key} className="flex items-center gap-2">
                                     <Icon className="h-3.5 w-3.5 text-zinc-500" />
                                     <span className="text-xs text-zinc-400 capitalize w-20">{key}</span>
-                                    <div className="flex-1 h-1.5 bg-slate-50 rounded-full overflow-hidden">
+                                    <div className="flex-1 h-1.5 bg-[#18181B] rounded-full overflow-hidden">
                                       <div className={cn("h-full rounded-full", gradeBg(val))} style={{ width: `${val}%` }} />
                                     </div>
                                     <span className={cn("text-sm font-display font-bold w-8 text-right", gradeColor(val))}>
@@ -529,9 +529,9 @@ export default function PlugPage() {
                             </div>
 
                             {/* Projection */}
-                            <div className="bg-slate-50 rounded-lg p-3">
+                            <div className="bg-[#18181B] rounded-lg p-3">
                               <div className="text-[9px] uppercase tracking-wider text-zinc-500 mb-1">Projection</div>
-                              <div className="text-sm text-slate-800 capitalize font-display">{generatedReport.projection}</div>
+                              <div className="text-sm text-zinc-100 capitalize font-display">{generatedReport.projection}</div>
                             </div>
 
                             {/* Strengths / Weaknesses */}
@@ -551,7 +551,7 @@ export default function PlugPage() {
                             </div>
 
                             {/* Narrative */}
-                            <div className="bg-slate-50 rounded-lg p-3">
+                            <div className="bg-[#18181B] rounded-lg p-3">
                               <div className="text-[9px] uppercase tracking-wider text-zinc-500 mb-1.5">Narrative</div>
                               <p className="text-xs text-zinc-300 leading-relaxed">{generatedReport.narrative}</p>
                             </div>
@@ -580,12 +580,12 @@ export default function PlugPage() {
                   <CardContent>
                     <div className="space-y-3">
                       {recentReports.map((rpt) => (
-                        <div key={rpt.id} className="flex items-center gap-4 p-3 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors">
+                        <div key={rpt.id} className="flex items-center gap-4 p-3 rounded-lg bg-[#18181B] hover:bg-white/8 transition-colors">
                           <div className={cn("h-10 w-10 rounded-lg flex items-center justify-center font-display text-sm font-bold", gradeBg(rpt.overallGrade), "text-black")}>
                             {rpt.overallGrade}
                           </div>
                           <div className="flex-1">
-                            <p className="text-sm text-slate-800">{rpt.athleteName}</p>
+                            <p className="text-sm text-zinc-100">{rpt.athleteName}</p>
                             <p className="text-xs text-zinc-500 capitalize">{rpt.event} evaluation &middot; {rpt.date}</p>
                           </div>
                           <Button variant="glass" size="sm" className="text-xs">
@@ -626,8 +626,8 @@ export default function PlugPage() {
                         </div>
                         <div className="space-y-2">
                           {stageAthletes.map((ath) => (
-                            <Card key={ath.id} className="p-3 cursor-pointer hover:bg-slate-50 transition-colors" onClick={() => { setSelectedAthlete(ath); setActiveTab("athletes"); }}>
-                              <p className="text-sm text-slate-800 truncate">{ath.firstName} {ath.lastName}</p>
+                            <Card key={ath.id} className="p-3 cursor-pointer hover:bg-white/5 transition-colors" onClick={() => { setSelectedAthlete(ath); setActiveTab("athletes"); }}>
+                              <p className="text-sm text-zinc-100 truncate">{ath.firstName} {ath.lastName}</p>
                               <p className="text-[10px] text-zinc-500">{ath.position}</p>
                               <div className={cn("text-sm font-display font-bold mt-1", gradeColor(ath.scoutingGrade))}>
                                 {ath.scoutingGrade}
@@ -635,7 +635,7 @@ export default function PlugPage() {
                             </Card>
                           ))}
                           {stageAthletes.length === 0 && (
-                            <div className="border border-dashed border-slate-200 rounded-xl p-4 text-center">
+                            <div className="border border-dashed border-white/10 rounded-xl p-4 text-center">
                               <p className="text-[10px] text-zinc-600">No athletes</p>
                             </div>
                           )}
@@ -666,13 +666,13 @@ export default function PlugPage() {
                       ].map((bucket) => (
                         <div key={bucket.range} className="flex items-center gap-3">
                           <span className="text-xs text-zinc-400 w-36">{bucket.range}</span>
-                          <div className="flex-1 h-2 bg-slate-50 rounded-full overflow-hidden">
+                          <div className="flex-1 h-2 bg-[#18181B] rounded-full overflow-hidden">
                             <div
                               className={cn("h-full rounded-full", bucket.color)}
                               style={{ width: `${athletes.length > 0 ? (bucket.count / athletes.length) * 100 : 0}%` }}
                             />
                           </div>
-                          <span className="text-sm font-display text-slate-800 w-6 text-right">{bucket.count}</span>
+                          <span className="text-sm font-display text-zinc-100 w-6 text-right">{bucket.count}</span>
                         </div>
                       ))}
                     </div>
@@ -693,8 +693,8 @@ export default function PlugPage() {
                           return acc;
                         }, {})
                       ).map(([sport, count]) => (
-                        <div key={sport} className="flex items-center justify-between p-2 rounded-lg bg-slate-50">
-                          <span className="text-sm text-slate-800 capitalize">{sport}</span>
+                        <div key={sport} className="flex items-center justify-between p-2 rounded-lg bg-[#18181B]">
+                          <span className="text-sm text-zinc-100 capitalize">{sport}</span>
                           <span className="text-sm font-display text-gold">{count}</span>
                         </div>
                       ))}
@@ -709,25 +709,25 @@ export default function PlugPage() {
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                      <div className="bg-slate-50 rounded-lg p-4">
+                      <div className="bg-[#18181B] rounded-lg p-4">
                         <div className="text-2xl font-display text-emerald-400 font-bold">
                           {athletes.length > 0 ? Math.round(athletes.reduce((s, a) => s + a.scoutingGrade, 0) / athletes.length) : 0}
                         </div>
                         <div className="text-[10px] text-zinc-500 uppercase mt-1">Avg Scout Grade</div>
                       </div>
-                      <div className="bg-slate-50 rounded-lg p-4">
+                      <div className="bg-[#18181B] rounded-lg p-4">
                         <div className="text-2xl font-display text-gold font-bold">
                           {athletes.length > 0 ? Math.max(...athletes.map((a) => a.scoutingGrade)) : 0}
                         </div>
                         <div className="text-[10px] text-zinc-500 uppercase mt-1">Highest Grade</div>
                       </div>
-                      <div className="bg-slate-50 rounded-lg p-4">
+                      <div className="bg-[#18181B] rounded-lg p-4">
                         <div className="text-2xl font-display text-cyan-400 font-bold">
                           {athletes.filter((a) => a.gpa >= 3.5).length}
                         </div>
                         <div className="text-[10px] text-zinc-500 uppercase mt-1">Academic Qualifiers</div>
                       </div>
-                      <div className="bg-slate-50 rounded-lg p-4">
+                      <div className="bg-[#18181B] rounded-lg p-4">
                         <div className="text-2xl font-display text-violet-400 font-bold">
                           {new Set(athletes.map((a) => a.location.state)).size}
                         </div>

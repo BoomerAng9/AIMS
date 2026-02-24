@@ -192,17 +192,17 @@ export default function BlockWisePage() {
   const isPurchaseBelowMax = inputs.purchasePrice <= results.maxOffer;
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 p-4 md:p-6">
+    <div className="min-h-screen bg-[#F8FAFC] text-zinc-100 p-4 md:p-6">
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-3">
           <span className="text-emerald-400">BlockWise</span>
-          <span className="text-slate-500 font-normal">AI</span>
+          <span className="text-zinc-400 font-normal">AI</span>
           <span className="text-[10px] font-mono px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 ml-1">
             FLIP CALCULATOR
           </span>
         </h1>
-        <p className="text-slate-500 text-sm mt-1">
+        <p className="text-zinc-400 text-sm mt-1">
           Stop guessing. Know your numbers before you make an offer.
         </p>
       </div>
@@ -222,13 +222,13 @@ export default function BlockWisePage() {
       >
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <p className="text-xs font-mono text-slate-500 mb-1">DEAL VERDICT</p>
+            <p className="text-xs font-mono text-zinc-400 mb-1">DEAL VERDICT</p>
             <p className={`text-2xl md:text-3xl font-bold font-mono ${
               isGreatDeal ? 'text-emerald-400' : isGoodDeal ? 'text-amber-400' : 'text-red-400'
             }`}>
               {isGreatDeal ? 'YES — MOVE ON THIS' : isGoodDeal ? 'MAYBE — NEGOTIATE HARDER' : 'NO — WALK AWAY'}
             </p>
-            <p className="text-sm text-slate-500 mt-1">
+            <p className="text-sm text-zinc-400 mt-1">
               {results.dealStatus} &middot; {results.profit >= 0 ? fmtCurrency(results.profit) : '-' + fmtCurrency(Math.abs(results.profit))} profit &middot; {results.roi.toFixed(1)}% ROI
             </p>
           </div>
@@ -236,15 +236,15 @@ export default function BlockWisePage() {
           <div className="grid grid-cols-3 gap-4 text-center">
             <div>
               <p className="text-xl md:text-2xl font-mono font-bold text-emerald-400">{fmtCurrency(results.profit)}</p>
-              <p className="text-[10px] text-slate-500">NET PROFIT</p>
+              <p className="text-[10px] text-zinc-400">NET PROFIT</p>
             </div>
             <div>
               <p className="text-xl md:text-2xl font-mono font-bold text-amber-400">{results.roi.toFixed(1)}%</p>
-              <p className="text-[10px] text-slate-500">ROI</p>
+              <p className="text-[10px] text-zinc-400">ROI</p>
             </div>
             <div>
               <p className="text-xl md:text-2xl font-mono font-bold text-cyan-400">{results.cashOnCashReturn.toFixed(1)}%</p>
-              <p className="text-[10px] text-slate-500">CASH-ON-CASH</p>
+              <p className="text-[10px] text-zinc-400">CASH-ON-CASH</p>
             </div>
           </div>
         </div>
@@ -280,10 +280,10 @@ export default function BlockWisePage() {
             <PercentInput label="Loan-to-Value (LTV)" value={inputs.loanToValue} onChange={v => update('loanToValue', v)} />
             <PercentInput label="Interest Rate (Annual)" value={inputs.interestRate} onChange={v => update('interestRate', v)} />
             <NumberInput label="Loan Points" value={inputs.loanPoints} onChange={v => update('loanPoints', v)} />
-            <div className="bg-slate-50 rounded-lg p-3 mt-2">
-              <p className="text-xs text-slate-500">Hard Money Loan Amount</p>
+            <div className="bg-[#18181B] rounded-lg p-3 mt-2">
+              <p className="text-xs text-zinc-400">Hard Money Loan Amount</p>
               <p className="text-lg font-mono font-bold text-amber-400">{fmtCurrency(results.loanAmount)}</p>
-              <p className="text-xs text-slate-500 mt-0.5">Cash needed for gap: {fmtCurrency(results.cashRequired)}</p>
+              <p className="text-xs text-zinc-400 mt-0.5">Cash needed for gap: {fmtCurrency(results.cashRequired)}</p>
             </div>
           </InputSection>
 
@@ -300,8 +300,8 @@ export default function BlockWisePage() {
         {/* Right Column: Results */}
         <div className="space-y-4">
           {/* Profit Waterfall */}
-          <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-4">
-            <h3 className="text-sm font-semibold text-slate-500 mb-3">PROFIT WATERFALL</h3>
+          <div className="bg-[#111113] border border-white/10 shadow-[0_1px_2px_rgba(0,0,0,0.3)] rounded-xl p-4">
+            <h3 className="text-sm font-semibold text-zinc-400 mb-3">PROFIT WATERFALL</h3>
             <div className="space-y-2">
               <WaterfallRow label="Sale Price (ARV)" value={inputs.arv} positive />
               <WaterfallRow label="Purchase Price" value={-inputs.purchasePrice} />
@@ -310,7 +310,7 @@ export default function BlockWisePage() {
               <WaterfallRow label="Financing Costs" value={-results.totalFinancingCosts} />
               <WaterfallRow label="Holding Costs" value={-results.totalHoldingCosts} />
               <WaterfallRow label="Selling Costs" value={-results.totalSellingCosts} />
-              <div className="border-t border-slate-200 pt-2 mt-2">
+              <div className="border-t border-white/10 pt-2 mt-2">
                 <WaterfallRow label="NET PROFIT" value={results.profit} isBold positive={results.profit >= 0} />
               </div>
             </div>
@@ -327,7 +327,7 @@ export default function BlockWisePage() {
           {/* Detailed Breakdown (Collapsible) */}
           <button
             onClick={() => setShowBreakdown(!showBreakdown)}
-            className="w-full px-4 py-3 text-sm text-slate-500 bg-white border border-slate-200 shadow-sm rounded-xl hover:border-slate-200 transition-colors flex items-center justify-between"
+            className="w-full px-4 py-3 text-sm text-zinc-400 bg-[#111113] border border-white/10 shadow-[0_1px_2px_rgba(0,0,0,0.3)] rounded-xl hover:border-white/10 transition-colors flex items-center justify-between"
           >
             <span>Full Cost Breakdown</span>
             <svg className={`w-4 h-4 transition-transform ${showBreakdown ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -341,7 +341,7 @@ export default function BlockWisePage() {
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: 'auto', opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
-                className="bg-white border border-slate-200 shadow-sm rounded-xl p-4 overflow-hidden"
+                className="bg-[#111113] border border-white/10 shadow-[0_1px_2px_rgba(0,0,0,0.3)] rounded-xl p-4 overflow-hidden"
               >
                 <div className="space-y-3 text-sm">
                   <BreakdownSection title="Acquisition">
@@ -396,36 +396,36 @@ export default function BlockWisePage() {
                 <div className="bg-amber-500/5 border border-amber-500/15 rounded-xl p-4">
                   <p className="text-xs text-amber-400 font-mono mb-1">CASH GAP TO FILL</p>
                   <p className="text-2xl font-mono font-bold text-amber-400">{fmtCurrency(results.cashRequired)}</p>
-                  <p className="text-xs text-slate-500 mt-1">
+                  <p className="text-xs text-zinc-400 mt-1">
                     The hard money lender covers {fmtCurrency(results.loanAmount)} ({inputs.loanToValue}% LTV).
                     You need {fmtCurrency(results.cashRequired)} for down payment + costs.
                   </p>
                 </div>
 
                 {opmOptions.map((opt, i) => (
-                  <div key={i} className="bg-white border border-slate-200 shadow-sm rounded-xl p-4">
+                  <div key={i} className="bg-[#111113] border border-white/10 shadow-[0_1px_2px_rgba(0,0,0,0.3)] rounded-xl p-4">
                     <div className="flex items-center justify-between mb-2">
                       <h4 className="text-sm font-semibold">{opt.name}</h4>
                       <span className="text-xs font-mono text-emerald-400">
                         Your profit: {fmtCurrency(opt.yourProfit)}
                       </span>
                     </div>
-                    <p className="text-xs text-slate-500 mb-3">{opt.desc}</p>
+                    <p className="text-xs text-zinc-400 mb-3">{opt.desc}</p>
                     <div className="grid grid-cols-3 gap-2 text-center">
-                      <div className="bg-slate-50 rounded-lg p-2">
+                      <div className="bg-[#18181B] rounded-lg p-2">
                         <p className="text-sm font-mono font-bold text-emerald-400">{fmtCurrency(opt.yourCash)}</p>
-                        <p className="text-[10px] text-slate-500">Your Cash</p>
+                        <p className="text-[10px] text-zinc-400">Your Cash</p>
                       </div>
-                      <div className="bg-slate-50 rounded-lg p-2">
+                      <div className="bg-[#18181B] rounded-lg p-2">
                         <p className="text-sm font-mono font-bold text-cyan-400">{fmtCurrency(opt.partnerCash)}</p>
-                        <p className="text-[10px] text-slate-500">Partner Cash</p>
+                        <p className="text-[10px] text-zinc-400">Partner Cash</p>
                       </div>
-                      <div className="bg-slate-50 rounded-lg p-2">
+                      <div className="bg-[#18181B] rounded-lg p-2">
                         <p className="text-sm font-mono font-bold text-amber-400">{fmtCurrency(opt.lenderCash)}</p>
-                        <p className="text-[10px] text-slate-500">Lender Cash</p>
+                        <p className="text-[10px] text-zinc-400">Lender Cash</p>
                       </div>
                     </div>
-                    <p className="text-[10px] text-slate-500 mt-2">Split: {opt.profitSplit}</p>
+                    <p className="text-[10px] text-zinc-400 mt-2">Split: {opt.profitSplit}</p>
                   </div>
                 ))}
               </motion.div>
@@ -433,8 +433,8 @@ export default function BlockWisePage() {
           </AnimatePresence>
 
           {/* Rental Hold Analysis */}
-          <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-4">
-            <h3 className="text-sm font-semibold text-slate-500 mb-3">WHAT IF YOU HOLD AS RENTAL?</h3>
+          <div className="bg-[#111113] border border-white/10 shadow-[0_1px_2px_rgba(0,0,0,0.3)] rounded-xl p-4">
+            <h3 className="text-sm font-semibold text-zinc-400 mb-3">WHAT IF YOU HOLD AS RENTAL?</h3>
             <RentalAnalysis arv={inputs.arv} totalInvestment={results.totalInvestment} cashRequired={results.cashRequired} />
           </div>
         </div>
@@ -449,12 +449,12 @@ function InputSection({ title, color, children }: { title: string; color: string
   const borderMap: Record<string, string> = {
     emerald: 'border-emerald-500/20',
     amber: 'border-amber-500/20',
-    zinc: 'border-slate-200 shadow-sm',
+    zinc: 'border-white/10 shadow-[0_1px_2px_rgba(0,0,0,0.3)]',
   };
 
   return (
-    <div className={`bg-white border ${borderMap[color] || 'border-slate-200'} rounded-xl p-4 shadow-sm`}>
-      <h3 className="text-xs font-mono font-semibold text-slate-500 mb-3 tracking-wider">{title}</h3>
+    <div className={`bg-[#111113] border ${borderMap[color] || 'border-white/10'} rounded-xl p-4 shadow-[0_1px_2px_rgba(0,0,0,0.3)]`}>
+      <h3 className="text-xs font-mono font-semibold text-zinc-400 mb-3 tracking-wider">{title}</h3>
       <div className="space-y-3">
         {children}
       </div>
@@ -467,9 +467,9 @@ function CurrencyInput({ label, value, onChange, highlight }: {
 }) {
   return (
     <div>
-      <label className="text-xs text-slate-500 block mb-1">{label}</label>
+      <label className="text-xs text-zinc-400 block mb-1">{label}</label>
       <div className="relative">
-        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">$</span>
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-sm">$</span>
         <input
           type="number"
           value={value || ''}
@@ -477,7 +477,7 @@ function CurrencyInput({ label, value, onChange, highlight }: {
           className={`w-full pl-7 pr-3 py-2 rounded-lg text-sm font-mono outline-none transition-colors ${
             highlight
               ? 'bg-emerald-500/5 border border-emerald-500/20 text-emerald-300 focus:border-emerald-500/40'
-              : 'bg-slate-100/60 border border-slate-200/50 text-slate-900 focus:border-slate-400'
+              : 'bg-[#1F1F23]/60 border border-white/10 text-zinc-100 focus:border-white/20'
           }`}
         />
       </div>
@@ -490,16 +490,16 @@ function PercentInput({ label, value, onChange }: {
 }) {
   return (
     <div>
-      <label className="text-xs text-slate-500 block mb-1">{label}</label>
+      <label className="text-xs text-zinc-400 block mb-1">{label}</label>
       <div className="relative">
         <input
           type="number"
           value={value || ''}
           onChange={e => onChange(e.target.value)}
           step="0.5"
-          className="w-full pl-3 pr-7 py-2 bg-slate-100/60 border border-slate-200/50 rounded-lg text-sm font-mono text-slate-900 outline-none focus:border-slate-400 transition-colors"
+          className="w-full pl-3 pr-7 py-2 bg-[#1F1F23]/60 border border-white/10 rounded-lg text-sm font-mono text-zinc-100 outline-none focus:border-white/20 transition-colors"
         />
-        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">%</span>
+        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 text-sm">%</span>
       </div>
     </div>
   );
@@ -510,12 +510,12 @@ function NumberInput({ label, value, onChange }: {
 }) {
   return (
     <div>
-      <label className="text-xs text-slate-500 block mb-1">{label}</label>
+      <label className="text-xs text-zinc-400 block mb-1">{label}</label>
       <input
         type="number"
         value={value || ''}
         onChange={e => onChange(e.target.value)}
-        className="w-full px-3 py-2 bg-slate-100/60 border border-slate-200/50 rounded-lg text-sm font-mono text-slate-900 outline-none focus:border-slate-400 transition-colors"
+        className="w-full px-3 py-2 bg-[#1F1F23]/60 border border-white/10 rounded-lg text-sm font-mono text-zinc-100 outline-none focus:border-white/20 transition-colors"
       />
     </div>
   );
@@ -529,9 +529,9 @@ function WaterfallRow({ label, value, positive, isBold }: {
   const isPos = value >= 0;
   return (
     <div className={`flex items-center justify-between ${isBold ? 'text-base' : 'text-sm'}`}>
-      <span className={isBold ? 'font-semibold text-slate-900' : 'text-slate-500'}>{label}</span>
+      <span className={isBold ? 'font-semibold text-zinc-100' : 'text-zinc-400'}>{label}</span>
       <span className={`font-mono ${isBold ? 'font-bold' : ''} ${
-        positive && isPos ? 'text-emerald-400' : !isPos ? 'text-red-400' : 'text-slate-600'
+        positive && isPos ? 'text-emerald-400' : !isPos ? 'text-red-400' : 'text-zinc-300'
       }`}>
         {isPos ? '+' : '-'}${fmt(Math.abs(value))}
       </span>
@@ -542,13 +542,13 @@ function WaterfallRow({ label, value, positive, isBold }: {
 function MetricCard({ label, value, sub, color }: {
   label: string; value: string; sub: string; color?: string;
 }) {
-  const textColor = color === 'emerald' ? 'text-emerald-400' : color === 'amber' ? 'text-amber-400' : color === 'red' ? 'text-red-400' : 'text-slate-900';
+  const textColor = color === 'emerald' ? 'text-emerald-400' : color === 'amber' ? 'text-amber-400' : color === 'red' ? 'text-red-400' : 'text-zinc-100';
 
   return (
-    <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-3">
-      <p className="text-xs text-slate-500 mb-1">{label}</p>
+    <div className="bg-[#111113] border border-white/10 shadow-[0_1px_2px_rgba(0,0,0,0.3)] rounded-xl p-3">
+      <p className="text-xs text-zinc-400 mb-1">{label}</p>
       <p className={`text-lg font-mono font-bold ${textColor}`}>{value}</p>
-      <p className="text-[10px] text-slate-500 mt-0.5">{sub}</p>
+      <p className="text-[10px] text-zinc-400 mt-0.5">{sub}</p>
     </div>
   );
 }
@@ -556,8 +556,8 @@ function MetricCard({ label, value, sub, color }: {
 function BreakdownSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div>
-      <p className="text-xs font-mono text-slate-500 mb-1">{title}</p>
-      <div className="space-y-1 pl-2 border-l border-slate-200">
+      <p className="text-xs font-mono text-zinc-400 mb-1">{title}</p>
+      <div className="space-y-1 pl-2 border-l border-white/10">
         {children}
       </div>
     </div>
@@ -567,8 +567,8 @@ function BreakdownSection({ title, children }: { title: string; children: React.
 function BreakdownRow({ label, value, bold }: { label: string; value: number; bold?: boolean }) {
   return (
     <div className="flex justify-between text-xs">
-      <span className={bold ? 'text-slate-600 font-medium' : 'text-slate-500'}>{label}</span>
-      <span className={`font-mono ${bold ? 'text-slate-900 font-semibold' : 'text-slate-500'}`}>{fmtCurrency(value)}</span>
+      <span className={bold ? 'text-zinc-300 font-medium' : 'text-zinc-400'}>{label}</span>
+      <span className={`font-mono ${bold ? 'text-zinc-100 font-semibold' : 'text-zinc-400'}`}>{fmtCurrency(value)}</span>
     </div>
   );
 }
@@ -588,21 +588,21 @@ function RentalAnalysis({ arv, totalInvestment, cashRequired }: {
     <div className="grid grid-cols-2 gap-3">
       <div className="text-center">
         <p className="text-lg font-mono font-bold text-purple-400">{fmtCurrency(monthlyRent)}</p>
-        <p className="text-[10px] text-slate-500">Est. Monthly Rent</p>
+        <p className="text-[10px] text-zinc-400">Est. Monthly Rent</p>
       </div>
       <div className="text-center">
         <p className="text-lg font-mono font-bold text-purple-400">{capRate.toFixed(1)}%</p>
-        <p className="text-[10px] text-slate-500">Cap Rate</p>
+        <p className="text-[10px] text-zinc-400">Cap Rate</p>
       </div>
       <div className="text-center">
         <p className="text-lg font-mono font-bold text-purple-400">{fmtCurrency(noi)}</p>
-        <p className="text-[10px] text-slate-500">Annual NOI (60%)</p>
+        <p className="text-[10px] text-zinc-400">Annual NOI (60%)</p>
       </div>
       <div className="text-center">
         <p className="text-lg font-mono font-bold text-purple-400">{cashOnCash.toFixed(1)}%</p>
-        <p className="text-[10px] text-slate-500">Cash-on-Cash</p>
+        <p className="text-[10px] text-zinc-400">Cash-on-Cash</p>
       </div>
-      <p className="col-span-2 text-[10px] text-slate-500 text-center mt-1">
+      <p className="col-span-2 text-[10px] text-zinc-400 text-center mt-1">
         BRRRR Strategy: Buy at {fmtCurrency(totalInvestment)}, rent at {fmtCurrency(monthlyRent)}/mo, refinance at 75% ARV ({fmtCurrency(arv * 0.75)})
       </p>
     </div>
