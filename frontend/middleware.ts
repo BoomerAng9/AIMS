@@ -26,26 +26,27 @@ const PRIMARY_HOST = 'plugmein.cloud';
 
 const ALLOWED_ORIGINS = IS_PRODUCTION
   ? [
-      'https://plugmein.cloud',
-      'https://www.plugmein.cloud',
-      'https://demo.plugmein.cloud',
-      'https://aims.plugmein.cloud',
-      'https://www.aims.plugmein.cloud',
-      'https://api.aims.plugmein.cloud',
-      'https://luc.plugmein.cloud',
-      'https://aimanagedsolutions.cloud',
-      'https://www.aimanagedsolutions.cloud',
-    ]
+    'https://plugmein.cloud',
+    'https://www.plugmein.cloud',
+    'https://demo.plugmein.cloud',
+    'https://aims.plugmein.cloud',
+    'https://www.aims.plugmein.cloud',
+    'https://api.aims.plugmein.cloud',
+    'https://luc.plugmein.cloud',
+    'https://aimanagedsolutions.cloud',
+    'https://www.aimanagedsolutions.cloud',
+    'https://hh.plugmein.cloud',
+  ]
   : [
-      'http://localhost:3000',
-      'http://localhost:3001',
-      'http://localhost:3002',
-      'http://localhost:8080',
-      'http://127.0.0.1:3000',
-      'http://127.0.0.1:3001',
-      'http://127.0.0.1:3002',
-      'http://127.0.0.1:8080',
-    ];
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'http://localhost:3002',
+    'http://localhost:8080',
+    'http://127.0.0.1:3000',
+    'http://127.0.0.1:3001',
+    'http://127.0.0.1:3002',
+    'http://127.0.0.1:8080',
+  ];
 
 // Extended list of attack tools and malicious bots
 const BLOCKED_USER_AGENTS = [
@@ -296,10 +297,23 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(redirectUrl);
   }
 
-  // 1. Domain routing — plugmein.cloud (app) + aimanagedsolutions.cloud (father site)
-  //    Both domains proxy to the same Next.js frontend via nginx.
+  // 1. Domain routing — plugmein.cloud (app), aimanagedsolutions.cloud (father site), hh.plugmein.cloud
+  const hostname = request.headers.get('host');
+  const isHalalHubDomain = hostname === 'hh.plugmein.cloud' || (!IS_PRODUCTION && hostname?.startsWith('hh.localhost'));
 
-  // 2. Honeypot check (block bots probing for vulnerabilities)
+  if (isHalalHubDomain) {
+    if (pathname === '/') {
+      const url = request.nextUrl.clone();
+      url.pathname = '/halalhub';
+      return NextResponse.rewrite(url);
+    }
+    // Prevent recursive rewrites and ensure we're serving out of the /halalhub group
+    if (!pathname.startsWith('/halalhub') && !pathname.startsWith('/api')) {
+      const url = request.nextUrl.clone();
+      url.pathname = `/halalhub${pathname}`;
+      return NextResponse.rewrite(url);
+    }
+  }
   if (isHoneypot(pathname)) {
     console.warn(`[SECURITY] Honeypot triggered: ${ip} -> ${pathname}`);
     return createErrorResponse('Not Found', 404);

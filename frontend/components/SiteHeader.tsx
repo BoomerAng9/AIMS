@@ -20,6 +20,7 @@ const LANDING_NAV = [
   { href: "/gallery", label: "Gallery" },
   { href: "/pricing", label: "Pricing" },
   { href: "/about", label: "About" },
+  { href: "/halalhub", label: "HalalHub" },
 ];
 
 // Navigation for the APP domain (plugmein.cloud — do, build, deploy)
@@ -28,6 +29,7 @@ const APP_NAV = [
   { href: "/chat", label: "Chat w/ACHEEVY" },
   { href: "/dashboard/circuit-box", label: "Circuit Box" },
   { href: "/dashboard/model-garden", label: "Model Garden" },
+  { href: "/halalhub", label: "HalalHub" },
 ];
 
 function useIsLandingDomain(): boolean {

@@ -1,0 +1,72 @@
+  Γû▓ Next.js 14.2.35
+  - Environments: .env.local, .env
+  - Experiments (use with caution):
+    ┬╖ externalDir
+
+   Creating an optimized production build ...
+ Γ£ô Compiled successfully
+   Skipping validation of types
+   Skipping linting
+   Collecting page data ...
+ ΓÜá Using edge runtime on a page currently disables static generation for that page
+   Generating static pages (0/194) ...
+[LUC state] Error: n [Error]: Dynamic server usage: Route /api/luc/state couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at l (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\chunks\8948.js:1:57759)
+    at d (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\chunks\5609.js:25:26443)
+    at s (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\chunks\5609.js:25:19584)
+    at x (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\luc\state\route.js:1:1317)
+    at C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:38417
+    at C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\server\lib\trace\tracer.js:140:36
+    at NoopContextManager.with (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\@opentelemetry\api\build\src\context\NoopContextManager.js:25:19)
+    at ContextAPI.with (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\@opentelemetry\api\build\src\api\context.js:60:46)
+    at NoopTracer.startActiveSpan (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\@opentelemetry\api\build\src\trace\NoopTracer.js:65:31)
+    at ProxyTracer.startActiveSpan (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\@opentelemetry\api\build\src\trace\ProxyTracer.js:36:24) {
+  description: "Route /api/luc/state couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+   Generating static pages (48/194) 
+prisma:error 
+Invalid `prisma.nFLTeamNeeds.findMany()` invocation:
+
+
+The table `main.NFLTeamNeeds` does not exist in the current database.
+[Draft News] Error: PrismaClientKnownRequestError: 
+Invalid `prisma.nFLTeamNeeds.findMany()` invocation:
+
+
+The table `main.NFLTeamNeeds` does not exist in the current database.
+    at $n.handleRequestError (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\@prisma\client\runtime\library.js:121:7315)
+    at $n.handleAndLogRequestError (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async l (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\perform\draft\news\route.js:1:587)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:38411
+    at async e_.execute (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:27880)
+    at async e_.handle (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:39943)
+    at async exportAppRoute (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\export\routes\app-route.js:77:26)
+    at async exportPageImpl (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\export\worker.js:175:20) {
+  code: 'P2021',
+  clientVersion: '5.22.0',
+  meta: { modelName: 'NFLTeamNeeds', table: 'main.NFLTeamNeeds' }
+}
+[Subscription] Error: Dynamic server usage: Route /api/stripe/subscription couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+Search test error: B [Error]: Dynamic server usage: Route /api/test/search couldn't be rendered statically because it used `nextUrl.searchParams`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at V (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:21778)
+    at Object.get (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:29137)
+    at p (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\test\search\route.js:1:543)
+    at C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:38417
+    at C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\server\lib\trace\tracer.js:140:36
+    at NoopContextManager.with (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\@opentelemetry\api\build\src\context\NoopContextManager.js:25:19)
+    at ContextAPI.with (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\@opentelemetry\api\build\src\api\context.js:60:46)
+    at NoopTracer.startActiveSpan (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\@opentelemetry\api\build\src\trace\NoopTracer.js:65:31)
+    at ProxyTracer.startActiveSpan (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\@opentelemetry\api\build\src\trace\ProxyTracer.js:36:24)
+    at C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\server\lib\trace\tracer.js:122:103 {
+  description: "Route /api/test/search couldn't be rendered statically because it used `nextUrl.searchParams`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+[Verticals API] GET error: Dynamic server usage: Route /api/verticals couldn't be rendered statically because it used `nextUrl.searchParams`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+   Generating static pages (96/194) 
+   Generating static pages (145/194) 
+ Γ£ô Generating static pages (194/194)
+   Finalizing page optimization ...
+   Collecting build traces ...

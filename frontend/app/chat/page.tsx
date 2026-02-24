@@ -3,17 +3,9 @@
 /**
  * Chat w/ACHEEVY — Next-Level Command Center
  *
- * Two modes:
- *   TEXT  — Vercel AI SDK (useChat) with markdown rendering + voice TTS
- *   VOICE — ElevenLabs Conversational AI Agent SDK (real-time bi-directional)
- *
- * Design: Luxury Industrial AI / Hangar UI World
- *   - h-dvh fit-to-screen, zero dead space
- *   - Glass panel messages with depth layering
- *   - Gold accent system, ambient breathing glow
- *   - Audio frequency visualizer during voice sessions
- *   - File attachments, voice selector, model switcher
- *   - Needs analysis first (no info dumping)
+ * Full Nano Banana Pro UI (Obsidian & Gold)
+ * Glassmorphic Panels, Dark Mode Default
+ * Integrated Vercel AI SDK & ElevenLabs Voice
  */
 
 import { useChat } from 'ai/react';
@@ -31,7 +23,6 @@ import {
   PanelLeftClose, PanelLeftOpen, Plus, MessageSquare, Trash2,
 } from 'lucide-react';
 import { SiteHeader } from '@/components/SiteHeader';
-import { LogoWallBackground } from '@/components/LogoWallBackground';
 import { TTS_VOICES } from '@/lib/voice';
 import { sanitizeForTTS } from '@/lib/voice/sanitize';
 
@@ -42,15 +33,15 @@ import { sanitizeForTTS } from '@/lib/voice/sanitize';
 const ELEVENLABS_AGENT_ID = process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID || '';
 
 const AI_MODELS = [
-  { key: 'claude-opus',   label: 'Claude Opus 4.6' },
+  { key: 'claude-opus', label: 'Claude Opus 4.6' },
   { key: 'claude-sonnet', label: 'Claude Sonnet 4.6' },
-  { key: 'qwen',          label: 'Qwen 2.5 Coder 32B', tag: 'code' },
-  { key: 'qwen-max',      label: 'Qwen Max' },
-  { key: 'minimax',       label: 'MiniMax-01' },
-  { key: 'glm',           label: 'GLM-5' },
-  { key: 'kimi',          label: 'Kimi K2.5', tag: 'fast' },
-  { key: 'nano-banana',   label: 'Nano Banana Pro', tag: 'fast' },
-  { key: 'gemini-pro',    label: 'Gemini 2.5 Pro' },
+  { key: 'qwen', label: 'Qwen 2.5 Coder 32B', tag: 'code' },
+  { key: 'qwen-max', label: 'Qwen Max' },
+  { key: 'minimax', label: 'MiniMax-01' },
+  { key: 'glm', label: 'GLM-5' },
+  { key: 'kimi', label: 'Kimi K2.5', tag: 'fast' },
+  { key: 'nano-banana', label: 'Nano Banana Pro', tag: 'fast' },
+  { key: 'gemini-pro', label: 'Gemini 2.5 Pro' },
 ] as const;
 
 const THREADS_KEY = 'aims_chat_threads';
@@ -74,7 +65,7 @@ function loadThreads(): Thread[] {
 }
 
 function saveThreads(t: Thread[]) {
-  try { localStorage.setItem(THREADS_KEY, JSON.stringify(t)); } catch {}
+  try { localStorage.setItem(THREADS_KEY, JSON.stringify(t)); } catch { }
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -154,31 +145,30 @@ function VoiceSelector({ voiceId, provider, onSelect }: {
     <div className="relative">
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg border border-slate-200 bg-white hover:border-gold/20 text-[11px] text-slate-500 font-mono transition-colors"
+        className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg border border-[rgba(255,255,255,0.1)] bg-[#111111] hover:border-[#D4AF37]/50 text-[11px] text-[rgba(255,255,255,0.6)] font-mono transition-colors"
       >
-        <Volume2 className="w-3 h-3 text-gold/50" />
+        <Volume2 className="w-3 h-3 text-[#D4AF37]/50" />
         <span>{cur?.name || 'Voice'}</span>
         <ChevronDown className={`w-3 h-3 transition-transform ${open ? 'rotate-180' : ''}`} />
       </button>
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-full mt-1 z-50 w-52 max-h-64 overflow-y-auto rounded-xl border border-slate-200 bg-white/95 backdrop-blur-xl shadow-2xl">
+          <div className="absolute right-0 top-full mt-1 z-50 w-52 max-h-64 overflow-y-auto rounded-xl border border-[rgba(255,255,255,0.1)] bg-[#111111]/95 backdrop-blur-xl shadow-2xl">
             {(['elevenlabs', 'deepgram'] as const).map(prov => (
               <div key={prov}>
-                <div className="px-3 py-1.5 border-b border-slate-200">
-                  <span className="text-[9px] text-slate-400 font-mono uppercase tracking-wider">{prov}</span>
+                <div className="px-3 py-1.5 border-b border-[rgba(255,255,255,0.1)]">
+                  <span className="text-[9px] text-[rgba(255,255,255,0.4)] font-mono uppercase tracking-wider">{prov}</span>
                 </div>
                 {TTS_VOICES.filter(v => v.provider === prov).map(v => (
                   <button
                     key={v.id}
                     onClick={() => { onSelect(v.id, v.provider); setOpen(false); }}
-                    className={`w-full text-left px-3 py-1.5 text-[11px] hover:bg-white flex justify-between ${
-                      voiceId === v.id ? 'text-gold bg-gold/[0.06]' : 'text-slate-500'
-                    }`}
+                    className={`w-full text-left px-3 py-1.5 text-[11px] hover:bg-[rgba(255,255,255,0.05)] flex justify-between ${voiceId === v.id ? 'text-[#D4AF37] bg-[rgba(212,175,55,0.1)]' : 'text-white'
+                      }`}
                   >
                     <span>{v.name}</span>
-                    <span className="text-slate-300">{v.style}</span>
+                    <span className="text-[rgba(255,255,255,0.4)]">{v.style}</span>
                   </button>
                 ))}
               </div>
@@ -212,43 +202,43 @@ function MessageBubble({ role, content, isStreaming }: {
       {/* Avatar */}
       <div className="flex-shrink-0 mt-0.5">
         {isUser ? (
-          <div className="w-7 h-7 rounded-full bg-gold/15 border border-gold/25 flex items-center justify-center">
-            <User className="w-3.5 h-3.5 text-gold/70" />
+          <div className="w-8 h-8 rounded-full bg-[rgba(212,175,55,0.1)] border border-[rgba(212,175,55,0.3)] flex items-center justify-center">
+            <User className="w-4 h-4 text-[#D4AF37]" />
           </div>
         ) : (
-          <div className="relative w-7 h-7 rounded-full overflow-hidden bg-gold/10 border border-gold/20">
-            <Image src="/images/acheevy/acheevy-helmet.png" alt="ACHEEVY" width={28} height={28} className="w-full h-full object-cover" />
+          <div className="relative w-8 h-8 rounded-full overflow-hidden bg-[rgba(212,175,55,0.1)] border border-[rgba(212,175,55,0.3)] shadow-[0_0_10px_rgba(212,175,55,0.2)]">
+            <Image src="/images/acheevy/acheevy-helmet.png" alt="ACHEEVY" width={32} height={32} className="w-full h-full object-cover" />
             {isStreaming && (
-              <div className="absolute inset-0 rounded-full border-2 border-gold/40 animate-ping" />
+              <div className="absolute inset-0 rounded-full border-2 border-[#D4AF37]/50 animate-ping" />
             )}
           </div>
         )}
       </div>
 
       {/* Bubble */}
-      <div className={`min-w-0 max-w-[80%] ${isUser ? 'ml-auto' : ''}`}>
-        <div className={`rounded-2xl px-4 py-2.5 text-sm leading-relaxed break-words overflow-hidden ${
-          isUser
-            ? 'bg-gold/10 text-slate-800 rounded-tr-sm border border-gold/15'
-            : 'bg-white backdrop-blur-sm text-slate-700 rounded-tl-sm border border-slate-200 shadow-[0_2px_8px_rgba(0,0,0,0.3)]'
-        }`}>
+      <div className={`min-w-0 max-w-[85%] ${isUser ? 'ml-auto' : ''}`}>
+        <div className={`px-4 py-3 text-sm leading-relaxed break-words overflow-hidden ${isUser
+          ? 'bg-[rgba(212,175,55,0.15)] text-white rounded-2xl rounded-tr-sm border border-[rgba(212,175,55,0.3)]'
+          : 'bg-[#111111]/80 backdrop-blur-md text-[rgba(255,255,255,0.9)] rounded-2xl rounded-tl-sm border border-[rgba(255,255,255,0.08)] shadow-[0_4px_16px_rgba(0,0,0,0.5)]'
+          }`}>
           {isUser ? (
             <p className="whitespace-pre-wrap break-words">{content}</p>
           ) : (
             <div className="prose prose-invert prose-sm max-w-none break-words
-              prose-headings:text-slate-800 prose-a:text-gold prose-strong:text-slate-800
-              prose-code:text-gold/80 prose-code:bg-slate-100/40 prose-code:px-1 prose-code:py-0.5 prose-code:rounded
-              prose-pre:max-w-full prose-pre:overflow-x-auto prose-p:my-1.5 prose-headings:my-2">
+              prose-headings:text-white prose-a:text-[#D4AF37] prose-strong:text-white
+              prose-code:text-[#D4AF37] prose-code:bg-[rgba(255,255,255,0.05)] prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded
+              prose-pre:max-w-full prose-pre:overflow-x-auto prose-p:my-1.5 prose-headings:my-2
+              prose-pre:bg-[#0A0A0A] prose-pre:border prose-pre:border-[rgba(255,255,255,0.1)]">
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
                 components={{
                   code({ className, children, ...props }) {
                     if (!className) {
-                      return <code className="bg-slate-100/40 px-1 py-0.5 rounded text-gold/80 text-[12px]" {...props}>{children}</code>;
+                      return <code className="bg-[rgba(255,255,255,0.05)] px-1.5 py-0.5 rounded text-[#D4AF37] text-[13px] font-mono" {...props}>{children}</code>;
                     }
                     return (
-                      <pre className="bg-slate-100/60 rounded-lg p-3 overflow-x-auto border border-slate-200 my-2 max-w-full">
-                        <code className={`${className} text-[12px]`} {...props}>{children}</code>
+                      <pre className="bg-[#0A0A0A] rounded-xl p-4 overflow-x-auto border border-[rgba(255,255,255,0.1)] my-3 max-w-full shadow-inner">
+                        <code className={`${className} text-[13px] font-mono`} {...props}>{children}</code>
                       </pre>
                     );
                   },
@@ -256,7 +246,7 @@ function MessageBubble({ role, content, isStreaming }: {
               >
                 {content}
               </ReactMarkdown>
-              {isStreaming && <span className="inline-block w-1.5 h-4 bg-gold/60 ml-0.5 animate-pulse rounded-sm" />}
+              {isStreaming && <span className="inline-block w-1.5 h-4 bg-[#D4AF37] ml-1 animate-pulse rounded-sm" />}
             </div>
           )}
         </div>
@@ -264,10 +254,11 @@ function MessageBubble({ role, content, isStreaming }: {
         {/* Copy */}
         {!isUser && !isStreaming && content && (
           <button
-            onClick={() => { navigator.clipboard.writeText(content); setCopied(true); setTimeout(() => setCopied(false), 1500); }}
-            className="mt-0.5 p-1 rounded opacity-0 hover:opacity-100 text-slate-300 hover:text-gold/60 transition-all"
+            onClick={() => { navigator.clipboard.writeText(content); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
+            className="mt-1 flex items-center gap-1.5 px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 hover:opacity-100 text-[10px] uppercase font-bold tracking-wider text-[rgba(255,255,255,0.4)] hover:text-[#D4AF37] hover:bg-[rgba(212,175,55,0.1)] transition-all"
           >
-            {copied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+            {copied ? <Check className="w-3 h-3 text-[#10B981]" /> : <Copy className="w-3 h-3" />}
+            {copied ? 'Copied' : 'Copy'}
           </button>
         )}
       </div>
@@ -293,43 +284,44 @@ function ThreadsSidebar({ threads, activeId, onSelect, onNew, onDelete, open, on
   return (
     <motion.aside
       initial={{ width: 0, opacity: 0 }}
-      animate={{ width: 240, opacity: 1 }}
+      animate={{ width: 260, opacity: 1 }}
       exit={{ width: 0, opacity: 0 }}
-      transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
-      className="flex-shrink-0 overflow-hidden border-r border-slate-200 bg-slate-50/70"
+      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+      className="flex-shrink-0 overflow-hidden border-r border-[rgba(255,255,255,0.08)] bg-[#0A0A0A]/95 backdrop-blur-xl z-20"
     >
-      <div className="flex flex-col h-full w-[240px]">
-        <div className="flex items-center justify-between px-3 py-2.5 border-b border-slate-200">
-          <span className="text-[9px] uppercase tracking-[0.15em] text-slate-400 font-mono">Threads</span>
-          <div className="flex gap-1">
-            <button onClick={onNew} className="p-1 rounded text-slate-400 hover:text-gold transition-colors"><Plus size={13} /></button>
-            <button onClick={onToggle} className="p-1 rounded text-slate-400 hover:text-slate-500 transition-colors"><PanelLeftClose size={13} /></button>
+      <div className="flex flex-col h-full w-[260px]">
+        <div className="flex items-center justify-between px-4 py-4 border-b border-[rgba(255,255,255,0.08)]">
+          <span className="text-[10px] uppercase tracking-[0.2em] text-[rgba(255,255,255,0.4)] font-mono font-bold">Encrypted Threads</span>
+          <div className="flex gap-2">
+            <button onClick={onNew} className="p-1.5 rounded-md bg-[rgba(255,255,255,0.05)] text-[rgba(255,255,255,0.6)] hover:bg-[rgba(212,175,55,0.1)] hover:text-[#D4AF37] transition-colors"><Plus size={14} /></button>
+            <button onClick={onToggle} className="p-1.5 rounded-md bg-[rgba(255,255,255,0.05)] text-[rgba(255,255,255,0.6)] hover:bg-[rgba(255,255,255,0.1)] hover:text-white transition-colors"><PanelLeftClose size={14} /></button>
           </div>
         </div>
-        <div className="flex-1 overflow-y-auto py-1.5 space-y-0.5">
+        <div className="flex-1 overflow-y-auto py-2 space-y-1">
           {threads.length === 0 ? (
-            <div className="px-3 py-8 text-center">
-              <MessageSquare className="w-5 h-5 text-slate-300 mx-auto mb-1.5" />
-              <p className="text-[9px] text-slate-300 font-mono">No threads yet</p>
+            <div className="px-4 py-10 text-center flex flex-col items-center">
+              <div className="w-12 h-12 rounded-full border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] flex items-center justify-center mb-3">
+                <MessageSquare className="w-5 h-5 text-[rgba(255,255,255,0.2)]" />
+              </div>
+              <p className="text-xs text-[rgba(255,255,255,0.3)] font-mono uppercase tracking-widest">No Active Links</p>
             </div>
           ) : threads.map(t => (
             <div
               key={t.id}
               onClick={() => onSelect(t.id)}
-              className={`group flex items-center gap-2 mx-1.5 px-2.5 py-2 rounded-lg cursor-pointer transition-all ${
-                activeId === t.id
-                  ? 'bg-gold/[0.08] border border-gold/15'
-                  : 'border border-transparent hover:bg-white'
-              }`}
+              className={`group flex items-center gap-3 mx-2 px-3 py-3 rounded-xl cursor-pointer transition-all ${activeId === t.id
+                ? 'bg-[rgba(212,175,55,0.1)] border border-[rgba(212,175,55,0.3)] shadow-[inset_2px_0_0_#D4AF37]'
+                : 'border border-transparent hover:bg-[rgba(255,255,255,0.03)]'
+                }`}
             >
-              <MessageSquare size={11} className={activeId === t.id ? 'text-gold/60' : 'text-slate-300'} />
+              <MessageSquare size={14} className={activeId === t.id ? 'text-[#D4AF37]' : 'text-[rgba(255,255,255,0.3)]'} />
               <div className="flex-1 min-w-0">
-                <p className={`text-[11px] truncate ${activeId === t.id ? 'text-gold/80' : 'text-slate-500'}`}>{t.title}</p>
+                <p className={`text-sm font-medium truncate ${activeId === t.id ? 'text-white' : 'text-[rgba(255,255,255,0.6)] group-hover:text-white transition-colors'}`}>{t.title}</p>
               </div>
               <button
                 onClick={(e) => { e.stopPropagation(); onDelete(t.id); }}
-                className="p-0.5 rounded opacity-0 group-hover:opacity-100 text-slate-300 hover:text-red-400 transition-all"
-              ><Trash2 size={10} /></button>
+                className="p-1 rounded-md opacity-0 group-hover:opacity-100 text-[rgba(255,255,255,0.3)] hover:text-red-400 hover:bg-red-400/10 transition-all"
+              ><Trash2 size={12} /></button>
             </div>
           ))}
         </div>
@@ -339,79 +331,12 @@ function ThreadsSidebar({ threads, activeId, onSelect, onNew, onDelete, open, on
 }
 
 // ─────────────────────────────────────────────────────────────
-// Voice Session Panel (ElevenLabs Agent SDK)
-// ─────────────────────────────────────────────────────────────
-
-function VoiceSessionPanel({ conversation, active, onEnd }: {
-  conversation: ReturnType<typeof useConversation>;
-  active: boolean;
-  onEnd: () => void;
-}) {
-  if (!active) return null;
-
-  const isConnected = conversation.status === 'connected';
-  const isSpeaking = conversation.isSpeaking;
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 20 }}
-      className="mx-auto w-full max-w-2xl mb-3"
-    >
-      <div className="rounded-2xl border border-gold/15 bg-gradient-to-b from-gold/[0.04] to-transparent backdrop-blur-sm p-4">
-        {/* Status */}
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400 animate-pulse'}`} />
-            <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">
-              {isConnected ? (isSpeaking ? 'ACHEEVY Speaking' : 'Listening') : 'Connecting...'}
-            </span>
-          </div>
-          <button
-            onClick={onEnd}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-500/15 text-red-400 text-[10px] font-mono uppercase tracking-wider hover:bg-red-500/25 transition-colors"
-          >
-            <PhoneOff className="w-3 h-3" />
-            End
-          </button>
-        </div>
-
-        {/* Visualizers */}
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <p className="text-[8px] text-slate-300 font-mono uppercase mb-1">You</p>
-            <div className="rounded-lg bg-white border border-slate-200 p-1">
-              <FrequencyVisualizer
-                getData={conversation.getInputByteFrequencyData}
-                active={isConnected}
-                color="#3B82F6"
-              />
-            </div>
-          </div>
-          <div>
-            <p className="text-[8px] text-gold/30 font-mono uppercase mb-1">ACHEEVY</p>
-            <div className="rounded-lg bg-gold/[0.02] border border-gold/[0.06] p-1">
-              <FrequencyVisualizer
-                getData={conversation.getOutputByteFrequencyData}
-                active={isSpeaking}
-                color="#D4AF37"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    </motion.div>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────
 // Main Chat Page
 // ─────────────────────────────────────────────────────────────
 
 export default function ChatPage() {
   return (
-    <Suspense fallback={<div className="flex items-center justify-center h-dvh bg-[#F8FAFC]"><Loader2 className="w-8 h-8 animate-spin text-gold" /></div>}>
+    <Suspense fallback={<div className="flex items-center justify-center h-dvh bg-[#0A0A0A]"><Loader2 className="w-8 h-8 animate-spin text-[#D4AF37]" /></div>}>
       <ChatContent />
     </Suspense>
   );
@@ -470,7 +395,6 @@ function ChatContent() {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  // Load voice prefs
   useEffect(() => {
     try {
       const saved = JSON.parse(localStorage.getItem(VOICE_SETTINGS_KEY) || '{}');
@@ -480,7 +404,6 @@ function ChatContent() {
     } catch { /* ignore */ }
   }, []);
 
-  // Save voice prefs
   useEffect(() => {
     try {
       localStorage.setItem(VOICE_SETTINGS_KEY, JSON.stringify({
@@ -521,22 +444,18 @@ function ChatContent() {
     setIsSpeaking(false);
   }, []);
 
-  // ── File attachments ──
   const [files, setFiles] = useState<File[]>([]);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  // ── Threads ──
   const [threads, setThreads] = useState<Thread[]>([]);
   const [activeThreadId, setActiveThreadId] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // ── Init ──
   useEffect(() => {
     setThreads(loadThreads());
     try { if (localStorage.getItem(SIDEBAR_KEY) === 'true') setSidebarOpen(true); } catch { /* ignore */ }
   }, []);
 
-  // Pre-fill from ?q=
   useEffect(() => {
     const q = searchParams.get('q');
     if (q && !prefillHandled.current) {
@@ -548,12 +467,10 @@ function ChatContent() {
     }
   }, [searchParams, setInput]);
 
-  // Auto-scroll
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, voiceTranscript]);
 
-  // Auto-resize textarea
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
@@ -561,7 +478,6 @@ function ChatContent() {
     }
   }, [input]);
 
-  // Auto TTS on new assistant message
   useEffect(() => {
     if (!isLoading && messages.length > 0) {
       const last = messages[messages.length - 1];
@@ -572,13 +488,12 @@ function ChatContent() {
     }
   }, [isLoading, messages, speakText]);
 
-  // Thread management
   const toggleSidebar = useCallback(() => {
     setSidebarOpen(p => { const n = !p; try { localStorage.setItem(SIDEBAR_KEY, String(n)); } catch { /* ignore */ } return n; });
   }, []);
 
   const createThread = useCallback(() => {
-    const t: Thread = { id: `t_${Date.now()}`, title: `Thread ${threads.length + 1}`, createdAt: Date.now() };
+    const t: Thread = { id: `t_${Date.now()}`, title: `Terminal Session ${threads.length + 1}`, createdAt: Date.now() };
     const updated = [t, ...threads];
     setThreads(updated); saveThreads(updated); setActiveThreadId(t.id);
   }, [threads]);
@@ -589,7 +504,6 @@ function ChatContent() {
     if (activeThreadId === id) setActiveThreadId(null);
   }, [threads, activeThreadId]);
 
-  // Update thread title
   useEffect(() => {
     if (activeThreadId && messages.length > 0) {
       const firstUser = messages.find(m => m.role === 'user');
@@ -606,7 +520,6 @@ function ChatContent() {
     }
   }, [messages, activeThreadId]);
 
-  // Submit handlers
   const handleEnhancedSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
@@ -622,277 +535,242 @@ function ChatContent() {
 
   const hasAgent = Boolean(ELEVENLABS_AGENT_ID);
 
-  // ─────────────────────────────────────────────────────────
-  // RENDER
-  // ─────────────────────────────────────────────────────────
-
   return (
-    <LogoWallBackground mode="dashboard">
-      <div className="h-dvh w-full flex flex-col overflow-hidden">
-        <SiteHeader />
+    <div className="h-dvh w-full flex flex-col overflow-hidden bg-[#0A0A0A] text-white selection:bg-[#D4AF37]/30">
+      {/* Global dark matrix ambient overlay */}
+      <div className="fixed inset-0 bg-[url('/assets/noise.png')] opacity-[0.03] pointer-events-none z-[999]" />
+      <div className="fixed inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.1)_50%)] bg-[length:100%_4px] pointer-events-none z-[998]" />
 
-        <div className="flex-1 flex overflow-hidden min-h-0">
-          {/* Sidebar */}
-          <AnimatePresence>
-            {sidebarOpen && (
-              <ThreadsSidebar
-                threads={threads}
-                activeId={activeThreadId}
-                onSelect={setActiveThreadId}
-                onNew={createThread}
-                onDelete={deleteThread}
-                open={sidebarOpen}
-                onToggle={toggleSidebar}
+      <SiteHeader />
+
+      <div className="flex-1 flex overflow-hidden min-h-0 relative z-10">
+        <AnimatePresence>
+          {sidebarOpen && (
+            <ThreadsSidebar
+              threads={threads}
+              activeId={activeThreadId}
+              onSelect={setActiveThreadId}
+              onNew={createThread}
+              onDelete={deleteThread}
+              open={sidebarOpen}
+              onToggle={toggleSidebar}
+            />
+          )}
+        </AnimatePresence>
+
+        <main className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden relative">
+
+          {/* ACHEEVY Watermark Background inside the chat terminal */}
+          <div className="absolute inset-0 flex items-center justify-center opacity-[0.02] pointer-events-none mix-blend-screen scale-125 md:scale-150">
+            <Image src="/images/acheevy/acheevy-helmet.png" alt="" width={800} height={800} className="object-contain" />
+          </div>
+
+          {/* Top Panel Matrix */}
+          <div className="flex-shrink-0 flex items-center justify-between px-6 py-4 border-b border-[rgba(255,255,255,0.08)] bg-[#111111]/90 backdrop-blur-xl z-20 shadow-[0_4px_30px_rgba(0,0,0,0.5)]">
+            <div className="flex items-center gap-4 min-w-0">
+              {!sidebarOpen && (
+                <button onClick={toggleSidebar} className="p-1.5 rounded-lg bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.08)] text-[rgba(255,255,255,0.6)] hover:bg-[rgba(212,175,55,0.1)] hover:text-[#D4AF37] hover:border-[#D4AF37]/30 transition-all shadow-md">
+                  <PanelLeftOpen size={16} />
+                </button>
+              )}
+              <div className="relative flex-shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-[rgba(212,175,55,0.1)] border border-[rgba(212,175,55,0.3)] flex items-center justify-center overflow-hidden shadow-[0_0_15px_rgba(212,175,55,0.2)]">
+                  <Image src="/images/acheevy/acheevy-helmet.png" alt="ACHEEVY" width={40} height={40} className="w-full h-full object-cover" />
+                </div>
+                <div className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-[#111111] ${voiceActive ? 'bg-[#D4AF37] animate-pulse shadow-[0_0_10px_#D4AF37]' : 'bg-[#10B981] shadow-[0_0_10px_#10B981]'
+                  }`} />
+              </div>
+              <div className="min-w-0">
+                <h1 className="font-black text-lg text-white tracking-widest uppercase flex items-center gap-2">ACHEEVY <span className="text-[10px] bg-[rgba(255,255,255,0.1)] px-2 py-0.5 rounded-sm border border-[rgba(255,255,255,0.1)] text-[rgba(255,255,255,0.5)]">V.3.1.PRO</span></h1>
+                <p className="text-xs text-[#D4AF37] font-mono uppercase tracking-[0.2em] opacity-80">
+                  {voiceActive ? '>> SECURE AUDIO ENCLAVE <<' : '>> TEXT TERMINAL ONLINE <<'}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <select
+                value={selectedModel}
+                onChange={(e) => setSelectedModel(e.target.value)}
+                className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.1)] rounded-lg px-3 py-2 text-xs text-[rgba(255,255,255,0.8)] font-mono outline-none cursor-pointer focus:border-[#D4AF37]/50 appearance-none shadow-inner"
+              >
+                {AI_MODELS.map(m => (
+                  <option key={m.key} value={m.key} className="bg-[#0A0A0A] text-white">
+                    [{m.key}] {m.label}
+                  </option>
+                ))}
+              </select>
+
+              <VoiceSelector
+                voiceId={ttsVoiceId}
+                provider={ttsProvider}
+                onSelect={(id, p) => { setTtsVoiceId(id); setTtsProvider(p); }}
               />
+
+              {hasAgent && (
+                <button
+                  onClick={voiceActive ? endVoiceSession : startVoiceSession}
+                  className={`px-4 py-2 rounded-lg font-bold text-xs uppercase tracking-wider flex items-center gap-2 transition-all shadow-lg ${voiceActive
+                    ? 'bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30 shadow-[0_0_15px_rgba(239,68,68,0.3)]'
+                    : 'bg-[#D4AF37] text-[#0A0A0A] hover:bg-amber-400 shadow-[0_0_15px_rgba(212,175,55,0.3)] hover:scale-105'
+                    }`}
+                >
+                  {voiceActive ? <><PhoneOff size={14} /> Kill Link</> : <><Mic size={14} /> Initialize Audio</>}
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Chat Feed */}
+          <div className="flex-1 overflow-y-auto scroll-smooth min-h-0 relative z-10 px-4 md:px-8 py-8">
+            <div className="max-w-4xl mx-auto flex flex-col gap-6">
+
+              {messages.length === 0 && !voiceActive && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="flex flex-col items-center justify-center py-20"
+                >
+                  <div className="relative w-24 h-24 mb-6">
+                    <div className="absolute inset-0 rounded-2xl bg-[rgba(212,175,55,0.05)] border border-[#D4AF37]/20 overflow-hidden shadow-[0_0_40px_rgba(212,175,55,0.15)] backdrop-blur-3xl transform rotate-3">
+                      <Image src="/images/acheevy/acheevy-helmet.png" alt="ACHEEVY" width={96} height={96} className="w-full h-full object-cover scale-110" />
+                    </div>
+                  </div>
+                  <h2 className="text-2xl font-black text-white tracking-widest mb-3" style={{ textShadow: "0 0 20px rgba(212,175,55,0.4)" }}>Chat w/ACHEEVY</h2>
+                  <p className="text-[rgba(255,255,255,0.5)] text-sm text-center max-w-sm font-mono uppercase tracking-wider leading-relaxed">
+                    What will we deploy today?
+                  </p>
+                </motion.div>
+              )}
+
+              <AnimatePresence>
+                {messages.map((m, i) => (
+                  <MessageBubble
+                    key={m.id}
+                    role={m.role}
+                    content={m.content}
+                    isStreaming={isLoading && i === messages.length - 1 && m.role === 'assistant'}
+                  />
+                ))}
+              </AnimatePresence>
+
+              {voiceActive && voiceTranscript.map((entry, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className={`flex gap-3 ${entry.role === 'user' ? 'flex-row-reverse' : ''}`}
+                >
+                  <div className={`px-4 py-3 text-sm break-words max-w-[85%] border shadow-lg ${entry.role === 'user'
+                    ? 'bg-[rgba(212,175,55,0.15)] text-white rounded-2xl rounded-tr-sm border-[rgba(212,175,55,0.3)]'
+                    : 'bg-[#111111]/90 text-[rgba(255,255,255,0.9)] rounded-2xl rounded-tl-sm border-[rgba(255,255,255,0.1)] backdrop-blur-md'
+                    }`}>
+                    {entry.text}
+                  </div>
+                </motion.div>
+              ))}
+
+              {isLoading && messages.length > 0 && messages[messages.length - 1].role === 'user' && (
+                <div className="flex gap-4 items-start">
+                  <div className="w-8 h-8 rounded-full bg-[rgba(212,175,55,0.1)] border border-[#D4AF37]/30 overflow-hidden flex-shrink-0 animate-pulse">
+                    <Image src="/images/acheevy/acheevy-helmet.png" alt="" width={32} height={32} className="w-full h-full object-cover" />
+                  </div>
+                  <div className="px-4 py-3 bg-[#111111]/80 rounded-2xl rounded-tl-sm border border-[rgba(255,255,255,0.08)] flex items-center gap-2 shadow-lg backdrop-blur-md">
+                    <div className="w-2 h-2 bg-[#D4AF37] opacity-80 rounded-sm animate-bounce [animation-delay:-0.3s]" />
+                    <div className="w-2 h-2 bg-[#D4AF37] opacity-80 rounded-sm animate-bounce [animation-delay:-0.15s]" />
+                    <div className="w-2 h-2 bg-[#D4AF37] opacity-80 rounded-sm animate-bounce" />
+                    <span className="text-[10px] font-mono text-[rgba(255,255,255,0.4)] ml-2 uppercase tracking-wide">Processing...</span>
+                  </div>
+                </div>
+              )}
+
+              <div ref={messagesEndRef} className="h-4" />
+            </div>
+          </div>
+
+          {/* Voice Session Graphic Panel */}
+          <AnimatePresence>
+            {voiceActive && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
+                className="w-full max-w-4xl mx-auto mb-4 px-4"
+              >
+                <div className="rounded-2xl border border-[#D4AF37]/30 bg-[#111111]/90 backdrop-blur-xl p-6 shadow-[0_0_40px_rgba(212,175,55,0.15)] relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-[#D4AF37] opacity-5 blur-[100px] rounded-full pointer-events-none" />
+
+                  <div className="flex items-center justify-between mb-4 relative z-10">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-3 h-3 rounded-full ${conversation.status === 'connected' ? 'bg-[#10B981] animate-pulse shadow-[0_0_15px_#10B981]' : 'bg-[#F59E0B] animate-pulse shadow-[0_0_15px_#F59E0B]'}`} />
+                      <span className="text-[11px] font-mono text-white font-bold uppercase tracking-widest">
+                        {conversation.status === 'connected' ? (conversation.isSpeaking ? 'ACHEEVY TRANSMITTING' : 'ACHEEVY LISTENING...') : 'ESTABLISHING HANDSHAKE...'}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-6 relative z-10">
+                    <div className="bg-[#0A0A0A] rounded-xl border border-[rgba(255,255,255,0.05)] p-3 shadow-inner">
+                      <p className="text-[10px] text-[rgba(255,255,255,0.4)] font-mono uppercase tracking-widest mb-2 flex justify-between">
+                        <span>[USER_MIC_INPUT]</span>
+                        <span>{conversation.status === 'connected' ? 'ACTIVE' : 'STANDBY'}</span>
+                      </p>
+                      <FrequencyVisualizer getData={conversation.getInputByteFrequencyData} active={conversation.status === 'connected'} color="#10B981" />
+                    </div>
+                    <div className="bg-[rgba(212,175,55,0.02)] rounded-xl border border-[#D4AF37]/20 p-3 shadow-inner">
+                      <p className="text-[10px] text-[#D4AF37]/60 font-mono uppercase tracking-widest mb-2 flex justify-between">
+                        <span>[AGENT_AI_OUTPUT]</span>
+                        <span>{conversation.isSpeaking ? 'TX_ON' : 'IDLE'}</span>
+                      </p>
+                      <FrequencyVisualizer getData={conversation.getOutputByteFrequencyData} active={conversation.isSpeaking} color="#D4AF37" />
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
             )}
           </AnimatePresence>
 
-          {/* Main Area */}
-          <main className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden">
-            {/* ── Header ── */}
-            <div className="flex-shrink-0 flex items-center gap-3 px-4 py-2.5 border-b border-slate-200 bg-white/90 backdrop-blur-xl">
-              {/* Left */}
-              <div className="flex items-center gap-2.5 min-w-0">
-                {!sidebarOpen && (
-                  <button onClick={toggleSidebar} className="p-1 rounded text-slate-400 hover:text-gold transition-colors flex-shrink-0">
-                    <PanelLeftOpen size={15} />
-                  </button>
-                )}
-                <div className="relative flex-shrink-0">
-                  <div className="w-8 h-8 rounded-lg bg-white border border-gold/15 overflow-hidden">
-                    <Image src="/images/acheevy/acheevy-helmet.png" alt="ACHEEVY" width={32} height={32} className="w-full h-full object-cover" />
-                  </div>
-                  <div className={`absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full border-[1.5px] border-white ${
-                    voiceActive ? 'bg-gold animate-pulse' : 'bg-emerald-400'
-                  }`} />
-                </div>
-                <div className="min-w-0">
-                  <h1 className="font-semibold text-sm text-slate-800 tracking-tight truncate">Chat w/ACHEEVY</h1>
-                  <p className="text-[9px] text-slate-400 font-mono truncate">
-                    {voiceActive ? 'Voice Session Active' : 'Vercel AI SDK + ElevenLabs Agent'}
-                  </p>
-                </div>
-              </div>
+          {/* Secure Chat Input */}
+          <div className="flex-shrink-0 bg-[#111111]/95 backdrop-blur-2xl border-t border-[rgba(255,255,255,0.05)] px-4 py-5 z-20">
+            <div className="max-w-4xl mx-auto w-full relative group">
+              <form id="chat-form" onSubmit={handleEnhancedSubmit} className="relative flex items-end w-full rounded-2xl bg-[#0A0A0A] border border-[rgba(255,255,255,0.1)] focus-within:border-[#D4AF37]/50 focus-within:ring-1 focus-within:ring-[#D4AF37]/50 shadow-[0_4px_25px_rgba(0,0,0,0.5)] transition-all overflow-hidden">
 
-              {/* Right controls */}
-              <div className="flex items-center gap-1.5 ml-auto flex-shrink-0">
-                {/* Model */}
-                <select
-                  value={selectedModel}
-                  onChange={(e) => setSelectedModel(e.target.value)}
-                  className="bg-white border border-slate-200 rounded-lg px-2 py-1 text-[10px] text-slate-500 font-mono outline-none cursor-pointer max-w-[90px] appearance-none"
-                  title="AI Model"
-                >
-                  {AI_MODELS.map(m => (
-                    <option key={m.key} value={m.key} className="bg-white">
-                      {m.label}
-                    </option>
-                  ))}
-                </select>
-
-                {/* Voice */}
-                <VoiceSelector
-                  voiceId={ttsVoiceId}
-                  provider={ttsProvider}
-                  onSelect={(id, p) => { setTtsVoiceId(id); setTtsProvider(p); }}
+                <textarea
+                  ref={textareaRef}
+                  value={input}
+                  onChange={handleInputChange}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Message ACHEEVY..."
+                  disabled={isLoading || voiceActive}
+                  className="flex-1 max-h-40 min-h-[56px] py-4 pl-5 pr-14 bg-transparent outline-none resize-none text-white text-sm placeholder-[rgba(255,255,255,0.3)] disabled:opacity-50 font-mono"
+                  rows={1}
                 />
 
-                {/* Voice session */}
-                {hasAgent && (
-                  <button
-                    onClick={voiceActive ? endVoiceSession : startVoiceSession}
-                    className={`p-1.5 rounded-lg transition-all ${
-                      voiceActive
-                        ? 'bg-red-500/15 text-red-400 hover:bg-red-500/25'
-                        : 'bg-gold/10 text-gold/70 hover:bg-gold/20 hover:text-gold'
-                    }`}
-                    title={voiceActive ? 'End voice session' : 'Start voice session'}
-                  >
-                    {voiceActive ? <PhoneOff size={14} /> : <Phone size={14} />}
-                  </button>
-                )}
-              </div>
-            </div>
-
-            {/* ── Messages ── */}
-            <div className="flex-1 overflow-y-auto overflow-x-hidden scroll-smooth min-h-0">
-              <div className="max-w-2xl mx-auto px-4 py-4 space-y-4 w-full">
-                {/* Welcome */}
-                {messages.length === 0 && !voiceActive && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="flex flex-col items-center justify-center py-8"
-                  >
-                    <div className="relative w-16 h-16 mb-4">
-                      <div className="absolute inset-0 rounded-2xl bg-gold/10 border border-gold/15 overflow-hidden">
-                        <Image src="/images/acheevy/acheevy-helmet.png" alt="ACHEEVY" width={64} height={64} className="w-full h-full object-cover" />
-                      </div>
-                      <div className="absolute inset-0 rounded-2xl border border-gold/20 animate-pulse" style={{ animationDuration: '3s' }} />
-                    </div>
-                    <h2 className="text-lg font-semibold text-slate-800 mb-1">Chat w/ACHEEVY</h2>
-                    <p className="text-slate-400 text-sm text-center max-w-sm">
-                      What will we deploy today?
-                    </p>
-                    {hasAgent && (
-                      <button
-                        onClick={startVoiceSession}
-                        className="mt-4 flex items-center gap-2 px-4 py-2 rounded-xl bg-gold/10 border border-gold/20 text-gold/80 text-sm hover:bg-gold/15 hover:border-gold/30 transition-all"
-                      >
-                        <Phone className="w-4 h-4" />
-                        Start Voice Session
-                      </button>
-                    )}
-                  </motion.div>
-                )}
-
-                {/* Text messages */}
-                <AnimatePresence>
-                  {messages.map((m, i) => (
-                    <MessageBubble
-                      key={m.id}
-                      role={m.role}
-                      content={m.content}
-                      isStreaming={isLoading && i === messages.length - 1 && m.role === 'assistant'}
-                    />
-                  ))}
-                </AnimatePresence>
-
-                {/* Voice transcript */}
-                {voiceActive && voiceTranscript.map((entry, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, y: 6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className={`flex gap-3 ${entry.role === 'user' ? 'flex-row-reverse' : ''}`}
-                  >
-                    <div className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm break-words ${
-                      entry.role === 'user'
-                        ? 'bg-gold/10 text-slate-800 rounded-tr-sm border border-gold/15'
-                        : 'bg-white text-slate-700 rounded-tl-sm border border-slate-200'
-                    }`}>
-                      {entry.text}
-                    </div>
-                  </motion.div>
-                ))}
-
-                {/* Loading */}
-                {isLoading && messages.length > 0 && messages[messages.length - 1].role === 'user' && (
-                  <div className="flex gap-3">
-                    <div className="w-7 h-7 rounded-full bg-gold/10 border border-gold/15 overflow-hidden flex-shrink-0">
-                      <Image src="/images/acheevy/acheevy-helmet.png" alt="" width={28} height={28} className="w-full h-full object-cover animate-pulse" />
-                    </div>
-                    <div className="px-3 py-2.5 bg-white rounded-2xl rounded-tl-sm border border-slate-200 flex items-center gap-1.5">
-                      <div className="w-1.5 h-1.5 bg-gold/40 rounded-full animate-bounce [animation-delay:-0.3s]" />
-                      <div className="w-1.5 h-1.5 bg-gold/40 rounded-full animate-bounce [animation-delay:-0.15s]" />
-                      <div className="w-1.5 h-1.5 bg-gold/40 rounded-full animate-bounce" />
-                    </div>
-                  </div>
-                )}
-
-                <div ref={messagesEndRef} />
-              </div>
-            </div>
-
-            {/* ── Voice Session Panel ── */}
-            <AnimatePresence>
-              {voiceActive && (
-                <div className="flex-shrink-0 px-4">
-                  <VoiceSessionPanel conversation={conversation} active={voiceActive} onEnd={endVoiceSession} />
+                <div className="absolute right-2 bottom-2 flex items-center gap-1 bg-[#0A0A0A]">
+                  {isLoading ? (
+                    <button type="button" onClick={stop} className="p-2.5 rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-colors border border-red-500/30">
+                      <Square size={16} fill="currentColor" />
+                    </button>
+                  ) : (
+                    <button
+                      type="submit"
+                      disabled={!input.trim() || voiceActive}
+                      className="p-2.5 rounded-xl bg-[#D4AF37] text-[#0A0A0A] hover:bg-amber-400 disabled:opacity-20 disabled:bg-[rgba(255,255,255,0.1)] disabled:text-[rgba(255,255,255,0.3)] transition-all font-bold group-focus-within:shadow-[0_0_15px_rgba(212,175,55,0.4)]"
+                    >
+                      <Send size={16} className={input.trim() ? 'translate-x-[1px] translate-y-[-1px]' : ''} />
+                    </button>
+                  )}
                 </div>
-              )}
-            </AnimatePresence>
+              </form>
 
-            {/* ── Input Area ── */}
-            <div className="flex-shrink-0 border-t border-slate-200 bg-white/90 backdrop-blur-xl px-4 py-3">
-              <div className="max-w-2xl mx-auto w-full">
-                {/* File previews */}
-                {files.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5 mb-2">
-                    {files.map((f, i) => (
-                      <div key={`${f.name}-${i}`} className="flex items-center gap-1.5 px-2 py-1 rounded-lg border border-slate-200 bg-white text-[10px] text-slate-500">
-                        <Paperclip className="w-2.5 h-2.5 text-gold/40" />
-                        <span className="max-w-[100px] truncate">{f.name}</span>
-                        <button onClick={() => setFiles(p => p.filter((_, j) => j !== i))} className="text-slate-300 hover:text-red-400"><X className="w-2.5 h-2.5" /></button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                <form id="chat-form" onSubmit={handleEnhancedSubmit}>
-                  <div className="flex items-end gap-2 rounded-2xl border border-slate-200 bg-white p-2.5 focus-within:border-gold/20 transition-colors">
-                    {/* File attach */}
-                    <button
-                      type="button"
-                      onClick={() => fileRef.current?.click()}
-                      className="p-2 rounded-xl bg-white text-slate-400 hover:text-gold/60 hover:bg-gold/[0.06] transition-all flex-shrink-0"
-                    >
-                      <Paperclip className="w-4 h-4" />
-                    </button>
-                    <input
-                      ref={fileRef}
-                      type="file"
-                      multiple
-                      accept="image/*,.pdf,.txt,.csv,.json,.md,.doc,.docx"
-                      onChange={(e) => {
-                        const f = Array.from(e.target.files || []);
-                        if (f.length) setFiles(p => [...p, ...f].slice(0, 5));
-                        if (fileRef.current) fileRef.current.value = '';
-                      }}
-                      className="hidden"
-                    />
-
-                    {/* Text input */}
-                    <textarea
-                      ref={textareaRef}
-                      value={input}
-                      onChange={handleInputChange}
-                      onKeyDown={handleKeyDown}
-                      placeholder={voiceActive ? 'Voice session active...' : 'Message ACHEEVY...'}
-                      disabled={isLoading || voiceActive}
-                      rows={1}
-                      className="flex-1 bg-transparent text-slate-800 placeholder:text-slate-300 resize-none outline-none text-sm leading-relaxed max-h-[140px] py-1.5 min-w-0"
-                    />
-
-                    {/* TTS toggle */}
-                    <button
-                      type="button"
-                      onClick={() => { isSpeaking ? stopSpeaking() : setTtsEnabled(!ttsEnabled); }}
-                      className={`p-2 rounded-xl transition-all flex-shrink-0 ${
-                        isSpeaking ? 'bg-gold/15 text-gold animate-pulse'
-                          : ttsEnabled ? 'bg-gold/[0.06] text-gold/60' : 'bg-white text-slate-300'
-                      }`}
-                      title={ttsEnabled ? (isSpeaking ? 'Stop' : 'TTS On') : 'Enable TTS'}
-                    >
-                      {ttsEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
-                    </button>
-
-                    {/* Send / Stop */}
-                    {isLoading ? (
-                      <button type="button" onClick={stop} className="p-2 rounded-xl bg-red-500/15 text-red-400 hover:bg-red-500/25 transition-colors flex-shrink-0">
-                        <Square className="w-4 h-4" />
-                      </button>
-                    ) : (
-                      <button
-                        type="submit"
-                        disabled={!input.trim() || voiceActive}
-                        className={`p-2 rounded-xl transition-all flex-shrink-0 ${
-                          input.trim() && !voiceActive
-                            ? 'bg-gold text-black hover:bg-[#F6C453]'
-                            : 'bg-white text-slate-300 cursor-not-allowed'
-                        }`}
-                      >
-                        <Send className="w-4 h-4" />
-                      </button>
-                    )}
-                  </div>
-                </form>
-
+              <div className="text-center mt-3 flex justify-center gap-4 text-[10px] font-mono text-[rgba(255,255,255,0.3)] tracking-widest uppercase">
+                <span>Shift+Enter to add new line</span>
+                <span>Enter to send</span>
               </div>
             </div>
-          </main>
-        </div>
+          </div>
+        </main>
       </div>
-    </LogoWallBackground>
+    </div>
   );
 }
