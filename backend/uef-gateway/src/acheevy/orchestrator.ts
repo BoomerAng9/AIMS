@@ -14,8 +14,8 @@
 import { getIIAgentClient, IIAgentClient, IIAgentTask } from '../ii-agent/client';
 import { LUCEngine } from '../luc';
 import { v4 as uuidv4 } from 'uuid';
-import { triggerPmoPipeline } from '../n8n';
-import type { N8nPipelineResponse } from '../n8n';
+import { triggerPmoPipeline, triggerVerticalWorkflow } from '../pipeline';
+import type { PipelineResponse } from '../pipeline';
 import { executeVertical } from './execution-engine';
 import { spawnAgent, decommissionAgent, getRoster, getAvailableRoster } from '../deployment-hub';
 import type { SpawnRequest, EnvironmentTarget } from '../deployment-hub';
@@ -512,7 +512,7 @@ export class AcheevyOrchestrator {
     req: AcheevyExecuteRequest
   ): Promise<AcheevyExecuteResponse> {
     try {
-      const result: N8nPipelineResponse = await triggerPmoPipeline({
+      const result: PipelineResponse = await triggerPmoPipeline({
         userId: req.userId,
         message: req.message,
         requestId,
@@ -598,7 +598,7 @@ export class AcheevyOrchestrator {
         };
       }
 
-      // Fire-and-forget: also trigger n8n workflow for this vertical (Phase B automation)
+      // Fire-and-forget: also trigger pipeline workflow for this vertical (Phase B automation)
       triggerVerticalWorkflow({
         verticalId,
         userId: req.userId,
@@ -606,7 +606,7 @@ export class AcheevyOrchestrator {
         sessionId: req.conversationId || requestId,
         requestId,
       }).catch(err => {
-        logger.warn({ err: err instanceof Error ? err.message : err, verticalId }, '[ACHEEVY] n8n vertical workflow trigger failed (non-blocking)');
+        logger.warn({ err: err instanceof Error ? err.message : err, verticalId }, '[ACHEEVY] vertical workflow trigger failed (non-blocking)');
       });
 
       return {

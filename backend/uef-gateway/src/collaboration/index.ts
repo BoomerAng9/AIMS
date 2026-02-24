@@ -28,10 +28,10 @@ export type {
 export { DEFAULT_FEED_CONFIG } from './types';
 
 import { CollaborationFeedGenerator } from './feed';
-import { executeChainOfCommandFull } from '../n8n/chain-of-command';
-import { createPipelinePacket } from '../n8n/pmo-router';
+import { executeChainOfCommandFull } from '../pipeline/chain-of-command';
+import { createPipelinePacket } from '../pipeline/pmo-router';
 import type { CollaborationSession, FeedConfig } from './types';
-import type { PmoPipelinePacket } from '../n8n/types';
+import type { PmoPipelinePacket } from '../pipeline/types';
 
 // ---------------------------------------------------------------------------
 // Convenience: Run a demo collaboration session

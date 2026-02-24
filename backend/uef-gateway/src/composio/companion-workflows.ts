@@ -1,19 +1,18 @@
 /**
- * n8n Companion Workflows — Scheduled counterparts to Composio playbooks
+ * Companion Workflows — Scheduled counterparts to Composio playbooks
  *
  * Each Composio playbook has a real-time component (executed on demand)
- * and an optional scheduled component (runs on a cron/webhook in n8n).
+ * and an optional scheduled component (cron/webhook-driven pipeline).
  *
- * This file generates the n8n workflow JSON for each companion workflow.
- * Deploy via: POST /api/n8n/workflows { action: 'deploy', workflow: <json> }
+ * This file generates workflow JSON templates for each companion workflow.
  *
  * Architecture:
  *   Composio_Ang  → real-time actions (send email, create issue, post message)
- *   n8n companion → scheduled triggers (poll for events, cron reports, webhook listeners)
+ *   Companion     → scheduled triggers (poll for events, cron reports, webhook listeners)
  *   Both → report to ACHEEVY via UEF Gateway for audit trail
  */
 
-interface N8nNode {
+interface WorkflowNode {
   id: string;
   name: string;
   type: string;
@@ -21,16 +20,16 @@ interface N8nNode {
   parameters: Record<string, unknown>;
 }
 
-interface N8nWorkflow {
+interface CompanionWorkflow {
   name: string;
-  nodes: N8nNode[];
+  nodes: WorkflowNode[];
   connections: Record<string, { main: Array<Array<{ node: string; type: string; index: number }>> }>;
   active: boolean;
   settings: { executionOrder: string };
 }
 
-function buildConnections(nodes: N8nNode[]): N8nWorkflow['connections'] {
-  const connections: N8nWorkflow['connections'] = {};
+function buildConnections(nodes: WorkflowNode[]): CompanionWorkflow['connections'] {
+  const connections: CompanionWorkflow['connections'] = {};
   for (let i = 0; i < nodes.length - 1; i++) {
     connections[nodes[i].name] = {
       main: [[{ node: nodes[i + 1].name, type: 'main', index: 0 }]],
@@ -43,8 +42,8 @@ function buildConnections(nodes: N8nNode[]): N8nWorkflow['connections'] {
 // Polls Stripe for new charges every 15 minutes, then triggers Composio
 // to update CRM and create follow-up tasks.
 
-function revenueGhostScheduler(): N8nWorkflow {
-  const nodes: N8nNode[] = [
+function revenueGhostScheduler(): CompanionWorkflow {
+  const nodes: WorkflowNode[] = [
     {
       id: 'cron',
       name: 'Every 15 Minutes',
@@ -111,8 +110,8 @@ function revenueGhostScheduler(): N8nWorkflow {
 // ── Codebase Guardian Cron ──────────────────────────────────────────
 // Runs every hour, checks for new PRs, triggers Composio_Ang for analysis.
 
-function codebaseGuardianCron(): N8nWorkflow {
-  const nodes: N8nNode[] = [
+function codebaseGuardianCron(): CompanionWorkflow {
+  const nodes: WorkflowNode[] = [
     {
       id: 'cron',
       name: 'Every Hour',
@@ -178,8 +177,8 @@ function codebaseGuardianCron(): N8nWorkflow {
 // ── Content Hydra Distributor ───────────────────────────────────────
 // Webhook listener: when content is published in Notion, distribute everywhere.
 
-function contentHydraDistributor(): N8nWorkflow {
-  const nodes: N8nNode[] = [
+function contentHydraDistributor(): CompanionWorkflow {
+  const nodes: WorkflowNode[] = [
     {
       id: 'webhook',
       name: 'Content Published Webhook',
@@ -241,8 +240,8 @@ function contentHydraDistributor(): N8nWorkflow {
 // ── Client Onboarding Pipeline ──────────────────────────────────────
 // Webhook: new Stripe customer → full provisioning chain.
 
-function onboardingPipeline(): N8nWorkflow {
-  const nodes: N8nNode[] = [
+function onboardingPipeline(): CompanionWorkflow {
+  const nodes: WorkflowNode[] = [
     {
       id: 'webhook',
       name: 'New Customer Webhook',
@@ -315,8 +314,8 @@ function onboardingPipeline(): N8nWorkflow {
 // ── Competitive Intel Radar ─────────────────────────────────────────
 // Weekly cron: scrape competitors, analyze, report.
 
-function intelRadarWeekly(): N8nWorkflow {
-  const nodes: N8nNode[] = [
+function intelRadarWeekly(): CompanionWorkflow {
+  const nodes: WorkflowNode[] = [
     {
       id: 'cron',
       name: 'Every Monday 9am',
@@ -371,8 +370,8 @@ function intelRadarWeekly(): N8nWorkflow {
 // ── Meeting Action Extractor ────────────────────────────────────────
 // Runs every 30 minutes, checks for recently ended calendar events.
 
-function meetingActionExtractor(): N8nWorkflow {
-  const nodes: N8nNode[] = [
+function meetingActionExtractor(): CompanionWorkflow {
+  const nodes: WorkflowNode[] = [
     {
       id: 'cron',
       name: 'Every 30 Minutes',
@@ -438,8 +437,8 @@ function meetingActionExtractor(): N8nWorkflow {
 // ── Cost Sentinel Daily ─────────────────────────────────────────────
 // Daily 8am: collect cloud billing, analyze anomalies, report.
 
-function costSentinelDaily(): N8nWorkflow {
-  const nodes: N8nNode[] = [
+function costSentinelDaily(): CompanionWorkflow {
+  const nodes: WorkflowNode[] = [
     {
       id: 'cron',
       name: 'Every Day 8am',
@@ -492,7 +491,7 @@ function costSentinelDaily(): N8nWorkflow {
 
 // ── Export All Companion Workflows ───────────────────────────────────
 
-export const N8N_COMPANION_WORKFLOWS: Record<string, () => N8nWorkflow> = {
+export const COMPANION_WORKFLOWS: Record<string, () => CompanionWorkflow> = {
   'revenue-ghost-scheduler': revenueGhostScheduler,
   'codebase-guardian-cron': codebaseGuardianCron,
   'content-hydra-distributor': contentHydraDistributor,

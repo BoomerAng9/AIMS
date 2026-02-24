@@ -3,6 +3,15 @@ import Link from 'next/link';
 
 const PROJECT_TYPES = [
   {
+    id: 'creative-studio',
+    title: 'Creative Studio',
+    description: 'AI-powered creative builds with the NtNtN Engine — from brief to deployed site',
+    icon: '✨',
+    href: '/dashboard/ntntn-studio',
+    features: ['NtNtN Engine', '3-pillar pipeline', 'Buildsmith delivery', 'Live preview'],
+    recommended: true,
+  },
+  {
     id: 'diy',
     title: 'DIY Projects',
     description: 'Hands-on home projects with voice and vision guidance',
@@ -13,7 +22,7 @@ const PROJECT_TYPES = [
   {
     id: 'web-app',
     title: 'Web Application',
-    description: 'Build a custom web application from scratch',
+    description: 'Build a custom web app with guided configuration',
     icon: '🌐',
     href: '/dashboard/make-it-mine/web-app',
     features: ['Full-stack development', 'Deployment included', 'Custom domain'],
@@ -63,6 +72,11 @@ export default function MakeItMinePage() {
             {project.comingSoon && (
               <span className="absolute top-4 right-4 text-[0.65rem] uppercase tracking-wider text-gold bg-gold/10 px-2 py-1 rounded">
                 Coming Soon
+              </span>
+            )}
+            {(project as any).recommended && (
+              <span className="absolute top-4 right-4 text-[0.65rem] uppercase tracking-wider text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-1 rounded">
+                Recommended
               </span>
             )}
 

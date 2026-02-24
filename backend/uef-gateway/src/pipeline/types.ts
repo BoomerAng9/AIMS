@@ -1,5 +1,5 @@
 /**
- * n8n PMO Routing — Type Definitions
+ * PMO Pipeline — Type Definitions
  *
  * Types for the chain-of-command pipeline:
  *   User → ACHEEVY → Boomer_Ang → Chicken Hawk → Squad → Lil_Hawks → Receipt → ACHEEVY → User
@@ -227,17 +227,17 @@ export interface PmoPipelinePacket {
 }
 
 // ---------------------------------------------------------------------------
-// n8n Integration
+// Pipeline Integration
 // ---------------------------------------------------------------------------
 
-export interface N8nTriggerPayload {
+export interface PipelineTriggerPayload {
   userId: string;
   message: string;
   requestId?: string;
   context?: Record<string, unknown>;
 }
 
-export interface N8nPipelineResponse {
+export interface PipelineResponse {
   requestId: string;
   userId: string;
   status: ShiftStatus;

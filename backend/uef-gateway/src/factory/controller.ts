@@ -116,7 +116,7 @@ export class FactoryController {
 
   /**
    * Ingest an event from any source.
-   * This is the primary entry point — called by webhooks, n8n, UI actions, etc.
+   * This is the primary entry point — called by webhooks, pipelines, UI actions, etc.
    */
   async ingestEvent(event: FactoryEvent): Promise<{
     accepted: boolean;

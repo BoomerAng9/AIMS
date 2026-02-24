@@ -65,8 +65,8 @@ composioRouter.post('/execute', async (req: Request, res: Response) => {
     success: true,
     data: result.data,
     executionTimeMs: result.executionTimeMs,
-    // n8n-compatible format for webhook chaining
-    n8nPayload: composioBridge.formatForN8n(actionName, result),
+    // Pipeline-compatible format for webhook chaining
+    pipelinePayload: composioBridge.formatForPipeline(actionName, result),
   });
 });
 

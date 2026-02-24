@@ -13,7 +13,7 @@
  *   luc_projects  — LUC pricing & effort oracle records
  *   plugs         — Built artifacts (aiPlugs)
  *   boomer_angs   — Agent roster (Chicken Hawk, Lil_Hawks, directors)
- *   workflows     — Automation definitions (n8n, custom pipelines)
+ *   workflows     — Automation definitions (pipelines, custom workflows)
  *   runs          — Execution run records
  *   logs          — Structured log entries
  *   assets        — Files, diagrams, screenshots, configs
@@ -178,7 +178,7 @@ export interface BoomerAngRecord {
 // workflows — Automation definitions
 // ---------------------------------------------------------------------------
 
-export type WorkflowEngine = 'n8n' | 'custom' | 'cloud-functions' | 'hybrid';
+export type WorkflowEngine = 'pipeline' | 'custom' | 'cloud-functions' | 'hybrid';
 export type WorkflowStatus = 'draft' | 'active' | 'paused' | 'disabled' | 'archived';
 
 export interface WorkflowStep {

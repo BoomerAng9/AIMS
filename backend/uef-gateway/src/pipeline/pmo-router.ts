@@ -23,7 +23,7 @@ import {
   PmoClassification,
   BoomerDirective,
   CrewSpecialty,
-  N8nTriggerPayload,
+  PipelineTriggerPayload,
   ChainPosition,
   PmoPipelinePacket,
 } from './types';
@@ -381,7 +381,7 @@ export function buildDirective(classification: PmoClassification, message: strin
 // Pipeline Entry — creates the initial PmoPipelinePacket
 // ---------------------------------------------------------------------------
 
-export function createPipelinePacket(payload: N8nTriggerPayload): PmoPipelinePacket {
+export function createPipelinePacket(payload: PipelineTriggerPayload): PmoPipelinePacket {
   const requestId = payload.requestId || `REQ-${uuidv4().slice(0, 8).toUpperCase()}`;
   const now = new Date().toISOString();
 

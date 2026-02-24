@@ -141,6 +141,79 @@ function generateServiceHealth(): ServiceHealth[] {
   ];
 }
 
+/**
+ * Fetch real service health from backend, fallback to generated data.
+ */
+async function fetchServiceHealthFromAPI(): Promise<ServiceHealth[]> {
+  try {
+    const res = await fetch("/api/operations/services");
+    if (res.ok) {
+      const data = await res.json();
+      if (data.services?.length > 0) return data.services;
+    }
+  } catch { /* Backend unreachable — use generated data */ }
+  return generateServiceHealth();
+}
+
+/**
+ * Fetch real alerts from backend, fallback to static data.
+ */
+async function fetchAlertsFromAPI(): Promise<{ active: ActiveAlert[]; history: unknown[] }> {
+  try {
+    const res = await fetch("/api/operations/alerts");
+    if (res.ok) {
+      const data = await res.json();
+      if (!data.fallback) return data;
+    }
+  } catch { /* Backend unreachable */ }
+  return { active: ACTIVE_ALERTS, history: [] };
+}
+
+/**
+ * Hook: Periodically refreshes service health (real API → fallback).
+ */
+function useServiceHealth() {
+  const [services, setServices] = useState<ServiceHealth[]>(() => generateServiceHealth());
+  const [isLiveData, setIsLiveData] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+    const refresh = async () => {
+      const result = await fetchServiceHealthFromAPI();
+      if (mounted) {
+        setServices(result);
+        // Check if we got real data (latency field set by real check will differ from static)
+        setIsLiveData(result.some(s => s.lastCheck === "just now"));
+      }
+    };
+    refresh();
+    const interval = setInterval(refresh, 15000);
+    return () => { mounted = false; clearInterval(interval); };
+  }, []);
+
+  return { services, isLiveData };
+}
+
+/**
+ * Hook: Fetches real alerts from backend with periodic refresh.
+ */
+function useLiveAlerts() {
+  const [alerts, setAlerts] = useState<ActiveAlert[]>(ACTIVE_ALERTS);
+
+  useEffect(() => {
+    let mounted = true;
+    const refresh = async () => {
+      const data = await fetchAlertsFromAPI();
+      if (mounted && data.active.length > 0) setAlerts(data.active);
+    };
+    refresh();
+    const interval = setInterval(refresh, 10000);
+    return () => { mounted = false; clearInterval(interval); };
+  }, []);
+
+  return alerts;
+}
+
 /* ------------------------------------------------------------------ */
 /*  Live Data Hooks                                                    */
 /* ------------------------------------------------------------------ */
@@ -440,7 +513,8 @@ export default function OperationsPage() {
   const [theaterOpen, setTheaterOpen] = useState(false);
   const { responseTimeData, requestRateData, cpuData, memoryData, errorRateData } = useLiveTelemetry();
   const liveEvents = useLiveEvents();
-  const services = useMemo(() => generateServiceHealth(), []);
+  const { services, isLiveData } = useServiceHealth();
+  const alerts = useLiveAlerts();
 
   // KPI calculations from live data
   const currentResponseTime = responseTimeData[responseTimeData.length - 1]?.value ?? 0;
@@ -492,6 +566,14 @@ export default function OperationsPage() {
                 {isLive ? "LIVE" : "PAUSED"}
               </span>
             </button>
+
+            {/* Backend data indicator */}
+            {isLiveData && (
+              <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-blue-500/20 bg-blue-500/10 text-[9px] font-bold uppercase tracking-widest text-blue-400">
+                <Wifi size={10} />
+                API
+              </span>
+            )}
 
             {/* Time range selector */}
             <div className="flex items-center rounded-lg border border-wireframe-stroke bg-[#1F1F23]/60 p-0.5">
@@ -610,7 +692,7 @@ export default function OperationsPage() {
       <div className="flex items-center gap-1 border-b border-wireframe-stroke pb-0">
         {[
           { key: "overview" as const, label: "Overview", icon: Eye },
-          { key: "alerts" as const, label: "Alerts", icon: AlertTriangle, count: ACTIVE_ALERTS.length },
+          { key: "alerts" as const, label: "Alerts", icon: AlertTriangle, count: alerts.length },
           { key: "incidents" as const, label: "Incidents", icon: Bell, count: INCIDENTS.filter(i => i.status !== "resolved").length },
           { key: "traces" as const, label: "Traces", icon: Radio, count: CORRELATION_TRACES.length },
         ].map((tab) => (
@@ -868,7 +950,7 @@ export default function OperationsPage() {
                 <AlertTriangle size={14} className="text-gold" />
                 <h2 className="text-sm font-semibold uppercase tracking-widest text-zinc-200">Active Alerts</h2>
               </div>
-              {ACTIVE_ALERTS.length === 0 ? (
+              {alerts.length === 0 ? (
                 <div className="rounded-2xl border border-dashed border-emerald-400/20 bg-emerald-400/5 p-8 text-center">
                   <CheckCircle2 size={24} className="text-emerald-400 mx-auto mb-2" />
                   <p className="text-sm text-emerald-400">No active alerts</p>
@@ -885,7 +967,7 @@ export default function OperationsPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {ACTIVE_ALERTS.map((alert) => (
+                      {alerts.map((alert) => (
                         <tr key={alert.id} className="border-t border-wireframe-stroke hover:bg-[#111113] transition-colors">
                           <td className="p-3"><code className="text-[10px] font-mono text-gold">{alert.id}</code></td>
                           <td className="p-3"><SeverityBadge severity={alert.severity} /></td>

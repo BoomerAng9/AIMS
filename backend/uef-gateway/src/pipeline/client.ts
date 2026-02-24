@@ -8,11 +8,7 @@
 import logger from '../logger';
 import { createPipelinePacket } from './pmo-router';
 import { executeChainOfCommand } from './chain-of-command';
-import { N8nTriggerPayload, N8nPipelineResponse } from './types';
-
-// Re-export types under pipeline-oriented names
-export type PipelineTriggerPayload = N8nTriggerPayload;
-export type PipelineResponse = N8nPipelineResponse;
+import { PipelineTriggerPayload, PipelineResponse } from './types';
 
 // ---------------------------------------------------------------------------
 // Vertical-to-Pipeline Mapping
@@ -34,7 +30,7 @@ export interface VerticalTriggerPayload {
  * Execute the PMO pipeline in-process.
  * Uses chain-of-command: ACHEEVY → Boomer_Ang → Chicken Hawk → Squad → Lil_Hawks → Receipt
  */
-async function executePipeline(payload: N8nTriggerPayload): Promise<N8nPipelineResponse> {
+async function executePipeline(payload: PipelineTriggerPayload): Promise<PipelineResponse> {
   const packet = createPipelinePacket(payload);
   return executeChainOfCommand(packet);
 }
@@ -42,7 +38,7 @@ async function executePipeline(payload: N8nTriggerPayload): Promise<N8nPipelineR
 /**
  * Trigger the PMO routing pipeline.
  */
-export async function triggerPmoPipeline(payload: N8nTriggerPayload): Promise<N8nPipelineResponse> {
+export async function triggerPmoPipeline(payload: PipelineTriggerPayload): Promise<PipelineResponse> {
   logger.info(
     { userId: payload.userId, requestId: payload.requestId },
     '[Pipeline] Triggering PMO pipeline',
@@ -50,15 +46,12 @@ export async function triggerPmoPipeline(payload: N8nTriggerPayload): Promise<N8
   return executePipeline(payload);
 }
 
-// Keep backward-compatible export name during migration
-export const triggerN8nPmoWorkflow = triggerPmoPipeline;
-
 /**
  * Trigger a vertical-specific pipeline after Phase A completes.
  */
 export async function triggerVerticalWorkflow(
   payload: VerticalTriggerPayload,
-): Promise<N8nPipelineResponse> {
+): Promise<PipelineResponse> {
   logger.info(
     { verticalId: payload.verticalId, userId: payload.userId },
     '[Pipeline] Triggering vertical pipeline',

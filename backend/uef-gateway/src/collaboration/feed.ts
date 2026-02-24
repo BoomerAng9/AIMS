@@ -24,7 +24,7 @@ import type {
   ExecutionRecord,
   VerificationResult,
   ShiftReceipt,
-} from '../n8n/types';
+} from '../pipeline/types';
 import type {
   FeedEntry,
   FeedEntryType,

@@ -6,7 +6,7 @@ name: aims
 # =============================================================================
 # Used in HYBRID deployment mode:
 #   Cloud Run → frontend, uef-gateway (stateless, auto-scaling)
-#   VPS       → Redis, n8n, Agent Bridge, agents (stateful)
+#   VPS       → Redis, Agent Bridge, agents (stateful)
 #
 # The stateless services (frontend, uef-gateway) are deployed to Cloud Run
 # and connect back to these VPS services via the public IP / reverse proxy.
@@ -14,7 +14,7 @@ name: aims
 # Usage:
 #   docker compose -f infra/docker-compose.vps.yml up -d
 #   docker compose -f infra/docker-compose.vps.yml --profile tier1-agents up -d
-#   docker compose -f infra/docker-compose.vps.yml --profile n8n up -d
+#   docker compose -f infra/docker-compose.vps.yml --profile ii-agents up -d
 # =============================================================================
 
 services:

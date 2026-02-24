@@ -50,11 +50,11 @@ import { lucProjectService } from './shelves/luc-project-service';
 import { allShelfTools } from './shelves/mcp-tools';
 import { ossModels } from './llm/oss-models';
 import { personaplex } from './llm/personaplex';
-import { triggerPmoPipeline } from './n8n';
+import { triggerPmoPipeline } from './pipeline';
 import { plugRouter } from './plug-catalog/router';
 import { instanceLifecycle, autoScaler, cdnDeploy, tenantNetworks } from './plug-catalog';
 import { dispatchChickenHawkBuild } from './agents/cloudrun-dispatcher';
-import { triggerVerticalWorkflow } from './n8n/client';
+import { triggerVerticalWorkflow } from './pipeline/client';
 import { cloudflareRouter, markdownForAgents } from './cloudflare';
 import { paymentsRouter } from './payments';
 import { normalizeInput, getDialectStats, SLANG_ENTRY_COUNT, INTENT_PHRASE_COUNT } from './nlp';
@@ -741,7 +741,7 @@ app.post('/vertical/execute', async (req, res) => {
       return;
     }
 
-    const { triggerVerticalWorkflow } = await import('./n8n/client');
+    const { triggerVerticalWorkflow } = await import('./pipeline/client');
     const result = await triggerVerticalWorkflow({
       verticalId,
       userId: userId || req.headers['x-user-id'] as string || 'anon-unknown',
@@ -2082,8 +2082,8 @@ app.use(shelfRouter);
 app.use('/api', plugRouter);
 
 // --------------------------------------------------------------------------
-// Composio Integration — Cross-Platform Actions (alongside n8n)
-// Composio = real-time, on-demand actions | n8n = scheduled pipelines
+// Composio Integration — Cross-Platform Actions
+// Composio = real-time, on-demand actions | Companion workflows = scheduled pipelines
 // --------------------------------------------------------------------------
 app.use('/composio', composioRouter);
 
@@ -2375,7 +2375,7 @@ app.get('/api/tenant-networks', async (_req, res) => {
 });
 
 // --------------------------------------------------------------------------
-// Vertical Workflow Triggers — n8n Integration
+// Vertical Workflow Triggers — Pipeline Integration
 // --------------------------------------------------------------------------
 
 app.post('/api/vertical/trigger', async (req, res) => {

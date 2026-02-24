@@ -1,9 +1,9 @@
 /**
  * Composio Module — Cross-platform integration bridge for A.I.M.S.
  *
- * Works alongside n8n to provide full-spectrum automation:
- *   Composio = real-time, LLM-directed, OAuth-gated actions (500+ integrations)
- *   n8n      = scheduled, event-driven, visual workflow pipelines
+ * Provides full-spectrum automation:
+ *   Composio  = real-time, LLM-directed, OAuth-gated actions (500+ integrations)
+ *   Companion = scheduled, event-driven workflow pipelines
  *
  * Both are orchestrated by ACHEEVY through the UEF Gateway.
  */
@@ -17,4 +17,4 @@ export type {
   ComposioHealthStatus,
 } from './composio-bridge';
 export { composioRouter } from './composio-routes';
-export { N8N_COMPANION_WORKFLOWS } from './n8n-companions';
+export { COMPANION_WORKFLOWS } from './companion-workflows';

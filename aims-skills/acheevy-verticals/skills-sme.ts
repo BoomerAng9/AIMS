@@ -214,6 +214,214 @@ const SKILLS_REGISTRY: SkillSME[] = [
   },
 
   // ═══════════════════════════════════════════════════════════════════════
+  // Forms & Data Collection (Paperform)
+  // ═══════════════════════════════════════════════════════════════════════
+  {
+    id: 'paperform',
+    name: 'Paperform (Multi-Step Forms & Data Collection)',
+    category: 'workflow',
+    status: 'active',
+    purpose: 'Doc-style form builder for client intake, needs analysis, booking, feedback, and payment collection. Paperform is accessed through the Pipedream MCP bridge — never direct API calls. Forms support multi-page steppers (page breaks with conditional visibility), one-at-a-time guided mode, calculated fields, Stripe payments, eSignatures, and 26+ field types. The public API is read-heavy — form design happens in the Paperform editor; A.I.M.S. reads forms, fetches submissions, and processes results via webhooks.',
+    capabilities: [
+      'Multi-page forms via page breaks (/break command) with conditional page visibility',
+      'One-at-a-time guided mode — each question on its own page with auto-advance',
+      'Conditional field/section/page visibility based on prior answers (AND/OR logic)',
+      'Calculated fields — auto-compute tier, path, priority score, LUC estimate',
+      'Progress bar and partial submission tracking (30-day retention for lead recovery)',
+      'Stripe/Square/Braintree/PayPal payment fields for service collection',
+      'Date/time booking fields for consultation scheduling',
+      'eSignatures via Papersign companion product',
+      'Form read via Pipedream MCP: paperform_list_forms, paperform_get_form',
+      'Submission read/delete via MCP: paperform_list_submissions, paperform_get_submission',
+      'Partial submission access: paperform_list_partial_submissions, paperform_get_partial_submission',
+      'Event triggers: new_submission and partial_submission for automation',
+      'Embeddable via JS script (inline, full-screen, popup) with onsubmit/onpagechange callbacks',
+      'Pre-fill fields via data-prefill attribute or URL parameters (UTM support)',
+      'Post-submission conditional logic: different success pages, emails, and webhooks per answer path',
+      'Webhook-driven pipeline: Paperform → Pipedream → n8n → Firestore → Notion → Drive → Gmail → Calendar → ACHEEVY',
+    ],
+    limitations: [
+      'Public API is READ-ONLY — cannot create or modify forms via API (form design in Paperform editor only)',
+      'Programmatic webhook creation requires Business plan API tier',
+      'Standard API (Essentials/Pro plans): read forms, fields, submissions, partial submissions, delete submissions',
+      'Cannot call Paperform API directly — must go through Pipedream MCP bridge',
+      'API key (PAPERFORM_API_KEY) stored inside Pipedream, never exposed to agents',
+      'Cannot embed forms natively in Next.js — requires JS script loader or iframe',
+      'Rate limits enforced globally (429 response); exact limits not publicly documented',
+      'Partial submissions auto-deleted after 30 days; honors browser Do Not Track',
+      'Free plan: 30 submissions/month, no API access. Essentials: 100/month. Pro: 1,000/month',
+      'Cannot delete forms without HITL approval (destructive action)',
+    ],
+    usage: {
+      apiEndpoint: 'Pipedream MCP: https://mcp.pipedream.net/v2 (tools: paperform_*). Paperform API base: https://api.paperform.co/v1 (read-only, via Pipedream proxy)',
+      importPath: undefined,
+      envVars: ['PIPEDREAM_API_KEY', 'PIPEDREAM_MCP_URL'],
+      prerequisites: [
+        'PIPEDREAM_API_KEY must be set',
+        'PAPERFORM_API_KEY must be configured inside Pipedream (encrypted at rest)',
+        'Pipedream MCP bridge must be active at https://mcp.pipedream.net/v2',
+        'Forms must be designed in Paperform editor first — API cannot create forms',
+      ],
+      parameters: [
+        { name: 'form_id', type: 'string', required: true, description: 'Paperform form ID or slug for read operations', example: 'aims-onboarding-needs-analysis' },
+        { name: 'submission_id', type: 'string', required: false, description: 'Specific submission ID for get/delete', example: 'sub_abc123' },
+        { name: 'page', type: 'number', required: false, description: 'Page number for paginated submission lists', example: '1' },
+        { name: 'limit', type: 'number', required: false, description: 'Items per page for paginated lists', example: '100' },
+      ],
+      exampleInvocation: `// List all forms:
+// Tool: paperform_list_forms
+//
+// Get form fields:
+// Tool: paperform_get_form
+// Args: { slug_or_id: "aims-onboarding-needs-analysis" }
+//
+// List submissions (paginated):
+// Tool: paperform_list_submissions
+// Args: { form_id: "aims-onboarding-needs-analysis", page: 1, limit: 50 }
+//
+// Get single submission:
+// Tool: paperform_get_submission
+// Args: { submission_id: "sub_abc123" }`,
+    },
+    triggers: [
+      'intake form', 'questionnaire', 'survey', 'client onboarding form',
+      'needs analysis form', 'booking form', 'feedback form', 'multi-step form',
+      'get form submissions', 'form responses', 'onboarding form', 'sign up form',
+      'data collection', 'client intake', 'NPS survey', 'support request form',
+      'form data', 'pull submissions', 'check form responses',
+    ],
+    conditions: [
+      'PIPEDREAM_API_KEY is configured',
+      'PAPERFORM_API_KEY is stored inside Pipedream',
+      'Task requires structured data collection from a user or client',
+      'Forms already exist in Paperform (API cannot create new forms)',
+    ],
+    decisionLogic: 'Use Paperform for ANY structured data collection: client intake, needs analysis, booking, feedback, support requests, payment collection. Forms are designed in the Paperform editor (not via API). Use multi-page forms when intake spans 5+ fields or multiple concern areas. Use conditional page routing when user answers determine which questions to ask next. Use calculated fields for tier/path/cost estimation. For simple single-field collection, use in-chat conversation instead. For submission processing automation, pair with Stepper workflows.',
+    antiPatterns: [
+      'Attempting to create forms via API (the public API is read-only — design in Paperform editor)',
+      'Calling Paperform API directly instead of through Pipedream MCP',
+      'Exposing PAPERFORM_API_KEY to any agent (it lives in Pipedream only)',
+      'Revealing "Paperform" to users — always say "your intake form" or "your questionnaire"',
+      'Using single-page forms for complex multi-section intake (use page breaks + conditional logic)',
+      'Deleting forms without HITL approval',
+      'Storing raw submission data outside tenant-scoped Firestore',
+      'Not setting up partial submission tracking for lead recovery',
+      'Skipping calculated fields when tier/path/cost estimation is useful',
+      'Ignoring pagination on submission lists (paginate with page + limit params)',
+    ],
+    conflicts: [],
+    costConsiderations: 'Paperform plans: Free (30 subs/month, no API), Essentials $29/month (100 subs, Standard API), Pro $59/month (1,000 subs, custom CSS/domains), Business (120K subs/year, webhook API). Submission processing costs depend on downstream actions (Firestore writes, Notion pages, Gmail sends). A.I.M.S. needs at minimum Essentials plan for API access.',
+    dependencies: [],
+    consumers: ['paperform-stepper', 'needs-analysis', 'plug-spinup', 'acheevy-chat'],
+    dataFlow: 'Form designed in Paperform editor → Form URL shared to user → User fills multi-step form → Paperform webhook → Pipedream → n8n automation → Validate → Firestore (tenant-scoped) → Notion (project page) → Google Drive (client folder) → Gmail (welcome email) → Calendar (if consultation booked) → ACHEEVY chat notification. Read path: Agent → Pipedream MCP → paperform_list_submissions → Process → Store',
+    relatedMethodology: 'foster',
+    relatedLIBSection: 'instructions',
+    recommendedModel: 'claude-haiku-4.5',
+    lucServiceKey: 'form_management',
+    sourceFiles: [
+      'aims-skills/tools/paperform.tool.md',
+      'aims-skills/skills/integrations/paperform.skill.md',
+      'aims-skills/skills/integrations/onboarding-needs-analysis-form.skill.md',
+      'aims-skills/brains/PLUG_ANG_BRAIN.md',
+      'aims-skills/tools/pipedream-mcp.tool.md',
+    ],
+    skillFile: 'aims-skills/skills/integrations/paperform.skill.md',
+    brainSection: 'Section 33: MCP Capabilities — Paperform via Pipedream',
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // Workflow Automation (Stepper — AI-Native Automation by Paperform)
+  // ═══════════════════════════════════════════════════════════════════════
+  {
+    id: 'paperform-stepper',
+    name: 'Stepper (AI-Native Workflow Automation)',
+    category: 'workflow',
+    status: 'active',
+    purpose: 'Stepper (stepper.io) is a standalone AI-native workflow automation platform built by the Paperform founders. It is a Zapier/Make competitor where you describe automations in natural language and the AI builds multi-step workflows. Stepper connects 50+ apps — including Paperform, HubSpot, Slack, Gmail, Notion, Stripe, Anthropic, Google Gemini, and more. In A.I.M.S., Stepper handles the post-submission automation pipeline: when a Paperform intake is submitted, Stepper orchestrates the multi-step workflow across services (CRM update, email notification, calendar booking, project creation). Stepper complements n8n — use Stepper for Paperform-triggered workflows, n8n for everything else.',
+    capabilities: [
+      'Conversational AI workflow builder — describe automation in natural language, AI builds it',
+      'Multi-step workflows with sequential and parallel execution paths',
+      'Multiple triggers per workflow (form submission, schedule, API event, app trigger)',
+      'Native Paperform integration — triggers on new_submission and partial_submission',
+      'Reusable components — build step sequences once, reuse across workflows',
+      '50+ app integrations: Paperform, HubSpot, Slack, Gmail, Google Calendar/Drive/Sheets/Docs, Notion, Stripe, Trello, Airtable, Asana, Linear, Calendly, Mailchimp, ActiveCampaign, Pipedrive, Twilio, Zendesk, Intercom, Apify, Typeform, JotForm',
+      'AI-powered steps — call Anthropic, Google Gemini, DeepSeek models within workflows',
+      'Credit-based execution model — workflows pause when credits exhausted (no unexpected bills)',
+      'Conditional branching and error handling in workflow steps',
+      'Real-time execution monitoring and run history',
+    ],
+    limitations: [
+      'Separate product from Paperform — requires its own account at stepper.io',
+      'Credit system: free tier has daily credit quota; Pro ($19/month) has unlimited runs (fair use)',
+      'AI steps, email/SMS sending, and premium API calls consume credits',
+      'When credits exhausted, credit-dependent workflows pause automatically',
+      'Newer product — app integration count (50+) is smaller than Zapier (5,000+) or Make (1,000+)',
+      'No direct API/MCP integration with A.I.M.S. yet — configuration done in Stepper UI',
+      'Cannot self-host Stepper — SaaS only',
+      'Workflow editing is done in Stepper UI, not programmatically via A.I.M.S.',
+    ],
+    usage: {
+      apiEndpoint: 'Stepper UI: https://stepper.io (no direct API from A.I.M.S. — workflows configured in Stepper dashboard)',
+      importPath: undefined,
+      envVars: [],
+      prerequisites: [
+        'Stepper account at stepper.io (free tier or Pro $19/month)',
+        'Paperform connected as a trigger source in Stepper',
+        'Target apps (Gmail, Notion, Drive, etc.) authenticated in Stepper',
+      ],
+      parameters: [
+        { name: 'trigger', type: 'StepperTrigger', required: true, description: 'Event that starts the workflow (e.g., Paperform new_submission)', example: 'Paperform: New Submission on aims-onboarding-needs-analysis' },
+        { name: 'steps', type: 'StepperStep[]', required: true, description: 'Ordered actions to execute (e.g., validate, store in Notion, send email)', example: '[ { app: "Notion", action: "Create Page" }, { app: "Gmail", action: "Send Email" } ]' },
+        { name: 'conditions', type: 'StepperCondition[]', required: false, description: 'Branching rules between steps', example: '{ if: "submission.budget > 500", then: "route to enterprise path" }' },
+      ],
+      exampleInvocation: `// Stepper workflow (configured in Stepper UI, not A.I.M.S. code):
+// 1. Trigger: Paperform → New Submission on "aims-onboarding-needs-analysis"
+// 2. Step: Validate submission data (AI step using Anthropic)
+// 3. Step: Create Notion project page with submission data
+// 4. Step: Create Google Drive folder for client
+// 5. Step: Send welcome email via Gmail
+// 6. Condition: If consultation requested → Create Google Calendar event
+// 7. Step: Post notification to Slack #new-clients channel`,
+    },
+    triggers: [
+      'automate form submissions', 'workflow automation', 'stepper', 'post-submission workflow',
+      'automate intake', 'submission pipeline', 'form to CRM', 'form to email',
+      'form to notion', 'automate onboarding', 'trigger workflow on form submit',
+    ],
+    conditions: [
+      'Stepper account is active at stepper.io',
+      'Paperform is connected as trigger source in Stepper',
+      'Target apps are authenticated in Stepper',
+      'Task involves automating what happens AFTER a form submission',
+    ],
+    decisionLogic: 'Use Stepper for Paperform-triggered automation workflows — especially the onboarding pipeline (form → validate → Notion → Drive → Gmail → Calendar → Slack). Use Stepper when the workflow starts from a Paperform submission. Use n8n for non-Paperform automations (scheduled tasks, API-triggered jobs, internal platform workflows). Stepper and n8n are complementary: Stepper owns form-to-action, n8n owns everything else. For simple one-step actions (just send an email on submit), use Paperform\'s built-in webhook + Pipedream instead of Stepper.',
+    antiPatterns: [
+      'Using Stepper for non-form-related automations (use n8n instead)',
+      'Running complex multi-branch workflows on Stepper free tier (credits will exhaust quickly)',
+      'Revealing "Stepper" to users — always say "your automated workflow" or "your submission processing"',
+      'Duplicating Stepper workflows in n8n (choose one for each pipeline, not both)',
+      'Not monitoring credit usage — workflows silently pause when credits run out',
+      'Hardcoding credentials in workflow steps (use Stepper\'s built-in auth management)',
+    ],
+    conflicts: [],
+    costConsiderations: 'Stepper pricing: Free tier (daily credit quota), Pro $19/month (unlimited runs, fair use). AI steps consume more credits than basic steps. Credit-dependent workflows pause when credits exhausted — monitor usage. For high-volume form processing (1,000+ submissions/month), Pro tier is required. Stepper cost is additive to Paperform plan cost.',
+    dependencies: ['paperform'],
+    consumers: ['needs-analysis', 'acheevy-chat'],
+    dataFlow: 'Paperform submission → Stepper trigger fires → AI validates data → Conditional routing (tier/path) → Parallel steps: [Notion page + Drive folder + Gmail welcome + Calendar booking (if requested)] → Slack notification → ACHEEVY chat notification (via webhook to UEF Gateway)',
+    relatedMethodology: 'foster',
+    relatedLIBSection: 'instructions',
+    recommendedModel: undefined,
+    lucServiceKey: 'workflow_automation',
+    sourceFiles: [
+      'aims-skills/tools/paperform.tool.md',
+      'aims-skills/skills/integrations/paperform.skill.md',
+      'aims-skills/skills/integrations/onboarding-needs-analysis-form.skill.md',
+    ],
+    skillFile: 'aims-skills/skills/integrations/paperform.skill.md',
+    brainSection: 'Section 33: MCP Capabilities — Paperform via Pipedream',
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════
   // Deployment & PaaS
   // ═══════════════════════════════════════════════════════════════════════
   {

@@ -114,7 +114,7 @@ export async function routeToAgents(
 
     case 'INTEGRATION': {
       // Cross-platform integration: Composio_Ang handles real-time actions
-      // Works alongside n8n for scheduled components
+      // Works alongside companion workflows for scheduled components
       logger.info({ reqId }, '[Router] INTEGRATION → Composio_Ang');
       const composioAgent = registry.get('composio-ang');
       if (composioAgent) {

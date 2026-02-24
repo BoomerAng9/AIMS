@@ -33,7 +33,7 @@ import {
   VerificationResult,
   ShiftReceipt,
   ShiftStatus,
-  N8nPipelineResponse,
+  PipelineResponse,
 } from './types';
 
 // ---------------------------------------------------------------------------
@@ -488,7 +488,7 @@ function sealReceipt(packet: PmoPipelinePacket): PmoPipelinePacket {
 // Step 7: ACHEEVY Response — Format final output for User
 // ---------------------------------------------------------------------------
 
-function buildResponse(packet: PmoPipelinePacket): N8nPipelineResponse {
+function buildResponse(packet: PmoPipelinePacket): PipelineResponse {
   const receipt = packet.receipt!;
   const exec = packet.execution!;
   const boomer = packet.boomerDirective!;
@@ -556,12 +556,12 @@ function buildResponse(packet: PmoPipelinePacket): N8nPipelineResponse {
  *   Chicken Hawk → Squad → Lil_Hawks → Verification → Receipt → Response
  *
  * Input: PmoPipelinePacket (already classified + directed by pmo-router)
- * Output: N8nPipelineResponse (ready to return to user)
+ * Output: PipelineResponse (ready to return to user)
  *
  * Each step in the pipeline is dispatched to real agents via the A2A registry.
  * Agents may be in-process (Boomer_Angs) or containerized (Research_Ang, etc.).
  */
-export async function executeChainOfCommand(packet: PmoPipelinePacket): Promise<N8nPipelineResponse> {
+export async function executeChainOfCommand(packet: PmoPipelinePacket): Promise<PipelineResponse> {
   logger.info(
     { requestId: packet.requestId, office: packet.classification.pmoOffice, director: packet.boomerDirective?.director },
     '[Chain] Starting chain-of-command pipeline (A2A dispatch active)',
@@ -594,7 +594,7 @@ export async function executeChainOfCommand(packet: PmoPipelinePacket): Promise<
  * Get the full pipeline packet after execution (for debugging/audit).
  */
 export async function executeChainOfCommandFull(packet: PmoPipelinePacket): Promise<{
-  response: N8nPipelineResponse;
+  response: PipelineResponse;
   packet: PmoPipelinePacket;
 }> {
   let state = spawnShift(packet);
