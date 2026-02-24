@@ -21,7 +21,7 @@ import {
   FlaskConical, FolderKanban, Users, Boxes,
   Trophy, Activity, Mic, Theater, BookOpen,
   Coins, CircleDot, TrendingUp, Building, Layers,
-  Store, ShoppingCart, Calculator, Map, Code, Eye,
+  Store, ShoppingCart, Calculator, Map, Plug,
 } from "lucide-react";
 
 // ── Types ──
@@ -80,8 +80,14 @@ const PRIVATE_SANDBOX: NavItem[] = [
   { href: "/sandbox/verticals", label: "Verticals", icon: Shield },
 ];
 
-const PRIVATE_LIVE_APPS: NavItem[] = [
-  { href: "/halalhub", label: "HalalHub", icon: Store, highlight: true },
+// Plugs — Catalog + My Plugs
+const PLUG_ITEMS: NavItem[] = [
+  { href: "/dashboard/plug-catalog", label: "Plug Catalog", icon: Store, highlight: true },
+  { href: "/dashboard/plugs", label: "My Plugs", icon: Boxes, highlight: true },
+];
+
+// Live Apps — Standalone tools accessible without diving into verticals
+const LIVE_APPS: NavItem[] = [
   { href: "/dashboard/luc", label: "LUC Calculator", icon: Calculator, highlight: true },
   { href: "/dashboard/garage-to-global", label: "Garage to Global", icon: Store, highlight: true },
   { href: "/dashboard/buy-in-bulk", label: "Buy in Bulk", icon: ShoppingCart, highlight: true },
@@ -289,7 +295,16 @@ export function DashboardNav() {
         ))}
       </div>
 
-      {/* Live Apps */}
+      {/* Plugs — Catalog & Deployed */}
+      <div className="mx-2 mt-2 border-t border-violet-200/50" />
+      <div className="mt-1 space-y-0.5">
+        <SectionLabel label="Plugs" icon={Plug} />
+        {PLUG_ITEMS.map((item) => (
+          <NavLink key={item.href} item={item} pathname={pathname} />
+        ))}
+      </div>
+
+      {/* Live Apps — Direct access tools */}
       <div className="mx-2 mt-2 border-t border-emerald-200/50" />
       <div className="mt-1 space-y-0.5">
         <SectionLabel label="Live Apps" icon={Rocket} />
