@@ -10,7 +10,7 @@
 export interface ToolEntry {
   readonly id: string;
   readonly file: string;
-  readonly category: 'ai' | 'voice' | 'search' | 'payments' | 'database' | 'email' | 'messaging' | 'infra' | 'cloud' | 'video' | 'workflow' | 'web' | 'auth' | 'ui' | 'analytics';
+  readonly category: 'ai' | 'voice' | 'search' | 'payments' | 'database' | 'email' | 'messaging' | 'infra' | 'cloud' | 'video' | 'workflow' | 'web' | 'auth' | 'ui' | 'analytics' | 'mcp';
   readonly provider: string;
   readonly envVars: readonly string[];
 }
@@ -57,6 +57,17 @@ export const TOOL_REGISTRY: readonly ToolEntry[] = [
   // ── Cloud / GCP ─────────────────────────────────────────────────────
   { id: 'gcp-cloud', file: 'gcp-cloud.tool.md', category: 'cloud', provider: 'Google Cloud', envVars: ['GOOGLE_APPLICATION_CREDENTIALS', 'GOOGLE_CLOUD_PROJECT'] },
   { id: 'google-oauth', file: 'google-oauth.tool.md', category: 'cloud', provider: 'Google', envVars: ['GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET'] },
+
+  // ── MCP Connectors (OAuth-authenticated via Claude Code Connectors) ─
+  { id: 'google-drive-mcp', file: 'google-drive-mcp.tool.md', category: 'mcp', provider: 'Google', envVars: [] },
+  { id: 'github-mcp', file: 'github-mcp.tool.md', category: 'mcp', provider: 'GitHub', envVars: [] },
+  { id: 'notion-mcp', file: 'notion-mcp.tool.md', category: 'mcp', provider: 'Notion', envVars: [] },
+  { id: 'gmail-mcp', file: 'gmail-mcp.tool.md', category: 'mcp', provider: 'Google', envVars: [] },
+  { id: 'google-calendar-mcp', file: 'google-calendar-mcp.tool.md', category: 'mcp', provider: 'Google', envVars: [] },
+  { id: 'cloudflare-browser-mcp', file: 'cloudflare-browser-mcp.tool.md', category: 'mcp', provider: 'Cloudflare', envVars: [] },
+  { id: 'cloudflare-containers-mcp', file: 'cloudflare-containers-mcp.tool.md', category: 'mcp', provider: 'Cloudflare', envVars: [] },
+  { id: 'cloudflare-workers-mcp', file: 'cloudflare-workers-mcp.tool.md', category: 'mcp', provider: 'Cloudflare', envVars: [] },
+  { id: 'cloudflare-builds-mcp', file: 'cloudflare-builds-mcp.tool.md', category: 'mcp', provider: 'Cloudflare', envVars: [] },
 
   // ── Video / Media ───────────────────────────────────────────────────
   { id: 'kling-ai', file: 'kling-ai.tool.md', category: 'video', provider: 'Kling AI', envVars: ['KLING_API_KEY'] },

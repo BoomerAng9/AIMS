@@ -1,6 +1,7 @@
 {
   "name": "aims-frontend",
   "version": "0.1.0",
+  "license": "PROPRIETARY",
   "private": true,
   "scripts": {
     "dev": "next dev",

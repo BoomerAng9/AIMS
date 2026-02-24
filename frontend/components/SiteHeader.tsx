@@ -28,6 +28,7 @@ const APP_NAV = [
   { href: "/chat", label: "Chat w/ACHEEVY" },
   { href: "/dashboard/circuit-box", label: "Circuit Box" },
   { href: "/dashboard/model-garden", label: "Model Garden" },
+  { href: "/halalhub", label: "HalalHub" },
 ];
 
 function useIsLandingDomain(): boolean {
