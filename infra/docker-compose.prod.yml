@@ -170,7 +170,6 @@ services:
       - LOG_LEVEL=${LOG_LEVEL:-info}
       - AGENT_BRIDGE_URL=http://agent-bridge:3010
       - REDIS_URL=redis://:${REDIS_PASSWORD:-aims_redis_secret}@redis:6379
-      - N8N_URL=http://n8n:5678
       - RESEARCH_ANG_URL=http://research-ang:3020
       - ROUTER_ANG_URL=http://router-ang:3021
       - CHICKENHAWK_URL=http://chickenhawk-core:4001
@@ -482,7 +481,6 @@ services:
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
       - UEF_GATEWAY_URL=http://uef-gateway:3001
       - AGENT_BRIDGE_URL=http://agent-bridge:3010
-      - N8N_URL=http://n8n:5678
       - REDIS_URL=redis://:${REDIS_PASSWORD:-aims_redis_secret}@redis:6379
       - CORS_ORIGIN=${CORS_ORIGIN}
     depends_on:
@@ -497,45 +495,6 @@ services:
       retries: 3
       start_period: 15s
     restart: unless-stopped
-    networks:
-      - aims-network
-      - sandbox-network
-    deploy:
-      resources:
-        limits:
-          cpus: '1'
-          memory: 1G
-
-  # ---------------------------------------------------------------------------
-  # n8n — Core Workflow Automation Engine
-  # Factory floor for Boomer_Ang dispatch, Chicken Hawk builds,
-  # Lil_Hawk workflows, PMO pipeline, and all automation tasks.
-  # This is CORE infrastructure — not optional.
-  # ---------------------------------------------------------------------------
-  n8n:
-    image: n8nio/n8n:2.8.2
-    expose:
-      - "5678"
-    environment:
-      - N8N_BASIC_AUTH_ACTIVE=true
-      - N8N_BASIC_AUTH_USER=${N8N_AUTH_USER:-aims}
-      - N8N_BASIC_AUTH_PASSWORD=${N8N_AUTH_PASSWORD:-aims-n8n-change-me}
-      - N8N_HOST=0.0.0.0
-      - N8N_PORT=5678
-      - N8N_PROTOCOL=http
-      - WEBHOOK_URL=${N8N_WEBHOOK_URL:-http://n8n:5678}
-      - N8N_HIRING_BANNER_ENABLED=false
-      - N8N_DIAGNOSTICS_ENABLED=false
-    volumes:
-      - n8n-data:/home/node/.n8n
-    healthcheck:
-      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5678/healthz" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 20s
-    restart: unless-stopped
-    user: "1000:1000"
     networks:
       - aims-network
       - sandbox-network
@@ -834,7 +793,6 @@ volumes:
   gateway-data:
   redis-data:
   agent-zero-data:
-  n8n-data:
   luc-data:
   demo-luc-data:
   perform-debate-logs:

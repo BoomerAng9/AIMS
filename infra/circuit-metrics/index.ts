@@ -18,13 +18,12 @@ const SERVICES: Record<string, string> = {
   acheevy: process.env.ACHEEVY_URL || 'http://acheevy:3003',
   agentBridge: process.env.AGENT_BRIDGE_URL || 'http://agent-bridge:3010',
   chickenhawkCore: process.env.CHICKENHAWK_CORE_URL || 'http://chickenhawk-core:4001',
-  n8n: process.env.N8N_URL || 'http://n8n:5678',
 };
 
 // UEF Gateway for plug operations data
 const UEF_GATEWAY = process.env.UEF_GATEWAY_URL || 'http://uef-gateway:4000';
 
-// Alerting webhook (Slack, Discord, or n8n)
+// Alerting webhook (Slack, Discord, or automation pipeline)
 const ALERT_WEBHOOK = process.env.ALERT_WEBHOOK_URL || '';
 const ALERT_COOLDOWN_MS = 300_000; // 5 min between alerts per service
 

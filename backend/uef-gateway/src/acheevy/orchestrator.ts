@@ -14,7 +14,7 @@
 import { getIIAgentClient, IIAgentClient, IIAgentTask } from '../ii-agent/client';
 import { LUCEngine } from '../luc';
 import { v4 as uuidv4 } from 'uuid';
-import { triggerN8nPmoWorkflow } from '../n8n';
+import { triggerPmoPipeline } from '../n8n';
 import type { N8nPipelineResponse } from '../n8n';
 import { executeVertical } from './execution-engine';
 import { spawnAgent, decommissionAgent, getRoster, getAvailableRoster } from '../deployment-hub';
@@ -412,7 +412,7 @@ export class AcheevyOrchestrator {
     const skillTaskMap: Record<string, IIAgentTask['type']> = {
       'remotion': 'code',
       'gemini-research': 'research',
-      'n8n-workflow': 'code',
+      'automation-workflow': 'code',
       'stitch': 'code',
       'best-practices': 'research',
     };
@@ -461,14 +461,14 @@ export class AcheevyOrchestrator {
   }
 
   /**
-   * PMO routing: chain-of-command pipeline via n8n
+   * PMO routing: chain-of-command pipeline
    */
   private async handlePmoRouting(
     requestId: string,
     req: AcheevyExecuteRequest
   ): Promise<AcheevyExecuteResponse> {
     try {
-      const result: N8nPipelineResponse = await triggerN8nPmoWorkflow({
+      const result: N8nPipelineResponse = await triggerPmoPipeline({
         userId: req.userId,
         message: req.message,
         requestId,
@@ -490,8 +490,8 @@ export class AcheevyOrchestrator {
           amount: result.metrics.stepsCompleted + 1,
         },
       };
-    } catch (n8nErr) {
-      logger.warn({ err: n8nErr instanceof Error ? n8nErr.message : n8nErr, requestId }, '[ACHEEVY] n8n PMO pipeline failed, trying Chicken Hawk');
+    } catch (pipelineErr) {
+      logger.warn({ err: pipelineErr instanceof Error ? pipelineErr.message : pipelineErr, requestId }, '[ACHEEVY] PMO pipeline failed, trying Chicken Hawk');
       // Fallback: Chicken Hawk for PMO routing
       try {
         const manifest = buildManifest(requestId, 'research', req.message, req.userId, { pmo: true });

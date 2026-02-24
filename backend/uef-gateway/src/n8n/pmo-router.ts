@@ -62,7 +62,7 @@ const PMO_KEYWORDS: Record<PmoId, PmoKeywordConfig> = {
     keywords: [
       'workflow', 'automate', 'schedule', 'cron', 'sla', 'throughput', 'queue',
       'monitor', 'health', 'uptime', 'performance', 'load', 'scaling', 'ops', 'operations',
-      'n8n', 'webhook', 'trigger', 'node', 'pipeline', 'integration', 'automation',
+      'webhook', 'trigger', 'node', 'pipeline', 'integration', 'automation',
       'json', 'transform', 'parse', 'schema', 'payload', 'etl',
     ],
   },
@@ -168,8 +168,8 @@ function planFinanceSteps(message: string): StepPlan {
 
 function planOpsSteps(message: string): StepPlan {
   const steps: string[] = [];
-  if (message.includes('n8n') || message.includes('webhook') || message.includes('trigger')) {
-    steps.push('Design n8n workflow architecture', 'Configure trigger nodes and webhooks', 'Wire node connections and data flow');
+  if (message.includes('webhook') || message.includes('trigger')) {
+    steps.push('Design workflow architecture', 'Configure triggers and webhooks', 'Wire step connections and data flow');
   }
   if (message.includes('json') || message.includes('transform') || message.includes('parse') || message.includes('schema')) {
     steps.push('Validate JSON payload structure', 'Design data transformation mapping', 'Generate JSON schema for validation');

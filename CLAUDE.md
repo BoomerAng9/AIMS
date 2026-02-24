@@ -34,7 +34,7 @@ of "achieving" — it must fully accomplish what its name represents.
 These rules determine WHERE every piece of code deploys. Apply them to every task:
 
 ```
-IF core platform service (ACHEEVY API, UEF Gateway, Per|Form, House of Ang, Redis, n8n)
+IF core platform service (ACHEEVY API, UEF Gateway, Per|Form, House of Ang, Redis)
   THEN → AIMS Core VPS (76.13.96.107 / srv1328075.hstgr.cloud) in Docker
   Files: infra/docker-compose.prod.yml, deploy.sh
   Deploy: ./deploy.sh --domain plugmein.cloud --landing-domain aimanagedsolutions.cloud
@@ -54,7 +54,7 @@ IF GPU-accelerated AI inference (PersonaPlex / Nemotron model serving)
 
 IF autonomous build/execution job (Chicken Hawk builds, scheduled tasks)
   THEN → GCP Cloud Run Jobs (sandboxed, scale-to-zero, 60 min timeout)
-  Triggered by: n8n workflows, ACHEEVY dispatch, or API events
+  Triggered by: ACHEEVY dispatch, automation pipelines, or API events
   VPC connector to reach Firestore, ByteRover, LUC on internal network
 
 IF CI pipeline (image builds on push to main)
@@ -95,7 +95,7 @@ See **`AIMS_PLAN.md`** for the full SOP, PRD, implementation roadmap, and AIMS_R
 - **CI Pipeline**: GitHub Actions → Cloud Build → Artifact Registry (build+push only)
 
 ### VPS Services (default deploy, no profiles)
-nginx, frontend, demo-frontend, uef-gateway, house-of-ang, acheevy, redis, agent-bridge, chickenhawk-core, n8n, circuit-metrics, ii-agent, ii-agent-postgres, ii-agent-tools, ii-agent-sandbox (15 containers)
+nginx, frontend, demo-frontend, uef-gateway, house-of-ang, acheevy, redis, agent-bridge, chickenhawk-core, circuit-metrics, ii-agent, ii-agent-postgres, ii-agent-tools, ii-agent-sandbox (14 containers)
 SSL: host certbot (apt) — certs at /etc/letsencrypt, bind-mounted into nginx container
 
 ### User-Deployed Plug Instances (dynamic, on-demand)

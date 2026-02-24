@@ -48,7 +48,7 @@ import { lucProjectService } from './shelves/luc-project-service';
 import { allShelfTools } from './shelves/mcp-tools';
 import { ossModels } from './llm/oss-models';
 import { personaplex } from './llm/personaplex';
-import { N8nClient } from './n8n';
+import { triggerPmoPipeline } from './n8n';
 import { plugRouter } from './plug-catalog/router';
 import { cloudflareRouter, markdownForAgents } from './cloudflare';
 import { paymentsRouter } from './payments';
@@ -654,7 +654,7 @@ app.get('/llm/usage', (req, res) => {
 // ACHEEVY Orchestrator — Intent classification → agent dispatch
 // This is the PRIMARY execution path for the chat interface.
 // Frontend sends: { userId, message, intent, context }
-// Gateway routes to II-Agent, A2A agents, n8n, or verticals.
+// Gateway routes to II-Agent, A2A agents, pipeline, or verticals.
 // --------------------------------------------------------------------------
 app.post('/acheevy/execute', async (req, res) => {
   try {
@@ -688,7 +688,7 @@ app.post('/acheevy/execute', async (req, res) => {
 });
 
 // --------------------------------------------------------------------------
-// Vertical Execute — Phase B: dispatch vertical to n8n workflow pipeline
+// Vertical Execute — Phase B: dispatch vertical to chain-of-command pipeline
 // Called by the frontend after Phase A step-progression completes.
 // --------------------------------------------------------------------------
 app.post('/vertical/execute', async (req, res) => {
@@ -927,7 +927,7 @@ app.post('/acheevy/classify', (req, res) => {
           /deploy\s*(a|an|the)?\s*(plug|tool|agent|instance|container)/i,
           /spin\s*up/i,
           /install\s*(a|an|the)?\s*(tool|agent|service)/i,
-          /set\s*up\s*(a|an)?\s*(tool|agent|service|n8n|openclaw)/i,
+          /set\s*up\s*(a|an)?\s*(tool|agent|service|openclaw)/i,
           /launch\s*(a|an)?\s*(tool|agent|container)/i,
           /\brun\s*(a|an)?\s*(tool|agent|service)\b/i,
         ],
@@ -2602,71 +2602,20 @@ app.post('/ingress/acp', acpLimiter, async (req, res) => {
 });
 
 // --------------------------------------------------------------------------
-// n8n Management — Workflow Deploy, Activate, List, Health
+// PMO Pipeline — Direct chain-of-command execution
 // --------------------------------------------------------------------------
 
-const n8nClient = new N8nClient();
-
-// n8n health check
-app.get('/n8n/health', async (_req, res) => {
-  try {
-    const health = await n8nClient.healthCheck();
-    res.json(health);
-  } catch (err) {
-    res.json({ ok: false, error: err instanceof Error ? err.message : 'Health check failed' });
-  }
-});
-
-// List n8n workflows
-app.get('/n8n/workflows', async (_req, res) => {
-  try {
-    const workflows = await n8nClient.listWorkflows();
-    res.json({ workflows, count: workflows.length });
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : 'Failed to list workflows';
-    res.status(500).json({ error: msg });
-  }
-});
-
-// Deploy a workflow to n8n
-app.post('/n8n/workflows/deploy', async (req, res) => {
-  try {
-    const { workflowJson } = req.body;
-    if (!workflowJson) {
-      res.status(400).json({ error: 'Missing workflowJson in body' });
-      return;
-    }
-    const result = await n8nClient.deployWorkflow(workflowJson);
-    res.status(201).json(result);
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : 'Workflow deploy failed';
-    res.status(500).json({ error: msg });
-  }
-});
-
-// Activate a workflow on n8n
-app.post('/n8n/workflows/:workflowId/activate', async (req, res) => {
-  try {
-    await n8nClient.activateWorkflow(req.params.workflowId);
-    res.json({ success: true, workflowId: req.params.workflowId });
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : 'Workflow activation failed';
-    res.status(500).json({ error: msg });
-  }
-});
-
-// Trigger PMO pipeline via n8n (or local fallback)
-app.post('/n8n/trigger', async (req, res) => {
+app.post('/pipeline/trigger', async (req, res) => {
   try {
     const { userId, message, context } = req.body;
     if (!userId || !message) {
       res.status(400).json({ error: 'Missing userId or message' });
       return;
     }
-    const result = await n8nClient.triggerPmoWorkflow({ userId, message, context });
+    const result = await triggerPmoPipeline({ userId, message, context });
     res.json(result);
   } catch (err) {
-    const msg = err instanceof Error ? err.message : 'n8n trigger failed';
+    const msg = err instanceof Error ? err.message : 'Pipeline trigger failed';
     res.status(500).json({ error: msg });
   }
 });

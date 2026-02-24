@@ -49,7 +49,7 @@ services:
 
   # ---------------------------------------------------------------------------
   # Layer 3: II Agents & Automation
-  # Activate with: docker compose --profile ii-agents --profile n8n up -d
+  # Activate with: docker compose --profile ii-agents up -d
   # ---------------------------------------------------------------------------
   agent-zero:
     image: frdel/agent-zero-run:latest
@@ -64,23 +64,8 @@ services:
     profiles:
       - ii-agents
 
-  n8n:
-    image: n8nio/n8n:2.8.2
-    ports:
-      - "5678:5678"
-    environment:
-      - N8N_BASIC_AUTH_ACTIVE=false
-      - WEBHOOK_URL=http://localhost:5678
-    volumes:
-      - n8n-data:/home/node/.n8n
-    networks:
-      - aims-network
-    profiles:
-      - n8n
-
 volumes:
   agent-zero-data:
-  n8n-data:
 
 networks:
   aims-network:

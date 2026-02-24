@@ -1,5 +1,5 @@
 /**
- * n8n PMO Routing — Module Barrel Export
+ * PMO Pipeline — Module Barrel Export
  *
  * Chain of Command Pipeline:
  *   User → ACHEEVY → Boomer_Ang → Chicken Hawk → Squad → Lil_Hawks → Receipt → ACHEEVY → User
@@ -7,7 +7,8 @@
 
 export { classifyIntent, buildDirective, createPipelinePacket } from './pmo-router';
 export { executeChainOfCommand, executeChainOfCommandFull } from './chain-of-command';
-export { triggerN8nPmoWorkflow, N8nClient } from './client';
+export { triggerN8nPmoWorkflow, triggerPmoPipeline, triggerVerticalWorkflow } from './client';
+export type { PipelineTriggerPayload, PipelineResponse, VerticalTriggerPayload } from './client';
 export type {
   PmoPipelinePacket,
   N8nTriggerPayload,
