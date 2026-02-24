@@ -16,6 +16,7 @@ import {
   TrendingUp,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { ScrollReveal, GlowBorder, ScrollProgress } from '@/components/motion';
 
 /* ─── HalalHub Landing Page ────────────────────────────────────────────────
    AIMS Landing UI Archetype: Hero + Features + Trust + CTA
@@ -23,12 +24,14 @@ import { motion } from 'framer-motion';
    Mobile-first, single-column → 2-column hero from md up
    ──────────────────────────────────────────────────────────────────────── */
 
+import { scrollTransition, stagger } from '@/lib/motion/tokens';
+
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
-    transition: { delay: i * 0.1, duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] },
+    transition: { delay: i * stagger.normal, ...scrollTransition.reveal },
   }),
 };
 
@@ -74,6 +77,8 @@ const STATS = [
 export default function HalalHubLanding() {
   return (
     <div className="flex flex-col">
+      <ScrollProgress color="bg-emerald-500" height={2} zIndex={60} />
+
       {/* ─── Hero ──────────────────────────────────────────────── */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-emerald-50 via-white to-amber-50/30" />
@@ -109,13 +114,15 @@ export default function HalalHubLanding() {
                 and every transaction is protected.
               </motion.p>
               <motion.div variants={fadeUp} custom={3} className="flex flex-wrap gap-3">
-                <Link
-                  href="/halalhub/shop"
-                  className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-600/20 transition-all hover:bg-emerald-700 hover:shadow-xl hover:shadow-emerald-600/30"
-                >
-                  Start Shopping
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
+                <GlowBorder theme="emerald" rounded="rounded-xl">
+                  <Link
+                    href="/halalhub/shop"
+                    className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-600/20 transition-all hover:bg-emerald-700 hover:shadow-xl hover:shadow-emerald-600/30"
+                  >
+                    Start Shopping
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </GlowBorder>
                 <Link
                   href="/halalhub/(auth)/signup/vendor"
                   className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-700 transition-all hover:border-emerald-200 hover:bg-emerald-50"
@@ -169,127 +176,118 @@ export default function HalalHubLanding() {
       </section>
 
       {/* ─── Categories ───────────────────────────────────────── */}
-      <section className="border-t border-slate-200/60 bg-white py-16 md:py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">
-              Browse by Category
-            </h2>
-            <p className="mt-2 text-base text-slate-500">
-              Find exactly what you need from verified halal vendors.
-            </p>
+      <ScrollReveal speed="reveal" margin="early">
+        <section className="border-t border-slate-200/60 bg-white py-16 md:py-20">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="text-center">
+              <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">
+                Browse by Category
+              </h2>
+              <p className="mt-2 text-base text-slate-500">
+                Find exactly what you need from verified halal vendors.
+              </p>
+            </div>
+            <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+              {CATEGORIES.map((cat, i) => (
+                <ScrollReveal key={cat.name} speed="pop" delay={i * 0.05} distance={16}>
+                  <Link
+                    href={`/halalhub/shop?category=${cat.name.toLowerCase()}`}
+                    className="group flex flex-col items-center gap-3 rounded-2xl border border-slate-100 bg-white p-5 text-center transition-all hover:border-emerald-200 hover:shadow-lg hover:shadow-emerald-600/5"
+                  >
+                    <span className={`flex h-12 w-12 items-center justify-center rounded-xl text-2xl ${cat.color}`}>
+                      {cat.icon}
+                    </span>
+                    <div>
+                      <p className="text-sm font-semibold text-slate-900 group-hover:text-emerald-700">
+                        {cat.name}
+                      </p>
+                      <p className="mt-0.5 text-xs text-slate-400">{cat.count} listings</p>
+                    </div>
+                  </Link>
+                </ScrollReveal>
+              ))}
+            </div>
           </div>
-          <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-            {CATEGORIES.map((cat, i) => (
-              <motion.div
-                key={cat.name}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.05 }}
-              >
-                <Link
-                  href={`/halalhub/shop?category=${cat.name.toLowerCase()}`}
-                  className="group flex flex-col items-center gap-3 rounded-2xl border border-slate-100 bg-white p-5 text-center transition-all hover:border-emerald-200 hover:shadow-lg hover:shadow-emerald-600/5"
-                >
-                  <span className={`flex h-12 w-12 items-center justify-center rounded-xl text-2xl ${cat.color}`}>
-                    {cat.icon}
-                  </span>
-                  <div>
-                    <p className="text-sm font-semibold text-slate-900 group-hover:text-emerald-700">
-                      {cat.name}
-                    </p>
-                    <p className="mt-0.5 text-xs text-slate-400">{cat.count} listings</p>
-                  </div>
-                </Link>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
+        </section>
+      </ScrollReveal>
 
       {/* ─── Trust & Safety ───────────────────────────────────── */}
-      <section className="py-16 md:py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">
-              Built on Trust
-            </h2>
-            <p className="mt-2 text-base text-slate-500">
-              Every aspect of HalalHub is designed to protect buyers and sellers.
-            </p>
+      <ScrollReveal speed="reveal">
+        <section className="py-16 md:py-20">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="text-center">
+              <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">
+                Built on Trust
+              </h2>
+              <p className="mt-2 text-base text-slate-500">
+                Every aspect of HalalHub is designed to protect buyers and sellers.
+              </p>
+            </div>
+            <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {TRUST_ITEMS.map((item, i) => (
+                <ScrollReveal key={item.title} speed="pop" delay={i * 0.08} distance={16}>
+                  <div className="rounded-2xl border border-slate-100 bg-white p-6 transition-all hover:border-emerald-200 hover:shadow-lg hover:shadow-emerald-600/5">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600">
+                      <item.icon className="h-5 w-5" />
+                    </div>
+                    <h3 className="mt-4 text-base font-semibold text-slate-900">{item.title}</h3>
+                    <p className="mt-2 text-sm text-slate-500 leading-relaxed">{item.desc}</p>
+                  </div>
+                </ScrollReveal>
+              ))}
+            </div>
           </div>
-          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {TRUST_ITEMS.map((item, i) => (
-              <motion.div
-                key={item.title}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.08 }}
-                className="rounded-2xl border border-slate-100 bg-white p-6 transition-all hover:border-emerald-200 hover:shadow-lg hover:shadow-emerald-600/5"
-              >
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600">
-                  <item.icon className="h-5 w-5" />
-                </div>
-                <h3 className="mt-4 text-base font-semibold text-slate-900">{item.title}</h3>
-                <p className="mt-2 text-sm text-slate-500 leading-relaxed">{item.desc}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
+        </section>
+      </ScrollReveal>
 
       {/* ─── How It Works ─────────────────────────────────────── */}
-      <section className="border-t border-slate-200/60 bg-white py-16 md:py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">
-              How It Works
-            </h2>
+      <ScrollReveal speed="reveal">
+        <section className="border-t border-slate-200/60 bg-white py-16 md:py-20">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="text-center">
+              <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">
+                How It Works
+              </h2>
+            </div>
+            <div className="mt-10 grid gap-8 md:grid-cols-3">
+              {[
+                {
+                  step: '01',
+                  title: 'Browse & Discover',
+                  desc: 'Search by category, location, or keyword. Filter by certification, rating, and delivery options.',
+                  icon: '🔍',
+                },
+                {
+                  step: '02',
+                  title: 'Order with Confidence',
+                  desc: 'Add to cart and checkout securely. Payment is held in escrow until you confirm delivery.',
+                  icon: '🛒',
+                },
+                {
+                  step: '03',
+                  title: 'Enjoy & Review',
+                  desc: 'Receive your order, confirm delivery to release payment. Leave a review to help the community.',
+                  icon: '⭐',
+                },
+              ].map((item, i) => (
+                <ScrollReveal key={item.step} speed="pop" delay={i * 0.1} distance={16}>
+                  <div className="relative flex flex-col items-center text-center">
+                    <span className="text-4xl">{item.icon}</span>
+                    <span className="mt-3 text-xs font-bold text-emerald-600 tracking-widest uppercase">
+                      Step {item.step}
+                    </span>
+                    <h3 className="mt-2 text-lg font-semibold text-slate-900">{item.title}</h3>
+                    <p className="mt-2 text-sm text-slate-500 leading-relaxed max-w-xs">{item.desc}</p>
+                  </div>
+                </ScrollReveal>
+              ))}
+            </div>
           </div>
-          <div className="mt-10 grid gap-8 md:grid-cols-3">
-            {[
-              {
-                step: '01',
-                title: 'Browse & Discover',
-                desc: 'Search by category, location, or keyword. Filter by certification, rating, and delivery options.',
-                icon: '🔍',
-              },
-              {
-                step: '02',
-                title: 'Order with Confidence',
-                desc: 'Add to cart and checkout securely. Payment is held in escrow until you confirm delivery.',
-                icon: '🛒',
-              },
-              {
-                step: '03',
-                title: 'Enjoy & Review',
-                desc: 'Receive your order, confirm delivery to release payment. Leave a review to help the community.',
-                icon: '⭐',
-              },
-            ].map((item, i) => (
-              <motion.div
-                key={item.step}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="relative flex flex-col items-center text-center"
-              >
-                <span className="text-4xl">{item.icon}</span>
-                <span className="mt-3 text-xs font-bold text-emerald-600 tracking-widest uppercase">
-                  Step {item.step}
-                </span>
-                <h3 className="mt-2 text-lg font-semibold text-slate-900">{item.title}</h3>
-                <p className="mt-2 text-sm text-slate-500 leading-relaxed max-w-xs">{item.desc}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
+        </section>
+      </ScrollReveal>
 
       {/* ─── Vendor CTA ───────────────────────────────────────── */}
+      <ScrollReveal speed="cinematic" margin="early">
       <section className="py-16 md:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-600 to-emerald-700 p-8 md:p-14">
@@ -341,6 +339,7 @@ export default function HalalHubLanding() {
           </div>
         </div>
       </section>
+      </ScrollReveal>
     </div>
   );
 }

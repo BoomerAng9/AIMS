@@ -24,6 +24,11 @@ import {
   heroItem,
   viewportMargin,
 } from "@/lib/motion";
+import {
+  ScrollProgress as ScrollProgressBar,
+  GlowBorder,
+  ScrollReveal,
+} from "@/components/motion";
 
 /* ═══════════════════════════════════════════════════════════
    A.I.M.S. Landing Page — Modern Light SaaS
@@ -109,16 +114,7 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-// ── Scroll Progress Bar ──
-function ScrollProgress() {
-  const { scrollYProgress } = useScroll();
-  return (
-    <motion.div
-      className="fixed top-0 left-0 right-0 h-[2px] bg-amber-500 origin-left z-[60]"
-      style={{ scaleX: scrollYProgress }}
-    />
-  );
-}
+// ScrollProgress replaced by reusable component from @/components/motion
 
 export default function HomePage() {
   const isShowroom = useIsShowroom();
@@ -136,7 +132,7 @@ export default function HomePage() {
   return (
     <main className="relative min-h-screen bg-[#F8FAFC] overflow-x-hidden text-slate-900 selection:bg-amber-100">
 
-      <ScrollProgress />
+      <ScrollProgressBar height={2} zIndex={60} />
 
       {/* ── Background ── */}
       <div className="fixed inset-0 z-0">
@@ -211,12 +207,14 @@ export default function HomePage() {
                 variants={heroItem}
                 className="flex flex-col sm:flex-row gap-4 pt-4"
               >
-                <Link
-                  href="/chat"
-                  className="h-14 px-10 bg-amber-600 text-slate-800 font-bold uppercase tracking-widest text-xs rounded-xl inline-flex items-center justify-center gap-3 hover:bg-amber-700 hover:shadow-lg hover:shadow-amber-200/50 transition-all group"
-                >
-                  Initiate Chat <Zap size={18} className="group-hover:scale-125 transition-transform" />
-                </Link>
+                <GlowBorder theme="gold" rounded="rounded-xl">
+                  <Link
+                    href="/chat"
+                    className="h-14 px-10 bg-amber-600 text-slate-800 font-bold uppercase tracking-widest text-xs rounded-xl inline-flex items-center justify-center gap-3 hover:bg-amber-700 hover:shadow-lg hover:shadow-amber-200/50 transition-all group"
+                  >
+                    Initiate Chat <Zap size={18} className="group-hover:scale-125 transition-transform" />
+                  </Link>
+                </GlowBorder>
                 <Link
                   href="#experiences"
                   className="h-14 px-10 border border-slate-200 hover:border-amber-200 bg-white text-slate-700 font-bold uppercase tracking-widest text-xs rounded-xl inline-flex items-center justify-center gap-2 transition-all hover:shadow-sm"
@@ -247,9 +245,15 @@ export default function HomePage() {
           </motion.div>
         </section>
 
-        <ExperienceGateway />
-        <PlatformPillars />
-        <FinalCTA />
+        <ScrollReveal speed="reveal" margin="early">
+          <ExperienceGateway />
+        </ScrollReveal>
+        <ScrollReveal speed="reveal">
+          <PlatformPillars />
+        </ScrollReveal>
+        <ScrollReveal speed="cinematic" margin="early">
+          <FinalCTA />
+        </ScrollReveal>
         <SiteFooter />
       </div>
     </main>
@@ -451,9 +455,11 @@ function FinalCTA() {
 
           <div className="relative z-10 flex flex-col sm:flex-row gap-6 justify-center">
             <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-              <Link href="/chat" className="h-16 px-12 bg-amber-600 text-slate-800 font-bold uppercase tracking-widest text-xs rounded-2xl inline-flex items-center justify-center gap-3 hover:bg-amber-700 hover:shadow-lg hover:shadow-amber-200/50 transition-all">
-                Initiate Protocols
-              </Link>
+              <GlowBorder theme="gold" rounded="rounded-2xl">
+                <Link href="/chat" className="h-16 px-12 bg-amber-600 text-slate-800 font-bold uppercase tracking-widest text-xs rounded-2xl inline-flex items-center justify-center gap-3 hover:bg-amber-700 hover:shadow-lg hover:shadow-amber-200/50 transition-all">
+                  Initiate Protocols
+                </Link>
+              </GlowBorder>
             </motion.div>
             <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
               <Link href="/(auth)/sign-up" className="h-16 px-12 border border-slate-200 hover:border-amber-200 bg-white text-slate-700 font-bold uppercase tracking-widest text-xs rounded-2xl inline-flex items-center justify-center gap-3 transition-all hover:shadow-sm">
