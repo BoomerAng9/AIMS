@@ -8,7 +8,7 @@
  * Inspired by Claude, ChatGPT, and Kimi interfaces
  */
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -137,7 +137,7 @@ interface MessageBubbleProps {
   isLast?: boolean;
 }
 
-function MessageBubble({ message, onSpeak, onCopy, isLast }: MessageBubbleProps) {
+const MessageBubble = memo(function MessageBubble({ message, onSpeak, onCopy, isLast }: MessageBubbleProps) {
   const [copied, setCopied] = useState(false);
   const isUser = message.role === 'user';
   const isStreaming = message.isStreaming;
@@ -264,7 +264,7 @@ function MessageBubble({ message, onSpeak, onCopy, isLast }: MessageBubbleProps)
       </div>
     </motion.div>
   );
-}
+});
 
 // ─────────────────────────────────────────────────────────────
 // Isolated Voice Visual Components (prevent 60fps parent re-renders)
@@ -539,6 +539,12 @@ export function ChatInterface({
     },
   });
 
+  // Memoize handleSpeak to prevent re-renders of MessageBubble
+  const { speak } = voiceOutput;
+  const handleSpeak = useCallback((text: string) => {
+    speak(text);
+  }, [speak]);
+
   // ─────────────────────────────────────────────────────────
   // Department/Ang Selection Helpers
   // ─────────────────────────────────────────────────────────
@@ -588,6 +594,29 @@ export function ChatInterface({
   // Send Message Handler
   // ─────────────────────────────────────────────────────────
 
+  // Classify message for vertical match (non-blocking)
+  // Uses the gateway /acheevy/classify endpoint which returns { intent, confidence, requiresAgent }
+  const classifyForVertical = useCallback(async (message: string) => {
+    try {
+      const res = await fetch('/api/acheevy/classify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message }),
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      // The gateway returns intent as 'vertical:<id>' (e.g. 'vertical:idea-generator')
+      if (data.requiresAgent && data.confidence > 0.6 && data.intent) {
+        const intent = data.intent as string;
+        if (intent.startsWith('vertical:')) {
+          verticalFlow.startVertical(intent.replace('vertical:', ''));
+        }
+      }
+    } catch {
+      // Classification is non-blocking — silent fail
+    }
+  }, [verticalFlow]);
+
   const handleSend = useCallback(async (text?: string) => {
     const messageText = text || inputValue;
     if (!messageText.trim() || isStreaming || isLoading) return;
@@ -624,30 +653,7 @@ export function ChatInterface({
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
     }
-  }, [inputValue, isStreaming, isLoading, sendMessage, showOrchestration, orchestration, verticalFlow]);
-
-  // Classify message for vertical match (non-blocking)
-  // Uses the gateway /acheevy/classify endpoint which returns { intent, confidence, requiresAgent }
-  const classifyForVertical = useCallback(async (message: string) => {
-    try {
-      const res = await fetch('/api/acheevy/classify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message }),
-      });
-      if (!res.ok) return;
-      const data = await res.json();
-      // The gateway returns intent as 'vertical:<id>' (e.g. 'vertical:idea-generator')
-      if (data.requiresAgent && data.confidence > 0.6 && data.intent) {
-        const intent = data.intent as string;
-        if (intent.startsWith('vertical:')) {
-          verticalFlow.startVertical(intent.replace('vertical:', ''));
-        }
-      }
-    } catch {
-      // Classification is non-blocking — silent fail
-    }
-  }, [verticalFlow]);
+  }, [inputValue, isStreaming, isLoading, sendMessage, showOrchestration, orchestration, verticalFlow, classifyForVertical]);
 
   // ─────────────────────────────────────────────────────────
   // Keyboard Handling
@@ -722,7 +728,7 @@ export function ChatInterface({
                 key={message.id}
                 message={message}
                 isLast={index === messages.length - 1}
-                onSpeak={(text) => voiceOutput.speak(text)}
+                onSpeak={handleSpeak}
               />
             ))}
           </AnimatePresence>
