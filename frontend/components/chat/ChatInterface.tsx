@@ -241,16 +241,16 @@ function MessageBubble({ message, onSpeak, onCopy, isLast }: MessageBubbleProps)
         </div>
 
         {/* File Deliverables — rendered from message metadata */}
-        {!isUser && !isStreaming && message.metadata?.files && (
+        {!isUser && !isStreaming && Array.isArray(message.metadata?.files) && (
           <div className="mt-2">
             <FileDownloadGroup
               files={
-                (message.metadata.files as Array<{
+                message.metadata.files as Array<{
                   content: string;
                   filename?: string;
                   format?: 'md' | 'json' | 'csv' | 'txt' | 'html';
                   label?: string;
-                }>)
+                }>
               }
             />
           </div>
