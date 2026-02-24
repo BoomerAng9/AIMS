@@ -1,6 +1,7 @@
 {
   "name": "uef-gateway",
   "version": "1.0.0",
+  "license": "PROPRIETARY",
   "description": "Universal Execution Framework Gateway for A.I.M.S.",
   "main": "dist/index.js",
   "scripts": {

@@ -3,6 +3,26 @@
 @tailwind utilities;
 
 /* ═══════════════════════════════════════════════════════════
+   Glow Border Animation (Huly.io-style rotating gradient)
+   Used by: components/motion/GlowBorder.tsx
+   ═══════════════════════════════════════════════════════════ */
+
+@property --glow-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes glow-spin {
+  from { --glow-angle: 0deg; }
+  to { --glow-angle: 360deg; }
+}
+
+.glow-border > div:first-child {
+  animation: glow-spin 3s linear infinite;
+}
+
+/* ═══════════════════════════════════════════════════════════
    A.I.M.S. Design System — v3 (Light)
    Clean · Professional · Modern SaaS · Mobile-first
    ═══════════════════════════════════════════════════════════ */
