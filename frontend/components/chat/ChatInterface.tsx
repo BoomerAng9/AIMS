@@ -8,7 +8,7 @@
  * Inspired by Claude, ChatGPT, and Kimi interfaces
  */
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -25,6 +25,8 @@ import { DepartmentBoard } from '@/components/orchestration/DepartmentBoard';
 import { UserInputModal } from '@/components/change-order/UserInputModal';
 import { CollaborationSidebar } from '@/components/collaboration/CollaborationFeed';
 import { VerticalStepIndicator } from '@/components/chat/VerticalStepIndicator';
+import { OnboardingGateBanner } from '@/components/chat/OnboardingGateBanner';
+import { FileDownload, FileDownloadGroup } from '@/components/chat/FileDownload';
 import type { ChatMessage } from '@/lib/chat/types';
 import type { ChangeOrder } from '@/lib/change-order/types';
 import { formatCurrency } from '@/lib/change-order/types';
@@ -137,7 +139,7 @@ interface MessageBubbleProps {
   isLast?: boolean;
 }
 
-function MessageBubble({ message, onSpeak, onCopy, isLast }: MessageBubbleProps) {
+const MessageBubble = memo(function MessageBubble({ message, onSpeak, onCopy, isLast }: MessageBubbleProps) {
   const [copied, setCopied] = useState(false);
   const isUser = message.role === 'user';
   const isStreaming = message.isStreaming;
@@ -238,6 +240,22 @@ function MessageBubble({ message, onSpeak, onCopy, isLast }: MessageBubbleProps)
           )}
         </div>
 
+        {/* File Deliverables — rendered from message metadata */}
+        {!isUser && !isStreaming && Array.isArray(message.metadata?.files) && (
+          <div className="mt-2">
+            <FileDownloadGroup
+              files={
+                message.metadata.files as Array<{
+                  content: string;
+                  filename?: string;
+                  format?: 'md' | 'json' | 'csv' | 'txt' | 'html';
+                  label?: string;
+                }>
+              }
+            />
+          </div>
+        )}
+
         {/* Message Actions (for assistant messages) */}
         {!isUser && !isStreaming && message.content && (
           <div className="flex items-center gap-2 mt-2 opacity-0 hover:opacity-100 transition-opacity">
@@ -264,7 +282,7 @@ function MessageBubble({ message, onSpeak, onCopy, isLast }: MessageBubbleProps)
       </div>
     </motion.div>
   );
-}
+});
 
 // ─────────────────────────────────────────────────────────────
 // Isolated Voice Visual Components (prevent 60fps parent re-renders)
@@ -539,6 +557,12 @@ export function ChatInterface({
     },
   });
 
+  // Memoize handleSpeak to prevent re-renders of MessageBubble
+  const { speak } = voiceOutput;
+  const handleSpeak = useCallback((text: string) => {
+    speak(text);
+  }, [speak]);
+
   // ─────────────────────────────────────────────────────────
   // Department/Ang Selection Helpers
   // ─────────────────────────────────────────────────────────
@@ -588,6 +612,29 @@ export function ChatInterface({
   // Send Message Handler
   // ─────────────────────────────────────────────────────────
 
+  // Classify message for vertical match (non-blocking)
+  // Uses the gateway /acheevy/classify endpoint which returns { intent, confidence, requiresAgent }
+  const classifyForVertical = useCallback(async (message: string) => {
+    try {
+      const res = await fetch('/api/acheevy/classify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message }),
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      // The gateway returns intent as 'vertical:<id>' (e.g. 'vertical:idea-generator')
+      if (data.requiresAgent && data.confidence > 0.6 && data.intent) {
+        const intent = data.intent as string;
+        if (intent.startsWith('vertical:')) {
+          verticalFlow.startVertical(intent.replace('vertical:', ''));
+        }
+      }
+    } catch {
+      // Classification is non-blocking — silent fail
+    }
+  }, [verticalFlow]);
+
   const handleSend = useCallback(async (text?: string) => {
     const messageText = text || inputValue;
     if (!messageText.trim() || isStreaming || isLoading) return;
@@ -624,30 +671,7 @@ export function ChatInterface({
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
     }
-  }, [inputValue, isStreaming, isLoading, sendMessage, showOrchestration, orchestration, verticalFlow]);
-
-  // Classify message for vertical match (non-blocking)
-  // Uses the gateway /acheevy/classify endpoint which returns { intent, confidence, requiresAgent }
-  const classifyForVertical = useCallback(async (message: string) => {
-    try {
-      const res = await fetch('/api/acheevy/classify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message }),
-      });
-      if (!res.ok) return;
-      const data = await res.json();
-      // The gateway returns intent as 'vertical:<id>' (e.g. 'vertical:idea-generator')
-      if (data.requiresAgent && data.confidence > 0.6 && data.intent) {
-        const intent = data.intent as string;
-        if (intent.startsWith('vertical:')) {
-          verticalFlow.startVertical(intent.replace('vertical:', ''));
-        }
-      }
-    } catch {
-      // Classification is non-blocking — silent fail
-    }
-  }, [verticalFlow]);
+  }, [inputValue, isStreaming, isLoading, sendMessage, showOrchestration, orchestration, verticalFlow, classifyForVertical]);
 
   // ─────────────────────────────────────────────────────────
   // Keyboard Handling
@@ -665,6 +689,9 @@ export function ChatInterface({
       {/* Messages Area */}
       <div className="flex-1 overflow-y-auto px-4 py-6">
         <div className="max-w-3xl mx-auto space-y-6">
+          {/* Onboarding Gate Banner — shown until onboarding is complete */}
+          {messages.length === 0 && <OnboardingGateBanner />}
+
           {/* Welcome Message */}
           {messages.length === 0 && welcomeMessage && (
             <motion.div
@@ -722,7 +749,7 @@ export function ChatInterface({
                 key={message.id}
                 message={message}
                 isLast={index === messages.length - 1}
-                onSpeak={(text) => voiceOutput.speak(text)}
+                onSpeak={handleSpeak}
               />
             ))}
           </AnimatePresence>

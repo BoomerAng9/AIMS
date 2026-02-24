@@ -255,12 +255,13 @@ export default function YourSpacePage() {
 
   return (
     <div className="relative min-h-screen overflow-hidden">
-      {/* Starfield Background */}
+      {/* Starfield Background — light theme to match platform style */}
       <StarfieldBackground
         starCount={300}
         showPlanets
         showNebulae
-        showShootingStars
+        showShootingStars={false}
+        theme="light"
       />
 
       {/* Navigation HUD */}

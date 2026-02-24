@@ -194,6 +194,10 @@ interface StarfieldBackgroundProps {
   showShootingStars?: boolean;
   interactive?: boolean;
   className?: string;
+  /** 'dark' = original deep-space look; 'light' = soft white/blue for light-themed pages */
+  theme?: 'dark' | 'light';
+  /** When true the starfield uses absolute positioning instead of fixed, so it stays within its parent container */
+  contained?: boolean;
 }
 
 export function StarfieldBackground({
@@ -203,8 +207,11 @@ export function StarfieldBackground({
   showShootingStars = true,
   interactive = false,
   className = '',
+  theme = 'dark',
+  contained = false,
 }: StarfieldBackgroundProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const isLight = theme === 'light';
 
   // Generate stars once
   const stars = useMemo(() => generateStars(starCount), [starCount]);
@@ -240,36 +247,52 @@ export function StarfieldBackground({
     },
   ], []);
 
+  // Theme-aware colors
+  const containerBg = isLight
+    ? 'radial-gradient(ellipse at bottom, #F0F4FF 0%, #F8FAFC 100%)'
+    : 'radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%)';
+
+  const overlayBg = isLight
+    ? `
+      radial-gradient(ellipse at 20% 80%, rgba(120, 0, 255, 0.04) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 20%, rgba(255, 180, 0, 0.03) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, rgba(0, 100, 255, 0.03) 0%, transparent 70%)
+    `
+    : `
+      radial-gradient(ellipse at 20% 80%, rgba(120, 0, 255, 0.1) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 20%, rgba(255, 100, 0, 0.05) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, rgba(0, 100, 255, 0.05) 0%, transparent 70%)
+    `;
+
+  const starFill = isLight ? '#94A3B8' : 'white';
+  const starOpacityScale = isLight ? 0.4 : 1.0;
+
+  const vignetteBg = isLight
+    ? 'radial-gradient(ellipse at center, transparent 40%, rgba(248,250,252,0.8) 100%)'
+    : 'radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.6) 100%)';
+
   return (
     <div
       ref={containerRef}
-      className={`fixed inset-0 overflow-hidden bg-[#030014] ${className}`}
-      style={{
-        background: 'radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%)',
-      }}
+      className={`${contained ? 'absolute' : 'fixed'} inset-0 overflow-hidden ${isLight ? 'bg-[#F8FAFC]' : 'bg-[#030014]'} ${className}`}
+      style={{ background: containerBg }}
     >
-      {/* Deep space gradient */}
+      {/* Deep space / soft sky gradient */}
       <div
         className="absolute inset-0"
-        style={{
-          background: `
-            radial-gradient(ellipse at 20% 80%, rgba(120, 0, 255, 0.1) 0%, transparent 50%),
-            radial-gradient(ellipse at 80% 20%, rgba(255, 100, 0, 0.05) 0%, transparent 50%),
-            radial-gradient(ellipse at 50% 50%, rgba(0, 100, 255, 0.05) 0%, transparent 70%)
-          `,
-        }}
+        style={{ background: overlayBg }}
       />
 
       {/* Nebulae */}
       {showNebulae && (
         <>
-          <Nebula x={20} y={30} color="#8B5CF6" />
-          <Nebula x={70} y={60} color="#EC4899" />
-          <Nebula x={40} y={80} color="#3B82F6" />
+          <Nebula x={20} y={30} color={isLight ? '#C4B5FD' : '#8B5CF6'} />
+          <Nebula x={70} y={60} color={isLight ? '#FBCFE8' : '#EC4899'} />
+          <Nebula x={40} y={80} color={isLight ? '#BFDBFE' : '#3B82F6'} />
         </>
       )}
 
-      {/* Stars */}
+      {/* Stars / sparkles */}
       <svg className="absolute inset-0 w-full h-full">
         {stars.map((star) => (
           <motion.circle
@@ -277,10 +300,14 @@ export function StarfieldBackground({
             cx={`${star.x}%`}
             cy={`${star.y}%`}
             r={star.size}
-            fill="white"
-            initial={{ opacity: star.opacity }}
+            fill={starFill}
+            initial={{ opacity: star.opacity * starOpacityScale }}
             animate={{
-              opacity: [star.opacity, star.opacity * 0.3, star.opacity],
+              opacity: [
+                star.opacity * starOpacityScale,
+                star.opacity * 0.3 * starOpacityScale,
+                star.opacity * starOpacityScale,
+              ],
             }}
             transition={{
               duration: star.twinkleSpeed,
@@ -298,7 +325,7 @@ export function StarfieldBackground({
       ))}
 
       {/* Shooting stars */}
-      {showShootingStars && (
+      {showShootingStars && !isLight && (
         <>
           <ShootingStar />
           <ShootingStar />
@@ -308,9 +335,7 @@ export function StarfieldBackground({
       {/* Vignette overlay */}
       <div
         className="absolute inset-0 pointer-events-none"
-        style={{
-          background: 'radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.6) 100%)',
-        }}
+        style={{ background: vignetteBg }}
       />
     </div>
   );

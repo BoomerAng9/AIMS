@@ -1,3 +1,5 @@
+'use client';
+
 import { motion } from 'framer-motion';
 
 export function NetworkBug() {
@@ -22,7 +24,7 @@ export function NetworkBug() {
                     transition={{ duration: 1.5, repeat: Infinity }}
                     className="w-2 h-2 rounded-full bg-white"
                 />
-                <span className="text-[10px] font-bold text-slate-800 tracking-widest uppercase">Live Network</span>
+                <span className="text-[10px] font-bold text-white tracking-widest uppercase">Live Network</span>
             </div>
         </div>
     );

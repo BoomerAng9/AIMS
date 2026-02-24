@@ -108,6 +108,62 @@ nginx reverse proxy config, health check, and lifecycle management via ACHEEVY.
 - `--profile ii-agents` → agent-zero
 - `--profile perform` → scout-hub, film-room, war-room (Per|Form / Gridiron)
 
+## A.I.M.S. GATEWAY SYSTEM
+
+The A.I.M.S. GATEWAY SYSTEM (formerly DEOM Gateway System) is the multi-channel access,
+security, and service delivery layer for the entire platform. It governs WHO can access WHAT
+and HOW they interact with the platform.
+
+### History
+The original DEOM Gateway System was built for Saudi Arabia — connecting businesses to the
+General Authority of Zakat and VAT through secure one-way API tokens, ERP reporting, and
+subscription-based compliance services. The A.I.M.S. GATEWAY SYSTEM inherits that lineage
+but is re-engineered for global use.
+
+### Multi-Channel Access
+
+**Admin Channel** — `admin.aimanagedsolutions.cloud`
+- Owner/Developer access to both `plugmein.cloud` and `aimanagedsolutions.cloud`
+- Developer-mode interface — full visibility into all agents
+- Boomer_Ang management (create, configure, assign, monitor)
+- Lil_Hawk management (deploy, task assignment, status tracking)
+- Chicken Hawk management (safety policies, audit logs, compliance gates)
+- ACHEEVY remains the orchestrator, but the owner can manage all agent layers directly
+- Infrastructure, Docker, deployment, and monitoring tools fully exposed
+
+**User Channel** — `plugmein.cloud` (main domain)
+- Customer-facing access — simplified, clean UI
+- Users interact ONLY with ACHEEVY — no agent names exposed
+- No developer access, no infrastructure visibility
+- Paywalled features, managed service experience
+- White-label version may grant developer access later (not now)
+
+### Security Layer
+Security features and parameters are enabled by default for BOTH admin and user channels:
+- Secure Drop Tokens (SDTs) for artifact delivery
+- Evidence Locker with chain-of-custody tracking
+- Certification gates for Plug marketplace
+- Role-based access (OWNER, ADMIN, CUSTOMER, DEMO_USER)
+- Audit trail on all Gateway events
+
+### LUC (Locale Universal Calculator) Integration
+The Gateway System integrates LUC as the universal calculation engine:
+- **Foundation**: Built from the Flip Secrets real estate calculator (`aims-tools/luc/presets/real-estate-flip/`)
+- **K1 Taxation**: Real estate K1 reporting — critical for investors and enterprise users
+- **Zakat/VAT**: Saudi market plug-in for ERP integration and Zakat reporting
+- **North America**: K1 taxation, real estate taxes, business tax calculation
+- **Customizable**: Base LUC engine can be customized per customer use case via CLI tooling
+- **Billing**: All calculations metered through LUC usage tracking
+
+### Gateway Services (aims-skills/gateway/)
+- **SDT Service** — Issue, revoke, rotate, validate Secure Drop Tokens
+- **Evidence Locker** — Artifact storage with SHA-256 integrity and custody chain
+- **Certification Gate** — Plug certification pipeline (review, check, certify, exception)
+- **Submission Service** — Form-based submissions to external parties
+- **Compliance Packs** — Region/industry compliance bundles
+- **Operations Engine** — Job packets, LUC quotes, operations feed
+- **Event Bus** — 24+ event types for full audit trail
+
 ## Key Rules
 1. All tool access goes through Port Authority (UEF Gateway) — no direct service exposure
 2. Only ACHEEVY speaks to the user — never internal agent names
@@ -123,6 +179,39 @@ nginx reverse proxy config, health check, and lifecycle management via ACHEEVY.
 2. Make changes in the appropriate file (hooks/, skills/, tasks/, acheevy-verticals/)
 3. Update the brain file to reflect changes
 4. Export new modules from the relevant index.ts
+
+## Agent Naming Conventions — MANDATORY
+
+### Spelling
+- **ACHEEVY** — NOT "ACHEVY", NOT "Achevy". Double-E, double-V-Y.
+- **A.I.M.S. GATEWAY SYSTEM** — Formerly "DEOM Gateway System". NOT "DEON", NOT "DM Gateway", NOT "Dion Gateway". Always "A.I.M.S. GATEWAY SYSTEM"
+
+### Agent Hierarchy Names
+- **Boomer_Ang** — Manager-level agents. Name format: `Name_Ang` (e.g., SME_Ang, Researcher_Ang, Quality_Ang). NOT "boomerang".
+- **Lil_Hawk** — Worker-level agents. Name format: `Lil_X_Hawk` where X is a short nickname (e.g., Lil_Creddy_Hawk, Lil_Scout_Hawk). NEVER "Name_Hawk" without "Lil_" prefix.
+- **Chicken Hawk** — Coordinator/safety bot. Always "Chicken Hawk" (two words).
+
+### Examples of WRONG naming
+```
+WRONG: Credential_Hawk    → CORRECT: Lil_Creddy_Hawk
+WRONG: Scout_Hawk         → CORRECT: Lil_Scout_Hawk
+WRONG: boomerang          → CORRECT: Boomer_Ang
+WRONG: ACHEVY             → CORRECT: ACHEEVY
+WRONG: DM Gateway         → CORRECT: A.I.M.S. GATEWAY SYSTEM
+WRONG: DEON Gateway       → CORRECT: A.I.M.S. GATEWAY SYSTEM (historical name was DEOM, now renamed)
+```
+
+## Documented Mistakes (Learn From These)
+
+1. Named a Lil_Hawk as "Credential_Hawk" instead of "Lil_Creddy_Hawk" — Lil_Hawks ALWAYS follow `Lil_X_Hawk` pattern
+2. Spelled ACHEEVY as "ACHEVY" — must be double-E
+3. Called A.I.M.S. GATEWAY SYSTEM by wrong names ("DM Gateway", "DEON Gateway") — the original system was DEOM Gateway System, now renamed to A.I.M.S. GATEWAY SYSTEM
+4. Wrapped entire sections in ScrollReveal, causing IntersectionObserver collapse (opacity:0) — only use per-element ScrollReveal
+5. ACHEEVY chat was told it could see images — it cannot, text-only backend
+6. Internal agent names exposed in public-facing UI — only ACHEEVY speaks to users
+7. Design skills exist but were never auto-triggered during builds
+8. MIT license was applied — this is proprietary, not open source
+9. Called Boomer_Ang agents "boomerangs" — the correct name is always **Boomer_Ang** (with underscore). Never "boomerang", "boomerangs", or "Boomerang"
 
 ## Testing
 ```bash
@@ -171,10 +260,10 @@ Before writing custom animations, check `frontend/components/motion/`:
 
 ## Dual-Layer Access (PRIVATE vs PUBLIC)
 
-A.I.M.S. has two interaction modes:
+A.I.M.S. has two interaction modes, enforced by the A.I.M.S. GATEWAY SYSTEM:
 
-- **PRIVATE mode** (Owner/Admin): Full technical vocabulary, all agents visible, all integrations exposed, developer tools, raw ACHEEVY
-- **PUBLIC mode** (Customer): Simplified UI, plain language labels, no agent names, paywalled features
+- **PRIVATE mode** (Owner/Admin via `admin.aimanagedsolutions.cloud`): Full technical vocabulary, all agents visible (Boomer_Ang, Lil_Hawks, Chicken Hawk), all integrations exposed, developer tools, raw ACHEEVY. Owner can manage all agent layers directly.
+- **PUBLIC mode** (Customer via `plugmein.cloud`): Simplified UI, plain language labels, no agent names, paywalled features. Users interact ONLY with ACHEEVY.
 
 Use `usePlatformMode()` from `frontend/lib/platform-mode.tsx` to detect mode.
 Use `t(key, mode)` from `frontend/lib/terminology.ts` for mode-aware labels.

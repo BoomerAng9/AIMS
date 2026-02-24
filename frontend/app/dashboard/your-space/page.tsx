@@ -3,8 +3,18 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import { useSession } from "next-auth/react";
 import { User, Camera, Settings, Activity, Users, Building2, Loader2 } from "lucide-react";
+import { SpaceStation } from "@/components/your-space/SpaceStation";
+import { Spacecraft } from "@/components/your-space/Spacecraft";
+
+// StarfieldBackground uses framer-motion with useRef — safe for client but
+// dynamic-import keeps the bundle lean for SSR and avoids hydration flicker.
+const StarfieldBackground = dynamic(
+  () => import("@/components/your-space/StarfieldBackground").then((m) => m.StarfieldBackground),
+  { ssr: false }
+);
 
 interface UserStats {
   tasksCompleted: number;
@@ -48,6 +58,16 @@ export default function YourSpacePage() {
     }
     fetchStats();
   }, []);
+
+  // Space station & spacecraft state (tied to profile)
+  const [showShip, setShowShip] = useState(false);
+  const [stationData, setStationData] = useState({
+    fuel: 847,
+    maxFuel: 1000,
+    materials: 234,
+    crewCount: 23,
+    visitors: 156,
+  });
 
   const stats = [
     { label: "Tasks Completed", value: String(userStats.tasksCompleted), icon: Activity },
@@ -98,7 +118,19 @@ export default function YourSpacePage() {
   }
 
   return (
-    <div className="animate-in fade-in duration-700">
+    <div className="relative animate-in fade-in duration-700">
+      {/* Subtle starfield behind the profile — light theme, contained within page */}
+      <div className="absolute inset-0 -z-10 overflow-hidden rounded-3xl opacity-50 pointer-events-none">
+        <StarfieldBackground
+          starCount={120}
+          showPlanets={false}
+          showNebulae
+          showShootingStars={false}
+          theme="light"
+          contained
+        />
+      </div>
+
       {/* Two-column layout: profile info left, hero image right */}
       <div className="flex flex-col-reverse lg:flex-row gap-6 lg:gap-8">
         {/* Left Column: Profile Info */}
@@ -259,6 +291,76 @@ export default function YourSpacePage() {
             <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white/60 to-transparent pointer-events-none" />
           </div>
         </div>
+      </div>
+
+      {/* ── Space Station & Spacecraft ──────────────────────────── */}
+      <div className="mt-8 space-y-6">
+        <header>
+          <p className="text-[10px] uppercase tracking-[0.3em] text-gold/50 mb-1">
+            Home Base &amp; Fleet
+          </p>
+          <h2 className="text-2xl font-bold tracking-tight text-slate-800 font-display">
+            YOUR STATION
+          </h2>
+        </header>
+
+        {/* Station / Ship toggle */}
+        <div className="flex gap-2 mb-2">
+          <button
+            onClick={() => setShowShip(false)}
+            className={`px-4 py-2 text-xs font-semibold rounded-full border transition-all ${
+              !showShip
+                ? "bg-gold/10 border-gold/30 text-gold"
+                : "bg-slate-50 border-wireframe-stroke text-slate-400 hover:text-slate-600"
+            }`}
+          >
+            Station
+          </button>
+          <button
+            onClick={() => setShowShip(true)}
+            className={`px-4 py-2 text-xs font-semibold rounded-full border transition-all ${
+              showShip
+                ? "bg-gold/10 border-gold/30 text-gold"
+                : "bg-slate-50 border-wireframe-stroke text-slate-400 hover:text-slate-600"
+            }`}
+          >
+            Spacecraft
+          </button>
+        </div>
+
+        {/* Conditionally show Station or Ship */}
+        {!showShip ? (
+          <SpaceStation
+            name={userName + "'s Station"}
+            level="moon"
+            fuel={stationData.fuel}
+            maxFuel={stationData.maxFuel}
+            materials={stationData.materials}
+            crewCount={stationData.crewCount}
+            visitors={stationData.visitors}
+            onLaunch={() => setShowShip(true)}
+            onMine={() => {
+              setStationData((prev) => ({
+                ...prev,
+                fuel: Math.min(prev.fuel + 50, prev.maxFuel),
+                materials: prev.materials + 10,
+              }));
+            }}
+            onBuild={() => console.log("Build with Claude Code")}
+          />
+        ) : (
+          <Spacecraft
+            name="Star Chaser"
+            shipClass="cruiser"
+            fuel={stationData.fuel}
+            maxFuel={stationData.maxFuel}
+            speed={12}
+            cargo={45}
+            maxCargo={100}
+            isLaunched={false}
+            onCustomize={() => console.log("Customize ship")}
+          />
+        )}
       </div>
     </div>
   );

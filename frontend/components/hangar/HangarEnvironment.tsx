@@ -28,16 +28,16 @@ function HangarFloor() {
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow>
         <planeGeometry args={[HANGAR_WIDTH, HANGAR_DEPTH]} />
         <meshStandardMaterial
-          color="#0a0e14"
-          metalness={0.9}
-          roughness={0.2}
-          envMapIntensity={config.enableReflections ? 0.5 : 0}
+          color="#e2e8f0"
+          metalness={0.3}
+          roughness={0.6}
+          envMapIntensity={config.enableReflections ? 0.3 : 0}
         />
       </mesh>
 
       {/* Floor grid lines */}
       <gridHelper
-        args={[HANGAR_WIDTH, 24, '#1a2a3a', '#0d1520']}
+        args={[HANGAR_WIDTH, 24, '#cbd5e1', '#e2e8f0']}
         position={[0, 0.01, 0]}
       />
 
@@ -109,7 +109,7 @@ function CeilingLEDs() {
 
 /** Hangar walls with subtle wireframe edges */
 function HangarWalls() {
-  const wallColor = '#0a0e14';
+  const wallColor = '#f1f5f9';
 
   return (
     <group>
@@ -119,11 +119,11 @@ function HangarWalls() {
         <meshStandardMaterial
           color={wallColor}
           transparent
-          opacity={WALL_OPACITY}
-          metalness={0.8}
-          roughness={0.3}
+          opacity={0.15}
+          metalness={0.2}
+          roughness={0.7}
         />
-        <Edges color="#1a2a3a" threshold={15} />
+        <Edges color="#cbd5e1" threshold={15} />
       </mesh>
 
       {/* Left wall */}
@@ -135,11 +135,11 @@ function HangarWalls() {
         <meshStandardMaterial
           color={wallColor}
           transparent
-          opacity={WALL_OPACITY}
-          metalness={0.8}
-          roughness={0.3}
+          opacity={0.15}
+          metalness={0.2}
+          roughness={0.7}
         />
-        <Edges color="#1a2a3a" threshold={15} />
+        <Edges color="#cbd5e1" threshold={15} />
       </mesh>
 
       {/* Right wall */}
@@ -151,11 +151,11 @@ function HangarWalls() {
         <meshStandardMaterial
           color={wallColor}
           transparent
-          opacity={WALL_OPACITY}
-          metalness={0.8}
-          roughness={0.3}
+          opacity={0.15}
+          metalness={0.2}
+          roughness={0.7}
         />
-        <Edges color="#1a2a3a" threshold={15} />
+        <Edges color="#cbd5e1" threshold={15} />
       </mesh>
 
       {/* Ceiling */}
@@ -165,11 +165,11 @@ function HangarWalls() {
       >
         <planeGeometry args={[HANGAR_WIDTH, HANGAR_DEPTH]} />
         <meshStandardMaterial
-          color="#050810"
+          color="#f8fafc"
           transparent
-          opacity={0.3}
-          metalness={0.9}
-          roughness={0.1}
+          opacity={0.4}
+          metalness={0.1}
+          roughness={0.8}
         />
       </mesh>
     </group>
@@ -234,11 +234,11 @@ function BuildStations() {
           <mesh rotation={[-Math.PI / 2, 0, 0]}>
             <circleGeometry args={[1.2, 32]} />
             <meshStandardMaterial
-              color="#0d1520"
+              color="#e2e8f0"
               emissive="#FF6A2A"
               emissiveIntensity={0.15}
-              metalness={0.8}
-              roughness={0.2}
+              metalness={0.3}
+              roughness={0.5}
             />
           </mesh>
           {/* Station ring */}
@@ -266,11 +266,11 @@ function CommandPlatform() {
       <mesh position={[0, 1.5, 0]}>
         <cylinderGeometry args={[2.5, 3, 3, 6]} />
         <meshStandardMaterial
-          color="#0a0e14"
-          metalness={0.9}
-          roughness={0.15}
+          color="#e2e8f0"
+          metalness={0.4}
+          roughness={0.4}
           emissive="#C6A74E"
-          emissiveIntensity={0.08}
+          emissiveIntensity={0.12}
         />
         <Edges color="#C6A74E" threshold={15} />
       </mesh>
@@ -294,7 +294,7 @@ export default function HangarEnvironment() {
 
   return (
     <group>
-      {config.enableFog && <fog attach="fog" args={['#0B0F14', 15, 45]} />}
+      {config.enableFog && <fog attach="fog" args={['#F0F4F8', 20, 50]} />}
       <HangarFloor />
       <HangarWalls />
       <CeilingLEDs />

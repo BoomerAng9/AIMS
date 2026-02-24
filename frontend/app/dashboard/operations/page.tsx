@@ -26,6 +26,7 @@ import {
   RefreshCw,
   Circle,
 } from "lucide-react";
+import { LiveOpsTheater } from "@/components/deploy-platform/LiveOpsTheater";
 import {
   AreaChart,
   Area,
@@ -509,6 +510,7 @@ export default function OperationsPage() {
   const [activeTab, setActiveTab] = useState<"overview" | "alerts" | "incidents" | "traces">("overview");
   const [timeRange, setTimeRange] = useState<TimeRange>("1h");
   const [isLive, setIsLive] = useState(true);
+  const [theaterOpen, setTheaterOpen] = useState(false);
   const { responseTimeData, requestRateData, cpuData, memoryData, errorRateData } = useLiveTelemetry();
   const liveEvents = useLiveEvents();
   const { services, isLiveData } = useServiceHealth();
@@ -587,6 +589,17 @@ export default function OperationsPage() {
                 </button>
               ))}
             </div>
+
+            {/* Live Ops Theater */}
+            <button
+              onClick={() => setTheaterOpen(true)}
+              className="flex items-center gap-1.5 rounded-lg border border-gold/20 bg-gold/5 px-3 py-1.5 transition-all hover:bg-gold/10"
+            >
+              <Eye size={12} className="text-gold" />
+              <span className="text-[10px] font-bold uppercase tracking-widest text-gold">
+                Live Ops
+              </span>
+            </button>
 
             {/* System status */}
             <div className="flex items-center gap-1.5 rounded-lg bg-emerald-400/5 border border-emerald-400/20 px-3 py-1.5">
@@ -1076,6 +1089,13 @@ export default function OperationsPage() {
           )}
         </motion.div>
       </AnimatePresence>
+
+      {/* Live Ops Theater Overlay */}
+      <LiveOpsTheater
+        shiftId="SH-OPS-LIVE"
+        isOpen={theaterOpen}
+        onClose={() => setTheaterOpen(false)}
+      />
     </motion.div>
   );
 }

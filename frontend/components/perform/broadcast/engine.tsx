@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useEffect, useCallback, createContext, useContext } from 'react';
 
 export type SegmentType = 'BIG_BOARD' | 'WAR_ROOM_DEBATE' | 'MOCK_DRAFT_DESK' | 'HUMAN_ANCHOR_FEED';
