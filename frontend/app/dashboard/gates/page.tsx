@@ -371,7 +371,7 @@ export default function GatesPage() {
   return (
     <div className="space-y-6 animate-in fade-in duration-700">
       {/* ---- Hero Section ---- */}
-      <section className="relative overflow-hidden rounded-3xl border border-gold/20 bg-gradient-to-br from-[#0a0a0a] via-black/90 to-gold/10 shadow-[0_0_60px_rgba(251,191,36,0.1)]">
+      <section className="relative overflow-hidden rounded-3xl border border-gold/20 bg-gradient-to-br from-white via-white/90 to-gold/10 shadow-[0_0_60px_rgba(251,191,36,0.1)]">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(251,191,36,0.04),transparent_60%)]" />
         <div className="relative z-10 p-8 md:p-10">
           <div className="flex items-center gap-2 mb-3">
@@ -383,10 +383,10 @@ export default function GatesPage() {
           <p className="text-[10px] uppercase tracking-[0.3em] text-gold mb-1">
             7-Gate Verification &amp; Compliance
           </p>
-          <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-white font-display">
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-800 font-display">
             GATES &amp; EVIDENCE LOCKER
           </h1>
-          <p className="mt-2 text-sm text-white/40 max-w-xl">
+          <p className="mt-2 text-sm text-slate-400 max-w-xl">
             Quality_Ang applies the ORACLE methodology across seven gates.
             Every gate must pass before deployment is authorized.
             Evidence artifacts are immutably logged for audit and compliance.
@@ -395,13 +395,13 @@ export default function GatesPage() {
       </section>
 
       {/* ---- Summary Bar ---- */}
-      <section className="rounded-3xl border border-wireframe-stroke bg-black/60 p-6 backdrop-blur-2xl">
+      <section className="rounded-3xl border border-wireframe-stroke bg-slate-50/70 p-6 backdrop-blur-2xl">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h2 className="text-sm font-semibold uppercase tracking-widest text-white/80 font-display">
+            <h2 className="text-sm font-semibold uppercase tracking-widest text-slate-700 font-display">
               Gate Progress
             </h2>
-            <p className="mt-1 text-[0.65rem] text-white/30 uppercase tracking-wider">
+            <p className="mt-1 text-[0.65rem] text-slate-400 uppercase tracking-wider">
               {PASSED}/{TOTAL} gates passed — {PASS_PERCENTAGE}% complete
             </p>
           </div>
@@ -423,7 +423,7 @@ export default function GatesPage() {
 
         {/* Progress Bar */}
         <div className="mt-4">
-          <div className="h-2 w-full rounded-full bg-white/5 overflow-hidden">
+          <div className="h-2 w-full rounded-full bg-slate-50 overflow-hidden">
             <div className="h-full flex">
               <div
                 className="bg-gradient-to-r from-emerald-500 to-emerald-400 transition-all duration-700"
@@ -439,7 +439,7 @@ export default function GatesPage() {
               />
             </div>
           </div>
-          <div className="mt-2 flex justify-between text-[9px] text-white/20">
+          <div className="mt-2 flex justify-between text-[9px] text-slate-300">
             <span>Gate 1</span>
             <span>Gate 7</span>
           </div>
@@ -447,20 +447,20 @@ export default function GatesPage() {
 
         {/* Quick Stats */}
         <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div className="rounded-2xl border border-wireframe-stroke bg-black/40 p-3 text-center">
-            <p className="text-[10px] uppercase tracking-widest text-white/30">Total Gates</p>
-            <p className="text-xl font-bold text-white mt-1">{TOTAL}</p>
+          <div className="rounded-2xl border border-wireframe-stroke bg-slate-100/60 p-3 text-center">
+            <p className="text-[10px] uppercase tracking-widest text-slate-400">Total Gates</p>
+            <p className="text-xl font-bold text-slate-800 mt-1">{TOTAL}</p>
           </div>
-          <div className="rounded-2xl border border-wireframe-stroke bg-black/40 p-3 text-center">
-            <p className="text-[10px] uppercase tracking-widest text-white/30">Pass Rate</p>
+          <div className="rounded-2xl border border-wireframe-stroke bg-slate-100/60 p-3 text-center">
+            <p className="text-[10px] uppercase tracking-widest text-slate-400">Pass Rate</p>
             <p className="text-xl font-bold text-emerald-400 mt-1">{PASS_PERCENTAGE}%</p>
           </div>
-          <div className="rounded-2xl border border-wireframe-stroke bg-black/40 p-3 text-center">
-            <p className="text-[10px] uppercase tracking-widest text-white/30">Evidence</p>
+          <div className="rounded-2xl border border-wireframe-stroke bg-slate-100/60 p-3 text-center">
+            <p className="text-[10px] uppercase tracking-widest text-slate-400">Evidence</p>
             <p className="text-xl font-bold text-gold mt-1">{TOTAL_EVIDENCE}</p>
           </div>
-          <div className="rounded-2xl border border-wireframe-stroke bg-black/40 p-3 text-center">
-            <p className="text-[10px] uppercase tracking-widest text-white/30">Deploy Ready</p>
+          <div className="rounded-2xl border border-wireframe-stroke bg-slate-100/60 p-3 text-center">
+            <p className="text-[10px] uppercase tracking-widest text-slate-400">Deploy Ready</p>
             <p className="text-xl font-bold text-red-400 mt-1">No</p>
           </div>
         </div>
@@ -470,11 +470,11 @@ export default function GatesPage() {
       <section>
         <div className="flex items-center gap-3 mb-1">
           <Shield size={16} className="text-gold" />
-          <h2 className="text-sm font-semibold uppercase tracking-widest text-white/80 font-display">
+          <h2 className="text-sm font-semibold uppercase tracking-widest text-slate-700 font-display">
             ORACLE 7-Gate Verification
           </h2>
         </div>
-        <p className="text-[0.65rem] text-white/30 uppercase tracking-wider mb-4">
+        <p className="text-[0.65rem] text-slate-400 uppercase tracking-wider mb-4">
           Sequential gates — each must pass before proceeding
         </p>
 
@@ -487,11 +487,11 @@ export default function GatesPage() {
               <div
                 key={gate.id}
                 onClick={() => setExpandedGate(isExpanded ? null : gate.id)}
-                className={`group relative rounded-2xl border p-5 backdrop-blur-2xl transition-all cursor-pointer hover:bg-black/80 ${colors.border} ${colors.bg} ${colors.glow}`}
+                className={`group relative rounded-2xl border p-5 backdrop-blur-2xl transition-all cursor-pointer hover:bg-white/80 ${colors.border} ${colors.bg} ${colors.glow}`}
               >
                 {/* Gate Number Badge */}
                 <div className="absolute -top-2.5 -left-1 flex items-center gap-1.5">
-                  <span className="rounded-full bg-black border border-wireframe-stroke px-2.5 py-0.5 text-[9px] font-bold text-gold uppercase tracking-wider">
+                  <span className="rounded-full bg-white border border-wireframe-stroke px-2.5 py-0.5 text-[9px] font-bold text-gold uppercase tracking-wider">
                     Gate {gate.id}
                   </span>
                 </div>
@@ -499,8 +499,8 @@ export default function GatesPage() {
                 {/* Header */}
                 <div className="flex items-start justify-between mt-2">
                   <div className="flex-1 pr-3">
-                    <h3 className="text-sm font-semibold text-white">{gate.name}</h3>
-                    <p className="text-[10px] text-white/30 mt-1 leading-relaxed">
+                    <h3 className="text-sm font-semibold text-slate-800">{gate.name}</h3>
+                    <p className="text-[10px] text-slate-400 mt-1 leading-relaxed">
                       {gate.description}
                     </p>
                   </div>
@@ -515,7 +515,7 @@ export default function GatesPage() {
                     <span className={`h-1 w-1 rounded-full ${colors.dot}`} />
                     {gate.status}
                   </span>
-                  <span className="text-[9px] text-white/20 font-mono">
+                  <span className="text-[9px] text-slate-300 font-mono">
                     {formatTimestamp(gate.timestamp)}
                   </span>
                 </div>
@@ -523,13 +523,13 @@ export default function GatesPage() {
                 {/* Evidence Count */}
                 <div className="mt-3 flex items-center justify-between border-t border-wireframe-stroke pt-3">
                   <div className="flex items-center gap-1.5">
-                    <FileText size={10} className="text-white/20" />
-                    <span className="text-[10px] text-white/30">
+                    <FileText size={10} className="text-slate-300" />
+                    <span className="text-[10px] text-slate-400">
                       {gate.evidenceCount} artifact{gate.evidenceCount !== 1 ? "s" : ""}
                     </span>
                   </div>
                   {gate.verifiedBy && (
-                    <span className="text-[9px] text-white/20 font-mono">
+                    <span className="text-[9px] text-slate-300 font-mono">
                       {gate.verifiedBy}
                     </span>
                   )}
@@ -538,10 +538,10 @@ export default function GatesPage() {
                 {/* Expanded Details */}
                 {isExpanded && (
                   <div className="mt-3 border-t border-wireframe-stroke pt-3 animate-in fade-in slide-in-from-top-2 duration-200">
-                    <p className="text-[10px] uppercase tracking-widest text-white/30 mb-1.5">
+                    <p className="text-[10px] uppercase tracking-widest text-slate-400 mb-1.5">
                       Details
                     </p>
-                    <p className="text-xs text-white/50 leading-relaxed">
+                    <p className="text-xs text-slate-500 leading-relaxed">
                       {gate.details}
                     </p>
                   </div>
@@ -561,7 +561,7 @@ export default function GatesPage() {
             <p className="text-xs text-red-400/60 mt-1 leading-relaxed">
               Gate 6 (Deployment) failed: VPS bootstrap not yet executed. Gate 7 (Operations) is
               blocked pending deployment environment availability. Run{" "}
-              <code className="rounded bg-black/60 border border-wireframe-stroke px-1.5 py-0.5 text-[10px] font-mono text-red-300/70">
+              <code className="rounded bg-slate-50/70 border border-wireframe-stroke px-1.5 py-0.5 text-[10px] font-mono text-red-300/70">
                 infra/vps-setup.sh
               </code>{" "}
               on the target VPS to unblock. Once the environment is live, Operations Gate can
@@ -572,15 +572,15 @@ export default function GatesPage() {
       </section>
 
       {/* ---- Evidence Locker ---- */}
-      <section className="rounded-3xl border border-wireframe-stroke bg-black/60 p-6 backdrop-blur-2xl">
+      <section className="rounded-3xl border border-wireframe-stroke bg-slate-50/70 p-6 backdrop-blur-2xl">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
           <div className="flex items-center gap-3">
             <Lock size={16} className="text-gold" />
             <div>
-              <h2 className="text-sm font-semibold uppercase tracking-widest text-white/80 font-display">
+              <h2 className="text-sm font-semibold uppercase tracking-widest text-slate-700 font-display">
                 Evidence Locker
               </h2>
-              <p className="mt-1 text-[0.65rem] text-white/30 uppercase tracking-wider">
+              <p className="mt-1 text-[0.65rem] text-slate-400 uppercase tracking-wider">
                 Immutable audit trail — {TOTAL_EVIDENCE} artifacts collected
               </p>
             </div>
@@ -595,7 +595,7 @@ export default function GatesPage() {
                 className={`rounded-full border px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider transition-colors ${
                   evidenceFilter === filter
                     ? "border-gold/20 bg-gold/10 text-gold"
-                    : "border-wireframe-stroke bg-black/40 text-white/30 hover:border-white/20 hover:text-white/50"
+                    : "border-wireframe-stroke bg-slate-100/60 text-slate-400 hover:border-slate-200 hover:text-slate-500"
                 }`}
               >
                 {filter === "all" ? `All (${TOTAL_EVIDENCE})` : filter}
@@ -609,25 +609,25 @@ export default function GatesPage() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-wireframe-stroke">
-                <th className="p-3 text-left text-[10px] uppercase tracking-widest text-white/30 font-semibold">
+                <th className="p-3 text-left text-[10px] uppercase tracking-widest text-slate-400 font-semibold">
                   ID
                 </th>
-                <th className="p-3 text-left text-[10px] uppercase tracking-widest text-white/30 font-semibold">
+                <th className="p-3 text-left text-[10px] uppercase tracking-widest text-slate-400 font-semibold">
                   Artifact
                 </th>
-                <th className="p-3 text-left text-[10px] uppercase tracking-widest text-white/30 font-semibold">
+                <th className="p-3 text-left text-[10px] uppercase tracking-widest text-slate-400 font-semibold">
                   Type
                 </th>
-                <th className="p-3 text-left text-[10px] uppercase tracking-widest text-white/30 font-semibold">
+                <th className="p-3 text-left text-[10px] uppercase tracking-widest text-slate-400 font-semibold">
                   Gate
                 </th>
-                <th className="p-3 text-center text-[10px] uppercase tracking-widest text-white/30 font-semibold">
+                <th className="p-3 text-center text-[10px] uppercase tracking-widest text-slate-400 font-semibold">
                   Size
                 </th>
-                <th className="p-3 text-left text-[10px] uppercase tracking-widest text-white/30 font-semibold">
+                <th className="p-3 text-left text-[10px] uppercase tracking-widest text-slate-400 font-semibold">
                   Signed By
                 </th>
-                <th className="p-3 text-right text-[10px] uppercase tracking-widest text-white/30 font-semibold">
+                <th className="p-3 text-right text-[10px] uppercase tracking-widest text-slate-400 font-semibold">
                   Timestamp
                 </th>
               </tr>
@@ -635,7 +635,7 @@ export default function GatesPage() {
             <tbody>
               {filteredEvidence.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="p-8 text-center text-xs text-white/20">
+                  <td colSpan={7} className="p-8 text-center text-xs text-slate-300">
                     No evidence artifacts match this filter.
                   </td>
                 </tr>
@@ -645,17 +645,17 @@ export default function GatesPage() {
                   return (
                     <tr
                       key={artifact.id}
-                      className="border-t border-wireframe-stroke hover:bg-white/[0.02] transition-colors"
+                      className="border-t border-wireframe-stroke hover:bg-white transition-colors"
                     >
                       <td className="p-3">
-                        <code className="rounded bg-black/60 border border-wireframe-stroke px-2 py-0.5 text-[10px] font-mono text-gold">
+                        <code className="rounded bg-slate-50/70 border border-wireframe-stroke px-2 py-0.5 text-[10px] font-mono text-gold">
                           {artifact.id}
                         </code>
                       </td>
                       <td className="p-3">
                         <div className="flex items-center gap-2">
-                          <FileText size={12} className="text-white/20 shrink-0" />
-                          <span className="text-xs font-medium text-white">
+                          <FileText size={12} className="text-slate-300 shrink-0" />
+                          <span className="text-xs font-medium text-slate-800">
                             {artifact.name}
                           </span>
                         </div>
@@ -668,25 +668,25 @@ export default function GatesPage() {
                         </span>
                       </td>
                       <td className="p-3">
-                        <span className="text-[10px] text-white/40 font-mono">
+                        <span className="text-[10px] text-slate-400 font-mono">
                           G{artifact.gateId}
                         </span>
-                        <span className="text-[10px] text-white/20 ml-1.5">
+                        <span className="text-[10px] text-slate-300 ml-1.5">
                           {artifact.gateName}
                         </span>
                       </td>
                       <td className="p-3 text-center">
-                        <span className="text-[10px] text-white/30 font-mono">
+                        <span className="text-[10px] text-slate-400 font-mono">
                           {artifact.size}
                         </span>
                       </td>
                       <td className="p-3">
-                        <span className="text-[10px] text-white/40 font-mono">
+                        <span className="text-[10px] text-slate-400 font-mono">
                           {artifact.signedBy}
                         </span>
                       </td>
                       <td className="p-3 text-right">
-                        <span className="text-[9px] text-white/20 font-mono">
+                        <span className="text-[9px] text-slate-300 font-mono">
                           {formatTimestamp(artifact.timestamp)}
                         </span>
                       </td>
@@ -701,8 +701,8 @@ export default function GatesPage() {
         {/* Locker Footer */}
         <div className="mt-4 rounded-2xl border border-dashed border-gold/20 bg-gold/[0.02] p-4">
           <div className="flex items-start gap-2">
-            <Lock size={12} className="text-white/20 mt-0.5 shrink-0" />
-            <p className="text-[10px] text-white/30 leading-relaxed">
+            <Lock size={12} className="text-slate-300 mt-0.5 shrink-0" />
+            <p className="text-[10px] text-slate-400 leading-relaxed">
               All evidence artifacts are cryptographically stamped and immutable once submitted.
               Artifacts are signed by the verifying agent (Quality_Ang, The Farmer, BuildSmith, or
               the responsible Boomer_Ang). Evidence cannot be modified or deleted after gate
@@ -713,11 +713,11 @@ export default function GatesPage() {
       </section>
 
       {/* ---- SOP Pillar Alignment ---- */}
-      <section className="rounded-3xl border border-wireframe-stroke bg-black/60 p-6 backdrop-blur-2xl">
-        <h2 className="text-sm font-semibold uppercase tracking-widest text-white/80 font-display">
+      <section className="rounded-3xl border border-wireframe-stroke bg-slate-50/70 p-6 backdrop-blur-2xl">
+        <h2 className="text-sm font-semibold uppercase tracking-widest text-slate-700 font-display">
           SOP Pillar Alignment
         </h2>
-        <p className="mt-1 text-[0.65rem] text-white/30 uppercase tracking-wider mb-4">
+        <p className="mt-1 text-[0.65rem] text-slate-400 uppercase tracking-wider mb-4">
           Gate coverage mapped to the 12 SOP pillars
         </p>
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -750,10 +750,10 @@ export default function GatesPage() {
               )}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[10px] font-bold text-white/50">{p.pillar}</span>
-                  <span className="text-[10px] text-white font-medium truncate">{p.name}</span>
+                  <span className="text-[10px] font-bold text-slate-500">{p.pillar}</span>
+                  <span className="text-[10px] text-slate-800 font-medium truncate">{p.name}</span>
                 </div>
-                <span className="text-[9px] text-white/20 font-mono">{p.gate}</span>
+                <span className="text-[9px] text-slate-300 font-mono">{p.gate}</span>
               </div>
             </div>
           ))}

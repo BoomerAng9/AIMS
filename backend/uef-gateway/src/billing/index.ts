@@ -11,7 +11,9 @@
  * "Activity breeds Activity."
  */
 
+import { v4 as uuidv4 } from 'uuid';
 import logger from '../logger';
+import { agentTransactionStore, agentWalletStore } from './persistence';
 
 // ---------------------------------------------------------------------------
 // Task-Based Multipliers — applied to token consumption per action
@@ -20,18 +22,27 @@ import logger from '../logger';
 export type TaskType =
   | 'CODE_GEN' | 'CODE_REVIEW' | 'ARCHITECTURE'
   | 'AGENT_SWARM' | 'SECURITY_AUDIT' | 'DEPLOYMENT'
-  | 'WORKFLOW_AUTO' | 'BIZ_INTEL' | 'FULL_AUTONOMOUS';
+  | 'WORKFLOW_AUTO' | 'BIZ_INTEL' | 'FULL_AUTONOMOUS'
+  | 'BUILD' | 'FDH_FOSTER' | 'FDH_DEVELOP' | 'FDH_HONE'
+  | 'FACTORY_RUN' | 'HEALTH_REMEDIATION';
 
 export const TASK_MULTIPLIERS: Record<TaskType, { multiplier: number; label: string }> = {
-  CODE_GEN:        { multiplier: 1.0,  label: 'Code Generation' },
-  CODE_REVIEW:     { multiplier: 1.2,  label: 'Code Review' },
-  WORKFLOW_AUTO:   { multiplier: 1.3,  label: 'Workflow Automation' },
-  SECURITY_AUDIT:  { multiplier: 1.45, label: 'Security Audit' },
-  ARCHITECTURE:    { multiplier: 1.5,  label: 'Architecture Planning' },
-  BIZ_INTEL:       { multiplier: 1.6,  label: 'Business Intelligence' },
-  DEPLOYMENT:      { multiplier: 1.1,  label: 'Deployment Jobs' },
-  AGENT_SWARM:     { multiplier: 2.0,  label: 'Multi-Agent Orchestration' },
-  FULL_AUTONOMOUS: { multiplier: 3.0,  label: 'Full Autonomous Swarm' },
+  CODE_GEN:            { multiplier: 1.0,  label: 'Code Generation' },
+  CODE_REVIEW:         { multiplier: 1.2,  label: 'Code Review' },
+  WORKFLOW_AUTO:       { multiplier: 1.3,  label: 'Workflow Automation' },
+  SECURITY_AUDIT:      { multiplier: 1.45, label: 'Security Audit' },
+  ARCHITECTURE:        { multiplier: 1.5,  label: 'Architecture Planning' },
+  BIZ_INTEL:           { multiplier: 1.6,  label: 'Business Intelligence' },
+  DEPLOYMENT:          { multiplier: 1.1,  label: 'Deployment Jobs' },
+  AGENT_SWARM:         { multiplier: 2.0,  label: 'Multi-Agent Orchestration' },
+  FULL_AUTONOMOUS:     { multiplier: 3.0,  label: 'Full Autonomous Swarm' },
+  // Factory Controller / FDH Machine-Job Types
+  BUILD:               { multiplier: 1.5,  label: 'Build Pipeline (NtNtN)' },
+  FDH_FOSTER:          { multiplier: 0.3,  label: 'FDH Foster — Context Ingestion' },
+  FDH_DEVELOP:         { multiplier: 1.5,  label: 'FDH Develop — Build Execution' },
+  FDH_HONE:            { multiplier: 0.5,  label: 'FDH Hone — ORACLE Verification' },
+  FACTORY_RUN:         { multiplier: 1.8,  label: 'Factory Run (Full FDH Pipeline)' },
+  HEALTH_REMEDIATION:  { multiplier: 0.2,  label: 'Health Remediation (Auto)' },
 };
 
 // ---------------------------------------------------------------------------
@@ -171,6 +182,54 @@ export function meterTokens(
   }, '[Billing] Token metering');
 
   return { rawTokens, taskType, multiplier: mult, effectiveTokens, costUsd };
+}
+
+/**
+ * Meter token usage AND persist the transaction to SQLite.
+ * Wraps meterTokens() with side-effect persistence for production tracking.
+ * Returns the same MeteredUsage result plus whether persistence succeeded.
+ */
+export function meterAndRecord(
+  rawTokens: number,
+  taskType: TaskType,
+  tierId: string,
+  agentId: string,
+  description?: string,
+): MeteredUsage & { recorded: boolean } {
+  const usage = meterTokens(rawTokens, taskType, tierId);
+
+  let recorded = false;
+  try {
+    const txnId = `txn_meter_${uuidv4()}`;
+    agentTransactionStore.create({
+      id: txnId,
+      agentId,
+      type: 'debit',
+      amount: usage.costUsd,
+      currency: 'usd',
+      description: description || `Metered: ${taskType} (${usage.effectiveTokens} tokens)`,
+      counterparty: 'aims-platform',
+      protocol: 'luc-meter',
+      timestamp: new Date().toISOString(),
+    });
+
+    // Deduct LUC equivalent from wallet (100 LUC per $1 USD)
+    const lucCost = Math.floor(usage.costUsd * 100);
+    if (lucCost > 0) {
+      const wallet = agentWalletStore.getOrCreate(agentId);
+      agentWalletStore.updateBalance(agentId, Math.max(wallet.lucBalance - lucCost, 0));
+    }
+
+    recorded = true;
+    logger.info(
+      { txnId, agentId, taskType, effectiveTokens: usage.effectiveTokens, costUsd: usage.costUsd },
+      '[Billing] Metered usage recorded to SQLite',
+    );
+  } catch (err) {
+    logger.warn({ err, agentId, taskType }, '[Billing] Failed to persist metered usage — continuing');
+  }
+
+  return { ...usage, recorded };
 }
 
 /**

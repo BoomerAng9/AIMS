@@ -121,13 +121,13 @@ export default function PerFormHub() {
   }, [newsItems.length]);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white overflow-x-hidden">
+    <div className="min-h-screen bg-white text-slate-800 overflow-x-hidden">
 
       {/* ── BREAKING TICKER (top) ───────────────────────────────── */}
-      <div className="sticky top-0 z-50 h-10 bg-[#0a0a0a]/95 backdrop-blur-xl border-b border-white/5 flex items-center overflow-hidden">
+      <div className="sticky top-0 z-50 h-10 bg-white/95 backdrop-blur-xl border-b border-slate-100 flex items-center overflow-hidden">
         <div className="flex-shrink-0 h-full bg-red-600 flex items-center px-4 gap-2">
           <motion.span animate={{ opacity: [1, 0.3, 1] }} transition={{ repeat: Infinity, duration: 1.2 }} className="w-2 h-2 rounded-full bg-white" />
-          <span className="text-[0.6rem] font-black uppercase tracking-widest text-white whitespace-nowrap">BREAKING</span>
+          <span className="text-[0.6rem] font-black uppercase tracking-widest text-slate-800 whitespace-nowrap">BREAKING</span>
         </div>
         <div className="flex-1 overflow-hidden px-6">
           <motion.p
@@ -135,7 +135,7 @@ export default function PerFormHub() {
             initial={{ y: 15, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -15, opacity: 0 }}
-            className="text-[0.65rem] font-mono text-white/70 tracking-wide truncate"
+            className="text-[0.65rem] font-mono text-slate-600 tracking-wide truncate"
           >
             {newsItems.length > 0
               ? newsItems[ticker]?.headline || `Per|Form ${CURRENT_YEAR} NFL Combine Coverage — Feb 23–Mar 2 · On-field drills begin Feb 26`
@@ -153,7 +153,7 @@ export default function PerFormHub() {
       <section className="relative min-h-[70vh] flex flex-col justify-end pb-16 pt-32 overflow-hidden">
 
         {/* Background layers */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#0a0a0a] to-[#0a0a0a]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-white via-white to-white" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(212,175,55,0.08)_0%,transparent_60%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(34,211,238,0.04)_0%,transparent_60%)]" />
         {/* Grid overlay */}
@@ -171,11 +171,11 @@ export default function PerFormHub() {
               <span className="text-[0.65rem] font-mono tracking-[0.4em] uppercase text-gold/80">A.I.M.S. Sports Intelligence</span>
             </div>
 
-            <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-[0.9] text-white">
+            <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-[0.9] text-slate-800">
               PER<span className="text-gold">|</span>FORM
             </h1>
 
-            <p className="text-xl md:text-2xl font-light text-white/60 leading-relaxed max-w-2xl">
+            <p className="text-xl md:text-2xl font-light text-slate-500 leading-relaxed max-w-2xl">
               A proof-of-concept built on A.I.M.S. technology. The P.A.I. grading system, Boomer_Ang analysts, and ACHEEVY orchestration — applied to sports scouting and NIL intelligence.
             </p>
 
@@ -190,7 +190,7 @@ export default function PerFormHub() {
               </Link>
               <Link
                 href="/sandbox/perform/big-board"
-                className="flex items-center gap-3 px-8 py-4 bg-white/5 border border-white/10 text-white font-medium text-sm rounded-xl hover:bg-white/10 transition-colors"
+                className="flex items-center gap-3 px-8 py-4 bg-slate-50 border border-slate-200 text-slate-800 font-medium text-sm rounded-xl hover:bg-slate-100 transition-colors"
               >
                 <ListOrdered size={16} />
                 View Big Board
@@ -206,8 +206,8 @@ export default function PerFormHub() {
                 { label: 'States Covered', val: '50' },
               ].map(m => (
                 <div key={m.label} className="flex flex-col">
-                  <span className="text-2xl font-black text-white">{m.val}</span>
-                  <span className="text-[0.6rem] font-mono tracking-widest uppercase text-white/30">{m.label}</span>
+                  <span className="text-2xl font-black text-slate-800">{m.val}</span>
+                  <span className="text-[0.6rem] font-mono tracking-widest uppercase text-slate-400">{m.label}</span>
                 </div>
               ))}
             </div>
@@ -228,10 +228,10 @@ export default function PerFormHub() {
             <Mic size={22} />
           </button>
           <div className="relative">
-            <p className="text-base font-medium text-white">&ldquo;Tell me about Fernando Mendoza&rdquo;</p>
-            <p className="text-xs text-white/40 font-mono mt-1 uppercase tracking-widest">Voice-first scouting — say a name, position, or school</p>
+            <p className="text-base font-medium text-slate-800">&ldquo;Tell me about Fernando Mendoza&rdquo;</p>
+            <p className="text-xs text-slate-400 font-mono mt-1 uppercase tracking-widest">Voice-first scouting — say a name, position, or school</p>
           </div>
-          <div className="relative ml-auto hidden md:flex items-center gap-3 text-[0.6rem] font-mono uppercase tracking-widest text-white/30">
+          <div className="relative ml-auto hidden md:flex items-center gap-3 text-[0.6rem] font-mono uppercase tracking-widest text-slate-400">
             <Zap size={12} className="text-gold/50" /> Powered by A.I.M.S.
           </div>
         </motion.div>
@@ -240,7 +240,7 @@ export default function PerFormHub() {
       {/* ── NAV TILES ──────────────────────────────────────────────── */}
       <section className="max-w-[1400px] mx-auto px-6 pb-16">
         <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-[0.65rem] font-mono tracking-[0.3em] uppercase text-white/30">Platform</h2>
+          <h2 className="text-[0.65rem] font-mono tracking-[0.3em] uppercase text-slate-400">Platform</h2>
         </div>
         <motion.div
           initial={{ opacity: 0 }}
@@ -257,14 +257,14 @@ export default function PerFormHub() {
             >
               <Link
                 href={tile.href}
-                className={`group flex flex-col gap-3 p-5 rounded-2xl bg-[#0f0f0f] border border-white/[0.06] ${tile.border} transition-all duration-200 hover:bg-[#141414] h-full`}
+                className={`group flex flex-col gap-3 p-5 rounded-2xl bg-white border border-slate-200 ${tile.border} transition-all duration-200 hover:bg-[#F8FAFC] h-full`}
               >
                 <div className={`h-10 w-10 rounded-xl ${tile.bg} border ${tile.border.replace('hover:', '')} flex items-center justify-center ${tile.color}`}>
                   <tile.icon size={18} />
                 </div>
                 <div>
-                  <p className={`text-sm font-semibold text-white group-hover:${tile.color} transition-colors`}>{tile.label}</p>
-                  <p className="text-[0.6rem] text-white/30 font-mono mt-0.5">{tile.sub}</p>
+                  <p className={`text-sm font-semibold text-slate-800 group-hover:${tile.color} transition-colors`}>{tile.label}</p>
+                  <p className="text-[0.6rem] text-slate-400 font-mono mt-0.5">{tile.sub}</p>
                 </div>
                 <div className={`mt-auto flex items-center gap-1 text-[0.6rem] font-mono uppercase tracking-widest ${tile.color} opacity-0 group-hover:opacity-100 transition-opacity`}>
                   Enter <ChevronRight size={10} />
@@ -280,8 +280,8 @@ export default function PerFormHub() {
         <section className="max-w-[1400px] mx-auto px-6 pb-16">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-2xl font-black tracking-tight text-white">{CURRENT_YEAR} Big Board</h2>
-              <p className="text-xs text-white/30 font-mono mt-1">Sorted by P.A.I. Score · Updated in real time</p>
+              <h2 className="text-2xl font-black tracking-tight text-slate-800">{CURRENT_YEAR} Big Board</h2>
+              <p className="text-xs text-slate-400 font-mono mt-1">Sorted by P.A.I. Score · Updated in real time</p>
             </div>
             <Link href="/sandbox/perform/big-board" className="flex items-center gap-2 text-xs font-mono text-gold/60 hover:text-gold transition-colors uppercase tracking-widest">
               Full Board <ArrowRight size={12} />
@@ -291,7 +291,7 @@ export default function PerFormHub() {
           <div className="space-y-2">
             {topProspects.map((prospect, i) => {
               const tierStyle = TIER_STYLES[prospect.tier as Tier];
-              const tierPill = TIER_PILL[prospect.tier] || 'bg-white/10 text-white/60';
+              const tierPill = TIER_PILL[prospect.tier] || 'bg-slate-100 text-slate-500';
               return (
                 <motion.div
                   key={prospect.id}
@@ -301,10 +301,10 @@ export default function PerFormHub() {
                 >
                   <Link
                     href={`/sandbox/perform/prospects/${getProspectSlug(prospect)}`}
-                    className="group flex items-center gap-5 p-5 rounded-2xl bg-[#0f0f0f] border border-white/[0.06] hover:border-gold/20 hover:bg-[#141414] transition-all"
+                    className="group flex items-center gap-5 p-5 rounded-2xl bg-white border border-slate-200 hover:border-gold/20 hover:bg-[#F8FAFC] transition-all"
                   >
                     {/* Rank */}
-                    <span className="text-3xl font-black text-white/10 w-10 text-center flex-shrink-0 group-hover:text-white/20 transition-colors">
+                    <span className="text-3xl font-black text-slate-300 w-10 text-center flex-shrink-0 group-hover:text-slate-300 transition-colors">
                       {i + 1}
                     </span>
 
@@ -315,10 +315,10 @@ export default function PerFormHub() {
 
                     {/* Name + School */}
                     <div className="flex-1 min-w-0">
-                      <p className="font-bold text-white text-base group-hover:text-gold transition-colors truncate">
+                      <p className="font-bold text-slate-800 text-base group-hover:text-gold transition-colors truncate">
                         {prospect.name}
                       </p>
-                      <p className="text-[0.65rem] text-white/30 font-mono mt-0.5 truncate">
+                      <p className="text-[0.65rem] text-slate-400 font-mono mt-0.5 truncate">
                         {prospect.school} · {prospect.state} · {prospect.classYear}
                       </p>
                     </div>
@@ -333,10 +333,10 @@ export default function PerFormHub() {
                       <span className={`text-2xl font-black ${getScoreColor(prospect.paiScore)}`}>
                         {prospect.paiScore}
                       </span>
-                      <p className="text-[0.5rem] font-mono text-white/20 uppercase tracking-widest">P.A.I.</p>
+                      <p className="text-[0.5rem] font-mono text-slate-300 uppercase tracking-widest">P.A.I.</p>
                     </div>
 
-                    <ArrowRight size={14} className="text-white/10 group-hover:text-gold/40 flex-shrink-0 transition-colors" />
+                    <ArrowRight size={14} className="text-slate-300 group-hover:text-gold/40 flex-shrink-0 transition-colors" />
                   </Link>
                 </motion.div>
               );
@@ -348,8 +348,8 @@ export default function PerFormHub() {
       {/* ── ANALYTICS ENGINE ──────────────────────────────────────── */}
       <section className="max-w-[1400px] mx-auto px-6 pb-16">
         <div className="mb-6">
-          <h2 className="text-2xl font-black tracking-tight text-white">Intelligence Engine</h2>
-          <p className="text-xs text-white/30 font-mono mt-1">Three-tier search architecture · Load balanced · Real-time</p>
+          <h2 className="text-2xl font-black tracking-tight text-slate-800">Intelligence Engine</h2>
+          <p className="text-xs text-slate-400 font-mono mt-1">Three-tier search architecture · Load balanced · Real-time</p>
         </div>
         <div className="grid md:grid-cols-3 gap-4">
           {[
@@ -384,9 +384,9 @@ export default function PerFormHub() {
             <div key={t.tier} className={`relative bg-gradient-to-b ${t.color} border rounded-2xl p-6 overflow-hidden`}>
               <div className={`absolute top-0 left-0 w-full h-0.5 ${t.bar}`} />
               <div className={`text-[0.6rem] font-black tracking-[0.4em] uppercase ${t.accent} mb-3`}>{t.tier}</div>
-              <h3 className="text-xl font-black text-white mb-1">{t.label}</h3>
+              <h3 className="text-xl font-black text-slate-800 mb-1">{t.label}</h3>
               <p className={`text-[0.65rem] font-mono uppercase tracking-widest ${t.accent} opacity-70 mb-3`}>{t.model}</p>
-              <p className="text-sm text-white/50 leading-relaxed">{t.desc}</p>
+              <p className="text-sm text-slate-500 leading-relaxed">{t.desc}</p>
             </div>
           ))}
         </div>
@@ -404,10 +404,10 @@ export default function PerFormHub() {
                   <Shield size={20} className="text-gold" />
                   <span className="text-[0.65rem] font-mono tracking-[0.3em] uppercase text-gold/70">Proprietary Scoring System</span>
                 </div>
-                <h2 className="text-3xl md:text-4xl font-black tracking-tight text-white mb-3">
+                <h2 className="text-3xl md:text-4xl font-black tracking-tight text-slate-800 mb-3">
                   The P.A.I. System
                 </h2>
-                <p className="text-sm text-white/50 leading-relaxed">
+                <p className="text-sm text-slate-500 leading-relaxed">
                   Performance · Athleticism · Intangibles. Three dimensions, evaluated independently, combined into one definitive score.
                   <span className="text-gold/70"> Grades are public. Formula is confidential.</span>
                 </p>
@@ -450,13 +450,13 @@ export default function PerFormHub() {
                   pct: '30%',
                 },
               ].map(c => (
-                <div key={c.letter} className="p-5 rounded-xl bg-black/40 border border-white/5">
+                <div key={c.letter} className="p-5 rounded-xl bg-slate-100/60 border border-slate-100">
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-3xl font-black text-gold">{c.letter}</span>
-                    <span className="text-[0.65rem] font-mono text-white/30 bg-white/5 px-2 py-1 rounded-lg">{c.pct}</span>
+                    <span className="text-[0.65rem] font-mono text-slate-400 bg-slate-50 px-2 py-1 rounded-lg">{c.pct}</span>
                   </div>
-                  <p className="font-bold text-white text-base mb-1">{c.title}</p>
-                  <p className="text-[0.65rem] text-white/40 leading-relaxed">{c.desc}</p>
+                  <p className="font-bold text-slate-800 text-base mb-1">{c.title}</p>
+                  <p className="text-[0.65rem] text-slate-400 leading-relaxed">{c.desc}</p>
                 </div>
               ))}
             </div>
@@ -468,8 +468,8 @@ export default function PerFormHub() {
       <section className="max-w-[1400px] mx-auto px-6 pb-16">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-2xl font-black tracking-tight text-white">The Analyst Team</h2>
-            <p className="text-xs text-white/30 font-mono mt-1">AI-powered · ESPN-level personalities · Real grades</p>
+            <h2 className="text-2xl font-black tracking-tight text-slate-800">The Analyst Team</h2>
+            <p className="text-xs text-slate-400 font-mono mt-1">AI-powered · ESPN-level personalities · Real grades</p>
           </div>
           <Link href="/sandbox/perform/analysts" className="flex items-center gap-2 text-xs font-mono text-gold/60 hover:text-gold transition-colors uppercase tracking-widest">
             Full Roster <ArrowRight size={12} />
@@ -487,13 +487,13 @@ export default function PerFormHub() {
             >
               <div className={`absolute top-4 right-4 w-2 h-2 rounded-full ${a.dot} animate-pulse`} />
 
-              <div className={`w-12 h-12 rounded-xl bg-white/5 border ${a.border} flex items-center justify-center mb-4`}>
+              <div className={`w-12 h-12 rounded-xl bg-slate-50 border ${a.border} flex items-center justify-center mb-4`}>
                 <Star size={20} className={a.accent} />
               </div>
 
-              <h3 className={`text-lg font-black text-white mb-0.5`}>{a.name}</h3>
+              <h3 className={`text-lg font-black text-slate-800 mb-0.5`}>{a.name}</h3>
               <p className={`text-[0.6rem] font-mono uppercase tracking-widest ${a.accent} opacity-80 mb-3`}>{a.role}</p>
-              <p className="text-xs text-white/50 leading-relaxed mb-4">{a.bio}</p>
+              <p className="text-xs text-slate-500 leading-relaxed mb-4">{a.bio}</p>
               <p className={`text-[0.65rem] italic ${a.accent} opacity-70`}>{a.catchphrase}</p>
             </motion.div>
           ))}
@@ -505,8 +505,8 @@ export default function PerFormHub() {
         <section className="max-w-[1400px] mx-auto px-6 pb-16">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-2xl font-black tracking-tight text-white">Latest Analysis</h2>
-              <p className="text-xs text-white/30 font-mono mt-1">Written by the analyst team · Updated automatically</p>
+              <h2 className="text-2xl font-black tracking-tight text-slate-800">Latest Analysis</h2>
+              <p className="text-xs text-slate-400 font-mono mt-1">Written by the analyst team · Updated automatically</p>
             </div>
             <Link href="/sandbox/perform/content" className="flex items-center gap-2 text-xs font-mono text-gold/60 hover:text-gold transition-colors uppercase tracking-widest">
               All Articles <ArrowRight size={12} />
@@ -520,16 +520,16 @@ export default function PerFormHub() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 }}
-                className="group p-5 rounded-2xl bg-[#0f0f0f] border border-white/[0.06] hover:border-white/10 transition-all cursor-pointer"
+                className="group p-5 rounded-2xl bg-white border border-slate-200 hover:border-slate-300 transition-all cursor-pointer"
               >
                 <div className="flex items-center gap-2 mb-3">
                   <span className="px-2 py-0.5 rounded text-[0.55rem] font-mono font-bold uppercase tracking-widest bg-gold/10 text-gold/80 border border-gold/20">
                     {String(article.type || '').replace(/_/g, ' ')}
                   </span>
-                  <span className="text-[0.55rem] font-mono text-white/25">{article.readTimeMin} min read</span>
+                  <span className="text-[0.55rem] font-mono text-slate-400">{article.readTimeMin} min read</span>
                 </div>
-                <p className="text-sm font-semibold text-white group-hover:text-gold transition-colors leading-snug mb-2">{article.title}</p>
-                <p className="text-xs text-white/35 line-clamp-2 leading-relaxed">{article.excerpt}</p>
+                <p className="text-sm font-semibold text-slate-800 group-hover:text-gold transition-colors leading-snug mb-2">{article.title}</p>
+                <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">{article.excerpt}</p>
               </motion.div>
             ))}
           </div>
@@ -545,23 +545,23 @@ export default function PerFormHub() {
               <div className="w-2 h-2 rounded-full bg-red-500" />
               <span className="text-[0.65rem] font-mono uppercase tracking-[0.4em] text-red-400">Live Coverage Active</span>
             </motion.div>
-            <h2 className="text-4xl md:text-5xl font-black tracking-tight text-white mb-3">
+            <h2 className="text-4xl md:text-5xl font-black tracking-tight text-slate-800 mb-3">
               NFL Combine Coverage
             </h2>
-            <p className="text-base text-white/50 mb-2">February 23 – March 2, {CURRENT_YEAR} · Indianapolis</p>
-            <p className="text-sm text-white/40 max-w-xl mx-auto mb-8">
+            <p className="text-base text-slate-500 mb-2">February 23 – March 2, {CURRENT_YEAR} · Indianapolis</p>
+            <p className="text-sm text-slate-400 max-w-xl mx-auto mb-8">
               Per|Form analysts score every workout in real time. P.A.I. scores update as combine measurables come in. No other platform does this.
             </p>
             <div className="flex gap-4 justify-center flex-wrap">
               <Link
                 href="/sandbox/perform/draft"
-                className="px-8 py-3.5 bg-red-600 hover:bg-red-500 text-white font-bold text-sm rounded-xl transition-colors shadow-[0_0_20px_rgba(220,38,38,0.3)] flex items-center gap-2"
+                className="px-8 py-3.5 bg-red-600 hover:bg-red-500 text-slate-800 font-bold text-sm rounded-xl transition-colors shadow-[0_0_20px_rgba(220,38,38,0.3)] flex items-center gap-2"
               >
                 <Radio size={16} /> Enter Draft Center
               </Link>
               <Link
                 href="/sandbox/perform/big-board"
-                className="px-8 py-3.5 bg-white/5 border border-white/10 text-white text-sm rounded-xl hover:bg-white/10 transition-colors"
+                className="px-8 py-3.5 bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl hover:bg-slate-100 transition-colors"
               >
                 View Big Board
               </Link>
@@ -571,8 +571,8 @@ export default function PerFormHub() {
       </section>
 
       {/* ── FOOTER ──────────────────────────────────────────────────── */}
-      <footer className="border-t border-white/5 py-8">
-        <div className="max-w-[1400px] mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4 text-[0.6rem] font-mono uppercase tracking-widest text-white/20">
+      <footer className="border-t border-slate-100 py-8">
+        <div className="max-w-[1400px] mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4 text-[0.6rem] font-mono uppercase tracking-widest text-slate-300">
           <span>Per|Form · A.I.M.S. Sports Intelligence Platform</span>
           <span>P.A.I. Grades Public · Formula Confidential · Powered by: A.I.M.S.</span>
         </div>

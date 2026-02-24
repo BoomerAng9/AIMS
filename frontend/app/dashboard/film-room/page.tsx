@@ -231,14 +231,14 @@ export default function FilmRoomPage() {
   // ─── Render ──────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white p-6 space-y-6">
+    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">
             <span className="text-cyan-400">Film Room</span>
           </h1>
-          <p className="text-zinc-400 mt-1">Per|Form Video Intelligence — Twelve Labs + ScoutVerify</p>
+          <p className="text-slate-500 mt-1">Per|Form Video Intelligence — Twelve Labs + ScoutVerify</p>
         </div>
         <div className="flex items-center gap-3">
           <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm border ${
@@ -259,7 +259,7 @@ export default function FilmRoomPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-zinc-900 rounded-lg p-1 w-fit">
+      <div className="flex gap-1 bg-white rounded-lg p-1 w-fit">
         {(['search', 'index', 'verify', 'report'] as const).map(tab => (
           <button
             key={tab}
@@ -267,7 +267,7 @@ export default function FilmRoomPage() {
             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
               activeTab === tab
                 ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
-                : 'text-zinc-400 hover:text-white hover:bg-zinc-800'
+                : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
             }`}
           >
             {tab === 'search' ? 'Semantic Search' :
@@ -278,17 +278,17 @@ export default function FilmRoomPage() {
       </div>
 
       {/* Tab Content */}
-      <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
+      <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-6">
         {/* ── SEARCH TAB ── */}
         {activeTab === 'search' && (
           <div className="space-y-4">
             <h2 className="text-xl font-semibold">Semantic Film Search</h2>
-            <p className="text-zinc-400 text-sm">Search indexed game film using natural language. Example: &quot;quarterback scrambles right and throws deep&quot;</p>
+            <p className="text-slate-500 text-sm">Search indexed game film using natural language. Example: &quot;quarterback scrambles right and throws deep&quot;</p>
             <div className="flex gap-3">
               <select
                 value={selectedIndex}
                 onChange={e => setSelectedIndex(e.target.value)}
-                className="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white"
+                className="bg-slate-100 border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800"
               >
                 <option value="">Select index...</option>
                 {indexes.map(idx => (
@@ -300,27 +300,27 @@ export default function FilmRoomPage() {
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 placeholder="Describe what you're looking for..."
-                className="flex-1 bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-sm text-white placeholder-zinc-500"
+                className="flex-1 bg-slate-100 border border-slate-200 rounded-lg px-4 py-2 text-sm text-slate-800 placeholder-slate-400"
                 onKeyDown={e => e.key === 'Enter' && handleSearch()}
               />
               <button
                 onClick={handleSearch}
                 disabled={loading || !selectedIndex || !searchQuery}
-                className="px-6 py-2 bg-cyan-500 hover:bg-cyan-600 disabled:bg-zinc-700 disabled:text-zinc-500 text-white rounded-lg text-sm font-medium transition-colors"
+                className="px-6 py-2 bg-cyan-500 hover:bg-cyan-600 disabled:bg-slate-200 disabled:text-slate-400 text-slate-800 rounded-lg text-sm font-medium transition-colors"
               >
                 {loading ? 'Searching...' : 'Search'}
               </button>
             </div>
             {searchResults.length > 0 && (
               <div className="space-y-2 mt-4">
-                <h3 className="text-sm font-medium text-zinc-300">{searchResults.length} results</h3>
+                <h3 className="text-sm font-medium text-slate-600">{searchResults.length} results</h3>
                 {searchResults.map(r => (
-                  <div key={r.id} className="bg-zinc-800/50 border border-zinc-700/50 rounded-lg p-4 flex items-center justify-between">
+                  <div key={r.id} className="bg-slate-50 border border-slate-200 rounded-lg p-4 flex items-center justify-between">
                     <div>
                       <span className="text-cyan-400 font-mono text-sm">{formatSeconds(r.start)} — {formatSeconds(r.end)}</span>
-                      <span className="text-zinc-500 text-sm ml-3">Video: {r.videoId.slice(0, 8)}...</span>
+                      <span className="text-slate-500 text-sm ml-3">Video: {r.videoId.slice(0, 8)}...</span>
                     </div>
-                    <span className="text-sm text-zinc-400">Score: {(r.score * 100).toFixed(1)}%</span>
+                    <span className="text-sm text-slate-500">Score: {(r.score * 100).toFixed(1)}%</span>
                   </div>
                 ))}
               </div>
@@ -333,34 +333,34 @@ export default function FilmRoomPage() {
           <div className="space-y-6">
             <div>
               <h2 className="text-xl font-semibold">Index Game Film</h2>
-              <p className="text-zinc-400 text-sm mt-1">Upload game film for AI analysis. Videos are processed through Twelve Labs Marengo for embeddings and searchability.</p>
+              <p className="text-slate-500 text-sm mt-1">Upload game film for AI analysis. Videos are processed through Twelve Labs Marengo for embeddings and searchability.</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Create Index */}
-              <div className="bg-zinc-800/50 border border-zinc-700/50 rounded-lg p-4 space-y-3">
+              <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 space-y-3">
                 <h3 className="font-medium">Create New Index</h3>
                 <input
                   type="text"
                   value={indexName}
                   onChange={e => setIndexName(e.target.value)}
                   placeholder="Index name (e.g., 2026-hs-prospects)"
-                  className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white placeholder-zinc-500"
+                  className="w-full bg-slate-100 border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 placeholder-slate-400"
                 />
                 <button
                   onClick={handleCreateIndex}
                   disabled={loading || !indexName}
-                  className="w-full px-4 py-2 bg-cyan-500 hover:bg-cyan-600 disabled:bg-zinc-700 disabled:text-zinc-500 text-white rounded-lg text-sm font-medium transition-colors"
+                  className="w-full px-4 py-2 bg-cyan-500 hover:bg-cyan-600 disabled:bg-slate-200 disabled:text-slate-400 text-slate-800 rounded-lg text-sm font-medium transition-colors"
                 >
                   Create Index
                 </button>
               </div>
               {/* Add Video */}
-              <div className="bg-zinc-800/50 border border-zinc-700/50 rounded-lg p-4 space-y-3">
+              <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 space-y-3">
                 <h3 className="font-medium">Add Video to Index</h3>
                 <select
                   value={selectedIndex}
                   onChange={e => setSelectedIndex(e.target.value)}
-                  className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white"
+                  className="w-full bg-slate-100 border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800"
                 >
                   <option value="">Select index...</option>
                   {indexes.map(idx => (
@@ -372,12 +372,12 @@ export default function FilmRoomPage() {
                   value={videoUrl}
                   onChange={e => setVideoUrl(e.target.value)}
                   placeholder="Video URL (MP4, YouTube, etc.)"
-                  className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white placeholder-zinc-500"
+                  className="w-full bg-slate-100 border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 placeholder-slate-400"
                 />
                 <button
                   onClick={handleIndexVideo}
                   disabled={loading || !selectedIndex || !videoUrl}
-                  className="w-full px-4 py-2 bg-cyan-500 hover:bg-cyan-600 disabled:bg-zinc-700 disabled:text-zinc-500 text-white rounded-lg text-sm font-medium transition-colors"
+                  className="w-full px-4 py-2 bg-cyan-500 hover:bg-cyan-600 disabled:bg-slate-200 disabled:text-slate-400 text-slate-800 rounded-lg text-sm font-medium transition-colors"
                 >
                   {loading ? 'Submitting...' : 'Index Video'}
                 </button>
@@ -392,12 +392,12 @@ export default function FilmRoomPage() {
                 <h3 className="font-medium mb-2">Existing Indexes</h3>
                 <div className="grid gap-2">
                   {indexes.map(idx => (
-                    <div key={idx.id} className="bg-zinc-800/30 border border-zinc-700/30 rounded-lg px-4 py-3 flex items-center justify-between">
+                    <div key={idx.id} className="bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 flex items-center justify-between">
                       <div>
-                        <span className="text-white font-medium">{idx.name}</span>
-                        <span className="text-zinc-500 text-sm ml-3">ID: {idx.id}</span>
+                        <span className="text-slate-800 font-medium">{idx.name}</span>
+                        <span className="text-slate-500 text-sm ml-3">ID: {idx.id}</span>
                       </div>
-                      <span className="text-zinc-400 text-sm">{idx.videoCount ?? '?'} videos</span>
+                      <span className="text-slate-500 text-sm">{idx.videoCount ?? '?'} videos</span>
                     </div>
                   ))}
                 </div>
@@ -411,7 +411,7 @@ export default function FilmRoomPage() {
           <div className="space-y-6">
             <div>
               <h2 className="text-xl font-semibold">ScoutVerify</h2>
-              <p className="text-zinc-400 text-sm mt-1">Automated prospect evaluation verification — checks highlight bias, cross-references claims, and scores confidence.</p>
+              <p className="text-slate-500 text-sm mt-1">Automated prospect evaluation verification — checks highlight bias, cross-references claims, and scores confidence.</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <input
@@ -419,34 +419,34 @@ export default function FilmRoomPage() {
                 value={prospectName}
                 onChange={e => setProspectName(e.target.value)}
                 placeholder="Prospect name *"
-                className="bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-sm text-white placeholder-zinc-500"
+                className="bg-slate-100 border border-slate-200 rounded-lg px-4 py-2 text-sm text-slate-800 placeholder-slate-400"
               />
               <input
                 type="text"
                 value={prospectPosition}
                 onChange={e => setProspectPosition(e.target.value)}
                 placeholder="Position (e.g., QB, WR)"
-                className="bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-sm text-white placeholder-zinc-500"
+                className="bg-slate-100 border border-slate-200 rounded-lg px-4 py-2 text-sm text-slate-800 placeholder-slate-400"
               />
               <input
                 type="text"
                 value={prospectSchool}
                 onChange={e => setProspectSchool(e.target.value)}
                 placeholder="School"
-                className="bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-sm text-white placeholder-zinc-500"
+                className="bg-slate-100 border border-slate-200 rounded-lg px-4 py-2 text-sm text-slate-800 placeholder-slate-400"
               />
               <input
                 type="url"
                 value={verifyVideoUrl}
                 onChange={e => setVerifyVideoUrl(e.target.value)}
                 placeholder="Highlight reel URL (optional)"
-                className="bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-sm text-white placeholder-zinc-500"
+                className="bg-slate-100 border border-slate-200 rounded-lg px-4 py-2 text-sm text-slate-800 placeholder-slate-400"
               />
             </div>
             <button
               onClick={handleScoutVerify}
               disabled={loading || !prospectName}
-              className="px-6 py-2 bg-emerald-500 hover:bg-emerald-600 disabled:bg-zinc-700 disabled:text-zinc-500 text-white rounded-lg text-sm font-medium transition-colors"
+              className="px-6 py-2 bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-200 disabled:text-slate-400 text-slate-800 rounded-lg text-sm font-medium transition-colors"
             >
               {loading ? 'Verifying...' : 'Run ScoutVerify'}
             </button>
@@ -488,17 +488,17 @@ export default function FilmRoomPage() {
 
                 {/* Claims */}
                 {verifyReport.claims.length > 0 && (
-                  <div className="bg-zinc-800/50 border border-zinc-700/50 rounded-lg p-4">
+                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
                     <h4 className="font-medium mb-3">Extracted Claims ({verifyReport.claims.length})</h4>
                     <div className="space-y-2 max-h-60 overflow-y-auto">
                       {verifyReport.claims.map((claim, i) => (
                         <div key={i} className="flex items-start gap-3 text-sm">
                           <span className={`mt-0.5 w-2 h-2 rounded-full shrink-0 ${
                             claim.verified === true ? 'bg-emerald-400' :
-                            claim.verified === false ? 'bg-red-400' : 'bg-zinc-500'
+                            claim.verified === false ? 'bg-red-400' : 'bg-slate-400'
                           }`} />
-                          <span className="text-zinc-300">{claim.claim}</span>
-                          <span className="text-zinc-500 text-xs ml-auto shrink-0">{claim.category}</span>
+                          <span className="text-slate-600">{claim.claim}</span>
+                          <span className="text-slate-500 text-xs ml-auto shrink-0">{claim.category}</span>
                         </div>
                       ))}
                     </div>
@@ -507,9 +507,9 @@ export default function FilmRoomPage() {
 
                 {/* Scouting Report */}
                 {verifyReport.scoutingReport && (
-                  <div className="bg-zinc-800/50 border border-zinc-700/50 rounded-lg p-4">
+                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
                     <h4 className="font-medium mb-3">AI Scouting Report</h4>
-                    <pre className="text-zinc-300 text-sm whitespace-pre-wrap font-sans leading-relaxed">
+                    <pre className="text-slate-600 text-sm whitespace-pre-wrap font-sans leading-relaxed">
                       {verifyReport.scoutingReport}
                     </pre>
                   </div>
@@ -520,19 +520,19 @@ export default function FilmRoomPage() {
                   {verifyReport.bullCase && (
                     <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-4">
                       <h4 className="text-emerald-400 font-medium mb-2">Bull Case</h4>
-                      <p className="text-zinc-300 text-sm">{verifyReport.bullCase}</p>
+                      <p className="text-slate-600 text-sm">{verifyReport.bullCase}</p>
                     </div>
                   )}
                   {verifyReport.bearCase && (
                     <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4">
                       <h4 className="text-red-400 font-medium mb-2">Bear Case</h4>
-                      <p className="text-zinc-300 text-sm">{verifyReport.bearCase}</p>
+                      <p className="text-slate-600 text-sm">{verifyReport.bearCase}</p>
                     </div>
                   )}
                 </div>
 
                 {/* Meta */}
-                <p className="text-zinc-500 text-xs">
+                <p className="text-slate-500 text-xs">
                   Report {verifyReport.reportId} | {verifyReport.videosAnalyzed} video(s) analyzed | {verifyReport.processingTimeMs}ms
                 </p>
               </div>
@@ -544,27 +544,27 @@ export default function FilmRoomPage() {
         {activeTab === 'report' && (
           <div className="space-y-4">
             <h2 className="text-xl font-semibold">Generate Scouting Report</h2>
-            <p className="text-zinc-400 text-sm">Enter a Twelve Labs video ID to generate an AI scouting report from game film using Pegasus.</p>
+            <p className="text-slate-500 text-sm">Enter a Twelve Labs video ID to generate an AI scouting report from game film using Pegasus.</p>
             <div className="flex gap-3">
               <input
                 type="text"
                 value={reportVideoId}
                 onChange={e => setReportVideoId(e.target.value)}
                 placeholder="Twelve Labs Video ID"
-                className="flex-1 bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-sm text-white placeholder-zinc-500"
+                className="flex-1 bg-slate-100 border border-slate-200 rounded-lg px-4 py-2 text-sm text-slate-800 placeholder-slate-400"
               />
               <button
                 onClick={handleGenerateReport}
                 disabled={loading || !reportVideoId}
-                className="px-6 py-2 bg-cyan-500 hover:bg-cyan-600 disabled:bg-zinc-700 disabled:text-zinc-500 text-white rounded-lg text-sm font-medium transition-colors"
+                className="px-6 py-2 bg-cyan-500 hover:bg-cyan-600 disabled:bg-slate-200 disabled:text-slate-400 text-slate-800 rounded-lg text-sm font-medium transition-colors"
               >
                 {loading ? 'Generating...' : 'Generate Report'}
               </button>
             </div>
             {generatedReport && (
-              <div className="bg-zinc-800/50 border border-zinc-700/50 rounded-lg p-6 mt-4">
+              <div className="bg-slate-50 border border-slate-200 rounded-lg p-6 mt-4">
                 <h3 className="font-medium mb-3 text-cyan-400">Generated Scouting Report</h3>
-                <pre className="text-zinc-300 text-sm whitespace-pre-wrap font-sans leading-relaxed">
+                <pre className="text-slate-600 text-sm whitespace-pre-wrap font-sans leading-relaxed">
                   {generatedReport}
                 </pre>
               </div>

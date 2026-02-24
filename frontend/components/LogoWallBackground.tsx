@@ -11,88 +11,58 @@ type Props = {
 };
 
 /**
- * LogoWallBackground — Premium branded environment
+ * LogoWallBackground — Clean branded environment with embossed logo
  *
- * Gold A.I.M.S. logo embossed across all pages at ultra-low opacity,
- * like a luxury brand's monogram wallpaper — think Louis Vuitton or
- * Gucci's repeating logo pattern pressed into leather.
- *
- * The emboss effect: subtle repeating logo + inner shadow illusion
- * on ink-dark background with ambient gold accent lighting.
+ * Light, minimal background with a subtle raised/embossed AIMS logo watermark.
+ * Professional SaaS feel with warm accent touches.
  */
 export function LogoWallBackground({ mode = "hero", children }: Props) {
+  const showLogo = mode === "hero" || mode === "auth" || mode === "dashboard";
+
   return (
     <div className={clsx(
-      "relative text-white",
-      mode === "dashboard" ? "h-full bg-ink" : "min-h-full bg-ink"
+      "relative overflow-hidden",
+      mode === "dashboard" ? "h-full bg-[#F8FAFC]" : "min-h-full bg-[#F8FAFC]"
     )}>
-      {/* Base gradient — warm ink with gold bias */}
-      <div
-        className="pointer-events-none absolute inset-0 z-0"
-        style={{
-          background: `
-            radial-gradient(ellipse at 20% 20%, rgba(212,175,55,0.03) 0%, transparent 50%),
-            radial-gradient(ellipse at 80% 80%, rgba(212,175,55,0.02) 0%, transparent 50%),
-            linear-gradient(180deg, #0B0E14 0%, #080A10 50%, #0B0E14 100%)
-          `,
-        }}
-        aria-hidden="true"
-      />
-
-      {/* EMBOSSED A.I.M.S. LOGO — repeating monogram wallpaper */}
-      <div
-        className="pointer-events-none absolute inset-0 z-0"
-        style={{
-          backgroundImage: "url('/images/logos/achievemor-gold.png')",
-          backgroundSize: '100px 100px',
-          backgroundRepeat: 'repeat',
-          opacity: 0.025,
-          filter: 'contrast(0.8) brightness(0.9)',
-        }}
-        aria-hidden="true"
-      />
-
-      {/* Emboss depth layer — shifted copy for 3D pressed-in effect */}
-      <div
-        className="pointer-events-none absolute inset-0 z-0"
-        style={{
-          backgroundImage: "url('/images/logos/achievemor-gold.png')",
-          backgroundSize: '100px 100px',
-          backgroundRepeat: 'repeat',
-          backgroundPosition: '1px 1px',
-          opacity: 0.012,
-          filter: 'brightness(1.5) contrast(0.7)',
-          mixBlendMode: 'overlay',
-        }}
-        aria-hidden="true"
-      />
-
-      {/* Ambient gold glow — top-left accent */}
+      {/* Subtle warm gradient accent — top-left */}
       <div
         className="pointer-events-none absolute top-0 left-0 w-[600px] h-[600px] z-0"
         style={{
-          background: 'radial-gradient(circle at 0% 0%, rgba(212,175,55,0.04) 0%, transparent 60%)',
+          background: 'radial-gradient(circle at 0% 0%, rgba(217,119,6,0.03) 0%, transparent 60%)',
         }}
         aria-hidden="true"
       />
 
-      {/* Ambient gold glow — bottom-right */}
+      {/* Subtle warm gradient accent — bottom-right */}
       <div
         className="pointer-events-none absolute bottom-0 right-0 w-[400px] h-[400px] z-0"
         style={{
-          background: 'radial-gradient(circle at 100% 100%, rgba(212,175,55,0.025) 0%, transparent 60%)',
+          background: 'radial-gradient(circle at 100% 100%, rgba(217,119,6,0.02) 0%, transparent 60%)',
         }}
         aria-hidden="true"
       />
 
-      {/* Cinematic vignette — dark edges for depth */}
-      <div
-        className="pointer-events-none absolute inset-0 z-0"
-        style={{
-          background: 'radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.45) 100%)',
-        }}
-        aria-hidden="true"
-      />
+      {/* Embossed logo watermark — subtle raised/debossed effect */}
+      {showLogo && (
+        <div
+          className="pointer-events-none absolute z-[1]"
+          style={{
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: mode === "auth" ? '500px' : '700px',
+            height: mode === "auth" ? '500px' : '700px',
+            backgroundImage: 'url(/assets/aims_transparent_logo.svg)',
+            backgroundSize: 'contain',
+            backgroundRepeat: 'no-repeat',
+            backgroundPosition: 'center',
+            opacity: 0.035,
+            filter: 'drop-shadow(1px 1px 0 rgba(255,255,255,0.8)) drop-shadow(-1px -1px 0 rgba(0,0,0,0.04)) drop-shadow(2px 2px 1px rgba(217,119,6,0.06))',
+            mixBlendMode: 'multiply',
+          }}
+          aria-hidden="true"
+        />
+      )}
 
       {/* Content */}
       <main className={clsx(

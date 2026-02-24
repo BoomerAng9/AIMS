@@ -250,7 +250,7 @@ export class PrismaLucStorage implements LucStorageAdapter {
   // Account Management
   // ─────────────────────────────────────────────────────────────────────────
 
-  async createAccount(workspaceId: string, planId: string = "free"): Promise<LucAccount> {
+  async createAccount(workspaceId: string, planId: string = "p2p"): Promise<LucAccount> {
     const { start, end } = calculateBillingPeriod();
     const quotas = initializeQuotas(planId);
 
@@ -280,7 +280,7 @@ export class PrismaLucStorage implements LucStorageAdapter {
     };
   }
 
-  async ensureAccount(workspaceId: string, planId: string = "free"): Promise<LucAccount> {
+  async ensureAccount(workspaceId: string, planId: string = "p2p"): Promise<LucAccount> {
     const existing = await this.getAccount(workspaceId);
     if (existing) {
       return existing;

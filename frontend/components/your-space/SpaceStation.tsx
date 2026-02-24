@@ -139,7 +139,7 @@ function FuelGauge({ current, max }: { current: number; max: number }) {
             {current.toLocaleString()} / {max.toLocaleString()} LUC
           </span>
         </div>
-        <div className="h-2 bg-black/50 rounded-full overflow-hidden">
+        <div className="h-2 bg-slate-50/60 rounded-full overflow-hidden">
           <motion.div
             className={`h-full rounded-full ${isLow ? 'bg-red-500' : 'bg-gradient-to-r from-amber-500 to-amber-400'}`}
             initial={{ width: 0 }}
@@ -170,7 +170,7 @@ function ActionButton({
   disabled?: boolean;
 }) {
   const variants = {
-    default: 'bg-white/5 hover:bg-white/10 text-gray-300 border-wireframe-stroke',
+    default: 'bg-slate-50 hover:bg-slate-100 text-gray-300 border-wireframe-stroke',
     primary: 'bg-gold/10 hover:bg-gold-light text-gold border-gold/30',
     success: 'bg-green-500/20 hover:bg-green-500/30 text-green-300 border-green-500/30',
   };
@@ -219,7 +219,7 @@ export function SpaceStation({
     <div className="relative">
       {/* Station Card */}
       <motion.div
-        className="bg-black/40 backdrop-blur-xl border border-wireframe-stroke rounded-2xl overflow-hidden"
+        className="bg-slate-100/60 backdrop-blur-xl border border-wireframe-stroke rounded-2xl overflow-hidden"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
       >
@@ -244,7 +244,7 @@ export function SpaceStation({
               </motion.div>
 
               <div>
-                <h2 className="text-xl font-bold text-white">{name}</h2>
+                <h2 className="text-xl font-bold text-slate-800">{name}</h2>
                 <p className="text-sm text-gray-400">{config.label}</p>
                 {config.nextLevel && (
                   <p className="text-xs text-gold mt-1">
@@ -257,7 +257,7 @@ export function SpaceStation({
             {/* Stats */}
             <div className="flex gap-6 text-center">
               <div>
-                <p className="text-2xl font-bold text-white">{crewCount}</p>
+                <p className="text-2xl font-bold text-slate-800">{crewCount}</p>
                 <p className="text-xs text-gray-500">Crew</p>
               </div>
               <div>
@@ -314,23 +314,23 @@ export function SpaceStation({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-slate-50/70 backdrop-blur-sm p-4"
             onClick={() => setShowInviteModal(false)}
           >
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-[#0a0a0a] border border-wireframe-stroke rounded-2xl p-6 max-w-md w-full"
+              className="bg-white border border-wireframe-stroke rounded-2xl p-6 max-w-md w-full"
               onClick={(e) => e.stopPropagation()}
             >
-              <h3 className="text-lg font-bold text-white mb-2">Invite Explorers</h3>
+              <h3 className="text-lg font-bold text-slate-800 mb-2">Invite Explorers</h3>
               <p className="text-sm text-gray-400 mb-4">
                 Share your space with others. When they join through your link, they'll land on your station first!
               </p>
 
               {/* Invite Link */}
-              <div className="flex items-center gap-2 p-3 bg-black/50 rounded-lg border border-wireframe-stroke mb-4">
+              <div className="flex items-center gap-2 p-3 bg-slate-50/60 rounded-lg border border-wireframe-stroke mb-4">
                 <LinkIcon className="w-4 h-4 text-gray-500 flex-shrink-0" />
                 <input
                   type="text"
@@ -355,7 +355,7 @@ export function SpaceStation({
 
               <button
                 onClick={() => setShowInviteModal(false)}
-                className="w-full mt-4 py-2 text-sm text-gray-400 hover:text-white transition-colors"
+                className="w-full mt-4 py-2 text-sm text-gray-400 hover:text-slate-800 transition-colors"
               >
                 Close
               </button>

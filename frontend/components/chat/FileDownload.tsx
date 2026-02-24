@@ -23,7 +23,7 @@ const FORMAT_ICONS: Record<string, { icon: string; color: string }> = {
   md:   { icon: 'MD',   color: 'text-blue-400 bg-blue-500/10 border-blue-500/20' },
   json: { icon: 'JSON', color: 'text-green-400 bg-green-500/10 border-green-500/20' },
   csv:  { icon: 'CSV',  color: 'text-orange-400 bg-orange-500/10 border-orange-500/20' },
-  txt:  { icon: 'TXT',  color: 'text-white/60 bg-white/5 border-white/10' },
+  txt:  { icon: 'TXT',  color: 'text-slate-500 bg-slate-50 border-slate-200' },
   html: { icon: 'HTML', color: 'text-purple-400 bg-purple-500/10 border-purple-500/20' },
 };
 
@@ -73,7 +73,7 @@ export function FileDownload({ content, filename, format = 'md', label, metadata
         flex items-center gap-3 px-4 py-3 rounded-xl border transition-all
         ${downloaded
           ? 'border-green-500/30 bg-green-500/5'
-          : 'border-white/10 bg-white/[0.03] hover:bg-white/[0.06] hover:border-white/20'
+          : 'border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-200'
         }
         ${downloading ? 'opacity-60 cursor-wait' : 'cursor-pointer'}
       `}
@@ -85,10 +85,10 @@ export function FileDownload({ content, filename, format = 'md', label, metadata
 
       {/* File info */}
       <div className="flex-1 text-left min-w-0">
-        <p className="text-sm font-medium text-white/80 truncate">
+        <p className="text-sm font-medium text-slate-700 truncate">
           {label || filename || `Export.${format}`}
         </p>
-        <p className="text-[11px] text-white/30">
+        <p className="text-[11px] text-slate-400">
           {format.toUpperCase()} &middot; {sizeKB}KB
           {downloaded && <span className="text-green-400 ml-2">Downloaded</span>}
         </p>
@@ -103,7 +103,7 @@ export function FileDownload({ content, filename, format = 'md', label, metadata
             <polyline points="20 6 9 17 4 12" />
           </svg>
         ) : (
-          <svg className="w-5 h-5 text-white/30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg className="w-5 h-5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
             <polyline points="7 10 12 15 17 10" />
             <line x1="12" y1="15" x2="12" y2="3" />
@@ -122,7 +122,7 @@ export function FileDownloadGroup({ files }: { files: FileDownloadProps[] }) {
 
   return (
     <div className="space-y-2 mt-3">
-      <p className="text-xs text-white/30 font-medium uppercase tracking-wider">Deliverables</p>
+      <p className="text-xs text-slate-400 font-medium uppercase tracking-wider">Deliverables</p>
       {files.map((file, i) => (
         <FileDownload key={i} {...file} />
       ))}

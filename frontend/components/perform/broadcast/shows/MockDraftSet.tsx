@@ -17,7 +17,7 @@ const ON_THE_CLOCK_ORDER = [
 export function MockDraftSet({ segment }: { segment: BroadcastSegment }) {
 
     return (
-        <div className="w-full h-full flex flex-col items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/20 via-black to-black relative">
+        <div className="w-full h-full flex flex-col items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/20 via-white to-white relative">
 
             {/* Ambient glow */}
             <div className="absolute inset-0 bg-gradient-radial from-blue-900/10 to-transparent pointer-events-none" />
@@ -27,12 +27,12 @@ export function MockDraftSet({ segment }: { segment: BroadcastSegment }) {
                 initial={{ y: -40, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.6 }}
-                className="absolute top-0 w-full flex items-center justify-between px-16 py-6 border-b border-white/10 bg-black/40 backdrop-blur-sm z-10"
+                className="absolute top-0 w-full flex items-center justify-between px-16 py-6 border-b border-slate-200 bg-slate-100/60 backdrop-blur-sm z-10"
             >
                 <div className="flex items-center gap-4">
                     <span className="text-[10px] font-bold tracking-[0.4em] uppercase text-gold/80">Per|Form Network</span>
                 </div>
-                <span className="text-[10px] font-mono uppercase text-white/40 tracking-widest">
+                <span className="text-[10px] font-mono uppercase text-slate-400 tracking-widest">
                     NFL Draft {CURRENT_YEAR} · Round 1
                 </span>
             </motion.div>
@@ -56,16 +56,16 @@ export function MockDraftSet({ segment }: { segment: BroadcastSegment }) {
                 <motion.div
                     animate={{ boxShadow: ['0 0 30px rgba(218,165,32,0.1)', '0 0 60px rgba(218,165,32,0.3)', '0 0 30px rgba(218,165,32,0.1)'] }}
                     transition={{ duration: 2, repeat: Infinity }}
-                    className="bg-black/80 backdrop-blur-xl border border-gold/30 rounded-2xl px-20 py-10 flex flex-col items-center gap-4"
+                    className="bg-white/80 backdrop-blur-xl border border-gold/30 rounded-2xl px-20 py-10 flex flex-col items-center gap-4"
                 >
                     <span className="text-8xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-white/40">
                         #{ON_THE_CLOCK_ORDER[0].pick}
                     </span>
                     <div className="text-center">
-                        <p className="text-3xl font-bold text-white tracking-wide">{ON_THE_CLOCK_ORDER[0].team}</p>
+                        <p className="text-3xl font-bold text-slate-800 tracking-wide">{ON_THE_CLOCK_ORDER[0].team}</p>
                         <div className="flex gap-2 mt-3 justify-center">
                             {ON_THE_CLOCK_ORDER[0].needs.map(n => (
-                                <span key={n} className="px-3 py-1 bg-white/10 border border-white/20 text-white/70 text-xs font-bold rounded-full uppercase tracking-widest">
+                                <span key={n} className="px-3 py-1 bg-slate-100 border border-slate-200 text-slate-600 text-xs font-bold rounded-full uppercase tracking-widest">
                                     {n}
                                 </span>
                             ))}
@@ -84,10 +84,10 @@ export function MockDraftSet({ segment }: { segment: BroadcastSegment }) {
                 {ON_THE_CLOCK_ORDER.slice(1).map((pick) => (
                     <div
                         key={pick.pick}
-                        className="bg-white/5 border border-white/10 rounded-xl px-6 py-4 flex flex-col items-center gap-1 min-w-[110px]"
+                        className="bg-slate-50 border border-slate-200 rounded-xl px-6 py-4 flex flex-col items-center gap-1 min-w-[110px]"
                     >
-                        <span className="text-xl font-black text-white/50">#{pick.pick}</span>
-                        <span className="text-xs text-white/40 font-medium tracking-wide text-center leading-tight">{pick.team}</span>
+                        <span className="text-xl font-black text-slate-500">#{pick.pick}</span>
+                        <span className="text-xs text-slate-400 font-medium tracking-wide text-center leading-tight">{pick.team}</span>
                     </div>
                 ))}
             </motion.div>
@@ -97,7 +97,7 @@ export function MockDraftSet({ segment }: { segment: BroadcastSegment }) {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 0.4 }}
                 transition={{ delay: 1 }}
-                className="absolute bottom-6 text-[10px] text-white/40 tracking-widest uppercase font-mono"
+                className="absolute bottom-6 text-[10px] text-slate-400 tracking-widest uppercase font-mono"
             >
                 NFL Draft {CURRENT_YEAR} · A.I.M.S. Scoring &amp; Grading System
             </motion.p>

@@ -36,13 +36,20 @@ Triggers when any agent needs to select a model, estimate costs, or understand t
 | Task Type | Recommended Model | Tier | Why |
 |-----------|-------------------|------|-----|
 | Simple routing/classification | `gemini-3.0-flash` | Fast | $0.10/M input, fastest |
-| General chat/responses | `claude-sonnet-4.5` | Standard | Best quality/cost balance |
-| Complex reasoning/coding | `claude-opus-4.6` | Premium | Most capable, 1M context |
-| Research summaries | `gemini-3-pro` | Standard | Good at synthesis, large context |
+| General chat/responses | `claude-sonnet-4.6` | Standard | Best quality/cost balance, adaptive thinking |
+| Complex reasoning/coding | `claude-opus-4.6` | Premium | Most capable, 1M context, adaptive max effort |
+| Research + web grounding | `gemini-3.1-pro` | Standard | **$2/$12**, 1M ctx, native Google Search grounding, ARC-AGI-2 77.1%. See `skills/gemini-3.1-pro.skill.md` |
 | Quick extraction/parsing | `claude-haiku-4.5` | Fast | Fast, cheap, good enough |
-| Budget-sensitive batch work | `llama-3.3-70b` | Economy | $0.10/M, no API cost |
-| Visual agentic / agent swarm | `moonshotai/kimi-k2.5` | Premium | 1T MoE, native multimodal, 256K ctx — use via NVIDIA NIM or platform.moonshot.ai. See `skills/kimi-k2.5.skill.md` |
+| Budget frontier reasoning | `glm-5` | Economy | **$1/$3.20**, 744B MoE, MIT licensed, record-low hallucination. See `skills/glm-5.skill.md` |
+| Budget-sensitive batch work | `llama-4-maverick` | Economy | $0.27/M, 1M context, MoE |
+| Visual agentic / agent swarm | `moonshotai/kimi-k2.5` | Premium | 1T MoE, native multimodal, 256K ctx. See `skills/kimi-k2.5.skill.md` |
 | Video understanding | `moonshotai/kimi-k2.5` | Premium | Only model with native video input (official API only) |
+| Ultra-budget frontier reasoning | `seed-2.0-pro` | Economy | **$0.47/$2.37**, 98.3 AIME, 89.5 VideoMME — Volcano Engine only. See `skills/bytedance-seed-2.0.skill.md` |
+| AI video generation | Seedance 2.0 | — | 20s @ 1080p, character consistency — Volcano Engine. See `skills/bytedance-seed-2.0.skill.md` |
+| Competitive coding | `seed-2.0-code` | Economy | 3020 Codeforces, 87.8 LiveCodeBench — Volcano Engine. See `skills/bytedance-seed-2.0.skill.md` |
+| Chinese-language tasks | `glm-5` | Economy | Natively bilingual, CLUE benchmark leader. See `skills/glm-5.skill.md` |
+| Voice / real-time response | `claude-opus-4.6` (fast mode) | Premium | 2.5x speed, same intelligence. See `skills/claude-4.6.skill.md` |
+| Security audits | `claude-opus-4.6` (max effort) | Premium | Found 500+ zero-days. See `skills/claude-4.6.skill.md` |
 
 ### Cost Awareness Rules
 

@@ -40,7 +40,7 @@ const CHAPTER_COLORS: Record<string, { border: string; glow: string; text: strin
 
 export default function BookOfVibePage() {
   return (
-    <main className="flex flex-col min-h-full bg-ink text-white">
+    <main className="flex flex-col min-h-full bg-[#F8FAFC] text-slate-800">
       <SiteHeader />
 
       {/* Hero banner */}
@@ -72,7 +72,7 @@ export default function BookOfVibePage() {
           >
             {BOOK_OF_VIBE.subtitle}
           </motion.p>
-          <motion.p variants={fadeIn} className="text-sm md:text-base text-white/40 leading-relaxed max-w-2xl mx-auto">
+          <motion.p variants={fadeIn} className="text-sm md:text-base text-slate-400 leading-relaxed max-w-2xl mx-auto">
             {BOOK_OF_VIBE.prologue}
           </motion.p>
         </motion.div>
@@ -81,7 +81,7 @@ export default function BookOfVibePage() {
       {/* Chapter navigation */}
       <section className="max-w-4xl mx-auto px-4 pb-8">
         <div className="wireframe-card p-4 md:p-6">
-          <p className="text-xs font-mono uppercase tracking-[0.3em] text-white/30 mb-4">Chapters</p>
+          <p className="text-xs font-mono uppercase tracking-[0.3em] text-slate-400 mb-4">Chapters</p>
           <div className="flex flex-wrap gap-2">
             {BOOK_OF_VIBE.chapters.map((chapter) => {
               const colors = CHAPTER_COLORS[chapter.color] || CHAPTER_COLORS.gold;
@@ -89,7 +89,7 @@ export default function BookOfVibePage() {
                 <a
                   key={chapter.number}
                   href={`#chapter-${chapter.number}`}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-mono uppercase tracking-wider border ${colors.border} ${colors.text} hover:bg-white/5 transition-colors`}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-mono uppercase tracking-wider border ${colors.border} ${colors.text} hover:bg-slate-50 transition-colors`}
                 >
                   <span className="opacity-50">{chapter.number}.</span> {chapter.title.split(' — ')[0]}
                 </a>
@@ -119,9 +119,9 @@ export default function BookOfVibePage() {
                 </span>
                 <div className="h-px flex-1 bg-wireframe-stroke" />
               </div>
-              <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">{chapter.title}</h2>
+              <h2 className="text-2xl md:text-3xl font-bold text-slate-800 mb-2">{chapter.title}</h2>
               <p className={`text-sm italic mb-6 ${colors.text}/60`}>{chapter.subtitle}</p>
-              <p className="text-sm md:text-base text-white/60 leading-relaxed whitespace-pre-line">
+              <p className="text-sm md:text-base text-slate-500 leading-relaxed whitespace-pre-line">
                 {chapter.content}
               </p>
             </motion.article>
@@ -137,7 +137,7 @@ export default function BookOfVibePage() {
           className="text-center py-12 border-t border-wireframe-stroke"
         >
           <p className="text-xs font-mono uppercase tracking-[0.3em] text-gold/50 mb-6">Epilogue</p>
-          <p className="text-sm md:text-base text-white/50 leading-relaxed max-w-2xl mx-auto italic">
+          <p className="text-sm md:text-base text-slate-500 leading-relaxed max-w-2xl mx-auto italic">
             {BOOK_OF_VIBE.epilogue}
           </p>
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">

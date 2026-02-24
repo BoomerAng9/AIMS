@@ -1,22 +1,21 @@
 // frontend/app/dashboard/house-of-ang/page.tsx
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import type { LucideIcon } from "lucide-react";
 import {
   Building2,
   Users,
   Zap,
   Shield,
   Code,
-  Megaphone,
-  BarChart3,
   Activity,
   Brain,
   ChevronDown,
   ChevronRight,
   ArrowDown,
+  Wifi,
+  WifiOff,
 } from "lucide-react";
 import {
   DELEGATION_CHAIN,
@@ -27,105 +26,45 @@ import {
 } from "@/lib/governance";
 
 /* ------------------------------------------------------------------ */
-/*  Data                                                               */
+/*  Types                                                              */
 /* ------------------------------------------------------------------ */
 
-interface SupervisoryAng {
-  name: string;
-  title: string;
-  pmo: string;
-  status: "DEPLOYED";
-}
-
-const SUPERVISORY_ROSTER: SupervisoryAng[] = [
-  { name: "Boomer_CTO", title: "Chief Technology Officer", pmo: "TECH OFFICE", status: "DEPLOYED" },
-  { name: "Boomer_CFO", title: "Chief Financial Officer", pmo: "FINANCE OFFICE", status: "DEPLOYED" },
-  { name: "Boomer_COO", title: "Chief Operating Officer", pmo: "OPS OFFICE", status: "DEPLOYED" },
-  { name: "Boomer_CMO", title: "Chief Marketing Officer", pmo: "MARKETING OFFICE", status: "DEPLOYED" },
-  { name: "Boomer_CDO", title: "Chief Design Officer", pmo: "DESIGN OFFICE", status: "DEPLOYED" },
-  { name: "Boomer_CPO", title: "Chief Publication Officer", pmo: "PUBLISHING OFFICE", status: "DEPLOYED" },
-  { name: "DevOps Agent", title: "DevOps Specialist", pmo: "TECH OFFICE", status: "DEPLOYED" },
-  { name: "Value Agent", title: "Financial Analyst", pmo: "FINANCE OFFICE", status: "DEPLOYED" },
-  { name: "Flow Boss Agent", title: "Workflow Orchestrator", pmo: "OPS OFFICE", status: "DEPLOYED" },
-  { name: "Social Campaign Agent", title: "Campaign Manager", pmo: "MARKETING OFFICE", status: "DEPLOYED" },
-  { name: "Video Editing Agent", title: "Multimedia Producer", pmo: "DESIGN OFFICE", status: "DEPLOYED" },
-  { name: "Social Agent", title: "Content Publisher", pmo: "PUBLISHING OFFICE", status: "DEPLOYED" },
-];
-
-interface ExecutionAng {
+interface RegisteredAgent {
   id: string;
   name: string;
-  role: string;
-  icon: LucideIcon;
-  status: "DEPLOYED" | "STANDBY";
-  tasks: number;
-  successRate: number;
-  specialties: string[];
+  description: string;
+  capabilities: string[];
+  healthStatus: "online" | "offline" | "degraded";
 }
 
-const EXECUTION_ROSTER: ExecutionAng[] = [
-  {
-    id: "engineer-ang",
-    name: "Engineer_Ang",
-    role: "Full-Stack Builder",
-    icon: Code,
-    status: "DEPLOYED",
-    tasks: 12,
-    successRate: 94,
-    specialties: ["React / Next.js", "Node.js APIs", "Cloud Deploy"],
-  },
-  {
-    id: "marketer-ang",
-    name: "Marketer_Ang",
-    role: "Growth Strategist",
-    icon: Megaphone,
-    status: "DEPLOYED",
-    tasks: 8,
-    successRate: 91,
-    specialties: ["SEO Audits", "Copy Generation", "Campaign Flows"],
-  },
-  {
-    id: "analyst-ang",
-    name: "Analyst_Ang",
-    role: "Data & Intelligence",
-    icon: BarChart3,
-    status: "STANDBY",
-    tasks: 3,
-    successRate: 97,
-    specialties: ["Market Research", "Data Pipelines", "Visualization"],
-  },
-  {
-    id: "quality-ang",
-    name: "Quality_Ang",
-    role: "ORACLE Verifier",
-    icon: Shield,
-    status: "STANDBY",
-    tasks: 5,
-    successRate: 100,
-    specialties: ["7-Gate Checks", "Security Audits", "Code Review"],
-  },
-  {
-    id: "chicken-hawk",
-    name: "Chicken Hawk",
-    role: "Coordinator / Enforcer",
-    icon: Zap,
-    status: "DEPLOYED",
-    tasks: 28,
-    successRate: 96,
-    specialties: ["SOP Enforcement", "Throughput Regulation", "Escalation"],
-  },
-];
-
 /* ------------------------------------------------------------------ */
-/*  Computed Stats                                                     */
+/*  Real data hook — fetches from House of Ang registry                */
 /* ------------------------------------------------------------------ */
 
-const TOTAL_ANGS = SUPERVISORY_ROSTER.length + EXECUTION_ROSTER.length;
-const DEPLOYED = SUPERVISORY_ROSTER.filter((a) => a.status === "DEPLOYED").length +
-  EXECUTION_ROSTER.filter((a) => a.status === "DEPLOYED").length;
-const STANDBY = TOTAL_ANGS - DEPLOYED;
-const SUPERVISORY_COUNT = SUPERVISORY_ROSTER.length;
-const EXECUTION_COUNT = EXECUTION_ROSTER.length;
+function useRegisteredAgents() {
+  const [agents, setAgents] = useState<RegisteredAgent[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch("/api/circuit-box/boomerangs", { cache: "no-store" });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.agents && Array.isArray(data.agents)) {
+          setAgents(data.agents);
+        }
+      } catch {
+        // API unreachable — show empty state
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  return { agents, loading };
+}
+
 const TOTAL_LIL_HAWKS = LIL_HAWK_SQUADS.reduce((s, sq) => s + sq.hawks.length, 0);
 
 /* ------------------------------------------------------------------ */
@@ -136,6 +75,10 @@ export default function HouseOfAngPage() {
   const [spawnOpen, setSpawnOpen] = useState(false);
   const [chainOpen, setChainOpen] = useState(false);
   const [evolutionOpen, setEvolutionOpen] = useState(false);
+  const { agents, loading } = useRegisteredAgents();
+
+  const onlineAgents = agents.filter((a) => a.healthStatus === "online").length;
+  const offlineAgents = agents.filter((a) => a.healthStatus === "offline").length;
 
   return (
     <div className="space-y-6 animate-in fade-in duration-700">
@@ -151,8 +94,8 @@ export default function HouseOfAngPage() {
               sizes="100vw"
               className="object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/60 to-transparent" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30" />
+            <div className="absolute inset-0 bg-gradient-to-r from-white/90 via-white/60 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-white/80 via-transparent to-white/30" />
           </div>
 
           <div className="relative z-10 flex h-full min-h-[280px] md:min-h-[380px] flex-col justify-end p-8 md:p-10">
@@ -165,10 +108,10 @@ export default function HouseOfAngPage() {
             <p className="text-[10px] uppercase tracking-[0.3em] text-gold mb-1">
               Boomer_Ang Factory &amp; Deployment Center
             </p>
-            <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-white font-display">
+            <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-800 font-display">
               HOUSE OF ANG
             </h1>
-            <p className="mt-2 text-sm text-white/40 max-w-lg">
+            <p className="mt-2 text-sm text-slate-400 max-w-lg">
               The birthplace and command center for all Boomer_Angs.
               Authority flows upward. Accountability flows downward.
               Activity breeds Activity.
@@ -180,18 +123,18 @@ export default function HouseOfAngPage() {
       {/* ---- Stats Bar ---- */}
       <div className="grid grid-cols-2 sm:grid-cols-6 gap-3">
         {[
-          { label: "Total Angs", value: TOTAL_ANGS, color: "text-white" },
-          { label: "Deployed", value: DEPLOYED, color: "text-emerald-400" },
-          { label: "Standby", value: STANDBY, color: "text-gold" },
-          { label: "Supervisory", value: SUPERVISORY_COUNT, color: "text-gold" },
-          { label: "Execution", value: EXECUTION_COUNT, color: "text-gold" },
+          { label: "Registered", value: agents.length, color: "text-slate-800" },
+          { label: "Online", value: onlineAgents, color: "text-emerald-400" },
+          { label: "Offline", value: offlineAgents, color: "text-red-400" },
+          { label: "Registry", value: "v3.0", color: "text-gold" },
+          { label: "Source", value: "Live", color: "text-gold" },
           { label: "Lil_Hawks", value: TOTAL_LIL_HAWKS, color: "text-emerald-300" },
         ].map((stat) => (
           <div
             key={stat.label}
-            className="rounded-2xl border border-wireframe-stroke bg-black/60 p-4 backdrop-blur-2xl text-center"
+            className="rounded-2xl border border-wireframe-stroke bg-slate-50/70 p-4 backdrop-blur-2xl text-center"
           >
-            <p className="text-[10px] uppercase tracking-widest text-white/40">
+            <p className="text-[10px] uppercase tracking-widest text-slate-400">
               {stat.label}
             </p>
             <p className={`text-2xl font-semibold mt-1 ${stat.color}`}>
@@ -202,7 +145,7 @@ export default function HouseOfAngPage() {
       </div>
 
       {/* ---- Delegation Chain ---- */}
-      <section className="rounded-3xl border border-wireframe-stroke bg-black/60 p-6 backdrop-blur-2xl">
+      <section className="rounded-3xl border border-wireframe-stroke bg-slate-50/70 p-6 backdrop-blur-2xl">
         <button
           onClick={() => setChainOpen(!chainOpen)}
           className="w-full flex items-center justify-between"
@@ -210,10 +153,10 @@ export default function HouseOfAngPage() {
           <div className="flex items-center gap-3">
             <ArrowDown size={16} className="text-gold" />
             <div className="text-left">
-              <h2 className="text-sm font-semibold uppercase tracking-widest text-white/80 font-display">
+              <h2 className="text-sm font-semibold uppercase tracking-widest text-slate-700 font-display">
                 Chain of Command
               </h2>
-              <p className="text-[0.65rem] text-white/30 uppercase tracking-wider">
+              <p className="text-[0.65rem] text-slate-400 uppercase tracking-wider">
                 Hard rule — no shortcuts, no exceptions
               </p>
             </div>
@@ -233,11 +176,11 @@ export default function HouseOfAngPage() {
                         ? "border-gold/20 bg-gold/[0.02]"
                         : level.rank === 2
                           ? "border-red-400/20 bg-red-400/[0.02]"
-                          : "border-wireframe-stroke bg-black/40"
+                          : "border-wireframe-stroke bg-slate-100/60"
                   }`}>
-                    <p className="text-xs font-bold text-white">{level.role}</p>
-                    <p className="text-[10px] text-white/30 mt-0.5">{level.label}</p>
-                    <p className="text-[9px] text-white/20 mt-1">
+                    <p className="text-xs font-bold text-slate-800">{level.role}</p>
+                    <p className="text-[10px] text-slate-400 mt-0.5">{level.label}</p>
+                    <p className="text-[9px] text-slate-300 mt-1">
                       Speaks to: {level.speaks_to}
                     </p>
                   </div>
@@ -247,7 +190,7 @@ export default function HouseOfAngPage() {
                 </React.Fragment>
               ))}
             </div>
-            <p className="mt-4 text-[10px] text-white/20 text-center max-w-lg mx-auto">
+            <p className="mt-4 text-[10px] text-slate-300 text-center max-w-lg mx-auto">
               Lil_Hawks only speak to their Squad Leader or Chicken Hawk.
               Chicken Hawks only speak to Boomer_Angs.
               Boomer_Angs are the only ones that speak to ACHEEVY.
@@ -258,7 +201,7 @@ export default function HouseOfAngPage() {
       </section>
 
       {/* ---- Chicken Hawk + Lil_Hawk Evolution ---- */}
-      <section className="rounded-3xl border border-wireframe-stroke bg-black/60 p-6 backdrop-blur-2xl">
+      <section className="rounded-3xl border border-wireframe-stroke bg-slate-50/70 p-6 backdrop-blur-2xl">
         <button
           onClick={() => setEvolutionOpen(!evolutionOpen)}
           className="w-full flex items-center justify-between"
@@ -266,10 +209,10 @@ export default function HouseOfAngPage() {
           <div className="flex items-center gap-3">
             <Zap size={16} className="text-gold" />
             <div className="text-left">
-              <h2 className="text-sm font-semibold uppercase tracking-widest text-white/80 font-display">
+              <h2 className="text-sm font-semibold uppercase tracking-widest text-slate-700 font-display">
                 Hawk Evolution &amp; Squads
               </h2>
-              <p className="text-[0.65rem] text-white/30 uppercase tracking-wider">
+              <p className="text-[0.65rem] text-slate-400 uppercase tracking-wider">
                 Lil_Hawks evolve through discipline — Chicken Hawk enforces order
               </p>
             </div>
@@ -281,7 +224,7 @@ export default function HouseOfAngPage() {
           <div className="mt-6 space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
             {/* Chicken Hawk */}
             <div className="flex flex-col md:flex-row gap-6 items-start">
-              <div className="w-32 h-32 rounded-2xl border border-red-400/20 bg-black/40 overflow-hidden shrink-0 flex items-center justify-center relative">
+              <div className="w-32 h-32 rounded-2xl border border-red-400/20 bg-slate-100/60 overflow-hidden shrink-0 flex items-center justify-center relative">
                 <Image
                   src={CHICKEN_HAWK_IMAGE}
                   alt="Chicken Hawk — Coordinator and Enforcer"
@@ -297,9 +240,9 @@ export default function HouseOfAngPage() {
                     Coordinator
                   </span>
                 </div>
-                <p className="text-xs text-white/40 leading-relaxed">
+                <p className="text-xs text-slate-400 leading-relaxed">
                   Coordinators, disciplinarians, throughput regulators, and escalation points.
-                  Chicken Hawks do <strong className="text-white/50">not</strong> mentor — they assign work, enforce SOP,
+                  Chicken Hawks do <strong className="text-slate-500">not</strong> mentor — they assign work, enforce SOP,
                   monitor performance, and relay structured updates to Boomer_Angs.
                   They must themselves respond well to mentorship coming down from Boomer_Angs.
                 </p>
@@ -313,8 +256,8 @@ export default function HouseOfAngPage() {
               </h3>
               <div className="grid gap-4 md:grid-cols-3">
                 {EVOLUTION_STAGES.map((stage) => (
-                  <div key={stage.id} className="rounded-2xl border border-wireframe-stroke bg-black/40 p-4">
-                    <div className="h-24 rounded-xl border border-wireframe-stroke bg-black/20 mb-3 flex items-center justify-center overflow-hidden relative">
+                  <div key={stage.id} className="rounded-2xl border border-wireframe-stroke bg-slate-100/60 p-4">
+                    <div className="h-24 rounded-xl border border-wireframe-stroke bg-slate-50/30 mb-3 flex items-center justify-center overflow-hidden relative">
                       <Image
                         src={stage.image}
                         alt={stage.visual}
@@ -331,10 +274,10 @@ export default function HouseOfAngPage() {
                         </span>
                       )}
                     </div>
-                    <p className="text-[10px] text-white/30 mb-2">{stage.description}</p>
+                    <p className="text-[10px] text-slate-400 mb-2">{stage.description}</p>
                     <ul className="space-y-1">
                       {stage.criteria.map((c, i) => (
-                        <li key={i} className="text-[9px] text-white/20 flex items-start gap-1.5">
+                        <li key={i} className="text-[9px] text-slate-300 flex items-start gap-1.5">
                           <span className="text-gold mt-0.5 shrink-0">{"\u2022"}</span>
                           {c}
                         </li>
@@ -352,11 +295,11 @@ export default function HouseOfAngPage() {
               </h3>
               <div className="space-y-3">
                 {PROMOTION_PATHS.map((path) => (
-                  <div key={`${path.from}-${path.to}`} className="rounded-2xl border border-wireframe-stroke bg-black/30 p-4">
+                  <div key={`${path.from}-${path.to}`} className="rounded-2xl border border-wireframe-stroke bg-slate-100/40 p-4">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="text-[10px] text-white/30">{path.from}</span>
+                      <span className="text-[10px] text-slate-400">{path.from}</span>
                       <span className="text-gold">{"\u2192"}</span>
-                      <span className="text-[10px] font-semibold text-white">{path.to}</span>
+                      <span className="text-[10px] font-semibold text-slate-800">{path.to}</span>
                       {path.reversible && (
                         <span className="rounded-full bg-gold/10 px-1.5 py-0.5 text-[7px] text-gold uppercase">
                           Reversible
@@ -368,7 +311,7 @@ export default function HouseOfAngPage() {
                         <p className="text-[9px] uppercase tracking-wider text-emerald-400/60 mb-1">Required</p>
                         <ul className="space-y-0.5">
                           {path.criteria.map((c, i) => (
-                            <li key={i} className="text-[9px] text-white/20 flex items-start gap-1">
+                            <li key={i} className="text-[9px] text-slate-300 flex items-start gap-1">
                               <span className="text-emerald-400/40 shrink-0">{"\u2713"}</span>{c}
                             </li>
                           ))}
@@ -378,7 +321,7 @@ export default function HouseOfAngPage() {
                         <p className="text-[9px] uppercase tracking-wider text-red-400/60 mb-1">Blockers</p>
                         <ul className="space-y-0.5">
                           {path.blockers.map((b, i) => (
-                            <li key={i} className="text-[9px] text-white/20 flex items-start gap-1">
+                            <li key={i} className="text-[9px] text-slate-300 flex items-start gap-1">
                               <span className="text-red-400/40 shrink-0">{"\u2717"}</span>{b}
                             </li>
                           ))}
@@ -397,17 +340,17 @@ export default function HouseOfAngPage() {
               </h3>
               <div className="grid gap-4 lg:grid-cols-3">
                 {LIL_HAWK_SQUADS.map((squad) => (
-                  <div key={squad.name} className="rounded-2xl border border-wireframe-stroke bg-black/40 p-4">
+                  <div key={squad.name} className="rounded-2xl border border-wireframe-stroke bg-slate-100/60 p-4">
                     <p className="text-xs font-semibold text-gold">{squad.name}</p>
-                    <p className="text-[10px] text-white/30 mt-0.5">{squad.purpose}</p>
+                    <p className="text-[10px] text-slate-400 mt-0.5">{squad.purpose}</p>
                     <div className="mt-2 flex items-center gap-2">
-                      <span className="text-[8px] uppercase tracking-wider text-white/20">Squad Leader:</span>
+                      <span className="text-[8px] uppercase tracking-wider text-slate-300">Squad Leader:</span>
                       <span className="rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 text-[8px] font-bold text-emerald-400">
                         {squad.leaderRole}_LIL_HAWK
                       </span>
                     </div>
                     <div className="mt-2 flex items-center gap-2">
-                      <span className="text-[8px] uppercase tracking-wider text-white/20">Reports to:</span>
+                      <span className="text-[8px] uppercase tracking-wider text-slate-300">Reports to:</span>
                       <span className="text-[9px] text-red-400/70 font-mono">{squad.reportsTo}</span>
                     </div>
                     <div className="mt-3 flex flex-wrap gap-1.5">
@@ -417,7 +360,7 @@ export default function HouseOfAngPage() {
                           className={`rounded-full border px-2 py-0.5 text-[9px] font-mono ${
                             hawk === squad.leaderRole
                               ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-400"
-                              : "border-amber-50/10 bg-gold/10 text-white/50"
+                              : "border-amber-50/10 bg-gold/10 text-slate-500"
                           }`}
                         >
                           {hawk}_LIL_HAWK
@@ -432,124 +375,132 @@ export default function HouseOfAngPage() {
         )}
       </section>
 
-      {/* ---- Section 1: Supervisory Roster ---- */}
-      <section className="rounded-3xl border border-wireframe-stroke bg-black/60 p-6 backdrop-blur-2xl">
+      {/* ---- Section 1: Registered Agents (Live from House of Ang API) ---- */}
+      <section className="rounded-3xl border border-wireframe-stroke bg-slate-50/70 p-6 backdrop-blur-2xl">
         <div className="flex items-center gap-3 mb-1">
           <Users size={16} className="text-gold" />
-          <h2 className="text-sm font-semibold uppercase tracking-widest text-white/80 font-display">
-            Supervisory Roster
+          <h2 className="text-sm font-semibold uppercase tracking-widest text-slate-700 font-display">
+            Registered Agents
           </h2>
         </div>
-        <p className="text-[0.65rem] text-white/30 uppercase tracking-wider mb-4">
-          C-Suite Boomer_Angs &amp; departmental agents — the only layer that speaks to ACHEEVY
+        <p className="text-[0.65rem] text-slate-400 uppercase tracking-wider mb-4">
+          Live from House of Ang registry — real agents with real containers
         </p>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="border-b border-wireframe-stroke">
-                <th className="pb-2 text-[10px] uppercase tracking-widest text-white/30 font-semibold">Agent</th>
-                <th className="pb-2 text-[10px] uppercase tracking-widest text-white/30 font-semibold">Title</th>
-                <th className="pb-2 text-[10px] uppercase tracking-widest text-white/30 font-semibold">PMO</th>
-                <th className="pb-2 text-[10px] uppercase tracking-widest text-white/30 font-semibold text-right">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {SUPERVISORY_ROSTER.map((ang) => (
-                <tr
-                  key={ang.name}
-                  className="border-b border-wireframe-stroke last:border-0 hover:bg-white/[0.02] transition-colors"
-                >
-                  <td className="py-3 text-sm font-medium text-white font-mono">{ang.name}</td>
-                  <td className="py-3 text-xs text-white/50">{ang.title}</td>
-                  <td className="py-3">
-                    <span className="rounded-full border border-wireframe-stroke bg-white/5 px-2.5 py-1 text-[10px] text-gold font-mono">
-                      {ang.pmo}
-                    </span>
-                  </td>
-                  <td className="py-3 text-right">
-                    <div className="inline-flex items-center gap-1.5">
-                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                      <span className="text-[9px] uppercase font-bold tracking-wider text-emerald-400">{ang.status}</span>
-                    </div>
-                  </td>
+        {loading ? (
+          <div className="flex items-center gap-2 py-8 justify-center">
+            <span className="h-4 w-4 animate-spin rounded-full border-2 border-gold/30 border-t-gold" />
+            <span className="text-xs text-slate-400">Loading registry...</span>
+          </div>
+        ) : agents.length === 0 ? (
+          <div className="py-8 text-center">
+            <p className="text-xs text-slate-400">No agents registered or House of Ang unreachable</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="border-b border-wireframe-stroke">
+                  <th className="pb-2 text-[10px] uppercase tracking-widest text-slate-400 font-semibold">Agent</th>
+                  <th className="pb-2 text-[10px] uppercase tracking-widest text-slate-400 font-semibold">Description</th>
+                  <th className="pb-2 text-[10px] uppercase tracking-widest text-slate-400 font-semibold">Capabilities</th>
+                  <th className="pb-2 text-[10px] uppercase tracking-widest text-slate-400 font-semibold text-right">Health</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {agents.map((ang) => (
+                  <tr
+                    key={ang.id}
+                    className="border-b border-wireframe-stroke last:border-0 hover:bg-white transition-colors"
+                  >
+                    <td className="py-3 text-sm font-medium text-slate-800 font-mono">{ang.name}</td>
+                    <td className="py-3 text-xs text-slate-500 max-w-xs truncate">{ang.description}</td>
+                    <td className="py-3">
+                      <div className="flex flex-wrap gap-1">
+                        {ang.capabilities.slice(0, 3).map((cap) => (
+                          <span key={cap} className="rounded-full border border-wireframe-stroke bg-slate-50 px-2 py-0.5 text-[9px] text-gold font-mono">
+                            {cap}
+                          </span>
+                        ))}
+                        {ang.capabilities.length > 3 && (
+                          <span className="text-[9px] text-slate-300">+{ang.capabilities.length - 3}</span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="py-3 text-right">
+                      <div className="inline-flex items-center gap-1.5">
+                        {ang.healthStatus === "online" ? (
+                          <>
+                            <Wifi size={12} className="text-emerald-400" />
+                            <span className="text-[9px] uppercase font-bold tracking-wider text-emerald-400">Online</span>
+                          </>
+                        ) : (
+                          <>
+                            <WifiOff size={12} className="text-red-400/60" />
+                            <span className="text-[9px] uppercase font-bold tracking-wider text-red-400/60">Offline</span>
+                          </>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </section>
 
-      {/* ---- Section 2: Execution Roster ---- */}
+      {/* ---- Section 2: Agent Cards (live from registry) ---- */}
       <section>
         <div className="flex items-center gap-3 mb-1">
           <Activity size={16} className="text-gold" />
-          <h2 className="text-sm font-semibold uppercase tracking-widest text-white/80 font-display">
-            Execution Roster
+          <h2 className="text-sm font-semibold uppercase tracking-widest text-slate-700 font-display">
+            Agent Detail Cards
           </h2>
         </div>
-        <p className="text-[0.65rem] text-white/30 uppercase tracking-wider mb-4">
-          Task-level Boomer_Angs &amp; Chicken Hawk — manage, train, coordinate, verify
+        <p className="text-[0.65rem] text-slate-400 uppercase tracking-wider mb-4">
+          Live health + capability view for each registered Boomer_Ang
         </p>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {EXECUTION_ROSTER.map((ang) => (
+          {agents.map((ang) => (
             <div
               key={ang.id}
-              className={`group relative overflow-hidden rounded-3xl border p-6 backdrop-blur-2xl transition-all hover:bg-black/80 ${
-                ang.id === "chicken-hawk"
-                  ? "border-red-400/20 bg-red-400/[0.02] hover:border-red-400/40"
-                  : "border-wireframe-stroke bg-black/60 hover:border-gold/20"
-              }`}
+              className="group relative overflow-hidden rounded-3xl border border-wireframe-stroke bg-slate-50/70 p-6 backdrop-blur-2xl transition-all hover:bg-white/80 hover:border-gold/20"
             >
               <div className="flex items-start gap-4">
-                <div className={`flex h-12 w-12 items-center justify-center rounded-2xl transition-colors ${
-                  ang.id === "chicken-hawk"
-                    ? "bg-red-400/10 text-red-400 group-hover:bg-red-400 group-hover:text-black"
-                    : "bg-white/5 text-gold group-hover:bg-gold group-hover:text-black"
-                }`}>
-                  <ang.icon size={24} />
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-50 text-gold group-hover:bg-gold group-hover:text-black transition-colors">
+                  <Code size={24} />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold text-white">{ang.name}</h3>
+                    <h3 className="text-lg font-semibold text-slate-800">{ang.name}</h3>
                     <div className="flex items-center gap-1.5">
                       <span
                         className={`h-2 w-2 rounded-full ${
-                          ang.status === "DEPLOYED" ? "bg-emerald-400 animate-pulse" : "bg-gold"
+                          ang.healthStatus === "online" ? "bg-emerald-400 animate-pulse" : "bg-red-400/60"
                         }`}
                       />
                       <span
                         className={`text-[10px] uppercase font-bold tracking-wider ${
-                          ang.status === "DEPLOYED" ? "text-emerald-400" : "text-gold"
+                          ang.healthStatus === "online" ? "text-emerald-400" : "text-red-400/60"
                         }`}
                       >
-                        {ang.status}
+                        {ang.healthStatus}
                       </span>
                     </div>
                   </div>
-                  <p className="text-xs text-white/40 mt-0.5">{ang.role}</p>
-                </div>
-              </div>
-
-              <div className="mt-4 grid grid-cols-2 gap-3">
-                <div className="rounded-xl bg-white/5 p-3">
-                  <p className="text-[10px] uppercase tracking-widest text-white/30">Tasks</p>
-                  <p className="text-lg font-semibold text-white mt-1">{ang.tasks}</p>
-                </div>
-                <div className="rounded-xl bg-white/5 p-3">
-                  <p className="text-[10px] uppercase tracking-widest text-white/30">Success</p>
-                  <p className="text-lg font-semibold text-emerald-400 mt-1">{ang.successRate}%</p>
+                  <p className="text-xs text-slate-400 mt-0.5">{ang.description}</p>
                 </div>
               </div>
 
               <div className="mt-4 flex flex-wrap gap-1.5">
-                {ang.specialties.map((s) => (
+                {ang.capabilities.map((cap) => (
                   <span
-                    key={s}
-                    className="rounded-full border border-wireframe-stroke bg-white/5 px-2.5 py-1 text-[10px] text-white/50"
+                    key={cap}
+                    className="rounded-full border border-wireframe-stroke bg-slate-50 px-2.5 py-1 text-[10px] text-slate-500"
                   >
-                    {s}
+                    {cap.replace(/_/g, " ")}
                   </span>
                 ))}
               </div>
@@ -559,9 +510,9 @@ export default function HouseOfAngPage() {
       </section>
 
       {/* ---- Section 3: Forged Boomerang + Canon ---- */}
-      <section className="rounded-3xl border border-wireframe-stroke bg-black/60 p-6 backdrop-blur-2xl">
+      <section className="rounded-3xl border border-wireframe-stroke bg-slate-50/70 p-6 backdrop-blur-2xl">
         <div className="flex flex-col md:flex-row gap-6 items-center">
-          <div className="w-40 h-40 rounded-2xl border border-gold/20 bg-black/40 overflow-hidden shrink-0 flex items-center justify-center relative">
+          <div className="w-40 h-40 rounded-2xl border border-gold/20 bg-slate-100/60 overflow-hidden shrink-0 flex items-center justify-center relative">
             <Image
               src="/images/acheevy/acheevy-helmet.png"
               alt="The Forged Boomerang — tool of the Angs"
@@ -571,10 +522,10 @@ export default function HouseOfAngPage() {
             />
           </div>
           <div className="flex-1 text-center md:text-left">
-            <h3 className="text-sm font-semibold uppercase tracking-widest text-white/80 font-display mb-2">
+            <h3 className="text-sm font-semibold uppercase tracking-widest text-slate-700 font-display mb-2">
               The Canon
             </h3>
-            <p className="text-xs text-white/30 leading-relaxed max-w-xl">
+            <p className="text-xs text-slate-400 leading-relaxed max-w-xl">
               Lil_Hawks are workers who prove themselves through discipline, teamwork, and responsiveness
               to guidance. They do not lead, teach, or mentor — they execute and adapt. Some earn the
               right to coordinate as Squad Leaders, and a few rise to become Chicken Hawks, whose role
@@ -591,25 +542,25 @@ export default function HouseOfAngPage() {
       <section>
         <div className="flex items-center gap-3 mb-1">
           <Brain size={16} className="text-gold" />
-          <h2 className="text-sm font-semibold uppercase tracking-widest text-white/80 font-display">
+          <h2 className="text-sm font-semibold uppercase tracking-widest text-slate-700 font-display">
             Spawn Bay
           </h2>
         </div>
-        <p className="text-[0.65rem] text-white/30 uppercase tracking-wider mb-4">
+        <p className="text-[0.65rem] text-slate-400 uppercase tracking-wider mb-4">
           Agent fabrication &amp; deployment
         </p>
 
         <div
-          className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-wireframe-stroke bg-black/20 p-10 text-center transition-all hover:border-gold/20 cursor-pointer group"
+          className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-wireframe-stroke bg-slate-50/30 p-10 text-center transition-all hover:border-gold/20 cursor-pointer group"
           onClick={() => setSpawnOpen(!spawnOpen)}
         >
-          <div className="flex h-14 w-14 items-center justify-center rounded-full border border-dashed border-white/20 text-white/20 group-hover:border-gold/30 group-hover:text-gold transition-all">
+          <div className="flex h-14 w-14 items-center justify-center rounded-full border border-dashed border-slate-200 text-slate-300 group-hover:border-gold/30 group-hover:text-gold transition-all">
             <Brain size={24} />
           </div>
           <p className="mt-4 text-lg font-semibold text-gold/50 group-hover:text-gold transition-colors">
             Spawn New Boomer_Ang
           </p>
-          <p className="mt-2 text-xs text-white/20 max-w-md">
+          <p className="mt-2 text-xs text-slate-300 max-w-md">
             Define a custom agent with specific skills and routing rules.
             New Angs deploy from the House and integrate into the delegation chain.
           </p>
@@ -617,27 +568,27 @@ export default function HouseOfAngPage() {
           {spawnOpen && (
             <div className="mt-6 w-full max-w-lg space-y-4 text-left animate-in fade-in slide-in-from-bottom-4 duration-300">
               <div className="space-y-2">
-                <label className="text-[10px] uppercase tracking-wider text-white/40">Agent Name</label>
+                <label className="text-[10px] uppercase tracking-wider text-slate-400">Agent Name</label>
                 <input
                   type="text"
                   placeholder="e.g. DesignerAng"
-                  className="w-full rounded-xl border border-wireframe-stroke bg-black/80 p-2.5 text-sm text-white outline-none focus:border-gold/30 placeholder:text-white/20"
+                  className="w-full rounded-xl border border-wireframe-stroke bg-white/80 p-2.5 text-sm text-slate-800 outline-none focus:border-gold/30 placeholder:text-slate-300"
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] uppercase tracking-wider text-white/40">Role / Specialization</label>
+                <label className="text-[10px] uppercase tracking-wider text-slate-400">Role / Specialization</label>
                 <input
                   type="text"
                   placeholder="e.g. UI/UX Design Specialist"
-                  className="w-full rounded-xl border border-wireframe-stroke bg-black/80 p-2.5 text-sm text-white outline-none focus:border-gold/30 placeholder:text-white/20"
+                  className="w-full rounded-xl border border-wireframe-stroke bg-white/80 p-2.5 text-sm text-slate-800 outline-none focus:border-gold/30 placeholder:text-slate-300"
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] uppercase tracking-wider text-white/40">Routing Rules</label>
+                <label className="text-[10px] uppercase tracking-wider text-slate-400">Routing Rules</label>
                 <textarea
                   rows={3}
                   placeholder="Define when this agent should be invoked..."
-                  className="w-full rounded-xl border border-wireframe-stroke bg-black/80 p-2.5 text-sm text-white outline-none focus:border-gold/30 placeholder:text-white/20"
+                  className="w-full rounded-xl border border-wireframe-stroke bg-white/80 p-2.5 text-sm text-slate-800 outline-none focus:border-gold/30 placeholder:text-slate-300"
                 />
               </div>
               <button className="rounded-full bg-gold px-6 py-2.5 text-xs font-bold text-black shadow-[0_0_15px_rgba(251,191,36,0.3)] transition-all hover:scale-105 active:scale-95">

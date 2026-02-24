@@ -1,0 +1,42 @@
+{
+  "$schema": "Multi-VPS node configuration for A.I.M.S. instance placement",
+  "nodes": [
+    {
+      "id": "vps-primary",
+      "host": "76.13.96.107",
+      "sshAlias": "srv1328075.hstgr.cloud",
+      "role": "primary",
+      "region": "us-east",
+      "cores": 4,
+      "memoryGB": 8,
+      "diskGB": 100,
+      "maxPlugInstances": 8,
+      "portRange": { "start": 51000, "end": 51080 },
+      "services": [
+        "nginx", "frontend", "demo-frontend", "uef-gateway",
+        "house-of-ang", "acheevy", "redis", "agent-bridge",
+        "chickenhawk-core", "n8n", "circuit-metrics",
+        "ii-agent", "ii-agent-postgres", "ii-agent-tools", "ii-agent-sandbox"
+      ],
+      "tags": ["core", "gateway", "primary-db"]
+    }
+  ],
+  "placement": {
+    "strategy": "least-loaded",
+    "fallback": "round-robin",
+    "healthCheckIntervalSec": 30,
+    "maxPlugsPerNode": 8,
+    "reservedMemoryMB": 1024,
+    "affinityRules": [
+      { "service": "redis", "node": "vps-primary", "reason": "session store must be on primary" },
+      { "service": "nginx", "node": "vps-primary", "reason": "TLS termination on primary gateway" },
+      { "service": "frontend", "node": "vps-primary", "reason": "SSR needs low latency to gateway" }
+    ]
+  },
+  "plugRouting": {
+    "dnsStrategy": "wildcard-cname",
+    "pattern": "*.plugs.plugmein.cloud",
+    "proxyPassFromPrimary": true,
+    "healthEndpoint": "/health"
+  }
+}

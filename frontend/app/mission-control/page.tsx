@@ -102,17 +102,17 @@ export default function AutonomousDashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-obsidian text-foreground overflow-x-hidden selection:bg-gold/30">
+    <div className="min-h-screen bg-[#F8FAFC] text-slate-800 overflow-x-hidden selection:bg-gold/30">
       <SiteHeader />
       
       <main className="pt-24 pb-20 px-4 md:px-8 max-w-7xl mx-auto">
         
         {/* Header Section */}
         <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-display font-medium text-white mb-4">
+            <h1 className="text-4xl md:text-5xl font-display font-medium text-slate-800 mb-4">
                Mission Control
             </h1>
-            <p className="text-xl text-gray-400 font-sans max-w-2xl mx-auto">
+            <p className="text-xl text-slate-500 font-sans max-w-2xl mx-auto">
                 Real-time monitoring of ACHEEVY's autonomous execution loops.
             </p>
         </div>
@@ -130,13 +130,13 @@ export default function AutonomousDashboardPage() {
             
             {/* Left: Controls */}
             <div className="lg:col-span-1 space-y-6">
-                <div className="bg-leather rounded-xl p-6 border border-wireframe-stroke">
-                    <h3 className="text-xl font-marker text-frosty-white mb-4">Manual Override</h3>
+                <div className="bg-white rounded-xl p-6 border border-slate-200">
+                    <h3 className="text-xl font-marker text-slate-900 mb-4">Manual Override</h3>
                     <div className="space-y-4">
                         <button 
                             onClick={startSimulation}
                             disabled={status === 'active'}
-                            className="w-full py-3 px-4 bg-gold hover:bg-gold-light text-obsidian font-bold rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                            className="w-full py-3 px-4 bg-gold hover:bg-gold-light text-black font-bold rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                         >
                             <span>▶</span> Trigger Test Loop
                         </button>
@@ -155,18 +155,18 @@ export default function AutonomousDashboardPage() {
                     </div>
                 </div>
 
-                <div className="bg-leather rounded-xl p-6 border border-wireframe-stroke">
-                    <h3 className="text-xl font-marker text-frosty-white mb-4">Active SubAgents</h3>
+                <div className="bg-white rounded-xl p-6 border border-slate-200">
+                    <h3 className="text-xl font-marker text-slate-900 mb-4">Active SubAgents</h3>
                     <div className="space-y-3">
-                        <div className="flex items-center gap-3 p-3 bg-obsidian rounded-lg border border-wireframe-stroke">
+                        <div className="flex items-center gap-3 p-3 bg-[#F8FAFC] rounded-lg border border-slate-200">
                             <div className="w-2 h-2 rounded-full bg-green-500"></div>
                             <span className="font-mono text-sm">Reviewer_01</span>
-                            <span className="ml-auto text-xs text-gray-500">Idle</span>
+                            <span className="ml-auto text-xs text-slate-500">Idle</span>
                         </div>
-                        <div className="flex items-center gap-3 p-3 bg-obsidian rounded-lg border border-wireframe-stroke">
+                        <div className="flex items-center gap-3 p-3 bg-[#F8FAFC] rounded-lg border border-slate-200">
                             <div className="w-2 h-2 rounded-full bg-gray-500"></div>
                             <span className="font-mono text-sm">Coder_X</span>
-                            <span className="ml-auto text-xs text-gray-500">Offline</span>
+                            <span className="ml-auto text-xs text-slate-500">Offline</span>
                         </div>
                     </div>
                 </div>
@@ -174,19 +174,19 @@ export default function AutonomousDashboardPage() {
 
             {/* Right: Logs */}
             <div className="lg:col-span-2">
-                <div className="bg-leather rounded-xl p-6 border border-wireframe-stroke h-full min-h-[400px] flex flex-col">
+                <div className="bg-white rounded-xl p-6 border border-slate-200 h-full min-h-[400px] flex flex-col">
                     <div className="flex justify-between items-center mb-4">
-                         <h3 className="text-xl font-marker text-frosty-white">System Logs</h3>
-                         <span className="text-xs font-mono text-gray-500">Trace ID: #88392-AX</span>
+                         <h3 className="text-xl font-marker text-slate-900">System Logs</h3>
+                         <span className="text-xs font-mono text-slate-500">Trace ID: #88392-AX</span>
                     </div>
-                   
-                    <div className="flex-1 bg-obsidian rounded-lg p-4 font-mono text-sm text-gray-300 overflow-y-auto max-h-[400px] space-y-2 border border-wireframe-stroke shadow-inner">
+
+                    <div className="flex-1 bg-[#F8FAFC] rounded-lg p-4 font-mono text-sm text-slate-600 overflow-y-auto max-h-[400px] space-y-2 border border-slate-200 shadow-inner">
                         {logs.length === 0 && (
-                            <div className="text-center text-gray-600 italic py-10">No active logs. System standby.</div>
+                            <div className="text-center text-slate-400 italic py-10">No active logs. System standby.</div>
                         )}
                         {logs.map((log, i) => (
                             <div key={i} className="flex gap-3">
-                                <span className="text-gray-600 shrink-0">[{log.timestamp}]</span>
+                                <span className="text-slate-400 shrink-0">[{log.timestamp}]</span>
                                 <span className={`${log.type === 'error' ? 'text-red-400' : 'text-green-400/80'}`}>
                                     {log.type === 'info' ? '➜' : '✖'} {log.message}
                                 </span>

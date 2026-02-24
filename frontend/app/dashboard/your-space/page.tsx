@@ -1,22 +1,59 @@
 // frontend/app/dashboard/your-space/page.tsx
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { User, Camera, Settings, Activity, Users, Building2 } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { User, Camera, Settings, Activity, Users, Building2, Loader2 } from "lucide-react";
+
+interface UserStats {
+  tasksCompleted: number;
+  activeAgents: number;
+  projects: number;
+  uptime: string;
+}
 
 export default function YourSpacePage() {
+  const { data: session, status } = useSession();
   const [bio, setBio] = useState(
     "Builder, operator, and orchestrator. Leveraging AI agents to ship faster and think bigger."
   );
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
+  const [userStats, setUserStats] = useState<UserStats>({
+    tasksCompleted: 0,
+    activeAgents: 0,
+    projects: 0,
+    uptime: "—",
+  });
+
+  // Fetch live project count
+  useEffect(() => {
+    async function fetchStats() {
+      try {
+        const res = await fetch("/api/projects");
+        if (res.ok) {
+          const data = await res.json();
+          const projects = data.projects || [];
+          const completed = projects.filter((p: any) => p.status === "completed" || p.status === "deployed").length;
+          setUserStats(prev => ({
+            ...prev,
+            projects: projects.length,
+            tasksCompleted: completed,
+          }));
+        }
+      } catch {
+        // Silent fallback
+      }
+    }
+    fetchStats();
+  }, []);
 
   const stats = [
-    { label: "Tasks Completed", value: "47", icon: Activity },
-    { label: "Active Agents", value: "5", icon: Users },
-    { label: "PMO Offices", value: "6", icon: Building2 },
-    { label: "Uptime", value: "99.8%" , icon: Activity },
+    { label: "Tasks Completed", value: String(userStats.tasksCompleted), icon: Activity },
+    { label: "Active Agents", value: String(userStats.activeAgents || "—"), icon: Users },
+    { label: "Projects", value: String(userStats.projects), icon: Building2 },
+    { label: "Uptime", value: userStats.uptime, icon: Activity },
   ];
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
@@ -47,52 +84,75 @@ export default function YourSpacePage() {
     }
   };
 
+  const userName = session?.user?.name || "ACHEEVY Operator";
+  const userEmail = session?.user?.email || "";
+  const userRole = (session?.user as any)?.role || "USER";
+  const memberSince = session?.user ? "Member" : "—";
+
+  if (status === "loading") {
+    return (
+      <div className="flex items-center justify-center py-20 animate-in fade-in">
+        <Loader2 size={24} className="animate-spin text-gold" />
+      </div>
+    );
+  }
+
   return (
     <div className="animate-in fade-in duration-700">
       {/* Two-column layout: profile info left, hero image right */}
       <div className="flex flex-col-reverse lg:flex-row gap-6 lg:gap-8">
-        {/* ─── Left Column: Profile Info ─── */}
+        {/* Left Column: Profile Info */}
         <div className="w-full lg:w-[45%] space-y-6">
           {/* Header */}
           <header>
             <p className="text-[10px] uppercase tracking-[0.3em] text-gold/50 mb-1">
               Profile &amp; Identity
             </p>
-            <h1 className="text-3xl font-bold tracking-tight text-white font-display">
+            <h1 className="text-3xl font-bold tracking-tight text-slate-800 font-display">
               YOUR SPACE
             </h1>
           </header>
 
           {/* User Info Card */}
-          <section className="rounded-3xl border border-wireframe-stroke bg-black/60 p-6 backdrop-blur-2xl space-y-5">
+          <section className="rounded-3xl border border-wireframe-stroke bg-slate-50/70 p-6 backdrop-blur-2xl space-y-5">
             <div className="flex items-center gap-3 mb-2">
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gold/10 text-gold">
                 <User size={22} />
               </div>
               <div>
-                <h2 className="text-lg font-semibold text-white">
-                  ACHEEVY Operator
+                <h2 className="text-lg font-semibold text-slate-800">
+                  {userName}
                 </h2>
-                <p className="text-xs text-white/40 font-mono">@operator</p>
+                <p className="text-xs text-slate-400 font-mono">
+                  {userEmail || `@${userName.toLowerCase().replace(/\s+/g, '')}`}
+                </p>
               </div>
             </div>
 
-            <div className="space-y-1">
-              <p className="text-[10px] uppercase tracking-wider text-white/30">
-                Member Since
-              </p>
-              <p className="text-sm text-white/50">January 2025</p>
+            <div className="flex items-center gap-4">
+              <div className="space-y-1">
+                <p className="text-[10px] uppercase tracking-wider text-slate-400">
+                  Role
+                </p>
+                <p className="text-sm text-slate-500">{userRole === "OWNER" ? "Platform Owner" : "Member"}</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-[10px] uppercase tracking-wider text-slate-400">
+                  Status
+                </p>
+                <p className="text-sm text-emerald-400">{memberSince}</p>
+              </div>
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] uppercase tracking-wider text-white/30">
+              <label className="text-[10px] uppercase tracking-wider text-slate-400">
                 Bio
               </label>
               <textarea
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
                 rows={3}
-                className="w-full rounded-xl border border-wireframe-stroke bg-black/80 p-3 text-sm text-white outline-none focus:border-gold/30 transition-colors resize-none leading-relaxed"
+                className="w-full rounded-xl border border-wireframe-stroke bg-white/80 p-3 text-sm text-slate-800 outline-none focus:border-gold/30 transition-colors resize-none leading-relaxed"
               />
             </div>
           </section>
@@ -102,15 +162,15 @@ export default function YourSpacePage() {
             {stats.map((stat) => (
               <div
                 key={stat.label}
-                className="rounded-2xl border border-wireframe-stroke bg-black/60 p-4 backdrop-blur-xl"
+                className="rounded-2xl border border-wireframe-stroke bg-slate-50/70 p-4 backdrop-blur-xl"
               >
                 <div className="flex items-center gap-2 mb-2">
                   <stat.icon size={13} className="text-gold" />
-                  <p className="text-[10px] uppercase tracking-wider text-white/30">
+                  <p className="text-[10px] uppercase tracking-wider text-slate-400">
                     {stat.label}
                   </p>
                 </div>
-                <p className="text-2xl font-bold text-white font-display">
+                <p className="text-2xl font-bold text-slate-800 font-display">
                   {stat.value}
                 </p>
               </div>
@@ -136,13 +196,13 @@ export default function YourSpacePage() {
 
           {/* Motto */}
           <div className="pt-2 pb-4">
-            <p className="text-sm italic text-white/20 tracking-wide">
+            <p className="text-sm italic text-slate-300 tracking-wide">
               &ldquo;Activity breeds Activity.&rdquo;
             </p>
           </div>
         </div>
 
-        {/* ─── Right Column: Hero Profile Image ─── */}
+        {/* Right Column: Hero Profile Image */}
         <div className="w-full lg:w-[55%]">
           <div
             onDragOver={(e) => {
@@ -169,18 +229,18 @@ export default function YourSpacePage() {
             <div
               className={`absolute inset-0 flex flex-col items-center justify-center gap-4 transition-opacity ${
                 profileImage
-                  ? "opacity-0 hover:opacity-100 bg-black/60"
+                  ? "opacity-0 hover:opacity-100 bg-slate-50/70"
                   : "opacity-100"
               }`}
             >
-              <div className="flex h-16 w-16 items-center justify-center rounded-full border border-gold/20 bg-black/40 backdrop-blur-sm">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full border border-gold/20 bg-slate-100/60 backdrop-blur-sm">
                 <Camera size={28} className="text-gold/80" />
               </div>
               <div className="text-center">
-                <p className="text-sm font-semibold text-white">
+                <p className="text-sm font-semibold text-slate-800">
                   {profileImage ? "Change Image" : "Upload Profile Image"}
                 </p>
-                <p className="mt-1 text-xs text-white/30">
+                <p className="mt-1 text-xs text-slate-400">
                   Drop your image here or click to browse
                 </p>
               </div>
@@ -196,7 +256,7 @@ export default function YourSpacePage() {
             </div>
 
             {/* Subtle corner accent */}
-            <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
+            <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white/60 to-transparent pointer-events-none" />
           </div>
         </div>
       </div>

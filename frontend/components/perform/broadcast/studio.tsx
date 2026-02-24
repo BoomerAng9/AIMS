@@ -21,7 +21,7 @@ export function StudioArena() {
             className="fixed inset-0 z-50 bg-[#060606] overflow-hidden flex flex-col"
         >
             {/* Studio Background Layer */}
-            <div className="absolute inset-0 pointer-events-none opacity-20 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gold/40 via-black to-black" />
+            <div className="absolute inset-0 pointer-events-none opacity-20 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gold/40 via-white to-white" />
 
             {/* Network Bug Top Right */}
             <NetworkBug />

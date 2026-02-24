@@ -71,28 +71,28 @@ export default function BoomerangsPage() {
     <div className="space-y-6 animate-in fade-in duration-700">
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-white font-display">
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-800 font-display">
             BOOMER_ANGS
           </h1>
-          <p className="text-sm text-white/50">
+          <p className="text-sm text-slate-500">
             Your AI agent team. Each Boomer_Ang specializes in a domain and reports to ACHEEVY.
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 rounded-full border border-wireframe-stroke bg-black/60 px-4 py-2">
+          <div className="flex items-center gap-2 rounded-full border border-wireframe-stroke bg-slate-50/70 px-4 py-2">
             <Activity size={14} className="text-emerald-400" />
-            <span className="text-xs text-white/50">
+            <span className="text-xs text-slate-500">
               <span className="font-semibold text-emerald-400">{activeCount}</span> Registered
             </span>
           </div>
-          <div className="flex items-center gap-2 rounded-full border border-wireframe-stroke bg-black/60 px-4 py-2">
+          <div className="flex items-center gap-2 rounded-full border border-wireframe-stroke bg-slate-50/70 px-4 py-2">
             <span className={`text-[9px] uppercase font-bold tracking-wider ${source === "registry" ? "text-emerald-400" : "text-gold"}`}>
               {source === "registry" ? "Live Registry" : "Local Registry"}
             </span>
           </div>
           <button
             onClick={fetchAgents}
-            className="flex items-center gap-1.5 rounded-full border border-wireframe-stroke bg-black/60 px-3 py-2 text-xs text-white/50 hover:text-white hover:border-white/20 transition-colors"
+            className="flex items-center gap-1.5 rounded-full border border-wireframe-stroke bg-slate-50/70 px-3 py-2 text-xs text-slate-500 hover:text-slate-800 hover:border-slate-200 transition-colors"
           >
             <RefreshCw size={12} />
           </button>
@@ -100,7 +100,7 @@ export default function BoomerangsPage() {
       </header>
 
       {loading ? (
-        <div className="flex items-center justify-center h-48 text-white/20 text-sm">
+        <div className="flex items-center justify-center h-48 text-slate-300 text-sm">
           Loading registry...
         </div>
       ) : (
@@ -110,15 +110,15 @@ export default function BoomerangsPage() {
             return (
               <div
                 key={ang.id}
-                className="group relative overflow-hidden rounded-3xl border border-wireframe-stroke bg-black/60 p-6 backdrop-blur-2xl transition-all hover:border-gold/20 hover:bg-black/80"
+                className="group relative overflow-hidden rounded-3xl border border-wireframe-stroke bg-slate-50/70 p-6 backdrop-blur-2xl transition-all hover:border-gold/20 hover:bg-white/80"
               >
                 <div className="flex items-start gap-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/5 text-gold group-hover:bg-gold group-hover:text-black transition-colors">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-50 text-gold group-hover:bg-gold group-hover:text-black transition-colors">
                     <IconComponent size={24} />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-semibold text-white">{ang.name}</h3>
+                      <h3 className="text-lg font-semibold text-slate-800">{ang.name}</h3>
                       <div className="flex items-center gap-1.5">
                         <span className="h-2 w-2 rounded-full bg-gold" />
                         <span className="text-[10px] uppercase font-bold tracking-wider text-gold">
@@ -126,7 +126,7 @@ export default function BoomerangsPage() {
                         </span>
                       </div>
                     </div>
-                    <p className="text-xs text-white/40 mt-0.5">{ang.description}</p>
+                    <p className="text-xs text-slate-400 mt-0.5">{ang.description}</p>
                   </div>
                 </div>
 
@@ -134,7 +134,7 @@ export default function BoomerangsPage() {
                   {ang.capabilities.map((cap) => (
                     <span
                       key={cap}
-                      className="rounded-full border border-wireframe-stroke bg-white/5 px-2.5 py-1 text-[10px] text-white/50"
+                      className="rounded-full border border-wireframe-stroke bg-slate-50 px-2.5 py-1 text-[10px] text-slate-500"
                     >
                       {cap.replace(/_/g, " ")}
                     </span>
@@ -142,22 +142,22 @@ export default function BoomerangsPage() {
                 </div>
 
                 <div className="mt-4 pt-3 border-t border-wireframe-stroke">
-                  <p className="text-[10px] text-white/30 uppercase tracking-wider">Endpoint</p>
-                  <p className="text-xs text-white/40 mt-1 font-mono truncate">{ang.endpoint}</p>
+                  <p className="text-[10px] text-slate-400 uppercase tracking-wider">Endpoint</p>
+                  <p className="text-xs text-slate-400 mt-1 font-mono truncate">{ang.endpoint}</p>
                 </div>
               </div>
             );
           })}
 
           {/* Spawn New */}
-          <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-wireframe-stroke bg-black/20 p-8 text-center transition-all hover:border-gold/20 cursor-pointer group">
-            <div className="flex h-14 w-14 items-center justify-center rounded-full border border-dashed border-white/20 text-2xl text-white/20 group-hover:border-gold/20 group-hover:text-gold transition-all">
+          <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-wireframe-stroke bg-slate-50/30 p-8 text-center transition-all hover:border-gold/20 cursor-pointer group">
+            <div className="flex h-14 w-14 items-center justify-center rounded-full border border-dashed border-slate-200 text-2xl text-slate-300 group-hover:border-gold/20 group-hover:text-gold transition-all">
               <Brain size={24} />
             </div>
             <p className="mt-4 text-sm text-lg text-gold/50">
               Spawn a new Boomer_Ang
             </p>
-            <p className="mt-1 text-xs text-white/20">
+            <p className="mt-1 text-xs text-slate-300">
               Define a custom agent with specific skills and routing rules.
             </p>
           </div>

@@ -78,7 +78,7 @@ export function Brand({
 }: BrandProps) {
   const colorClasses = {
     gold: 'text-gold',
-    white: 'text-white',
+    white: 'text-slate-800',
     inherit: '',
   };
 

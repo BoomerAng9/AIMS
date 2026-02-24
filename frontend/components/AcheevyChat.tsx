@@ -29,6 +29,8 @@ import type { ReadReceipt } from '@/lib/acheevy/read-receipt';
 import AcheevyMessage from './AcheevyMessage';
 import { VoicePlaybackBar } from './chat/VoicePlaybackBar';
 import { VoiceVisualizer } from '@/components/ui/VoiceVisualizer';
+import { useVerticalFlow } from '@/hooks/useVerticalFlow';
+import { VerticalStepIndicator } from './chat/VerticalStepIndicator';
 
 // ── Types ──
 
@@ -118,6 +120,65 @@ export default function AcheevyChat() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const prevMessageCountRef = useRef(0);
+
+  // ── Vertical Flow — Phase A step progression + Phase B dispatch ──
+  const verticalFlow = useVerticalFlow({
+    userId: 'current-user',
+    onPhaseAComplete: async (verticalId, collectedData) => {
+      // Auto-append a Phase B confirmation message
+      append({
+        role: 'assistant',
+        content: `Phase A complete for **${verticalId}**. I've collected all the inputs needed.\n\nReady to execute Phase B? This will dispatch the pipeline to the team.\n\n*Click "Execute Phase B" below or type "go" to proceed.*`,
+      });
+    },
+    onExecuteRequested: async (verticalId, collectedData) => {
+      // Dispatch Phase B execution via the gateway
+      try {
+        const res = await fetch('/api/vertical/trigger', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ verticalId, userId: 'current-user', collectedData }),
+        });
+        const data = await res.json();
+        append({
+          role: 'assistant',
+          content: `Phase B dispatched for **${verticalId}**.\n\nRequest ID: \`${data.requestId || 'pending'}\`\nStatus: ${data.status || 'dispatched'}\n\nThe team is executing now. I'll update you as results come in.`,
+        });
+      } catch {
+        append({
+          role: 'assistant',
+          content: `Phase B dispatch failed for **${verticalId}**. I'll retry through the local pipeline.`,
+        });
+      }
+    },
+  });
+
+  // Detect vertical intent from assistant responses and auto-classify user input
+  useEffect(() => {
+    if (messages.length < 2) return;
+    const last = messages[messages.length - 1];
+    if (last?.role !== 'user' || verticalFlow.isActive) return;
+
+    // Quick classify: check if the user message matches a vertical trigger
+    const text = last.content.toLowerCase();
+    const verticalTriggers: Record<string, string[]> = {
+      'idea-generator': ['idea', 'brainstorm', 'startup idea'],
+      'pain-points': ['pain point', 'problem', 'frustration'],
+      'brand-name': ['brand name', 'company name', 'naming'],
+      'mvp-plan': ['mvp', 'minimum viable', 'build plan'],
+      'content-calendar': ['content calendar', 'content plan', 'posting schedule'],
+      'social-hooks': ['social media', 'hooks', 'viral', 'social launch'],
+      'cold-outreach': ['cold email', 'outreach', 'cold outbound'],
+      'automation': ['automate', 'workflow', 'automation'],
+    };
+
+    for (const [verticalId, triggers] of Object.entries(verticalTriggers)) {
+      if (triggers.some(t => text.includes(t))) {
+        verticalFlow.startVertical(verticalId);
+        break;
+      }
+    }
+  }, [messages, verticalFlow]);
 
   // ── Voice Input (Groq Whisper STT → Deepgram fallback) ──
   const handleTranscript = useCallback((result: { text: string }) => {
@@ -238,7 +299,7 @@ export default function AcheevyChat() {
   const voiceState = voiceInput.isListening ? 'listening' : voiceInput.isProcessing ? 'processing' : 'idle';
 
   return (
-    <div className="flex flex-col h-[calc(100dvh-3.5rem)] relative overflow-hidden bg-[#0A0A0A] text-white font-sans">
+    <div className="flex flex-col h-[calc(100dvh-3.5rem)] relative overflow-hidden bg-white text-slate-800 font-sans">
       {/* Branded background */}
       <div
         className="absolute inset-0 z-0 pointer-events-none"
@@ -278,7 +339,7 @@ export default function AcheevyChat() {
             type="button"
             onClick={() => voiceOutput.setAutoPlay(!voiceOutput.autoPlayEnabled)}
             title={voiceOutput.autoPlayEnabled ? 'Mute auto-speak' : 'Enable auto-speak'}
-            className={`p-1.5 rounded-lg transition-colors ${voiceOutput.autoPlayEnabled ? 'text-gold bg-gold/10' : 'text-white/30 hover:text-white/60'}`}
+            className={`p-1.5 rounded-lg transition-colors ${voiceOutput.autoPlayEnabled ? 'text-gold bg-gold/10' : 'text-slate-400 hover:text-slate-500'}`}
           >
             {voiceOutput.autoPlayEnabled ? <Volume2 size={14} /> : <VolumeX size={14} />}
           </button>
@@ -286,23 +347,23 @@ export default function AcheevyChat() {
           <div className="relative">
             <button
               onClick={() => setShowIntentPicker(!showIntentPicker)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 border border-wireframe-stroke hover:border-gold/30 transition-all text-xs"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-50 border border-wireframe-stroke hover:border-gold/30 transition-all text-xs"
             >
               <selectedIntent.icon className="w-3.5 h-3.5 text-gold" />
-              <span className="text-white/80">{selectedIntent.label}</span>
+              <span className="text-slate-700">{selectedIntent.label}</span>
             </button>
             {showIntentPicker && (
-              <div className="absolute right-0 top-full mt-1 w-48 bg-[#0A0A0A]/95 border border-wireframe-stroke rounded-xl p-1.5 backdrop-blur-xl shadow-2xl z-50">
+              <div className="absolute right-0 top-full mt-1 w-48 bg-white/95 border border-wireframe-stroke rounded-xl p-1.5 backdrop-blur-xl shadow-2xl z-50">
                 {INTENT_OPTIONS.map(opt => (
                   <button
                     key={opt.value}
                     onClick={() => { setIntent(opt.value); setShowIntentPicker(false); }}
-                    className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left transition-all text-xs ${intent === opt.value ? 'bg-gold/10 border border-gold/20' : 'hover:bg-white/5 border border-transparent'}`}
+                    className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left transition-all text-xs ${intent === opt.value ? 'bg-gold/10 border border-gold/20' : 'hover:bg-slate-50 border border-transparent'}`}
                   >
-                    <opt.icon className={`w-3.5 h-3.5 ${intent === opt.value ? 'text-gold' : 'text-white/40'}`} />
+                    <opt.icon className={`w-3.5 h-3.5 ${intent === opt.value ? 'text-gold' : 'text-slate-400'}`} />
                     <div>
-                      <div className={`font-medium ${intent === opt.value ? 'text-gold' : 'text-white/80'}`}>{opt.label}</div>
-                      <div className="text-[9px] text-white/30 font-mono">{opt.desc}</div>
+                      <div className={`font-medium ${intent === opt.value ? 'text-gold' : 'text-slate-700'}`}>{opt.label}</div>
+                      <div className="text-[9px] text-slate-400 font-mono">{opt.desc}</div>
                     </div>
                   </button>
                 ))}
@@ -313,11 +374,11 @@ export default function AcheevyChat() {
       </div>
 
       {/* Team shelf */}
-      <div className="relative z-10 px-4 py-2 border-b border-wireframe-stroke bg-black/50 backdrop-blur-md flex gap-1.5 overflow-x-auto no-scrollbar">
+      <div className="relative z-10 px-4 py-2 border-b border-wireframe-stroke bg-slate-50/60 backdrop-blur-md flex gap-1.5 overflow-x-auto no-scrollbar">
         {TEAM_SLOTS.map(slot => (
-          <div key={slot.id} className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border transition-colors cursor-default ${pmo?.director?.toLowerCase().includes(slot.id) ? 'border-gold/20 bg-gold/5' : 'border-wireframe-stroke bg-white/[0.02]'}`}>
-            <div className={`w-1.5 h-1.5 rounded-full ${pmo?.director?.toLowerCase().includes(slot.id) ? 'bg-gold animate-pulse' : 'bg-white/20'}`} />
-            <span className="text-[9px] font-mono text-white/50 uppercase tracking-wider">{slot.name}</span>
+          <div key={slot.id} className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border transition-colors cursor-default ${pmo?.director?.toLowerCase().includes(slot.id) ? 'border-gold/20 bg-gold/5' : 'border-wireframe-stroke bg-white'}`}>
+            <div className={`w-1.5 h-1.5 rounded-full ${pmo?.director?.toLowerCase().includes(slot.id) ? 'bg-gold animate-pulse' : 'bg-slate-100'}`} />
+            <span className="text-[9px] font-mono text-slate-500 uppercase tracking-wider">{slot.name}</span>
           </div>
         ))}
       </div>
@@ -346,7 +407,7 @@ export default function AcheevyChat() {
         </motion.div>
         {isLoading && messages.length > 0 && messages[messages.length - 1].role === 'user' && (
           <div className="flex gap-3">
-            <div className="w-7 h-7 rounded-lg bg-white/5 border border-gold/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
+            <div className="w-7 h-7 rounded-lg bg-slate-50 border border-gold/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
               <Image
                 src="/images/acheevy/acheevy-helmet-chat.png"
                 alt="ACHEEVY"
@@ -367,17 +428,29 @@ export default function AcheevyChat() {
         <div ref={messagesEndRef} />
       </div>
 
+      {/* Vertical Flow Step Indicator + Phase B Gate */}
+      {verticalFlow.isActive && (
+        <div className="relative z-20 px-4 py-2 border-t border-gold/20 bg-gold/[0.03]">
+          <VerticalStepIndicator
+            state={verticalFlow.state}
+            transitionPrompt={verticalFlow.getTransitionPrompt()}
+            onExecute={() => verticalFlow.confirmExecution()}
+            onDismiss={() => verticalFlow.reset()}
+          />
+        </div>
+      )}
+
       {/* Input */}
-      <div className="relative z-20 p-3 bg-[#0A0A0A]/80 backdrop-blur-xl border-t border-wireframe-stroke">
+      <div className="relative z-20 p-3 bg-white/80 backdrop-blur-xl border-t border-wireframe-stroke">
         {attachments.length > 0 && (
           <div className="px-3 pb-3 flex gap-2 flex-wrap">
             {attachments.map(file => {
               const Icon = FILE_CATEGORY_ICON[file.category] || FileText;
               return (
-                <div key={file.id} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/5 border border-wireframe-stroke text-xs">
+                <div key={file.id} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-50 border border-wireframe-stroke text-xs">
                   <Icon className="w-3 h-3 text-gold/60" />
-                  <span className="text-white/70 max-w-[120px] truncate">{file.name}</span>
-                  <button type="button" onClick={() => removeAttachment(file.id)} className="p-0.5 rounded text-white/30 hover:text-red-400 transition-colors">
+                  <span className="text-slate-600 max-w-[120px] truncate">{file.name}</span>
+                  <button type="button" onClick={() => removeAttachment(file.id)} className="p-0.5 rounded text-slate-400 hover:text-red-400 transition-colors">
                     <X className="w-3 h-3" />
                   </button>
                 </div>
@@ -416,7 +489,26 @@ export default function AcheevyChat() {
           onSubmit={(e) => {
             e.preventDefault();
             if (!input.trim() && attachments.length === 0) return;
-            append({ role: 'user', content: input });
+
+            // Handle Phase B confirmation
+            if (verticalFlow.isReadyToExecute && input.trim().toLowerCase() === 'go') {
+              verticalFlow.confirmExecution();
+              setInput('');
+              return;
+            }
+
+            // Advance vertical step if in Phase A
+            if (verticalFlow.isPhaseA) {
+              verticalFlow.advanceStep(input.trim());
+            }
+
+            // Inject vertical context into the message for the LLM
+            const stepContext = verticalFlow.getCurrentStepContext();
+            const messageContent = stepContext
+              ? `${input}\n\n---\n[SYSTEM_CONTEXT]\n${stepContext}`
+              : input;
+
+            append({ role: 'user', content: messageContent });
             setInput('');
             setAttachments([]);
           }}
@@ -426,7 +518,7 @@ export default function AcheevyChat() {
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={isUploading}
-            className="p-3 text-white/40 hover:text-gold hover:bg-gold/10 rounded-xl transition-all border border-transparent hover:border-gold/30 disabled:opacity-30"
+            className="p-3 text-slate-400 hover:text-gold hover:bg-gold/10 rounded-xl transition-all border border-transparent hover:border-gold/30 disabled:opacity-30"
           >
             {isUploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Paperclip className="w-5 h-5" />}
           </button>
@@ -447,7 +539,7 @@ export default function AcheevyChat() {
                 ? 'text-red-400 bg-red-500/10 border-red-500/30 animate-pulse'
                 : voiceInput.isProcessing
                   ? 'text-gold/60 bg-gold/5 border-gold/20 cursor-wait'
-                  : 'text-white/40 hover:text-gold hover:bg-gold/10 border-transparent hover:border-gold/30'
+                  : 'text-slate-400 hover:text-gold hover:bg-gold/10 border-transparent hover:border-gold/30'
             } disabled:opacity-30`}
             title={voiceInput.isListening ? 'Stop recording' : voiceInput.isProcessing ? 'Transcribing...' : 'Start voice input'}
           >
@@ -465,7 +557,7 @@ export default function AcheevyChat() {
             onChange={handleInputChange}
             placeholder={voiceInput.isProcessing ? 'Transcribing your voice...' : voiceInput.isListening ? 'Listening...' : 'Tell me what you need...'}
             disabled={isLoading}
-            className="flex-1 bg-black/40 hover:bg-black/60 focus:bg-black border border-wireframe-stroke focus:border-gold/40 rounded-xl py-3 pl-4 pr-12 text-white text-base placeholder:text-white/20 transition-all outline-none"
+            className="flex-1 bg-slate-100/60 hover:bg-slate-50/70 focus:bg-white border border-wireframe-stroke focus:border-gold/40 rounded-xl py-3 pl-4 pr-12 text-slate-800 text-base placeholder:text-slate-300 transition-all outline-none"
           />
 
           {isLoading ? (
@@ -480,7 +572,7 @@ export default function AcheevyChat() {
         </form>
         <div className="flex items-center justify-center gap-1.5 mt-2 pb-2">
           <Image src="/images/logos/achievemor-gold.png" alt="A.I.M.S." width={12} height={12} className="opacity-30" />
-          <p className="text-[9px] font-mono text-white/15 uppercase tracking-[0.2em]">A.I.M.S. v2.0 &bull; {intent} Mode</p>
+          <p className="text-[9px] font-mono text-slate-300 uppercase tracking-[0.2em]">A.I.M.S. v2.0 &bull; {intent} Mode</p>
         </div>
       </div>
     </div>

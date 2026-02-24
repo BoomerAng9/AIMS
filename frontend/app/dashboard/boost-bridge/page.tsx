@@ -205,19 +205,19 @@ export default function BoostBridgePage() {
 
   return (
     <OwnerGate>
-      <div className="min-h-screen bg-zinc-950 text-zinc-100 p-4 md:p-6">
+      <div className="min-h-screen bg-[#F8FAFC] text-slate-900 p-4 md:p-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold tracking-tight flex items-center gap-3">
               <span className="text-blue-400">Boost</span>
-              <span className="text-zinc-600">|</span>
+              <span className="text-slate-500">|</span>
               <span className="text-purple-400">Bridge</span>
               <span className="text-[10px] font-mono px-2 py-1 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">
                 PRODUCTIVELY FUN
               </span>
             </h1>
-            <p className="text-zinc-500 text-sm mt-1">
+            <p className="text-slate-500 text-sm mt-1">
               Simulate. Validate. Elevate. AI meets the real world.
             </p>
           </div>
@@ -232,7 +232,7 @@ export default function BoostBridgePage() {
               className={`px-4 py-2 text-sm rounded-lg border transition-colors flex items-center gap-2 ${
                 engine === tab.id
                   ? `bg-${tab.color}-500/10 text-${tab.color}-400 border-${tab.color}-500/20`
-                  : 'text-zinc-500 border-zinc-800 hover:border-zinc-700'
+                  : 'text-slate-500 border-slate-200 hover:border-slate-300'
               }`}
             >
               <span>{tab.emoji}</span>
@@ -249,7 +249,7 @@ export default function BoostBridgePage() {
               <button
                 onClick={() => { setCrowdView('submit'); setReport(null); setEvents([]); }}
                 className={`px-3 py-1.5 text-xs rounded-lg border transition-colors ${
-                  crowdView === 'submit' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' : 'text-zinc-500 border-zinc-800'
+                  crowdView === 'submit' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' : 'text-slate-500 border-slate-200'
                 }`}
               >
                 New Simulation
@@ -257,7 +257,7 @@ export default function BoostBridgePage() {
               <button
                 onClick={() => { setCrowdView('history'); fetchHistory(); }}
                 className={`px-3 py-1.5 text-xs rounded-lg border transition-colors ${
-                  crowdView === 'history' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' : 'text-zinc-500 border-zinc-800'
+                  crowdView === 'history' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' : 'text-slate-500 border-slate-200'
                 }`}
               >
                 History ({history.length})
@@ -269,37 +269,37 @@ export default function BoostBridgePage() {
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-3xl mx-auto space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-xs text-zinc-500 mb-1 block">Product / Idea Name</label>
+                    <label className="text-xs text-slate-500 mb-1 block">Product / Idea Name</label>
                     <input
                       value={productName}
                       onChange={e => setProductName(e.target.value)}
                       placeholder="e.g., FitCheck — AI Style Advisor"
-                      className="w-full px-3 py-2 bg-black/40 border border-zinc-700/50 rounded-lg text-sm text-zinc-200 outline-none focus:border-blue-500/30"
+                      className="w-full px-3 py-2 bg-slate-100/60 border border-slate-200 rounded-lg text-sm text-slate-900 outline-none focus:border-blue-500/30"
                     />
                   </div>
                   <div>
-                    <label className="text-xs text-zinc-500 mb-1 block">Target Demographic</label>
+                    <label className="text-xs text-slate-500 mb-1 block">Target Demographic</label>
                     <input
                       value={targetDemo}
                       onChange={e => setTargetDemo(e.target.value)}
                       placeholder="e.g., Gen Z consumers, 18-28, urban, fashion-forward"
-                      className="w-full px-3 py-2 bg-black/40 border border-zinc-700/50 rounded-lg text-sm text-zinc-200 outline-none focus:border-blue-500/30"
+                      className="w-full px-3 py-2 bg-slate-100/60 border border-slate-200 rounded-lg text-sm text-slate-900 outline-none focus:border-blue-500/30"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="text-xs text-zinc-500 mb-1 block">Product Description</label>
+                  <label className="text-xs text-slate-500 mb-1 block">Product Description</label>
                   <textarea
                     value={productDescription}
                     onChange={e => setProductDescription(e.target.value)}
                     placeholder="Describe your product or idea in 2-5 sentences. What does it do? Who is it for? What problem does it solve? The more specific, the better the simulation."
-                    className="w-full h-48 bg-black/40 border border-zinc-700/50 rounded-lg p-3 text-sm text-zinc-200 font-mono outline-none focus:border-blue-500/30 resize-y"
+                    className="w-full h-48 bg-slate-100/60 border border-slate-200 rounded-lg p-3 text-sm text-slate-900 font-mono outline-none focus:border-blue-500/30 resize-y"
                   />
                 </div>
 
                 <div>
-                  <label className="text-xs text-zinc-500 mb-1 block">
+                  <label className="text-xs text-slate-500 mb-1 block">
                     Crowd Size: {personaCount} personas
                   </label>
                   <input
@@ -310,7 +310,7 @@ export default function BoostBridgePage() {
                     onChange={e => setPersonaCount(Number(e.target.value))}
                     className="w-full accent-blue-500"
                   />
-                  <div className="flex justify-between text-[10px] text-zinc-700">
+                  <div className="flex justify-between text-[10px] text-slate-500">
                     <span>5 (quick pulse)</span>
                     <span>50 (solid read)</span>
                     <span>100 (deep dive)</span>
@@ -325,7 +325,7 @@ export default function BoostBridgePage() {
                   {submitting ? 'Assembling The Crowd...' : 'Run Simulation'}
                 </button>
 
-                <p className="text-[10px] text-zinc-700 text-center">
+                <p className="text-[10px] text-slate-500 text-center">
                   Synthetic personas get generated, experience your product, and give raw unfiltered feedback. No cap.
                 </p>
               </motion.div>
@@ -334,12 +334,12 @@ export default function BoostBridgePage() {
             {/* Processing View */}
             {crowdView === 'processing' && (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-3xl mx-auto space-y-4">
-                <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-4">
+                <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-4">
                   <div className="flex items-center justify-between mb-2">
                     <p className="text-sm font-medium">{statusMessage}</p>
-                    <span className="text-xs font-mono text-zinc-500">{progress}%</span>
+                    <span className="text-xs font-mono text-slate-500">{progress}%</span>
                   </div>
-                  <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
+                  <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
                     <motion.div
                       className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"
                       initial={{ width: 0 }}
@@ -349,30 +349,30 @@ export default function BoostBridgePage() {
                   </div>
                 </div>
 
-                <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-4">
+                <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-4">
                   <div className="flex items-center gap-2 mb-3">
                     <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
-                    <p className="text-xs font-mono text-zinc-500">THE CROWD — LIVE FEED</p>
+                    <p className="text-xs font-mono text-slate-500">THE CROWD — LIVE FEED</p>
                   </div>
                   <div ref={eventLogRef} className="h-64 overflow-y-auto space-y-1 font-mono text-xs">
                     {events.map((evt, i) => (
                       <div key={i} className="flex gap-2">
-                        <span className="text-zinc-700 shrink-0">
+                        <span className="text-slate-500 shrink-0">
                           {new Date(evt.timestamp).toLocaleTimeString()}
                         </span>
                         <span className={`shrink-0 ${
                           evt.event.includes('ERROR') || evt.event.includes('FAILED') ? 'text-red-400' :
                           evt.event.includes('COMPLETE') ? 'text-emerald-400' :
                           evt.event.includes('START') || evt.event.includes('ASSEMBLING') ? 'text-blue-400' :
-                          'text-zinc-400'
+                          'text-slate-500'
                         }`}>
                           [{evt.event}]
                         </span>
-                        <span className="text-zinc-500 truncate">{evt.detail}</span>
+                        <span className="text-slate-500 truncate">{evt.detail}</span>
                       </div>
                     ))}
                     {events.length === 0 && (
-                      <p className="text-zinc-700">Assembling The Crowd...</p>
+                      <p className="text-slate-500">Assembling The Crowd...</p>
                     )}
                   </div>
                 </div>
@@ -389,8 +389,8 @@ export default function BoostBridgePage() {
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-3xl mx-auto">
                 {history.length === 0 ? (
                   <div className="text-center py-20">
-                    <p className="text-zinc-600 text-lg">No simulations yet</p>
-                    <p className="text-zinc-700 text-sm mt-1">Run your first Crowd simulation to see results here</p>
+                    <p className="text-slate-500 text-lg">No simulations yet</p>
+                    <p className="text-slate-500 text-sm mt-1">Run your first Crowd simulation to see results here</p>
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -400,7 +400,7 @@ export default function BoostBridgePage() {
                         <button
                           key={r.reportId}
                           onClick={() => loadReport(r.reportId)}
-                          className="w-full text-left bg-zinc-900/50 border border-zinc-800 rounded-xl p-4 hover:border-zinc-700 transition-colors"
+                          className="w-full text-left bg-white border border-slate-200 shadow-sm rounded-xl p-4 hover:border-slate-300 transition-colors"
                         >
                           <div className="flex items-center justify-between mb-1">
                             <h3 className="font-medium text-sm">{r.productName}</h3>
@@ -412,7 +412,7 @@ export default function BoostBridgePage() {
                             <span className="text-blue-400">{r.totalPersonas} personas</span>
                             <span className="text-emerald-400">{r.wouldUsePercent}% would use</span>
                             <span className="text-amber-400">{r.wouldPayPercent}% would pay</span>
-                            <span className="text-zinc-600 ml-auto">{new Date(r.completedAt).toLocaleDateString()}</span>
+                            <span className="text-slate-500 ml-auto">{new Date(r.completedAt).toLocaleDateString()}</span>
                           </div>
                         </button>
                       );
@@ -429,11 +429,11 @@ export default function BoostBridgePage() {
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-3xl mx-auto text-center py-20">
             <p className="text-4xl mb-4">🏟️</p>
             <h2 className="text-xl font-bold text-amber-400 mb-2">The Proving Ground</h2>
-            <p className="text-zinc-500 text-sm max-w-md mx-auto">
+            <p className="text-slate-500 text-sm max-w-md mx-auto">
               Real trial users. Real products. Automated recruitment, onboarding flows,
               and feedback loops. The bridge between simulation and validation.
             </p>
-            <p className="text-zinc-700 text-xs mt-4">
+            <p className="text-slate-500 text-xs mt-4">
               API ready at /api/trial/* — Frontend coming in next sprint.
             </p>
           </motion.div>
@@ -445,30 +445,30 @@ export default function BoostBridgePage() {
             <div className="text-center mb-8">
               <p className="text-4xl mb-4">🥋</p>
               <h2 className="text-xl font-bold text-purple-400 mb-2">The Dojo</h2>
-              <p className="text-zinc-500 text-sm">
+              <p className="text-slate-500 text-sm">
                 P2P training with AI-evaluated accreditation. Not participation trophies — verified skills.
               </p>
             </div>
 
             {/* Badge Wall */}
-            <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
-              <h3 className="text-sm font-semibold text-zinc-400 mb-4">ACCREDITATION LOG</h3>
+            <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-6">
+              <h3 className="text-sm font-semibold text-slate-500 mb-4">ACCREDITATION LOG</h3>
               {badges.length === 0 ? (
-                <p className="text-zinc-600 text-sm text-center py-8">No badges earned yet. Be the first.</p>
+                <p className="text-slate-500 text-sm text-center py-8">No badges earned yet. Be the first.</p>
               ) : (
                 <div className="space-y-3">
                   {badges.map(b => {
                     const emoji = b.tier === 'sensei' ? '👑' : b.tier === 'black' ? '🥋' : b.tier === 'blue' ? '🔵' : '⚪';
                     return (
-                      <div key={b.badgeId} className="flex items-center gap-3 p-3 bg-black/30 rounded-lg border border-zinc-800/50">
+                      <div key={b.badgeId} className="flex items-center gap-3 p-3 bg-slate-100/40 rounded-lg border border-slate-200/50">
                         <span className="text-2xl">{emoji}</span>
                         <div className="flex-1">
                           <p className="text-sm font-medium">{b.recipientName}</p>
-                          <p className="text-xs text-zinc-500">{b.tier.toUpperCase()} BELT in {b.domain}</p>
+                          <p className="text-xs text-slate-500">{b.tier.toUpperCase()} BELT in {b.domain}</p>
                         </div>
                         <div className="text-right">
                           <p className="text-sm font-mono text-purple-400">{b.score}%</p>
-                          <p className="text-[10px] text-zinc-600">{new Date(b.earnedAt).toLocaleDateString()}</p>
+                          <p className="text-[10px] text-slate-500">{new Date(b.earnedAt).toLocaleDateString()}</p>
                         </div>
                       </div>
                     );
@@ -477,7 +477,7 @@ export default function BoostBridgePage() {
               )}
             </div>
 
-            <p className="text-zinc-700 text-xs mt-4 text-center">
+            <p className="text-slate-500 text-xs mt-4 text-center">
               API ready at /api/dojo/* — Full curriculum builder coming in next sprint.
             </p>
           </motion.div>
@@ -498,13 +498,13 @@ function CrowdReportViewer({ report }: { report: CrowdReport }) {
       <div className={`rounded-xl border p-6 ${style.bg} ${style.border}`}>
         <div className="flex items-center justify-between mb-4">
           <div>
-            <p className="text-xs font-mono text-zinc-500 mb-1">CROWD SIMULATION REPORT</p>
+            <p className="text-xs font-mono text-slate-500 mb-1">CROWD SIMULATION REPORT</p>
             <h2 className="text-xl font-bold">{report.productName}</h2>
-            <p className="text-sm text-zinc-500">{report.totalPersonas} personas &middot; {new Date(report.completedAt).toLocaleString()}</p>
+            <p className="text-sm text-slate-500">{report.totalPersonas} personas &middot; {new Date(report.completedAt).toLocaleString()}</p>
           </div>
           <div className="text-center">
             <p className={`text-3xl font-mono font-bold ${style.text}`}>{report.avgNPS}</p>
-            <p className="text-[10px] text-zinc-500">NPS / 10</p>
+            <p className="text-[10px] text-slate-500">NPS / 10</p>
           </div>
         </div>
 
@@ -522,68 +522,68 @@ function CrowdReportViewer({ report }: { report: CrowdReport }) {
       </div>
 
       {/* Executive Summary */}
-      <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
-        <h3 className="text-sm font-semibold text-zinc-400 mb-3">THE READ</h3>
-        <div className="text-sm text-zinc-300 whitespace-pre-wrap leading-relaxed">
+      <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-6">
+        <h3 className="text-sm font-semibold text-slate-500 mb-3">THE READ</h3>
+        <div className="text-sm text-slate-600 whitespace-pre-wrap leading-relaxed">
           {report.executiveSummary}
         </div>
       </div>
 
       {/* Friction vs Delight */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-zinc-900/50 border border-red-500/10 rounded-xl p-6">
+        <div className="bg-white border border-red-500/10 shadow-sm rounded-xl p-6">
           <h3 className="text-sm font-semibold text-red-400 mb-3">FRICTION POINTS</h3>
           <div className="space-y-2">
             {report.topFrictionPoints.slice(0, 7).map((f, i) => (
               <div key={i} className="flex items-center justify-between">
-                <span className="text-sm text-zinc-300 truncate">{f.issue}</span>
+                <span className="text-sm text-slate-600 truncate">{f.issue}</span>
                 <span className="text-xs font-mono text-red-400 shrink-0 ml-2">{f.frequency}x</span>
               </div>
             ))}
             {report.topFrictionPoints.length === 0 && (
-              <p className="text-zinc-600 text-sm">No significant friction reported</p>
+              <p className="text-slate-500 text-sm">No significant friction reported</p>
             )}
           </div>
         </div>
 
-        <div className="bg-zinc-900/50 border border-emerald-500/10 rounded-xl p-6">
+        <div className="bg-white border border-emerald-500/10 shadow-sm rounded-xl p-6">
           <h3 className="text-sm font-semibold text-emerald-400 mb-3">DELIGHT POINTS</h3>
           <div className="space-y-2">
             {report.topDelightPoints.slice(0, 7).map((d, i) => (
               <div key={i} className="flex items-center justify-between">
-                <span className="text-sm text-zinc-300 truncate">{d.feature}</span>
+                <span className="text-sm text-slate-600 truncate">{d.feature}</span>
                 <span className="text-xs font-mono text-emerald-400 shrink-0 ml-2">{d.frequency}x</span>
               </div>
             ))}
             {report.topDelightPoints.length === 0 && (
-              <p className="text-zinc-600 text-sm">No significant delight reported</p>
+              <p className="text-slate-500 text-sm">No significant delight reported</p>
             )}
           </div>
         </div>
       </div>
 
       {/* Persona Reactions (sample) */}
-      <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
-        <h3 className="text-sm font-semibold text-zinc-400 mb-4">RAW REACTIONS (sample)</h3>
+      <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-6">
+        <h3 className="text-sm font-semibold text-slate-500 mb-4">RAW REACTIONS (sample)</h3>
         <div className="space-y-3">
           {report.reactions.slice(0, 8).map((r, i) => {
             const persona = report.personas.find(p => p.id === r.personaId);
             const sentimentColor = r.sentiment === 'enthusiastic' ? 'text-emerald-400'
               : r.sentiment === 'positive' ? 'text-blue-400'
-              : r.sentiment === 'neutral' ? 'text-zinc-400'
+              : r.sentiment === 'neutral' ? 'text-slate-500'
               : 'text-red-400';
 
             return (
-              <div key={i} className="p-3 bg-black/30 rounded-lg border border-zinc-800/50">
+              <div key={i} className="p-3 bg-slate-100/40 rounded-lg border border-slate-200/50">
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs font-medium text-zinc-300">
+                  <span className="text-xs font-medium text-slate-600">
                     {persona?.name || r.personaId} &middot; {persona?.age}, {persona?.occupation}
                   </span>
                   <span className={`text-[10px] font-mono ${sentimentColor}`}>
                     NPS {r.npsScore}/10
                   </span>
                 </div>
-                <p className="text-sm text-zinc-400 italic">&ldquo;{r.rawFeedback}&rdquo;</p>
+                <p className="text-sm text-slate-500 italic">&ldquo;{r.rawFeedback}&rdquo;</p>
               </div>
             );
           })}
@@ -592,11 +592,11 @@ function CrowdReportViewer({ report }: { report: CrowdReport }) {
 
       {/* Recommendations */}
       {report.recommendations.length > 0 && (
-        <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
-          <h3 className="text-sm font-semibold text-zinc-400 mb-3">THE MOVE</h3>
+        <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-6">
+          <h3 className="text-sm font-semibold text-slate-500 mb-3">THE MOVE</h3>
           <ol className="space-y-2">
             {report.recommendations.map((rec, i) => (
-              <li key={i} className="flex gap-3 text-sm text-zinc-300">
+              <li key={i} className="flex gap-3 text-sm text-slate-600">
                 <span className="text-blue-400 font-mono shrink-0">{i + 1}.</span>
                 <span>{rec}</span>
               </li>
@@ -606,7 +606,7 @@ function CrowdReportViewer({ report }: { report: CrowdReport }) {
       )}
 
       {/* Meta */}
-      <div className="text-center text-[10px] text-zinc-700 font-mono">
+      <div className="text-center text-[10px] text-slate-500 font-mono">
         Report ID: {report.reportId} &middot; Boost|Bridge v1.0 &middot; Productively Fun
       </div>
     </motion.div>
@@ -619,11 +619,11 @@ function MiniStat({ label, value, color }: { label: string; value: string | numb
     : color === 'emerald' ? 'text-emerald-400'
     : color === 'blue' ? 'text-blue-400'
     : color === 'purple' ? 'text-purple-400'
-    : 'text-zinc-200';
+    : 'text-slate-900';
   return (
     <div className="text-center">
       <p className={`text-lg font-mono font-bold ${textColor}`}>{value}</p>
-      <p className="text-[10px] text-zinc-600">{label}</p>
+      <p className="text-[10px] text-slate-500">{label}</p>
     </div>
   );
 }

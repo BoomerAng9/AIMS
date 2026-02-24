@@ -61,7 +61,7 @@ interface CollaborationSession {
 // ── Agent Role Colors & Icons ──────────────────────────────────
 
 const ROLE_CONFIG: Record<AgentRole, { color: string; bg: string; icon: string }> = {
-  system:       { color: 'text-white/40',  bg: 'bg-white/5',     icon: 'SYS' },
+  system:       { color: 'text-slate-400',  bg: 'bg-slate-50',     icon: 'SYS' },
   acheevy:      { color: 'text-gold',      bg: 'bg-gold/10',     icon: 'ACH' },
   boomer_ang:   { color: 'text-blue-400',  bg: 'bg-blue-500/10', icon: 'BMR' },
   chicken_hawk: { color: 'text-orange-400',bg: 'bg-orange-500/10',icon: 'CHK' },
@@ -101,11 +101,11 @@ function FeedEntryRow({ entry, isLast }: { entry: FeedEntry; isLast: boolean }) 
       transition={{ duration: 0.2 }}
       className={`
         flex gap-3 py-2 px-3 rounded-lg transition-colors
-        ${entry.depth > 0 ? 'ml-6 border-l-2 border-white/5' : ''}
+        ${entry.depth > 0 ? 'ml-6 border-l-2 border-slate-100' : ''}
         ${isThinking ? 'opacity-60' : ''}
         ${isNugget ? 'bg-gold/5 border border-gold/10' : ''}
-        ${isHandoff ? 'bg-white/[0.02]' : ''}
-        hover:bg-white/[0.03]
+        ${isHandoff ? 'bg-white' : ''}
+        hover:bg-white
       `}
     >
       {/* Avatar Badge */}
@@ -121,18 +121,18 @@ function FeedEntryRow({ entry, isLast }: { entry: FeedEntry; isLast: boolean }) 
             {entry.speaker.displayName}
           </span>
           {entry.speaker.kunya && (
-            <span className="text-[10px] text-white/20 italic">{entry.speaker.kunya}</span>
+            <span className="text-[10px] text-slate-300 italic">{entry.speaker.kunya}</span>
           )}
-          <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-white/30 font-mono">
+          <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-50 text-slate-400 font-mono">
             {typeIcon}
           </span>
-          <span className="text-[10px] text-white/15 ml-auto font-mono">
+          <span className="text-[10px] text-slate-300 ml-auto font-mono">
             {new Date(entry.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
           </span>
         </div>
 
         {/* Message */}
-        <p className={`text-sm leading-relaxed ${isThinking ? 'text-white/40 italic' : 'text-white/70'}`}>
+        <p className={`text-sm leading-relaxed ${isThinking ? 'text-slate-400 italic' : 'text-slate-600'}`}>
           {isNugget && <span className="text-gold mr-1">TIP:</span>}
           {entry.message}
         </p>
@@ -146,12 +146,12 @@ function FeedEntryRow({ entry, isLast }: { entry: FeedEntry; isLast: boolean }) 
               </span>
             )}
             {entry.metadata.confidence !== undefined && (
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-white/30 font-mono">
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-50 text-slate-400 font-mono">
                 {Math.round((entry.metadata.confidence as number) * 100)}%
               </span>
             )}
             {entry.metadata.durationMs !== undefined && (
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-white/30 font-mono">
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-50 text-slate-400 font-mono">
                 {String(entry.metadata.durationMs)}ms
               </span>
             )}
@@ -173,9 +173,9 @@ function FeedEntryRow({ entry, isLast }: { entry: FeedEntry; isLast: boolean }) 
 
 function StatsBar({ stats, status }: { stats: CollaborationSession['stats']; status: string }) {
   return (
-    <div className="flex items-center gap-4 px-4 py-2 border-b border-white/5 text-[11px] font-mono text-white/30">
-      <span className={`flex items-center gap-1 ${status === 'active' ? 'text-green-400' : status === 'failed' ? 'text-red-400' : 'text-white/40'}`}>
-        <span className={`w-1.5 h-1.5 rounded-full ${status === 'active' ? 'bg-green-400 animate-pulse' : status === 'failed' ? 'bg-red-400' : 'bg-white/20'}`} />
+    <div className="flex items-center gap-4 px-4 py-2 border-b border-slate-100 text-[11px] font-mono text-slate-400">
+      <span className={`flex items-center gap-1 ${status === 'active' ? 'text-green-400' : status === 'failed' ? 'text-red-400' : 'text-slate-400'}`}>
+        <span className={`w-1.5 h-1.5 rounded-full ${status === 'active' ? 'bg-green-400 animate-pulse' : status === 'failed' ? 'bg-red-400' : 'bg-slate-100'}`} />
         {status.toUpperCase()}
       </span>
       <span>{stats.totalEntries} events</span>
@@ -266,11 +266,11 @@ export function CollaborationFeed({
     return (
       <div className={`wireframe-card rounded-xl ${compact ? 'p-3' : 'p-6'}`}>
         <div className="text-center py-8">
-          <div className="w-12 h-12 mx-auto mb-4 rounded-xl bg-white/5 flex items-center justify-center">
-            <span className="text-white/20 text-lg">{'{ }'}</span>
+          <div className="w-12 h-12 mx-auto mb-4 rounded-xl bg-slate-50 flex items-center justify-center">
+            <span className="text-slate-300 text-lg">{'{ }'}</span>
           </div>
-          <p className="text-sm text-white/30">No active collaboration session</p>
-          <p className="text-xs text-white/15 mt-1">Agent activity will appear here when tasks are executing</p>
+          <p className="text-sm text-slate-400">No active collaboration session</p>
+          <p className="text-xs text-slate-300 mt-1">Agent activity will appear here when tasks are executing</p>
         </div>
       </div>
     );
@@ -279,14 +279,14 @@ export function CollaborationFeed({
   return (
     <div className="wireframe-card rounded-xl overflow-hidden flex flex-col" style={{ maxHeight }}>
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
         <div className="flex items-center gap-2">
           <div className="w-6 h-6 rounded-md bg-gold/10 flex items-center justify-center">
             <span className="text-gold text-[10px] font-bold">CF</span>
           </div>
           <div>
-            <h3 className="text-sm font-medium text-white/80">Agent Viewport</h3>
-            <p className="text-[10px] text-white/30">{session.projectLabel}</p>
+            <h3 className="text-sm font-medium text-slate-700">Agent Viewport</h3>
+            <p className="text-[10px] text-slate-400">{session.projectLabel}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -294,7 +294,7 @@ export function CollaborationFeed({
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value as AgentRole | 'all')}
-            className="text-[10px] bg-white/5 border border-white/10 rounded px-1.5 py-1 text-white/50 outline-none"
+            className="text-[10px] bg-slate-50 border border-slate-200 rounded px-1.5 py-1 text-slate-500 outline-none"
           >
             <option value="all">All Agents</option>
             <option value="acheevy">ACHEEVY</option>
@@ -304,7 +304,7 @@ export function CollaborationFeed({
             <option value="verifier">Verifiers</option>
           </select>
           {onClose && (
-            <button onClick={onClose} className="text-white/30 hover:text-white/60 transition-colors text-lg leading-none">&times;</button>
+            <button onClick={onClose} className="text-slate-400 hover:text-slate-500 transition-colors text-lg leading-none">&times;</button>
           )}
         </div>
       </div>
@@ -327,7 +327,7 @@ export function CollaborationFeed({
       </div>
 
       {/* Footer */}
-      <div className="px-4 py-2 border-t border-white/5 text-[10px] text-white/20 flex justify-between">
+      <div className="px-4 py-2 border-t border-slate-100 text-[10px] text-slate-300 flex justify-between">
         <span>{filteredFeed.length} / {session.feed.length} entries</span>
         <span>Session: {session.sessionId}</span>
       </div>
@@ -354,7 +354,7 @@ export function CollaborationSidebar({
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: 400, opacity: 0 }}
           transition={{ type: 'spring', damping: 25 }}
-          className="fixed right-0 top-0 h-full w-[380px] z-50 bg-[#0A0A0A]/95 backdrop-blur-xl border-l border-white/5 shadow-2xl"
+          className="fixed right-0 top-0 h-full w-[380px] z-50 bg-white/95 backdrop-blur-xl border-l border-slate-100 shadow-2xl"
         >
           <CollaborationFeed
             session={session}

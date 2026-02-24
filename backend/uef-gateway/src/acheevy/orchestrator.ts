@@ -23,6 +23,29 @@ import { getMemoryEngine } from '../memory';
 import type { ExecutionOutcome } from '../memory';
 import { agentChat } from '../llm';
 import logger from '../logger';
+import { liveSim } from '../livesim';
+import { dispatchChickenHawkBuild } from '../agents/cloudrun-dispatcher';
+import { getFactoryController } from '../factory/controller';
+import type { FactoryEvent, FactoryEventSource } from '../factory/types';
+
+// NtNtN Engine: loaded at runtime to avoid tsconfig rootDir compilation issues
+let _ntntnEngine: any = null;
+function getNtNtN(): { detectBuildIntent: (msg: string) => boolean; classifyBuildIntent: (msg: string) => any[]; detectScopeTier: (msg: string) => string; AIMS_DEFAULT_STACK: Record<string, string> } {
+  if (!_ntntnEngine) {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      _ntntnEngine = require('../../../../aims-skills/ntntn-engine');
+    } catch {
+      _ntntnEngine = {
+        detectBuildIntent: () => false,
+        classifyBuildIntent: () => [],
+        detectScopeTier: () => 'page',
+        AIMS_DEFAULT_STACK: { framework: 'Next.js 16', styling: 'Tailwind CSS v4', animation: 'Motion v12', ui_components: 'shadcn/ui', deployment: 'Docker Compose' },
+      };
+    }
+  }
+  return _ntntnEngine;
+}
 
 // Vertical definitions: pure data (no gateway imports), loaded at runtime
 // to avoid tsconfig rootDir compilation issues with cross-boundary imports.
@@ -134,6 +157,23 @@ async function dispatchToChickenHawk(manifest: ChickenHawkManifest): Promise<{
   shiftId: string;
   result: any;
 }> {
+  // Try Cloud Run first (GCP sandboxed environment)
+  try {
+    const crResult = await dispatchChickenHawkBuild(manifest.manifest_id);
+    if ('dispatched' in crResult && crResult.dispatched) {
+      logger.info({ manifestId: manifest.manifest_id, mode: crResult.mode }, '[ACHEEVY] Build dispatched to Cloud Run');
+      return {
+        dispatched: true,
+        manifestId: manifest.manifest_id,
+        shiftId: manifest.shift_id,
+        result: { cloudRun: crResult },
+      };
+    }
+  } catch (crErr) {
+    logger.warn({ err: crErr instanceof Error ? crErr.message : crErr }, '[ACHEEVY] Cloud Run dispatch failed, falling back to local Chicken Hawk');
+  }
+
+  // Fallback: local Chicken Hawk container
   const res = await fetch(`${CHICKENHAWK_URL}/api/manifest`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -222,7 +262,9 @@ export class AcheevyOrchestrator {
 
       let routeResponse: AcheevyExecuteResponse | null = null;
 
-      if (routedTo.startsWith('plug-factory:')) {
+      if (routedTo === 'build:ntntn' || (routedTo === 'BUILD_PLUG' && getNtNtN().detectBuildIntent(req.message))) {
+        routeResponse = await this.handleNtNtNBuild(requestId, req);
+      } else if (routedTo.startsWith('plug-factory:')) {
         routeResponse = await this.handlePlugFabrication(requestId, req);
       } else if (routedTo === 'perform-stack') {
         routeResponse = await this.handlePerformStack(requestId, req);
@@ -236,6 +278,8 @@ export class AcheevyOrchestrator {
         routeResponse = await this.handleDeploymentHub(requestId, req);
       } else if (routedTo.startsWith('paas_')) {
         routeResponse = await this.handlePaaSOperations(requestId, req);
+      } else if (routedTo === 'manage_it' || routedTo.startsWith('factory:')) {
+        routeResponse = await this.handleFactoryController(requestId, req);
       }
 
       if (routeResponse) {
@@ -554,6 +598,17 @@ export class AcheevyOrchestrator {
         };
       }
 
+      // Fire-and-forget: also trigger n8n workflow for this vertical (Phase B automation)
+      triggerVerticalWorkflow({
+        verticalId,
+        userId: req.userId,
+        collectedData: collectedData as Record<string, unknown>,
+        sessionId: req.conversationId || requestId,
+        requestId,
+      }).catch(err => {
+        logger.warn({ err: err instanceof Error ? err.message : err, verticalId }, '[ACHEEVY] n8n vertical workflow trigger failed (non-blocking)');
+      });
+
       return {
         requestId,
         status: 'streaming',
@@ -702,6 +757,312 @@ export class AcheevyOrchestrator {
       },
       lucUsage: { service: 'spawn_shift', amount: 1 },
     };
+  }
+
+  /**
+   * Factory Controller: Always-on orchestration via FDH pipeline.
+   * Handles "Manage It" requests and factory:* intents.
+   * Creates FDH manifests, auto-approves or gates for human approval.
+   */
+  private async handleFactoryController(
+    requestId: string,
+    req: AcheevyExecuteRequest,
+  ): Promise<AcheevyExecuteResponse> {
+    const factory = getFactoryController();
+    const intent = req.intent;
+
+    // Factory status report
+    if (intent === 'factory:status') {
+      const status = factory.getStatus();
+      return {
+        requestId,
+        status: 'completed',
+        reply: [
+          `**Factory Controller:** ${status.status}`,
+          `Active FDH runs: ${status.activeFdhRuns}`,
+          `Pending approvals: ${status.pendingApprovals}`,
+          `Active chambers: ${status.activeChambers}`,
+          `Period cost: $${status.periodCost.totalUsd.toFixed(2)} / $${status.periodCost.budgetCapUsd.toFixed(2)} (${status.periodCost.utilizationPct.toFixed(0)}%)`,
+          status.recentCompletions.length > 0
+            ? `\nRecent completions:\n${status.recentCompletions.map(c => `- ${c.scope} (ORACLE: ${c.oracleScore}/8)`).join('\n')}`
+            : '',
+        ].filter(Boolean).join('\n'),
+        data: { factoryStatus: status },
+      };
+    }
+
+    // Approve a pending run
+    if (intent === 'factory:approve' && req.context?.runId) {
+      try {
+        const run = await factory.approveRun(req.context.runId as string);
+        return {
+          requestId,
+          status: 'completed',
+          reply: `FDH run approved and executing. Status: ${run.status}. ORACLE score: ${run.phaseResults.hone?.oracleScore ?? 'pending'}/8.`,
+          data: { fdhRun: { id: run.id, status: run.status } },
+          lucUsage: { service: 'factory_run', amount: run.lucActual.totalTokens },
+        };
+      } catch (err: any) {
+        return { requestId, status: 'error', reply: `Approval failed: ${err.message}`, error: err.message };
+      }
+    }
+
+    // Pause/resume factory
+    if (intent === 'factory:pause') {
+      factory.pause();
+      return { requestId, status: 'completed', reply: 'Factory controller paused. No new events will be processed until resumed.' };
+    }
+    if (intent === 'factory:resume') {
+      factory.resume();
+      return { requestId, status: 'completed', reply: 'Factory controller resumed. Processing events.' };
+    }
+
+    // Default: "Manage It" — create an FDH run from user request
+    const event: FactoryEvent = {
+      id: `evt_${requestId}`,
+      source: (req.context?.eventSource as FactoryEventSource) || 'user',
+      type: intent === 'manage_it' ? 'manage_it' : 'factory_request',
+      payload: {
+        message: req.message,
+        scope: req.context?.scope || req.message,
+        context: req.context || {},
+      },
+      chamberId: req.context?.chamberId as string,
+      userId: req.userId,
+      timestamp: new Date().toISOString(),
+      priority: (req.context?.priority as FactoryEvent['priority']) || 'normal',
+    };
+
+    try {
+      const result = await factory.ingestEvent(event);
+
+      if (!result.accepted) {
+        return {
+          requestId,
+          status: 'completed',
+          reply: `Factory controller: ${result.reason}`,
+          data: { factoryResult: result },
+        };
+      }
+
+      if (result.awaitingApproval) {
+        const run = factory.getRun(result.runId!);
+        return {
+          requestId,
+          status: 'completed',
+          reply: [
+            `I've created an execution plan for this. Here's the summary:`,
+            ``,
+            `**Scope:** ${run.manifest.scope}`,
+            `**Estimated cost:** $${run.manifest.lucEstimate.totalUsd.toFixed(2)}`,
+            `**Pipeline:** Foster → Develop → Hone (${run.manifest.plan.develop.steps.length} build steps)`,
+            `**Agents:** ${[...run.manifest.plan.foster.agents, ...run.manifest.plan.develop.agents].join(', ')}`,
+            ``,
+            `Approve to proceed, or adjust the scope.`,
+          ].join('\n'),
+          data: {
+            factoryResult: result,
+            fdhManifest: run.manifest,
+            awaiting: 'fdh_approval',
+            glass_box_event: 'APPROVAL_REQUESTED',
+          },
+          lucUsage: { service: 'factory_run', amount: 0 },
+          taskId: result.runId,
+        };
+      }
+
+      // Auto-approved — running
+      const run = factory.getRun(result.runId!);
+      const oracleScore = run.phaseResults.hone?.oracleScore;
+
+      return {
+        requestId,
+        status: run.status === 'completed' ? 'completed' : 'dispatched',
+        reply: run.status === 'completed'
+          ? [
+              `Done. The team executed and verified your request.`,
+              ``,
+              `**ORACLE Score:** ${oracleScore}/8`,
+              `**LUC Cost:** $${run.lucActual.totalUsd.toFixed(2)}`,
+              `**Receipt:** ${run.receipt?.receiptId || 'sealed'}`,
+              ``,
+              `${run.phaseResults.develop?.artifacts.length || 0} artifacts produced across ${run.phaseResults.develop?.wavesCompleted || 0} waves.`,
+            ].join('\n')
+          : `Task accepted — ACHEEVY is managing it. Status: ${run.status}. You'll be notified at key milestones.`,
+        data: {
+          factoryResult: result,
+          fdhRun: { id: run.id, status: run.status, oracleScore },
+          glass_box_event: run.status === 'completed' ? 'DELIVERABLE_READY' : 'PHASE_CHANGE',
+        },
+        lucUsage: { service: 'factory_run', amount: run.lucActual.totalTokens },
+        taskId: result.runId,
+      };
+    } catch (err: any) {
+      logger.error({ err, requestId }, '[ACHEEVY] Factory Controller error');
+      return {
+        requestId,
+        status: 'error',
+        reply: `Factory controller error: ${err.message}`,
+        error: err.message,
+      };
+    }
+  }
+
+  /**
+   * NtNtN Build Pipeline: Detect creative build intent → classify stack → dispatch to Chicken Hawk
+   * → deploy result as a Plug instance.
+   *
+   * Flow: User describes → NtNtN classifies → Picker_Ang selects stack → Buildsmith constructs
+   * → Chicken Hawk verifies → ACHEEVY deploys as running Plug instance.
+   */
+  private async handleNtNtNBuild(
+    requestId: string,
+    req: AcheevyExecuteRequest
+  ): Promise<AcheevyExecuteResponse> {
+    const message = req.message;
+
+    // 1. NtNtN Classification: detect categories and techniques
+    const ntntn = getNtNtN();
+    const classifications = ntntn.classifyBuildIntent(message);
+    const scopeTier = ntntn.detectScopeTier(message);
+    const primaryCategory = classifications[0]?.category || 'frontend_frameworks';
+    const primaryAgent = classifications[0]?.primary_boomer_ang || 'Picker_Ang';
+    const techniques = classifications
+      .filter((c: any) => c.technique_group)
+      .map((c: any) => c.technique_group!);
+
+    logger.info(
+      { requestId, scopeTier, primaryCategory, primaryAgent, techniques, matches: classifications.length },
+      '[ACHEEVY] NtNtN build intent classified'
+    );
+
+    // 2. Emit LiveSim event for real-time feed
+    liveSim.emitAgentActivity('ACHEEVY', 'ntntn_classify', `Build intent detected: ${scopeTier} scope, ${primaryCategory} category`, {
+      classifications: classifications.map((c: any) => ({ category: c.category, agent: c.primary_boomer_ang })),
+      scopeTier,
+    });
+
+    // 3. Build stack recommendation
+    const stack: Record<string, string> = {
+      ...ntntn.AIMS_DEFAULT_STACK,
+      ...(primaryCategory === '3d_visual' ? { animation: 'Three.js + React Three Fiber' } : {}),
+      ...(primaryCategory === 'animation_motion' ? { animation: 'Motion v12 + GSAP' } : {}),
+    };
+
+    // 4. Build Chicken Hawk manifest for the build
+    const buildSteps = this.generateBuildSteps(scopeTier, primaryCategory, techniques, message);
+
+    liveSim.emitAgentActivity(primaryAgent, 'stack_select', `Selected stack: ${stack.framework} + ${stack.styling} + ${stack.animation}`, {
+      stack,
+      steps: buildSteps.length,
+    });
+
+    // 5. Dispatch to Chicken Hawk
+    try {
+      const manifest = buildManifest(requestId, 'fullstack', message, req.userId, {
+        ntntn: true,
+        scopeTier,
+        primaryCategory,
+        stack,
+        techniques,
+      });
+
+      const chResult = await dispatchToChickenHawk(manifest);
+
+      liveSim.emitAgentActivity('Chicken Hawk', 'build_dispatched', `Build manifest dispatched: ${chResult.manifestId}`, {
+        manifestId: chResult.manifestId,
+        shiftId: chResult.shiftId,
+      });
+
+      return {
+        requestId,
+        status: 'dispatched',
+        reply: `Build request classified and dispatched.\n\n` +
+          `**Scope:** ${scopeTier} | **Category:** ${primaryCategory.replace(/_/g, ' ')}\n` +
+          `**Stack:** ${stack.framework}, ${stack.styling}, ${stack.animation}\n` +
+          `**Steps:** ${buildSteps.length} build phases planned\n` +
+          `**Shift ID:** ${chResult.shiftId}\n\n` +
+          `${primaryAgent} selected the stack. Chicken Hawk is executing the build. ` +
+          `Track progress in Deploy Dock or the LiveSim feed.`,
+        data: {
+          ntntn: { scopeTier, primaryCategory, stack, techniques },
+          chickenhawk: chResult,
+          buildSteps,
+        },
+        lucUsage: { service: 'container_hours', amount: scopeTier === 'platform' ? 3 : scopeTier === 'application' ? 2 : 1 },
+        taskId: chResult.manifestId,
+      };
+    } catch (err) {
+      // Chicken Hawk offline — return build plan as reference
+      logger.warn({ requestId, err }, '[ACHEEVY] NtNtN: Chicken Hawk offline, returning build plan');
+
+      return {
+        requestId,
+        status: 'completed',
+        reply: `I've analyzed your build request and prepared a plan.\n\n` +
+          `**Scope:** ${scopeTier} | **Category:** ${primaryCategory.replace(/_/g, ' ')}\n` +
+          `**Recommended Stack:**\n` +
+          `- Framework: ${stack.framework}\n` +
+          `- Styling: ${stack.styling}\n` +
+          `- Animation: ${stack.animation}\n` +
+          `- UI: ${stack.ui_components}\n\n` +
+          `**Build Steps:**\n${buildSteps.map((s, i) => `${i + 1}. ${s}`).join('\n')}\n\n` +
+          `Chicken Hawk is currently offline. The build plan is ready — it will execute when the executor comes online.`,
+        data: {
+          ntntn: { scopeTier, primaryCategory, stack, techniques },
+          buildSteps,
+          status: 'plan_ready',
+        },
+      };
+    }
+  }
+
+  /** Generate build steps based on NtNtN classification */
+  private generateBuildSteps(
+    scopeTier: string,
+    category: string,
+    techniques: string[],
+    _message: string
+  ): string[] {
+    const steps: string[] = [];
+
+    // Always: scaffold + configure
+    const defaultStack = getNtNtN().AIMS_DEFAULT_STACK;
+    steps.push(`Scaffold ${scopeTier} project with ${defaultStack.framework}`);
+    steps.push(`Configure styling with ${defaultStack.styling}`);
+
+    // Category-specific steps
+    if (category === 'animation_motion' || techniques.length > 0) {
+      steps.push(`Implement animation layer: ${techniques.join(', ') || 'micro interactions'}`);
+    }
+    if (category === '3d_visual') {
+      steps.push('Set up Three.js scene with React Three Fiber');
+      steps.push('Add lighting, materials, and camera controls');
+    }
+    if (category === 'backend_fullstack') {
+      steps.push('Generate API routes and data models');
+      steps.push('Wire authentication and session management');
+    }
+    if (category === 'scroll_interaction') {
+      steps.push('Implement scroll-driven animations and viewport reveals');
+    }
+
+    // Common steps based on scope
+    if (scopeTier === 'application' || scopeTier === 'platform') {
+      steps.push('Build component library with shadcn/ui');
+      steps.push('Implement responsive layouts and mobile breakpoints');
+    }
+    if (scopeTier === 'platform') {
+      steps.push('Set up multi-tenant data isolation');
+      steps.push('Configure admin dashboard and monitoring');
+    }
+
+    // Always: verify and deploy
+    steps.push('Run ORACLE 8-gate verification');
+    steps.push('Generate Docker Compose for deployment');
+    steps.push('Deploy as Plug instance on AIMS VPS');
+
+    return steps;
   }
 
   /**

@@ -28,7 +28,7 @@ export default function MomentStudioPage() {
             <BookOpen size={20} />
           </div>
           <div>
-            <h1 className="text-2xl font-display text-white tracking-tight">
+            <h1 className="text-2xl font-display text-slate-800 tracking-tight">
               Moment Studio
             </h1>
             <p className="text-xs text-violet-400/60 font-mono">
@@ -36,7 +36,7 @@ export default function MomentStudioPage() {
             </p>
           </div>
         </div>
-        <p className="text-sm text-white/40 max-w-lg">
+        <p className="text-sm text-slate-400 max-w-lg">
           Speak a quick recap of your day. Story_Ang turns it into a private
           audio diary with chapter titles and gentle reflections. Your stories,
           your space.
@@ -54,14 +54,14 @@ export default function MomentStudioPage() {
         >
           <Mic size={32} />
         </button>
-        <p className="text-sm text-white/40">
+        <p className="text-sm text-slate-400">
           &quot;Here&apos;s what happened today...&quot;
         </p>
       </motion.div>
 
       {/* Starters */}
       <motion.div variants={staggerItem} className="space-y-3">
-        <p className="text-xs text-white/20 font-mono uppercase tracking-widest">
+        <p className="text-xs text-slate-300 font-mono uppercase tracking-widest">
           Or start with a prompt
         </p>
         <div className="grid gap-2 md:grid-cols-2">
@@ -74,7 +74,7 @@ export default function MomentStudioPage() {
             <button
               key={s}
               type="button"
-              className="text-left px-4 py-3 rounded-xl border border-white/5 bg-white/[0.02] text-sm text-white/50 hover:text-violet-400 hover:border-violet-400/20 transition-colors"
+              className="text-left px-4 py-3 rounded-xl border border-slate-100 bg-white text-sm text-slate-500 hover:text-violet-400 hover:border-violet-400/20 transition-colors"
             >
               &quot;{s}&quot;
             </button>
@@ -91,13 +91,13 @@ export default function MomentStudioPage() {
           <h2 className="text-xs uppercase tracking-widest text-violet-400/50 font-mono">
             Sample Entry — Feb 14, 2026
           </h2>
-          <span className="text-[0.55rem] font-mono text-white/20">
+          <span className="text-[0.55rem] font-mono text-slate-300">
             7:15 total
           </span>
         </div>
 
         {/* Audio player */}
-        <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5">
+        <div className="p-4 rounded-xl bg-white border border-slate-100">
           <div className="flex items-center gap-3">
             <button
               type="button"
@@ -106,14 +106,14 @@ export default function MomentStudioPage() {
               <Play size={16} />
             </button>
             <div className="flex-1">
-              <div className="h-2 rounded-full bg-white/5 overflow-hidden">
+              <div className="h-2 rounded-full bg-slate-50 overflow-hidden">
                 <div className="h-full w-[48%] rounded-full bg-gradient-to-r from-violet-400/60 to-violet-400" />
               </div>
               <div className="flex justify-between mt-1">
-                <span className="text-[0.5rem] font-mono text-white/30">
+                <span className="text-[0.5rem] font-mono text-slate-400">
                   3:42
                 </span>
-                <span className="text-[0.5rem] font-mono text-white/30">
+                <span className="text-[0.5rem] font-mono text-slate-400">
                   7:15
                 </span>
               </div>
@@ -123,7 +123,7 @@ export default function MomentStudioPage() {
 
         {/* Chapters */}
         <div className="space-y-1">
-          <p className="text-[0.6rem] font-mono uppercase tracking-widest text-white/20 mb-2">
+          <p className="text-[0.6rem] font-mono uppercase tracking-widest text-slate-300 mb-2">
             Chapters
           </p>
           {[
@@ -134,13 +134,13 @@ export default function MomentStudioPage() {
             <button
               key={ch.time}
               type="button"
-              className="flex items-center gap-3 w-full text-left px-3 py-2 rounded-lg hover:bg-white/[0.03] transition-colors"
+              className="flex items-center gap-3 w-full text-left px-3 py-2 rounded-lg hover:bg-white transition-colors"
             >
               <span className="text-[0.55rem] font-mono text-violet-400/60 w-8">
                 {ch.time}
               </span>
-              <span className="text-xs text-white/60">{ch.title}</span>
-              <span className="text-[0.55rem] text-white/25">
+              <span className="text-xs text-slate-500">{ch.title}</span>
+              <span className="text-[0.55rem] text-slate-400">
                 — &quot;{ch.subtitle}&quot;
               </span>
             </button>
@@ -152,7 +152,7 @@ export default function MomentStudioPage() {
           <p className="text-[0.55rem] text-violet-400/60 font-mono uppercase mb-2">
             Story_Ang Reflections
           </p>
-          <p className="text-xs text-white/50 italic leading-relaxed">
+          <p className="text-xs text-slate-500 italic leading-relaxed">
             &quot;Today had an undercurrent of anticipation. The morning
             surprise set the tone — a reminder that good things arrive without
             announcement. The call at midday shifted everything sideways, but
@@ -172,14 +172,14 @@ export default function MomentStudioPage() {
           </button>
           <button
             type="button"
-            className="flex items-center gap-2 px-4 py-2 rounded-xl border border-white/10 text-xs text-white/40 hover:text-white hover:border-white/20 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 text-xs text-slate-400 hover:text-slate-800 hover:border-slate-200 transition-colors"
           >
             <Share2 size={12} />
             Share with Someone
           </button>
           <button
             type="button"
-            className="flex items-center gap-2 px-4 py-2 rounded-xl border border-white/10 text-xs text-white/40 hover:text-white hover:border-white/20 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 text-xs text-slate-400 hover:text-slate-800 hover:border-slate-200 transition-colors"
           >
             <RotateCcw size={12} />
             Redo

@@ -123,12 +123,12 @@ export default function WarRoomPage() {
     }
 
     return (
-        <div className="min-h-screen bg-[#0a0a0a] text-white pb-24">
+        <div className="min-h-screen bg-white text-slate-800 pb-24">
 
             {/* ── NAV ─────────────────────────────────────────────────────── */}
-            <nav className="sticky top-0 z-50 border-b border-white/5 bg-[#0a0a0a]/95 backdrop-blur-xl h-14 flex items-center">
+            <nav className="sticky top-0 z-50 border-b border-slate-100 bg-white/95 backdrop-blur-xl h-14 flex items-center">
                 <div className="max-w-[1400px] mx-auto px-6 w-full flex items-center justify-between">
-                    <Link href="/sandbox/perform" className="flex items-center gap-2 text-[0.65rem] text-white/30 hover:text-white transition-colors font-mono uppercase tracking-widest">
+                    <Link href="/sandbox/perform" className="flex items-center gap-2 text-[0.65rem] text-slate-400 hover:text-slate-800 transition-colors font-mono uppercase tracking-widest">
                         <ArrowLeft size={13} /> Per|Form
                     </Link>
                     <div className="flex items-center gap-3">
@@ -139,7 +139,7 @@ export default function WarRoomPage() {
             </nav>
 
             {/* ── HERO BANNER ─────────────────────────────────────────────── */}
-            <section className="relative overflow-hidden border-b border-white/5">
+            <section className="relative overflow-hidden border-b border-slate-100">
                 <div className="absolute inset-0 bg-gradient-to-br from-red-900/10 via-transparent to-blue-900/10" />
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(220,38,38,0.05)_0%,transparent_70%)]" />
 
@@ -153,12 +153,12 @@ export default function WarRoomPage() {
                             <Swords size={24} className="text-red-400" />
                             <span className="text-[0.65rem] font-mono tracking-[0.4em] uppercase text-red-400/70">Adversarial Analysis Engine</span>
                         </div>
-                        <h1 className="text-5xl md:text-6xl font-black tracking-tighter text-white">
+                        <h1 className="text-5xl md:text-6xl font-black tracking-tighter text-slate-800">
                             The War Room
                         </h1>
-                        <p className="text-lg text-white/50 leading-relaxed">
+                        <p className="text-lg text-slate-500 leading-relaxed">
                             Every prospect argued from both sides. Bull vs Bear. Raw takes, real grades.
-                            <span className="text-white/70"> Chicken Hawk mediates. ACHEEVY delivers the verdict.</span>
+                            <span className="text-slate-600"> Chicken Hawk mediates. ACHEEVY delivers the verdict.</span>
                         </p>
 
                         <div className="flex flex-wrap gap-3 pt-2 text-[0.6rem] font-mono uppercase tracking-widest">
@@ -180,14 +180,14 @@ export default function WarRoomPage() {
 
                 {/* ── TOPIC SELECTOR TAB ────────────────────────────────────── */}
                 <div>
-                    <div className="flex gap-1 mb-6 bg-white/[0.03] border border-white/5 rounded-xl p-1 w-fit">
+                    <div className="flex gap-1 mb-6 bg-white border border-slate-100 rounded-xl p-1 w-fit">
                         {([['featured', 'Featured Debates'], ['live', 'Live News'], ['custom', 'Custom Topic']] as const).map(([key, label]) => (
                             <button
                                 key={key}
                                 onClick={() => setActiveTab(key)}
                                 className={`px-5 py-2 rounded-lg text-xs font-mono uppercase tracking-widest transition-all ${activeTab === key
-                                    ? 'bg-white/10 text-white'
-                                    : 'text-white/30 hover:text-white/60'
+                                    ? 'bg-slate-100 text-slate-800'
+                                    : 'text-slate-400 hover:text-slate-500'
                                     }`}
                             >
                                 {label}
@@ -212,7 +212,7 @@ export default function WarRoomPage() {
                                         disabled={loading && activeSeed === i}
                                         className={`group text-left p-5 rounded-2xl border transition-all ${activeSeed === i
                                             ? 'border-gold/40 bg-gold/5 shadow-[0_0_20px_rgba(212,175,55,0.1)]'
-                                            : 'border-white/[0.06] bg-[#0f0f0f] hover:border-red-500/30 hover:bg-red-500/5'
+                                            : 'border-slate-200 bg-white hover:border-red-500/30 hover:bg-red-500/5'
                                             }`}
                                     >
                                         <div className="flex items-start gap-3">
@@ -220,8 +220,8 @@ export default function WarRoomPage() {
                                                 <Swords size={14} />
                                             </div>
                                             <div className="flex-1 min-w-0">
-                                                <p className="text-sm font-medium text-white leading-snug">{seed.headline}</p>
-                                                <div className="flex items-center gap-2 mt-2 text-[0.6rem] font-mono uppercase tracking-widest text-white/25">
+                                                <p className="text-sm font-medium text-slate-800 leading-snug">{seed.headline}</p>
+                                                <div className="flex items-center gap-2 mt-2 text-[0.6rem] font-mono uppercase tracking-widest text-slate-400">
                                                     <MessageSquare size={10} />
                                                     {loading && activeSeed === i ? 'Loading debate...' : 'Click to debate'}
                                                 </div>
@@ -242,9 +242,9 @@ export default function WarRoomPage() {
                                 className="space-y-2"
                             >
                                 {newsItems.length === 0 ? (
-                                    <div className="p-12 text-center border border-white/5 rounded-2xl bg-[#0f0f0f]">
-                                        <Radio size={24} className="text-white/20 mx-auto mb-3" />
-                                        <p className="text-sm text-white/30 font-mono">No live news items available. Check back during Combine week.</p>
+                                    <div className="p-12 text-center border border-slate-100 rounded-2xl bg-white">
+                                        <Radio size={24} className="text-slate-300 mx-auto mb-3" />
+                                        <p className="text-sm text-slate-400 font-mono">No live news items available. Check back during Combine week.</p>
                                     </div>
                                 ) : newsItems.map((item, i) => (
                                     <button
@@ -253,17 +253,17 @@ export default function WarRoomPage() {
                                         disabled={loading && activeSeed === 100 + i}
                                         className={`w-full text-left flex items-center gap-4 p-4 rounded-xl border transition-all ${activeSeed === 100 + i
                                             ? 'border-gold/30 bg-gold/5'
-                                            : 'border-white/[0.06] bg-[#0f0f0f] hover:border-red-500/20'
+                                            : 'border-slate-200 bg-white hover:border-red-500/20'
                                             }`}
                                     >
                                         <div className="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center text-red-400 flex-shrink-0">
                                             <Flame size={14} />
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <p className="text-sm text-white truncate">{item.headline}</p>
-                                            <p className="text-[0.6rem] font-mono text-white/25 mt-0.5">{item.source} · Debate this</p>
+                                            <p className="text-sm text-slate-800 truncate">{item.headline}</p>
+                                            <p className="text-[0.6rem] font-mono text-slate-400 mt-0.5">{item.source} · Debate this</p>
                                         </div>
-                                        <ChevronRight size={14} className="text-white/20 flex-shrink-0" />
+                                        <ChevronRight size={14} className="text-slate-300 flex-shrink-0" />
                                     </button>
                                 ))}
                             </motion.div>
@@ -278,14 +278,14 @@ export default function WarRoomPage() {
                                 exit={{ opacity: 0 }}
                                 className="space-y-4"
                             >
-                                <p className="text-xs text-white/40 font-mono">Enter any draft topic, prospect name, or question to trigger a live debate.</p>
+                                <p className="text-xs text-slate-400 font-mono">Enter any draft topic, prospect name, or question to trigger a live debate.</p>
                                 <div className="flex gap-3">
                                     <input
                                         value={customTopic}
                                         onChange={e => setCustomTopic(e.target.value)}
                                         onKeyDown={e => e.key === 'Enter' && triggerCustomDebate()}
                                         placeholder="e.g. 'Is Abdul Carter worth a top-3 pick?'"
-                                        className="flex-1 bg-[#0f0f0f] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-gold/40 font-mono"
+                                        className="flex-1 bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 placeholder:text-slate-300 focus:outline-none focus:border-gold/40 font-mono"
                                     />
                                     <button
                                         onClick={triggerCustomDebate}
@@ -315,7 +315,7 @@ export default function WarRoomPage() {
                                     <Swords size={20} className="text-red-400" />
                                 </div>
                             </div>
-                            <p className="text-sm text-white/40 font-mono">Activating analysts...</p>
+                            <p className="text-sm text-slate-400 font-mono">Activating analysts...</p>
                         </motion.div>
                     )}
 
@@ -329,15 +329,15 @@ export default function WarRoomPage() {
                             {/* Topic header */}
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-[0.6rem] font-mono uppercase tracking-[0.3em] text-white/30 mb-1">Active Debate</p>
-                                    <h3 className="text-xl font-bold text-white">{debate.debate.topic}</h3>
+                                    <p className="text-[0.6rem] font-mono uppercase tracking-[0.3em] text-slate-400 mb-1">Active Debate</p>
+                                    <h3 className="text-xl font-bold text-slate-800">{debate.debate.topic}</h3>
                                 </div>
                                 <button
                                     onClick={() => {
                                         const seed = DEBATE_SEEDS[activeSeed as number];
                                         if (seed) triggerDebate(seed, activeSeed as number);
                                     }}
-                                    className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white/50 text-xs font-mono hover:text-white transition-colors"
+                                    className="flex items-center gap-2 px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-500 text-xs font-mono hover:text-slate-800 transition-colors"
                                 >
                                     <RefreshCw size={12} /> Regenerate
                                 </button>
@@ -346,7 +346,7 @@ export default function WarRoomPage() {
                             {/* Bull vs Bear */}
                             <div className="grid md:grid-cols-2 gap-4">
                                 {/* BULL */}
-                                <div className="relative rounded-2xl bg-gradient-to-b from-red-950/40 to-[#0f0f0f] border border-red-500/30 overflow-hidden p-6">
+                                <div className="relative rounded-2xl bg-gradient-to-b from-red-50 to-white border border-red-500/30 overflow-hidden p-6">
                                     <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-red-500 to-transparent" />
                                     <div className="flex items-center gap-3 mb-4">
                                         <div className="w-8 h-8 rounded-lg bg-red-500/20 border border-red-500/30 flex items-center justify-center">
@@ -354,17 +354,17 @@ export default function WarRoomPage() {
                                         </div>
                                         <div>
                                             <p className="text-xs font-black uppercase tracking-widest text-red-400">{debate.debate.bull.analyst}</p>
-                                            <p className="text-[0.55rem] font-mono text-white/30 uppercase">{debate.debate.bull.angId} · The Bull Case</p>
+                                            <p className="text-[0.55rem] font-mono text-slate-400 uppercase">{debate.debate.bull.angId} · The Bull Case</p>
                                         </div>
                                         <div className="ml-auto w-2 h-2 rounded-full bg-red-500 animate-pulse" />
                                     </div>
-                                    <blockquote className="text-base text-white/80 leading-relaxed italic font-serif">
+                                    <blockquote className="text-base text-slate-700 leading-relaxed italic font-serif">
                                         &ldquo;{debate.debate.bull.take}&rdquo;
                                     </blockquote>
                                 </div>
 
                                 {/* BEAR */}
-                                <div className="relative rounded-2xl bg-gradient-to-b from-blue-950/40 to-[#0f0f0f] border border-blue-500/30 overflow-hidden p-6">
+                                <div className="relative rounded-2xl bg-gradient-to-b from-blue-50 to-white border border-blue-500/30 overflow-hidden p-6">
                                     <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-blue-500 to-transparent" />
                                     <div className="flex items-center gap-3 mb-4">
                                         <div className="w-8 h-8 rounded-lg bg-blue-500/20 border border-blue-500/30 flex items-center justify-center">
@@ -372,11 +372,11 @@ export default function WarRoomPage() {
                                         </div>
                                         <div>
                                             <p className="text-xs font-black uppercase tracking-widest text-blue-400">{debate.debate.bear.analyst}</p>
-                                            <p className="text-[0.55rem] font-mono text-white/30 uppercase">{debate.debate.bear.angId} · The Bear Case</p>
+                                            <p className="text-[0.55rem] font-mono text-slate-400 uppercase">{debate.debate.bear.angId} · The Bear Case</p>
                                         </div>
                                         <div className="ml-auto w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
                                     </div>
-                                    <blockquote className="text-base text-white/80 leading-relaxed italic font-serif">
+                                    <blockquote className="text-base text-slate-700 leading-relaxed italic font-serif">
                                         &ldquo;{debate.debate.bear.take}&rdquo;
                                     </blockquote>
                                 </div>
@@ -392,14 +392,14 @@ export default function WarRoomPage() {
                                         </div>
                                         <div>
                                             <p className="text-xs font-black uppercase tracking-widest text-gold">ACHEEVY</p>
-                                            <p className="text-[0.55rem] font-mono text-white/30 uppercase">Lead Analyst · Final Verdict</p>
+                                            <p className="text-[0.55rem] font-mono text-slate-400 uppercase">Lead Analyst · Final Verdict</p>
                                         </div>
                                         <div className="ml-auto px-2.5 py-1 bg-gold/10 border border-gold/20 rounded-lg text-[0.6rem] font-mono text-gold/70 uppercase tracking-widest">
                                             Mediated by {debate.debate.mediator}
                                         </div>
                                     </div>
-                                    <p className="text-base text-white/80 leading-relaxed">{debate.debate.verdict}</p>
-                                    <p className="text-[0.6rem] font-mono text-white/20 mt-3">
+                                    <p className="text-base text-slate-700 leading-relaxed">{debate.debate.verdict}</p>
+                                    <p className="text-[0.6rem] font-mono text-slate-300 mt-3">
                                         {new Date(debate.debate.timestamp).toLocaleTimeString()} · Per|Form War Room · Powered by A.I.M.S.
                                     </p>
                                 </div>
@@ -439,10 +439,10 @@ export default function WarRoomPage() {
                                 border: 'border-gold/20',
                             },
                         ].map(s => (
-                            <div key={s.step} className={`p-6 rounded-2xl border ${s.border} bg-white/[0.02]`}>
+                            <div key={s.step} className={`p-6 rounded-2xl border ${s.border} bg-white`}>
                                 <span className={`text-3xl font-black ${s.color} opacity-30 block mb-3`}>{s.step}</span>
-                                <h3 className="font-bold text-white mb-2">{s.title}</h3>
-                                <p className="text-sm text-white/40 leading-relaxed">{s.desc}</p>
+                                <h3 className="font-bold text-slate-800 mb-2">{s.title}</h3>
+                                <p className="text-sm text-slate-400 leading-relaxed">{s.desc}</p>
                             </div>
                         ))}
                     </motion.div>

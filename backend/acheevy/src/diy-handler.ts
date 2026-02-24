@@ -1,11 +1,14 @@
 /**
  * DIY Handler — Voice + Vision mode for hands-on projects
- * Processes user messages with optional image analysis via Google Vision
+ * Processes user messages with optional image analysis via Google Vision.
+ *
+ * Sessions are persisted to Redis with 24h TTL.
  */
 
 import { processVisionRequest } from './vision/google-vision';
 import { ttsClient } from './tts-client';
 import type { VisionGuidanceResponse } from './vision/types';
+import { redisGet, redisSet } from './redis';
 
 // ─────────────────────────────────────────────────────────────
 // Types
@@ -28,7 +31,7 @@ export interface DIYResponse {
 }
 
 // ─────────────────────────────────────────────────────────────
-// Session State (in-memory for now)
+// Session State (Redis-backed with in-memory fallback)
 // ─────────────────────────────────────────────────────────────
 
 interface DIYSession {
@@ -38,17 +41,31 @@ interface DIYSession {
   lastImageAnalysis?: VisionGuidanceResponse;
 }
 
-const sessions = new Map<string, DIYSession>();
+const DIY_PREFIX = 'acheevy:diy:';
+const DIY_TTL = 24 * 60 * 60; // 24 hours
 
-function getSession(sessionId: string, projectId: string): DIYSession {
-  if (!sessions.has(sessionId)) {
-    sessions.set(sessionId, {
-      projectId,
-      projectContext: '',
-      messageCount: 0,
-    });
+async function getSession(sessionId: string, projectId: string): Promise<DIYSession> {
+  const key = `${DIY_PREFIX}${sessionId}`;
+  const raw = await redisGet(key);
+
+  if (raw) {
+    try {
+      return JSON.parse(raw) as DIYSession;
+    } catch {
+      // corrupt data, create new
+    }
   }
-  return sessions.get(sessionId)!;
+
+  return {
+    projectId,
+    projectContext: '',
+    messageCount: 0,
+  };
+}
+
+async function saveSession(sessionId: string, session: DIYSession): Promise<void> {
+  const key = `${DIY_PREFIX}${sessionId}`;
+  await redisSet(key, JSON.stringify(session), DIY_TTL);
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -56,7 +73,7 @@ function getSession(sessionId: string, projectId: string): DIYSession {
 // ─────────────────────────────────────────────────────────────
 
 export async function processDIYRequest(request: DIYRequest): Promise<DIYResponse> {
-  const session = getSession(request.sessionId, request.projectId);
+  const session = await getSession(request.sessionId, request.projectId);
   session.messageCount++;
 
   let visionAnalysis: VisionGuidanceResponse | undefined;
@@ -80,7 +97,7 @@ export async function processDIYRequest(request: DIYRequest): Promise<DIYRespons
       reply = visionAnalysis.guidance;
 
       if (visionAnalysis.warnings.length > 0) {
-        reply += '\n\n⚠️ ' + visionAnalysis.warnings.join('\n⚠️ ');
+        reply += '\n\n\u26a0\ufe0f ' + visionAnalysis.warnings.join('\n\u26a0\ufe0f ');
       }
 
       suggestedActions.push(...visionAnalysis.nextSteps);
@@ -101,6 +118,7 @@ export async function processDIYRequest(request: DIYRequest): Promise<DIYRespons
 
   // Update session context
   session.projectContext += ` ${request.message}`;
+  await saveSession(request.sessionId, session);
 
   // Generate TTS audio for voice+vision mode
   let audioUrl: string | undefined;
@@ -132,7 +150,7 @@ function generateTextResponse(message: string, session: DIYSession): string {
 
   // Tool-related questions
   if (lower.includes('tool') || lower.includes('what do i need')) {
-    return "To recommend the right tools, it helps to see your project. Can you show me with the camera? Generally, most DIY projects need:\n\n• Measuring tools (tape measure, level)\n• Fastening tools (screwdriver, drill)\n• Cutting tools appropriate for your material\n• Safety equipment (glasses, gloves)\n\nWhat material are you working with?";
+    return "To recommend the right tools, it helps to see your project. Can you show me with the camera? Generally, most DIY projects need:\n\n\u2022 Measuring tools (tape measure, level)\n\u2022 Fastening tools (screwdriver, drill)\n\u2022 Cutting tools appropriate for your material\n\u2022 Safety equipment (glasses, gloves)\n\nWhat material are you working with?";
   }
 
   // Measurement questions
@@ -142,7 +160,7 @@ function generateTextResponse(message: string, session: DIYSession): string {
 
   // Safety questions
   if (lower.includes('safe') || lower.includes('danger') || lower.includes('careful')) {
-    return "Safety is crucial! Here are key points:\n\n• Always wear safety glasses when cutting or drilling\n• Use gloves when handling rough materials\n• Ensure good ventilation with paints/adhesives\n• Keep your workspace clean and organized\n• Know where your first aid kit is\n• If working with electricity, turn off the breaker first\n\nWhat specific safety concern do you have?";
+    return "Safety is crucial! Here are key points:\n\n\u2022 Always wear safety glasses when cutting or drilling\n\u2022 Use gloves when handling rough materials\n\u2022 Ensure good ventilation with paints/adhesives\n\u2022 Keep your workspace clean and organized\n\u2022 Know where your first aid kit is\n\u2022 If working with electricity, turn off the breaker first\n\nWhat specific safety concern do you have?";
   }
 
   // How-to questions
@@ -152,7 +170,7 @@ function generateTextResponse(message: string, session: DIYSession): string {
 
   // Problem/fix questions
   if (lower.includes('fix') || lower.includes('repair') || lower.includes('broken') || lower.includes('problem')) {
-    return "I can help troubleshoot! Show me the issue with your camera - capture a clear image of the problem area. The more I can see, the better I can diagnose what's going on and suggest a fix.\n\nWhile you get that ready, can you describe:\n• What happened?\n• When did you first notice it?\n• Have you tried anything to fix it already?";
+    return "I can help troubleshoot! Show me the issue with your camera - capture a clear image of the problem area. The more I can see, the better I can diagnose what's going on and suggest a fix.\n\nWhile you get that ready, can you describe:\n\u2022 What happened?\n\u2022 When did you first notice it?\n\u2022 Have you tried anything to fix it already?";
   }
 
   // Reference to previous image
@@ -162,5 +180,5 @@ function generateTextResponse(message: string, session: DIYSession): string {
   }
 
   // Default response
-  return "I'm here to help! For the best guidance:\n\n• Use the camera to show me your project\n• Ask specific questions about steps or techniques\n• Tell me about any problems you're facing\n\nWhat would you like to work on?";
+  return "I'm here to help! For the best guidance:\n\n\u2022 Use the camera to show me your project\n\u2022 Ask specific questions about steps or techniques\n\u2022 Tell me about any problems you're facing\n\nWhat would you like to work on?";
 }

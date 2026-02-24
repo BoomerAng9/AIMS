@@ -50,14 +50,14 @@ function formatCurrency(value: number): string {
 function TrendIcon({ trend }: { trend: string }) {
   if (trend === "UP") return <TrendingUp className="w-4 h-4 text-emerald-400" />;
   if (trend === "DOWN") return <TrendingDown className="w-4 h-4 text-red-400" />;
-  return <Minus className="w-4 h-4 text-white/30" />;
+  return <Minus className="w-4 h-4 text-slate-400" />;
 }
 
 function SkeletonTable() {
   return (
     <div className="space-y-3">
       {Array.from({ length: 8 }).map((_, i) => (
-        <div key={i} className="h-14 rounded-lg bg-white/5 animate-pulse" />
+        <div key={i} className="h-14 rounded-lg bg-slate-50 animate-pulse" />
       ))}
     </div>
   );
@@ -67,10 +67,10 @@ function SkeletonCards() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {Array.from({ length: 6 }).map((_, i) => (
-        <div key={i} className="rounded-xl border border-white/10 bg-black/60 p-5 animate-pulse">
-          <div className="h-4 w-2/3 rounded bg-white/10 mb-3" />
-          <div className="h-3 w-1/2 rounded bg-white/5 mb-2" />
-          <div className="h-6 w-1/3 rounded bg-white/10" />
+        <div key={i} className="rounded-xl border border-slate-200 bg-slate-50/70 p-5 animate-pulse">
+          <div className="h-4 w-2/3 rounded bg-slate-100 mb-3" />
+          <div className="h-3 w-1/2 rounded bg-slate-50 mb-2" />
+          <div className="h-6 w-1/3 rounded bg-slate-100" />
         </div>
       ))}
     </div>
@@ -130,7 +130,7 @@ export default function NilTrackerPage() {
         >
           NIL Rankings &amp; Tracker
         </h1>
-        <p className="mt-2 text-sm md:text-base text-white/50 max-w-xl mx-auto">
+        <p className="mt-2 text-sm md:text-base text-slate-500 max-w-xl mx-auto">
           Comprehensive Name, Image &amp; Likeness data across NCAA D1 football. Team totals, top deals, and player rankings.
         </p>
       </div>
@@ -144,7 +144,7 @@ export default function NilTrackerPage() {
             className={`flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all ${
               activeTab === tab.id
                 ? "bg-gold/15 text-gold border border-gold/30"
-                : "text-white/50 hover:text-white/80 hover:bg-white/5 border border-transparent"
+                : "text-slate-500 hover:text-slate-700 hover:bg-slate-50 border border-transparent"
             }`}
           >
             {tab.icon}
@@ -161,32 +161,32 @@ export default function NilTrackerPage() {
           ) : teamRankings.length === 0 ? (
             <EmptyState message="No team ranking data available." />
           ) : (
-            <div className="rounded-xl border border-white/10 bg-black/60 backdrop-blur-md overflow-hidden">
+            <div className="rounded-xl border border-slate-200 bg-slate-50/70 backdrop-blur-md overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[800px]">
                   <thead>
-                    <tr className="border-b border-white/10">
-                      <th className="p-3 md:p-4 text-left text-xs uppercase tracking-wider text-white/30 w-16">Rank</th>
-                      <th className="p-3 md:p-4 text-left text-xs uppercase tracking-wider text-white/30">Team</th>
-                      <th className="p-3 md:p-4 text-right text-xs uppercase tracking-wider text-white/30">Total NIL</th>
-                      <th className="p-3 md:p-4 text-right text-xs uppercase tracking-wider text-white/30">Avg/Player</th>
-                      <th className="p-3 md:p-4 text-right text-xs uppercase tracking-wider text-white/30">Top Deal</th>
-                      <th className="p-3 md:p-4 text-center text-xs uppercase tracking-wider text-white/30">Deals</th>
-                      <th className="p-3 md:p-4 text-center text-xs uppercase tracking-wider text-white/30 w-16">Trend</th>
+                    <tr className="border-b border-slate-200">
+                      <th className="p-3 md:p-4 text-left text-xs uppercase tracking-wider text-slate-400 w-16">Rank</th>
+                      <th className="p-3 md:p-4 text-left text-xs uppercase tracking-wider text-slate-400">Team</th>
+                      <th className="p-3 md:p-4 text-right text-xs uppercase tracking-wider text-slate-400">Total NIL</th>
+                      <th className="p-3 md:p-4 text-right text-xs uppercase tracking-wider text-slate-400">Avg/Player</th>
+                      <th className="p-3 md:p-4 text-right text-xs uppercase tracking-wider text-slate-400">Top Deal</th>
+                      <th className="p-3 md:p-4 text-center text-xs uppercase tracking-wider text-slate-400">Deals</th>
+                      <th className="p-3 md:p-4 text-center text-xs uppercase tracking-wider text-slate-400 w-16">Trend</th>
                     </tr>
                   </thead>
                   <tbody>
                     {teamRankings.map((team, idx) => (
                       <tr
                         key={team.id}
-                        className="border-t border-white/5 hover:bg-white/[0.02] transition-colors"
+                        className="border-t border-slate-100 hover:bg-white transition-colors"
                       >
                         <td className="p-3 md:p-4">
                           <span
                             className={`inline-flex items-center justify-center w-8 h-8 rounded-full text-xs font-bold ${
                               idx < 3
                                 ? "bg-gold/15 text-gold border border-gold/30"
-                                : "bg-white/5 text-white/50"
+                                : "bg-slate-50 text-slate-500"
                             }`}
                           >
                             {team.rank}
@@ -194,17 +194,17 @@ export default function NilTrackerPage() {
                         </td>
                         <td className="p-3 md:p-4">
                           <div>
-                            <p className="text-sm font-bold text-white">{team.team.commonName}</p>
-                            <p className="text-xs text-white/40">{team.team.schoolName}</p>
+                            <p className="text-sm font-bold text-slate-800">{team.team.commonName}</p>
+                            <p className="text-xs text-slate-400">{team.team.schoolName}</p>
                           </div>
                         </td>
                         <td className="p-3 md:p-4 text-right">
-                          <span className="text-sm font-bold text-white">
+                          <span className="text-sm font-bold text-slate-800">
                             {formatCurrency(team.totalNilValue)}
                           </span>
                         </td>
                         <td className="p-3 md:p-4 text-right">
-                          <span className="text-sm text-white/70">
+                          <span className="text-sm text-slate-600">
                             {formatCurrency(team.avgPerPlayer)}
                           </span>
                         </td>
@@ -214,7 +214,7 @@ export default function NilTrackerPage() {
                           </span>
                         </td>
                         <td className="p-3 md:p-4 text-center">
-                          <span className="text-sm text-white/70">{team.dealCount}</span>
+                          <span className="text-sm text-slate-600">{team.dealCount}</span>
                         </td>
                         <td className="p-3 md:p-4 text-center">
                           <div className="flex items-center justify-center">
@@ -246,15 +246,15 @@ export default function NilTrackerPage() {
                 return (
                   <div
                     key={deal.id}
-                    className="rounded-xl border border-white/10 bg-black/60 backdrop-blur-md p-4 md:p-6 hover:border-white/20 transition-all"
+                    className="rounded-xl border border-slate-200 bg-slate-50/70 backdrop-blur-md p-4 md:p-6 hover:border-slate-200 transition-all"
                   >
                     {/* Header */}
                     <div className="flex items-start justify-between mb-3">
                       <div className="min-w-0 flex-1">
-                        <h3 className="text-base font-bold text-white truncate">{deal.playerName}</h3>
+                        <h3 className="text-base font-bold text-slate-800 truncate">{deal.playerName}</h3>
                         <div className="flex items-center gap-2 mt-0.5">
                           {deal.team && (
-                            <span className="text-xs text-white/40">{deal.team.commonName}</span>
+                            <span className="text-xs text-slate-400">{deal.team.commonName}</span>
                           )}
                           {deal.position && (
                             <span className="text-xs text-gold/60 bg-gold/10 rounded px-1 py-0.5">{deal.position}</span>
@@ -269,25 +269,25 @@ export default function NilTrackerPage() {
                     {/* Brand */}
                     {deal.brandOrCollective && (
                       <div className="mb-3">
-                        <p className="text-xs text-white/40 uppercase tracking-wider">Brand / Collective</p>
-                        <p className="text-sm font-semibold text-white/80">{deal.brandOrCollective}</p>
+                        <p className="text-xs text-slate-400 uppercase tracking-wider">Brand / Collective</p>
+                        <p className="text-sm font-semibold text-slate-700">{deal.brandOrCollective}</p>
                       </div>
                     )}
 
                     {/* Value */}
                     <div className="flex items-baseline gap-2 mb-3">
                       <DollarSign className="w-4 h-4 text-gold" />
-                      <span className="text-2xl font-bold text-white">
+                      <span className="text-2xl font-bold text-slate-800">
                         {deal.estimatedValue ? formatCurrency(deal.estimatedValue) : "Undisclosed"}
                       </span>
                     </div>
 
                     {/* Meta Row */}
-                    <div className="flex items-center justify-between border-t border-white/5 pt-3 text-xs">
+                    <div className="flex items-center justify-between border-t border-slate-100 pt-3 text-xs">
                       <div className="flex items-center gap-3">
                         {deal.duration && (
-                          <span className="text-white/40">
-                            Duration: <span className="text-white/70">{deal.duration}</span>
+                          <span className="text-slate-400">
+                            Duration: <span className="text-slate-600">{deal.duration}</span>
                           </span>
                         )}
                       </div>
@@ -314,41 +314,41 @@ export default function NilTrackerPage() {
           ) : playerRankings.length === 0 ? (
             <EmptyState message="No player ranking data available." />
           ) : (
-            <div className="rounded-xl border border-white/10 bg-black/60 backdrop-blur-md overflow-hidden">
+            <div className="rounded-xl border border-slate-200 bg-slate-50/70 backdrop-blur-md overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[600px]">
                   <thead>
-                    <tr className="border-b border-white/10">
-                      <th className="p-3 md:p-4 text-left text-xs uppercase tracking-wider text-white/30 w-16">Rank</th>
-                      <th className="p-3 md:p-4 text-left text-xs uppercase tracking-wider text-white/30">Player</th>
-                      <th className="p-3 md:p-4 text-left text-xs uppercase tracking-wider text-white/30">Team</th>
-                      <th className="p-3 md:p-4 text-center text-xs uppercase tracking-wider text-white/30">Pos</th>
-                      <th className="p-3 md:p-4 text-right text-xs uppercase tracking-wider text-white/30">Total NIL</th>
-                      <th className="p-3 md:p-4 text-center text-xs uppercase tracking-wider text-white/30">Deals</th>
+                    <tr className="border-b border-slate-200">
+                      <th className="p-3 md:p-4 text-left text-xs uppercase tracking-wider text-slate-400 w-16">Rank</th>
+                      <th className="p-3 md:p-4 text-left text-xs uppercase tracking-wider text-slate-400">Player</th>
+                      <th className="p-3 md:p-4 text-left text-xs uppercase tracking-wider text-slate-400">Team</th>
+                      <th className="p-3 md:p-4 text-center text-xs uppercase tracking-wider text-slate-400">Pos</th>
+                      <th className="p-3 md:p-4 text-right text-xs uppercase tracking-wider text-slate-400">Total NIL</th>
+                      <th className="p-3 md:p-4 text-center text-xs uppercase tracking-wider text-slate-400">Deals</th>
                     </tr>
                   </thead>
                   <tbody>
                     {playerRankings.map((player, idx) => (
                       <tr
                         key={player.id}
-                        className="border-t border-white/5 hover:bg-white/[0.02] transition-colors"
+                        className="border-t border-slate-100 hover:bg-white transition-colors"
                       >
                         <td className="p-3 md:p-4">
                           <span
                             className={`inline-flex items-center justify-center w-8 h-8 rounded-full text-xs font-bold ${
                               idx < 3
                                 ? "bg-gold/15 text-gold border border-gold/30"
-                                : "bg-white/5 text-white/50"
+                                : "bg-slate-50 text-slate-500"
                             }`}
                           >
                             {player.rank}
                           </span>
                         </td>
                         <td className="p-3 md:p-4">
-                          <p className="text-sm font-bold text-white">{player.playerName}</p>
+                          <p className="text-sm font-bold text-slate-800">{player.playerName}</p>
                         </td>
                         <td className="p-3 md:p-4">
-                          <p className="text-sm text-white/70">
+                          <p className="text-sm text-slate-600">
                             {player.team?.commonName ?? "--"}
                           </p>
                         </td>
@@ -358,16 +358,16 @@ export default function NilTrackerPage() {
                               {player.position}
                             </span>
                           ) : (
-                            <span className="text-white/20">--</span>
+                            <span className="text-slate-300">--</span>
                           )}
                         </td>
                         <td className="p-3 md:p-4 text-right">
-                          <span className="text-sm font-bold text-white">
+                          <span className="text-sm font-bold text-slate-800">
                             {formatCurrency(player.totalNilValue)}
                           </span>
                         </td>
                         <td className="p-3 md:p-4 text-center">
-                          <span className="text-sm text-white/70">{player.dealCount}</span>
+                          <span className="text-sm text-slate-600">{player.dealCount}</span>
                         </td>
                       </tr>
                     ))}
@@ -384,9 +384,9 @@ export default function NilTrackerPage() {
 
 function EmptyState({ message }: { message: string }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-black/60 backdrop-blur-md p-12 text-center">
-      <FileText className="w-10 h-10 text-white/20 mx-auto mb-3" />
-      <p className="text-white/50 text-sm">{message}</p>
+    <div className="rounded-xl border border-slate-200 bg-slate-50/70 backdrop-blur-md p-12 text-center">
+      <FileText className="w-10 h-10 text-slate-300 mx-auto mb-3" />
+      <p className="text-slate-500 text-sm">{message}</p>
     </div>
   );
 }

@@ -137,19 +137,47 @@ export async function GET() {
       return NextResponse.json(P2P_RESPONSE);
     }
 
-    // Fetch token usage from LUC meter (in-memory for now, persistent store TODO)
+    // Fetch actual token usage from UEF Gateway usage tracker
     let tokensUsed = 0;
     try {
-      const meterRes = await fetch(
-        `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/luc/meter?userId=${encodeURIComponent(session.user.email)}`,
-        { headers: { cookie: '' } } // internal call — session already validated above
+      const gatewayUrl = process.env.UEF_GATEWAY_URL || process.env.NEXT_PUBLIC_UEF_GATEWAY_URL || 'http://uef-gateway:4000';
+
+      // Step 1: Get real token usage from the LLM usage tracker
+      const usageRes = await fetch(
+        `${gatewayUrl}/llm/usage?userId=${encodeURIComponent(session.user.email)}`,
+        { headers: { 'x-internal-caller': 'uef-gateway' } }
       );
-      if (meterRes.ok) {
-        const meterData = await meterRes.json();
-        tokensUsed = meterData?.summary?.quotas?.AI_CHAT?.used ?? 0;
+      if (usageRes.ok) {
+        const usageData = await usageRes.json();
+        tokensUsed = usageData.totalTokens || 0;
+      }
+
+      // Step 2: Check allowance with real usage to get overage info
+      if (tokensUsed > 0) {
+        const allowanceRes = await fetch(
+          `${gatewayUrl}/billing/check-allowance`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-internal-caller': 'uef-gateway',
+            },
+            body: JSON.stringify({
+              tierId: tierInfo.tierId,
+              monthlyUsedTokens: tokensUsed,
+            }),
+          }
+        );
+        if (allowanceRes.ok) {
+          const allowanceData = await allowanceRes.json();
+          // If user is in overage, surface total including overage
+          if (allowanceData.overage > 0) {
+            tokensUsed = (tierInfo.tokensIncluded || 0) + allowanceData.overage;
+          }
+        }
       }
     } catch {
-      // LUC meter unavailable — return 0 rather than blocking
+      // Gateway unavailable — return 0 rather than blocking subscription status
     }
 
     return NextResponse.json({

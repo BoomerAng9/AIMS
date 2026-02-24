@@ -103,6 +103,8 @@ services:
     restart: always
     networks:
       - aims-network
+    security_opt:
+      - no-new-privileges:true
 
   # ---------------------------------------------------------------------------
   # Demo Frontend (Next.js 14 — sandbox mode)
@@ -146,6 +148,8 @@ services:
     restart: always
     networks:
       - aims-network
+    security_opt:
+      - no-new-privileges:true
     deploy:
       resources:
         limits:
@@ -219,6 +223,8 @@ services:
     restart: always
     networks:
       - aims-network
+    security_opt:
+      - no-new-privileges:true
 
   # ---------------------------------------------------------------------------
   # House of Ang — Boomer_Ang Registry
@@ -249,6 +255,8 @@ services:
     networks:
       - aims-network
     user: "1000:1000"
+    security_opt:
+      - no-new-privileges:true
     deploy:
       resources:
         limits:
@@ -290,6 +298,8 @@ services:
     networks:
       - aims-network
     user: "1000:1000"
+    security_opt:
+      - no-new-privileges:true
     deploy:
       resources:
         limits:
@@ -308,6 +318,8 @@ services:
       - aims-network
       - sandbox-network
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     healthcheck:
       test: [ "CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-aims_redis_secret}", "ping" ]
       interval: 10s
@@ -350,6 +362,8 @@ services:
       - sandbox-network
     restart: unless-stopped
     user: "1000:1000"
+    security_opt:
+      - no-new-privileges:true
     healthcheck:
       test: [ "CMD", "wget", "-q", "--spider", "http://127.0.0.1:3010/health" ]
       interval: 30s
@@ -396,6 +410,8 @@ services:
     networks:
       - aims-network
     user: "1000:1000"
+    security_opt:
+      - no-new-privileges:true
     deploy:
       resources:
         limits:
@@ -431,6 +447,8 @@ services:
     networks:
       - aims-network
     user: "1000:1000"
+    security_opt:
+      - no-new-privileges:true
     deploy:
       resources:
         limits:
@@ -464,7 +482,73 @@ services:
       - ii-agents
 
   # ---------------------------------------------------------------------------
-  # Chicken Hawk — Core Execution Engine
+  # Chicken Hawk — Policy Enforcement (port 4002)
+  # Circuit Box: badge-level gating, tool permissions, budget caps, kill switch
+  # ---------------------------------------------------------------------------
+  chickenhawk-policy:
+    build:
+      context: ../services/chicken-hawk
+      dockerfile: Dockerfile
+    command: ["bun", "run", "src/policy/server.ts"]
+    expose:
+      - "4002"
+    environment:
+      - PORT=4002
+      - NODE_ENV=production
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -sf http://127.0.0.1:4002/health || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - aims-network
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+
+  # ---------------------------------------------------------------------------
+  # Chicken Hawk — Audit Log & Evidence Locker (port 4003)
+  # Immutable JSONL event log, structured timelines, 90-day retention
+  # ---------------------------------------------------------------------------
+  chickenhawk-audit:
+    build:
+      context: ../services/chicken-hawk
+      dockerfile: Dockerfile
+    command: ["bun", "run", "src/audit/server.ts"]
+    expose:
+      - "4003"
+    environment:
+      - PORT=4003
+      - NODE_ENV=production
+      - EVIDENCE_DIR=/data/evidence
+      - RETENTION_DAYS=90
+    volumes:
+      - chickenhawk-evidence:/data/evidence
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -sf http://127.0.0.1:4003/health || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - aims-network
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+
+  # ---------------------------------------------------------------------------
+  # Chicken Hawk — Core Execution Engine (port 4001)
   # Receives manifests from ACHEEVY orchestrator, spawns Lil_Hawk squads,
   # executes waves, collects evidence, reports up.
   # Command chain: ACHEEVY → Boomer_Ang → Chicken Hawk → Squad → Lil_Hawk
@@ -478,18 +562,29 @@ services:
     environment:
       - PORT=4001
       - NODE_ENV=production
+      - POLICY_URL=http://chickenhawk-policy:4002
+      - AUDIT_URL=http://chickenhawk-audit:4003
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GEMINI_MODEL=${GEMINI_MODEL:-gemini-3.0-flash}
       - UEF_GATEWAY_URL=http://uef-gateway:3001
+      - ACHEEVY_URL=http://acheevy:3003
       - AGENT_BRIDGE_URL=http://agent-bridge:3010
       - REDIS_URL=redis://:${REDIS_PASSWORD:-aims_redis_secret}@redis:6379
       - CORS_ORIGIN=${CORS_ORIGIN}
+    volumes:
+      - chickenhawk-data:/app/data
     depends_on:
+      chickenhawk-policy:
+        condition: service_healthy
+      chickenhawk-audit:
+        condition: service_healthy
       uef-gateway:
         condition: service_healthy
       agent-bridge:
         condition: service_started
     healthcheck:
-      test: [ "CMD", "node", "-e", "require('http').get('http://127.0.0.1:4001/health',r=>{process.exit(r.statusCode===200?0:1)}).on('error',()=>process.exit(1))" ]
+      test: [ "CMD-SHELL", "curl -sf http://127.0.0.1:4001/health || exit 1" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -498,6 +593,8 @@ services:
     networks:
       - aims-network
       - sandbox-network
+    security_opt:
+      - no-new-privileges:true
     deploy:
       resources:
         limits:
@@ -519,6 +616,8 @@ services:
       - HOUSE_OF_ANG_URL=http://house-of-ang:3002
       - ACHEEVY_URL=http://acheevy:3003
       - AGENT_BRIDGE_URL=http://agent-bridge:3010
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     depends_on:
       uef-gateway:
         condition: service_healthy
@@ -530,6 +629,8 @@ services:
     restart: unless-stopped
     networks:
       - aims-network
+    security_opt:
+      - no-new-privileges:true
     deploy:
       resources:
         limits:
@@ -573,6 +674,8 @@ services:
       - ii-agent-filestore:/.ii_agent
     networks:
       - aims-network
+    security_opt:
+      - no-new-privileges:true
     deploy:
       resources:
         limits:
@@ -595,6 +698,8 @@ services:
     restart: unless-stopped
     networks:
       - aims-network
+    security_opt:
+      - no-new-privileges:true
     deploy:
       resources:
         limits:
@@ -626,6 +731,8 @@ services:
       - ii-agent-filestore:/.ii_agent
     networks:
       - aims-network
+    security_opt:
+      - no-new-privileges:true
     deploy:
       resources:
         limits:
@@ -642,7 +749,8 @@ services:
     environment:
       - SERVER_HOST=0.0.0.0
       - SERVER_PORT=8100
-      - SANDBOX_DATABASE_URL=postgresql+asyncpg://${II_AGENT_DB_USER:-iiagent}:${II_AGENT_DB_PASSWORD:-iiagent}@ii-agent-postgres:5432/${II_AGENT_DB_NAME:-iiagentdev}?sslmode=disable
+      # sslmode omitted — traffic stays on internal Docker network (ii-agent-postgres not exposed)
+      - SANDBOX_DATABASE_URL=postgresql+asyncpg://${II_AGENT_DB_USER:-iiagent}:${II_AGENT_DB_PASSWORD:-iiagent}@ii-agent-postgres:5432/${II_AGENT_DB_NAME:-iiagentdev}
       - REDIS_URL=redis://:${REDIS_PASSWORD:-aims_redis_secret}@redis:6379/3
       - E2B_API_KEY=${E2B_API_KEY}
     depends_on:
@@ -658,6 +766,8 @@ services:
     restart: unless-stopped
     networks:
       - aims-network
+    security_opt:
+      - no-new-privileges:true
     deploy:
       resources:
         limits:
@@ -704,6 +814,8 @@ services:
         condition: service_healthy
     networks:
       - aims-network
+    security_opt:
+      - no-new-privileges:true
     deploy:
       resources:
         limits:
@@ -736,6 +848,8 @@ services:
     restart: unless-stopped
     networks:
       - aims-network
+    security_opt:
+      - no-new-privileges:true
     deploy:
       resources:
         limits:
@@ -779,6 +893,8 @@ services:
         condition: service_healthy
     networks:
       - aims-network
+    security_opt:
+      - no-new-privileges:true
     deploy:
       resources:
         limits:
@@ -800,6 +916,8 @@ volumes:
   perform-content:
   ii-agent-filestore:
   ii-agent-pgdata:
+  chickenhawk-data:
+  chickenhawk-evidence:
 
 
 networks:

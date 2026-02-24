@@ -17,15 +17,15 @@ export function OnboardingGateBanner() {
 
   return (
     <div className="mb-6 mx-6 md:mx-8 animate-in slide-in-from-top-4 duration-700">
-      <div className="relative overflow-hidden rounded-[24px] border border-gold/20 bg-gradient-to-r from-gold/20 to-black p-0.5 shadow-lg">
-        <div className="flex flex-col md:flex-row items-center justify-between rounded-[23px] bg-black/80 px-6 py-4">
+      <div className="relative overflow-hidden rounded-[24px] border border-gold/20 bg-gradient-to-r from-gold/20 to-white p-0.5 shadow-lg">
+        <div className="flex flex-col md:flex-row items-center justify-between rounded-[23px] bg-white/80 px-6 py-4">
           <div className="flex items-center gap-3">
             <div className="flex-shrink-0 text-gold">
               <Info size={20} />
             </div>
             <div className="text-center md:text-left">
-              <h3 className="text-sm font-semibold text-white">Strategic Onboarding Required</h3>
-              <p className="text-[11px] text-white/50 leading-tight">
+              <h3 className="text-sm font-semibold text-slate-800">Strategic Onboarding Required</h3>
+              <p className="text-[11px] text-slate-500 leading-tight">
                 ACHEEVY needs your business goal and LUC mission profile before execution.
               </p>
             </div>

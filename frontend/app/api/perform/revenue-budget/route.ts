@@ -61,6 +61,9 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(budgets);
   } catch (err) {
     console.error('[RevenueBudget] DB query failed:', err);
-    return NextResponse.json([]);
+    return NextResponse.json(
+      { error: 'Database unavailable', budgets: [] },
+      { status: 503 }
+    );
   }
 }

@@ -613,10 +613,10 @@ function ModelCard({
       animate={{ opacity: 1, y: 0 }}
       className="relative p-4 rounded-xl transition-all"
       style={{
-        backgroundColor: enabled ? AIMS_CIRCUIT_COLORS.primary + '10' : 'rgba(255,255,255,0.03)',
+        backgroundColor: enabled ? AIMS_CIRCUIT_COLORS.primary + '10' : '#FFFFFF',
         border: enabled
           ? `2px solid ${AIMS_CIRCUIT_COLORS.primary}`
-          : '1px solid rgba(255,255,255,0.08)',
+          : '1px solid #E2E8F0',
       }}
     >
       {model.popular && (
@@ -634,19 +634,19 @@ function ModelCard({
       <div className="flex items-start justify-between mb-2">
         <div>
           {/* User-friendly name first, technical name smaller */}
-          <h3 className="text-lg font-semibold text-white">{model.friendlyName}</h3>
+          <h3 className="text-lg font-semibold text-slate-800">{model.friendlyName}</h3>
           <p className="text-xs text-gray-500">{model.name} • {model.provider}</p>
         </div>
         <button
           onClick={onToggle}
           className={`w-10 h-10 rounded-lg flex items-center justify-center transition-all ${
-            enabled ? 'bg-green-500' : 'bg-gray-700 hover:bg-gray-600'
+            enabled ? 'bg-green-500' : 'bg-slate-100 hover:bg-slate-200'
           }`}
         >
           {enabled ? (
-            <CheckIcon className="w-5 h-5 text-white" />
+            <CheckIcon className="w-5 h-5 text-slate-800" />
           ) : (
-            <PlusIcon className="w-5 h-5 text-gray-300" />
+            <PlusIcon className="w-5 h-5 text-slate-500" />
           )}
         </button>
       </div>
@@ -660,7 +660,7 @@ function ModelCard({
           <span
             key={cap}
             className="px-2 py-0.5 rounded text-xs"
-            style={{ backgroundColor: '#0f172a', color: AIMS_CIRCUIT_COLORS.secondary }}
+            style={{ backgroundColor: '#F1F5F9', color: AIMS_CIRCUIT_COLORS.secondary }}
           >
             {cap}
           </span>
@@ -678,7 +678,7 @@ function ModelCard({
       </div>
 
       {(model.inputCost || model.outputCost) && (
-        <div className="mt-3 pt-3 border-t border-gray-700 flex justify-between text-xs text-gray-400">
+        <div className="mt-3 pt-3 border-t border-slate-200 flex justify-between text-xs text-gray-500">
           <span>Input: {model.inputCost}</span>
           <span>Output: {model.outputCost}</span>
         </div>
@@ -702,27 +702,27 @@ function ToolCard({
       animate={{ opacity: 1, y: 0 }}
       className="p-4 rounded-xl transition-all"
       style={{
-        backgroundColor: enabled ? AIMS_CIRCUIT_COLORS.primary + '10' : 'rgba(255,255,255,0.03)',
+        backgroundColor: enabled ? AIMS_CIRCUIT_COLORS.primary + '10' : '#FFFFFF',
         border: enabled
           ? `2px solid ${AIMS_CIRCUIT_COLORS.primary}`
-          : '1px solid rgba(255,255,255,0.08)',
+          : '1px solid #E2E8F0',
       }}
     >
       <div className="flex items-start justify-between mb-3">
         <div>
-          <h3 className="text-lg font-semibold text-white">{tool.name}</h3>
+          <h3 className="text-lg font-semibold text-slate-800">{tool.name}</h3>
           <p className="text-sm text-gray-400">{tool.provider}</p>
         </div>
         <button
           onClick={onToggle}
           className={`w-10 h-10 rounded-lg flex items-center justify-center transition-all ${
-            enabled ? 'bg-green-500' : 'bg-gray-700 hover:bg-gray-600'
+            enabled ? 'bg-green-500' : 'bg-slate-100 hover:bg-slate-200'
           }`}
         >
           {enabled ? (
-            <CheckIcon className="w-5 h-5 text-white" />
+            <CheckIcon className="w-5 h-5 text-slate-800" />
           ) : (
-            <PlusIcon className="w-5 h-5 text-gray-300" />
+            <PlusIcon className="w-5 h-5 text-slate-500" />
           )}
         </button>
       </div>
@@ -734,7 +734,7 @@ function ToolCard({
           <span
             key={feature}
             className="px-2 py-0.5 rounded text-xs"
-            style={{ backgroundColor: '#0f172a', color: AIMS_CIRCUIT_COLORS.secondary }}
+            style={{ backgroundColor: '#F1F5F9', color: AIMS_CIRCUIT_COLORS.secondary }}
           >
             {feature}
           </span>
@@ -754,8 +754,8 @@ function ConsumptionCard({ model }: { model: ConsumptionModel }) {
     <div
       className={`relative p-4 rounded-xl ${model.recommended ? 'ring-2' : ''}`}
       style={{
-        backgroundColor: 'rgba(255,255,255,0.03)',
-        border: '1px solid rgba(255,255,255,0.08)',
+        backgroundColor: '#FFFFFF',
+        border: '1px solid #E2E8F0',
         '--tw-ring-color': model.recommended ? AIMS_CIRCUIT_COLORS.accent : undefined,
       } as React.CSSProperties}
     >
@@ -771,14 +771,14 @@ function ConsumptionCard({ model }: { model: ConsumptionModel }) {
         </div>
       )}
 
-      <h3 className="text-lg font-semibold text-white mb-2">{model.name}</h3>
+      <h3 className="text-lg font-semibold text-slate-800 mb-2">{model.name}</h3>
       <p className="text-sm text-gray-400 mb-4">{model.description}</p>
 
       <ul className="space-y-2">
         {model.features.map((feature) => (
           <li key={feature} className="flex items-center gap-2 text-sm">
             <SparkleIcon className="w-4 h-4" style={{ color: AIMS_CIRCUIT_COLORS.primary }} />
-            <span className="text-gray-300">{feature}</span>
+            <span className="text-slate-500">{feature}</span>
           </li>
         ))}
       </ul>
@@ -877,7 +877,7 @@ export default function ModelGardenPage() {
           <div className="flex items-center gap-6 mt-6">
             <div
               className="px-6 py-4 rounded-xl"
-              style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}
+              style={{ backgroundColor: '#FFFFFF', border: '1px solid #E2E8F0' }}
             >
               <div className="text-3xl font-bold" style={{ color: AIMS_CIRCUIT_COLORS.accent }}>
                 {AI_MODELS.length}+
@@ -886,7 +886,7 @@ export default function ModelGardenPage() {
             </div>
             <div
               className="px-6 py-4 rounded-xl"
-              style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}
+              style={{ backgroundColor: '#FFFFFF', border: '1px solid #E2E8F0' }}
             >
               <div className="text-3xl font-bold" style={{ color: AIMS_CIRCUIT_COLORS.accent }}>
                 {TOOLS.length}+
@@ -895,7 +895,7 @@ export default function ModelGardenPage() {
             </div>
             <div
               className="px-6 py-4 rounded-xl"
-              style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}
+              style={{ backgroundColor: '#FFFFFF', border: '1px solid #E2E8F0' }}
             >
               <div className="text-3xl font-bold text-green-500">
                 {enabledModels.size + enabledTools.size}
@@ -940,7 +940,7 @@ export default function ModelGardenPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search models or providers..."
-                className="w-full pl-12 pr-4 py-3 rounded-lg bg-gray-800 border border-gray-700 text-white placeholder:text-gray-500 focus:border-gold/30 outline-none"
+                className="w-full pl-12 pr-4 py-3 rounded-lg bg-white border border-slate-200 text-slate-800 placeholder:text-gray-400 focus:border-gold/30 outline-none"
               />
             </div>
 
@@ -952,9 +952,9 @@ export default function ModelGardenPage() {
                   onClick={() => setCategoryFilter(cat)}
                   className="px-3 py-2 rounded-lg text-sm transition-all whitespace-nowrap"
                   style={{
-                    backgroundColor: categoryFilter === cat ? AIMS_CIRCUIT_COLORS.primary + '20' : '#1f2937',
-                    color: categoryFilter === cat ? AIMS_CIRCUIT_COLORS.accent : '#9ca3af',
-                    border: categoryFilter === cat ? `1px solid ${AIMS_CIRCUIT_COLORS.primary}60` : '1px solid #374151',
+                    backgroundColor: categoryFilter === cat ? AIMS_CIRCUIT_COLORS.primary + '20' : '#FFFFFF',
+                    color: categoryFilter === cat ? AIMS_CIRCUIT_COLORS.accent : '#64748b',
+                    border: categoryFilter === cat ? `1px solid ${AIMS_CIRCUIT_COLORS.primary}60` : '1px solid #E2E8F0',
                   }}
                 >
                   {getCategoryLabel(cat)}
@@ -1034,7 +1034,7 @@ export default function ModelGardenPage() {
 
                 <div
                   className="p-6 rounded-2xl"
-                  style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}
+                  style={{ backgroundColor: '#FFFFFF', border: '1px solid #E2E8F0' }}
                 >
                   {/* AI Applications Layer */}
                   <div className="mb-6">
@@ -1057,7 +1057,7 @@ export default function ModelGardenPage() {
                   {/* A.I.M.S. Core */}
                   <div
                     className="p-4 rounded-xl mb-6"
-                    style={{ backgroundColor: '#0f172a', border: '1px solid rgba(255,255,255,0.08)' }}
+                    style={{ backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0' }}
                   >
                     <div className="text-center mb-4" style={{ color: AIMS_CIRCUIT_COLORS.accent }}>
                       A.I.M.S. <span className="text-gray-400">for all your model and agent needs</span>
@@ -1125,9 +1125,9 @@ export default function ModelGardenPage() {
                   {/* Infrastructure */}
                   <div
                     className="p-4 rounded-xl text-center"
-                    style={{ backgroundColor: '#0f172a', border: '1px solid rgba(255,255,255,0.08)' }}
+                    style={{ backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0' }}
                   >
-                    <div className="text-lg font-medium text-white">Infrastructure</div>
+                    <div className="text-lg font-medium text-slate-800">Infrastructure</div>
                     <div className="text-sm text-gray-400">
                       OpenRouter Gateway • Cloudflare Workers • Edge Deployment
                     </div>
@@ -1143,7 +1143,7 @@ export default function ModelGardenPage() {
           <div
             className="inline-flex flex-col items-center gap-4 px-8 py-6 rounded-2xl"
             style={{
-              backgroundColor: 'rgba(255,255,255,0.03)',
+              backgroundColor: '#FFFFFF',
               border: `1px solid ${AIMS_CIRCUIT_COLORS.primary}40`,
             }}
           >

@@ -162,7 +162,7 @@ function StatusBar({ percent, status }: { percent: number; status: string }) {
   const color = colors[status as keyof typeof colors] || colors.ok;
 
   return (
-    <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
+    <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
       <motion.div
         initial={{ width: 0 }}
         animate={{ width: `${Math.min(percent, 100)}%` }}
@@ -200,7 +200,7 @@ function ServiceCard({
     >
       <div className="flex items-start justify-between mb-3">
         <div>
-          <h3 className="text-white font-medium">{service.name}</h3>
+          <h3 className="text-slate-800 font-medium">{service.name}</h3>
           <p className="text-xs text-gray-400">{bucket?.description}</p>
         </div>
         {service.status !== 'ok' && (
@@ -311,7 +311,7 @@ function QuoteCalculator({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50"
+      className="fixed inset-0 bg-slate-50/70 flex items-center justify-center p-4 z-50"
       onClick={onClose}
     >
       <motion.div
@@ -319,12 +319,12 @@ function QuoteCalculator({
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
         className="w-full max-w-md rounded-2xl p-6"
-        style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}
+        style={{ backgroundColor: '#FFFFFF', border: '1px solid #E2E8F0' }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-white">Quote Calculator</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-white">
+          <h2 className="text-xl font-bold text-slate-800">Quote Calculator</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-slate-800">
             <XCircleIcon className="w-6 h-6" />
           </button>
         </div>
@@ -334,10 +334,10 @@ function QuoteCalculator({
             <label className="block text-sm text-gray-400 mb-2">Service</label>
             <div
               className="px-4 py-3 rounded-lg"
-              style={{ backgroundColor: '#0f172a', border: '1px solid rgba(255,255,255,0.08)' }}
+              style={{ backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0' }}
             >
-              <div className="text-white font-medium">{bucket.name}</div>
-              <div className="text-xs text-gray-400">{bucket.description}</div>
+              <div className="text-slate-800 font-medium">{bucket.name}</div>
+              <div className="text-xs text-gray-500">{bucket.description}</div>
             </div>
           </div>
 
@@ -350,9 +350,9 @@ function QuoteCalculator({
               value={amount}
               onChange={(e) => setAmount(Math.max(0, parseInt(e.target.value) || 0))}
               min="0"
-              className="w-full px-4 py-3 rounded-lg text-white outline-none"
+              className="w-full px-4 py-3 rounded-lg text-slate-800 outline-none"
               style={{
-                backgroundColor: '#0f172a',
+                backgroundColor: '#F8FAFC',
                 border: `1px solid ${AIMS_CIRCUIT_COLORS.primary}40`,
               }}
             />
@@ -361,29 +361,29 @@ function QuoteCalculator({
           {quote && (
             <div
               className="p-4 rounded-lg space-y-3"
-              style={{ backgroundColor: '#0f172a', border: '1px solid rgba(255,255,255,0.08)' }}
+              style={{ backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0' }}
             >
               <div className="flex justify-between text-sm">
-                <span className="text-gray-400">Current Usage</span>
-                <span className="text-white">{quote.currentUsed.toLocaleString()} / {quote.limit.toLocaleString()}</span>
+                <span className="text-gray-500">Current Usage</span>
+                <span className="text-slate-800">{quote.currentUsed.toLocaleString()} / {quote.limit.toLocaleString()}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-gray-400">After Operation</span>
-                <span className="text-white">{(quote.currentUsed + amount).toLocaleString()}</span>
+                <span className="text-gray-500">After Operation</span>
+                <span className="text-slate-800">{(quote.currentUsed + amount).toLocaleString()}</span>
               </div>
               {quote.wouldExceed && (
                 <>
                   <div className="flex justify-between text-sm">
-                    <span className="text-yellow-400">Projected Overage</span>
-                    <span className="text-yellow-400">{quote.projectedOverage.toLocaleString()} {bucket.unit}s</span>
+                    <span className="text-yellow-600">Projected Overage</span>
+                    <span className="text-yellow-600">{quote.projectedOverage.toLocaleString()} {bucket.unit}s</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-yellow-400">Overage Cost</span>
-                    <span className="text-yellow-400 font-mono">${quote.projectedCost.toFixed(4)}</span>
+                    <span className="text-yellow-600">Overage Cost</span>
+                    <span className="text-yellow-600 font-mono">${quote.projectedCost.toFixed(4)}</span>
                   </div>
                 </>
               )}
-              <div className="pt-3 border-t border-gray-700 flex items-center gap-2">
+              <div className="pt-3 border-t border-slate-200 flex items-center gap-2">
                 {quote.allowed ? (
                   <>
                     <CheckCircleIcon className="w-5 h-5 text-green-500" />
@@ -430,7 +430,7 @@ function IndustryPresetSelector({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50"
+      className="fixed inset-0 bg-slate-50/70 flex items-center justify-center p-4 z-50"
       onClick={onClose}
     >
       <motion.div
@@ -438,17 +438,17 @@ function IndustryPresetSelector({
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
         className="w-full max-w-4xl max-h-[80vh] rounded-2xl p-6 overflow-hidden flex flex-col"
-        style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}
+        style={{ backgroundColor: '#FFFFFF', border: '1px solid #E2E8F0' }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-xl font-bold text-white">Industry Presets</h2>
+            <h2 className="text-xl font-bold text-slate-800">Industry Presets</h2>
             <p className="text-sm text-gray-400 mt-1">
               Select a preset to configure LUC for your industry
             </p>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-white">
+          <button onClick={onClose} className="text-gray-400 hover:text-slate-800">
             <XCircleIcon className="w-6 h-6" />
           </button>
         </div>
@@ -462,7 +462,7 @@ function IndustryPresetSelector({
               className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
                 selectedCategory === cat.id
                   ? 'bg-gold/10 text-gold border border-gold/30'
-                  : 'bg-gray-800/50 text-gray-400 border border-gray-700 hover:bg-gray-700/50'
+                  : 'bg-white text-gray-500 border border-slate-200 hover:bg-slate-50'
               }`}
             >
               {cat.label}
@@ -479,19 +479,19 @@ function IndustryPresetSelector({
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="p-4 rounded-xl text-left transition-all hover:ring-2 hover:ring-gold/50"
-                style={{ backgroundColor: '#0f172a', border: '1px solid rgba(255,255,255,0.08)' }}
+                style={{ backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0' }}
                 onClick={() => onSelect(preset.id)}
               >
                 <div className="flex items-start gap-3">
                   <span className="text-3xl">{preset.icon}</span>
                   <div className="flex-1">
-                    <h3 className="text-white font-medium">{preset.name}</h3>
+                    <h3 className="text-slate-800 font-medium">{preset.name}</h3>
                     <p className="text-xs text-gray-400 mt-1">{preset.description}</p>
                     <div className="flex flex-wrap gap-1 mt-2">
                       {preset.useCases.slice(0, 3).map((useCase, i) => (
                         <span
                           key={i}
-                          className="px-2 py-0.5 rounded text-xs bg-gray-700/50 text-gray-300"
+                          className="px-2 py-0.5 rounded text-xs bg-slate-100 text-slate-600"
                         >
                           {useCase}
                         </span>
@@ -526,7 +526,7 @@ function UsageHistoryPanel({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50"
+      className="fixed inset-0 bg-slate-50/70 flex items-center justify-center p-4 z-50"
       onClick={onClose}
     >
       <motion.div
@@ -534,15 +534,15 @@ function UsageHistoryPanel({
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
         className="w-full max-w-3xl max-h-[80vh] rounded-2xl p-6 overflow-hidden flex flex-col"
-        style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}
+        style={{ backgroundColor: '#FFFFFF', border: '1px solid #E2E8F0' }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <HistoryIcon className="w-6 h-6 text-gold" />
-            <h2 className="text-xl font-bold text-white">Usage History</h2>
+            <h2 className="text-xl font-bold text-slate-800">Usage History</h2>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-white">
+          <button onClick={onClose} className="text-gray-400 hover:text-slate-800">
             <XCircleIcon className="w-6 h-6" />
           </button>
         </div>
@@ -558,7 +558,7 @@ function UsageHistoryPanel({
                 <div
                   key={entry.id}
                   className="p-3 rounded-lg flex items-center justify-between"
-                  style={{ backgroundColor: '#0f172a', border: '1px solid rgba(255,255,255,0.08)' }}
+                  style={{ backgroundColor: '#FFFFFF', border: '1px solid #E2E8F0' }}
                 >
                   <div className="flex items-center gap-3">
                     <div
@@ -567,7 +567,7 @@ function UsageHistoryPanel({
                       }`}
                     />
                     <div>
-                      <div className="text-white text-sm font-medium">
+                      <div className="text-slate-800 text-sm font-medium">
                         {entry.service.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
                       </div>
                       <div className="text-xs text-gray-400">
@@ -669,7 +669,7 @@ function ImportExportPanel({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50"
+      className="fixed inset-0 bg-slate-50/70 flex items-center justify-center p-4 z-50"
       onClick={onClose}
     >
       <motion.div
@@ -677,12 +677,12 @@ function ImportExportPanel({
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
         className="w-full max-w-md rounded-2xl p-6"
-        style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}
+        style={{ backgroundColor: '#FFFFFF', border: '1px solid #E2E8F0' }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-white">Import / Export</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-white">
+          <h2 className="text-xl font-bold text-slate-800">Import / Export</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-slate-800">
             <XCircleIcon className="w-6 h-6" />
           </button>
         </div>
@@ -691,11 +691,11 @@ function ImportExportPanel({
           {/* Export */}
           <div
             className="p-4 rounded-lg"
-            style={{ backgroundColor: '#0f172a', border: '1px solid rgba(255,255,255,0.08)' }}
+            style={{ backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0' }}
           >
             <div className="flex items-center gap-2 mb-3">
               <DownloadIcon className="w-5 h-5 text-gold" />
-              <h3 className="text-white font-medium">Export Data</h3>
+              <h3 className="text-slate-800 font-medium">Export Data</h3>
             </div>
             <p className="text-xs text-gray-400 mb-3">
               Download your account data and usage history
@@ -731,11 +731,11 @@ function ImportExportPanel({
           {/* Import */}
           <div
             className="p-4 rounded-lg"
-            style={{ backgroundColor: '#0f172a', border: '1px solid rgba(255,255,255,0.08)' }}
+            style={{ backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0' }}
           >
             <div className="flex items-center gap-2 mb-3">
               <UploadIcon className="w-5 h-5 text-gold" />
-              <h3 className="text-white font-medium">Import Data</h3>
+              <h3 className="text-slate-800 font-medium">Import Data</h3>
             </div>
             <p className="text-xs text-gray-400 mb-3">
               Restore from a previous JSON export
@@ -755,9 +755,9 @@ function ImportExportPanel({
               disabled={loading}
               className="w-full py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
               style={{
-                backgroundColor: '#374151',
-                color: '#fff',
-                border: '1px solid #4b5563',
+                backgroundColor: '#F1F5F9',
+                color: '#334155',
+                border: '1px solid #E2E8F0',
               }}
             >
               Select JSON File
@@ -884,8 +884,8 @@ export default function LUCWorkspacePage() {
               <div
                 className="flex items-center gap-2 px-4 py-2 rounded-lg"
                 style={{
-                  backgroundColor: 'rgba(255,255,255,0.03)',
-                  border: '1px solid rgba(255,255,255,0.08)',
+                  backgroundColor: '#FFFFFF',
+                  border: '1px solid #E2E8F0',
                 }}
               >
                 <WalletIcon className="w-4 h-4 text-gray-400" />
@@ -900,9 +900,9 @@ export default function LUCWorkspacePage() {
                 onClick={() => setShowPresets(true)}
                 className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors"
                 style={{
-                  backgroundColor: 'rgba(255,255,255,0.03)',
-                  border: '1px solid rgba(255,255,255,0.08)',
-                  color: '#fff',
+                  backgroundColor: '#FFFFFF',
+                  border: '1px solid #E2E8F0',
+                  color: '#334155',
                 }}
               >
                 <GridIcon className="w-4 h-4" />
@@ -913,9 +913,9 @@ export default function LUCWorkspacePage() {
                 onClick={() => setShowHistory(true)}
                 className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors"
                 style={{
-                  backgroundColor: 'rgba(255,255,255,0.03)',
-                  border: '1px solid rgba(255,255,255,0.08)',
-                  color: '#fff',
+                  backgroundColor: '#FFFFFF',
+                  border: '1px solid #E2E8F0',
+                  color: '#334155',
                 }}
               >
                 <HistoryIcon className="w-4 h-4" />
@@ -926,9 +926,9 @@ export default function LUCWorkspacePage() {
                 onClick={() => setShowImportExport(true)}
                 className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors"
                 style={{
-                  backgroundColor: 'rgba(255,255,255,0.03)',
-                  border: '1px solid rgba(255,255,255,0.08)',
-                  color: '#fff',
+                  backgroundColor: '#FFFFFF',
+                  border: '1px solid #E2E8F0',
+                  color: '#334155',
                 }}
               >
                 <DownloadIcon className="w-4 h-4" />
@@ -961,7 +961,7 @@ export default function LUCWorkspacePage() {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
               <div
                 className="p-4 rounded-xl"
-                style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}
+                style={{ backgroundColor: '#FFFFFF', border: '1px solid #E2E8F0' }}
               >
                 <div className="text-sm text-gray-400 mb-1">Plan</div>
                 <div className="text-xl font-bold" style={{ color: AIMS_CIRCUIT_COLORS.accent }}>
@@ -970,7 +970,7 @@ export default function LUCWorkspacePage() {
               </div>
               <div
                 className="p-4 rounded-xl"
-                style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}
+                style={{ backgroundColor: '#FFFFFF', border: '1px solid #E2E8F0' }}
               >
                 <div className="text-sm text-gray-400 mb-1">Overall Usage</div>
                 <div
@@ -987,7 +987,7 @@ export default function LUCWorkspacePage() {
               </div>
               <div
                 className="p-4 rounded-xl"
-                style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}
+                style={{ backgroundColor: '#FFFFFF', border: '1px solid #E2E8F0' }}
               >
                 <div className="text-sm text-gray-400 mb-1">Total Overage</div>
                 <div className="text-xl font-bold text-red-400">
@@ -996,10 +996,10 @@ export default function LUCWorkspacePage() {
               </div>
               <div
                 className="p-4 rounded-xl"
-                style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}
+                style={{ backgroundColor: '#FFFFFF', border: '1px solid #E2E8F0' }}
               >
                 <div className="text-sm text-gray-400 mb-1">Billing Cycle Ends</div>
-                <div className="text-xl font-bold text-white">
+                <div className="text-xl font-bold text-slate-800">
                   {new Date(summary.billingCycleEnd).toLocaleDateString()}
                 </div>
               </div>
@@ -1009,16 +1009,16 @@ export default function LUCWorkspacePage() {
             {stats && stats.totalUsage > 0 && (
               <div
                 className="p-4 rounded-xl mb-8"
-                style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}
+                style={{ backgroundColor: '#FFFFFF', border: '1px solid #E2E8F0' }}
               >
                 <div className="flex items-center gap-2 mb-4">
                   <ChartIcon className="w-5 h-5 text-gold" />
-                  <h3 className="text-white font-medium">Usage Statistics</h3>
+                  <h3 className="text-slate-800 font-medium">Usage Statistics</h3>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div>
                     <div className="text-xs text-gray-400">Total Operations</div>
-                    <div className="text-lg font-bold text-white">{stats.totalUsage.toLocaleString()}</div>
+                    <div className="text-lg font-bold text-slate-800">{stats.totalUsage.toLocaleString()}</div>
                   </div>
                   <div>
                     <div className="text-xs text-gray-400">Total Cost</div>
@@ -1029,7 +1029,7 @@ export default function LUCWorkspacePage() {
                       <div className="text-xs text-gray-400 mb-1">Top Services</div>
                       <div className="flex flex-wrap gap-2">
                         {stats.topServices.map((svc, i) => (
-                          <span key={i} className="px-2 py-1 rounded text-xs bg-gray-700/50 text-gray-300">
+                          <span key={i} className="px-2 py-1 rounded text-xs bg-slate-100 text-slate-600">
                             {svc.service.replace(/_/g, ' ')} (${svc.cost.toFixed(2)})
                           </span>
                         ))}
@@ -1062,7 +1062,7 @@ export default function LUCWorkspacePage() {
 
             {/* Plan Selector */}
             <div className="mb-8">
-              <h2 className="text-lg font-semibold text-white mb-4">Change Plan</h2>
+              <h2 className="text-lg font-semibold text-slate-800 mb-4">Change Plan</h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {Object.values(LUC_PLANS).map((plan) => (
                   <button
@@ -1071,15 +1071,15 @@ export default function LUCWorkspacePage() {
                     className={`p-4 rounded-xl text-left transition-all ${
                       summary.planName === plan.name
                         ? 'ring-2'
-                        : 'hover:bg-white/5'
+                        : 'hover:bg-slate-50'
                     }`}
                     style={{
-                      backgroundColor: 'rgba(255,255,255,0.03)',
-                      border: '1px solid rgba(255,255,255,0.08)',
+                      backgroundColor: '#FFFFFF',
+                      border: '1px solid #E2E8F0',
                       '--tw-ring-color': summary.planName === plan.name ? AIMS_CIRCUIT_COLORS.accent : undefined,
                     } as React.CSSProperties}
                   >
-                    <div className="text-white font-medium">{plan.name}</div>
+                    <div className="text-slate-800 font-medium">{plan.name}</div>
                     <div className="text-2xl font-bold mt-1" style={{ color: AIMS_CIRCUIT_COLORS.accent }}>
                       ${plan.monthlyPrice}
                       <span className="text-sm text-gray-400 font-normal">/mo</span>
@@ -1094,7 +1094,7 @@ export default function LUCWorkspacePage() {
 
             {/* Service Cards */}
             <div className="mb-8">
-              <h2 className="text-lg font-semibold text-white mb-4">Service Quotas</h2>
+              <h2 className="text-lg font-semibold text-slate-800 mb-4">Service Quotas</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {summary.services.map((service) => (
                   <ServiceCard
@@ -1109,14 +1109,14 @@ export default function LUCWorkspacePage() {
             {/* Rate Card */}
             <div
               className="p-6 rounded-xl"
-              style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}
+              style={{ backgroundColor: '#FFFFFF', border: '1px solid #E2E8F0' }}
             >
-              <h2 className="text-lg font-semibold text-white mb-4">Rate Card</h2>
+              <h2 className="text-lg font-semibold text-slate-800 mb-4">Rate Card</h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                 {Object.values(SERVICE_BUCKETS).slice(0, 8).map((bucket) => (
                   <div key={bucket.key}>
                     <div className="text-sm text-gray-400">{bucket.name}</div>
-                    <div className="text-white font-mono">
+                    <div className="text-slate-800 font-mono">
                       ${bucket.overageRate.toFixed(4)} / {bucket.unit}
                     </div>
                   </div>

@@ -18,6 +18,11 @@ import logger from '../logger';
 import { plugCatalog } from './catalog';
 import { dockerRuntime } from './docker-runtime';
 import { portAllocator } from './port-allocator';
+import { instanceStore } from './instance-store';
+import { tenantNetworks } from './tenant-networks';
+import { liveSim } from '../livesim';
+import { Oracle } from '../oracle';
+import { integrationRegistry } from '../integrations';
 import type {
   PlugDefinition,
   PlugInstance,
@@ -57,6 +62,27 @@ export class PlugDeployEngine {
   private instances = new Map<string, PlugInstance>();
   private nextPort = BASE_PORT;
 
+  /**
+   * Hydrate the in-memory Map from SQLite on startup.
+   * Called during instanceLifecycle.initialize() so instances survive restarts.
+   */
+  loadFromStore(): number {
+    try {
+      const persisted = instanceStore.listAll();
+      for (const inst of persisted) {
+        this.instances.set(inst.instanceId, inst);
+        if (inst.assignedPort >= this.nextPort) {
+          this.nextPort = inst.assignedPort + 10;
+        }
+      }
+      logger.info({ count: persisted.length }, '[PlugDeploy] Loaded instances from SQLite');
+      return persisted.length;
+    } catch (err) {
+      logger.warn({ err }, '[PlugDeploy] Failed to load instances from SQLite — starting fresh');
+      return 0;
+    }
+  }
+
   // -----------------------------------------------------------------------
   // SPIN UP — One-click deployment
   // -----------------------------------------------------------------------
@@ -83,7 +109,40 @@ export class PlugDeployEngine {
     const events: SpinUpResult['events'] = [];
     const addEvent = (stage: string, message: string) => {
       events.push({ timestamp: now(), stage, message });
+      // Broadcast to LiveSim clients in real-time
+      liveSim.emitDeployEvent(instanceId, stage, message, {
+        plugId: plug.id,
+        plugName: plug.name,
+        userId: request.userId,
+      });
     };
+
+    // 0. ORACLE 8-gate verification — pre-flight security and governance check
+    const oracleSpec = {
+      query: `Deploy plug "${plug.name}" (${plug.id}) for user ${request.userId} in ${request.deliveryMode} mode`,
+      intent: 'BUILD_PLUG',
+      userId: request.userId,
+      budget: { maxUsd: 10 }, // Default per-deploy budget cap
+    };
+    const oracleOutput = {
+      quote: {
+        variants: [{ model: 'docker-deploy', estimate: { totalTokens: 1000, totalUsd: (plug as any).pricing?.hourlyUsd || 0.01 } }],
+      },
+    };
+    const oracleResult = await Oracle.runGates(oracleSpec, oracleOutput);
+    addEvent('oracle', `ORACLE 8-gate: ${oracleResult.passed ? 'PASS' : 'FAIL'} (score: ${oracleResult.score}/100)`);
+
+    if (!oracleResult.passed) {
+      const failures = oracleResult.gateFailures.join('; ');
+      logger.warn({ plugId: plug.id, userId: request.userId, failures }, '[PlugDeploy] ORACLE gate failed');
+      throw new Error(`Deployment blocked by ORACLE 8-gate: ${failures}`);
+    }
+
+    if (oracleResult.warnings.length > 0) {
+      for (const warning of oracleResult.warnings) {
+        addEvent('oracle-warn', warning);
+      }
+    }
 
     // 1. Validate delivery mode
     if (!plug.supportedDelivery.includes(request.deliveryMode)) {
@@ -98,6 +157,14 @@ export class PlugDeployEngine {
     // 2. Resolve customizations → env overrides
     const resolvedEnv = this.resolveEnvironment(plug, request);
     addEvent('configure', `Resolved ${Object.keys(resolvedEnv).length} environment variables`);
+
+    // Log activated integrations
+    if (request.integrations && request.integrations.length > 0) {
+      const names = request.integrations
+        .map(id => integrationRegistry.get(id)?.name || id)
+        .join(', ');
+      addEvent('integrations', `Activated integrations: ${names}`);
+    }
 
     // 3. Assign port (persistent allocation)
     const assignedPort = await this.allocatePortForInstance(instanceId, plug.id, request.userId);
@@ -123,6 +190,7 @@ export class PlugDeployEngine {
     };
 
     this.instances.set(instanceId, instance);
+    instanceStore.upsert(instance);
 
     // 5. Handle by delivery mode
     if (request.deliveryMode === 'exported') {
@@ -161,6 +229,11 @@ export class PlugDeployEngine {
         events,
       };
     }
+
+    // 8.5. Ensure per-user tenant network isolation
+    const tenantNetwork = await tenantNetworks.ensureTenantNetwork(request.userId);
+    instance.envOverrides['__tenantNetwork'] = tenantNetwork;
+    addEvent('isolate', `Tenant network: ${tenantNetwork}`);
 
     // 9. Pull Docker image
     const image = plug.docker.image;
@@ -380,6 +453,7 @@ export class PlugDeployEngine {
     await dockerRuntime.removeNginxConfig(instance);
 
     this.instances.delete(instanceId);
+    instanceStore.delete(instanceId);
     logger.info({ instanceId }, '[PlugDeploy] Instance fully decommissioned');
     return true;
   }
@@ -833,7 +907,24 @@ exit $?
       }
     }
 
-    // Apply explicit overrides (highest priority)
+    // Inject integration env vars (e.g., SENDGRID_API_KEY, STRIPE_SECRET_KEY)
+    // Only keys present in envOverrides are injected — the registry tells us
+    // which keys each integration needs, and the user supplies the values.
+    if (request.integrations && request.integrations.length > 0) {
+      const requiredKeys = integrationRegistry.getRequiredEnvKeys(request.integrations);
+      for (const key of requiredKeys) {
+        // Only inject if the user has provided a value via envOverrides
+        if (request.envOverrides[key]) {
+          env[key] = request.envOverrides[key];
+        }
+      }
+      logger.info(
+        { integrations: request.integrations, requiredKeys: requiredKeys.length },
+        '[PlugDeploy] Integration env vars resolved',
+      );
+    }
+
+    // Apply explicit overrides (highest priority — can override integration defaults)
     for (const [key, value] of Object.entries(request.envOverrides)) {
       env[key] = value;
     }
@@ -885,6 +976,7 @@ exit $?
 
   private transition(instance: PlugInstance, status: PlugInstanceStatus): void {
     instance.status = status;
+    try { instanceStore.updateStatus(instance.instanceId, status, instance); } catch (_) { /* best-effort */ }
     logger.info(
       { instanceId: instance.instanceId, status },
       `[PlugDeploy] Status → ${status}`,

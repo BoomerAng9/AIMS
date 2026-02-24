@@ -30,11 +30,11 @@ export default function PerFormLayout({ children }: { children: React.ReactNode 
   const pathname = usePathname();
 
   return (
-    <main className="min-h-screen bg-obsidian text-white">
+    <main className="min-h-screen bg-[#F8FAFC] text-slate-800">
       <SiteHeader />
 
       {/* ── Per|Form Sub-Navigation ─────────────────────────── */}
-      <div className="sticky top-14 z-40 border-b border-white/10 bg-[#0A0A0A]/90 backdrop-blur-xl">
+      <div className="sticky top-14 z-40 border-b border-slate-200 bg-white/90 backdrop-blur-xl">
         <div className="mx-auto max-w-7xl px-4 md:px-6 lg:px-8">
           <nav
             className="flex items-center gap-1.5 py-2 overflow-x-auto scrollbar-hide"
@@ -54,7 +54,7 @@ export default function PerFormLayout({ children }: { children: React.ReactNode 
                   className={`flex items-center gap-1.5 whitespace-nowrap rounded-full px-3.5 py-1.5 text-xs md:text-sm font-medium transition-all shrink-0 ${
                     isActive
                       ? "bg-gold/15 text-gold border border-gold/30 shadow-[0_0_10px_rgba(212,175,55,0.1)]"
-                      : "text-white/50 hover:text-white/80 hover:bg-white/5 border border-transparent"
+                      : "text-slate-500 hover:text-slate-700 hover:bg-slate-50 border border-transparent"
                   }`}
                 >
                   <Icon className="w-3.5 h-3.5" />

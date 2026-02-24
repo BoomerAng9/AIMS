@@ -238,7 +238,7 @@ function SignalBars({ level }: { level: number }) {
           className="w-1 rounded-sm transition-colors"
           style={{
             height: `${bar * 3 + 2}px`,
-            backgroundColor: bar <= level ? '#22c55e' : '#374151',
+            backgroundColor: bar <= level ? '#22c55e' : '#E2E8F0',
           }}
         />
       ))}
@@ -250,7 +250,7 @@ function LoadBar({ load, color = '#22c55e' }: { load: number; color?: string }) 
   return (
     <div className="flex items-center gap-2">
       <span className="text-xs text-gray-400">Load</span>
-      <div className="flex-1 h-2 bg-gray-700 rounded-full overflow-hidden">
+      <div className="flex-1 h-2 bg-slate-200 rounded-full overflow-hidden">
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${load}%` }}
@@ -274,12 +274,12 @@ function MasterToggle({ state }: { state: ToggleState }) {
       <div
         className="w-20 h-20 rounded-full flex items-center justify-center"
         style={{
-          background: `radial-gradient(circle, ${isOn ? '#ef4444' : '#374151'} 0%, ${isOn ? '#991b1b' : '#1f2937'} 100%)`,
-          boxShadow: isOn ? '0 0 30px #ef444480, inset 0 -5px 15px rgba(0,0,0,0.5)' : 'inset 0 -5px 15px rgba(0,0,0,0.5)',
-          border: '4px solid #1f2937',
+          background: `radial-gradient(circle, ${isOn ? '#ef4444' : '#cbd5e1'} 0%, ${isOn ? '#991b1b' : '#94a3b8'} 100%)`,
+          boxShadow: isOn ? '0 0 30px #ef444480, inset 0 -5px 15px rgba(0,0,0,0.2)' : 'inset 0 -5px 15px rgba(0,0,0,0.1)',
+          border: '4px solid #E2E8F0',
         }}
       />
-      <div className="absolute inset-0 flex flex-col items-center justify-center text-white font-bold">
+      <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-800 font-bold">
         <span className={`text-sm ${isOn ? 'opacity-100' : 'opacity-30'}`}>ON</span>
         <span className={`text-sm ${!isOn ? 'opacity-100' : 'opacity-30'}`}>OFF</span>
       </div>
@@ -296,15 +296,15 @@ function Panel({ title, children, className = '' }: { title: string; children: R
     <div
       className={`rounded-lg overflow-hidden ${className}`}
       style={{
-        backgroundColor: 'rgba(255,255,255,0.03)',
-        border: '1px solid #2d3a4d',
+        backgroundColor: '#F8FAFC',
+        border: '1px solid #E2E8F0',
       }}
     >
       <div
         className="px-4 py-2 text-center font-mono text-xs uppercase tracking-wider"
         style={{
-          backgroundColor: '#0f1729',
-          borderBottom: '1px solid #2d3a4d',
+          backgroundColor: '#F1F5F9',
+          borderBottom: '1px solid #E2E8F0',
           color: AIMS_CIRCUIT_COLORS.secondary,
         }}
       >
@@ -326,13 +326,13 @@ function AIAgentsPanel({ agents }: { agents: AIAgent[] }) {
             key={agent.id}
             className="p-3 rounded-lg"
             style={{
-              backgroundColor: '#0f172a',
-              border: agent.id === 'voice' ? `1px solid ${AIMS_CIRCUIT_COLORS.primary}60` : '1px solid #2d3a4d',
+              backgroundColor: '#FFFFFF',
+              border: agent.id === 'voice' ? `1px solid ${AIMS_CIRCUIT_COLORS.primary}60` : '1px solid #E2E8F0',
             }}
           >
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-white">{agent.name}</span>
+                <span className="text-sm font-medium text-slate-800">{agent.name}</span>
                 {agent.type && (
                   <span className="text-xs text-gray-400">({agent.type})</span>
                 )}
@@ -367,11 +367,11 @@ function RepositoriesPanel({ repos }: { repos: Repository[] }) {
             key={repo.id}
             className="p-2 rounded text-center"
             style={{
-              backgroundColor: '#0f172a',
-              border: repo.errorCount ? '1px solid #ef444460' : '1px solid #2d3a4d',
+              backgroundColor: '#FFFFFF',
+              border: repo.errorCount ? '1px solid #ef444460' : '1px solid #E2E8F0',
             }}
           >
-            <div className="text-xs text-white mb-1 truncate">{repo.name}</div>
+            <div className="text-xs text-slate-800 mb-1 truncate">{repo.name}</div>
             <div className="flex items-center justify-center gap-2 mb-1">
               <SignalBars level={repo.signal} />
             </div>
@@ -399,9 +399,9 @@ function IntegrationsPanel({ integrations }: { integrations: Integration[] }) {
           <div
             key={integration.id}
             className="flex items-center justify-between p-2 rounded"
-            style={{ backgroundColor: '#0f172a', border: '1px solid #2d3a4d' }}
+            style={{ backgroundColor: '#FFFFFF', border: '1px solid #E2E8F0' }}
           >
-            <span className="text-sm text-white">{integration.name}</span>
+            <span className="text-sm text-slate-800">{integration.name}</span>
             <div className="flex items-center gap-2">
               <Toggle state={integration.enabled} />
               <HealthBadge health={integration.health} />
@@ -426,9 +426,9 @@ function VoicePanel({ configs }: { configs: VoiceConfig[] }) {
           <div
             key={config.id}
             className="flex items-center justify-between p-2 rounded"
-            style={{ backgroundColor: '#0f172a', border: '1px solid #2d3a4d' }}
+            style={{ backgroundColor: '#FFFFFF', border: '1px solid #E2E8F0' }}
           >
-            <span className="text-sm text-white">{config.name}</span>
+            <span className="text-sm text-slate-800">{config.name}</span>
             <Toggle state={config.enabled} />
           </div>
         ))}
@@ -443,7 +443,7 @@ function VoicePanel({ configs }: { configs: VoiceConfig[] }) {
             <select
               value={modelSelection}
               onChange={(e) => setModelSelection(e.target.value)}
-              className="bg-gray-800 text-white text-xs px-2 py-1 rounded border border-gray-600"
+              className="bg-white text-slate-800 text-xs px-2 py-1 rounded border border-slate-300"
             >
               <option>Eleven Turbo v2</option>
               <option>Eleven Multilingual</option>
@@ -477,9 +477,9 @@ function DeploymentPanel({ services }: { services: DeploymentService[] }) {
           <div
             key={service.id}
             className="flex items-center justify-between p-2 rounded"
-            style={{ backgroundColor: '#0f172a', border: '1px solid #2d3a4d' }}
+            style={{ backgroundColor: '#FFFFFF', border: '1px solid #E2E8F0' }}
           >
-            <span className="text-sm text-white">{service.name}</span>
+            <span className="text-sm text-slate-800">{service.name}</span>
             <div className="flex items-center gap-2">
               <Toggle state={service.enabled} />
               <span className="text-[10px] text-gray-500">Last check: {service.lastCheck}</span>
@@ -498,42 +498,42 @@ function VoiceAgentPanel({ config }: { config: VoiceAgentConfig }) {
 
       <div
         className="p-3 rounded-lg"
-        style={{ backgroundColor: '#0f172a', border: '1px solid #2d3a4d' }}
+        style={{ backgroundColor: '#FFFFFF', border: '1px solid #E2E8F0' }}
       >
-        <h4 className="text-sm font-medium text-white mb-3">Voice Agent</h4>
+        <h4 className="text-sm font-medium text-slate-800 mb-3">Voice Agent</h4>
         <p className="text-xs text-gray-400 mb-3">(ElevenLabs STT/TTS)</p>
 
         <div className="space-y-2 text-xs">
           <div className="flex justify-between">
             <span className="text-gray-400">API keys/credentials:</span>
-            <span className="text-white font-mono">{config.apiKey}</span>
+            <span className="text-slate-800 font-mono">{config.apiKey}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-gray-400">Rate limits:</span>
-            <span className="text-white">{config.rateLimits}</span>
+            <span className="text-slate-800">{config.rateLimits}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-gray-400">Timeout settings:</span>
-            <span className="text-white">{config.timeout}</span>
+            <span className="text-slate-800">{config.timeout}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-gray-400">Retry policies:</span>
-            <span className="text-white">{config.retryPolicies}</span>
+            <span className="text-slate-800">{config.retryPolicies}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-gray-400">Error handling:</span>
-            <span className="text-white">{config.errorHandling}</span>
+            <span className="text-slate-800">{config.errorHandling}</span>
           </div>
         </div>
 
-        <div className="mt-4 pt-3 border-t border-gray-700 space-y-2 text-xs">
+        <div className="mt-4 pt-3 border-t border-slate-200 space-y-2 text-xs">
           <div className="flex justify-between">
             <span className="text-gray-400">Current load:</span>
             <span style={{ color: AIMS_CIRCUIT_COLORS.primary }}>{config.currentLoad}%</span>
           </div>
           <div className="flex justify-between">
             <span className="text-gray-400">Request count:</span>
-            <span className="text-white">{config.requestCount.toLocaleString()}</span>
+            <span className="text-slate-800">{config.requestCount.toLocaleString()}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-gray-400">Error rate:</span>
@@ -541,11 +541,11 @@ function VoiceAgentPanel({ config }: { config: VoiceAgentConfig }) {
           </div>
           <div className="flex justify-between">
             <span className="text-gray-400">Response time:</span>
-            <span className="text-white">{config.responseTime}</span>
+            <span className="text-slate-800">{config.responseTime}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-gray-400">Monthly usage:</span>
-            <span className="text-white">{config.monthlyUsage}</span>
+            <span className="text-slate-800">{config.monthlyUsage}</span>
           </div>
         </div>
       </div>
@@ -563,7 +563,7 @@ function LogsPanel({ logs }: { logs: LogEntry[] }) {
   return (
     <div
       className="p-3 rounded-lg"
-      style={{ backgroundColor: '#0f172a', border: '1px solid #2d3a4d' }}
+      style={{ backgroundColor: '#FFFFFF', border: '1px solid #E2E8F0' }}
     >
       <div className="text-xs text-gray-400 mb-2 uppercase">Bottom Panel</div>
       <div className="space-y-1.5">
@@ -576,7 +576,7 @@ function LogsPanel({ logs }: { logs: LogEntry[] }) {
               [{log.level.toUpperCase()}]
             </span>{' '}
             <span className="text-gray-500">{log.timestamp}:</span>{' '}
-            <span className="text-gray-300">{log.message}</span>
+            <span className="text-slate-600">{log.message}</span>
           </div>
         ))}
       </div>
@@ -591,7 +591,7 @@ function AlertsPanel() {
 
       <div className="flex items-center gap-2 text-sm">
         <div className="w-3 h-3 rounded-full bg-red-500" />
-        <span className="text-white">Alerts and warnings</span>
+        <span className="text-slate-800">Alerts and warnings</span>
       </div>
       <div className="flex items-center gap-2 text-xs">
         <AlertIcon className="w-4 h-4 text-yellow-500" />
@@ -600,7 +600,7 @@ function AlertsPanel() {
 
       <div className="flex items-center gap-2 text-sm pt-2">
         <UserIcon className="w-4 h-4 text-gray-400" />
-        <span className="text-white">User access audit trail</span>
+        <span className="text-slate-800">User access audit trail</span>
       </div>
     </div>
   );
@@ -655,14 +655,14 @@ export default function CircuitBox() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search"
-                className="w-48 pl-9 pr-3 py-2 rounded bg-gray-800 border border-gray-700 text-white text-sm"
+                className="w-48 pl-9 pr-3 py-2 rounded bg-white border border-slate-200 text-slate-800 text-sm"
               />
             </div>
             <div className="flex gap-2">
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="bg-gray-800 text-white text-xs px-2 py-1 rounded border border-gray-700"
+                className="bg-white text-slate-800 text-xs px-2 py-1 rounded border border-slate-200"
               >
                 <option value="all">Status</option>
                 <option value="on">On</option>
@@ -671,7 +671,7 @@ export default function CircuitBox() {
               <select
                 value={filterCategory}
                 onChange={(e) => setFilterCategory(e.target.value)}
-                className="bg-gray-800 text-white text-xs px-2 py-1 rounded border border-gray-700"
+                className="bg-white text-slate-800 text-xs px-2 py-1 rounded border border-slate-200"
               >
                 <option value="all">Category</option>
                 <option value="agent">Agents</option>
@@ -709,7 +709,7 @@ export default function CircuitBox() {
         <div className="col-span-2">
           <div
             className="p-3 rounded-lg h-full"
-            style={{ backgroundColor: '#0f172a', border: '1px solid #2d3a4d' }}
+            style={{ backgroundColor: '#FFFFFF', border: '1px solid #E2E8F0' }}
           >
             <AlertsPanel />
           </div>
@@ -717,7 +717,7 @@ export default function CircuitBox() {
       </div>
 
       {/* A.I.M.S. Branding Footer */}
-      <footer className="mt-8 pt-4 border-t border-gray-800 flex items-center justify-between">
+      <footer className="mt-8 pt-4 border-t border-slate-200 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div
             className="w-8 h-8 rounded flex items-center justify-center font-bold text-black"

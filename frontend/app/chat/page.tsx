@@ -154,7 +154,7 @@ function VoiceSelector({ voiceId, provider, onSelect }: {
     <div className="relative">
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg border border-white/[0.06] bg-white/[0.03] hover:border-gold/20 text-[11px] text-white/50 font-mono transition-colors"
+        className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg border border-slate-200 bg-white hover:border-gold/20 text-[11px] text-slate-500 font-mono transition-colors"
       >
         <Volume2 className="w-3 h-3 text-gold/50" />
         <span>{cur?.name || 'Voice'}</span>
@@ -163,22 +163,22 @@ function VoiceSelector({ voiceId, provider, onSelect }: {
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-full mt-1 z-50 w-52 max-h-64 overflow-y-auto rounded-xl border border-white/[0.08] bg-[#0A0A0A]/95 backdrop-blur-xl shadow-2xl">
+          <div className="absolute right-0 top-full mt-1 z-50 w-52 max-h-64 overflow-y-auto rounded-xl border border-slate-200 bg-white/95 backdrop-blur-xl shadow-2xl">
             {(['elevenlabs', 'deepgram'] as const).map(prov => (
               <div key={prov}>
-                <div className="px-3 py-1.5 border-b border-white/[0.04]">
-                  <span className="text-[9px] text-white/25 font-mono uppercase tracking-wider">{prov}</span>
+                <div className="px-3 py-1.5 border-b border-slate-200">
+                  <span className="text-[9px] text-slate-400 font-mono uppercase tracking-wider">{prov}</span>
                 </div>
                 {TTS_VOICES.filter(v => v.provider === prov).map(v => (
                   <button
                     key={v.id}
                     onClick={() => { onSelect(v.id, v.provider); setOpen(false); }}
-                    className={`w-full text-left px-3 py-1.5 text-[11px] hover:bg-white/[0.04] flex justify-between ${
-                      voiceId === v.id ? 'text-gold bg-gold/[0.06]' : 'text-white/50'
+                    className={`w-full text-left px-3 py-1.5 text-[11px] hover:bg-white flex justify-between ${
+                      voiceId === v.id ? 'text-gold bg-gold/[0.06]' : 'text-slate-500'
                     }`}
                   >
                     <span>{v.name}</span>
-                    <span className="text-white/20">{v.style}</span>
+                    <span className="text-slate-300">{v.style}</span>
                   </button>
                 ))}
               </div>
@@ -229,25 +229,25 @@ function MessageBubble({ role, content, isStreaming }: {
       <div className={`min-w-0 max-w-[80%] ${isUser ? 'ml-auto' : ''}`}>
         <div className={`rounded-2xl px-4 py-2.5 text-sm leading-relaxed break-words overflow-hidden ${
           isUser
-            ? 'bg-gold/10 text-white/90 rounded-tr-sm border border-gold/15'
-            : 'bg-white/[0.03] backdrop-blur-sm text-white/85 rounded-tl-sm border border-white/[0.06] shadow-[0_2px_8px_rgba(0,0,0,0.3)]'
+            ? 'bg-gold/10 text-slate-800 rounded-tr-sm border border-gold/15'
+            : 'bg-white backdrop-blur-sm text-slate-700 rounded-tl-sm border border-slate-200 shadow-[0_2px_8px_rgba(0,0,0,0.3)]'
         }`}>
           {isUser ? (
             <p className="whitespace-pre-wrap break-words">{content}</p>
           ) : (
             <div className="prose prose-invert prose-sm max-w-none break-words
-              prose-headings:text-white/90 prose-a:text-gold prose-strong:text-white/90
-              prose-code:text-gold/80 prose-code:bg-black/30 prose-code:px-1 prose-code:py-0.5 prose-code:rounded
+              prose-headings:text-slate-800 prose-a:text-gold prose-strong:text-slate-800
+              prose-code:text-gold/80 prose-code:bg-slate-100/40 prose-code:px-1 prose-code:py-0.5 prose-code:rounded
               prose-pre:max-w-full prose-pre:overflow-x-auto prose-p:my-1.5 prose-headings:my-2">
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
                 components={{
                   code({ className, children, ...props }) {
                     if (!className) {
-                      return <code className="bg-black/30 px-1 py-0.5 rounded text-gold/80 text-[12px]" {...props}>{children}</code>;
+                      return <code className="bg-slate-100/40 px-1 py-0.5 rounded text-gold/80 text-[12px]" {...props}>{children}</code>;
                     }
                     return (
-                      <pre className="bg-black/40 rounded-lg p-3 overflow-x-auto border border-white/[0.04] my-2 max-w-full">
+                      <pre className="bg-slate-100/60 rounded-lg p-3 overflow-x-auto border border-slate-200 my-2 max-w-full">
                         <code className={`${className} text-[12px]`} {...props}>{children}</code>
                       </pre>
                     );
@@ -265,7 +265,7 @@ function MessageBubble({ role, content, isStreaming }: {
         {!isUser && !isStreaming && content && (
           <button
             onClick={() => { navigator.clipboard.writeText(content); setCopied(true); setTimeout(() => setCopied(false), 1500); }}
-            className="mt-0.5 p-1 rounded opacity-0 hover:opacity-100 text-white/20 hover:text-gold/60 transition-all"
+            className="mt-0.5 p-1 rounded opacity-0 hover:opacity-100 text-slate-300 hover:text-gold/60 transition-all"
           >
             {copied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
           </button>
@@ -296,21 +296,21 @@ function ThreadsSidebar({ threads, activeId, onSelect, onNew, onDelete, open, on
       animate={{ width: 240, opacity: 1 }}
       exit={{ width: 0, opacity: 0 }}
       transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
-      className="flex-shrink-0 overflow-hidden border-r border-white/[0.06] bg-black/60"
+      className="flex-shrink-0 overflow-hidden border-r border-slate-200 bg-slate-50/70"
     >
       <div className="flex flex-col h-full w-[240px]">
-        <div className="flex items-center justify-between px-3 py-2.5 border-b border-white/[0.06]">
-          <span className="text-[9px] uppercase tracking-[0.15em] text-white/30 font-mono">Threads</span>
+        <div className="flex items-center justify-between px-3 py-2.5 border-b border-slate-200">
+          <span className="text-[9px] uppercase tracking-[0.15em] text-slate-400 font-mono">Threads</span>
           <div className="flex gap-1">
-            <button onClick={onNew} className="p-1 rounded text-white/30 hover:text-gold transition-colors"><Plus size={13} /></button>
-            <button onClick={onToggle} className="p-1 rounded text-white/30 hover:text-white/60 transition-colors"><PanelLeftClose size={13} /></button>
+            <button onClick={onNew} className="p-1 rounded text-slate-400 hover:text-gold transition-colors"><Plus size={13} /></button>
+            <button onClick={onToggle} className="p-1 rounded text-slate-400 hover:text-slate-500 transition-colors"><PanelLeftClose size={13} /></button>
           </div>
         </div>
         <div className="flex-1 overflow-y-auto py-1.5 space-y-0.5">
           {threads.length === 0 ? (
             <div className="px-3 py-8 text-center">
-              <MessageSquare className="w-5 h-5 text-white/[0.08] mx-auto mb-1.5" />
-              <p className="text-[9px] text-white/15 font-mono">No threads yet</p>
+              <MessageSquare className="w-5 h-5 text-slate-300 mx-auto mb-1.5" />
+              <p className="text-[9px] text-slate-300 font-mono">No threads yet</p>
             </div>
           ) : threads.map(t => (
             <div
@@ -319,16 +319,16 @@ function ThreadsSidebar({ threads, activeId, onSelect, onNew, onDelete, open, on
               className={`group flex items-center gap-2 mx-1.5 px-2.5 py-2 rounded-lg cursor-pointer transition-all ${
                 activeId === t.id
                   ? 'bg-gold/[0.08] border border-gold/15'
-                  : 'border border-transparent hover:bg-white/[0.03]'
+                  : 'border border-transparent hover:bg-white'
               }`}
             >
-              <MessageSquare size={11} className={activeId === t.id ? 'text-gold/60' : 'text-white/20'} />
+              <MessageSquare size={11} className={activeId === t.id ? 'text-gold/60' : 'text-slate-300'} />
               <div className="flex-1 min-w-0">
-                <p className={`text-[11px] truncate ${activeId === t.id ? 'text-gold/80' : 'text-white/50'}`}>{t.title}</p>
+                <p className={`text-[11px] truncate ${activeId === t.id ? 'text-gold/80' : 'text-slate-500'}`}>{t.title}</p>
               </div>
               <button
                 onClick={(e) => { e.stopPropagation(); onDelete(t.id); }}
-                className="p-0.5 rounded opacity-0 group-hover:opacity-100 text-white/15 hover:text-red-400 transition-all"
+                className="p-0.5 rounded opacity-0 group-hover:opacity-100 text-slate-300 hover:text-red-400 transition-all"
               ><Trash2 size={10} /></button>
             </div>
           ))}
@@ -364,7 +364,7 @@ function VoiceSessionPanel({ conversation, active, onEnd }: {
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400 animate-pulse'}`} />
-            <span className="text-[10px] font-mono text-white/40 uppercase tracking-wider">
+            <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">
               {isConnected ? (isSpeaking ? 'ACHEEVY Speaking' : 'Listening') : 'Connecting...'}
             </span>
           </div>
@@ -380,8 +380,8 @@ function VoiceSessionPanel({ conversation, active, onEnd }: {
         {/* Visualizers */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <p className="text-[8px] text-white/20 font-mono uppercase mb-1">You</p>
-            <div className="rounded-lg bg-white/[0.02] border border-white/[0.04] p-1">
+            <p className="text-[8px] text-slate-300 font-mono uppercase mb-1">You</p>
+            <div className="rounded-lg bg-white border border-slate-200 p-1">
               <FrequencyVisualizer
                 getData={conversation.getInputByteFrequencyData}
                 active={isConnected}
@@ -411,7 +411,7 @@ function VoiceSessionPanel({ conversation, active, onEnd }: {
 
 export default function ChatPage() {
   return (
-    <Suspense fallback={<div className="flex items-center justify-center h-dvh bg-ink"><Loader2 className="w-8 h-8 animate-spin text-gold" /></div>}>
+    <Suspense fallback={<div className="flex items-center justify-center h-dvh bg-[#F8FAFC]"><Loader2 className="w-8 h-8 animate-spin text-gold" /></div>}>
       <ChatContent />
     </Suspense>
   );
@@ -650,25 +650,25 @@ function ChatContent() {
           {/* Main Area */}
           <main className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden">
             {/* ── Header ── */}
-            <div className="flex-shrink-0 flex items-center gap-3 px-4 py-2.5 border-b border-white/[0.06] bg-[#0A0A0A]/90 backdrop-blur-xl">
+            <div className="flex-shrink-0 flex items-center gap-3 px-4 py-2.5 border-b border-slate-200 bg-white/90 backdrop-blur-xl">
               {/* Left */}
               <div className="flex items-center gap-2.5 min-w-0">
                 {!sidebarOpen && (
-                  <button onClick={toggleSidebar} className="p-1 rounded text-white/30 hover:text-gold transition-colors flex-shrink-0">
+                  <button onClick={toggleSidebar} className="p-1 rounded text-slate-400 hover:text-gold transition-colors flex-shrink-0">
                     <PanelLeftOpen size={15} />
                   </button>
                 )}
                 <div className="relative flex-shrink-0">
-                  <div className="w-8 h-8 rounded-lg bg-white/[0.04] border border-gold/15 overflow-hidden">
+                  <div className="w-8 h-8 rounded-lg bg-white border border-gold/15 overflow-hidden">
                     <Image src="/images/acheevy/acheevy-helmet.png" alt="ACHEEVY" width={32} height={32} className="w-full h-full object-cover" />
                   </div>
-                  <div className={`absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full border-[1.5px] border-[#0A0A0A] ${
+                  <div className={`absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full border-[1.5px] border-white ${
                     voiceActive ? 'bg-gold animate-pulse' : 'bg-emerald-400'
                   }`} />
                 </div>
                 <div className="min-w-0">
-                  <h1 className="font-semibold text-sm text-white tracking-tight truncate">Chat w/ACHEEVY</h1>
-                  <p className="text-[9px] text-white/25 font-mono truncate">
+                  <h1 className="font-semibold text-sm text-slate-800 tracking-tight truncate">Chat w/ACHEEVY</h1>
+                  <p className="text-[9px] text-slate-400 font-mono truncate">
                     {voiceActive ? 'Voice Session Active' : 'Vercel AI SDK + ElevenLabs Agent'}
                   </p>
                 </div>
@@ -680,11 +680,11 @@ function ChatContent() {
                 <select
                   value={selectedModel}
                   onChange={(e) => setSelectedModel(e.target.value)}
-                  className="bg-white/[0.03] border border-white/[0.06] rounded-lg px-2 py-1 text-[10px] text-white/50 font-mono outline-none cursor-pointer max-w-[90px] appearance-none"
+                  className="bg-white border border-slate-200 rounded-lg px-2 py-1 text-[10px] text-slate-500 font-mono outline-none cursor-pointer max-w-[90px] appearance-none"
                   title="AI Model"
                 >
                   {AI_MODELS.map(m => (
-                    <option key={m.key} value={m.key} className="bg-[#0A0A0A]">
+                    <option key={m.key} value={m.key} className="bg-white">
                       {m.label}
                     </option>
                   ))}
@@ -730,8 +730,8 @@ function ChatContent() {
                       </div>
                       <div className="absolute inset-0 rounded-2xl border border-gold/20 animate-pulse" style={{ animationDuration: '3s' }} />
                     </div>
-                    <h2 className="text-lg font-semibold text-white mb-1">Chat w/ACHEEVY</h2>
-                    <p className="text-white/35 text-sm text-center max-w-sm">
+                    <h2 className="text-lg font-semibold text-slate-800 mb-1">Chat w/ACHEEVY</h2>
+                    <p className="text-slate-400 text-sm text-center max-w-sm">
                       What will we deploy today?
                     </p>
                     {hasAgent && (
@@ -768,8 +768,8 @@ function ChatContent() {
                   >
                     <div className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm break-words ${
                       entry.role === 'user'
-                        ? 'bg-gold/10 text-white/90 rounded-tr-sm border border-gold/15'
-                        : 'bg-white/[0.03] text-white/85 rounded-tl-sm border border-white/[0.06]'
+                        ? 'bg-gold/10 text-slate-800 rounded-tr-sm border border-gold/15'
+                        : 'bg-white text-slate-700 rounded-tl-sm border border-slate-200'
                     }`}>
                       {entry.text}
                     </div>
@@ -782,7 +782,7 @@ function ChatContent() {
                     <div className="w-7 h-7 rounded-full bg-gold/10 border border-gold/15 overflow-hidden flex-shrink-0">
                       <Image src="/images/acheevy/acheevy-helmet.png" alt="" width={28} height={28} className="w-full h-full object-cover animate-pulse" />
                     </div>
-                    <div className="px-3 py-2.5 bg-white/[0.03] rounded-2xl rounded-tl-sm border border-white/[0.06] flex items-center gap-1.5">
+                    <div className="px-3 py-2.5 bg-white rounded-2xl rounded-tl-sm border border-slate-200 flex items-center gap-1.5">
                       <div className="w-1.5 h-1.5 bg-gold/40 rounded-full animate-bounce [animation-delay:-0.3s]" />
                       <div className="w-1.5 h-1.5 bg-gold/40 rounded-full animate-bounce [animation-delay:-0.15s]" />
                       <div className="w-1.5 h-1.5 bg-gold/40 rounded-full animate-bounce" />
@@ -804,28 +804,28 @@ function ChatContent() {
             </AnimatePresence>
 
             {/* ── Input Area ── */}
-            <div className="flex-shrink-0 border-t border-white/[0.06] bg-[#0A0A0A]/90 backdrop-blur-xl px-4 py-3">
+            <div className="flex-shrink-0 border-t border-slate-200 bg-white/90 backdrop-blur-xl px-4 py-3">
               <div className="max-w-2xl mx-auto w-full">
                 {/* File previews */}
                 {files.length > 0 && (
                   <div className="flex flex-wrap gap-1.5 mb-2">
                     {files.map((f, i) => (
-                      <div key={`${f.name}-${i}`} className="flex items-center gap-1.5 px-2 py-1 rounded-lg border border-white/[0.06] bg-white/[0.02] text-[10px] text-white/50">
+                      <div key={`${f.name}-${i}`} className="flex items-center gap-1.5 px-2 py-1 rounded-lg border border-slate-200 bg-white text-[10px] text-slate-500">
                         <Paperclip className="w-2.5 h-2.5 text-gold/40" />
                         <span className="max-w-[100px] truncate">{f.name}</span>
-                        <button onClick={() => setFiles(p => p.filter((_, j) => j !== i))} className="text-white/20 hover:text-red-400"><X className="w-2.5 h-2.5" /></button>
+                        <button onClick={() => setFiles(p => p.filter((_, j) => j !== i))} className="text-slate-300 hover:text-red-400"><X className="w-2.5 h-2.5" /></button>
                       </div>
                     ))}
                   </div>
                 )}
 
                 <form id="chat-form" onSubmit={handleEnhancedSubmit}>
-                  <div className="flex items-end gap-2 rounded-2xl border border-white/[0.08] bg-white/[0.02] p-2.5 focus-within:border-gold/20 transition-colors">
+                  <div className="flex items-end gap-2 rounded-2xl border border-slate-200 bg-white p-2.5 focus-within:border-gold/20 transition-colors">
                     {/* File attach */}
                     <button
                       type="button"
                       onClick={() => fileRef.current?.click()}
-                      className="p-2 rounded-xl bg-white/[0.03] text-white/30 hover:text-gold/60 hover:bg-gold/[0.06] transition-all flex-shrink-0"
+                      className="p-2 rounded-xl bg-white text-slate-400 hover:text-gold/60 hover:bg-gold/[0.06] transition-all flex-shrink-0"
                     >
                       <Paperclip className="w-4 h-4" />
                     </button>
@@ -851,7 +851,7 @@ function ChatContent() {
                       placeholder={voiceActive ? 'Voice session active...' : 'Message ACHEEVY...'}
                       disabled={isLoading || voiceActive}
                       rows={1}
-                      className="flex-1 bg-transparent text-white/90 placeholder:text-white/15 resize-none outline-none text-sm leading-relaxed max-h-[140px] py-1.5 min-w-0"
+                      className="flex-1 bg-transparent text-slate-800 placeholder:text-slate-300 resize-none outline-none text-sm leading-relaxed max-h-[140px] py-1.5 min-w-0"
                     />
 
                     {/* TTS toggle */}
@@ -860,7 +860,7 @@ function ChatContent() {
                       onClick={() => { isSpeaking ? stopSpeaking() : setTtsEnabled(!ttsEnabled); }}
                       className={`p-2 rounded-xl transition-all flex-shrink-0 ${
                         isSpeaking ? 'bg-gold/15 text-gold animate-pulse'
-                          : ttsEnabled ? 'bg-gold/[0.06] text-gold/60' : 'bg-white/[0.03] text-white/20'
+                          : ttsEnabled ? 'bg-gold/[0.06] text-gold/60' : 'bg-white text-slate-300'
                       }`}
                       title={ttsEnabled ? (isSpeaking ? 'Stop' : 'TTS On') : 'Enable TTS'}
                     >
@@ -879,7 +879,7 @@ function ChatContent() {
                         className={`p-2 rounded-xl transition-all flex-shrink-0 ${
                           input.trim() && !voiceActive
                             ? 'bg-gold text-black hover:bg-[#F6C453]'
-                            : 'bg-white/[0.04] text-white/20 cursor-not-allowed'
+                            : 'bg-white text-slate-300 cursor-not-allowed'
                         }`}
                       >
                         <Send className="w-4 h-4" />

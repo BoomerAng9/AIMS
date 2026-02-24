@@ -158,8 +158,8 @@ export function LEDPanel({ children, className = '', showScrews = true }: LEDPan
     <div
       className={`
         relative rounded-xl p-4
-        bg-gradient-to-b from-zinc-900/95 to-black
-        border border-zinc-700/50
+        bg-gradient-to-b from-slate-100/95 to-white
+        border border-slate-300/50
         ${className}
       `}
       style={{
@@ -194,14 +194,14 @@ function Screw({ position }: { position: 'top-left' | 'top-right' | 'bottom-left
 
   return (
     <div
-      className={`absolute ${positionClasses[position]} w-3 h-3 rounded-full bg-zinc-700 border border-zinc-600`}
+      className={`absolute ${positionClasses[position]} w-3 h-3 rounded-full bg-slate-300 border border-slate-400`}
       style={{
         boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.5), 0 1px 0 rgba(255,255,255,0.1)',
       }}
     >
-      <div className="absolute inset-0.5 rounded-full bg-gradient-to-br from-zinc-500 to-zinc-700" />
+      <div className="absolute inset-0.5 rounded-full bg-gradient-to-br from-slate-200 to-slate-400" />
       <div className="absolute inset-0 flex items-center justify-center">
-        <div className="w-2 h-0.5 bg-zinc-800 rounded-full" />
+        <div className="w-2 h-0.5 bg-slate-500 rounded-full" />
       </div>
     </div>
   );
@@ -318,7 +318,7 @@ export function LEDBalance({
 
   return (
     <LEDPanel className="inline-block">
-      <p className="text-[10px] uppercase tracking-wider text-zinc-500 mb-2">{label}</p>
+      <p className="text-[10px] uppercase tracking-wider text-slate-500 mb-2">{label}</p>
       <LEDText text={`${prefix}${formatted}`} size="lg" color={color} />
     </LEDPanel>
   );
@@ -353,8 +353,8 @@ export function VoiceButton({
       disabled={isProcessing}
       className={`
         relative ${sizeClasses[size]} rounded-full
-        bg-gradient-to-b from-zinc-800 to-zinc-900
-        border-2 border-zinc-700
+        bg-gradient-to-b from-slate-100 to-slate-200
+        border-2 border-slate-300
         flex items-center justify-center
         transition-all hover:border-gold/20
         disabled:opacity-50
@@ -419,9 +419,9 @@ export function ActivityItem({ label, value, type = 'default' }: ActivityItemPro
 
   return (
     <div
-      className="flex items-center justify-between p-3 rounded-lg bg-zinc-900/50 border border-zinc-800"
+      className="flex items-center justify-between p-3 rounded-lg bg-slate-200/50 border border-slate-300"
     >
-      <span className="text-zinc-400 font-medium">{label}</span>
+      <span className="text-slate-500 font-medium">{label}</span>
       <div className="flex items-center gap-2">
         <span
           className="font-mono font-medium"

@@ -215,6 +215,148 @@
         "lil_hawks_terminated": "integer",
         "state_preserved": "boolean"
       }
+    },
+
+    "start_factory_run": {
+      "name": "start_factory_run",
+      "description": "Initiate an FDH pipeline from an event or user 'Manage It' request",
+      "category": "factory",
+      "parameters": {
+        "type": "object",
+        "required": ["scope"],
+        "properties": {
+          "scope": {"type": "string", "description": "What needs to be done"},
+          "chamber_id": {"type": "string", "description": "Target chamber (auto-created if omitted)"},
+          "priority": {"type": "string", "enum": ["standard", "priority", "urgent"], "default": "standard"},
+          "event_source": {"type": "string", "enum": ["git", "spec", "ticket", "telemetry", "schedule", "user", "build", "deploy", "automation"], "default": "user"}
+        }
+      },
+      "dispatch_to": "Factory Controller",
+      "returns": {
+        "run_id": "string",
+        "manifest_id": "string",
+        "awaiting_approval": "boolean",
+        "estimated_cost_usd": "number"
+      }
+    },
+
+    "oversee_factory_run": {
+      "name": "oversee_factory_run",
+      "description": "Monitor an active FDH run — check progress, detect stalls",
+      "category": "factory",
+      "parameters": {
+        "type": "object",
+        "required": ["run_id"],
+        "properties": {
+          "run_id": {"type": "string"},
+          "delegate_to": {"type": "string", "description": "Boomer_Ang to delegate oversight (e.g. OpsConsole_Ang)"}
+        }
+      },
+      "dispatch_to": "Factory Controller",
+      "returns": {
+        "status": "string",
+        "phase": "string",
+        "progress": "object",
+        "oracle_score": "number"
+      }
+    },
+
+    "approve_fdh_run": {
+      "name": "approve_fdh_run",
+      "description": "Approve a pending FDH manifest (HITL gate in Guide Me lane)",
+      "category": "factory",
+      "parameters": {
+        "type": "object",
+        "required": ["run_id"],
+        "properties": {
+          "run_id": {"type": "string"}
+        }
+      },
+      "dispatch_to": "Factory Controller",
+      "requires_confirmation": true,
+      "returns": {
+        "approved": "boolean",
+        "run_id": "string",
+        "status": "string"
+      }
+    },
+
+    "factory_status_report": {
+      "name": "factory_status_report",
+      "description": "Generate factory status report — active runs, costs, completions",
+      "category": "factory",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "include_chambers": {"type": "boolean", "default": true},
+          "include_recent": {"type": "boolean", "default": true}
+        }
+      },
+      "dispatch_to": "Factory Controller",
+      "returns": {
+        "factory_enabled": "boolean",
+        "status": "string",
+        "active_fdh_runs": "integer",
+        "pending_approvals": "integer",
+        "period_cost": "object",
+        "recent_completions": "object[]"
+      }
+    },
+
+    "pause_factory": {
+      "name": "pause_factory",
+      "description": "Temporarily halt all factory operations",
+      "category": "factory",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "reason": {"type": "string"}
+        }
+      },
+      "dispatch_to": "Factory Controller",
+      "requires_confirmation": true,
+      "returns": {
+        "paused": "boolean"
+      }
+    },
+
+    "resume_factory": {
+      "name": "resume_factory",
+      "description": "Resume factory operations after pause",
+      "category": "factory",
+      "parameters": {
+        "type": "object",
+        "properties": {}
+      },
+      "dispatch_to": "Factory Controller",
+      "returns": {
+        "resumed": "boolean"
+      }
+    },
+
+    "set_factory_policy": {
+      "name": "set_factory_policy",
+      "description": "Update Circuit Box factory policy (owner only)",
+      "category": "factory",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "auto_approve_threshold_usd": {"type": "number"},
+          "max_concurrent_fdh": {"type": "integer"},
+          "hours": {"type": "string", "enum": ["always", "business", "custom"]},
+          "stall_timeout_minutes": {"type": "integer"},
+          "monthly_budget_cap_usd": {"type": "number"},
+          "event_sources": {"type": "array", "items": {"type": "string"}},
+          "auto_wire_enabled": {"type": "boolean"},
+          "health_remediation": {"type": "string", "enum": ["restart_then_scale", "alert_only", "auto_scale"]}
+        }
+      },
+      "dispatch_to": "Factory Controller",
+      "requires_confirmation": true,
+      "returns": {
+        "updated": "boolean",
+        "policy": "object"
+      }
     }
   },
 

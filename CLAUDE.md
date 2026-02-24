@@ -130,3 +130,80 @@ cd frontend && npm run build    # Frontend build check
 cd backend/uef-gateway && npm run build  # Backend build check
 cd aims-skills && npm test      # Skills/hooks tests
 ```
+
+## Design System Auto-Trigger (MANDATORY)
+
+When building or modifying ANY frontend page, you MUST follow these rules:
+
+1. **Classify the page** using the archetype mapping below
+2. **Read the matching skill file** BEFORE writing any code
+3. **For landing/marketing pages**, ALSO apply `aims-animated-web` skill
+4. **ALL animation timing** MUST use tokens from `frontend/lib/motion/tokens.ts` — NO magic numbers
+5. **ALL animation variants** MUST come from `frontend/lib/motion/variants.ts`
+6. **Reusable components** live in `frontend/components/motion/` — use them before writing custom animations
+7. **ALWAYS apply** `aims-global-ui` rules (colors, spacing, typography, light theme) in addition to the archetype
+
+### Path → Archetype Mapping
+
+| Path Pattern | Archetype Skill | Extra Skills |
+|---|---|---|
+| `app/page.tsx`, `app/landing/**` | `.claude/skills/aims-landing-ui/SKILL.md` | + `aims-animated-web` |
+| `app/(auth)/**`, `app/onboarding/**` | `.claude/skills/aims-auth-onboarding-ui/SKILL.md` | — |
+| `app/chat/**`, `app/dashboard/chat/**` | `.claude/skills/aims-chat-ui/SKILL.md` | — |
+| `app/dashboard/**` (general) | `.claude/skills/aims-command-center-ui/SKILL.md` | — |
+| `app/crm/**`, `app/project-management/**` | `.claude/skills/aims-crm-ui/SKILL.md` | — |
+| `app/dashboard/luc/**`, `app/finance/**` | `.claude/skills/aims-finance-analytics-ui/SKILL.md` | — |
+| `app/dashboard/automations/**`, `app/workstreams/**` | `.claude/skills/aims-workflow-ui/SKILL.md` | — |
+| `app/dashboard/research/**`, `app/tools/**` | `.claude/skills/aims-content-tools-ui/SKILL.md` | — |
+| `app/halalhub/**` | `.claude/skills/aims-landing-ui/SKILL.md` (emerald variant) | + `aims-animated-web` |
+| **Global (always)** | `.claude/skills/aims-global-ui/SKILL.md` | — |
+
+### Motion Component Library
+
+Before writing custom animations, check `frontend/components/motion/`:
+- `ScrollReveal` — viewport-triggered fade/slide reveal
+- `ParallaxSection` — scroll-driven depth layers
+- `TiltCard` — mouse-tracking 3D perspective
+- `TypeReveal` — character-by-character stagger
+- `ScrollProgress` — fixed progress bar
+- `GlowBorder` — Huly.io-style rotating gradient border
+- `BentoGrid` — asymmetric feature grid with stagger
+
+## Dual-Layer Access (PRIVATE vs PUBLIC)
+
+A.I.M.S. has two interaction modes:
+
+- **PRIVATE mode** (Owner/Admin): Full technical vocabulary, all agents visible, all integrations exposed, developer tools, raw ACHEEVY
+- **PUBLIC mode** (Customer): Simplified UI, plain language labels, no agent names, paywalled features
+
+Use `usePlatformMode()` from `frontend/lib/platform-mode.tsx` to detect mode.
+Use `t(key, mode)` from `frontend/lib/terminology.ts` for mode-aware labels.
+
+**Never expose to PUBLIC users:** Agent names (Boomer_Ang, Lil_Hawk, Chicken Hawk), Docker terminology, infrastructure details. Only "ACHEEVY" and "your AI team".
+
+## Mistakes & Lessons Learned
+
+Every recurring mistake is documented here. Read this BEFORE making changes. Add new entries when mistakes are discovered.
+
+### Architecture Mistakes
+1. **Role mismatch** — Prisma schema used "MEMBER" as default, auth.ts used "USER". Always use canonical `UserRole` types: OWNER, ADMIN, CUSTOMER, DEMO_USER.
+2. **Two Chicken Hawk implementations** — In-process agent (`agents/chicken-hawk.ts`) AND standalone service (`services/chicken-hawk/`). The in-process version should proxy to standalone when `CHICKENHAWK_URL` is available.
+3. **Design skills not auto-triggered** — Skills in `.claude/skills/aims-*-ui/` are reference docs. They are NOT enforced by code. Follow the archetype-router mapping above every time.
+4. **Antigravity destructive changes** — External agents (Gemini/Antigravity) have deleted critical files when adding new features. Always review diffs before merging branches from other agents.
+
+### UI Mistakes
+5. **Magic animation numbers** — Never hard-code duration, easing, or spring values. Import from `@/lib/motion/tokens.ts`.
+6. **Missing reduced-motion** — Every animation component MUST respect `prefers-reduced-motion`. Test with DevTools.
+7. **Dark theme when not requested** — Default A.I.M.S. is LIGHT (#F8FAFC background). Only use dark backgrounds if explicitly requested.
+8. **Exposing agent names to public** — Customer-facing UI must NEVER show "Boomer_Ang", "Lil_Hawk", "Chicken Hawk". Only "ACHEEVY" and "your team".
+9. **Ignoring existing motion library** — `frontend/lib/motion/` has tokens.ts and variants.ts with 22+ reusable presets. Use them.
+
+### Deployment Mistakes
+10. **Pushing without permission** — Never push to remote without explicit owner request.
+11. **Skipping build verification** — Always run `cd frontend && npm run build` before considering frontend work complete.
+12. **License violations** — This is PROPRIETARY software. Never add MIT/Apache/GPL headers to A.I.M.S. code files. `backend/ii-agent/` is an exception (third-party fork with its own MIT license).
+
+### Security Mistakes
+13. **Sensitive data in logs** — Never log API keys, user passwords, or session tokens.
+14. **No auth on destructive actions** — Deploy, scale, decommission actions MUST check user role via `requireRole()` middleware before executing.
+15. **Prisma v7 breaking change** — Prisma v7 removed `url` from schema `datasource`. Use Prisma v5 CLI (`npx prisma@5 generate`) until migration complete.

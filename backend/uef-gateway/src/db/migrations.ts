@@ -202,6 +202,178 @@ const migrations: Migration[] = [
       `);
     },
   },
+  {
+    version: '005',
+    name: 'create_billing_tables',
+    up: (db: Database.Database): void => {
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS billing_provisions (
+          userId TEXT PRIMARY KEY,
+          tierId TEXT NOT NULL DEFAULT 'p2p',
+          tierName TEXT NOT NULL DEFAULT 'Pay-per-Use',
+          stripeCustomerId TEXT NOT NULL DEFAULT '',
+          stripeSubscriptionId TEXT NOT NULL DEFAULT '',
+          provisionedAt TEXT NOT NULL,
+          updatedAt TEXT NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS payment_sessions (
+          id TEXT PRIMARY KEY,
+          resourceType TEXT NOT NULL,
+          resourceId TEXT NOT NULL,
+          amount REAL NOT NULL,
+          currency TEXT NOT NULL DEFAULT 'usd',
+          network TEXT NOT NULL DEFAULT 'stripe',
+          status TEXT NOT NULL DEFAULT 'pending',
+          agentId TEXT,
+          metadata TEXT NOT NULL DEFAULT '{}',
+          receipt TEXT,
+          stripePaymentIntentId TEXT,
+          stripeCheckoutSessionId TEXT,
+          createdAt TEXT NOT NULL,
+          completedAt TEXT,
+          expiresAt TEXT NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS x402_receipts (
+          paymentId TEXT PRIMARY KEY,
+          network TEXT NOT NULL,
+          amount REAL NOT NULL,
+          currency TEXT NOT NULL,
+          resourceId TEXT NOT NULL,
+          timestamp TEXT NOT NULL,
+          expiresAt TEXT NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS agent_wallets (
+          agentId TEXT PRIMARY KEY,
+          lucBalance REAL NOT NULL DEFAULT 1000,
+          limitPerTransaction REAL NOT NULL DEFAULT 100,
+          limitPerHour REAL NOT NULL DEFAULT 500,
+          limitPerDay REAL NOT NULL DEFAULT 2000,
+          createdAt TEXT NOT NULL,
+          updatedAt TEXT NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS agent_transactions (
+          id TEXT PRIMARY KEY,
+          agentId TEXT NOT NULL,
+          type TEXT NOT NULL,
+          amount REAL NOT NULL,
+          currency TEXT NOT NULL DEFAULT 'usd',
+          description TEXT NOT NULL,
+          counterparty TEXT NOT NULL DEFAULT 'aims-platform',
+          protocol TEXT NOT NULL DEFAULT 'stripe',
+          timestamp TEXT NOT NULL
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_payment_sessions_status ON payment_sessions(status);
+        CREATE INDEX IF NOT EXISTS idx_payment_sessions_agentId ON payment_sessions(agentId);
+        CREATE INDEX IF NOT EXISTS idx_payment_sessions_expiresAt ON payment_sessions(expiresAt);
+        CREATE INDEX IF NOT EXISTS idx_x402_receipts_resourceId ON x402_receipts(resourceId);
+        CREATE INDEX IF NOT EXISTS idx_agent_transactions_agentId ON agent_transactions(agentId);
+        CREATE INDEX IF NOT EXISTS idx_agent_transactions_timestamp ON agent_transactions(timestamp);
+      `);
+    },
+  },
+  {
+    version: '006',
+    name: 'create_plug_instances_table',
+    up: (db: Database.Database): void => {
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS plug_instances (
+          instanceId TEXT PRIMARY KEY,
+          plugId TEXT NOT NULL,
+          userId TEXT NOT NULL,
+          name TEXT NOT NULL,
+          status TEXT NOT NULL DEFAULT 'configuring',
+          deliveryMode TEXT NOT NULL DEFAULT 'hosted',
+          assignedPort INTEGER NOT NULL,
+          domain TEXT,
+          envOverrides TEXT NOT NULL DEFAULT '{}',
+          customizationValues TEXT NOT NULL DEFAULT '{}',
+          securityLevel TEXT NOT NULL DEFAULT 'standard',
+          dspId TEXT,
+          lucCost REAL NOT NULL DEFAULT 0,
+          uptimeSeconds INTEGER NOT NULL DEFAULT 0,
+          lastHealthCheck TEXT,
+          healthStatus TEXT NOT NULL DEFAULT 'unknown',
+          exportBundle TEXT,
+          createdAt TEXT NOT NULL,
+          startedAt TEXT,
+          stoppedAt TEXT
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_plug_instances_userId ON plug_instances(userId);
+        CREATE INDEX IF NOT EXISTS idx_plug_instances_plugId ON plug_instances(plugId);
+        CREATE INDEX IF NOT EXISTS idx_plug_instances_status ON plug_instances(status);
+      `);
+    },
+  },
+  {
+    version: '007',
+    name: 'create_invoices_table',
+    up: (db: Database.Database): void => {
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS invoices (
+          id TEXT PRIMARY KEY,
+          userId TEXT NOT NULL,
+          tierId TEXT NOT NULL,
+          periodStart TEXT NOT NULL,
+          periodEnd TEXT NOT NULL,
+          status TEXT NOT NULL DEFAULT 'draft',
+          subtotal REAL NOT NULL DEFAULT 0,
+          tax REAL NOT NULL DEFAULT 0,
+          total REAL NOT NULL DEFAULT 0,
+          currency TEXT NOT NULL DEFAULT 'usd',
+          lineItems TEXT NOT NULL DEFAULT '[]',
+          stripeInvoiceId TEXT,
+          paidAt TEXT,
+          createdAt TEXT NOT NULL,
+          updatedAt TEXT NOT NULL
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_invoices_userId ON invoices(userId);
+        CREATE INDEX IF NOT EXISTS idx_invoices_status ON invoices(status);
+        CREATE INDEX IF NOT EXISTS idx_invoices_createdAt ON invoices(createdAt);
+      `);
+    },
+  },
+  {
+    version: '008',
+    name: 'create_observability_tables',
+    up: (db: Database.Database): void => {
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS metric_snapshots (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          metric TEXT NOT NULL,
+          value REAL NOT NULL,
+          labels TEXT DEFAULT '{}',
+          recorded_at TEXT NOT NULL
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_metric_snapshots_metric ON metric_snapshots(metric);
+        CREATE INDEX IF NOT EXISTS idx_metric_snapshots_recorded_at ON metric_snapshots(recorded_at);
+
+        CREATE TABLE IF NOT EXISTS alert_history (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          alertId TEXT NOT NULL,
+          name TEXT NOT NULL,
+          metric TEXT NOT NULL,
+          value REAL NOT NULL,
+          threshold REAL NOT NULL,
+          condition TEXT NOT NULL,
+          severity TEXT NOT NULL,
+          triggered_at TEXT NOT NULL,
+          acknowledged INTEGER NOT NULL DEFAULT 0
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_alert_history_alertId ON alert_history(alertId);
+        CREATE INDEX IF NOT EXISTS idx_alert_history_triggered_at ON alert_history(triggered_at);
+        CREATE INDEX IF NOT EXISTS idx_alert_history_severity ON alert_history(severity);
+      `);
+    },
+  },
 ];
 
 // ---------------------------------------------------------------------------

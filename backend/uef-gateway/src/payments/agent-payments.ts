@@ -15,11 +15,16 @@
  *
  * 4. Agent Wallets: Per-agent spending limits and transaction history.
  *    Implements the "programmable spending guardrails" pattern.
+ *
+ * SECURITY: All wallet state persisted to SQLite. No in-memory Maps.
+ * Payment tokens persisted to SQLite via payment_tokens table.
  */
 
 import { v4 as uuidv4 } from 'uuid';
 import { LUCEngine } from '../luc';
 import logger from '../logger';
+import { agentWalletStore, agentTransactionStore } from '../billing/persistence';
+import { getDb } from '../db';
 import type {
   X402PaymentRequired,
   X402PaymentProof,
@@ -83,22 +88,86 @@ function getProductPrice(productId: string): number {
 }
 
 // ---------------------------------------------------------------------------
-// Agent Payment Engine
+// Payment Token SQLite Persistence
+// ---------------------------------------------------------------------------
+
+function ensurePaymentTokensTable(): void {
+  const db = getDb();
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS payment_tokens (
+      tokenId TEXT PRIMARY KEY,
+      agentId TEXT NOT NULL,
+      maxAmount REAL NOT NULL,
+      currency TEXT NOT NULL DEFAULT 'usd',
+      allowedProducts TEXT NOT NULL DEFAULT '["*"]',
+      expiresAt TEXT NOT NULL,
+      usesRemaining INTEGER NOT NULL DEFAULT 10,
+      createdBy TEXT NOT NULL DEFAULT 'acheevy',
+      createdAt TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_payment_tokens_agentId ON payment_tokens(agentId);
+    CREATE INDEX IF NOT EXISTS idx_payment_tokens_expiresAt ON payment_tokens(expiresAt);
+  `);
+}
+
+function persistToken(token: AgentPaymentToken): void {
+  const db = getDb();
+  db.prepare(`
+    INSERT OR REPLACE INTO payment_tokens (tokenId, agentId, maxAmount, currency, allowedProducts, expiresAt, usesRemaining, createdBy, createdAt)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `).run(
+    token.tokenId, token.agentId, token.maxAmount, token.currency,
+    JSON.stringify(token.allowedProducts), token.expiresAt,
+    token.usesRemaining, token.createdBy, token.createdAt,
+  );
+}
+
+function getToken(tokenId: string): AgentPaymentToken | undefined {
+  const db = getDb();
+  const row = db.prepare('SELECT * FROM payment_tokens WHERE tokenId = ?').get(tokenId) as any;
+  if (!row) return undefined;
+  return {
+    ...row,
+    allowedProducts: JSON.parse(row.allowedProducts),
+  };
+}
+
+function updateToken(tokenId: string, updates: { usesRemaining: number; maxAmount: number }): void {
+  const db = getDb();
+  db.prepare('UPDATE payment_tokens SET usesRemaining = ?, maxAmount = ? WHERE tokenId = ?')
+    .run(updates.usesRemaining, updates.maxAmount, tokenId);
+}
+
+function cleanupExpiredTokens(): number {
+  const db = getDb();
+  const result = db.prepare('DELETE FROM payment_tokens WHERE expiresAt < ?').run(new Date().toISOString());
+  return result.changes;
+}
+
+// ---------------------------------------------------------------------------
+// Agent Payment Engine — ALL STATE IN SQLITE
 // ---------------------------------------------------------------------------
 
 export class AgentPaymentEngine {
-  private wallets = new Map<string, AgentWallet>();
-  private tokens = new Map<string, AgentPaymentToken>();
+  // pendingPayments is ephemeral by design (15-min TTL, session-scoped)
   private pendingPayments = new Map<string, X402PaymentRequired>();
+
+  constructor() {
+    ensurePaymentTokensTable();
+
+    // Cleanup expired tokens every 10 minutes
+    setInterval(() => {
+      const cleaned = cleanupExpiredTokens();
+      if (cleaned > 0) {
+        logger.info({ cleaned }, '[AgentPayments] Expired payment tokens cleaned');
+      }
+    }, 10 * 60 * 1000);
+  }
 
   // -----------------------------------------------------------------------
   // X402 Protocol — Request Payment
   // -----------------------------------------------------------------------
 
-  /**
-   * Create an X402 payment request for a resource.
-   * Returns headers and body that should be sent as HTTP 402 response.
-   */
   createPaymentRequired(
     resource: string,
     lucCost: number,
@@ -120,6 +189,9 @@ export class AgentPaymentEngine {
 
     this.pendingPayments.set(sessionId, payment);
 
+    // Auto-cleanup after expiry
+    setTimeout(() => this.pendingPayments.delete(sessionId), 15 * 60 * 1000);
+
     logger.info(
       { sessionId, resource, lucCost, usdAmount },
       '[AgentPayments] X402 payment required',
@@ -140,9 +212,6 @@ export class AgentPaymentEngine {
     };
   }
 
-  /**
-   * Verify an X402 payment proof and grant access.
-   */
   verifyPayment(proof: X402PaymentProof): {
     verified: boolean;
     lucCredits: number;
@@ -153,23 +222,19 @@ export class AgentPaymentEngine {
       return { verified: false, lucCredits: 0, error: 'Unknown payment session' };
     }
 
-    // Check expiration
     if (new Date(pending.expiresAt) < new Date()) {
       this.pendingPayments.delete(proof.paymentSessionId);
       return { verified: false, lucCredits: 0, error: 'Payment session expired' };
     }
 
-    // In production, verify the transaction hash / Stripe payment ID
-    // For now, accept any proof with a transaction reference
+    // REQUIRE a real payment reference — no empty proofs
     if (!proof.transactionHash && !proof.stripePaymentId && !proof.lucTransactionId) {
       return { verified: false, lucCredits: 0, error: 'No payment reference provided' };
     }
 
-    // Convert to LUC credits
     const rate = LUC_RATES[pending.currency.toLowerCase()] || 100;
     const lucCredits = Math.floor((pending.amount / 100) * rate);
 
-    // Clean up
     this.pendingPayments.delete(proof.paymentSessionId);
 
     logger.info(
@@ -181,13 +246,9 @@ export class AgentPaymentEngine {
   }
 
   // -----------------------------------------------------------------------
-  // Stripe Agent Commerce — Payment Tokens
+  // Stripe Agent Commerce — Payment Tokens (PERSISTED TO SQLITE)
   // -----------------------------------------------------------------------
 
-  /**
-   * Create a scoped payment token for an agent.
-   * The token limits what the agent can buy and how much it can spend.
-   */
   createPaymentToken(
     agentId: string,
     options: {
@@ -210,25 +271,20 @@ export class AgentPaymentEngine {
       createdAt: new Date().toISOString(),
     };
 
-    this.tokens.set(token.tokenId, token);
-
-    // Add to agent wallet
-    const wallet = this.getOrCreateWallet(agentId);
-    wallet.activeTokens.push(token);
+    // Persist to SQLite — survives restarts
+    persistToken(token);
 
     logger.info(
       { tokenId: token.tokenId, agentId, maxAmount: token.maxAmount },
-      '[AgentPayments] Payment token created',
+      '[AgentPayments] Payment token created (persisted)',
     );
 
     return token;
   }
 
-  /**
-   * Process a purchase using a payment token.
-   */
   processPurchase(request: AgentPurchaseRequest): AgentPurchaseResult {
-    const token = this.tokens.get(request.tokenId);
+    // Read token from SQLite — NOT in-memory
+    const token = getToken(request.tokenId);
     if (!token) {
       return { purchaseId: '', status: 'failed', amount: 0, currency: 'usd', lucCost: 0, receipt: 'Invalid token' };
     }
@@ -246,25 +302,45 @@ export class AgentPaymentEngine {
       return { purchaseId: '', status: 'failed', amount: 0, currency: 'usd', lucCost: 0, receipt: 'Product not allowed' };
     }
 
-    // Look up product price from catalog
     const unitPrice = getProductPrice(request.productId);
     const amount = request.quantity * unitPrice;
     if (amount > token.maxAmount) {
       return { purchaseId: '', status: 'failed', amount, currency: token.currency, lucCost: 0, receipt: 'Exceeds token limit' };
     }
 
-    // Deduct from token
-    token.usesRemaining--;
-    token.maxAmount -= amount;
-
-    // Convert to LUC
     const rate = LUC_RATES[token.currency] || 100;
     const lucCost = Math.floor(amount * rate);
 
-    // Record transaction
-    const wallet = this.getOrCreateWallet(token.agentId);
-    const transaction: AgentTransaction = {
-      id: `txn_${uuidv4()}`,
+    // Enforce spending limits from persistent wallet
+    const persistedWallet = agentWalletStore.getOrCreate(token.agentId);
+    if (amount > persistedWallet.limitPerTransaction) {
+      return { purchaseId: '', status: 'failed', amount, currency: token.currency, lucCost: 0, receipt: `Exceeds per-transaction limit ($${persistedWallet.limitPerTransaction})` };
+    }
+    const hourlySpend = agentTransactionStore.getHourlySpend(token.agentId);
+    if (hourlySpend + amount > persistedWallet.limitPerHour) {
+      return { purchaseId: '', status: 'failed', amount, currency: token.currency, lucCost: 0, receipt: `Exceeds hourly limit ($${persistedWallet.limitPerHour}, current: $${hourlySpend.toFixed(2)})` };
+    }
+    const dailySpend = agentTransactionStore.getDailySpend(token.agentId);
+    if (dailySpend + amount > persistedWallet.limitPerDay) {
+      return { purchaseId: '', status: 'failed', amount, currency: token.currency, lucCost: 0, receipt: `Exceeds daily limit ($${persistedWallet.limitPerDay}, current: $${dailySpend.toFixed(2)})` };
+    }
+
+    // Check LUC balance from SQLite
+    if (persistedWallet.lucBalance < lucCost) {
+      return { purchaseId: '', status: 'failed', amount, currency: token.currency, lucCost, receipt: `Insufficient LUC balance (need ${lucCost}, have ${persistedWallet.lucBalance})` };
+    }
+
+    // Deduct token uses + amount — persist to SQLite
+    updateToken(token.tokenId, {
+      usesRemaining: token.usesRemaining - 1,
+      maxAmount: token.maxAmount - amount,
+    });
+
+    // Record transaction in SQLite
+    const txnId = `txn_${uuidv4()}`;
+    agentTransactionStore.create({
+      id: txnId,
+      agentId: token.agentId,
       type: 'debit',
       amount,
       currency: token.currency,
@@ -272,21 +348,16 @@ export class AgentPaymentEngine {
       counterparty: 'aims-platform',
       protocol: 'stripe',
       timestamp: new Date().toISOString(),
-    };
-    wallet.recentTransactions.unshift(transaction);
-    wallet.lucBalance -= lucCost;
+    });
 
-    // Check spending limits
-    const hourlySpend = this.getHourlySpend(wallet);
-    if (hourlySpend > wallet.spendingLimit.perHour) {
-      logger.warn({ agentId: token.agentId, hourlySpend }, '[AgentPayments] Hourly spending limit exceeded');
-    }
+    // Update wallet balance in SQLite
+    agentWalletStore.updateBalance(token.agentId, persistedWallet.lucBalance - lucCost);
 
     const purchaseId = `pur_${uuidv4()}`;
 
     logger.info(
       { purchaseId, agentId: token.agentId, amount, lucCost },
-      '[AgentPayments] Purchase completed',
+      '[AgentPayments] Purchase completed (SQLite persisted)',
     );
 
     return {
@@ -299,40 +370,60 @@ export class AgentPaymentEngine {
   }
 
   // -----------------------------------------------------------------------
-  // Agent Wallets
+  // Agent Wallets — ALL READS/WRITES VIA SQLITE
   // -----------------------------------------------------------------------
 
+  /**
+   * Get wallet from SQLite (creates if missing with 1000 LUC starting balance).
+   * Returns a view-model compatible with the AgentWallet type.
+   */
   getOrCreateWallet(agentId: string): AgentWallet {
-    let wallet = this.wallets.get(agentId);
-    if (!wallet) {
-      wallet = {
-        agentId,
-        lucBalance: 1000, // Starting balance
-        spendingLimit: {
-          perTransaction: 100,
-          perHour: 500,
-          perDay: 2000,
-        },
-        recentTransactions: [],
-        activeTokens: [],
-      };
-      this.wallets.set(agentId, wallet);
-    }
-    return wallet;
+    const persisted = agentWalletStore.getOrCreate(agentId);
+    const recentTxns = agentTransactionStore.listByAgent(agentId, 20);
+    const tokens = this.listActiveTokens(agentId);
+
+    return {
+      agentId,
+      lucBalance: persisted.lucBalance,
+      spendingLimit: {
+        perTransaction: persisted.limitPerTransaction,
+        perHour: persisted.limitPerHour,
+        perDay: persisted.limitPerDay,
+      },
+      recentTransactions: recentTxns.map(t => ({
+        id: t.id,
+        type: t.type as 'credit' | 'debit',
+        amount: t.amount,
+        currency: t.currency,
+        description: t.description,
+        counterparty: t.counterparty,
+        protocol: t.protocol as 'stripe' | 'luc' | 'x402' | 'internal',
+        timestamp: t.timestamp,
+      })),
+      activeTokens: tokens,
+    };
   }
 
   getWallet(agentId: string): AgentWallet | undefined {
-    return this.wallets.get(agentId);
+    const persisted = agentWalletStore.get(agentId);
+    if (!persisted) return undefined;
+    return this.getOrCreateWallet(agentId);
   }
 
   /**
-   * Credit LUC to an agent wallet (e.g., after receiving payment).
+   * Credit LUC to an agent wallet. SQLite only — no in-memory.
    */
   creditWallet(agentId: string, lucAmount: number, description: string): void {
-    const wallet = this.getOrCreateWallet(agentId);
-    wallet.lucBalance += lucAmount;
-    wallet.recentTransactions.unshift({
-      id: `txn_${uuidv4()}`,
+    const persisted = agentWalletStore.getOrCreate(agentId);
+
+    // Write to SQLite FIRST (source of truth)
+    agentWalletStore.updateBalance(agentId, persisted.lucBalance + lucAmount);
+
+    // Record transaction
+    const txnId = `txn_${uuidv4()}`;
+    agentTransactionStore.create({
+      id: txnId,
+      agentId,
       type: 'credit',
       amount: lucAmount,
       currency: 'LUC',
@@ -341,14 +432,15 @@ export class AgentPaymentEngine {
       protocol: 'internal',
       timestamp: new Date().toISOString(),
     });
+
+    logger.info({ agentId, lucAmount, txnId }, '[AgentPayments] Wallet credited (SQLite)');
   }
 
   /**
-   * Check if an agent can afford a LUC cost.
+   * Check if an agent can afford a LUC cost. SQLite source of truth.
    */
   canAfford(agentId: string, lucCost: number): boolean {
-    const wallet = this.wallets.get(agentId);
-    if (!wallet) return true; // New wallets get starting balance
+    const wallet = agentWalletStore.getOrCreate(agentId);
     return wallet.lucBalance >= lucCost;
   }
 
@@ -356,11 +448,16 @@ export class AgentPaymentEngine {
   // Helpers
   // -----------------------------------------------------------------------
 
-  private getHourlySpend(wallet: AgentWallet): number {
-    const oneHourAgo = Date.now() - 3600_000;
-    return wallet.recentTransactions
-      .filter(t => t.type === 'debit' && new Date(t.timestamp).getTime() > oneHourAgo)
-      .reduce((sum, t) => sum + t.amount, 0);
+  private listActiveTokens(agentId: string): AgentPaymentToken[] {
+    const db = getDb();
+    const now = new Date().toISOString();
+    const rows = db.prepare(
+      'SELECT * FROM payment_tokens WHERE agentId = ? AND expiresAt > ? AND usesRemaining > 0 ORDER BY createdAt DESC LIMIT 20',
+    ).all(agentId, now) as any[];
+    return rows.map(r => ({
+      ...r,
+      allowedProducts: JSON.parse(r.allowedProducts),
+    }));
   }
 }
 

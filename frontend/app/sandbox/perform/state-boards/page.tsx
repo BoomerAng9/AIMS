@@ -96,12 +96,12 @@ const MOCK_PLAYERS: Record<string, { rank: number; name: string; position: strin
 };
 
 function getHeatColor(count: number): string {
-    if (count >= 150) return 'bg-red-500/80 border-red-500/50 text-white';
-    if (count >= 100) return 'bg-orange-500/70 border-orange-500/50 text-white';
+    if (count >= 150) return 'bg-red-500/80 border-red-500/50 text-slate-800';
+    if (count >= 100) return 'bg-orange-500/70 border-orange-500/50 text-slate-800';
     if (count >= 60) return 'bg-amber-500/60 border-amber-500/50 text-black';
     if (count >= 30) return 'bg-yellow-400/50 border-yellow-400/50 text-black';
-    if (count >= 15) return 'bg-emerald-400/40 border-emerald-400/40 text-white';
-    return 'bg-blue-400/20 border-blue-400/20 text-white/70';
+    if (count >= 15) return 'bg-emerald-400/40 border-emerald-400/40 text-slate-800';
+    return 'bg-blue-400/20 border-blue-400/20 text-slate-600';
 }
 
 function getHeatLabel(count: number): string {
@@ -136,11 +136,11 @@ export default function StateBoardsPage() {
     const activeStateData = ALL_STATES.find(s => s.code === activeState);
 
     return (
-        <div className="min-h-screen bg-[#0a0a0a] text-white selection:bg-purple-400/30 pb-24">
+        <div className="min-h-screen bg-white text-slate-800 selection:bg-purple-400/30 pb-24">
             {/* Top Nav */}
-            <nav className="border-b border-white/5 bg-[#0a0a0a]/80 backdrop-blur-xl sticky top-0 z-50">
+            <nav className="border-b border-slate-100 bg-white/80 backdrop-blur-xl sticky top-0 z-50">
                 <div className="max-w-[1400px] mx-auto px-6 h-16 flex items-center justify-between">
-                    <Link href="/sandbox/perform" className="flex items-center gap-2 text-[0.65rem] text-white/40 hover:text-purple-400 transition-colors font-mono uppercase tracking-widest">
+                    <Link href="/sandbox/perform" className="flex items-center gap-2 text-[0.65rem] text-slate-400 hover:text-purple-400 transition-colors font-mono uppercase tracking-widest">
                         <ArrowLeft size={14} /> Per|Form Hub
                     </Link>
                     <div className="text-[0.6rem] font-mono tracking-widest text-purple-400/50 flex items-center gap-2">
@@ -157,13 +157,13 @@ export default function StateBoardsPage() {
                 className="max-w-[1400px] mx-auto px-6 py-12 space-y-10"
             >
                 {/* Header */}
-                <motion.div variants={staggerItem} className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-6 border-b border-white/10">
+                <motion.div variants={staggerItem} className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-6 border-b border-slate-200">
                     <div className="space-y-3 max-w-2xl">
-                        <h1 className="text-4xl md:text-5xl font-display font-black tracking-tighter text-white">
+                        <h1 className="text-4xl md:text-5xl font-display font-black tracking-tighter text-slate-800">
                             High School <span className="text-purple-400">State Boards</span>
                         </h1>
-                        <p className="text-sm text-white/60 leading-relaxed font-sans max-w-xl">
-                            We don&apos;t index stars. We index <span className="text-white font-mono font-bold tracking-wider">PRODUCTION</span>.
+                        <p className="text-sm text-slate-500 leading-relaxed font-sans max-w-xl">
+                            We don&apos;t index stars. We index <span className="text-slate-800 font-mono font-bold tracking-wider">PRODUCTION</span>.
                             Tracking the top 50-100 high school athletes per state based entirely on previous-year statistical output.
                             Zero-star recruits outperforming 5-star narratives.
                         </p>
@@ -186,23 +186,23 @@ export default function StateBoardsPage() {
                             onClick={() => setActiveState(st.code)}
                             className={`p-4 rounded-xl border text-left transition-all hover:scale-[1.02] ${activeState === st.code
                                     ? 'bg-purple-400/10 border-purple-400/30 shadow-[0_0_20px_rgba(168,85,247,0.1)]'
-                                    : 'bg-white/[0.02] border-white/5 hover:border-white/10'
+                                    : 'bg-white border-slate-100 hover:border-slate-200'
                                 }`}
                         >
                             <div className="flex justify-between items-start mb-2">
-                                <span className="text-[0.6rem] font-mono uppercase tracking-widest text-white/40">#{idx + 1}</span>
+                                <span className="text-[0.6rem] font-mono uppercase tracking-widest text-slate-400">#{idx + 1}</span>
                                 <span className={`px-1.5 py-0.5 rounded text-[0.5rem] font-mono font-bold ${getHeatColor(st.count)}`}>
                                     {st.count}
                                 </span>
                             </div>
-                            <div className="text-lg font-display font-bold text-white">{st.name}</div>
-                            <div className="text-[0.6rem] font-mono text-white/30 mt-1">{st.topProducer} · {st.topPosition}</div>
+                            <div className="text-lg font-display font-bold text-slate-800">{st.name}</div>
+                            <div className="text-[0.6rem] font-mono text-slate-400 mt-1">{st.topProducer} · {st.topPosition}</div>
                         </button>
                     ))}
                 </motion.div>
 
                 {/* Heat Map Legend */}
-                <motion.div variants={staggerItem} className="flex flex-wrap items-center gap-3 text-[0.6rem] font-mono uppercase tracking-widest text-white/40">
+                <motion.div variants={staggerItem} className="flex flex-wrap items-center gap-3 text-[0.6rem] font-mono uppercase tracking-widest text-slate-400">
                     <span>Density:</span>
                     {[
                         { label: '150+', cls: 'bg-red-500/80' },
@@ -222,12 +222,12 @@ export default function StateBoardsPage() {
                 {/* Search + State Grid */}
                 <motion.div variants={staggerItem} className="space-y-6">
                     <div className="relative max-w-md">
-                        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" />
+                        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                         <input
                             value={search}
                             onChange={e => setSearch(e.target.value)}
                             placeholder="Search states, players, or positions..."
-                            className="w-full pl-9 pr-4 py-2.5 bg-[#0f0f0f] border border-white/10 rounded-xl text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-purple-400/40 font-mono"
+                            className="w-full pl-9 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 placeholder:text-slate-300 focus:outline-none focus:border-purple-400/40 font-mono"
                         />
                     </div>
 
@@ -239,15 +239,15 @@ export default function StateBoardsPage() {
                                 onClick={() => setActiveState(st.code)}
                                 className={`p-3 rounded-xl border text-center transition-all hover:scale-105 relative group ${activeState === st.code
                                         ? 'ring-2 ring-purple-400 border-purple-400/50 bg-purple-400/10'
-                                        : `${getHeatColor(st.count)} hover:ring-1 hover:ring-white/20`
+                                        : `${getHeatColor(st.count)} hover:ring-1 hover:ring-slate-200`
                                     }`}
                             >
                                 <div className="text-lg font-mono font-black">{st.code}</div>
                                 <div className="text-[0.5rem] font-mono opacity-70">{st.count}</div>
                                 {/* Tooltip */}
-                                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-[#1a1a1a] border border-white/10 rounded-lg text-left min-w-[160px] opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-20 shadow-2xl">
-                                    <div className="text-xs font-display font-bold text-white">{st.name}</div>
-                                    <div className="text-[0.55rem] font-mono text-white/40 mt-1">{st.count} prospects indexed</div>
+                                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-white border border-slate-200 rounded-lg text-left min-w-[160px] opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-20 shadow-2xl">
+                                    <div className="text-xs font-display font-bold text-slate-800">{st.name}</div>
+                                    <div className="text-[0.55rem] font-mono text-slate-400 mt-1">{st.count} prospects indexed</div>
                                     <div className="text-[0.55rem] font-mono text-purple-400 mt-0.5">{st.topProducer}</div>
                                 </div>
                             </button>
@@ -262,22 +262,22 @@ export default function StateBoardsPage() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: 20 }}
-                            className="bg-[#0f0f0f] border border-purple-400/20 rounded-2xl overflow-hidden shadow-[0_0_40px_rgba(168,85,247,0.08)]"
+                            className="bg-white border border-purple-400/20 rounded-2xl overflow-hidden shadow-[0_0_40px_rgba(168,85,247,0.08)]"
                         >
-                            <div className="p-6 border-b border-white/5 flex items-center justify-between">
+                            <div className="p-6 border-b border-slate-100 flex items-center justify-between">
                                 <div className="flex items-center gap-4">
                                     <div className={`h-12 w-12 rounded-xl flex items-center justify-center font-mono font-black text-lg ${getHeatColor(activeStateData.count)}`}>
                                         {activeState}
                                     </div>
                                     <div>
-                                        <h2 className="text-2xl font-display font-bold text-white">{activeStateData.name}</h2>
-                                        <div className="flex gap-3 text-[0.6rem] font-mono text-white/40 mt-1">
+                                        <h2 className="text-2xl font-display font-bold text-slate-800">{activeStateData.name}</h2>
+                                        <div className="flex gap-3 text-[0.6rem] font-mono text-slate-400 mt-1">
                                             <span>{activeStateData.count} indexed</span>
                                             <span className="text-purple-400">{getHeatLabel(activeStateData.count)}</span>
                                         </div>
                                     </div>
                                 </div>
-                                <button onClick={() => setActiveState(null)} className="text-white/30 hover:text-white transition-colors">
+                                <button onClick={() => setActiveState(null)} className="text-slate-400 hover:text-slate-800 transition-colors">
                                     <X size={20} />
                                 </button>
                             </div>
@@ -285,27 +285,27 @@ export default function StateBoardsPage() {
                             {activePlayers.length > 0 ? (
                                 <table className="w-full text-left border-collapse">
                                     <thead>
-                                        <tr className="border-b border-white/5 bg-white/[0.02]">
-                                            <th className="p-4 text-[0.65rem] font-mono uppercase tracking-widest text-white/30 font-medium">Rank</th>
-                                            <th className="p-4 text-[0.65rem] font-mono uppercase tracking-widest text-white/30 font-medium">Prospect</th>
-                                            <th className="p-4 text-[0.65rem] font-mono uppercase tracking-widest text-white/30 font-medium hidden md:table-cell">School / Class</th>
-                                            <th className="p-4 text-[0.65rem] font-mono uppercase tracking-widest text-white/30 font-medium">Prev. Season Stats</th>
-                                            <th className="p-4 text-[0.65rem] font-mono uppercase tracking-widest text-white/30 font-medium text-right">Status</th>
+                                        <tr className="border-b border-slate-100 bg-white">
+                                            <th className="p-4 text-[0.65rem] font-mono uppercase tracking-widest text-slate-400 font-medium">Rank</th>
+                                            <th className="p-4 text-[0.65rem] font-mono uppercase tracking-widest text-slate-400 font-medium">Prospect</th>
+                                            <th className="p-4 text-[0.65rem] font-mono uppercase tracking-widest text-slate-400 font-medium hidden md:table-cell">School / Class</th>
+                                            <th className="p-4 text-[0.65rem] font-mono uppercase tracking-widest text-slate-400 font-medium">Prev. Season Stats</th>
+                                            <th className="p-4 text-[0.65rem] font-mono uppercase tracking-widest text-slate-400 font-medium text-right">Status</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-white/5">
                                         {activePlayers.map(p => (
-                                            <tr key={p.rank} className="group hover:bg-white/[0.02] transition-colors">
+                                            <tr key={p.rank} className="group hover:bg-white transition-colors">
                                                 <td className="p-4">
-                                                    <span className="text-sm font-mono text-white/50">{p.rank.toString().padStart(2, '0')}</span>
+                                                    <span className="text-sm font-mono text-slate-500">{p.rank.toString().padStart(2, '0')}</span>
                                                 </td>
                                                 <td className="p-4">
                                                     <div className="flex flex-col gap-1">
-                                                        <span className="font-display font-bold text-white text-base group-hover:text-purple-400 transition-colors">
+                                                        <span className="font-display font-bold text-slate-800 text-base group-hover:text-purple-400 transition-colors">
                                                             {p.name}
                                                         </span>
                                                         <div className="flex gap-2 items-center">
-                                                            <span className="text-xs font-mono text-white/40">{p.position}</span>
+                                                            <span className="text-xs font-mono text-slate-400">{p.position}</span>
                                                             {p.stars === 0 ? (
                                                                 <span className="text-[0.55rem] font-mono bg-purple-400/20 text-purple-400 px-1.5 py-0.5 rounded tracking-widest">UNRANKED GEM</span>
                                                             ) : (
@@ -315,8 +315,8 @@ export default function StateBoardsPage() {
                                                     </div>
                                                 </td>
                                                 <td className="p-4 hidden md:table-cell">
-                                                    <div className="text-sm text-white/70">{p.school}</div>
-                                                    <div className="text-[0.6rem] font-mono text-white/30">Class of &apos;{p.class.slice(2)}</div>
+                                                    <div className="text-sm text-slate-600">{p.school}</div>
+                                                    <div className="text-[0.6rem] font-mono text-slate-400">Class of &apos;{p.class.slice(2)}</div>
                                                 </td>
                                                 <td className="p-4">
                                                     <span className="text-xs font-mono tracking-wide text-emerald-400/80">{p.stats}</span>
@@ -331,7 +331,7 @@ export default function StateBoardsPage() {
                                                             <Target size={10} /> Tier 2/3
                                                         </div>
                                                     ) : (
-                                                        <div className="inline-flex items-center gap-1.5 bg-white/5 border border-white/10 text-white/50 px-2.5 py-1 rounded text-[0.6rem] font-mono uppercase tracking-widest">
+                                                        <div className="inline-flex items-center gap-1.5 bg-slate-50 border border-slate-200 text-slate-500 px-2.5 py-1 rounded text-[0.6rem] font-mono uppercase tracking-widest">
                                                             {p.status}
                                                         </div>
                                                     )}
@@ -343,13 +343,13 @@ export default function StateBoardsPage() {
                             ) : (
                                 <div className="p-12 text-center">
                                     <Radar size={24} className="text-purple-400/30 mx-auto mb-3 animate-spin-slow" />
-                                    <p className="text-sm text-white/40 font-mono">Prospect data for {activeStateData.name} is being indexed...</p>
-                                    <p className="text-[0.6rem] text-white/20 font-mono mt-2">Tier 1 harvest in progress. {activeStateData.count} records identified.</p>
+                                    <p className="text-sm text-slate-400 font-mono">Prospect data for {activeStateData.name} is being indexed...</p>
+                                    <p className="text-[0.6rem] text-slate-300 font-mono mt-2">Tier 1 harvest in progress. {activeStateData.count} records identified.</p>
                                 </div>
                             )}
 
-                            <div className="p-4 border-t border-white/5 flex justify-between items-center">
-                                <span className="text-[0.6rem] font-mono text-white/30">Showing top {activePlayers.length} of {activeStateData.count} indexed</span>
+                            <div className="p-4 border-t border-slate-100 flex justify-between items-center">
+                                <span className="text-[0.6rem] font-mono text-slate-400">Showing top {activePlayers.length} of {activeStateData.count} indexed</span>
                                 <button className="text-[0.65rem] font-mono text-purple-400/70 hover:text-purple-400 transition-colors flex items-center gap-1">
                                     View Full {activeState} Board <ChevronRight size={12} />
                                 </button>
@@ -365,7 +365,7 @@ export default function StateBoardsPage() {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-6"
+                            className="fixed inset-0 bg-white/80 backdrop-blur-sm z-50 flex items-center justify-center p-6"
                             onClick={() => setShowSubmitForm(false)}
                         >
                             <motion.div
@@ -373,17 +373,17 @@ export default function StateBoardsPage() {
                                 animate={{ scale: 1, opacity: 1 }}
                                 exit={{ scale: 0.95, opacity: 0 }}
                                 onClick={e => e.stopPropagation()}
-                                className="bg-[#0f0f0f] border border-purple-500/20 rounded-2xl p-8 max-w-lg w-full shadow-[0_0_60px_rgba(168,85,247,0.1)] relative"
+                                className="bg-white border border-purple-500/20 rounded-2xl p-8 max-w-lg w-full shadow-[0_0_60px_rgba(168,85,247,0.1)] relative"
                             >
-                                <button onClick={() => setShowSubmitForm(false)} className="absolute top-4 right-4 text-white/30 hover:text-white">
+                                <button onClick={() => setShowSubmitForm(false)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-800">
                                     <X size={20} />
                                 </button>
 
                                 <Upload className="text-purple-400 mb-4" size={28} />
-                                <h3 className="text-2xl font-display font-bold text-white mb-2 tracking-tight">
+                                <h3 className="text-2xl font-display font-bold text-slate-800 mb-2 tracking-tight">
                                     Submit a Prospect
                                 </h3>
-                                <p className="text-sm text-white/50 mb-6 leading-relaxed">
+                                <p className="text-sm text-slate-500 mb-6 leading-relaxed">
                                     Mainstream recruiting networks miss production every day. Submit a player we should be tracking.
                                     Our AGI will activate Deep Research and output an accurate grade.
                                 </p>
@@ -391,31 +391,31 @@ export default function StateBoardsPage() {
                                 <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); setIsSubmitting(true); setTimeout(() => { setIsSubmitting(false); setShowSubmitForm(false); }, 2000); }}>
                                     <div className="grid grid-cols-2 gap-3">
                                         <div>
-                                            <label className="block text-[0.65rem] font-mono text-white/40 uppercase tracking-widest mb-1">First Name</label>
-                                            <input type="text" className="w-full bg-[#0a0a0a] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50" required />
+                                            <label className="block text-[0.65rem] font-mono text-slate-400 uppercase tracking-widest mb-1">First Name</label>
+                                            <input type="text" className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:border-purple-400/50" required />
                                         </div>
                                         <div>
-                                            <label className="block text-[0.65rem] font-mono text-white/40 uppercase tracking-widest mb-1">Last Name</label>
-                                            <input type="text" className="w-full bg-[#0a0a0a] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50" required />
+                                            <label className="block text-[0.65rem] font-mono text-slate-400 uppercase tracking-widest mb-1">Last Name</label>
+                                            <input type="text" className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:border-purple-400/50" required />
                                         </div>
                                     </div>
                                     <div className="grid grid-cols-3 gap-3">
                                         <div>
-                                            <label className="block text-[0.65rem] font-mono text-white/40 uppercase tracking-widest mb-1">Position</label>
-                                            <input type="text" className="w-full bg-[#0a0a0a] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50" placeholder="RB" required />
+                                            <label className="block text-[0.65rem] font-mono text-slate-400 uppercase tracking-widest mb-1">Position</label>
+                                            <input type="text" className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:border-purple-400/50" placeholder="RB" required />
                                         </div>
                                         <div>
-                                            <label className="block text-[0.65rem] font-mono text-white/40 uppercase tracking-widest mb-1">High School</label>
-                                            <input type="text" className="w-full bg-[#0a0a0a] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50" required />
+                                            <label className="block text-[0.65rem] font-mono text-slate-400 uppercase tracking-widest mb-1">High School</label>
+                                            <input type="text" className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:border-purple-400/50" required />
                                         </div>
                                         <div>
-                                            <label className="block text-[0.65rem] font-mono text-white/40 uppercase tracking-widest mb-1">State</label>
-                                            <input type="text" className="w-full bg-[#0a0a0a] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50" placeholder="TX" required />
+                                            <label className="block text-[0.65rem] font-mono text-slate-400 uppercase tracking-widest mb-1">State</label>
+                                            <input type="text" className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:border-purple-400/50" placeholder="TX" required />
                                         </div>
                                     </div>
                                     <div>
-                                        <label className="block text-[0.65rem] font-mono text-white/40 uppercase tracking-widest mb-1">Stat Line or MaxPreps Link</label>
-                                        <textarea className="w-full bg-[#0a0a0a] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50 h-24 resize-none" placeholder="2,400 Rush Yds | 32 TD | 8.5 YPC or paste MaxPreps URL..." required />
+                                        <label className="block text-[0.65rem] font-mono text-slate-400 uppercase tracking-widest mb-1">Stat Line or MaxPreps Link</label>
+                                        <textarea className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:border-purple-400/50 h-24 resize-none" placeholder="2,400 Rush Yds | 32 TD | 8.5 YPC or paste MaxPreps URL..." required />
                                     </div>
                                     <button
                                         type="submit"

@@ -49,7 +49,7 @@ export function VerticalStepIndicator({
               {vertical.name}
             </span>
             {!isComplete && !isExecuting && (
-              <span className="text-xs text-white/30">
+              <span className="text-xs text-slate-400">
                 Step {currentStep + 1} of {totalSteps}
               </span>
             )}
@@ -62,7 +62,7 @@ export function VerticalStepIndicator({
           </div>
           <button
             onClick={onDismiss}
-            className="text-white/20 hover:text-white/50 text-xs transition-colors"
+            className="text-slate-300 hover:text-slate-500 text-xs transition-colors"
             title="Dismiss vertical flow"
           >
             x
@@ -84,7 +84,7 @@ export function VerticalStepIndicator({
                       ? 'bg-gold text-black'
                       : isCurrent
                         ? 'bg-gold/20 text-gold border border-gold/40'
-                        : 'bg-white/5 text-white/20 border border-white/10'
+                        : 'bg-slate-50 text-slate-300 border border-slate-200'
                     }
                   `}
                 >
@@ -99,7 +99,7 @@ export function VerticalStepIndicator({
                 {i < totalSteps - 1 && (
                   <div
                     className={`w-4 h-0.5 rounded ${
-                      isCompleted ? 'bg-gold/60' : 'bg-white/10'
+                      isCompleted ? 'bg-gold/60' : 'bg-slate-100'
                     }`}
                   />
                 )}
@@ -111,15 +111,15 @@ export function VerticalStepIndicator({
         {/* Current Step Info */}
         {!isComplete && !isExecuting && currentChainStep && (
           <div className="px-4 pb-3">
-            <p className="text-xs font-medium text-white/70">{currentChainStep.name}</p>
-            <p className="text-xs text-white/30 mt-0.5">{currentChainStep.purpose}</p>
+            <p className="text-xs font-medium text-slate-600">{currentChainStep.name}</p>
+            <p className="text-xs text-slate-400 mt-0.5">{currentChainStep.purpose}</p>
           </div>
         )}
 
         {/* Transition / Execute Prompt */}
         {isComplete && transitionPrompt && (
           <div className="px-4 pb-3">
-            <p className="text-xs text-white/50 mb-2">{transitionPrompt}</p>
+            <p className="text-xs text-slate-500 mb-2">{transitionPrompt}</p>
             <div className="flex gap-2">
               <button
                 onClick={onExecute}
@@ -129,7 +129,7 @@ export function VerticalStepIndicator({
               </button>
               <button
                 onClick={onDismiss}
-                className="px-4 py-1.5 rounded-lg bg-white/5 text-white/50 text-xs hover:bg-white/10 transition-colors"
+                className="px-4 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-xs hover:bg-slate-100 transition-colors"
               >
                 Not now
               </button>
@@ -141,7 +141,7 @@ export function VerticalStepIndicator({
         {isExecuting && (
           <div className="px-4 pb-3 flex items-center gap-2">
             <div className="w-3 h-3 border-2 border-gold border-t-transparent rounded-full animate-spin" />
-            <span className="text-xs text-white/40">Pipeline running — agents are working on your request...</span>
+            <span className="text-xs text-slate-400">Pipeline running — agents are working on your request...</span>
           </div>
         )}
       </motion.div>

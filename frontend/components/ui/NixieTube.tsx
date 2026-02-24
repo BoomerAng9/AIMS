@@ -34,8 +34,8 @@ function NixieDigit({ value, size = 'md', glowColor = '#ff6b1a' }: NixieDigitPro
     <div
       className={`
         relative ${sizeConfig.tube} rounded-t-full rounded-b-lg
-        bg-gradient-to-b from-zinc-800/80 via-zinc-900/90 to-zinc-950
-        border border-zinc-700/50
+        bg-gradient-to-b from-amber-50/80 via-amber-100/90 to-amber-200
+        border border-amber-300/50
         flex items-center justify-center
         overflow-hidden
       `}
@@ -64,8 +64,8 @@ function NixieDigit({ value, size = 'md', glowColor = '#ff6b1a' }: NixieDigitPro
 
       {/* Tube base rings */}
       <div className="absolute bottom-0 left-0 right-0 h-4">
-        <div className="absolute bottom-3 left-1 right-1 h-1 bg-zinc-600 rounded-full" />
-        <div className="absolute bottom-1 left-0 right-0 h-2 bg-gradient-to-t from-zinc-700 to-zinc-800 rounded-b-lg" />
+        <div className="absolute bottom-3 left-1 right-1 h-1 bg-amber-300 rounded-full" />
+        <div className="absolute bottom-1 left-0 right-0 h-2 bg-gradient-to-t from-amber-200 to-amber-100 rounded-b-lg" />
       </div>
 
       {/* Internal mesh/grid */}
@@ -194,7 +194,7 @@ export function NixieTubeDisplay({
   return (
     <div className="flex flex-col items-center gap-2">
       {label && (
-        <span className="text-xs uppercase tracking-wider text-white/40 font-medium">
+        <span className="text-xs uppercase tracking-wider text-slate-400 font-medium">
           {label}
         </span>
       )}
@@ -264,8 +264,8 @@ export function NixieStatsPanel({ stats, size = 'sm', className = '' }: NixieSta
     <div
       className={`
         flex flex-wrap gap-6 p-4 rounded-xl
-        bg-gradient-to-b from-zinc-900/95 to-black
-        border border-zinc-800/50
+        bg-gradient-to-b from-amber-50/95 to-white
+        border border-amber-200/50
         backdrop-blur-sm
         ${className}
       `}

@@ -16,6 +16,10 @@ export {
   getAvailableTools,
   getHawkExecutionHistory,
   getGlobalStats,
+  initHawkScheduler,
+  stopHawkScheduler,
+  registerHawkSchedule,
+  unregisterHawkSchedule,
 } from './engine';
 
 export type {

@@ -1,62 +1,6 @@
 {
   "boomerangs": [
     {
-      "id": "researcher_ang",
-      "name": "Researcher_Ang",
-      "source_repo": "intelligent-internet/researcher",
-      "description": "Deep research specialist using Brave Search + RAG",
-      "capabilities": [
-        "brave_web_search",
-        "academic_research",
-        "fact_verification",
-        "source_citation"
-      ],
-      "required_quotas": {
-        "brave_searches": 1,
-        "api_calls": 5
-      },
-      "endpoint": "http://researcher-ang:8100/execute",
-      "health_check": "http://researcher-ang:8100/health",
-      "status": "registered"
-    },
-    {
-      "id": "voice_ang",
-      "name": "Voice_Ang",
-      "source_repo": "intelligent-internet/voice-assistant",
-      "description": "ElevenLabs voice synthesis and transcription",
-      "capabilities": [
-        "text_to_speech",
-        "voice_cloning",
-        "audio_transcription",
-        "multilingual_tts"
-      ],
-      "required_quotas": {
-        "elevenlabs_chars": 1000
-      },
-      "endpoint": "http://voice-ang:8101/execute",
-      "health_check": "http://voice-ang:8101/health",
-      "status": "registered"
-    },
-    {
-      "id": "vision_ang",
-      "name": "Vision_Ang",
-      "source_repo": "intelligent-internet/video-processor",
-      "description": "Video/image processing and analysis",
-      "capabilities": [
-        "video_transcoding",
-        "image_analysis",
-        "ocr_extraction",
-        "scene_detection"
-      ],
-      "required_quotas": {
-        "container_hours": 0.5,
-        "storage_gb": 2
-      },
-      "endpoint": "http://vision-ang:7000/execute",
-      "health_check": "http://vision-ang:7000/health",
-      "status": "registered"
-    },
-    {
       "id": "automation_ang",
       "name": "Automation_Ang",
       "source_repo": "intelligent-internet/automation-engine",
@@ -75,25 +19,6 @@
       "status": "registered"
     },
     {
-      "id": "sitebuilder_ang",
-      "name": "SiteBuilder_Ang",
-      "source_repo": "payload-cms + grapesjs",
-      "description": "Website generation and management",
-      "capabilities": [
-        "page_creation",
-        "template_deployment",
-        "visual_editing",
-        "cms_management"
-      ],
-      "required_quotas": {
-        "api_calls": 10,
-        "storage_gb": 1
-      },
-      "endpoint": "http://sitebuilder-ang:3002/api/execute",
-      "health_check": "http://sitebuilder-ang:3002/api/health",
-      "status": "registered"
-    },
-    {
       "id": "coder_ang",
       "name": "Coder_Ang",
       "source_repo": "aims/coder-ang",
@@ -102,7 +27,8 @@
         "code_generation",
         "sandbox_execution",
         "debugging",
-        "refactoring"
+        "refactoring",
+        "code_review"
       ],
       "required_quotas": {
         "container_hours": 0.25,
@@ -113,10 +39,29 @@
       "status": "registered"
     },
     {
-      "id": "orchestrator_ang",
-      "name": "Orchestrator_Ang",
-      "source_repo": "agent-zero",
-      "description": "Multi-agent task coordination via Agent Zero",
+      "id": "research_ang",
+      "name": "Research_Ang",
+      "source_repo": "aims/research-ang",
+      "description": "Deep research specialist using web search, RAG, and fact verification",
+      "capabilities": [
+        "brave_web_search",
+        "academic_research",
+        "fact_verification",
+        "source_citation"
+      ],
+      "required_quotas": {
+        "brave_searches": 1,
+        "api_calls": 5
+      },
+      "endpoint": "http://research-ang:3020/execute",
+      "health_check": "http://research-ang:3020/health",
+      "status": "registered"
+    },
+    {
+      "id": "router_ang",
+      "name": "Router_Ang",
+      "source_repo": "aims/router-ang",
+      "description": "Intelligent task routing and capability matching across agents",
       "capabilities": [
         "task_decomposition",
         "agent_spawning",
@@ -124,381 +69,32 @@
         "parallel_execution"
       ],
       "required_quotas": {
-        "container_hours": 0.5,
-        "api_calls": 30
-      },
-      "endpoint": "http://agent-zero:8000/orchestrate",
-      "health_check": "http://agent-zero:8000/health",
-      "status": "registered"
-    },
-    {
-      "id": "marketer_ang",
-      "name": "Marketer_Ang",
-      "source_repo": "intelligent-internet/content-engine",
-      "description": "Growth, content, and campaign specialist",
-      "capabilities": [
-        "seo_audit",
-        "copy_generation",
-        "campaign_flows",
-        "social_scheduling"
-      ],
-      "required_quotas": {
-        "api_calls": 15
-      },
-      "endpoint": "http://marketer-ang:8102/execute",
-      "health_check": "http://marketer-ang:8102/health",
-      "status": "registered"
-    },
-    {
-      "id": "data_ang",
-      "name": "Data_Ang",
-      "source_repo": "intelligent-internet/data-pipeline",
-      "description": "ETL pipelines, analytics, and visualization",
-      "capabilities": [
-        "data_extraction",
-        "data_transformation",
-        "visualization",
-        "report_generation"
-      ],
-      "required_quotas": {
-        "container_hours": 0.25,
         "api_calls": 10
       },
-      "endpoint": "http://data-ang:8103/execute",
-      "health_check": "http://data-ang:8103/health",
-      "status": "registered"
-    },
-    {
-      "id": "quality_ang",
-      "name": "Quality_Ang",
-      "source_repo": "aims/oracle-verifier",
-      "description": "ORACLE 7-Gate verification and quality assurance",
-      "capabilities": [
-        "gate_verification",
-        "security_audit",
-        "code_review",
-        "compliance_check"
-      ],
-      "required_quotas": {
-        "api_calls": 5
-      },
-      "endpoint": "http://quality-ang:8104/execute",
-      "health_check": "http://quality-ang:8104/health",
-      "status": "registered"
-    },
-    {
-      "id": "juno_ang",
-      "name": "Juno_Ang",
-      "source_repo": "aims/n8n-schema-forge",
-      "description": "Workflow Scribe — Expert lead for n8n JSON workflow crafting, schema enforcement, and elastic surge coordination under DT-PMO Automation Systems Office",
-      "capabilities": [
-        "n8n_workflow_json",
-        "schema_validation",
-        "workflow_blueprint",
-        "idempotency_enforcement",
-        "credential_scoping",
-        "surge_coordination",
-        "workflow_creation",
-        "webhook_triggers"
-      ],
-      "required_quotas": {
-        "n8n_executions": 5,
-        "api_calls": 30
-      },
-      "endpoint": "http://n8n-juno:8200/execute",
-      "health_check": "http://n8n-juno:8200/health",
-      "status": "registered"
-    },
-    {
-      "id": "rio_ang",
-      "name": "Rio_Ang",
-      "source_repo": "aims/n8n-schema-forge",
-      "description": "The Builder — Intermediate workflow builder for n8n, builds from established packs, wires integrations, maintains clean failure paths",
-      "capabilities": [
-        "workflow_creation",
-        "webhook_triggers",
-        "api_integration"
-      ],
-      "required_quotas": {
-        "n8n_executions": 3,
-        "api_calls": 15
-      },
-      "endpoint": "http://n8n-rio:8201/execute",
-      "health_check": "http://n8n-rio:8201/health",
-      "status": "registered"
-    },
-    {
-      "id": "koda_ang",
-      "name": "Koda_Ang",
-      "source_repo": "aims/n8n-schema-forge",
-      "description": "The Joiner — Intermediate service connector and data transform specialist, keeps contracts stable",
-      "capabilities": [
-        "workflow_creation",
-        "api_integration",
-        "data_transformation"
-      ],
-      "required_quotas": {
-        "n8n_executions": 3,
-        "api_calls": 15
-      },
-      "endpoint": "http://n8n-koda:8202/execute",
-      "health_check": "http://n8n-koda:8202/health",
-      "status": "registered"
-    },
-    {
-      "id": "lumen_ang",
-      "name": "Lumen_Ang",
-      "source_repo": "aims/n8n-schema-forge",
-      "description": "Polish — Intern packaging specialist for workflow documentation, naming checks, test payload sets, and variant builds",
-      "capabilities": [
-        "schema_validation"
-      ],
-      "required_quotas": {
-        "api_calls": 5
-      },
-      "endpoint": "http://n8n-lumen:8203/execute",
-      "health_check": "http://n8n-lumen:8203/health",
-      "status": "registered"
-    },
-    {
-      "id": "nova_ang",
-      "name": "Nova_Ang",
-      "source_repo": "aims/n8n-schema-forge",
-      "description": "Checklist — Intern QA specialist for running checklists and verifying formatting consistency",
-      "capabilities": [
-        "schema_validation",
-        "gate_verification"
-      ],
-      "required_quotas": {
-        "api_calls": 5
-      },
-      "endpoint": "http://n8n-nova:8204/execute",
-      "health_check": "http://n8n-nova:8204/health",
-      "status": "registered"
-    },
-    {
-      "id": "betty_ann_ang",
-      "name": "Betty-Ann_Ang",
-      "source_repo": "aims/hr-pmo",
-      "description": "The Gardener — Expert HR PMO lead for people standards, progression, and operational culture",
-      "capabilities": [
-        "role_assignment",
-        "performance_evaluation",
-        "standards_enforcement",
-        "progression_management",
-        "coaching_coordination"
-      ],
-      "required_quotas": {
-        "api_calls": 10
-      },
-      "endpoint": "http://hr-betty-ann:8300/execute",
-      "health_check": "http://hr-betty-ann:8300/health",
-      "status": "registered"
-    },
-    {
-      "id": "aria_ang",
-      "name": "Aria_Ang",
-      "source_repo": "aims/hr-pmo",
-      "description": "The Listener — Intermediate HR operations specialist for intake, triage, training scheduling, and standards reinforcement",
-      "capabilities": [
-        "role_assignment",
-        "performance_evaluation"
-      ],
-      "required_quotas": {
-        "api_calls": 5
-      },
-      "endpoint": "http://hr-aria:8301/execute",
-      "health_check": "http://hr-aria:8301/health",
-      "status": "registered"
-    },
-    {
-      "id": "rumi_ang",
-      "name": "Rumi_Ang",
-      "source_repo": "aims/hr-pmo",
-      "description": "The Coach — Intermediate training and coaching specialist converting mistakes into mastery",
-      "capabilities": [
-        "coaching_coordination",
-        "performance_evaluation"
-      ],
-      "required_quotas": {
-        "api_calls": 5
-      },
-      "endpoint": "http://hr-rumi:8302/execute",
-      "health_check": "http://hr-rumi:8302/health",
-      "status": "registered"
-    },
-    {
-      "id": "eamon_ang",
-      "name": "Eamon_Ang",
-      "source_repo": "aims/hr-pmo",
-      "description": "The Auditor — Expert Holdings Liaison for objective system-wide performance evaluations, efficiency reports, and code mending recommendations",
-      "capabilities": [
-        "performance_evaluation",
-        "standards_enforcement",
-        "report_generation"
-      ],
-      "required_quotas": {
-        "api_calls": 15
-      },
-      "endpoint": "http://hr-eamon:8303/execute",
-      "health_check": "http://hr-eamon:8303/health",
-      "status": "registered"
-    },
-    {
-      "id": "astra_ang",
-      "name": "Astra_Ang",
-      "source_repo": "aims/dtpmo-leadership",
-      "description": "North Star — Expert DT-PMO lead keeping agentic operations aligned to strategy, safety, and user experience",
-      "capabilities": [
-        "governance_management",
-        "priority_setting",
-        "conflict_arbitration"
-      ],
-      "required_quotas": {
-        "api_calls": 10
-      },
-      "endpoint": "http://dtpmo-astra:8400/execute",
-      "health_check": "http://dtpmo-astra:8400/health",
-      "status": "registered"
-    },
-    {
-      "id": "atlas_ang",
-      "name": "Atlas_Ang",
-      "source_repo": "aims/dtpmo-leadership",
-      "description": "Load-Bearer — Expert operations and reliability specialist protecting uptime, throughput, and runtime stability",
-      "capabilities": [
-        "governance_management",
-        "report_generation"
-      ],
-      "required_quotas": {
-        "api_calls": 10
-      },
-      "endpoint": "http://dtpmo-atlas:8401/execute",
-      "health_check": "http://dtpmo-atlas:8401/health",
-      "status": "registered"
-    },
-    {
-      "id": "blueprint_ang",
-      "name": "Blueprint_Ang",
-      "source_repo": "aims/dtpmo-leadership",
-      "description": "The Drafter — Expert architecture and patterns specialist enforcing build consistency across the platform",
-      "capabilities": [
-        "governance_management",
-        "schema_validation"
-      ],
-      "required_quotas": {
-        "api_calls": 10
-      },
-      "endpoint": "http://dtpmo-blueprint:8402/execute",
-      "health_check": "http://dtpmo-blueprint:8402/health",
-      "status": "registered"
-    },
-    {
-      "id": "sentinel_ang",
-      "name": "Sentinel_Ang",
-      "source_repo": "aims/dtpmo-leadership",
-      "description": "Red Rope — Expert governance, risk, and KYB specialist ensuring every action is permitted, auditable, and safe",
-      "capabilities": [
-        "governance_management",
-        "security_audit",
-        "compliance_check"
-      ],
-      "required_quotas": {
-        "api_calls": 10
-      },
-      "endpoint": "http://dtpmo-sentinel:8403/execute",
-      "health_check": "http://dtpmo-sentinel:8403/health",
-      "status": "registered"
-    },
-    {
-      "id": "ledger_ang",
-      "name": "Ledger_Ang",
-      "source_repo": "aims/dtpmo-leadership",
-      "description": "The Meter — Expert cost and efficiency specialist making cost visible, controlled, and optimized",
-      "capabilities": [
-        "governance_management",
-        "report_generation"
-      ],
-      "required_quotas": {
-        "api_calls": 10
-      },
-      "endpoint": "http://dtpmo-ledger:8404/execute",
-      "health_check": "http://dtpmo-ledger:8404/health",
-      "status": "registered"
-    },
-    {
-      "id": "proof_ang",
-      "name": "Proof_Ang",
-      "source_repo": "aims/dtpmo-leadership",
-      "description": "Final Word — Expert quality and verification specialist ensuring outputs are correct, safe, and ready",
-      "capabilities": [
-        "gate_verification",
-        "governance_management"
-      ],
-      "required_quotas": {
-        "api_calls": 10
-      },
-      "endpoint": "http://dtpmo-proof:8405/execute",
-      "health_check": "http://dtpmo-proof:8405/health",
+      "endpoint": "http://router-ang:3021/execute",
+      "health_check": "http://router-ang:3021/health",
       "status": "registered"
     }
   ],
   "capability_index": {
-    "brave_web_search": ["researcher_ang"],
-    "academic_research": ["researcher_ang"],
-    "fact_verification": ["researcher_ang", "quality_ang"],
-    "source_citation": ["researcher_ang"],
-    "text_to_speech": ["voice_ang"],
-    "voice_cloning": ["voice_ang"],
-    "audio_transcription": ["voice_ang"],
-    "multilingual_tts": ["voice_ang"],
-    "video_transcoding": ["vision_ang"],
-    "image_analysis": ["vision_ang"],
-    "ocr_extraction": ["vision_ang"],
-    "scene_detection": ["vision_ang"],
-    "workflow_creation": ["automation_ang", "juno_ang", "rio_ang", "koda_ang"],
-    "webhook_triggers": ["automation_ang", "juno_ang"],
+    "workflow_creation": ["automation_ang"],
+    "webhook_triggers": ["automation_ang"],
     "scheduled_tasks": ["automation_ang"],
-    "api_integration": ["automation_ang", "rio_ang", "koda_ang"],
-    "page_creation": ["sitebuilder_ang"],
-    "template_deployment": ["sitebuilder_ang"],
-    "visual_editing": ["sitebuilder_ang"],
-    "cms_management": ["sitebuilder_ang"],
+    "api_integration": ["automation_ang"],
     "code_generation": ["coder_ang"],
     "sandbox_execution": ["coder_ang"],
     "debugging": ["coder_ang"],
     "refactoring": ["coder_ang"],
-    "task_decomposition": ["orchestrator_ang"],
-    "agent_spawning": ["orchestrator_ang"],
-    "result_synthesis": ["orchestrator_ang"],
-    "parallel_execution": ["orchestrator_ang"],
-    "seo_audit": ["marketer_ang"],
-    "copy_generation": ["marketer_ang"],
-    "campaign_flows": ["marketer_ang"],
-    "social_scheduling": ["marketer_ang"],
-    "data_extraction": ["data_ang"],
-    "data_transformation": ["data_ang", "koda_ang"],
-    "visualization": ["data_ang"],
-    "report_generation": ["data_ang", "eamon_ang", "atlas_ang", "ledger_ang"],
-    "gate_verification": ["quality_ang", "nova_ang", "proof_ang"],
-    "security_audit": ["quality_ang", "sentinel_ang"],
-    "code_review": ["quality_ang", "coder_ang"],
-    "compliance_check": ["quality_ang", "sentinel_ang"],
-    "n8n_workflow_json": ["juno_ang"],
-    "schema_validation": ["juno_ang", "lumen_ang", "blueprint_ang"],
-    "workflow_blueprint": ["juno_ang"],
-    "idempotency_enforcement": ["juno_ang"],
-    "credential_scoping": ["juno_ang"],
-    "surge_coordination": ["juno_ang"],
-    "role_assignment": ["betty_ann_ang", "aria_ang"],
-    "performance_evaluation": ["betty_ann_ang", "aria_ang", "rumi_ang", "eamon_ang"],
-    "standards_enforcement": ["betty_ann_ang", "eamon_ang"],
-    "progression_management": ["betty_ann_ang"],
-    "coaching_coordination": ["betty_ann_ang", "rumi_ang"],
-    "governance_management": ["astra_ang", "atlas_ang", "blueprint_ang", "sentinel_ang", "ledger_ang", "proof_ang"],
-    "priority_setting": ["astra_ang"],
-    "conflict_arbitration": ["astra_ang"]
+    "code_review": ["coder_ang"],
+    "brave_web_search": ["research_ang"],
+    "academic_research": ["research_ang"],
+    "fact_verification": ["research_ang"],
+    "source_citation": ["research_ang"],
+    "task_decomposition": ["router_ang"],
+    "agent_spawning": ["router_ang"],
+    "result_synthesis": ["router_ang"],
+    "parallel_execution": ["router_ang"]
   },
-  "version": "2.0.0",
-  "last_updated": "2026-02-08T00:00:00Z"
+  "version": "3.0.0",
+  "last_updated": "2026-02-22T00:00:00Z"
 }

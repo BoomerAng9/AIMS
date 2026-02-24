@@ -82,13 +82,13 @@ const AcheevyMessage = memo(function AcheevyMessage({
           </div>
         )}
         <div className={`relative group px-4 py-3 rounded-2xl text-base leading-relaxed max-w-[85%] ${m.role === 'user'
-            ? 'bg-white/5 text-white rounded-tr-sm border border-wireframe-stroke shadow-sm'
-            : 'glass-card border border-gold/10 bg-[#0a0a0a]/60 text-white/90 rounded-tl-sm shadow-[0_4px_20px_-4px_rgba(0,0,0,0.5)]'
+            ? 'bg-slate-50 text-slate-800 rounded-tr-sm border border-wireframe-stroke shadow-sm'
+            : 'glass-card border border-gold/10 bg-white/60 text-slate-800 rounded-tl-sm shadow-[0_4px_20px_-4px_rgba(0,0,0,0.5)]'
           }`}>
           {m.role === 'user' ? (
             m.content
           ) : (
-            <div className="prose prose-invert prose-base max-w-none prose-code:text-gold prose-code:bg-black/40 prose-code:px-1 prose-code:rounded prose-p:text-white/90 prose-strong:text-white prose-li:text-white/80">
+            <div className="prose prose-invert prose-base max-w-none prose-code:text-gold prose-code:bg-slate-100/60 prose-code:px-1 prose-code:rounded prose-p:text-slate-800 prose-strong:text-slate-800 prose-li:text-slate-700">
               <ReactMarkdown remarkPlugins={[remarkGfm]}>{m.content}</ReactMarkdown>
               {isLoading && isLast && (
                 <span className="inline-block w-1.5 h-4 bg-gold ml-0.5 animate-pulse" />
@@ -112,7 +112,7 @@ const AcheevyMessage = memo(function AcheevyMessage({
                   type="button"
                   onClick={() => onSpeak(m.id, m.content)}
                   title="Speak this message"
-                  className="p-1 rounded text-white/30 hover:text-gold hover:bg-gold/10 transition-colors"
+                  className="p-1 rounded text-slate-400 hover:text-gold hover:bg-gold/10 transition-colors"
                 >
                   <Play size={12} />
                 </button>
@@ -121,7 +121,7 @@ const AcheevyMessage = memo(function AcheevyMessage({
                 type="button"
                 onClick={() => onReplay(m.id, m.content)}
                 title="Replay"
-                className="p-1 rounded text-white/30 hover:text-gold hover:bg-gold/10 transition-colors"
+                className="p-1 rounded text-slate-400 hover:text-gold hover:bg-gold/10 transition-colors"
               >
                 <RotateCcw size={12} />
               </button>
@@ -129,8 +129,8 @@ const AcheevyMessage = memo(function AcheevyMessage({
           )}
         </div>
         {m.role === 'user' && (
-          <div className="w-7 h-7 rounded-lg bg-white/5 border border-wireframe-stroke flex items-center justify-center flex-shrink-0 mt-0.5">
-            <User className="w-3.5 h-3.5 text-white/50" />
+          <div className="w-7 h-7 rounded-lg bg-slate-50 border border-wireframe-stroke flex items-center justify-center flex-shrink-0 mt-0.5">
+            <User className="w-3.5 h-3.5 text-slate-500" />
           </div>
         )}
       </div>

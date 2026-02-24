@@ -46,7 +46,7 @@ const LUC_GATE_ACTIONS = new Set([
 const PORT_RANGE_MIN = 51000;
 const PORT_RANGE_MAX = 65000;
 
-// All PaaS action names
+// All PaaS action names (includes automation actions)
 const ALL_PAAS_ACTIONS = new Set([
   'DEPLOY_INSTANCE',
   'MONITOR_INSTANCE',
@@ -55,6 +55,10 @@ const ALL_PAAS_ACTIONS = new Set([
   'EXPORT_INSTANCE',
   'BROWSE_CATALOG',
   'RUN_NEEDS_ANALYSIS',
+  'CREATE_AUTOMATION',
+  'MANAGE_AUTOMATION',
+  'RUN_AUTOMATION',
+  'VIEW_AUTOMATION_HISTORY',
 ]);
 
 export const PaaSEnforcementHook: HookDefinition = {

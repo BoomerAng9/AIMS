@@ -62,10 +62,10 @@ export default function HowItWorksPage() {
     >
       {/* Hero */}
       <motion.section variants={fadeUp} className="text-center space-y-4">
-        <h1 className="text-3xl md:text-5xl font-display text-white tracking-tight">
+        <h1 className="text-3xl md:text-5xl font-display text-slate-800 tracking-tight">
           How The Arena Works
         </h1>
-        <p className="text-sm md:text-base text-white/40 max-w-2xl mx-auto">
+        <p className="text-sm md:text-base text-slate-400 max-w-2xl mx-auto">
           Skill-based contests where knowledge pays. AI generates fresh contests daily.
           Free and paid options. Real prizes. Pure skill — never luck.
         </p>
@@ -83,8 +83,8 @@ export default function HowItWorksPage() {
                 {step.num}
               </div>
               <div>
-                <h3 className="text-sm font-medium text-white mb-1">{step.title}</h3>
-                <p className="text-[0.65rem] text-white/35 leading-relaxed">{step.desc}</p>
+                <h3 className="text-sm font-medium text-slate-800 mb-1">{step.title}</h3>
+                <p className="text-[0.65rem] text-slate-400 leading-relaxed">{step.desc}</p>
               </div>
             </div>
           ))}
@@ -105,7 +105,7 @@ export default function HowItWorksPage() {
                 </div>
                 <h3 className={`text-sm font-display ${ct.color}`}>{ct.label}</h3>
               </div>
-              <p className="text-[0.65rem] text-white/35 leading-relaxed">{ct.desc}</p>
+              <p className="text-[0.65rem] text-slate-400 leading-relaxed">{ct.desc}</p>
             </div>
           ))}
         </div>
@@ -119,17 +119,17 @@ export default function HowItWorksPage() {
         <div className="wireframe-card rounded-2xl p-8">
           <div className="grid gap-6 md:grid-cols-2">
             <div>
-              <h3 className="text-sm text-white font-medium mb-4">Standard Payout</h3>
+              <h3 className="text-sm text-slate-800 font-medium mb-4">Standard Payout</h3>
               <div className="space-y-2">
                 {[
                   { place: '1st Place', pct: '50%', icon: Trophy, color: 'text-gold' },
                   { place: '2nd Place', pct: '30%', icon: Award, color: 'text-zinc-300' },
                   { place: '3rd Place', pct: '20%', icon: Award, color: 'text-amber-600' },
                 ].map(row => (
-                  <div key={row.place} className="flex items-center justify-between px-4 py-3 rounded-xl bg-white/[0.02]">
+                  <div key={row.place} className="flex items-center justify-between px-4 py-3 rounded-xl bg-white">
                     <div className="flex items-center gap-2">
                       <row.icon size={14} className={row.color} />
-                      <span className="text-sm text-white/60">{row.place}</span>
+                      <span className="text-sm text-slate-500">{row.place}</span>
                     </div>
                     <span className="font-display text-gold">{row.pct}</span>
                   </div>
@@ -137,13 +137,13 @@ export default function HowItWorksPage() {
               </div>
             </div>
             <div>
-              <h3 className="text-sm text-white font-medium mb-4">How Prize Pools Work</h3>
-              <div className="space-y-3 text-[0.65rem] text-white/35 leading-relaxed">
+              <h3 className="text-sm text-slate-800 font-medium mb-4">How Prize Pools Work</h3>
+              <div className="space-y-3 text-[0.65rem] text-slate-400 leading-relaxed">
                 <p>Prize pools are funded by entry fees. A 15% platform fee is deducted, and the remaining 85% is distributed to winners.</p>
                 <p>Free contests award XP instead of cash prizes. Some free contests have sponsored prize pools.</p>
                 <div className="p-3 rounded-xl bg-gold/5 border border-gold/10">
                   <p className="text-gold text-xs font-medium mb-1">Example</p>
-                  <p className="text-white/40">50 players x $10 entry = $500 total. After 15% fee ($75), the prize pool is $425. 1st gets $212.50, 2nd gets $127.50, 3rd gets $85.</p>
+                  <p className="text-slate-400">50 players x $10 entry = $500 total. After 15% fee ($75), the prize pool is $425. 1st gets $212.50, 2nd gets $127.50, 3rd gets $85.</p>
                 </div>
               </div>
             </div>
@@ -163,12 +163,12 @@ export default function HowItWorksPage() {
                 <div className={`px-3 py-1.5 rounded-lg ${tier.bg} ${tier.color} text-xs font-display`}>
                   {tier.name}
                 </div>
-                <span className="text-[0.5rem] font-mono text-white/20">{tier.xp} XP</span>
-                {i < TIERS.length - 1 && <ArrowRight size={10} className="text-white/10 mx-1" />}
+                <span className="text-[0.5rem] font-mono text-slate-300">{tier.xp} XP</span>
+                {i < TIERS.length - 1 && <ArrowRight size={10} className="text-slate-300 mx-1" />}
               </div>
             ))}
           </div>
-          <p className="text-[0.6rem] text-white/25 text-center mt-4 font-mono">
+          <p className="text-[0.6rem] text-slate-400 text-center mt-4 font-mono">
             Earn XP by entering contests, winning, and maintaining streaks. Higher tiers unlock exclusive contests.
           </p>
         </div>
@@ -182,7 +182,7 @@ export default function HowItWorksPage() {
         <div className="wireframe-card rounded-2xl p-8 space-y-6">
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-3">
-              <h3 className="text-sm text-white font-medium flex items-center gap-2">
+              <h3 className="text-sm text-slate-800 font-medium flex items-center gap-2">
                 <Shield size={14} className="text-emerald-400" /> Skill-Based Contests
               </h3>
               <ul className="space-y-2">
@@ -192,7 +192,7 @@ export default function HowItWorksPage() {
                   'No random draws, dice rolls, or chance elements',
                   'Compliant with skill-based contest regulations',
                 ].map((item, i) => (
-                  <li key={i} className="flex items-start gap-2 text-[0.65rem] text-white/35">
+                  <li key={i} className="flex items-start gap-2 text-[0.65rem] text-slate-400">
                     <CheckCircle size={12} className="text-emerald-400 mt-0.5 flex-shrink-0" />
                     <span>{item}</span>
                   </li>
@@ -200,7 +200,7 @@ export default function HowItWorksPage() {
               </ul>
             </div>
             <div className="space-y-3">
-              <h3 className="text-sm text-white font-medium flex items-center gap-2">
+              <h3 className="text-sm text-slate-800 font-medium flex items-center gap-2">
                 <XCircle size={14} className="text-red-400" /> Not Gambling
               </h3>
               <ul className="space-y-2">
@@ -210,7 +210,7 @@ export default function HowItWorksPage() {
                   'No house edge — platform only takes a flat fee',
                   'Free alternative entry method always available',
                 ].map((item, i) => (
-                  <li key={i} className="flex items-start gap-2 text-[0.65rem] text-white/35">
+                  <li key={i} className="flex items-start gap-2 text-[0.65rem] text-slate-400">
                     <CheckCircle size={12} className="text-blue-400 mt-0.5 flex-shrink-0" />
                     <span>{item}</span>
                   </li>
@@ -218,7 +218,7 @@ export default function HowItWorksPage() {
               </ul>
             </div>
           </div>
-          <div className="pt-4 border-t border-white/[0.04] text-[0.55rem] text-white/20 font-mono space-y-1">
+          <div className="pt-4 border-t border-slate-200 text-[0.55rem] text-slate-300 font-mono space-y-1">
             <p>Must be 18+ to participate in paid contests. Not available in all U.S. states.</p>
             <p>Excluded states: AZ, HI, ID, LA, MT, NV, WA. Play responsibly.</p>
             <p>Contest results are final. Disputes resolved within 48 hours.</p>

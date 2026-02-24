@@ -2,11 +2,14 @@
 
 import { SessionProvider } from "next-auth/react";
 import { DemoProvider } from "@/lib/demo-context";
+import { PlatformModeProvider } from "@/lib/platform-mode";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
     <SessionProvider>
-      <DemoProvider>{children}</DemoProvider>
+      <PlatformModeProvider>
+        <DemoProvider>{children}</DemoProvider>
+      </PlatformModeProvider>
     </SessionProvider>
   );
 }

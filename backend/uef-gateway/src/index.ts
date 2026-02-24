@@ -18,7 +18,9 @@ import { JSON_SQUAD_PROFILES } from './agents/lil-hawks/json-expert-squad';
 import { pmoRegistry } from './pmo/registry';
 import { houseOfAng } from './pmo/house-of-ang';
 import { runCollaborationDemo, renderJSON } from './collaboration';
-import { TIER_CONFIGS, TASK_MULTIPLIERS as BILLING_MULTIPLIERS, PILLAR_CONFIGS, checkAllowance, calculatePillarAddon, checkAgentLimit } from './billing';
+import { TIER_CONFIGS, TASK_MULTIPLIERS as BILLING_MULTIPLIERS, PILLAR_CONFIGS, checkAllowance, calculatePillarAddon, checkAgentLimit, meterAndRecord } from './billing';
+import { billingProvisions, paymentSessionStore, x402ReceiptStore } from './billing/persistence';
+import { agentPayments } from './payments/agent-payments';
 import { openrouter, MODELS as LLM_MODELS, llmGateway, usageTracker } from './llm';
 import { verticalRegistry } from './verticals';
 import { projectStore, plugStore, deploymentStore, auditStore, evidenceStore, startCleanupSchedule, stopCleanupSchedule, closeDb } from './db';
@@ -36,7 +38,7 @@ import { secrets } from './secrets';
 import { supplyChain } from './supply-chain';
 import { sandboxEnforcer } from './sandbox';
 import { securityTester } from './security';
-import { alertEngine, correlationManager, metricsExporter } from './observability';
+import { alertEngine, correlationManager, metricsExporter, initObservabilityPersistence } from './observability';
 import { releaseManager } from './release';
 import { backupManager } from './backup';
 import { incidentManager } from './backup/incident-runbook';
@@ -50,10 +52,15 @@ import { ossModels } from './llm/oss-models';
 import { personaplex } from './llm/personaplex';
 import { triggerPmoPipeline } from './n8n';
 import { plugRouter } from './plug-catalog/router';
+import { instanceLifecycle, autoScaler, cdnDeploy, tenantNetworks } from './plug-catalog';
+import { dispatchChickenHawkBuild } from './agents/cloudrun-dispatcher';
+import { triggerVerticalWorkflow } from './n8n/client';
 import { cloudflareRouter, markdownForAgents } from './cloudflare';
 import { paymentsRouter } from './payments';
 import { normalizeInput, getDialectStats, SLANG_ENTRY_COUNT, INTENT_PHRASE_COUNT } from './nlp';
 import { videoRouter } from './video';
+import { liveSim } from './livesim';
+import { composioRouter } from './composio';
 import logger from './logger';
 
 // Custom Lil_Hawks — User-Created Bots
@@ -61,6 +68,7 @@ import {
   createCustomHawk, listUserHawks, getHawk, updateHawkStatus, deleteHawk,
   executeHawk, getAvailableDomains, getAvailableTools, getHawkExecutionHistory,
   getGlobalStats as getHawkGlobalStats,
+  initHawkScheduler, stopHawkScheduler,
 } from './custom-hawks';
 import type { CustomHawkSpec, HawkExecutionRequest } from './custom-hawks';
 
@@ -88,13 +96,31 @@ const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY || '';
 // --------------------------------------------------------------------------
 // Security Middleware
 // --------------------------------------------------------------------------
-app.use(helmet({ contentSecurityPolicy: false }));
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"], // Frontend may need inline scripts
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", 'data:', 'https:'],
+      connectSrc: ["'self'", 'https:'],
+      fontSrc: ["'self'", 'https:', 'data:'],
+      objectSrc: ["'none'"],
+      frameAncestors: ["'none'"],
+    },
+  },
+  crossOriginEmbedderPolicy: false, // Allow loading external resources (fonts, images)
+}));
 
 const corsOrigin = process.env.CORS_ORIGIN || 'http://localhost:3000';
 app.use(cors({
   origin: corsOrigin.split(',').map(o => o.trim()),
-  methods: ['GET', 'POST'],
+  methods: ['GET', 'POST', 'DELETE', 'PUT', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'x-api-key', 'x-user-id', 'x-internal-caller', 'Authorization'],
+  credentials: true,
 }));
+// Raw body for Stripe webhook signature verification (must be before express.json())
+app.use('/api/payments/stripe/webhook', express.raw({ type: 'application/json' }));
 app.use(express.json());
 
 // Correlation ID middleware — every request gets a trace ID
@@ -145,9 +171,17 @@ const acpLimiter = rateLimit({
 // API Key Authentication — all routes except /health require X-API-Key
 // --------------------------------------------------------------------------
 function requireApiKey(req: express.Request, res: express.Response, next: express.NextFunction): void {
-  // In dev without a key configured, allow requests through
-  if (!INTERNAL_API_KEY && process.env.NODE_ENV !== 'production') {
+  // Stripe webhook uses its own signature verification — exempt from API key
+  if (req.path === '/api/payments/stripe/webhook') {
     next();
+    return;
+  }
+
+  // SECURITY: If no API key is configured, reject all requests.
+  // No dev-mode bypass — set INTERNAL_API_KEY in all environments.
+  if (!INTERNAL_API_KEY) {
+    logger.error({ path: req.path }, '[UEF] INTERNAL_API_KEY not configured — rejecting request');
+    res.status(503).json({ error: 'API key not configured — server misconfiguration' });
     return;
   }
 
@@ -649,6 +683,14 @@ app.get('/llm/usage', (req, res) => {
     res.json(usageTracker.getGlobalStats());
   }
 });
+
+// --------------------------------------------------------------------------
+// Factory Controller — Always-On Orchestration (FDH Pipeline)
+// Persistent factory loop: watches events → auto-kicks FDH → drives to completion
+// Integrates with Manage It / Guide Me paths for human-in-the-loop gates
+// --------------------------------------------------------------------------
+import { factoryRouter } from './factory';
+app.use('/factory', factoryRouter);
 
 // --------------------------------------------------------------------------
 // ACHEEVY Orchestrator — Intent classification → agent dispatch
@@ -1589,39 +1631,205 @@ app.post('/billing/check-agents', (req, res) => {
 });
 
 // Provision tier — called by Stripe webhook after checkout/subscription events
-const provisionedTiers = new Map<string, { tierId: string; tierName: string; stripeCustomerId: string; stripeSubscriptionId: string; provisionedAt: string }>();
+// Persisted to SQLite via billingProvisions (replaces in-memory Map)
 
+// SECURITY: Billing provision is a privileged operation — requires internal caller
 app.post('/billing/provision', (req, res) => {
+  // Only internal services (Stripe webhook, ACHEEVY) should set billing tiers
+  const caller = req.headers['x-internal-caller'];
+  if (caller !== 'acheevy' && caller !== 'uef-gateway' && caller !== 'stripe-webhook') {
+    logger.warn({ path: req.path, ip: req.ip }, '[Billing] Rejected: provision requires x-internal-caller header');
+    res.status(403).json({ error: 'Forbidden — billing provision is restricted to internal services' });
+    return;
+  }
+
   const { userId, tierId, tierName, stripeCustomerId, stripeSubscriptionId, provisionedAt, reason } = req.body;
   if (!userId || !tierId) {
     res.status(400).json({ error: 'Missing userId or tierId' });
     return;
   }
 
-  provisionedTiers.set(userId, {
+  const now = new Date().toISOString();
+  billingProvisions.upsert({
+    userId,
     tierId,
     tierName: tierName || tierId,
     stripeCustomerId: stripeCustomerId || '',
     stripeSubscriptionId: stripeSubscriptionId || '',
-    provisionedAt: provisionedAt || new Date().toISOString(),
+    provisionedAt: provisionedAt || now,
+    updatedAt: now,
   });
 
-  logger.info({ userId, tierId, tierName, reason }, '[Billing] Tier provisioned');
-  res.json({ success: true, userId, tierId, tierName, provisionedAt });
+  logger.info({ userId, tierId, tierName, reason }, '[Billing] Tier provisioned (persisted)');
+  res.json({ success: true, userId, tierId, tierName, provisionedAt: provisionedAt || now });
 });
 
 app.get('/billing/provision', (req, res) => {
-  const userId = req.query.userId as string;
+  const queryUserId = req.query.userId as string;
+  const authUserId = req.headers['x-user-id'] as string | undefined;
+  const userId = authUserId || queryUserId;
+
   if (!userId) {
     res.status(400).json({ error: 'Missing userId' });
     return;
   }
-  const tier = provisionedTiers.get(userId);
+
+  // SECURITY: Users can only query their own billing provision
+  if (authUserId && queryUserId && authUserId !== queryUserId) {
+    logger.warn({ authUserId, queryUserId }, '[Billing] SECURITY: User tried to read another user\'s provision');
+    res.status(403).json({ error: 'Forbidden — you can only view your own billing status' });
+    return;
+  }
+
+  const tier = billingProvisions.get(userId);
   if (!tier) {
     res.json({ userId, tierId: 'p2p', tierName: 'Pay-per-Use', provisioned: false });
     return;
   }
-  res.json({ userId, ...tier, provisioned: true });
+  const { userId: _uid, ...tierData } = tier;
+  res.json({ userId, ...tierData, provisioned: true });
+});
+
+// --------------------------------------------------------------------------
+// Billing — Invoice Generation & History
+// --------------------------------------------------------------------------
+
+import { invoiceStore } from './billing/persistence';
+import { generateInvoiceLineItems, calculateFees, generateSavingsLedgerEntries } from './billing';
+
+// Generate an invoice for a user's current billing period
+app.post('/billing/invoice/generate', (req, res) => {
+  // SECURITY: Only internal callers can generate invoices
+  const caller = req.headers['x-internal-caller'];
+  if (caller !== 'acheevy' && caller !== 'uef-gateway' && caller !== 'stripe-webhook') {
+    res.status(403).json({ error: 'Forbidden — invoice generation restricted to internal services' });
+    return;
+  }
+
+  const { userId, overageTokens, p2pTransactionCount } = req.body;
+  if (!userId) {
+    res.status(400).json({ error: 'userId is required' });
+    return;
+  }
+
+  const provision = billingProvisions.get(userId);
+  const tierId = provision?.tierId || 'p2p';
+
+  const lineItems = generateInvoiceLineItems(
+    tierId,
+    overageTokens || 0,
+    p2pTransactionCount || 0,
+  );
+
+  // Calculate fees breakdown for ledger entries
+  const isP2p = tierId === 'p2p';
+  const feeBreakdown = calculateFees(isP2p, p2pTransactionCount || 0);
+
+  const subtotal = lineItems.reduce((sum, item) => sum + item.total, 0);
+  // Tax rate from env (default 0 — set BILLING_TAX_RATE for jurisdictions that require it)
+  const taxRate = parseFloat(process.env.BILLING_TAX_RATE || '0');
+  const taxableAmount = lineItems
+    .filter(i => i.category !== 'savings_credit')
+    .reduce((sum, i) => sum + i.total, 0);
+  const tax = Math.round(taxableAmount * taxRate * 100) / 100;
+  const total = Math.round((subtotal + tax) * 100) / 100;
+
+  const now = new Date();
+  const periodEnd = now.toISOString();
+  const periodStart = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString();
+
+  const invoiceId = `inv_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+  const invoiceRecord = {
+    id: invoiceId,
+    userId,
+    tierId,
+    periodStart,
+    periodEnd,
+    status: 'issued' as const,
+    subtotal,
+    tax,
+    total,
+    currency: 'usd',
+    lineItems: JSON.stringify(lineItems),
+    createdAt: now.toISOString(),
+    updatedAt: now.toISOString(),
+  };
+
+  invoiceStore.create(invoiceRecord);
+
+  // Generate triple-ledger savings entries from fee events
+  const savingsLedger = [];
+  if (feeBreakdown.maintenanceFee > 0) {
+    savingsLedger.push(...generateSavingsLedgerEntries(userId, 'maintenance_fee', feeBreakdown.maintenanceFee));
+  }
+  if (feeBreakdown.transactionFee > 0) {
+    savingsLedger.push(...generateSavingsLedgerEntries(userId, 'transaction_fee', feeBreakdown.transactionFee));
+  }
+
+  logger.info({
+    invoiceId, userId, total, lineItemCount: lineItems.length,
+    feeBreakdown: { maintenance: feeBreakdown.maintenanceFee, transaction: feeBreakdown.transactionFee },
+    savingsEntries: savingsLedger.length,
+  }, '[Billing] Invoice generated with fee breakdown and savings ledger');
+
+  res.json({
+    invoice: {
+      ...invoiceRecord,
+      lineItems,
+    },
+    feeBreakdown,
+    savingsLedger,
+  });
+});
+
+// List a user's invoices
+app.get('/billing/invoices', (req, res) => {
+  const authUserId = req.headers['x-user-id'] as string | undefined;
+  const queryUserId = req.query.userId as string;
+  const userId = authUserId || queryUserId;
+
+  if (!userId) {
+    res.status(400).json({ error: 'userId required' });
+    return;
+  }
+
+  // SECURITY: Users can only see their own invoices
+  if (authUserId && queryUserId && authUserId !== queryUserId) {
+    res.status(403).json({ error: 'Forbidden — you can only view your own invoices' });
+    return;
+  }
+
+  const invoices = invoiceStore.listByUser(userId);
+  res.json({
+    invoices: invoices.map(inv => ({
+      ...inv,
+      lineItems: JSON.parse(inv.lineItems),
+    })),
+    count: invoices.length,
+  });
+});
+
+// Get a specific invoice
+app.get('/billing/invoice/:id', (req, res) => {
+  const invoice = invoiceStore.get(req.params.id);
+  if (!invoice) {
+    res.status(404).json({ error: 'Invoice not found' });
+    return;
+  }
+
+  // SECURITY: Verify ownership
+  const authUserId = req.headers['x-user-id'] as string | undefined;
+  if (authUserId && invoice.userId !== authUserId) {
+    res.status(403).json({ error: 'Forbidden — you do not own this invoice' });
+    return;
+  }
+
+  res.json({
+    invoice: {
+      ...invoice,
+      lineItems: JSON.parse(invoice.lineItems),
+    },
+  });
 });
 
 // --------------------------------------------------------------------------
@@ -1872,6 +2080,322 @@ app.use(shelfRouter);
 // Plug Catalog & Instance Management — PaaS Operations
 // --------------------------------------------------------------------------
 app.use('/api', plugRouter);
+
+// --------------------------------------------------------------------------
+// Composio Integration — Cross-Platform Actions (alongside n8n)
+// Composio = real-time, on-demand actions | n8n = scheduled pipelines
+// --------------------------------------------------------------------------
+app.use('/composio', composioRouter);
+
+// --------------------------------------------------------------------------
+// Circuit Metrics Proxy — Forward to circuit-metrics container
+// --------------------------------------------------------------------------
+const CIRCUIT_METRICS_URL = process.env.CIRCUIT_METRICS_URL || 'http://circuit-metrics:9090';
+
+app.get('/api/circuit-metrics/:path(*)', async (req, res) => {
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+    const upstream = await fetch(`${CIRCUIT_METRICS_URL}/${req.params.path}`, {
+      signal: controller.signal,
+    });
+    clearTimeout(timeout);
+    const data = await upstream.json();
+    res.status(upstream.status).json(data);
+  } catch (err) {
+    res.status(502).json({ error: 'Circuit Metrics unreachable', detail: err instanceof Error ? err.message : 'unknown' });
+  }
+});
+
+// --------------------------------------------------------------------------
+// LiveSim — Real-Time Agent Feed REST Endpoints
+// --------------------------------------------------------------------------
+
+app.get('/api/livesim/stats', (_req, res) => {
+  res.json(liveSim.getStats());
+});
+
+app.get('/api/livesim/events', (req, res) => {
+  const limit = parseInt(req.query.limit as string) || 50;
+  res.json({ events: liveSim.getRecentEvents(limit) });
+});
+
+app.post('/api/livesim/emit', (req, res) => {
+  const { type, room, data } = req.body;
+  if (!type || !room) {
+    res.status(400).json({ error: 'type and room are required' });
+    return;
+  }
+  liveSim.broadcast({ type, room, data: data || {} });
+  res.json({ emitted: true });
+});
+
+/**
+ * SSE stream endpoint for the frontend LiveSim page.
+ * Clients connect via EventSource and receive real-time agent events.
+ * The frontend expects `data: JSON` per SSE spec.
+ */
+app.get('/api/livesim/stream', (req, res) => {
+  const sessionId = req.query.sessionId as string;
+
+  // Set up SSE headers
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.setHeader('X-Accel-Buffering', 'no'); // Disable nginx buffering
+  res.flushHeaders();
+
+  // Send initial connection event
+  res.write(`data: ${JSON.stringify({ id: Date.now().toString(), type: 'coordination', agent: 'ACHEEVY', content: 'LiveSim connected — streaming real-time events', timestamp: new Date().toISOString() })}\n\n`);
+
+  // Poll recent events and send new ones as SSE
+  let lastSeen = 0;
+  const pollInterval = setInterval(() => {
+    const events = liveSim.getRecentEvents(20);
+    const newEvents = events.filter((_, i) => i >= lastSeen);
+    for (const evt of newEvents) {
+      // Map LiveSim events to the frontend's SimLogEntry format
+      const logEntry = {
+        id: evt.timestamp,
+        type: evt.type === 'agent_activity' ? 'action' :
+              evt.type === 'deploy_event' ? 'result' :
+              evt.type === 'health_update' ? 'coordination' :
+              evt.type === 'vertical_step' ? 'thought' : 'coordination',
+        agent: (evt.data as any).agent || 'ACHEEVY',
+        content: (evt.data as any).detail || (evt.data as any).message || JSON.stringify(evt.data),
+        timestamp: evt.timestamp,
+        sessionId,
+      };
+      res.write(`data: ${JSON.stringify(logEntry)}\n\n`);
+    }
+    lastSeen = events.length;
+  }, 2000);
+
+  // Heartbeat to keep connection alive
+  const heartbeat = setInterval(() => {
+    res.write(': heartbeat\n\n');
+  }, 15000);
+
+  // Clean up on disconnect
+  req.on('close', () => {
+    clearInterval(pollInterval);
+    clearInterval(heartbeat);
+  });
+});
+
+// --------------------------------------------------------------------------
+// PersonaPlex Voice API — Full-Duplex Voice Sessions
+// --------------------------------------------------------------------------
+
+app.post('/api/personaplex/:action', async (req, res) => {
+  const { action } = req.params;
+  const body = req.body;
+
+  switch (action) {
+    case 'start': {
+      const session = await personaplex.startSession();
+      if (!session) {
+        res.json({ started: false, configured: personaplex.isConfigured(), error: 'Failed to start session' });
+        return;
+      }
+      res.json({ started: true, session });
+      break;
+    }
+    case 'speak': {
+      const { text, sessionId } = body;
+      if (!text) { res.status(400).json({ error: 'text required' }); return; }
+      const result = await personaplex.speak(text, sessionId);
+      res.json(result);
+      break;
+    }
+    case 'chat': {
+      const { messages } = body;
+      if (!messages || !Array.isArray(messages)) { res.status(400).json({ error: 'messages array required' }); return; }
+      try {
+        const result = await personaplex.chat(messages);
+        res.json(result);
+      } catch (err) {
+        res.status(502).json({ error: err instanceof Error ? err.message : 'PersonaPlex chat failed' });
+      }
+      break;
+    }
+    case 'status': {
+      const { type, projectName, summary, sessionId } = body;
+      await personaplex.deliverStatusUpdate({ type, projectName, summary, sessionId });
+      res.json({ delivered: true });
+      break;
+    }
+    default:
+      res.status(404).json({ error: `Unknown PersonaPlex action: ${action}` });
+  }
+});
+
+app.get('/api/personaplex/status', (_req, res) => {
+  res.json({
+    configured: personaplex.isConfigured(),
+    available: personaplex.isConfigured(),
+    capabilities: ['voice', 'text', 'status-query'],
+  });
+});
+
+app.get('/api/personaplex/session/:sessionId', (_req, res) => {
+  // Session tracking is handled by the PersonaPlex service itself
+  res.json({ sessionId: _req.params.sessionId, status: 'active' });
+});
+
+app.delete('/api/personaplex/session/:sessionId', async (req, res) => {
+  await personaplex.endSession(req.params.sessionId);
+  res.json({ ended: true });
+});
+
+// --------------------------------------------------------------------------
+// Onboarding — New User Profile Persistence
+// --------------------------------------------------------------------------
+
+const onboardingProfiles = new Map<string, Record<string, unknown>>();
+
+app.post('/api/onboarding', (req, res) => {
+  const { fullName, region, objective, industry, companyName, onboardedAt } = req.body;
+  if (!fullName) {
+    res.status(400).json({ error: 'fullName required' });
+    return;
+  }
+
+  const profileId = `profile-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  const profile = {
+    profileId,
+    fullName,
+    region: region || 'Not specified',
+    objective: objective || 'Just exploring',
+    industry: industry || 'Technology / SaaS',
+    companyName: companyName || '',
+    onboardedAt: onboardedAt || new Date().toISOString(),
+    tier: 'free',
+  };
+
+  onboardingProfiles.set(profileId, profile);
+  logger.info({ profileId, fullName }, '[UEF] New user onboarded');
+  res.json({ profileId, saved: true });
+});
+
+// --------------------------------------------------------------------------
+// Auto-Scaler — Horizontal & Vertical Scaling for Plug Instances
+// --------------------------------------------------------------------------
+
+app.get('/api/autoscaler/stats', (_req, res) => {
+  res.json(autoScaler.getStats());
+});
+
+app.post('/api/autoscaler/policy', (req, res) => {
+  const { instanceId, ...policy } = req.body;
+  if (!instanceId) {
+    res.status(400).json({ error: 'instanceId required' });
+    return;
+  }
+  const result = autoScaler.setPolicy(instanceId, policy);
+  res.json({ policy: result });
+});
+
+app.post('/api/autoscaler/tier', (req, res) => {
+  const { instanceId, tier } = req.body;
+  if (!instanceId || !tier) {
+    res.status(400).json({ error: 'instanceId and tier required' });
+    return;
+  }
+  const result = autoScaler.applyTierLimits(instanceId, tier);
+  res.json({ policy: result });
+});
+
+app.delete('/api/autoscaler/policy/:instanceId', (req, res) => {
+  autoScaler.removePolicy(req.params.instanceId);
+  res.json({ removed: true });
+});
+
+// --------------------------------------------------------------------------
+// CDN Deploy — Static Site Hosting Pipeline
+// --------------------------------------------------------------------------
+
+app.post('/api/cdn/deploy', async (req, res) => {
+  const { projectId, userId, projectName, files, customDomain, paywallEnabled } = req.body;
+  if (!projectId || !userId || !projectName || !files) {
+    res.status(400).json({ error: 'Missing required fields: projectId, userId, projectName, files' });
+    return;
+  }
+  try {
+    const result = await cdnDeploy.deploy({ projectId, userId, projectName, files, customDomain, paywallEnabled });
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err instanceof Error ? err.message : 'Deploy failed' });
+  }
+});
+
+app.get('/api/cdn/deployments', (_req, res) => {
+  res.json({ deployments: cdnDeploy.listDeployments() });
+});
+
+app.get('/api/cdn/deployments/:slug', (req, res) => {
+  const deployment = cdnDeploy.getDeployment(req.params.slug);
+  if (!deployment) {
+    res.status(404).json({ error: 'Deployment not found' });
+    return;
+  }
+  res.json(deployment);
+});
+
+app.delete('/api/cdn/deployments/:slug', async (req, res) => {
+  const result = await cdnDeploy.decommission(req.params.slug);
+  res.json(result);
+});
+
+// --------------------------------------------------------------------------
+// Cloud Run Dispatcher — Chicken Hawk Build Jobs
+// --------------------------------------------------------------------------
+
+app.post('/api/cloudrun/dispatch', async (req, res) => {
+  const { taskId, manifestUrl, preferService } = req.body;
+  if (!taskId) {
+    res.status(400).json({ error: 'taskId required' });
+    return;
+  }
+  try {
+    const result = await dispatchChickenHawkBuild(taskId, manifestUrl, preferService);
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err instanceof Error ? err.message : 'Dispatch failed' });
+  }
+});
+
+// --------------------------------------------------------------------------
+// Tenant Network Isolation — Per-User Docker Networks
+// --------------------------------------------------------------------------
+
+app.get('/api/tenant-networks', async (_req, res) => {
+  const networks = await tenantNetworks.listTenantNetworks();
+  res.json({ networks });
+});
+
+// --------------------------------------------------------------------------
+// Vertical Workflow Triggers — n8n Integration
+// --------------------------------------------------------------------------
+
+app.post('/api/vertical/trigger', async (req, res) => {
+  const { verticalId, userId, collectedData, sessionId } = req.body;
+  if (!verticalId || !userId) {
+    res.status(400).json({ error: 'verticalId and userId required' });
+    return;
+  }
+  try {
+    const result = await triggerVerticalWorkflow({
+      verticalId,
+      userId,
+      collectedData: collectedData || {},
+      sessionId,
+    });
+    res.json(result);
+  } catch (err) {
+    res.status(502).json({ error: err instanceof Error ? err.message : 'Workflow trigger failed' });
+  }
+});
 
 // --------------------------------------------------------------------------
 // LUC Project Service — Pricing & Effort Oracle
@@ -2215,6 +2739,51 @@ app.get('/observability/metrics/prometheus', (_req, res) => {
   res.send(metricsExporter.exportPrometheus());
 });
 
+// Per-tenant observability: instance alerts and health for a specific user
+app.get('/observability/tenant/:userId', (req, res) => {
+  const userId = req.params.userId;
+
+  // Get user's instances
+  const { plugDeployEngine: deployEngine } = require('./plug-catalog/deploy-engine');
+  const instances = deployEngine.listByUser(userId);
+
+  // Filter alerts relevant to this user's instances
+  const instanceIds = instances.map((i: any) => i.instanceId);
+  const allActive = alertEngine.getActiveAlerts();
+  const allHistory = alertEngine.getAlertHistory(100);
+
+  const tenantAlerts = allActive.filter((a: any) =>
+    instanceIds.some((id: string) => a.metric.includes(id))
+  );
+  const tenantHistory = allHistory.filter((a: any) =>
+    instanceIds.some((id: string) => a.metric.includes(id))
+  );
+
+  // Aggregate health stats for this tenant
+  const healthSummary = {
+    total: instances.length,
+    healthy: instances.filter((i: any) => i.healthStatus === 'healthy').length,
+    unhealthy: instances.filter((i: any) => i.healthStatus === 'unhealthy').length,
+    unknown: instances.filter((i: any) => !i.healthStatus || i.healthStatus === 'unknown').length,
+  };
+
+  res.json({
+    userId,
+    instances: instances.map((i: any) => ({
+      instanceId: i.instanceId,
+      plugId: i.plugId,
+      name: i.name,
+      status: i.status,
+      healthStatus: i.healthStatus,
+      uptimeSeconds: i.uptimeSeconds,
+      lastHealthCheck: i.lastHealthCheck,
+    })),
+    healthSummary,
+    activeAlerts: tenantAlerts,
+    alertHistory: tenantHistory,
+  });
+});
+
 // --------------------------------------------------------------------------
 // Pillar 11 — Release Engineering
 // --------------------------------------------------------------------------
@@ -2547,9 +3116,32 @@ app.post('/ingress/acp', acpLimiter, async (req, res) => {
 
     logger.info({ passed: oracleResult.passed, score: oracleResult.score }, '[UEF] ORACLE result');
 
-    // 5. Agent dispatch (only if ORACLE passes AND policy is cleared)
+    // 5. Pre-execution affordability check
+    const estimatedLucCost = quote.variants[0]?.estimate?.totalTokens
+      ? Math.floor((quote.variants[0].estimate.totalUsd || 0) * 100)
+      : 0;
+
+    let insufficientFunds = false;
+    const isGuest = acpReq.userId === 'guest';
+
+    // Guest users get estimates only — never full agent execution
+    if (isGuest) {
+      insufficientFunds = true;
+      logger.info({ userId: acpReq.userId }, '[UEF] Guest user — estimate only, no agent execution');
+    } else if (estimatedLucCost > 0) {
+      const affordable = agentPayments.canAfford(acpReq.userId, estimatedLucCost);
+      if (!affordable) {
+        insufficientFunds = true;
+        logger.warn(
+          { userId: acpReq.userId, estimatedLucCost },
+          '[UEF] Insufficient LUC balance — blocking execution',
+        );
+      }
+    }
+
+    // 6. Agent dispatch (only if ORACLE passes, policy cleared, AND affordable)
     let agentResult = { executed: false, agentOutputs: [] as Array<{ status: string; agentId: string; result: { summary: string; artifacts: string[] } }>, primaryAgent: null as string | null };
-    if (oracleResult.passed && prepPacket.policyManifest.cleared) {
+    if (oracleResult.passed && prepPacket.policyManifest.cleared && !insufficientFunds) {
       agentResult = await routeToAgents(
         acpReq.intent,
         acpReq.naturalLanguage,
@@ -2558,11 +3150,39 @@ app.post('/ingress/acp', acpLimiter, async (req, res) => {
       );
     }
 
-    // 6. Construct response
+    // 7. Post-execution metering — record actual token usage to SQLite
+    if (agentResult.executed && acpReq.userId !== 'guest') {
+      const taskType = acpReq.intent === 'BUILD_PLUG' ? 'DEPLOYMENT'
+        : acpReq.intent === 'RESEARCH' ? 'BIZ_INTEL'
+        : acpReq.intent === 'AGENTIC_WORKFLOW' ? 'AGENT_SWARM'
+        : 'CODE_GEN';
+      const rawTokens = quote.variants[0]?.estimate?.totalTokens || 0;
+      const provision = billingProvisions.get(acpReq.userId);
+      const tierId = provision?.tierId || 'p2p';
+
+      meterAndRecord(
+        rawTokens,
+        taskType as any,
+        tierId,
+        acpReq.userId,
+        `ACP ${acpReq.intent}: ${acpReq.naturalLanguage.slice(0, 80)}`,
+      );
+    }
+
+    // 8. Construct response
+    const acpStatus = isGuest ? 'ESTIMATE_ONLY'
+      : insufficientFunds ? 'PAYMENT_REQUIRED'
+      : (oracleResult.passed ? 'SUCCESS' : 'ERROR');
+    const acpMessage = isGuest
+      ? 'Sign in to execute tasks. Here is your cost estimate.'
+      : insufficientFunds
+      ? 'Insufficient LUC balance. Please top up your wallet to continue.'
+      : buildResponseMessage(acpReq.intent, oracleResult.passed, agentResult.executed);
+
     const response: ACPResponse = {
       reqId: acpReq.reqId,
-      status: oracleResult.passed ? 'SUCCESS' : 'ERROR',
-      message: buildResponseMessage(acpReq.intent, oracleResult.passed, agentResult.executed),
+      status: acpStatus as any,
+      message: acpMessage,
       quote: quote,
       executionPlan: executionPlan,
     };
@@ -2754,22 +3374,63 @@ app.post('/memory/preference', (req, res) => {
 });
 
 // --------------------------------------------------------------------------
-// Start Server
+// Start Server — initialize deploy engine lifecycle before listening
 // --------------------------------------------------------------------------
-export const server = app.listen(PORT, () => {
-  const agents = registry.list();
-  logger.info({ port: PORT, agents: agents.length }, 'UEF Gateway (Layer 2) running');
-  logger.info(`Agents online: ${agents.map(a => a.name).join(', ')}`);
-  logger.info(`ACP Ingress available at http://localhost:${PORT}/ingress/acp`);
-});
+async function startServer(): Promise<void> {
+  // Initialize plug instance lifecycle: loads port state, wires health monitor,
+  // starts background health sweeps, and reconciles with Docker state.
+  try {
+    await instanceLifecycle.initialize();
+    autoScaler.start(60000); // Evaluate scaling every 60s
+    logger.info('[UEF] Instance lifecycle initialized — health monitor + auto-scaler running');
+  } catch (err) {
+    logger.error({ err }, '[UEF] Instance lifecycle init failed — continuing without health monitoring');
+  }
+
+  // ── Observability Persistence (restore + periodic flush) ────────────────
+  initObservabilityPersistence();
+
+  // ── Hawk Scheduler (register cron schedules for active hawks) ──────────
+  initHawkScheduler();
+
+  // ── Billing Maintenance Cron (every 5 minutes) ──────────────────────────
+  setInterval(() => {
+    try {
+      const expiredSessions = paymentSessionStore.expireStaleSessions();
+      const expiredReceipts = x402ReceiptStore.cleanup();
+      if (expiredSessions > 0 || expiredReceipts > 0) {
+        logger.info({ expiredSessions, expiredReceipts }, '[BillingCron] Cleaned up expired records');
+      }
+    } catch (err) {
+      logger.error({ err }, '[BillingCron] Cleanup failed');
+    }
+  }, 5 * 60 * 1000);
+
+  server.listen(PORT, () => {
+    const agents = registry.list();
+    logger.info({ port: PORT, agents: agents.length }, 'UEF Gateway (Layer 2) running');
+    logger.info(`Agents online: ${agents.map(a => a.name).join(', ')}`);
+    logger.info(`ACP Ingress available at http://localhost:${PORT}/ingress/acp`);
+  });
+}
+
+export const server = require('http').createServer(app);
+
+// Attach LiveSim WebSocket to the HTTP server
+liveSim.attach(server);
+
+startServer();
 
 // --------------------------------------------------------------------------
 // Graceful Shutdown — let Docker stop containers cleanly
 // --------------------------------------------------------------------------
 function shutdown(signal: string) {
   logger.info({ signal }, '[UEF] Received shutdown signal, draining connections...');
+  metricsExporter.flushToDb(); // Persist metrics before shutdown
+  stopHawkScheduler(); // Stop all hawk cron schedules
   stopCleanupSchedule();
   memoryEngine.stopMaintenance();
+  instanceLifecycle.getHealthMonitor().stop();
   server.close(() => {
     closeDb();
     logger.info('[UEF] All connections drained. DB closed. Exiting.');

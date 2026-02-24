@@ -190,7 +190,7 @@ export default function RevenuePlatformPage() {
       <motion.section variants={staggerItem}>
         <Link
           href="/dashboard/research"
-          className="mb-4 inline-flex items-center gap-2 text-sm text-white/40 transition hover:text-gold"
+          className="mb-4 inline-flex items-center gap-2 text-sm text-slate-400 transition hover:text-gold"
         >
           <ArrowLeft size={14} />
           Back to Research Hub
@@ -201,10 +201,10 @@ export default function RevenuePlatformPage() {
             <DollarSign size={22} className="text-gold" />
           </div>
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-white font-display">
+            <h1 className="text-2xl font-semibold tracking-tight text-slate-800 font-display">
               Revenue Platform
             </h1>
-            <p className="text-sm text-white/50">
+            <p className="text-sm text-slate-500">
               Monetization strategy, billing tiers, and revenue streams
             </p>
           </div>
@@ -213,7 +213,7 @@ export default function RevenuePlatformPage() {
 
       {/* ── LUC Billing Tiers ──────────────────────────────── */}
       <motion.section variants={staggerItem}>
-        <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-white/80 font-display">
+        <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-slate-700 font-display">
           LUC Billing Tiers
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
@@ -224,7 +224,7 @@ export default function RevenuePlatformPage() {
               className={`relative rounded-3xl border p-6 backdrop-blur-2xl ${
                 tier.highlight
                   ? "border-gold/30 bg-gold/5"
-                  : "border-wireframe-stroke bg-black/60"
+                  : "border-wireframe-stroke bg-slate-50/70"
               }`}
             >
               {/* Recommended Badge */}
@@ -250,26 +250,26 @@ export default function RevenuePlatformPage() {
                     className={tier.highlight ? "text-gold" : "text-gold/80"}
                   />
                 </div>
-                <h3 className="text-lg font-semibold text-white font-display">
+                <h3 className="text-lg font-semibold text-slate-800 font-display">
                   {tier.name}
                 </h3>
               </div>
 
               {/* Price */}
               <div className="mb-3">
-                <span className="text-3xl font-bold text-white">
+                <span className="text-3xl font-bold text-slate-800">
                   ${tier.price}
                 </span>
-                <span className="text-sm text-white/40">/month</span>
+                <span className="text-sm text-slate-400">/month</span>
               </div>
 
               {/* Description */}
-              <p className="mb-4 text-xs leading-relaxed text-white/50">
+              <p className="mb-4 text-xs leading-relaxed text-slate-500">
                 {tier.description}
               </p>
 
               {/* Quota Summary */}
-              <div className="mb-4 rounded-xl border border-wireframe-stroke bg-white/5 p-3">
+              <div className="mb-4 rounded-xl border border-wireframe-stroke bg-slate-50 p-3">
                 <p className="mb-2 text-[10px] font-medium uppercase tracking-wider text-gold/50">
                   {tier.quotaLabel}
                 </p>
@@ -279,8 +279,8 @@ export default function RevenuePlatformPage() {
                       key={key}
                       className="flex items-center justify-between text-xs"
                     >
-                      <span className="text-white/40">{key}</span>
-                      <span className="font-mono text-white/70">{value}</span>
+                      <span className="text-slate-400">{key}</span>
+                      <span className="font-mono text-slate-600">{value}</span>
                     </div>
                   ))}
                 </div>
@@ -291,7 +291,7 @@ export default function RevenuePlatformPage() {
                 {tier.features.map((feature) => (
                   <li
                     key={feature}
-                    className="flex items-start gap-2 text-xs text-white/50"
+                    className="flex items-start gap-2 text-xs text-slate-500"
                   >
                     <CheckCircle2
                       size={12}
@@ -310,7 +310,7 @@ export default function RevenuePlatformPage() {
 
       {/* ── Revenue Streams ────────────────────────────────── */}
       <motion.section variants={staggerItem}>
-        <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-white/80 font-display">
+        <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-slate-700 font-display">
           Revenue Streams
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -318,7 +318,7 @@ export default function RevenuePlatformPage() {
             <motion.div
               key={stream.id}
               whileHover={{ y: -2 }}
-              className="rounded-3xl border border-wireframe-stroke bg-black/60 p-6 backdrop-blur-2xl"
+              className="rounded-3xl border border-wireframe-stroke bg-slate-50/70 p-6 backdrop-blur-2xl"
             >
               <div className="mb-3 flex items-center gap-3">
                 <div
@@ -330,23 +330,23 @@ export default function RevenuePlatformPage() {
                 >
                   <stream.icon size={18} style={{ color: stream.color }} />
                 </div>
-                <h3 className="text-base font-semibold text-white font-display">
+                <h3 className="text-base font-semibold text-slate-800 font-display">
                   {stream.name}
                 </h3>
               </div>
-              <p className="mb-4 text-sm leading-relaxed text-white/60">
+              <p className="mb-4 text-sm leading-relaxed text-slate-500">
                 {stream.description}
               </p>
               <div className="flex gap-4">
                 {stream.metrics.map((m) => (
                   <div
                     key={m.label}
-                    className="rounded-xl border border-wireframe-stroke bg-white/5 px-3 py-2"
+                    className="rounded-xl border border-wireframe-stroke bg-slate-50 px-3 py-2"
                   >
                     <p className="text-[10px] font-medium uppercase tracking-wider text-gold/50">
                       {m.label}
                     </p>
-                    <p className="text-sm font-semibold text-white">
+                    <p className="text-sm font-semibold text-slate-800">
                       {m.value}
                     </p>
                   </div>
@@ -359,10 +359,10 @@ export default function RevenuePlatformPage() {
 
       {/* ── Monetization Strategy ──────────────────────────── */}
       <motion.section variants={staggerItem}>
-        <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-white/80 font-display">
+        <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-slate-700 font-display">
           Monetization Strategy
         </h2>
-        <div className="rounded-3xl border border-wireframe-stroke bg-black/60 p-6 backdrop-blur-2xl">
+        <div className="rounded-3xl border border-wireframe-stroke bg-slate-50/70 p-6 backdrop-blur-2xl">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Phase 1 */}
             <div className="space-y-3">
@@ -371,15 +371,15 @@ export default function RevenuePlatformPage() {
                   <Zap size={14} className="text-gold" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-white">Phase 1</p>
-                  <p className="text-[10px] text-white/40">Foundation</p>
+                  <p className="text-sm font-semibold text-slate-800">Phase 1</p>
+                  <p className="text-[10px] text-slate-400">Foundation</p>
                 </div>
               </div>
               <ul className="space-y-1.5 pl-10">
-                <li className="text-xs text-white/50">Launch free tier for adoption</li>
-                <li className="text-xs text-white/50">Build aiPlug marketplace MVP</li>
-                <li className="text-xs text-white/50">Onboard 100 beta users</li>
-                <li className="text-xs text-white/50">Validate LUC billing engine</li>
+                <li className="text-xs text-slate-500">Launch free tier for adoption</li>
+                <li className="text-xs text-slate-500">Build aiPlug marketplace MVP</li>
+                <li className="text-xs text-slate-500">Onboard 100 beta users</li>
+                <li className="text-xs text-slate-500">Validate LUC billing engine</li>
               </ul>
             </div>
 
@@ -390,15 +390,15 @@ export default function RevenuePlatformPage() {
                   <TrendingUp size={14} className="text-blue-400" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-white">Phase 2</p>
-                  <p className="text-[10px] text-white/40">Growth</p>
+                  <p className="text-sm font-semibold text-slate-800">Phase 2</p>
+                  <p className="text-[10px] text-slate-400">Growth</p>
                 </div>
               </div>
               <ul className="space-y-1.5 pl-10">
-                <li className="text-xs text-white/50">Convert free to paid tiers</li>
-                <li className="text-xs text-white/50">Expand marketplace catalog</li>
-                <li className="text-xs text-white/50">Launch API access program</li>
-                <li className="text-xs text-white/50">Target $10K MRR</li>
+                <li className="text-xs text-slate-500">Convert free to paid tiers</li>
+                <li className="text-xs text-slate-500">Expand marketplace catalog</li>
+                <li className="text-xs text-slate-500">Launch API access program</li>
+                <li className="text-xs text-slate-500">Target $10K MRR</li>
               </ul>
             </div>
 
@@ -409,22 +409,22 @@ export default function RevenuePlatformPage() {
                   <BarChart3 size={14} className="text-purple-400" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-white">Phase 3</p>
-                  <p className="text-[10px] text-white/40">Scale</p>
+                  <p className="text-sm font-semibold text-slate-800">Phase 3</p>
+                  <p className="text-[10px] text-slate-400">Scale</p>
                 </div>
               </div>
               <ul className="space-y-1.5 pl-10">
-                <li className="text-xs text-white/50">White-label enterprise deals</li>
-                <li className="text-xs text-white/50">On-premise deployment option</li>
-                <li className="text-xs text-white/50">Partner & reseller program</li>
-                <li className="text-xs text-white/50">Target $100K MRR</li>
+                <li className="text-xs text-slate-500">White-label enterprise deals</li>
+                <li className="text-xs text-slate-500">On-premise deployment option</li>
+                <li className="text-xs text-slate-500">Partner & reseller program</li>
+                <li className="text-xs text-slate-500">Target $100K MRR</li>
               </ul>
             </div>
           </div>
 
           {/* Bottom Bar */}
           <div className="mt-6 flex items-center justify-between border-t border-wireframe-stroke pt-4">
-            <p className="text-xs text-white/40">
+            <p className="text-xs text-slate-400">
               Revenue engine powered by the LUC (Locale Universal Calculator) billing system
             </p>
             <Link

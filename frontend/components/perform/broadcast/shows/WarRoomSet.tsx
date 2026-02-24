@@ -32,12 +32,12 @@ export function WarRoomSet({ segment }: { segment: BroadcastSegment }) {
                         />
                     </div>
 
-                    <div className="relative z-10 bg-black/80 backdrop-blur-md border border-red-500/30 p-6 rounded-2xl w-3/4">
+                    <div className="relative z-10 bg-white/80 backdrop-blur-md border border-red-500/30 p-6 rounded-2xl w-3/4">
                         <h4 className="text-red-500 font-bold uppercase tracking-widest text-xs mb-2 flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
                             The Bull Case
                         </h4>
-                        <p className="text-white/80 text-lg leading-relaxed mix-blend-screen">
+                        <p className="text-slate-700 text-lg leading-relaxed mix-blend-screen">
                             "When healthy, McCoy is the best CB in this class. ACL recovery is routine now — 12+ months out. The ball skills and athleticism are elite."
                         </p>
                     </div>
@@ -76,12 +76,12 @@ export function WarRoomSet({ segment }: { segment: BroadcastSegment }) {
                         />
                     </div>
 
-                    <div className="relative z-10 bg-black/80 backdrop-blur-md border border-blue-500/30 p-6 rounded-2xl w-3/4 self-end">
+                    <div className="relative z-10 bg-white/80 backdrop-blur-md border border-blue-500/30 p-6 rounded-2xl w-3/4 self-end">
                         <h4 className="text-blue-500 font-bold uppercase tracking-widest text-xs mb-2 flex items-center gap-2">
                             <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
                             The Bear Case
                         </h4>
-                        <p className="text-white/80 text-lg leading-relaxed mix-blend-screen text-right">
+                        <p className="text-slate-700 text-lg leading-relaxed mix-blend-screen text-right">
                             "Missed entire 2025 season. ACL tears change athletes. Teams drafting in the top 15 can't afford medical risks."
                         </p>
                     </div>

@@ -35,6 +35,7 @@ const ALLOWED_ORIGINS = IS_PRODUCTION
       'https://luc.plugmein.cloud',
       'https://aimanagedsolutions.cloud',
       'https://www.aimanagedsolutions.cloud',
+      'https://hh.aimanagedsolutions.cloud',
     ]
   : [
       'http://localhost:3000',
@@ -85,11 +86,12 @@ const HONEYPOT_PATHS = [
 // Content Security Policy - strict but functional
 const CSP_DIRECTIVES = IS_PRODUCTION ? [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live",
+  // unsafe-inline required for Next.js inline scripts; unsafe-eval for dynamic imports
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' https://fonts.gstatic.com",
   "img-src 'self' data: https: blob:",
-  "connect-src 'self' https://api.aims.plugmein.cloud https://api.anthropic.com https://generativelanguage.googleapis.com https://api.moonshot.cn https://api.groq.com https://api.openai.com https://api.elevenlabs.io wss:",
+  "connect-src 'self' https://plugmein.cloud https://api.aims.plugmein.cloud https://aimanagedsolutions.cloud https://hh.aimanagedsolutions.cloud https://api.anthropic.com https://generativelanguage.googleapis.com https://api.moonshot.cn https://api.groq.com https://api.openai.com https://api.elevenlabs.io wss://plugmein.cloud wss://api.aims.plugmein.cloud",
   "media-src 'self' blob:",
   "object-src 'none'",
   "frame-ancestors 'none'",
@@ -102,7 +104,7 @@ const CSP_DIRECTIVES = IS_PRODUCTION ? [
   "style-src 'self' 'unsafe-inline'",
   "font-src 'self' data:",
   "img-src 'self' data: https: blob:",
-  "connect-src *",
+  "connect-src 'self' http://localhost:* http://127.0.0.1:* ws://localhost:* ws://127.0.0.1:*",
   "media-src 'self' blob:",
 ].join('; ');
 
