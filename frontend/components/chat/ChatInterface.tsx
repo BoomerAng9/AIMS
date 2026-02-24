@@ -25,6 +25,8 @@ import { DepartmentBoard } from '@/components/orchestration/DepartmentBoard';
 import { UserInputModal } from '@/components/change-order/UserInputModal';
 import { CollaborationSidebar } from '@/components/collaboration/CollaborationFeed';
 import { VerticalStepIndicator } from '@/components/chat/VerticalStepIndicator';
+import { OnboardingGateBanner } from '@/components/chat/OnboardingGateBanner';
+import { FileDownload, FileDownloadGroup } from '@/components/chat/FileDownload';
 import type { ChatMessage } from '@/lib/chat/types';
 import type { ChangeOrder } from '@/lib/change-order/types';
 import { formatCurrency } from '@/lib/change-order/types';
@@ -237,6 +239,22 @@ const MessageBubble = memo(function MessageBubble({ message, onSpeak, onCopy, is
             </div>
           )}
         </div>
+
+        {/* File Deliverables — rendered from message metadata */}
+        {!isUser && !isStreaming && Array.isArray(message.metadata?.files) && (
+          <div className="mt-2">
+            <FileDownloadGroup
+              files={
+                message.metadata.files as Array<{
+                  content: string;
+                  filename?: string;
+                  format?: 'md' | 'json' | 'csv' | 'txt' | 'html';
+                  label?: string;
+                }>
+              }
+            />
+          </div>
+        )}
 
         {/* Message Actions (for assistant messages) */}
         {!isUser && !isStreaming && message.content && (
@@ -671,6 +689,9 @@ export function ChatInterface({
       {/* Messages Area */}
       <div className="flex-1 overflow-y-auto px-4 py-6">
         <div className="max-w-3xl mx-auto space-y-6">
+          {/* Onboarding Gate Banner — shown until onboarding is complete */}
+          {messages.length === 0 && <OnboardingGateBanner />}
+
           {/* Welcome Message */}
           {messages.length === 0 && welcomeMessage && (
             <motion.div

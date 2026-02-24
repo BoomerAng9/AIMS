@@ -26,7 +26,11 @@ import {
 import { DRAFT_TIER_STYLES, TREND_STYLES, getScoreColor } from '@/lib/perform/types';
 import type { DraftTier, Trend } from '@/lib/perform/types';
 import { BroadcastProvider, useBroadcastEngine } from '@/components/perform/broadcast/engine';
+import type { BroadcastSegment } from '@/components/perform/broadcast/engine';
 import { StudioArena } from '@/components/perform/broadcast/studio';
+import { MockDraftSet } from '@/components/perform/broadcast/shows/MockDraftSet';
+import { HumanAnchorFeed } from '@/components/perform/broadcast/shows/HumanAnchorFeed';
+import { NetworkBug, LowerThird } from '@/components/perform/broadcast/graphics';
 
 function NetworkControls() {
   const { isLive, startBroadcast, stopBroadcast } = useBroadcastEngine();
@@ -663,6 +667,50 @@ function DraftPageContent() {
                 <ChevronRight size={16} className="absolute top-5 right-5 text-slate-300 group-hover:text-blue-400 transition-colors" />
               </div>
             </Link>
+          </motion.div>
+
+          {/* ═══════════════════════════════════════════════════════
+              BROADCAST PREVIEW — On The Clock + Analyst Feed
+              Inline broadcast-quality segments from the show engine.
+              ═══════════════════════════════════════════════════════ */}
+          <motion.div variants={staggerItem} className="grid md:grid-cols-2 gap-4">
+            {/* MockDraftSet — On The Clock Preview */}
+            <div className="relative bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm group hover:border-gold/30 transition-all">
+              <div className="flex items-center gap-2 px-4 py-2 bg-[#F8FAFC] border-b border-slate-100">
+                <div className="h-1.5 w-1.5 bg-red-500 rounded-full animate-pulse" />
+                <span className="text-[0.55rem] font-mono uppercase tracking-[0.2em] text-gold font-bold">On The Clock</span>
+                <span className="text-[0.55rem] font-mono uppercase tracking-[0.15em] text-slate-400 ml-auto">Mock Draft Preview</span>
+              </div>
+              <div className="h-[380px] overflow-hidden">
+                <MockDraftSet segment={{
+                  id: 'draft-preview-otc',
+                  type: 'MOCK_DRAFT_DESK',
+                  title: `NFL Draft ${new Date().getFullYear()}`,
+                  durationSeconds: 30,
+                  host: 'BOOMER_ANG',
+                  topic: 'On The Clock — Who goes #1 Overall?',
+                } as BroadcastSegment} />
+              </div>
+            </div>
+
+            {/* HumanAnchorFeed — Analyst Desk Preview */}
+            <div className="relative bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm group hover:border-gold/30 transition-all">
+              <div className="flex items-center gap-2 px-4 py-2 bg-[#F8FAFC] border-b border-slate-100">
+                <div className="h-1.5 w-1.5 bg-emerald-500 rounded-full animate-pulse" />
+                <span className="text-[0.55rem] font-mono uppercase tracking-[0.2em] text-emerald-500 font-bold">Analyst Feed</span>
+                <span className="text-[0.55rem] font-mono uppercase tracking-[0.15em] text-slate-400 ml-auto">Studio Camera</span>
+              </div>
+              <div className="h-[380px] overflow-hidden bg-white">
+                <HumanAnchorFeed segment={{
+                  id: 'draft-preview-anchor',
+                  type: 'HUMAN_ANCHOR_FEED',
+                  title: 'Per|Form Draft Center',
+                  durationSeconds: 30,
+                  host: 'HUMAN',
+                  topic: `Welcome to the ${new Date().getFullYear()} NFL Draft Coverage`,
+                } as BroadcastSegment} />
+              </div>
+            </div>
           </motion.div>
 
           {/* ═══════════════════════════════════════════════════════

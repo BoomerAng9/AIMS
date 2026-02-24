@@ -57,9 +57,9 @@ export default function HangarScene() {
         near: 0.1,
         far: 100,
       }}
-      style={{ background: '#0B0F14' }}
+      style={{ background: '#F0F4F8' }}
     >
-      <color attach="background" args={['#0B0F14']} />
+      <color attach="background" args={['#F0F4F8']} />
 
       <Suspense fallback={null}>
         <SceneContent />

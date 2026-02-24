@@ -17,6 +17,17 @@ import {
   ChevronRight,
   Play,
 } from "lucide-react";
+import {
+  scrollReveal,
+  scrollRevealScale,
+  staggerContainer,
+  staggerItem,
+  heroStagger,
+  heroItem,
+  viewportMargin,
+} from "@/lib/motion";
+import { DelayedSignUpModal } from "@/components/DelayedSignUpModal";
+import { AppShowcase, BuildPrompts } from "@/components/landing/AppShowcase";
 
 /* ═══════════════════════════════════════════════════════════
    A.I.M.S. Landing Page — Dark Premium PaaS
@@ -242,6 +253,45 @@ export default function HomePage() {
               </div>
             </FadeIn>
 
+        <ExperienceGateway />
+        <AppShowcase />
+        <BuildPrompts />
+        <PlatformPillars />
+        <FinalCTA />
+        <SiteFooter />
+        <DelayedSignUpModal />
+      </div>
+    </main>
+  );
+}
+
+function SiteNav() {
+  const { scrollY } = useScroll();
+  const navBgOpacity = useTransform(scrollY, [0, 100], [0.6, 0.95]);
+  const navShadow = useTransform(scrollY, [0, 100], [0, 1]);
+
+  return (
+    <motion.nav
+      className="sticky top-0 z-50 h-20 flex items-center justify-center px-6"
+      initial={{ y: -20, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.5, delay: 0.1 }}
+    >
+      <motion.div
+        className="w-full max-w-7xl flex items-center justify-between backdrop-blur-xl px-6 py-3 border border-slate-200 rounded-2xl"
+        style={{
+          backgroundColor: useTransform(navBgOpacity, (v) => `rgba(255, 255, 255, ${v})`),
+          boxShadow: useTransform(navShadow, (v) => `0 ${v * 4}px ${v * 16}px rgba(0,0,0,${v * 0.06})`),
+        }}
+      >
+        <Link href="/" className="flex items-center gap-3 group">
+          <motion.div whileHover={{ rotate: 15 }} transition={{ type: "spring", stiffness: 300, damping: 15 }}>
+            <Image
+              src="/images/acheevy/acheevy-helmet.png"
+              alt="A.I.M.S."
+              width={32}
+              height={32}
+            />
             {/* Trust line */}
             <FadeIn delay={0.4}>
               <div className="mt-16 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-xs text-zinc-600">

@@ -30,8 +30,8 @@ export default function HangarLighting() {
 
   return (
     <>
-      {/* Ambient fill — low to keep the hangar moody */}
-      <ambientLight intensity={0.15} color="#1a1a2e" />
+      {/* Ambient fill — bright for light theme */}
+      <ambientLight intensity={0.6} color="#f8fafc" />
 
       {/* Main overhead spot — ACHEEVY command platform */}
       <spotLight
@@ -72,11 +72,11 @@ export default function HangarLighting() {
         decay={2}
       />
 
-      {/* Hemisphere light — subtle sky/ground */}
+      {/* Hemisphere light — sky/ground fill */}
       <hemisphereLight
-        color="#1a1a2e"
-        groundColor="#0B0F14"
-        intensity={0.3}
+        color="#e0f2fe"
+        groundColor="#f1f5f9"
+        intensity={0.5}
       />
 
       {/* Directional fill from camera direction */}
