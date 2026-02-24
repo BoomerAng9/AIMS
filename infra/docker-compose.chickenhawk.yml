@@ -34,7 +34,6 @@ services:
       - NODE_ENV=production
       - POLICY_URL=http://chickenhawk-policy:4002
       - AUDIT_URL=http://chickenhawk-audit:4003
-      - N8N_URL=http://n8n:5678
       - AGENT_BRIDGE_URL=http://agent-bridge:3010
       - ACHEEVY_URL=http://acheevy:3003
       - GEMINI_API_KEY=${GEMINI_API_KEY}

@@ -10,23 +10,20 @@ import express, { Request, Response } from 'express';
 const app = express();
 const PORT = parseInt(process.env.PORT || '9090', 10);
 
-// All services to monitor — matches docker-compose.prod.yml
-const SERVICES: Record<string, { url: string; type: string }> = {
-  frontend:           { url: process.env.FRONTEND_URL          || 'http://frontend:3000',         type: 'core' },
-  'uef-gateway':      { url: process.env.UEF_GATEWAY_URL       || 'http://uef-gateway:4000',      type: 'core' },
-  'house-of-ang':     { url: process.env.HOUSE_OF_ANG_URL      || 'http://house-of-ang:3002',     type: 'core' },
-  acheevy:            { url: process.env.ACHEEVY_URL            || 'http://acheevy:3003',          type: 'core' },
-  'agent-bridge':     { url: process.env.AGENT_BRIDGE_URL       || 'http://agent-bridge:3010',     type: 'core' },
-  'chickenhawk-core': { url: process.env.CHICKENHAWK_CORE_URL   || 'http://chickenhawk-core:4001', type: 'core' },
-  n8n:                { url: process.env.N8N_URL                || 'http://n8n:5678',              type: 'tool' },
-  redis:              { url: process.env.REDIS_URL              || 'http://redis:6379',            type: 'infra' },
-  'ii-agent':         { url: process.env.II_AGENT_URL           || 'http://ii-agent:8000',         type: 'agent' },
+// Service endpoints to monitor
+const SERVICES: Record<string, string> = {
+  frontend: process.env.FRONTEND_URL || 'http://frontend:3000',
+  uefGateway: process.env.UEF_GATEWAY_URL || 'http://uef-gateway:4000',
+  houseOfAng: process.env.HOUSE_OF_ANG_URL || 'http://house-of-ang:3002',
+  acheevy: process.env.ACHEEVY_URL || 'http://acheevy:3003',
+  agentBridge: process.env.AGENT_BRIDGE_URL || 'http://agent-bridge:3010',
+  chickenhawkCore: process.env.CHICKENHAWK_CORE_URL || 'http://chickenhawk-core:4001',
 };
 
 // UEF Gateway for plug operations data
 const UEF_GATEWAY = process.env.UEF_GATEWAY_URL || 'http://uef-gateway:4000';
 
-// Alerting webhook (Slack, Discord, or n8n)
+// Alerting webhook (Slack, Discord, or automation pipeline)
 const ALERT_WEBHOOK = process.env.ALERT_WEBHOOK_URL || '';
 const ALERT_COOLDOWN_MS = 300_000; // 5 min between alerts per service
 

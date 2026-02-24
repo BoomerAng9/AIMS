@@ -98,8 +98,8 @@ export async function POST(
     });
   }
 
-  // ── n8n Workflow Task ──
-  if (skillId === "n8n-workflow") {
+  // ── Automation Workflow Task ──
+  if (skillId === "automation-workflow") {
     const { action, template } = body;
     const availableTemplates = ["recruiter", "marketer"];
 
@@ -116,16 +116,14 @@ export async function POST(
       }
       return NextResponse.json({
         message: `Boomer_Ang "${template}" deployment queued.`,
-        command: `node scripts/boomer.mjs create-action ${template}`,
         status: "queued",
       });
     }
 
     return NextResponse.json({
-      message: "n8n Workflow skill activated.",
+      message: "Automation workflow skill activated.",
       templates: availableTemplates,
       actions: ["list", "deploy", "check"],
-      cliUsage: "node scripts/boomer.mjs <command> [template]",
     });
   }
 
