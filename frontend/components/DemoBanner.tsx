@@ -37,10 +37,7 @@ export function DemoBanner() {
         className="group flex items-center gap-1.5 rounded-lg border border-violet-500/20 bg-violet-500/10 px-3 py-1 text-xs font-semibold text-violet-400 transition hover:bg-violet-500/20"
       >
         Get full access
-        <ExternalLink
-          size={12}
-          className="transition-transform group-hover:translate-x-0.5"
-        />
+        <ExternalLink size={12} />
       </a>
     </motion.div>
   );
