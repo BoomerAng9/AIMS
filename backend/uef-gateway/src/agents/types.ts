@@ -25,6 +25,8 @@ export type AgentId =
   | 'workflow-smith-squad'
   | 'vision-scout-squad'
   | 'json-expert-squad'
+  | 'sme-ang'
+  | 'lil-creddy-hawk'
   // Boomer_Ang roster (spawnable via Deployment Hub)
   | 'scout-ang'
   | 'opsconsole-ang'

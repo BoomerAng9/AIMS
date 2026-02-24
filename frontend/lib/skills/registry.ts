@@ -279,6 +279,47 @@ export const SKILL_REGISTRY: SkillDefinition[] = [
     icon: "calendar",
     color: "emerald",
   },
+
+  // ── MCP INTEGRATIONS (SME_Ang domain) ─────────────────────────
+  {
+    id: "boost-space-automation",
+    name: "Boost.space Automation",
+    type: "skill",
+    status: "active",
+    triggers: ["boost space", "boostspace", "data sync", "business data", "connected apps", "single source of truth", "data enrichment"],
+    description: "Query, write, and enrich business data across 2000+ connected apps via Boost.space Remote MCP.",
+    execution: { target: "api", route: "/api/mcp/boost-space" },
+    priority: "high",
+    definitionFile: "aims-skills/skills/integrations/boost-space-automation.skill.md",
+    icon: "database",
+    color: "blue",
+  },
+  {
+    id: "boost-space-deployapps",
+    name: "Boost.space Deployapps",
+    type: "skill",
+    status: "active",
+    triggers: ["deploy apps", "deployapps", "integrator", "trigger scenario", "run scenario", "automation scenario", "workflow trigger", "on demand scenario"],
+    description: "Trigger On-Demand automation scenarios via Boost.space Integrator MCP with parameterized execution.",
+    execution: { target: "api", route: "/api/mcp/boost-integrator" },
+    priority: "high",
+    definitionFile: "aims-skills/skills/integrations/boost-space-deployapps.skill.md",
+    icon: "zap",
+    color: "amber",
+  },
+  {
+    id: "magic-ui-components",
+    name: "21st.dev Magic UI",
+    type: "skill",
+    status: "active",
+    triggers: ["21st", "21st.dev", "magic component", "magic ui", "/ui", "generate component", "ui component", "component builder", "component inspiration", "logo search"],
+    description: "Generate production-grade React/TypeScript UI components from natural language via 21st.dev Magic MCP.",
+    execution: { target: "api", route: "/api/mcp/magic-ui" },
+    priority: "high",
+    definitionFile: "aims-skills/skills/integrations/magic-ui-components.skill.md",
+    icon: "sparkles",
+    color: "violet",
+  },
 ];
 
 // ─── Lookup Helpers ──────────────────────────────────────────

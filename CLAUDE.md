@@ -124,6 +124,37 @@ nginx reverse proxy config, health check, and lifecycle management via ACHEEVY.
 3. Update the brain file to reflect changes
 4. Export new modules from the relevant index.ts
 
+## Agent Naming Conventions — MANDATORY
+
+### Spelling
+- **ACHEEVY** — NOT "ACHEVY", NOT "Achevy". Double-E, double-V-Y.
+- **DEON Gateway System** — NOT "DM Gateway", NOT "Dion Gateway"
+
+### Agent Hierarchy Names
+- **Boomer_Ang** — Manager-level agents. Name format: `Name_Ang` (e.g., SME_Ang, Researcher_Ang, Quality_Ang). NOT "boomerang".
+- **Lil_Hawk** — Worker-level agents. Name format: `Lil_X_Hawk` where X is a short nickname (e.g., Lil_Creddy_Hawk, Lil_Scout_Hawk). NEVER "Name_Hawk" without "Lil_" prefix.
+- **Chicken Hawk** — Coordinator/safety bot. Always "Chicken Hawk" (two words).
+
+### Examples of WRONG naming
+```
+WRONG: Credential_Hawk    → CORRECT: Lil_Creddy_Hawk
+WRONG: Scout_Hawk         → CORRECT: Lil_Scout_Hawk
+WRONG: boomerang          → CORRECT: Boomer_Ang
+WRONG: ACHEVY             → CORRECT: ACHEEVY
+WRONG: DM Gateway         → CORRECT: DEON Gateway System
+```
+
+## Documented Mistakes (Learn From These)
+
+1. Named a Lil_Hawk as "Credential_Hawk" instead of "Lil_Creddy_Hawk" — Lil_Hawks ALWAYS follow `Lil_X_Hawk` pattern
+2. Spelled ACHEEVY as "ACHEVY" — must be double-E
+3. Called DEON Gateway System "DM Gateway System" — wrong name entirely
+4. Wrapped entire sections in ScrollReveal, causing IntersectionObserver collapse (opacity:0) — only use per-element ScrollReveal
+5. ACHEEVY chat was told it could see images — it cannot, text-only backend
+6. Internal agent names exposed in public-facing UI — only ACHEEVY speaks to users
+7. Design skills exist but were never auto-triggered during builds
+8. MIT license was applied — this is proprietary, not open source
+
 ## Testing
 ```bash
 cd frontend && npm run build    # Frontend build check
