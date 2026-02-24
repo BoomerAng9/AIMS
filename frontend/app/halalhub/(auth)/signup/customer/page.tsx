@@ -1,150 +1,196 @@
-'use client';
+"use client";
 
-import React from 'react';
-import Link from 'next/link';
-import { User, Mail, Lock, Phone, ArrowRight, Store } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
+import Link from "next/link";
+import { MoveRight, Lock, User, Mail } from "lucide-react";
+import Image from "next/image";
+import { useState } from "react";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
-/* ─── HalalHub Customer Signup ─────────────────────────────────────────────
-   AIMS Auth Archetype: Glass card, centered, mobile-first.
-   ──────────────────────────────────────────────────────────────────────── */
+export default function HalalHubCustomerSignup() {
+    const router = useRouter();
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
 
-export default function CustomerSignup() {
-  return (
-    <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4 py-12">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="w-full max-w-md"
-      >
-        <div className="rounded-2xl border border-slate-200/60 bg-white p-8 shadow-xl shadow-slate-200/50">
-          <div className="text-center">
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-600 text-white font-bold text-lg">
-              H
-            </div>
-            <h1 className="mt-4 text-2xl font-bold text-slate-900">Create your account</h1>
-            <p className="mt-1 text-sm text-slate-500">Join HalalHub and start shopping</p>
-          </div>
+    const [formData, setFormData] = useState({
+        firstName: "",
+        lastName: "",
+        email: "",
+        password: "",
+    });
 
-          {/* Role toggle */}
-          <div className="mt-6 flex rounded-xl border border-slate-200 bg-slate-50 p-1">
-            <div className="flex-1 rounded-lg bg-emerald-600 py-2 text-center text-sm font-semibold text-white">
-              Customer
-            </div>
-            <Link
-              href="/halalhub/(auth)/signup/vendor"
-              className="flex-1 rounded-lg py-2 text-center text-sm font-medium text-slate-500 transition-colors hover:text-slate-700"
-            >
-              Vendor
-            </Link>
-          </div>
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
 
-          <form className="mt-6 space-y-4" onSubmit={(e) => e.preventDefault()}>
-            {/* Name */}
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-slate-700">
-                Full Name
-              </label>
-              <div className="relative mt-1.5">
-                <User className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                <input
-                  id="name"
-                  type="text"
-                  placeholder="Your full name"
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 outline-none transition-colors focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-500/20"
-                />
-              </div>
-            </div>
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError("");
 
-            {/* Email */}
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-slate-700">
-                Email
-              </label>
-              <div className="relative mt-1.5">
-                <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                <input
-                  id="email"
-                  type="email"
-                  placeholder="you@example.com"
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 outline-none transition-colors focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-500/20"
-                />
-              </div>
-            </div>
+        if (!formData.firstName || !formData.email || !formData.password) {
+            setError("Please fill out all required fields.");
+            return;
+        }
 
-            {/* Phone */}
-            <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-slate-700">
-                Phone <span className="text-slate-400">(optional)</span>
-              </label>
-              <div className="relative mt-1.5">
-                <Phone className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                <input
-                  id="phone"
-                  type="tel"
-                  placeholder="+1 (555) 000-0000"
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 outline-none transition-colors focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-500/20"
-                />
-              </div>
-            </div>
+        setLoading(true);
 
-            {/* Password */}
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-slate-700">
-                Password
-              </label>
-              <div className="relative mt-1.5">
-                <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                <input
-                  id="password"
-                  type="password"
-                  placeholder="Minimum 8 characters"
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 outline-none transition-colors focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-500/20"
-                />
-              </div>
-            </div>
+        try {
+            // Register user via existing API route
+            const res = await fetch("/api/auth/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    firstName: formData.firstName,
+                    lastName: formData.lastName,
+                    email: formData.email,
+                    password: formData.password,
+                    businessType: "customer", // distinguish them
+                })
+            });
 
-            {/* Terms */}
-            <div className="flex items-start gap-2">
-              <input
-                id="terms"
-                type="checkbox"
-                className="mt-0.5 h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
-              />
-              <label htmlFor="terms" className="text-xs text-slate-500 leading-relaxed">
-                I agree to the{' '}
-                <Link href="#" className="font-medium text-emerald-600 hover:underline">
-                  Terms of Service
-                </Link>{' '}
-                and{' '}
-                <Link href="#" className="font-medium text-emerald-600 hover:underline">
-                  Privacy Policy
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.error || "Failed to create customer account.");
+            }
+
+            // Successfully registered, sign them in
+            const loginRes = await signIn("credentials", {
+                redirect: false,
+                email: formData.email,
+                password: formData.password,
+            });
+
+            if (loginRes?.error) {
+                throw new Error(loginRes.error);
+            }
+
+            // Redirect to shop
+            router.push("/halalhub/shop");
+
+        } catch (err: any) {
+            setError(err.message || "An unexpected error occurred.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <main className="min-h-screen bg-[#0A0A0A] flex flex-col items-center justify-center p-6 relative font-sans selection:bg-[#D4AF37]/30 py-20">
+            {/* Global Texture & Glow */}
+            <div className="absolute inset-0 bg-[url('/assets/noise.png')] opacity-[0.03] pointer-events-none z-0" />
+            <div className="fixed inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.1)_50%)] bg-[length:100%_4px] pointer-events-none z-0" />
+            <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[radial-gradient(ellipse_at_center,rgba(16,185,129,0.06)_0%,transparent_60%)] pointer-events-none" />
+
+            {/* Back to Home wrapper */}
+            <div className="absolute top-8 left-8 z-20">
+                <Link href="/halalhub" className="text-[rgba(255,255,255,0.6)] hover:text-white flex items-center gap-2 text-sm font-medium transition-colors">
+                    <MoveRight size={16} className="rotate-180" /> Back to HalalHub
                 </Link>
-              </label>
             </div>
 
-            {/* Submit */}
-            <button
-              type="submit"
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-600/20 transition-all hover:bg-emerald-700 hover:shadow-xl"
+            <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
+                className="w-full max-w-md relative z-10"
             >
-              Create Account
-              <ArrowRight className="h-4 w-4" />
-            </button>
-          </form>
+                {/* Auth Container (Glass Box) */}
+                <div className="rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[#111111]/80 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.6)] overflow-hidden">
 
-          <p className="mt-6 text-center text-sm text-slate-500">
-            Already have an account?{' '}
-            <Link
-              href="/halalhub/(auth)/login"
-              className="font-semibold text-emerald-600 hover:text-emerald-700"
-            >
-              Sign in
-            </Link>
-          </p>
-        </div>
-      </motion.div>
-    </div>
-  );
+                    {/* Header */}
+                    <div className="p-8 border-b border-[rgba(255,255,255,0.08)] text-center relative overflow-hidden">
+
+                        <div className="flex justify-center mb-6 relative z-10">
+                            <Image src="/assets/aims_logo.png" alt="AIMS" width={48} height={48} className="opacity-90 drop-shadow-[0_0_12px_rgba(212,175,55,0.4)]" />
+                        </div>
+
+                        <h1 className="text-2xl font-bold text-white tracking-tight mb-2 relative z-10">
+                            Create Account
+                        </h1>
+                        <p className="text-[rgba(255,255,255,0.6)] text-sm max-w-sm mx-auto relative z-10">
+                            Join HalalHub to instantly browse, save, and order from <span className="text-[#10B981]">1,500+ Verified Vendors</span>.
+                        </p>
+                    </div>
+
+                    {/* Form Body */}
+                    <form onSubmit={handleSubmit} className="p-8 space-y-6">
+
+                        {error && (
+                            <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20 text-red-500 text-sm font-medium">
+                                {error}
+                            </div>
+                        )}
+
+                        <div className="space-y-4">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-mono uppercase tracking-wider text-[rgba(255,255,255,0.6)]">First Name</label>
+                                    <div className="relative">
+                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <User size={16} className="text-[rgba(255,255,255,0.4)]" />
+                                        </div>
+                                        <input required name="firstName" value={formData.firstName} onChange={handleChange} type="text" placeholder="John" className="w-full h-12 pl-10 pr-4 bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.08)] text-white rounded-xl focus:outline-none focus:border-[#10B981] focus:ring-1 focus:ring-[#10B981] transition-all placeholder:text-[rgba(255,255,255,0.2)]" />
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-mono uppercase tracking-wider text-[rgba(255,255,255,0.6)]">Last Name</label>
+                                    <input name="lastName" value={formData.lastName} onChange={handleChange} type="text" placeholder="Doe" className="w-full h-12 px-4 bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.08)] text-white rounded-xl focus:outline-none focus:border-[#10B981] focus:ring-1 focus:ring-[#10B981] transition-all placeholder:text-[rgba(255,255,255,0.2)]" />
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-xs font-mono uppercase tracking-wider text-[rgba(255,255,255,0.6)]">Email Address</label>
+                                <div className="relative">
+                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                        <Mail size={18} className="text-[rgba(255,255,255,0.4)]" />
+                                    </div>
+                                    <input required name="email" value={formData.email} onChange={handleChange} type="email" placeholder="john@example.com" className="w-full h-12 pl-12 pr-4 bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.08)] text-white rounded-xl focus:outline-none focus:border-[#10B981] focus:ring-1 focus:ring-[#10B981] transition-all placeholder:text-[rgba(255,255,255,0.2)]" />
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-xs font-mono uppercase tracking-wider text-[rgba(255,255,255,0.6)]">Create Password</label>
+                                <div className="relative">
+                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                        <Lock size={18} className="text-[rgba(255,255,255,0.4)]" />
+                                    </div>
+                                    <input required name="password" value={formData.password} onChange={handleChange} type="password" placeholder="••••••••" className="w-full h-12 pl-12 pr-4 bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.08)] text-white rounded-xl focus:outline-none focus:border-[#10B981] focus:ring-1 focus:ring-[#10B981] transition-all placeholder:text-[rgba(255,255,255,0.2)]" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <button disabled={loading} type="submit" className="w-full h-12 bg-[#10B981] hover:bg-emerald-400 text-slate-900 font-bold rounded-xl transition-all shadow-[0_2px_8px_rgba(16,185,129,0.3)] hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(16,185,129,0.4)] text-lg disabled:opacity-50 disabled:pointer-events-none">
+                            {loading ? "Registering & Authenticating..." : "Sign Up"}
+                        </button>
+                    </form>
+
+                    {/* Footer / Alt Auth */}
+                    <div className="p-8 border-t border-[rgba(255,255,255,0.08)] bg-[rgba(0,0,0,0.2)] text-center divide-y divide-[rgba(255,255,255,0.05)]">
+                        <div className="pb-4">
+                            <p className="text-sm text-[rgba(255,255,255,0.6)]">
+                                Already have an account? <Link href="/halalhub/login" className="text-white hover:text-[#10B981] font-medium transition-colors">Sign In Here</Link>
+                            </p>
+                        </div>
+                        <div className="pt-4 flex flex-col gap-2">
+                            <Link href="/halalhub/signup/vendor" className="text-sm font-medium text-[rgba(255,255,255,0.4)] hover:text-white transition-colors">
+                                Own a business? Register as a Vendor Instead
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="mt-8 text-center flex justify-center items-center flex-col gap-2">
+                    <p className="text-[rgba(255,255,255,0.4)] text-xs tracking-widest font-mono uppercase">
+                        Orchestrated by AI Managed Solutions
+                    </p>
+                </div>
+            </motion.div>
+        </main>
+    );
 }
