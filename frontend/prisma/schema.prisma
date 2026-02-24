@@ -504,11 +504,9 @@ model TriviaQuestion {
   timesCorrect  Int       @default(0)
 
   createdAt     DateTime  @default(now())
-
-  @@index([category, difficulty])
-  @@index([source])
-  @@index([timesUsed])
 }
+
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Per|Form — CFB Recruiting & Analytics

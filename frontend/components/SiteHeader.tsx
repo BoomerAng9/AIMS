@@ -20,6 +20,7 @@ const LANDING_NAV = [
   { href: "/gallery", label: "Gallery" },
   { href: "/pricing", label: "Pricing" },
   { href: "/about", label: "About" },
+  { href: "/halalhub", label: "HalalHub" },
 ];
 
 // Navigation for the APP domain (plugmein.cloud — do, build, deploy)
