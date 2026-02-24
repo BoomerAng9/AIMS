@@ -1,19 +1,24 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, useScroll, useTransform, useInView } from "framer-motion";
 import {
   MessageSquare,
   Trophy,
-  Hammer,
-  Bird,
+  Bot,
+  Workflow,
   ArrowRight,
   ChevronRight,
-  Workflow,
   Shield,
   Zap,
+  Rocket,
+  BarChart3,
+  Package,
+  Clock,
+  CheckCircle2,
+  HeartHandshake,
 } from "lucide-react";
 import {
   scrollReveal,
@@ -27,36 +32,23 @@ import {
 import {
   ScrollProgress as ScrollProgressBar,
   GlowBorder,
-  ScrollReveal,
 } from "@/components/motion";
 
 /* ═══════════════════════════════════════════════════════════
-   A.I.M.S. Landing Page — Modern Light SaaS
+   A.I.M.S. Landing Page — PaaS Platform
 
-   Theme: "AI Managed Solutions — Clean, Professional"
-   Background: Light with warm amber accents
+   AI Managed Solutions — Deploy AI tools, agents, and
+   platforms with one click. Managed end-to-end by ACHEEVY.
+
+   Theme: Light with warm amber accents on #F8FAFC base
    ═══════════════════════════════════════════════════════════ */
 
-// ── Domain Detection ──
-function useIsShowroom(): boolean {
-  const [isShowroom, setIsShowroom] = useState(false);
-  useEffect(() => {
-    const host = window.location.hostname.replace(/^www\./, "");
-    setIsShowroom(
-      host === "aimanagedsolutions.cloud" ||
-      host.includes("localhost") ||
-      host === "127.0.0.1"
-    );
-  }, []);
-  return isShowroom;
-}
-
-// ── Experience Tiles ──
-const EXPERIENCES = [
+// ── Service Cards ──
+const SERVICES = [
   {
-    id: "chat",
-    title: "Chat w/ACHEEVY",
-    description: "Your AI executive orchestrator. Voice-first command center with multi-agent routing.",
+    id: "assistant",
+    title: "Talk to ACHEEVY",
+    description: "Your AI operations assistant. Describe what you need — ACHEEVY handles the rest, from deployment to monitoring.",
     icon: MessageSquare,
     href: "/chat",
     gradient: "from-amber-50",
@@ -65,9 +57,9 @@ const EXPERIENCES = [
     status: "live",
   },
   {
-    id: "perform",
-    title: "Per|Form Platform",
-    description: "AI-powered sports analytics engine. Big Board, War Room, and full Draft Simulator.",
+    id: "analytics",
+    title: "Sports Analytics",
+    description: "AI-powered draft simulator, big board rankings, and real-time analytics for fantasy and professional sports.",
     icon: Trophy,
     href: "/sandbox/perform/draft",
     gradient: "from-emerald-50",
@@ -76,10 +68,10 @@ const EXPERIENCES = [
     status: "live",
   },
   {
-    id: "boomerang",
-    title: "Build a Boomer_Ang",
-    description: "Design specialized AI workers with custom skills and distinct operational personas.",
-    icon: Hammer,
+    id: "agents",
+    title: "Custom AI Agents",
+    description: "Build specialized AI workers tailored to your business. Define skills, personas, and workflows — deploy instantly.",
+    icon: Bot,
     href: "/dashboard/boomerangs",
     gradient: "from-blue-50",
     border: "border-blue-200",
@@ -87,15 +79,37 @@ const EXPERIENCES = [
     status: "beta",
   },
   {
-    id: "chicken-hawk",
-    title: "Unleash Chicken Hawk",
-    description: "Autonomous code and task execution. Parallelized workflow orchestration at scale.",
-    icon: Bird,
-    href: "/dashboard/custom-hawks",
+    id: "automation",
+    title: "Workflow Automation",
+    description: "Connect your tools and automate complex business processes. Parallel execution, smart routing, built-in monitoring.",
+    icon: Workflow,
+    href: "/dashboard/automations",
     gradient: "from-purple-50",
     border: "border-purple-200",
     accent: "text-purple-600",
     status: "beta",
+  },
+];
+
+// ── How It Works Steps ──
+const STEPS = [
+  {
+    number: "01",
+    title: "Browse & Choose",
+    description: "Explore our catalog of AI tools, agents, and platforms. Find exactly what your business needs.",
+    icon: Package,
+  },
+  {
+    number: "02",
+    title: "Deploy Instantly",
+    description: "One click to launch. Auto-configured with SSL, health checks, and monitoring built in from day one.",
+    icon: Rocket,
+  },
+  {
+    number: "03",
+    title: "Scale & Manage",
+    description: "ACHEEVY monitors performance, handles scaling, and keeps everything running. You focus on your business.",
+    icon: BarChart3,
   },
 ];
 
@@ -114,11 +128,7 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-// ScrollProgress replaced by reusable component from @/components/motion
-
 export default function HomePage() {
-  const isShowroom = useIsShowroom();
-
   // Parallax for hero section
   const heroRef = useRef(null);
   const { scrollYProgress: heroProgress } = useScroll({
@@ -136,11 +146,8 @@ export default function HomePage() {
 
       {/* ── Background ── */}
       <div className="fixed inset-0 z-0">
-        {/* Warm gradient */}
         <div className="absolute inset-0 bg-gradient-to-b from-white via-[#F8FAFC] to-slate-100" />
-        {/* Subtle amber radial */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1200px] h-[800px] bg-[radial-gradient(ellipse_at_center,rgba(217,119,6,0.04)_0%,transparent_70%)]" />
-        {/* Embossed logo watermark */}
         <div
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] pointer-events-none"
           style={{
@@ -158,7 +165,7 @@ export default function HomePage() {
       <div className="relative z-10 flex flex-col min-h-screen">
         <SiteNav />
 
-        {/* Hero Section — with parallax */}
+        {/* ── Hero Section ── */}
         <section ref={heroRef} className="relative min-h-[90vh] flex items-center justify-center px-6 py-20 overflow-hidden">
           <motion.div style={{ y: heroBgY }} className="absolute inset-0 pointer-events-none">
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(217,119,6,0.06)_0%,transparent_50%)]" />
@@ -184,7 +191,7 @@ export default function HomePage() {
                   <div className="relative w-full h-full rounded-full bg-emerald-500" />
                 </div>
                 <span className="text-xs font-mono uppercase tracking-[0.3em] text-amber-700">
-                  Operations Live
+                  Platform Active
                 </span>
               </motion.div>
 
@@ -200,7 +207,8 @@ export default function HomePage() {
                 variants={heroItem}
                 className="text-lg md:text-xl text-slate-500 max-w-xl leading-relaxed font-light"
               >
-                I&apos;m ACHEEVY, your autonomous operations lead. From code generation to complex business logic, A.I.M.S. orchestrates 25+ specialized agents to execute your vision.
+                Deploy AI-powered tools, agents, and platforms with one click.
+                ACHEEVY manages everything — from provisioning to monitoring — so you can focus on growing your business.
               </motion.p>
 
               <motion.div
@@ -210,21 +218,40 @@ export default function HomePage() {
                 <GlowBorder theme="gold" rounded="rounded-xl">
                   <Link
                     href="/chat"
-                    className="h-14 px-10 bg-amber-600 text-slate-800 font-bold uppercase tracking-widest text-xs rounded-xl inline-flex items-center justify-center gap-3 hover:bg-amber-700 hover:shadow-lg hover:shadow-amber-200/50 transition-all group"
+                    className="h-14 px-10 bg-amber-600 text-white font-bold uppercase tracking-widest text-xs rounded-xl inline-flex items-center justify-center gap-3 hover:bg-amber-700 hover:shadow-lg hover:shadow-amber-200/50 transition-all group"
                   >
-                    Initiate Chat <Zap size={18} className="group-hover:scale-125 transition-transform" />
+                    Get Started <Zap size={18} className="group-hover:scale-125 transition-transform" />
                   </Link>
                 </GlowBorder>
                 <Link
-                  href="#experiences"
+                  href="#solutions"
                   className="h-14 px-10 border border-slate-200 hover:border-amber-200 bg-white text-slate-700 font-bold uppercase tracking-widest text-xs rounded-xl inline-flex items-center justify-center gap-2 transition-all hover:shadow-sm"
                 >
-                  Catalog Hub <ChevronRight size={16} />
+                  Browse Tools <ChevronRight size={16} />
                 </Link>
+              </motion.div>
+
+              {/* Trust indicators */}
+              <motion.div
+                variants={heroItem}
+                className="flex flex-wrap items-center gap-6 pt-2 text-sm text-slate-400"
+              >
+                <span className="flex items-center gap-2">
+                  <CheckCircle2 size={16} className="text-emerald-500" />
+                  One-Click Deploy
+                </span>
+                <span className="flex items-center gap-2">
+                  <Shield size={16} className="text-emerald-500" />
+                  SSL Included
+                </span>
+                <span className="flex items-center gap-2">
+                  <Clock size={16} className="text-emerald-500" />
+                  24/7 Monitoring
+                </span>
               </motion.div>
             </motion.div>
 
-            {/* Visual Hero — floating animation */}
+            {/* Visual Hero */}
             <motion.div
               variants={heroItem}
               className="relative w-full max-w-[500px] aspect-square"
@@ -235,7 +262,7 @@ export default function HomePage() {
               <div className="relative z-10 w-full h-full rounded-[3rem] p-8 overflow-hidden shadow-xl border border-slate-200 bg-white">
                 <Image
                   src="/images/acheevy/hero-character.png"
-                  alt="ACHEEVY"
+                  alt="ACHEEVY — Your AI Operations Assistant"
                   fill
                   className="object-contain p-4 scale-[1.05]"
                   priority
@@ -245,15 +272,18 @@ export default function HomePage() {
           </motion.div>
         </section>
 
-        <ScrollReveal speed="reveal" margin="early">
-          <ExperienceGateway />
-        </ScrollReveal>
-        <ScrollReveal speed="reveal">
-          <PlatformPillars />
-        </ScrollReveal>
-        <ScrollReveal speed="cinematic" margin="early">
-          <FinalCTA />
-        </ScrollReveal>
+        {/* ── Solutions ── */}
+        <SolutionsSection />
+
+        {/* ── How It Works ── */}
+        <HowItWorks />
+
+        {/* ── Platform Pillars ── */}
+        <PlatformPillars />
+
+        {/* ── Final CTA ── */}
+        <FinalCTA />
+
         <SiteFooter />
       </div>
     </main>
@@ -295,14 +325,14 @@ function SiteNav() {
 
         <div className="flex items-center gap-6">
           <Link href="/chat" className="text-xs font-mono uppercase tracking-widest text-slate-400 hover:text-amber-600 transition-colors hidden md:block">
-            Connect
+            Dashboard
           </Link>
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Link
               href="/(auth)/sign-in"
-              className="h-10 px-6 border border-amber-200 rounded-lg bg-amber-50 text-amber-700 text-xs font-bold uppercase tracking-widest hover:bg-amber-600 hover:text-slate-800 hover:border-amber-600 transition-all"
+              className="h-10 px-6 border border-amber-200 rounded-lg bg-amber-50 text-amber-700 text-xs font-bold uppercase tracking-widest hover:bg-amber-600 hover:text-white hover:border-amber-600 transition-all inline-flex items-center justify-center"
             >
-              Unlock
+              Sign In
             </Link>
           </motion.div>
         </div>
@@ -311,12 +341,12 @@ function SiteNav() {
   );
 }
 
-function ExperienceGateway() {
+function SolutionsSection() {
   const sectionRef = useRef(null);
   const isInView = useInView(sectionRef, { once: true, margin: viewportMargin.early });
 
   return (
-    <section id="experiences" ref={sectionRef} className="relative py-32 px-6">
+    <section id="solutions" ref={sectionRef} className="relative py-32 px-6">
       <div className="max-w-7xl mx-auto">
         <motion.div
           className="flex flex-col md:flex-row items-end justify-between mb-16 gap-4"
@@ -325,11 +355,11 @@ function ExperienceGateway() {
           animate={isInView ? "visible" : "hidden"}
         >
           <div className="space-y-4">
-            <p className="text-xs font-mono uppercase tracking-[0.5em] text-amber-600/60">Operational Nodes</p>
-            <h2 className="text-4xl md:text-6xl font-black text-slate-900 uppercase font-display leading-[0.9]">Choose Your <br /> Experience</h2>
+            <p className="text-xs font-mono uppercase tracking-[0.5em] text-amber-600/60">What You Can Deploy</p>
+            <h2 className="text-4xl md:text-6xl font-black text-slate-900 uppercase font-display leading-[0.9]">Ready-to-Launch <br /> Solutions</h2>
           </div>
           <p className="text-slate-500 text-sm md:text-base max-w-md font-light leading-relaxed">
-            The A.I.M.S. ecosystem spans from deep reasoning and analytics to autonomous execution and creative building.
+            From AI assistants to analytics platforms — browse our catalog, pick a solution, and deploy it in seconds.
           </p>
         </motion.div>
 
@@ -339,26 +369,26 @@ function ExperienceGateway() {
           initial="hidden"
           animate={isInView ? "visible" : "hidden"}
         >
-          {EXPERIENCES.map((exp, i) => (
-            <motion.div key={exp.id} variants={staggerItem}>
+          {SERVICES.map((svc) => (
+            <motion.div key={svc.id} variants={staggerItem}>
               <Link
-                href={exp.href}
-                className={`group relative overflow-hidden rounded-2xl border ${exp.border} bg-white p-8 h-[360px] flex flex-col transition-all hover:-translate-y-2 hover:shadow-lg`}
+                href={svc.href}
+                className={`group relative overflow-hidden rounded-2xl border ${svc.border} bg-white p-8 h-[360px] flex flex-col transition-all hover:-translate-y-2 hover:shadow-lg`}
               >
-                <div className={`absolute inset-0 bg-gradient-to-br ${exp.gradient} to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+                <div className={`absolute inset-0 bg-gradient-to-br ${svc.gradient} to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
 
                 <div className="relative z-10 flex justify-between items-start mb-8">
-                  <div className={`size-14 rounded-2xl bg-white border ${exp.border} flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm`}>
-                    <exp.icon className={`size-7 ${exp.accent}`} />
+                  <div className={`size-14 rounded-2xl bg-white border ${svc.border} flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm`}>
+                    <svc.icon className={`size-7 ${svc.accent}`} />
                   </div>
-                  <StatusBadge status={exp.status} />
+                  <StatusBadge status={svc.status} />
                 </div>
 
                 <div className="relative z-10 mt-auto space-y-4">
-                  <h3 className="text-2xl font-bold text-slate-800 leading-tight">{exp.title}</h3>
-                  <p className="text-slate-500 text-sm leading-relaxed font-light">{exp.description}</p>
-                  <div className={`flex items-center gap-2 text-[11px] font-mono uppercase tracking-widest ${exp.accent} opacity-60 group-hover:opacity-100 transition-opacity`}>
-                    Initialize <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                  <h3 className="text-2xl font-bold text-slate-800 leading-tight">{svc.title}</h3>
+                  <p className="text-slate-500 text-sm leading-relaxed font-light">{svc.description}</p>
+                  <div className={`flex items-center gap-2 text-[11px] font-mono uppercase tracking-widest ${svc.accent} opacity-60 group-hover:opacity-100 transition-opacity`}>
+                    Explore <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
                   </div>
                 </div>
               </Link>
@@ -370,20 +400,103 @@ function ExperienceGateway() {
   );
 }
 
+function HowItWorks() {
+  const sectionRef = useRef(null);
+  const isInView = useInView(sectionRef, { once: true, margin: viewportMargin.standard });
+
+  return (
+    <section ref={sectionRef} className="py-32 px-6 border-y border-slate-200 bg-white">
+      <div className="max-w-7xl mx-auto">
+        <motion.div
+          className="text-center mb-20"
+          variants={scrollReveal}
+          initial="hidden"
+          animate={isInView ? "visible" : "hidden"}
+        >
+          <p className="text-xs font-mono uppercase tracking-[0.5em] text-amber-600/60 mb-4">Simple Process</p>
+          <h2 className="text-4xl md:text-6xl font-black text-slate-900 uppercase font-display leading-[0.9]">
+            How It Works
+          </h2>
+        </motion.div>
+
+        <motion.div
+          className="grid gap-12 md:grid-cols-3"
+          variants={staggerContainer}
+          initial="hidden"
+          animate={isInView ? "visible" : "hidden"}
+        >
+          {STEPS.map((step) => (
+            <motion.div
+              key={step.number}
+              variants={staggerItem}
+              className="relative flex flex-col items-center text-center space-y-6"
+            >
+              <div className="relative">
+                <div className="size-20 rounded-3xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600 shadow-sm">
+                  <step.icon size={32} />
+                </div>
+                <span className="absolute -top-3 -right-3 size-8 rounded-full bg-amber-600 text-white text-xs font-bold flex items-center justify-center shadow-lg">
+                  {step.number}
+                </span>
+              </div>
+              <div className="space-y-3">
+                <h3 className="text-slate-800 font-bold text-xl uppercase tracking-wide font-display">
+                  {step.title}
+                </h3>
+                <p className="text-slate-500 text-sm leading-relaxed font-light max-w-xs mx-auto">
+                  {step.description}
+                </p>
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
 function PlatformPillars() {
   const PILLARS = [
-    { title: "Voice-First", desc: "Orchestrate complex business logic through natural conversation and intent.", icon: MessageSquare },
-    { title: "Autonomous", desc: "A swarm of specialized agents handle research, design, and execution.", icon: Workflow },
-    { title: "Verifiable", desc: "No proof, No done. Every task includes evidentiary validation.", icon: Shield },
-    { title: "Scalable", desc: "Instantly deploy applications to global infrastructure via ACHEEVY.", icon: Zap },
+    {
+      title: "Conversational",
+      desc: "Tell ACHEEVY what you need in plain language. No config files, no terminals — just results.",
+      icon: MessageSquare,
+    },
+    {
+      title: "Fully Managed",
+      desc: "Your AI team handles provisioning, configuration, health checks, and scaling automatically.",
+      icon: Workflow,
+    },
+    {
+      title: "Accountable",
+      desc: "Every action is documented with evidence. Full audit trail so you always know what happened and why.",
+      icon: Shield,
+    },
+    {
+      title: "Instant Deploy",
+      desc: "From catalog to live in seconds. SSL, monitoring, and backups included — no setup required.",
+      icon: Zap,
+    },
   ];
 
   const pillarsRef = useRef(null);
   const isInView = useInView(pillarsRef, { once: true, margin: viewportMargin.standard });
 
   return (
-    <section className="py-32 px-6 border-y border-slate-200 bg-white">
+    <section className="py-32 px-6">
       <div className="max-w-7xl mx-auto">
+        <motion.div
+          className="text-center mb-20"
+          variants={scrollReveal}
+          initial="hidden"
+          animate={isInView ? "visible" : "hidden"}
+        >
+          <p className="text-xs font-mono uppercase tracking-[0.5em] text-amber-600/60 mb-4">Why A.I.M.S.</p>
+          <h2 className="text-4xl md:text-6xl font-black text-slate-900 uppercase font-display leading-[0.9]">
+            Built for <span className="text-amber-600">Business</span>
+          </h2>
+        </motion.div>
+
         <motion.div
           ref={pillarsRef}
           className="grid gap-16 md:grid-cols-4"
@@ -391,7 +504,7 @@ function PlatformPillars() {
           initial="hidden"
           animate={isInView ? "visible" : "hidden"}
         >
-          {PILLARS.map((p, i) => (
+          {PILLARS.map((p) => (
             <motion.div
               key={p.title}
               variants={staggerItem}
@@ -429,7 +542,7 @@ function FinalCTA() {
         initial="hidden"
         animate={isInView ? "visible" : "hidden"}
       >
-        <div className="absolute -inset-1 bg-gradient-to-r from-amber-200/30 via-slate-100 to-amber-200/30 rounded-[4rem] blur-xl opacity-50 group-hover:opacity-100 transition duration-1000"></div>
+        <div className="absolute -inset-1 bg-gradient-to-r from-amber-200/30 via-slate-100 to-amber-200/30 rounded-[4rem] blur-xl opacity-50 group-hover:opacity-100 transition duration-1000" />
         <div className="relative bg-white border border-slate-200 p-12 md:p-24 text-center rounded-[4rem] overflow-hidden shadow-xl">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(217,119,6,0.03)_0%,transparent_70%)]" />
 
@@ -447,23 +560,25 @@ function FinalCTA() {
           </motion.div>
 
           <h2 className="relative z-10 text-4xl md:text-7xl font-black text-slate-900 uppercase tracking-tighter font-display mb-6">
-            Secure Your <span className="text-amber-600">Seat</span>
+            Start Building <span className="text-amber-600">Today</span>
           </h2>
           <p className="relative z-10 text-slate-500 text-base md:text-xl mb-12 max-w-2xl mx-auto font-light leading-relaxed">
-            The network is expanding. Register to unlock full autonomous capabilities, custom agent workflows, and your personalized operational workspace.
+            Join A.I.M.S. and let ACHEEVY manage your AI tools, agents, and platforms.
+            One conversation is all it takes to deploy your first solution.
           </p>
 
           <div className="relative z-10 flex flex-col sm:flex-row gap-6 justify-center">
             <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
               <GlowBorder theme="gold" rounded="rounded-2xl">
-                <Link href="/chat" className="h-16 px-12 bg-amber-600 text-slate-800 font-bold uppercase tracking-widest text-xs rounded-2xl inline-flex items-center justify-center gap-3 hover:bg-amber-700 hover:shadow-lg hover:shadow-amber-200/50 transition-all">
-                  Initiate Protocols
+                <Link href="/chat" className="h-16 px-12 bg-amber-600 text-white font-bold uppercase tracking-widest text-xs rounded-2xl inline-flex items-center justify-center gap-3 hover:bg-amber-700 hover:shadow-lg hover:shadow-amber-200/50 transition-all">
+                  <HeartHandshake size={18} />
+                  Get Started Free
                 </Link>
               </GlowBorder>
             </motion.div>
             <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
               <Link href="/(auth)/sign-up" className="h-16 px-12 border border-slate-200 hover:border-amber-200 bg-white text-slate-700 font-bold uppercase tracking-widest text-xs rounded-2xl inline-flex items-center justify-center gap-3 transition-all hover:shadow-sm">
-                Establish Identity
+                Create Account
               </Link>
             </motion.div>
           </div>
@@ -477,11 +592,11 @@ function SiteFooter() {
   return (
     <footer className="py-16 border-t border-slate-200 px-6 relative z-10 bg-white">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8 text-slate-400 text-xs font-mono tracking-[0.2em] uppercase">
-        <p>&copy; {new Date().getFullYear()} ACHIEVEMOR &middot; A.I.M.S. Operations Protocol v2.5</p>
+        <p>&copy; {new Date().getFullYear()} A.I.M.S. &mdash; AI Managed Solutions</p>
         <div className="flex gap-10">
-          <Link href="/terms" className="hover:text-amber-600 transition-colors">Terms of Service</Link>
-          <Link href="/economics" className="hover:text-amber-600 transition-colors">Economics</Link>
-          <Link href="/privacy" className="hover:text-amber-600 transition-colors">Operational Shield</Link>
+          <Link href="/terms" className="hover:text-amber-600 transition-colors">Terms</Link>
+          <Link href="/economics" className="hover:text-amber-600 transition-colors">Pricing</Link>
+          <Link href="/privacy" className="hover:text-amber-600 transition-colors">Privacy</Link>
         </div>
       </div>
     </footer>

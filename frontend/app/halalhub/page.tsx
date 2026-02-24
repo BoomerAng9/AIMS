@@ -153,12 +153,12 @@ export default function HalalHubLanding() {
               transition={{ delay: 0.3, duration: 0.6 }}
               className="relative"
             >
-              <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-100 to-emerald-50 shadow-2xl shadow-emerald-600/10">
+              <div className="relative aspect-[3/4] sm:aspect-[4/5] overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-100 to-emerald-50 shadow-2xl shadow-emerald-600/10">
                 <Image
                   src="/assets/halalhub_storefront.jpg"
                   alt="HalalHub — Verified halal marketplace"
                   fill
-                  className="object-cover"
+                  className="object-contain"
                   priority
                 />
                 {/* Floating badge */}
@@ -176,118 +176,111 @@ export default function HalalHubLanding() {
       </section>
 
       {/* ─── Categories ───────────────────────────────────────── */}
-      <ScrollReveal speed="reveal" margin="early">
-        <section className="border-t border-slate-200/60 bg-white py-16 md:py-20">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="text-center">
-              <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">
-                Browse by Category
-              </h2>
-              <p className="mt-2 text-base text-slate-500">
-                Find exactly what you need from verified halal vendors.
-              </p>
-            </div>
-            <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-              {CATEGORIES.map((cat, i) => (
-                <ScrollReveal key={cat.name} speed="pop" delay={i * 0.05} distance={16}>
-                  <Link
-                    href={`/halalhub/shop?category=${cat.name.toLowerCase()}`}
-                    className="group flex flex-col items-center gap-3 rounded-2xl border border-slate-100 bg-white p-5 text-center transition-all hover:border-emerald-200 hover:shadow-lg hover:shadow-emerald-600/5"
-                  >
-                    <span className={`flex h-12 w-12 items-center justify-center rounded-xl text-2xl ${cat.color}`}>
-                      {cat.icon}
-                    </span>
-                    <div>
-                      <p className="text-sm font-semibold text-slate-900 group-hover:text-emerald-700">
-                        {cat.name}
-                      </p>
-                      <p className="mt-0.5 text-xs text-slate-400">{cat.count} listings</p>
-                    </div>
-                  </Link>
-                </ScrollReveal>
-              ))}
-            </div>
+      <section className="border-t border-slate-200/60 bg-white py-16 md:py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">
+              Browse by Category
+            </h2>
+            <p className="mt-2 text-base text-slate-500">
+              Find exactly what you need from verified halal vendors.
+            </p>
           </div>
-        </section>
-      </ScrollReveal>
+          <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+            {CATEGORIES.map((cat, i) => (
+              <ScrollReveal key={cat.name} speed="pop" delay={i * 0.05} distance={16}>
+                <Link
+                  href={`/halalhub/shop?category=${cat.name.toLowerCase()}`}
+                  className="group flex flex-col items-center gap-3 rounded-2xl border border-slate-100 bg-white p-5 text-center transition-all hover:border-emerald-200 hover:shadow-lg hover:shadow-emerald-600/5"
+                >
+                  <span className={`flex h-12 w-12 items-center justify-center rounded-xl text-2xl ${cat.color}`}>
+                    {cat.icon}
+                  </span>
+                  <div>
+                    <p className="text-sm font-semibold text-slate-900 group-hover:text-emerald-700">
+                      {cat.name}
+                    </p>
+                    <p className="mt-0.5 text-xs text-slate-400">{cat.count} listings</p>
+                  </div>
+                </Link>
+              </ScrollReveal>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* ─── Trust & Safety ───────────────────────────────────── */}
-      <ScrollReveal speed="reveal">
-        <section className="py-16 md:py-20">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="text-center">
-              <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">
-                Built on Trust
-              </h2>
-              <p className="mt-2 text-base text-slate-500">
-                Every aspect of HalalHub is designed to protect buyers and sellers.
-              </p>
-            </div>
-            <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {TRUST_ITEMS.map((item, i) => (
-                <ScrollReveal key={item.title} speed="pop" delay={i * 0.08} distance={16}>
-                  <div className="rounded-2xl border border-slate-100 bg-white p-6 transition-all hover:border-emerald-200 hover:shadow-lg hover:shadow-emerald-600/5">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600">
-                      <item.icon className="h-5 w-5" />
-                    </div>
-                    <h3 className="mt-4 text-base font-semibold text-slate-900">{item.title}</h3>
-                    <p className="mt-2 text-sm text-slate-500 leading-relaxed">{item.desc}</p>
-                  </div>
-                </ScrollReveal>
-              ))}
-            </div>
+      <section className="py-16 md:py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">
+              Built on Trust
+            </h2>
+            <p className="mt-2 text-base text-slate-500">
+              Every aspect of HalalHub is designed to protect buyers and sellers.
+            </p>
           </div>
-        </section>
-      </ScrollReveal>
+          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {TRUST_ITEMS.map((item, i) => (
+              <ScrollReveal key={item.title} speed="pop" delay={i * 0.08} distance={16}>
+                <div className="rounded-2xl border border-slate-100 bg-white p-6 transition-all hover:border-emerald-200 hover:shadow-lg hover:shadow-emerald-600/5">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600">
+                    <item.icon className="h-5 w-5" />
+                  </div>
+                  <h3 className="mt-4 text-base font-semibold text-slate-900">{item.title}</h3>
+                  <p className="mt-2 text-sm text-slate-500 leading-relaxed">{item.desc}</p>
+                </div>
+              </ScrollReveal>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* ─── How It Works ─────────────────────────────────────── */}
-      <ScrollReveal speed="reveal">
-        <section className="border-t border-slate-200/60 bg-white py-16 md:py-20">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="text-center">
-              <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">
-                How It Works
-              </h2>
-            </div>
-            <div className="mt-10 grid gap-8 md:grid-cols-3">
-              {[
-                {
-                  step: '01',
-                  title: 'Browse & Discover',
-                  desc: 'Search by category, location, or keyword. Filter by certification, rating, and delivery options.',
-                  icon: '🔍',
-                },
-                {
-                  step: '02',
-                  title: 'Order with Confidence',
-                  desc: 'Add to cart and checkout securely. Payment is held in escrow until you confirm delivery.',
-                  icon: '🛒',
-                },
-                {
-                  step: '03',
-                  title: 'Enjoy & Review',
-                  desc: 'Receive your order, confirm delivery to release payment. Leave a review to help the community.',
-                  icon: '⭐',
-                },
-              ].map((item, i) => (
-                <ScrollReveal key={item.step} speed="pop" delay={i * 0.1} distance={16}>
-                  <div className="relative flex flex-col items-center text-center">
-                    <span className="text-4xl">{item.icon}</span>
-                    <span className="mt-3 text-xs font-bold text-emerald-600 tracking-widest uppercase">
-                      Step {item.step}
-                    </span>
-                    <h3 className="mt-2 text-lg font-semibold text-slate-900">{item.title}</h3>
-                    <p className="mt-2 text-sm text-slate-500 leading-relaxed max-w-xs">{item.desc}</p>
-                  </div>
-                </ScrollReveal>
-              ))}
-            </div>
+      <section className="border-t border-slate-200/60 bg-white py-16 md:py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">
+              How It Works
+            </h2>
           </div>
-        </section>
-      </ScrollReveal>
+          <div className="mt-10 grid gap-8 md:grid-cols-3">
+            {[
+              {
+                step: '01',
+                title: 'Browse & Discover',
+                desc: 'Search by category, location, or keyword. Filter by certification, rating, and delivery options.',
+                icon: '🔍',
+              },
+              {
+                step: '02',
+                title: 'Order with Confidence',
+                desc: 'Add to cart and checkout securely. Payment is held in escrow until you confirm delivery.',
+                icon: '🛒',
+              },
+              {
+                step: '03',
+                title: 'Enjoy & Review',
+                desc: 'Receive your order, confirm delivery to release payment. Leave a review to help the community.',
+                icon: '⭐',
+              },
+            ].map((item, i) => (
+              <ScrollReveal key={item.step} speed="pop" delay={i * 0.1} distance={16}>
+                <div className="relative flex flex-col items-center text-center">
+                  <span className="text-4xl">{item.icon}</span>
+                  <span className="mt-3 text-xs font-bold text-emerald-600 tracking-widest uppercase">
+                    Step {item.step}
+                  </span>
+                  <h3 className="mt-2 text-lg font-semibold text-slate-900">{item.title}</h3>
+                  <p className="mt-2 text-sm text-slate-500 leading-relaxed max-w-xs">{item.desc}</p>
+                </div>
+              </ScrollReveal>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* ─── Vendor CTA ───────────────────────────────────────── */}
-      <ScrollReveal speed="cinematic" margin="early">
       <section className="py-16 md:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-600 to-emerald-700 p-8 md:p-14">
@@ -339,7 +332,6 @@ export default function HalalHubLanding() {
           </div>
         </div>
       </section>
-      </ScrollReveal>
     </div>
   );
 }
