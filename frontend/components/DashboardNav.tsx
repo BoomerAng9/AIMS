@@ -22,7 +22,7 @@ import {
   Trophy, Activity, Mic, Theater, BookOpen,
   Coins, CircleDot, TrendingUp, Building, Layers,
   Store, ShoppingCart, Calculator, Map, Plug,
-  Code, Eye,
+  Code, Eye, Wand2,
 } from "lucide-react";
 
 // ── Types ──
@@ -50,6 +50,7 @@ const PRIVATE_CORE: NavItem[] = [
   { href: "/dashboard/deploy-dock", label: "Deploy Dock", icon: Rocket, highlight: true },
   { href: "/dashboard/automations", label: "Automations", icon: Zap, highlight: true },
   { href: "/dashboard/make-it-mine", label: "Make It Mine", icon: Wrench, highlight: true },
+  { href: "/dashboard/ntntn-studio", label: "Creative Studio", icon: Wand2, highlight: true },
   { href: "/dashboard/your-space", label: "Your Space", icon: Users },
   { href: "/dashboard/plan", label: "Plan", icon: FolderKanban },
 ];
@@ -119,6 +120,7 @@ const PUBLIC_CORE: NavItem[] = [
   { href: "/dashboard", label: "Home", icon: BarChart3 },
   { href: "/dashboard/deploy-dock", label: "Launch Tools", icon: Rocket, highlight: true },
   { href: "/dashboard/make-it-mine", label: "Build Something", icon: Wrench, highlight: true },
+  { href: "/dashboard/ntntn-studio", label: "Creative Studio", icon: Wand2, highlight: true },
   { href: "/dashboard/your-space", label: "My Workspace", icon: Users },
   { href: "/dashboard/plan", label: "My Plan", icon: FolderKanban },
 ];
