@@ -177,7 +177,7 @@ export default function HomePage() {
   const heroY = useTransform(heroProgress, [0, 1], ["0%", "15%"]);
 
   return (
-    <main className="relative min-h-screen bg-[#09090B] text-zinc-100 selection:bg-amber-500/20">
+    <div role="main" className="relative min-h-screen bg-[#09090B] text-zinc-100 selection:bg-amber-500/20">
       <ScrollProgress />
 
       {/* ── Ambient Background ── */}
@@ -261,7 +261,7 @@ export default function HomePage() {
         <SiteFooter />
         <DelayedSignUpModal />
       </div>
-    </main>
+    </div>
   );
 }
 
