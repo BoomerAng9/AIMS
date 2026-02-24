@@ -2099,6 +2099,59 @@ level of expertise for every tool in the platform.
 
 ---
 
+## 33. MCP Capabilities (External Service Connections)
+
+A.I.M.S. connects to external services through **Model Context Protocol (MCP)** servers.
+Every MCP connection is a capability that ACHEEVY and the chain of command can invoke
+to interact with the real world — files, email, calendars, code, containers, forms.
+
+**All MCP calls flow through Port Authority (UEF Gateway).** No agent directly touches
+credentials. MCP servers handle auth, and Port Authority meters usage via LUC.
+
+**Master Reference:** `aims-skills/tools/MCP_CAPABILITIES.md`
+
+### Connected MCP Servers (10)
+
+| # | MCP Server | Owner | Category | Doc |
+|---|-----------|-------|----------|-----|
+| 1 | **Google Drive** | Scout_Ang | Productivity | `tools/google-drive-mcp.tool.md` |
+| 2 | **GitHub** | Patchsmith_Ang | Source Control | `tools/github-mcp.tool.md` |
+| 3 | **Notion** | Scribe_Ang | Knowledge Base | `tools/notion-mcp.tool.md` |
+| 4 | **Gmail** | Plug_Ang | Communication | `tools/gmail-mcp.tool.md` |
+| 5 | **Google Calendar** | OpsConsole_Ang | Scheduling | `tools/google-calendar-mcp.tool.md` |
+| 6 | **Browser Rendering** | Scout_Ang | Web/Scraping | `tools/cloudflare-browser-mcp.tool.md` |
+| 7 | **CF Containers** | Runner_Ang | Edge Compute | `tools/cloudflare-containers-mcp.tool.md` |
+| 8 | **Workers** | Buildsmith | Edge Functions | `tools/cloudflare-workers-mcp.tool.md` |
+| 9 | **Workers Builds** | Buildsmith | Edge CI/CD | `tools/cloudflare-builds-mcp.tool.md` |
+| 10 | **Pipedream (Paperform)** | Plug_Ang | Forms/Intake | `tools/pipedream-mcp.tool.md` |
+
+### MCP Allowed Tools (add to ACHEEVY's tool dispatch)
+
+`GOOGLE_DRIVE_MCP`, `GITHUB_MCP`, `NOTION_MCP`, `GMAIL_MCP`, `GOOGLE_CALENDAR_MCP`,
+`CF_BROWSER_MCP`, `CF_CONTAINERS_MCP`, `CF_WORKERS_MCP`, `CF_BUILDS_MCP`, `PIPEDREAM_MCP`
+
+### HITL-Gated MCP Actions (ALWAYS require human approval)
+
+| MCP | Action | Risk |
+|-----|--------|------|
+| Gmail | Send/forward email | Outbound communication |
+| Calendar | Event with external attendees | Visible to others |
+| GitHub | Merge PR, force push | Production code change |
+| Notion | Delete page/database | Irreversible |
+| Drive | Delete file, share externally | Data loss / exposure |
+| CF Containers | Delete container | Service disruption |
+| Workers | Delete Worker | Service disruption |
+| Paperform | Delete form | Data loss |
+
+### Key Integration Pipelines Using MCPs
+
+**Onboarding:** Paperform → Notion (project page) → Drive (client folder) → Gmail (welcome) → Calendar (booking)
+**Deployment:** GitHub (PR merge) → Builds (build) → Browser (screenshot) → Notion (deploy log) → Gmail (notify)
+**Research:** Notion (knowledge base) → Drive (documents) → Browser (web scraping) → Notion (store findings)
+**FDH Factory:** GitHub (read changes) → Builds (build) → Containers (deploy) → Browser (verify) → GitHub (PR) → Notion (log)
+
+---
+
 > **"Activity breeds Activity — shipped beats perfect."**
 >
 > **"AI Managed Solutions is not a name. It's what we do. We manage services with AI."**
@@ -2114,4 +2167,5 @@ level of expertise for every tool in the platform.
 > Look-Listen-Learn makes every engagement intelligent. Personality Inheritance
 > makes every agent carry ACHEEVY's DNA. Enterprise Launch makes organizations possible.
 > Model Intelligence makes every LLM call deliberate. Skills SME makes every agent an expert.
+> MCP Capabilities make every external service reachable.
 > Together, they are A.I.M.S. — managing services with AI, autonomously, with a human in the loop.

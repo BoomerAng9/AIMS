@@ -161,7 +161,7 @@
     {
       "pack_id": "G",
       "name": "MCP Bridge Integrations",
-      "primary": "Third-party services wired through MCP bridge gateways (Pipedream, Composio).",
+      "primary": "Third-party services wired through MCP bridge gateways (Pipedream, Composio, Claude Code Connectors).",
       "repos": [
         {
           "repo": "pipedream-mcp",
@@ -173,6 +173,60 @@
           "repo": "paperform",
           "delegated_owner": "Plug_Ang",
           "role": "Form builder — client intake, needs analysis, surveys, bookings via Pipedream MCP",
+          "wrapper_type": "MCP_BRIDGE_WRAPPER"
+        },
+        {
+          "repo": "google-drive-mcp",
+          "delegated_owner": "Scout_Ang",
+          "role": "File storage, search, collaboration — docs, sheets, PDFs via Claude Code Connector",
+          "wrapper_type": "MCP_BRIDGE_WRAPPER"
+        },
+        {
+          "repo": "github-mcp",
+          "delegated_owner": "Patchsmith_Ang",
+          "role": "Source control — repos, issues, PRs, code search, releases via Claude Code Connector",
+          "wrapper_type": "MCP_BRIDGE_WRAPPER"
+        },
+        {
+          "repo": "notion-mcp",
+          "delegated_owner": "Scribe_Ang",
+          "role": "Knowledge base — pages, databases, blocks, comments via Claude Code Connector",
+          "wrapper_type": "MCP_BRIDGE_WRAPPER"
+        },
+        {
+          "repo": "gmail-mcp",
+          "delegated_owner": "Plug_Ang",
+          "role": "Email — search, read, compose, reply, label via Claude Code Connector (HITL on send)",
+          "wrapper_type": "MCP_BRIDGE_WRAPPER"
+        },
+        {
+          "repo": "google-calendar-mcp",
+          "delegated_owner": "OpsConsole_Ang",
+          "role": "Scheduling — events, availability, bookings via Claude Code Connector",
+          "wrapper_type": "MCP_BRIDGE_WRAPPER"
+        },
+        {
+          "repo": "cloudflare-browser-mcp",
+          "delegated_owner": "Scout_Ang",
+          "role": "Headless browser — screenshots, PDF, scraping, DOM interaction via Cloudflare edge",
+          "wrapper_type": "MCP_BRIDGE_WRAPPER"
+        },
+        {
+          "repo": "cloudflare-containers-mcp",
+          "delegated_owner": "Runner_Ang",
+          "role": "Edge containers — deploy, manage, scale containers on Cloudflare edge",
+          "wrapper_type": "MCP_BRIDGE_WRAPPER"
+        },
+        {
+          "repo": "cloudflare-workers-mcp",
+          "delegated_owner": "Buildsmith",
+          "role": "Edge functions — deploy, manage Workers for webhooks, API proxies, protocol bridges",
+          "wrapper_type": "MCP_BRIDGE_WRAPPER"
+        },
+        {
+          "repo": "cloudflare-builds-mcp",
+          "delegated_owner": "Buildsmith",
+          "role": "Edge CI/CD — build, bundle, deploy Workers with build pipelines",
           "wrapper_type": "MCP_BRIDGE_WRAPPER"
         }
       ]
