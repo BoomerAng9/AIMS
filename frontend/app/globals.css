@@ -32,16 +32,20 @@
   --color-border-hover: rgba(255, 255, 255, 0.15);
   --color-border-active: rgba(255, 255, 255, 0.22);
 
-  /* Brand accent — amber/gold optimized for dark */
-  --color-accent: #F59E0B;
-  --color-accent-light: #FBBF24;
-  --color-accent-dark: #D97706;
-  --color-accent-bg: rgba(245, 158, 11, 0.08);
-  --color-accent-border: rgba(245, 158, 11, 0.25);
-  --color-accent-glow: rgba(245, 158, 11, 0.15);
+  /* Brand accent — violet/purple for Loopra AI theme */
+  --color-accent: #8B5CF6;
+  --color-accent-light: #A78BFA;
+  --color-accent-dark: #7C3AED;
+  --color-accent-bg: rgba(139, 92, 246, 0.08);
+  --color-accent-border: rgba(139, 92, 246, 0.25);
+  --color-accent-glow: rgba(139, 92, 246, 0.15);
+
+  /* Secondary accent — cyan for gradients */
+  --color-accent-secondary: #06B6D4;
+  --color-accent-secondary-glow: rgba(6, 182, 212, 0.12);
 
   /* Legacy alias */
-  --color-gold: #F59E0B;
+  --color-gold: #8B5CF6;
 }
 
 /* ─── Base ────────────────────────────────────────────────── */
@@ -63,7 +67,7 @@ body {
 }
 
 ::selection {
-  background: rgba(245, 158, 11, 0.25);
+  background: rgba(139, 92, 246, 0.25);
   color: #FAFAFA;
 }
 
@@ -120,18 +124,18 @@ body {
       0 4px 16px rgba(0, 0, 0, 0.3);
   }
 
-  /* Primary button — amber accent */
+  /* Primary button — violet gradient accent */
   .btn-primary {
     @apply inline-flex items-center justify-center gap-2;
     @apply h-11 px-6 rounded-xl;
     @apply text-sm font-semibold;
-    background: #F59E0B;
-    color: #09090B;
+    background: linear-gradient(135deg, #8B5CF6, #7C3AED);
+    color: #FFFFFF;
     transition: all 0.2s;
   }
   .btn-primary:hover {
-    background: #FBBF24;
-    box-shadow: 0 0 24px rgba(245, 158, 11, 0.3), 0 4px 12px rgba(245, 158, 11, 0.2);
+    background: linear-gradient(135deg, #A78BFA, #8B5CF6);
+    box-shadow: 0 0 24px rgba(139, 92, 246, 0.3), 0 4px 12px rgba(139, 92, 246, 0.2);
   }
   .btn-primary:active {
     transform: scale(0.98);
@@ -189,9 +193,25 @@ body {
     background: linear-gradient(to right, transparent, var(--color-border), transparent);
   }
 
-  /* Accent gradient text */
+  /* Accent gradient text — violet to cyan */
   .text-gold-gradient {
-    background: linear-gradient(135deg, #F59E0B, #FBBF24, #F59E0B);
+    background: linear-gradient(135deg, #8B5CF6, #06B6D4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Violet gradient text */
+  .text-violet-gradient {
+    background: linear-gradient(135deg, #A78BFA, #8B5CF6, #7C3AED);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Violet-to-cyan gradient text */
+  .text-aurora-gradient {
+    background: linear-gradient(135deg, #8B5CF6, #06B6D4, #22D3EE);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -214,15 +234,23 @@ body {
   }
 
   .text-shadow-gold {
-    text-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
+    text-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
   }
 
   .glow-gold {
-    box-shadow: 0 0 20px rgba(245, 158, 11, 0.1);
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.1);
   }
 
   .glow-gold-strong {
-    box-shadow: 0 0 40px rgba(245, 158, 11, 0.2);
+    box-shadow: 0 0 40px rgba(139, 92, 246, 0.2);
+  }
+
+  .glow-violet {
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.15);
+  }
+
+  .glow-violet-strong {
+    box-shadow: 0 0 60px rgba(139, 92, 246, 0.25);
   }
 
   /* Grid background — dark subtle */
@@ -267,6 +295,14 @@ body {
     background: radial-gradient(circle, rgba(245, 158, 11, 0.12) 0%, transparent 70%);
   }
 
+  .glow-orb-violet {
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.12) 0%, transparent 70%);
+  }
+
+  .glow-orb-cyan {
+    background: radial-gradient(circle, rgba(6, 182, 212, 0.10) 0%, transparent 70%);
+  }
+
   .glow-orb-blue {
     background: radial-gradient(circle, rgba(59, 130, 246, 0.08) 0%, transparent 70%);
   }
@@ -309,8 +345,13 @@ body {
 }
 
 @keyframes border-glow {
-  0%, 100% { border-color: rgba(245, 158, 11, 0.15); }
-  50% { border-color: rgba(245, 158, 11, 0.35); }
+  0%, 100% { border-color: rgba(139, 92, 246, 0.15); }
+  50% { border-color: rgba(139, 92, 246, 0.35); }
+}
+
+@keyframes gradient-rotate {
+  0% { --gradient-angle: 0deg; }
+  100% { --gradient-angle: 360deg; }
 }
 
 @keyframes aurora {

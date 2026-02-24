@@ -35,14 +35,20 @@ module.exports = {
           hover: 'rgba(255, 255, 255, 0.15)',
         },
 
-        // Accent — amber/gold optimized for dark
+        // Accent — violet/purple (Loopra AI theme)
         gold: {
-          DEFAULT: '#F59E0B',
-          light: '#FBBF24',
-          dark: '#D97706',
-          dim: 'rgba(245, 158, 11, 0.08)',
+          DEFAULT: '#8B5CF6',
+          light: '#A78BFA',
+          dark: '#7C3AED',
+          dim: 'rgba(139, 92, 246, 0.08)',
         },
-        champagne: '#FBBF24',
+        violet: {
+          DEFAULT: '#8B5CF6',
+          light: '#A78BFA',
+          dark: '#7C3AED',
+          dim: 'rgba(139, 92, 246, 0.08)',
+        },
+        champagne: '#A78BFA',
 
         // Status signals — brighter for dark bg
         signal: {
@@ -89,13 +95,16 @@ module.exports = {
       },
       boxShadow: {
         'glass': '0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2)',
-        'neon-gold': '0 4px 14px rgba(245, 158, 11, 0.2)',
+        'neon-gold': '0 4px 14px rgba(139, 92, 246, 0.2)',
+        'neon-violet': '0 4px 14px rgba(139, 92, 246, 0.2)',
+        'neon-cyan': '0 4px 14px rgba(6, 182, 212, 0.2)',
         'neon-blue': '0 4px 14px rgba(59, 130, 246, 0.2)',
-        'glow-gold': '0 4px 14px rgba(245, 158, 11, 0.15)',
-        'glow-gold-soft': '0 2px 8px rgba(245, 158, 11, 0.08)',
+        'glow-gold': '0 4px 14px rgba(139, 92, 246, 0.15)',
+        'glow-gold-soft': '0 2px 8px rgba(139, 92, 246, 0.08)',
+        'glow-violet': '0 4px 14px rgba(139, 92, 246, 0.15)',
         'wireframe-inner': '0 1px 2px rgba(0,0,0,0.3)',
         'card-lift': '0 4px 16px rgba(0,0,0,0.4), 0 1px 4px rgba(0,0,0,0.3)',
-        'glow-controlled': '0 2px 8px rgba(245, 158, 11, 0.06)',
+        'glow-controlled': '0 2px 8px rgba(139, 92, 246, 0.06)',
         'card-sm': '0 1px 2px rgba(0,0,0,0.3)',
         'card-md': '0 2px 8px rgba(0,0,0,0.4)',
         'card-lg': '0 8px 24px rgba(0,0,0,0.5)',
@@ -124,8 +133,8 @@ module.exports = {
           to: { opacity: '1', transform: 'translateY(0)' },
         },
         pulse_gold: {
-          '0%, 100%': { opacity: '1', boxShadow: '0 0 6px rgba(245,158,11,0.1)' },
-          '50%': { opacity: '0.85', boxShadow: '0 0 16px rgba(245,158,11,0.25)' },
+          '0%, 100%': { opacity: '1', boxShadow: '0 0 6px rgba(139,92,246,0.1)' },
+          '50%': { opacity: '0.85', boxShadow: '0 0 16px rgba(139,92,246,0.25)' },
         },
         connector_pulse: {
           '0%, 100%': { opacity: '0.3' },

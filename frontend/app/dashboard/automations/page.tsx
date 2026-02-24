@@ -1,15 +1,15 @@
 'use client';
 
 // frontend/app/dashboard/automations/page.tsx
-// Automations Hub — Agent automations, Paperform library, and Stepper workflows
-import { useState, useMemo } from 'react';
+// Automations Hub — Agent automations, Paperform forms, and Stepper workflows
+// Data comes from API endpoints — no hardcoded mock data.
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import {
   Zap, Plus, Play, Pause, Clock, GitPullRequest,
   AlertTriangle, Shield, Search, FileText, Layers, Wrench,
   Activity, Trash2, ChevronRight, MoreHorizontal, Filter,
   CalendarClock, Radio, CheckCircle2, XCircle, Loader2,
   MessageSquare, Bug, ListChecks, Settings,
-  // Forms & Stepper icons
   ClipboardList, UserPlus, Star, LifeBuoy, Calendar, CreditCard,
   Rocket, BarChart3, GitBranch, Users, Ticket, CalendarCheck,
   Brain, UserX, ExternalLink, ArrowRight, Link2, Eye, Hash,
@@ -114,22 +114,7 @@ interface StepperWorkflowEntry {
   recentRuns: { id: string; triggeredBy: string; startedAt: string; status: string; creditsCost: number; summary: string }[];
 }
 
-// ─── Mock Data: Automations ──────────────────────────────────────────────────
-
-const MOCK_AUTOMATIONS: Automation[] = [
-  { id: 'auto-1', name: 'Auto-Generate PR Descriptions', instructions: 'When a PR is opened, analyze the diff and generate a description...', triggers: [{ type: 'event', source: 'github', event: 'pr_opened', label: 'PR opened' }], status: 'active', agentId: 'acheevy', lastRunAt: '2026-02-23T07:42:00Z', lastRunStatus: 'success', runsTotal: 47, runsSuccess: 45, runsFailed: 2, tags: ['github', 'pr'], createdAt: '2026-02-01T00:00:00Z' },
-  { id: 'auto-2', name: 'Daily Sentry Error Report', instructions: 'Every morning, fetch errors from last 24h, rank by users affected...', triggers: [{ type: 'scheduled', cron: '0 8 * * *', label: 'Daily at 8 AM' }], status: 'active', agentId: 'acheevy', lastRunAt: '2026-02-23T08:00:00Z', lastRunStatus: 'success', runsTotal: 22, runsSuccess: 21, runsFailed: 1, tags: ['sentry', 'monitoring'], createdAt: '2026-02-01T00:00:00Z' },
-  { id: 'auto-3', name: 'Security Vulnerability Scan', instructions: 'Scan for SQL injection, XSS, hardcoded secrets, auth flaws...', triggers: [{ type: 'scheduled', cron: '0 6 * * *', label: 'Daily at 6 AM' }], status: 'paused', agentId: 'acheevy', lastRunAt: '2026-02-20T06:00:00Z', lastRunStatus: 'failure', runsTotal: 15, runsSuccess: 13, runsFailed: 2, tags: ['security'], createdAt: '2026-02-05T00:00:00Z' },
-  { id: 'auto-4', name: 'Post-Deploy Health Monitor', instructions: 'After each deploy: run health checks, monitor error rates for 15 min...', triggers: [{ type: 'event', source: 'acheevy', event: 'deploy_complete', label: 'Deploy complete' }], status: 'active', agentId: 'acheevy', lastRunAt: '2026-02-22T14:30:00Z', lastRunStatus: 'success', runsTotal: 8, runsSuccess: 8, runsFailed: 0, tags: ['monitoring', 'deploy'], createdAt: '2026-02-10T00:00:00Z' },
-];
-
-const MOCK_RUNS: AutomationRun[] = [
-  { id: 'run-1', automationId: 'auto-1', triggeredBy: 'PR #142 opened', startedAt: '2026-02-23T07:42:00Z', completedAt: '2026-02-23T07:42:18Z', status: 'success', summary: 'Generated description for PR #142: "Add mHC research module"', prsCreated: 0, messagesPosted: 1, lucCost: 0.12 },
-  { id: 'run-2', automationId: 'auto-2', triggeredBy: 'Schedule: Daily 8 AM', startedAt: '2026-02-23T08:00:00Z', completedAt: '2026-02-23T08:01:45Z', status: 'success', summary: 'Posted 3 high-priority errors to #engineering-bugs, created 3 Linear tickets', prsCreated: 0, messagesPosted: 1, lucCost: 0.35 },
-  { id: 'run-3', automationId: 'auto-4', triggeredBy: 'Deploy: frontend v2.4.1', startedAt: '2026-02-22T14:30:00Z', completedAt: '2026-02-22T14:45:00Z', status: 'success', summary: 'Health checks passed. No error rate regression detected.', prsCreated: 0, messagesPosted: 1, lucCost: 0.28 },
-  { id: 'run-4', automationId: 'auto-3', triggeredBy: 'Schedule: Daily 6 AM', startedAt: '2026-02-20T06:00:00Z', completedAt: '2026-02-20T06:03:22Z', status: 'failure', summary: 'Scan timeout: repository too large for allocated sandbox memory', prsCreated: 0, messagesPosted: 0, lucCost: 0.15 },
-  { id: 'run-5', automationId: 'auto-1', triggeredBy: 'PR #141 opened', startedAt: '2026-02-22T16:10:00Z', completedAt: '2026-02-22T16:10:12Z', status: 'success', summary: 'Generated description for PR #141: "Fix auth redirect loop"', prsCreated: 0, messagesPosted: 1, lucCost: 0.10 },
-];
+// ─── Automation Templates (these are real product templates, not fake data) ──
 
 const TEMPLATES: AutomationTemplate[] = [
   { id: 'auto-pr-description', name: 'Auto-Generate PR Descriptions', description: 'Create clear PR descriptions when PRs are opened.', category: 'code_quality', icon: 'file-text', instructions: '', defaultTriggers: [{ type: 'event', source: 'github', event: 'pr_opened', label: 'PR opened' }], requiredServers: ['github'], tags: ['github', 'pr'], popularity: 95 },
@@ -138,33 +123,6 @@ const TEMPLATES: AutomationTemplate[] = [
   { id: 'security-scan', name: 'Security Vulnerability Scan', description: 'Scan your codebase daily for security issues.', category: 'security', icon: 'shield', instructions: '', defaultTriggers: [{ type: 'scheduled', cron: '0 6 * * *', label: 'Daily at 6 AM' }], requiredServers: ['github', 'linear'], tags: ['security'], popularity: 85 },
   { id: 'sentry-prioritize', name: 'Prioritize Sentry Errors', description: 'Daily report ranked by users affected.', category: 'bug_fixes', icon: 'alert-triangle', instructions: '', defaultTriggers: [{ type: 'scheduled', cron: '0 8 * * *', label: 'Daily at 8 AM' }], requiredServers: ['sentry', 'slack', 'linear'], tags: ['sentry', 'monitoring'], popularity: 88 },
   { id: 'deploy-health', name: 'Post-Deploy Health Monitor', description: 'Monitor health after every deployment.', category: 'monitoring', icon: 'activity', instructions: '', defaultTriggers: [{ type: 'event', source: 'acheevy', event: 'deploy_complete', label: 'Deploy complete' }], requiredServers: ['github', 'slack'], tags: ['monitoring', 'deploy'], popularity: 82 },
-];
-
-// ─── Mock Data: Form Library ─────────────────────────────────────────────────
-
-const FORM_LIBRARY: FormEntry[] = [
-  { id: 'form-onboarding-intake', slug: 'aims-onboarding-needs-analysis', name: 'Onboarding Needs Analysis', description: 'First form every new user completes. Captures identity, goals, and service routing.', category: 'onboarding', status: 'live', pageCount: 5, fieldCount: 18, submissionCount: 142, partialCount: 23, accent: '#F59E0B', stepperWorkflowIds: ['stepper-onboarding-pipeline'], tags: ['onboarding', 'intake', 'critical'], updatedAt: '2026-02-20T00:00:00Z' },
-  { id: 'form-plug-needs', slug: 'aims-plug-needs-analysis', name: 'Plug Needs Analysis', description: 'Deep-dive requirements for plug recommendation and enterprise deployments.', category: 'needs_analysis', status: 'live', pageCount: 3, fieldCount: 9, submissionCount: 67, partialCount: 12, accent: '#3B82F6', stepperWorkflowIds: ['stepper-needs-analysis-pipeline'], tags: ['enterprise', 'needs-analysis'], updatedAt: '2026-02-18T00:00:00Z' },
-  { id: 'form-feedback-nps', slug: 'aims-feedback-nps', name: 'Feedback & NPS Survey', description: 'Post-delivery satisfaction survey with Net Promoter Score tracking.', category: 'feedback', status: 'live', pageCount: 1, fieldCount: 6, submissionCount: 89, partialCount: 8, accent: '#10B981', stepperWorkflowIds: ['stepper-feedback-processor'], tags: ['feedback', 'nps'], updatedAt: '2026-02-15T00:00:00Z' },
-  { id: 'form-support-request', slug: 'aims-support-request', name: 'Support Request', description: 'Structured issue intake with urgency triage and auto-ticket creation.', category: 'support', status: 'live', pageCount: 1, fieldCount: 6, submissionCount: 34, partialCount: 2, accent: '#EF4444', stepperWorkflowIds: ['stepper-support-triage'], tags: ['support', 'triage'], updatedAt: '2026-02-22T00:00:00Z' },
-  { id: 'form-consultation-booking', slug: 'aims-consultation-booking', name: 'Consultation Booking', description: 'Calendar-connected booking form with auto-confirmation.', category: 'booking', status: 'live', pageCount: 1, fieldCount: 8, submissionCount: 28, partialCount: 5, accent: '#8B5CF6', stepperWorkflowIds: ['stepper-booking-confirm'], tags: ['booking', 'calendar'], updatedAt: '2026-02-21T00:00:00Z' },
-  { id: 'form-service-payment', slug: 'aims-service-payment', name: 'Service Payment', description: 'Stripe-connected payment collection for consulting and premium services.', category: 'payment', status: 'live', pageCount: 1, fieldCount: 6, submissionCount: 19, partialCount: 7, accent: '#F59E0B', stepperWorkflowIds: ['stepper-payment-receipt'], tags: ['payment', 'stripe'], updatedAt: '2026-02-22T00:00:00Z' },
-  { id: 'form-project-kickoff', slug: 'aims-project-kickoff', name: 'Project Kickoff Brief', description: 'Detailed scope form for custom builds — objectives, deliverables, constraints.', category: 'needs_analysis', status: 'live', pageCount: 2, fieldCount: 7, submissionCount: 15, partialCount: 4, accent: '#3B82F6', stepperWorkflowIds: ['stepper-project-setup'], tags: ['project', 'kickoff'], updatedAt: '2026-02-22T00:00:00Z' },
-  { id: 'form-satisfaction-survey', slug: 'aims-satisfaction-survey', name: 'Client Satisfaction Survey', description: 'Quarterly survey for active clients — quality, reliability, expansion.', category: 'survey', status: 'live', pageCount: 2, fieldCount: 6, submissionCount: 52, partialCount: 11, accent: '#10B981', stepperWorkflowIds: ['stepper-survey-processor'], tags: ['survey', 'quarterly'], updatedAt: '2026-02-20T00:00:00Z' },
-];
-
-// ─── Mock Data: Stepper Workflows ────────────────────────────────────────────
-
-const STEPPER_WORKFLOWS: StepperWorkflowEntry[] = [
-  { id: 'stepper-onboarding-pipeline', name: 'Onboarding Intake Pipeline', description: 'Validate → Firestore → Notion → Drive → email → calendar → ACHEEVY.', status: 'active', triggerLabel: 'New submission on Onboarding Needs Analysis', connectedFormId: 'form-onboarding-intake', stepsCount: 8, appsUsed: ['anthropic', 'firestore', 'notion', 'google_drive', 'gmail', 'google_calendar', 'acheevy'], runsTotal: 142, runsSuccess: 138, runsFailed: 4, lastRunAt: '2026-02-23T14:20:00Z', lastRunStatus: 'success', creditsCostTotal: 412.5, tags: ['onboarding', 'critical'], recentRuns: [{ id: 'sr-1', triggeredBy: 'Sarah Chen', startedAt: '2026-02-23T14:20:00Z', status: 'success', creditsCost: 3.2, summary: 'Notion + Drive + email + calendar' }, { id: 'sr-2', triggeredBy: 'Marcus Rivera', startedAt: '2026-02-22T09:15:00Z', status: 'success', creditsCost: 2.8, summary: 'Full pipeline (no consultation)' }] },
-  { id: 'stepper-needs-analysis-pipeline', name: 'Needs Analysis → Plug Recommendation', description: 'AI-analyze requirements → match plugs → report → notify.', status: 'active', triggerLabel: 'New submission on Plug Needs Analysis', connectedFormId: 'form-plug-needs', stepsCount: 5, appsUsed: ['anthropic', 'firestore', 'notion', 'gmail', 'acheevy'], runsTotal: 67, runsSuccess: 64, runsFailed: 3, lastRunAt: '2026-02-23T11:00:00Z', lastRunStatus: 'success', creditsCostTotal: 268.0, tags: ['enterprise', 'recommendation'], recentRuns: [{ id: 'sr-3', triggeredBy: 'TechCorp Inc', startedAt: '2026-02-23T11:00:00Z', status: 'success', creditsCost: 4.1, summary: 'Recommended OpenClaw Pro' }] },
-  { id: 'stepper-feedback-processor', name: 'Feedback & NPS Processor', description: 'Sentiment analysis → NPS classify → Sheets → detractor alert.', status: 'active', triggerLabel: 'New submission on Feedback & NPS Survey', connectedFormId: 'form-feedback-nps', stepsCount: 6, appsUsed: ['anthropic', 'google_sheets', 'slack', 'gmail'], runsTotal: 89, runsSuccess: 87, runsFailed: 2, lastRunAt: '2026-02-23T10:30:00Z', lastRunStatus: 'success', creditsCostTotal: 102.3, tags: ['feedback', 'nps'], recentRuns: [{ id: 'sr-4', triggeredBy: 'Alex Kim (NPS: 9)', startedAt: '2026-02-23T10:30:00Z', status: 'success', creditsCost: 1.2, summary: 'Promoter logged, testimonial requested' }] },
-  { id: 'stepper-support-triage', name: 'Support Request Triage', description: 'AI classify → Linear ticket → Slack → ack email.', status: 'active', triggerLabel: 'New submission on Support Request', connectedFormId: 'form-support-request', stepsCount: 5, appsUsed: ['anthropic', 'linear', 'slack', 'gmail', 'acheevy'], runsTotal: 34, runsSuccess: 33, runsFailed: 1, lastRunAt: '2026-02-23T08:00:00Z', lastRunStatus: 'success', creditsCostTotal: 68.4, tags: ['support', 'triage'], recentRuns: [{ id: 'sr-5', triggeredBy: 'Auth redirect (Critical)', startedAt: '2026-02-23T08:00:00Z', status: 'success', creditsCost: 2.1, summary: 'Ticket ENG-412 created' }] },
-  { id: 'stepper-booking-confirm', name: 'Booking Confirmation', description: 'Calendar event → confirmation email → team notify.', status: 'active', triggerLabel: 'New submission on Consultation Booking', connectedFormId: 'form-consultation-booking', stepsCount: 3, appsUsed: ['google_calendar', 'gmail', 'slack'], runsTotal: 28, runsSuccess: 27, runsFailed: 1, lastRunAt: '2026-02-22T15:00:00Z', lastRunStatus: 'success', creditsCostTotal: 21.6, tags: ['booking', 'calendar'], recentRuns: [{ id: 'sr-6', triggeredBy: 'Maria Gonzalez', startedAt: '2026-02-22T15:00:00Z', status: 'success', creditsCost: 0.8, summary: 'Booked Feb 25 2PM' }] },
-  { id: 'stepper-payment-receipt', name: 'Payment Receipt & Activation', description: 'Record → receipt → Notion invoice → activate service.', status: 'active', triggerLabel: 'New submission on Service Payment', connectedFormId: 'form-service-payment', stepsCount: 4, appsUsed: ['firestore', 'gmail', 'notion', 'acheevy'], runsTotal: 19, runsSuccess: 19, runsFailed: 0, lastRunAt: '2026-02-22T11:30:00Z', lastRunStatus: 'success', creditsCostTotal: 27.5, tags: ['payment', 'billing'], recentRuns: [{ id: 'sr-7', triggeredBy: 'Custom Build ($2,499)', startedAt: '2026-02-22T11:30:00Z', status: 'success', creditsCost: 1.5, summary: 'Payment recorded, activated' }] },
-  { id: 'stepper-project-setup', name: 'Project Setup Pipeline', description: 'Notion → Drive → AI plan → kickoff email.', status: 'active', triggerLabel: 'New submission on Project Kickoff Brief', connectedFormId: 'form-project-kickoff', stepsCount: 5, appsUsed: ['notion', 'google_drive', 'anthropic', 'gmail', 'acheevy'], runsTotal: 15, runsSuccess: 14, runsFailed: 1, lastRunAt: '2026-02-22T09:00:00Z', lastRunStatus: 'success', creditsCostTotal: 58.5, tags: ['project', 'setup'], recentRuns: [{ id: 'sr-8', triggeredBy: 'E-commerce Rebuild', startedAt: '2026-02-22T09:00:00Z', status: 'success', creditsCost: 4.2, summary: 'Full setup + AI plan' }] },
-  { id: 'stepper-partial-followup', name: 'Partial Submission Follow-up', description: 'Chat nudge → wait → email → mark abandoned.', status: 'active', triggerLabel: 'Partial submission (24h)', connectedFormId: null, stepsCount: 6, appsUsed: ['acheevy', 'gmail', 'notion'], runsTotal: 23, runsSuccess: 18, runsFailed: 5, lastRunAt: '2026-02-22T00:00:00Z', lastRunStatus: 'success', creditsCostTotal: 11.5, tags: ['lead-recovery', 'follow-up'], recentRuns: [{ id: 'sr-9', triggeredBy: 'Anonymous user', startedAt: '2026-02-22T00:00:00Z', status: 'success', creditsCost: 0.5, summary: 'Chat nudge sent' }] },
-  { id: 'stepper-survey-processor', name: 'Quarterly Survey Processor', description: 'Theme analysis → Sheets → expansion alerts.', status: 'active', triggerLabel: 'New submission on Satisfaction Survey', connectedFormId: 'form-satisfaction-survey', stepsCount: 4, appsUsed: ['anthropic', 'google_sheets', 'slack'], runsTotal: 52, runsSuccess: 50, runsFailed: 2, lastRunAt: '2026-02-20T09:00:00Z', lastRunStatus: 'success', creditsCostTotal: 52.0, tags: ['survey', 'expansion'], recentRuns: [] },
 ];
 
 // ─── Icon Maps ───────────────────────────────────────────────────────────────
@@ -180,12 +138,6 @@ const FORM_ICON_MAP: Record<FormCategory, typeof Zap> = {
   onboarding: UserPlus, needs_analysis: ClipboardList, feedback: Star,
   support: LifeBuoy, booking: Calendar, payment: CreditCard,
   survey: BarChart3, custom: FileText,
-};
-
-const STEPPER_ICON_MAP: Record<string, typeof Zap> = {
-  'git-branch': GitBranch, 'users': Users, 'ticket': Ticket,
-  'calendar-check': CalendarCheck, 'brain': Brain, 'user-x': UserX,
-  'rocket': Rocket, 'bar-chart': BarChart3,
 };
 
 const CATEGORY_LABELS: Record<FormCategory, string> = {
@@ -247,9 +199,38 @@ function StatCard({ label, value, accent }: { label: string; value: string; acce
   );
 }
 
+// ─── Empty State Component ───────────────────────────────────────────────────
+
+function EmptyState({ icon: Icon, title, description, actionLabel, onAction }: {
+  icon: typeof Zap;
+  title: string;
+  description: string;
+  actionLabel?: string;
+  onAction?: () => void;
+}) {
+  return (
+    <div className="text-center py-20">
+      <div className="w-16 h-16 rounded-2xl bg-zinc-800/50 border border-white/10 flex items-center justify-center mx-auto mb-4">
+        <Icon className="w-7 h-7 text-zinc-600" />
+      </div>
+      <h3 className="text-sm font-medium text-zinc-300 mb-1">{title}</h3>
+      <p className="text-xs text-zinc-500 max-w-sm mx-auto mb-4">{description}</p>
+      {actionLabel && onAction && (
+        <button onClick={onAction} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-600 text-white text-xs font-medium hover:bg-amber-700 transition-colors">
+          <Plus className="w-3.5 h-3.5" />
+          {actionLabel}
+        </button>
+      )}
+    </div>
+  );
+}
+
 // ─── Automations Tab Content ─────────────────────────────────────────────────
 
 function AutomationsList({ automations, onSelect }: { automations: Automation[]; onSelect: (id: string) => void }) {
+  if (automations.length === 0) {
+    return <EmptyState icon={Zap} title="No automations yet" description="Create your first automation to run tasks on a schedule or in response to events." actionLabel="Create Automation" onAction={() => {}} />;
+  }
   return (
     <div className="space-y-3">
       {automations.map(auto => (
@@ -389,7 +370,7 @@ function TemplateGrid({ templates, onUse }: { templates: AutomationTemplate[]; o
 
 // ─── Forms Library Tab ───────────────────────────────────────────────────────
 
-function FormsLibrary({ forms, onSelectForm }: { forms: FormEntry[]; onSelectForm: (id: string) => void }) {
+function FormsLibrary({ forms }: { forms: FormEntry[] }) {
   const [categoryFilter, setCategoryFilter] = useState<FormCategory | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -404,12 +385,15 @@ function FormsLibrary({ forms, onSelectForm }: { forms: FormEntry[]; onSelectFor
     });
   }, [forms, categoryFilter, searchQuery]);
 
+  if (forms.length === 0) {
+    return <EmptyState icon={ClipboardList} title="No forms connected" description="Connect your Paperform account via Pipedream MCP to see your forms here. Forms are designed in Paperform editor." />;
+  }
+
   const totalSubs = forms.reduce((s, f) => s + f.submissionCount, 0);
   const totalPartials = forms.reduce((s, f) => s + f.partialCount, 0);
 
   return (
     <div className="space-y-4">
-      {/* Stats */}
       <div className="grid grid-cols-4 gap-3">
         <StatCard label="Total Forms" value={forms.length.toString()} />
         <StatCard label="Submissions" value={totalSubs.toLocaleString()} accent="text-emerald-400" />
@@ -417,7 +401,6 @@ function FormsLibrary({ forms, onSelectForm }: { forms: FormEntry[]; onSelectFor
         <StatCard label="Live Forms" value={forms.filter(f => f.status === 'live').length.toString()} accent="text-blue-400" />
       </div>
 
-      {/* Filters */}
       <div className="flex items-center gap-3">
         <div className="relative flex-1 max-w-xs">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-600" />
@@ -435,13 +418,11 @@ function FormsLibrary({ forms, onSelectForm }: { forms: FormEntry[]; onSelectFor
         </div>
       </div>
 
-      {/* Form Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         {filtered.map(form => {
           const Icon = FORM_ICON_MAP[form.category] || FileText;
-          const connectedWorkflow = STEPPER_WORKFLOWS.find(w => form.stepperWorkflowIds.includes(w.id));
           return (
-            <button key={form.id} onClick={() => onSelectForm(form.id)} className="text-left p-4 rounded-xl bg-[#111113] border border-white/10 hover:border-amber-500/20 transition-all group">
+            <div key={form.id} className="text-left p-4 rounded-xl bg-[#111113] border border-white/10 hover:border-amber-500/20 transition-all group">
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: `${form.accent}15` }}>
                   <Icon className="w-5 h-5" style={{ color: form.accent }} />
@@ -457,19 +438,12 @@ function FormsLibrary({ forms, onSelectForm }: { forms: FormEntry[]; onSelectFor
                     <span className="flex items-center gap-1"><Hash className="w-3 h-3" />{form.fieldCount} fields</span>
                     <span className="flex items-center gap-1"><Eye className="w-3 h-3" />{form.submissionCount} subs</span>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex gap-1">
-                      {form.tags.slice(0, 3).map(t => <span key={t} className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-500">{t}</span>)}
-                    </div>
-                    {connectedWorkflow && (
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 flex items-center gap-1">
-                        <Link2 className="w-3 h-3" /> Stepper
-                      </span>
-                    )}
+                  <div className="flex gap-1">
+                    {form.tags.slice(0, 3).map(t => <span key={t} className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-500">{t}</span>)}
                   </div>
                 </div>
               </div>
-            </button>
+            </div>
           );
         })}
       </div>
@@ -484,85 +458,9 @@ function FormsLibrary({ forms, onSelectForm }: { forms: FormEntry[]; onSelectFor
   );
 }
 
-// ─── Form Detail Panel ───────────────────────────────────────────────────────
-
-function FormDetail({ form, onClose }: { form: FormEntry; onClose: () => void }) {
-  const Icon = FORM_ICON_MAP[form.category] || FileText;
-  const workflows = STEPPER_WORKFLOWS.filter(w => form.stepperWorkflowIds.includes(w.id));
-  const completionRate = form.submissionCount > 0 ? Math.round((form.submissionCount / (form.submissionCount + form.partialCount)) * 100) : 0;
-
-  return (
-    <div className="space-y-6">
-      <div>
-        <button onClick={onClose} className="text-xs text-zinc-500 hover:text-zinc-300 mb-2 flex items-center gap-1">
-          <ChevronRight className="w-3 h-3 rotate-180" /> Back to Forms
-        </button>
-        <div className="flex items-start justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${form.accent}15` }}>
-              <Icon className="w-6 h-6" style={{ color: form.accent }} />
-            </div>
-            <div>
-              <h2 className="text-lg font-semibold text-zinc-100">{form.name}</h2>
-              <p className="text-sm text-zinc-400">{form.description}</p>
-              <div className="flex items-center gap-2 mt-1">
-                <StatusBadge status={form.status} />
-                <span className="text-xs text-zinc-500">{CATEGORY_LABELS[form.category]}</span>
-                <span className="text-xs text-zinc-600">slug: {form.slug}</span>
-              </div>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <button className="flex items-center gap-2 px-3 py-2 rounded-lg bg-zinc-800 text-zinc-300 text-xs hover:bg-zinc-700 transition-colors border border-white/10">
-              <ExternalLink className="w-3.5 h-3.5" /> Open in Paperform
-            </button>
-            <button className="flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-600 text-white text-xs hover:bg-amber-700 transition-colors">
-              <Eye className="w-3.5 h-3.5" /> Preview
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-4 gap-3">
-        <StatCard label="Submissions" value={form.submissionCount.toLocaleString()} accent="text-emerald-400" />
-        <StatCard label="Partial / Abandoned" value={form.partialCount.toString()} accent="text-amber-400" />
-        <StatCard label="Completion Rate" value={`${completionRate}%`} />
-        <StatCard label="Structure" value={`${form.pageCount}p / ${form.fieldCount}f`} />
-      </div>
-
-      {/* Connected Stepper Workflows */}
-      {workflows.length > 0 && (
-        <div>
-          <h3 className="text-xs font-medium text-zinc-400 uppercase tracking-wider mb-2">Connected Stepper Workflows</h3>
-          <div className="space-y-2">
-            {workflows.map(w => (
-              <div key={w.id} className="flex items-center gap-4 p-3 rounded-lg bg-[#111113] border border-white/10">
-                <GitBranch className="w-4 h-4 text-blue-400" />
-                <div className="flex-1 min-w-0">
-                  <div className="text-sm text-zinc-200">{w.name}</div>
-                  <div className="text-xs text-zinc-500 mt-0.5">{w.stepsCount} steps &middot; {w.appsUsed.length} apps &middot; {w.runsTotal} runs</div>
-                </div>
-                <StatusBadge status={w.status} />
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Form Tags */}
-      <div>
-        <h3 className="text-xs font-medium text-zinc-400 uppercase tracking-wider mb-2">Tags</h3>
-        <div className="flex gap-2 flex-wrap">
-          {form.tags.map(t => <span key={t} className="text-xs px-2 py-1 rounded-md bg-zinc-800 text-zinc-400 border border-white/10">{t}</span>)}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 // ─── Stepper Workflows Tab ───────────────────────────────────────────────────
 
-function StepperWorkflows({ workflows, onSelectWorkflow }: { workflows: StepperWorkflowEntry[]; onSelectWorkflow: (id: string) => void }) {
+function StepperWorkflows({ workflows }: { workflows: StepperWorkflowEntry[] }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'paused' | 'draft'>('all');
 
@@ -577,12 +475,15 @@ function StepperWorkflows({ workflows, onSelectWorkflow }: { workflows: StepperW
     });
   }, [workflows, searchQuery, statusFilter]);
 
+  if (workflows.length === 0) {
+    return <EmptyState icon={GitBranch} title="No Stepper workflows" description="Connect Stepper.io to automate post-submission workflows. Workflows are configured in the Stepper dashboard." />;
+  }
+
   const totalRuns = workflows.reduce((s, w) => s + w.runsTotal, 0);
   const totalCredits = workflows.reduce((s, w) => s + w.creditsCostTotal, 0);
 
   return (
     <div className="space-y-4">
-      {/* Stats */}
       <div className="grid grid-cols-4 gap-3">
         <StatCard label="Workflows" value={workflows.length.toString()} />
         <StatCard label="Total Runs" value={totalRuns.toLocaleString()} accent="text-emerald-400" />
@@ -590,7 +491,6 @@ function StepperWorkflows({ workflows, onSelectWorkflow }: { workflows: StepperW
         <StatCard label="Credits Used" value={totalCredits.toFixed(1)} accent="text-amber-400" />
       </div>
 
-      {/* Filters */}
       <div className="flex items-center gap-3">
         <div className="relative flex-1 max-w-xs">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-600" />
@@ -608,58 +508,48 @@ function StepperWorkflows({ workflows, onSelectWorkflow }: { workflows: StepperW
         </div>
       </div>
 
-      {/* Workflow Cards */}
       <div className="space-y-3">
-        {filtered.map(wf => {
-          const connectedForm = FORM_LIBRARY.find(f => f.id === wf.connectedFormId);
-          return (
-            <button key={wf.id} onClick={() => onSelectWorkflow(wf.id)} className="w-full text-left p-4 rounded-xl bg-[#111113] border border-white/10 hover:border-blue-500/20 transition-all group">
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex items-start gap-3 flex-1 min-w-0">
-                  <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center shrink-0">
-                    <GitBranch className="w-5 h-5 text-blue-400" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="text-sm font-medium text-zinc-100 truncate">{wf.name}</h3>
-                      <StatusBadge status={wf.status} />
-                    </div>
-                    <p className="text-xs text-zinc-400 line-clamp-1 mb-2">{wf.description}</p>
-                    <div className="flex items-center gap-3 text-xs text-zinc-500 mb-2">
-                      <span className="flex items-center gap-1"><Radio className="w-3 h-3" />{wf.triggerLabel}</span>
-                    </div>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-500">{wf.stepsCount} steps</span>
-                      {wf.appsUsed.slice(0, 4).map(app => (
-                        <span key={app} className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-500 capitalize">{app.replace(/_/g, ' ')}</span>
-                      ))}
-                      {wf.appsUsed.length > 4 && <span className="text-[10px] text-zinc-600">+{wf.appsUsed.length - 4} more</span>}
-                      {connectedForm && (
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center gap-1">
-                          <ClipboardList className="w-3 h-3" /> {connectedForm.name}
-                        </span>
-                      )}
-                    </div>
-                  </div>
+        {filtered.map(wf => (
+          <div key={wf.id} className="w-full text-left p-4 rounded-xl bg-[#111113] border border-white/10 hover:border-blue-500/20 transition-all group">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex items-start gap-3 flex-1 min-w-0">
+                <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center shrink-0">
+                  <GitBranch className="w-5 h-5 text-blue-400" />
                 </div>
-                <div className="flex items-center gap-4 text-xs text-zinc-500 shrink-0">
-                  <div className="text-right">
-                    <div className="flex items-center gap-1">
-                      {wf.lastRunStatus && <RunStatusIcon status={wf.lastRunStatus} />}
-                      <span>{wf.lastRunAt ? timeAgo(wf.lastRunAt) : 'Never'}</span>
-                    </div>
-                    <div className="mt-0.5">
-                      <span className="text-emerald-600">{wf.runsSuccess}</span>/<span className={wf.runsFailed > 0 ? 'text-red-500' : ''}>{wf.runsFailed}</span>
-                      <span className="ml-1 text-zinc-600">runs</span>
-                    </div>
-                    <div className="mt-0.5 text-amber-500/60">{wf.creditsCostTotal.toFixed(1)} credits</div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="text-sm font-medium text-zinc-100 truncate">{wf.name}</h3>
+                    <StatusBadge status={wf.status} />
                   </div>
-                  <ChevronRight className="w-4 h-4 text-zinc-600 group-hover:text-blue-400 transition-colors" />
+                  <p className="text-xs text-zinc-400 line-clamp-1 mb-2">{wf.description}</p>
+                  <div className="flex items-center gap-3 text-xs text-zinc-500 mb-2">
+                    <span className="flex items-center gap-1"><Radio className="w-3 h-3" />{wf.triggerLabel}</span>
+                  </div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-500">{wf.stepsCount} steps</span>
+                    {wf.appsUsed.slice(0, 4).map(app => (
+                      <span key={app} className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-500 capitalize">{app.replace(/_/g, ' ')}</span>
+                    ))}
+                    {wf.appsUsed.length > 4 && <span className="text-[10px] text-zinc-600">+{wf.appsUsed.length - 4} more</span>}
+                  </div>
                 </div>
               </div>
-            </button>
-          );
-        })}
+              <div className="flex items-center gap-4 text-xs text-zinc-500 shrink-0">
+                <div className="text-right">
+                  <div className="flex items-center gap-1">
+                    {wf.lastRunStatus && <RunStatusIcon status={wf.lastRunStatus} />}
+                    <span>{wf.lastRunAt ? timeAgo(wf.lastRunAt) : 'Never'}</span>
+                  </div>
+                  <div className="mt-0.5">
+                    <span className="text-emerald-600">{wf.runsSuccess}</span>/<span className={wf.runsFailed > 0 ? 'text-red-500' : ''}>{wf.runsFailed}</span>
+                    <span className="ml-1 text-zinc-600">runs</span>
+                  </div>
+                  {wf.creditsCostTotal > 0 && <div className="mt-0.5 text-amber-500/60">{wf.creditsCostTotal.toFixed(1)} credits</div>}
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
 
       {filtered.length === 0 && (
@@ -668,111 +558,6 @@ function StepperWorkflows({ workflows, onSelectWorkflow }: { workflows: StepperW
           <p className="text-zinc-500 text-sm">No workflows match your filters</p>
         </div>
       )}
-    </div>
-  );
-}
-
-// ─── Stepper Detail Panel ────────────────────────────────────────────────────
-
-function StepperDetail({ workflow, onClose }: { workflow: StepperWorkflowEntry; onClose: () => void }) {
-  const connectedForm = FORM_LIBRARY.find(f => f.id === workflow.connectedFormId);
-  const successRate = workflow.runsTotal > 0 ? Math.round((workflow.runsSuccess / workflow.runsTotal) * 100) : 0;
-
-  return (
-    <div className="space-y-6">
-      <div>
-        <button onClick={onClose} className="text-xs text-zinc-500 hover:text-zinc-300 mb-2 flex items-center gap-1">
-          <ChevronRight className="w-3 h-3 rotate-180" /> Back to Stepper Flows
-        </button>
-        <div className="flex items-start justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center">
-              <GitBranch className="w-6 h-6 text-blue-400" />
-            </div>
-            <div>
-              <h2 className="text-lg font-semibold text-zinc-100">{workflow.name}</h2>
-              <p className="text-sm text-zinc-400">{workflow.description}</p>
-              <div className="flex items-center gap-2 mt-1">
-                <StatusBadge status={workflow.status} />
-                <span className="text-xs text-zinc-500">{workflow.stepsCount} steps</span>
-              </div>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <button className="flex items-center gap-2 px-3 py-2 rounded-lg bg-zinc-800 text-zinc-300 text-xs hover:bg-zinc-700 transition-colors border border-white/10">
-              <ExternalLink className="w-3.5 h-3.5" /> Open in Stepper
-            </button>
-            <button className="flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-600 text-white text-xs hover:bg-blue-700 transition-colors">
-              <Play className="w-3.5 h-3.5" /> Run Now
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-4 gap-3">
-        <StatCard label="Total Runs" value={workflow.runsTotal.toString()} />
-        <StatCard label="Success Rate" value={`${successRate}%`} accent={successRate >= 90 ? 'text-emerald-400' : 'text-amber-400'} />
-        <StatCard label="Credits Used" value={workflow.creditsCostTotal.toFixed(1)} accent="text-amber-400" />
-        <StatCard label="Last Run" value={workflow.lastRunAt ? timeAgo(workflow.lastRunAt) : 'Never'} />
-      </div>
-
-      {/* Trigger */}
-      <div>
-        <h3 className="text-xs font-medium text-zinc-400 uppercase tracking-wider mb-2">Trigger</h3>
-        <div className="p-3 rounded-lg bg-[#111113] border border-white/10 flex items-center gap-3">
-          <Radio className="w-4 h-4 text-blue-400" />
-          <span className="text-sm text-zinc-200">{workflow.triggerLabel}</span>
-          {connectedForm && (
-            <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center gap-1 ml-auto">
-              <ClipboardList className="w-3 h-3" /> {connectedForm.name}
-            </span>
-          )}
-        </div>
-      </div>
-
-      {/* Apps Used */}
-      <div>
-        <h3 className="text-xs font-medium text-zinc-400 uppercase tracking-wider mb-2">Connected Apps ({workflow.appsUsed.length})</h3>
-        <div className="flex gap-2 flex-wrap">
-          {workflow.appsUsed.map(app => (
-            <span key={app} className="text-xs px-2.5 py-1 rounded-lg bg-zinc-800 text-zinc-300 border border-white/10 capitalize">
-              {app.replace(/_/g, ' ')}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      {/* Recent Runs */}
-      <div>
-        <h3 className="text-xs font-medium text-zinc-400 uppercase tracking-wider mb-2">Recent Runs</h3>
-        {workflow.recentRuns.length > 0 ? (
-          <div className="space-y-2">
-            {workflow.recentRuns.map(run => (
-              <div key={run.id} className="flex items-center gap-4 p-3 rounded-lg bg-[#111113] border border-white/10">
-                <RunStatusIcon status={run.status} />
-                <div className="flex-1 min-w-0">
-                  <div className="text-sm text-zinc-200 truncate">{run.summary}</div>
-                  <div className="text-xs text-zinc-500 mt-0.5">Triggered by: {run.triggeredBy}</div>
-                </div>
-                <div className="text-right text-xs text-zinc-500 shrink-0">
-                  <div>{timeAgo(run.startedAt)}</div>
-                  <div className="mt-0.5 text-amber-500/60">{run.creditsCost.toFixed(1)} credits</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-sm text-zinc-500">No recent runs.</p>
-        )}
-      </div>
-
-      {/* Tags */}
-      <div>
-        <h3 className="text-xs font-medium text-zinc-400 uppercase tracking-wider mb-2">Tags</h3>
-        <div className="flex gap-2 flex-wrap">
-          {workflow.tags.map(t => <span key={t} className="text-xs px-2 py-1 rounded-md bg-zinc-800 text-zinc-400 border border-white/10">{t}</span>)}
-        </div>
-      </div>
     </div>
   );
 }
@@ -799,27 +584,62 @@ export default function AutomationsPage() {
   const [statusFilter, setStatusFilter] = useState<AutomationStatus | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Data fetched from API (starts empty — no fake data)
+  const [automations, setAutomations] = useState<Automation[]>([]);
+  const [runs, setRuns] = useState<AutomationRun[]>([]);
+  const [forms, setForms] = useState<FormEntry[]>([]);
+  const [stepperWorkflows, setStepperWorkflows] = useState<StepperWorkflowEntry[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  // Fetch forms from API
+  const fetchForms = useCallback(async () => {
+    try {
+      const res = await fetch('/api/forms');
+      if (res.ok) {
+        const data = await res.json();
+        setForms(data.forms || []);
+      }
+    } catch {
+      // API not available yet — leave empty
+    }
+  }, []);
+
+  // Fetch stepper workflows from API
+  const fetchStepper = useCallback(async () => {
+    try {
+      const res = await fetch('/api/stepper');
+      if (res.ok) {
+        const data = await res.json();
+        setStepperWorkflows(data.workflows || []);
+      }
+    } catch {
+      // API not available yet — leave empty
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchForms();
+    fetchStepper();
+  }, [fetchForms, fetchStepper]);
+
   const filteredAutomations = useMemo(() => {
-    return MOCK_AUTOMATIONS.filter(a => {
+    return automations.filter(a => {
       if (statusFilter !== 'all' && a.status !== statusFilter) return false;
       if (searchQuery && !a.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
       return true;
     });
-  }, [statusFilter, searchQuery]);
+  }, [automations, statusFilter, searchQuery]);
 
-  const selectedAutomation = MOCK_AUTOMATIONS.find(a => a.id === selectedId);
-  const selectedForm = FORM_LIBRARY.find(f => f.id === selectedId);
-  const selectedWorkflow = STEPPER_WORKFLOWS.find(w => w.id === selectedId);
+  const selectedAutomation = automations.find(a => a.id === selectedId);
 
   const tabs: { key: TabKey; label: string; icon: typeof Zap; count?: number }[] = [
-    { key: 'automations', label: 'Automations', icon: Zap, count: MOCK_AUTOMATIONS.filter(a => a.status === 'active').length },
-    { key: 'forms', label: 'Form Library', icon: ClipboardList, count: FORM_LIBRARY.length },
-    { key: 'stepper', label: 'Stepper Flows', icon: GitBranch, count: STEPPER_WORKFLOWS.filter(w => w.status === 'active').length },
+    { key: 'automations', label: 'Automations', icon: Zap, count: automations.filter(a => a.status === 'active').length },
+    { key: 'forms', label: 'Form Library', icon: ClipboardList, count: forms.length },
+    { key: 'stepper', label: 'Stepper Flows', icon: GitBranch, count: stepperWorkflows.filter(w => w.status === 'active').length },
     { key: 'templates', label: 'Templates', icon: Layers, count: TEMPLATES.length },
     { key: 'history', label: 'Run History', icon: Clock },
   ];
 
-  // Handle back navigation from detail views
   const handleBack = () => setSelectedId(null);
 
   return (
@@ -860,7 +680,7 @@ export default function AutomationsPage() {
             >
               <Icon className="w-4 h-4" />
               {tab.label}
-              {tab.count !== undefined && (
+              {tab.count !== undefined && tab.count > 0 && (
                 <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${isActive ? 'bg-amber-500/15 text-amber-400' : 'bg-zinc-800 text-zinc-500'}`}>
                   {tab.count}
                 </span>
@@ -871,13 +691,8 @@ export default function AutomationsPage() {
       </div>
 
       {/* Content */}
-      {/* Automation detail */}
       {activeTab === 'automations' && selectedAutomation ? (
-        <AutomationDetail automation={selectedAutomation} runs={MOCK_RUNS} onClose={handleBack} />
-      ) : activeTab === 'forms' && selectedForm ? (
-        <FormDetail form={selectedForm} onClose={handleBack} />
-      ) : activeTab === 'stepper' && selectedWorkflow ? (
-        <StepperDetail workflow={selectedWorkflow} onClose={handleBack} />
+        <AutomationDetail automation={selectedAutomation} runs={runs} onClose={handleBack} />
       ) : (
         <>
           {activeTab === 'automations' && (
@@ -898,23 +713,16 @@ export default function AutomationsPage() {
                   ))}
                 </div>
               </div>
-              {filteredAutomations.length > 0 ? (
-                <AutomationsList automations={filteredAutomations} onSelect={setSelectedId} />
-              ) : (
-                <div className="text-center py-16">
-                  <Zap className="w-10 h-10 text-zinc-600 mx-auto mb-3" />
-                  <p className="text-zinc-500 text-sm">No automations found</p>
-                </div>
-              )}
+              <AutomationsList automations={filteredAutomations} onSelect={setSelectedId} />
             </>
           )}
 
           {activeTab === 'forms' && (
-            <FormsLibrary forms={FORM_LIBRARY} onSelectForm={setSelectedId} />
+            <FormsLibrary forms={forms} />
           )}
 
           {activeTab === 'stepper' && (
-            <StepperWorkflows workflows={STEPPER_WORKFLOWS} onSelectWorkflow={setSelectedId} />
+            <StepperWorkflows workflows={stepperWorkflows} />
           )}
 
           {activeTab === 'templates' && (
@@ -922,7 +730,9 @@ export default function AutomationsPage() {
           )}
 
           {activeTab === 'history' && (
-            <AutomationRunHistory runs={MOCK_RUNS} />
+            runs.length > 0
+              ? <AutomationRunHistory runs={runs} />
+              : <EmptyState icon={Clock} title="No run history" description="Automation runs will appear here once you create and execute automations." />
           )}
         </>
       )}

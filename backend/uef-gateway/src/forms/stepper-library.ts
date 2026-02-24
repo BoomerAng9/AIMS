@@ -1,31 +1,28 @@
 /**
  * Stepper Workflow Library — AI-Native Automation by Paperform
  *
- * Pre-built Stepper workflows that trigger on Paperform submissions.
- * Stepper handles the post-submission pipeline: validate → store → notify → action.
+ * Workflow step definitions for Stepper.io automations.
+ * Workflows are configured in Stepper UI (stepper.io) — this library
+ * defines the schema/structure for reference and dashboard display.
  *
- * Workflows are configured in Stepper UI (stepper.io) — this library tracks
- * definitions and run history for the Automations dashboard.
+ * Runtime data (run counts, credits, run history) comes from
+ * Stepper API — NOT hardcoded here.
  */
 
 import type {
   StepperWorkflow,
   StepperWorkflowTemplate,
   StepperWorkflowStatus,
-  StepperApp,
 } from './types';
 
-// ─── Live Stepper Workflows ──────────────────────────────────────────────────
+// ─── Workflow Definitions (structure only — no fake stats) ───────────────────
 
 const STEPPER_WORKFLOWS: StepperWorkflow[] = [
-  // ═══════════════════════════════════════════════════════════════════════════
-  // Onboarding Pipeline
-  // ═══════════════════════════════════════════════════════════════════════════
   {
     id: 'stepper-onboarding-pipeline',
     name: 'Onboarding Intake Pipeline',
     description: 'Full onboarding automation: validate submission → Firestore → Notion project page → Drive folder → welcome email → calendar booking → ACHEEVY notification.',
-    status: 'active',
+    status: 'draft',
     trigger: {
       type: 'form_submission',
       app: 'paperform',
@@ -43,30 +40,23 @@ const STEPPER_WORKFLOWS: StepperWorkflow[] = [
       { id: 'step-8', order: 8, type: 'webhook', app: 'acheevy', action: 'Notify ACHEEVY chat', label: 'ACHEEVY Notification', config: { webhookUrl: '/api/acheevy/notify', payload: 'onboarding_complete' } },
     ],
     connectedFormId: 'form-onboarding-intake',
-    runs: [
-      { id: 'srun-1', workflowId: 'stepper-onboarding-pipeline', triggeredBy: 'Onboarding: Sarah Chen', startedAt: '2026-02-23T14:20:00Z', completedAt: '2026-02-23T14:20:45Z', status: 'success', stepsCompleted: 8, stepsTotal: 8, creditsCost: 3.2, summary: 'Full pipeline: Notion page + Drive folder + welcome email + calendar booking' },
-      { id: 'srun-2', workflowId: 'stepper-onboarding-pipeline', triggeredBy: 'Onboarding: Marcus Rivera', startedAt: '2026-02-22T09:15:00Z', completedAt: '2026-02-22T09:15:32Z', status: 'success', stepsCompleted: 7, stepsTotal: 8, creditsCost: 2.8, summary: 'Full pipeline minus calendar (no consultation requested)' },
-      { id: 'srun-3', workflowId: 'stepper-onboarding-pipeline', triggeredBy: 'Onboarding: Priya Patel', startedAt: '2026-02-21T16:45:00Z', completedAt: '2026-02-21T16:46:10Z', status: 'success', stepsCompleted: 8, stepsTotal: 8, creditsCost: 3.5, summary: 'Full pipeline with enterprise tier classification + consultation booked' },
-    ],
-    runsTotal: 142,
-    runsSuccess: 138,
-    runsFailed: 4,
-    lastRunAt: '2026-02-23T14:20:00Z',
-    lastRunStatus: 'success',
-    creditsCostTotal: 412.5,
-    createdAt: '2026-01-15T00:00:00Z',
-    updatedAt: '2026-02-23T00:00:00Z',
+    runs: [],
+    runsTotal: 0,
+    runsSuccess: 0,
+    runsFailed: 0,
+    lastRunAt: null,
+    lastRunStatus: null,
+    creditsCostTotal: 0,
+    createdAt: '',
+    updatedAt: '',
     tags: ['onboarding', 'critical', 'full-pipeline'],
   },
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // Needs Analysis Pipeline
-  // ═══════════════════════════════════════════════════════════════════════════
   {
     id: 'stepper-needs-analysis-pipeline',
     name: 'Needs Analysis → Plug Recommendation',
     description: 'Process needs analysis submissions: AI-analyze requirements → match to plug catalog → generate recommendation report → notify user.',
-    status: 'active',
+    status: 'draft',
     trigger: {
       type: 'form_submission',
       app: 'paperform',
@@ -81,28 +71,23 @@ const STEPPER_WORKFLOWS: StepperWorkflow[] = [
       { id: 'step-5', order: 5, type: 'webhook', app: 'acheevy', action: 'Notify ACHEEVY with recommendations', label: 'ACHEEVY Alert', config: { webhookUrl: '/api/acheevy/notify', payload: 'needs_analysis_complete' } },
     ],
     connectedFormId: 'form-plug-needs',
-    runs: [
-      { id: 'srun-4', workflowId: 'stepper-needs-analysis-pipeline', triggeredBy: 'Needs Analysis: TechCorp Inc', startedAt: '2026-02-23T11:00:00Z', completedAt: '2026-02-23T11:01:12Z', status: 'success', stepsCompleted: 5, stepsTotal: 5, creditsCost: 4.1, summary: 'Recommended: OpenClaw Pro + custom agent. Enterprise tier match.' },
-    ],
-    runsTotal: 67,
-    runsSuccess: 64,
-    runsFailed: 3,
-    lastRunAt: '2026-02-23T11:00:00Z',
-    lastRunStatus: 'success',
-    creditsCostTotal: 268.0,
-    createdAt: '2026-01-20T00:00:00Z',
-    updatedAt: '2026-02-23T00:00:00Z',
+    runs: [],
+    runsTotal: 0,
+    runsSuccess: 0,
+    runsFailed: 0,
+    lastRunAt: null,
+    lastRunStatus: null,
+    creditsCostTotal: 0,
+    createdAt: '',
+    updatedAt: '',
     tags: ['needs-analysis', 'recommendation', 'enterprise'],
   },
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // Feedback Processor
-  // ═══════════════════════════════════════════════════════════════════════════
   {
     id: 'stepper-feedback-processor',
     name: 'Feedback & NPS Processor',
     description: 'Process feedback submissions: calculate NPS, detect sentiment, flag critical issues, update client health score.',
-    status: 'active',
+    status: 'draft',
     trigger: {
       type: 'form_submission',
       app: 'paperform',
@@ -118,28 +103,23 @@ const STEPPER_WORKFLOWS: StepperWorkflow[] = [
       { id: 'step-6', order: 6, type: 'send_email', app: 'gmail', action: 'Send testimonial request follow-up', label: 'Testimonial Follow-up', config: { template: 'testimonial-request' } },
     ],
     connectedFormId: 'form-feedback-nps',
-    runs: [
-      { id: 'srun-5', workflowId: 'stepper-feedback-processor', triggeredBy: 'Feedback: Alex Kim (NPS: 9)', startedAt: '2026-02-23T10:30:00Z', completedAt: '2026-02-23T10:30:15Z', status: 'success', stepsCompleted: 4, stepsTotal: 6, creditsCost: 1.2, summary: 'Promoter — logged + testimonial follow-up sent' },
-    ],
-    runsTotal: 89,
-    runsSuccess: 87,
-    runsFailed: 2,
-    lastRunAt: '2026-02-23T10:30:00Z',
-    lastRunStatus: 'success',
-    creditsCostTotal: 102.3,
-    createdAt: '2026-01-25T00:00:00Z',
-    updatedAt: '2026-02-23T00:00:00Z',
+    runs: [],
+    runsTotal: 0,
+    runsSuccess: 0,
+    runsFailed: 0,
+    lastRunAt: null,
+    lastRunStatus: null,
+    creditsCostTotal: 0,
+    createdAt: '',
+    updatedAt: '',
     tags: ['feedback', 'nps', 'sentiment'],
   },
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // Support Triage
-  // ═══════════════════════════════════════════════════════════════════════════
   {
     id: 'stepper-support-triage',
     name: 'Support Request Triage',
     description: 'Auto-triage support requests: classify severity, create Linear ticket, assign to team, notify Slack.',
-    status: 'active',
+    status: 'draft',
     trigger: {
       type: 'form_submission',
       app: 'paperform',
@@ -154,28 +134,23 @@ const STEPPER_WORKFLOWS: StepperWorkflow[] = [
       { id: 'step-5', order: 5, type: 'webhook', app: 'acheevy', action: 'Notify ACHEEVY for chat follow-up', label: 'ACHEEVY Follow-up', config: { webhookUrl: '/api/acheevy/notify', payload: 'support_ticket_created' } },
     ],
     connectedFormId: 'form-support-request',
-    runs: [
-      { id: 'srun-6', workflowId: 'stepper-support-triage', triggeredBy: 'Support: Auth redirect loop (Critical)', startedAt: '2026-02-23T08:00:00Z', completedAt: '2026-02-23T08:00:22Z', status: 'success', stepsCompleted: 5, stepsTotal: 5, creditsCost: 2.1, summary: 'Critical ticket ENG-412 created, team notified via Slack' },
-    ],
-    runsTotal: 34,
-    runsSuccess: 33,
-    runsFailed: 1,
-    lastRunAt: '2026-02-23T08:00:00Z',
-    lastRunStatus: 'success',
-    creditsCostTotal: 68.4,
-    createdAt: '2026-02-01T00:00:00Z',
-    updatedAt: '2026-02-23T00:00:00Z',
+    runs: [],
+    runsTotal: 0,
+    runsSuccess: 0,
+    runsFailed: 0,
+    lastRunAt: null,
+    lastRunStatus: null,
+    creditsCostTotal: 0,
+    createdAt: '',
+    updatedAt: '',
     tags: ['support', 'triage', 'linear'],
   },
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // Booking Confirmation
-  // ═══════════════════════════════════════════════════════════════════════════
   {
     id: 'stepper-booking-confirm',
     name: 'Consultation Booking Confirmation',
     description: 'Process consultation bookings: check availability → create calendar event → send confirmation → notify team.',
-    status: 'active',
+    status: 'draft',
     trigger: {
       type: 'form_submission',
       app: 'paperform',
@@ -188,28 +163,23 @@ const STEPPER_WORKFLOWS: StepperWorkflow[] = [
       { id: 'step-3', order: 3, type: 'notify', app: 'slack', action: 'Notify #consultations channel', label: 'Team Notify', config: { channel: '#consultations' } },
     ],
     connectedFormId: 'form-consultation-booking',
-    runs: [
-      { id: 'srun-7', workflowId: 'stepper-booking-confirm', triggeredBy: 'Booking: Maria Gonzalez — Platform Demo', startedAt: '2026-02-22T15:00:00Z', completedAt: '2026-02-22T15:00:18Z', status: 'success', stepsCompleted: 3, stepsTotal: 3, creditsCost: 0.8, summary: 'Booked Feb 25 at 2 PM, confirmation sent, team notified' },
-    ],
-    runsTotal: 28,
-    runsSuccess: 27,
-    runsFailed: 1,
-    lastRunAt: '2026-02-22T15:00:00Z',
-    lastRunStatus: 'success',
-    creditsCostTotal: 21.6,
-    createdAt: '2026-02-05T00:00:00Z',
-    updatedAt: '2026-02-22T00:00:00Z',
+    runs: [],
+    runsTotal: 0,
+    runsSuccess: 0,
+    runsFailed: 0,
+    lastRunAt: null,
+    lastRunStatus: null,
+    creditsCostTotal: 0,
+    createdAt: '',
+    updatedAt: '',
     tags: ['booking', 'calendar', 'confirmation'],
   },
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // Payment Receipt
-  // ═══════════════════════════════════════════════════════════════════════════
   {
     id: 'stepper-payment-receipt',
     name: 'Payment Receipt & Activation',
     description: 'Process payments: generate receipt → activate service → create project → notify team.',
-    status: 'active',
+    status: 'draft',
     trigger: {
       type: 'form_submission',
       app: 'paperform',
@@ -223,28 +193,23 @@ const STEPPER_WORKFLOWS: StepperWorkflow[] = [
       { id: 'step-4', order: 4, type: 'webhook', app: 'acheevy', action: 'Activate service via ACHEEVY', label: 'Activate Service', config: { webhookUrl: '/api/acheevy/activate', payload: 'payment_received' } },
     ],
     connectedFormId: 'form-service-payment',
-    runs: [
-      { id: 'srun-8', workflowId: 'stepper-payment-receipt', triggeredBy: 'Payment: Custom Build — Professional ($2,499)', startedAt: '2026-02-22T11:30:00Z', completedAt: '2026-02-22T11:30:25Z', status: 'success', stepsCompleted: 4, stepsTotal: 4, creditsCost: 1.5, summary: 'Payment recorded, receipt sent, service activated' },
-    ],
-    runsTotal: 19,
-    runsSuccess: 19,
+    runs: [],
+    runsTotal: 0,
+    runsSuccess: 0,
     runsFailed: 0,
-    lastRunAt: '2026-02-22T11:30:00Z',
-    lastRunStatus: 'success',
-    creditsCostTotal: 27.5,
-    createdAt: '2026-02-10T00:00:00Z',
-    updatedAt: '2026-02-22T00:00:00Z',
+    lastRunAt: null,
+    lastRunStatus: null,
+    creditsCostTotal: 0,
+    createdAt: '',
+    updatedAt: '',
     tags: ['payment', 'billing', 'activation'],
   },
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // Project Setup
-  // ═══════════════════════════════════════════════════════════════════════════
   {
     id: 'stepper-project-setup',
     name: 'Project Setup Pipeline',
     description: 'Set up new project workspace: Notion page → Drive folder → Slack channel → team assignment → kickoff email.',
-    status: 'active',
+    status: 'draft',
     trigger: {
       type: 'form_submission',
       app: 'paperform',
@@ -259,28 +224,23 @@ const STEPPER_WORKFLOWS: StepperWorkflow[] = [
       { id: 'step-5', order: 5, type: 'webhook', app: 'acheevy', action: 'Initialize project in ACHEEVY', label: 'ACHEEVY Init', config: { webhookUrl: '/api/acheevy/project/init', payload: 'project_kickoff' } },
     ],
     connectedFormId: 'form-project-kickoff',
-    runs: [
-      { id: 'srun-9', workflowId: 'stepper-project-setup', triggeredBy: 'Kickoff: E-commerce Dashboard Rebuild', startedAt: '2026-02-22T09:00:00Z', completedAt: '2026-02-22T09:01:05Z', status: 'success', stepsCompleted: 5, stepsTotal: 5, creditsCost: 4.2, summary: 'Notion page + Drive folder + AI plan + kickoff email sent' },
-    ],
-    runsTotal: 15,
-    runsSuccess: 14,
-    runsFailed: 1,
-    lastRunAt: '2026-02-22T09:00:00Z',
-    lastRunStatus: 'success',
-    creditsCostTotal: 58.5,
-    createdAt: '2026-02-12T00:00:00Z',
-    updatedAt: '2026-02-22T00:00:00Z',
+    runs: [],
+    runsTotal: 0,
+    runsSuccess: 0,
+    runsFailed: 0,
+    lastRunAt: null,
+    lastRunStatus: null,
+    creditsCostTotal: 0,
+    createdAt: '',
+    updatedAt: '',
     tags: ['project', 'setup', 'kickoff'],
   },
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // Partial Submission Follow-up
-  // ═══════════════════════════════════════════════════════════════════════════
   {
     id: 'stepper-partial-followup',
     name: 'Partial Submission Follow-up',
     description: 'Re-engage users who started but did not finish a form. Nudge via chat, then email, then mark as abandoned.',
-    status: 'active',
+    status: 'draft',
     trigger: {
       type: 'partial_submission',
       app: 'paperform',
@@ -294,28 +254,23 @@ const STEPPER_WORKFLOWS: StepperWorkflow[] = [
       { id: 'step-5', order: 5, type: 'delay', app: 'custom', action: 'Wait 7 days', label: 'Wait 7d', config: { delayDays: 7 } },
       { id: 'step-6', order: 6, type: 'store', app: 'notion', action: 'Mark lead as abandoned', label: 'Mark Abandoned', config: { database: 'Leads', status: 'Abandoned' } },
     ],
-    runs: [
-      { id: 'srun-10', workflowId: 'stepper-partial-followup', triggeredBy: 'Partial: anonymous user on Onboarding form', startedAt: '2026-02-22T00:00:00Z', completedAt: '2026-02-22T00:00:08Z', status: 'success', stepsCompleted: 2, stepsTotal: 6, creditsCost: 0.5, summary: 'Chat nudge sent — user has active session' },
-    ],
-    runsTotal: 23,
-    runsSuccess: 18,
-    runsFailed: 5,
-    lastRunAt: '2026-02-22T00:00:00Z',
-    lastRunStatus: 'success',
-    creditsCostTotal: 11.5,
-    createdAt: '2026-02-01T00:00:00Z',
-    updatedAt: '2026-02-22T00:00:00Z',
+    runs: [],
+    runsTotal: 0,
+    runsSuccess: 0,
+    runsFailed: 0,
+    lastRunAt: null,
+    lastRunStatus: null,
+    creditsCostTotal: 0,
+    createdAt: '',
+    updatedAt: '',
     tags: ['lead-recovery', 'follow-up', 'partial'],
   },
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // Survey Processor
-  // ═══════════════════════════════════════════════════════════════════════════
   {
     id: 'stepper-survey-processor',
     name: 'Quarterly Survey Processor',
     description: 'Process quarterly satisfaction surveys: analyze responses → update client health scores → generate insights report.',
-    status: 'active',
+    status: 'draft',
     trigger: {
       type: 'form_submission',
       app: 'paperform',
@@ -330,14 +285,14 @@ const STEPPER_WORKFLOWS: StepperWorkflow[] = [
     ],
     connectedFormId: 'form-satisfaction-survey',
     runs: [],
-    runsTotal: 52,
-    runsSuccess: 50,
-    runsFailed: 2,
-    lastRunAt: '2026-02-20T09:00:00Z',
-    lastRunStatus: 'success',
-    creditsCostTotal: 52.0,
-    createdAt: '2026-01-30T00:00:00Z',
-    updatedAt: '2026-02-20T00:00:00Z',
+    runsTotal: 0,
+    runsSuccess: 0,
+    runsFailed: 0,
+    lastRunAt: null,
+    lastRunStatus: null,
+    creditsCostTotal: 0,
+    createdAt: '',
+    updatedAt: '',
     tags: ['survey', 'health-score', 'expansion'],
   },
 ];
@@ -348,7 +303,7 @@ const STEPPER_TEMPLATES: StepperWorkflowTemplate[] = [
   {
     id: 'stpl-form-to-notion-drive-email',
     name: 'Form → Notion + Drive + Email',
-    description: 'Full onboarding pipeline: validate form → Notion page → Drive folder → welcome email. The most common Stepper pattern.',
+    description: 'Full onboarding pipeline: validate form → Notion page → Drive folder → welcome email.',
     icon: 'git-branch',
     triggerType: 'form_submission',
     triggerApp: 'paperform',
@@ -460,7 +415,6 @@ class StepperLibraryEngine {
     }
   }
 
-  /** List all workflows, optionally filtered */
   listWorkflows(filter?: { status?: StepperWorkflowStatus; formId?: string; search?: string }): StepperWorkflow[] {
     let results = Array.from(this.workflows.values());
     if (filter?.status) {
@@ -480,27 +434,22 @@ class StepperLibraryEngine {
     return results;
   }
 
-  /** Get a workflow by ID */
   getWorkflow(workflowId: string): StepperWorkflow | undefined {
     return this.workflows.get(workflowId);
   }
 
-  /** Get workflows connected to a form */
   getWorkflowsForForm(formId: string): StepperWorkflow[] {
     return Array.from(this.workflows.values()).filter(w => w.connectedFormId === formId);
   }
 
-  /** List all workflow templates */
   listTemplates(): StepperWorkflowTemplate[] {
     return Array.from(this.templates.values());
   }
 
-  /** Get a workflow template by ID */
   getTemplate(templateId: string): StepperWorkflowTemplate | undefined {
     return this.templates.get(templateId);
   }
 
-  /** Get aggregate statistics */
   getStats(): { totalWorkflows: number; activeWorkflows: number; totalRuns: number; totalCredits: number } {
     const workflows = Array.from(this.workflows.values());
     return {

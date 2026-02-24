@@ -1,9 +1,12 @@
 /**
  * A.I.M.S. Form Library — Paperform via Pipedream MCP
  *
- * Pre-defined form templates for every A.I.M.S. vertical.
- * Forms are designed in Paperform editor; this library tracks them
- * and provides the catalog for the Forms UI.
+ * Form structure definitions for every A.I.M.S. vertical.
+ * Forms are designed in Paperform editor; this library defines
+ * the schema/structure for reference and catalog display.
+ *
+ * Runtime data (submission counts, partial counts) comes from
+ * Paperform API via Pipedream MCP — NOT hardcoded here.
  */
 
 import type {
@@ -13,19 +16,16 @@ import type {
   FormStatus,
 } from './types';
 
-// ─── Live Forms (deployed in Paperform) ──────────────────────────────────────
+// ─── Form Definitions (structure only — no fake stats) ───────────────────────
 
 const FORM_LIBRARY: FormDefinition[] = [
-  // ═══════════════════════════════════════════════════════════════════════════
-  // Onboarding
-  // ═══════════════════════════════════════════════════════════════════════════
   {
     id: 'form-onboarding-intake',
     slug: 'aims-onboarding-needs-analysis',
     name: 'Onboarding Needs Analysis',
     description: 'First form every new user completes. Captures who they are, what they need, and routes them to the right path.',
     category: 'onboarding',
-    status: 'live',
+    status: 'draft',
     pages: [
       {
         title: 'About You',
@@ -86,24 +86,21 @@ const FORM_LIBRARY: FormDefinition[] = [
       successMessage: "Welcome to A.I.M.S.! ACHEEVY is reviewing your submission now. Head to chat to get started.",
     },
     theme: { accent: '#F59E0B', background: '#F8FAFC' },
-    submissionCount: 142,
-    partialCount: 23,
-    createdAt: '2026-01-15T00:00:00Z',
-    updatedAt: '2026-02-20T00:00:00Z',
+    submissionCount: 0,
+    partialCount: 0,
+    createdAt: '',
+    updatedAt: '',
     stepperWorkflowIds: ['stepper-onboarding-pipeline'],
     tags: ['onboarding', 'intake', 'critical'],
   },
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // Plug Needs Analysis
-  // ═══════════════════════════════════════════════════════════════════════════
   {
     id: 'form-plug-needs',
     slug: 'aims-plug-needs-analysis',
     name: 'Plug Needs Analysis',
     description: 'Deep-dive into service requirements for plug recommendation. Used by enterprise clients and complex deployments.',
     category: 'needs_analysis',
-    status: 'live',
+    status: 'draft',
     pages: [
       {
         title: 'Current Pain Points',
@@ -136,24 +133,21 @@ const FORM_LIBRARY: FormDefinition[] = [
       successMessage: "Thanks! ACHEEVY will analyze your requirements and recommend the best plugs within minutes.",
     },
     theme: { accent: '#3B82F6', background: '#F8FAFC' },
-    submissionCount: 67,
-    partialCount: 12,
-    createdAt: '2026-01-20T00:00:00Z',
-    updatedAt: '2026-02-18T00:00:00Z',
+    submissionCount: 0,
+    partialCount: 0,
+    createdAt: '',
+    updatedAt: '',
     stepperWorkflowIds: ['stepper-needs-analysis-pipeline'],
     tags: ['enterprise', 'needs-analysis', 'plug-recommendation'],
   },
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // Feedback & NPS
-  // ═══════════════════════════════════════════════════════════════════════════
   {
     id: 'form-feedback-nps',
     slug: 'aims-feedback-nps',
     name: 'Feedback & NPS Survey',
     description: 'Post-delivery satisfaction survey with Net Promoter Score tracking. Sent after each milestone or project completion.',
     category: 'feedback',
-    status: 'live',
+    status: 'draft',
     pages: [
       {
         title: 'Your Experience',
@@ -173,24 +167,21 @@ const FORM_LIBRARY: FormDefinition[] = [
       successMessage: "Thank you for your feedback! Your input directly shapes how we improve A.I.M.S.",
     },
     theme: { accent: '#10B981', background: '#F8FAFC' },
-    submissionCount: 89,
-    partialCount: 8,
-    createdAt: '2026-01-25T00:00:00Z',
-    updatedAt: '2026-02-15T00:00:00Z',
+    submissionCount: 0,
+    partialCount: 0,
+    createdAt: '',
+    updatedAt: '',
     stepperWorkflowIds: ['stepper-feedback-processor'],
     tags: ['feedback', 'nps', 'satisfaction'],
   },
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // Support Request
-  // ═══════════════════════════════════════════════════════════════════════════
   {
     id: 'form-support-request',
     slug: 'aims-support-request',
     name: 'Support Request',
     description: 'Structured issue intake with category routing, urgency triage, and auto-ticket creation.',
     category: 'support',
-    status: 'live',
+    status: 'draft',
     pages: [
       {
         title: 'Issue Details',
@@ -210,24 +201,21 @@ const FORM_LIBRARY: FormDefinition[] = [
       successMessage: "Support request submitted! ACHEEVY will triage this and you'll get an update within the hour.",
     },
     theme: { accent: '#EF4444', background: '#F8FAFC' },
-    submissionCount: 34,
-    partialCount: 2,
-    createdAt: '2026-02-01T00:00:00Z',
-    updatedAt: '2026-02-22T00:00:00Z',
+    submissionCount: 0,
+    partialCount: 0,
+    createdAt: '',
+    updatedAt: '',
     stepperWorkflowIds: ['stepper-support-triage'],
     tags: ['support', 'triage', 'tickets'],
   },
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // Consultation Booking
-  // ═══════════════════════════════════════════════════════════════════════════
   {
     id: 'form-consultation-booking',
     slug: 'aims-consultation-booking',
     name: 'Consultation Booking',
     description: 'Book a 15-minute consultation with the A.I.M.S. team. Calendar-connected with auto-confirmation.',
     category: 'booking',
-    status: 'live',
+    status: 'draft',
     pages: [
       {
         title: 'Book Your Consultation',
@@ -249,24 +237,21 @@ const FORM_LIBRARY: FormDefinition[] = [
       successMessage: "Consultation booked! You'll receive a calendar invite within minutes.",
     },
     theme: { accent: '#8B5CF6', background: '#F8FAFC' },
-    submissionCount: 28,
-    partialCount: 5,
-    createdAt: '2026-02-05T00:00:00Z',
-    updatedAt: '2026-02-21T00:00:00Z',
+    submissionCount: 0,
+    partialCount: 0,
+    createdAt: '',
+    updatedAt: '',
     stepperWorkflowIds: ['stepper-booking-confirm'],
     tags: ['booking', 'consultation', 'calendar'],
   },
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // Service Payment
-  // ═══════════════════════════════════════════════════════════════════════════
   {
     id: 'form-service-payment',
     slug: 'aims-service-payment',
     name: 'Service Payment',
     description: 'One-off payment collection for consulting, custom builds, and premium services. Stripe-connected.',
     category: 'payment',
-    status: 'live',
+    status: 'draft',
     pages: [
       {
         title: 'Payment Details',
@@ -286,24 +271,21 @@ const FORM_LIBRARY: FormDefinition[] = [
       successMessage: "Payment received! A receipt has been sent to your email. ACHEEVY will follow up in chat.",
     },
     theme: { accent: '#F59E0B', background: '#F8FAFC' },
-    submissionCount: 19,
-    partialCount: 7,
-    createdAt: '2026-02-10T00:00:00Z',
-    updatedAt: '2026-02-22T00:00:00Z',
+    submissionCount: 0,
+    partialCount: 0,
+    createdAt: '',
+    updatedAt: '',
     stepperWorkflowIds: ['stepper-payment-receipt'],
     tags: ['payment', 'stripe', 'billing'],
   },
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // Project Kickoff
-  // ═══════════════════════════════════════════════════════════════════════════
   {
     id: 'form-project-kickoff',
     slug: 'aims-project-kickoff',
     name: 'Project Kickoff Brief',
     description: 'Detailed project scope form for custom builds. Captures objectives, deliverables, stakeholders, and constraints.',
     category: 'needs_analysis',
-    status: 'live',
+    status: 'draft',
     pages: [
       {
         title: 'Project Overview',
@@ -329,24 +311,21 @@ const FORM_LIBRARY: FormDefinition[] = [
       successMessage: "Project brief received! ACHEEVY will create your project workspace and Notion page within minutes.",
     },
     theme: { accent: '#3B82F6', background: '#F8FAFC' },
-    submissionCount: 15,
-    partialCount: 4,
-    createdAt: '2026-02-12T00:00:00Z',
-    updatedAt: '2026-02-22T00:00:00Z',
+    submissionCount: 0,
+    partialCount: 0,
+    createdAt: '',
+    updatedAt: '',
     stepperWorkflowIds: ['stepper-project-setup'],
     tags: ['project', 'kickoff', 'scope'],
   },
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // Client Satisfaction Survey
-  // ═══════════════════════════════════════════════════════════════════════════
   {
     id: 'form-satisfaction-survey',
     slug: 'aims-satisfaction-survey',
     name: 'Client Satisfaction Survey',
     description: 'Quarterly satisfaction survey for active clients. Tracks service quality, feature usage, and expansion opportunities.',
     category: 'survey',
-    status: 'live',
+    status: 'draft',
     pages: [
       {
         title: 'Service Quality',
@@ -371,10 +350,10 @@ const FORM_LIBRARY: FormDefinition[] = [
       successMessage: "Thank you for your feedback! Your responses help us improve A.I.M.S. for everyone.",
     },
     theme: { accent: '#10B981', background: '#F8FAFC' },
-    submissionCount: 52,
-    partialCount: 11,
-    createdAt: '2026-01-30T00:00:00Z',
-    updatedAt: '2026-02-20T00:00:00Z',
+    submissionCount: 0,
+    partialCount: 0,
+    createdAt: '',
+    updatedAt: '',
     stepperWorkflowIds: ['stepper-survey-processor'],
     tags: ['survey', 'quarterly', 'satisfaction'],
   },
@@ -386,7 +365,7 @@ const FORM_TEMPLATES: FormTemplate[] = [
   {
     id: 'tpl-client-onboarding',
     name: 'Client Onboarding Intake',
-    description: 'Multi-step form with conditional routing for new client intake. Captures identity, goals, and service requirements.',
+    description: 'Multi-step form with conditional routing for new client intake.',
     category: 'onboarding',
     icon: 'user-plus',
     pages: FORM_LIBRARY[0].pages,
@@ -409,7 +388,7 @@ const FORM_TEMPLATES: FormTemplate[] = [
   {
     id: 'tpl-feedback-nps',
     name: 'Feedback & NPS Survey',
-    description: 'Quick satisfaction survey with Net Promoter Score. Send after milestones or project delivery.',
+    description: 'Quick satisfaction survey with Net Promoter Score.',
     category: 'feedback',
     icon: 'star',
     pages: FORM_LIBRARY[2].pages,
@@ -453,7 +432,7 @@ const FORM_TEMPLATES: FormTemplate[] = [
   {
     id: 'tpl-project-kickoff',
     name: 'Project Kickoff Brief',
-    description: 'Detailed scope capture for custom builds — objectives, deliverables, and constraints.',
+    description: 'Detailed scope capture for custom builds.',
     category: 'needs_analysis',
     icon: 'rocket',
     pages: FORM_LIBRARY[6].pages,
@@ -491,7 +470,6 @@ class FormLibraryEngine {
     }
   }
 
-  /** List all forms, optionally filtered by category or status */
   listForms(filter?: { category?: FormCategory; status?: FormStatus; search?: string }): FormDefinition[] {
     let results = Array.from(this.forms.values());
     if (filter?.category) {
@@ -511,29 +489,24 @@ class FormLibraryEngine {
     return results;
   }
 
-  /** Get a form by ID */
   getForm(formId: string): FormDefinition | undefined {
     return this.forms.get(formId);
   }
 
-  /** Get a form by slug */
   getFormBySlug(slug: string): FormDefinition | undefined {
     return Array.from(this.forms.values()).find(f => f.slug === slug);
   }
 
-  /** List all form templates */
   listTemplates(category?: FormCategory): FormTemplate[] {
     const templates = Array.from(this.templates.values());
     if (category) return templates.filter(t => t.category === category);
     return templates;
   }
 
-  /** Get a template by ID */
   getTemplate(templateId: string): FormTemplate | undefined {
     return this.templates.get(templateId);
   }
 
-  /** Get form statistics */
   getStats(): { totalForms: number; totalSubmissions: number; totalPartials: number; formsByCategory: Record<string, number> } {
     const forms = Array.from(this.forms.values());
     const byCategory: Record<string, number> = {};

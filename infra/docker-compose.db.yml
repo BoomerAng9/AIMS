@@ -1,0 +1,49 @@
+version: "3.8"
+name: aims-db
+
+# =============================================================================
+# HalalHub Database Stack
+# =============================================================================
+# Run this independently of the main stack to keep the DB alive during redeploys:
+#   docker compose -f infra/docker-compose.db.yml up -d
+# =============================================================================
+
+services:
+  # ---------------------------------------------------------------------------
+  # PostgreSQL 15 - HalalHub Main Database
+  # ---------------------------------------------------------------------------
+  postgres:
+    image: postgres:15-alpine
+    container_name: halalhub-postgres
+    ports:
+      - "5432:5432" # Exposed to host so `aims` network containers can access it via host IP or if joined to same network
+    environment:
+      - POSTGRES_USER=${HALALHUB_DB_USER:-halalhub}
+      - POSTGRES_PASSWORD=${HALALHUB_DB_PASSWORD:-halalhub_secret_2026}
+      - POSTGRES_DB=${HALALHUB_DB_NAME:-halalhub_prod}
+    volumes:
+      - halalhub-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
+    networks:
+      - aims-network
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+
+volumes:
+  halalhub-pgdata:
+    name: aims_halalhub-pgdata
+
+# Attach to the existing network created by the main docker-compose.prod.yml
+networks:
+  aims-network:
+    external: true
