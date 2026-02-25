@@ -1,9 +1,8 @@
 /**
- * A.I.M.S. Next.js Middleware — Edge Runtime
+ * A.I.M.S. Next.js Middleware
  *
- * Global security layer + edge-aware routing that runs on every request.
+ * Global security layer + device-aware routing that runs on every request.
  * Protects against bots, attacks, and abuse.
- * Injects geo/device context headers for edge API consumers (wearables, mobile).
  *
  * NO BACK DOORS. TRUE PENTESTING-READY.
  */
@@ -392,19 +391,6 @@ export function middleware(request: NextRequest) {
       response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-API-Key, X-Device-Type');
       response.headers.set('Access-Control-Max-Age', '86400');
     }
-  }
-
-  // ── Edge context injection (geo + device awareness) ──────
-  // Vercel populates these headers at the edge automatically.
-  // We normalize them so downstream API routes get clean context
-  // without each route parsing geo headers independently.
-  const geo = request.geo;
-  if (geo) {
-    if (geo.city) response.headers.set('X-Edge-City', geo.city);
-    if (geo.country) response.headers.set('X-Edge-Country', geo.country);
-    if (geo.region) response.headers.set('X-Edge-Region', geo.region);
-    if (geo.latitude) response.headers.set('X-Edge-Lat', geo.latitude);
-    if (geo.longitude) response.headers.set('X-Edge-Lon', geo.longitude);
   }
 
   // Device type detection — lightweight classification for wearable routing

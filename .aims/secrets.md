@@ -73,12 +73,6 @@ echo -n "new-value" | gcloud secrets versions add SECRET_NAME --data-file=-
 
 ---
 
-## Vercel (if using)
-
-**URL:** https://vercel.com/[your-team]/aims/settings/environment-variables
-
----
-
 ## Generate New Secrets
 
 ```bash

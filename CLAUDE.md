@@ -292,6 +292,10 @@ Every recurring mistake is documented here. Read this BEFORE making changes. Add
 11. **Skipping build verification** — Always run `cd frontend && npm run build` before considering frontend work complete.
 12. **License violations** — This is PROPRIETARY software. Never add MIT/Apache/GPL headers to A.I.M.S. code files. `backend/ii-agent/` is an exception (third-party fork with its own MIT license).
 
+### Deployment Mistakes (continued)
+16. **Vercel added without authorization** — Vercel was added as a deployment target, introducing `process.env.VERCEL` checks, edge runtime exports, serverless filesystem workarounds, and `vercel.json` configs across 26 files. A.I.M.S. deploys to VPS Docker ONLY. Never add Vercel, Netlify, or other PaaS-specific code paths. The deployment target is `infra/docker-compose.prod.yml` via `deploy.sh`.
+17. **Mock/fake data in production pages** — Hardcoded fake prospect data, mock player arrays, and placeholder content were shipped as "real" data. Never use inline mock data in production pages. All data must come from API routes backed by real data sources or be clearly gated behind a `DEMO_MODE` flag.
+
 ### Security Mistakes
 13. **Sensitive data in logs** — Never log API keys, user passwords, or session tokens.
 14. **No auth on destructive actions** — Deploy, scale, decommission actions MUST check user role via `requireRole()` middleware before executing.

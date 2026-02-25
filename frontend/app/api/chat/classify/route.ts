@@ -1,15 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export const runtime = 'edge';
-
 /**
- * PMO Intent Classification Endpoint — Edge Runtime
+ * PMO Intent Classification Endpoint
  *
  * Lightweight client-side classifier that mirrors the backend pmo-router.
  * Returns PMO office, director, confidence, and execution lane for a message.
  * Used by the Chat w/ACHEEVY UI to show pipeline routing in real-time.
- *
- * Runs on Vercel Edge for sub-10ms classification globally.
  */
 
 type PmoId =

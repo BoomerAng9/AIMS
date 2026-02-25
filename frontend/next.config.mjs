@@ -3,15 +3,11 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const isVercel = !!process.env.VERCEL;
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // 'standalone' is for Docker; Vercel uses its own build output
-  ...(isVercel ? {} : { output: 'standalone' }),
+  output: 'standalone',
   images: {
-    // Vercel has native image optimization; Docker needs unoptimized
-    unoptimized: !isVercel,
+    unoptimized: true,
   },
   eslint: {
     // ESLint checked separately in CI; don't block production builds

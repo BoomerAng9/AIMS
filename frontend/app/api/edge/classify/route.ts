@@ -1,14 +1,10 @@
 /**
- * Edge Intent Classifier — PMO routing at the edge
+ * Intent Classifier — PMO routing
  *
  * Pure computation, zero Node.js dependencies.
- * Mirrors the full /api/chat/classify endpoint but runs on edge runtime
+ * Mirrors the full /api/chat/classify endpoint
  * with a leaner response payload optimized for wearable/mobile clients.
- *
- * Runtime: Vercel Edge (~10ms globally)
  */
-
-export const runtime = 'edge';
 
 type PmoId =
   | 'tech-office' | 'finance-office' | 'ops-office'
