@@ -9,6 +9,12 @@
 
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/db/prisma';
+import { SEED_DRAFT_PROSPECTS, NFL_TEAM_NEEDS_2026 } from '@/lib/perform/seed-draft-data';
+import {
+  SEED_TRANSFER_PORTAL,
+  SEED_COACHING_CHANGES,
+  SEED_NIL_TEAM_RANKINGS,
+} from '@/lib/perform/seed-ncaa-data';
 
 const CURRENT_SEASON = new Date().getFullYear();
 
@@ -114,6 +120,12 @@ export async function GET() {
       }
     }
 
+    // If DB is essentially empty (no prospects, no portal entries), use seed fallback
+    const hasData = standings.length > 0 || portalMoves.length > 0 || topDraftProspects.length > 0;
+    if (!hasData) {
+      return NextResponse.json(getGridironSeedFallback());
+    }
+
     return NextResponse.json({
       standings: standings.map((s: any) => ({
         team: s.team?.commonName || 'Unknown',
@@ -192,16 +204,71 @@ export async function GET() {
       updatedAt: new Date().toISOString(),
     });
   } catch (err: any) {
-    console.error('[Per|Form Gridiron] Error:', err.message);
-    return NextResponse.json({
-      standings: [],
-      portalMoves: [],
-      coachingChanges: [],
-      scoreboard: [],
-      draftBoard: [],
-      nilLeaders: [],
-      portalSummary: { inPortal: 0, committed: 0, withdrawn: 0, signed: 0, total: 0 },
-      updatedAt: new Date().toISOString(),
-    });
+    console.error('[Per|Form Gridiron] DB error, falling back to seed data:', err.message);
+    // Return seed data fallback so the gridiron page always has content
+    return NextResponse.json(getGridironSeedFallback());
   }
+}
+
+/** Fallback gridiron data from seed files — always returns meaningful data */
+function getGridironSeedFallback() {
+  return {
+    standings: [],  // No conference standings in seed data — acceptable for draft-focused launch
+    portalMoves: SEED_TRANSFER_PORTAL.slice(0, 10).map((p, i) => ({
+      playerName: p.playerName,
+      position: p.position,
+      status: p.status,
+      stars: p.stars,
+      paiScore: p.paiScore,
+      tier: p.tier,
+      nilValuation: p.nilValuation,
+      from: p.previousTeamAbbrev || 'Unknown',
+      fromAbbr: p.previousTeamAbbrev || '???',
+      to: p.newTeamAbbrev || null,
+      toAbbr: p.newTeamAbbrev || null,
+      enteredDate: p.enteredDate,
+      committedDate: p.committedDate || null,
+    })),
+    coachingChanges: SEED_COACHING_CHANGES.slice(0, 8).map(c => ({
+      coachName: c.coachName,
+      changeType: c.changeType,
+      previousTeam: c.previousTeamAbbrev,
+      newTeam: c.newTeamAbbrev,
+      contractValue: c.contractValue || null,
+      effectiveDate: c.effectiveDate,
+      record: c.record || null,
+    })),
+    scoreboard: [],  // No live game data from seed — acceptable
+    draftBoard: SEED_DRAFT_PROSPECTS.filter(d => d.projectedRound <= 2).slice(0, 10).map(d => ({
+      name: `${d.firstName} ${d.lastName}`,
+      position: d.position,
+      college: d.college,
+      paiScore: d.paiScore,
+      tier: d.tier,
+      overallRank: d.overallRank,
+      projectedRound: d.projectedRound,
+      projectedPick: d.projectedPick,
+      projectedTeam: null,
+      trend: d.trend,
+      combineInvite: d.combineInvite,
+    })),
+    nilLeaders: SEED_NIL_TEAM_RANKINGS.slice(0, 10).map(n => ({
+      team: n.teamAbbrev,
+      abbreviation: n.teamAbbrev,
+      rank: n.rank,
+      totalNilValue: n.totalNilValue,
+      avgPerPlayer: n.avgPerPlayer,
+      dealCount: n.dealCount,
+      trend: n.trend,
+    })),
+    portalSummary: {
+      inPortal: SEED_TRANSFER_PORTAL.filter(p => p.status === 'IN_PORTAL').length,
+      committed: SEED_TRANSFER_PORTAL.filter(p => p.status === 'COMMITTED').length,
+      withdrawn: SEED_TRANSFER_PORTAL.filter(p => p.status === 'WITHDRAWN').length,
+      signed: SEED_TRANSFER_PORTAL.filter(p => p.status === 'SIGNED').length,
+      total: SEED_TRANSFER_PORTAL.length,
+    },
+    source: 'seed-data',
+    updatedAt: new Date().toISOString(),
+  };
 }

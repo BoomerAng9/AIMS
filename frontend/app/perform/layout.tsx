@@ -8,21 +8,34 @@ import { SiteHeader } from "@/components/SiteHeader";
 import Footer from "@/components/landing/Footer";
 import {
   LayoutGrid,
+  ListOrdered,
+  Trophy,
+  Swords,
   RefreshCw,
   ArrowRightLeft,
   DollarSign,
   PiggyBank,
-  Trophy,
+  MapPin,
+  FileText,
+  Users,
+  Building2,
   CreditCard,
+  RotateCcw,
 } from "lucide-react";
 
 const PERFORM_NAV = [
-  { href: "/perform", label: "Big Board", icon: LayoutGrid },
-  { href: "/perform/coaching-carousel", label: "Coaching Carousel", icon: RefreshCw },
-  { href: "/perform/transfer-portal", label: "Transfer Portal", icon: ArrowRightLeft },
-  { href: "/perform/nil-tracker", label: "NIL Tracker", icon: DollarSign },
-  { href: "/perform/revenue-budget", label: "Revenue Budget", icon: PiggyBank },
+  { href: "/perform", label: "Hub", icon: LayoutGrid },
+  { href: "/perform/big-board", label: "Big Board", icon: ListOrdered },
+  { href: "/perform/redraft", label: "Redraft", icon: RotateCcw },
   { href: "/perform/draft", label: "Draft", icon: Trophy },
+  { href: "/perform/war-room", label: "War Room", icon: Swords },
+  { href: "/perform/coaching-carousel", label: "Coaching", icon: RefreshCw },
+  { href: "/perform/transfer-portal", label: "Portal", icon: ArrowRightLeft },
+  { href: "/perform/nil-tracker", label: "NIL", icon: DollarSign },
+  { href: "/perform/state-boards", label: "HS Boards", icon: MapPin },
+  { href: "/perform/content", label: "Content", icon: FileText },
+  { href: "/perform/analysts", label: "Analysts", icon: Users },
+  { href: "/perform/directory", label: "Directory", icon: Building2 },
   { href: "/perform/pricing", label: "Pricing", icon: CreditCard },
 ];
 

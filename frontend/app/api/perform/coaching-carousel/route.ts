@@ -13,6 +13,55 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getCoachingChanges, getCoachingCarouselStats } from '@/lib/perform/ncaa-data-service';
+import { SEED_COACHING_CHANGES } from '@/lib/perform/seed-ncaa-data';
+
+/** Build coaching carousel data from seed entries */
+function getSeedCoachingChanges(filters?: {
+  season?: number;
+  changeType?: string;
+  limit?: number;
+  offset?: number;
+}) {
+  let entries = [...SEED_COACHING_CHANGES];
+
+  if (filters?.season) entries = entries.filter(e => e.season === filters.season);
+  if (filters?.changeType) entries = entries.filter(e => e.changeType === filters.changeType);
+
+  const offset = filters?.offset || 0;
+  const limit = filters?.limit || 50;
+
+  return entries.slice(offset, offset + limit).map(e => ({
+    id: `seed-cc-${e.coachName}`.toLowerCase().replace(/[^a-z0-9-]/g, ''),
+    coachName: e.coachName,
+    previousRole: e.previousRole,
+    newRole: e.newRole,
+    previousTeam: e.previousTeamAbbrev ? { commonName: e.previousTeamAbbrev, abbreviation: e.previousTeamAbbrev } : null,
+    newTeam: e.newTeamAbbrev ? { commonName: e.newTeamAbbrev, abbreviation: e.newTeamAbbrev } : null,
+    changeType: e.changeType,
+    season: e.season,
+    effectiveDate: e.effectiveDate,
+    contractYears: e.contractYears || null,
+    contractValue: e.contractValue || null,
+    buyout: e.buyout || null,
+    record: e.record || null,
+    notes: e.notes || null,
+    verified: e.verified,
+    source: 'seed-data',
+  }));
+}
+
+function getSeedCarouselStats(season?: number) {
+  const entries = season ? SEED_COACHING_CHANGES.filter(e => e.season === season) : SEED_COACHING_CHANGES;
+  return {
+    total: entries.length,
+    hired: entries.filter(e => e.changeType === 'HIRED').length,
+    fired: entries.filter(e => e.changeType === 'FIRED').length,
+    resigned: entries.filter(e => e.changeType === 'RESIGNED').length,
+    retired: entries.filter(e => e.changeType === 'RETIRED').length,
+    interim: entries.filter(e => e.changeType === 'INTERIM').length,
+    source: 'seed-data',
+  };
+}
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -27,6 +76,9 @@ export async function GET(req: NextRequest) {
     // Stats summary
     if (stats) {
       const statsData = await getCoachingCarouselStats(season);
+      if (statsData.total === 0) {
+        return NextResponse.json(getSeedCarouselStats(season));
+      }
       return NextResponse.json(statsData);
     }
 
@@ -39,12 +91,17 @@ export async function GET(req: NextRequest) {
       offset,
     });
 
+    // If DB returned empty, use seed data
+    if (!changes || changes.length === 0) {
+      return NextResponse.json(getSeedCoachingChanges({ season, changeType: changeType || undefined, limit, offset }));
+    }
+
     return NextResponse.json(changes);
   } catch (err) {
-    console.error('[CoachingCarousel] DB query failed:', err);
-    return NextResponse.json(
-      { error: 'Database unavailable', changes: [] },
-      { status: 503 }
-    );
+    console.error('[CoachingCarousel] DB query failed, using seed data:', err);
+    if (stats) {
+      return NextResponse.json(getSeedCarouselStats(season));
+    }
+    return NextResponse.json(getSeedCoachingChanges({ season, changeType: changeType || undefined, limit, offset }));
   }
 }
