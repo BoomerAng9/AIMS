@@ -22,10 +22,12 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   // Allow imports from ../aims-tools/ outside the frontend directory
-  // Don't bundle resend — its dep chain (htmlparser2/entities) is broken at build time
-  serverExternalPackages: ['resend'],
   experimental: {
     externalDir: true,
+    // Don't bundle resend — its dep chain (htmlparser2/entities) is broken at build time
+    // Next.js 14.x uses experimental.serverComponentsExternalPackages (renamed to
+    // serverExternalPackages in Next.js 15, which is NOT recognized in 14.x)
+    serverComponentsExternalPackages: ['resend'],
   },
   webpack: (config) => {
     config.resolve.alias['@/aims-tools'] = path.resolve(__dirname, '../aims-tools');
