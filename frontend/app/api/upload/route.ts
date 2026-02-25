@@ -14,6 +14,8 @@ import { randomUUID } from 'crypto';
 
 export const maxDuration = 30;
 
+const isServerless = !!process.env.VERCEL || !!process.env.AWS_LAMBDA_FUNCTION_NAME;
+
 const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB
 const MAX_FILES = 5;
 
@@ -90,6 +92,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         { error: `Maximum ${MAX_FILES} files per upload` },
         { status: 400 },
+      );
+    }
+
+    // On Vercel, the filesystem is read-only. Uploads need Vercel Blob / S3.
+    if (isServerless) {
+      return NextResponse.json(
+        { error: 'File uploads require object storage (Vercel Blob or S3). Local filesystem is read-only in serverless environments.' },
+        { status: 501 },
       );
     }
 

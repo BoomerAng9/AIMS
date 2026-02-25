@@ -12,7 +12,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 
-const GATEWAY_URL = process.env.NEXT_PUBLIC_UEF_GATEWAY_URL || process.env.UEF_GATEWAY_URL || 'http://uef-gateway:4000';
+const GATEWAY_URL = process.env.UEF_GATEWAY_URL || process.env.NEXT_PUBLIC_UEF_GATEWAY_URL || 'http://uef-gateway:4000';
 
 /**
  * POST /api/voice/personaplex

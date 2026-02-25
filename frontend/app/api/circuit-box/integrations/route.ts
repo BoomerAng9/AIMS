@@ -8,7 +8,7 @@
 
 import { NextResponse } from 'next/server';
 
-const UEF_URL = process.env.UEF_ENDPOINT || 'http://uef-gateway:4000';
+const UEF_URL = process.env.UEF_GATEWAY_URL || process.env.UEF_ENDPOINT || 'http://uef-gateway:4000';
 
 interface KeyInfo {
   id: string;

@@ -12,7 +12,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
 const ACHEEVY_URL = process.env.ACHEEVY_URL || "http://acheevy:3003";
-const UEF_URL = process.env.UEF_ENDPOINT || "http://uef-gateway:3001";
+const UEF_URL = process.env.UEF_GATEWAY_URL || process.env.UEF_ENDPOINT || "http://uef-gateway:3001";
 
 interface ChatRequest {
   message: string;

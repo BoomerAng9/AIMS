@@ -39,17 +39,21 @@ const DEPLOY_COSTS: Record<string, { service: ServiceKey; amount: number }> = {
   rollback: { service: "DEPLOY", amount: 5 },
 };
 
-// ── Persistent file-backed store (survives server restarts) ──
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
+// ── Deployment store ──
+// On VPS (Docker): file-backed for persistence across restarts.
+// On Vercel (serverless): in-memory only (fs is read-only).
 import { join } from 'path';
 
+const isServerless = !!process.env.VERCEL || !!process.env.AWS_LAMBDA_FUNCTION_NAME;
 const STORE_DIR = join(process.cwd(), '.data');
 const STORE_FILE = join(STORE_DIR, 'deployments.json');
 
 function loadDeployments(): Map<string, any> {
+  if (isServerless) return new Map();
   try {
-    if (existsSync(STORE_FILE)) {
-      const data = JSON.parse(readFileSync(STORE_FILE, 'utf-8'));
+    const fs = require('fs');
+    if (fs.existsSync(STORE_FILE)) {
+      const data = JSON.parse(fs.readFileSync(STORE_FILE, 'utf-8'));
       return new Map(Object.entries(data));
     }
   } catch {
@@ -59,10 +63,12 @@ function loadDeployments(): Map<string, any> {
 }
 
 function saveDeployments(deployments: Map<string, any>) {
+  if (isServerless) return; // No-op on serverless — fs is read-only
   try {
-    if (!existsSync(STORE_DIR)) mkdirSync(STORE_DIR, { recursive: true });
+    const fs = require('fs');
+    if (!fs.existsSync(STORE_DIR)) fs.mkdirSync(STORE_DIR, { recursive: true });
     const obj = Object.fromEntries(deployments);
-    writeFileSync(STORE_FILE, JSON.stringify(obj, null, 2), 'utf-8');
+    fs.writeFileSync(STORE_FILE, JSON.stringify(obj, null, 2), 'utf-8');
   } catch (err) {
     console.error('[Deploy Dock] Failed to save deployments:', err);
   }
@@ -564,24 +570,22 @@ async function handleLaunchDeployment(body: any, userId: string) {
     });
   }
 
-  // Also add local verification event
-  setTimeout(() => {
-    deployment.events.push({
-      id: `evt-${uuidv4().slice(0, 8)}`,
-      deploymentId,
-      timestamp: new Date().toISOString(),
-      stage: "verify",
-      title: "Validation Complete",
-      description: "Chicken Hawk verified all gates passed",
-      agent: "chicken_hawk",
-      proof: {
-        type: "scan",
-        label: "Gate Scan",
-        value: "3/3 gates passed",
-        timestamp: new Date().toISOString(),
-      },
-    });
-  }, 2000);
+  // Add local verification event synchronously (setTimeout won't fire on serverless)
+  deployment.events.push({
+    id: `evt-${uuidv4().slice(0, 8)}`,
+    deploymentId,
+    timestamp: new Date(Date.now() + 2000).toISOString(), // Offset to simulate async
+    stage: "verify",
+    title: "Validation Complete",
+    description: "Chicken Hawk verified all gates passed",
+    agent: "chicken_hawk",
+    proof: {
+      type: "scan",
+      label: "Gate Scan",
+      value: "3/3 gates passed",
+      timestamp: new Date(Date.now() + 2000).toISOString(),
+    },
+  });
 
   saveDeployments(deployments);
   return NextResponse.json({
