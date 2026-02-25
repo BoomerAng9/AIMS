@@ -7,6 +7,45 @@
  * and provides expert guidance on capabilities, parameters, and best practices.
  *
  * Specialties: MCP Routing, Integration Knowledge, Tool Dispatch, Skill Ingestion
+ *
+ * ---------------------------------------------------------------------------
+ * LLM Provider Registry (managed by SME_Ang)
+ * ---------------------------------------------------------------------------
+ *
+ * Mercury (Inception Labs) — Diffusion LLM
+ *   API:     https://api.inceptionlabs.ai/v1  (OpenAI-compatible, drop-in)
+ *   Models:  mercury-2 (general/reasoning), mercury-coder-small (code)
+ *   Speed:   1,009 tok/s on Blackwell GPUs — 5-10x faster than autoregressive
+ *   How:     Diffusion-based parallel token generation (NOT autoregressive)
+ *   Budget:  10M tokens allocated
+ *   Env:     MERCURY_API_KEY, MERCURY_BASE_URL, MERCURY_MODEL
+ *
+ *   Best use cases inside A.I.M.S.:
+ *     1. Agent loop acceleration — ACHEEVY multi-step task chains where latency
+ *        compounds (deploy → configure → health-check → report). Mercury cuts
+ *        each LLM call's wall-clock time by 5-10x.
+ *     2. Real-time voice/chat — Sub-200ms first-token for live ACHEEVY chat and
+ *        voice agent responses (ElevenLabs STT → Mercury → ElevenLabs TTS).
+ *     3. Bulk content generation — Plug catalog descriptions, export README files,
+ *        onboarding copy, email templates at scale without queue back-pressure.
+ *     4. Code generation & editing — mercury-coder-small for rapid Plug scaffolding,
+ *        Dockerfile generation, nginx config templating, and NtNtN build pipelines.
+ *     5. Search augmentation — Fast summarization layer on top of Brave Search
+ *        results before presenting to the user.
+ *     6. LUC calculation narratives — Instant plain-English explanation of complex
+ *        financial calculations (K1, Zakat, flip analysis) from LUC engine output.
+ *
+ *   Comparison to other providers:
+ *     - OpenRouter: 200+ models, broad coverage, slower per-call
+ *     - Mercury:    1-2 models, ultra-fast, ideal for latency-sensitive hot paths
+ *     - PersonaPlex: GPU inference for Nemotron avatar — different use case
+ *
+ *   Integration pattern:
+ *     Mercury uses the OpenAI chat completions format:
+ *       POST ${MERCURY_BASE_URL}/chat/completions
+ *       Authorization: Bearer ${MERCURY_API_KEY}
+ *       Body: { model: "mercury-2", messages: [...] }
+ * ---------------------------------------------------------------------------
  */
 
 import logger from '../../logger';
@@ -21,10 +60,12 @@ const profile = {
   capabilities: [
     { name: 'mcp-dispatch', weight: 0.98 },
     { name: 'integration-knowledge', weight: 0.95 },
+    { name: 'llm-provider-routing', weight: 0.93 },
     { name: 'tool-routing', weight: 0.92 },
     { name: 'skill-ingestion', weight: 0.90 },
     { name: 'data-query', weight: 0.85 },
     { name: 'workflow-trigger', weight: 0.85 },
+    { name: 'fast-inference', weight: 0.85 },
     { name: 'ui-component-generation', weight: 0.80 },
     { name: 'credential-management', weight: 0.75 },
   ],
@@ -76,6 +117,14 @@ const MCP_TOOLS: MCPTool[] = [
     triggers: ['search', 'web search', 'find online', 'look up', 'research'],
     skillFile: 'aims-skills/skills/brave-search.skill.md',
     toolFile: 'aims-skills/tools/brave-search.tool.md',
+  },
+  {
+    id: 'mercury-llm',
+    name: 'Mercury Diffusion LLM (Inception Labs)',
+    category: 'fast-inference',
+    triggers: ['mercury', 'inception labs', 'diffusion llm', 'fast inference', 'fast model', 'speed', 'low latency', 'bulk generate'],
+    skillFile: 'aims-skills/skills/integrations/mercury-llm.skill.md',
+    toolFile: 'aims-skills/tools/mercury-llm.tool.md',
   },
 ];
 
