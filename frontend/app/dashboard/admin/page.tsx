@@ -155,6 +155,28 @@ function AdminPanel() {
         </div>
       </section>
 
+      {/* Quick Access — Owner Tools */}
+      <section className="rounded-3xl border border-wireframe-stroke bg-[#18181B]/70 p-6 backdrop-blur-2xl">
+        <h2 className="text-sm font-semibold uppercase tracking-widest text-zinc-200 font-display">
+          Owner Tools
+        </h2>
+        <p className="mt-1 text-[0.65rem] text-zinc-500 uppercase tracking-wider">Direct access — A.I.M.S. Gateway System</p>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <a
+            href="/dashboard/admin/ii-agent"
+            className="group flex items-center gap-4 rounded-2xl border border-amber-500/20 bg-[#1F1F23]/60 p-4 hover:border-amber-500/40 hover:bg-amber-500/5 transition-all"
+          >
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10 border border-amber-500/20">
+              <span className="text-amber-400 text-lg">🤖</span>
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-zinc-200 group-hover:text-amber-300 transition-colors">II-Agent Control</p>
+              <p className="text-[10px] text-zinc-500">Autonomous code, research, builds, slides</p>
+            </div>
+          </a>
+        </div>
+      </section>
+
       {/* System Metrics */}
       <section className="rounded-3xl border border-wireframe-stroke bg-[#18181B]/70 p-6 backdrop-blur-2xl">
         <h2 className="text-sm font-semibold uppercase tracking-widest text-zinc-200 font-display">
