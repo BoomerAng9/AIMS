@@ -15,6 +15,62 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getTransferPortalEntries, getTransferPortalStats } from '@/lib/perform/ncaa-data-service';
+import { SEED_TRANSFER_PORTAL } from '@/lib/perform/seed-ncaa-data';
+
+/** Build transfer portal data from seed entries */
+function getSeedTransferPortal(filters?: {
+  season?: number;
+  status?: string;
+  position?: string;
+  transferWindow?: string;
+  limit?: number;
+  offset?: number;
+}) {
+  let entries = [...SEED_TRANSFER_PORTAL];
+
+  if (filters?.season) entries = entries.filter(e => e.season === filters.season);
+  if (filters?.status) entries = entries.filter(e => e.status === filters.status);
+  if (filters?.position) entries = entries.filter(e => e.position.toUpperCase() === filters.position!.toUpperCase());
+  if (filters?.transferWindow) entries = entries.filter(e => e.transferWindow === filters.transferWindow);
+
+  // Sort by paiScore descending
+  entries.sort((a, b) => (b.paiScore || 0) - (a.paiScore || 0));
+
+  const offset = filters?.offset || 0;
+  const limit = filters?.limit || 50;
+
+  return entries.slice(offset, offset + limit).map((e, i) => ({
+    id: `seed-portal-${e.playerName}`.toLowerCase().replace(/[^a-z0-9-]/g, ''),
+    playerName: e.playerName,
+    position: e.position,
+    eligibility: e.eligibility,
+    previousTeam: { commonName: e.previousTeamAbbrev, abbreviation: e.previousTeamAbbrev },
+    newTeam: e.newTeamAbbrev ? { commonName: e.newTeamAbbrev, abbreviation: e.newTeamAbbrev } : null,
+    status: e.status,
+    season: e.season,
+    enteredDate: e.enteredDate,
+    committedDate: e.committedDate || null,
+    stars: e.stars,
+    previousStats: e.previousStats,
+    nilValuation: e.nilValuation,
+    paiScore: e.paiScore,
+    tier: e.tier,
+    transferWindow: e.transferWindow,
+    source: 'seed-data',
+  }));
+}
+
+function getSeedPortalStats(season?: number) {
+  const entries = season ? SEED_TRANSFER_PORTAL.filter(e => e.season === season) : SEED_TRANSFER_PORTAL;
+  return {
+    total: entries.length,
+    inPortal: entries.filter(e => e.status === 'IN_PORTAL').length,
+    committed: entries.filter(e => e.status === 'COMMITTED').length,
+    withdrawn: entries.filter(e => e.status === 'WITHDRAWN').length,
+    signed: entries.filter(e => e.status === 'SIGNED').length,
+    source: 'seed-data',
+  };
+}
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -31,6 +87,10 @@ export async function GET(req: NextRequest) {
     // Stats summary
     if (stats) {
       const statsData = await getTransferPortalStats(season);
+      // If DB returned empty stats, use seed
+      if (statsData.total === 0) {
+        return NextResponse.json(getSeedPortalStats(season));
+      }
       return NextResponse.json(statsData);
     }
 
@@ -45,12 +105,18 @@ export async function GET(req: NextRequest) {
       offset,
     });
 
+    // If DB returned empty, use seed data
+    if (!entries || entries.length === 0) {
+      return NextResponse.json(getSeedTransferPortal({ season, status: status || undefined, position: position || undefined, transferWindow: transferWindow || undefined, limit, offset }));
+    }
+
     return NextResponse.json(entries);
   } catch (err) {
-    console.error('[TransferPortal] DB query failed:', err);
-    return NextResponse.json(
-      { error: 'Database unavailable', entries: [] },
-      { status: 503 }
-    );
+    console.error('[TransferPortal] DB query failed, using seed data:', err);
+    // Fallback to seed data instead of error
+    if (stats) {
+      return NextResponse.json(getSeedPortalStats(season));
+    }
+    return NextResponse.json(getSeedTransferPortal({ season, status: status || undefined, position: position || undefined, transferWindow: transferWindow || undefined, limit, offset }));
   }
 }
