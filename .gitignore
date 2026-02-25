@@ -45,6 +45,9 @@ yarn-error.log*
 .vscode/
 .idea/
 
+# Vercel
+.vercel/
+
 # A.I.M.S. Specific
 infra/.env
 backend/uef-gateway/dist/
