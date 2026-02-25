@@ -1,17 +1,14 @@
 /**
- * Edge Relay — Thin proxy to UEF Gateway from the edge
+ * Relay — Thin proxy to UEF Gateway
  *
  * Accepts lightweight requests from wearable/mobile clients,
- * enriches them with edge context (geo, device type),
+ * enriches them with device context,
  * and forwards to the UEF Gateway.
  *
  * This is the wearable's single entry point into ACHEEVY orchestration.
  * Supports both fire-and-forget (async) and synchronous request modes.
- *
- * Runtime: Vercel Edge (30s timeout)
  */
 
-export const runtime = 'edge';
 export const maxDuration = 30;
 
 const UEF_GATEWAY_URL = process.env.UEF_GATEWAY_URL || process.env.NEXT_PUBLIC_UEF_GATEWAY_URL || '';

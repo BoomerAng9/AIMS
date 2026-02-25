@@ -2,9 +2,7 @@
  * LUC Server Storage — Persistent Data Layer
  *
  * Production-ready server-side storage for LUC accounts.
- * On VPS: Uses JSON files for persistence across server restarts.
- * On Vercel: Uses in-memory storage (data lost on cold start — real
- *   persistence should go through UEF Gateway / database).
+ * Uses JSON files for persistence across server restarts (VPS/Docker).
  */
 
 import {
@@ -21,12 +19,10 @@ import {
 // Storage Configuration
 // ─────────────────────────────────────────────────────────────
 
-const isServerless = !!process.env.VERCEL || !!process.env.AWS_LAMBDA_FUNCTION_NAME;
-
-// Only resolve paths when NOT serverless (avoids importing path/fs unnecessarily)
-const DATA_DIR = isServerless ? '' : (process.env.LUC_DATA_DIR || require('path').join(process.cwd(), '.luc-data'));
-const ACCOUNTS_FILE = isServerless ? '' : require('path').join(DATA_DIR, 'accounts.json');
-const USAGE_HISTORY_FILE = isServerless ? '' : require('path').join(DATA_DIR, 'usage-history.json');
+const path = require('path');
+const DATA_DIR = process.env.LUC_DATA_DIR || path.join(process.cwd(), '.luc-data');
+const ACCOUNTS_FILE = path.join(DATA_DIR, 'accounts.json');
+const USAGE_HISTORY_FILE = path.join(DATA_DIR, 'usage-history.json');
 
 // ─────────────────────────────────────────────────────────────
 // Types
@@ -51,11 +47,10 @@ interface UsageHistoryData {
   [userId: string]: UsageHistoryEntry[];
 }
 // ─────────────────────────────────────────────────────────────
-// File System Utilities (VPS only — no-op on serverless)
+// File System Utilities
 // ─────────────────────────────────────────────────────────────
 
 async function ensureDataDir(): Promise<void> {
-  if (isServerless) return;
   const fs = require('fs') as typeof import('fs');
   try {
     await fs.promises.access(DATA_DIR);
@@ -66,7 +61,6 @@ async function ensureDataDir(): Promise<void> {
 }
 
 async function readJSONFile<T>(filePath: string, defaultValue: T): Promise<T> {
-  if (isServerless) return defaultValue;
   const fs = require('fs') as typeof import('fs');
   try {
     try {
@@ -83,7 +77,6 @@ async function readJSONFile<T>(filePath: string, defaultValue: T): Promise<T> {
 }
 
 async function writeJSONFile<T>(filePath: string, data: T): Promise<void> {
-  if (isServerless) return; // Read-only filesystem on Vercel
   const fs = require('fs') as typeof import('fs');
   try {
     await ensureDataDir();
@@ -105,10 +98,7 @@ export class ServerStorageAdapter {
   private readonly cacheTTL: number = 5000; // 5 second cache
 
   constructor() {
-    // Fire and forget data dir creation (VPS only)
-    if (!isServerless) {
-      ensureDataDir().catch(console.error);
-    }
+    ensureDataDir().catch(console.error);
   }
 
   private isCacheValid(): boolean {

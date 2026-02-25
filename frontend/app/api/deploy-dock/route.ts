@@ -39,17 +39,13 @@ const DEPLOY_COSTS: Record<string, { service: ServiceKey; amount: number }> = {
   rollback: { service: "DEPLOY", amount: 5 },
 };
 
-// ── Deployment store ──
-// On VPS (Docker): file-backed for persistence across restarts.
-// On Vercel (serverless): in-memory only (fs is read-only).
+// ── Deployment store (file-backed for persistence across restarts) ──
 import { join } from 'path';
 
-const isServerless = !!process.env.VERCEL || !!process.env.AWS_LAMBDA_FUNCTION_NAME;
 const STORE_DIR = join(process.cwd(), '.data');
 const STORE_FILE = join(STORE_DIR, 'deployments.json');
 
 function loadDeployments(): Map<string, any> {
-  if (isServerless) return new Map();
   try {
     const fs = require('fs');
     if (fs.existsSync(STORE_FILE)) {
@@ -63,7 +59,6 @@ function loadDeployments(): Map<string, any> {
 }
 
 function saveDeployments(deployments: Map<string, any>) {
-  if (isServerless) return; // No-op on serverless — fs is read-only
   try {
     const fs = require('fs');
     if (!fs.existsSync(STORE_DIR)) fs.mkdirSync(STORE_DIR, { recursive: true });
