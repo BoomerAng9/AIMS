@@ -174,6 +174,30 @@ function AdminPanel() {
               <p className="text-[10px] text-zinc-500">Autonomous code, research, builds, slides</p>
             </div>
           </a>
+          <a
+            href="/dashboard/admin/chicken-hawk"
+            className="group flex items-center gap-4 rounded-2xl border border-orange-500/20 bg-[#1F1F23]/60 p-4 hover:border-orange-500/40 hover:bg-orange-500/5 transition-all"
+          >
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-500/10 border border-orange-500/20">
+              <span className="text-orange-400 text-lg">🦅</span>
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-zinc-200 group-hover:text-orange-300 transition-colors">Chicken Hawk Control</p>
+              <p className="text-[10px] text-zinc-500">Pipeline execution, squads, shelf walking</p>
+            </div>
+          </a>
+          <a
+            href="/dashboard/admin/lil-hawks"
+            className="group flex items-center gap-4 rounded-2xl border border-cyan-500/20 bg-[#1F1F23]/60 p-4 hover:border-cyan-500/40 hover:bg-cyan-500/5 transition-all"
+          >
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-500/10 border border-cyan-500/20">
+              <span className="text-cyan-400 text-lg">🐥</span>
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-zinc-200 group-hover:text-cyan-300 transition-colors">Lil_Hawks Squad Control</p>
+              <p className="text-[10px] text-zinc-500">Squads, role cards, crew designations</p>
+            </div>
+          </a>
         </div>
       </section>
 
