@@ -12,7 +12,7 @@
  * - Elapsed / remaining time display
  */
 
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Play, Pause, Square, Volume2 } from 'lucide-react';
 
@@ -53,7 +53,8 @@ function formatTime(seconds: number): string {
   return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
-export function VoicePlaybackBar({ voiceOutput }: VoicePlaybackBarProps) {
+// Memoized to prevent re-renders when parent updates but props are stable
+export const VoicePlaybackBar = memo(function VoicePlaybackBar({ voiceOutput }: VoicePlaybackBarProps) {
   const [progress, setProgress] = useState(0);
   const [speed, setSpeed] = useState<PlaybackSpeed>(1);
   const [isDragging, setIsDragging] = useState(false);
@@ -261,4 +262,4 @@ export function VoicePlaybackBar({ voiceOutput }: VoicePlaybackBarProps) {
       </motion.div>
     </AnimatePresence>
   );
-}
+});
