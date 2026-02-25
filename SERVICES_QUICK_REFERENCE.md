@@ -194,15 +194,15 @@ POST /api/video/generate
 
 Copy to `frontend/.env.local`:
 ```bash
-GEMINI_API_KEY=AIzaSyBwXCwmxDfKJ1dW-5Cx1HxinyqowNP2wYQ
-GROQ_API_KEY=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
-ELEVENLABS_API_KEY=sk-th-lK8kcLH4Qjvy1Ecl3avdSbmdbXT6sFQIsC5zo19oJU5Y3ZH9gaxTTQR9nIL3T6eJPdTdK28AymnagKmQMBmRnGJx4sUT3c02uHU3
+GEMINI_API_KEY=your_gemini_api_key_here
+GROQ_API_KEY=your_groq_api_key_here
+ELEVENLABS_API_KEY=your_elevenlabs_api_key_here
 ELEVENLABS_VOICE_ID=pNInz6obpgDQGcFmaJgB
-DEEPGRAM_API_KEY=994f12f975faad20cd2c20d1f88d1c28ba64f056
-E2B_API_KEY=e2b_1ea70b3c92c3f28c040adb724b6e474c12b91829
-BRAVE_SEARCH_API_KEY=BSAWyxJDh8Ks8spCKMSrXV8Jngzp-fh
-TAVILY_API_KEY=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
-SERPER_API_KEY=53784f12ce2c9062600b9342a4161215f3ffb033
+DEEPGRAM_API_KEY=your_deepgram_api_key_here
+E2B_API_KEY=your_e2b_api_key_here
+BRAVE_SEARCH_API_KEY=your_brave_search_api_key_here
+TAVILY_API_KEY=your_tavily_api_key_here
+SERPER_API_KEY=your_serper_api_key_here
 ```
 
 ---
