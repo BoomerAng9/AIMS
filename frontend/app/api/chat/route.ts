@@ -20,7 +20,9 @@ import { streamText } from 'ai';
 import { createOpenAI } from '@ai-sdk/openai';
 import { buildSystemPrompt } from '@/lib/acheevy/persona';
 
-export const maxDuration = 120;
+// Vercel Hobby plan caps at 60s; Pro allows up to 300s.
+// Use 60 for broad compatibility — upgrade to 300 on Pro plan.
+export const maxDuration = 60;
 
 // ── UEF Gateway (primary — metered through LUC) ─────────────
 const UEF_GATEWAY_URL = process.env.UEF_GATEWAY_URL || process.env.NEXT_PUBLIC_UEF_GATEWAY_URL || '';

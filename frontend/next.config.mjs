@@ -22,10 +22,10 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   // Allow imports from ../aims-tools/ outside the frontend directory
+  // Don't bundle resend — its dep chain (htmlparser2/entities) is broken at build time
+  serverExternalPackages: ['resend'],
   experimental: {
     externalDir: true,
-    // Don't bundle resend — its dep chain (htmlparser2/entities) is broken at build time
-    serverComponentsExternalPackages: ['resend'],
   },
   webpack: (config) => {
     config.resolve.alias['@/aims-tools'] = path.resolve(__dirname, '../aims-tools');

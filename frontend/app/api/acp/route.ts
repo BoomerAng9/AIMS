@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 
-const UEF_URL = process.env.UEF_ENDPOINT || 'http://uef-gateway:3001';
+const UEF_URL = process.env.UEF_GATEWAY_URL || process.env.UEF_ENDPOINT || 'http://uef-gateway:3001';
 const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY || '';
 
 export async function POST(request: Request) {
