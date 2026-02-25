@@ -1,5 +1,13 @@
-import fs from 'fs';
-import path from 'path';
+/**
+ * CFB Team Data — College Football team lookup from local CSV.
+ *
+ * On VPS: Reads team.csv from ../docs/Training_Data/cfb-data/.
+ * On Vercel: CSV is outside the deployment bundle, so lookups
+ *   gracefully return null. Use the CollegeFootballData.com API
+ *   (CFBD_API_KEY) for production Vercel deployments.
+ */
+
+const isServerless = !!process.env.VERCEL || !!process.env.AWS_LAMBDA_FUNCTION_NAME;
 
 export interface CollegeInfo {
     school: string;
@@ -13,7 +21,17 @@ let cfbTeamsCache: Record<string, CollegeInfo> | null = null;
 
 export function getCollegeInfo(collegeName: string): CollegeInfo | null {
     if (!cfbTeamsCache) {
+        // On serverless, skip filesystem access entirely — CSV is not in the bundle
+        if (isServerless) {
+            console.warn('[CFB Data] Serverless environment detected — local CSV unavailable. Use CFBD API.');
+            cfbTeamsCache = {};
+            return null;
+        }
+
         try {
+            const fs = require('fs');
+            const path = require('path');
+
             // Assuming process.cwd() is A.I.M.S/frontend
             // and docs is at A.I.M.S/docs
             const csvPath = path.join(
