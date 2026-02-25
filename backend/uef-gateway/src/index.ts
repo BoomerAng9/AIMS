@@ -61,6 +61,7 @@ import { normalizeInput, getDialectStats, SLANG_ENTRY_COUNT, INTENT_PHRASE_COUNT
 import { videoRouter } from './video';
 import { liveSim } from './livesim';
 import { composioRouter } from './composio';
+import { iiAgentRouter } from './ii-agent';
 import logger from './logger';
 
 // Custom Lil_Hawks — User-Created Bots
@@ -2080,6 +2081,13 @@ app.use(shelfRouter);
 // Plug Catalog & Instance Management — PaaS Operations
 // --------------------------------------------------------------------------
 app.use('/api', plugRouter);
+
+// --------------------------------------------------------------------------
+// II-Agent — Autonomous Execution Engine (OWNER ONLY)
+// Gated by requireOwnerRole middleware inside iiAgentRouter.
+// Access: admin.aimanagedsolutions.cloud → OWNER role only
+// --------------------------------------------------------------------------
+app.use('/ii-agent', iiAgentRouter);
 
 // --------------------------------------------------------------------------
 // Composio Integration — Cross-Platform Actions
