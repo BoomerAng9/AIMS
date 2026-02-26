@@ -21,10 +21,12 @@ import {
   Building2,
   CreditCard,
   RotateCcw,
+  Database,
 } from "lucide-react";
 
 const PERFORM_NAV = [
   { href: "/perform", label: "Hub", icon: LayoutGrid },
+  { href: "/perform/ncaa-database", label: "Database", icon: Database },
   { href: "/perform/big-board", label: "Big Board", icon: ListOrdered },
   { href: "/perform/redraft", label: "Redraft", icon: RotateCcw },
   { href: "/perform/draft", label: "Draft", icon: Trophy },

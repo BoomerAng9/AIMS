@@ -16,7 +16,7 @@ import { motion } from 'framer-motion';
 import {
   ArrowRight, TrendingUp, FileText, Swords, Mic, Users, ListOrdered,
   Shuffle, MapPin, Radio, Flame, BarChart3, Activity, ChevronRight,
-  Zap, Shield, Target, Star, Search, Building2,
+  Zap, Shield, Target, Star, Search, Building2, Database,
 } from 'lucide-react';
 import type { Prospect, ContentArticle, Tier } from '@/lib/perform/types';
 import { TIER_STYLES, getScoreColor, getProspectSlug } from '@/lib/perform/types';
@@ -75,6 +75,7 @@ const ANALYSTS = [
 
 // ── Platform navigation tiles ───────────────────────────────────
 const NAV_TILES = [
+  { href: '/perform/ncaa-database', label: 'NCAA Database', sub: 'Every player · Every team · Searchable', icon: Database, color: 'text-indigo-400', bg: 'bg-indigo-400/10', border: 'hover:border-indigo-400/30' },
   { href: '/perform/big-board', label: 'Big Board', sub: 'Ranked prospects · P.A.I. scores', icon: ListOrdered, color: 'text-gold', bg: 'bg-gold/10', border: 'hover:border-gold/30' },
   { href: '/perform/draft', label: 'NFL Draft', sub: `${CURRENT_YEAR} Mock Draft · On the Clock`, icon: TrendingUp, color: 'text-emerald-400', bg: 'bg-emerald-400/10', border: 'hover:border-emerald-400/30' },
   { href: '/perform/war-room', label: 'War Room', sub: 'Bull vs Bear debates live', icon: Swords, color: 'text-red-400', bg: 'bg-red-400/10', border: 'hover:border-red-400/30' },
