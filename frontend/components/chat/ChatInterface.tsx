@@ -13,6 +13,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import Image from 'next/image';
+
+const REMARK_PLUGINS = [remarkGfm];
 import { useStreamingChat } from '@/hooks/useStreamingChat';
 import { useVoiceInput } from '@/hooks/useVoiceInput';
 import { useVoiceOutput } from '@/hooks/useVoiceOutput';
@@ -191,7 +193,7 @@ const MessageBubble = memo(function MessageBubble({ message, onSpeak, onCopy, is
           ) : (
             <div className="prose prose-invert prose-sm max-w-none">
               <ReactMarkdown
-                remarkPlugins={[remarkGfm]}
+                remarkPlugins={REMARK_PLUGINS}
                 components={{
                   // Custom code block styling
                   code({ node, className, children, ...props }) {

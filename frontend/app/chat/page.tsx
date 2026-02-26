@@ -17,13 +17,15 @@
  */
 
 import { useChat } from 'ai/react';
-import { useState, useRef, useEffect, useCallback, Suspense } from 'react';
+import { useState, useRef, useEffect, useCallback, Suspense, memo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import Image from 'next/image';
 import { useConversation } from '@elevenlabs/react';
+
+const REMARK_PLUGINS = [remarkGfm];
 import {
   Send, Square, User, Copy, Check,
   Mic, MicOff, Volume2, VolumeX, Loader2,
@@ -194,7 +196,7 @@ function VoiceSelector({ voiceId, provider, onSelect }: {
 // Message Bubble (Glass Panel)
 // ─────────────────────────────────────────────────────────────
 
-function MessageBubble({ role, content, isStreaming }: {
+const MessageBubble = memo(function MessageBubble({ role, content, isStreaming }: {
   role: string;
   content: string;
   isStreaming?: boolean;
@@ -240,7 +242,7 @@ function MessageBubble({ role, content, isStreaming }: {
               prose-code:text-gold/80 prose-code:bg-white/5 prose-code:px-1 prose-code:py-0.5 prose-code:rounded
               prose-pre:max-w-full prose-pre:overflow-x-auto prose-p:my-1.5 prose-headings:my-2">
               <ReactMarkdown
-                remarkPlugins={[remarkGfm]}
+                remarkPlugins={REMARK_PLUGINS}
                 components={{
                   code({ className, children, ...props }) {
                     if (!className) {
@@ -273,7 +275,7 @@ function MessageBubble({ role, content, isStreaming }: {
       </div>
     </motion.div>
   );
-}
+});
 
 // ─────────────────────────────────────────────────────────────
 // Threads Sidebar
