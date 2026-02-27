@@ -18,7 +18,7 @@ export async function GET(
   const { id } = params;
 
   // Placeholder: in-memory store isn't shared across route segments
-  // in Next.js edge/serverless. Return a not-found so the frontend
+  // in Next.js route handlers. Return a not-found so the frontend
   // can fall back to passing data via query params or sessionStorage.
   return NextResponse.json(
     { error: `Report ${id} not found. Reports are session-scoped until Firestore migration.` },

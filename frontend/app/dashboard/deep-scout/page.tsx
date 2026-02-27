@@ -209,7 +209,7 @@ export default function DeepScoutPage() {
           const { done, value } = await reader.read();
           if (done) break;
           const chunk = decoder.decode(value, { stream: true });
-          // Parse Vercel AI SDK streaming format
+          // Parse AI SDK streaming format
           const lines = chunk.split('\n');
           for (const line of lines) {
             if (line.startsWith('0:')) {

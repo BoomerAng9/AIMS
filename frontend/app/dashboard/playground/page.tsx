@@ -230,7 +230,7 @@ function PromptPlayground() {
           }),
         });
         const text = await res.text();
-        // Parse Vercel AI SDK stream format
+        // Parse AI SDK data-stream format
         const lines = text.split('\n').filter(l => l.startsWith('0:'));
         return lines.map(l => {
           try { return JSON.parse(l.slice(2)); } catch { return l.slice(2); }

@@ -14,6 +14,13 @@ import {
 } from "@/lib/perform/subscription-models";
 import { Mic, Building2, Film, Crown, Check, X, ChevronDown, ChevronUp } from "lucide-react";
 
+const MODEL_ICONS: Record<string, React.ReactNode> = {
+  Mic: <Mic className="h-5 w-5" />,
+  Building2: <Building2 className="h-5 w-5" />,
+  Film: <Film className="h-5 w-5" />,
+  Crown: <Crown className="h-5 w-5" />,
+};
+
 const COLOR_MAP: Record<string, { border: string; bg: string; text: string; badge: string }> = {
   emerald: {
     border: "border-emerald-200",
@@ -365,7 +372,6 @@ export default function PerFormPricingPage() {
           <div className="h-px flex-1 bg-gradient-to-r from-gold/20 to-transparent" />
           <h2
             className="text-xl md:text-2xl uppercase tracking-wider text-amber-400 font-display text-center"
-            style={{ fontFamily: markerFont }}
           >
             Usage Levels
           </h2>
@@ -435,7 +441,6 @@ export default function PerFormPricingPage() {
           <div className="h-px flex-1 bg-gradient-to-r from-gold/20 to-transparent" />
           <h2
             className="text-xl md:text-2xl uppercase tracking-wider text-amber-400 font-display text-center"
-            style={{ fontFamily: markerFont }}
           >
             What Your Subscription Covers
           </h2>

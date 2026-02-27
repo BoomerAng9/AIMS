@@ -9,8 +9,6 @@
  * Supports both fire-and-forget (async) and synchronous request modes.
  */
 
-export const maxDuration = 30;
-
 const UEF_GATEWAY_URL = process.env.UEF_GATEWAY_URL || process.env.NEXT_PUBLIC_UEF_GATEWAY_URL || '';
 const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY || '';
 

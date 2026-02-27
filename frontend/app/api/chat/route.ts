@@ -6,7 +6,7 @@
  *      → II-Agent / A2A agents / n8n → structured response
  *   2. LLM stream:    conversational message → /llm/stream → Vertex AI / OpenRouter
  *      → SSE text stream (metered through LUC)
- *   3. Direct fallback: gateway unreachable → Vercel AI SDK → OpenRouter
+ *   3. Direct fallback: gateway unreachable → AI SDK → OpenRouter
  *
  * The classify step calls /acheevy/classify to determine intent.
  * If requiresAgent=true, we dispatch to the orchestrator.
@@ -19,10 +19,6 @@
 import { streamText } from 'ai';
 import { createOpenAI } from '@ai-sdk/openai';
 import { buildSystemPrompt } from '@/lib/acheevy/persona';
-
-// Vercel Hobby plan caps at 60s; Pro allows up to 300s.
-// Use 60 for broad compatibility — upgrade to 300 on Pro plan.
-export const maxDuration = 60;
 
 // ── UEF Gateway (primary — metered through LUC) ─────────────
 const UEF_GATEWAY_URL = process.env.UEF_GATEWAY_URL || process.env.NEXT_PUBLIC_UEF_GATEWAY_URL || '';
@@ -128,7 +124,7 @@ async function tryAgentDispatch(
 
     const result = await res.json();
 
-    // Format orchestrator response as Vercel AI SDK text stream
+    // Format orchestrator response as AI SDK text stream
     const reply = result.reply || 'Task received. Processing...';
     const meta = [];
     if (result.taskId) meta.push(`Task ID: ${result.taskId}`);
@@ -140,7 +136,7 @@ async function tryAgentDispatch(
       ? `${reply}\n\n---\n*${meta.join(' | ')}*`
       : reply;
 
-    // Emit as Vercel AI SDK text stream format (single-shot)
+    // Emit as AI SDK text stream format (single-shot)
     const encoder = new TextEncoder();
     const stream = new ReadableStream({
       start(controller) {
@@ -198,7 +194,7 @@ async function tryGatewayStream(
 
     if (!res.ok || !res.body) return null;
 
-    // Transform gateway SSE format to Vercel AI SDK format
+    // Transform gateway SSE format to AI SDK data-stream format
     const encoder = new TextEncoder();
     const decoder = new TextDecoder();
     const reader = res.body.getReader();
@@ -219,7 +215,7 @@ async function tryGatewayStream(
           try {
             const parsed = JSON.parse(data);
             if (parsed.text) {
-              // Emit as Vercel AI SDK text stream format
+              // Emit as AI SDK text stream format
               controller.enqueue(encoder.encode(`0:${JSON.stringify(parsed.text)}\n`));
             }
           } catch { /* skip malformed */ }
@@ -433,7 +429,7 @@ export async function POST(req: Request) {
     const gatewayResponse = await tryGatewayStream(modelId, messages, systemPrompt, userId);
     if (gatewayResponse) return gatewayResponse;
 
-    // Step 4: Direct OpenRouter via Vercel AI SDK (fallback)
+    // Step 4: Direct OpenRouter via AI SDK (fallback)
     const result = await streamText({
       model: openrouter(modelId),
       system: systemPrompt,

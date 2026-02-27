@@ -4,7 +4,7 @@
  * Chat w/ACHEEVY — Next-Level Command Center
  *
  * Two modes:
- *   TEXT  — Vercel AI SDK (useChat) with markdown rendering + voice TTS
+ *   TEXT  — AI SDK (useChat) with markdown rendering + voice TTS
  *   VOICE — ElevenLabs Conversational AI Agent SDK (real-time bi-directional)
  *
  * Design: Luxury Industrial AI / Hangar UI World
@@ -421,7 +421,7 @@ function ChatContent() {
   const searchParams = useSearchParams();
   const [selectedModel, setSelectedModel] = useState('claude-opus');
 
-  // ── Text Chat (Vercel AI SDK) ──
+  // ── Text Chat (AI SDK) ──
   const {
     messages, input, handleInputChange, handleSubmit,
     isLoading, stop, setInput,

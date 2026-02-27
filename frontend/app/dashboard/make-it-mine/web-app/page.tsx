@@ -186,7 +186,7 @@ export default function WebAppBuilderPage() {
 
         const chunk = decoder.decode(value, { stream: true });
         for (const line of chunk.split('\n')) {
-          // Vercel AI SDK data-stream format: "0:<json-string>\n"
+          // AI SDK data-stream format: "0:<json-string>\n"
           if (line.startsWith('0:')) {
             try {
               const token = JSON.parse(line.slice(2)) as string;
