@@ -3,8 +3,8 @@
 /**
  * Per|Form Prospect Profile — Individual Scouting Page (Production)
  *
- * Full prospect breakdown: P.A.I. grade, component scores, AGI analysis.
- * Light theme per AIMS design system. No layout chrome — parent layout handles it.
+ * Full prospect breakdown: AGI grade, component scores, intelligence analysis.
+ * "Luxury Industrial" editorial theme.
  */
 
 import { useEffect, useState } from 'react';
@@ -21,9 +21,9 @@ function RadialScore({ label, value, icon: Icon }: { label: string; value: numbe
   const strokeDasharray = `${pct} 100`;
 
   return (
-    <div className="flex flex-col items-center justify-center p-6 bg-white border border-slate-200 rounded-2xl relative overflow-hidden group hover:border-gold/30 transition-colors">
-      <div className="absolute top-4 right-4 text-slate-300 group-hover:text-gold/20 transition-colors">
-        <Icon size={24} />
+    <div className="flex flex-col items-center justify-center p-8 bg-white border border-slate-200 rounded-sm relative overflow-hidden group hover:border-emerald-500 transition-all shadow-sm">
+      <div className="absolute top-4 right-4 text-slate-200 group-hover:text-emerald-100 transition-colors">
+        <Icon size={32} />
       </div>
 
       <div className="relative w-24 h-24 mb-4">
@@ -38,17 +38,17 @@ function RadialScore({ label, value, icon: Icon }: { label: string; value: numbe
           />
           {/* Progress Circle */}
           <path
-            className={value >= 95 ? "text-gold" : value >= 90 ? "text-emerald-400" : "text-slate-400"}
+            className={value >= 90 ? "text-emerald-600" : value >= 80 ? "text-emerald-500" : "text-slate-400"}
             strokeDasharray={strokeDasharray}
             d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
             fill="none"
             stroke="currentColor"
-            strokeWidth="2"
+            strokeWidth="2.5"
             strokeLinecap="round"
           />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center flex-col">
-          <span className="text-2xl font-display font-bold text-slate-800 tracking-tighter">{value}</span>
+          <span className="text-3xl font-serif font-bold text-slate-950 tracking-tighter">{value}</span>
         </div>
       </div>
 
@@ -59,13 +59,13 @@ function RadialScore({ label, value, icon: Icon }: { label: string; value: numbe
 
 function AgiRow({ label, score }: { label: string, score: number }) {
   return (
-    <div className="flex items-center justify-between py-3 border-b border-slate-100 last:border-0">
-      <span className="text-xs text-slate-500 font-medium">{label}</span>
-      <div className="flex items-center gap-4">
-        <div className="w-32 h-1.5 bg-slate-50 rounded-full overflow-hidden">
-          <div className="h-full bg-gold/70 rounded-full" style={{ width: `${(score / 10) * 100}%` }} />
+    <div className="flex items-center justify-between py-4 border-b border-slate-100 last:border-0">
+      <span className="text-[11px] text-slate-500 font-bold uppercase tracking-tight">{label}</span>
+      <div className="flex items-center gap-6">
+        <div className="w-40 h-1 bg-slate-50 rounded-full overflow-hidden">
+          <div className="h-full bg-emerald-600 rounded-full" style={{ width: `${(score / 10) * 100}%` }} />
         </div>
-        <span className="text-xs font-mono font-bold text-slate-800 w-6 text-right">{score.toFixed(1)}</span>
+        <span className="text-sm font-serif font-black text-slate-950 w-8 text-right">{score.toFixed(1)}</span>
       </div>
     </div>
   );
@@ -136,9 +136,9 @@ export default function ProspectProfilePage() {
   return (
     <div className="pb-20">
       {/* Back Link */}
-      <div className="max-w-[1200px] mx-auto px-6 pt-6">
-        <Link href="/perform/big-board" className="inline-flex items-center gap-2 text-[0.65rem] text-slate-400 hover:text-gold transition-colors font-mono uppercase tracking-widest">
-          <ArrowLeft size={14} /> Back to Big Board
+      <div className="max-w-[1200px] mx-auto px-6 pt-10">
+        <Link href="/perform/ncaa-database" className="inline-flex items-center gap-2 text-[10px] text-slate-400 hover:text-emerald-700 transition-colors font-black uppercase tracking-[0.2em]">
+          <ArrowLeft size={16} /> NCAA Database Registry
         </Link>
       </div>
 
@@ -152,19 +152,21 @@ export default function ProspectProfilePage() {
         <motion.div variants={staggerItem} className="flex flex-col lg:flex-row items-center justify-between gap-12">
           {/* Left: Identity */}
           <div className="space-y-6 flex-1">
-            <div className="inline-flex items-center gap-3 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-full">
-              <span className="h-2 w-2 rounded-full bg-gold animate-pulse" />
-              <span className="text-[0.6rem] font-mono tracking-widest uppercase text-slate-500">{prospect.school}</span>
+            <div className="inline-flex items-center gap-3 px-3 py-1 bg-emerald-950 text-white rounded-sm">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-[9px] font-black tracking-[0.2em] uppercase">{prospect.school}</span>
             </div>
 
-            <h1 className="text-5xl md:text-7xl font-display font-black tracking-tighter uppercase leading-[0.9]">
+            <h1 className="text-6xl md:text-8xl font-serif font-bold tracking-tighter uppercase leading-[0.85] text-slate-950">
               {prospect.firstName} <br />
-              <span className="text-slate-800">{prospect.lastName}</span>
+              <span className="italic text-emerald-700">{prospect.lastName}</span>
             </h1>
 
-            <div className="flex flex-wrap items-center gap-4 text-xs font-mono font-bold uppercase tracking-wider">
-              <div className="px-3 py-1 bg-gold/10 text-gold border border-gold/30 rounded">{prospect.position}</div>
+            <div className="flex flex-wrap items-center gap-6 text-[10px] font-black uppercase tracking-[0.2em]">
+              <div className="text-emerald-800">{prospect.position}</div>
+              <div className="text-slate-300">/</div>
               <div className="text-slate-400">{prospect.conference || prospect.state}</div>
+              <div className="text-slate-300">/</div>
               <div className="text-slate-400">{prospect.classYear}</div>
             </div>
 
@@ -182,13 +184,13 @@ export default function ProspectProfilePage() {
           {/* Right: Big Circle Score */}
           <div className="shrink-0 relative flex items-center justify-center">
             {/* Glow ring */}
-            <div className={`absolute inset-0 rounded-full blur-3xl opacity-20 ${isPrime ? 'bg-gold' : 'bg-slate-100'}`} />
+            <div className={`absolute inset-0 rounded-full blur-3xl opacity-10 ${isPrime ? 'bg-emerald-500' : 'bg-slate-100'}`} />
 
-            <div className={`w-64 h-64 rounded-full border-[3px] border-dashed flex flex-col items-center justify-center relative bg-white z-10 ${isPrime ? 'border-gold shadow-[0_0_50px_rgba(212,175,55,0.15)] text-gold' : 'border-slate-200 text-slate-800'}`}>
-              <div className="text-[0.6rem] font-mono uppercase tracking-widest mb-1 opacity-60">P.A.I. Score</div>
-              <div className="text-7xl font-display font-black tracking-tighter">{prospect.paiScore.toFixed(1)}</div>
-              <div className={`mt-2 px-3 py-1 rounded text-[0.65rem] font-bold font-mono tracking-widest uppercase ${isPrime ? 'bg-gold text-black' : 'bg-slate-100 text-slate-800'}`}>
-                {isPrime ? 'PRIME TIER' : 'ELITE TIER'}
+            <div className={`w-72 h-72 rounded-sm border border-slate-200 flex flex-col items-center justify-center relative bg-white z-10 shadow-2xl shadow-slate-200/50`}>
+              <div className="text-[10px] font-black uppercase tracking-[0.3em] mb-4 text-slate-400">Associated Grading Index</div>
+              <div className={`text-8xl font-serif font-bold tracking-tighter ${getScoreColor(prospect.paiScore)}`}>{prospect.paiScore}</div>
+              <div className={`mt-6 px-4 py-1.5 rounded-sm text-[10px] font-black tracking-[0.2em] uppercase ${isPrime ? 'bg-emerald-700 text-white' : 'bg-slate-100 text-slate-800'}`}>
+                {isPrime ? 'PRIME GRADE' : 'ELITE GRADE'}
               </div>
             </div>
           </div>
@@ -202,30 +204,29 @@ export default function ProspectProfilePage() {
         </motion.div>
 
         {/* AGI BREAKDOWN TABLE */}
-        <motion.div variants={staggerItem} className="bg-white border border-slate-200 rounded-2xl p-8">
-          <div className="flex items-center gap-3 mb-8">
-            <div className="h-6 w-1 bg-gold rounded-full" />
-            <h2 className="text-lg font-display font-bold uppercase tracking-widest">AGI Breakdown</h2>
-            <span className="text-[0.6rem] text-gold/50 font-mono ml-auto">0-10 SCALED METRICS</span>
+        <motion.div variants={staggerItem} className="bg-white border border-slate-200 rounded-sm p-12 shadow-sm">
+          <div className="flex items-center gap-6 mb-12 border-b border-slate-100 pb-8">
+            <h2 className="text-3xl font-serif font-bold tracking-tight text-slate-950">AGI <span className="italic text-emerald-800">Intelligence Breakdown</span></h2>
+            <span className="text-[9px] text-slate-400 font-black ml-auto uppercase tracking-[0.3em]">0-10 SCALED METRICS</span>
           </div>
 
           <div className="grid md:grid-cols-2 gap-12">
             <div>
-              <h3 className="text-[0.65rem] font-mono uppercase tracking-widest text-slate-400 mb-4 border-b border-slate-200 pb-2">AGI Core</h3>
+              <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-6 pb-2 border-b border-slate-50">Dimensions</h3>
               <div className="space-y-1">
-                <AgiRow label="Game Performance" score={agiCore.game} />
-                <AgiRow label="Raw Athletics" score={agiCore.athletics} />
-                <AgiRow label="Overall Production" score={agiCore.production} />
-                <AgiRow label="Competition Level" score={agiCore.competition} />
+                <AgiRow label="Performance Utility" score={agiCore.game} />
+                <AgiRow label="Biomechanical Metrics" score={agiCore.athletics} />
+                <AgiRow label="Aggregate Production" score={agiCore.production} />
+                <AgiRow label="Level of Competition" score={agiCore.competition} />
               </div>
             </div>
             <div>
-              <h3 className="text-[0.65rem] font-mono uppercase tracking-widest text-slate-400 mb-4 border-b border-slate-200 pb-2">AGI Modifiers</h3>
+              <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-6 pb-2 border-b border-slate-50">Orchestration Modifiers</h3>
               <div className="space-y-1">
-                <AgiRow label="Leadership" score={agiMods.leadership} />
-                <AgiRow label="Upside Ceiling" score={agiMods.upside} />
-                <AgiRow label="Known Concerns" score={agiMods.concerns} />
-                <AgiRow label="Evaluator Confidence" score={agiMods.confidence} />
+                <AgiRow label="Leadership & Signal" score={agiMods.leadership} />
+                <AgiRow label="Athletic Ceiling" score={agiMods.upside} />
+                <AgiRow label="Risk Profile" score={agiMods.concerns} />
+                <AgiRow label="Orchestrator Confidence" score={agiMods.confidence} />
               </div>
             </div>
           </div>
@@ -293,32 +294,35 @@ export default function ProspectProfilePage() {
         </motion.div>
 
         {/* CROSS PLATFORM BENCHMARK */}
-        <motion.div variants={staggerItem} className="space-y-4">
-          <h2 className="text-[0.7rem] inline-block px-3 py-1 bg-slate-50 border border-slate-200 rounded font-mono uppercase tracking-widest text-slate-500">Benchmark Comparison</h2>
-          <div className="w-full bg-white border border-slate-200 rounded-2xl overflow-hidden">
-            <div className="grid grid-cols-5 px-6 py-4 bg-white border-b border-slate-100 text-[0.6rem] font-mono uppercase tracking-widest text-slate-400">
-              <div className="col-span-2">Platform</div>
-              <div className="text-center">Overall Grade</div>
-              <div className="text-center">Raw Talent</div>
+        <motion.div variants={staggerItem} className="space-y-6">
+          <div className="flex items-center gap-4">
+            <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Platform Benchmarks</h2>
+            <div className="h-px flex-1 bg-slate-100" />
+          </div>
+          <div className="w-full bg-white border border-slate-200 rounded-sm overflow-hidden shadow-sm">
+            <div className="grid grid-cols-5 px-8 py-6 bg-slate-50 border-b border-slate-200 text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">
+              <div className="col-span-2">System Authority</div>
+              <div className="text-center">AGI Grade</div>
+              <div className="text-center">Talent Utility</div>
               <div className="text-center">Production</div>
             </div>
 
-            <div className="grid grid-cols-5 px-6 py-4 border-b border-slate-200 items-center">
-              <div className="col-span-2 flex items-center gap-2 font-display font-bold text-gold">
-                PER|FORM AGI
+            <div className="grid grid-cols-5 px-8 py-8 border-b border-slate-100 items-center">
+              <div className="col-span-2 flex items-center gap-3 font-serif font-bold text-emerald-800 text-lg">
+                PER<span className="italic text-emerald-600">|</span>FORM AGI
               </div>
-              <div className="text-center font-display font-black text-xl text-gold">{prospect.paiScore.toFixed(1)}</div>
-              <div className="text-center font-mono text-sm text-slate-600">{agiCore.athletics.toFixed(1)}</div>
-              <div className="text-center font-mono text-sm text-slate-600">{agiCore.production.toFixed(1)}</div>
+              <div className="text-center font-serif font-black text-3xl text-emerald-700">{prospect.paiScore}</div>
+              <div className="text-center font-bold text-sm text-slate-900">{agiCore.athletics.toFixed(1)}</div>
+              <div className="text-center font-bold text-sm text-slate-900">{agiCore.production.toFixed(1)}</div>
             </div>
 
-            <div className="grid grid-cols-5 px-6 py-4 border-b border-slate-200 items-center">
-              <div className="col-span-2 flex items-center gap-2 font-sans font-semibold text-slate-500 text-sm">
-                Consensus Data
+            <div className="grid grid-cols-5 px-8 py-8 items-center bg-slate-50/30">
+              <div className="col-span-2 flex items-center gap-2 font-black text-[10px] uppercase tracking-widest text-slate-400">
+                Industry Consensus
               </div>
-              <div className="text-center font-display font-semibold text-lg text-slate-400">~93.5</div>
-              <div className="text-center font-mono text-sm text-slate-400">9.0</div>
-              <div className="text-center font-mono text-sm text-slate-400">9.2</div>
+              <div className="text-center font-serif font-bold text-xl text-slate-300">~93.5</div>
+              <div className="text-center font-bold text-sm text-slate-300">9.0</div>
+              <div className="text-center font-bold text-sm text-slate-300">9.2</div>
             </div>
           </div>
         </motion.div>

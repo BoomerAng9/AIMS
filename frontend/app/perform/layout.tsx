@@ -49,10 +49,10 @@ export default function PerFormLayout({ children }: { children: React.ReactNode 
       <SiteHeader />
 
       {/* ── Per|Form Sub-Navigation ─────────────────────────── */}
-      <div className="sticky top-14 z-40 border-b border-slate-200 bg-white/90 backdrop-blur-xl">
+      <div className="sticky top-14 z-40 border-b border-slate-200 bg-white shadow-sm">
         <div className="mx-auto max-w-7xl px-4 md:px-6 lg:px-8">
           <nav
-            className="flex items-center gap-1.5 py-2 overflow-x-auto scrollbar-hide"
+            className="flex items-center gap-1 py-1.5 overflow-x-auto scrollbar-hide no-scrollbar"
             style={{ WebkitOverflowScrolling: "touch" }}
           >
             {PERFORM_NAV.map((item) => {
@@ -66,13 +66,12 @@ export default function PerFormLayout({ children }: { children: React.ReactNode 
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center gap-1.5 whitespace-nowrap rounded-full px-3.5 py-1.5 text-xs md:text-sm font-medium transition-all shrink-0 ${
-                    isActive
-                      ? "bg-gold/15 text-gold border border-gold/30 shadow-[0_0_10px_rgba(212,175,55,0.1)]"
-                      : "text-slate-500 hover:text-slate-700 hover:bg-slate-50 border border-transparent"
-                  }`}
+                  className={`flex items-center gap-2 whitespace-nowrap rounded-sm px-4 py-2 text-xs md:text-[11px] font-black uppercase tracking-widest transition-all shrink-0 border-b-2 ${isActive
+                      ? "text-emerald-800 border-emerald-600 bg-emerald-50/30"
+                      : "text-slate-400 border-transparent hover:text-slate-600 hover:bg-slate-50"
+                    }`}
                 >
-                  <Icon className="w-3.5 h-3.5" />
+                  <Icon className="w-3 h-3 opacity-60" />
                   {item.label}
                 </Link>
               );

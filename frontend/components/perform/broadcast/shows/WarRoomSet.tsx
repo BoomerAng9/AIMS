@@ -16,10 +16,10 @@ export function WarRoomSet({ segment }: { segment: BroadcastSegment }) {
                     initial={{ x: -100, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ type: 'spring', damping: 20 }}
-                    className="flex-1 bg-[#1a0f0f] border border-red-900/50 rounded-3xl overflow-hidden relative shadow-[0_0_50px_rgba(220,38,38,0.15)] flex flex-col justify-end p-8"
+                    className="flex-1 bg-white border border-emerald-200 rounded-3xl overflow-hidden relative shadow-sm flex flex-col justify-end p-8"
                 >
                     <div className="absolute top-0 right-0 p-6 pointer-events-none">
-                        <Flame className="w-16 h-16 text-red-500/20" />
+                        <Flame className="w-16 h-16 text-emerald-500/10" />
                     </div>
 
                     <div className="absolute bottom-0 right-[-50px] opacity-70">
@@ -32,12 +32,12 @@ export function WarRoomSet({ segment }: { segment: BroadcastSegment }) {
                         />
                     </div>
 
-                    <div className="relative z-10 bg-white/80 backdrop-blur-md border border-red-500/30 p-6 rounded-2xl w-3/4">
-                        <h4 className="text-red-500 font-bold uppercase tracking-widest text-xs mb-2 flex items-center gap-2">
-                            <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                    <div className="relative z-10 bg-white/90 backdrop-blur-md border border-emerald-500/20 p-6 rounded-2xl w-3/4 shadow-lg">
+                        <h4 className="text-emerald-600 font-bold uppercase tracking-widest text-xs mb-2 flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                             The Bull Case
                         </h4>
-                        <p className="text-slate-700 text-lg leading-relaxed">
+                        <p className="text-slate-800 text-lg leading-relaxed">
                             "When healthy, McCoy is the best CB in this class. ACL recovery is routine now — 12+ months out. The ball skills and athleticism are elite."
                         </p>
                     </div>
@@ -60,10 +60,10 @@ export function WarRoomSet({ segment }: { segment: BroadcastSegment }) {
                     initial={{ x: 100, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ type: 'spring', damping: 20 }}
-                    className="flex-1 bg-[#0a1118] border border-blue-900/50 rounded-3xl overflow-hidden relative shadow-[0_0_50px_rgba(59,130,246,0.15)] flex flex-col justify-end p-8"
+                    className="flex-1 bg-white border border-slate-200 rounded-3xl overflow-hidden relative shadow-sm flex flex-col justify-end p-8"
                 >
                     <div className="absolute top-0 left-0 p-6 pointer-events-none">
-                        <MessageSquare className="w-16 h-16 text-blue-500/20" />
+                        <MessageSquare className="w-16 h-16 text-slate-500/10" />
                     </div>
 
                     <div className="absolute bottom-0 left-[-50px] opacity-80 scale-x-[-1]">
@@ -76,12 +76,12 @@ export function WarRoomSet({ segment }: { segment: BroadcastSegment }) {
                         />
                     </div>
 
-                    <div className="relative z-10 bg-white/80 backdrop-blur-md border border-blue-500/30 p-6 rounded-2xl w-3/4 self-end">
-                        <h4 className="text-blue-500 font-bold uppercase tracking-widest text-xs mb-2 flex items-center gap-2">
-                            <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+                    <div className="relative z-10 bg-white/90 backdrop-blur-md border border-slate-500/20 p-6 rounded-2xl w-3/4 self-end shadow-lg">
+                        <h4 className="text-slate-600 font-bold uppercase tracking-widest text-xs mb-2 flex items-center gap-2">
+                            <div className="w-2 h-2 rounded-full bg-slate-500 animate-pulse" />
                             The Bear Case
                         </h4>
-                        <p className="text-slate-700 text-lg leading-relaxed text-right">
+                        <p className="text-slate-800 text-lg leading-relaxed text-right">
                             "Missed entire 2025 season. ACL tears change athletes. Teams drafting in the top 15 can't afford medical risks."
                         </p>
                     </div>

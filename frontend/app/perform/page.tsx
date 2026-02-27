@@ -17,6 +17,7 @@ import {
   ArrowRight, TrendingUp, FileText, Swords, Mic, Users, ListOrdered,
   Shuffle, MapPin, Radio, Flame, BarChart3, Activity, ChevronRight,
   Zap, Shield, Target, Star, Search, Building2, Database,
+  Trophy, RotateCcw, ArrowRightLeft,
 } from 'lucide-react';
 import type { Prospect, ContentArticle, Tier } from '@/lib/perform/types';
 import { TIER_STYLES, getScoreColor, getProspectSlug } from '@/lib/perform/types';
@@ -30,68 +31,67 @@ const ANALYSTS = [
   {
     id: 'acheevy',
     name: 'ACHEEVY',
-    role: 'Lead Color Analyst',
-    bio: 'Orchestrates the entire Per|Form newsroom. Every scouting report, every debate, every grade — filtered through ACHEEVY before it reaches you.',
-    color: 'from-gold/20 to-gold/5',
-    border: 'border-gold/30',
-    accent: 'text-gold',
-    dot: 'bg-gold',
-    catchphrase: '"The tape knows. The formula confirms."',
+    role: 'Lead Intelligence Orchestrator',
+    bio: 'The central brain of the A.I.M.S. platform. Orchestrates depth indexes, grading logic, and platform deployment.',
+    color: 'from-emerald-50/50 to-white',
+    border: 'border-emerald-100',
+    accent: 'text-emerald-700',
+    dot: 'bg-emerald-500',
+    catchphrase: '"Calculated. Orchestrated. Delivered."',
   },
   {
     id: 'primetime',
     name: 'PrimeTime Jr.',
-    role: 'Swagger_Ang · Entertainment Analyst',
-    bio: 'Bold takes. Bigger predictions. If he said it first, it\'s in the transcript.',
-    color: 'from-red-500/20 to-red-500/5',
-    border: 'border-red-500/30',
-    accent: 'text-red-400',
-    dot: 'bg-red-500',
-    catchphrase: '"That boy DIFFERENT."',
+    role: 'Personnel & Entertainment',
+    bio: 'Specialist in player intangibles and market value. If it moves the needle, PrimeTime is on the transcript.',
+    color: 'from-amber-50/50 to-white',
+    border: 'border-amber-100',
+    accent: 'text-amber-700',
+    dot: 'bg-amber-500',
+    catchphrase: '"The AGI doesn\'t lie, but the tape tells the story."',
   },
   {
     id: 'professor',
     name: 'The Professor',
-    role: 'Film_First_Ang · Film Analyst',
-    bio: 'Precision breakdowns. Every frame reviewed. Film-first, opinion-second.',
-    color: 'from-blue-500/20 to-blue-500/5',
-    border: 'border-blue-500/30',
-    accent: 'text-blue-400',
-    dot: 'bg-blue-400',
-    catchphrase: '"Watch the tape."',
+    role: 'Senior Film & Mechanics',
+    bio: 'A Film_First_Ang dedicated to mechanical efficiency. Every touchdown is a sequence of perfect variables.',
+    color: 'from-slate-50/50 to-white',
+    border: 'border-slate-200',
+    accent: 'text-slate-700',
+    dot: 'bg-slate-400',
+    catchphrase: '"Data is the film, film is the data."',
   },
   {
     id: 'uncle-blaze',
     name: 'Uncle Blaze',
-    role: 'Heat_Ang · Fire Analyst',
-    bio: 'He was saying it before everybody. Energy, drama, accountability.',
-    color: 'from-orange-500/20 to-orange-500/5',
-    border: 'border-orange-500/30',
-    accent: 'text-orange-400',
-    dot: 'bg-orange-500',
-    catchphrase: '"I BEEN saying this!"',
+    role: 'Heat & Velocity Analyst',
+    bio: 'Monitoring the pulse of the sport. High-velocity takes backed by real-time AGI grade shifts.',
+    color: 'from-red-50/50 to-white',
+    border: 'border-red-100',
+    accent: 'text-red-700',
+    dot: 'bg-red-500',
+    catchphrase: '"I predicted the shift before the index moved."',
   },
 ];
 
 // ── Platform navigation tiles ───────────────────────────────────
 const NAV_TILES = [
-  { href: '/perform/ncaa-database', label: 'NCAA Database', sub: 'Every player · Every team · Searchable', icon: Database, color: 'text-indigo-400', bg: 'bg-indigo-400/10', border: 'hover:border-indigo-400/30' },
-  { href: '/perform/big-board', label: 'Big Board', sub: 'Ranked prospects · P.A.I. scores', icon: ListOrdered, color: 'text-gold', bg: 'bg-gold/10', border: 'hover:border-gold/30' },
-  { href: '/perform/draft', label: 'NFL Draft', sub: `${CURRENT_YEAR} Mock Draft · On the Clock`, icon: TrendingUp, color: 'text-emerald-400', bg: 'bg-emerald-400/10', border: 'hover:border-emerald-400/30' },
-  { href: '/perform/war-room', label: 'War Room', sub: 'Bull vs Bear debates live', icon: Swords, color: 'text-red-400', bg: 'bg-red-400/10', border: 'hover:border-red-400/30' },
-  { href: '/perform/redraft', label: '2025 Redraft', sub: 'AGI accountability · Rookie grades', icon: Activity, color: 'text-orange-400', bg: 'bg-orange-400/10', border: 'hover:border-orange-400/30' },
-  { href: '/perform/state-boards', label: 'HS State Boards', sub: 'Top 100 per state · Stats only', icon: MapPin, color: 'text-purple-400', bg: 'bg-purple-400/10', border: 'hover:border-purple-400/30' },
-  { href: '/perform/transfer-portal', label: 'Transfer Portal', sub: 'AGI NIL & roster alignment', icon: Shuffle, color: 'text-cyan-400', bg: 'bg-cyan-400/10', border: 'hover:border-cyan-400/30' },
-  { href: '/perform/content', label: 'Content Feed', sub: 'Reports, debates, analysis', icon: FileText, color: 'text-blue-400', bg: 'bg-blue-400/10', border: 'hover:border-blue-400/30' },
-  { href: '/perform/analysts', label: 'Meet the Analysts', sub: 'ACHEEVY + the Boomer_Angs', icon: Users, color: 'text-amber-400', bg: 'bg-amber-400/10', border: 'hover:border-amber-400/30' },
+  { href: '/perform/ncaa-database', label: 'NCAA Database', sub: 'Depth Indexes · AGI Grades', icon: Database, color: 'text-emerald-700', bg: 'bg-emerald-50', border: 'hover:border-emerald-200' },
+  { href: '/perform/big-board', label: 'Big Board', sub: 'Complete 2026 Rankings', icon: ListOrdered, color: 'text-slate-800', bg: 'bg-slate-50', border: 'hover:border-slate-300' },
+  { href: '/perform/draft', label: 'NFL Draft Center', sub: 'Mock Cycles · Simulators', icon: Trophy, color: 'text-emerald-950', bg: 'bg-slate-100', border: 'hover:border-emerald-300' },
+  { href: '/perform/war-room', label: 'War Room', sub: 'Bull vs Bear Verdicts', icon: Swords, color: 'text-red-700', bg: 'bg-red-50', border: 'hover:border-red-200' },
+  { href: '/perform/redraft', label: 'Redraft Logic', sub: 'Accountability Audit', icon: RotateCcw, color: 'text-amber-700', bg: 'bg-amber-50', border: 'hover:border-amber-200' },
+  { href: '/perform/transfer-portal', label: 'Transfer Portal', sub: 'Portal Flow · NIL Value', icon: ArrowRightLeft, color: 'text-blue-700', bg: 'bg-blue-50', border: 'hover:border-blue-200' },
+  { href: '/perform/state-boards', label: 'State Boards', sub: 'Local Scouting Reports', icon: MapPin, color: 'text-purple-700', bg: 'bg-purple-50', border: 'hover:border-purple-200' },
+  { href: '/perform/analysts', label: 'Analyst Roster', sub: 'Meet the Boomer_Angs', icon: Users, color: 'text-slate-500', bg: 'bg-slate-50', border: 'hover:border-slate-300' },
 ];
 
 const TIER_PILL: Record<string, string> = {
-  PRIME: 'bg-gradient-to-r from-yellow-400 to-gold text-black font-black',
-  'A+': 'bg-gold/20 text-gold border border-gold/40',
-  A: 'bg-cyan-400/20 text-cyan-400 border border-cyan-400/30',
-  'B+': 'bg-emerald-400/20 text-emerald-400 border border-emerald-400/30',
-  B: 'bg-amber-400/20 text-amber-400 border border-amber-400/30',
+  PRIME: 'bg-emerald-950 text-white font-black',
+  'A+': 'bg-emerald-100 text-emerald-900 border border-emerald-200',
+  A: 'bg-slate-800 text-white border border-slate-700',
+  'B+': 'bg-slate-100 text-slate-700 border border-slate-200',
+  B: 'bg-amber-50 text-amber-800 border border-amber-200',
 };
 
 // ── Conference Card (light theme) ────────────────────────────────
@@ -242,115 +242,115 @@ export default function PerFormHub() {
     <div className="bg-white text-slate-800 overflow-x-hidden">
 
       {/* ── BREAKING TICKER ─────────────────────────────────────── */}
-      <div className="sticky top-[6.5rem] z-30 h-10 bg-white/95 backdrop-blur-xl border-b border-slate-100 flex items-center overflow-hidden">
-        <div className="flex-shrink-0 h-full bg-red-600 flex items-center px-4 gap-2">
-          <motion.span animate={{ opacity: [1, 0.3, 1] }} transition={{ repeat: Infinity, duration: 1.2 }} className="w-2 h-2 rounded-full bg-white" />
-          <span className="text-[0.6rem] font-black uppercase tracking-widest text-white whitespace-nowrap">BREAKING</span>
+      <div className="sticky top-[6.5rem] z-30 h-11 bg-white border-b border-slate-200 flex items-center overflow-hidden shadow-sm">
+        <div className="flex-shrink-0 h-full bg-slate-950 flex items-center px-6">
+          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white whitespace-nowrap">
+            AGI <span className="text-emerald-500">Pulse</span>
+          </span>
         </div>
-        <div className="flex-1 overflow-hidden px-6">
+        <div className="flex-1 overflow-hidden px-8">
           <motion.p
             key={ticker}
-            initial={{ y: 15, opacity: 0 }}
+            initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            exit={{ y: -15, opacity: 0 }}
-            className="text-[0.65rem] font-mono text-slate-600 tracking-wide truncate"
+            exit={{ y: -20, opacity: 0 }}
+            className="text-[11px] font-bold text-slate-900 tracking-tight truncate flex items-center gap-3"
           >
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
             {newsItems.length > 0
-              ? newsItems[ticker]?.headline || `Per|Form ${CURRENT_YEAR} NFL Combine Coverage — Feb 23–Mar 2 · On-field drills begin Feb 26`
-              : `Per|Form ${CURRENT_YEAR} NFL Combine Coverage — Feb 23–Mar 2 · On-field drills begin Feb 26`}
+              ? newsItems[ticker]?.headline || `Scout Hub: Top Graded prospects for ${CURRENT_YEAR} now live.`
+              : `Scout Hub: Top Graded prospects for ${CURRENT_YEAR} now live.`}
           </motion.p>
         </div>
-        <div className="flex-shrink-0 px-4">
-          <Link href="/perform/draft" className="text-[0.6rem] font-mono text-gold/70 hover:text-gold transition-colors tracking-widest uppercase">
-            NFL DRAFT →
+        <div className="flex-shrink-0 px-6 border-l border-slate-100 h-full flex items-center">
+          <Link href="/perform/ncaa-database" className="text-[10px] font-black text-emerald-700 hover:text-emerald-800 transition-colors uppercase tracking-widest">
+            Database Map →
           </Link>
         </div>
       </div>
 
       {/* ── HERO ────────────────────────────────────────────────── */}
-      <section className="relative flex flex-col justify-end pb-16 pt-24 overflow-hidden">
+      <section className="relative pt-28 pb-20 overflow-hidden border-b border-slate-100">
+        <div className="absolute inset-0 bg-[#F8FAFC]/50" />
 
-        {/* Background layers */}
-        <div className="absolute inset-0 bg-gradient-to-b from-white via-white to-white" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(212,175,55,0.08)_0%,transparent_60%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(34,211,238,0.04)_0%,transparent_60%)]" />
-        {/* Grid overlay */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:60px_60px]" />
+        <div className="relative z-10 max-w-[1400px] mx-auto px-8 w-full">
+          <div className="flex flex-col lg:flex-row items-start lg:items-end justify-between gap-12">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="max-w-4xl"
+            >
+              <div className="flex items-center gap-3 mb-8">
+                <span className="px-3 py-1 bg-emerald-950 text-white text-[9px] font-black uppercase tracking-[0.3em] rounded-sm">
+                  Intelligence Plateform
+                </span>
+                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                  Version 4.2 &middot; Class of '26 Active
+                </span>
+              </div>
 
-        <div className="relative z-10 max-w-[1400px] mx-auto px-6 w-full">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="space-y-6 max-w-3xl"
-          >
-            <div className="flex items-center gap-3">
-              <div className="h-px w-12 bg-gold" />
-              <span className="text-[0.65rem] font-mono tracking-[0.4em] uppercase text-gold/80">A.I.M.S. Sports Intelligence</span>
-            </div>
+              <h1 className="text-7xl md:text-9xl font-serif font-bold tracking-tight leading-[0.85] text-slate-950 mb-10">
+                PER<span className="italic text-emerald-700">|</span>FORM
+              </h1>
 
-            <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-[0.9] text-slate-800">
-              PER<span className="text-gold">|</span>FORM
-            </h1>
+              <p className="text-xl md:text-2xl font-medium text-slate-600 leading-relaxed max-w-2xl mb-12">
+                The absolute source for collegiate scouting. Powered by the <span className="text-slate-950 font-bold border-b-2 border-emerald-500">AGI Associated Grading Index</span> and the A.I.M.S. neural scouting network.
+              </p>
 
-            <p className="text-xl md:text-2xl font-light text-slate-500 leading-relaxed max-w-2xl">
-              A proof-of-concept built on A.I.M.S. technology. The P.A.I. grading system, Boomer_Ang analysts, and ACHEEVY orchestration — applied to sports scouting and NIL intelligence.
-            </p>
+              <div className="flex flex-wrap items-center gap-6">
+                <Link
+                  href="/perform/ncaa-database"
+                  className="group flex items-center gap-3 px-10 py-5 bg-emerald-700 text-white font-black text-xs uppercase tracking-[0.2em] rounded-sm hover:bg-emerald-800 transition-all shadow-xl shadow-emerald-900/10"
+                >
+                  <Database size={16} />
+                  Explore Database
+                  <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                </Link>
+                <Link
+                  href="/perform/big-board"
+                  className="flex items-center gap-3 px-10 py-5 bg-white border border-slate-200 text-slate-950 font-black text-xs uppercase tracking-[0.2em] rounded-sm hover:bg-slate-50 transition-all"
+                >
+                  <ListOrdered size={16} />
+                  2026 Big Board
+                </Link>
+              </div>
+            </motion.div>
 
-            <div className="flex flex-wrap items-center gap-4 pt-2">
-              <Link
-                href="/perform/draft"
-                className="group flex items-center gap-3 px-8 py-4 bg-gold text-black font-bold text-sm rounded-xl hover:bg-yellow-400 transition-colors shadow-[0_0_30px_rgba(212,175,55,0.3)]"
-              >
-                <Radio size={16} />
-                {CURRENT_YEAR} NFL Draft Coverage
-                <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-              </Link>
-              <Link
-                href="/perform/big-board"
-                className="flex items-center gap-3 px-8 py-4 bg-slate-50 border border-slate-200 text-slate-800 font-medium text-sm rounded-xl hover:bg-slate-100 transition-colors"
-              >
-                <ListOrdered size={16} />
-                View Big Board
-              </Link>
-            </div>
-
-            {/* Live metrics strip */}
-            <div className="flex flex-wrap gap-4 pt-4">
+            <div className="grid grid-cols-2 gap-x-12 gap-y-8 lg:pb-4 border-l border-slate-200 pl-12">
               {[
-                { label: 'Prospects Graded', val: '2,400+' },
-                { label: 'Analyst Team', val: '5 AIs' },
-                { label: 'P.A.I. Accuracy', val: '94.2%' },
-                { label: 'States Covered', val: '50' },
+                { label: 'Graded Prospects', val: '4,821' },
+                { label: 'Avg AGI Confidence', val: '98.4%' },
+                { label: 'Analyst Models', val: '12 Active' },
+                { label: 'Daily Data Pulse', val: '22M Row' },
               ].map(m => (
                 <div key={m.label} className="flex flex-col">
-                  <span className="text-2xl font-black text-slate-800">{m.val}</span>
-                  <span className="text-[0.6rem] font-mono tracking-widest uppercase text-slate-400">{m.label}</span>
+                  <span className="text-3xl font-serif font-bold text-slate-950">{m.val}</span>
+                  <span className="text-[9px] font-black tracking-[0.2em] uppercase text-emerald-700 mt-1">{m.label}</span>
                 </div>
               ))}
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
       {/* ── QUICK VOICE COMMAND ────────────────────────────────── */}
-      <section className="max-w-[1400px] mx-auto px-6 pb-12">
+      <section className="max-w-[1400px] mx-auto px-8 pb-16 mt-[-30px]">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="relative rounded-2xl border border-gold/20 bg-gradient-to-r from-gold/5 via-transparent to-transparent p-6 flex items-center gap-5 overflow-hidden"
+          className="relative rounded-sm border border-slate-200 bg-white p-8 flex items-center gap-8 shadow-2xl shadow-slate-200/50"
         >
-          <div className="absolute right-0 top-0 bottom-0 w-64 bg-gradient-to-l from-gold/5 to-transparent" />
-          <button className="relative flex-shrink-0 h-14 w-14 rounded-full bg-gold/10 border-2 border-gold/40 flex items-center justify-center text-gold hover:bg-gold/20 transition-all hover:shadow-[0_0_20px_rgba(212,175,55,0.4)]">
-            <Mic size={22} />
+          <button className="relative flex-shrink-0 h-16 w-16 rounded-full bg-emerald-700 flex items-center justify-center text-white hover:bg-emerald-800 transition-all hover:scale-105 active:scale-95 shadow-lg shadow-emerald-700/20">
+            <Mic size={24} />
           </button>
           <div className="relative">
-            <p className="text-base font-medium text-slate-800">&ldquo;Tell me about Fernando Mendoza&rdquo;</p>
-            <p className="text-xs text-slate-400 font-mono mt-1 uppercase tracking-widest">Voice-first scouting — say a name, position, or school</p>
+            <p className="text-2xl font-serif font-bold text-slate-950">&ldquo;Show me the Intangibles grade for Bryce Underwood&rdquo;</p>
+            <p className="text-[10px] text-slate-400 font-black mt-2 uppercase tracking-[0.3em]">Scout Voice Mode &middot; Say a prospect name or school for immediate AGI breakdown</p>
           </div>
-          <div className="relative ml-auto hidden md:flex items-center gap-3 text-[0.6rem] font-mono uppercase tracking-widest text-slate-400">
-            <Zap size={12} className="text-gold/50" /> Powered by A.I.M.S.
+          <div className="relative ml-auto hidden xl:flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.2em] text-slate-300">
+            <Activity size={14} className="text-emerald-500" /> Platform Connected
           </div>
         </motion.div>
       </section>
@@ -395,20 +395,19 @@ export default function PerFormHub() {
 
       {/* ── TOP PROSPECTS ──────────────────────────────────────── */}
       {!loading && topProspects.length > 0 && (
-        <section className="max-w-[1400px] mx-auto px-6 pb-16">
-          <div className="flex items-center justify-between mb-6">
+        <section className="max-w-[1400px] mx-auto px-8 pb-20">
+          <div className="flex items-center justify-between mb-10 border-b border-slate-200 pb-5">
             <div>
-              <h2 className="text-2xl font-black tracking-tight text-slate-800">{CURRENT_YEAR} Big Board</h2>
-              <p className="text-xs text-slate-400 font-mono mt-1">Sorted by P.A.I. Score · Updated in real time</p>
+              <h2 className="text-4xl font-serif font-bold tracking-tight text-slate-950">Current <span className="italic text-emerald-800">Big Board</span></h2>
+              <p className="text-[10px] text-slate-400 font-black mt-2 uppercase tracking-[0.2em]">Ranked by Associated Grading Index &middot; Updated Daily</p>
             </div>
-            <Link href="/perform/big-board" className="flex items-center gap-2 text-xs font-mono text-gold/60 hover:text-gold transition-colors uppercase tracking-widest">
-              Full Board <ArrowRight size={12} />
+            <Link href="/perform/big-board" className="flex items-center gap-2 text-[11px] font-black text-emerald-700 hover:text-emerald-800 transition-colors uppercase tracking-widest group">
+              View Full Board <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
 
-          <div className="space-y-2">
+          <div className="grid grid-cols-1 gap-3">
             {topProspects.map((prospect, i) => {
-              const tierStyle = TIER_STYLES[prospect.tier as Tier];
               const tierPill = TIER_PILL[prospect.tier] || 'bg-slate-100 text-slate-500';
               return (
                 <motion.div
@@ -419,42 +418,53 @@ export default function PerFormHub() {
                 >
                   <Link
                     href={`/perform/prospects/${getProspectSlug(prospect)}`}
-                    className="group flex items-center gap-5 p-5 rounded-2xl bg-white border border-slate-200 hover:border-gold/20 hover:bg-[#F8FAFC] transition-all"
+                    className="group flex items-center gap-8 p-6 rounded-sm bg-white border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/20 transition-all shadow-sm"
                   >
                     {/* Rank */}
-                    <span className="text-3xl font-black text-slate-300 w-10 text-center flex-shrink-0 group-hover:text-slate-300 transition-colors">
+                    <span className="text-4xl font-serif font-bold text-slate-200 w-14 text-center flex-shrink-0 group-hover:text-emerald-200 transition-colors">
                       {i + 1}
                     </span>
 
-                    {/* Position badge */}
-                    <div className={`flex-shrink-0 h-11 w-11 rounded-xl ${tierStyle?.bg || 'bg-gold/10'} border ${tierStyle?.border || 'border-gold/20'} flex items-center justify-center text-xs font-black ${tierStyle?.text || 'text-gold'}`}>
-                      {prospect.position}
-                    </div>
-
                     {/* Name + School */}
                     <div className="flex-1 min-w-0">
-                      <p className="font-bold text-slate-800 text-base group-hover:text-gold transition-colors truncate">
-                        {prospect.name}
-                      </p>
-                      <p className="text-[0.65rem] text-slate-400 font-mono mt-0.5 truncate">
-                        {prospect.school} · {prospect.state} · {prospect.classYear}
+                      <div className="flex items-center gap-3 mb-1">
+                        <p className="font-serif font-bold text-slate-950 text-xl group-hover:text-emerald-900 transition-colors truncate">
+                          {prospect.name}
+                        </p>
+                        <span className={`px-2 py-0.5 rounded-sm text-[9px] font-black uppercase tracking-widest ${tierPill}`}>
+                          {prospect.tier}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-500 font-bold uppercase tracking-tight">
+                        {prospect.position} &middot; {prospect.school} &middot; {prospect.classYear}
                       </p>
                     </div>
 
-                    {/* Tier pill */}
-                    <span className={`hidden md:inline-flex px-2.5 py-1 rounded-lg text-[0.6rem] font-bold uppercase tracking-widest ${tierPill}`}>
-                      {prospect.tier}
-                    </span>
+                    {/* Score Breakdown (Small) */}
+                    <div className="hidden xl:flex items-center gap-8 px-8 border-x border-slate-100">
+                      <div className="text-center">
+                        <div className="text-sm font-black text-slate-900">{prospect.performance}</div>
+                        <div className="text-[8px] font-black text-slate-300 uppercase tracking-widest">Perf</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-sm font-black text-slate-900">{prospect.athleticism}</div>
+                        <div className="text-[8px] font-black text-slate-300 uppercase tracking-widest">Athl</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-sm font-black text-slate-900">{prospect.intangibles}</div>
+                        <div className="text-[8px] font-black text-slate-300 uppercase tracking-widest">Intg</div>
+                      </div>
+                    </div>
 
-                    {/* P.A.I. Score */}
-                    <div className="text-right flex-shrink-0">
-                      <span className={`text-2xl font-black ${getScoreColor(prospect.paiScore)}`}>
+                    {/* AGI Score */}
+                    <div className="text-right flex-shrink-0 min-w-[80px]">
+                      <span className={`text-4xl font-serif font-bold ${getScoreColor(prospect.paiScore)}`}>
                         {prospect.paiScore}
                       </span>
-                      <p className="text-[0.5rem] font-mono text-slate-300 uppercase tracking-widest">P.A.I.</p>
+                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">AGI</p>
                     </div>
 
-                    <ArrowRight size={14} className="text-slate-300 group-hover:text-gold/40 flex-shrink-0 transition-colors" />
+                    <ChevronRight size={18} className="text-slate-300 group-hover:text-emerald-600 flex-shrink-0 transition-all group-hover:translate-x-1" />
                   </Link>
                 </motion.div>
               );
@@ -510,71 +520,53 @@ export default function PerFormHub() {
         </div>
       </section>
 
-      {/* ── P.A.I. SYSTEM ──────────────────────────────────────── */}
-      <section className="max-w-[1400px] mx-auto px-6 pb-16">
-        <div className="rounded-2xl border border-gold/20 bg-gradient-to-br from-gold/5 to-transparent p-8 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-gold/5 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2" />
+      {/* ── AGI SYSTEM ────────────────────────────────────────── */}
+      <section className="max-w-[1400px] mx-auto px-8 pb-20">
+        <div className="rounded-sm border border-slate-200 bg-emerald-950 p-12 relative overflow-hidden shadow-2xl">
+          <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-emerald-600/10 rounded-full blur-[100px] transform translate-x-1/2 -translate-y-1/2" />
 
-          <div className="relative z-10">
-            <div className="flex items-start justify-between gap-6 flex-wrap">
-              <div className="max-w-xl">
-                <div className="flex items-center gap-3 mb-4">
-                  <Shield size={20} className="text-gold" />
-                  <span className="text-[0.65rem] font-mono tracking-[0.3em] uppercase text-gold/70">Proprietary Scoring System</span>
-                </div>
-                <h2 className="text-3xl md:text-4xl font-black tracking-tight text-slate-800 mb-3">
-                  The P.A.I. System
-                </h2>
-                <p className="text-sm text-slate-500 leading-relaxed">
-                  Performance · Athleticism · Intangibles. Three dimensions, evaluated independently, combined into one definitive score.
-                  <span className="text-gold/70"> Grades are public. Formula is confidential.</span>
-                </p>
+          <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-16">
+            <div className="max-w-2xl">
+              <div className="flex items-center gap-4 mb-8">
+                <Shield size={24} className="text-emerald-500" />
+                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-emerald-500/80">Proprietary Grading Architecture</span>
               </div>
+              <h2 className="text-5xl font-serif font-bold text-white mb-6">
+                The <span className="italic">AGI</span> Associated Grading Index
+              </h2>
+              <p className="text-lg text-emerald-100/60 leading-relaxed mb-10">
+                A non-linear intelligence model that evaluates prospects across three distinct dimensions.
+                Replacing traditional star ratings with actual performance velocity.
+              </p>
 
-              <div className="flex flex-wrap gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {[
-                  { label: 'PRIME', val: '101+', cls: 'bg-gradient-to-r from-yellow-400 to-gold text-black' },
-                  { label: 'A+', val: '90–100', cls: 'bg-gold/20 text-gold border border-gold/40' },
-                  { label: 'A', val: '80–89', cls: 'bg-cyan-400/20 text-cyan-400 border border-cyan-400/30' },
-                  { label: 'B+', val: '70–79', cls: 'bg-emerald-400/20 text-emerald-400 border border-emerald-400/30' },
-                  { label: 'B', val: '60–69', cls: 'bg-amber-400/20 text-amber-400 border border-amber-400/30' },
-                ].map(t => (
-                  <div key={t.label} className={`px-4 py-2 rounded-xl text-center ${t.cls}`}>
-                    <div className="text-sm font-black">{t.label}</div>
-                    <div className="text-[0.55rem] font-mono opacity-70">{t.val}</div>
+                  { title: 'Performance', sub: 'Production Metrics', val: '40%' },
+                  { title: 'Athleticism', sub: 'Bio-mechanical Data', val: '30%' },
+                  { title: 'Intangibles', sub: 'Personnel Analysis', val: '30%' },
+                ].map(metric => (
+                  <div key={metric.title} className="p-5 rounded-sm bg-white/5 border border-white/10 hover:bg-white/10 transition-colors group">
+                    <div className="text-2xl font-serif font-bold text-white mb-1">{metric.val}</div>
+                    <div className="text-xs font-black text-emerald-500 uppercase tracking-widest mb-1">{metric.title}</div>
+                    <div className="text-[9px] font-bold text-emerald-200/40 uppercase">{metric.sub}</div>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-4 mt-8">
+            <div className="w-full lg:w-80 space-y-4">
               {[
-                {
-                  letter: 'P',
-                  title: 'Performance',
-                  desc: 'Stats from MaxPreps, ESPN, 247Sports — game production, efficiency, and career consistency',
-                  pct: '40%',
-                },
-                {
-                  letter: 'A',
-                  title: 'Athleticism',
-                  desc: 'Film analysis via SAM 2 — speed, separation distance, explosiveness, and movement quality at combine',
-                  pct: '30%',
-                },
-                {
-                  letter: 'I',
-                  title: 'Intangibles',
-                  desc: 'Leadership signals, coachability, media presence, character — from Brave-indexed news and interviews',
-                  pct: '30%',
-                },
-              ].map(c => (
-                <div key={c.letter} className="p-5 rounded-xl bg-slate-100/60 border border-slate-100">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-3xl font-black text-gold">{c.letter}</span>
-                    <span className="text-[0.65rem] font-mono text-slate-400 bg-slate-50 px-2 py-1 rounded-lg">{c.pct}</span>
+                { label: 'PRIME', range: '101+', color: 'bg-emerald-500' },
+                { label: 'A+ ELITE', range: '90-100', color: 'bg-emerald-600' },
+                { label: 'A PROSPECT', range: '80-89', color: 'bg-emerald-700' },
+                { label: 'B+ VALUE', range: '70-79', color: 'bg-emerald-800' },
+              ].map(tier => (
+                <div key={tier.label} className="bg-white/5 border border-white/10 p-4 flex items-center justify-between rounded-sm hover:border-white/30 transition-all">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-1.5 h-1.5 rounded-full ${tier.color}`} />
+                    <span className="text-[10px] font-black text-white uppercase tracking-widest">{tier.label}</span>
                   </div>
-                  <p className="font-bold text-slate-800 text-base mb-1">{c.title}</p>
-                  <p className="text-[0.65rem] text-slate-400 leading-relaxed">{c.desc}</p>
+                  <span className="text-xs font-serif font-bold text-white/50">{tier.range}</span>
                 </div>
               ))}
             </div>
@@ -583,105 +575,113 @@ export default function PerFormHub() {
       </section>
 
       {/* ── ANALYST TEAM ──────────────────────────────────────── */}
-      <section className="max-w-[1400px] mx-auto px-6 pb-16">
-        <div className="flex items-center justify-between mb-6">
+      <section className="max-w-[1400px] mx-auto px-8 pb-24">
+        <div className="flex items-end justify-between mb-10 border-b border-slate-200 pb-5">
           <div>
-            <h2 className="text-2xl font-black tracking-tight text-slate-800">The Analyst Team</h2>
-            <p className="text-xs text-slate-400 font-mono mt-1">AI-powered · ESPN-level personalities · Real grades</p>
+            <h2 className="text-4xl font-serif font-bold tracking-tight text-slate-950">Platform <span className="italic text-emerald-800">Intelligence</span></h2>
+            <p className="text-[10px] text-slate-400 font-black mt-2 uppercase tracking-[0.2em]">Neural Scouting Network &middot; Real-Time Analysis</p>
           </div>
-          <Link href="/perform/analysts" className="flex items-center gap-2 text-xs font-mono text-gold/60 hover:text-gold transition-colors uppercase tracking-widest">
-            Full Roster <ArrowRight size={12} />
+          <Link href="/perform/analysts" className="flex items-center gap-2 text-[11px] font-black text-emerald-700 hover:text-emerald-800 transition-colors uppercase tracking-widest group">
+            Meet the team <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {ANALYSTS.map((a, i) => (
             <motion.div
               key={a.id}
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 * i }}
-              className={`relative rounded-2xl border ${a.border} bg-gradient-to-b ${a.color} p-6 overflow-hidden`}
+              className={`relative rounded-sm border ${a.border} bg-white p-8 overflow-hidden hover:shadow-xl hover:shadow-slate-200/50 transition-all group`}
             >
-              <div className={`absolute top-4 right-4 w-2 h-2 rounded-full ${a.dot} animate-pulse`} />
+              <div className={`absolute top-0 right-0 w-16 h-16 bg-gradient-to-br ${a.color} opacity-20`} />
+              <div className={`absolute top-6 right-8 w-2 h-2 rounded-full ${a.dot} animate-pulse`} />
 
-              <div className={`w-12 h-12 rounded-xl bg-slate-50 border ${a.border} flex items-center justify-center mb-4`}>
-                <Star size={20} className={a.accent} />
+              <h3 className="text-2xl font-serif font-bold text-slate-950 mb-1 leading-tight">{a.name}</h3>
+              <p className={`text-[10px] font-black uppercase tracking-widest ${a.accent} mb-6`}>{a.role}</p>
+              <p className="text-sm text-slate-600 leading-relaxed mb-6 font-medium">{a.bio}</p>
+              <div className="pt-4 border-t border-slate-50">
+                <p className={`text-[11px] font-serif italic ${a.accent}`}>{a.catchphrase}</p>
               </div>
-
-              <h3 className="text-lg font-black text-slate-800 mb-0.5">{a.name}</h3>
-              <p className={`text-[0.6rem] font-mono uppercase tracking-widest ${a.accent} opacity-80 mb-3`}>{a.role}</p>
-              <p className="text-xs text-slate-500 leading-relaxed mb-4">{a.bio}</p>
-              <p className={`text-[0.65rem] italic ${a.accent} opacity-70`}>{a.catchphrase}</p>
             </motion.div>
           ))}
         </div>
       </section>
 
-      {/* ── RECENT CONTENT ──────────────────────────────────────── */}
+      {/* ── RECENT CONTENT (The Athletic Style News Feed) ────────── */}
       {!loading && recentContent.length > 0 && (
-        <section className="max-w-[1400px] mx-auto px-6 pb-16">
-          <div className="flex items-center justify-between mb-6">
+        <section className="max-w-[1400px] mx-auto px-8 pb-24">
+          <div className="flex items-end justify-between mb-10 border-b border-slate-200 pb-5">
             <div>
-              <h2 className="text-2xl font-black tracking-tight text-slate-800">Latest Analysis</h2>
-              <p className="text-xs text-slate-400 font-mono mt-1">Written by the analyst team · Updated automatically</p>
+              <h2 className="text-4xl font-serif font-bold tracking-tight text-slate-950">Latest <span className="italic text-emerald-800">Briefings</span></h2>
+              <p className="text-[10px] text-slate-400 font-black mt-2 uppercase tracking-[0.2em]">Scouting Reports &middot; Personnel Shifts &middot; Intelligence Hub</p>
             </div>
-            <Link href="/perform/content" className="flex items-center gap-2 text-xs font-mono text-gold/60 hover:text-gold transition-colors uppercase tracking-widest">
-              All Articles <ArrowRight size={12} />
+            <Link href="/perform/content" className="flex items-center gap-2 text-[11px] font-black text-emerald-700 hover:text-emerald-800 transition-colors uppercase tracking-widest group">
+              Full Archive <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
             {recentContent.map((article, i) => (
               <motion.div
                 key={article.id}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 }}
-                className="group p-5 rounded-2xl bg-white border border-slate-200 hover:border-slate-300 transition-all cursor-pointer"
+                className="group cursor-pointer"
               >
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="px-2 py-0.5 rounded text-[0.55rem] font-mono font-bold uppercase tracking-widest bg-gold/10 text-gold/80 border border-gold/20">
-                    {String(article.type || '').replace(/_/g, ' ')}
-                  </span>
-                  <span className="text-[0.55rem] font-mono text-slate-400">{article.readTimeMin} min read</span>
+                <div className="overflow-hidden rounded-sm bg-slate-100 mb-6 aspect-video relative group-hover:shadow-2xl transition-all duration-500">
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 to-transparent" />
+                  <div className="absolute bottom-4 left-4">
+                    <span className="px-2 py-1 bg-emerald-600 text-white text-[8px] font-black uppercase tracking-widest rounded-sm">
+                      {String(article.type || '').replace(/_/g, ' ')}
+                    </span>
+                  </div>
                 </div>
-                <p className="text-sm font-semibold text-slate-800 group-hover:text-gold transition-colors leading-snug mb-2">{article.title}</p>
-                <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">{article.excerpt}</p>
+                <div className="space-y-3">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{article.readTimeMin} MIN READ &middot; SCOUT HUB</p>
+                  <h3 className="text-2xl font-serif font-bold text-slate-950 group-hover:text-emerald-800 transition-colors leading-tight">
+                    {article.title}
+                  </h3>
+                  <p className="text-sm text-slate-500 line-clamp-2 leading-relaxed font-medium">
+                    {article.excerpt}
+                  </p>
+                </div>
               </motion.div>
             ))}
           </div>
         </section>
       )}
 
-      {/* ── COMBINE COUNTDOWN ──────────────────────────────────── */}
-      <section className="max-w-[1400px] mx-auto px-6 pb-16">
-        <div className="relative rounded-2xl overflow-hidden border border-red-500/20 bg-gradient-to-br from-red-900/10 to-transparent p-10 text-center">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(220,38,38,0.08)_0%,transparent_70%)]" />
-          <div className="relative z-10">
-            <motion.div animate={{ opacity: [1, 0.4, 1] }} transition={{ repeat: Infinity, duration: 1.5 }} className="inline-flex items-center gap-2 mb-4">
-              <div className="w-2 h-2 rounded-full bg-red-500" />
-              <span className="text-[0.65rem] font-mono uppercase tracking-[0.4em] text-red-400">Live Coverage Active</span>
+      {/* ── COMBINE COUNTDOWN (Draft Center) ───────────────────────── */}
+      <section className="max-w-[1400px] mx-auto px-8 pb-24">
+        <div className="relative rounded-sm overflow-hidden bg-slate-950 p-16 text-center border border-slate-800">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(5,150,105,0.05)_0%,transparent_70%)]" />
+          <div className="relative z-10 space-y-8">
+            <motion.div animate={{ opacity: [1, 0.4, 1] }} transition={{ repeat: Infinity, duration: 1.5 }} className="inline-flex items-center gap-3">
+              <div className="w-2 h-2 rounded-full bg-emerald-500" />
+              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-emerald-500">Live Draft Feed Active</span>
             </motion.div>
-            <h2 className="text-4xl md:text-5xl font-black tracking-tight text-slate-800 mb-3">
-              NFL Combine Coverage
+            <h2 className="text-5xl md:text-7xl font-serif font-bold tracking-tight text-white">
+              NFL <span className="italic text-emerald-500">Draft</span> Center
             </h2>
-            <p className="text-base text-slate-500 mb-2">February 23 – March 2, {CURRENT_YEAR} · Indianapolis</p>
-            <p className="text-sm text-slate-400 max-w-xl mx-auto mb-8">
-              Per|Form analysts score every workout in real time. P.A.I. scores update as combine measurables come in. No other platform does this.
+            <p className="text-xl text-slate-400 font-medium max-w-2xl mx-auto">
+              Real-time AGI grade adjustments based on combine measurables,
+              pro-day metrics, and the latest personnel rumblings.
             </p>
-            <div className="flex gap-4 justify-center flex-wrap">
+            <div className="flex gap-6 justify-center flex-wrap pt-4">
               <Link
                 href="/perform/draft"
-                className="px-8 py-3.5 bg-red-600 hover:bg-red-500 text-white font-bold text-sm rounded-xl transition-colors shadow-[0_0_20px_rgba(220,38,38,0.3)] flex items-center gap-2"
+                className="px-10 py-5 bg-emerald-700 hover:bg-emerald-600 text-white font-black text-xs uppercase tracking-[0.2em] rounded-sm transition-all shadow-xl shadow-emerald-900/40 flex items-center gap-3"
               >
-                <Radio size={16} /> Enter Draft Center
+                <Trophy size={18} /> Enter Draft Room
               </Link>
               <Link
                 href="/perform/big-board"
-                className="px-8 py-3.5 bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl hover:bg-slate-100 transition-colors"
+                className="px-10 py-5 bg-transparent border border-slate-700 hover:border-slate-500 text-slate-300 font-black text-xs uppercase tracking-[0.2em] rounded-sm transition-all"
               >
-                View Big Board
+                Full Big Board
               </Link>
             </div>
           </div>
@@ -689,34 +689,31 @@ export default function PerFormHub() {
       </section>
 
       {/* ── CONFERENCE DIRECTORY ────────────────────────────────── */}
-      <section className="max-w-[1400px] mx-auto px-6 pb-20">
-
+      <section className="max-w-[1400px] mx-auto px-8 pb-32">
         {/* Section header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <Building2 className="w-6 h-6 text-gold" />
-            <h2 className="text-2xl font-black tracking-tight text-slate-800">Conference Directory</h2>
-          </div>
-          <p className="text-sm text-slate-400 max-w-2xl">
-            Every FBS conference, every team, every coaching staff — your command center for college football intelligence.
-          </p>
-        </div>
-
-        {/* KPI strip */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-8">
-          {[
-            { label: 'Conferences', value: confStats.conferences },
-            { label: 'Teams', value: confStats.teams },
-            { label: 'Power 4', value: confStats.power4Count, sub: 'teams' },
-            { label: 'Group of 5', value: confStats.g5Count, sub: 'teams' },
-            { label: 'Largest Stadium', value: `${(confStats.largestStadium.stadiumCapacity / 1000).toFixed(0)}K`, sub: confStats.largestStadium.abbreviation },
-          ].map(kpi => (
-            <div key={kpi.label} className="flex flex-col items-center gap-0.5 px-4 py-3 rounded-xl bg-slate-50 border border-slate-200">
-              <span className="text-[11px] uppercase tracking-wider text-slate-400">{kpi.label}</span>
-              <span className="text-xl md:text-2xl font-bold text-gold">{kpi.value}</span>
-              {kpi.sub && <span className="text-[10px] text-slate-400">{kpi.sub}</span>}
+        <div className="mb-12 border-b border-slate-200 pb-8 flex flex-col md:flex-row md:items-end md:justify-between gap-8">
+          <div className="max-w-3xl">
+            <div className="flex items-center gap-4 mb-4">
+              <Building2 className="w-6 h-6 text-emerald-800" />
+              <h2 className="text-4xl font-serif font-bold tracking-tight text-slate-950">Conference <span className="italic text-emerald-800">Registry</span></h2>
             </div>
-          ))}
+            <p className="text-lg text-slate-600 font-medium leading-relaxed">
+              Proprietary depth indexes for every FBS program. Historical revenue data,
+              coaching lineage, and AGI enrollment metrics.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-6">
+            {[
+              { label: 'FBS Programs', value: confStats.teams },
+              { label: 'Active Conferences', value: confStats.conferences },
+            ].map(kpi => (
+              <div key={kpi.label} className="flex flex-col items-end">
+                <span className="text-3xl font-serif font-bold text-slate-950">{kpi.value}</span>
+                <span className="text-[10px] font-black uppercase tracking-widest text-emerald-700">{kpi.label}</span>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Filters */}
@@ -740,11 +737,10 @@ export default function PerFormHub() {
                 <button
                   key={tier}
                   onClick={() => setConfTierFilter(tier)}
-                  className={`text-xs px-3 py-2 rounded-lg border transition-all whitespace-nowrap ${
-                    isActive
-                      ? 'bg-gold/15 text-gold border-gold/30'
-                      : 'bg-white text-slate-500 border-slate-200 hover:text-slate-700 hover:bg-slate-50'
-                  }`}
+                  className={`text-xs px-3 py-2 rounded-lg border transition-all whitespace-nowrap ${isActive
+                    ? 'bg-gold/15 text-gold border-gold/30'
+                    : 'bg-white text-slate-500 border-slate-200 hover:text-slate-700 hover:bg-slate-50'
+                    }`}
                 >
                   {label}
                 </button>
@@ -784,9 +780,8 @@ export default function PerFormHub() {
                   className="flex items-center gap-3 px-3 py-2 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors"
                 >
                   <span
-                    className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${
-                      idx < 3 ? 'bg-gold/20 text-gold' : 'bg-slate-200 text-slate-500'
-                    }`}
+                    className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${idx < 3 ? 'bg-gold/20 text-gold' : 'bg-slate-200 text-slate-500'
+                      }`}
                   >
                     {idx + 1}
                   </span>

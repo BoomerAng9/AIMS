@@ -147,11 +147,10 @@ export default function WarRoomPage() {
                     <div className="flex items-center gap-4">
                         <button
                             onClick={() => setShowBroadcastSet(!showBroadcastSet)}
-                            className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-[0.6rem] font-bold tracking-[0.2em] uppercase transition-all ${
-                                showBroadcastSet
-                                    ? 'bg-red-600/10 text-red-500 border-red-500/40 hover:bg-red-600/20'
-                                    : 'bg-gold/10 text-gold border-gold/30 hover:bg-gold/20'
-                            }`}
+                            className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-[0.6rem] font-bold tracking-[0.2em] uppercase transition-all ${showBroadcastSet
+                                ? 'bg-red-600/10 text-red-500 border-red-500/40 hover:bg-red-600/20'
+                                : 'bg-gold/10 text-gold border-gold/30 hover:bg-gold/20'
+                                }`}
                         >
                             <Radio size={12} className={showBroadcastSet ? 'animate-pulse text-red-500' : 'text-gold'} />
                             {showBroadcastSet ? 'Hide Broadcast' : 'Watch Debate Set'}
@@ -165,9 +164,9 @@ export default function WarRoomPage() {
             </nav>
 
             {/* ── HERO BANNER ─────────────────────────────────────────────── */}
-            <section className="relative overflow-hidden border-b border-slate-100">
-                <div className="absolute inset-0 bg-gradient-to-br from-red-900/10 via-transparent to-blue-900/10" />
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(220,38,38,0.05)_0%,transparent_70%)]" />
+            <section className="relative overflow-hidden border-b border-slate-200">
+                <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-transparent to-amber-50/30" />
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(217,119,6,0.03)_0%,transparent_70%)]" />
 
                 <div className="relative z-10 max-w-[1400px] mx-auto px-6 py-16">
                     <motion.div
@@ -176,8 +175,8 @@ export default function WarRoomPage() {
                         className="space-y-4 max-w-2xl"
                     >
                         <div className="flex items-center gap-3">
-                            <Swords size={24} className="text-red-400" />
-                            <span className="text-[0.65rem] font-mono tracking-[0.4em] uppercase text-red-400/70">Adversarial Analysis Engine</span>
+                            <Swords size={24} className="text-amber-600" />
+                            <span className="text-[0.65rem] font-mono tracking-[0.4em] uppercase text-slate-400">AGI — Associated Grading Index</span>
                         </div>
                         <h1 className="text-5xl md:text-6xl font-black tracking-tighter text-slate-800">
                             The War Room
@@ -188,14 +187,14 @@ export default function WarRoomPage() {
                         </p>
 
                         <div className="flex flex-wrap gap-3 pt-2 text-[0.6rem] font-mono uppercase tracking-widest">
-                            <div className="flex items-center gap-2 px-3 py-1.5 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400">
+                            <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-600">
                                 <Flame size={12} /> Bull Case
                             </div>
-                            <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-500/10 border border-blue-500/30 rounded-lg text-blue-400">
+                            <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-600">
                                 <Shield size={12} /> Bear Case
                             </div>
-                            <div className="flex items-center gap-2 px-3 py-1.5 bg-gold/10 border border-gold/30 rounded-lg text-gold">
-                                <Zap size={12} /> ACHEEVY Verdict
+                            <div className="flex items-center gap-2 px-3 py-1.5 bg-amber-50 border border-amber-200 rounded-lg text-amber-600">
+                                <Zap size={12} /> AGI Verdict
                             </div>
                         </div>
                     </motion.div>
@@ -406,17 +405,17 @@ export default function WarRoomPage() {
                             {/* Bull vs Bear */}
                             <div className="grid md:grid-cols-2 gap-4">
                                 {/* BULL */}
-                                <div className="relative rounded-2xl bg-gradient-to-b from-red-50 to-white border border-red-500/30 overflow-hidden p-6">
-                                    <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-red-500 to-transparent" />
+                                <div className="relative rounded-2xl bg-gradient-to-b from-emerald-50 to-white border border-emerald-200 overflow-hidden p-6 shadow-sm">
+                                    <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-emerald-500 to-transparent" />
                                     <div className="flex items-center gap-3 mb-4">
-                                        <div className="w-8 h-8 rounded-lg bg-red-500/20 border border-red-500/30 flex items-center justify-center">
-                                            <TrendingUp size={14} className="text-red-400" />
+                                        <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center">
+                                            <TrendingUp size={14} className="text-emerald-600" />
                                         </div>
                                         <div>
-                                            <p className="text-xs font-black uppercase tracking-widest text-red-400">{debate.debate.bull.analyst}</p>
+                                            <p className="text-xs font-black uppercase tracking-widest text-emerald-600">{debate.debate.bull.analyst}</p>
                                             <p className="text-[0.55rem] font-mono text-slate-400 uppercase">{debate.debate.bull.angId} · The Bull Case</p>
                                         </div>
-                                        <div className="ml-auto w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                                        <div className="ml-auto w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                                     </div>
                                     <blockquote className="text-base text-slate-700 leading-relaxed italic font-serif">
                                         &ldquo;{debate.debate.bull.take}&rdquo;
@@ -424,17 +423,17 @@ export default function WarRoomPage() {
                                 </div>
 
                                 {/* BEAR */}
-                                <div className="relative rounded-2xl bg-gradient-to-b from-blue-50 to-white border border-blue-500/30 overflow-hidden p-6">
-                                    <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-blue-500 to-transparent" />
+                                <div className="relative rounded-2xl bg-gradient-to-b from-slate-50 to-white border border-slate-200 overflow-hidden p-6 shadow-sm">
+                                    <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-slate-400 to-transparent" />
                                     <div className="flex items-center gap-3 mb-4">
-                                        <div className="w-8 h-8 rounded-lg bg-blue-500/20 border border-blue-500/30 flex items-center justify-center">
-                                            <TrendingDown size={14} className="text-blue-400" />
+                                        <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
+                                            <TrendingDown size={14} className="text-slate-600" />
                                         </div>
                                         <div>
-                                            <p className="text-xs font-black uppercase tracking-widest text-blue-400">{debate.debate.bear.analyst}</p>
+                                            <p className="text-xs font-black uppercase tracking-widest text-slate-600">{debate.debate.bear.analyst}</p>
                                             <p className="text-[0.55rem] font-mono text-slate-400 uppercase">{debate.debate.bear.angId} · The Bear Case</p>
                                         </div>
-                                        <div className="ml-auto w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+                                        <div className="ml-auto w-2 h-2 rounded-full bg-slate-400 animate-pulse" />
                                     </div>
                                     <blockquote className="text-base text-slate-700 leading-relaxed italic font-serif">
                                         &ldquo;{debate.debate.bear.take}&rdquo;
@@ -443,24 +442,24 @@ export default function WarRoomPage() {
                             </div>
 
                             {/* ACHEEVY Verdict */}
-                            <div className="relative rounded-2xl border border-gold/30 bg-gradient-to-br from-gold/5 via-transparent to-transparent p-6 overflow-hidden">
-                                <div className="absolute top-0 right-0 w-40 h-40 bg-gold/5 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2" />
+                            <div className="relative rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50/50 via-white to-white p-6 overflow-hidden shadow-sm">
+                                <div className="absolute top-0 right-0 w-40 h-40 bg-amber-100/20 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2" />
                                 <div className="relative z-10">
                                     <div className="flex items-center gap-3 mb-4">
-                                        <div className="w-8 h-8 rounded-lg bg-gold/20 border border-gold/30 flex items-center justify-center">
-                                            <Zap size={14} className="text-gold" />
+                                        <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center">
+                                            <Zap size={14} className="text-amber-600" />
                                         </div>
                                         <div>
-                                            <p className="text-xs font-black uppercase tracking-widest text-gold">ACHEEVY</p>
-                                            <p className="text-[0.55rem] font-mono text-slate-400 uppercase">Lead Analyst · Final Verdict</p>
+                                            <p className="text-xs font-black uppercase tracking-widest text-amber-600">ACHEEVY</p>
+                                            <p className="text-[0.55rem] font-mono text-slate-400 uppercase">Lead Analyst · AGI Verdict</p>
                                         </div>
-                                        <div className="ml-auto px-2.5 py-1 bg-gold/10 border border-gold/20 rounded-lg text-[0.6rem] font-mono text-gold/70 uppercase tracking-widest">
+                                        <div className="ml-auto px-2.5 py-1 bg-amber-100 border border-amber-200 rounded-lg text-[0.6rem] font-mono text-amber-600/70 uppercase tracking-widest">
                                             Mediated by {debate.debate.mediator}
                                         </div>
                                     </div>
-                                    <p className="text-base text-slate-700 leading-relaxed">{debate.debate.verdict}</p>
-                                    <p className="text-[0.6rem] font-mono text-slate-300 mt-3">
-                                        {new Date(debate.debate.timestamp).toLocaleTimeString()} · Per|Form War Room · Powered by A.I.M.S.
+                                    <p className="text-base text-slate-700 leading-relaxed font-medium">{debate.debate.verdict}</p>
+                                    <p className="text-[0.6rem] font-mono text-slate-400 mt-3">
+                                        {new Date(debate.debate.timestamp).toLocaleTimeString()} · AGI — Associated Grading Index
                                     </p>
                                 </div>
                             </div>

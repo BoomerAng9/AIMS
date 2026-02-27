@@ -106,37 +106,37 @@ export const TIER_STYLES: Record<Tier, {
 }> = {
   ELITE: {
     label: 'Elite',
-    bg: 'bg-gold/15',
-    border: 'border-gold/30',
-    text: 'text-gold',
-    glow: 'shadow-[0_0_12px_rgba(212,175,55,0.2)]',
+    bg: 'bg-emerald-950',
+    border: 'border-emerald-950',
+    text: 'text-white',
+    glow: 'shadow-lg shadow-emerald-950/20',
   },
   BLUE_CHIP: {
     label: 'Blue Chip',
-    bg: 'bg-blue-400/15',
-    border: 'border-blue-400/30',
-    text: 'text-blue-400',
-    glow: 'shadow-[0_0_12px_rgba(96,165,250,0.2)]',
+    bg: 'bg-slate-100',
+    border: 'border-slate-200',
+    text: 'text-slate-900',
+    glow: '',
   },
   PROSPECT: {
     label: 'Prospect',
-    bg: 'bg-emerald-400/15',
-    border: 'border-emerald-400/30',
-    text: 'text-emerald-400',
-    glow: 'shadow-[0_0_12px_rgba(52,211,153,0.15)]',
+    bg: 'bg-emerald-50',
+    border: 'border-emerald-100',
+    text: 'text-emerald-700',
+    glow: '',
   },
   SLEEPER: {
     label: 'Sleeper',
-    bg: 'bg-amber-400/15',
-    border: 'border-amber-400/30',
-    text: 'text-amber-400',
-    glow: 'shadow-[0_0_12px_rgba(251,191,36,0.15)]',
+    bg: 'bg-amber-50',
+    border: 'border-amber-100',
+    text: 'text-amber-700',
+    glow: '',
   },
   DEVELOPMENTAL: {
     label: 'Developmental',
-    bg: 'bg-zinc-400/15',
-    border: 'border-zinc-400/30',
-    text: 'text-zinc-400',
+    bg: 'bg-slate-50',
+    border: 'border-slate-100',
+    text: 'text-slate-400',
     glow: '',
   },
 };
@@ -237,9 +237,9 @@ export function getProspectSlug(prospect: { firstName: string; lastName: string 
 }
 
 export function getScoreColor(score: number): string {
-  if (score >= 90) return 'text-gold';
-  if (score >= 80) return 'text-blue-400';
-  if (score >= 70) return 'text-emerald-400';
-  if (score >= 60) return 'text-amber-400';
-  return 'text-zinc-400';
+  if (score >= 90) return 'text-emerald-800 font-black';
+  if (score >= 80) return 'text-slate-800 font-bold';
+  if (score >= 70) return 'text-slate-600 font-medium';
+  if (score >= 60) return 'text-amber-700';
+  return 'text-slate-400';
 }

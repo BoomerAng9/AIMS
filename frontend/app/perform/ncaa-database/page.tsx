@@ -3,11 +3,11 @@
 /**
  * Per|Form — NCAA Football Database
  *
- * PFF-inspired premium sports analytics design. Dark theme, dense data,
- * sortable/filterable. Three tabs: Player Database | Team Database | Position Rankings
+ * Luxury Industrial light theme inspired by 'The Athletic'. Premium sports analytics,
+ * dense data, sortable/filterable. Three tabs: Player Database | Team Database | Position Rankings
  *
  * All data sourced from /api/perform/prospects with seed data fallback.
- * Remixed with Per|Form branding: gold accent, P.A.I. grading system.
+ * Powered by AGI — Associated Grading Index.
  */
 
 import { useEffect, useState, useMemo, useCallback } from 'react';
@@ -18,7 +18,7 @@ import {
   SlidersHorizontal, X, ChevronRight, BarChart3, TrendingUp,
   CheckCircle, Zap, ListOrdered, Swords, ArrowRight,
 } from 'lucide-react';
-import type { Prospect, Tier, Trend, Pool } from '@/lib/perform/types';
+import type { Prospect, Tier, Trend, Pool, ContentArticle } from '@/lib/perform/types';
 import { TIER_STYLES, TREND_STYLES, getScoreColor, getProspectSlug } from '@/lib/perform/types';
 import { CONFERENCES, TIER_LABELS } from '@/lib/perform/conferences';
 import type { Conference, ConferenceTier, Team } from '@/lib/perform/conferences';
@@ -54,24 +54,24 @@ const CONFERENCES_FILTER = [
 ];
 
 const TICKER_HEADLINES = [
-  'P.A.I. scores updated across all conferences',
+  'AGI scores updated across all conferences',
   'Transfer Portal tracker: 200+ new entries this cycle',
-  'NFL Combine Coverage: Per|Form analysts scoring every workout',
+  'NFL Combine Coverage: Per|Form analysts scoring every workout with AGI',
   '2026 class rankings shakeup after spring evaluations',
   'War Room debates: Bull vs Bear on top 10 QBs',
-  'Per|Form Intelligence Engine processes 500+ games this season',
+  'AGI Intelligence Engine processes 500+ games this season',
 ];
 
 // ─────────────────────────────────────────────────────────────
-// Dark-theme Tier Styles
+// Luxury Industrial Tier Styles (Light Theme)
 // ─────────────────────────────────────────────────────────────
 
-const DARK_TIER_STYLES: Record<string, { label: string; bg: string; text: string; border: string }> = {
-  ELITE: { label: 'Elite', bg: 'bg-gold/20', text: 'text-gold', border: 'border-gold/40' },
-  BLUE_CHIP: { label: 'Blue Chip', bg: 'bg-blue-400/20', text: 'text-blue-400', border: 'border-blue-400/40' },
-  PROSPECT: { label: 'Prospect', bg: 'bg-emerald-400/20', text: 'text-emerald-400', border: 'border-emerald-400/40' },
-  SLEEPER: { label: 'Sleeper', bg: 'bg-amber-400/20', text: 'text-amber-400', border: 'border-amber-400/40' },
-  DEVELOPMENTAL: { label: 'Developmental', bg: 'bg-zinc-400/20', text: 'text-zinc-400', border: 'border-zinc-400/40' },
+const AGI_TIER_STYLES: Record<string, { label: string; bg: string; text: string; border: string }> = {
+  ELITE: { label: 'Elite', bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200' },
+  BLUE_CHIP: { label: 'Blue Chip', bg: 'bg-slate-50', text: 'text-slate-700', border: 'border-slate-200' },
+  PROSPECT: { label: 'Prospect', bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-200' },
+  SLEEPER: { label: 'Sleeper', bg: 'bg-zinc-50', text: 'text-zinc-600', border: 'border-zinc-200' },
+  DEVELOPMENTAL: { label: 'Dev', bg: 'bg-zinc-50', text: 'text-zinc-500', border: 'border-zinc-200' },
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -79,10 +79,10 @@ const DARK_TIER_STYLES: Record<string, { label: string; bg: string; text: string
 // ─────────────────────────────────────────────────────────────
 
 function TrendIcon({ trend }: { trend: string }) {
-  if (trend === 'UP') return <ArrowUpRight className="w-3.5 h-3.5 text-emerald-400" />;
-  if (trend === 'DOWN') return <ArrowDownRight className="w-3.5 h-3.5 text-red-400" />;
-  if (trend === 'NEW') return <Star className="w-3.5 h-3.5 text-gold" />;
-  return <Minus className="w-3.5 h-3.5 text-slate-500" />;
+  if (trend === 'UP') return <ArrowUpRight className="w-3.5 h-3.5 text-emerald-600" />;
+  if (trend === 'DOWN') return <ArrowDownRight className="w-3.5 h-3.5 text-red-600" />;
+  if (trend === 'NEW') return <Star className="w-3.5 h-3.5 text-amber-600" />;
+  return <Minus className="w-3.5 h-3.5 text-slate-400" />;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -108,9 +108,8 @@ function SortHeader({
   return (
     <button
       onClick={() => onSort(field)}
-      className={`flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wider hover:text-slate-200 transition-colors ${
-        isActive ? 'text-gold' : 'text-slate-500'
-      } ${className}`}
+      className={`flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider hover:text-slate-900 transition-colors ${isActive ? 'text-emerald-700' : 'text-slate-500'
+        } ${className}`}
     >
       {label}
       {isActive && (currentDir === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />)}
@@ -133,10 +132,10 @@ function ScoreBadge({ score, size = 'md' }: { score: number; size?: 'sm' | 'md' 
 // ─────────────────────────────────────────────────────────────
 
 function TierPill({ tier }: { tier: string }) {
-  const style = DARK_TIER_STYLES[tier];
+  const style = AGI_TIER_STYLES[tier];
   if (!style) return <span className="text-[10px] text-slate-500">{tier}</span>;
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider ${style.bg} ${style.text} border ${style.border}`}>
+    <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${style.bg} ${style.text} border ${style.border}`}>
       {style.label}
     </span>
   );
@@ -150,11 +149,10 @@ function FilterChip({ label, active, onClick }: { label: string; active: boolean
   return (
     <button
       onClick={onClick}
-      className={`px-2.5 py-1 rounded-lg text-[11px] font-medium border transition-all ${
-        active
-          ? 'bg-gold/20 text-gold border-gold/40'
-          : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-slate-200 hover:bg-slate-700'
-      }`}
+      className={`px-3 py-1 rounded border transition-all text-[11px] font-bold uppercase tracking-tight ${active
+        ? 'bg-emerald-600 text-white border-emerald-700'
+        : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300 hover:text-slate-700'
+        }`}
     >
       {label}
     </button>
@@ -168,7 +166,7 @@ function FilterChip({ label, active, onClick }: { label: string; active: boolean
 function GradeBadge({ score }: { score: number }) {
   return (
     <span
-      className="inline-flex items-center justify-center px-2.5 py-1 rounded text-xs font-black text-white tabular-nums bg-gold"
+      className="inline-flex items-center justify-center px-2.5 py-1 rounded text-xs font-black text-white tabular-nums bg-amber-600"
     >
       {score}
     </span>
@@ -194,6 +192,9 @@ export default function NCAADatabasePage() {
   const [sortDir, setSortDir] = useState<SortDir>('desc');
   const [showFilters, setShowFilters] = useState(false);
 
+  // Content state
+  const [articles, setArticles] = useState<ContentArticle[]>([]);
+
   // Team filters
   const [teamSearch, setTeamSearch] = useState('');
   const [teamConfFilter, setTeamConfFilter] = useState<ConferenceTier | ''>('');
@@ -203,13 +204,29 @@ export default function NCAADatabasePage() {
 
   // ── Load data ────────────────────────────────────────────
   useEffect(() => {
-    fetch('/api/perform/prospects?limit=500')
-      .then(r => r.json())
-      .then(data => {
-        if (Array.isArray(data)) setProspects(data);
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const [pRes, cRes] = await Promise.all([
+          fetch('/api/perform/prospects?limit=500'),
+          fetch('/api/perform/content')
+        ]);
+
+        if (pRes.ok) {
+          const data = await pRes.json();
+          if (Array.isArray(data)) setProspects(data);
+        }
+        if (cRes.ok) {
+          const content = await cRes.json();
+          if (Array.isArray(content)) setArticles(content);
+        }
+      } catch (err) {
+        console.error('Failed to fetch data:', err);
+      } finally {
         setLoading(false);
-      })
-      .catch(() => setLoading(false));
+      }
+    };
+    fetchData();
   }, []);
 
   // ── Sort handler ─────────────────────────────────────────
@@ -330,28 +347,32 @@ export default function NCAADatabasePage() {
     return [...prospects].sort((a, b) => b.paiScore - a.paiScore).slice(0, 4);
   }, [prospects]);
 
-  // ── Ticker derived from real data ────────────────────────
+  // ── Ticker derived from live rankings + news ──────────────
   const tickerItems = useMemo(() => {
-    const items = [...TICKER_HEADLINES];
+    const items = articles.length > 0
+      ? articles.slice(0, 3).map(a => a.title.replace(/P\.A\.I\./g, 'AGI'))
+      : [...TICKER_HEADLINES];
+
     if (top4Prospects.length > 0) {
       const p = top4Prospects[0];
-      items.unshift(`${p.name} leads all prospects with ${p.paiScore} P.A.I. grade`);
+      items.unshift(`${p.name} leads all prospects with a ${p.paiScore} AGI grade`);
     }
     if (top4Prospects.length > 1) {
       const p = top4Prospects[1];
-      const tierLabel = DARK_TIER_STYLES[p.tier as string]?.label || p.tier;
-      items.splice(2, 0, `${p.name} (${p.position}) earns ${tierLabel} tier rating`);
+      const style = AGI_TIER_STYLES[p.tier as string] || { label: p.tier };
+      items.splice(2, 0, `${p.name} (${p.position}) earns a ${style.label} tier AGI rating`);
     }
     return items;
-  }, [top4Prospects]);
+  }, [top4Prospects, articles]);
 
   const activeFilters = [posFilter, tierFilter, poolFilter, confFilter].filter(Boolean).length;
 
   return (
-    <div className="bg-slate-900 text-white min-h-screen">
+    <div className="bg-[#F8FAFC] text-slate-900 min-h-screen font-sans">
 
       {/* ── Ticker Keyframes ───────────────────────────────── */}
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         @keyframes perform-ticker {
           0% { transform: translateX(0); }
           100% { transform: translateX(-50%); }
@@ -382,33 +403,28 @@ export default function NCAADatabasePage() {
       `}} />
 
       {/* ── Breaking News Ticker ──────────────────────────── */}
-      <div className="bg-slate-950 border-b border-slate-800 text-xs">
+      <div className="bg-white border-b border-slate-200 text-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-10 flex items-center justify-between">
           <div className="flex items-center space-x-4 overflow-hidden">
-            <span className="text-gold font-bold whitespace-nowrap uppercase tracking-wider text-[11px]">
+            <span className="text-emerald-600 font-bold whitespace-nowrap uppercase tracking-wider text-[11px]">
               Live
             </span>
             <div className="overflow-hidden flex-1 relative">
               <div className="perform-ticker-wrap whitespace-nowrap inline-block">
                 {tickerItems.map((item, i) => (
-                  <span key={i} className="mx-4 text-slate-300">
-                    {item} &bull;
-                  </span>
-                ))}
-                {tickerItems.slice(0, 4).map((item, i) => (
-                  <span key={`dup-${i}`} className="mx-4 text-slate-300">
+                  <span key={i} className="mx-4 text-slate-600">
                     {item} &bull;
                   </span>
                 ))}
               </div>
             </div>
           </div>
-          <div className="hidden md:flex items-center space-x-4 text-slate-400">
-            <Link href="/perform/pricing" className="hover:text-gold transition">
+          <div className="hidden md:flex items-center space-x-4 text-slate-400 font-bold uppercase tracking-tighter">
+            <Link href="/perform/pricing" className="hover:text-emerald-600 transition">
               Subscribe
             </Link>
-            <span className="text-slate-700">|</span>
-            <Link href="/perform" className="hover:text-gold transition">
+            <span className="text-slate-200">|</span>
+            <Link href="/perform" className="hover:text-emerald-600 transition">
               Hub
             </Link>
           </div>
@@ -416,44 +432,39 @@ export default function NCAADatabasePage() {
       </div>
 
       {/* ── Hero Section ─────────────────────────────────── */}
-      <section className="relative overflow-hidden">
-        {/* Background gradient with subtle radial accents */}
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" />
-        <div
-          className="absolute inset-0 opacity-[0.06]"
-          style={{
-            backgroundImage:
-              'radial-gradient(circle at 20% 50%, rgba(139,92,246,0.4) 0%, transparent 50%), radial-gradient(circle at 80% 30%, rgba(139,92,246,0.2) 0%, transparent 50%)',
-          }}
-        />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 md:py-20">
-          <span className="inline-flex items-center gap-2 bg-gold/15 text-gold px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full border border-gold/30 mb-6">
-            <Zap className="w-3.5 h-3.5" />
-            Per|Form Intelligence Engine
-          </span>
-          <h1 className="text-4xl md:text-6xl font-black mb-4 max-w-4xl leading-[1.1] tracking-tight">
-            NCAA Football{' '}
-            <span className="text-gold">Database</span>
-          </h1>
-          <p className="text-slate-400 text-lg mb-10 max-w-2xl leading-relaxed">
-            Every prospect. Every team. Every conference. P.A.I.-graded and AI-verified
-            &mdash; the most comprehensive college football intelligence database.
-          </p>
-          <div className="flex flex-wrap items-center gap-6 text-sm">
+      <section className="relative overflow-hidden bg-white border-b border-slate-200">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 md:py-24">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8">
+            <div className="max-w-3xl">
+              <span className="inline-flex items-center gap-2 bg-emerald-50 text-emerald-700 px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded border border-emerald-100 mb-6">
+                <Zap className="w-3 h-3" />
+                AGI — Associated Grading Index
+              </span>
+              <h1 className="text-4xl md:text-7xl font-serif font-bold mb-4 leading-[1.05] tracking-tight text-slate-950">
+                NCAA Football <br />
+                <span className="italic text-emerald-800">Database</span>
+              </h1>
+              <p className="text-slate-600 text-lg md:text-xl font-medium max-w-2xl leading-relaxed">
+                The industry standard for grading, ranking, and deep analytics.
+                Powered by our proprietary AGI engine for surgical precision.
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-12 flex flex-wrap items-center gap-8 text-sm">
             {[
-              { value: dbStats.totalPlayers, label: 'Players' },
-              { value: dbStats.teams, label: 'Teams' },
+              { value: dbStats.totalPlayers, label: 'Prospects' },
+              { value: dbStats.teams, label: 'Programs' },
               { value: CONFERENCES.length, label: 'Conferences' },
               { value: dbStats.eliteCount, label: 'Elite Tier' },
             ].map((stat, i) => (
-              <div key={stat.label} className="flex items-center gap-3">
-                {i > 0 && <div className="w-px h-8 bg-slate-700 hidden sm:block" />}
-                <div className="flex items-center gap-2">
-                  <span className="text-gold font-black text-2xl tabular-nums">{stat.value}</span>
-                  <span className="text-slate-500 uppercase text-xs tracking-wider font-medium">
-                    {stat.label}
-                  </span>
-                </div>
+              <div key={stat.label} className="flex flex-col">
+                <span className="text-slate-950 font-black text-3xl tabular-nums tracking-tighter">
+                  {stat.value}
+                </span>
+                <span className="text-slate-400 uppercase text-[10px] font-bold tracking-widest">
+                  {stat.label}
+                </span>
               </div>
             ))}
           </div>
@@ -462,21 +473,21 @@ export default function NCAADatabasePage() {
 
       {/* ── Stats Bar: Top Graded by Position ────────────── */}
       {topByPosition.length > 0 && (
-        <section className="bg-slate-800/80 border-y border-slate-700">
+        <section className="bg-slate-50 border-b border-slate-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
               {topByPosition.map(({ position, player }, i) => (
                 <div
                   key={position}
-                  className={i < topByPosition.length - 1 ? 'md:border-r md:border-slate-700' : ''}
+                  className={i < topByPosition.length - 1 ? 'md:border-r md:border-slate-200' : ''}
                 >
-                  <p className="text-slate-500 text-xs uppercase tracking-wider mb-1 font-medium">
-                    Highest Graded {position}
+                  <p className="text-slate-500 text-[10px] uppercase tracking-widest mb-1 font-bold">
+                    AGI Leader: {position}
                   </p>
-                  <p className="text-xl font-black text-gold truncate">
+                  <p className="text-xl font-serif font-bold text-slate-900 truncate">
                     {player.lastName || player.name?.split(' ').pop()}
                   </p>
-                  <p className="text-2xl font-black tabular-nums text-white">{player.paiScore}</p>
+                  <p className="text-2xl font-black tabular-nums text-emerald-700">{player.paiScore}</p>
                 </div>
               ))}
             </div>
@@ -488,7 +499,7 @@ export default function NCAADatabasePage() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
         {/* ── Tab Navigation ──────────────────────────────── */}
-        <div className="flex items-center gap-1 mb-8 border-b border-slate-700">
+        <div className="flex items-center gap-1 mb-12 border-b border-slate-200">
           {TABS.map(tab => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -496,68 +507,131 @@ export default function NCAADatabasePage() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-5 py-3.5 text-sm font-semibold border-b-2 transition-all uppercase tracking-wide ${
-                  isActive
-                    ? 'border-gold text-gold'
-                    : 'border-transparent text-slate-500 hover:text-slate-300'
-                }`}
+                className={`flex items-center gap-2 px-8 py-5 text-[11px] font-black border-b-2 transition-all uppercase tracking-[0.2em] relative ${isActive
+                  ? 'border-emerald-600 text-slate-900 group'
+                  : 'border-transparent text-slate-400 hover:text-slate-600'
+                  }`}
               >
-                <Icon className="w-4 h-4" />
+                <Icon className={`w-4 h-4 ${isActive ? 'text-emerald-600' : 'text-slate-300'}`} />
                 {tab.label}
+                {isActive && (
+                  <span className="absolute -top-1 -right-1 flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                  </span>
+                )}
               </button>
             );
           })}
           <div className="flex-1" />
-          <span className="text-[11px] font-mono text-slate-600 uppercase tracking-widest pr-2 hidden md:block">
-            Per|Form Intelligence
-          </span>
+          <div className="hidden lg:flex items-center gap-6">
+            <div className="flex flex-col items-end">
+              <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Platform Sync</span>
+              <span className="text-[10px] font-bold text-emerald-600 uppercase">Live Database</span>
+            </div>
+            <div className="h-8 w-px bg-slate-200" />
+          </div>
         </div>
 
         {/* ════════════════════════════════════════════════════
              TAB: PLAYER DATABASE
            ════════════════════════════════════════════════════ */}
         {activeTab === 'players' && (
-          <div>
-            {/* Search + Filter Toggle */}
-            <div className="flex items-center gap-3 mb-4">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+          <div className="space-y-12">
+
+            {/* ── News Grid (The Athletic style) ── */}
+            {articles.length > 0 && (
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pb-12 border-b border-slate-100">
+                {/* Main Feature */}
+                <div className="lg:col-span-8 flex flex-col group cursor-pointer">
+                  <div className="aspect-[16/9] bg-slate-50 border border-slate-200 mb-6 overflow-hidden rounded shadow-sm relative">
+                    <div className="absolute inset-0 flex items-center justify-center p-8 opacity-40 group-hover:scale-105 transition-transform duration-700">
+                      <Trophy className="w-32 h-32 text-slate-200" />
+                    </div>
+                    <div className="absolute top-6 left-6">
+                      <span className="bg-slate-950 text-white text-[10px] font-black uppercase tracking-[0.2em] px-4 py-2 shadow-2xl">
+                        Scouting Deep Dive
+                      </span>
+                    </div>
+                  </div>
+                  <h3 className="text-3xl md:text-4xl font-serif font-bold text-slate-950 group-hover:text-emerald-800 transition-colors mb-3 leading-[1.1] tracking-tight">
+                    {articles[0].title.replace(/P\.A\.I\./g, 'AGI')}
+                  </h3>
+                  <p className="text-slate-500 text-base md:text-lg font-medium leading-relaxed mb-6 line-clamp-2 max-w-2xl">
+                    {articles[0].excerpt.replace(/P\.A\.I\./g, 'AGI')}
+                  </p>
+                  <div className="mt-auto flex items-center gap-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                    <span className="text-emerald-600">{articles[0].generatedBy}</span>
+                    <span className="w-1.5 h-1.5 bg-slate-200 rounded-full" />
+                    <span>{articles[0].readTimeMin} min read</span>
+                    <span className="w-1.5 h-1.5 bg-slate-200 rounded-full" />
+                    <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3" /> Verified Data</span>
+                  </div>
+                </div>
+
+                {/* Vertical Sidebar Stories */}
+                <div className="lg:col-span-4 space-y-8 border-l border-slate-100 pl-8 hidden lg:block">
+                  <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6">Latest Updates</h4>
+                  {articles.slice(1, 5).map(article => (
+                    <div key={article.id} className="group cursor-pointer">
+                      <span className="text-emerald-700 text-[9px] font-black uppercase tracking-widest mb-1.5 block">
+                        {article.type.replace(/_/g, ' ')}
+                      </span>
+                      <h4 className="text-base font-bold text-slate-950 group-hover:text-emerald-800 transition-colors leading-snug mb-2">
+                        {article.title.replace(/P\.A\.I\./g, 'AGI')}
+                      </h4>
+                      <div className="flex items-center gap-2 text-[9px] font-black text-slate-400 uppercase tracking-widest">
+                        <span>{article.readTimeMin} min</span>
+                        <span>&middot;</span>
+                        <span>{new Date(article.generatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Search + Filter UI */}
+            <div className="flex flex-col md:flex-row items-center gap-4 py-8">
+              <div className="relative flex-1 w-full group">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-emerald-600 transition-colors" />
                 <input
                   type="text"
-                  placeholder="Search by name, school, state, or position..."
+                  placeholder="Query AGI index by name, position, or school..."
                   value={search}
                   onChange={e => setSearch(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-gold/40 focus:ring-1 focus:ring-gold/20"
+                  className="w-full pl-12 pr-4 py-4 rounded border border-slate-200 text-base font-medium focus:outline-none focus:border-emerald-500 bg-white transition-all shadow-sm"
                 />
               </div>
-              <button
-                onClick={() => setShowFilters(f => !f)}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium transition-all ${
-                  showFilters || activeFilters > 0
-                    ? 'bg-gold/15 text-gold border-gold/40'
-                    : 'bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-700'
-                }`}
-              >
-                <SlidersHorizontal className="w-4 h-4" />
-                Filters
-                {activeFilters > 0 && (
-                  <span className="px-1.5 py-0.5 rounded-full bg-gold text-white text-[10px] font-bold">
-                    {activeFilters}
-                  </span>
-                )}
-              </button>
+              <div className="flex gap-2 w-full md:w-auto overflow-x-auto no-scrollbar pb-1 md:pb-0">
+                <button
+                  onClick={() => setShowFilters(f => !f)}
+                  className={`flex items-center gap-2 px-8 py-4 rounded border text-[11px] font-black uppercase tracking-widest transition-all ${showFilters || activeFilters > 0
+                    ? 'bg-emerald-600 text-white border-emerald-700 shadow-lg'
+                    : 'bg-white text-slate-600 border-slate-200 hover:border-slate-400'
+                    }`}
+                >
+                  <SlidersHorizontal className="w-4 h-4" />
+                  Advanced Selection
+                  {activeFilters > 0 && (
+                    <span className="ml-2 px-2 py-0.5 rounded-full bg-white text-emerald-600 text-[9px] font-black">
+                      {activeFilters}
+                    </span>
+                  )}
+                </button>
+              </div>
             </div>
 
             {/* Filter Panel */}
             {showFilters && (
-              <div className="mb-6 p-4 rounded-xl bg-slate-800 border border-slate-700 space-y-4">
+              <div className="mb-6 p-8 rounded border border-slate-200 bg-slate-50 space-y-8 shadow-sm">
                 {/* Position */}
                 <div>
-                  <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2 block">
-                    Position
+                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4 block">
+                    Position Selection
                   </label>
-                  <div className="flex flex-wrap gap-1.5">
-                    <FilterChip label="All" active={!posFilter} onClick={() => setPosFilter('')} />
+                  <div className="flex flex-wrap gap-2">
+                    <FilterChip label="All Positions" active={!posFilter} onClick={() => setPosFilter('')} />
                     {POSITIONS.map(p => (
                       <FilterChip
                         key={p}
@@ -571,8 +645,8 @@ export default function NCAADatabasePage() {
 
                 {/* Tier */}
                 <div>
-                  <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2 block">
-                    Tier
+                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4 block">
+                    Intelligence Tier
                   </label>
                   <div className="flex flex-wrap gap-1.5">
                     <FilterChip label="All" active={!tierFilter} onClick={() => setTierFilter('')} />
@@ -588,110 +662,110 @@ export default function NCAADatabasePage() {
                 </div>
 
                 {/* Pool + Conference */}
-                <div className="flex flex-wrap gap-4">
-                  <div>
-                    <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2 block">
-                      Pool
+                <div className="flex flex-wrap gap-8 items-end">
+                  <div className="w-full md:w-64">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3 block">
+                      Registry Pool
                     </label>
                     <select
                       value={poolFilter}
                       onChange={e => setPoolFilter(e.target.value)}
-                      className="px-3 py-2 rounded-lg border border-slate-700 text-sm text-slate-200 bg-slate-800 focus:outline-none focus:border-gold/40"
+                      className="w-full px-4 py-3 rounded border border-slate-200 text-sm font-bold text-slate-900 bg-white focus:outline-none focus:border-emerald-500 transition-colors"
                     >
                       {POOLS.map(p => (
                         <option key={p.value} value={p.value}>{p.label}</option>
                       ))}
                     </select>
                   </div>
-                  <div>
-                    <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2 block">
-                      Conference
+                  <div className="w-full md:w-64">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3 block">
+                      Conference Registry
                     </label>
                     <select
                       value={confFilter}
                       onChange={e => setConfFilter(e.target.value)}
-                      className="px-3 py-2 rounded-lg border border-slate-700 text-sm text-slate-200 bg-slate-800 focus:outline-none focus:border-gold/40"
+                      className="w-full px-4 py-3 rounded border border-slate-200 text-sm font-bold text-slate-900 bg-white focus:outline-none focus:border-emerald-500 transition-colors"
                     >
                       {CONFERENCES_FILTER.map(c => (
                         <option key={c.value} value={c.value}>{c.label}</option>
                       ))}
                     </select>
                   </div>
-                </div>
 
-                {/* Clear All */}
-                {activeFilters > 0 && (
-                  <button
-                    onClick={() => {
-                      setPosFilter('');
-                      setTierFilter('');
-                      setPoolFilter('');
-                      setConfFilter('');
-                    }}
-                    className="flex items-center gap-1.5 text-xs text-red-400 hover:text-red-300 transition-colors"
-                  >
-                    <X className="w-3.5 h-3.5" /> Clear all filters
-                  </button>
-                )}
+                  {/* Clear All */}
+                  {activeFilters > 0 && (
+                    <button
+                      onClick={() => {
+                        setPosFilter('');
+                        setTierFilter('');
+                        setPoolFilter('');
+                        setConfFilter('');
+                      }}
+                      className="flex items-center gap-2 px-6 py-3 rounded bg-white border border-red-100 text-[10px] font-black uppercase tracking-widest text-red-600 hover:bg-red-50 transition-all shadow-sm"
+                    >
+                      <X className="w-4 h-4" /> Reset Filters
+                    </button>
+                  )}
+                </div>
               </div>
             )}
 
             {/* Results count */}
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-[11px] font-mono text-slate-500 uppercase tracking-widest">
+            <div className="flex items-center justify-between mb-3 px-1">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                 {filteredProspects.length} player{filteredProspects.length !== 1 ? 's' : ''}
                 {activeFilters > 0 && ' (filtered)'}
               </span>
-              <span className="text-[11px] font-mono text-slate-600 uppercase tracking-widest">
-                Sorted by {sortField} {sortDir === 'desc' ? '\u2193' : '\u2191'}
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                Sorted by {sortField === 'paiScore' ? 'AGI Score' : sortField} {sortDir === 'desc' ? '\u2193' : '\u2191'}
               </span>
             </div>
 
             {/* ── Data Table ──────────────────────────────── */}
-            <div className="bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden">
+            <div className="bg-white border border-slate-200 rounded overflow-hidden shadow-sm">
               <div className="overflow-x-auto">
                 <table className="w-full text-left">
                   <thead>
-                    <tr className="border-b border-slate-700 bg-slate-800/80">
-                      <th className="px-4 py-3 w-12">
+                    <tr className="border-b border-slate-200 bg-slate-50">
+                      <th className="px-4 py-4 w-12">
                         <SortHeader label="Rank" field="nationalRank" currentSort={sortField} currentDir={sortDir} onSort={handleSort} />
                       </th>
-                      <th className="px-4 py-3">
+                      <th className="px-4 py-4">
                         <SortHeader label="Player" field="name" currentSort={sortField} currentDir={sortDir} onSort={handleSort} />
                       </th>
-                      <th className="px-3 py-3 w-16">
-                        <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Pos</span>
+                      <th className="px-3 py-4 w-16">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Pos</span>
                       </th>
-                      <th className="px-4 py-3">
+                      <th className="px-4 py-4">
                         <SortHeader label="School" field="school" currentSort={sortField} currentDir={sortDir} onSort={handleSort} />
                       </th>
-                      <th className="px-3 py-3 w-12 hidden md:table-cell">
-                        <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">St</span>
+                      <th className="px-3 py-4 w-12 hidden md:table-cell">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">St</span>
                       </th>
-                      <th className="px-3 py-3 w-16 hidden lg:table-cell">
-                        <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Class</span>
+                      <th className="px-3 py-4 w-16 hidden lg:table-cell">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Class</span>
                       </th>
-                      <th className="px-3 py-3 w-20">
-                        <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Tier</span>
+                      <th className="px-3 py-4 w-20">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Tier</span>
                       </th>
-                      <th className="px-3 py-3 w-16 text-center">
-                        <SortHeader label="P.A.I." field="paiScore" currentSort={sortField} currentDir={sortDir} onSort={handleSort} className="justify-center" />
+                      <th className="px-3 py-4 w-16 text-center">
+                        <SortHeader label="AGI" field="paiScore" currentSort={sortField} currentDir={sortDir} onSort={handleSort} className="justify-center" />
                       </th>
-                      <th className="px-3 py-3 w-12 text-center hidden lg:table-cell">
+                      <th className="px-3 py-4 w-12 text-center hidden lg:table-cell">
                         <SortHeader label="P" field="performance" currentSort={sortField} currentDir={sortDir} onSort={handleSort} className="justify-center" />
                       </th>
-                      <th className="px-3 py-3 w-12 text-center hidden lg:table-cell">
+                      <th className="px-3 py-4 w-12 text-center hidden lg:table-cell">
                         <SortHeader label="A" field="athleticism" currentSort={sortField} currentDir={sortDir} onSort={handleSort} className="justify-center" />
                       </th>
-                      <th className="px-3 py-3 w-12 text-center hidden lg:table-cell">
+                      <th className="px-3 py-4 w-12 text-center hidden lg:table-cell">
                         <SortHeader label="I" field="intangibles" currentSort={sortField} currentDir={sortDir} onSort={handleSort} className="justify-center" />
                       </th>
-                      <th className="px-3 py-3 w-10 text-center">
-                        <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">&Delta;</span>
+                      <th className="px-3 py-4 w-10 text-center">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">&Delta;</span>
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-700/50">
+                  <tbody className="divide-y divide-slate-100">
                     {loading ? (
                       <tr>
                         <td colSpan={12} className="px-4 py-16 text-center">
@@ -710,49 +784,49 @@ export default function NCAADatabasePage() {
                       </tr>
                     ) : (
                       filteredProspects.slice(0, 100).map((p, i) => (
-                        <tr key={p.id} className="hover:bg-gold/[0.04] transition-colors group">
-                          <td className="px-4 py-3">
-                            <span className="text-sm font-bold text-slate-500 tabular-nums">
+                        <tr key={p.id} className="hover:bg-emerald-50/50 transition-colors group">
+                          <td className="px-4 py-4">
+                            <span className="text-sm font-black text-slate-400 tabular-nums">
                               {p.nationalRank || i + 1}
                             </span>
                           </td>
-                          <td className="px-4 py-3">
+                          <td className="px-4 py-4">
                             <Link href={`/perform/prospects/${getProspectSlug(p)}`} className="group/link">
-                              <span className="text-sm font-semibold text-white group-hover/link:text-gold transition-colors">
+                              <span className="text-sm font-bold text-slate-900 group-hover/link:text-emerald-700 transition-colors">
                                 {p.name}
                               </span>
                             </Link>
                           </td>
-                          <td className="px-3 py-3">
-                            <span className="inline-flex items-center justify-center w-9 h-6 rounded bg-slate-700 text-[10px] font-bold text-slate-300">
+                          <td className="px-3 py-4">
+                            <span className="inline-flex items-center justify-center w-10 h-7 rounded border border-slate-200 bg-white text-[10px] font-black text-slate-600">
                               {p.position}
                             </span>
                           </td>
-                          <td className="px-4 py-3">
-                            <span className="text-sm text-slate-400">{p.school}</span>
+                          <td className="px-4 py-4">
+                            <span className="text-sm font-medium text-slate-600">{p.school}</span>
                           </td>
-                          <td className="px-3 py-3 hidden md:table-cell">
-                            <span className="text-xs text-slate-500">{p.state}</span>
+                          <td className="px-3 py-4 hidden md:table-cell">
+                            <span className="text-xs font-bold text-slate-400">{p.state}</span>
                           </td>
-                          <td className="px-3 py-3 hidden lg:table-cell">
-                            <span className="text-xs text-slate-500">{p.classYear}</span>
+                          <td className="px-3 py-4 hidden lg:table-cell">
+                            <span className="text-xs font-bold text-slate-400">{p.classYear}</span>
                           </td>
-                          <td className="px-3 py-3">
+                          <td className="px-3 py-4">
                             <TierPill tier={p.tier} />
                           </td>
-                          <td className="px-3 py-3 text-center">
+                          <td className="px-3 py-4 text-center">
                             <ScoreBadge score={p.paiScore} />
                           </td>
-                          <td className="px-3 py-3 text-center hidden lg:table-cell">
-                            <span className="text-xs font-semibold text-slate-400 tabular-nums">{p.performance}</span>
+                          <td className="px-3 py-4 text-center hidden lg:table-cell">
+                            <span className="text-xs font-black text-slate-400 tabular-nums">{p.performance}</span>
                           </td>
-                          <td className="px-3 py-3 text-center hidden lg:table-cell">
-                            <span className="text-xs font-semibold text-slate-400 tabular-nums">{p.athleticism}</span>
+                          <td className="px-3 py-4 text-center hidden lg:table-cell">
+                            <span className="text-xs font-black text-slate-400 tabular-nums">{p.athleticism}</span>
                           </td>
-                          <td className="px-3 py-3 text-center hidden lg:table-cell">
-                            <span className="text-xs font-semibold text-slate-400 tabular-nums">{p.intangibles}</span>
+                          <td className="px-3 py-4 text-center hidden lg:table-cell">
+                            <span className="text-xs font-black text-slate-400 tabular-nums">{p.intangibles}</span>
                           </td>
-                          <td className="px-3 py-3 text-center">
+                          <td className="px-3 py-4 text-center">
                             <TrendIcon trend={p.trend} />
                           </td>
                         </tr>
@@ -764,8 +838,8 @@ export default function NCAADatabasePage() {
 
               {/* Table footer */}
               {filteredProspects.length > 100 && (
-                <div className="px-4 py-3 border-t border-slate-700 bg-slate-800/50 text-center">
-                  <span className="text-[11px] font-mono text-slate-500 uppercase tracking-widest">
+                <div className="px-4 py-4 border-t border-slate-200 bg-slate-50 text-center">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest text">
                     Showing 100 of {filteredProspects.length} &mdash; use filters to narrow results
                   </span>
                 </div>
@@ -782,28 +856,27 @@ export default function NCAADatabasePage() {
             {/* Search + Filter */}
             <div className="flex items-center gap-3 mb-4">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <input
                   type="text"
-                  placeholder="Search teams, coaches, cities..."
+                  placeholder="Search programs..."
                   value={teamSearch}
                   onChange={e => setTeamSearch(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-gold/40 focus:ring-1 focus:ring-gold/20"
+                  className="w-full pl-10 pr-4 py-3 rounded border border-slate-200 text-sm focus:outline-none focus:border-emerald-500 bg-white"
                 />
               </div>
-              <div className="flex gap-1.5">
+              <div className="flex gap-2">
                 {(['', 'power4', 'group_of_5', 'independent'] as const).map(tier => {
                   const isActive = teamConfFilter === tier;
-                  const label = tier === '' ? 'All' : TIER_LABELS[tier as ConferenceTier]?.label || tier;
+                  const label = tier === '' ? 'All Tiers' : TIER_LABELS[tier as ConferenceTier]?.label || tier;
                   return (
                     <button
                       key={tier}
                       onClick={() => setTeamConfFilter(tier)}
-                      className={`text-xs px-3 py-2 rounded-lg border transition-all whitespace-nowrap ${
-                        isActive
-                          ? 'bg-gold/15 text-gold border-gold/40'
-                          : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-slate-200'
-                      }`}
+                      className={`text-[11px] font-black uppercase tracking-tight px-4 py-2 rounded border transition-all whitespace-nowrap ${isActive
+                        ? 'bg-emerald-600 text-white border-emerald-700 shadow-sm'
+                        : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'
+                        }`}
                     >
                       {label}
                     </button>
@@ -812,81 +885,81 @@ export default function NCAADatabasePage() {
               </div>
             </div>
 
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-[11px] font-mono text-slate-500 uppercase tracking-widest">
-                {filteredTeams.length} team{filteredTeams.length !== 1 ? 's' : ''}
+            <div className="flex items-center justify-between mb-3 px-1">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                {filteredTeams.length} program{filteredTeams.length !== 1 ? 's' : ''}
               </span>
             </div>
 
             {/* Team Table */}
-            <div className="bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden">
+            <div className="bg-white border border-slate-200 rounded overflow-hidden shadow-sm">
               <div className="overflow-x-auto">
                 <table className="w-full text-left">
                   <thead>
-                    <tr className="border-b border-slate-700 bg-slate-800/80">
-                      <th className="px-4 py-3">
-                        <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">School</span>
+                    <tr className="border-b border-slate-200 bg-slate-50">
+                      <th className="px-4 py-4">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">School</span>
                       </th>
-                      <th className="px-3 py-3 hidden md:table-cell">
-                        <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Conference</span>
+                      <th className="px-3 py-4 hidden md:table-cell">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Conference</span>
                       </th>
-                      <th className="px-4 py-3">
-                        <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Head Coach</span>
+                      <th className="px-4 py-4">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Head Coach</span>
                       </th>
-                      <th className="px-4 py-3 hidden lg:table-cell">
-                        <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Stadium</span>
+                      <th className="px-4 py-4 hidden lg:table-cell">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Stadium</span>
                       </th>
-                      <th className="px-3 py-3 text-right hidden lg:table-cell">
-                        <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Capacity</span>
+                      <th className="px-3 py-4 text-right hidden lg:table-cell">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Capacity</span>
                       </th>
-                      <th className="px-3 py-3 hidden md:table-cell">
-                        <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Location</span>
+                      <th className="px-3 py-4 hidden md:table-cell">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Location</span>
                       </th>
-                      <th className="px-3 py-3 w-16">
-                        <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Colors</span>
+                      <th className="px-3 py-4 w-16">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Colors</span>
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-700/50">
+                  <tbody className="divide-y divide-slate-100">
                     {filteredTeams.map(team => (
-                      <tr key={team.id} className="hover:bg-gold/[0.04] transition-colors">
-                        <td className="px-4 py-3">
+                      <tr key={team.id} className="hover:bg-emerald-50/50 transition-colors">
+                        <td className="px-4 py-4">
                           <div>
-                            <span className="text-sm font-semibold text-white">{team.schoolName}</span>
-                            <span className="text-xs text-slate-500 ml-1.5">{team.mascot}</span>
+                            <span className="text-sm font-black text-slate-900">{team.schoolName}</span>
+                            <span className="text-xs font-bold text-slate-400 ml-1.5">{team.mascot}</span>
                           </div>
                         </td>
-                        <td className="px-3 py-3 hidden md:table-cell">
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-slate-700 text-slate-300 border border-slate-600">
+                        <td className="px-3 py-4 hidden md:table-cell">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded border border-slate-200 bg-white text-[10px] font-black uppercase tracking-wider text-slate-600">
                             {team.conferenceAbbrev}
                           </span>
                         </td>
-                        <td className="px-4 py-3">
+                        <td className="px-4 py-4">
                           <div>
-                            <span className="text-sm text-slate-300">{team.headCoach}</span>
-                            <span className="text-[10px] text-slate-600 ml-1">({team.headCoachSince})</span>
+                            <span className="text-sm font-bold text-slate-700">{team.headCoach}</span>
+                            <span className="text-[10px] font-black text-slate-400 ml-1 uppercase">({team.headCoachSince})</span>
                           </div>
                         </td>
-                        <td className="px-4 py-3 hidden lg:table-cell">
-                          <span className="text-xs text-slate-400">{team.stadium}</span>
+                        <td className="px-4 py-4 hidden lg:table-cell">
+                          <span className="text-xs font-bold text-slate-500">{team.stadium}</span>
                         </td>
-                        <td className="px-3 py-3 text-right hidden lg:table-cell">
-                          <span className="text-xs font-semibold text-slate-300 tabular-nums">
+                        <td className="px-3 py-4 text-right hidden lg:table-cell">
+                          <span className="text-xs font-black text-slate-800 tabular-nums">
                             {team.stadiumCapacity.toLocaleString()}
                           </span>
                         </td>
-                        <td className="px-3 py-3 hidden md:table-cell">
-                          <div className="flex items-center gap-1 text-xs text-slate-500">
+                        <td className="px-3 py-4 hidden md:table-cell">
+                          <div className="flex items-center gap-1 text-xs font-bold text-slate-400">
                             <MapPin className="w-3 h-3" />
                             {team.city}, {team.state}
                           </div>
                         </td>
-                        <td className="px-3 py-3">
+                        <td className="px-3 py-4">
                           <div className="flex items-center gap-1">
                             {team.colors.slice(0, 3).map((c, ci) => (
                               <div
                                 key={ci}
-                                className="w-4 h-4 rounded-full border border-slate-600"
+                                className="w-4 h-4 rounded-full border border-slate-200"
                                 style={{ backgroundColor: c.hex }}
                                 title={c.name}
                               />
@@ -912,16 +985,15 @@ export default function NCAADatabasePage() {
               <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-3 block">
                 Select Position
               </label>
-              <div className="flex flex-wrap gap-1.5">
+              <div className="flex flex-wrap gap-2">
                 {POSITIONS.map(p => (
                   <button
                     key={p}
                     onClick={() => setPosRankPosition(p)}
-                    className={`px-3 py-2 rounded-lg text-xs font-bold border transition-all ${
-                      posRankPosition === p
-                        ? 'bg-gold/20 text-gold border-gold/40 shadow-[0_0_8px_rgba(139,92,246,0.2)]'
-                        : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-slate-200 hover:bg-slate-700'
-                    }`}
+                    className={`px-4 py-2 rounded text-[11px] font-black border uppercase tracking-tighter transition-all ${posRankPosition === p
+                      ? 'bg-emerald-600 text-white border-emerald-700 shadow-sm'
+                      : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'
+                      }`}
                   >
                     {p}
                   </button>
@@ -930,22 +1002,22 @@ export default function NCAADatabasePage() {
             </div>
 
             {/* Position Header */}
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-4 px-1">
               <div>
-                <h2 className="text-xl font-black text-white">
+                <h2 className="text-2xl font-serif font-bold text-slate-950">
                   Top {posRankPosition}s
                 </h2>
-                <p className="text-[11px] font-mono text-slate-500 uppercase tracking-widest mt-0.5">
-                  {positionPlayers.length} player{positionPlayers.length !== 1 ? 's' : ''} &middot; Ranked by P.A.I. Score
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">
+                  {positionPlayers.length} player{positionPlayers.length !== 1 ? 's' : ''} &middot; Ranked by AGI Score
                 </p>
               </div>
             </div>
 
             {/* Position Rankings List */}
             {positionPlayers.length === 0 ? (
-              <div className="text-center py-16 bg-slate-800 border border-slate-700 rounded-2xl">
-                <BarChart3 className="w-8 h-8 text-slate-600 mx-auto mb-2" />
-                <p className="text-sm text-slate-500">No {posRankPosition} prospects in the database yet.</p>
+              <div className="text-center py-16 bg-white border border-slate-200 rounded shadow-sm">
+                <BarChart3 className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+                <p className="text-sm font-bold text-slate-400">No {posRankPosition} prospects in the database yet.</p>
               </div>
             ) : (
               <div className="space-y-2">
@@ -953,72 +1025,71 @@ export default function NCAADatabasePage() {
                   <Link
                     key={p.id}
                     href={`/perform/prospects/${getProspectSlug(p)}`}
-                    className="group flex items-center gap-4 p-4 rounded-xl bg-slate-800 border border-slate-700 hover:border-gold/30 hover:bg-gold/[0.04] transition-all"
+                    className="group flex items-center gap-4 p-5 rounded border border-slate-200 bg-white hover:border-emerald-300 hover:bg-emerald-50/30 transition-all shadow-sm"
                   >
                     {/* Rank */}
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-black flex-shrink-0 ${
-                      i < 3
-                        ? 'bg-gold/20 text-gold border border-gold/40'
-                        : 'bg-slate-700 text-slate-400 border border-slate-600'
-                    }`}>
+                    <div className={`w-10 h-10 rounded flex items-center justify-center text-sm font-black flex-shrink-0 ${i < 3
+                      ? 'bg-amber-600 text-white'
+                      : 'bg-slate-100 text-slate-400'
+                      }`}>
                       {i + 1}
                     </div>
 
                     {/* Player Info */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-bold text-white group-hover:text-gold transition-colors">
+                        <span className="text-sm font-bold text-slate-900 group-hover:text-emerald-700 transition-colors">
                           {p.name}
                         </span>
                         <TierPill tier={p.tier} />
                       </div>
                       <div className="flex items-center gap-3 mt-0.5">
-                        <span className="text-[11px] text-slate-500">{p.school}</span>
-                        <span className="text-[11px] text-slate-600">&middot;</span>
-                        <span className="text-[11px] text-slate-500">{p.state}</span>
-                        <span className="text-[11px] text-slate-600">&middot;</span>
-                        <span className="text-[11px] text-slate-500">{p.classYear}</span>
+                        <span className="text-[11px] font-bold text-slate-500">{p.school}</span>
+                        <span className="text-[11px] text-slate-200">&middot;</span>
+                        <span className="text-[11px] font-bold text-slate-400">{p.state}</span>
+                        <span className="text-[11px] text-slate-200">&middot;</span>
+                        <span className="text-[11px] font-bold text-slate-400">{p.classYear}</span>
                         {p.height && (
                           <>
-                            <span className="text-[11px] text-slate-600">&middot;</span>
-                            <span className="text-[11px] text-slate-500">{p.height}</span>
+                            <span className="text-[11px] text-slate-200">&middot;</span>
+                            <span className="text-[11px] font-bold text-slate-400">{p.height}</span>
                           </>
                         )}
                         {p.weight > 0 && (
                           <>
-                            <span className="text-[11px] text-slate-600">&middot;</span>
-                            <span className="text-[11px] text-slate-500">{p.weight} lbs</span>
+                            <span className="text-[11px] text-slate-200">&middot;</span>
+                            <span className="text-[11px] font-bold text-slate-400">{p.weight} lbs</span>
                           </>
                         )}
                       </div>
                     </div>
 
                     {/* Component Scores */}
-                    <div className="hidden md:flex items-center gap-4">
+                    <div className="hidden md:flex items-center gap-6">
                       <div className="text-center">
-                        <div className="text-xs font-semibold text-slate-400 tabular-nums">{p.performance}</div>
-                        <div className="text-[9px] text-slate-600 uppercase">Perf</div>
+                        <div className="text-xs font-black text-slate-400 tabular-nums">{p.performance}</div>
+                        <div className="text-[9px] font-bold text-slate-300 uppercase">Perf</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-xs font-semibold text-slate-400 tabular-nums">{p.athleticism}</div>
-                        <div className="text-[9px] text-slate-600 uppercase">Athl</div>
+                        <div className="text-xs font-black text-slate-400 tabular-nums">{p.athleticism}</div>
+                        <div className="text-[9px] font-bold text-slate-300 uppercase">Athl</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-xs font-semibold text-slate-400 tabular-nums">{p.intangibles}</div>
-                        <div className="text-[9px] text-slate-600 uppercase">Intg</div>
+                        <div className="text-xs font-black text-slate-400 tabular-nums">{p.intangibles}</div>
+                        <div className="text-[9px] font-bold text-slate-300 uppercase">Intg</div>
                       </div>
                     </div>
 
-                    {/* P.A.I. Score */}
-                    <div className="text-right flex-shrink-0">
+                    {/* AGI Score */}
+                    <div className="text-right flex-shrink-0 pr-2">
                       <ScoreBadge score={p.paiScore} size="lg" />
-                      <div className="text-[9px] font-mono text-slate-600 uppercase tracking-widest">P.A.I.</div>
+                      <div className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">AGI</div>
                     </div>
 
                     {/* Trend */}
                     <TrendIcon trend={p.trend} />
 
-                    <ChevronRight className="w-4 h-4 text-slate-600 group-hover:text-gold/50 flex-shrink-0" />
+                    <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-emerald-400 flex-shrink-0" />
                   </Link>
                 ))}
               </div>
@@ -1026,47 +1097,63 @@ export default function NCAADatabasePage() {
           </div>
         )}
 
-        {/* ── Top Graded Prospects (PFF-style cards) ──────── */}
+        {/* ── Top Graded Prospects (The Athletic Style Cards) ──────── */}
         {top4Prospects.length > 0 && (
-          <div className="mt-16 mb-12">
-            <div className="flex justify-between items-center mb-8">
-              <h2 className="text-3xl font-black uppercase tracking-tight">
-                Top Graded Prospects
-              </h2>
+          <div className="mt-24 mb-20">
+            <div className="flex justify-between items-end mb-10 border-b border-slate-200 pb-5">
+              <div>
+                <h2 className="text-4xl font-serif font-bold tracking-tight text-slate-950">
+                  Top Graded <span className="italic text-emerald-800">Prospects</span>
+                </h2>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-2">
+                  Live AGI analysis &middot; Class of '25 & '26
+                </p>
+              </div>
               <Link
                 href="/perform/big-board"
-                className="text-gold hover:underline text-sm font-semibold flex items-center gap-1"
+                className="text-emerald-700 hover:text-emerald-800 text-[11px] font-black uppercase tracking-widest flex items-center gap-1.5 transition-transform hover:translate-x-1"
               >
-                View Big Board <ArrowRight className="w-4 h-4" />
+                View Big Board <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {top4Prospects.map(p => (
                 <Link
                   key={p.id}
                   href={`/perform/prospects/${getProspectSlug(p)}`}
-                  className="bg-slate-800 p-5 rounded-xl border border-slate-700 hover:border-gold/40 transition-all duration-300 card-hover group cursor-pointer"
+                  className="bg-white p-8 rounded border border-slate-200 hover:border-emerald-500 hover:shadow-[0_20px_50px_rgba(0,0,0,0.05)] transition-all duration-500 group cursor-pointer relative overflow-hidden"
                 >
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-xs text-slate-500 uppercase tracking-wider font-semibold">
-                      {p.position}
-                    </span>
+                  <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity">
+                    <Trophy className="w-24 h-24" />
+                  </div>
+                  <div className="flex items-start justify-between mb-8">
+                    <div className="flex flex-col">
+                      <span className="text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em] mb-1">
+                        {p.position}
+                      </span>
+                      <span className="text-[11px] font-bold text-slate-400 uppercase tracking-tight">{p.school}</span>
+                    </div>
                     <GradeBadge score={p.paiScore} />
                   </div>
-                  <div className="w-16 h-16 rounded-full mx-auto mb-4 bg-slate-700 border-2 border-slate-600 flex items-center justify-center group-hover:border-gold/40 transition-colors">
-                    <span className="text-xl font-black text-slate-400 group-hover:text-gold transition-colors">
-                      {p.firstName?.[0]}{p.lastName?.[0]}
-                    </span>
-                  </div>
-                  <h4 className="text-lg font-bold text-center text-white group-hover:text-gold transition-colors">
+
+                  <h4 className="text-2xl font-serif font-bold text-slate-950 group-hover:text-emerald-800 transition-colors mb-4 leading-tight">
                     {p.name}
                   </h4>
-                  <p className="text-slate-500 text-sm text-center mb-3">{p.school}</p>
-                  <div className="flex justify-center space-x-4 text-xs text-slate-500">
-                    <span>P: {p.performance}</span>
-                    <span>A: {p.athleticism}</span>
-                    <span>I: {p.intangibles}</span>
+
+                  <div className="grid grid-cols-3 gap-4 pt-6 border-t border-slate-50">
+                    <div className="flex flex-col">
+                      <span className="text-lg font-black text-slate-900 tabular-nums">{p.performance}</span>
+                      <span className="text-[8px] font-black text-slate-300 uppercase tracking-widest">Perf</span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-lg font-black text-slate-900 tabular-nums">{p.athleticism}</span>
+                      <span className="text-[8px] font-black text-slate-300 uppercase tracking-widest">Athl</span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-lg font-black text-slate-900 tabular-nums">{p.intangibles}</span>
+                      <span className="text-[8px] font-black text-slate-300 uppercase tracking-widest">Intg</span>
+                    </div>
                   </div>
                 </Link>
               ))}
@@ -1080,7 +1167,7 @@ export default function NCAADatabasePage() {
             {
               icon: ListOrdered,
               title: 'Big Board',
-              desc: 'Complete prospect rankings with P.A.I. grades and tier breakdowns.',
+              desc: 'Complete prospect rankings with AGI grades and tier breakdowns.',
               href: '/perform/big-board',
             },
             {
@@ -1092,7 +1179,7 @@ export default function NCAADatabasePage() {
             {
               icon: Trophy,
               title: 'NFL Draft',
-              desc: 'Mock drafts, simulators, and team needs analysis for 2025.',
+              desc: 'Mock drafts, simulators, and team needs analysis for 2026.',
               href: '/perform/draft',
             },
           ].map(tool => {
@@ -1101,17 +1188,17 @@ export default function NCAADatabasePage() {
               <Link
                 key={tool.title}
                 href={tool.href}
-                className="bg-slate-800 p-6 rounded-xl border border-slate-700 hover:border-gold/40 transition-all duration-300 card-hover group cursor-pointer"
+                className="bg-white p-8 rounded border border-slate-200 hover:border-emerald-300 transition-all duration-300 shadow-sm group cursor-pointer"
               >
-                <div className="w-12 h-12 bg-slate-700 rounded-lg flex items-center justify-center mb-4 group-hover:bg-gold/20 transition-colors">
-                  <Icon className="w-6 h-6 text-slate-400 group-hover:text-gold transition-colors" />
+                <div className="w-14 h-14 bg-slate-50 rounded flex items-center justify-center mb-6 group-hover:bg-emerald-50 transition-colors">
+                  <Icon className="w-7 h-7 text-slate-400 group-hover:text-emerald-600 transition-colors" />
                 </div>
-                <h3 className="text-xl font-bold mb-2 group-hover:text-gold transition-colors uppercase tracking-wide">
+                <h3 className="text-xl font-serif font-bold mb-2 group-hover:text-emerald-800 transition-colors leading-tight">
                   {tool.title}
                 </h3>
-                <p className="text-slate-500 text-sm mb-4">{tool.desc}</p>
-                <span className="text-gold text-sm font-semibold flex items-center gap-1">
-                  Explore <ChevronRight className="w-4 h-4" />
+                <p className="text-slate-500 text-sm font-medium leading-relaxed mb-6">{tool.desc}</p>
+                <span className="text-emerald-700 text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5 transition-transform group-hover:translate-x-1">
+                  Explore <ChevronRight className="w-3.5 h-3.5" />
                 </span>
               </Link>
             );
@@ -1119,48 +1206,58 @@ export default function NCAADatabasePage() {
         </div>
 
         {/* ── Premium CTA ──────────────────────────────────── */}
-        <div className="bg-gradient-to-r from-slate-800 to-slate-900 rounded-2xl p-8 md:p-12 mb-12 border border-slate-700 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-gold opacity-10 rounded-full blur-3xl transform translate-x-32 -translate-y-16" />
-          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
-            <div className="text-center md:text-left">
-              <h2 className="text-3xl md:text-4xl font-black mb-4 uppercase tracking-tight">
-                Unlock Per|Form Premium
+        <div className="bg-slate-950 rounded py-16 px-10 md:px-20 mb-24 border border-slate-800 relative overflow-hidden shadow-2xl">
+          <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-emerald-600/5 rounded-full blur-[120px] transform translate-x-1/2 -translate-y-1/2" />
+          <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-emerald-900/10 rounded-full blur-[100px] transform -translate-x-1/2 translate-y-1/2" />
+
+          <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-16">
+            <div className="max-w-3xl text-center lg:text-left">
+              <span className="text-emerald-500 text-[10px] font-black uppercase tracking-[0.3em] mb-6 block">
+                Exclusive Intelligence
+              </span>
+              <h2 className="text-4xl md:text-6xl font-serif font-bold mb-8 tracking-tight text-white leading-tight">
+                Master the Game with <br />
+                <span className="italic text-emerald-500 underline decoration-slate-800 underline-offset-8">AGI Premium</span>
               </h2>
-              <p className="text-slate-400 max-w-xl mb-6">
-                Get access to exclusive P.A.I. grades, advanced scouting reports, War Room debates,
-                and the full intelligence engine used by scouts and analysts.
+              <p className="text-slate-400 text-lg md:text-xl font-medium leading-relaxed mb-10 max-w-xl">
+                Unrestricted access to our depth indexes, daily scouting pulse,
+                and the full Associated Grading Index analytics suite.
               </p>
-              <div className="flex flex-wrap gap-4 justify-center md:justify-start">
-                {['P.A.I. Grades', 'Scouting Reports', 'War Room Access'].map(feature => (
-                  <div key={feature} className="flex items-center space-x-2 text-sm">
-                    <CheckCircle className="w-5 h-5 text-gold flex-shrink-0" />
+              <div className="flex flex-wrap gap-x-10 gap-y-6 justify-center lg:justify-start">
+                {['Live AGI Pulse', 'Intangibles Data', 'War Room access'].map(feature => (
+                  <div key={feature} className="flex items-center space-x-3 text-[10px] font-black uppercase tracking-widest text-slate-300">
+                    <CheckCircle className="w-4 h-4 text-emerald-500" />
                     <span>{feature}</span>
                   </div>
                 ))}
               </div>
             </div>
-            <div className="flex flex-col gap-3 w-full md:w-auto">
+
+            <div className="flex flex-col gap-5 w-full md:w-80 group">
               <Link
                 href="/perform/pricing"
-                className="bg-gold hover:opacity-90 text-white px-8 py-3 rounded-lg font-bold transition whitespace-nowrap text-center uppercase tracking-wide"
+                className="bg-emerald-600 hover:bg-emerald-500 text-white px-10 py-5 rounded text-xs font-black uppercase tracking-[0.2em] transition-all transform hover:-translate-y-1 shadow-xl shadow-emerald-900/40 text-center"
               >
                 Start Free Trial
               </Link>
               <Link
                 href="/perform/pricing"
-                className="border border-slate-600 hover:border-gold text-white px-8 py-3 rounded-lg font-semibold transition whitespace-nowrap text-center"
+                className="bg-transparent border border-slate-800 hover:border-slate-500 text-slate-400 hover:text-white px-10 py-5 rounded text-xs font-bold uppercase tracking-[0.2em] transition-all text-center"
               >
-                View Plans
+                Platform Plans
               </Link>
+              <p className="text-[9px] text-slate-600 font-bold uppercase tracking-widest text-center mt-2 group-hover:text-slate-500 transition-colors">
+                Trusted by 500+ Programs
+              </p>
             </div>
           </div>
         </div>
       </main>
 
       {/* ── Footer Note ──────────────────────────────────── */}
-      <div className="border-t border-slate-800 py-8 text-center">
-        <p className="text-[11px] font-mono text-slate-600 uppercase tracking-widest">
-          Per|Form NCAA Football Database &middot; P.A.I. Graded &middot; Powered by A.I.M.S. Intelligence
+      <div className="border-t border-slate-200 py-12 text-center bg-white">
+        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest scale-90 opacity-75">
+          Per|Form NCAA Football Database &middot; AGI Graded &middot; Official Platform of A.I.M.S.
         </p>
       </div>
     </div>

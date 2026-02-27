@@ -11,7 +11,7 @@ import { ArrowLeft } from "lucide-react";
 
 export default function SandboxLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-full flex flex-col">
+    <div className="min-h-screen flex flex-col">
       {/* Sandbox top bar */}
       <nav className="flex items-center justify-between px-6 py-4 border-b border-wireframe-stroke bg-slate-100/60 backdrop-blur-xl">
         <Link
