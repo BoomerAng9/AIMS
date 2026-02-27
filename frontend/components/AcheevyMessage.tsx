@@ -31,6 +31,8 @@ interface AcheevyMessageProps {
   onReplay: (id: string, content: string) => void;
 }
 
+const REMARK_PLUGINS = [remarkGfm];
+
 /**
  * Custom areEqual comparator — prevents re-renders during streaming
  * unless something visible in this specific message changed.
@@ -89,7 +91,7 @@ const AcheevyMessage = memo(function AcheevyMessage({
             m.content
           ) : (
             <div className="prose prose-invert prose-base max-w-none prose-code:text-gold prose-code:bg-slate-100/60 prose-code:px-1 prose-code:rounded prose-p:text-slate-800 prose-strong:text-slate-800 prose-li:text-slate-700">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{m.content}</ReactMarkdown>
+              <ReactMarkdown remarkPlugins={REMARK_PLUGINS}>{m.content}</ReactMarkdown>
               {isLoading && isLast && (
                 <span className="inline-block w-1.5 h-4 bg-gold ml-0.5 animate-pulse" />
               )}
