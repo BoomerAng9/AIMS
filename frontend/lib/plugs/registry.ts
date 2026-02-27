@@ -201,6 +201,33 @@ export const PLUG_REGISTRY: PlugDefinition[] = [
     priority: "high",
     definitionFile: "",
   },
+  {
+    id: "deepsite",
+    name: "DeepSite v4",
+    slug: "deepsite",
+    vertical: "Web Development",
+    type: "AI Website Builder",
+    description: "AI-powered vibe-coding platform — generate complete websites and web apps from natural language prompts.",
+    longDescription:
+      "DeepSite v4 is a Hugging Face open-source (MIT) website builder that generates multi-file web projects from prompts. Features Monaco editor, Sandpack live preview, chat-based iterative editing with SEARCH/REPLACE diffs, URL-based website redesign, and support for 6+ open-source LLMs via HF Inference Router. Includes auto-deploy to Hugging Face Spaces and ZIP export.",
+    icon: "globe",
+    status: "active",
+    tier: "starter",
+    infrastructure: ["Next.js 16", "MongoDB", "HF Inference API", "Sandpack", "Monaco Editor"],
+    features: [
+      "Natural language to website generation",
+      "Multi-file projects (HTML/CSS/JS)",
+      "Chat-based iterative editing",
+      "Website redesign from URL",
+      "6+ open-source LLM models",
+      "Auto-deploy to HF Spaces",
+      "ZIP project export",
+      "Live preview with Sandpack",
+    ],
+    color: "orange",
+    priority: "high",
+    definitionFile: "deepsite_plug.md",
+  },
 ];
 
 // ─── Lookup Helpers ──────────────────────────────────────────

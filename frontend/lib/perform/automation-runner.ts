@@ -6,11 +6,65 @@
  * and logs results to PerformAutomationRun.
  */
 
-import prisma from '@/lib/db/prisma';
 import {
   createAutomationRun,
   completeAutomationRun,
 } from './ncaa-data-service';
+import { GoogleGenerativeAI } from '@google/generative-ai';
+
+const BRAVE_API_KEY = process.env.BRAVE_API_KEY || '';
+const BRAVE_BASE_URL = 'https://api.search.brave.com/res/v1/web/search';
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
+const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+
+/**
+ * Universal Search & Extract Helper (The Scout)
+ */
+async function scoutSignals(query: string, instructions: string): Promise<any[]> {
+  if (!BRAVE_API_KEY || !GEMINI_API_KEY) return [];
+
+  // 1. GATHER: Search Brave
+  const params = new URLSearchParams({ q: query, count: '10', freshness: 'day' });
+  const res = await fetch(`${BRAVE_BASE_URL}?${params}`, {
+    headers: { 'X-Subscription-Token': BRAVE_API_KEY, 'Accept': 'application/json' },
+  });
+  const searchData = await res.json();
+  const snippets = (searchData.web?.results || []).map((r: any) => `Title: ${r.title}\nDesc: ${r.description}`).join('\n\n');
+
+  if (!snippets) return [];
+
+  // 2. HARVEST: Extract via Gemini
+  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+  const prompt = `
+    You are Boomer_Ang, the Per|Form Intelligence Scout.
+    Extract real-world sports data from these signals for the 2026/2025 season.
+    
+    SIGNALS:
+    ${snippets}
+    
+    TASK:
+    ${instructions}
+    
+    Return ONLY a JSON array of objects. If no data found, return [].
+  `;
+
+  const result = await model.generateContent(prompt);
+  const text = result.response.text();
+  const jsonStr = text.replace(/```json\n|```/g, '').trim();
+
+  try {
+    return JSON.parse(jsonStr);
+  } catch (e) {
+    console.error('[Scout] JSON Parse error:', e, text);
+    return [];
+  }
+}
+
+/** Resolve a team abbreviation to its ID */
+async function getTeamId(abbrev: string): Promise<string | null> {
+  const team = await prisma.performTeam.findFirst({ where: { abbreviation: abbrev } });
+  return team?.id || null;
+}
 
 // ─────────────────────────────────────────────────────────────
 // Coaching Carousel Scanner (Boomer_Ang)
@@ -25,19 +79,40 @@ export async function runCoachingScan(): Promise<string> {
   });
 
   try {
-    // Count existing unverified entries needing verification
-    const unverified = await prisma.coachingChange.count({
-      where: { verified: false },
-    });
+    const rawData = await scoutSignals(
+      '"coaching change" college football hire fire resign 2025 2026',
+      'Extract coaching changes. Fields: coachName, previousRole, newRole, previousTeamAbbrev, newTeamAbbrev, changeType (HIRED|FIRED|RESIGNED|RETIRED|INTERIM), contractValue, notes.'
+    );
 
-    const total = await prisma.coachingChange.count();
+    let createdCount = 0;
+    for (const item of rawData) {
+      const prevId = item.previousTeamAbbrev ? await getTeamId(item.previousTeamAbbrev) : null;
+      const nextId = item.newTeamAbbrev ? await getTeamId(item.newTeamAbbrev) : null;
+
+      await prisma.coachingChange.create({
+        data: {
+          coachName: item.coachName,
+          previousRole: item.previousRole,
+          newRole: item.newRole,
+          previousTeamId: prevId,
+          newTeamId: nextId,
+          changeType: item.changeType || 'HIRED',
+          season: 2026,
+          effectiveDate: new Date(),
+          contractValue: item.contractValue,
+          notes: item.notes,
+          source: 'Boomer_Ang Scout Loop',
+          verified: false,
+        }
+      });
+      createdCount++;
+    }
 
     await completeAutomationRun(run.id, {
       status: 'COMPLETED',
-      recordsScanned: total,
-      recordsUpdated: 0,
-      recordsCreated: 0,
-      summary: `Coaching scan complete. ${total} records in database, ${unverified} awaiting Lil_Hawk verification.`,
+      recordsScanned: rawData.length,
+      recordsCreated: createdCount,
+      summary: `Coaching scan complete. ${createdCount} new coaching movements harvested from signals.`,
     });
 
     return run.id;
@@ -65,18 +140,39 @@ export async function runPortalScan(): Promise<string> {
   });
 
   try {
-    const [total, inPortal, unverified] = await Promise.all([
-      prisma.transferPortalEntry.count(),
-      prisma.transferPortalEntry.count({ where: { status: 'IN_PORTAL' } }),
-      prisma.transferPortalEntry.count({ where: { verified: false } }),
-    ]);
+    const rawData = await scoutSignals(
+      '"entered transfer portal" OR "committed to" transfer college football 247sports on3',
+      'Extract portal entries. Fields: playerName, position, previousTeamAbbrev, newTeamAbbrev (if committed), status (IN_PORTAL|COMMITTED|WITHDRAWN|SIGNED), eligibility, stars (1-5).'
+    );
+
+    let createdCount = 0;
+    for (const item of rawData) {
+      const prevId = item.previousTeamAbbrev ? await getTeamId(item.previousTeamAbbrev) : null;
+      const nextId = item.newTeamAbbrev ? await getTeamId(item.newTeamAbbrev) : null;
+
+      await prisma.transferPortalEntry.create({
+        data: {
+          playerName: item.playerName,
+          position: item.position || 'N/A',
+          previousTeamId: prevId,
+          newTeamId: nextId,
+          status: item.status || 'IN_PORTAL',
+          season: 2026,
+          enteredDate: new Date(),
+          eligibility: item.eligibility,
+          stars: item.stars,
+          source: 'Boomer_Ang Scout Loop',
+          verified: false,
+        }
+      });
+      createdCount++;
+    }
 
     await completeAutomationRun(run.id, {
       status: 'COMPLETED',
-      recordsScanned: total,
-      recordsUpdated: 0,
-      recordsCreated: 0,
-      summary: `Portal scan complete. ${total} entries tracked, ${inPortal} currently in portal, ${unverified} awaiting verification.`,
+      recordsScanned: rawData.length,
+      recordsCreated: createdCount,
+      summary: `Portal scan complete. ${createdCount} new transfer signals harvested.`,
     });
 
     return run.id;
@@ -95,7 +191,7 @@ export async function runPortalScan(): Promise<string> {
 // NIL Rankings Update (Boomer_Ang)
 // ─────────────────────────────────────────────────────────────
 
-export async function runNilUpdate(season: number = 2025): Promise<string> {
+export async function runNilUpdate(season: number = 2026): Promise<string> {
   const run = await createAutomationRun({
     agentName: 'boomer_ang',
     taskType: 'NIL_UPDATE',
@@ -104,11 +200,32 @@ export async function runNilUpdate(season: number = 2025): Promise<string> {
   });
 
   try {
-    // Aggregate NIL deals by team
-    const deals = await prisma.nilDeal.findMany({
-      where: { season, status: 'ACTIVE' },
-      include: { team: { select: { id: true } } },
-    });
+    const rawData = await scoutSignals(
+      '"NIL deal" OR "NIL collective" college football signed on3 sportico',
+      'Extract NIL deals. Fields: playerName, teamAbbrev, brandOrCollective, estimatedValue (number), dealType (COLLECTIVE|ENDORSEMENT), position.'
+    );
+
+    let createdCount = 0;
+    for (const item of rawData) {
+      const teamId = item.teamAbbrev ? await getTeamId(item.teamAbbrev) : null;
+
+      await prisma.nilDeal.create({
+        data: {
+          playerName: item.playerName,
+          teamId,
+          brandOrCollective: item.brandOrCollective,
+          estimatedValue: item.estimatedValue,
+          dealType: item.dealType || 'COLLECTIVE',
+          position: item.position,
+          season,
+          status: 'ACTIVE',
+          announcedDate: new Date(),
+          source: 'Boomer_Ang Scout Loop',
+          verified: false,
+        }
+      });
+      createdCount++;
+    }
 
     const teamAgg: Record<string, {
       teamId: string;
@@ -151,8 +268,8 @@ export async function runNilUpdate(season: number = 2025): Promise<string> {
 
       const trend = !prev ? 'NEW'
         : prev.rank > (i + 1) ? 'UP'
-        : prev.rank < (i + 1) ? 'DOWN'
-        : 'STEADY';
+          : prev.rank < (i + 1) ? 'DOWN'
+            : 'STEADY';
 
       await prisma.nilTeamRanking.upsert({
         where: { teamId_season: { teamId: entry.teamId, season } },

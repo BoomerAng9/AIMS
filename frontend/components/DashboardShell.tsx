@@ -13,125 +13,11 @@ import { LogoWallBackground } from "./LogoWallBackground";
 import { DynamicTagline } from "./DynamicTagline";
 import { MottoBar } from "./MottoBar";
 import { LucUsageWidget } from "./LucUsageWidget";
+import { Breadcrumbs } from "./Breadcrumbs";
+import { useHealthCheck, statusDotClass, statusLabel, statusMessage } from "@/hooks/useHealthCheck";
+import { useLucBalance } from "@/hooks/useLucBalance";
 
 const IS_DEMO = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
-
-// ── Inline hooks ────────────────────────────────────────────
-
-type HealthStatus = "healthy" | "degraded" | "unhealthy" | "loading";
-
-interface HealthData {
-  status: HealthStatus;
-  services: { name: string; status: string }[];
-  responseTime?: number;
-}
-
-function useHealthCheck() {
-  const [health, setHealth] = useState<HealthData>({
-    status: "loading",
-    services: [],
-  });
-
-  useEffect(() => {
-    let mounted = true;
-
-    async function check() {
-      try {
-        const res = await fetch("/api/health");
-        if (!res.ok) throw new Error("unhealthy");
-        const data = await res.json();
-        if (mounted) {
-          setHealth({
-            status: data.status as HealthStatus,
-            services: data.services ?? [],
-            responseTime: data.responseTime,
-          });
-        }
-      } catch {
-        if (mounted) {
-          setHealth({ status: "unhealthy", services: [] });
-        }
-      }
-    }
-
-    check();
-    const interval = setInterval(check, 30_000);
-    return () => {
-      mounted = false;
-      clearInterval(interval);
-    };
-  }, []);
-
-  return health;
-}
-
-function useLucBalance() {
-  const [balance, setBalance] = useState<string>("...");
-  const [tier, setTier] = useState<string>("");
-
-  useEffect(() => {
-    let mounted = true;
-
-    fetch("/api/luc/usage")
-      .then((res) => (res.ok ? res.json() : Promise.reject()))
-      .then((data) => {
-        if (mounted) {
-          setBalance(data.balance ?? "$0.00");
-          setTier(data.name ?? "Explorer");
-        }
-      })
-      .catch(() => {
-        if (mounted) setBalance("$0.00");
-      });
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  return { balance, tier };
-}
-
-// ── Helpers ─────────────────────────────────────────────────
-
-function statusDotClass(status: HealthStatus): string {
-  switch (status) {
-    case "healthy":
-      return "bg-emerald-500";
-    case "degraded":
-      return "bg-amber-500";
-    case "unhealthy":
-      return "bg-red-500";
-    default:
-      return "bg-zinc-600 animate-pulse";
-  }
-}
-
-function statusLabel(status: HealthStatus): string {
-  switch (status) {
-    case "healthy":
-      return "All systems operational";
-    case "degraded":
-      return "Partial degradation detected";
-    case "unhealthy":
-      return "Services unreachable";
-    default:
-      return "Checking status...";
-  }
-}
-
-function statusMessage(status: HealthStatus): string {
-  switch (status) {
-    case "healthy":
-      return "All services online and operational.";
-    case "degraded":
-      return "Running with limited capacity. Some services may be slow.";
-    case "unhealthy":
-      return "Services currently unreachable. Retrying automatically.";
-    default:
-      return "Connecting to services...";
-  }
-}
 
 // ── Component ───────────────────────────────────────────────
 
@@ -298,6 +184,11 @@ export function DashboardShell({ children }: Props) {
               </div>
             </div>
           </header>
+
+          {/* Breadcrumb strip */}
+          <div className="border-b border-white/5 bg-[#09090B]/60 px-4 sm:px-6 lg:px-8 xl:px-12 py-2">
+            <Breadcrumbs className="max-w-7xl mx-auto" />
+          </div>
 
           {/* Main content */}
           <main className="flex-1 flex flex-col">

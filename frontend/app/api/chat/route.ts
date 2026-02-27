@@ -282,6 +282,91 @@ async function recallMemories(message: string, userId: string): Promise<string> 
 }
 
 // ---------------------------------------------------------------------------
+// Local M.I.M. Intent Detection — routes build/validate intents to builders
+// ---------------------------------------------------------------------------
+
+interface MIMDetection {
+  type: 'idea-validation' | 'build-web' | 'build-mobile' | 'build-automation' | 'deep-scout' | null;
+  confidence: number;
+}
+
+function detectMIMIntent(message: string): MIMDetection {
+  const lower = message.toLowerCase();
+
+  // Idea validation patterns
+  const ideaPatterns = [
+    /\b(validate|test|check|assess|evaluate)\b.*\b(idea|concept|business|startup)\b/,
+    /\bi have (an? )?idea\b/,
+    /\b(is this|would this|could this)\b.*\b(work|viable|good idea)\b/,
+    /\b(idea validation|validate my idea)\b/,
+    /\bwhat do you think (about|of)\b.*\b(idea|concept|app|business)\b/,
+  ];
+
+  // Build/create patterns
+  const buildWebPatterns = [
+    /\b(build|create|make|generate)\b.*\b(website|web app|web page|landing page|webapp|site)\b/,
+    /\b(website|web app|landing page)\b.*\b(for me|for my|that)\b/,
+  ];
+
+  const buildMobilePatterns = [
+    /\b(build|create|make|generate)\b.*\b(mobile app|ios app|android app|phone app|app)\b/,
+    /\b(mobile|ios|android)\b.*\b(app|application)\b/,
+  ];
+
+  const buildAutomationPatterns = [
+    /\b(build|create|make|set up|automate)\b.*\b(automation|workflow|pipeline|integration)\b/,
+    /\b(automate|connect|integrate)\b.*\b(when|every|if)\b/,
+    /\b(n8n|zapier|make\.com)\b.*\b(workflow|automation)\b/,
+  ];
+
+  const deepScoutPatterns = [
+    /\b(research|investigate|analyse|analyze|scout|explore)\b.*\b(market|industry|competitor|niche)\b/,
+    /\bdeep (scout|research|dive)\b/,
+    /\b(market research|competitor analysis|industry analysis)\b/,
+  ];
+
+  for (const p of ideaPatterns) {
+    if (p.test(lower)) return { type: 'idea-validation', confidence: 0.85 };
+  }
+  for (const p of deepScoutPatterns) {
+    if (p.test(lower)) return { type: 'deep-scout', confidence: 0.85 };
+  }
+  for (const p of buildMobilePatterns) {
+    if (p.test(lower)) return { type: 'build-mobile', confidence: 0.8 };
+  }
+  for (const p of buildAutomationPatterns) {
+    if (p.test(lower)) return { type: 'build-automation', confidence: 0.8 };
+  }
+  for (const p of buildWebPatterns) {
+    if (p.test(lower)) return { type: 'build-web', confidence: 0.8 };
+  }
+
+  return { type: null, confidence: 0 };
+}
+
+function buildMIMResponse(detection: MIMDetection, originalMessage: string): string | null {
+  switch (detection.type) {
+    case 'idea-validation':
+      return `I can help validate that idea. I've got a full 4-step validation pipeline ready — it covers clarity, gap analysis, audience resonance, and expert perspective.\n\n**→ [Open Deep Scout](/dashboard/deep-scout)** to run the full validation\n\nOr describe your idea right here and I'll give you quick initial feedback.`;
+
+    case 'deep-scout':
+      return `My research engine is ready. Deep Scout runs competitive analysis, market research, and opportunity mapping.\n\n**→ [Open Deep Scout](/dashboard/deep-scout)** for the full research pipeline\n\nI can also do a quick analysis right here if you tell me more about what you want to explore.`;
+
+    case 'build-web':
+      return `Let's build it. I have a full web app builder with live preview, multi-model support, and iterative editing.\n\n**→ [Open Web App Builder](/dashboard/make-it-mine/web-app)** for the full build experience\n\nOr describe exactly what you need and I'll get started.`;
+
+    case 'build-mobile':
+      return `Mobile app — got it. I'll generate a native-looking PWA prototype with bottom nav, touch gestures, and mobile-first design.\n\n**→ [Open Mobile App Builder](/dashboard/make-it-mine/mobile-app)** for the full build experience with phone frame preview\n\nDescribe your app concept and I can start building.`;
+
+    case 'build-automation':
+      return `Workflow automation ready. I'll create a visual workflow with triggers, actions, conditions, and connections.\n\n**→ [Open Automation Builder](/dashboard/make-it-mine/automation)** for the visual workflow builder\n\nTell me what you want to automate and I'll map it out.`;
+
+    default:
+      return null;
+  }
+}
+
+// ---------------------------------------------------------------------------
 // POST handler — the unified entry point
 // ---------------------------------------------------------------------------
 
@@ -298,6 +383,29 @@ export async function POST(req: Request) {
     // Get the last user message for classification
     const lastUserMessage = [...messages].reverse().find((m: { role: string }) => m.role === 'user');
     const lastMessage = lastUserMessage?.content || '';
+
+    // Step 0: Local M.I.M. intent detection — fast-path for build/validate intents
+    const mimDetection = detectMIMIntent(lastMessage);
+    if (mimDetection.type && mimDetection.confidence > 0.7) {
+      const mimResponse = buildMIMResponse(mimDetection, lastMessage);
+      if (mimResponse) {
+        console.log(`[ACHEEVY Chat] M.I.M. intent detected: ${mimDetection.type} (${mimDetection.confidence})`);
+        const encoder = new TextEncoder();
+        const stream = new ReadableStream({
+          start(controller) {
+            controller.enqueue(encoder.encode(`0:${JSON.stringify(mimResponse)}\n`));
+            controller.close();
+          },
+        });
+        return new Response(stream, {
+          headers: {
+            'Content-Type': 'text/plain; charset=utf-8',
+            'X-ACHEEVY-Intent': `mim:${mimDetection.type}`,
+            'X-ACHEEVY-MIM': 'true',
+          },
+        });
+      }
+    }
 
     // Memory recall: fetch relevant memories for this user's message
     const memoryContext = await recallMemories(lastMessage, userId);

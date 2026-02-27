@@ -45,7 +45,7 @@ const COLOR_ANALYSTS = [
         name: 'PrimeTime Jr.',
         title: 'Entertainment Analyst',
         subtitle: 'Bold Takes · Big Predictions · Cultural Authority',
-        bio: `Born confidence. If he said it first, it's in the transcript. Blends elite analytical knowledge with maximum swagger. Real P.A.I. grades, delivered with a flair no other platform can match.`,
+        bio: `Born confidence. If he said it first, it's in the transcript. Blends elite analytical knowledge with maximum swagger. Real AGI grades, delivered with a flair no other platform can match.`,
         catchphrase: '"That boy DIFFERENT. I knew it before everybody knew it."',
         tags: ['Skill Positions', 'Draft Risers', 'Bold Predictions'],
         color: {

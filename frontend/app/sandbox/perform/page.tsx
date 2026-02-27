@@ -79,7 +79,7 @@ const NAV_TILES = [
   { href: '/sandbox/perform/draft', label: 'NFL Draft', sub: `${CURRENT_YEAR} Mock Draft · On the Clock`, icon: TrendingUp, color: 'text-emerald-400', bg: 'bg-emerald-400/10', border: 'hover:border-emerald-400/30' },
   { href: '/sandbox/perform/war-room', label: 'War Room', sub: 'Bull vs Bear debates live', icon: Swords, color: 'text-red-400', bg: 'bg-red-400/10', border: 'hover:border-red-400/30' },
   { href: '/sandbox/perform/redraft', label: '2025 Redraft', sub: 'AGI accountability · Rookie grades', icon: Activity, color: 'text-orange-400', bg: 'bg-orange-400/10', border: 'hover:border-orange-400/30' },
-  { href: '/sandbox/perform/state-boards', label: 'HS State Boards', sub: 'Top 100 per state · Stats only', icon: MapPin, color: 'text-purple-400', bg: 'bg-purple-400/10', border: 'hover:border-purple-400/30' },
+  { href: '/sandbox/perform/state-boards', label: 'HS State Boards', sub: 'Top 100 per state · Stats only', icon: MapPin, color: 'text-amber-400', bg: 'bg-amber-400/10', border: 'hover:border-amber-400/30' },
   { href: '/sandbox/perform/transfer-portal', label: 'Transfer Portal', sub: 'AGI NIL & roster alignment', icon: Shuffle, color: 'text-cyan-400', bg: 'bg-cyan-400/10', border: 'hover:border-cyan-400/30' },
   { href: '/sandbox/perform/content', label: 'Content Feed', sub: 'Reports, debates, analysis', icon: FileText, color: 'text-blue-400', bg: 'bg-blue-400/10', border: 'hover:border-blue-400/30' },
   { href: '/sandbox/perform/analysts', label: 'Meet the Analysts', sub: 'ACHEEVY + the Boomer_Angs', icon: Users, color: 'text-amber-400', bg: 'bg-amber-400/10', border: 'hover:border-amber-400/30' },

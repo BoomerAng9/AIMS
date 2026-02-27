@@ -6,7 +6,7 @@
  * GET /api/perform/nil?view=team-rankings — NIL team rankings
  * GET /api/perform/nil?view=player-rankings — NIL player rankings
  * GET /api/perform/nil?view=stats — NIL stats summary
- * GET /api/perform/nil?season=2025 — Filter by season (default 2025)
+ * GET /api/perform/coaching-carousel?season=2026 — Filter by season (default 2026)
  * GET /api/perform/nil?teamId=<uuid> — Filter by team ID
  * GET /api/perform/nil?dealType=ENDORSEMENT — Filter deals by type
  *
@@ -83,7 +83,7 @@ function getSeedNilStats() {
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const season = parseInt(searchParams.get('season') || '2025', 10);
+  const season = parseInt(searchParams.get('season') || '2026', 10);
   const teamId = searchParams.get('teamId');
   const dealType = searchParams.get('dealType');
   const view = searchParams.get('view') || 'team-rankings';

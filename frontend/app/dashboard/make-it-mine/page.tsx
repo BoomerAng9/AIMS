@@ -3,13 +3,29 @@ import Link from 'next/link';
 
 const PROJECT_TYPES = [
   {
+    id: 'deep-scout',
+    title: 'Deep Scout',
+    description: 'AI research engine — validate ideas, clone competitors, and map markets before building',
+    icon: '🔬',
+    href: '/dashboard/deep-scout',
+    features: ['4-step idea validation', 'Competitor research', 'Clone & adaptation plans', 'Scrollytelling reports'],
+    recommended: true,
+  },
+  {
     id: 'creative-studio',
     title: 'Creative Studio',
     description: 'AI-powered creative builds with the NtNtN Engine — from brief to deployed site',
     icon: '✨',
     href: '/dashboard/ntntn-studio',
     features: ['NtNtN Engine', '3-pillar pipeline', 'Buildsmith delivery', 'Live preview'],
-    recommended: true,
+  },
+  {
+    id: 'web-app',
+    title: 'Web Application',
+    description: 'AI-powered web app builder — describe your idea and ACHEEVY builds it live',
+    icon: '🌐',
+    href: '/dashboard/make-it-mine/web-app',
+    features: ['AI code generation', 'Live preview', 'Iterative editing', 'Plug deployment'],
   },
   {
     id: 'diy',
@@ -18,14 +34,6 @@ const PROJECT_TYPES = [
     icon: '🔧',
     href: '/dashboard/make-it-mine/diy',
     features: ['Voice interaction', 'Camera guidance', 'Step-by-step help'],
-  },
-  {
-    id: 'web-app',
-    title: 'Web Application',
-    description: 'Build a custom web app with guided configuration',
-    icon: '🌐',
-    href: '/dashboard/make-it-mine/web-app',
-    features: ['Full-stack development', 'Deployment included', 'Custom domain'],
   },
   {
     id: 'mobile-app',
@@ -51,7 +59,7 @@ export default function MakeItMinePage() {
       <header className="mb-8">
         <h1 className="text-2xl font-bold text-zinc-100">Make It Mine</h1>
         <p className="mt-2 text-zinc-400">
-          Choose a project type and let A.I.M.S. guide you through the creation process
+          Deep Universal Meticulous Build — research, validate, build, and deploy real software
         </p>
       </header>
 
@@ -59,21 +67,13 @@ export default function MakeItMinePage() {
         {PROJECT_TYPES.map((project) => (
           <Link
             key={project.id}
-            href={project.comingSoon ? '#' : project.href}
+            href={project.href}
             className={`
               group relative overflow-hidden rounded-2xl border p-6
               transition-all duration-300
-              ${project.comingSoon
-                ? 'border-wireframe-stroke bg-[#111113] cursor-not-allowed opacity-60'
-                : 'border-gold/20 bg-[#111113] hover:border-gold/20 hover:bg-white/5'
-              }
+              border-gold/20 bg-[#111113] hover:border-gold/20 hover:bg-white/5
             `}
           >
-            {project.comingSoon && (
-              <span className="absolute top-4 right-4 text-[0.65rem] uppercase tracking-wider text-gold bg-gold/10 px-2 py-1 rounded">
-                Coming Soon
-              </span>
-            )}
             {(project as any).recommended && (
               <span className="absolute top-4 right-4 text-[0.65rem] uppercase tracking-wider text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-1 rounded">
                 Recommended
@@ -86,7 +86,7 @@ export default function MakeItMinePage() {
                 <h2 className="text-lg font-semibold text-zinc-100 group-hover:text-gold transition-colors">
                   {project.title}
                 </h2>
-                <p className="mt-1 text-sm text-zinc-500">
+                <p className="mt-1 text-base font-medium text-zinc-400">
                   {project.description}
                 </p>
 

@@ -65,7 +65,7 @@ function getSeedCarouselStats(season?: number) {
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const season = parseInt(searchParams.get('season') || '2025', 10);
+  const season = parseInt(searchParams.get('season') || '2026', 10);
   const changeType = searchParams.get('changeType');
   const teamId = searchParams.get('teamId');
   const stats = searchParams.get('stats') === 'true';
