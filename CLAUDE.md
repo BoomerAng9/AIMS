@@ -95,7 +95,8 @@ See **`AIMS_PLAN.md`** for the full SOP, PRD, implementation roadmap, and AIMS_R
 - **CI Pipeline**: GitHub Actions → Cloud Build → Artifact Registry (build+push only)
 
 ### VPS Services (default deploy, no profiles)
-nginx, frontend, demo-frontend, uef-gateway, house-of-ang, acheevy, redis, agent-bridge, chickenhawk-core, circuit-metrics, ii-agent, ii-agent-postgres, ii-agent-tools, ii-agent-sandbox (14 containers)
+nginx, frontend, demo-frontend, uef-gateway, house-of-ang, acheevy, redis, agent-bridge, chickenhawk-core, circuit-metrics (10 containers)
+ii-agent runs externally — use docker-compose.aims.yaml overlay from the ii-agent repo
 SSL: host certbot (apt) — certs at /etc/letsencrypt, bind-mounted into nginx container
 
 ### User-Deployed Plug Instances (dynamic, on-demand)
@@ -290,7 +291,7 @@ Every recurring mistake is documented here. Read this BEFORE making changes. Add
 ### Deployment Mistakes
 10. **Pushing without permission** — Never push to remote without explicit owner request.
 11. **Skipping build verification** — Always run `cd frontend && npm run build` before considering frontend work complete.
-12. **License violations** — This is PROPRIETARY software. Never add MIT/Apache/GPL headers to A.I.M.S. code files. `backend/ii-agent/` is an exception (third-party fork with its own MIT license).
+12. **License violations** — This is PROPRIETARY software. Never add MIT/Apache/GPL headers to A.I.M.S. code files.
 
 ### Deployment Mistakes (continued)
 16. **Vercel added without authorization** — Vercel was added as a deployment target, introducing `process.env.VERCEL` checks, edge runtime exports, serverless filesystem workarounds, and `vercel.json` configs across 26 files. A.I.M.S. deploys to VPS Docker ONLY. Never add Vercel, Netlify, or other PaaS-specific code paths. The deployment target is `infra/docker-compose.prod.yml` via `deploy.sh`.

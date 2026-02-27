@@ -117,19 +117,20 @@ const PLUG_REGISTRY: PlugDefinition[] = [
   {
     id: 'ii-agent',
     name: 'II-Agent',
-    tagline: 'Full-stack autonomous code execution with Socket.IO streaming',
-    description: 'AIMS native autonomous execution engine. Writes code, runs tests, deploys artifacts. Features real-time Socket.IO streaming, PostgreSQL persistence, isolated sandbox, and tool server. Already part of the core AIMS stack.',
+    tagline: 'Full-stack autonomous code execution with WebSocket streaming',
+    description: 'Autonomous execution engine for AIMS. Writes code, runs tests, deploys artifacts. Features real-time WebSocket streaming, PostgreSQL persistence, isolated sandbox, and tool server. Deployed externally via docker-compose.aims.yaml overlay.',
     category: 'code-execution',
-    tags: ['code', 'autonomous', 'socket.io', 'full-stack', 'sandbox'],
+    tags: ['code', 'autonomous', 'websocket', 'full-stack', 'sandbox', 'external'],
     tier: 'starter',
     version: '1.0.0',
-    license: 'Proprietary',
+    license: 'Apache-2.0',
     docker: {
-      buildContext: '../backend/ii-agent',
+      image: 'ii-agent:latest',
+      // Deploy via ii-agent repo's integrations/aims/docker-compose.aims.yaml overlay
     },
     resources: { cpuLimit: '2', memoryLimit: '2G', gpuRequired: false },
     ports: [
-      { internal: 8000, description: 'Main agent (Socket.IO)', protocol: 'ws' },
+      { internal: 8000, description: 'Main agent (WebSocket)', protocol: 'ws' },
       { internal: 1236, description: 'Tools server', protocol: 'http' },
       { internal: 8100, description: 'Sandbox environment', protocol: 'http' },
     ],

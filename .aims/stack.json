@@ -88,8 +88,9 @@
       "internal": true
     },
     "iiAgent": {
-      "purpose": "ACHEEVY Desktop",
-      "path": "/backend/ii-agent"
+      "purpose": "ACHEEVY Desktop (external deployment)",
+      "external": true,
+      "note": "Deployed from separate ii-agent repo using docker-compose.aims.yaml overlay"
     }
   },
 

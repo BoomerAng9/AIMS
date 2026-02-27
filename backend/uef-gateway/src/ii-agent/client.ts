@@ -1,18 +1,19 @@
 /**
- * II-Agent Client for ACHEEVY Integration
+ * II-Agent Client for ACHEEVY Integration (External Mode)
  *
- * Bridges ACHEEVY orchestrator with the ii-agent autonomous execution engine.
- * Speaks Socket.IO (ii-agent's native protocol) and translates to/from
- * the IIAgentTask/IIAgentResponse interfaces the orchestrator expects.
+ * Connects to an externally-deployed ii-agent instance via native WebSocket.
+ * The ii-agent source code no longer lives in this repo — it's deployed
+ * separately using its own docker-compose overlay (docker-compose.aims.yaml).
  *
- * Protocol translation:
- *   Gateway → ii-agent: Socket.IO `chat_message` with type "query"
- *   ii-agent → Gateway: Socket.IO `chat_event` with various event types
+ * Protocol: JSON over raw WebSocket (ws://<host>:<port>/ws)
+ * Previous protocol was Socket.IO — changed to raw WS for external deployment.
  *
- * Falls back to raw WebSocket if Socket.IO is unavailable.
+ * Fallback chain (handled by ACHEEVY orchestrator, not here):
+ *   ii-agent → Chicken Hawk → LLM chat → queue
  */
 
 import { EventEmitter } from 'events';
+import WebSocket from 'ws';
 import { v4 as uuidv4 } from 'uuid';
 
 export interface IIAgentTask {
@@ -65,19 +66,21 @@ const TASK_TYPE_TO_AGENT_TYPE: Record<string, string> = {
 };
 
 /**
- * IIAgentClient — Socket.IO bridge to ii-agent backend.
+ * IIAgentClient — WebSocket bridge to external ii-agent backend.
  *
- * Uses dynamic import for socket.io-client to avoid hard dependency.
- * If socket.io-client is not installed, falls back to HTTP-only mode.
+ * Uses the `ws` package for native WebSocket communication.
+ * If the external ii-agent is unavailable, callers (ACHEEVY orchestrator)
+ * handle fallback to Chicken Hawk or direct LLM chat.
  */
 export class IIAgentClient extends EventEmitter {
   private httpUrl: string;
-  private socketUrl: string;
-  private socket: any = null;
+  private wsUrl: string;
+  private socket: WebSocket | null = null;
   private connected = false;
   private sessionUuid: string;
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 5;
+  private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private pendingTasks: Map<string, {
     resolve: (response: IIAgentResponse) => void;
     reject: (error: Error) => void;
@@ -89,87 +92,88 @@ export class IIAgentClient extends EventEmitter {
   constructor(options?: { wsUrl?: string; httpUrl?: string }) {
     super();
     this.httpUrl = options?.httpUrl || process.env.II_AGENT_HTTP_URL || 'http://ii-agent:8000';
-    this.socketUrl = options?.wsUrl || process.env.II_AGENT_WS_URL || this.httpUrl;
+    // Derive WS URL from HTTP URL if not explicitly set
+    const rawWsUrl = options?.wsUrl || process.env.II_AGENT_WS_URL || this.httpUrl;
+    this.wsUrl = rawWsUrl.replace(/^http/, 'ws');
     this.sessionUuid = uuidv4();
   }
 
   /**
-   * Connect to ii-agent via Socket.IO
+   * Connect to ii-agent via WebSocket
    */
   async connect(): Promise<void> {
-    if (this.connected && this.socket?.connected) return;
+    if (this.connected && this.socket?.readyState === WebSocket.OPEN) return;
 
-    try {
-      // Dynamic import — socket.io-client may not be installed
-      const { io } = await import('socket.io-client');
+    return new Promise((resolve, reject) => {
+      const timeoutId = setTimeout(() => {
+        reject(new Error('Connection to ii-agent timed out (10s)'));
+      }, 10000);
 
-      return new Promise((resolve, reject) => {
-        const timeoutId = setTimeout(() => {
-          reject(new Error('Connection to ii-agent timed out (10s)'));
-        }, 10000);
+      // Build WS URL with auth params
+      const url = new URL('/ws', this.wsUrl);
+      url.searchParams.set('token', process.env.II_AGENT_SERVICE_TOKEN || 'aims-service-token');
+      url.searchParams.set('session_uuid', this.sessionUuid);
 
-        this.socket = io(this.socketUrl, {
-          auth: {
-            // ii-agent requires a JWT token for auth.
-            // Use a service token or skip auth in dev mode.
-            token: process.env.II_AGENT_SERVICE_TOKEN || 'aims-service-token',
-            session_uuid: this.sessionUuid,
-          },
-          transports: ['websocket', 'polling'],
-          reconnection: true,
-          reconnectionAttempts: this.maxReconnectAttempts,
-          reconnectionDelay: 1000,
-          timeout: 10000,
+      this.socket = new WebSocket(url.toString());
+
+      this.socket.on('open', () => {
+        clearTimeout(timeoutId);
+        console.log('[II-Agent] Connected via WebSocket');
+        this.connected = true;
+        this.reconnectAttempts = 0;
+
+        // Join session
+        this.send({
+          event: 'join_session',
+          session_uuid: this.sessionUuid,
         });
 
-        this.socket.on('connect', () => {
-          clearTimeout(timeoutId);
-          console.log('[II-Agent] Connected via Socket.IO');
-          this.connected = true;
-          this.reconnectAttempts = 0;
-
-          // Join session room
-          this.socket.emit('join_session', {
-            session_uuid: this.sessionUuid,
-          });
-
-          this.emit('connected');
-          resolve();
-        });
-
-        // All ii-agent events come on the `chat_event` channel
-        this.socket.on('chat_event', (event: { type: string; content: any }) => {
-          this.handleChatEvent(event);
-        });
-
-        this.socket.on('disconnect', (reason: string) => {
-          console.log(`[II-Agent] Disconnected: ${reason}`);
-          this.connected = false;
-          this.emit('disconnected');
-        });
-
-        this.socket.on('connect_error', (error: Error) => {
-          clearTimeout(timeoutId);
-          console.error('[II-Agent] Connection error:', error.message);
-          this.connected = false;
-          this.emit('error', error);
-          reject(error);
-        });
+        this.emit('connected');
+        resolve();
       });
-    } catch (importError) {
-      // socket.io-client not installed — operate in HTTP-only mode
-      console.warn('[II-Agent] socket.io-client not available, using HTTP-only mode');
-      throw new Error('Socket.IO client not available');
-    }
+
+      this.socket.on('message', (data: Buffer) => {
+        try {
+          const msg = JSON.parse(data.toString());
+          // Handle both envelope formats:
+          //   { event: 'chat_event', type: '...', content: ... }
+          //   { type: '...', content: ... }
+          if (msg.event === 'chat_event' || msg.type) {
+            this.handleChatEvent(msg);
+          }
+        } catch {
+          // Non-JSON message, ignore
+        }
+      });
+
+      this.socket.on('close', (code: number, reason: Buffer) => {
+        console.log(`[II-Agent] Disconnected: code=${code} reason=${reason.toString()}`);
+        this.connected = false;
+        this.emit('disconnected');
+        this.scheduleReconnect();
+      });
+
+      this.socket.on('error', (error: Error) => {
+        clearTimeout(timeoutId);
+        console.error('[II-Agent] Connection error:', error.message);
+        this.connected = false;
+        this.emit('error', error);
+        reject(error);
+      });
+    });
   }
 
   /**
    * Disconnect from ii-agent
    */
   disconnect(): void {
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = null;
+    }
     if (this.socket) {
-      this.socket.emit('leave_session', { session_uuid: this.sessionUuid });
-      this.socket.disconnect();
+      this.send({ event: 'leave_session', session_uuid: this.sessionUuid });
+      this.socket.close();
       this.socket = null;
       this.connected = false;
     }
@@ -179,13 +183,13 @@ export class IIAgentClient extends EventEmitter {
    * Check if connected
    */
   isConnected(): boolean {
-    return this.connected && this.socket?.connected === true;
+    return this.connected && this.socket?.readyState === WebSocket.OPEN;
   }
 
   /**
    * Execute a task on ii-agent.
-   * Translates IIAgentTask → Socket.IO `chat_message` with type "query"
-   * Collects `chat_event` responses → assembles IIAgentResponse
+   * Translates IIAgentTask → WebSocket JSON message
+   * Collects response events → assembles IIAgentResponse
    */
   async executeTask(task: IIAgentTask): Promise<IIAgentResponse> {
     if (!this.isConnected()) {
@@ -234,8 +238,9 @@ export class IIAgentClient extends EventEmitter {
         },
       };
 
-      // Send as Socket.IO chat_message
-      this.socket.emit('chat_message', {
+      // Send as WebSocket JSON message
+      this.send({
+        event: 'chat_message',
         session_uuid: this.sessionUuid,
         type: 'query',
         content: queryContent,
@@ -251,7 +256,6 @@ export class IIAgentClient extends EventEmitter {
       await this.connect();
     }
 
-    const taskId = `task_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
     const eventQueue: IIAgentEvent[] = [];
     let completed = false;
     let error: Error | null = null;
@@ -272,7 +276,8 @@ export class IIAgentClient extends EventEmitter {
     this.on('ii_agent_event', eventHandler);
 
     // Send query
-    this.socket.emit('chat_message', {
+    this.send({
+      event: 'chat_message',
       session_uuid: this.sessionUuid,
       type: 'query',
       content: {
@@ -302,7 +307,8 @@ export class IIAgentClient extends EventEmitter {
    */
   async cancelTask(_taskId: string): Promise<void> {
     if (this.isConnected()) {
-      this.socket.emit('chat_message', {
+      this.send({
+        event: 'chat_message',
         session_uuid: this.sessionUuid,
         type: 'cancel',
         content: {},
@@ -350,7 +356,37 @@ export class IIAgentClient extends EventEmitter {
   // ── Private Methods ───────────────────────────────────────
 
   /**
-   * Handle incoming ii-agent `chat_event` messages.
+   * Send a JSON message over WebSocket
+   */
+  private send(data: Record<string, unknown>): void {
+    if (this.socket?.readyState === WebSocket.OPEN) {
+      this.socket.send(JSON.stringify(data));
+    }
+  }
+
+  /**
+   * Schedule a reconnection attempt with exponential backoff
+   */
+  private scheduleReconnect(): void {
+    if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+      console.error('[II-Agent] Max reconnect attempts reached');
+      return;
+    }
+
+    const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts), 30000);
+    this.reconnectAttempts++;
+
+    console.log(`[II-Agent] Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
+
+    this.reconnectTimer = setTimeout(() => {
+      this.connect().catch((err) => {
+        console.error('[II-Agent] Reconnection failed:', err.message);
+      });
+    }, delay);
+  }
+
+  /**
+   * Handle incoming ii-agent event messages.
    * Translates ii-agent event types to IIAgentResponse for pending tasks.
    */
   private handleChatEvent(event: { type: string; content: any }): void {
