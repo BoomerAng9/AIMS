@@ -456,10 +456,10 @@ export function Hero() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-4xl">
               <motion.div variants={staggerItem}>
                 <Link href="/the-book-of-vibe" className="group block h-full">
-                  <div className="wireframe-card p-6 text-center hover:border-purple-500/30 hover:shadow-[0_0_30px_rgba(147,51,234,0.06)] transition-all duration-500 h-full">
+                  <div className="wireframe-card p-6 text-center hover:border-amber-500/30 hover:shadow-[0_0_30px_rgba(245,158,11,0.06)] transition-all duration-500 h-full">
                     <div className="text-4xl mb-3">📖</div>
                     <h3
-                      className="text-base md:text-lg font-bold text-slate-800 mb-1.5 group-hover:text-purple-400 transition-colors"
+                      className="text-base md:text-lg font-bold text-slate-800 mb-1.5 group-hover:text-amber-500 transition-colors"
                       style={{ fontFamily: 'var(--font-display, "Doto", monospace)' }}
                     >
                       The Book of V.I.B.E.

@@ -31,7 +31,7 @@ const CHAPTER_COLORS: Record<string, { border: string; glow: string; text: strin
   cyan: { border: 'border-cyan-500/30', glow: 'shadow-[0_0_30px_rgba(6,182,212,0.08)]', text: 'text-cyan-400' },
   emerald: { border: 'border-emerald-500/30', glow: 'shadow-[0_0_30px_rgba(16,185,129,0.08)]', text: 'text-emerald-400' },
   blue: { border: 'border-blue-500/30', glow: 'shadow-[0_0_30px_rgba(59,130,246,0.08)]', text: 'text-blue-400' },
-  purple: { border: 'border-amber-500/30', glow: 'shadow-[0_0_30px_rgba(147,51,234,0.08)]', text: 'text-amber-400' },
+  purple: { border: 'border-amber-500/30', glow: 'shadow-[0_0_30px_rgba(245,158,11,0.08)]', text: 'text-amber-400' },
   indigo: { border: 'border-indigo-500/30', glow: 'shadow-[0_0_30px_rgba(99,102,241,0.08)]', text: 'text-indigo-400' },
   rose: { border: 'border-rose-500/30', glow: 'shadow-[0_0_30px_rgba(244,63,94,0.08)]', text: 'text-rose-400' },
   red: { border: 'border-red-500/30', glow: 'shadow-[0_0_30px_rgba(239,68,68,0.08)]', text: 'text-red-400' },
@@ -48,7 +48,7 @@ export default function BookOfVibePage() {
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
-            background: 'radial-gradient(ellipse at center, rgba(147,51,234,0.06) 0%, transparent 70%)',
+            background: 'radial-gradient(ellipse at center, rgba(245,158,11,0.06) 0%, transparent 70%)',
           }}
         />
         <motion.div

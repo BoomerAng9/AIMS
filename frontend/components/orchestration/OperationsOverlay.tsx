@@ -31,7 +31,7 @@ const PHASE_CONFIG: Record<OrchestrationPhase, {
   color: string;
 }> = {
   ingest: { label: 'Receiving', icon: '📥', color: 'text-blue-400' },
-  route: { label: 'Routing', icon: '🔀', color: 'text-purple-400' },
+  route: { label: 'Routing', icon: '🔀', color: 'text-amber-400' },
   delegate: { label: 'Delegating', icon: '👥', color: 'text-cyan-400' },
   execute: { label: 'Working', icon: '⚙️', color: 'text-gold' },
   verify: { label: 'Verifying', icon: '✓', color: 'text-green-400' },
@@ -73,7 +73,7 @@ function AgentAvatar({ agent, size = 'sm', status }: {
   const roleColors = {
     acheevy: 'bg-gradient-to-br from-gold to-gold/60',
     manager: 'bg-gradient-to-br from-cyan-500 to-blue-600',
-    boomerang: 'bg-gradient-to-br from-purple-500 to-indigo-600',
+    boomerang: 'bg-gradient-to-br from-amber-500 to-amber-600',
   };
 
   return (

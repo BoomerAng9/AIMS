@@ -73,7 +73,7 @@ const STATUS_STYLES = {
 const CATEGORY_COLORS: Record<string, string> = {
   core: "border-gold/30",
   tool: "border-blue-400/30",
-  agent: "border-violet-400/30",
+  agent: "border-amber-400/30",
   vertical: "border-emerald-400/30",
   infra: "border-cyan-400/30",
 };
@@ -543,7 +543,7 @@ export function PlatformMindMap() {
           ["core", "Core", "border-gold/30"],
           ["tool", "Tools", "border-blue-400/30"],
           ["vertical", "Verticals", "border-emerald-400/30"],
-          ["agent", "Agents", "border-violet-400/30"],
+          ["agent", "Agents", "border-amber-400/30"],
           ["infra", "Infra", "border-cyan-400/30"],
         ] as const).map(([key, label, border]) => (
           <div key={key} className="flex items-center gap-1.5">

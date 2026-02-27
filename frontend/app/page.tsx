@@ -94,12 +94,12 @@ function AmbientOrbs() {
     <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
       {/* Subtle grid */}
       <div className="absolute inset-0 bg-grid opacity-40" />
-      {/* Primary violet orb — top center */}
-      <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[900px] h-[600px] bg-[radial-gradient(ellipse_at_center,rgba(139,92,246,0.08)_0%,transparent_70%)]" />
+      {/* Primary amber orb — top center */}
+      <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[900px] h-[600px] bg-[radial-gradient(ellipse_at_center,rgba(245,158,11,0.08)_0%,transparent_70%)]" />
       {/* Secondary cyan orb — bottom left */}
       <div className="absolute bottom-0 -left-20 w-[600px] h-[500px] bg-[radial-gradient(ellipse_at_center,rgba(6,182,212,0.05)_0%,transparent_70%)]" />
-      {/* Tertiary violet orb — right */}
-      <div className="absolute top-1/2 -right-40 w-[500px] h-[500px] bg-[radial-gradient(ellipse_at_center,rgba(139,92,246,0.04)_0%,transparent_70%)]" />
+      {/* Tertiary amber orb — right */}
+      <div className="absolute top-1/2 -right-40 w-[500px] h-[500px] bg-[radial-gradient(ellipse_at_center,rgba(245,158,11,0.04)_0%,transparent_70%)]" />
       {/* Vignette */}
       <div className="absolute inset-0 vignette-overlay" />
     </div>
@@ -211,7 +211,7 @@ function ScrollProgress() {
       className="fixed top-0 left-0 right-0 h-[2px] origin-left z-[60]"
       style={{
         scaleX: scrollYProgress,
-        background: "linear-gradient(90deg, #8B5CF6, #06B6D4)",
+        background: "linear-gradient(90deg, #F59E0B, #06B6D4)",
       }}
     />
   );
@@ -392,7 +392,7 @@ export default function HomePage() {
            ══════════════════════════════════════════════════════ */}
         <section className="py-28 px-4 md:px-6 relative">
           {/* Section ambient glow */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-[radial-gradient(ellipse_at_center,rgba(139,92,246,0.04)_0%,transparent_70%)] pointer-events-none" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-[radial-gradient(ellipse_at_center,rgba(245,158,11,0.04)_0%,transparent_70%)] pointer-events-none" />
 
           <div className="max-w-6xl mx-auto relative">
             <FadeIn>
@@ -598,7 +598,7 @@ export default function HomePage() {
 
               <div className="relative p-12 md:p-20 text-center rounded-[2rem] border border-amber-500/10 bg-[#111113]/90 backdrop-blur-xl overflow-hidden">
                 {/* Ambient glow inside card */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[200px] bg-[radial-gradient(ellipse_at_center,rgba(139,92,246,0.1)_0%,transparent_70%)] pointer-events-none" />
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[200px] bg-[radial-gradient(ellipse_at_center,rgba(245,158,11,0.1)_0%,transparent_70%)] pointer-events-none" />
 
                 <div className="relative z-10">
                   <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500/15 to-cyan-500/10 border border-amber-500/20 flex items-center justify-center mx-auto mb-8 p-1">
@@ -660,7 +660,7 @@ export default function HomePage() {
               <Link href="/privacy" className="hover:text-zinc-400 transition-colors">
                 Privacy
               </Link>
-              <Link href="/economics" className="hover:text-zinc-400 transition-colors">
+              <Link href="/pricing" className="hover:text-zinc-400 transition-colors">
                 Pricing
               </Link>
               <Link href="/about" className="hover:text-zinc-400 transition-colors">
@@ -712,7 +712,7 @@ function Nav() {
             {[
               { href: "/plugs", label: "Catalog" },
               { href: "#how-it-works", label: "How It Works" },
-              { href: "/economics", label: "Pricing" },
+              { href: "/pricing", label: "Pricing" },
               { href: "/about", label: "About" },
             ].map((link) => (
               <Link
@@ -761,7 +761,7 @@ function Nav() {
             {[
               { href: "/plugs", label: "Catalog" },
               { href: "#how-it-works", label: "How It Works" },
-              { href: "/economics", label: "Pricing" },
+              { href: "/pricing", label: "Pricing" },
               { href: "/about", label: "About" },
             ].map((link) => (
               <Link

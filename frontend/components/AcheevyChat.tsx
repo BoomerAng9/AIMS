@@ -64,7 +64,7 @@ const INTENT_OPTIONS = [
 const TEAM_SLOTS = [
   { id: 'engineer', name: 'Engineer', color: 'emerald' },
   { id: 'marketer', name: 'Marketer', color: 'blue' },
-  { id: 'analyst', name: 'Analyst', color: 'violet' },
+  { id: 'analyst', name: 'Analyst', color: 'amber' },
   { id: 'quality', name: 'Quality', color: 'amber' },
   { id: 'executor', name: 'Executor', color: 'red' },
 ];

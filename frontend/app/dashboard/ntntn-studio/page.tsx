@@ -235,7 +235,7 @@ function PillarSection({
               ? "#10b981"
               : color.includes("amber") ? "#d4af37"
               : color.includes("blue") ? "#3b82f6"
-              : "#8b5cf6",
+              : "#F59E0B",
           }}
         />
       </div>

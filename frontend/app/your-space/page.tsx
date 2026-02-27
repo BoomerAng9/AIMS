@@ -34,7 +34,7 @@ interface Planet {
 // ─────────────────────────────────────────────────────────────
 
 const NEARBY_PLANETS: Planet[] = [
-  { id: 'p1', name: 'Zephyr-7', type: 'unexplored', distance: 12, resources: ['Helium-3', 'Iron'], x: 75, y: 20, color: '#8B5CF6' },
+  { id: 'p1', name: 'Zephyr-7', type: 'unexplored', distance: 12, resources: ['Helium-3', 'Iron'], x: 75, y: 20, color: '#F59E0B' },
   { id: 'p2', name: 'Nova Prime', type: 'friendly', owner: 'Captain_Stellar', distance: 24, resources: ['Gold', 'Titanium'], x: 20, y: 35, color: '#F59E0B' },
   { id: 'p3', name: 'Darkholme', type: 'unexplored', distance: 48, resources: ['Dark Matter', 'Crystals'], x: 85, y: 65, color: '#6366F1' },
   { id: 'p4', name: 'Eden-12', type: 'explored', distance: 8, resources: ['Water', 'Organics'], x: 40, y: 80, color: '#22C55E' },

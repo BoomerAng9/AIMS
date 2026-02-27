@@ -160,7 +160,7 @@ const revenueStreams = [
       { label: "License Fee", value: "$2K+/mo" },
       { label: "Setup Fee", value: "$5K" },
     ],
-    color: "#8B5CF6",
+    color: "#F59E0B",
   },
   {
     id: "api-access",

@@ -223,9 +223,9 @@ export function StarfieldBackground({
       x: 85,
       y: 15,
       size: 60,
-      color: '#8B5CF6',
+      color: '#F59E0B',
       hasRings: true,
-      glowColor: '#A78BFA',
+      glowColor: '#FBBF24',
     },
     {
       id: 'planet-2',
@@ -286,7 +286,7 @@ export function StarfieldBackground({
       {/* Nebulae */}
       {showNebulae && (
         <>
-          <Nebula x={20} y={30} color={isLight ? '#C4B5FD' : '#8B5CF6'} />
+          <Nebula x={20} y={30} color={isLight ? '#FDE68A' : '#F59E0B'} />
           <Nebula x={70} y={60} color={isLight ? '#FBCFE8' : '#EC4899'} />
           <Nebula x={40} y={80} color={isLight ? '#BFDBFE' : '#3B82F6'} />
         </>

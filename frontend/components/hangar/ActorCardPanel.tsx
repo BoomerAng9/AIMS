@@ -12,7 +12,7 @@ import type { ActorType } from '@/lib/hangar/actorRegistry';
 const STATE_BADGES: Record<string, { label: string; color: string }> = {
   IDLE: { label: 'Idle', color: 'bg-slate-100' },
   LISTENING: { label: 'Listening', color: 'bg-blue-500/60' },
-  ASSIGNED: { label: 'Assigned', color: 'bg-purple-500/60' },
+  ASSIGNED: { label: 'Assigned', color: 'bg-amber-500/60' },
   EXECUTING: { label: 'Executing', color: 'bg-orange-500/60' },
   RETURNING: { label: 'Returning', color: 'bg-cyan-500/60' },
   COMPLETE: { label: 'Complete', color: 'bg-green-500/60' },

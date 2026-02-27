@@ -143,7 +143,7 @@ const pipelineStages = [
     label: "Artifact Registry",
     detail: "Images pushed to aims-docker repo",
     icon: Package,
-    color: "#8B5CF6",
+    color: "#F59E0B",
   },
   {
     label: "Deploy to VPS",

@@ -200,13 +200,13 @@ function DevModeToggle() {
       className={clsx(
         "flex items-center gap-2.5 w-full rounded-lg px-3 py-2 transition-all text-sm border",
         isPrivate
-          ? "border-violet-200 bg-violet-50 text-violet-700 hover:bg-violet-100"
+          ? "border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100"
           : "border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100"
       )}
       title={isPrivate ? "Switch to Customer View" : "Switch to Developer View"}
     >
       {isPrivate ? (
-        <Code className="w-4 h-4 text-violet-500" />
+        <Code className="w-4 h-4 text-amber-500" />
       ) : (
         <Eye className="w-4 h-4 text-slate-400" />
       )}
@@ -217,7 +217,7 @@ function DevModeToggle() {
         className={clsx(
           "ml-auto text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded",
           isPrivate
-            ? "bg-violet-200 text-violet-800"
+            ? "bg-amber-200 text-amber-800"
             : "bg-slate-200 text-slate-600"
         )}
       >

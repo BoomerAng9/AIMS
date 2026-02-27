@@ -89,7 +89,7 @@ function AgentNode({ agent, isActive, onClick }: {
           w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold
           ${agent.role === 'acheevy' ? 'bg-gradient-to-br from-gold to-amber-600 text-black' : ''}
           ${agent.role === 'manager' ? 'bg-gradient-to-br from-cyan-500 to-blue-600 text-slate-800' : ''}
-          ${agent.role === 'boomerang' ? 'bg-gradient-to-br from-purple-500 to-indigo-600 text-slate-800' : ''}
+          ${agent.role === 'boomerang' ? 'bg-gradient-to-br from-amber-500 to-amber-600 text-slate-800' : ''}
         `}>
           {agent.name[0]}
         </div>
@@ -289,8 +289,8 @@ function ChainOfCommand({ state }: { state: OrchestrationState }) {
               <>
                 {/* Arrow */}
                 <div className="flex items-center">
-                  <div className="w-6 h-0.5 bg-gradient-to-r from-cyan-500/50 to-purple-500/50" />
-                  <div className="w-0 h-0 border-t-[4px] border-t-transparent border-l-[6px] border-l-purple-500/50 border-b-[4px] border-b-transparent" />
+                  <div className="w-6 h-0.5 bg-gradient-to-r from-cyan-500/50 to-amber-500/50" />
+                  <div className="w-0 h-0 border-t-[4px] border-t-transparent border-l-[6px] border-l-amber-500/50 border-b-[4px] border-b-transparent" />
                 </div>
 
                 {/* Angs */}
@@ -298,7 +298,7 @@ function ChainOfCommand({ state }: { state: OrchestrationState }) {
                   {state.activeAngs.slice(0, 3).map((ang, i) => (
                     <div
                       key={ang.id}
-                      className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center border-2 border-black"
+                      className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center border-2 border-black"
                       style={{ zIndex: 3 - i }}
                     >
                       <span className="text-slate-800 font-medium text-xs">

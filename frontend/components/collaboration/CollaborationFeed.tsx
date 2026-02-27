@@ -66,7 +66,7 @@ const ROLE_CONFIG: Record<AgentRole, { color: string; bg: string; icon: string }
   boomer_ang:   { color: 'text-blue-400',  bg: 'bg-blue-500/10', icon: 'BMR' },
   chicken_hawk: { color: 'text-orange-400',bg: 'bg-orange-500/10',icon: 'CHK' },
   lil_hawk:     { color: 'text-green-400', bg: 'bg-green-500/10',icon: 'LIL' },
-  verifier:     { color: 'text-purple-400',bg: 'bg-purple-500/10',icon: 'VRF' },
+  verifier:     { color: 'text-amber-400',bg: 'bg-amber-500/10',icon: 'VRF' },
   receipt:      { color: 'text-cyan-400',  bg: 'bg-cyan-500/10', icon: 'RCT' },
 };
 

@@ -82,7 +82,7 @@ const NAV_TILES = [
   { href: '/perform/war-room', label: 'War Room', sub: 'Bull vs Bear Verdicts', icon: Swords, color: 'text-red-700', bg: 'bg-red-50', border: 'hover:border-red-200' },
   { href: '/perform/redraft', label: 'Redraft Logic', sub: 'Accountability Audit', icon: RotateCcw, color: 'text-amber-700', bg: 'bg-amber-50', border: 'hover:border-amber-200' },
   { href: '/perform/transfer-portal', label: 'Transfer Portal', sub: 'Portal Flow · NIL Value', icon: ArrowRightLeft, color: 'text-blue-700', bg: 'bg-blue-50', border: 'hover:border-blue-200' },
-  { href: '/perform/state-boards', label: 'State Boards', sub: 'Local Scouting Reports', icon: MapPin, color: 'text-purple-700', bg: 'bg-purple-50', border: 'hover:border-purple-200' },
+  { href: '/perform/state-boards', label: 'State Boards', sub: 'Local Scouting Reports', icon: MapPin, color: 'text-amber-700', bg: 'bg-amber-50', border: 'hover:border-amber-200' },
   { href: '/perform/analysts', label: 'Analyst Roster', sub: 'Meet the Boomer_Angs', icon: Users, color: 'text-slate-500', bg: 'bg-slate-50', border: 'hover:border-slate-300' },
 ];
 

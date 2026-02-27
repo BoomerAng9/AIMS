@@ -54,7 +54,7 @@ export default function ArenaLobby() {
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
-            background: 'radial-gradient(ellipse at 30% 50%, rgba(212,175,55,0.08) 0%, transparent 60%), radial-gradient(ellipse at 80% 50%, rgba(147,51,234,0.06) 0%, transparent 60%)',
+            background: 'radial-gradient(ellipse at 30% 50%, rgba(212,175,55,0.08) 0%, transparent 60%), radial-gradient(ellipse at 80% 50%, rgba(245,158,11,0.06) 0%, transparent 60%)',
           }}
         />
         <div className="relative z-10 px-8 md:px-12 py-12 md:py-16">

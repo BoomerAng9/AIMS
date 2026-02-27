@@ -86,7 +86,7 @@ const FORMAT_CONFIG: Record<string, FormatConfig> = {
   html: {
     icon: FileCode,
     label: 'HTML',
-    badgeColor: 'text-purple-500 bg-purple-50 border-purple-200',
+    badgeColor: 'text-amber-500 bg-amber-50 border-amber-200',
     mimeType: 'text/html',
   },
 };

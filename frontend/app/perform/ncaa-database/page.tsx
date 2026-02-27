@@ -453,7 +453,7 @@ export default function NCAADatabasePage() {
           left: 0;
           width: 0;
           height: 2px;
-          background-color: var(--perform-accent, #8B5CF6);
+          background-color: var(--perform-accent, #F59E0B);
           transition: width 0.3s;
         }
         .nav-link-underline:hover::after {
@@ -506,7 +506,7 @@ export default function NCAADatabasePage() {
           className="absolute inset-0 opacity-[0.06]"
           style={{
             backgroundImage:
-              'radial-gradient(circle at 20% 50%, rgba(139,92,246,0.4) 0%, transparent 50%), radial-gradient(circle at 80% 30%, rgba(139,92,246,0.2) 0%, transparent 50%)',
+              'radial-gradient(circle at 20% 50%, rgba(245,158,11,0.4) 0%, transparent 50%), radial-gradient(circle at 80% 30%, rgba(245,158,11,0.2) 0%, transparent 50%)',
           }}
         />
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 border-b border-slate-800 pb-8">
@@ -1080,7 +1080,7 @@ export default function NCAADatabasePage() {
                     key={p}
                     onClick={() => setPosRankPosition(p)}
                     className={`px-3 py-2 rounded-lg text-xs font-bold border transition-all ${posRankPosition === p
-                      ? 'bg-gold/20 text-gold border-gold/40 shadow-[0_0_8px_rgba(139,92,246,0.2)]'
+                      ? 'bg-gold/20 text-gold border-gold/40 shadow-[0_0_8px_rgba(245,158,11,0.2)]'
                       : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-slate-200 hover:bg-slate-700'
                       }`}
                   >

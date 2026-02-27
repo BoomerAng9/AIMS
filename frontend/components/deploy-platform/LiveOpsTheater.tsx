@@ -108,7 +108,7 @@ function YardAnimation({ phase, progress }: { phase: string; progress: number })
     { x: 30, y: 60, color: '#22C55E' },
     { x: 50, y: 60, color: '#EAB308' },
     { x: 70, y: 60, color: '#EF4444' },
-    { x: 90, y: 60, color: '#8B5CF6' },
+    { x: 90, y: 60, color: '#F59E0B' },
   ];
 
   return (
