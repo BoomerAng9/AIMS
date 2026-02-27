@@ -22,7 +22,7 @@ import {
   Trophy, Activity, Mic, Theater, BookOpen,
   Coins, CircleDot, TrendingUp, Building, Layers,
   Store, ShoppingCart, Calculator, Map, Plug,
-  Code, Eye, Wand2,
+  Code, Eye, Wand2, Briefcase, Target,
 } from "lucide-react";
 
 // ── Types ──
@@ -98,6 +98,19 @@ const PRIVATE_LIVE_APPS: NavItem[] = [
 const PRIVATE_PERFORM: NavItem[] = [
   { href: "/dashboard/nil", label: "N.I.L.", icon: Trophy },
   { href: "/dashboard/sports-tracker", label: "Sports Tracker", icon: Activity },
+];
+
+// Hybrid Business Manager — Fractional executive roles
+const PRIVATE_HBM: NavItem[] = [
+  { href: "/dashboard/hybrid-business-manager", label: "HBM Hub", icon: Briefcase, highlight: true },
+  { href: "/dashboard/hybrid-business-manager/engineer", label: "H B Engineer", icon: Code },
+  { href: "/dashboard/hybrid-business-manager/architect", label: "Architect", icon: Layers },
+  { href: "/dashboard/hybrid-business-manager/ciso", label: "CISO", icon: Shield },
+  { href: "/dashboard/hybrid-business-manager/cto", label: "CTO", icon: Cpu },
+];
+
+const PRIVATE_HBM_OWNER: NavItem[] = [
+  { href: "/dashboard/hybrid-business-manager/multus-maven", label: "Multus Maven", icon: Target, highlight: true, ownerOnly: true },
 ];
 
 const PRIVATE_OWNER: NavItem[] = [
@@ -363,6 +376,18 @@ export function DashboardNav() {
       <div className="mt-1 space-y-0.5">
         <SectionLabel label="Per|Form" icon={Trophy} />
         {PRIVATE_PERFORM.map((item) => (
+          <NavLink key={item.href} item={item} pathname={pathname} />
+        ))}
+      </div>
+
+      {/* Hybrid Business Manager */}
+      <div className="mx-2 mt-2 border-t border-blue-200/50" />
+      <div className="mt-1 space-y-0.5">
+        <SectionLabel label="HBM" icon={Briefcase} />
+        {PRIVATE_HBM.map((item) => (
+          <NavLink key={item.href} item={item} pathname={pathname} />
+        ))}
+        {isOwner && PRIVATE_HBM_OWNER.map((item) => (
           <NavLink key={item.href} item={item} pathname={pathname} />
         ))}
       </div>
