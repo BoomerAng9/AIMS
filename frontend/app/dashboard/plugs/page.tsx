@@ -34,7 +34,7 @@ const STATUS_CONFIG: Record<PlugStatus, { label: string; color: string; dot: str
   live:     { label: "Live",      color: "text-emerald-400", dot: "bg-emerald-400 animate-pulse" },
   building: { label: "Building",  color: "text-blue-400",    dot: "bg-blue-400 animate-pulse" },
   review:   { label: "In Review", color: "text-gold",        dot: "bg-gold" },
-  ready:    { label: "Ready",     color: "text-violet-400",  dot: "bg-violet-400" },
+  ready:    { label: "Ready",     color: "text-amber-400",  dot: "bg-amber-400" },
   deployed: { label: "Deployed",  color: "text-emerald-400", dot: "bg-emerald-400" },
 };
 

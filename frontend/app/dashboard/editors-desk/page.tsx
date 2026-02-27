@@ -57,13 +57,13 @@ const TIER_BADGE: Record<string, string> = {
   ELITE: 'bg-amber-500/15 text-amber-400 border-amber-500/25',
   BLUE_CHIP: 'bg-cyan-500/15 text-cyan-400 border-cyan-500/25',
   PROSPECT: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/25',
-  SLEEPER: 'bg-purple-500/15 text-purple-400 border-purple-500/25',
+  SLEEPER: 'bg-amber-500/15 text-amber-400 border-amber-500/25',
   DEVELOPMENTAL: 'bg-zinc-500/15 text-zinc-400 border-white/20/25',
 };
 
 const TYPE_BADGE: Record<string, string> = {
   BLOG: 'bg-cyan-500/15 text-cyan-400',
-  PODCAST: 'bg-purple-500/15 text-purple-400',
+  PODCAST: 'bg-amber-500/15 text-amber-400',
   RANKING_UPDATE: 'bg-amber-500/15 text-amber-400',
 };
 
@@ -207,9 +207,9 @@ export default function EditorsDesk() {
             <div className="text-right">
               <p className="text-xs text-zinc-400 font-mono">THREE-GATE SYSTEM</p>
               <div className="flex gap-2 mt-1">
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400">G1 Auto</span>
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-400 ring-1 ring-amber-500/30">G2 You</span>
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-500/15 text-zinc-400">G3 Monitor</span>
+                <span className="text-xs px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400">G1 Auto</span>
+                <span className="text-xs px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-400 ring-1 ring-amber-500/30">G2 You</span>
+                <span className="text-xs px-1.5 py-0.5 rounded bg-zinc-500/15 text-zinc-400">G3 Monitor</span>
               </div>
             </div>
           </div>
@@ -275,7 +275,7 @@ export default function EditorsDesk() {
                     onClick={() => setExpandedId(expandedId === item.id ? null : item.id)}
                   >
                     {/* Type Badge */}
-                    <span className={`px-2 py-1 rounded text-[10px] font-mono font-medium uppercase shrink-0 ${TYPE_BADGE[item.type] || TYPE_BADGE.BLOG}`}>
+                    <span className={`px-2 py-1 rounded text-xs font-mono font-medium uppercase shrink-0 ${TYPE_BADGE[item.type] || TYPE_BADGE.BLOG}`}>
                       {item.type}
                     </span>
 
@@ -314,12 +314,12 @@ export default function EditorsDesk() {
 
                     {/* Status badge (approved/rejected) */}
                     {item.status === 'APPROVED' && (
-                      <span className="px-2 py-1 text-[10px] font-mono rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
+                      <span className="px-2 py-1 text-xs font-mono rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
                         SHIPPED
                       </span>
                     )}
                     {item.status === 'REJECTED' && (
-                      <span className="px-2 py-1 text-[10px] font-mono rounded bg-red-500/15 text-red-400 border border-red-500/25">
+                      <span className="px-2 py-1 text-xs font-mono rounded bg-red-500/15 text-red-400 border border-red-500/25">
                         REJECTED
                       </span>
                     )}
@@ -405,7 +405,7 @@ export default function EditorsDesk() {
                 >
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="font-medium text-sm truncate">{d.prospectName}</h3>
-                    <span className={`px-2 py-0.5 text-[10px] font-mono rounded border ${TIER_BADGE[d.tier] || TIER_BADGE.DEVELOPMENTAL}`}>
+                    <span className={`px-2 py-0.5 text-xs font-mono rounded border ${TIER_BADGE[d.tier] || TIER_BADGE.DEVELOPMENTAL}`}>
                       {d.tier}
                     </span>
                   </div>
@@ -428,19 +428,19 @@ export default function EditorsDesk() {
                       { label: 'C', value: d.grocScore.competitionLevel },
                     ].map(comp => (
                       <div key={comp.label} className="flex items-center gap-2">
-                        <span className="text-[10px] font-mono text-zinc-400 w-3">{comp.label}</span>
+                        <span className="text-xs font-mono text-zinc-400 w-3">{comp.label}</span>
                         <div className="flex-1 h-1.5 bg-[#1F1F23] rounded-full overflow-hidden">
                           <div
                             className="h-full bg-amber-500/60 rounded-full transition-all"
                             style={{ width: `${comp.value}%` }}
                           />
                         </div>
-                        <span className="text-[10px] font-mono text-zinc-400 w-6 text-right">{comp.value}</span>
+                        <span className="text-xs font-mono text-zinc-400 w-6 text-right">{comp.value}</span>
                       </div>
                     ))}
                   </div>
                   {d.flaggedForFilm && (
-                    <p className="text-[10px] text-cyan-400 font-mono mt-2">FLAGGED FOR FILM REVIEW</p>
+                    <p className="text-xs text-cyan-400 font-mono mt-2">FLAGGED FOR FILM REVIEW</p>
                   )}
                 </div>
               ))}

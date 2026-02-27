@@ -78,8 +78,8 @@ const SECTIONS = [
   },
   {
     title: "Agents",
-    color: "border-violet-400/30",
-    dot: "bg-violet-400",
+    color: "border-amber-400/30",
+    dot: "bg-amber-400",
     items: [
       { label: "LiveSim", href: "/dashboard/livesim", status: "live" as const, desc: "Real-time agent observation" },
       { label: "Boomer_Angs", href: "/dashboard/boomerangs", status: "live" as const, desc: "Specialist agent team" },
@@ -186,7 +186,7 @@ export default function PlatformMapPage() {
                     >
                       <span className="w-1.5 h-1.5 rounded-full bg-[#1F1F23]" />
                       <span className="flex-1 text-zinc-500">{item.label}</span>
-                      <span className="text-[10px] font-mono text-zinc-600">PLANNED</span>
+                      <span className="text-xs font-mono text-zinc-600">PLANNED</span>
                     </div>
                   )
                 ))}

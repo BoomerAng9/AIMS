@@ -83,11 +83,10 @@ export default function BigBoardPage() {
           <div className="hidden md:flex items-center gap-4">
             <button
               onClick={() => setShowBroadcastSpotlight(!showBroadcastSpotlight)}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-[0.6rem] font-bold tracking-[0.2em] uppercase transition-all ${
-                showBroadcastSpotlight
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-[0.6rem] font-bold tracking-[0.2em] uppercase transition-all ${showBroadcastSpotlight
                   ? 'bg-red-600/10 text-red-500 border-red-500/40 hover:bg-red-600/20'
                   : 'bg-gold/10 text-gold border-gold/30 hover:bg-gold/20'
-              }`}
+                }`}
             >
               <Radio size={12} className={showBroadcastSpotlight ? 'animate-pulse text-red-500' : 'text-gold'} />
               {showBroadcastSpotlight ? 'Hide Spotlight' : 'Top 5 Spotlight'}
@@ -119,11 +118,10 @@ export default function BigBoardPage() {
           <div className="flex items-center gap-3">
             <button
               onClick={() => setShowBroadcastSpotlight(!showBroadcastSpotlight)}
-              className={`flex items-center gap-2 px-4 py-2.5 border rounded-lg text-xs font-mono uppercase tracking-wider transition-all ${
-                showBroadcastSpotlight
+              className={`flex items-center gap-2 px-4 py-2.5 border rounded-lg text-xs font-mono uppercase tracking-wider transition-all ${showBroadcastSpotlight
                   ? 'bg-red-500/10 text-red-500 border-red-500/30 hover:bg-red-500/20'
                   : 'bg-gold/10 text-gold border-gold/30 hover:bg-gold/20'
-              }`}
+                }`}
             >
               {showBroadcastSpotlight ? <EyeOff size={14} /> : <Radio size={14} />}
               {showBroadcastSpotlight ? 'Exit Spotlight' : 'Broadcast Spotlight'}
@@ -188,8 +186,8 @@ export default function BigBoardPage() {
                 key={pos}
                 onClick={() => setPosFilter(pos)}
                 className={`px-5 py-2.5 rounded-full text-xs font-mono font-semibold tracking-wider transition-all whitespace-nowrap ${posFilter === pos
-                    ? 'bg-gold text-black shadow-[0_0_15px_rgba(212,175,55,0.3)]'
-                    : 'bg-white text-slate-500 border border-slate-100 hover:text-slate-800 border-transparent hover:border-slate-200'
+                  ? 'bg-gold text-black shadow-[0_0_15px_rgba(212,175,55,0.3)]'
+                  : 'bg-white text-slate-500 border border-slate-100 hover:text-slate-800 border-transparent hover:border-slate-200'
                   }`}
               >
                 {pos}
@@ -207,7 +205,7 @@ export default function BigBoardPage() {
             <span className="text-center">Pos</span>
             <span>School</span>
             <span>Conf</span>
-            <span className="text-center text-gold/70">P.A.I. Score</span>
+            <span className="text-center text-gold/70">AGI Score</span>
             <span className="text-center">Tier</span>
             <span className="text-center">Trend</span>
             <span></span>
@@ -233,7 +231,7 @@ export default function BigBoardPage() {
                   EDGE: 'bg-red-500/20 text-red-400 border-red-500/30',
                   OT: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
                   S: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-                  WR: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
+                  WR: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
                   CB: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
                 };
                 const posStyle = posColors[prospect.position] || 'bg-zinc-500/20 text-zinc-400 border-zinc-500/30';
@@ -287,7 +285,7 @@ export default function BigBoardPage() {
                       {prospect.state || 'CONF'}
                     </div>
 
-                    {/* P.A.I. */}
+                    {/* AGI */}
                     <div className={`text-2xl font-display font-black md:text-center ${isPrime ? 'text-gold drop-shadow-[0_0_8px_rgba(212,175,55,0.4)]' : 'text-slate-800'}`}>
                       {prospect.paiScore.toFixed(1)}
                     </div>
@@ -295,10 +293,10 @@ export default function BigBoardPage() {
                     {/* Tier */}
                     <div className="md:text-center">
                       <span className={`inline-block px-3 py-1 text-[0.6rem] font-bold font-mono tracking-widest uppercase border rounded ${isPrime
-                          ? 'bg-gold/10 text-gold border-gold/30'
-                          : isElite
-                            ? 'bg-slate-50 text-slate-600 border-slate-200'
-                            : 'bg-transparent text-slate-400 border-transparent'
+                        ? 'bg-gold/10 text-gold border-gold/30'
+                        : isElite
+                          ? 'bg-slate-50 text-slate-600 border-slate-200'
+                          : 'bg-transparent text-slate-400 border-transparent'
                         }`}>
                         {isPrime ? 'PRIME' : isElite ? 'ELITE' : 'HIGH'}
                       </span>
@@ -345,7 +343,7 @@ export default function BigBoardPage() {
         {/* Dashboard Widgets Row */}
         <motion.div variants={staggerItem} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="bg-white border border-slate-200 rounded-xl p-6 relative overflow-hidden">
-            <h3 className="text-[0.65rem] font-bold font-mono text-gold uppercase tracking-widest mb-4">P.A.I. Scoring Guide</h3>
+            <h3 className="text-[0.65rem] font-bold font-mono text-gold uppercase tracking-widest mb-4">AGI Scoring Guide</h3>
             <div className="space-y-3">
               <div className="flex justify-between items-center text-xs font-mono">
                 <span className="text-slate-500">95 - 100+</span>
@@ -378,7 +376,7 @@ export default function BigBoardPage() {
               </div>
             </div>
             <p className="text-xs text-slate-500 italic leading-relaxed">
-              &quot;Performance Artificial Intelligence scores are generated using thousands of data points including EPA+, positional leverage, and athletic profiles. Filtered through AGI matrices.&quot;
+              &quot;Associated Grading Index scores are generated using thousands of data points including EPA+, positional leverage, and athletic profiles. Filtered through AGI matrices.&quot;
             </p>
           </div>
 

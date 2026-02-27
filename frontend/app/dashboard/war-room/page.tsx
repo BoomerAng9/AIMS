@@ -69,7 +69,7 @@ const TIER_COLORS: Record<string, string> = {
   ELITE: 'text-amber-400 bg-amber-400/10 border-amber-400/30',
   BLUE_CHIP: 'text-cyan-400 bg-cyan-400/10 border-cyan-400/30',
   PROSPECT: 'text-emerald-400 bg-emerald-400/10 border-emerald-400/30',
-  SLEEPER: 'text-purple-400 bg-purple-400/10 border-purple-400/30',
+  SLEEPER: 'text-amber-400 bg-amber-400/10 border-amber-400/30',
   DEVELOPMENTAL: 'text-zinc-400 bg-[#1F1F23] border-white/15',
 };
 
@@ -286,7 +286,7 @@ export default function WarRoomPage() {
                 <div key={`${item.title}-${i}`} className="flex items-start gap-3 p-3 bg-[#18181B] rounded-lg border border-white/10">
                   <span className={`px-2 py-0.5 rounded text-xs font-medium shrink-0 ${
                     item.type === 'BLOG' ? 'bg-cyan-500/20 text-cyan-400' :
-                    item.type === 'PODCAST' ? 'bg-purple-500/20 text-purple-400' :
+                    item.type === 'PODCAST' ? 'bg-amber-500/20 text-amber-400' :
                     'bg-amber-500/20 text-amber-400'
                   }`}>
                     {item.type}

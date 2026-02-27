@@ -258,7 +258,7 @@ function ChickenHawkControl() {
       {/* Gateway Badge */}
       <div className="flex items-center gap-2 px-1">
         <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" />
-        <span className="text-[10px] text-zinc-500 uppercase tracking-wider font-mono">
+        <span className="text-xs text-zinc-500 uppercase tracking-wider font-mono">
           A.I.M.S. Gateway System — OWNER access verified — All operations audit-logged
         </span>
       </div>
@@ -266,7 +266,7 @@ function ChickenHawkControl() {
       {/* Status Cards */}
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-2xl border border-wireframe-stroke bg-[#18181B]/70 p-4 backdrop-blur-2xl">
-          <p className="text-[10px] uppercase tracking-wider text-zinc-500">Uptime</p>
+          <p className="text-xs uppercase tracking-wider text-zinc-500">Uptime</p>
           <p className="text-xl font-bold text-zinc-100 mt-1">
             {uptime != null ? `${Math.floor(uptime / 60)}m ${uptime % 60}s` : "—"}
           </p>
@@ -275,17 +275,17 @@ function ChickenHawkControl() {
           </p>
         </div>
         <div className="rounded-2xl border border-wireframe-stroke bg-[#18181B]/70 p-4 backdrop-blur-2xl">
-          <p className="text-[10px] uppercase tracking-wider text-zinc-500">Active Squads</p>
+          <p className="text-xs uppercase tracking-wider text-zinc-500">Active Squads</p>
           <p className="text-xl font-bold text-zinc-100 mt-1">{activeSquads.length}</p>
           <p className="text-[9px] text-zinc-600 mt-0.5">Currently running</p>
         </div>
         <div className="rounded-2xl border border-wireframe-stroke bg-[#18181B]/70 p-4 backdrop-blur-2xl">
-          <p className="text-[10px] uppercase tracking-wider text-zinc-500">Completed</p>
+          <p className="text-xs uppercase tracking-wider text-zinc-500">Completed</p>
           <p className="text-xl font-bold text-zinc-100 mt-1">{completedManifests}</p>
           <p className="text-[9px] text-zinc-600 mt-0.5">Manifests executed</p>
         </div>
         <div className="rounded-2xl border border-wireframe-stroke bg-[#18181B]/70 p-4 backdrop-blur-2xl">
-          <p className="text-[10px] uppercase tracking-wider text-zinc-500">Audit Buffer</p>
+          <p className="text-xs uppercase tracking-wider text-zinc-500">Audit Buffer</p>
           <p className="text-xl font-bold text-zinc-100 mt-1">{bufferedEvents}</p>
           <p className="text-[9px] text-zinc-600 mt-0.5">Events queued</p>
         </div>
@@ -306,7 +306,7 @@ function ChickenHawkControl() {
                 {cap.icon}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-[11px] font-medium text-zinc-200 truncate">{cap.name}</p>
+                <p className="text-sm font-medium text-zinc-200 truncate">{cap.name}</p>
                 <div className="mt-1 flex items-center gap-2">
                   <div className="h-1 flex-1 rounded-full bg-[#111113]">
                     <div
@@ -332,7 +332,7 @@ function ChickenHawkControl() {
             {adapters.map((adapter) => (
               <span
                 key={adapter}
-                className="rounded-full border border-wireframe-stroke bg-[#1F1F23]/60 px-3 py-1 text-[10px] font-mono text-zinc-400"
+                className="rounded-full border border-wireframe-stroke bg-[#1F1F23]/60 px-3 py-1 text-xs font-mono text-zinc-400"
               >
                 {adapter}
               </span>
@@ -356,7 +356,7 @@ function ChickenHawkControl() {
             <button
               onClick={emergencyStop}
               disabled={emergencyStopping}
-              className="flex items-center gap-1.5 rounded-full border border-red-500/30 bg-red-500/10 px-3 py-1.5 text-[10px] font-semibold text-red-400 hover:bg-red-500/20 transition-colors disabled:opacity-40"
+              className="flex items-center gap-1.5 rounded-full border border-red-500/30 bg-red-500/10 px-3 py-1.5 text-xs font-semibold text-red-400 hover:bg-red-500/20 transition-colors disabled:opacity-40"
             >
               {emergencyStopping ? (
                 <Loader2 className="h-3 w-3 animate-spin" />
@@ -373,7 +373,7 @@ function ChickenHawkControl() {
             <div className="rounded-2xl border border-dashed border-wireframe-stroke bg-[#18181B]/30 p-8 text-center">
               <Bird className="h-8 w-8 text-zinc-600 mx-auto mb-2" />
               <p className="text-sm text-zinc-500">No active squads</p>
-              <p className="text-[10px] text-zinc-600 mt-1">
+              <p className="text-xs text-zinc-600 mt-1">
                 Squads are spawned when manifests are submitted for execution
               </p>
             </div>
@@ -396,13 +396,13 @@ function ChickenHawkControl() {
                       )}
                       <div>
                         <p className="text-xs font-semibold text-zinc-200 font-mono">{squad.squad_id}</p>
-                        <p className="text-[10px] text-zinc-500 mt-0.5">
+                        <p className="text-xs text-zinc-500 mt-0.5">
                           Manifest: {squad.manifest_id} | Shift: {squad.shift_id}
                         </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="text-[10px] text-zinc-500 font-mono">
+                      <span className="text-xs text-zinc-500 font-mono">
                         {squad.lil_hawks?.length || 0} hawks
                       </span>
                       <span className={`rounded-full px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wider ${
@@ -428,7 +428,7 @@ function ChickenHawkControl() {
                             <div className="flex items-center gap-2.5 min-w-0">
                               <Bird className="h-3.5 w-3.5 text-orange-400 flex-shrink-0" />
                               <div className="min-w-0">
-                                <p className="text-[11px] font-semibold text-zinc-200 truncate">{hawk.moniker}</p>
+                                <p className="text-sm font-semibold text-zinc-200 truncate">{hawk.moniker}</p>
                                 <p className="text-[9px] text-zinc-600 font-mono truncate">
                                   {hawk.persona_handle} | Task: {hawk.task_id}
                                 </p>
@@ -476,7 +476,7 @@ function ChickenHawkControl() {
             className="w-full rounded-2xl border border-wireframe-stroke bg-[#1F1F23]/80 px-4 py-3 text-sm text-zinc-200 placeholder:text-zinc-600 focus:border-orange-500/50 focus:outline-none focus:ring-1 focus:ring-orange-500/20 disabled:opacity-50 resize-none"
           />
           <div className="mt-3 flex items-center justify-between">
-            <span className="text-[10px] text-zinc-600 font-mono">
+            <span className="text-xs text-zinc-600 font-mono">
               {executing ? "Executing pipeline..." : "Cmd+Enter to execute"}
             </span>
             <button

@@ -118,7 +118,7 @@ export const OrchestratorStatus = ({
               ACHEEVY
             </h2>
             <span
-              className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider border ${
+              className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wider border ${
                 isActive
                   ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                   : "bg-slate-50 text-slate-500 border-slate-200"
@@ -173,7 +173,7 @@ export const OrchestratorStatus = ({
         {/* Uptime */}
         <div className="flex items-center gap-2 flex-1 px-4 py-2.5">
           <Clock className="h-3.5 w-3.5 text-slate-400" />
-          <span className="text-[10px] uppercase tracking-wider text-slate-400">
+          <span className="text-xs uppercase tracking-wider text-slate-400">
             Uptime
           </span>
           <span className="font-mono text-slate-600 ml-auto">
@@ -184,7 +184,7 @@ export const OrchestratorStatus = ({
         {/* Status */}
         <div className="flex items-center gap-2 flex-1 px-4 py-2.5">
           <Cpu className="h-3.5 w-3.5 text-slate-400" />
-          <span className="text-[10px] uppercase tracking-wider text-slate-400">
+          <span className="text-xs uppercase tracking-wider text-slate-400">
             State
           </span>
           <span
@@ -199,7 +199,7 @@ export const OrchestratorStatus = ({
         {/* Last Activity */}
         <div className="flex items-center gap-2 flex-1 px-4 py-2.5">
           <Activity className="h-3.5 w-3.5 text-slate-400" />
-          <span className="text-[10px] uppercase tracking-wider text-slate-400">
+          <span className="text-xs uppercase tracking-wider text-slate-400">
             Last Active
           </span>
           <span className="font-mono text-slate-600 ml-auto">

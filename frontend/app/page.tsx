@@ -28,9 +28,9 @@ import {
 /* ═══════════════════════════════════════════════════════════
    A.I.M.S. Landing Page — Loopra AI Automation Theme
 
-   Aesthetic: Dark · Purple/Violet gradients · Glassmorphism
+   Aesthetic: Dark · Gold/Amber gradients · Glassmorphism
    Inspired by: Loopra AI Automation (aura.build)
-   Accents: Violet (#8B5CF6) → Cyan (#06B6D4)
+   Accents: Amber (#F59E0B) → Cyan (#06B6D4)
    Cards: Frosted glass with gradient borders
    ═══════════════════════════════════════════════════════════ */
 
@@ -63,16 +63,16 @@ function FadeIn({
 function GlassCard({
   children,
   className = "",
-  glowColor = "violet",
+  glowColor = "amber",
 }: {
   children: React.ReactNode;
   className?: string;
-  glowColor?: "violet" | "cyan" | "mixed";
+  glowColor?: "amber" | "cyan" | "mixed";
 }) {
   const colors = {
-    violet: "from-violet-500/20 via-transparent to-violet-500/20",
+    amber: "from-amber-500/20 via-transparent to-amber-500/20",
     cyan: "from-cyan-500/20 via-transparent to-cyan-500/20",
-    mixed: "from-violet-500/20 via-cyan-500/10 to-violet-500/20",
+    mixed: "from-amber-500/20 via-cyan-500/10 to-amber-500/20",
   };
   return (
     <div className={`relative group ${className}`}>
@@ -114,7 +114,7 @@ const DEPLOY_CATEGORIES = [
     description:
       "Deploy popular tools like n8n, Gitea, Metabase, and more with one click. Pre-configured and production-ready.",
     items: ["n8n", "Gitea", "Metabase", "Uptime Kuma"],
-    gradient: "from-violet-500/10 to-transparent",
+    gradient: "from-amber-500/10 to-transparent",
   },
   {
     icon: Bot,
@@ -130,7 +130,7 @@ const DEPLOY_CATEGORIES = [
     description:
       "Ship complete web applications with frontend, backend, and database. Auto-configured networking.",
     items: ["Next.js", "Express + Postgres", "Django", "Rails"],
-    gradient: "from-violet-500/10 to-transparent",
+    gradient: "from-amber-500/10 to-transparent",
   },
   {
     icon: Layers,
@@ -228,7 +228,7 @@ export default function HomePage() {
   const heroY = useTransform(heroProgress, [0, 1], ["0%", "15%"]);
 
   return (
-    <main className="relative min-h-screen bg-[#09090B] text-zinc-100 selection:bg-violet-500/20">
+    <main className="relative min-h-screen bg-[#09090B] text-zinc-100 selection:bg-amber-500/20">
       <ScrollProgress />
       <AmbientOrbs />
 
@@ -249,12 +249,12 @@ export default function HomePage() {
           >
             {/* Status badge */}
             <FadeIn>
-              <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full border border-violet-500/20 bg-violet-500/[0.05] mb-8">
+              <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full border border-amber-500/20 bg-amber-500/[0.05] mb-8">
                 <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inset-0 rounded-full bg-violet-400 opacity-75" />
-                  <span className="relative rounded-full h-2 w-2 bg-violet-500" />
+                  <span className="animate-ping absolute inset-0 rounded-full bg-amber-400 opacity-75" />
+                  <span className="relative rounded-full h-2 w-2 bg-amber-500" />
                 </span>
-                <span className="text-xs font-medium text-violet-300">
+                <span className="text-xs font-medium text-amber-300">
                   Platform Live &middot; AI-Powered Infrastructure
                 </span>
               </div>
@@ -271,7 +271,7 @@ export default function HomePage() {
 
             {/* Subhead */}
             <FadeIn delay={0.2}>
-              <p className="text-base sm:text-lg md:text-xl text-zinc-400 max-w-2xl mx-auto leading-relaxed mb-10">
+              <p className="text-lg sm:text-xl md:text-2xl text-zinc-300 max-w-2xl mx-auto leading-relaxed mb-10">
                 One-click deployment of open source tools, AI agents, and
                 full-stack platforms. Provisioned, configured, and managed
                 by autonomous AI.
@@ -283,14 +283,14 @@ export default function HomePage() {
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Link
                   href="/chat"
-                  className="group h-13 px-8 rounded-xl bg-gradient-to-r from-violet-600 to-violet-500 text-white font-semibold text-sm inline-flex items-center gap-2.5 hover:from-violet-500 hover:to-violet-400 transition-all hover:shadow-lg hover:shadow-violet-500/25"
+                  className="group h-13 px-8 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 text-white font-bold text-base inline-flex items-center gap-2.5 hover:from-amber-500 hover:to-amber-400 transition-all hover:shadow-lg hover:shadow-amber-500/25"
                 >
                   Start Deploying
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                 </Link>
                 <Link
                   href="#how-it-works"
-                  className="group h-13 px-8 rounded-xl border border-white/10 text-zinc-300 font-medium text-sm inline-flex items-center gap-2.5 hover:border-violet-500/30 hover:bg-violet-500/[0.04] transition-all"
+                  className="group h-13 px-8 rounded-xl border border-white/10 text-zinc-300 font-semibold text-base inline-flex items-center gap-2.5 hover:border-amber-500/30 hover:bg-amber-500/[0.04] transition-all"
                 >
                   See How It Works
                   <Play className="w-3.5 h-3.5" />
@@ -309,7 +309,7 @@ export default function HomePage() {
                 ].map((stat) => (
                   <div key={stat.label} className="text-center">
                     <div className="text-2xl sm:text-3xl font-bold text-aurora-gradient">{stat.value}</div>
-                    <div className="text-xs text-zinc-500 mt-1">{stat.label}</div>
+                    <div className="text-sm font-medium text-zinc-500 mt-1">{stat.label}</div>
                   </div>
                 ))}
               </div>
@@ -347,10 +347,10 @@ export default function HomePage() {
           <div className="max-w-6xl mx-auto">
             <FadeIn>
               <div className="text-center mb-20">
-                <p className="text-sm font-medium text-violet-400 mb-3">
+                <p className="text-base font-semibold text-amber-400 mb-3">
                   How It Works
                 </p>
-                <h2 className="text-3xl md:text-5xl font-bold tracking-tight">
+                <h2 className="text-4xl md:text-6xl font-black tracking-tight">
                   Three Steps to{" "}
                   <span className="text-aurora-gradient">Live</span>
                 </h2>
@@ -360,24 +360,24 @@ export default function HomePage() {
             <div className="grid md:grid-cols-3 gap-6">
               {HOW_IT_WORKS.map((item, i) => (
                 <FadeIn key={item.step} delay={i * 0.1}>
-                  <GlassCard glowColor={i === 1 ? "cyan" : "violet"}>
+                  <GlassCard glowColor={i === 1 ? "cyan" : "amber"}>
                     <div className="relative p-8">
                       {/* Step number watermark */}
                       <span className="text-6xl font-bold text-white/[0.03] absolute top-4 right-6 font-display">
                         {item.step}
                       </span>
                       <div className="relative z-10">
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500/15 to-cyan-500/10 border border-violet-500/20 flex items-center justify-center mb-6">
-                          <item.icon className="w-5 h-5 text-violet-400" />
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500/15 to-cyan-500/10 border border-amber-500/20 flex items-center justify-center mb-6">
+                          <item.icon className="w-5 h-5 text-amber-400" />
                         </div>
-                        <h3 className="text-xl font-bold mb-3">{item.title}</h3>
-                        <p className="text-sm text-zinc-500 leading-relaxed">
+                        <h3 className="text-2xl font-bold mb-3">{item.title}</h3>
+                        <p className="text-base font-medium text-zinc-400 leading-relaxed">
                           {item.description}
                         </p>
                       </div>
                       {/* Connector line */}
                       {i < 2 && (
-                        <div className="hidden md:block absolute top-1/2 -right-3 w-6 border-t border-dashed border-violet-500/20" />
+                        <div className="hidden md:block absolute top-1/2 -right-3 w-6 border-t border-dashed border-amber-500/20" />
                       )}
                     </div>
                   </GlassCard>
@@ -397,10 +397,10 @@ export default function HomePage() {
           <div className="max-w-6xl mx-auto relative">
             <FadeIn>
               <div className="text-center mb-20">
-                <p className="text-sm font-medium text-violet-400 mb-3">
+                <p className="text-base font-semibold text-amber-400 mb-3">
                   Plug Catalog
                 </p>
-                <h2 className="text-3xl md:text-5xl font-bold tracking-tight">
+                <h2 className="text-4xl md:text-6xl font-black tracking-tight">
                   What You Can Deploy
                 </h2>
                 <p className="mt-4 text-zinc-500 max-w-xl mx-auto">
@@ -413,18 +413,18 @@ export default function HomePage() {
             <div className="grid md:grid-cols-2 gap-6">
               {DEPLOY_CATEGORIES.map((cat, i) => (
                 <FadeIn key={cat.title} delay={i * 0.08}>
-                  <GlassCard glowColor={i % 2 === 0 ? "violet" : "cyan"}>
+                  <GlassCard glowColor={i % 2 === 0 ? "amber" : "cyan"}>
                     <div className="group relative p-8 h-full">
                       {/* Subtle gradient overlay */}
                       <div className={`absolute inset-0 bg-gradient-to-br ${cat.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl`} />
 
                       <div className="relative z-10">
                         {/* Icon */}
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500/15 to-cyan-500/10 border border-violet-500/20 flex items-center justify-center mb-5">
-                          <cat.icon className="w-6 h-6 text-violet-400" />
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500/15 to-cyan-500/10 border border-amber-500/20 flex items-center justify-center mb-5">
+                          <cat.icon className="w-6 h-6 text-amber-400" />
                         </div>
-                        <h3 className="text-lg font-bold mb-2">{cat.title}</h3>
-                        <p className="text-sm text-zinc-500 leading-relaxed mb-5">
+                        <h3 className="text-xl font-bold mb-2">{cat.title}</h3>
+                        <p className="text-base font-medium text-zinc-400 leading-relaxed mb-5">
                           {cat.description}
                         </p>
                         {/* Item tags */}
@@ -432,7 +432,7 @@ export default function HomePage() {
                           {cat.items.map((item) => (
                             <span
                               key={item}
-                              className="px-2.5 py-1 rounded-md bg-violet-500/[0.06] border border-violet-500/10 text-xs text-violet-300"
+                              className="px-2.5 py-1 rounded-md bg-amber-500/[0.06] border border-amber-500/10 text-sm font-semibold text-amber-300"
                             >
                               {item}
                             </span>
@@ -440,7 +440,7 @@ export default function HomePage() {
                         </div>
                       </div>
                       {/* Arrow */}
-                      <ChevronRight className="absolute top-8 right-8 w-5 h-5 text-zinc-700 group-hover:text-violet-400 group-hover:translate-x-1 transition-all" />
+                      <ChevronRight className="absolute top-8 right-8 w-5 h-5 text-zinc-700 group-hover:text-amber-400 group-hover:translate-x-1 transition-all" />
                     </div>
                   </GlassCard>
                 </FadeIn>
@@ -451,7 +451,7 @@ export default function HomePage() {
               <div className="mt-12 text-center">
                 <Link
                   href="/plugs"
-                  className="inline-flex items-center gap-2 text-sm text-violet-400 hover:text-violet-300 transition-colors font-medium"
+                  className="inline-flex items-center gap-2 text-sm text-amber-400 hover:text-amber-300 transition-colors font-medium"
                 >
                   Browse Full Catalog
                   <ArrowRight className="w-4 h-4" />
@@ -468,10 +468,10 @@ export default function HomePage() {
           <div className="max-w-6xl mx-auto">
             <FadeIn>
               <div className="text-center mb-20">
-                <p className="text-sm font-medium text-violet-400 mb-3">
+                <p className="text-base font-semibold text-amber-400 mb-3">
                   Platform
                 </p>
-                <h2 className="text-3xl md:text-5xl font-bold tracking-tight">
+                <h2 className="text-4xl md:text-6xl font-black tracking-tight">
                   Built for{" "}
                   <span className="text-aurora-gradient">Production</span>
                 </h2>
@@ -481,15 +481,104 @@ export default function HomePage() {
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {CAPABILITIES.map((cap, i) => (
                 <FadeIn key={cap.title} delay={i * 0.06}>
-                  <GlassCard glowColor={i % 3 === 0 ? "violet" : i % 3 === 1 ? "cyan" : "mixed"}>
+                  <GlassCard glowColor={i % 3 === 0 ? "amber" : i % 3 === 1 ? "cyan" : "mixed"}>
                     <div className="p-6">
-                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-violet-500/15 to-cyan-500/10 border border-violet-500/20 flex items-center justify-center mb-4">
-                        <cap.icon className="w-5 h-5 text-violet-400" />
+                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-500/15 to-cyan-500/10 border border-amber-500/20 flex items-center justify-center mb-4">
+                        <cap.icon className="w-5 h-5 text-amber-400" />
                       </div>
                       <h3 className="font-semibold mb-2">{cap.title}</h3>
-                      <p className="text-sm text-zinc-500 leading-relaxed">
+                      <p className="text-base font-medium text-zinc-400 leading-relaxed">
                         {cap.desc}
                       </p>
+                    </div>
+                  </GlassCard>
+                </FadeIn>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ══════════════════════════════════════════════════════
+            PHILOSOPHY — Loopra-inspired "nervous system" section
+           ══════════════════════════════════════════════════════ */}
+        <section className="py-28 px-4 md:px-6 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-amber-500/[0.02] to-transparent pointer-events-none" />
+          <div className="max-w-4xl mx-auto relative text-center">
+            <FadeIn>
+              <p className="text-sm font-bold text-amber-400 uppercase tracking-[0.25em] mb-6">
+                The Philosophy
+              </p>
+            </FadeIn>
+            <FadeIn delay={0.1}>
+              <h2 className="text-2xl sm:text-4xl md:text-6xl font-black tracking-tight leading-tight">
+                We build the{" "}
+                <span className="text-aurora-gradient">nervous system</span>{" "}
+                for the autonomous enterprise.
+              </h2>
+            </FadeIn>
+            <FadeIn delay={0.2}>
+              <p className="mt-8 text-base md:text-lg text-zinc-500 leading-relaxed max-w-2xl mx-auto">
+                Rejecting the friction of manual orchestration, we engineer
+                intelligent loops that blend data precision with infinite scale
+                to accelerate and evolve.
+              </p>
+            </FadeIn>
+          </div>
+        </section>
+
+        {/* ══════════════════════════════════════════════════════
+            TESTIMONIALS — Social proof (Loopra pattern)
+           ══════════════════════════════════════════════════════ */}
+        <section className="py-28 px-4 md:px-6 border-y border-white/[0.04]">
+          <div className="max-w-6xl mx-auto">
+            <FadeIn>
+              <div className="text-center mb-16">
+                <p className="text-base font-semibold text-amber-400 mb-3">
+                  Testimonials
+                </p>
+                <h2 className="text-4xl md:text-6xl font-black tracking-tight">
+                  Trusted by Teams Who{" "}
+                  <span className="text-aurora-gradient">Automate</span>
+                </h2>
+              </div>
+            </FadeIn>
+
+            <div className="grid md:grid-cols-3 gap-6">
+              {[
+                {
+                  quote:
+                    "A.I.M.S. completely changed how we handle deployment. The autonomous orchestration saved us hundreds of engineering hours.",
+                  name: "Operations Lead",
+                  role: "Tech Startup",
+                  glow: "amber" as const,
+                },
+                {
+                  quote:
+                    "The ability to deploy and manage containers through conversation is a game changer. We shipped 3x faster.",
+                  name: "CTO",
+                  role: "SaaS Platform",
+                  glow: "cyan" as const,
+                },
+                {
+                  quote:
+                    "Finally, an AI platform that treats infrastructure as code. Full lifecycle management with human oversight where it matters.",
+                  name: "DevOps Lead",
+                  role: "Enterprise Team",
+                  glow: "mixed" as const,
+                },
+              ].map((t, i) => (
+                <FadeIn key={i} delay={i * 0.1}>
+                  <GlassCard glowColor={t.glow}>
+                    <div className="p-8 flex flex-col h-full">
+                      <p className="text-base font-medium text-zinc-400 leading-relaxed flex-1 italic">
+                        &ldquo;{t.quote}&rdquo;
+                      </p>
+                      <div className="mt-6 pt-4 border-t border-white/[0.06]">
+                        <p className="text-base font-bold text-zinc-100">
+                          {t.name}
+                        </p>
+                        <p className="text-sm font-medium text-zinc-500">{t.role}</p>
+                      </div>
                     </div>
                   </GlassCard>
                 </FadeIn>
@@ -505,14 +594,14 @@ export default function HomePage() {
           <FadeIn>
             <div className="max-w-3xl mx-auto relative">
               {/* Gradient glow behind card */}
-              <div className="absolute -inset-2 bg-gradient-to-r from-violet-500/10 via-cyan-500/5 to-violet-500/10 rounded-[2rem] blur-2xl" />
+              <div className="absolute -inset-2 bg-gradient-to-r from-amber-500/10 via-cyan-500/5 to-amber-500/10 rounded-[2rem] blur-2xl" />
 
-              <div className="relative p-12 md:p-20 text-center rounded-[2rem] border border-violet-500/10 bg-[#111113]/90 backdrop-blur-xl overflow-hidden">
+              <div className="relative p-12 md:p-20 text-center rounded-[2rem] border border-amber-500/10 bg-[#111113]/90 backdrop-blur-xl overflow-hidden">
                 {/* Ambient glow inside card */}
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[200px] bg-[radial-gradient(ellipse_at_center,rgba(139,92,246,0.1)_0%,transparent_70%)] pointer-events-none" />
 
                 <div className="relative z-10">
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-500/15 to-cyan-500/10 border border-violet-500/20 flex items-center justify-center mx-auto mb-8 p-1">
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500/15 to-cyan-500/10 border border-amber-500/20 flex items-center justify-center mx-auto mb-8 p-1">
                     <Image
                       src="/images/acheevy/acheevy-helmet.png"
                       alt="A.I.M.S."
@@ -521,7 +610,7 @@ export default function HomePage() {
                       className="rounded-xl"
                     />
                   </div>
-                  <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">
+                  <h2 className="text-4xl md:text-6xl font-black tracking-tight mb-4">
                     Ready to{" "}
                     <span className="text-aurora-gradient">Automate</span>?
                   </h2>
@@ -532,14 +621,14 @@ export default function HomePage() {
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <Link
                       href="/chat"
-                      className="group h-13 px-8 rounded-xl bg-gradient-to-r from-violet-600 to-violet-500 text-white font-semibold text-sm inline-flex items-center justify-center gap-2.5 hover:from-violet-500 hover:to-violet-400 transition-all hover:shadow-lg hover:shadow-violet-500/25"
+                      className="group h-13 px-8 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 text-white font-bold text-base inline-flex items-center justify-center gap-2.5 hover:from-amber-500 hover:to-amber-400 transition-all hover:shadow-lg hover:shadow-amber-500/25"
                     >
                       Get Started Free
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                     </Link>
                     <Link
                       href="/(auth)/sign-up"
-                      className="h-13 px-8 rounded-xl border border-violet-500/20 text-zinc-300 font-medium text-sm inline-flex items-center justify-center gap-2.5 hover:border-violet-500/30 hover:bg-violet-500/[0.04] transition-all"
+                      className="h-13 px-8 rounded-xl border border-amber-500/20 text-zinc-300 font-semibold text-base inline-flex items-center justify-center gap-2.5 hover:border-amber-500/30 hover:bg-amber-500/[0.04] transition-all"
                     >
                       Create Account
                     </Link>
@@ -646,7 +735,7 @@ function Nav() {
             </Link>
             <Link
               href="/chat"
-              className="h-9 px-4 rounded-lg bg-gradient-to-r from-violet-600 to-violet-500 text-white text-sm font-semibold inline-flex items-center hover:from-violet-500 hover:to-violet-400 transition-all"
+              className="h-9 px-4 rounded-lg bg-gradient-to-r from-amber-600 to-amber-500 text-white text-sm font-semibold inline-flex items-center hover:from-amber-500 hover:to-amber-400 transition-all"
             >
               Get Started
             </Link>
@@ -679,7 +768,7 @@ function Nav() {
                 key={link.label}
                 href={link.href}
                 onClick={() => setMobileOpen(false)}
-                className="px-4 py-2.5 text-sm text-zinc-400 hover:text-zinc-100 hover:bg-violet-500/[0.06] rounded-xl transition-colors"
+                className="px-4 py-2.5 text-sm text-zinc-400 hover:text-zinc-100 hover:bg-amber-500/[0.06] rounded-xl transition-colors"
               >
                 {link.label}
               </Link>

@@ -136,15 +136,15 @@ export default function StateBoardsPage() {
     const activeStateData = ALL_STATES.find(s => s.code === activeState);
 
     return (
-        <div className="min-h-screen bg-white text-slate-800 selection:bg-purple-400/30 pb-24">
+        <div className="min-h-screen bg-white text-slate-800 selection:bg-amber-400/30 pb-24">
             {/* Top Nav */}
             <nav className="border-b border-slate-100 bg-white/80 backdrop-blur-xl sticky top-0 z-50">
                 <div className="max-w-[1400px] mx-auto px-6 h-16 flex items-center justify-between">
-                    <Link href="/sandbox/perform" className="flex items-center gap-2 text-[0.65rem] text-slate-400 hover:text-purple-400 transition-colors font-mono uppercase tracking-widest">
+                    <Link href="/sandbox/perform" className="flex items-center gap-2 text-[0.65rem] text-slate-400 hover:text-amber-400 transition-colors font-mono uppercase tracking-widest">
                         <ArrowLeft size={14} /> Per|Form Hub
                     </Link>
-                    <div className="text-[0.6rem] font-mono tracking-widest text-purple-400/50 flex items-center gap-2">
-                        <Database size={12} className="text-purple-400/70" />
+                    <div className="text-[0.6rem] font-mono tracking-widest text-amber-400/50 flex items-center gap-2">
+                        <Database size={12} className="text-amber-400/70" />
                         {totalProspects.toLocaleString()} PROSPECTS INDEXED &middot; 50 STATES
                     </div>
                 </div>
@@ -160,7 +160,7 @@ export default function StateBoardsPage() {
                 <motion.div variants={staggerItem} className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-6 border-b border-slate-200">
                     <div className="space-y-3 max-w-2xl">
                         <h1 className="text-4xl md:text-5xl font-display font-black tracking-tighter text-slate-800">
-                            High School <span className="text-purple-400">State Boards</span>
+                            High School <span className="text-amber-400">State Boards</span>
                         </h1>
                         <p className="text-sm text-slate-500 leading-relaxed font-sans max-w-xl">
                             We don&apos;t index stars. We index <span className="text-slate-800 font-mono font-bold tracking-wider">PRODUCTION</span>.
@@ -171,7 +171,7 @@ export default function StateBoardsPage() {
                     <div className="flex gap-3">
                         <button
                             onClick={() => setShowSubmitForm(true)}
-                            className="flex items-center gap-2 px-4 py-2.5 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 rounded-lg text-purple-400 text-xs font-mono uppercase tracking-wider transition-colors"
+                            className="flex items-center gap-2 px-4 py-2.5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 rounded-lg text-amber-400 text-xs font-mono uppercase tracking-wider transition-colors"
                         >
                             <Upload size={14} /> Submit a Prospect
                         </button>
@@ -185,7 +185,7 @@ export default function StateBoardsPage() {
                             key={st.code}
                             onClick={() => setActiveState(st.code)}
                             className={`p-4 rounded-xl border text-left transition-all hover:scale-[1.02] ${activeState === st.code
-                                    ? 'bg-purple-400/10 border-purple-400/30 shadow-[0_0_20px_rgba(168,85,247,0.1)]'
+                                    ? 'bg-amber-400/10 border-amber-400/30 shadow-[0_0_20px_rgba(245,158,11,0.1)]'
                                     : 'bg-white border-slate-100 hover:border-slate-200'
                                 }`}
                         >
@@ -227,7 +227,7 @@ export default function StateBoardsPage() {
                             value={search}
                             onChange={e => setSearch(e.target.value)}
                             placeholder="Search states, players, or positions..."
-                            className="w-full pl-9 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 placeholder:text-slate-300 focus:outline-none focus:border-purple-400/40 font-mono"
+                            className="w-full pl-9 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 placeholder:text-slate-300 focus:outline-none focus:border-amber-400/40 font-mono"
                         />
                     </div>
 
@@ -238,7 +238,7 @@ export default function StateBoardsPage() {
                                 key={st.code}
                                 onClick={() => setActiveState(st.code)}
                                 className={`p-3 rounded-xl border text-center transition-all hover:scale-105 relative group ${activeState === st.code
-                                        ? 'ring-2 ring-purple-400 border-purple-400/50 bg-purple-400/10'
+                                        ? 'ring-2 ring-amber-400 border-amber-400/50 bg-amber-400/10'
                                         : `${getHeatColor(st.count)} hover:ring-1 hover:ring-slate-200`
                                     }`}
                             >
@@ -248,7 +248,7 @@ export default function StateBoardsPage() {
                                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-white border border-slate-200 rounded-lg text-left min-w-[160px] opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-20 shadow-2xl">
                                     <div className="text-xs font-display font-bold text-slate-800">{st.name}</div>
                                     <div className="text-[0.55rem] font-mono text-slate-400 mt-1">{st.count} prospects indexed</div>
-                                    <div className="text-[0.55rem] font-mono text-purple-400 mt-0.5">{st.topProducer}</div>
+                                    <div className="text-[0.55rem] font-mono text-amber-400 mt-0.5">{st.topProducer}</div>
                                 </div>
                             </button>
                         ))}
@@ -262,7 +262,7 @@ export default function StateBoardsPage() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: 20 }}
-                            className="bg-white border border-purple-400/20 rounded-2xl overflow-hidden shadow-[0_0_40px_rgba(168,85,247,0.08)]"
+                            className="bg-white border border-amber-400/20 rounded-2xl overflow-hidden shadow-[0_0_40px_rgba(245,158,11,0.08)]"
                         >
                             <div className="p-6 border-b border-slate-100 flex items-center justify-between">
                                 <div className="flex items-center gap-4">
@@ -273,7 +273,7 @@ export default function StateBoardsPage() {
                                         <h2 className="text-2xl font-display font-bold text-slate-800">{activeStateData.name}</h2>
                                         <div className="flex gap-3 text-[0.6rem] font-mono text-slate-400 mt-1">
                                             <span>{activeStateData.count} indexed</span>
-                                            <span className="text-purple-400">{getHeatLabel(activeStateData.count)}</span>
+                                            <span className="text-amber-400">{getHeatLabel(activeStateData.count)}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -301,13 +301,13 @@ export default function StateBoardsPage() {
                                                 </td>
                                                 <td className="p-4">
                                                     <div className="flex flex-col gap-1">
-                                                        <span className="font-display font-bold text-slate-800 text-base group-hover:text-purple-400 transition-colors">
+                                                        <span className="font-display font-bold text-slate-800 text-base group-hover:text-amber-400 transition-colors">
                                                             {p.name}
                                                         </span>
                                                         <div className="flex gap-2 items-center">
                                                             <span className="text-xs font-mono text-slate-400">{p.position}</span>
                                                             {p.stars === 0 ? (
-                                                                <span className="text-[0.55rem] font-mono bg-purple-400/20 text-purple-400 px-1.5 py-0.5 rounded tracking-widest">UNRANKED GEM</span>
+                                                                <span className="text-[0.55rem] font-mono bg-amber-400/20 text-amber-400 px-1.5 py-0.5 rounded tracking-widest">UNRANKED GEM</span>
                                                             ) : (
                                                                 <span className="text-[0.55rem] font-mono text-yellow-500/50">{'★'.repeat(p.stars)}</span>
                                                             )}
@@ -342,7 +342,7 @@ export default function StateBoardsPage() {
                                 </table>
                             ) : (
                                 <div className="p-12 text-center">
-                                    <Radar size={24} className="text-purple-400/30 mx-auto mb-3 animate-spin-slow" />
+                                    <Radar size={24} className="text-amber-400/30 mx-auto mb-3 animate-spin-slow" />
                                     <p className="text-sm text-slate-400 font-mono">Prospect data for {activeStateData.name} is being indexed...</p>
                                     <p className="text-[0.6rem] text-slate-300 font-mono mt-2">Tier 1 harvest in progress. {activeStateData.count} records identified.</p>
                                 </div>
@@ -350,7 +350,7 @@ export default function StateBoardsPage() {
 
                             <div className="p-4 border-t border-slate-100 flex justify-between items-center">
                                 <span className="text-[0.6rem] font-mono text-slate-400">Showing top {activePlayers.length} of {activeStateData.count} indexed</span>
-                                <button className="text-[0.65rem] font-mono text-purple-400/70 hover:text-purple-400 transition-colors flex items-center gap-1">
+                                <button className="text-[0.65rem] font-mono text-amber-400/70 hover:text-amber-400 transition-colors flex items-center gap-1">
                                     View Full {activeState} Board <ChevronRight size={12} />
                                 </button>
                             </div>
@@ -373,13 +373,13 @@ export default function StateBoardsPage() {
                                 animate={{ scale: 1, opacity: 1 }}
                                 exit={{ scale: 0.95, opacity: 0 }}
                                 onClick={e => e.stopPropagation()}
-                                className="bg-white border border-purple-500/20 rounded-2xl p-8 max-w-lg w-full shadow-[0_0_60px_rgba(168,85,247,0.1)] relative"
+                                className="bg-white border border-amber-500/20 rounded-2xl p-8 max-w-lg w-full shadow-[0_0_60px_rgba(245,158,11,0.1)] relative"
                             >
                                 <button onClick={() => setShowSubmitForm(false)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-800">
                                     <X size={20} />
                                 </button>
 
-                                <Upload className="text-purple-400 mb-4" size={28} />
+                                <Upload className="text-amber-400 mb-4" size={28} />
                                 <h3 className="text-2xl font-display font-bold text-slate-800 mb-2 tracking-tight">
                                     Submit a Prospect
                                 </h3>
@@ -392,35 +392,35 @@ export default function StateBoardsPage() {
                                     <div className="grid grid-cols-2 gap-3">
                                         <div>
                                             <label className="block text-[0.65rem] font-mono text-slate-400 uppercase tracking-widest mb-1">First Name</label>
-                                            <input type="text" className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:border-purple-400/50" required />
+                                            <input type="text" className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:border-amber-400/50" required />
                                         </div>
                                         <div>
                                             <label className="block text-[0.65rem] font-mono text-slate-400 uppercase tracking-widest mb-1">Last Name</label>
-                                            <input type="text" className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:border-purple-400/50" required />
+                                            <input type="text" className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:border-amber-400/50" required />
                                         </div>
                                     </div>
                                     <div className="grid grid-cols-3 gap-3">
                                         <div>
                                             <label className="block text-[0.65rem] font-mono text-slate-400 uppercase tracking-widest mb-1">Position</label>
-                                            <input type="text" className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:border-purple-400/50" placeholder="RB" required />
+                                            <input type="text" className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:border-amber-400/50" placeholder="RB" required />
                                         </div>
                                         <div>
                                             <label className="block text-[0.65rem] font-mono text-slate-400 uppercase tracking-widest mb-1">High School</label>
-                                            <input type="text" className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:border-purple-400/50" required />
+                                            <input type="text" className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:border-amber-400/50" required />
                                         </div>
                                         <div>
                                             <label className="block text-[0.65rem] font-mono text-slate-400 uppercase tracking-widest mb-1">State</label>
-                                            <input type="text" className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:border-purple-400/50" placeholder="TX" required />
+                                            <input type="text" className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:border-amber-400/50" placeholder="TX" required />
                                         </div>
                                     </div>
                                     <div>
                                         <label className="block text-[0.65rem] font-mono text-slate-400 uppercase tracking-widest mb-1">Stat Line or MaxPreps Link</label>
-                                        <textarea className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:border-purple-400/50 h-24 resize-none" placeholder="2,400 Rush Yds | 32 TD | 8.5 YPC or paste MaxPreps URL..." required />
+                                        <textarea className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:border-amber-400/50 h-24 resize-none" placeholder="2,400 Rush Yds | 32 TD | 8.5 YPC or paste MaxPreps URL..." required />
                                     </div>
                                     <button
                                         type="submit"
                                         disabled={isSubmitting}
-                                        className="w-full py-3 bg-purple-500 hover:bg-purple-400 text-black font-mono font-bold uppercase tracking-widest text-xs rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                                        className="w-full py-3 bg-amber-500 hover:bg-amber-400 text-black font-mono font-bold uppercase tracking-widest text-xs rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                                     >
                                         {isSubmitting ? (
                                             <><Radar size={14} className="animate-spin" /> Activating Deep Research...</>

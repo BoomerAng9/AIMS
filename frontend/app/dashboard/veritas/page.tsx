@@ -207,7 +207,7 @@ export default function VeritasPage() {
           <div>
             <h1 className="text-2xl font-bold tracking-tight flex items-center gap-3">
               <span className="text-red-400">Veritas</span>
-              <span className="text-[10px] font-mono px-2 py-1 rounded bg-red-500/10 text-red-400 border border-red-500/20">
+              <span className="text-xs font-mono px-2 py-1 rounded bg-red-500/10 text-red-400 border border-red-500/20">
                 RESEARCH VERIFICATION
               </span>
             </h1>
@@ -267,7 +267,7 @@ export default function VeritasPage() {
                 placeholder="Paste the text content of your business plan, pitch deck, or research document here. Veritas will extract and verify every numerical claim."
                 className="w-full h-64 bg-[#1F1F23]/60 border border-white/10 rounded-lg p-3 text-sm text-zinc-100 font-mono outline-none focus:border-red-500/30 resize-y"
               />
-              <p className="text-[10px] text-zinc-400 mt-1">
+              <p className="text-xs text-zinc-400 mt-1">
                 {documentText.length.toLocaleString()} characters &middot; Paste text from PDF, pitch deck, or business plan
               </p>
             </div>
@@ -280,7 +280,7 @@ export default function VeritasPage() {
               {submitting ? 'Submitting...' : 'Verify This Document'}
             </button>
 
-            <p className="text-[10px] text-zinc-400 text-center">
+            <p className="text-xs text-zinc-400 text-center">
               Boss (Claude) extracts claims → Grunts (Sonar/Brave) verify → Guardrails flag variance → You get the report
             </p>
           </motion.div>
@@ -361,7 +361,7 @@ export default function VeritasPage() {
                     >
                       <div className="flex items-center justify-between mb-1">
                         <h3 className="font-medium text-sm">{r.projectName}</h3>
-                        <span className={`px-2 py-0.5 text-[10px] font-mono rounded border ${style.bg} ${style.text} ${style.border}`}>
+                        <span className={`px-2 py-0.5 text-xs font-mono rounded border ${style.bg} ${style.text} ${style.border}`}>
                           {style.label}
                         </span>
                       </div>
@@ -403,7 +403,7 @@ function ReportViewer({ report }: { report: Report }) {
             <p className={`text-3xl font-mono font-bold ${riskStyle.text}`}>
               {report.confidenceScore}
             </p>
-            <p className="text-[10px] text-zinc-400">CONFIDENCE</p>
+            <p className="text-xs text-zinc-400">CONFIDENCE</p>
           </div>
         </div>
 
@@ -435,7 +435,7 @@ function ReportViewer({ report }: { report: Report }) {
             return (
               <div key={i} className={`p-4 rounded-lg border ${style.bg} ${style.border}`}>
                 <div className="flex items-start gap-3">
-                  <span className={`shrink-0 px-2 py-0.5 text-[10px] font-mono rounded ${style.bg} ${style.text} border ${style.border}`}>
+                  <span className={`shrink-0 px-2 py-0.5 text-xs font-mono rounded ${style.bg} ${style.text} border ${style.border}`}>
                     {style.label}
                   </span>
                   <div className="flex-1 min-w-0">
@@ -470,7 +470,7 @@ function ReportViewer({ report }: { report: Report }) {
                             href={s.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-[10px] px-1.5 py-0.5 rounded bg-[#1F1F23] text-cyan-400 hover:text-cyan-300 transition-colors"
+                            className="text-xs px-1.5 py-0.5 rounded bg-[#1F1F23] text-cyan-400 hover:text-cyan-300 transition-colors"
                           >
                             {s.title}
                           </a>
@@ -501,7 +501,7 @@ function ReportViewer({ report }: { report: Report }) {
       )}
 
       {/* Meta */}
-      <div className="text-center text-[10px] text-zinc-400 font-mono">
+      <div className="text-center text-xs text-zinc-400 font-mono">
         Report ID: {report.reportId} &middot; Processing time: {(report.processingTimeMs / 1000).toFixed(1)}s &middot; A.I.M.S. Veritas v1.0
       </div>
     </motion.div>
@@ -513,7 +513,7 @@ function MiniStat({ label, value, color }: { label: string; value: number; color
   return (
     <div className="text-center">
       <p className={`text-lg font-mono font-bold ${textColor}`}>{value}</p>
-      <p className="text-[10px] text-zinc-400">{label}</p>
+      <p className="text-xs text-zinc-400">{label}</p>
     </div>
   );
 }

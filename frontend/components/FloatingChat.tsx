@@ -74,7 +74,7 @@ export default function FloatingChat() {
                     <span className="text-base font-semibold text-slate-800 tracking-wide">
                       {mode === 'chat' ? 'Chat w/ACHEEVY' : 'ACHEEVY Voice'}
                     </span>
-                    <div className="flex items-center gap-1 text-[10px] text-emerald-400/80 font-mono uppercase tracking-widest">
+                    <div className="flex items-center gap-1 text-xs text-emerald-400/80 font-mono uppercase tracking-widest">
                       <Zap className="w-2.5 h-2.5" /> Active
                     </div>
                   </div>
@@ -150,7 +150,7 @@ export default function FloatingChat() {
                 <div className="text-sm font-semibold text-slate-700 group-hover:text-gold transition-colors">
                   Chat w/ACHEEVY
                 </div>
-                <div className="text-[10px] text-slate-400 font-mono uppercase tracking-wider">
+                <div className="text-xs text-slate-400 font-mono uppercase tracking-wider">
                   Command Console
                 </div>
               </div>

@@ -74,7 +74,7 @@ const COLOR_MAP: Record<string, { bg: string; text: string; border: string; glow
   red: { bg: 'bg-red-500/10', text: 'text-red-400', border: 'border-red-500/20', glow: 'hover:shadow-red-500/10' },
   emerald: { bg: 'bg-emerald-500/10', text: 'text-emerald-400', border: 'border-emerald-500/20', glow: 'hover:shadow-emerald-500/10' },
   amber: { bg: 'bg-amber-500/10', text: 'text-amber-400', border: 'border-amber-500/20', glow: 'hover:shadow-amber-500/10' },
-  violet: { bg: 'bg-violet-500/10', text: 'text-violet-400', border: 'border-violet-500/20', glow: 'hover:shadow-violet-500/10' },
+  violet: { bg: 'bg-amber-500/10', text: 'text-amber-400', border: 'border-amber-500/20', glow: 'hover:shadow-amber-500/10' },
   cyan: { bg: 'bg-cyan-500/10', text: 'text-cyan-400', border: 'border-cyan-500/20', glow: 'hover:shadow-cyan-500/10' },
   pink: { bg: 'bg-pink-500/10', text: 'text-pink-400', border: 'border-pink-500/20', glow: 'hover:shadow-pink-500/10' },
 };
@@ -143,7 +143,7 @@ export default function DiscoverPage() {
           className="bg-gradient-to-br from-red-500/10 via-white to-white border border-red-500/20 rounded-2xl p-8 md:p-12"
         >
           <div className="flex items-center gap-3 mb-4">
-            <span className="px-2 py-1 text-[10px] font-mono rounded bg-red-500/15 text-red-400 border border-red-500/20">
+            <span className="px-2 py-1 text-xs font-mono rounded bg-red-500/15 text-red-400 border border-red-500/20">
               CASE STUDY
             </span>
             <span className="text-xs text-zinc-400">Veritas Research Verification</span>
@@ -265,7 +265,7 @@ function StatPill({ label, value, color }: { label: string; value: string; color
       <p className={`text-xl md:text-2xl font-mono font-bold ${color === 'red' ? 'text-red-400' : 'text-zinc-100'}`}>
         {value}
       </p>
-      <p className="text-[10px] text-zinc-400 mt-0.5">{label}</p>
+      <p className="text-xs text-zinc-400 mt-0.5">{label}</p>
     </div>
   );
 }

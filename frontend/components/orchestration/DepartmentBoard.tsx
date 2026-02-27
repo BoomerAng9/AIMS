@@ -51,7 +51,7 @@ function StatusBadge({ status }: { status: BoomerAngStatus }) {
 
   return (
     <span className={`
-      px-2 py-0.5 text-[10px] font-medium rounded-full border
+      px-2 py-0.5 text-xs font-medium rounded-full border
       ${STATUS_STYLES[status]}
     `}>
       {labels[status]}
@@ -198,7 +198,7 @@ function DepartmentCard({
             <div className="px-4 pb-4 space-y-3">
               {/* Manager */}
               <div>
-                <p className="text-[10px] uppercase tracking-wider text-slate-300 mb-2">
+                <p className="text-xs uppercase tracking-wider text-slate-300 mb-2">
                   Department Lead
                 </p>
                 <AgentNode agent={department.manager} isActive={isActive} />
@@ -206,7 +206,7 @@ function DepartmentCard({
 
               {/* Boomer_Angs */}
               <div>
-                <p className="text-[10px] uppercase tracking-wider text-slate-300 mb-2">
+                <p className="text-xs uppercase tracking-wider text-slate-300 mb-2">
                   Team Members
                 </p>
                 <div className="space-y-2">
@@ -234,7 +234,7 @@ function DepartmentCard({
 function ChainOfCommand({ state }: { state: OrchestrationState }) {
   return (
     <div className="space-y-3">
-      <p className="text-[10px] uppercase tracking-wider text-slate-300">
+      <p className="text-xs uppercase tracking-wider text-slate-300">
         Chain of Command
       </p>
 
@@ -330,7 +330,7 @@ function ChainOfCommand({ state }: { state: OrchestrationState }) {
 function OperationsLog({ events }: { events: HandoffEvent[] }) {
   return (
     <div className="space-y-2">
-      <p className="text-[10px] uppercase tracking-wider text-slate-300">
+      <p className="text-xs uppercase tracking-wider text-slate-300">
         Operations Log
       </p>
 
@@ -340,7 +340,7 @@ function OperationsLog({ events }: { events: HandoffEvent[] }) {
             key={event.id}
             className="flex items-start gap-2 p-2 rounded-lg bg-white hover:bg-white transition-colors"
           >
-            <span className="text-[10px] text-slate-300 whitespace-nowrap">
+            <span className="text-xs text-slate-300 whitespace-nowrap">
               {new Date(event.timestamp).toLocaleTimeString()}
             </span>
             <p className="text-xs text-slate-500 flex-1">
@@ -432,7 +432,7 @@ export function DepartmentBoard({ state, isOpen, onClose }: DepartmentBoardProps
 
               {/* Departments */}
               <div className="space-y-3">
-                <p className="text-[10px] uppercase tracking-wider text-slate-300">
+                <p className="text-xs uppercase tracking-wider text-slate-300">
                   Departments
                 </p>
                 {DEPARTMENTS.map(dept => (

@@ -142,7 +142,7 @@ const CREW_ROLES = [
   { role: "YardOps", color: "text-emerald-400", desc: "Yard management — organizing, sorting, queuing" },
   { role: "SafetyOps", color: "text-red-400", desc: "Safety gates — compliance, validation, blocking" },
   { role: "LoadOps", color: "text-amber-400", desc: "Payload handling — data movement, transformation" },
-  { role: "DispatchOps", color: "text-purple-400", desc: "Routing — dispatch decisions, handoffs" },
+  { role: "DispatchOps", color: "text-amber-400", desc: "Routing — dispatch decisions, handoffs" },
 ];
 
 // ── Color helpers ──────────────────────────────────────────────────────────
@@ -150,7 +150,7 @@ const CREW_ROLES = [
 function accentBorder(color: string) {
   const map: Record<string, string> = {
     blue: "border-blue-500/30",
-    purple: "border-purple-500/30",
+    purple: "border-amber-500/30",
     emerald: "border-emerald-500/30",
     amber: "border-amber-500/30",
   };
@@ -160,7 +160,7 @@ function accentBorder(color: string) {
 function accentBg(color: string) {
   const map: Record<string, string> = {
     blue: "bg-blue-500/10",
-    purple: "bg-purple-500/10",
+    purple: "bg-amber-500/10",
     emerald: "bg-emerald-500/10",
     amber: "bg-amber-500/10",
   };
@@ -170,7 +170,7 @@ function accentBg(color: string) {
 function accentText(color: string) {
   const map: Record<string, string> = {
     blue: "text-blue-400",
-    purple: "text-purple-400",
+    purple: "text-amber-400",
     emerald: "text-emerald-400",
     amber: "text-amber-400",
   };
@@ -306,7 +306,7 @@ function LilHawksControl() {
       {/* Gateway Badge */}
       <div className="flex items-center gap-2 px-1">
         <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" />
-        <span className="text-[10px] text-zinc-500 uppercase tracking-wider font-mono">
+        <span className="text-xs text-zinc-500 uppercase tracking-wider font-mono">
           A.I.M.S. Gateway System — OWNER access verified — Squad operations audit-logged
         </span>
       </div>
@@ -314,27 +314,27 @@ function LilHawksControl() {
       {/* Stats */}
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         <div className="rounded-2xl border border-wireframe-stroke bg-[#18181B]/70 p-4 backdrop-blur-2xl">
-          <p className="text-[10px] uppercase tracking-wider text-zinc-500">Squads</p>
+          <p className="text-xs uppercase tracking-wider text-zinc-500">Squads</p>
           <p className="text-xl font-bold text-zinc-100 mt-1">{SQUAD_DEFS.length}</p>
           <p className="text-[9px] text-zinc-600 mt-0.5">Defined profiles</p>
         </div>
         <div className="rounded-2xl border border-wireframe-stroke bg-[#18181B]/70 p-4 backdrop-blur-2xl">
-          <p className="text-[10px] uppercase tracking-wider text-zinc-500">Squad Hawks</p>
+          <p className="text-xs uppercase tracking-wider text-zinc-500">Squad Hawks</p>
           <p className="text-xl font-bold text-zinc-100 mt-1">{totalSquadHawks}</p>
           <p className="text-[9px] text-zinc-600 mt-0.5">Across all squads</p>
         </div>
         <div className="rounded-2xl border border-wireframe-stroke bg-[#18181B]/70 p-4 backdrop-blur-2xl">
-          <p className="text-[10px] uppercase tracking-wider text-zinc-500">Gate Hawks</p>
+          <p className="text-xs uppercase tracking-wider text-zinc-500">Gate Hawks</p>
           <p className="text-xl font-bold text-red-400 mt-1">{totalGateHawks}</p>
           <p className="text-[9px] text-zinc-600 mt-0.5">Can block progression</p>
         </div>
         <div className="rounded-2xl border border-wireframe-stroke bg-[#18181B]/70 p-4 backdrop-blur-2xl">
-          <p className="text-[10px] uppercase tracking-wider text-zinc-500">Role Cards</p>
+          <p className="text-xs uppercase tracking-wider text-zinc-500">Role Cards</p>
           <p className="text-xl font-bold text-zinc-100 mt-1">{ROLE_CARDS.length}</p>
           <p className="text-[9px] text-zinc-600 mt-0.5">Governance roles</p>
         </div>
         <div className="rounded-2xl border border-wireframe-stroke bg-[#18181B]/70 p-4 backdrop-blur-2xl">
-          <p className="text-[10px] uppercase tracking-wider text-zinc-500">Active</p>
+          <p className="text-xs uppercase tracking-wider text-zinc-500">Active</p>
           <p className="text-xl font-bold text-emerald-400 mt-1">{activeSquads.length}</p>
           <p className="text-[9px] text-zinc-600 mt-0.5">Running now</p>
         </div>
@@ -390,12 +390,12 @@ function LilHawksControl() {
                     <p className={`text-xs font-semibold ${accentText(squad.accentColor)}`}>
                       {squad.name}
                     </p>
-                    <p className="text-[10px] text-zinc-500 mt-0.5">{squad.purpose}</p>
+                    <p className="text-xs text-zinc-500 mt-0.5">{squad.purpose}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] text-zinc-500 font-mono">{squad.hawks.length} hawks</span>
-                  <span className="text-[10px] text-red-400/60 font-mono">
+                  <span className="text-xs text-zinc-500 font-mono">{squad.hawks.length} hawks</span>
+                  <span className="text-xs text-red-400/60 font-mono">
                     {squad.hawks.filter((h) => h.gate).length} gates
                   </span>
                 </div>
@@ -415,7 +415,7 @@ function LilHawksControl() {
                           </div>
                           <Bird className={`h-3.5 w-3.5 flex-shrink-0 ${accentText(squad.accentColor)}`} />
                           <div className="min-w-0">
-                            <p className="text-[11px] font-semibold text-zinc-200">{hawk.name}</p>
+                            <p className="text-sm font-semibold text-zinc-200">{hawk.name}</p>
                             <p className="text-[9px] text-zinc-500 mt-0.5">{hawk.role}</p>
                           </div>
                         </div>
@@ -430,7 +430,7 @@ function LilHawksControl() {
                   </div>
                   {squad.id === "prep-squad-alpha" && (
                     <div className="mt-3 rounded-xl border border-dashed border-blue-500/20 bg-blue-500/[0.03] p-3">
-                      <p className="text-[10px] text-blue-400/70">
+                      <p className="text-xs text-blue-400/70">
                         Execution order: Intake → Decomp → Context → Policy [GATE] → Cost [GATE] → Router
                       </p>
                     </div>
@@ -461,7 +461,7 @@ function LilHawksControl() {
             className="w-full rounded-2xl border border-wireframe-stroke bg-[#1F1F23]/80 px-4 py-3 text-sm text-zinc-200 placeholder:text-zinc-600 focus:border-blue-500/50 focus:outline-none focus:ring-1 focus:ring-blue-500/20 disabled:opacity-50 resize-none"
           />
           <div className="mt-3 flex items-center justify-between">
-            <span className="text-[10px] text-zinc-600 font-mono">
+            <span className="text-xs text-zinc-600 font-mono">
               {prepRunning ? "Running prep squad..." : "Cmd+Enter to run"}
             </span>
             <button
@@ -516,7 +516,7 @@ function LilHawksControl() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-xs font-semibold text-zinc-200 font-mono">{squad.squad_id}</p>
-                    <p className="text-[10px] text-zinc-500 mt-0.5">
+                    <p className="text-xs text-zinc-500 mt-0.5">
                       {squad.lil_hawks?.length || 0} hawks | Shift: {squad.shift_id}
                     </p>
                   </div>
@@ -581,7 +581,7 @@ function LilHawksControl() {
               >
                 <div className="flex items-center gap-2">
                   <Sparkles className="h-3.5 w-3.5 text-cyan-400 flex-shrink-0" />
-                  <p className="text-[11px] font-semibold text-zinc-200 truncate">{card.name}</p>
+                  <p className="text-sm font-semibold text-zinc-200 truncate">{card.name}</p>
                 </div>
                 <p className="text-[9px] text-zinc-500 mt-1.5">{card.function}</p>
                 <p className="text-[8px] text-cyan-400/60 font-mono mt-1 italic">
@@ -599,10 +599,10 @@ function LilHawksControl() {
           Chain of Command
         </h2>
         <div className="mt-4 flex items-center justify-center">
-          <div className="flex items-center gap-3 text-[10px] font-mono text-zinc-500">
+          <div className="flex items-center gap-3 text-xs font-mono text-zinc-500">
             <span className="rounded-lg border border-amber-500/20 bg-amber-500/5 px-2.5 py-1 text-amber-400">ACHEEVY</span>
             <span className="text-zinc-600">→</span>
-            <span className="rounded-lg border border-purple-500/20 bg-purple-500/5 px-2.5 py-1 text-purple-400">Boomer_Ang</span>
+            <span className="rounded-lg border border-amber-500/20 bg-amber-500/5 px-2.5 py-1 text-amber-400">Boomer_Ang</span>
             <span className="text-zinc-600">→</span>
             <span className="rounded-lg border border-orange-500/20 bg-orange-500/5 px-2.5 py-1 text-orange-400">Chicken Hawk</span>
             <span className="text-zinc-600">→</span>

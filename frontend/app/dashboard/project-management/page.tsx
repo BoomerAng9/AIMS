@@ -114,7 +114,7 @@ export default function ProjectManagementPage() {
       {/* ---- Header ---- */}
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <p className="text-[10px] uppercase tracking-[0.3em] text-gold/50 mb-1">
+          <p className="text-xs uppercase tracking-[0.3em] text-gold/50 mb-1">
             Governance &middot; Strategy &middot; Execution
           </p>
           <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-zinc-100 font-display">
@@ -127,7 +127,7 @@ export default function ProjectManagementPage() {
         </div>
         <div className="flex items-center gap-2 rounded-full border border-wireframe-stroke bg-[#18181B]/70 px-4 py-2">
           <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="text-[10px] uppercase font-bold text-emerald-400/80 tracking-widest">
+          <span className="text-xs uppercase font-bold text-emerald-400/80 tracking-widest">
             {PMO_OFFICES.length} OFFICES ONLINE
           </span>
         </div>
@@ -146,7 +146,7 @@ export default function ProjectManagementPage() {
                 <h3 className="text-lg font-semibold text-zinc-100 font-display">
                   {office.code}
                 </h3>
-                <p className="text-[10px] uppercase tracking-wider text-zinc-500 mt-0.5">
+                <p className="text-xs uppercase tracking-wider text-zinc-500 mt-0.5">
                   {office.fullName}
                 </p>
               </div>
@@ -165,23 +165,23 @@ export default function ProjectManagementPage() {
 
             {/* Director */}
             <div className="mt-4 rounded-xl bg-[#18181B] p-3">
-              <p className="text-[10px] uppercase tracking-widest text-zinc-200 font-semibold">
+              <p className="text-xs uppercase tracking-widest text-zinc-200 font-semibold">
                 Director
               </p>
               <p className="text-sm font-medium text-zinc-100 mt-1 font-mono">
                 {office.director.name}
               </p>
-              <p className="text-[10px] text-zinc-500 mt-0.5">
+              <p className="text-xs text-zinc-500 mt-0.5">
                 {office.director.title}
               </p>
-              <p className="text-[10px] text-zinc-500 italic mt-0.5">
+              <p className="text-xs text-zinc-500 italic mt-0.5">
                 {office.director.scope}
               </p>
             </div>
 
             {/* Departmental Agent */}
             <div className="mt-3">
-              <p className="text-[10px] uppercase tracking-widest text-zinc-200 font-semibold mb-2">
+              <p className="text-xs uppercase tracking-widest text-zinc-200 font-semibold mb-2">
                 Departmental Agent
               </p>
               <div className="flex items-center justify-between rounded-lg border border-wireframe-stroke bg-[#1F1F23]/60 px-3 py-2">
@@ -217,7 +217,7 @@ export default function ProjectManagementPage() {
           <h2 className="text-sm font-semibold uppercase tracking-widest text-zinc-200 font-display">
             ACHEEVY Command Chain
           </h2>
-          <p className="mt-1 text-[10px] text-zinc-500 uppercase tracking-wider">
+          <p className="mt-1 text-xs text-zinc-500 uppercase tracking-wider">
             Request lifecycle from user intent to execution
           </p>
 
@@ -236,7 +236,7 @@ export default function ProjectManagementPage() {
             ))}
           </div>
 
-          <p className="mt-5 text-center text-[10px] text-zinc-600 italic">
+          <p className="mt-5 text-center text-xs text-zinc-600 italic">
             Every request is routed through the governance layer before reaching execution agents.
           </p>
         </div>

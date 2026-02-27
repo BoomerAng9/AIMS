@@ -100,7 +100,7 @@ export default function CalculatorPage() {
                                     onChange={(e) => setDistance(e.target.value)}
                                     className="w-full h-2 bg-[rgba(255,255,255,0.1)] rounded-lg appearance-none cursor-pointer accent-[#D4AF37]"
                                 />
-                                <div className="flex justify-between text-[10px] text-[rgba(255,255,255,0.4)] px-1">
+                                <div className="flex justify-between text-xs text-[rgba(255,255,255,0.4)] px-1">
                                     <span>5m</span>
                                     <span>50m</span>
                                     <span>100m</span>

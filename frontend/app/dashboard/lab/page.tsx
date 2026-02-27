@@ -96,7 +96,7 @@ export default function LabPage() {
             <h2 className="text-sm font-semibold uppercase tracking-widest text-zinc-200 font-display">
               Results
             </h2>
-            <span className={`ml-auto text-[10px] uppercase font-bold tracking-wider ${
+            <span className={`ml-auto text-xs uppercase font-bold tracking-wider ${
               result.status === "SUCCESS" ? "text-emerald-400" : "text-red-400"
             }`}>
               {result.status === "SUCCESS" ? "Ready" : "Error"}

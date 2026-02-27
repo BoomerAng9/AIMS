@@ -318,7 +318,7 @@ export function LEDBalance({
 
   return (
     <LEDPanel className="inline-block">
-      <p className="text-[10px] uppercase tracking-wider text-slate-500 mb-2">{label}</p>
+      <p className="text-xs uppercase tracking-wider text-slate-500 mb-2">{label}</p>
       <LEDText text={`${prefix}${formatted}`} size="lg" color={color} />
     </LEDPanel>
   );

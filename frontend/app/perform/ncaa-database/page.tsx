@@ -1,13 +1,13 @@
 'use client';
 
 /**
- * Per|Form — NCAA Football Database
+ * Per|Form — The Ledger: Football Intelligence
  *
- * Luxury Industrial light theme inspired by 'The Athletic'. Premium sports analytics,
- * dense data, sortable/filterable. Three tabs: Player Database | Team Database | Position Rankings
+ * PFF-inspired premium sports analytics design. Dark theme, dense data,
+ * sortable/filterable. 2026 Season Update.
  *
  * All data sourced from /api/perform/prospects with seed data fallback.
- * Powered by AGI — Associated Grading Index.
+ * Remixed with Per|Form branding: AGI Score, 2026 Recruiting Class, & Transaction Ticker.
  */
 
 import { useEffect, useState, useMemo, useCallback } from 'react';
@@ -27,13 +27,15 @@ import type { Conference, ConferenceTier, Team } from '@/lib/perform/conferences
 // Constants
 // ─────────────────────────────────────────────────────────────
 
-type TabId = 'players' | 'teams' | 'positions';
+type TabId = 'players' | 'portal' | 'nil' | 'carousel' | 'bankroll' | 'teams' | 'positions';
 type SortDir = 'asc' | 'desc';
 
 const TABS: { id: TabId; label: string; icon: typeof Database }[] = [
-  { id: 'players', label: 'Player Database', icon: Database },
-  { id: 'teams', label: 'Team Database', icon: Building2 },
-  { id: 'positions', label: 'Position Rankings', icon: BarChart3 },
+  { id: 'players', label: 'Recruits', icon: Users },
+  { id: 'portal', label: 'The Portal', icon: Swords },
+  { id: 'nil', label: 'The Ledger', icon: Zap },
+  { id: 'carousel', label: 'The Carousel', icon: TrendingUp },
+  { id: 'bankroll', label: 'Bankroll', icon: Building2 },
 ];
 
 const POSITIONS = [
@@ -54,12 +56,21 @@ const CONFERENCES_FILTER = [
 ];
 
 const TICKER_HEADLINES = [
-  'AGI scores updated across all conferences',
-  'Transfer Portal tracker: 200+ new entries this cycle',
-  'NFL Combine Coverage: Per|Form analysts scoring every workout with AGI',
-  '2026 class rankings shakeup after spring evaluations',
-  'War Room debates: Bull vs Bear on top 10 QBs',
-  'AGI Intelligence Engine processes 500+ games this season',
+  'AGI Intelligence Engine: 2026 Recruiting Class grades finalized',
+  'David Sanders Jr. (OT) officially signs with Ohio State - Buckeye nation celebrating No. 1 OT',
+  'Transfer Portal: 200+ new entries in last 24 hours as 2026 Spring Window opens',
+  'Breaking: NFL Combine results shifting 2026 Prospect trajectories',
+  'Per|Form War Room: Bull vs Bear debates on 2026 Quarterback class',
+  'NIL Update: 2026 freshmen class projected valuations exceeding $50M collectively',
+];
+
+const TRANSACTION_TICKER = [
+  'PORTAL: QB Julian Sayin (Ohio State) - COMMITTED',
+  'NIL: WR Jeremiah Smith (Ohio State) - $3.5M DEAL SIGNED',
+  'FORM: OT David Sanders Jr. - LETTER OF INTENT FILED (OSU)',
+  'PORTAL: RB Rocket Sanders (South Carolina) - ACTIVE',
+  'NIL: QB Malachi Nelson (Boise St) - NEW PARTNERSHIP',
+  'FORM: HC Ryan Day - CONTRACT EXTENSION PENDING',
 ];
 
 // ─────────────────────────────────────────────────────────────
@@ -67,11 +78,11 @@ const TICKER_HEADLINES = [
 // ─────────────────────────────────────────────────────────────
 
 const AGI_TIER_STYLES: Record<string, { label: string; bg: string; text: string; border: string }> = {
-  ELITE: { label: 'Elite', bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200' },
-  BLUE_CHIP: { label: 'Blue Chip', bg: 'bg-slate-50', text: 'text-slate-700', border: 'border-slate-200' },
-  PROSPECT: { label: 'Prospect', bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-200' },
-  SLEEPER: { label: 'Sleeper', bg: 'bg-zinc-50', text: 'text-zinc-600', border: 'border-zinc-200' },
-  DEVELOPMENTAL: { label: 'Dev', bg: 'bg-zinc-50', text: 'text-zinc-500', border: 'border-zinc-200' },
+  ELITE: { label: 'Elite', bg: 'bg-amber-500/20', text: 'text-amber-500', border: 'border-amber-500/40' },
+  BLUE_CHIP: { label: 'Blue Chip', bg: 'bg-blue-400/20', text: 'text-blue-400', border: 'border-blue-400/40' },
+  PROSPECT: { label: 'Prospect', bg: 'bg-emerald-400/20', text: 'text-emerald-400', border: 'border-emerald-400/40' },
+  SLEEPER: { label: 'Sleeper', bg: 'bg-zinc-400/20', text: 'text-zinc-400', border: 'border-zinc-400/40' },
+  DEVELOPMENTAL: { label: 'Developmental', bg: 'bg-slate-500/20', text: 'text-slate-500', border: 'border-slate-500/40' },
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -108,7 +119,7 @@ function SortHeader({
   return (
     <button
       onClick={() => onSort(field)}
-      className={`flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider hover:text-slate-900 transition-colors ${isActive ? 'text-emerald-700' : 'text-slate-500'
+      className={`flex items-center gap-1 text-sm font-semibold uppercase tracking-wider hover:text-slate-200 transition-colors ${isActive ? 'text-gold' : 'text-slate-500'
         } ${className}`}
     >
       {label}
@@ -133,9 +144,9 @@ function ScoreBadge({ score, size = 'md' }: { score: number; size?: 'sm' | 'md' 
 
 function TierPill({ tier }: { tier: string }) {
   const style = AGI_TIER_STYLES[tier];
-  if (!style) return <span className="text-[10px] text-slate-500">{tier}</span>;
+  if (!style) return <span className="text-xs text-slate-500">{tier}</span>;
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${style.bg} ${style.text} border ${style.border}`}>
+    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider ${style.bg} ${style.text} border ${style.border}`}>
       {style.label}
     </span>
   );
@@ -149,9 +160,9 @@ function FilterChip({ label, active, onClick }: { label: string; active: boolean
   return (
     <button
       onClick={onClick}
-      className={`px-3 py-1 rounded border transition-all text-[11px] font-bold uppercase tracking-tight ${active
-        ? 'bg-emerald-600 text-white border-emerald-700'
-        : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300 hover:text-slate-700'
+      className={`px-2.5 py-1 rounded-lg text-sm font-medium border transition-all ${active
+        ? 'bg-gold/20 text-gold border-gold/40'
+        : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-slate-200 hover:bg-slate-700'
         }`}
     >
       {label}
@@ -191,6 +202,8 @@ export default function NCAADatabasePage() {
   const [sortField, setSortField] = useState('paiScore');
   const [sortDir, setSortDir] = useState<SortDir>('desc');
   const [showFilters, setShowFilters] = useState(false);
+  const [dynamicHeadlines, setDynamicHeadlines] = useState<string[]>([]);
+  const [isAutomating, setIsAutomating] = useState(false);
 
   // Content state
   const [articles, setArticles] = useState<ContentArticle[]>([]);
@@ -201,6 +214,12 @@ export default function NCAADatabasePage() {
 
   // Position rankings
   const [posRankPosition, setPosRankPosition] = useState('QB');
+
+  // Multi-tab data
+  const [portalData, setPortalData] = useState<any[]>([]);
+  const [nilData, setNilData] = useState<any[]>([]);
+  const [carouselData, setCarouselData] = useState<any[]>([]);
+  const [budgetData, setBudgetData] = useState<any[]>([]);
 
   // ── Load data ────────────────────────────────────────────
   useEffect(() => {
@@ -227,7 +246,50 @@ export default function NCAADatabasePage() {
       }
     };
     fetchData();
+
+    // Fetch news
+    fetch('/api/perform/content/news')
+      .then(r => r.json())
+      .then(data => {
+        if (data.headlines) setDynamicHeadlines(data.headlines);
+      });
+
+    // Fetch Portal
+    fetch('/api/perform/transfer-portal?season=2026')
+      .then(r => r.json())
+      .then(setPortalData);
+
+    // Fetch NIL
+    fetch('/api/perform/nil?view=deals&season=2026')
+      .then(r => r.json())
+      .then(setNilData);
+
+    // Fetch Coaching
+    fetch('/api/perform/coaching-carousel?season=2026')
+      .then(r => r.json())
+      .then(setCarouselData);
+
+    // Fetch Budgets
+    fetch('/api/perform/revenue-budget?season=2026')
+      .then(r => r.json())
+      .then(setBudgetData);
   }, []);
+
+  const triggerAutomation = async () => {
+    setIsAutomating(true);
+    try {
+      const res = await fetch('/api/perform/content/news', {
+        method: 'POST',
+        body: JSON.stringify({ mode: 'automate' })
+      });
+      const data = await res.json();
+      if (data.headlines) setDynamicHeadlines(data.headlines);
+    } catch (err) {
+      console.error('Automation error:', err);
+    } finally {
+      setIsAutomating(false);
+    }
+  };
 
   // ── Sort handler ─────────────────────────────────────────
   const handleSort = useCallback((field: string) => {
@@ -349,21 +411,18 @@ export default function NCAADatabasePage() {
 
   // ── Ticker derived from live rankings + news ──────────────
   const tickerItems = useMemo(() => {
-    const items = articles.length > 0
-      ? articles.slice(0, 3).map(a => a.title.replace(/P\.A\.I\./g, 'AGI'))
-      : [...TICKER_HEADLINES];
-
+    const items = dynamicHeadlines.length > 0 ? [...dynamicHeadlines] : [...TICKER_HEADLINES];
     if (top4Prospects.length > 0) {
       const p = top4Prospects[0];
-      items.unshift(`${p.name} leads all prospects with a ${p.paiScore} AGI grade`);
+      items.unshift(`${p.name} leads all prospects with ${p.paiScore} AGI grade`);
     }
     if (top4Prospects.length > 1) {
       const p = top4Prospects[1];
-      const style = AGI_TIER_STYLES[p.tier as string] || { label: p.tier };
-      items.splice(2, 0, `${p.name} (${p.position}) earns a ${style.label} tier AGI rating`);
+      const tierLabel = AGI_TIER_STYLES[p.tier as string]?.label || p.tier;
+      items.splice(2, 0, `${p.name} (${p.position}) earns ${tierLabel} tier rating`);
     }
     return items;
-  }, [top4Prospects, articles]);
+  }, [top4Prospects, dynamicHeadlines]);
 
   const activeFilters = [posFilter, tierFilter, poolFilter, confFilter].filter(Boolean).length;
 
@@ -406,7 +465,7 @@ export default function NCAADatabasePage() {
       <div className="bg-white border-b border-slate-200 text-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-10 flex items-center justify-between">
           <div className="flex items-center space-x-4 overflow-hidden">
-            <span className="text-emerald-600 font-bold whitespace-nowrap uppercase tracking-wider text-[11px]">
+            <span className="text-emerald-600 font-bold whitespace-nowrap uppercase tracking-wider text-sm">
               Live
             </span>
             <div className="overflow-hidden flex-1 relative">
@@ -419,8 +478,16 @@ export default function NCAADatabasePage() {
               </div>
             </div>
           </div>
-          <div className="hidden md:flex items-center space-x-4 text-slate-400 font-bold uppercase tracking-tighter">
-            <Link href="/perform/pricing" className="hover:text-emerald-600 transition">
+          <div className="hidden md:flex items-center space-x-4 text-slate-400">
+            <button
+              onClick={triggerAutomation}
+              disabled={isAutomating}
+              className="text-xs px-2 py-0.5 rounded border border-gold/30 text-gold hover:bg-gold/10 transition disabled:opacity-50"
+            >
+              {isAutomating ? 'Automating...' : 'Trigger News Loop'}
+            </button>
+            <span className="text-slate-700">|</span>
+            <Link href="/perform/pricing" className="hover:text-gold transition">
               Subscribe
             </Link>
             <span className="text-slate-200">|</span>
@@ -432,26 +499,50 @@ export default function NCAADatabasePage() {
       </div>
 
       {/* ── Hero Section ─────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-white border-b border-slate-200">
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 md:py-24">
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8">
-            <div className="max-w-3xl">
-              <span className="inline-flex items-center gap-2 bg-emerald-50 text-emerald-700 px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded border border-emerald-100 mb-6">
-                <Zap className="w-3 h-3" />
-                AGI — Associated Grading Index
+      <section className="relative overflow-hidden">
+        {/* Background gradient with subtle radial accents */}
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" />
+        <div
+          className="absolute inset-0 opacity-[0.06]"
+          style={{
+            backgroundImage:
+              'radial-gradient(circle at 20% 50%, rgba(139,92,246,0.4) 0%, transparent 50%), radial-gradient(circle at 80% 30%, rgba(139,92,246,0.2) 0%, transparent 50%)',
+          }}
+        />
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 border-b border-slate-800 pb-8">
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-gold animate-pulse" />
+              <span className="text-xs font-bold text-slate-500 uppercase tracking-[0.2em]">
+                Per|Form Intelligence Engine &middot; Live 2026 Season
               </span>
-              <h1 className="text-4xl md:text-7xl font-serif font-bold mb-4 leading-[1.05] tracking-tight text-slate-950">
-                NCAA Football <br />
-                <span className="italic text-emerald-800">Database</span>
-              </h1>
-              <p className="text-slate-600 text-lg md:text-xl font-medium max-w-2xl leading-relaxed">
-                The industry standard for grading, ranking, and deep analytics.
-                Powered by our proprietary AGI engine for surgical precision.
-              </p>
             </div>
+            <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tight leading-none mb-6">
+              The <span className="text-gold italic">Ledger</span>
+            </h1>
+            <p className="text-slate-400 max-w-2xl text-lg leading-relaxed">
+              The premier <span className="text-slate-200">2026 Recruiting & Transaction Database</span>.
+              AGI-graded, scout-verified, and contract-ready. Built for the modern era of NCAA performance.
+            </p>
           </div>
 
-          <div className="mt-12 flex flex-wrap items-center gap-8 text-sm">
+          <div className="flex items-center gap-4">
+            <div className="text-right hidden sm:block">
+              <div className="text-xs text-slate-500 font-bold uppercase tracking-widest mb-1">AGI Update Interval</div>
+              <div className="text-gold font-mono text-sm leading-none">EVERY 4.8 HOURS (5X DAILY)</div>
+            </div>
+            <button
+              onClick={triggerAutomation}
+              disabled={isAutomating}
+              className="bg-slate-800 hover:bg-gold hover:text-white border border-slate-700 hover:border-gold px-6 py-2.5 rounded-lg flex items-center gap-2 transition-all duration-300 font-bold uppercase tracking-wide text-xs group"
+            >
+              <Zap className={`w-4 h-4 ${isAutomating ? 'animate-spin' : 'group-hover:animate-pulse'}`} />
+              {isAutomating ? 'Harvesting Signals...' : 'Trigger News Loop'}
+            </button>
+          </div>
+        </div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 md:py-20">
+          <div className="flex flex-wrap items-center gap-6 text-sm">
             {[
               { value: dbStats.totalPlayers, label: 'Prospects' },
               { value: dbStats.teams, label: 'Programs' },
@@ -462,7 +553,7 @@ export default function NCAADatabasePage() {
                 <span className="text-slate-950 font-black text-3xl tabular-nums tracking-tighter">
                   {stat.value}
                 </span>
-                <span className="text-slate-400 uppercase text-[10px] font-bold tracking-widest">
+                <span className="text-slate-400 uppercase text-xs font-bold tracking-widest">
                   {stat.label}
                 </span>
               </div>
@@ -481,7 +572,7 @@ export default function NCAADatabasePage() {
                   key={position}
                   className={i < topByPosition.length - 1 ? 'md:border-r md:border-slate-200' : ''}
                 >
-                  <p className="text-slate-500 text-[10px] uppercase tracking-widest mb-1 font-bold">
+                  <p className="text-slate-500 text-xs uppercase tracking-widest mb-1 font-bold">
                     AGI Leader: {position}
                   </p>
                   <p className="text-xl font-serif font-bold text-slate-900 truncate">
@@ -507,9 +598,9 @@ export default function NCAADatabasePage() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-8 py-5 text-[11px] font-black border-b-2 transition-all uppercase tracking-[0.2em] relative ${isActive
-                  ? 'border-emerald-600 text-slate-900 group'
-                  : 'border-transparent text-slate-400 hover:text-slate-600'
+                className={`flex items-center gap-2 px-5 py-3.5 text-sm font-semibold border-b-2 transition-all uppercase tracking-wide ${isActive
+                  ? 'border-gold text-gold'
+                  : 'border-transparent text-slate-500 hover:text-slate-300'
                   }`}
               >
                 <Icon className={`w-4 h-4 ${isActive ? 'text-emerald-600' : 'text-slate-300'}`} />
@@ -527,7 +618,7 @@ export default function NCAADatabasePage() {
           <div className="hidden lg:flex items-center gap-6">
             <div className="flex flex-col items-end">
               <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Platform Sync</span>
-              <span className="text-[10px] font-bold text-emerald-600 uppercase">Live Database</span>
+              <span className="text-xs font-bold text-emerald-600 uppercase">Live Database</span>
             </div>
             <div className="h-8 w-px bg-slate-200" />
           </div>
@@ -549,7 +640,7 @@ export default function NCAADatabasePage() {
                       <Trophy className="w-32 h-32 text-slate-200" />
                     </div>
                     <div className="absolute top-6 left-6">
-                      <span className="bg-slate-950 text-white text-[10px] font-black uppercase tracking-[0.2em] px-4 py-2 shadow-2xl">
+                      <span className="bg-slate-950 text-white text-xs font-black uppercase tracking-[0.2em] px-4 py-2 shadow-2xl">
                         Scouting Deep Dive
                       </span>
                     </div>
@@ -560,7 +651,7 @@ export default function NCAADatabasePage() {
                   <p className="text-slate-500 text-base md:text-lg font-medium leading-relaxed mb-6 line-clamp-2 max-w-2xl">
                     {articles[0].excerpt.replace(/P\.A\.I\./g, 'AGI')}
                   </p>
-                  <div className="mt-auto flex items-center gap-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                  <div className="mt-auto flex items-center gap-4 text-xs font-black text-slate-400 uppercase tracking-widest">
                     <span className="text-emerald-600">{articles[0].generatedBy}</span>
                     <span className="w-1.5 h-1.5 bg-slate-200 rounded-full" />
                     <span>{articles[0].readTimeMin} min read</span>
@@ -571,7 +662,7 @@ export default function NCAADatabasePage() {
 
                 {/* Vertical Sidebar Stories */}
                 <div className="lg:col-span-4 space-y-8 border-l border-slate-100 pl-8 hidden lg:block">
-                  <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6">Latest Updates</h4>
+                  <h4 className="text-sm font-black text-slate-400 uppercase tracking-[0.2em] mb-6">Latest Updates</h4>
                   {articles.slice(1, 5).map(article => (
                     <div key={article.id} className="group cursor-pointer">
                       <span className="text-emerald-700 text-[9px] font-black uppercase tracking-widest mb-1.5 block">
@@ -603,23 +694,21 @@ export default function NCAADatabasePage() {
                   className="w-full pl-12 pr-4 py-4 rounded border border-slate-200 text-base font-medium focus:outline-none focus:border-emerald-500 bg-white transition-all shadow-sm"
                 />
               </div>
-              <div className="flex gap-2 w-full md:w-auto overflow-x-auto no-scrollbar pb-1 md:pb-0">
-                <button
-                  onClick={() => setShowFilters(f => !f)}
-                  className={`flex items-center gap-2 px-8 py-4 rounded border text-[11px] font-black uppercase tracking-widest transition-all ${showFilters || activeFilters > 0
-                    ? 'bg-emerald-600 text-white border-emerald-700 shadow-lg'
-                    : 'bg-white text-slate-600 border-slate-200 hover:border-slate-400'
-                    }`}
-                >
-                  <SlidersHorizontal className="w-4 h-4" />
-                  Advanced Selection
-                  {activeFilters > 0 && (
-                    <span className="ml-2 px-2 py-0.5 rounded-full bg-white text-emerald-600 text-[9px] font-black">
-                      {activeFilters}
-                    </span>
-                  )}
-                </button>
-              </div>
+              <button
+                onClick={() => setShowFilters(f => !f)}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium transition-all ${showFilters || activeFilters > 0
+                  ? 'bg-gold/15 text-gold border-gold/40'
+                  : 'bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-700'
+                  }`}
+              >
+                <SlidersHorizontal className="w-4 h-4" />
+                Filters
+                {activeFilters > 0 && (
+                  <span className="px-1.5 py-0.5 rounded-full bg-gold text-white text-xs font-bold">
+                    {activeFilters}
+                  </span>
+                )}
+              </button>
             </div>
 
             {/* Filter Panel */}
@@ -627,7 +716,7 @@ export default function NCAADatabasePage() {
               <div className="mb-6 p-8 rounded border border-slate-200 bg-slate-50 space-y-8 shadow-sm">
                 {/* Position */}
                 <div>
-                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4 block">
+                  <label className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 block">
                     Position Selection
                   </label>
                   <div className="flex flex-wrap gap-2">
@@ -645,7 +734,7 @@ export default function NCAADatabasePage() {
 
                 {/* Tier */}
                 <div>
-                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4 block">
+                  <label className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 block">
                     Intelligence Tier
                   </label>
                   <div className="flex flex-wrap gap-1.5">
@@ -664,7 +753,7 @@ export default function NCAADatabasePage() {
                 {/* Pool + Conference */}
                 <div className="flex flex-wrap gap-8 items-end">
                   <div className="w-full md:w-64">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3 block">
+                    <label className="text-xs font-black uppercase tracking-widest text-slate-400 mb-3 block">
                       Registry Pool
                     </label>
                     <select
@@ -678,7 +767,7 @@ export default function NCAADatabasePage() {
                     </select>
                   </div>
                   <div className="w-full md:w-64">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3 block">
+                    <label className="text-xs font-black uppercase tracking-widest text-slate-400 mb-3 block">
                       Conference Registry
                     </label>
                     <select
@@ -701,7 +790,7 @@ export default function NCAADatabasePage() {
                         setPoolFilter('');
                         setConfFilter('');
                       }}
-                      className="flex items-center gap-2 px-6 py-3 rounded bg-white border border-red-100 text-[10px] font-black uppercase tracking-widest text-red-600 hover:bg-red-50 transition-all shadow-sm"
+                      className="flex items-center gap-2 px-6 py-3 rounded bg-white border border-red-100 text-xs font-black uppercase tracking-widest text-red-600 hover:bg-red-50 transition-all shadow-sm"
                     >
                       <X className="w-4 h-4" /> Reset Filters
                     </button>
@@ -712,11 +801,11 @@ export default function NCAADatabasePage() {
 
             {/* Results count */}
             <div className="flex items-center justify-between mb-3 px-1">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">
                 {filteredProspects.length} player{filteredProspects.length !== 1 ? 's' : ''}
                 {activeFilters > 0 && ' (filtered)'}
               </span>
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">
                 Sorted by {sortField === 'paiScore' ? 'AGI Score' : sortField} {sortDir === 'desc' ? '\u2193' : '\u2191'}
               </span>
             </div>
@@ -734,21 +823,21 @@ export default function NCAADatabasePage() {
                         <SortHeader label="Player" field="name" currentSort={sortField} currentDir={sortDir} onSort={handleSort} />
                       </th>
                       <th className="px-3 py-4 w-16">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Pos</span>
+                        <span className="text-sm font-bold uppercase tracking-wider text-slate-400">Pos</span>
                       </th>
                       <th className="px-4 py-4">
                         <SortHeader label="School" field="school" currentSort={sortField} currentDir={sortDir} onSort={handleSort} />
                       </th>
                       <th className="px-3 py-4 w-12 hidden md:table-cell">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">St</span>
+                        <span className="text-sm font-bold uppercase tracking-wider text-slate-400">St</span>
                       </th>
                       <th className="px-3 py-4 w-16 hidden lg:table-cell">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Class</span>
+                        <span className="text-sm font-bold uppercase tracking-wider text-slate-400">Class</span>
                       </th>
                       <th className="px-3 py-4 w-20">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Tier</span>
+                        <span className="text-sm font-bold uppercase tracking-wider text-slate-400">Tier</span>
                       </th>
-                      <th className="px-3 py-4 w-16 text-center">
+                      <th className="px-3 py-3 w-16 text-center">
                         <SortHeader label="AGI" field="paiScore" currentSort={sortField} currentDir={sortDir} onSort={handleSort} className="justify-center" />
                       </th>
                       <th className="px-3 py-4 w-12 text-center hidden lg:table-cell">
@@ -761,7 +850,7 @@ export default function NCAADatabasePage() {
                         <SortHeader label="I" field="intangibles" currentSort={sortField} currentDir={sortDir} onSort={handleSort} className="justify-center" />
                       </th>
                       <th className="px-3 py-4 w-10 text-center">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">&Delta;</span>
+                        <span className="text-sm font-bold uppercase tracking-wider text-slate-400">&Delta;</span>
                       </th>
                     </tr>
                   </thead>
@@ -798,7 +887,7 @@ export default function NCAADatabasePage() {
                             </Link>
                           </td>
                           <td className="px-3 py-4">
-                            <span className="inline-flex items-center justify-center w-10 h-7 rounded border border-slate-200 bg-white text-[10px] font-black text-slate-600">
+                            <span className="inline-flex items-center justify-center w-10 h-7 rounded border border-slate-200 bg-white text-xs font-black text-slate-600">
                               {p.position}
                             </span>
                           </td>
@@ -839,7 +928,7 @@ export default function NCAADatabasePage() {
               {/* Table footer */}
               {filteredProspects.length > 100 && (
                 <div className="px-4 py-4 border-t border-slate-200 bg-slate-50 text-center">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest text">
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-widest text">
                     Showing 100 of {filteredProspects.length} &mdash; use filters to narrow results
                   </span>
                 </div>
@@ -873,9 +962,9 @@ export default function NCAADatabasePage() {
                     <button
                       key={tier}
                       onClick={() => setTeamConfFilter(tier)}
-                      className={`text-[11px] font-black uppercase tracking-tight px-4 py-2 rounded border transition-all whitespace-nowrap ${isActive
-                        ? 'bg-emerald-600 text-white border-emerald-700 shadow-sm'
-                        : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'
+                      className={`text-xs px-3 py-2 rounded-lg border transition-all whitespace-nowrap ${isActive
+                        ? 'bg-gold/15 text-gold border-gold/40'
+                        : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-slate-200'
                         }`}
                     >
                       {label}
@@ -886,7 +975,7 @@ export default function NCAADatabasePage() {
             </div>
 
             <div className="flex items-center justify-between mb-3 px-1">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">
                 {filteredTeams.length} program{filteredTeams.length !== 1 ? 's' : ''}
               </span>
             </div>
@@ -898,25 +987,25 @@ export default function NCAADatabasePage() {
                   <thead>
                     <tr className="border-b border-slate-200 bg-slate-50">
                       <th className="px-4 py-4">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">School</span>
+                        <span className="text-sm font-bold uppercase tracking-wider text-slate-400">School</span>
                       </th>
                       <th className="px-3 py-4 hidden md:table-cell">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Conference</span>
+                        <span className="text-sm font-bold uppercase tracking-wider text-slate-400">Conference</span>
                       </th>
                       <th className="px-4 py-4">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Head Coach</span>
+                        <span className="text-sm font-bold uppercase tracking-wider text-slate-400">Head Coach</span>
                       </th>
                       <th className="px-4 py-4 hidden lg:table-cell">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Stadium</span>
+                        <span className="text-sm font-bold uppercase tracking-wider text-slate-400">Stadium</span>
                       </th>
                       <th className="px-3 py-4 text-right hidden lg:table-cell">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Capacity</span>
+                        <span className="text-sm font-bold uppercase tracking-wider text-slate-400">Capacity</span>
                       </th>
                       <th className="px-3 py-4 hidden md:table-cell">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Location</span>
+                        <span className="text-sm font-bold uppercase tracking-wider text-slate-400">Location</span>
                       </th>
                       <th className="px-3 py-4 w-16">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Colors</span>
+                        <span className="text-sm font-bold uppercase tracking-wider text-slate-400">Colors</span>
                       </th>
                     </tr>
                   </thead>
@@ -930,14 +1019,14 @@ export default function NCAADatabasePage() {
                           </div>
                         </td>
                         <td className="px-3 py-4 hidden md:table-cell">
-                          <span className="inline-flex items-center px-2 py-0.5 rounded border border-slate-200 bg-white text-[10px] font-black uppercase tracking-wider text-slate-600">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded border border-slate-200 bg-white text-xs font-black uppercase tracking-wider text-slate-600">
                             {team.conferenceAbbrev}
                           </span>
                         </td>
                         <td className="px-4 py-4">
                           <div>
                             <span className="text-sm font-bold text-slate-700">{team.headCoach}</span>
-                            <span className="text-[10px] font-black text-slate-400 ml-1 uppercase">({team.headCoachSince})</span>
+                            <span className="text-xs font-black text-slate-400 ml-1 uppercase">({team.headCoachSince})</span>
                           </div>
                         </td>
                         <td className="px-4 py-4 hidden lg:table-cell">
@@ -982,7 +1071,7 @@ export default function NCAADatabasePage() {
           <div>
             {/* Position Selector */}
             <div className="mb-6">
-              <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-3 block">
+              <label className="text-sm font-semibold uppercase tracking-wider text-slate-500 mb-3 block">
                 Select Position
               </label>
               <div className="flex flex-wrap gap-2">
@@ -990,9 +1079,9 @@ export default function NCAADatabasePage() {
                   <button
                     key={p}
                     onClick={() => setPosRankPosition(p)}
-                    className={`px-4 py-2 rounded text-[11px] font-black border uppercase tracking-tighter transition-all ${posRankPosition === p
-                      ? 'bg-emerald-600 text-white border-emerald-700 shadow-sm'
-                      : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'
+                    className={`px-3 py-2 rounded-lg text-xs font-bold border transition-all ${posRankPosition === p
+                      ? 'bg-gold/20 text-gold border-gold/40 shadow-[0_0_8px_rgba(139,92,246,0.2)]'
+                      : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-slate-200 hover:bg-slate-700'
                       }`}
                   >
                     {p}
@@ -1007,7 +1096,7 @@ export default function NCAADatabasePage() {
                 <h2 className="text-2xl font-serif font-bold text-slate-950">
                   Top {posRankPosition}s
                 </h2>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-0.5">
                   {positionPlayers.length} player{positionPlayers.length !== 1 ? 's' : ''} &middot; Ranked by AGI Score
                 </p>
               </div>
@@ -1028,9 +1117,9 @@ export default function NCAADatabasePage() {
                     className="group flex items-center gap-4 p-5 rounded border border-slate-200 bg-white hover:border-emerald-300 hover:bg-emerald-50/30 transition-all shadow-sm"
                   >
                     {/* Rank */}
-                    <div className={`w-10 h-10 rounded flex items-center justify-center text-sm font-black flex-shrink-0 ${i < 3
-                      ? 'bg-amber-600 text-white'
-                      : 'bg-slate-100 text-slate-400'
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-black flex-shrink-0 ${i < 3
+                      ? 'bg-gold/20 text-gold border border-gold/40'
+                      : 'bg-slate-700 text-slate-400 border border-slate-600'
                       }`}>
                       {i + 1}
                     </div>
@@ -1044,21 +1133,21 @@ export default function NCAADatabasePage() {
                         <TierPill tier={p.tier} />
                       </div>
                       <div className="flex items-center gap-3 mt-0.5">
-                        <span className="text-[11px] font-bold text-slate-500">{p.school}</span>
-                        <span className="text-[11px] text-slate-200">&middot;</span>
-                        <span className="text-[11px] font-bold text-slate-400">{p.state}</span>
-                        <span className="text-[11px] text-slate-200">&middot;</span>
-                        <span className="text-[11px] font-bold text-slate-400">{p.classYear}</span>
+                        <span className="text-sm font-bold text-slate-500">{p.school}</span>
+                        <span className="text-sm text-slate-200">&middot;</span>
+                        <span className="text-sm font-bold text-slate-400">{p.state}</span>
+                        <span className="text-sm text-slate-200">&middot;</span>
+                        <span className="text-sm font-bold text-slate-400">{p.classYear}</span>
                         {p.height && (
                           <>
-                            <span className="text-[11px] text-slate-200">&middot;</span>
-                            <span className="text-[11px] font-bold text-slate-400">{p.height}</span>
+                            <span className="text-sm text-slate-200">&middot;</span>
+                            <span className="text-sm font-bold text-slate-400">{p.height}</span>
                           </>
                         )}
                         {p.weight > 0 && (
                           <>
-                            <span className="text-[11px] text-slate-200">&middot;</span>
-                            <span className="text-[11px] font-bold text-slate-400">{p.weight} lbs</span>
+                            <span className="text-sm text-slate-200">&middot;</span>
+                            <span className="text-sm font-bold text-slate-400">{p.weight} lbs</span>
                           </>
                         )}
                       </div>
@@ -1097,7 +1186,148 @@ export default function NCAADatabasePage() {
           </div>
         )}
 
-        {/* ── Top Graded Prospects (The Athletic Style Cards) ──────── */}
+        {/* ════════════════════════════════════════════════════
+             TAB: THE PORTAL
+           ════════════════════════════════════════════════════ */}
+        {activeTab === 'portal' && (
+          <div className="space-y-4">
+            <div className="bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden">
+              <table className="w-full text-left">
+                <thead className="bg-slate-900/50 border-b border-slate-700">
+                  <tr>
+                    <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Player</th>
+                    <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Position</th>
+                    <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">From</th>
+                    <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">To</th>
+                    <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest text-right">AGI Score</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-700">
+                  {portalData.map((e, i) => (
+                    <tr key={i} className="hover:bg-slate-700/30 transition-colors group">
+                      <td className="px-6 py-4">
+                        <div className="font-bold text-white group-hover:text-gold transition-colors">{e.playerName}</div>
+                        <div className="text-xs text-slate-500 uppercase">{e.status}</div>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-slate-400">{e.position}</td>
+                      <td className="px-6 py-4 text-sm text-slate-400">{e.previousTeam?.commonName || '—'}</td>
+                      <td className="px-6 py-4 text-sm text-gold font-bold">{e.newTeam?.commonName || '—'}</td>
+                      <td className="px-6 py-4 text-right"><GradeBadge score={e.paiScore || 0} /></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* ════════════════════════════════════════════════════
+             TAB: THE LEDGER (NIL)
+           ════════════════════════════════════════════════════ */}
+        {activeTab === 'nil' && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden">
+              <h3 className="px-6 py-4 bg-slate-900/50 border-b border-slate-700 text-xs font-bold uppercase tracking-wider text-gold">Latest Valuations</h3>
+              <div className="divide-y divide-slate-700">
+                {nilData.map((d, i) => (
+                  <div key={i} className="px-6 py-4 flex items-center justify-between hover:bg-slate-700/30 transition-colors">
+                    <div>
+                      <div className="font-bold text-white">{d.playerName}</div>
+                      <div className="text-xs text-slate-500 uppercase tracking-tight">With {d.brandOrCollective} &middot; {d.team?.commonName}</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-emerald-400 font-black tabular-nums">${d.estimatedValue?.toLocaleString()}</div>
+                      <div className="text-[9px] text-slate-600 uppercase font-mono">Valuation</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-6">
+              <h3 className="text-sm font-bold text-white mb-4 uppercase tracking-tighter">Market Intelligence</h3>
+              <p className="text-slate-400 text-xs leading-relaxed">
+                The Ledger tracks all high-signal NIL transactions for the 2026 class.
+                Data is harvested from collective filings, brand announcements, and authorized sources.
+              </p>
+              <div className="mt-6 flex flex-col gap-3">
+                <div className="p-3 rounded-lg bg-slate-900 border border-slate-700">
+                  <div className="text-xs text-slate-500 uppercase font-bold mb-1">Total Market Volume</div>
+                  <div className="text-xl font-black text-white">$145.2M</div>
+                </div>
+                <div className="p-3 rounded-lg bg-slate-900 border border-slate-700">
+                  <div className="text-xs text-slate-500 uppercase font-bold mb-1">Avg Deal (Elite Tier)</div>
+                  <div className="text-xl font-black text-white">$2.1M</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ════════════════════════════════════════════════════
+             TAB: THE CAROUSEL (COACHING)
+           ════════════════════════════════════════════════════ */}
+        {activeTab === 'carousel' && (
+          <div className="space-y-4">
+            {carouselData.map((c, i) => (
+              <div key={i} className="flex flex-col md:flex-row md:items-center gap-6 p-6 rounded-2xl bg-slate-800 border border-slate-700 hover:border-gold/30 transition-all">
+                <div className="flex-1">
+                  <span className={`inline-block px-2 py-0.5 rounded text-xs font-bold uppercase mb-2 ${c.changeType === 'HIRED' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'
+                    }`}>
+                    {c.changeType}
+                  </span>
+                  <h3 className="text-xl font-black text-white">{c.coachName}</h3>
+                  <p className="text-sm text-slate-400 mt-1">
+                    {c.newRole || 'Head Coach'} &middot; <span className="text-gold font-bold">{c.newTeam?.commonName || 'TBD'}</span>
+                  </p>
+                </div>
+                <div className="flex items-center gap-8 border-l border-slate-700 pl-8">
+                  <div>
+                    <div className="text-xs text-slate-500 uppercase font-bold mb-1">Previous</div>
+                    <div className="text-sm text-slate-300">{c.previousTeam?.commonName || '—'}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-slate-500 uppercase font-bold mb-1">Date</div>
+                    <div className="text-sm text-slate-300">{new Date(c.effectiveDate).toLocaleDateString()}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* ════════════════════════════════════════════════════
+             TAB: BANKROLL (BUDGETS)
+           ════════════════════════════════════════════════════ */}
+        {activeTab === 'bankroll' && (
+          <div className="bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden">
+            <table className="w-full text-left">
+              <thead className="bg-slate-900/50 border-b border-slate-700">
+                <tr>
+                  <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">School</th>
+                  <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Tier</th>
+                  <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">NIL Budget</th>
+                  <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Cap Space</th>
+                  <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest text-right">Cap Rank</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-700">
+                {budgetData.map((b, i) => (
+                  <tr key={i} className="hover:bg-slate-700/30 transition-colors">
+                    <td className="px-6 py-4 font-bold text-white">{b.team?.schoolName}</td>
+                    <td className="px-6 py-4">
+                      <span className="px-2 py-0.5 rounded bg-slate-900 text-xs text-slate-400 border border-slate-700">{b.spendingTier}</span>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-slate-300 font-mono">${(b.nilBudget / 1000000).toFixed(1)}M</td>
+                    <td className="px-6 py-4 text-sm text-emerald-400 font-black font-mono">${(b.capSpace / 1000000).toFixed(1)}M</td>
+                    <td className="px-6 py-4 text-right font-bold text-gold">#{b.capRank}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* ── Top Graded Prospects (PFF-style cards) ──────── */}
         {top4Prospects.length > 0 && (
           <div className="mt-24 mb-20">
             <div className="flex justify-between items-end mb-10 border-b border-slate-200 pb-5">
@@ -1105,13 +1335,13 @@ export default function NCAADatabasePage() {
                 <h2 className="text-4xl font-serif font-bold tracking-tight text-slate-950">
                   Top Graded <span className="italic text-emerald-800">Prospects</span>
                 </h2>
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-2">
+                <p className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mt-2">
                   Live AGI analysis &middot; Class of '25 & '26
                 </p>
               </div>
               <Link
                 href="/perform/big-board"
-                className="text-emerald-700 hover:text-emerald-800 text-[11px] font-black uppercase tracking-widest flex items-center gap-1.5 transition-transform hover:translate-x-1"
+                className="text-emerald-700 hover:text-emerald-800 text-sm font-black uppercase tracking-widest flex items-center gap-1.5 transition-transform hover:translate-x-1"
               >
                 View Big Board <ArrowRight className="w-3.5 h-3.5" />
               </Link>
@@ -1129,10 +1359,10 @@ export default function NCAADatabasePage() {
                   </div>
                   <div className="flex items-start justify-between mb-8">
                     <div className="flex flex-col">
-                      <span className="text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em] mb-1">
+                      <span className="text-xs font-black text-emerald-600 uppercase tracking-[0.2em] mb-1">
                         {p.position}
                       </span>
-                      <span className="text-[11px] font-bold text-slate-400 uppercase tracking-tight">{p.school}</span>
+                      <span className="text-sm font-bold text-slate-400 uppercase tracking-tight">{p.school}</span>
                     </div>
                     <GradeBadge score={p.paiScore} />
                   </div>
@@ -1197,7 +1427,7 @@ export default function NCAADatabasePage() {
                   {tool.title}
                 </h3>
                 <p className="text-slate-500 text-sm font-medium leading-relaxed mb-6">{tool.desc}</p>
-                <span className="text-emerald-700 text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5 transition-transform group-hover:translate-x-1">
+                <span className="text-emerald-700 text-xs font-black uppercase tracking-widest flex items-center gap-1.5 transition-transform group-hover:translate-x-1">
                   Explore <ChevronRight className="w-3.5 h-3.5" />
                 </span>
               </Link>
@@ -1212,21 +1442,21 @@ export default function NCAADatabasePage() {
 
           <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-16">
             <div className="max-w-3xl text-center lg:text-left">
-              <span className="text-emerald-500 text-[10px] font-black uppercase tracking-[0.3em] mb-6 block">
+              <span className="text-emerald-500 text-xs font-black uppercase tracking-[0.3em] mb-6 block">
                 Exclusive Intelligence
               </span>
               <h2 className="text-4xl md:text-6xl font-serif font-bold mb-8 tracking-tight text-white leading-tight">
                 Master the Game with <br />
                 <span className="italic text-emerald-500 underline decoration-slate-800 underline-offset-8">AGI Premium</span>
               </h2>
-              <p className="text-slate-400 text-lg md:text-xl font-medium leading-relaxed mb-10 max-w-xl">
-                Unrestricted access to our depth indexes, daily scouting pulse,
-                and the full Associated Grading Index analytics suite.
+              <p className="text-slate-400 max-w-xl mb-6">
+                Get access to exclusive AGI grades, advanced scouting reports, War Room debates,
+                and the full intelligence engine used by scouts and analysts.
               </p>
-              <div className="flex flex-wrap gap-x-10 gap-y-6 justify-center lg:justify-start">
-                {['Live AGI Pulse', 'Intangibles Data', 'War Room access'].map(feature => (
-                  <div key={feature} className="flex items-center space-x-3 text-[10px] font-black uppercase tracking-widest text-slate-300">
-                    <CheckCircle className="w-4 h-4 text-emerald-500" />
+              <div className="flex flex-wrap gap-4 justify-center md:justify-start">
+                {['AGI Grades', 'Scouting Reports', 'War Room Access'].map(feature => (
+                  <div key={feature} className="flex items-center space-x-2 text-sm">
+                    <CheckCircle className="w-5 h-5 text-gold flex-shrink-0" />
                     <span>{feature}</span>
                   </div>
                 ))}
@@ -1254,11 +1484,33 @@ export default function NCAADatabasePage() {
         </div>
       </main>
 
-      {/* ── Footer Note ──────────────────────────────────── */}
-      <div className="border-t border-slate-200 py-12 text-center bg-white">
-        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest scale-90 opacity-75">
-          Per|Form NCAA Football Database &middot; AGI Graded &middot; Official Platform of A.I.M.S.
+      <div className="border-t border-slate-800 py-12 text-center pb-24">
+        <p className="text-sm font-mono text-slate-600 uppercase tracking-[0.3em] mb-4">
+          Per|Form Football Intelligence &middot; AGI (Associated Grading Index) System &middot; &copy; 2026 AI Managed Solutions
         </p>
+        <div className="flex justify-center gap-6 opacity-30 grayscale hover:grayscale-0 transition-all duration-500">
+          {/* Add subtle partner logos here if needed */}
+        </div>
+      </div>
+
+      {/* ── Transaction Ticker (Bottom Fixed) ─────────────────── */}
+      <div className="fixed bottom-0 left-0 right-0 h-10 bg-slate-900 border-t border-slate-800 flex items-center z-50 overflow-hidden">
+        <div className="bg-gold h-full px-4 flex items-center text-white font-black text-xs uppercase tracking-widest whitespace-nowrap">
+          Transaction Hub
+        </div>
+        <div className="flex-1 overflow-hidden">
+          <div className="flex animate-[ticker_40s_linear_infinite] whitespace-nowrap gap-12 text-sm font-medium text-slate-400">
+            {[...TRANSACTION_TICKER, ...TRANSACTION_TICKER].map((item, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-gold/50" />
+                {item}
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="px-4 text-xs font-mono text-slate-500 border-l border-slate-800">
+          {new Date().toLocaleTimeString()}
+        </div>
       </div>
     </div>
   );

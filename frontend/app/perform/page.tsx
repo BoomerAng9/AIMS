@@ -108,7 +108,7 @@ function ConferenceCard({ conf }: { conf: Conference }) {
           <p className="text-xs text-slate-400">{conf.name}</p>
         </div>
         <span
-          className={`text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full ${tier.bg} ${tier.border} border ${tier.color}`}
+          className={`text-xs uppercase tracking-wider px-2 py-0.5 rounded-full ${tier.bg} ${tier.border} border ${tier.color}`}
         >
           {tier.label}
         </span>
@@ -118,15 +118,15 @@ function ConferenceCard({ conf }: { conf: Conference }) {
       <div className="grid grid-cols-3 gap-2 mb-4">
         <div className="text-center py-1.5 rounded-lg bg-slate-50">
           <div className="text-sm font-bold text-slate-800">{conf.teams.length}</div>
-          <div className="text-[10px] text-slate-400">Teams</div>
+          <div className="text-xs text-slate-400">Teams</div>
         </div>
         <div className="text-center py-1.5 rounded-lg bg-slate-50">
           <div className="text-sm font-bold text-slate-800">{(totalCapacity / 1000).toFixed(0)}K</div>
-          <div className="text-[10px] text-slate-400">Total Seats</div>
+          <div className="text-xs text-slate-400">Total Seats</div>
         </div>
         <div className="text-center py-1.5 rounded-lg bg-slate-50">
           <div className="text-sm font-bold text-slate-800">{conf.founded}</div>
-          <div className="text-[10px] text-slate-400">Founded</div>
+          <div className="text-xs text-slate-400">Founded</div>
         </div>
       </div>
 
@@ -135,21 +135,21 @@ function ConferenceCard({ conf }: { conf: Conference }) {
         {conf.teams.slice(0, 12).map((team) => (
           <span
             key={team.id}
-            className="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 border border-slate-200 hover:bg-slate-200 transition-colors cursor-default"
+            className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 border border-slate-200 hover:bg-slate-200 transition-colors cursor-default"
             title={`${team.schoolName} ${team.mascot} — ${team.headCoach}`}
           >
             {team.abbreviation}
           </span>
         ))}
         {conf.teams.length > 12 && (
-          <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-50 text-slate-400">
+          <span className="text-xs px-2 py-0.5 rounded-full bg-slate-50 text-slate-400">
             +{conf.teams.length - 12}
           </span>
         )}
       </div>
 
       {/* Commissioner */}
-      <div className="flex items-center justify-between text-[11px] text-slate-400">
+      <div className="flex items-center justify-between text-sm text-slate-400">
         <span>Commissioner: {conf.commissioner}</span>
         <span>
           {conf.hqCity}, {conf.hqState}
@@ -244,7 +244,7 @@ export default function PerFormHub() {
       {/* ── BREAKING TICKER ─────────────────────────────────────── */}
       <div className="sticky top-[6.5rem] z-30 h-11 bg-white border-b border-slate-200 flex items-center overflow-hidden shadow-sm">
         <div className="flex-shrink-0 h-full bg-slate-950 flex items-center px-6">
-          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white whitespace-nowrap">
+          <span className="text-xs font-black uppercase tracking-[0.2em] text-white whitespace-nowrap">
             AGI <span className="text-emerald-500">Pulse</span>
           </span>
         </div>
@@ -254,7 +254,7 @@ export default function PerFormHub() {
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -20, opacity: 0 }}
-            className="text-[11px] font-bold text-slate-900 tracking-tight truncate flex items-center gap-3"
+            className="text-sm font-bold text-slate-900 tracking-tight truncate flex items-center gap-3"
           >
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
             {newsItems.length > 0
@@ -263,7 +263,7 @@ export default function PerFormHub() {
           </motion.p>
         </div>
         <div className="flex-shrink-0 px-6 border-l border-slate-100 h-full flex items-center">
-          <Link href="/perform/ncaa-database" className="text-[10px] font-black text-emerald-700 hover:text-emerald-800 transition-colors uppercase tracking-widest">
+          <Link href="/perform/ncaa-database" className="text-xs font-black text-emerald-700 hover:text-emerald-800 transition-colors uppercase tracking-widest">
             Database Map →
           </Link>
         </div>
@@ -285,7 +285,7 @@ export default function PerFormHub() {
                 <span className="px-3 py-1 bg-emerald-950 text-white text-[9px] font-black uppercase tracking-[0.3em] rounded-sm">
                   Intelligence Plateform
                 </span>
-                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                <span className="text-xs font-black uppercase tracking-widest text-slate-400">
                   Version 4.2 &middot; Class of '26 Active
                 </span>
               </div>
@@ -347,9 +347,9 @@ export default function PerFormHub() {
           </button>
           <div className="relative">
             <p className="text-2xl font-serif font-bold text-slate-950">&ldquo;Show me the Intangibles grade for Bryce Underwood&rdquo;</p>
-            <p className="text-[10px] text-slate-400 font-black mt-2 uppercase tracking-[0.3em]">Scout Voice Mode &middot; Say a prospect name or school for immediate AGI breakdown</p>
+            <p className="text-xs text-slate-400 font-black mt-2 uppercase tracking-[0.3em]">Scout Voice Mode &middot; Say a prospect name or school for immediate AGI breakdown</p>
           </div>
-          <div className="relative ml-auto hidden xl:flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.2em] text-slate-300">
+          <div className="relative ml-auto hidden xl:flex items-center gap-4 text-xs font-black uppercase tracking-[0.2em] text-slate-300">
             <Activity size={14} className="text-emerald-500" /> Platform Connected
           </div>
         </motion.div>
@@ -399,9 +399,9 @@ export default function PerFormHub() {
           <div className="flex items-center justify-between mb-10 border-b border-slate-200 pb-5">
             <div>
               <h2 className="text-4xl font-serif font-bold tracking-tight text-slate-950">Current <span className="italic text-emerald-800">Big Board</span></h2>
-              <p className="text-[10px] text-slate-400 font-black mt-2 uppercase tracking-[0.2em]">Ranked by Associated Grading Index &middot; Updated Daily</p>
+              <p className="text-xs text-slate-400 font-black mt-2 uppercase tracking-[0.2em]">Ranked by Associated Grading Index &middot; Updated Daily</p>
             </div>
-            <Link href="/perform/big-board" className="flex items-center gap-2 text-[11px] font-black text-emerald-700 hover:text-emerald-800 transition-colors uppercase tracking-widest group">
+            <Link href="/perform/big-board" className="flex items-center gap-2 text-sm font-black text-emerald-700 hover:text-emerald-800 transition-colors uppercase tracking-widest group">
               View Full Board <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
@@ -435,7 +435,7 @@ export default function PerFormHub() {
                           {prospect.tier}
                         </span>
                       </div>
-                      <p className="text-[11px] text-slate-500 font-bold uppercase tracking-tight">
+                      <p className="text-sm text-slate-500 font-bold uppercase tracking-tight">
                         {prospect.position} &middot; {prospect.school} &middot; {prospect.classYear}
                       </p>
                     </div>
@@ -529,7 +529,7 @@ export default function PerFormHub() {
             <div className="max-w-2xl">
               <div className="flex items-center gap-4 mb-8">
                 <Shield size={24} className="text-emerald-500" />
-                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-emerald-500/80">Proprietary Grading Architecture</span>
+                <span className="text-xs font-black uppercase tracking-[0.4em] text-emerald-500/80">Proprietary Grading Architecture</span>
               </div>
               <h2 className="text-5xl font-serif font-bold text-white mb-6">
                 The <span className="italic">AGI</span> Associated Grading Index
@@ -564,7 +564,7 @@ export default function PerFormHub() {
                 <div key={tier.label} className="bg-white/5 border border-white/10 p-4 flex items-center justify-between rounded-sm hover:border-white/30 transition-all">
                   <div className="flex items-center gap-3">
                     <div className={`w-1.5 h-1.5 rounded-full ${tier.color}`} />
-                    <span className="text-[10px] font-black text-white uppercase tracking-widest">{tier.label}</span>
+                    <span className="text-xs font-black text-white uppercase tracking-widest">{tier.label}</span>
                   </div>
                   <span className="text-xs font-serif font-bold text-white/50">{tier.range}</span>
                 </div>
@@ -579,9 +579,9 @@ export default function PerFormHub() {
         <div className="flex items-end justify-between mb-10 border-b border-slate-200 pb-5">
           <div>
             <h2 className="text-4xl font-serif font-bold tracking-tight text-slate-950">Platform <span className="italic text-emerald-800">Intelligence</span></h2>
-            <p className="text-[10px] text-slate-400 font-black mt-2 uppercase tracking-[0.2em]">Neural Scouting Network &middot; Real-Time Analysis</p>
+            <p className="text-xs text-slate-400 font-black mt-2 uppercase tracking-[0.2em]">Neural Scouting Network &middot; Real-Time Analysis</p>
           </div>
-          <Link href="/perform/analysts" className="flex items-center gap-2 text-[11px] font-black text-emerald-700 hover:text-emerald-800 transition-colors uppercase tracking-widest group">
+          <Link href="/perform/analysts" className="flex items-center gap-2 text-sm font-black text-emerald-700 hover:text-emerald-800 transition-colors uppercase tracking-widest group">
             Meet the team <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
@@ -599,10 +599,10 @@ export default function PerFormHub() {
               <div className={`absolute top-6 right-8 w-2 h-2 rounded-full ${a.dot} animate-pulse`} />
 
               <h3 className="text-2xl font-serif font-bold text-slate-950 mb-1 leading-tight">{a.name}</h3>
-              <p className={`text-[10px] font-black uppercase tracking-widest ${a.accent} mb-6`}>{a.role}</p>
+              <p className={`text-xs font-black uppercase tracking-widest ${a.accent} mb-6`}>{a.role}</p>
               <p className="text-sm text-slate-600 leading-relaxed mb-6 font-medium">{a.bio}</p>
               <div className="pt-4 border-t border-slate-50">
-                <p className={`text-[11px] font-serif italic ${a.accent}`}>{a.catchphrase}</p>
+                <p className={`text-sm font-serif italic ${a.accent}`}>{a.catchphrase}</p>
               </div>
             </motion.div>
           ))}
@@ -615,9 +615,9 @@ export default function PerFormHub() {
           <div className="flex items-end justify-between mb-10 border-b border-slate-200 pb-5">
             <div>
               <h2 className="text-4xl font-serif font-bold tracking-tight text-slate-950">Latest <span className="italic text-emerald-800">Briefings</span></h2>
-              <p className="text-[10px] text-slate-400 font-black mt-2 uppercase tracking-[0.2em]">Scouting Reports &middot; Personnel Shifts &middot; Intelligence Hub</p>
+              <p className="text-xs text-slate-400 font-black mt-2 uppercase tracking-[0.2em]">Scouting Reports &middot; Personnel Shifts &middot; Intelligence Hub</p>
             </div>
-            <Link href="/perform/content" className="flex items-center gap-2 text-[11px] font-black text-emerald-700 hover:text-emerald-800 transition-colors uppercase tracking-widest group">
+            <Link href="/perform/content" className="flex items-center gap-2 text-sm font-black text-emerald-700 hover:text-emerald-800 transition-colors uppercase tracking-widest group">
               Full Archive <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
@@ -640,7 +640,7 @@ export default function PerFormHub() {
                   </div>
                 </div>
                 <div className="space-y-3">
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{article.readTimeMin} MIN READ &middot; SCOUT HUB</p>
+                  <p className="text-xs font-black text-slate-400 uppercase tracking-widest">{article.readTimeMin} MIN READ &middot; SCOUT HUB</p>
                   <h3 className="text-2xl font-serif font-bold text-slate-950 group-hover:text-emerald-800 transition-colors leading-tight">
                     {article.title}
                   </h3>
@@ -661,7 +661,7 @@ export default function PerFormHub() {
           <div className="relative z-10 space-y-8">
             <motion.div animate={{ opacity: [1, 0.4, 1] }} transition={{ repeat: Infinity, duration: 1.5 }} className="inline-flex items-center gap-3">
               <div className="w-2 h-2 rounded-full bg-emerald-500" />
-              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-emerald-500">Live Draft Feed Active</span>
+              <span className="text-xs font-black uppercase tracking-[0.4em] text-emerald-500">Live Draft Feed Active</span>
             </motion.div>
             <h2 className="text-5xl md:text-7xl font-serif font-bold tracking-tight text-white">
               NFL <span className="italic text-emerald-500">Draft</span> Center
@@ -710,7 +710,7 @@ export default function PerFormHub() {
             ].map(kpi => (
               <div key={kpi.label} className="flex flex-col items-end">
                 <span className="text-3xl font-serif font-bold text-slate-950">{kpi.value}</span>
-                <span className="text-[10px] font-black uppercase tracking-widest text-emerald-700">{kpi.label}</span>
+                <span className="text-xs font-black uppercase tracking-widest text-emerald-700">{kpi.label}</span>
               </div>
             ))}
           </div>
@@ -780,7 +780,7 @@ export default function PerFormHub() {
                   className="flex items-center gap-3 px-3 py-2 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors"
                 >
                   <span
-                    className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${idx < 3 ? 'bg-gold/20 text-gold' : 'bg-slate-200 text-slate-500'
+                    className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${idx < 3 ? 'bg-gold/20 text-gold' : 'bg-slate-200 text-slate-500'
                       }`}
                   >
                     {idx + 1}
@@ -790,9 +790,9 @@ export default function PerFormHub() {
                       <span className="text-sm font-medium text-slate-800 truncate">
                         {team.commonName} {team.mascot}
                       </span>
-                      <span className="text-[10px] text-slate-400">{team.conferenceName}</span>
+                      <span className="text-xs text-slate-400">{team.conferenceName}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-[11px] text-slate-400">
+                    <div className="flex items-center gap-2 text-sm text-slate-400">
                       <MapPin className="w-3 h-3" />
                       <span className="truncate">{team.stadium}</span>
                     </div>

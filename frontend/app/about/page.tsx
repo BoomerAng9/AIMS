@@ -132,9 +132,9 @@ export default function AboutPage() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="wireframe-card p-8 md:p-10 border-purple-500/20"
+          className="wireframe-card p-8 md:p-10 border-amber-500/20"
         >
-          <h2 className="text-xl font-bold text-purple-400 mb-4">From Lore to Platform</h2>
+          <h2 className="text-xl font-bold text-amber-400 mb-4">From Lore to Platform</h2>
           <p className="text-sm text-zinc-400 leading-relaxed mb-6">
             The V.I.B.E. universe isn&apos;t just a story &mdash; it&apos;s the operating philosophy of
             A.I.M.S. built into the code itself. The characters you meet in the Book of V.I.B.E.
@@ -182,7 +182,7 @@ export default function AboutPage() {
           </a>
           <Link
             href="/the-book-of-vibe"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-400 text-sm font-medium hover:bg-purple-500/20 transition-all"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 text-sm font-medium hover:bg-amber-500/20 transition-all"
           >
             Read the Book of V.I.B.E.
             <span className="text-lg">&rarr;</span>

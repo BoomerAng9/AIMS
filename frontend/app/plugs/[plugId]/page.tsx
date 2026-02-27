@@ -69,7 +69,7 @@ const STATUS_COLORS: Record<string, string> = {
   prospect: "bg-cyan-500/20 text-cyan-400 border-cyan-500/30",
   contacted: "bg-blue-500/20 text-blue-400 border-blue-500/30",
   evaluating: "bg-gold/20 text-gold border-gold/30",
-  shortlisted: "bg-violet-500/20 text-violet-400 border-violet-500/30",
+  shortlisted: "bg-amber-500/20 text-amber-400 border-amber-500/30",
   "offer-pending": "bg-pink-500/20 text-pink-400 border-pink-500/30",
   offered: "bg-pink-500/20 text-pink-400 border-pink-500/30",
   committed: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
@@ -88,7 +88,7 @@ const GRADE_ICONS: Record<string, React.ElementType> = {
 const PIPELINE_STAGES = [
   { key: "identified", label: "Identified", color: "bg-zinc-500" },
   { key: "scouted", label: "Scouted", color: "bg-cyan-500" },
-  { key: "shortlisted", label: "Shortlisted", color: "bg-violet-500" },
+  { key: "shortlisted", label: "Shortlisted", color: "bg-amber-500" },
   { key: "offerPending", label: "Offer Pending", color: "bg-gold" },
   { key: "committed", label: "Committed", color: "bg-emerald-500" },
 ];
@@ -221,7 +221,7 @@ export default function PlugPage() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <span className="flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] bg-emerald-950/30 text-emerald-400 px-3 py-1.5 rounded-full border border-emerald-500/20">
+            <span className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] bg-emerald-950/30 text-emerald-400 px-3 py-1.5 rounded-full border border-emerald-500/20">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
               Plug Active
             </span>
@@ -313,7 +313,7 @@ export default function PlugPage() {
                               <p className="text-sm text-zinc-100 truncate">
                                 {ath.firstName} {ath.lastName}
                               </p>
-                              <p className="text-[10px] text-zinc-500">
+                              <p className="text-xs text-zinc-500">
                                 {ath.position} &middot; {ath.school}
                               </p>
                             </div>
@@ -345,7 +345,7 @@ export default function PlugPage() {
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="text-sm text-zinc-100 truncate">{rpt.athleteName}</p>
-                            <p className="text-[10px] text-zinc-500 capitalize">
+                            <p className="text-xs text-zinc-500 capitalize">
                               {rpt.event} &middot; {rpt.date}
                             </p>
                           </div>
@@ -365,7 +365,7 @@ export default function PlugPage() {
                   ].map((stat) => (
                     <Card key={stat.label} className="text-center p-4">
                       <div className={cn("text-3xl font-display font-bold mb-1", stat.color)}>{stat.value}</div>
-                      <div className="text-[10px] uppercase tracking-wider text-zinc-500">{stat.label}</div>
+                      <div className="text-xs uppercase tracking-wider text-zinc-500">{stat.label}</div>
                     </Card>
                   ))}
                 </div>
@@ -628,7 +628,7 @@ export default function PlugPage() {
                           {stageAthletes.map((ath) => (
                             <Card key={ath.id} className="p-3 cursor-pointer hover:bg-white/5 transition-colors" onClick={() => { setSelectedAthlete(ath); setActiveTab("athletes"); }}>
                               <p className="text-sm text-zinc-100 truncate">{ath.firstName} {ath.lastName}</p>
-                              <p className="text-[10px] text-zinc-500">{ath.position}</p>
+                              <p className="text-xs text-zinc-500">{ath.position}</p>
                               <div className={cn("text-sm font-display font-bold mt-1", gradeColor(ath.scoutingGrade))}>
                                 {ath.scoutingGrade}
                               </div>
@@ -636,7 +636,7 @@ export default function PlugPage() {
                           ))}
                           {stageAthletes.length === 0 && (
                             <div className="border border-dashed border-white/10 rounded-xl p-4 text-center">
-                              <p className="text-[10px] text-zinc-600">No athletes</p>
+                              <p className="text-xs text-zinc-600">No athletes</p>
                             </div>
                           )}
                         </div>
@@ -713,25 +713,25 @@ export default function PlugPage() {
                         <div className="text-2xl font-display text-emerald-400 font-bold">
                           {athletes.length > 0 ? Math.round(athletes.reduce((s, a) => s + a.scoutingGrade, 0) / athletes.length) : 0}
                         </div>
-                        <div className="text-[10px] text-zinc-500 uppercase mt-1">Avg Scout Grade</div>
+                        <div className="text-xs text-zinc-500 uppercase mt-1">Avg Scout Grade</div>
                       </div>
                       <div className="bg-[#18181B] rounded-lg p-4">
                         <div className="text-2xl font-display text-gold font-bold">
                           {athletes.length > 0 ? Math.max(...athletes.map((a) => a.scoutingGrade)) : 0}
                         </div>
-                        <div className="text-[10px] text-zinc-500 uppercase mt-1">Highest Grade</div>
+                        <div className="text-xs text-zinc-500 uppercase mt-1">Highest Grade</div>
                       </div>
                       <div className="bg-[#18181B] rounded-lg p-4">
                         <div className="text-2xl font-display text-cyan-400 font-bold">
                           {athletes.filter((a) => a.gpa >= 3.5).length}
                         </div>
-                        <div className="text-[10px] text-zinc-500 uppercase mt-1">Academic Qualifiers</div>
+                        <div className="text-xs text-zinc-500 uppercase mt-1">Academic Qualifiers</div>
                       </div>
                       <div className="bg-[#18181B] rounded-lg p-4">
-                        <div className="text-2xl font-display text-violet-400 font-bold">
+                        <div className="text-2xl font-display text-amber-400 font-bold">
                           {new Set(athletes.map((a) => a.location.state)).size}
                         </div>
-                        <div className="text-[10px] text-zinc-500 uppercase mt-1">States Covered</div>
+                        <div className="text-xs text-zinc-500 uppercase mt-1">States Covered</div>
                       </div>
                     </div>
                   </CardContent>

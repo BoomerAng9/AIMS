@@ -357,7 +357,7 @@ function ActorCard({ actor, expanded, onToggle }: { actor: HangarActor; expanded
             )}
           </div>
           <p className="text-xs text-zinc-400 mt-0.5">{actor.title}</p>
-          <p className="text-[10px] text-zinc-500 mt-0.5 uppercase tracking-wider">{actor.role}</p>
+          <p className="text-xs text-zinc-500 mt-0.5 uppercase tracking-wider">{actor.role}</p>
         </div>
 
         <div className="shrink-0 mt-1">
@@ -388,18 +388,18 @@ function ActorCard({ actor, expanded, onToggle }: { actor: HangarActor; expanded
 
               {/* Motto */}
               <div className={`rounded-xl ${actor.accentBg} border ${actor.accentBorder} p-3`}>
-                <p className="text-[10px] text-zinc-500 uppercase tracking-wider mb-1">Motto</p>
+                <p className="text-xs text-zinc-500 uppercase tracking-wider mb-1">Motto</p>
                 <p className={`text-xs ${actor.accentColor} font-medium italic`}>"{actor.motto}"</p>
               </div>
 
               {/* Capabilities */}
               <div>
-                <p className="text-[10px] text-zinc-500 uppercase tracking-wider mb-2">Core Capabilities</p>
+                <p className="text-xs text-zinc-500 uppercase tracking-wider mb-2">Core Capabilities</p>
                 <div className="flex flex-wrap gap-1.5">
                   {actor.capabilities.map((cap) => (
                     <span
                       key={cap}
-                      className={`px-2 py-1 rounded-lg text-[10px] font-mono ${actor.accentBg} border ${actor.accentBorder} ${actor.accentColor}`}
+                      className={`px-2 py-1 rounded-lg text-xs font-mono ${actor.accentBg} border ${actor.accentBorder} ${actor.accentColor}`}
                     >
                       {cap}
                     </span>
@@ -445,7 +445,7 @@ function HierarchyNode({
         </div>
         <div>
           <p className={`text-sm font-bold ${actor.accentColor} font-display`}>{actor.name}</p>
-          <p className="text-[10px] text-zinc-500">{actor.title}</p>
+          <p className="text-xs text-zinc-500">{actor.title}</p>
         </div>
       </motion.div>
 
@@ -547,7 +547,7 @@ function EcosystemCycle() {
             >
               <div className={`w-[104px] rounded-xl border ${stage.border} ${stage.bg} backdrop-blur-xl p-3 text-center transition-all hover:scale-110`}>
                 <Icon size={18} className={`${stage.color} mx-auto mb-1`} />
-                <p className={`text-[10px] font-bold ${stage.color}`}>{stage.name}</p>
+                <p className={`text-xs font-bold ${stage.color}`}>{stage.name}</p>
                 <p className="text-[8px] text-zinc-500">{stage.subtitle}</p>
               </div>
             </motion.div>
@@ -608,7 +608,7 @@ function EcosystemCycle() {
                 </div>
                 <div>
                   <p className={`text-xs font-bold ${stage.color}`}>{stage.name}</p>
-                  <p className="text-[10px] text-zinc-500">{stage.subtitle}</p>
+                  <p className="text-xs text-zinc-500">{stage.subtitle}</p>
                 </div>
                 {i === stages.length - 1 && (
                   <RefreshCw size={14} className="text-gold/40 ml-auto" />
@@ -623,7 +623,7 @@ function EcosystemCycle() {
           );
         })}
         <div className="flex justify-center">
-          <div className="flex items-center gap-2 text-[10px] text-gold/40">
+          <div className="flex items-center gap-2 text-xs text-gold/40">
             <RefreshCw size={12} />
             <span>Cycle repeats — ever-growing organization</span>
           </div>
@@ -640,7 +640,7 @@ function EcosystemCycle() {
 const PMO_OFFICES = [
   { name: "Tech Office", lead: "Boomer_CTO", icon: Network, color: "text-cyan-400", bg: "bg-cyan-400/10", border: "border-cyan-400/20" },
   { name: "Finance Office", lead: "Boomer_CFO", icon: BarChart3, color: "text-emerald-400", bg: "bg-emerald-400/10", border: "border-emerald-400/20" },
-  { name: "Ops Office", lead: "Boomer_COO", icon: Activity, color: "text-violet-400", bg: "bg-violet-400/10", border: "border-violet-400/20" },
+  { name: "Ops Office", lead: "Boomer_COO", icon: Activity, color: "text-amber-400", bg: "bg-amber-400/10", border: "border-amber-400/20" },
   { name: "Marketing Office", lead: "Boomer_CMO", icon: Radar, color: "text-pink-400", bg: "bg-pink-400/10", border: "border-pink-400/20" },
   { name: "Design Office", lead: "Boomer_CDO", icon: Sparkles, color: "text-amber-400", bg: "bg-amber-400/10", border: "border-amber-400/20" },
   { name: "Publishing Office", lead: "Boomer_CPO", icon: Layers, color: "text-blue-400", bg: "bg-blue-400/10", border: "border-blue-400/20" },
@@ -662,7 +662,7 @@ function PMOGrid() {
               <Icon size={16} className={office.color} />
               <span className={`text-xs font-bold ${office.color}`}>{office.name}</span>
             </div>
-            <p className="text-[10px] text-zinc-500 font-mono">{office.lead}</p>
+            <p className="text-xs text-zinc-500 font-mono">{office.lead}</p>
           </motion.div>
         );
       })}
@@ -688,7 +688,7 @@ function SquadGrid() {
             <Users size={14} className="text-champagne" />
             <p className="text-xs font-bold text-champagne">{squad.name}</p>
           </div>
-          <p className="text-[10px] text-zinc-500 mb-3">{squad.purpose}</p>
+          <p className="text-xs text-zinc-500 mb-3">{squad.purpose}</p>
 
           <div className="flex items-center gap-2 mb-2">
             <span className="text-[8px] uppercase tracking-wider text-zinc-600">Squad Leader:</span>
@@ -741,7 +741,7 @@ function HRPanel() {
           key={m.label}
           className="rounded-xl border border-emerald-400/15 bg-emerald-400/5 backdrop-blur-xl p-4 text-center"
         >
-          <p className="text-[10px] uppercase tracking-widest text-zinc-500 mb-1">{m.label}</p>
+          <p className="text-xs uppercase tracking-widest text-zinc-500 mb-1">{m.label}</p>
           <p className={`text-2xl font-bold ${m.color} font-display`}>
             {m.isCount ? m.value : `${m.value}%`}
           </p>
@@ -831,12 +831,12 @@ export default function TheHangarPage() {
               <div className="relative p-6 sm:p-8 lg:p-10">
                 <div className="flex items-center gap-2 mb-3">
                   <Factory size={14} className="text-gold" />
-                  <span className="text-[10px] uppercase font-bold text-gold tracking-widest hangar-flicker">
+                  <span className="text-xs uppercase font-bold text-gold tracking-widest hangar-flicker">
                     Deployment Port Active
                   </span>
                 </div>
 
-                <p className="text-[10px] uppercase tracking-[0.3em] text-gold/60 mb-1">
+                <p className="text-xs uppercase tracking-[0.3em] text-gold/60 mb-1">
                   Organizational Command & Deployment Center
                 </p>
 
@@ -900,7 +900,7 @@ export default function TheHangarPage() {
                       <h2 className="text-sm font-semibold uppercase tracking-widest text-slate-700 font-display">
                         3D Orchestration View
                       </h2>
-                      <p className="text-[10px] text-slate-400 uppercase tracking-wider">
+                      <p className="text-xs text-slate-400 uppercase tracking-wider">
                         Real-time visualization of the AIMS build pipeline
                       </p>
                     </div>
@@ -920,7 +920,7 @@ export default function TheHangarPage() {
                       <h2 className="text-sm font-semibold uppercase tracking-widest text-zinc-200 font-display">
                         Organizational Hierarchy
                       </h2>
-                      <p className="text-[10px] text-zinc-500 uppercase tracking-wider">
+                      <p className="text-xs text-zinc-500 uppercase tracking-wider">
                         Authority flows upward — Accountability flows downward
                       </p>
                     </div>
@@ -969,7 +969,7 @@ export default function TheHangarPage() {
                       <h2 className="text-sm font-semibold uppercase tracking-widest text-zinc-200 font-display">
                         Boomer_Ang PMO Offices
                       </h2>
-                      <p className="text-[10px] text-zinc-500 uppercase tracking-wider">
+                      <p className="text-xs text-zinc-500 uppercase tracking-wider">
                         Job creation, delegation, roster remediation, and deployment
                       </p>
                     </div>
@@ -987,7 +987,7 @@ export default function TheHangarPage() {
                       <h2 className="text-sm font-semibold uppercase tracking-widest text-zinc-200 font-display">
                         Chicken Hawk — Squad Dispatch
                       </h2>
-                      <p className="text-[10px] text-zinc-500 uppercase tracking-wider">
+                      <p className="text-xs text-zinc-500 uppercase tracking-wider">
                         More specialized, more vast — no PMO offices. Direct squad delegation.
                       </p>
                     </div>
@@ -1016,7 +1016,7 @@ export default function TheHangarPage() {
                       <h2 className="text-sm font-semibold uppercase tracking-widest text-zinc-200 font-display">
                         Chain of Command
                       </h2>
-                      <p className="text-[10px] text-zinc-500 uppercase tracking-wider">
+                      <p className="text-xs text-zinc-500 uppercase tracking-wider">
                         Hard rule — no shortcuts, no exceptions
                       </p>
                     </div>
@@ -1053,11 +1053,11 @@ export default function TheHangarPage() {
                             </div>
                             <div className="flex-1">
                               <p className="text-sm font-bold text-zinc-100">{level.role}</p>
-                              <p className="text-[10px] text-zinc-500">{level.label}</p>
+                              <p className="text-xs text-zinc-500">{level.label}</p>
                             </div>
                             <div className="text-right">
                               <p className="text-[9px] text-zinc-600 uppercase tracking-wider">Speaks to</p>
-                              <p className="text-[10px] text-zinc-500">{level.speaks_to}</p>
+                              <p className="text-xs text-zinc-500">{level.speaks_to}</p>
                             </div>
                           </div>
                         </motion.div>
@@ -1068,7 +1068,7 @@ export default function TheHangarPage() {
                     ))}
                   </div>
 
-                  <p className="mt-6 text-[10px] text-zinc-600 text-center max-w-lg mx-auto leading-relaxed">
+                  <p className="mt-6 text-xs text-zinc-600 text-center max-w-lg mx-auto leading-relaxed">
                     Lil_Hawks only speak to their Squad Leader or Chicken Hawk.
                     Chicken Hawks only speak to Boomer_Angs.
                     Boomer_Angs are the only ones that speak to ACHEEVY.
@@ -1095,7 +1095,7 @@ export default function TheHangarPage() {
                             <p className="text-[9px] text-emerald-400/60 uppercase tracking-wider mb-1">What they are</p>
                             <ul className="space-y-0.5">
                               {def.what_they_are.map((item, i) => (
-                                <li key={i} className="text-[10px] text-zinc-500 flex items-start gap-1">
+                                <li key={i} className="text-xs text-zinc-500 flex items-start gap-1">
                                   <span className="text-emerald-400/40 shrink-0 mt-0.5">+</span>{item}
                                 </li>
                               ))}
@@ -1105,7 +1105,7 @@ export default function TheHangarPage() {
                             <p className="text-[9px] text-red-400/60 uppercase tracking-wider mb-1">What they are NOT</p>
                             <ul className="space-y-0.5">
                               {def.what_they_are_NOT.map((item, i) => (
-                                <li key={i} className="text-[10px] text-zinc-500 flex items-start gap-1">
+                                <li key={i} className="text-xs text-zinc-500 flex items-start gap-1">
                                   <span className="text-red-400/40 shrink-0 mt-0.5">-</span>{item}
                                 </li>
                               ))}
@@ -1138,7 +1138,7 @@ export default function TheHangarPage() {
                       <h2 className="text-sm font-semibold uppercase tracking-widest text-zinc-200 font-display">
                         Personnel Dossiers
                       </h2>
-                      <p className="text-[10px] text-zinc-500 uppercase tracking-wider">
+                      <p className="text-xs text-zinc-500 uppercase tracking-wider">
                         Every actor — their card, their bio, their mission
                       </p>
                     </div>
@@ -1173,7 +1173,7 @@ export default function TheHangarPage() {
                       <h2 className="text-sm font-semibold uppercase tracking-widest text-zinc-200 font-display">
                         Boomer_Ang Personalities
                       </h2>
-                      <p className="text-[10px] text-zinc-500 uppercase tracking-wider">
+                      <p className="text-xs text-zinc-500 uppercase tracking-wider">
                         Individual agent profiles — archetypes, strengths, blindspots
                       </p>
                     </div>
@@ -1199,7 +1199,7 @@ export default function TheHangarPage() {
                             {personality.archetype}
                           </span>
                         </div>
-                        <p className="text-[10px] text-zinc-500 mb-2 leading-relaxed">
+                        <p className="text-xs text-zinc-500 mb-2 leading-relaxed">
                           {personality.communication_style}
                         </p>
                         <div className={`rounded-lg p-2 ${
@@ -1240,7 +1240,7 @@ export default function TheHangarPage() {
                       <h2 className="text-sm font-semibold uppercase tracking-widest text-zinc-200 font-display">
                         The Ever-Growing Ecosystem
                       </h2>
-                      <p className="text-[10px] text-zinc-500 uppercase tracking-wider">
+                      <p className="text-xs text-zinc-500 uppercase tracking-wider">
                         Lil_Hawks mature to Chicken Hawks, who build their own squads
                       </p>
                     </div>
@@ -1248,7 +1248,7 @@ export default function TheHangarPage() {
 
                   <EcosystemCycle />
 
-                  <p className="mt-6 text-[10px] text-zinc-600 text-center max-w-lg mx-auto leading-relaxed">
+                  <p className="mt-6 text-xs text-zinc-600 text-center max-w-lg mx-auto leading-relaxed">
                     This creates a self-perpetuating growth cycle. Lil_Hawks who prove themselves
                     through discipline and consistency evolve through Power Surge to become
                     Chicken Hawk Candidates. Once promoted, they build their own squads of new
@@ -1289,7 +1289,7 @@ export default function TheHangarPage() {
                             </span>
                           )}
                         </div>
-                        <p className="text-[10px] text-zinc-500 mb-2">{stage.description}</p>
+                        <p className="text-xs text-zinc-500 mb-2">{stage.description}</p>
                         <ul className="space-y-1">
                           {stage.criteria.map((c, i) => (
                             <li key={i} className="text-[9px] text-zinc-600 flex items-start gap-1.5">
@@ -1327,7 +1327,7 @@ export default function TheHangarPage() {
                         Betty Ann Ang
                       </h2>
                       <p className="text-xs text-zinc-400 mt-0.5">HR Department Head — PMO Office</p>
-                      <p className="text-[10px] text-zinc-500 mt-1 leading-relaxed max-w-xl">
+                      <p className="text-xs text-zinc-500 mt-1 leading-relaxed max-w-xl">
                         The HR Department is a PMO office in and of itself. Betty Ann Ang oversees
                         all actors — from ACHEEVY all the way down to the Lil_Hawks. She monitors,
                         assesses, and measures efficiency in work habits, collaboration, highlights,
@@ -1355,7 +1355,7 @@ export default function TheHangarPage() {
                           className={`rounded-xl border ${item.border} bg-[#1F1F23]/60 p-3`}
                         >
                           <p className={`text-xs font-bold ${item.color} mb-1`}>{item.actor}</p>
-                          <p className="text-[10px] text-zinc-500 leading-relaxed">{item.scope}</p>
+                          <p className="text-xs text-zinc-500 leading-relaxed">{item.scope}</p>
                         </div>
                       ))}
                     </div>
@@ -1379,7 +1379,7 @@ export default function TheHangarPage() {
                             <Icon size={16} className="text-emerald-400 shrink-0 mt-0.5" />
                             <div>
                               <p className="text-xs font-bold text-emerald-400">{item.label}</p>
-                              <p className="text-[10px] text-zinc-500">{item.desc}</p>
+                              <p className="text-xs text-zinc-500">{item.desc}</p>
                             </div>
                           </div>
                         );

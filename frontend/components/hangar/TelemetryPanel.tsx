@@ -41,7 +41,7 @@ export default function TelemetryPanel() {
         <div className="text-xs text-[#C6A74E] uppercase tracking-widest font-medium">
           Telemetry
         </div>
-        <div className="text-[10px] text-slate-400 mt-0.5">
+        <div className="text-xs text-slate-400 mt-0.5">
           {telemetry.length} events
         </div>
       </div>
@@ -63,7 +63,7 @@ export default function TelemetryPanel() {
                 <div className={`text-xs font-medium ${TYPE_COLORS[entry.type]}`}>
                   {entry.label}
                 </div>
-                <div className="text-[10px] text-slate-400 truncate">
+                <div className="text-xs text-slate-400 truncate">
                   {entry.detail}
                 </div>
               </div>

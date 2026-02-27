@@ -147,7 +147,7 @@ function CategoryVendorCard({
             {vendor.badges.map((badge) => (
               <span
                 key={badge}
-                className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-medium text-emerald-700"
+                className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700"
               >
                 {badge}
               </span>

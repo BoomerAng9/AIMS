@@ -87,7 +87,7 @@ export function ReadReceiptChip({ receipt }: ReadReceiptProps) {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Shield size={12} className="text-gold/50" />
-                  <span className="text-[10px] text-slate-500 font-mono uppercase tracking-widest">
+                  <span className="text-xs text-slate-500 font-mono uppercase tracking-widest">
                     Engagement Record
                   </span>
                 </div>
@@ -149,7 +149,7 @@ export function ReadReceiptChip({ receipt }: ReadReceiptProps) {
                       ) : (
                         <Clock size={10} className="text-slate-300" />
                       )}
-                      <span className={`text-[11px] ${
+                      <span className={`text-sm ${
                         cp.status === 'passed' ? 'text-emerald-400/80' : cp.status === 'blocked' ? 'text-red-400/80' : 'text-slate-400'
                       }`}>
                         {cp.label}

@@ -175,10 +175,10 @@ export default function ActivityFeedPage() {
           <div key={stat.label} className="rounded-2xl border border-wireframe-stroke bg-[#1F1F23]/60 p-4 backdrop-blur-xl">
             <div className="flex items-center gap-2 mb-2">
               <stat.icon size={14} className="text-gold/60" />
-              <span className="text-[10px] uppercase tracking-wider text-zinc-500">{stat.label}</span>
+              <span className="text-xs uppercase tracking-wider text-zinc-500">{stat.label}</span>
             </div>
             <p className="text-2xl font-bold text-zinc-100">{stat.value}</p>
-            <p className="text-[10px] text-emerald-400/70 mt-1">{stat.change}</p>
+            <p className="text-xs text-emerald-400/70 mt-1">{stat.change}</p>
           </div>
         ))}
       </motion.div>
@@ -248,7 +248,7 @@ export default function ActivityFeedPage() {
                     <span className={`rounded-full px-2 py-0.5 text-[9px] font-semibold uppercase ${cfg?.bg || "bg-[#1F1F23]"} ${cfg?.color || "text-zinc-100"}`}>
                       {cfg?.label || entry.platform}
                     </span>
-                    <span className="text-[10px] text-zinc-600">{entry.type}</span>
+                    <span className="text-xs text-zinc-600">{entry.type}</span>
                   </div>
                   <h3 className="text-sm font-semibold text-zinc-100 truncate">{entry.title}</h3>
                   <p className="text-xs text-zinc-500 mt-0.5 line-clamp-2">{entry.preview}</p>
@@ -268,7 +268,7 @@ export default function ActivityFeedPage() {
                 {/* Timestamp */}
                 <div className="flex items-center gap-1 flex-shrink-0">
                   <Calendar size={10} className="text-zinc-600" />
-                  <span className="text-[10px] text-zinc-600">{entry.timestamp}</span>
+                  <span className="text-xs text-zinc-600">{entry.timestamp}</span>
                 </div>
               </div>
             </motion.div>

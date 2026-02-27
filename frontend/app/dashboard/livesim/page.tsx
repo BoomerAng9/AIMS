@@ -61,7 +61,7 @@ const TYPE_LABELS: Record<string, { label: string; color: string }> = {
   thought: { label: 'THINK', color: 'bg-blue-500/20 text-blue-400' },
   action: { label: 'ACT', color: 'bg-green-500/20 text-green-400' },
   result: { label: 'RESULT', color: 'bg-gold/20 text-gold' },
-  coordination: { label: 'COORD', color: 'bg-purple-500/20 text-purple-400' },
+  coordination: { label: 'COORD', color: 'bg-amber-500/20 text-amber-400' },
   question: { label: 'ASK', color: 'bg-orange-500/20 text-orange-400' },
   user: { label: 'USER', color: 'bg-[#1F1F23] text-zinc-100' },
 };
@@ -314,7 +314,7 @@ export default function LiveSimPage() {
                       <span className="text-zinc-600 font-mono text-xs min-w-[60px] pt-0.5">
                         {new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                       </span>
-                      <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${typeInfo.color}`}>
+                      <span className={`px-1.5 py-0.5 rounded text-xs font-bold ${typeInfo.color}`}>
                         {typeInfo.label}
                       </span>
                       <span className={`font-medium min-w-[100px] ${agentColor}`}>
@@ -376,7 +376,7 @@ export default function LiveSimPage() {
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-xs text-zinc-500">{agent.role}</span>
-                  <span className="text-[10px] text-zinc-600 uppercase">{agent.status}</span>
+                  <span className="text-xs text-zinc-600 uppercase">{agent.status}</span>
                 </div>
               </div>
             ))}

@@ -1285,6 +1285,54 @@ const PLUG_REGISTRY: PlugDefinition[] = [
     comingSoon: false,
     addedAt: '2026-02-22',
   },
+
+  // ── DEEPSITE v4 — AI Website Builder ───────────────────────────────────
+
+  {
+    id: 'deepsite',
+    name: 'DeepSite v4',
+    tagline: 'AI-powered website builder — generate full web apps from prompts',
+    description: 'DeepSite v4 is a vibe-coding platform by Hugging Face that generates complete websites and web apps from natural language prompts. Features multi-file project support (HTML/CSS/JS), chat-based iterative editing with SEARCH/REPLACE diffs, URL-based website redesign via Jina Reader, Monaco code editor, Sandpack live preview, and auto-deploy to Hugging Face Spaces. Supports 6+ open-source LLMs via HF Inference Router with provider auto-routing (Fireworks, Nebius, SambaNova, Novita, Groq, Together).',
+    category: 'code-execution',
+    tags: ['website-builder', 'vibe-coding', 'ai-codegen', 'frontend', 'huggingface', 'next.js', 'open-source'],
+    tier: 'starter',
+    version: '4.0.0',
+    sourceUrl: 'https://huggingface.co/spaces/enzostvs/deepsite',
+    license: 'MIT',
+    docker: {
+      image: 'node:20-alpine',
+      buildContext: 'deepsite',
+    },
+    resources: { cpuLimit: '2', memoryLimit: '2G', gpuRequired: false },
+    ports: [
+      { internal: 3001, description: 'Web UI + Editor', protocol: 'http' },
+    ],
+    volumes: [
+      { name: 'deepsite-data', mountPath: '/app/data', description: 'Projects and generated sites', persistent: true },
+    ],
+    healthCheck: { endpoint: '/api/healthcheck', interval: '30s', timeout: '10s', retries: 3, startPeriod: '45s' },
+    envVars: [
+      { key: 'AUTH_HUGGINGFACE_ID', description: 'Hugging Face OAuth App ID', required: true, sensitive: true, category: 'core' },
+      { key: 'AUTH_HUGGINGFACE_SECRET', description: 'Hugging Face OAuth App Secret', required: true, sensitive: true, category: 'core' },
+      { key: 'AUTH_SECRET', description: 'NextAuth session secret', required: true, sensitive: true, category: 'core' },
+      { key: 'NEXTAUTH_URL', description: 'Public URL for authentication callbacks', required: true, default: 'http://localhost:3001', sensitive: false, category: 'core' },
+      { key: 'MONGODB_URI', description: 'MongoDB connection string for project persistence', required: false, sensitive: true, category: 'database' },
+    ],
+    networkPolicy: { internetAccess: true, allowedEgress: ['*'], isolatedSandbox: false, bridgeToAims: true },
+    securityLevel: 'standard',
+    customizations: [
+      { id: 'default-model', label: 'Default Model', description: 'Primary LLM for code generation', type: 'select', options: ['Kimi K2.5', 'DeepSeek V3', 'DeepSeek V3.2', 'Qwen3 Coder', 'GLM-4.7', 'MiniMax M2.1'], default: 'Kimi K2.5' },
+      { id: 'auto-deploy', label: 'Auto-Deploy to HF', description: 'Automatically deploy generated sites as HF Spaces', type: 'toggle', default: true },
+    ],
+    dependencies: [],
+    supportedDelivery: ['hosted', 'exported'],
+    defaultDelivery: 'hosted',
+    icon: 'Globe',
+    accentColor: '#ff6b35',
+    featured: true,
+    comingSoon: false,
+    addedAt: '2026-02-26',
+  },
 ];
 
 // ---------------------------------------------------------------------------

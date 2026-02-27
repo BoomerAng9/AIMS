@@ -1,787 +1,554 @@
 'use client';
 
-// frontend/app/dashboard/make-it-mine/mobile-app/page.tsx
-import { useState, useRef, useCallback, useEffect } from 'react';
-import { useMediaPermissions } from '@/hooks/useMediaPermissions';
-import type {
-  ConsultationState,
-  ConsultationStep,
-  DIYProject,
-  InteractionMode,
-  VoiceMessage,
-} from '@/lib/diy/types';
+/**
+ * M.I.M. Mobile App Builder — A.I.M.S. AI-Powered Build Engine
+ *
+ * Chat-based mobile app prototyping. Users describe what they want →
+ * ACHEEVY generates a native-looking PWA prototype →
+ * live preview in a phone frame → iterative editing →
+ * deploy as a Plug or export as PWA.
+ *
+ * Follows D.U.M.B. — Deep Universal Meticulous Build.
+ */
+
+import React, { useState, useRef, useCallback, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
-  CONSULTATION_QUESTIONS,
-  CATEGORY_MAP,
-  SKILL_MAP,
-  getNextStep,
-  getStepProgress,
-  CATEGORY_SAFETY_TIPS,
-  estimateDuration,
-} from '@/lib/diy/consultation';
+  ArrowLeft,
+  Bot,
+  Check,
+  ChevronDown,
+  Code,
+  Copy,
+  Download,
+  Eye,
+  Loader2,
+  Maximize2,
+  Minimize2,
+  Rocket,
+  Send,
+  Smartphone,
+  X,
+} from 'lucide-react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { transition, spring, stagger } from '@/lib/motion/tokens';
 
-// ─────────────────────────────────────────────────────────────
-// Permission Request Component
-// ─────────────────────────────────────────────────────────────
+/* ─────────────────────────────────────────────────────────────────── */
+/*  Constants                                                          */
+/* ─────────────────────────────────────────────────────────────────── */
 
-function PermissionGate({
-  onGranted,
-}: {
-  onGranted: () => void;
-}) {
-  const {
-    permissions,
-    platform,
-    instructions,
-    isChecking,
-    error,
-    requestBoth,
-    openSystemSettings,
-  } = useMediaPermissions();
+const MODELS = [
+  { id: 'deepseek-v3',   label: 'DeepSeek V3',   description: 'Fast & capable (default)' },
+  { id: 'qwen3-coder',   label: 'Qwen3 Coder',   description: 'Code specialist' },
+  { id: 'gemini-flash',  label: 'Gemini Flash',   description: 'Speed optimised' },
+  { id: 'claude-sonnet', label: 'Claude Sonnet',  description: 'Highest quality' },
+  { id: 'gpt-4.1-mini',  label: 'GPT-4.1 Mini',  description: 'Balanced' },
+] as const;
 
-  const handleRequestPermissions = async () => {
-    const result = await requestBoth();
-    if (result.camera && result.microphone) {
-      onGranted();
+type ModelId    = typeof MODELS[number]['id'];
+type PanelView  = 'preview' | 'code';
+
+const STARTER_PROMPTS = [
+  'A fitness tracking app with workout log, progress charts, and daily step counter',
+  'A food delivery app with restaurant cards, menu browser, cart, and order tracking',
+  'A social media app with photo feed, stories bar, profile page, and messaging',
+  'A personal finance app with account balances, transaction list, and budget categories',
+  'A task management app with kanban board, due dates, and team assignment',
+  'A meditation app with session timer, guided options, streak tracker, and calming UI',
+];
+
+/* ─────────────────────────────────────────────────────────────────── */
+/*  Types                                                              */
+/* ─────────────────────────────────────────────────────────────────── */
+
+interface ChatMessage {
+  id:        string;
+  role:      'user' | 'assistant';
+  content:   string;
+  timestamp: number;
+  isError?:  boolean;
+}
+
+/* ─────────────────────────────────────────────────────────────────── */
+/*  Root Component                                                     */
+/* ─────────────────────────────────────────────────────────────────── */
+
+export default function MobileAppBuilderPage() {
+  const [prompt,        setPrompt]        = useState('');
+  const [messages,      setMessages]      = useState<ChatMessage[]>([]);
+  const [generatedCode, setGeneratedCode] = useState('');
+  const [isGenerating,  setIsGenerating]  = useState(false);
+  const [selectedModel, setSelectedModel] = useState<ModelId>('deepseek-v3');
+  const [showModelMenu, setShowModelMenu] = useState(false);
+  const [panelView,     setPanelView]     = useState<PanelView>('preview');
+  const [copied,        setCopied]        = useState(false);
+  const [isFullscreen,  setIsFullscreen]  = useState(false);
+  const [error,         setError]         = useState<string | null>(null);
+
+  const chatEndRef  = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const prefersReducedMotion =
+    typeof window !== 'undefined' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const animProps = (delay = 0) =>
+    prefersReducedMotion
+      ? {}
+      : { initial: { opacity: 0, y: 8 }, animate: { opacity: 1, y: 0 },
+          transition: { ...transition.enter, delay } };
+
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, isGenerating]);
+
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 150)}px`;
     }
-  };
+  }, [prompt]);
 
-  if (isChecking) {
+  const extractHTML = useCallback((raw: string) => {
+    let s = raw.trim();
+    if (s.startsWith('```html')) s = s.slice(7);
+    else if (s.startsWith('```'))  s = s.slice(3);
+    if (s.endsWith('```')) s = s.slice(0, -3);
+    return s.trim();
+  }, []);
+
+  /* ── Generate / Edit ── */
+  const handleGenerate = useCallback(async () => {
+    const text = prompt.trim();
+    if (!text || isGenerating) return;
+
+    setError(null);
+    setIsGenerating(true);
+    setPrompt('');
+
+    const userMsg: ChatMessage = {
+      id: `u-${Date.now()}`, role: 'user', content: text, timestamp: Date.now(),
+    };
+    setMessages(prev => [...prev, userMsg]);
+    if (!generatedCode) setPanelView('preview');
+
+    try {
+      const res = await fetch('/api/make-it-mine/generate-mobile', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt: text,
+          code:   generatedCode || undefined,
+          model:  selectedModel,
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({})) as { error?: string };
+        throw new Error(data.error ?? `Server error ${res.status}`);
+      }
+
+      const reader  = res.body?.getReader();
+      if (!reader) throw new Error('No response stream');
+
+      const decoder = new TextDecoder();
+      let accumulated = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        const chunk = decoder.decode(value, { stream: true });
+        for (const line of chunk.split('\n')) {
+          if (line.startsWith('0:')) {
+            try {
+              const token = JSON.parse(line.slice(2)) as string;
+              accumulated += token;
+              setGeneratedCode(extractHTML(accumulated));
+            } catch { /* skip non-JSON */ }
+          }
+        }
+      }
+
+      setGeneratedCode(extractHTML(accumulated));
+      setMessages(prev => [...prev, {
+        id: `a-${Date.now()}`, role: 'assistant',
+        content: generatedCode
+          ? '✓ Updated your mobile app. Describe more changes or switch to Code view.'
+          : '✓ Your mobile app prototype is ready! Describe edits to refine it.',
+        timestamp: Date.now(),
+      }]);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Generation failed';
+      setError(msg);
+      setMessages(prev => [...prev, {
+        id: `e-${Date.now()}`, role: 'assistant',
+        content: `Error: ${msg}`, timestamp: Date.now(), isError: true,
+      }]);
+    } finally {
+      setIsGenerating(false);
+    }
+  }, [prompt, isGenerating, generatedCode, selectedModel, extractHTML]);
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleGenerate(); }
+  }, [handleGenerate]);
+
+  const handleCopy = useCallback(async () => {
+    if (!generatedCode) return;
+    await navigator.clipboard.writeText(generatedCode);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }, [generatedCode]);
+
+  const handleDownload = useCallback(() => {
+    if (!generatedCode) return;
+    const blob = new Blob([generatedCode], { type: 'text/html' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url; a.download = 'mobile-app.html'; a.click();
+    URL.revokeObjectURL(url);
+  }, [generatedCode]);
+
+  const currentModel = MODELS.find(m => m.id === selectedModel) ?? MODELS[0];
+
+  /* ─────────────────────────────────────────────────────────────── */
+  /*  Render                                                         */
+  /* ─────────────────────────────────────────────────────────────── */
+
+  return (
+    <div className="flex h-[calc(100vh-64px)] flex-col bg-[#0A0A0B]">
+
+      {/* ── Top Bar ── */}
+      <header className="flex shrink-0 items-center justify-between border-b border-white/[0.06] bg-[#0A0A0B]/95 px-4 py-2.5 backdrop-blur-sm">
+        <div className="flex items-center gap-3">
+          <Link
+            href="/dashboard/make-it-mine"
+            className="flex items-center gap-1.5 rounded-lg px-2 py-1 text-sm text-zinc-500 transition-colors hover:bg-white/5 hover:text-zinc-300"
+          >
+            <ArrowLeft size={14} />
+            M.I.M.
+          </Link>
+          <div className="h-4 w-px bg-white/[0.08]" />
+          <div className="flex items-center gap-2">
+            <Image src="/assets/aims_transparent_logo.svg" alt="A.I.M.S." width={22} height={22} className="opacity-90" />
+            <span className="text-base font-bold text-zinc-100">Mobile App Builder</span>
+            <span className="rounded-full bg-amber-500/10 px-2 py-0.5 text-xs font-semibold text-amber-400">
+              Powered by ACHEEVY
+            </span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          {/* Model picker */}
+          <div className="relative">
+            <button
+              onClick={() => setShowModelMenu(v => !v)}
+              className="flex items-center gap-1.5 rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-base font-medium text-zinc-400 transition-colors hover:border-white/20 hover:text-zinc-300"
+            >
+              <Bot size={13} />
+              {currentModel.label}
+              <ChevronDown size={12} />
+            </button>
+            <AnimatePresence>
+              {showModelMenu && (
+                <motion.div
+                  initial={{ opacity: 0, y: -4, scale: 0.97 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -4, scale: 0.97 }}
+                  transition={transition.fast}
+                  className="absolute right-0 top-full z-50 mt-1 w-56 overflow-hidden rounded-xl border border-white/[0.08] bg-[#111115] shadow-2xl"
+                >
+                  {MODELS.map(m => (
+                    <button
+                      key={m.id}
+                      onClick={() => { setSelectedModel(m.id); setShowModelMenu(false); }}
+                      className={`flex w-full items-center justify-between px-3 py-2.5 text-left text-sm transition-colors hover:bg-white/[0.04] ${
+                        selectedModel === m.id ? 'bg-amber-500/10 text-amber-400' : 'text-zinc-400'
+                      }`}
+                    >
+                      <div>
+                        <p className="font-medium">{m.label}</p>
+                        <p className="text-sm text-zinc-500">{m.description}</p>
+                      </div>
+                      {selectedModel === m.id && <Check size={14} />}
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {generatedCode && (
+            <div className="flex items-center gap-1">
+              <button onClick={handleCopy} title="Copy HTML" className="flex items-center gap-1 rounded-lg px-2 py-1.5 text-sm font-medium text-zinc-500 transition-colors hover:bg-white/[0.04] hover:text-zinc-300">
+                {copied ? <Check size={13} className="text-emerald-400" /> : <Copy size={13} />}
+              </button>
+              <button onClick={handleDownload} title="Download PWA" className="rounded-lg px-2 py-1.5 text-sm font-medium text-zinc-500 transition-colors hover:bg-white/[0.04] hover:text-zinc-300">
+                <Download size={13} />
+              </button>
+              <button onClick={() => setIsFullscreen(v => !v)} title={isFullscreen ? 'Exit fullscreen' : 'Fullscreen'} className="rounded-lg px-2 py-1.5 text-sm font-medium text-zinc-500 transition-colors hover:bg-white/[0.04] hover:text-zinc-300">
+                {isFullscreen ? <Minimize2 size={13} /> : <Maximize2 size={13} />}
+              </button>
+              <Link href="/dashboard/plugs" className="flex items-center gap-1.5 rounded-lg bg-amber-500/10 px-3 py-1.5 text-sm font-semibold text-amber-400 transition-colors hover:bg-amber-500/20">
+                <Rocket size={12} />
+                Deploy as Plug
+              </Link>
+            </div>
+          )}
+        </div>
+      </header>
+
+      {/* ── Body ── */}
+      <div className="flex flex-1 overflow-hidden">
+
+        {/* Left: Chat */}
+        {!isFullscreen && (
+          <div className="flex w-full flex-col border-r border-white/[0.06] md:w-[380px] lg:w-[420px]">
+            <div className="flex-1 overflow-y-auto px-4 py-4">
+              {messages.length === 0
+                ? <MobileEmptyState onSelect={p => { setPrompt(p); setTimeout(() => textareaRef.current?.focus(), 50); }} />
+                : (
+                  <div className="space-y-3">
+                    {messages.map((msg) => (
+                      <motion.div
+                        key={msg.id}
+                        {...animProps()}
+                        className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                      >
+                        <div className={`max-w-[88%] rounded-2xl px-4 py-2.5 text-base leading-relaxed ${
+                          msg.role === 'user'
+                            ? 'bg-amber-500/[0.12] text-amber-200'
+                            : msg.isError
+                              ? 'bg-red-500/10 text-red-400'
+                              : 'bg-white/[0.04] text-zinc-400'
+                        }`}>{msg.content}</div>
+                      </motion.div>
+                    ))}
+                    {isGenerating && (
+                      <div className="flex items-center gap-2 text-sm text-zinc-500">
+                        <Loader2 size={13} className="animate-spin" />
+                        ACHEEVY is building your mobile app…
+                      </div>
+                    )}
+                    <div ref={chatEndRef} />
+                  </div>
+                )
+              }
+            </div>
+
+            <AnimatePresence>
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="mx-4 mb-2 flex items-start gap-2 rounded-lg bg-red-500/[0.08] px-3 py-2 text-sm text-red-400"
+                >
+                  <span className="flex-1">{error}</span>
+                  <button onClick={() => setError(null)} title="Dismiss" className="shrink-0 mt-0.5"><X size={12} /></button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <div className="border-t border-white/[0.06] p-4">
+              <div className="flex items-end gap-2 rounded-xl border border-white/[0.08] bg-white/[0.02] p-2.5 transition-colors focus-within:border-amber-500/30">
+                <textarea
+                  ref={textareaRef}
+                  value={prompt}
+                  onChange={e => setPrompt(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder={generatedCode
+                    ? 'Tell ACHEEVY what to change (e.g. "Add a dark mode toggle")'
+                    : 'Describe the mobile app you want to build…'}
+                  rows={1}
+                  className="max-h-[150px] flex-1 resize-none bg-transparent text-sm text-zinc-200 outline-none placeholder:text-zinc-600"
+                />
+                <button
+                  onClick={handleGenerate}
+                  disabled={!prompt.trim() || isGenerating}
+                  className="flex shrink-0 items-center justify-center rounded-lg bg-amber-500 p-2 text-white transition-all hover:bg-amber-400 active:scale-95 disabled:cursor-not-allowed disabled:opacity-25"
+                >
+                  {isGenerating ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />}
+                </button>
+              </div>
+              <p className="mt-2 text-sm text-zinc-600">
+                Enter to send · Shift+Enter for new line · Generates native-looking PWA prototypes
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Right: Preview / Code */}
+        <div className="flex flex-1 flex-col overflow-hidden">
+          <div className="flex shrink-0 items-center justify-between border-b border-white/[0.06] px-4 py-2">
+            <div className="flex items-center gap-1">
+              {(['preview', 'code'] as PanelView[]).map(v => (
+                <button
+                  key={v}
+                  onClick={() => setPanelView(v)}
+                  className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium capitalize transition-colors ${
+                    panelView === v ? 'bg-white/[0.08] text-zinc-200' : 'text-zinc-500 hover:text-zinc-300'
+                  }`}
+                >
+                  {v === 'preview' ? <Eye size={13} /> : <Code size={13} />}
+                  {v}
+                </button>
+              ))}
+            </div>
+            {isFullscreen && (
+              <button onClick={() => setIsFullscreen(false)} className="flex items-center gap-1 rounded-lg px-2 py-1.5 text-sm font-medium text-zinc-500 transition-colors hover:bg-white/[0.04] hover:text-zinc-300">
+                <Minimize2 size={13} /> Exit Fullscreen
+              </button>
+            )}
+          </div>
+
+          <div className="flex-1 overflow-hidden">
+            {panelView === 'preview'
+              ? <MobilePreviewPanel code={generatedCode} isGenerating={isGenerating} />
+              : <MobileCodePanel code={generatedCode} onCodeChange={setGeneratedCode} />
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────── */
+/*  Empty State                                                        */
+/* ─────────────────────────────────────────────────────────────────── */
+
+function MobileEmptyState({ onSelect }: { onSelect: (p: string) => void }) {
+  const pref = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  return (
+    <div className="flex h-full flex-col items-center justify-center px-4 py-8">
+      <motion.div
+        initial={pref ? undefined : { opacity: 0, scale: 0.94 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={spring.gentle}
+        className="mb-8 text-center"
+      >
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-500/10">
+          <Smartphone size={28} className="text-amber-400" />
+        </div>
+        <h2 className="text-base font-semibold text-zinc-200">A.I.M.S. Mobile App Builder</h2>
+        <p className="mt-1.5 max-w-[280px] text-base font-medium text-zinc-400 leading-relaxed">
+          Describe your mobile app idea and ACHEEVY will generate a native-looking PWA prototype.
+        </p>
+      </motion.div>
+
+      <div className="w-full max-w-sm space-y-2">
+        <p className="mb-3 text-xs font-bold uppercase tracking-widest text-zinc-600">App ideas</p>
+        {STARTER_PROMPTS.slice(0, 4).map((sp, i) => (
+          <motion.button
+            key={i}
+            initial={pref ? undefined : { opacity: 0, x: -6 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ ...transition.enter, delay: pref ? 0 : i * stagger.normal }}
+            onClick={() => onSelect(sp)}
+            className="w-full rounded-xl border border-white/[0.06] bg-white/[0.02] p-3 text-left text-sm font-medium text-zinc-400 leading-relaxed transition-all hover:border-amber-500/20 hover:bg-amber-500/[0.04] hover:text-zinc-300"
+          >
+            {sp}
+          </motion.button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────── */
+/*  Mobile Preview Panel — Phone Frame                                 */
+/* ─────────────────────────────────────────────────────────────────── */
+
+function MobilePreviewPanel({ code, isGenerating }: { code: string; isGenerating: boolean }) {
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  useEffect(() => {
+    const doc = iframeRef.current?.contentDocument;
+    if (doc && code) {
+      doc.open();
+      doc.write(code);
+      doc.close();
+    }
+  }, [code]);
+
+  if (!code && !isGenerating) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-pulse text-zinc-400">Checking permissions...</div>
+      <div className="flex h-full flex-col items-center justify-center gap-3 text-zinc-700">
+        <Smartphone size={36} strokeWidth={1.5} />
+        <p className="text-base font-semibold">Mobile preview appears here</p>
       </div>
     );
   }
 
-  const cameraGranted = permissions.camera === 'granted';
-  const micGranted = permissions.microphone === 'granted';
+  return (
+    <div className="flex h-full items-center justify-center overflow-auto bg-[#0D0D10] p-6">
+      {/* Phone frame */}
+      <div className="relative flex flex-col items-center">
+        {/* Device bezel */}
+        <div
+          className="relative overflow-hidden rounded-[3rem] border-[6px] border-zinc-800 bg-black shadow-2xl shadow-amber-500/5"
+          style={{ width: 390, height: 844 }}
+        >
+          {/* Dynamic Island */}
+          <div className="absolute left-1/2 top-2 z-20 h-[34px] w-[126px] -translate-x-1/2 rounded-full bg-black" />
 
-  if (cameraGranted && micGranted) {
-    onGranted();
-    return null;
+          {/* Loading overlay */}
+          {isGenerating && !code && (
+            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-black/80">
+              <Loader2 size={24} className="animate-spin text-amber-400" />
+              <p className="text-base font-medium text-zinc-400">Building your app…</p>
+            </div>
+          )}
+
+          {/* App content */}
+          <iframe
+            ref={iframeRef}
+            className="h-full w-full border-0 bg-white"
+            sandbox="allow-scripts allow-same-origin"
+            title="Mobile App Preview"
+          />
+
+          {/* Home indicator */}
+          <div className="absolute bottom-2 left-1/2 z-20 h-[5px] w-[134px] -translate-x-1/2 rounded-full bg-zinc-700" />
+        </div>
+
+        {/* Device label */}
+        <p className="mt-4 text-sm text-zinc-500">iPhone 15 Pro · 390 × 844</p>
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────── */
+/*  Code Panel                                                         */
+/* ─────────────────────────────────────────────────────────────────── */
+
+function MobileCodePanel({ code, onCodeChange }: { code: string; onCodeChange: (c: string) => void }) {
+  if (!code) {
+    return (
+      <div className="flex h-full flex-col items-center justify-center gap-3 text-zinc-700">
+        <Code size={36} strokeWidth={1.5} />
+        <p className="text-base font-semibold">Generated code appears here</p>
+      </div>
+    );
   }
 
   return (
-    <div className="max-w-lg mx-auto text-center space-y-6 py-12">
-      <div className="text-6xl mb-4">🎥🎤</div>
-      <h2 className="text-xl font-semibold text-zinc-100">
-        Camera & Microphone Access Required
-      </h2>
-      <p className="text-zinc-400">
-        Mobile App Mode uses your camera to show UI sketches and your microphone for voice interaction.
-        This allows ACHEEVY to provide real-time native development guidance as you build.
-      </p>
-
-      <div className="flex flex-col gap-3 mt-6">
-        {/* Permission Status */}
-        <div className="flex justify-center gap-8 text-sm">
-          <div className={`flex items-center gap-2 ${cameraGranted ? 'text-green-400' : 'text-zinc-500'}`}>
-            <span>{cameraGranted ? '✓' : '○'}</span>
-            <span>Camera</span>
-          </div>
-          <div className={`flex items-center gap-2 ${micGranted ? 'text-green-400' : 'text-zinc-500'}`}>
-            <span>{micGranted ? '✓' : '○'}</span>
-            <span>Microphone</span>
-          </div>
-        </div>
-
-        {error && (
-          <div className="text-red-400 text-sm bg-red-400/10 rounded-lg p-3">
-            {error}
-          </div>
-        )}
-
-        {/* Request Button */}
-        <button
-          onClick={handleRequestPermissions}
-          className="mt-4 px-6 py-3 rounded-full bg-gradient-to-r from-gold to-gold text-black font-semibold hover:shadow-[0_0_24px_rgba(251,191,36,0.5)] transition-shadow"
-        >
-          Grant Access
-        </button>
-
-        {/* Platform-specific instructions */}
-        {(permissions.camera === 'denied' || permissions.microphone === 'denied') && (
-          <div className="mt-4 text-sm text-zinc-500">
-            <p className="mb-2">If the button doesn&apos;t work, you may need to enable permissions manually:</p>
-            <button
-              onClick={openSystemSettings}
-              className="text-gold hover:text-gold underline"
-            >
-              Open Settings Instructions
-            </button>
-            <p className="mt-2 text-xs text-zinc-600">
-              Platform detected: {platform}
-            </p>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────
-// Consultation Flow Component
-// ─────────────────────────────────────────────────────────────
-
-function ConsultationFlow({
-  onComplete,
-}: {
-  onComplete: (project: DIYProject) => void;
-}) {
-  const [state, setState] = useState<ConsultationState>({
-    currentStep: 'welcome',
-    projectDraft: {},
-    responses: {},
-    isComplete: false,
-  });
-
-  const currentQuestion = CONSULTATION_QUESTIONS.find(q => q.step === state.currentStep);
-  const progress = getStepProgress(state.currentStep);
-
-  const handleResponse = (value: string) => {
-    const newResponses = { ...state.responses, [state.currentStep]: value };
-
-    // Map responses to project draft
-    const draft = { ...state.projectDraft };
-
-    if (state.currentStep === 'project_description') {
-      draft.description = value;
-      draft.title = value.split(' ').slice(0, 5).join(' ');
-    } else if (state.currentStep === 'category_selection') {
-      draft.category = CATEGORY_MAP[value] || 'other';
-    } else if (state.currentStep === 'skill_assessment') {
-      draft.skillLevel = SKILL_MAP[value] || 'beginner';
-    } else if (state.currentStep === 'tools_inventory') {
-      draft.toolsNeeded = value.split(',').map(t => t.trim());
-    }
-
-    const nextStep = getNextStep(state.currentStep);
-
-    if (nextStep === 'ready') {
-      // Complete the project setup
-      const finalProject: DIYProject = {
-        id: `diy-${Date.now()}`,
-        userId: 'current-user',
-        title: draft.title || 'My DIY Project',
-        description: draft.description || '',
-        category: draft.category || 'other',
-        skillLevel: draft.skillLevel || 'beginner',
-        estimatedDuration: estimateDuration(
-          draft.category || 'other',
-          draft.skillLevel || 'beginner',
-          draft.description || ''
-        ),
-        toolsNeeded: draft.toolsNeeded || [],
-        materialsNeeded: [],
-        safetyConsiderations: CATEGORY_SAFETY_TIPS[draft.category || 'other'],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        status: 'active',
-      };
-      onComplete(finalProject);
-      return;
-    }
-
-    setState({
-      ...state,
-      currentStep: nextStep,
-      projectDraft: draft,
-      responses: newResponses,
-    });
-  };
-
-  if (!currentQuestion) return null;
-
-  return (
-    <div className="max-w-2xl mx-auto py-8">
-      {/* Progress Bar */}
-      <div className="mb-8">
-        <div className="flex justify-between text-xs text-zinc-500 mb-2">
-          <span>Consultation</span>
-          <span>{progress}%</span>
-        </div>
-        <div className="h-1 bg-[#1F1F23] rounded-full overflow-hidden">
-          <div
-            className="h-full bg-gradient-to-r from-gold to-gold transition-all duration-500"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-      </div>
-
-      {/* Question Card */}
-      <div className="bg-[#111113] border border-gold/20 rounded-2xl p-8">
-        <p className="text-lg text-zinc-100 whitespace-pre-line">
-          {currentQuestion.prompt}
-        </p>
-
-        <div className="mt-6">
-          {currentQuestion.type === 'text' && (
-            <TextInput onSubmit={handleResponse} />
-          )}
-          {currentQuestion.type === 'select' && (
-            <SelectInput options={currentQuestion.options || []} onSelect={handleResponse} />
-          )}
-          {currentQuestion.type === 'multiselect' && (
-            <MultiSelectInput options={currentQuestion.options || []} onSubmit={handleResponse} />
-          )}
-          {currentQuestion.type === 'confirm' && (
-            <ConfirmInput options={currentQuestion.options || []} onSelect={handleResponse} />
-          )}
-        </div>
-      </div>
-
-      {/* Project Summary Preview */}
-      {Object.keys(state.projectDraft).length > 0 && state.currentStep === 'plan_review' && (
-        <div className="mt-6 bg-[#111113] border border-wireframe-stroke rounded-xl p-6">
-          <h3 className="text-sm font-medium text-gold mb-3">Project Summary</h3>
-          <dl className="space-y-2 text-sm">
-            {state.projectDraft.title && (
-              <div className="flex">
-                <dt className="w-24 text-zinc-500">Project:</dt>
-                <dd className="text-zinc-100">{state.projectDraft.title}</dd>
-              </div>
-            )}
-            {state.projectDraft.category && (
-              <div className="flex">
-                <dt className="w-24 text-zinc-500">Category:</dt>
-                <dd className="text-zinc-100 capitalize">{state.projectDraft.category.replace('_', ' ')}</dd>
-              </div>
-            )}
-            {state.projectDraft.skillLevel && (
-              <div className="flex">
-                <dt className="w-24 text-zinc-500">Level:</dt>
-                <dd className="text-zinc-100 capitalize">{state.projectDraft.skillLevel}</dd>
-              </div>
-            )}
-          </dl>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// Input Components
-function TextInput({ onSubmit }: { onSubmit: (value: string) => void }) {
-  const [value, setValue] = useState('');
-
-  return (
-    <form onSubmit={(e) => { e.preventDefault(); if (value.trim()) onSubmit(value.trim()); }}>
+    <div className="relative h-full">
       <textarea
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        className="w-full h-32 bg-[#1F1F23]/60 border border-wireframe-stroke rounded-xl p-4 text-zinc-100 placeholder:text-zinc-600 outline-none focus:border-gold/30 transition-colors resize-none"
-        placeholder="Describe your project..."
-        autoFocus
+        value={code}
+        onChange={e => onCodeChange(e.target.value)}
+        spellCheck={false}
+        placeholder="Generated PWA code"
+        aria-label="Generated PWA code"
+        className="h-full w-full resize-none bg-[#0D0D10] p-4 font-mono text-sm leading-relaxed text-amber-400/85 outline-none selection:bg-amber-500/20"
       />
-      <button
-        type="submit"
-        disabled={!value.trim()}
-        className="mt-4 px-6 py-2 rounded-full bg-gold text-black font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gold transition-colors"
-      >
-        Continue
-      </button>
-    </form>
-  );
-}
-
-function SelectInput({ options, onSelect }: { options: string[]; onSelect: (value: string) => void }) {
-  return (
-    <div className="grid gap-2">
-      {options.map((option) => (
-        <button
-          key={option}
-          onClick={() => onSelect(option)}
-          className="text-left px-4 py-3 rounded-xl border border-wireframe-stroke bg-[#111113] text-zinc-300 hover:border-gold/20 hover:bg-white/5 transition-all"
-        >
-          {option}
-        </button>
-      ))}
-    </div>
-  );
-}
-
-function MultiSelectInput({ options, onSubmit }: { options: string[]; onSubmit: (value: string) => void }) {
-  const [selected, setSelected] = useState<Set<string>>(new Set());
-
-  const toggle = (option: string) => {
-    const next = new Set(selected);
-    if (next.has(option)) {
-      next.delete(option);
-    } else {
-      next.add(option);
-    }
-    setSelected(next);
-  };
-
-  return (
-    <div>
-      <div className="grid gap-2 mb-4">
-        {options.map((option) => (
-          <button
-            key={option}
-            onClick={() => toggle(option)}
-            className={`text-left px-4 py-3 rounded-xl border transition-all ${selected.has(option)
-                ? 'border-gold/30 bg-gold/10 text-zinc-100'
-                : 'border-wireframe-stroke bg-[#111113] text-zinc-300 hover:border-white/10'
-              }`}
-          >
-            <span className="mr-2">{selected.has(option) ? '✓' : '○'}</span>
-            {option}
-          </button>
-        ))}
+      <div className="pointer-events-none absolute bottom-3 right-4 rounded bg-white/[0.04] px-2 py-0.5 text-xs text-zinc-600">
+        {code.split('\n').length.toLocaleString()} lines
       </div>
-      <button
-        onClick={() => onSubmit(Array.from(selected).join(', '))}
-        className="px-6 py-2 rounded-full bg-gold text-black font-medium hover:bg-gold transition-colors"
-      >
-        Continue
-      </button>
-    </div>
-  );
-}
-
-function ConfirmInput({ options, onSelect }: { options: string[]; onSelect: (value: string) => void }) {
-  return (
-    <div className="flex flex-wrap gap-3">
-      {options.map((option) => (
-        <button
-          key={option}
-          onClick={() => onSelect(option)}
-          className="px-5 py-2 rounded-full border border-gold/20 bg-gold/10 text-zinc-400 hover:border-gold/30 hover:bg-gold/10 transition-all"
-        >
-          {option}
-        </button>
-      ))}
-    </div>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────
-// Voice + Vision Interactive Mode
-// ─────────────────────────────────────────────────────────────
-
-function VoiceVisionMode({
-  project,
-  onSwitchToConsole,
-}: {
-  project: DIYProject;
-  onSwitchToConsole: () => void;
-}) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [isListening, setIsListening] = useState(false);
-  const [isSpeaking, setIsSpeaking] = useState(false);
-  const [messages, setMessages] = useState<VoiceMessage[]>([
-    {
-      id: '1',
-      role: 'acheevy',
-      content: `Great! I'm ready to help with your ${project.category.replace('_', ' ')} project: "${project.title}". Show me what you're working on and I'll guide you through it. You can speak or type your questions.`,
-      timestamp: new Date().toISOString(),
-    },
-  ]);
-  const [cameraActive, setCameraActive] = useState(false);
-
-  // Start camera stream
-  const startCamera = useCallback(async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } },
-        audio: false,
-      });
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        setCameraActive(true);
-      }
-    } catch (err) {
-      console.error('Failed to start camera:', err);
-    }
-  }, []);
-
-  // Capture current frame
-  const captureFrame = useCallback((): string | null => {
-    if (!videoRef.current || !canvasRef.current) return null;
-
-    const video = videoRef.current;
-    const canvas = canvasRef.current;
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return null;
-
-    ctx.drawImage(video, 0, 0);
-    return canvas.toDataURL('image/jpeg', 0.8);
-  }, []);
-
-  // Send message with optional image
-  const sendMessage = useCallback(async (text: string, includeImage: boolean = false) => {
-    const userMessage: VoiceMessage = {
-      id: `msg-${Date.now()}`,
-      role: 'user',
-      content: text,
-      timestamp: new Date().toISOString(),
-      hasImage: includeImage,
-    };
-
-    setMessages(prev => [...prev, userMessage]);
-
-    // Capture image if requested
-    const imageBase64 = includeImage ? captureFrame() : undefined;
-
-    try {
-      const response = await fetch('/api/acheevy/diy', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          sessionId: project.id,
-          projectId: project.id,
-          message: text,
-          imageBase64,
-          mode: 'voice_vision' as InteractionMode,
-        }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        const acheevyMessage: VoiceMessage = {
-          id: `msg-${Date.now()}-reply`,
-          role: 'acheevy',
-          content: data.reply,
-          timestamp: new Date().toISOString(),
-          imageAnalysis: data.visionAnalysis,
-        };
-        setMessages(prev => [...prev, acheevyMessage]);
-
-        // TODO: Play TTS audio if available
-        if (data.audioUrl) {
-          setIsSpeaking(true);
-          // Play audio...
-          setTimeout(() => setIsSpeaking(false), 3000);
-        }
-      }
-    } catch (err) {
-      console.error('Failed to send message:', err);
-    }
-  }, [project.id, captureFrame]);
-
-  // Toggle voice listening
-  const toggleListening = () => {
-    setIsListening(!isListening);
-    // TODO: Implement Web Speech API recognition
-  };
-
-  useEffect(() => {
-    startCamera();
-    return () => {
-      // Cleanup: stop camera stream
-      if (videoRef.current?.srcObject) {
-        const stream = videoRef.current.srcObject as MediaStream;
-        stream.getTracks().forEach(track => track.stop());
-      }
-    };
-  }, [startCamera]);
-
-  return (
-    <div className="flex flex-col h-[calc(100vh-8rem)]">
-      {/* Header */}
-      <header className="flex items-center justify-between px-4 py-3 border-b border-wireframe-stroke">
-        <div>
-          <h2 className="font-semibold text-zinc-100">{project.title}</h2>
-          <p className="text-xs text-zinc-500 capitalize">{project.category.replace('_', ' ')} • {project.skillLevel}</p>
-        </div>
-        <button
-          onClick={onSwitchToConsole}
-          className="text-sm text-zinc-400 hover:text-gold transition-colors"
-        >
-          Switch to Console Mode
-        </button>
-      </header>
-
-      <div className="flex-1 flex gap-4 p-4 overflow-hidden">
-        {/* Camera View */}
-        <div className="w-1/2 relative rounded-xl overflow-hidden bg-[#111113]">
-          <video
-            ref={videoRef}
-            autoPlay
-            playsInline
-            muted
-            className="w-full h-full object-cover"
-          />
-          <canvas ref={canvasRef} className="hidden" />
-
-          {/* Camera Controls */}
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-3">
-            <button
-              onClick={() => sendMessage('What do you see?', true)}
-              className="px-4 py-2 rounded-full bg-gold text-black text-sm font-medium hover:bg-gold transition-colors"
-            >
-              📸 Capture & Analyze
-            </button>
-          </div>
-
-          {!cameraActive && (
-            <div className="absolute inset-0 flex items-center justify-center bg-[#111113]/80">
-              <p className="text-zinc-400">Starting camera...</p>
-            </div>
-          )}
-        </div>
-
-        {/* Chat Area */}
-        <div className="w-1/2 flex flex-col bg-[#111113] rounded-xl border border-wireframe-stroke">
-          {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {messages.map((msg) => (
-              <div
-                key={msg.id}
-                className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-              >
-                <div
-                  className={`max-w-[85%] rounded-2xl px-4 py-3 ${msg.role === 'user'
-                      ? 'bg-gold/10 text-zinc-100'
-                      : 'bg-[#18181B] text-zinc-300'
-                    }`}
-                >
-                  {msg.hasImage && (
-                    <span className="text-xs text-gold block mb-1">📸 Image attached</span>
-                  )}
-                  <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
-                  {msg.imageAnalysis && (
-                    <div className="mt-2 pt-2 border-t border-wireframe-stroke text-xs text-zinc-500">
-                      <p>Detected: {msg.imageAnalysis.analysis.labels.slice(0, 3).map(l => l.description).join(', ')}</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Input Area */}
-          <div className="p-4 border-t border-wireframe-stroke">
-            <div className="flex gap-2">
-              <button
-                onClick={toggleListening}
-                className={`p-3 rounded-xl transition-all ${isListening
-                    ? 'bg-red-500/20 text-red-400 animate-pulse'
-                    : 'bg-[#18181B] text-zinc-400 hover:bg-white/8'
-                  }`}
-              >
-                🎤
-              </button>
-              <input
-                type="text"
-                placeholder="Type or speak your question..."
-                className="flex-1 bg-[#1F1F23]/60 border border-wireframe-stroke rounded-xl px-4 py-3 text-sm text-zinc-100 placeholder:text-zinc-600 outline-none focus:border-gold/30"
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && e.currentTarget.value.trim()) {
-                    sendMessage(e.currentTarget.value.trim());
-                    e.currentTarget.value = '';
-                  }
-                }}
-              />
-              <button
-                onClick={() => sendMessage('Show me what you see', true)}
-                className="p-3 rounded-xl bg-[#18181B] text-zinc-400 hover:bg-white/8 transition-colors"
-              >
-                📷
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Status Bar */}
-      <footer className="px-4 py-2 border-t border-wireframe-stroke flex items-center justify-between text-xs text-zinc-500">
-        <div className="flex items-center gap-4">
-          <span className={cameraActive ? 'text-green-400' : 'text-red-400'}>
-            ● Camera {cameraActive ? 'Active' : 'Inactive'}
-          </span>
-          <span className={isListening ? 'text-green-400' : ''}>
-            ● Voice {isListening ? 'Listening' : 'Ready'}
-          </span>
-        </div>
-        <span>Session: {project.id.slice(-8)}</span>
-      </footer>
-    </div>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────
-// Console Mode (Text + Voice, No Vision)
-// ─────────────────────────────────────────────────────────────
-
-function ConsoleMode({
-  project,
-  onSwitchToVision,
-}: {
-  project: DIYProject;
-  onSwitchToVision: () => void;
-}) {
-  const [messages, setMessages] = useState<VoiceMessage[]>([
-    {
-      id: '1',
-      role: 'acheevy',
-      content: `Console mode active. Voice is still available but camera is off. Ask me anything about your ${project.category.replace('_', ' ')} project.`,
-      timestamp: new Date().toISOString(),
-    },
-  ]);
-  const [input, setInput] = useState('');
-  const [isListening, setIsListening] = useState(false);
-
-  const sendMessage = async (text: string) => {
-    const userMessage: VoiceMessage = {
-      id: `msg-${Date.now()}`,
-      role: 'user',
-      content: text,
-      timestamp: new Date().toISOString(),
-    };
-
-    setMessages(prev => [...prev, userMessage]);
-    setInput('');
-
-    try {
-      const response = await fetch('/api/acheevy/diy', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          sessionId: project.id,
-          projectId: project.id,
-          message: text,
-          mode: 'console' as InteractionMode,
-        }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        const acheevyMessage: VoiceMessage = {
-          id: `msg-${Date.now()}-reply`,
-          role: 'acheevy',
-          content: data.reply,
-          timestamp: new Date().toISOString(),
-        };
-        setMessages(prev => [...prev, acheevyMessage]);
-      }
-    } catch (err) {
-      console.error('Failed to send message:', err);
-    }
-  };
-
-  return (
-    <div className="flex flex-col h-[calc(100vh-8rem)] max-w-3xl mx-auto">
-      {/* Header */}
-      <header className="flex items-center justify-between px-4 py-3 border-b border-wireframe-stroke">
-        <div>
-          <h2 className="font-semibold text-zinc-100">{project.title}</h2>
-          <p className="text-xs text-zinc-500">Console Mode • Voice Active • Camera Off</p>
-        </div>
-        <button
-          onClick={onSwitchToVision}
-          className="text-sm text-gold hover:text-gold transition-colors"
-        >
-          Enable Camera
-        </button>
-      </header>
-
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.map((msg) => (
-          <div
-            key={msg.id}
-            className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-          >
-            <div
-              className={`max-w-[80%] rounded-2xl px-4 py-3 ${msg.role === 'user'
-                  ? 'bg-gold/10 text-zinc-100'
-                  : 'bg-[#18181B] text-zinc-300'
-                }`}
-            >
-              <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Input */}
-      <div className="p-4 border-t border-wireframe-stroke">
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            if (input.trim()) sendMessage(input.trim());
-          }}
-          className="flex gap-2"
-        >
-          <button
-            type="button"
-            onClick={() => setIsListening(!isListening)}
-            className={`p-3 rounded-xl transition-all ${isListening
-                ? 'bg-red-500/20 text-red-400 animate-pulse'
-                : 'bg-[#18181B] text-zinc-400 hover:bg-white/8'
-              }`}
-          >
-            🎤
-          </button>
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Type your question..."
-            className="flex-1 bg-[#1F1F23]/60 border border-wireframe-stroke rounded-xl px-4 py-3 text-sm text-zinc-100 placeholder:text-zinc-600 outline-none focus:border-gold/30"
-          />
-          <button
-            type="submit"
-            disabled={!input.trim()}
-            className="px-5 py-3 rounded-xl bg-gold text-black font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gold transition-colors"
-          >
-            Send
-          </button>
-        </form>
-      </div>
-    </div>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────
-// Main Page Component
-// ─────────────────────────────────────────────────────────────
-
-type PageState = 'permissions' | 'consultation' | 'voice_vision' | 'console';
-
-export default function MobileAppPage() {
-  const [pageState, setPageState] = useState<PageState>('permissions');
-  const [project, setProject] = useState<DIYProject | null>(null);
-
-  const handlePermissionsGranted = () => {
-    setPageState('consultation');
-  };
-
-  const handleConsultationComplete = (completedProject: DIYProject) => {
-    setProject(completedProject);
-    setPageState('voice_vision');
-  };
-
-  return (
-    <div className="min-h-screen">
-      {pageState === 'permissions' && (
-        <PermissionGate onGranted={handlePermissionsGranted} />
-      )}
-
-      {pageState === 'consultation' && (
-        <ConsultationFlow onComplete={handleConsultationComplete} />
-      )}
-
-      {pageState === 'voice_vision' && project && (
-        <VoiceVisionMode
-          project={project}
-          onSwitchToConsole={() => setPageState('console')}
-        />
-      )}
-
-      {pageState === 'console' && project && (
-        <ConsoleMode
-          project={project}
-          onSwitchToVision={() => setPageState('voice_vision')}
-        />
-      )}
     </div>
   );
 }

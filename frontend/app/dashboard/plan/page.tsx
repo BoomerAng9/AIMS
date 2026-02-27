@@ -46,7 +46,7 @@ function StatusBadge({ status }: { status: "in_progress" | "pending" | "complete
   };
   const c = config[status];
   return (
-    <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[10px] uppercase font-bold tracking-wider ${c.color}`}>
+    <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs uppercase font-bold tracking-wider ${c.color}`}>
       <c.icon size={12} className={c.spin ? "animate-spin" : ""} />
       {c.label}
     </span>
@@ -130,7 +130,7 @@ export default function PlanPage() {
                     </div>
                     <div>
                       <h3 className="text-sm font-semibold text-zinc-100">{project.name}</h3>
-                      <p className="text-[10px] text-zinc-500 mt-0.5">
+                      <p className="text-xs text-zinc-500 mt-0.5">
                         Created {new Date(project.createdAt).toLocaleDateString()}
                         {project.description && ` · ${project.description.slice(0, 60)}${project.description.length > 60 ? '...' : ''}`}
                       </p>
@@ -141,7 +141,7 @@ export default function PlanPage() {
 
                 {/* Progress Bar */}
                 <div className="mt-5">
-                  <div className="flex justify-between text-[10px] mb-1.5">
+                  <div className="flex justify-between text-xs mb-1.5">
                     <span className="text-zinc-500 uppercase tracking-wider">Progress</span>
                     <span className="text-gold font-semibold">{progress}%</span>
                   </div>

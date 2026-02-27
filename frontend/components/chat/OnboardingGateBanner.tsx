@@ -185,7 +185,7 @@ export function OnboardingGateBanner() {
                 <h3 className="text-sm font-semibold text-slate-800">
                   Strategic Onboarding
                 </h3>
-                <p className="text-[11px] text-slate-400 leading-tight">
+                <p className="text-sm text-slate-400 leading-tight">
                   ACHEEVY needs your mission profile before full execution
                   capability unlocks.
                 </p>
@@ -196,10 +196,10 @@ export function OnboardingGateBanner() {
           {/* Progress bar */}
           <div className="px-5 pt-3">
             <div className="flex items-center justify-between mb-1.5">
-              <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">
+              <span className="text-xs font-medium text-slate-400 uppercase tracking-wider">
                 Progress
               </span>
-              <span className="text-[10px] font-mono text-slate-500">
+              <span className="text-xs font-mono text-slate-500">
                 {completedCount}/{totalSteps} steps
               </span>
             </div>
@@ -282,7 +282,7 @@ export function OnboardingGateBanner() {
                         {step.label}
                       </p>
                       {isNext && (
-                        <p className="text-[10px] text-slate-400 truncate">
+                        <p className="text-xs text-slate-400 truncate">
                           {step.description}
                         </p>
                       )}
@@ -306,7 +306,7 @@ export function OnboardingGateBanner() {
             <div className="px-5 pb-4 pt-1">
               <Link
                 href={nextIncompleteStep.href}
-                className="flex items-center justify-center gap-2 w-full rounded-xl bg-gold px-5 py-2.5 text-[11px] font-bold text-black uppercase tracking-widest transition-all hover:bg-gold/90 active:scale-[0.98] shadow-[0_0_15px_rgba(251,191,36,0.2)]"
+                className="flex items-center justify-center gap-2 w-full rounded-xl bg-gold px-5 py-2.5 text-sm font-bold text-black uppercase tracking-widest transition-all hover:bg-gold/90 active:scale-[0.98] shadow-[0_0_15px_rgba(251,191,36,0.2)]"
               >
                 Continue: {nextIncompleteStep.label}{' '}
                 <ArrowRight size={14} />

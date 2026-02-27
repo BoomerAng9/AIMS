@@ -200,16 +200,16 @@ export default function ArenaLobby() {
 
         <Link
           href="/arena/how-it-works"
-          className="wireframe-card rounded-2xl p-5 flex items-center gap-4 hover:border-purple-400/20 transition-colors group"
+          className="wireframe-card rounded-2xl p-5 flex items-center gap-4 hover:border-amber-400/20 transition-colors group"
         >
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-400/10 border border-purple-400/20 text-purple-400">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-400/10 border border-amber-400/20 text-amber-400">
             <Brain size={18} />
           </div>
           <div className="flex-1">
-            <p className="text-sm font-medium text-slate-800 group-hover:text-purple-400 transition-colors">How It Works</p>
+            <p className="text-sm font-medium text-slate-800 group-hover:text-amber-400 transition-colors">How It Works</p>
             <p className="text-[0.55rem] text-slate-400 font-mono">Rules, payouts, and FAQ</p>
           </div>
-          <ArrowRight size={14} className="text-slate-300 group-hover:text-purple-400/40 transition-colors" />
+          <ArrowRight size={14} className="text-slate-300 group-hover:text-amber-400/40 transition-colors" />
         </Link>
       </motion.section>
 

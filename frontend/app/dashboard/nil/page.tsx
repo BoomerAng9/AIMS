@@ -26,7 +26,7 @@ const COLOR_MAP: Record<string, { border: string; bg: string; text: string }> = 
   amber:   { border: 'border-amber-500/30',   bg: 'bg-amber-500/10',   text: 'text-amber-400' },
   emerald: { border: 'border-emerald-500/30', bg: 'bg-emerald-500/10', text: 'text-emerald-400' },
   cyan:    { border: 'border-cyan-500/30',    bg: 'bg-cyan-500/10',    text: 'text-cyan-400' },
-  purple:  { border: 'border-purple-500/30',  bg: 'bg-purple-500/10',  text: 'text-purple-400' },
+  purple:  { border: 'border-amber-500/30',  bg: 'bg-amber-500/10',  text: 'text-amber-400' },
   blue:    { border: 'border-blue-500/30',    bg: 'bg-blue-500/10',    text: 'text-blue-400' },
   red:     { border: 'border-red-500/30',     bg: 'bg-red-500/10',     text: 'text-red-400' },
 };
@@ -65,7 +65,7 @@ export default function NILPage() {
           <p className="text-zinc-400 text-sm">
             {NIL_FOUNDATION.tagline}
           </p>
-          <p className="text-xs text-zinc-400 mt-1">
+          <p className="text-sm text-zinc-400 mt-1">
             Per|Form Platform
           </p>
         </div>
@@ -80,7 +80,7 @@ export default function NILPage() {
           <div className="text-2xl">📕</div>
           <div>
             <p className="text-sm font-semibold text-amber-400">{NIL_FOUNDATION.book.title}</p>
-            <p className="text-[10px] text-zinc-400">Available on {NIL_FOUNDATION.book.platform}</p>
+            <p className="text-xs font-medium text-zinc-400">Available on {NIL_FOUNDATION.book.platform}</p>
           </div>
         </a>
       </div>
@@ -91,7 +91,7 @@ export default function NILPage() {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`px-4 py-2 text-xs rounded-lg border transition-colors whitespace-nowrap ${
+            className={`px-4 py-2 text-sm rounded-lg border transition-colors whitespace-nowrap ${
               activeTab === tab.id
                 ? 'bg-amber-500/20 text-amber-400 border-amber-500/30'
                 : 'bg-[#111113] text-zinc-400 border-white/10 hover:border-white/15'
@@ -137,7 +137,7 @@ function OverviewTab() {
             href={NIL_FOUNDATION.book.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-xs text-amber-400 hover:text-amber-300 transition-colors"
+            className="inline-flex items-center gap-1.5 text-sm text-amber-400 hover:text-amber-300 transition-colors"
           >
             Available on {NIL_FOUNDATION.book.platform} &rarr;
           </a>
@@ -154,7 +154,7 @@ function OverviewTab() {
               className={`bg-[#111113] shadow-[0_1px_2px_rgba(0,0,0,0.3)] border ${colors.border} rounded-xl p-5`}
             >
               <div className="flex items-center gap-2 mb-2">
-                <span className={`text-xs font-mono uppercase tracking-wider ${colors.text}`}>
+                <span className={`text-sm font-mono uppercase tracking-wider ${colors.text}`}>
                   {section.title}
                 </span>
               </div>
@@ -178,17 +178,17 @@ function OverviewTab() {
             return (
               <div key={profile.position} className="flex items-start gap-4 p-3 bg-[#18181B] rounded-lg border border-white/10">
                 <div className="shrink-0">
-                  <span className={`px-2 py-1 rounded text-xs border font-medium ${colors.border} ${colors.bg} ${colors.text}`}>
+                  <span className={`px-2 py-1 rounded text-sm border font-semibold ${colors.border} ${colors.bg} ${colors.text}`}>
                     {profile.nilPotential.toUpperCase()}
                   </span>
                 </div>
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-sm font-medium">{profile.position}</span>
-                    <span className="text-xs text-zinc-400">{profile.sport}</span>
+                    <span className="text-sm font-semibold">{profile.position}</span>
+                    <span className="text-sm text-zinc-400">{profile.sport}</span>
                   </div>
-                  <p className="text-xs text-zinc-400">{profile.valueDiver}</p>
-                  <p className="text-xs text-zinc-400 mt-1">{profile.challenge}</p>
+                  <p className="text-sm text-zinc-400">{profile.valueDiver}</p>
+                  <p className="text-sm text-zinc-400 mt-1">{profile.challenge}</p>
                 </div>
               </div>
             );
@@ -217,18 +217,18 @@ function DealsTab() {
             >
               <div className="flex items-center justify-between mb-2">
                 <h3 className="font-semibold">{deal.name}</h3>
-                <span className={`px-2 py-0.5 rounded text-[10px] border font-mono ${colors.border} ${colors.bg} ${colors.text}`}>
+                <span className={`px-2 py-0.5 rounded text-xs border font-mono ${colors.border} ${colors.bg} ${colors.text}`}>
                   {deal.accessLevel.toUpperCase()}
                 </span>
               </div>
-              <p className="text-xs text-zinc-400 mb-3">{deal.description}</p>
+              <p className="text-sm text-zinc-400 mb-3">{deal.description}</p>
               <div className="flex items-center gap-2 mb-3">
-                <span className="text-[10px] text-zinc-400 uppercase tracking-wider">Value Range</span>
-                <span className={`text-xs font-mono font-bold ${colors.text}`}>{deal.valueRange}</span>
+                <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Value Range</span>
+                <span className={`text-sm font-mono font-bold ${colors.text}`}>{deal.valueRange}</span>
               </div>
               <div className="flex flex-wrap gap-1.5">
                 {deal.examples.map(ex => (
-                  <span key={ex} className="px-2 py-0.5 bg-[#1F1F23] rounded text-[10px] text-zinc-400 border border-white/10">
+                  <span key={ex} className="px-2 py-0.5 bg-[#1F1F23] rounded text-xs font-medium text-zinc-400 border border-white/10">
                     {ex}
                   </span>
                 ))}
@@ -259,8 +259,8 @@ function ValuationTab() {
           return (
             <div key={factor.id}>
               <div className="flex items-center justify-between mb-1">
-                <span className="text-sm font-medium">{factor.name}</span>
-                <span className={`text-xs font-mono font-bold ${colors.text}`}>{pct}%</span>
+                <span className="text-sm font-semibold">{factor.name}</span>
+                <span className={`text-sm font-mono font-bold ${colors.text}`}>{pct}%</span>
               </div>
               <div className="h-2 bg-[#1F1F23] rounded-full overflow-hidden">
                 <div
@@ -268,7 +268,7 @@ function ValuationTab() {
                   style={{ width: `${pct}%`, backgroundColor: `var(--tw-bg-opacity, 1)` }}
                 />
               </div>
-              <p className="text-xs text-zinc-400 mt-1">{factor.description}</p>
+              <p className="text-sm text-zinc-400 mt-1">{factor.description}</p>
             </div>
           );
         })}
@@ -283,7 +283,7 @@ function ValuationTab() {
               <h3 className={`text-sm font-semibold mb-3 ${colors.text}`}>{factor.name}</h3>
               <ul className="space-y-1.5">
                 {factor.metrics.map(metric => (
-                  <li key={metric} className="flex items-center gap-2 text-xs text-zinc-400">
+                  <li key={metric} className="flex items-center gap-2 text-sm text-zinc-400">
                     <div className={`w-1 h-1 rounded-full ${colors.bg} border ${colors.border}`} />
                     {metric}
                   </li>
@@ -320,12 +320,12 @@ function TiersTab() {
                   </span>
                   <span className={`text-lg font-mono font-bold ${colors.text}`}>{tier.range}</span>
                 </div>
-                <span className="text-[10px] text-zinc-400 uppercase tracking-wider max-w-[200px] text-right">
+                <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider max-w-[200px] text-right">
                   {tier.prevalence}
                 </span>
               </div>
               <p className="text-sm text-zinc-400 mb-2">{tier.description}</p>
-              <p className="text-xs text-zinc-400 italic">{tier.archetype}</p>
+              <p className="text-sm text-zinc-400 italic">{tier.archetype}</p>
             </div>
           );
         })}
@@ -349,7 +349,7 @@ function PortalRevenueTab() {
       {portalSection && (
         <div className="bg-[#111113] shadow-[0_1px_2px_rgba(0,0,0,0.3)] border border-blue-500/30 rounded-xl p-6">
           <h2 className="text-lg font-semibold text-blue-400 mb-1">{portalSection.title}</h2>
-          <p className="text-xs italic text-blue-400/60 mb-4">{portalSection.subtitle}</p>
+          <p className="text-sm italic text-blue-400/60 mb-4">{portalSection.subtitle}</p>
           <p className="text-sm text-zinc-400 leading-relaxed whitespace-pre-line">{portalSection.content}</p>
         </div>
       )}
@@ -357,7 +357,7 @@ function PortalRevenueTab() {
       {revenueSection && (
         <div className="bg-[#111113] shadow-[0_1px_2px_rgba(0,0,0,0.3)] border border-emerald-500/30 rounded-xl p-6">
           <h2 className="text-lg font-semibold text-emerald-400 mb-1">{revenueSection.title}</h2>
-          <p className="text-xs italic text-emerald-400/60 mb-4">{revenueSection.subtitle}</p>
+          <p className="text-sm italic text-emerald-400/60 mb-4">{revenueSection.subtitle}</p>
           <p className="text-sm text-zinc-400 leading-relaxed whitespace-pre-line">{revenueSection.content}</p>
         </div>
       )}
@@ -366,7 +366,7 @@ function PortalRevenueTab() {
       <div className="bg-[#111113] shadow-[0_1px_2px_rgba(0,0,0,0.3)] border border-amber-500/30 rounded-xl p-6">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-lg font-semibold text-amber-400">The P.A.I. Formula</h2>
-          <span className="text-xs text-zinc-400 italic">
+          <span className="text-sm text-zinc-400 italic">
             from {NIL_FOUNDATION.book.title}
           </span>
         </div>
@@ -376,7 +376,7 @@ function PortalRevenueTab() {
           <p className="text-lg font-mono font-bold text-amber-400 tracking-wider">
             P.A.I. = Performance + Athleticism + Intangibles
           </p>
-          <p className="text-xs text-zinc-400 mt-2">Composite Score (0-100+) &middot; Proprietary weighting</p>
+          <p className="text-sm text-zinc-400 mt-2">Composite Score (0-100+) &middot; Proprietary weighting</p>
         </div>
 
         <p className="text-sm text-zinc-400 leading-relaxed mb-5">
@@ -395,15 +395,15 @@ function PortalRevenueTab() {
                   </span>
                   <div>
                     <h3 className={`text-sm font-semibold ${colors.text}`}>{comp.name}</h3>
-                    <p className="text-[10px] text-zinc-400 font-mono">Weighted component</p>
+                    <p className="text-xs font-medium text-zinc-400 font-mono">Weighted component</p>
                   </div>
                 </div>
-                <p className="text-xs text-zinc-400 mb-2">{comp.description}</p>
+                <p className="text-sm text-zinc-400 mb-2">{comp.description}</p>
                 <div className="border-t border-white/10 pt-2 mt-2">
-                  <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-0.5">Source Agent</p>
-                  <p className="text-xs text-zinc-300 font-medium">{comp.sourceAgent}</p>
-                  <p className="text-[10px] text-zinc-400 uppercase tracking-wider mt-1.5 mb-0.5">Data Source</p>
-                  <p className="text-xs text-zinc-300">{comp.dataSource}</p>
+                  <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-0.5">Source Agent</p>
+                  <p className="text-sm text-zinc-300 font-semibold">{comp.sourceAgent}</p>
+                  <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mt-1.5 mb-0.5">Data Source</p>
+                  <p className="text-sm text-zinc-300">{comp.dataSource}</p>
                 </div>
               </div>
             );
@@ -418,7 +418,7 @@ function PortalRevenueTab() {
             return (
               <div key={tier.label} className={`p-2 rounded-lg border ${colors.border} ${colors.bg} text-center`}>
                 <p className={`text-sm font-bold font-mono ${colors.text}`}>{tier.label}</p>
-                <p className="text-[10px] text-zinc-400">{tier.scoreRange}</p>
+                <p className="text-xs font-medium text-zinc-400">{tier.scoreRange}</p>
                 <p className="text-[9px] text-zinc-400 mt-0.5">{tier.grade}</p>
               </div>
             );
@@ -456,11 +456,11 @@ function TimelineTab() {
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-sm font-mono font-bold text-amber-400">{event.year}</span>
                   {event.month && (
-                    <span className="text-xs text-zinc-400">{event.month}</span>
+                    <span className="text-sm text-zinc-400">{event.month}</span>
                   )}
                 </div>
                 <h3 className="text-sm font-semibold text-zinc-100 mb-1">{event.event}</h3>
-                <p className="text-xs text-zinc-400">{event.significance}</p>
+                <p className="text-sm text-zinc-400">{event.significance}</p>
               </div>
             </div>
           ))}

@@ -18,10 +18,10 @@ export default function TokenMeter() {
   return (
     <div className="bg-slate-100/60 backdrop-blur-md border border-slate-200 rounded-xl px-6 py-3 min-w-[400px]">
       <div className="flex items-center justify-between mb-2">
-        <div className="text-[10px] text-slate-400 uppercase tracking-widest">
+        <div className="text-xs text-slate-400 uppercase tracking-widest">
           Orchestration Pipeline
         </div>
-        <div className="text-[10px] text-slate-400">
+        <div className="text-xs text-slate-400">
           {events.length} events processed
         </div>
       </div>

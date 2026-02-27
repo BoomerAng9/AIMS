@@ -31,7 +31,7 @@ const TX_STYLES: Record<string, { icon: typeof ArrowUpRight; color: string; bg: 
   ENTRY_FEE: { icon: ArrowUpRight, color: 'text-red-400', bg: 'bg-red-400/10', prefix: '' },
   WINNINGS: { icon: ArrowDownLeft, color: 'text-gold', bg: 'bg-gold/10', prefix: '+' },
   REFUND: { icon: ArrowDownLeft, color: 'text-blue-400', bg: 'bg-blue-400/10', prefix: '+' },
-  BONUS: { icon: ArrowDownLeft, color: 'text-purple-400', bg: 'bg-purple-400/10', prefix: '+' },
+  BONUS: { icon: ArrowDownLeft, color: 'text-amber-400', bg: 'bg-amber-400/10', prefix: '+' },
 };
 
 const DEPOSIT_AMOUNTS = [10, 25, 50, 100];

@@ -56,7 +56,7 @@ interface HawkRecord {
 const DOMAINS: Array<{ id: HawkDomain; name: string; icon: string; color: string; examples: string[] }> = [
   { id: 'trading', name: 'Trading & Finance', icon: '$', color: 'text-green-400 bg-green-500/10 border-green-500/20', examples: ['Portfolio tracker', 'Alert bot', 'News scanner'] },
   { id: 'research', name: 'Research', icon: 'R', color: 'text-blue-400 bg-blue-500/10 border-blue-500/20', examples: ['Competitor intel', 'Market analysis', 'Patent search'] },
-  { id: 'content', name: 'Content & Writing', icon: 'W', color: 'text-purple-400 bg-purple-500/10 border-purple-500/20', examples: ['Blog writer', 'Newsletter curator', 'SEO copy'] },
+  { id: 'content', name: 'Content & Writing', icon: 'W', color: 'text-amber-400 bg-amber-500/10 border-amber-500/20', examples: ['Blog writer', 'Newsletter curator', 'SEO copy'] },
   { id: 'code', name: 'Code & Engineering', icon: '< >', color: 'text-orange-400 bg-orange-500/10 border-orange-500/20', examples: ['Code reviewer', 'Bug finder', 'API tester'] },
   { id: 'automation', name: 'Automation', icon: 'A', color: 'text-cyan-400 bg-cyan-500/10 border-cyan-500/20', examples: ['Email sorter', 'Data sync', 'Report gen'] },
   { id: 'education', name: 'Education', icon: 'E', color: 'text-yellow-400 bg-yellow-500/10 border-yellow-500/20', examples: ['Essay grader', 'Quiz maker', 'Tutor bot'] },
@@ -111,16 +111,16 @@ function HawkCard({ hawk, onActivate, onPause, onDelete }: {
           </div>
           <div>
             <h3 className="text-sm font-medium text-zinc-200">{hawk.hawkName}</h3>
-            <p className="text-[10px] text-zinc-500">{hawk.spec.purpose}</p>
+            <p className="text-xs text-zinc-500">{hawk.spec.purpose}</p>
           </div>
         </div>
-        <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${statusColor}`}>
+        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${statusColor}`}>
           {hawk.status.toUpperCase()}
         </span>
       </div>
 
       {/* Stats */}
-      <div className="flex items-center gap-4 mb-3 text-[10px] text-zinc-500 font-mono">
+      <div className="flex items-center gap-4 mb-3 text-xs text-zinc-500 font-mono">
         <span>{hawk.stats.totalRuns} runs</span>
         <span className="text-green-400/60">{hawk.stats.successfulRuns} ok</span>
         {hawk.stats.failedRuns > 0 && <span className="text-red-400/60">{hawk.stats.failedRuns} fail</span>}
@@ -130,31 +130,31 @@ function HawkCard({ hawk, onActivate, onPause, onDelete }: {
       {/* Tools badges */}
       <div className="flex flex-wrap gap-1 mb-3">
         {hawk.spec.tools.slice(0, 5).map(t => (
-          <span key={t} className="text-[10px] px-1.5 py-0.5 rounded bg-[#18181B] text-zinc-500">
+          <span key={t} className="text-xs px-1.5 py-0.5 rounded bg-[#18181B] text-zinc-500">
             {AVAILABLE_TOOLS.find(at => at.id === t)?.name || t}
           </span>
         ))}
         {hawk.spec.tools.length > 5 && (
-          <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#18181B] text-zinc-600">+{hawk.spec.tools.length - 5}</span>
+          <span className="text-xs px-1.5 py-0.5 rounded bg-[#18181B] text-zinc-600">+{hawk.spec.tools.length - 5}</span>
         )}
       </div>
 
       {/* Actions */}
       <div className="flex items-center gap-2 pt-2 border-t border-white/8">
         {hawk.status !== 'active' && (
-          <button onClick={onActivate} className="text-[10px] px-3 py-1 rounded-lg bg-green-500/10 text-green-400 hover:bg-green-500/20 transition-colors">
+          <button onClick={onActivate} className="text-xs px-3 py-1 rounded-lg bg-green-500/10 text-green-400 hover:bg-green-500/20 transition-colors">
             Activate
           </button>
         )}
         {hawk.status === 'active' && (
-          <button onClick={onPause} className="text-[10px] px-3 py-1 rounded-lg bg-yellow-500/10 text-yellow-400 hover:bg-yellow-500/20 transition-colors">
+          <button onClick={onPause} className="text-xs px-3 py-1 rounded-lg bg-yellow-500/10 text-yellow-400 hover:bg-yellow-500/20 transition-colors">
             Pause
           </button>
         )}
-        <button onClick={onDelete} className="text-[10px] px-3 py-1 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors ml-auto">
+        <button onClick={onDelete} className="text-xs px-3 py-1 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors ml-auto">
           Delete
         </button>
-        <span className="text-[10px] text-zinc-600">{hawk.supervisorAng}</span>
+        <span className="text-xs text-zinc-600">{hawk.supervisorAng}</span>
       </div>
     </motion.div>
   );
@@ -238,7 +238,7 @@ function HawkCreator({ onCreated, onCancel }: { onCreated: () => void; onCancel:
                   >
                     <span className="text-lg font-bold">{d.icon}</span>
                     <p className="text-xs font-medium text-zinc-400 mt-1">{d.name}</p>
-                    <p className="text-[10px] text-zinc-600 mt-0.5">{d.examples.join(', ')}</p>
+                    <p className="text-xs text-zinc-600 mt-0.5">{d.examples.join(', ')}</p>
                   </button>
                 ))}
               </div>
@@ -249,7 +249,7 @@ function HawkCreator({ onCreated, onCancel }: { onCreated: () => void; onCancel:
           {step === 1 && (
             <motion.div key="name" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
               <div>
-                <label className="text-[10px] text-zinc-500 uppercase tracking-wider font-medium">Hawk Name</label>
+                <label className="text-xs text-zinc-500 uppercase tracking-wider font-medium">Hawk Name</label>
                 <div className="flex items-center gap-2 mt-1">
                   <span className="text-sm text-zinc-500 font-mono">Lil_</span>
                   <input
@@ -263,12 +263,12 @@ function HawkCreator({ onCreated, onCancel }: { onCreated: () => void; onCancel:
                   <span className="text-sm text-zinc-500 font-mono">_Hawk</span>
                 </div>
                 {hawkName && (
-                  <p className="text-[10px] text-gold/50 mt-1 font-mono">{hawkName}</p>
+                  <p className="text-xs text-gold/50 mt-1 font-mono">{hawkName}</p>
                 )}
               </div>
 
               <div>
-                <label className="text-[10px] text-zinc-500 uppercase tracking-wider font-medium">Purpose</label>
+                <label className="text-xs text-zinc-500 uppercase tracking-wider font-medium">Purpose</label>
                 <textarea
                   value={purpose}
                   onChange={(e) => setPurpose(e.target.value)}
@@ -306,7 +306,7 @@ function HawkCreator({ onCreated, onCancel }: { onCreated: () => void; onCancel:
                     `}
                   >
                     <p className="text-xs font-medium text-zinc-400">{tool.name}</p>
-                    <p className="text-[10px] text-zinc-600 mt-0.5">{tool.description}</p>
+                    <p className="text-xs text-zinc-600 mt-0.5">{tool.description}</p>
                   </button>
                 ))}
               </div>
@@ -324,7 +324,7 @@ function HawkCreator({ onCreated, onCancel }: { onCreated: () => void; onCancel:
           {step === 3 && (
             <motion.div key="config" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
               <div>
-                <label className="text-[10px] text-zinc-500 uppercase tracking-wider font-medium">Autonomy Level</label>
+                <label className="text-xs text-zinc-500 uppercase tracking-wider font-medium">Autonomy Level</label>
                 <div className="flex gap-2 mt-1">
                   {([
                     { id: 'manual' as const, label: 'Manual', desc: 'Approve each action' },
@@ -339,14 +339,14 @@ function HawkCreator({ onCreated, onCancel }: { onCreated: () => void; onCancel:
                       `}
                     >
                       <p className="text-xs font-medium text-zinc-400">{a.label}</p>
-                      <p className="text-[10px] text-zinc-600">{a.desc}</p>
+                      <p className="text-xs text-zinc-600">{a.desc}</p>
                     </button>
                   ))}
                 </div>
               </div>
 
               <div>
-                <label className="text-[10px] text-zinc-500 uppercase tracking-wider font-medium">
+                <label className="text-xs text-zinc-500 uppercase tracking-wider font-medium">
                   Budget Cap: ${budget}/run
                 </label>
                 <input
@@ -357,7 +357,7 @@ function HawkCreator({ onCreated, onCancel }: { onCreated: () => void; onCancel:
                   onChange={(e) => setBudget(Number(e.target.value))}
                   className="w-full mt-1"
                 />
-                <div className="flex justify-between text-[10px] text-zinc-600">
+                <div className="flex justify-between text-xs text-zinc-600">
                   <span>$1</span>
                   <span>$50</span>
                 </div>

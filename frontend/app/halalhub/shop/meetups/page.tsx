@@ -76,7 +76,7 @@ export default function MeetupsPage() {
                     <div className="w-12 h-12 rounded-full border-2 border-[#D4AF37] flex items-center justify-center bg-[#111111] z-10 shadow-[0_0_15px_rgba(212,175,55,0.4)]">
                         <MapPin className="text-[#D4AF37]" size={20} />
                     </div>
-                    <div className="absolute text-[10px] font-mono text-[rgba(255,255,255,0.3)] bottom-4 right-4">
+                    <div className="absolute text-xs font-mono text-[rgba(255,255,255,0.3)] bottom-4 right-4">
                         Google 3D Maps Embed Localized
                     </div>
                 </div>

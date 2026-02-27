@@ -324,7 +324,7 @@ function IIAgentControl() {
                       : "bg-red-400 shadow-[0_0_8px_rgba(248,113,113,0.5)]"
                   }`}
                 />
-                <span className="text-[10px] font-mono text-zinc-500 uppercase">
+                <span className="text-xs font-mono text-zinc-500 uppercase">
                   {isConnected ? "Connected" : "Offline"}
                 </span>
               </div>
@@ -336,7 +336,7 @@ function IIAgentControl() {
       {/* Gateway Security Badge */}
       <div className="flex items-center gap-2 px-1">
         <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" />
-        <span className="text-[10px] text-zinc-500 uppercase tracking-wider font-mono">
+        <span className="text-xs text-zinc-500 uppercase tracking-wider font-mono">
           A.I.M.S. Gateway System — OWNER access verified — All executions audit-logged
         </span>
       </div>
@@ -363,7 +363,7 @@ function IIAgentControl() {
             </button>
           ))}
         </div>
-        <p className="mt-2 text-[10px] text-zinc-600">{selectedType.description}</p>
+        <p className="mt-2 text-xs text-zinc-600">{selectedType.description}</p>
       </section>
 
       {/* Input + Execute */}
@@ -382,14 +382,14 @@ function IIAgentControl() {
             className="w-full rounded-2xl border border-wireframe-stroke bg-[#1F1F23]/80 px-4 py-3 text-sm text-zinc-200 placeholder:text-zinc-600 focus:border-amber-500/50 focus:outline-none focus:ring-1 focus:ring-amber-500/20 disabled:opacity-50 resize-none"
           />
           <div className="mt-3 flex items-center justify-between">
-            <span className="text-[10px] text-zinc-600 font-mono">
+            <span className="text-xs text-zinc-600 font-mono">
               {running ? "Task executing..." : "Cmd+Enter to execute"}
             </span>
             <div className="flex items-center gap-2">
               {running && (
                 <button
                   onClick={cancelTask}
-                  className="flex items-center gap-1.5 rounded-full border border-red-500/30 bg-red-500/10 px-3 py-1.5 text-[10px] font-semibold text-red-400 hover:bg-red-500/20 transition-colors"
+                  className="flex items-center gap-1.5 rounded-full border border-red-500/30 bg-red-500/10 px-3 py-1.5 text-xs font-semibold text-red-400 hover:bg-red-500/20 transition-colors"
                 >
                   <XCircle className="h-3 w-3" />
                   Cancel
@@ -424,7 +424,7 @@ function IIAgentControl() {
           {running && (
             <div className="flex items-center gap-1.5">
               <CircleDot className="h-3 w-3 text-amber-400 animate-pulse" />
-              <span className="text-[10px] text-amber-400 font-mono uppercase">
+              <span className="text-xs text-amber-400 font-mono uppercase">
                 Streaming
               </span>
             </div>
@@ -469,7 +469,7 @@ function IIAgentControl() {
                     <p className="text-xs text-zinc-300 truncate max-w-[400px]">
                       {h.prompt}
                     </p>
-                    <p className="text-[10px] text-zinc-600 font-mono mt-0.5">
+                    <p className="text-xs text-zinc-600 font-mono mt-0.5">
                       {new Date(h.startedAt).toLocaleTimeString()}
                     </p>
                   </div>

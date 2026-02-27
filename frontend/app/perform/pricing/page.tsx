@@ -14,6 +14,13 @@ import {
 } from "@/lib/perform/subscription-models";
 import { Mic, Building2, Film, Crown, Check, X, ChevronDown, ChevronUp } from "lucide-react";
 
+const MODEL_ICONS: Record<string, React.ReactNode> = {
+  Mic: <Mic className="h-5 w-5" />,
+  Building2: <Building2 className="h-5 w-5" />,
+  Film: <Film className="h-5 w-5" />,
+  Crown: <Crown className="h-5 w-5" />,
+};
+
 const COLOR_MAP: Record<string, { border: string; bg: string; text: string; badge: string }> = {
   emerald: {
     border: "border-emerald-200",
@@ -118,7 +125,7 @@ export default function PerFormPricingPage() {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10">
           {/* Commitment Toggle */}
           <div className="text-center">
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-3">Commitment Term</p>
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 mb-3">Commitment Term</p>
             <div className="inline-flex rounded-sm border border-slate-200 bg-white p-1 shadow-sm">
               {commitmentOptions.map((opt) => (
                 <button
@@ -134,13 +141,13 @@ export default function PerFormPricingPage() {
               ))}
             </div>
             {selectedTerm === "9mo" && (
-              <p className="mt-3 text-[10px] font-black text-emerald-700 uppercase tracking-widest animate-pulse">Annual Cycle: 3 Months Complimentary</p>
+              <p className="mt-3 text-xs font-black text-emerald-700 uppercase tracking-widest animate-pulse">Annual Cycle: 3 Months Complimentary</p>
             )}
           </div>
 
           {/* Token Tier Toggle */}
           <div className="text-center">
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-3">Orchestration Level</p>
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 mb-3">Orchestration Level</p>
             <div className="inline-flex rounded-sm border border-slate-200 bg-white p-1 shadow-sm">
               {TOKEN_TIERS.map((tier) => (
                 <button
@@ -155,7 +162,7 @@ export default function PerFormPricingPage() {
                 </button>
               ))}
             </div>
-            <p className="mt-3 text-[10px] font-black text-slate-500 uppercase tracking-widest">
+            <p className="mt-3 text-xs font-black text-slate-500 uppercase tracking-widest">
               {formatTokens(currentTokenTier.tokensPerMonth)} Tokens &middot; ${currentTokenTier.monthlyAddon.toFixed(0)} Addon
             </p>
           </div>
@@ -214,7 +221,7 @@ export default function PerFormPricingPage() {
                         </span>
                       </div>
                       {price.tokenAddon > 0 && (
-                        <p className={`text-[10px] font-black uppercase tracking-widest mt-2 ${isAllInOne ? "text-white/40" : "text-slate-400"}`}>
+                        <p className={`text-xs font-black uppercase tracking-widest mt-2 ${isAllInOne ? "text-white/40" : "text-slate-400"}`}>
                           Incl. {currentTokenTier.name} usage
                         </p>
                       )}
@@ -307,13 +314,13 @@ export default function PerFormPricingPage() {
           <table className="w-full min-w-[800px]">
             <thead>
               <tr className="border-b border-slate-200 bg-slate-50">
-                <th className="p-6 text-left text-[10px] font-black uppercase tracking-widest text-slate-400 w-2/5">
+                <th className="p-6 text-left text-xs font-black uppercase tracking-widest text-slate-400 w-2/5">
                   Orchestration Capability
                 </th>
-                <th className="p-6 text-center text-[10px] font-black uppercase tracking-widest text-emerald-800">Creator</th>
-                <th className="p-6 text-center text-[10px] font-black uppercase tracking-widest text-blue-800">Partner</th>
-                <th className="p-6 text-center text-[10px] font-black uppercase tracking-widest text-amber-800">Families</th>
-                <th className="p-6 text-center text-[10px] font-black uppercase tracking-widest text-emerald-950">All-In-One</th>
+                <th className="p-6 text-center text-xs font-black uppercase tracking-widest text-emerald-800">Creator</th>
+                <th className="p-6 text-center text-xs font-black uppercase tracking-widest text-blue-800">Partner</th>
+                <th className="p-6 text-center text-xs font-black uppercase tracking-widest text-amber-800">Families</th>
+                <th className="p-6 text-center text-xs font-black uppercase tracking-widest text-emerald-950">All-In-One</th>
               </tr>
             </thead>
             <tbody>
@@ -365,7 +372,6 @@ export default function PerFormPricingPage() {
           <div className="h-px flex-1 bg-gradient-to-r from-gold/20 to-transparent" />
           <h2
             className="text-xl md:text-2xl uppercase tracking-wider text-amber-400 font-display text-center"
-            style={{ fontFamily: markerFont }}
           >
             Usage Levels
           </h2>
@@ -435,7 +441,6 @@ export default function PerFormPricingPage() {
           <div className="h-px flex-1 bg-gradient-to-r from-gold/20 to-transparent" />
           <h2
             className="text-xl md:text-2xl uppercase tracking-wider text-amber-400 font-display text-center"
-            style={{ fontFamily: markerFont }}
           >
             What Your Subscription Covers
           </h2>
@@ -459,7 +464,7 @@ export default function PerFormPricingPage() {
 
       {/* ──────────────────────── Philosophy ──────────────────────── */}
       <section className="mb-24 text-center px-10 py-16 bg-slate-950 rounded-sm">
-        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-emerald-500 mb-8">
+        <p className="text-xs font-black uppercase tracking-[0.4em] text-emerald-500 mb-8">
           The Intelligence Standard
         </p>
         <p className="text-2xl md:text-4xl font-serif font-bold text-white max-w-4xl mx-auto leading-tight mb-8">

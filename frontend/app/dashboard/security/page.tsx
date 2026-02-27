@@ -193,7 +193,7 @@ export default function SecurityCenterPage() {
                 <h1 className="text-2xl font-bold text-zinc-100 font-display">
                   Security Center
                 </h1>
-                <p className="text-[10px] uppercase tracking-[0.3em] text-gold/50">
+                <p className="text-xs uppercase tracking-[0.3em] text-gold/50">
                   Quality_Ang &middot; ORACLE Gate Verification
                 </p>
               </div>
@@ -205,7 +205,7 @@ export default function SecurityCenterPage() {
             </p>
           </div>
           <div className="hidden md:flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-400/10 border border-emerald-400/20 px-3 py-1 text-[10px] font-semibold text-emerald-400 uppercase tracking-wider">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-400/10 border border-emerald-400/20 px-3 py-1 text-xs font-semibold text-emerald-400 uppercase tracking-wider">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
               All Gates Passed
             </span>
@@ -239,11 +239,11 @@ export default function SecurityCenterPage() {
                 {card.status}
               </span>
             </div>
-            <p className="text-[10px] uppercase tracking-widest text-zinc-500">
+            <p className="text-xs uppercase tracking-widest text-zinc-500">
               {card.label}
             </p>
             <p className="text-2xl font-bold text-zinc-100 mt-1">{card.value}</p>
-            <p className="text-[10px] text-zinc-600 mt-1">{card.detail}</p>
+            <p className="text-xs text-zinc-600 mt-1">{card.detail}</p>
           </div>
         ))}
       </div>
@@ -263,16 +263,16 @@ export default function SecurityCenterPage() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-wireframe-stroke">
-                <th className="p-3 text-left text-[10px] uppercase tracking-widest text-zinc-500">
+                <th className="p-3 text-left text-xs uppercase tracking-widest text-zinc-500">
                   Pattern
                 </th>
-                <th className="p-3 text-left text-[10px] uppercase tracking-widest text-zinc-500">
+                <th className="p-3 text-left text-xs uppercase tracking-widest text-zinc-500">
                   Severity
                 </th>
-                <th className="p-3 text-left text-[10px] uppercase tracking-widest text-zinc-500">
+                <th className="p-3 text-left text-xs uppercase tracking-widest text-zinc-500">
                   Scope
                 </th>
-                <th className="p-3 text-center text-[10px] uppercase tracking-widest text-zinc-500">
+                <th className="p-3 text-center text-xs uppercase tracking-widest text-zinc-500">
                   Status
                 </th>
               </tr>
@@ -296,7 +296,7 @@ export default function SecurityCenterPage() {
                     </span>
                   </td>
                   <td className="p-3">
-                    <code className="rounded bg-[#18181B]/70 border border-wireframe-stroke px-2 py-0.5 text-[10px] font-mono text-gold">
+                    <code className="rounded bg-[#18181B]/70 border border-wireframe-stroke px-2 py-0.5 text-xs font-mono text-gold">
                       {finding.file}
                     </code>
                   </td>
@@ -312,7 +312,7 @@ export default function SecurityCenterPage() {
           </table>
         </div>
         <div className="mt-4 rounded-2xl border border-dashed border-emerald-400/10 bg-emerald-400/[0.02] p-4">
-          <p className="text-[10px] text-emerald-400/60 flex items-center gap-2">
+          <p className="text-xs text-emerald-400/60 flex items-center gap-2">
             <ShieldCheck size={12} />
             All 10 SAST patterns scanned — 0 findings. Score: 98/100 (2 pts deducted for
             informational complexity warnings).
@@ -341,7 +341,7 @@ export default function SecurityCenterPage() {
               key={level}
               className="rounded-2xl border border-wireframe-stroke bg-[#1F1F23]/60 p-4 text-center"
             >
-              <p className="text-[10px] uppercase tracking-widest text-zinc-500">
+              <p className="text-xs uppercase tracking-widest text-zinc-500">
                 {level}
               </p>
               <p
@@ -365,7 +365,7 @@ export default function SecurityCenterPage() {
 
         {/* Moderate Vulnerabilities */}
         <div className="mb-4">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-yellow-400/80 mb-3">
+          <p className="text-xs font-bold uppercase tracking-widest text-yellow-400/80 mb-3">
             Moderate ({DEPENDENCY_AUDIT.moderateDetails.length})
           </p>
           <div className="space-y-2">
@@ -388,8 +388,8 @@ export default function SecurityCenterPage() {
                     moderate
                   </span>
                 </div>
-                <p className="text-[11px] text-zinc-500 mt-2">{vuln.advisory}</p>
-                <p className="text-[10px] text-emerald-400/70 mt-1">
+                <p className="text-sm text-zinc-500 mt-2">{vuln.advisory}</p>
+                <p className="text-xs text-emerald-400/70 mt-1">
                   Fix: {vuln.fix}
                 </p>
               </div>
@@ -399,7 +399,7 @@ export default function SecurityCenterPage() {
 
         {/* High Vulnerabilities */}
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-orange-400/80 mb-3">
+          <p className="text-xs font-bold uppercase tracking-widest text-orange-400/80 mb-3">
             High ({DEPENDENCY_AUDIT.highDetails.length})
           </p>
           <div className="space-y-2">
@@ -422,8 +422,8 @@ export default function SecurityCenterPage() {
                     high
                   </span>
                 </div>
-                <p className="text-[11px] text-zinc-500 mt-2">{vuln.advisory}</p>
-                <p className="text-[10px] text-emerald-400/70 mt-1">
+                <p className="text-sm text-zinc-500 mt-2">{vuln.advisory}</p>
+                <p className="text-xs text-emerald-400/70 mt-1">
                   Fix: {vuln.fix}
                 </p>
               </div>
@@ -477,7 +477,7 @@ export default function SecurityCenterPage() {
                 className="flex items-center justify-between rounded-2xl border border-wireframe-stroke bg-[#1F1F23]/60 p-4"
               >
                 <div>
-                  <p className="text-[10px] uppercase tracking-widest text-zinc-500">
+                  <p className="text-xs uppercase tracking-widest text-zinc-500">
                     {item.label}
                   </p>
                   <p className="text-xs font-semibold text-zinc-100 mt-0.5">
@@ -500,7 +500,7 @@ export default function SecurityCenterPage() {
               </div>
             ))}
           </div>
-          <div className="mt-4 flex items-center gap-2 text-[10px] text-zinc-600">
+          <div className="mt-4 flex items-center gap-2 text-xs text-zinc-600">
             <Clock size={10} className="text-gold" />
             Last audit: {formatTimestamp(SUPPLY_CHAIN.lastAudit)}
           </div>
@@ -558,7 +558,7 @@ export default function SecurityCenterPage() {
                   <item.icon size={14} />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-[10px] uppercase tracking-widest text-zinc-500">
+                  <p className="text-xs uppercase tracking-widest text-zinc-500">
                     {item.label}
                   </p>
                   <p className="text-xs font-semibold text-zinc-100 mt-0.5 truncate">
@@ -571,7 +571,7 @@ export default function SecurityCenterPage() {
 
           {/* Resource Limits */}
           <div className="mt-4">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-gold mb-3">
+            <p className="text-xs font-bold uppercase tracking-widest text-gold mb-3">
               Resource Limits
             </p>
             <div className="grid grid-cols-2 gap-2">
@@ -606,7 +606,7 @@ export default function SecurityCenterPage() {
 
       {/* ── Footer Note ────────────────────────────────────────────── */}
       <section className="rounded-2xl border border-dashed border-gold/20 bg-gold/[0.02] p-4">
-        <p className="text-[10px] text-zinc-500 leading-relaxed">
+        <p className="text-xs text-zinc-500 leading-relaxed">
           Security posture is continuously verified by{" "}
           <span className="text-gold font-semibold">Quality_Ang</span> through
           the ORACLE methodology (7-gate verification). SAST scans run on every CI push

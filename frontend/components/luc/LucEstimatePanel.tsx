@@ -11,11 +11,11 @@ export function LucEstimatePanel({ estimate }: Props) {
     <div className="space-y-6">
       <div className="flex items-end justify-between border-b border-wireframe-stroke pb-4">
         <div>
-          <p className="text-[10px] uppercase tracking-widest text-slate-400 font-display">Estimated Workflow Cost</p>
+          <p className="text-xs uppercase tracking-widest text-slate-400 font-display">Estimated Workflow Cost</p>
           <h2 className="text-3xl font-bold text-slate-800 font-display">${estimate.totalUsd.toFixed(2)}</h2>
         </div>
         <div className="text-right">
-          <p className="text-[10px] uppercase tracking-widest text-slate-400 font-display">Total Tokens</p>
+          <p className="text-xs uppercase tracking-widest text-slate-400 font-display">Total Tokens</p>
           <p className="text-sm font-mono text-gold">{(estimate.totalTokens / 1000).toFixed(0)}k</p>
         </div>
       </div>
@@ -33,15 +33,15 @@ export function LucEstimatePanel({ estimate }: Props) {
       </div>
 
       <div className="rounded-2xl border border-gold/10 bg-gold/5 p-4">
-        <h4 className="text-[10px] font-bold uppercase tracking-widest text-gold mb-3">Orchestrator Selection</h4>
+        <h4 className="text-xs font-bold uppercase tracking-widest text-gold mb-3">Orchestrator Selection</h4>
         <div className="grid gap-2">
           {estimate.modelOptions.map((opt) => (
             <button key={opt.name} className="flex flex-col rounded-xl border border-wireframe-stroke bg-slate-100/60 p-3 text-left transition-all hover:border-gold/30 group">
               <div className="flex justify-between items-center">
                 <span className="text-xs font-semibold text-slate-800 group-hover:text-gold">{opt.name}</span>
-                <span className="text-[10px] text-slate-400">x{opt.costMultiplier} cost</span>
+                <span className="text-xs text-slate-400">x{opt.costMultiplier} cost</span>
               </div>
-              <p className="text-[10px] text-slate-400 mt-1">{opt.description}</p>
+              <p className="text-xs text-slate-400 mt-1">{opt.description}</p>
             </button>
           ))}
         </div>

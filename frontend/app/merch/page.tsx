@@ -51,7 +51,7 @@ export default function MerchPage() {
             >
               <div className="text-3xl mb-2">{cat.icon}</div>
               <h3 className="text-sm font-bold text-slate-800 mb-1">{cat.label}</h3>
-              <p className="text-[10px] text-slate-400">{cat.description}</p>
+              <p className="text-xs text-slate-400">{cat.description}</p>
             </div>
           ))}
         </div>
@@ -89,7 +89,7 @@ export default function MerchPage() {
 
               <div className="flex items-center justify-between">
                 <span className="text-sm font-bold text-gold font-mono">{item.price}</span>
-                <span className="px-2.5 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-amber-500/10 text-amber-400 border border-amber-500/30">
+                <span className="px-2.5 py-0.5 rounded-lg text-xs font-bold uppercase tracking-wider bg-amber-500/10 text-amber-400 border border-amber-500/30">
                   Coming Soon
                 </span>
               </div>

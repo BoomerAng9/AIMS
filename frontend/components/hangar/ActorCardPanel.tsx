@@ -40,7 +40,7 @@ export default function ActorCardPanel() {
         <div className="text-xs text-[#C6A74E] uppercase tracking-widest font-medium">
           Actors
         </div>
-        <div className="text-[10px] text-slate-400 mt-0.5">
+        <div className="text-xs text-slate-400 mt-0.5">
           {actors.length} active
         </div>
       </div>
@@ -75,7 +75,7 @@ export default function ActorCardPanel() {
                 <motion.div
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: 'auto', opacity: 1 }}
-                  className="mt-2 text-[10px] text-slate-400 space-y-0.5"
+                  className="mt-2 text-xs text-slate-400 space-y-0.5"
                 >
                   <div>Type: {actor.type}</div>
                   <div>ID: {actor.id}</div>

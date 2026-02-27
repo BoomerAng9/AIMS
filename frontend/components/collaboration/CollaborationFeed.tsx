@@ -110,7 +110,7 @@ function FeedEntryRow({ entry, isLast }: { entry: FeedEntry; isLast: boolean }) 
     >
       {/* Avatar Badge */}
       <div className={`flex-shrink-0 w-8 h-8 rounded-md ${config.bg} flex items-center justify-center`}>
-        <span className={`text-[10px] font-bold ${config.color}`}>{config.icon}</span>
+        <span className={`text-xs font-bold ${config.color}`}>{config.icon}</span>
       </div>
 
       {/* Content */}
@@ -121,12 +121,12 @@ function FeedEntryRow({ entry, isLast }: { entry: FeedEntry; isLast: boolean }) 
             {entry.speaker.displayName}
           </span>
           {entry.speaker.kunya && (
-            <span className="text-[10px] text-slate-300 italic">{entry.speaker.kunya}</span>
+            <span className="text-xs text-slate-300 italic">{entry.speaker.kunya}</span>
           )}
-          <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-50 text-slate-400 font-mono">
+          <span className="text-xs px-1.5 py-0.5 rounded bg-slate-50 text-slate-400 font-mono">
             {typeIcon}
           </span>
-          <span className="text-[10px] text-slate-300 ml-auto font-mono">
+          <span className="text-xs text-slate-300 ml-auto font-mono">
             {new Date(entry.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
           </span>
         </div>
@@ -141,17 +141,17 @@ function FeedEntryRow({ entry, isLast }: { entry: FeedEntry; isLast: boolean }) 
         {entry.metadata && (
           <div className="flex flex-wrap gap-1 mt-1">
             {entry.metadata.passed !== undefined && (
-              <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono ${entry.metadata.passed ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
+              <span className={`text-xs px-1.5 py-0.5 rounded font-mono ${entry.metadata.passed ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
                 {entry.metadata.passed ? 'PASS' : 'FAIL'}
               </span>
             )}
             {entry.metadata.confidence !== undefined && (
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-50 text-slate-400 font-mono">
+              <span className="text-xs px-1.5 py-0.5 rounded bg-slate-50 text-slate-400 font-mono">
                 {Math.round((entry.metadata.confidence as number) * 100)}%
               </span>
             )}
             {entry.metadata.durationMs !== undefined && (
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-50 text-slate-400 font-mono">
+              <span className="text-xs px-1.5 py-0.5 rounded bg-slate-50 text-slate-400 font-mono">
                 {String(entry.metadata.durationMs)}ms
               </span>
             )}
@@ -173,7 +173,7 @@ function FeedEntryRow({ entry, isLast }: { entry: FeedEntry; isLast: boolean }) 
 
 function StatsBar({ stats, status }: { stats: CollaborationSession['stats']; status: string }) {
   return (
-    <div className="flex items-center gap-4 px-4 py-2 border-b border-slate-100 text-[11px] font-mono text-slate-400">
+    <div className="flex items-center gap-4 px-4 py-2 border-b border-slate-100 text-sm font-mono text-slate-400">
       <span className={`flex items-center gap-1 ${status === 'active' ? 'text-green-400' : status === 'failed' ? 'text-red-400' : 'text-slate-400'}`}>
         <span className={`w-1.5 h-1.5 rounded-full ${status === 'active' ? 'bg-green-400 animate-pulse' : status === 'failed' ? 'bg-red-400' : 'bg-slate-100'}`} />
         {status.toUpperCase()}
@@ -282,11 +282,11 @@ export function CollaborationFeed({
       <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
         <div className="flex items-center gap-2">
           <div className="w-6 h-6 rounded-md bg-gold/10 flex items-center justify-center">
-            <span className="text-gold text-[10px] font-bold">CF</span>
+            <span className="text-gold text-xs font-bold">CF</span>
           </div>
           <div>
             <h3 className="text-sm font-medium text-slate-700">Agent Viewport</h3>
-            <p className="text-[10px] text-slate-400">{session.projectLabel}</p>
+            <p className="text-xs text-slate-400">{session.projectLabel}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -294,7 +294,7 @@ export function CollaborationFeed({
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value as AgentRole | 'all')}
-            className="text-[10px] bg-slate-50 border border-slate-200 rounded px-1.5 py-1 text-slate-500 outline-none"
+            className="text-xs bg-slate-50 border border-slate-200 rounded px-1.5 py-1 text-slate-500 outline-none"
           >
             <option value="all">All Agents</option>
             <option value="acheevy">ACHEEVY</option>
@@ -327,7 +327,7 @@ export function CollaborationFeed({
       </div>
 
       {/* Footer */}
-      <div className="px-4 py-2 border-t border-slate-100 text-[10px] text-slate-300 flex justify-between">
+      <div className="px-4 py-2 border-t border-slate-100 text-xs text-slate-300 flex justify-between">
         <span>{filteredFeed.length} / {session.feed.length} entries</span>
         <span>Session: {session.sessionId}</span>
       </div>

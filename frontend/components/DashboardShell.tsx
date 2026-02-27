@@ -13,125 +13,11 @@ import { LogoWallBackground } from "./LogoWallBackground";
 import { DynamicTagline } from "./DynamicTagline";
 import { MottoBar } from "./MottoBar";
 import { LucUsageWidget } from "./LucUsageWidget";
+import { Breadcrumbs } from "./Breadcrumbs";
+import { useHealthCheck, statusDotClass, statusLabel, statusMessage } from "@/hooks/useHealthCheck";
+import { useLucBalance } from "@/hooks/useLucBalance";
 
 const IS_DEMO = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
-
-// ── Inline hooks ────────────────────────────────────────────
-
-type HealthStatus = "healthy" | "degraded" | "unhealthy" | "loading";
-
-interface HealthData {
-  status: HealthStatus;
-  services: { name: string; status: string }[];
-  responseTime?: number;
-}
-
-function useHealthCheck() {
-  const [health, setHealth] = useState<HealthData>({
-    status: "loading",
-    services: [],
-  });
-
-  useEffect(() => {
-    let mounted = true;
-
-    async function check() {
-      try {
-        const res = await fetch("/api/health");
-        if (!res.ok) throw new Error("unhealthy");
-        const data = await res.json();
-        if (mounted) {
-          setHealth({
-            status: data.status as HealthStatus,
-            services: data.services ?? [],
-            responseTime: data.responseTime,
-          });
-        }
-      } catch {
-        if (mounted) {
-          setHealth({ status: "unhealthy", services: [] });
-        }
-      }
-    }
-
-    check();
-    const interval = setInterval(check, 30_000);
-    return () => {
-      mounted = false;
-      clearInterval(interval);
-    };
-  }, []);
-
-  return health;
-}
-
-function useLucBalance() {
-  const [balance, setBalance] = useState<string>("...");
-  const [tier, setTier] = useState<string>("");
-
-  useEffect(() => {
-    let mounted = true;
-
-    fetch("/api/luc/usage")
-      .then((res) => (res.ok ? res.json() : Promise.reject()))
-      .then((data) => {
-        if (mounted) {
-          setBalance(data.balance ?? "$0.00");
-          setTier(data.name ?? "Explorer");
-        }
-      })
-      .catch(() => {
-        if (mounted) setBalance("$0.00");
-      });
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  return { balance, tier };
-}
-
-// ── Helpers ─────────────────────────────────────────────────
-
-function statusDotClass(status: HealthStatus): string {
-  switch (status) {
-    case "healthy":
-      return "bg-emerald-500";
-    case "degraded":
-      return "bg-amber-500";
-    case "unhealthy":
-      return "bg-red-500";
-    default:
-      return "bg-zinc-600 animate-pulse";
-  }
-}
-
-function statusLabel(status: HealthStatus): string {
-  switch (status) {
-    case "healthy":
-      return "All systems operational";
-    case "degraded":
-      return "Partial degradation detected";
-    case "unhealthy":
-      return "Services unreachable";
-    default:
-      return "Checking status...";
-  }
-}
-
-function statusMessage(status: HealthStatus): string {
-  switch (status) {
-    case "healthy":
-      return "All services online and operational.";
-    case "degraded":
-      return "Running with limited capacity. Some services may be slow.";
-    case "unhealthy":
-      return "Services currently unreachable. Retrying automatically.";
-    default:
-      return "Connecting to services...";
-  }
-}
 
 // ── Component ───────────────────────────────────────────────
 
@@ -258,7 +144,7 @@ export function DashboardShell({ children }: Props) {
                   onClick={() => setShowAccountMenu(!showAccountMenu)}
                   className="flex items-center gap-2 rounded-lg border border-white/10 bg-[#111113] px-2.5 py-1.5 text-xs text-zinc-300 hover:border-white/20 transition-colors"
                 >
-                  <span className="h-6 w-6 rounded-full bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center text-[10px] font-bold text-black">
+                  <span className="h-6 w-6 rounded-full bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center text-xs font-bold text-black">
                     {userName.charAt(0).toUpperCase()}
                   </span>
                   <span className="hidden sm:inline">{userName}</span>
@@ -272,7 +158,7 @@ export function DashboardShell({ children }: Props) {
                     <div className="absolute right-0 top-full mt-2 w-56 rounded-xl border border-white/10 bg-[#18181B] shadow-lg shadow-black/50 z-40 overflow-hidden">
                       <div className="px-4 py-3 border-b border-white/8">
                         <p className="text-sm text-zinc-100 font-medium truncate">{userName}</p>
-                        <p className="text-[11px] text-zinc-500 truncate">{userEmail}</p>
+                        <p className="text-sm text-zinc-500 truncate">{userEmail}</p>
                         <span className="inline-block mt-1 text-[9px] px-1.5 py-0.5 rounded border border-amber-500/30 bg-amber-500/10 text-amber-400 font-mono uppercase">
                           {userRole}
                         </span>
@@ -298,6 +184,11 @@ export function DashboardShell({ children }: Props) {
               </div>
             </div>
           </header>
+
+          {/* Breadcrumb strip */}
+          <div className="border-b border-white/5 bg-[#09090B]/60 px-4 sm:px-6 lg:px-8 xl:px-12 py-2">
+            <Breadcrumbs className="max-w-7xl mx-auto" />
+          </div>
 
           {/* Main content */}
           <main className="flex-1 flex flex-col">

@@ -32,7 +32,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
         </section>
 
         {/* Footer */}
-        <p className="mt-6 text-center text-[11px] text-zinc-500">
+        <p className="mt-6 text-center text-sm text-zinc-500">
           Powered by A.I.M.S. &middot; plugmein.cloud
         </p>
       </div>

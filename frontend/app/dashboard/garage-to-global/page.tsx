@@ -290,7 +290,7 @@ function GrowthJourneyMap({ currentStage, onStageSelect }: { currentStage: Selle
                 <span className={`text-xs font-medium ${isActive ? 'text-gold' : isPast ? 'text-emerald-400' : 'text-zinc-400'}`}>
                   {info.name}
                 </span>
-                <span className="text-[10px] text-zinc-500">{info.productsRange}</span>
+                <span className="text-xs text-zinc-500">{info.productsRange}</span>
               </button>
               {idx < stages.length - 1 && (
                 <div className={`w-4 h-px flex-shrink-0 ${isPast ? 'bg-emerald-500/40' : 'bg-[#1F1F23]'}`} />
@@ -356,7 +356,7 @@ function MarketplaceGrid({ onSelect }: { onSelect: (mp: MarketplaceType) => void
                 <p className="text-xs text-zinc-500 mt-1 line-clamp-2">{mp.description}</p>
                 <div className="flex flex-wrap gap-1 mt-2">
                   {mp.bestFor.slice(0, 2).map((tag, i) => (
-                    <span key={i} className="px-1.5 py-0.5 rounded text-[10px] bg-[#18181B] text-zinc-400">{tag}</span>
+                    <span key={i} className="px-1.5 py-0.5 rounded text-xs bg-[#18181B] text-zinc-400">{tag}</span>
                   ))}
                 </div>
               </div>
@@ -440,10 +440,10 @@ function BestPracticesEngine({ selectedMarketplace }: { selectedMarketplace: Mar
                 <p className="text-xs text-zinc-500 mt-1">{bp.description}</p>
               </div>
               <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                <span className={`px-2 py-0.5 rounded text-[10px] font-medium border ${impactColors[bp.impact]}`}>
+                <span className={`px-2 py-0.5 rounded text-xs font-medium border ${impactColors[bp.impact]}`}>
                   {bp.impact} impact
                 </span>
-                <span className={`text-[10px] ${effortColors[bp.effort]}`}>
+                <span className={`text-xs ${effortColors[bp.effort]}`}>
                   {bp.effort} effort
                 </span>
               </div>
@@ -525,8 +525,8 @@ function MarketplaceDetailModal({ marketplace, onClose }: { marketplace: Marketp
             {tips.map((tip) => (
               <div key={tip.id} className="p-3 rounded-lg bg-white/3 border border-wireframe-stroke">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-[10px] font-mono text-gold/60 uppercase">{tip.category}</span>
-                  <span className={`text-[10px] px-1.5 py-0.5 rounded ${
+                  <span className="text-xs font-mono text-gold/60 uppercase">{tip.category}</span>
+                  <span className={`text-xs px-1.5 py-0.5 rounded ${
                     tip.impact === 'high' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-gold/10 text-gold'
                   }`}>
                     {tip.impact} impact

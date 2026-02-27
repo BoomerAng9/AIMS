@@ -350,7 +350,7 @@ function ChartTooltip({ active, payload, label, unit = "" }: { active?: boolean;
   if (!active || !payload?.length) return null;
   return (
     <div className="rounded-xl border border-wireframe-stroke bg-[#111113]/95 backdrop-blur-xl px-3 py-2 shadow-xl">
-      <p className="text-[10px] text-zinc-500 mb-1 font-mono">{label}</p>
+      <p className="text-xs text-zinc-500 mb-1 font-mono">{label}</p>
       {payload.map((entry, i) => (
         <p key={i} className="text-xs font-semibold" style={{ color: entry.color }}>
           {entry.name}: {entry.value}{unit}
@@ -402,7 +402,7 @@ function RadialGauge({ value, max, label, color, icon: Icon }: { value: number; 
           <span className="text-lg font-bold mt-0.5" style={{ color: thresholdColor }}>{pct}%</span>
         </div>
       </div>
-      <span className="text-[10px] text-zinc-500 mt-1 uppercase tracking-wider">{label}</span>
+      <span className="text-xs text-zinc-500 mt-1 uppercase tracking-wider">{label}</span>
     </div>
   );
 }
@@ -552,7 +552,7 @@ export default function OperationsPage() {
             </div>
             <div>
               <h1 className="text-xl font-bold text-zinc-100 font-display">Operations Command</h1>
-              <p className="text-[10px] text-zinc-500 uppercase tracking-widest">Platform Telemetry &amp; Observability</p>
+              <p className="text-xs text-zinc-500 uppercase tracking-widest">Platform Telemetry &amp; Observability</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -562,7 +562,7 @@ export default function OperationsPage() {
                 {isLive && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />}
                 <span className={`relative inline-flex rounded-full h-2 w-2 ${isLive ? "bg-emerald-400" : "bg-white/30"}`} />
               </span>
-              <span className={`text-[10px] font-bold uppercase tracking-widest ${isLive ? "text-emerald-400" : "text-zinc-500"}`}>
+              <span className={`text-xs font-bold uppercase tracking-widest ${isLive ? "text-emerald-400" : "text-zinc-500"}`}>
                 {isLive ? "LIVE" : "PAUSED"}
               </span>
             </button>
@@ -581,7 +581,7 @@ export default function OperationsPage() {
                 <button
                   key={range}
                   onClick={() => setTimeRange(range)}
-                  className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all ${
+                  className={`px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider transition-all ${
                     timeRange === range ? "bg-gold/10 text-gold border border-gold/20" : "text-zinc-500 hover:text-zinc-400"
                   }`}
                 >
@@ -596,7 +596,7 @@ export default function OperationsPage() {
               className="flex items-center gap-1.5 rounded-lg border border-gold/20 bg-gold/5 px-3 py-1.5 transition-all hover:bg-gold/10"
             >
               <Eye size={12} className="text-gold" />
-              <span className="text-[10px] font-bold uppercase tracking-widest text-gold">
+              <span className="text-xs font-bold uppercase tracking-widest text-gold">
                 Live Ops
               </span>
             </button>
@@ -604,7 +604,7 @@ export default function OperationsPage() {
             {/* System status */}
             <div className="flex items-center gap-1.5 rounded-lg bg-emerald-400/5 border border-emerald-400/20 px-3 py-1.5">
               <ShieldCheck size={12} className="text-emerald-400" />
-              <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-400">
+              <span className="text-xs font-bold uppercase tracking-widest text-emerald-400">
                 {healthyCount}/{services.length} Healthy
               </span>
             </div>
@@ -667,7 +667,7 @@ export default function OperationsPage() {
             className="rounded-xl border border-wireframe-stroke bg-[#18181B]/70 p-4 backdrop-blur-xl hover:border-white/10 transition-all"
           >
             <div className="flex items-center justify-between mb-1">
-              <p className="text-[10px] font-semibold uppercase tracking-widest text-zinc-500">{kpi.label}</p>
+              <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500">{kpi.label}</p>
               <kpi.icon size={14} style={{ color: kpi.color }} />
             </div>
             <p className="text-2xl font-bold" style={{ color: kpi.color }}>{kpi.value}</p>
@@ -679,7 +679,7 @@ export default function OperationsPage() {
               ) : (
                 <Activity size={10} className="text-zinc-600" />
               )}
-              <span className="text-[10px] text-zinc-500">{kpi.trendLabel}</span>
+              <span className="text-xs text-zinc-500">{kpi.trendLabel}</span>
             </div>
             <div className="mt-2 -mx-1">
               <Sparkline data={kpi.sparkData} color={kpi.color} />
@@ -795,7 +795,7 @@ export default function OperationsPage() {
                       <h3 className="text-sm font-semibold text-zinc-100">Service Health Matrix</h3>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-[10px] text-zinc-500">{healthyCount}/{services.length} services healthy</span>
+                      <span className="text-xs text-zinc-500">{healthyCount}/{services.length} services healthy</span>
                       <RefreshCw size={12} className="text-zinc-600 animate-spin" style={{ animationDuration: "3s" }} />
                     </div>
                   </div>
@@ -875,7 +875,7 @@ export default function OperationsPage() {
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cb-cyan opacity-75" />
                         <span className="relative inline-flex rounded-full h-2 w-2 bg-cb-cyan" />
                       </span>
-                      <span className="text-[10px] text-cb-cyan font-mono uppercase tracking-wider">STREAMING</span>
+                      <span className="text-xs text-cb-cyan font-mono uppercase tracking-wider">STREAMING</span>
                     </div>
                   </div>
                   <div className="max-h-[300px] overflow-y-auto">
@@ -902,7 +902,7 @@ export default function OperationsPage() {
                           <span className={`h-2 w-2 rounded-full mt-1.5 flex-shrink-0 ${dotColors[evt.severity]}`} />
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2">
-                              <span className="text-[10px] text-zinc-600 font-mono">{evt.time}</span>
+                              <span className="text-xs text-zinc-600 font-mono">{evt.time}</span>
                               <span className={`text-[9px] font-bold uppercase tracking-wider ${sevColors[evt.severity]}`}>{evt.type}</span>
                             </div>
                             <p className="text-xs text-zinc-300 mt-0.5">
@@ -954,7 +954,7 @@ export default function OperationsPage() {
                 <div className="rounded-2xl border border-dashed border-emerald-400/20 bg-emerald-400/5 p-8 text-center">
                   <CheckCircle2 size={24} className="text-emerald-400 mx-auto mb-2" />
                   <p className="text-sm text-emerald-400">No active alerts</p>
-                  <p className="text-[10px] text-zinc-600 mt-1">All metrics within thresholds</p>
+                  <p className="text-xs text-zinc-600 mt-1">All metrics within thresholds</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
@@ -962,23 +962,23 @@ export default function OperationsPage() {
                     <thead>
                       <tr className="border-b border-wireframe-stroke">
                         {["ID", "Severity", "Metric", "Threshold", "Current", "Fired"].map(h => (
-                          <th key={h} className="p-3 text-left text-[10px] uppercase tracking-widest text-zinc-500 font-semibold">{h}</th>
+                          <th key={h} className="p-3 text-left text-xs uppercase tracking-widest text-zinc-500 font-semibold">{h}</th>
                         ))}
                       </tr>
                     </thead>
                     <tbody>
                       {alerts.map((alert) => (
                         <tr key={alert.id} className="border-t border-wireframe-stroke hover:bg-[#111113] transition-colors">
-                          <td className="p-3"><code className="text-[10px] font-mono text-gold">{alert.id}</code></td>
+                          <td className="p-3"><code className="text-xs font-mono text-gold">{alert.id}</code></td>
                           <td className="p-3"><SeverityBadge severity={alert.severity} /></td>
                           <td className="p-3 text-xs font-medium text-zinc-100">{alert.metric}</td>
-                          <td className="p-3"><code className="rounded bg-[#18181B]/70 border border-wireframe-stroke px-2 py-0.5 text-[10px] font-mono text-zinc-500">{alert.threshold}</code></td>
+                          <td className="p-3"><code className="rounded bg-[#18181B]/70 border border-wireframe-stroke px-2 py-0.5 text-xs font-mono text-zinc-500">{alert.threshold}</code></td>
                           <td className="p-3">
-                            <code className={`rounded bg-[#18181B]/70 border border-wireframe-stroke px-2 py-0.5 text-[10px] font-mono ${
+                            <code className={`rounded bg-[#18181B]/70 border border-wireframe-stroke px-2 py-0.5 text-xs font-mono ${
                               alert.severity === "critical" ? "text-red-400" : alert.severity === "warning" ? "text-gold" : "text-sky-400"
                             }`}>{alert.current}</code>
                           </td>
-                          <td className="p-3 text-[10px] text-zinc-500">{formatTimestamp(alert.fired)}</td>
+                          <td className="p-3 text-xs text-zinc-500">{formatTimestamp(alert.fired)}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -1008,11 +1008,11 @@ export default function OperationsPage() {
                       <div className={`rounded-xl border ${isOpen ? "border-red-500/20 bg-red-500/5" : "border-wireframe-stroke bg-[#1F1F23]/60"} p-4`}>
                         <div className="flex items-center justify-between flex-wrap gap-2 mb-2">
                           <div className="flex items-center gap-2">
-                            <code className="text-[10px] font-mono text-gold">{inc.id}</code>
+                            <code className="text-xs font-mono text-gold">{inc.id}</code>
                             <IncidentBadge severity={inc.severity} />
                             <StatusBadge status={inc.status} />
                           </div>
-                          <div className="flex items-center gap-3 text-[10px] text-zinc-500">
+                          <div className="flex items-center gap-3 text-xs text-zinc-500">
                             {inc.duration && <span>Duration: <span className="text-zinc-400 font-mono">{inc.duration}</span></span>}
                             <span>{formatTimestamp(inc.created)}</span>
                           </div>
@@ -1038,7 +1038,7 @@ export default function OperationsPage() {
                   <thead>
                     <tr className="border-b border-wireframe-stroke">
                       {["Correlation ID", "Time", "Method", "Path", "Status", "Duration"].map(h => (
-                        <th key={h} className={`p-3 text-[10px] uppercase tracking-widest text-zinc-500 font-semibold ${h === "Status" || h === "Duration" ? "text-center" : "text-left"}`}>{h}</th>
+                        <th key={h} className={`p-3 text-xs uppercase tracking-widest text-zinc-500 font-semibold ${h === "Status" || h === "Duration" ? "text-center" : "text-left"}`}>{h}</th>
                       ))}
                     </tr>
                   </thead>
@@ -1053,10 +1053,10 @@ export default function OperationsPage() {
                       return (
                         <tr key={trace.correlationId} className="border-t border-wireframe-stroke hover:bg-[#111113] transition-colors">
                           <td className="p-3">
-                            <code className="rounded bg-[#18181B]/70 border border-wireframe-stroke px-2 py-0.5 text-[10px] font-mono text-gold">{trace.correlationId}</code>
+                            <code className="rounded bg-[#18181B]/70 border border-wireframe-stroke px-2 py-0.5 text-xs font-mono text-gold">{trace.correlationId}</code>
                           </td>
                           <td className="p-3">
-                            <span className="text-[10px] font-mono text-zinc-500">{trace.timestamp}</span>
+                            <span className="text-xs font-mono text-zinc-500">{trace.timestamp}</span>
                           </td>
                           <td className="p-3">
                             <span className={`rounded-full border px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${

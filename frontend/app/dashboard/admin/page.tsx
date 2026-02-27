@@ -140,7 +140,7 @@ function AdminPanel() {
               </span>
               <h1 className="text-2xl font-bold text-zinc-100 font-display">Super Admin</h1>
             </div>
-            <p className="mt-1 text-xs text-zinc-500">
+            <p className="mt-1 text-sm text-zinc-500">
               Full system control — agents, billing, models, squads, and platform metrics.
               This panel is not visible to regular users.
             </p>
@@ -148,7 +148,7 @@ function AdminPanel() {
           <button
             onClick={handleSaveAll}
             disabled={saving}
-            className="rounded-full bg-gold px-4 py-2 text-xs font-semibold text-black shadow-[0_0_15px_rgba(251,191,36,0.4)] hover:scale-105 active:scale-95 transition-transform disabled:opacity-50"
+            className="rounded-full bg-gold px-4 py-2 text-sm font-bold text-black shadow-[0_0_15px_rgba(251,191,36,0.4)] hover:scale-105 active:scale-95 transition-transform disabled:opacity-50"
           >
             {saving ? "Saving..." : "Save All"}
           </button>
@@ -171,7 +171,7 @@ function AdminPanel() {
             </div>
             <div>
               <p className="text-sm font-semibold text-zinc-200 group-hover:text-amber-300 transition-colors">II-Agent Control</p>
-              <p className="text-[10px] text-zinc-500">Autonomous code, research, builds, slides</p>
+              <p className="text-xs font-medium text-zinc-500">Autonomous code, research, builds, slides</p>
             </div>
           </a>
           <a
@@ -183,7 +183,7 @@ function AdminPanel() {
             </div>
             <div>
               <p className="text-sm font-semibold text-zinc-200 group-hover:text-orange-300 transition-colors">Chicken Hawk Control</p>
-              <p className="text-[10px] text-zinc-500">Pipeline execution, squads, shelf walking</p>
+              <p className="text-xs font-medium text-zinc-500">Pipeline execution, squads, shelf walking</p>
             </div>
           </a>
           <a
@@ -195,7 +195,7 @@ function AdminPanel() {
             </div>
             <div>
               <p className="text-sm font-semibold text-zinc-200 group-hover:text-cyan-300 transition-colors">Lil_Hawks Squad Control</p>
-              <p className="text-[10px] text-zinc-500">Squads, role cards, crew designations</p>
+              <p className="text-xs font-medium text-zinc-500">Squads, role cards, crew designations</p>
             </div>
           </a>
         </div>
@@ -210,7 +210,7 @@ function AdminPanel() {
         <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
           {SYSTEM_METRICS.map((m) => (
             <div key={m.label} className="rounded-2xl border border-wireframe-stroke bg-[#1F1F23]/60 p-4">
-              <p className="text-[10px] uppercase tracking-wider text-zinc-500">{m.label}</p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">{m.label}</p>
               <p className="text-xl font-bold text-zinc-100 mt-1">{m.value}</p>
               <p className="text-[9px] text-zinc-600 mt-0.5">{m.note}</p>
             </div>
@@ -232,7 +232,7 @@ function AdminPanel() {
           <button
             onClick={fetchApiKeys}
             disabled={keysLoading}
-            className="rounded-full border border-wireframe-stroke px-3 py-1.5 text-[10px] font-semibold text-gold hover:bg-white/5 transition-colors disabled:opacity-40"
+            className="rounded-full border border-wireframe-stroke px-3 py-1.5 text-sm font-semibold text-gold hover:bg-white/5 transition-colors disabled:opacity-40"
           >
             {keysLoading ? "Loading..." : "Refresh"}
           </button>
@@ -241,8 +241,8 @@ function AdminPanel() {
         <div className="mt-4">
           {keysError ? (
             <div className="rounded-2xl border border-red-500/20 bg-red-500/5 p-4">
-              <p className="text-xs text-red-400">{keysError}</p>
-              <p className="text-[10px] text-red-400/60 mt-1">
+              <p className="text-sm text-red-400">{keysError}</p>
+              <p className="text-sm text-red-400/60 mt-1">
                 Ensure the UEF Gateway is running and INTERNAL_API_KEY is configured.
               </p>
             </div>
@@ -251,22 +251,22 @@ function AdminPanel() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-wireframe-stroke">
-                    <th className="p-3 text-left text-[10px] uppercase tracking-widest text-zinc-500">Service</th>
-                    <th className="p-3 text-left text-[10px] uppercase tracking-widest text-zinc-500">Scope</th>
-                    <th className="p-3 text-left text-[10px] uppercase tracking-widest text-zinc-500">Key</th>
-                    <th className="p-3 text-center text-[10px] uppercase tracking-widest text-zinc-500">Status</th>
+                    <th className="p-3 text-left text-xs font-semibold uppercase tracking-widest text-zinc-400">Service</th>
+                    <th className="p-3 text-left text-xs font-semibold uppercase tracking-widest text-zinc-400">Scope</th>
+                    <th className="p-3 text-left text-xs font-semibold uppercase tracking-widest text-zinc-400">Key</th>
+                    <th className="p-3 text-center text-xs font-semibold uppercase tracking-widest text-zinc-400">Status</th>
                   </tr>
                 </thead>
                 <tbody>
                   {keysLoading ? (
                     <tr>
-                      <td colSpan={4} className="p-6 text-center text-xs text-zinc-500">
+                      <td colSpan={4} className="p-6 text-center text-sm text-zinc-500">
                         Loading key status...
                       </td>
                     </tr>
                   ) : apiKeys.length === 0 ? (
                     <tr>
-                      <td colSpan={4} className="p-6 text-center text-xs text-zinc-500">
+                      <td colSpan={4} className="p-6 text-center text-sm text-zinc-500">
                         No keys returned. Backend may not support /admin/api-keys yet.
                       </td>
                     </tr>
@@ -274,17 +274,17 @@ function AdminPanel() {
                     apiKeys.map((k) => (
                       <tr key={k.id} className="border-t border-wireframe-stroke hover:bg-[#111113] transition-colors">
                         <td className="p-3">
-                          <p className="text-xs font-semibold text-zinc-100">{k.label}</p>
+                          <p className="text-sm font-semibold text-zinc-100">{k.label}</p>
                           <p className="text-[9px] font-mono text-zinc-600 mt-0.5">{k.id}</p>
                         </td>
-                        <td className="p-3 text-xs text-zinc-400">{k.scope}</td>
+                        <td className="p-3 text-sm text-zinc-400">{k.scope}</td>
                         <td className="p-3">
                           {k.configured ? (
-                            <code className="rounded bg-[#18181B]/70 border border-wireframe-stroke px-2 py-1 text-[10px] font-mono text-gold">
+                            <code className="rounded bg-[#18181B]/70 border border-wireframe-stroke px-2 py-1 text-xs font-mono text-gold">
                               {k.masked}
                             </code>
                           ) : (
-                            <span className="text-[10px] text-zinc-600 italic">Not set</span>
+                            <span className="text-xs font-medium text-zinc-600 italic">Not set</span>
                           )}
                         </td>
                         <td className="p-3 text-center">
@@ -307,7 +307,7 @@ function AdminPanel() {
         </div>
 
         <div className="mt-4 rounded-2xl border border-dashed border-gold/20 bg-gold/[0.02] p-4">
-          <p className="text-[10px] text-zinc-500">
+          <p className="text-xs font-medium text-zinc-500">
             Keys are managed via environment variables on the VPS. Update them in{" "}
             <code className="text-gold">infra/.env.production</code> (for Docker services) or{" "}
             <code className="text-gold">~/.bashrc</code> (for CLI tools), then restart.
@@ -326,33 +326,33 @@ function AdminPanel() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-wireframe-stroke">
-                <th className="p-3 text-left text-[10px] uppercase tracking-widest text-zinc-500">Tier</th>
-                <th className="p-3 text-center text-[10px] uppercase tracking-widest text-zinc-500">Price</th>
-                <th className="p-3 text-center text-[10px] uppercase tracking-widest text-zinc-500">Tokens</th>
-                <th className="p-3 text-center text-[10px] uppercase tracking-widest text-zinc-500">Agents</th>
-                <th className="p-3 text-center text-[10px] uppercase tracking-widest text-zinc-500">Concurrent</th>
-                <th className="p-3 text-center text-[10px] uppercase tracking-widest text-zinc-500">Subscribers</th>
-                <th className="p-3 text-center text-[10px] uppercase tracking-widest text-zinc-500">MRR</th>
+                <th className="p-3 text-left text-xs font-semibold uppercase tracking-widest text-zinc-400">Tier</th>
+                <th className="p-3 text-center text-xs font-semibold uppercase tracking-widest text-zinc-400">Price</th>
+                <th className="p-3 text-center text-xs font-semibold uppercase tracking-widest text-zinc-400">Tokens</th>
+                <th className="p-3 text-center text-xs font-semibold uppercase tracking-widest text-zinc-400">Agents</th>
+                <th className="p-3 text-center text-xs font-semibold uppercase tracking-widest text-zinc-400">Concurrent</th>
+                <th className="p-3 text-center text-xs font-semibold uppercase tracking-widest text-zinc-400">Subscribers</th>
+                <th className="p-3 text-center text-xs font-semibold uppercase tracking-widest text-zinc-400">MRR</th>
               </tr>
             </thead>
             <tbody>
               {BILLING_OVERVIEW.map((t) => (
                 <tr key={t.tier} className="border-t border-wireframe-stroke">
-                  <td className="p-3 text-xs font-semibold text-zinc-100">{t.tier}</td>
-                  <td className="p-3 text-xs text-center text-zinc-400">{t.price}</td>
-                  <td className="p-3 text-xs text-center text-zinc-400">{t.tokens}</td>
-                  <td className="p-3 text-xs text-center text-emerald-400">{t.agents}</td>
-                  <td className="p-3 text-xs text-center text-emerald-400">{t.concurrent}</td>
-                  <td className="p-3 text-xs text-center text-zinc-100 font-semibold">{t.subscribers}</td>
-                  <td className="p-3 text-xs text-center text-gold font-semibold">$0</td>
+                  <td className="p-3 text-sm font-semibold text-zinc-100">{t.tier}</td>
+                  <td className="p-3 text-sm text-center text-zinc-400">{t.price}</td>
+                  <td className="p-3 text-sm text-center text-zinc-400">{t.tokens}</td>
+                  <td className="p-3 text-sm text-center text-emerald-400">{t.agents}</td>
+                  <td className="p-3 text-sm text-center text-emerald-400">{t.concurrent}</td>
+                  <td className="p-3 text-sm text-center text-zinc-100 font-semibold">{t.subscribers}</td>
+                  <td className="p-3 text-sm text-center text-gold font-semibold">$0</td>
                 </tr>
               ))}
             </tbody>
             <tfoot>
               <tr className="border-t border-gold/20 bg-gold/[0.03]">
-                <td className="p-3 text-xs font-bold text-gold" colSpan={5}>Total MRR</td>
-                <td className="p-3 text-xs text-center font-bold text-zinc-100">0</td>
-                <td className="p-3 text-xs text-center font-bold text-gold">$0</td>
+                <td className="p-3 text-sm font-bold text-gold" colSpan={5}>Total MRR</td>
+                <td className="p-3 text-sm text-center font-bold text-zinc-100">0</td>
+                <td className="p-3 text-sm text-center font-bold text-gold">$0</td>
               </tr>
             </tfoot>
           </table>
@@ -370,7 +370,7 @@ function AdminPanel() {
         <div className="mt-4 grid gap-4 md:grid-cols-2">
           {/* Agent Verticals */}
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-gold mb-3">Agent</p>
+            <p className="text-xs font-bold uppercase tracking-widest text-gold mb-3">Agent</p>
             <div className="space-y-2">
               {[
                 { id: "agent-zero", name: "Agent Zero", desc: "Computer-as-tool framework — Docker sandbox, web UI", url: "https://agent-zero.ai", cap: "computer-use, multi-agent, code execution" },
@@ -378,8 +378,8 @@ function AdminPanel() {
                 <div key={v.id} className="rounded-2xl border border-wireframe-stroke bg-[#1F1F23]/60 p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-xs font-semibold text-zinc-100">{v.name}</p>
-                      <p className="text-[10px] text-zinc-500 mt-0.5">{v.desc}</p>
+                      <p className="text-sm font-semibold text-zinc-100">{v.name}</p>
+                      <p className="text-xs font-medium text-zinc-500 mt-0.5">{v.desc}</p>
                     </div>
                     <span className="inline-flex items-center gap-1.5 rounded-full bg-gold/10 border border-gold/20 px-2 py-0.5 text-[9px] font-semibold text-gold uppercase">
                       <span className="h-1 w-1 rounded-full bg-gold" />
@@ -397,7 +397,7 @@ function AdminPanel() {
           </div>
           {/* Commons Verticals */}
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-400/80 mb-3">Commons</p>
+            <p className="text-xs font-bold uppercase tracking-widest text-emerald-400/80 mb-3">Commons</p>
             <div className="space-y-2">
               {[
                 { id: "claude-code", name: "Claude Code", desc: "Anthropic CLI — agentic coding, git, terminal", invoke: "claude", cap: "code-gen, file-ops, git" },
@@ -406,8 +406,8 @@ function AdminPanel() {
                 <div key={v.id} className="rounded-2xl border border-wireframe-stroke bg-[#1F1F23]/60 p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-xs font-semibold text-zinc-100">{v.name}</p>
-                      <p className="text-[10px] text-zinc-500 mt-0.5">{v.desc}</p>
+                      <p className="text-sm font-semibold text-zinc-100">{v.name}</p>
+                      <p className="text-xs font-medium text-zinc-500 mt-0.5">{v.desc}</p>
                     </div>
                     <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-400/10 border border-emerald-400/20 px-2 py-0.5 text-[9px] font-semibold text-emerald-400 uppercase">
                       <span className="h-1 w-1 rounded-full bg-emerald-400" />
@@ -438,7 +438,7 @@ function AdminPanel() {
           <p className="mt-1 text-[0.65rem] text-zinc-500 uppercase tracking-wider">Model Selection</p>
           <div className="mt-4 space-y-4">
             <div className="space-y-2">
-              <label className="text-xs text-zinc-400 uppercase tracking-wider">Primary Reasoning Model</label>
+              <label className="text-sm text-zinc-400 uppercase tracking-wider">Primary Reasoning Model</label>
               <select
                 value={primaryModel}
                 onChange={(e) => setPrimaryModel(e.target.value)}
@@ -450,7 +450,7 @@ function AdminPanel() {
               </select>
             </div>
             <div className="space-y-2">
-              <label className="text-xs text-zinc-400 uppercase tracking-wider">System Instructions</label>
+              <label className="text-sm text-zinc-400 uppercase tracking-wider">System Instructions</label>
               <textarea
                 className="w-full h-32 rounded-xl border border-wireframe-stroke bg-[#111113]/80 p-3 text-sm text-zinc-100 outline-none focus:border-gold/30"
                 value={systemPrompt}
@@ -470,9 +470,9 @@ function AdminPanel() {
             {CSUITE.map((ang) => (
               <div key={ang.role} className="flex items-center justify-between rounded-xl border border-wireframe-stroke bg-[#1F1F23]/60 p-3">
                 <div>
-                  <p className="text-xs font-medium text-zinc-100">{ang.role}</p>
+                  <p className="text-sm font-semibold text-zinc-100">{ang.role}</p>
                   <div className="flex items-center gap-2 mt-0.5">
-                    <p className="text-[10px] text-zinc-500">{ang.scope}</p>
+                    <p className="text-xs font-medium text-zinc-500">{ang.scope}</p>
                     <span className="rounded-full bg-gold/10 border border-gold/20 px-2 py-0.5 text-[9px] font-mono text-gold">
                       {ang.agent}
                     </span>
@@ -498,12 +498,12 @@ function AdminPanel() {
           {EXEC_AGENTS.map((ang) => (
             <div key={ang.role} className="flex items-center justify-between rounded-2xl border border-wireframe-stroke bg-[#1F1F23]/60 p-4">
               <div>
-                <p className="text-sm font-medium text-zinc-100">{ang.role}</p>
-                <p className="text-xs text-zinc-500">{ang.tasks}</p>
+                <p className="text-sm font-semibold text-zinc-100">{ang.role}</p>
+                <p className="text-sm text-zinc-500">{ang.tasks}</p>
               </div>
               <div className="flex items-center gap-2">
                 <span className={`h-1.5 w-1.5 rounded-full ${ang.status === 'Active' ? 'bg-emerald-400' : 'bg-gold'}`} />
-                <span className="text-[10px] uppercase font-semibold text-zinc-100">{ang.status}</span>
+                <span className="text-xs uppercase font-bold text-zinc-100">{ang.status}</span>
               </div>
             </div>
           ))}
@@ -519,8 +519,8 @@ function AdminPanel() {
         <div className="mt-4 grid gap-4 lg:grid-cols-3">
           {SQUADS.map((squad) => (
             <div key={squad.squad} className="rounded-2xl border border-wireframe-stroke bg-[#1F1F23]/60 p-4">
-              <p className="text-xs font-semibold text-gold">{squad.squad}</p>
-              <p className="text-[10px] text-zinc-500 mt-0.5">{squad.purpose}</p>
+              <p className="text-sm font-semibold text-gold">{squad.squad}</p>
+              <p className="text-xs font-medium text-zinc-500 mt-0.5">{squad.purpose}</p>
               <div className="mt-3 flex flex-wrap gap-1.5">
                 {squad.hawks.map((hawk) => (
                   <span key={hawk} className="rounded-full border border-wireframe-stroke bg-gold/10 px-2 py-0.5 text-[9px] font-mono text-zinc-400">
@@ -544,7 +544,7 @@ function AdminPanel() {
             User table, subscription status, usage metrics, and account actions
             will be available once the persistence layer (PostgreSQL) is wired.
           </p>
-          <p className="text-[10px] text-zinc-600 mt-2">
+          <p className="text-xs font-medium text-zinc-600 mt-2">
             Planned: User list, search, tier assignment, usage graphs, suspension, impersonation
           </p>
         </div>
@@ -559,19 +559,19 @@ function AdminPanel() {
         <div className="mt-4 flex flex-wrap gap-3">
           <button
             onClick={() => handleDangerAction("reset-agent-state")}
-            className="rounded-full border border-red-500/30 px-4 py-2 text-xs font-semibold text-red-400 hover:bg-red-500/10 transition-colors"
+            className="rounded-full border border-red-500/30 px-4 py-2 text-sm font-semibold text-red-400 hover:bg-red-500/10 transition-colors"
           >
             Reset All Agent State
           </button>
           <button
             onClick={() => handleDangerAction("flush-byterover-cache")}
-            className="rounded-full border border-red-500/30 px-4 py-2 text-xs font-semibold text-red-400 hover:bg-red-500/10 transition-colors"
+            className="rounded-full border border-red-500/30 px-4 py-2 text-sm font-semibold text-red-400 hover:bg-red-500/10 transition-colors"
           >
             Flush ByteRover Cache
           </button>
           <button
             onClick={() => handleDangerAction("clear-rate-limits")}
-            className="rounded-full border border-red-500/30 px-4 py-2 text-xs font-semibold text-red-400 hover:bg-red-500/10 transition-colors"
+            className="rounded-full border border-red-500/30 px-4 py-2 text-sm font-semibold text-red-400 hover:bg-red-500/10 transition-colors"
           >
             Clear Rate Limits
           </button>

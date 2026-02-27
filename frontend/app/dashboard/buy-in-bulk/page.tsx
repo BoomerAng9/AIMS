@@ -137,7 +137,7 @@ function ShoppingListBuilder({
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
                 <div className="flex items-center gap-1 bg-[#18181B] rounded-lg px-2 py-1">
-                  <span className="text-[10px] text-zinc-500">Qty</span>
+                  <span className="text-xs text-zinc-500">Qty</span>
                   <input
                     type="number"
                     value={item.quantity}
@@ -284,7 +284,7 @@ function RetailerPanel() {
               <span className="text-2xl">{retailer.icon}</span>
               <div>
                 <h3 className="text-sm font-medium text-zinc-100">{retailer.name}</h3>
-                <span className={`text-[10px] font-mono uppercase ${
+                <span className={`text-xs font-mono uppercase ${
                   retailer.enabled ? 'text-emerald-400' : 'text-zinc-500'
                 }`}>
                   {retailer.enabled ? 'Active' : 'Coming Soon'}
@@ -327,7 +327,7 @@ function DealScout() {
                 <div className="flex items-center gap-2 mt-1">
                   <span className="text-xs text-zinc-500">{deal.retailer}</span>
                   {deal.prime && (
-                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">Prime</span>
+                    <span className="text-xs px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">Prime</span>
                   )}
                   <span className="flex items-center gap-0.5 text-xs text-gold/60">
                     <Star className="w-3 h-3" />

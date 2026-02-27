@@ -12,8 +12,6 @@ import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 import { randomUUID } from 'crypto';
 
-export const maxDuration = 30;
-
 const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB
 const MAX_FILES = 5;
 

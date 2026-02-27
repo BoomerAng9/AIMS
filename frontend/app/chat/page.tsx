@@ -4,7 +4,7 @@
  * Chat w/ACHEEVY — Next-Level Command Center
  *
  * Two modes:
- *   TEXT  — Vercel AI SDK (useChat) with markdown rendering + voice TTS
+ *   TEXT  — AI SDK (useChat) with markdown rendering + voice TTS
  *   VOICE — ElevenLabs Conversational AI Agent SDK (real-time bi-directional)
  *
  * Design: Luxury Industrial AI / Hangar UI World
@@ -154,7 +154,7 @@ function VoiceSelector({ voiceId, provider, onSelect }: {
     <div className="relative">
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg border border-white/10 bg-[#111113] hover:border-gold/20 text-[11px] text-zinc-400 font-mono transition-colors"
+        className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg border border-white/10 bg-[#111113] hover:border-gold/20 text-sm text-zinc-400 font-mono transition-colors"
       >
         <Volume2 className="w-3 h-3 text-gold/50" />
         <span>{cur?.name || 'Voice'}</span>
@@ -173,7 +173,7 @@ function VoiceSelector({ voiceId, provider, onSelect }: {
                   <button
                     key={v.id}
                     onClick={() => { onSelect(v.id, v.provider); setOpen(false); }}
-                    className={`w-full text-left px-3 py-1.5 text-[11px] hover:bg-white/5 flex justify-between ${
+                    className={`w-full text-left px-3 py-1.5 text-sm hover:bg-white/5 flex justify-between ${
                       voiceId === v.id ? 'text-gold bg-gold/[0.06]' : 'text-zinc-400'
                     }`}
                   >
@@ -324,7 +324,7 @@ function ThreadsSidebar({ threads, activeId, onSelect, onNew, onDelete, open, on
             >
               <MessageSquare size={11} className={activeId === t.id ? 'text-gold/60' : 'text-zinc-600'} />
               <div className="flex-1 min-w-0">
-                <p className={`text-[11px] truncate ${activeId === t.id ? 'text-gold/80' : 'text-zinc-400'}`}>{t.title}</p>
+                <p className={`text-sm truncate ${activeId === t.id ? 'text-gold/80' : 'text-zinc-400'}`}>{t.title}</p>
               </div>
               <button
                 onClick={(e) => { e.stopPropagation(); onDelete(t.id); }}
@@ -364,13 +364,13 @@ function VoiceSessionPanel({ conversation, active, onEnd }: {
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400 animate-pulse'}`} />
-            <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">
+            <span className="text-xs font-mono text-slate-400 uppercase tracking-wider">
               {isConnected ? (isSpeaking ? 'ACHEEVY Speaking' : 'Listening') : 'Connecting...'}
             </span>
           </div>
           <button
             onClick={onEnd}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-500/15 text-red-400 text-[10px] font-mono uppercase tracking-wider hover:bg-red-500/25 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-500/15 text-red-400 text-xs font-mono uppercase tracking-wider hover:bg-red-500/25 transition-colors"
           >
             <PhoneOff className="w-3 h-3" />
             End
@@ -421,7 +421,7 @@ function ChatContent() {
   const searchParams = useSearchParams();
   const [selectedModel, setSelectedModel] = useState('claude-opus');
 
-  // ── Text Chat (Vercel AI SDK) ──
+  // ── Text Chat (AI SDK) ──
   const {
     messages, input, handleInputChange, handleSubmit,
     isLoading, stop, setInput,
@@ -680,7 +680,7 @@ function ChatContent() {
                 <select
                   value={selectedModel}
                   onChange={(e) => setSelectedModel(e.target.value)}
-                  className="bg-[#111113] border border-white/10 rounded-lg px-2 py-1 text-[10px] text-zinc-400 font-mono outline-none cursor-pointer max-w-[90px] appearance-none"
+                  className="bg-[#111113] border border-white/10 rounded-lg px-2 py-1 text-xs text-zinc-400 font-mono outline-none cursor-pointer max-w-[90px] appearance-none"
                   title="AI Model"
                 >
                   {AI_MODELS.map(m => (
@@ -810,7 +810,7 @@ function ChatContent() {
                 {files.length > 0 && (
                   <div className="flex flex-wrap gap-1.5 mb-2">
                     {files.map((f, i) => (
-                      <div key={`${f.name}-${i}`} className="flex items-center gap-1.5 px-2 py-1 rounded-lg border border-white/10 bg-[#111113] text-[10px] text-zinc-400">
+                      <div key={`${f.name}-${i}`} className="flex items-center gap-1.5 px-2 py-1 rounded-lg border border-white/10 bg-[#111113] text-xs text-zinc-400">
                         <Paperclip className="w-2.5 h-2.5 text-gold/40" />
                         <span className="max-w-[100px] truncate">{f.name}</span>
                         <button onClick={() => setFiles(p => p.filter((_, j) => j !== i))} className="text-zinc-600 hover:text-red-400"><X className="w-2.5 h-2.5" /></button>

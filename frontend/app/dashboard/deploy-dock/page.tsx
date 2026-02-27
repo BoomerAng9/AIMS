@@ -217,7 +217,7 @@ function TabButton({
 function GlassBoxEvent({ event }: { event: DeploymentEvent }) {
   const stageColors: Record<string, string> = {
     ingest: "bg-blue-500/20 text-blue-400 border-blue-500/30",
-    plan: "bg-violet-500/20 text-violet-400 border-violet-500/30",
+    plan: "bg-amber-500/20 text-amber-400 border-amber-500/30",
     quote: "bg-gold/20 text-gold border-gold/30",
     approved: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
     hatch: "bg-cyan-500/20 text-cyan-400 border-cyan-500/30",
@@ -240,11 +240,11 @@ function GlassBoxEvent({ event }: { event: DeploymentEvent }) {
           <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider border ${stageColors[event.stage]}`}>
             {event.stage}
           </span>
-          <span className="text-[10px] text-zinc-500 font-mono">
+          <span className="text-xs text-zinc-500 font-mono">
             {event.timestamp.toLocaleTimeString()}
           </span>
           {event.agent && (
-            <span className="text-[10px] text-gold/50 font-mono">
+            <span className="text-xs text-gold/50 font-mono">
               via {event.agent}
             </span>
           )}
@@ -255,7 +255,7 @@ function GlassBoxEvent({ event }: { event: DeploymentEvent }) {
 
         {event.proof && (
           <div className="flex items-center gap-2 mt-2">
-            <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-[#18181B] border border-wireframe-stroke text-[10px]">
+            <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-[#18181B] border border-wireframe-stroke text-xs">
               <FileCheck size={10} className="text-emerald-400" />
               <span className="text-zinc-400">{event.proof.label}:</span>
               <code className="text-gold font-mono">{event.proof.value}</code>
@@ -271,7 +271,7 @@ function AgentCard({ agent, onActivate }: { agent: AgentRoster; onActivate?: () 
   const typeColors = {
     boomer_ang: "border-gold/30 bg-gold/5",
     chicken_hawk: "border-cyan-500/30 bg-cyan-500/5",
-    lil_hawk: "border-violet-500/30 bg-violet-500/5",
+    lil_hawk: "border-amber-500/30 bg-amber-500/5",
   };
 
   const statusColors = {
@@ -300,7 +300,7 @@ function AgentCard({ agent, onActivate }: { agent: AgentRoster; onActivate?: () 
 
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold text-zinc-100 truncate">{agent.name}</p>
-          <p className="text-[10px] text-zinc-500 uppercase tracking-wider">{agent.role}</p>
+          <p className="text-xs text-zinc-500 uppercase tracking-wider">{agent.role}</p>
 
           <div className="flex flex-wrap gap-1 mt-2">
             {agent.capabilities.slice(0, 3).map((cap) => (
@@ -318,7 +318,7 @@ function AgentCard({ agent, onActivate }: { agent: AgentRoster; onActivate?: () 
       {onActivate && agent.status === "idle" && (
         <button
           onClick={onActivate}
-          className="mt-3 w-full flex items-center justify-center gap-1.5 py-2 rounded-lg bg-gold/10 text-gold text-[10px] font-semibold uppercase tracking-wider hover:bg-gold/20 transition-colors"
+          className="mt-3 w-full flex items-center justify-center gap-1.5 py-2 rounded-lg bg-gold/10 text-gold text-xs font-semibold uppercase tracking-wider hover:bg-gold/20 transition-colors"
         >
           <Zap size={10} />
           Hatch
@@ -402,7 +402,7 @@ function AcheevyPanel() {
           </motion.div>
           <div>
             <p className="text-sm font-semibold text-gold">Ask ACHEEVY</p>
-            <p className="text-[10px] text-gold/50 uppercase tracking-wider">Master Control Interface</p>
+            <p className="text-xs text-gold/50 uppercase tracking-wider">Master Control Interface</p>
           </div>
         </div>
       </div>
@@ -415,7 +415,7 @@ function AcheevyPanel() {
             <button
               key={m}
               onClick={() => setMode(m)}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-[10px] font-semibold uppercase tracking-wider transition-all ${
+              className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-semibold uppercase tracking-wider transition-all ${
                 mode === m
                   ? "text-gold bg-gold/10 border-b-2 border-gold"
                   : "text-zinc-500 hover:text-zinc-400 hover:bg-white/5"
@@ -580,7 +580,7 @@ function TransferView({ stage }: { stage: "idle" | "plan" | "quote" | "hatch" | 
 
       {/* Stage label */}
       <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
-        <span className="text-[10px] text-zinc-500 uppercase tracking-wider font-mono">
+        <span className="text-xs text-zinc-500 uppercase tracking-wider font-mono">
           Transfer View
         </span>
         <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider ${
@@ -881,7 +881,7 @@ export default function DeployDockPage() {
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-semibold text-zinc-100 truncate">{plug.name}</p>
-                            <p className="text-[10px] text-zinc-500 mt-0.5 line-clamp-2">{plug.tagline}</p>
+                            <p className="text-xs text-zinc-500 mt-0.5 line-clamp-2">{plug.tagline}</p>
                             <div className="flex items-center gap-2 mt-2 text-[9px] text-zinc-500 font-mono">
                               <span>{plug.resources?.cpu || "1"} CPU</span>
                               <span className="text-zinc-600">|</span>
@@ -934,8 +934,8 @@ export default function DeployDockPage() {
                   <div className="mt-6 rounded-2xl border border-wireframe-stroke bg-[#111113]/60 p-4">
                     <div className="flex items-center gap-2 mb-3">
                       <div className={`h-2 w-2 rounded-full ${circuitData.overall === "healthy" ? "bg-emerald-400" : "bg-amber-400"} animate-pulse`} />
-                      <span className="text-[10px] text-zinc-500 uppercase tracking-wider font-semibold">Platform Health</span>
-                      <span className="ml-auto text-[10px] text-zinc-500 font-mono">{circuitData.uptimePercent}% uptime</span>
+                      <span className="text-xs text-zinc-500 uppercase tracking-wider font-semibold">Platform Health</span>
+                      <span className="ml-auto text-xs text-zinc-500 font-mono">{circuitData.uptimePercent}% uptime</span>
                     </div>
                     <div className="grid grid-cols-4 gap-2">
                       {circuitData.services?.slice(0, 4).map((svc) => (
@@ -947,7 +947,7 @@ export default function DeployDockPage() {
                       ))}
                     </div>
                     {circuitData.plugInstances && (
-                      <div className="flex items-center gap-4 mt-3 text-[10px] text-zinc-500 font-mono">
+                      <div className="flex items-center gap-4 mt-3 text-xs text-zinc-500 font-mono">
                         <span>{circuitData.plugInstances.runningInstances} running</span>
                         <span className="text-zinc-600">|</span>
                         <span>{circuitData.plugInstances.healthStats.healthy} healthy</span>
@@ -970,7 +970,7 @@ export default function DeployDockPage() {
                           {instances.length} instance{instances.length !== 1 ? "s" : ""} managed
                         </p>
                       </div>
-                      <button onClick={loadInstances} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#18181B] text-zinc-500 text-[10px] font-semibold uppercase tracking-wider hover:bg-white/8 transition-colors">
+                      <button onClick={loadInstances} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#18181B] text-zinc-500 text-xs font-semibold uppercase tracking-wider hover:bg-white/8 transition-colors">
                         <RefreshCw size={10} /> Refresh
                       </button>
                     </div>
@@ -991,10 +991,10 @@ export default function DeployDockPage() {
                               <p className="text-sm font-semibold text-zinc-100 truncate flex-1">{inst.name || inst.plugId}</p>
                             </div>
                             <div className="space-y-1 mb-3">
-                              <p className="text-[10px] text-zinc-500 font-mono">
+                              <p className="text-xs text-zinc-500 font-mono">
                                 Port {inst.assignedPort} · {inst.status} · <span className={healthColor}>{inst.healthStatus || "checking"}</span>
                               </p>
-                              <p className="text-[10px] text-zinc-500 font-mono">
+                              <p className="text-xs text-zinc-500 font-mono">
                                 Uptime: {formatUptime(inst.uptimeSeconds)} · Plug: {inst.plugId}
                               </p>
                             </div>
@@ -1067,7 +1067,7 @@ export default function DeployDockPage() {
                     </div>
                     <div>
                       <p className="text-sm font-semibold text-zinc-100">n8n Workflow Binding</p>
-                      <p className="text-[10px] text-zinc-500">Connect to automation protocols</p>
+                      <p className="text-xs text-zinc-500">Connect to automation protocols</p>
                     </div>
                   </div>
 
@@ -1083,7 +1083,7 @@ export default function DeployDockPage() {
                         </div>
                         <button
                           onClick={() => setDeploymentStage("assign")}
-                          className="px-3 py-1 rounded-lg bg-orange-500/10 text-orange-400 text-[10px] font-semibold uppercase tracking-wider hover:bg-orange-500/20 transition-colors"
+                          className="px-3 py-1 rounded-lg bg-orange-500/10 text-orange-400 text-xs font-semibold uppercase tracking-wider hover:bg-orange-500/20 transition-colors"
                         >
                           Bind
                         </button>
@@ -1095,12 +1095,12 @@ export default function DeployDockPage() {
                 {/* Job Packets */}
                 <div className="rounded-2xl border border-wireframe-stroke bg-[#111113]/60 p-6 backdrop-blur-xl">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="h-10 w-10 rounded-xl bg-violet-500/10 border border-violet-500/30 flex items-center justify-center">
-                      <Package size={20} className="text-violet-400" />
+                    <div className="h-10 w-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center">
+                      <Package size={20} className="text-amber-400" />
                     </div>
                     <div>
                       <p className="text-sm font-semibold text-zinc-100">Job Packets</p>
-                      <p className="text-[10px] text-zinc-500">Deterministic task bundles with gates</p>
+                      <p className="text-xs text-zinc-500">Deterministic task bundles with gates</p>
                     </div>
                   </div>
 
@@ -1108,7 +1108,7 @@ export default function DeployDockPage() {
                     <div className="text-center py-8">
                       <Package size={32} className="text-zinc-600 mx-auto" />
                       <p className="mt-2 text-xs text-zinc-500">No job packets created yet</p>
-                      <button className="mt-3 px-4 py-2 rounded-lg bg-violet-500/10 text-violet-400 text-xs font-semibold hover:bg-violet-500/20 transition-colors">
+                      <button className="mt-3 px-4 py-2 rounded-lg bg-amber-500/10 text-amber-400 text-xs font-semibold hover:bg-amber-500/20 transition-colors">
                         Create Job Packet
                       </button>
                     </div>
@@ -1149,7 +1149,7 @@ export default function DeployDockPage() {
                         <p className="text-sm font-semibold text-zinc-100">
                           {catalogPlugs.find((p) => p.id === selectedPlugId)?.name || selectedPlugId}
                         </p>
-                        <p className="text-[10px] text-zinc-500">
+                        <p className="text-xs text-zinc-500">
                           {catalogPlugs.find((p) => p.id === selectedPlugId)?.tagline}
                         </p>
                       </div>
@@ -1158,17 +1158,17 @@ export default function DeployDockPage() {
 
                   <div className="grid gap-4 sm:grid-cols-3 mb-6">
                     <div className="p-4 rounded-xl bg-[#18181B] border border-wireframe-stroke">
-                      <p className="text-[10px] text-zinc-500 uppercase tracking-wider">Agents Ready</p>
+                      <p className="text-xs text-zinc-500 uppercase tracking-wider">Agents Ready</p>
                       <p className="text-2xl font-bold text-gold mt-1">
                         {roster.filter((a) => a.status === "active").length}/{roster.length}
                       </p>
                     </div>
                     <div className="p-4 rounded-xl bg-[#18181B] border border-wireframe-stroke">
-                      <p className="text-[10px] text-zinc-500 uppercase tracking-wider">Instances</p>
+                      <p className="text-xs text-zinc-500 uppercase tracking-wider">Instances</p>
                       <p className="text-2xl font-bold text-emerald-400 mt-1">{instances.length}</p>
                     </div>
                     <div className="p-4 rounded-xl bg-[#18181B] border border-wireframe-stroke">
-                      <p className="text-[10px] text-zinc-500 uppercase tracking-wider">Catalog</p>
+                      <p className="text-xs text-zinc-500 uppercase tracking-wider">Catalog</p>
                       <p className="text-2xl font-bold text-cyan-400 mt-1">{catalogPlugs.length}</p>
                     </div>
                   </div>
@@ -1239,7 +1239,7 @@ export default function DeployDockPage() {
                       Proof-linked status feed
                     </p>
                   </div>
-                  <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#18181B] text-zinc-500 text-[10px] font-semibold uppercase tracking-wider hover:bg-white/8 hover:text-zinc-400 transition-colors">
+                  <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#18181B] text-zinc-500 text-xs font-semibold uppercase tracking-wider hover:bg-white/8 hover:text-zinc-400 transition-colors">
                     <RefreshCw size={12} />
                     Refresh
                   </button>

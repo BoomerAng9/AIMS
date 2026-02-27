@@ -212,8 +212,8 @@ export default function BoostBridgePage() {
             <h1 className="text-2xl font-bold tracking-tight flex items-center gap-3">
               <span className="text-blue-400">Boost</span>
               <span className="text-zinc-400">|</span>
-              <span className="text-purple-400">Bridge</span>
-              <span className="text-[10px] font-mono px-2 py-1 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">
+              <span className="text-amber-400">Bridge</span>
+              <span className="text-xs font-mono px-2 py-1 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">
                 PRODUCTIVELY FUN
               </span>
             </h1>
@@ -310,7 +310,7 @@ export default function BoostBridgePage() {
                     onChange={e => setPersonaCount(Number(e.target.value))}
                     className="w-full accent-blue-500"
                   />
-                  <div className="flex justify-between text-[10px] text-zinc-400">
+                  <div className="flex justify-between text-xs text-zinc-400">
                     <span>5 (quick pulse)</span>
                     <span>50 (solid read)</span>
                     <span>100 (deep dive)</span>
@@ -325,7 +325,7 @@ export default function BoostBridgePage() {
                   {submitting ? 'Assembling The Crowd...' : 'Run Simulation'}
                 </button>
 
-                <p className="text-[10px] text-zinc-400 text-center">
+                <p className="text-xs text-zinc-400 text-center">
                   Synthetic personas get generated, experience your product, and give raw unfiltered feedback. No cap.
                 </p>
               </motion.div>
@@ -341,7 +341,7 @@ export default function BoostBridgePage() {
                   </div>
                   <div className="h-2 bg-[#1F1F23] rounded-full overflow-hidden">
                     <motion.div
-                      className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"
+                      className="h-full bg-gradient-to-r from-blue-500 to-amber-500 rounded-full"
                       initial={{ width: 0 }}
                       animate={{ width: `${progress}%` }}
                       transition={{ duration: 0.5 }}
@@ -404,7 +404,7 @@ export default function BoostBridgePage() {
                         >
                           <div className="flex items-center justify-between mb-1">
                             <h3 className="font-medium text-sm">{r.productName}</h3>
-                            <span className={`px-2 py-0.5 text-[10px] font-mono rounded border ${style.bg} ${style.text} ${style.border}`}>
+                            <span className={`px-2 py-0.5 text-xs font-mono rounded border ${style.bg} ${style.text} ${style.border}`}>
                               NPS {r.avgNPS}
                             </span>
                           </div>
@@ -444,7 +444,7 @@ export default function BoostBridgePage() {
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-3xl mx-auto">
             <div className="text-center mb-8">
               <p className="text-4xl mb-4">🥋</p>
-              <h2 className="text-xl font-bold text-purple-400 mb-2">The Dojo</h2>
+              <h2 className="text-xl font-bold text-amber-400 mb-2">The Dojo</h2>
               <p className="text-zinc-400 text-sm">
                 P2P training with AI-evaluated accreditation. Not participation trophies — verified skills.
               </p>
@@ -467,8 +467,8 @@ export default function BoostBridgePage() {
                           <p className="text-xs text-zinc-400">{b.tier.toUpperCase()} BELT in {b.domain}</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-sm font-mono text-purple-400">{b.score}%</p>
-                          <p className="text-[10px] text-zinc-400">{new Date(b.earnedAt).toLocaleDateString()}</p>
+                          <p className="text-sm font-mono text-amber-400">{b.score}%</p>
+                          <p className="text-xs text-zinc-400">{new Date(b.earnedAt).toLocaleDateString()}</p>
                         </div>
                       </div>
                     );
@@ -504,7 +504,7 @@ function CrowdReportViewer({ report }: { report: CrowdReport }) {
           </div>
           <div className="text-center">
             <p className={`text-3xl font-mono font-bold ${style.text}`}>{report.avgNPS}</p>
-            <p className="text-[10px] text-zinc-400">NPS / 10</p>
+            <p className="text-xs text-zinc-400">NPS / 10</p>
           </div>
         </div>
 
@@ -579,7 +579,7 @@ function CrowdReportViewer({ report }: { report: CrowdReport }) {
                   <span className="text-xs font-medium text-zinc-300">
                     {persona?.name || r.personaId} &middot; {persona?.age}, {persona?.occupation}
                   </span>
-                  <span className={`text-[10px] font-mono ${sentimentColor}`}>
+                  <span className={`text-xs font-mono ${sentimentColor}`}>
                     NPS {r.npsScore}/10
                   </span>
                 </div>
@@ -606,7 +606,7 @@ function CrowdReportViewer({ report }: { report: CrowdReport }) {
       )}
 
       {/* Meta */}
-      <div className="text-center text-[10px] text-zinc-400 font-mono">
+      <div className="text-center text-xs text-zinc-400 font-mono">
         Report ID: {report.reportId} &middot; Boost|Bridge v1.0 &middot; Productively Fun
       </div>
     </motion.div>
@@ -618,12 +618,12 @@ function MiniStat({ label, value, color }: { label: string; value: string | numb
     : color === 'amber' ? 'text-amber-400'
     : color === 'emerald' ? 'text-emerald-400'
     : color === 'blue' ? 'text-blue-400'
-    : color === 'purple' ? 'text-purple-400'
+    : color === 'purple' ? 'text-amber-400'
     : 'text-zinc-100';
   return (
     <div className="text-center">
       <p className={`text-lg font-mono font-bold ${textColor}`}>{value}</p>
-      <p className="text-[10px] text-zinc-400">{label}</p>
+      <p className="text-xs text-zinc-400">{label}</p>
     </div>
   );
 }

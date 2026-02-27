@@ -178,35 +178,35 @@ export default function CodebaseSyncPage() {
             <div className="rounded-xl border border-wireframe-stroke bg-[#18181B] px-3 py-2.5 text-center">
               <GitCommit size={16} className="mx-auto mb-1 text-gold/60" />
               <p className="text-lg font-bold text-zinc-100">{repoStats.commits}</p>
-              <p className="text-[10px] uppercase tracking-wider text-gold/50">
+              <p className="text-xs uppercase tracking-wider text-gold/50">
                 Commits
               </p>
             </div>
             <div className="rounded-xl border border-wireframe-stroke bg-[#18181B] px-3 py-2.5 text-center">
               <GitBranch size={16} className="mx-auto mb-1 text-blue-400/60" />
               <p className="text-lg font-bold text-zinc-100">{repoStats.branches}</p>
-              <p className="text-[10px] uppercase tracking-wider text-gold/50">
+              <p className="text-xs uppercase tracking-wider text-gold/50">
                 Branches
               </p>
             </div>
             <div className="rounded-xl border border-wireframe-stroke bg-[#18181B] px-3 py-2.5 text-center">
-              <Users size={16} className="mx-auto mb-1 text-purple-400/60" />
+              <Users size={16} className="mx-auto mb-1 text-amber-400/60" />
               <p className="text-lg font-bold text-zinc-100">{repoStats.contributors}</p>
-              <p className="text-[10px] uppercase tracking-wider text-gold/50">
+              <p className="text-xs uppercase tracking-wider text-gold/50">
                 Contributors
               </p>
             </div>
             <div className="rounded-xl border border-wireframe-stroke bg-[#18181B] px-3 py-2.5 text-center">
               <GitPullRequest size={16} className="mx-auto mb-1 text-emerald-400/60" />
               <p className="text-lg font-bold text-zinc-100">{repoStats.openPRs}</p>
-              <p className="text-[10px] uppercase tracking-wider text-gold/50">
+              <p className="text-xs uppercase tracking-wider text-gold/50">
                 Open PRs
               </p>
             </div>
             <div className="rounded-xl border border-wireframe-stroke bg-[#18181B] px-3 py-2.5 text-center">
               <Code2 size={16} className="mx-auto mb-1 text-cyan-400/60" />
               <p className="text-lg font-bold text-zinc-100">{repoStats.language}</p>
-              <p className="text-[10px] uppercase tracking-wider text-gold/50">
+              <p className="text-xs uppercase tracking-wider text-gold/50">
                 Language
               </p>
             </div>
@@ -215,7 +215,7 @@ export default function CodebaseSyncPage() {
               <p className="text-lg font-bold text-zinc-100">
                 {timeAgo(repoStats.lastPush)}
               </p>
-              <p className="text-[10px] uppercase tracking-wider text-gold/50">
+              <p className="text-xs uppercase tracking-wider text-gold/50">
                 Last Push
               </p>
             </div>
@@ -282,7 +282,7 @@ export default function CodebaseSyncPage() {
                     {branch.name}
                   </span>
                   {branch.isDefault && (
-                    <span className="flex-shrink-0 rounded-full border border-gold/30 bg-gold/10 px-2 py-0.5 text-[10px] font-bold uppercase text-gold">
+                    <span className="flex-shrink-0 rounded-full border border-gold/30 bg-gold/10 px-2 py-0.5 text-xs font-bold uppercase text-gold">
                       Default
                     </span>
                   )}
@@ -294,7 +294,7 @@ export default function CodebaseSyncPage() {
                   <span
                     className={`rounded-lg px-2 py-0.5 text-xs font-medium ${
                       branch.aheadBehind === "merged"
-                        ? "bg-purple-500/20 text-purple-400"
+                        ? "bg-amber-500/20 text-amber-400"
                         : branch.aheadBehind === "up to date"
                         ? "bg-emerald-500/20 text-emerald-400"
                         : "bg-blue-500/20 text-blue-400"

@@ -20,7 +20,7 @@ const stagger = { hidden: {}, visible: { transition: { staggerChildren: 0.08 } }
 
 const CONTEST_TYPES = [
   {
-    icon: Brain, label: 'Trivia', color: 'text-purple-400', bg: 'bg-purple-400/10', border: 'border-purple-400/20',
+    icon: Brain, label: 'Trivia', color: 'text-amber-400', bg: 'bg-amber-400/10', border: 'border-amber-400/20',
     desc: 'Answer questions across categories — science, sports, history, entertainment. Faster correct answers earn bonus points.',
   },
   {
@@ -48,7 +48,7 @@ const TIERS = [
   { name: 'Rookie', xp: '0', color: 'text-zinc-400', bg: 'bg-zinc-400/10' },
   { name: 'Contender', xp: '500', color: 'text-blue-400', bg: 'bg-blue-400/10' },
   { name: 'Veteran', xp: '2,000', color: 'text-emerald-400', bg: 'bg-emerald-400/10' },
-  { name: 'Elite', xp: '5,000', color: 'text-purple-400', bg: 'bg-purple-400/10' },
+  { name: 'Elite', xp: '5,000', color: 'text-amber-400', bg: 'bg-amber-400/10' },
   { name: 'Legend', xp: '15,000', color: 'text-gold', bg: 'bg-gold/10' },
 ];
 

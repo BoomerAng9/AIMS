@@ -329,7 +329,7 @@ export default function AcheevyChat() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
               </span>
-              <span className="text-[10px] font-medium tracking-wider text-emerald-500 uppercase">Systems: Nominal</span>
+              <span className="text-xs font-medium tracking-wider text-emerald-500 uppercase">Systems: Nominal</span>
             </div>
           </div>
         </div>

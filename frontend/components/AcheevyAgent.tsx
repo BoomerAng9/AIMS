@@ -416,7 +416,7 @@ export default function AcheevyAgent() {
             </div>
             <div>
               <h2 className="font-bold text-sm text-slate-800">ACHEEVY Voice</h2>
-              <div className="flex items-center gap-1 text-[10px] font-mono uppercase tracking-widest">
+              <div className="flex items-center gap-1 text-xs font-mono uppercase tracking-widest">
                 {isConnected ? (
                   <span className="text-emerald-400"><Zap className="w-2.5 h-2.5 inline" /> Live</span>
                 ) : isConnecting ? (
@@ -444,7 +444,7 @@ export default function AcheevyAgent() {
 
       {/* PMO Routing Pill */}
       {pmo && (
-        <div className="mx-3 mt-2 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gold/5 border border-gold/10 text-[10px]">
+        <div className="mx-3 mt-2 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gold/5 border border-gold/10 text-xs">
           <OfficeIcon className="w-3.5 h-3.5 text-gold" />
           <span className="text-gold font-medium">{pmo.officeLabel}</span>
           <span className={`ml-auto px-1.5 py-0.5 rounded-full font-mono uppercase ${

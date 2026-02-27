@@ -75,7 +75,7 @@ export default function BigBoardPage() {
         <div className="space-y-6 max-w-3xl">
           <div className="flex items-center gap-3">
             <span className="px-2 py-0.5 bg-emerald-950 text-white text-[8px] font-black uppercase tracking-[0.3em] rounded-sm">Registry Alpha</span>
-            <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Class of 2026 Registry</span>
+            <span className="text-xs font-black uppercase tracking-widest text-slate-400">Class of 2026 Registry</span>
           </div>
           <h1 className="text-5xl md:text-7xl font-serif font-bold tracking-tight text-slate-950 leading-tight">
             PER<span className="italic text-emerald-700">|</span>FORM <span className="text-slate-400 font-light">Big Board</span>
@@ -87,7 +87,7 @@ export default function BigBoardPage() {
         <div className="flex items-center gap-4">
           <button
             onClick={() => setShowBroadcastSpotlight(!showBroadcastSpotlight)}
-            className={`flex items-center gap-3 px-6 py-4 border rounded-sm text-[10px] font-black uppercase tracking-[0.2em] transition-all ${showBroadcastSpotlight
+            className={`flex items-center gap-3 px-6 py-4 border rounded-sm text-xs font-black uppercase tracking-[0.2em] transition-all ${showBroadcastSpotlight
               ? 'bg-red-600 text-white border-red-700'
               : 'bg-emerald-700 text-white border-emerald-800 hover:bg-emerald-800'
               }`}
@@ -95,7 +95,7 @@ export default function BigBoardPage() {
             {showBroadcastSpotlight ? <EyeOff size={16} /> : <Radio size={16} />}
             {showBroadcastSpotlight ? 'Exit Briefing' : 'Broadcast Spotlight'}
           </button>
-          <button className="flex items-center gap-3 px-6 py-4 bg-white border border-slate-200 text-slate-950 text-[10px] font-black uppercase tracking-[0.2em] rounded-sm hover:bg-slate-50 transition-all">
+          <button className="flex items-center gap-3 px-6 py-4 bg-white border border-slate-200 text-slate-950 text-xs font-black uppercase tracking-[0.2em] rounded-sm hover:bg-slate-50 transition-all">
             <Download size={16} /> Data Export
           </button>
         </div>
@@ -151,7 +151,7 @@ export default function BigBoardPage() {
             <button
               key={pos}
               onClick={() => setPosFilter(pos)}
-              className={`px-8 py-4 rounded-sm text-[10px] font-black uppercase tracking-[0.2em] transition-all whitespace-nowrap border ${posFilter === pos
+              className={`px-8 py-4 rounded-sm text-xs font-black uppercase tracking-[0.2em] transition-all whitespace-nowrap border ${posFilter === pos
                 ? 'bg-emerald-950 text-white border-emerald-950 shadow-lg shadow-emerald-900/20'
                 : 'bg-white text-slate-400 border-slate-100 hover:text-slate-800 hover:border-slate-200'
                 }`}
@@ -165,7 +165,7 @@ export default function BigBoardPage() {
       {/* Big Board Table */}
       <motion.div variants={staggerItem} className="bg-white border border-slate-200 rounded-sm overflow-hidden shadow-sm">
         {/* Table Header */}
-        <div className="hidden md:grid grid-cols-[80px_2fr_100px_1fr_1fr_120px_120px_100px_40px] gap-6 px-8 py-6 border-b border-slate-200 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 bg-slate-50">
+        <div className="hidden md:grid grid-cols-[80px_2fr_100px_1fr_1fr_120px_120px_100px_40px] gap-6 px-8 py-6 border-b border-slate-200 text-xs font-black uppercase tracking-[0.2em] text-slate-400 bg-slate-50">
           <span>Rank</span>
           <span>Personnel Record</span>
           <span className="text-center">Pos</span>
@@ -198,7 +198,7 @@ export default function BigBoardPage() {
                 EDGE: 'bg-red-500/20 text-red-400 border-red-500/30',
                 OT: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
                 S: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-                WR: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
+                WR: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
                 CB: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
               };
               const posStyle = posColors[prospect.position] || 'bg-zinc-500/20 text-zinc-400 border-zinc-500/30';
@@ -221,7 +221,7 @@ export default function BigBoardPage() {
                       <div className="text-xl text-slate-950 font-serif font-bold group-hover:text-emerald-900 transition-colors">
                         {prospect.name}
                       </div>
-                      <div className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] mt-1.5 font-bold">
+                      <div className="text-xs text-slate-400 font-black uppercase tracking-[0.2em] mt-1.5 font-bold">
                         {prospect.classYear} &middot; {prospect.height || '--'} &middot; {prospect.weight || '--'} LBS
                       </div>
                     </div>
@@ -229,18 +229,18 @@ export default function BigBoardPage() {
 
                   {/* Position */}
                   <div className="flex md:justify-center">
-                    <div className="text-[11px] font-black uppercase tracking-widest text-slate-500">
+                    <div className="text-sm font-black uppercase tracking-widest text-slate-500">
                       {prospect.position}
                     </div>
                   </div>
 
                   {/* School */}
-                  <div className="text-[11px] text-slate-700 font-black uppercase tracking-tight">
+                  <div className="text-sm text-slate-700 font-black uppercase tracking-tight">
                     {prospect.school}
                   </div>
 
                   {/* Conference */}
-                  <div className="text-[11px] text-slate-400 font-bold uppercase tracking-widest">
+                  <div className="text-sm text-slate-400 font-bold uppercase tracking-widest">
                     {prospect.state || 'CONF'}
                   </div>
 
@@ -302,7 +302,7 @@ export default function BigBoardPage() {
       {/* Dashboard Widgets Row */}
       <motion.div variants={staggerItem} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="bg-emerald-950 text-white border border-emerald-900 rounded-sm p-10 shadow-2xl shadow-emerald-950/20">
-          <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-500 mb-6">AGI Grade Guide</h3>
+          <h3 className="text-xs font-black uppercase tracking-[0.3em] text-emerald-500 mb-6">AGI Grade Guide</h3>
           <div className="space-y-4">
             <div className="flex justify-between items-center text-xs">
               <span className="text-emerald-400 font-bold uppercase tracking-widest">101+</span>
@@ -326,7 +326,7 @@ export default function BigBoardPage() {
             </div>
             <div>
               <h3 className="text-lg font-serif font-bold text-slate-950 leading-none">AGI Engine 4.2</h3>
-              <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mt-2">Active Multi-Point Analysis</p>
+              <p className="text-xs text-slate-400 font-black uppercase tracking-widest mt-2">Active Multi-Point Analysis</p>
             </div>
           </div>
           <p className="text-sm text-slate-500 font-medium leading-relaxed italic">
@@ -335,9 +335,9 @@ export default function BigBoardPage() {
         </div>
 
         <div className="bg-white border border-slate-200 rounded-sm p-10 flex flex-col items-center justify-center text-center shadow-sm">
-          <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4">Neural Data Pulse</h3>
+          <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4">Neural Data Pulse</h3>
           <div className="text-5xl font-serif font-black text-emerald-700 mb-2">99.8%</div>
-          <div className="flex items-center gap-2 text-[10px] text-emerald-600 font-black uppercase tracking-widest">
+          <div className="flex items-center gap-2 text-xs text-emerald-600 font-black uppercase tracking-widest">
             <CheckCircle2 size={12} /> Live Sync Active
           </div>
         </div>

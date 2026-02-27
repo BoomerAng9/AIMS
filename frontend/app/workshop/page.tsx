@@ -46,7 +46,7 @@ const FLOWS = [
     description:
       "Speak a quick recap of your day. ACHEEVY + a Story Boomer_Ang turn it into a private audio diary with chapters and gentle reflections.",
     icon: BookOpen,
-    accent: "text-violet-400 bg-violet-400/10 border-violet-400/20",
+    accent: "text-amber-400 bg-amber-400/10 border-amber-400/20",
     examples: [
       "Here's what happened today",
       "I had the strangest morning",
