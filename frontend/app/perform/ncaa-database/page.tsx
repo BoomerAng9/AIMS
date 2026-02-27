@@ -586,6 +586,78 @@ export default function NCAADatabasePage() {
         </section>
       )}
 
+      {/* ── AGI Intelligence Engine Definition ──────────────── */}
+      <section className="bg-white py-14 border-b border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col lg:flex-row gap-12 items-start">
+            <div className="flex-1">
+              <h2 className="text-3xl font-black text-slate-900 uppercase tracking-tight mb-4">
+                The <span className="text-gold italic">AGI</span> Engine
+              </h2>
+              <p className="text-slate-600 mb-4 leading-relaxed max-w-2xl text-sm">
+                The <strong>Associated Grading Index (AGI)</strong> is the proprietary intelligence engine powering the Per|Form platform. Rather than relying on simple star rankings, AGI utilizes a sophisticated weighting model designed by industry scouts and AI agents to project a player's true trajectory and professional upside.
+              </p>
+              <p className="text-slate-600 leading-relaxed max-w-2xl text-sm mb-6">
+                Through our automated <em>Fast Discovery & Harvest</em> loop, ACHEEVY continuously tracks the 2025 and 2026 classes, evaluating transfers, NIL valuations, and real-time performance. Each overall <strong>AGI Score</strong> is built from a player's <strong>P.A.I. matrix</strong>:
+              </p>
+              <ul className="text-slate-600 leading-relaxed max-w-2xl text-sm mb-6 space-y-2">
+                <li><span className="font-bold text-slate-900">P (Performance):</span> On-field production, situational tape analysis, and advanced statistical execution.</li>
+                <li><span className="font-bold text-slate-900">A (Athleticism):</span> Combine scores, verifiable speed, frame analysis, and dynamic movement.</li>
+                <li><span className="font-bold text-slate-900">I (Intangibles):</span> Leadership signals, scheme fit, football IQ, and our proprietary work ethic matrix.</li>
+              </ul>
+              <p className="text-slate-500 text-xs italic">
+                * Percentages and weighting formulas remain confidential to protect the integrity of the A.I.M.S. scouting architecture.
+              </p>
+            </div>
+            <div className="lg:w-[400px] bg-slate-50 border border-slate-200 rounded-2xl p-6 shadow-sm flex-shrink-0">
+              <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-6 flex items-center gap-2">
+                <Shield className="w-4 h-4 text-gold" />
+                2026 NFL Draft Profile Example
+              </div>
+              <h3 className="text-xl font-black text-slate-900 mb-1">Arch Manning</h3>
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-6">QB &middot; Texas &middot; Elite Tier</p>
+
+              <div className="space-y-5">
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-bold text-slate-600 uppercase">Performance (P)</span>
+                    <span className="text-xs font-mono font-black text-slate-900">98</span>
+                  </div>
+                  <div className="w-full bg-slate-200 rounded-full h-1.5">
+                    <div className="bg-emerald-500 h-1.5 rounded-full" style={{ width: '98%' }}></div>
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-bold text-slate-600 uppercase">Athleticism (A)</span>
+                    <span className="text-xs font-mono font-black text-slate-900">96</span>
+                  </div>
+                  <div className="w-full bg-slate-200 rounded-full h-1.5">
+                    <div className="bg-gold h-1.5 rounded-full" style={{ width: '96%' }}></div>
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-bold text-slate-600 uppercase">Intangibles (I)</span>
+                    <span className="text-xs font-mono font-black text-slate-900">97</span>
+                  </div>
+                  <div className="w-full bg-slate-200 rounded-full h-1.5">
+                    <div className="bg-blue-500 h-1.5 rounded-full" style={{ width: '97%' }}></div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-8 pt-6 border-t border-slate-200 flex justify-between items-center">
+                <span className="text-sm font-black text-slate-900 uppercase tracking-wide">Overall AGI Score</span>
+                <ScoreBadge score={97} size="lg" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ── Main Content ─────────────────────────────────── */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
