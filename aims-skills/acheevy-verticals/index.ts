@@ -36,6 +36,21 @@ export {
   getVerticalsByCategory,
 } from './vertical-definitions';
 
+// ── Hybrid Business Manager Vertical ────────────────────────────────────
+export {
+  HBM_VERTICALS,
+  HBM_AGENTS,
+  MULTUS_MAVEN,
+  getHBMVertical,
+  getAllHBMVerticals,
+  getHBMAgentsByVertical,
+  getHBMAgentsByTier,
+} from './hybrid-business-manager';
+export type {
+  HBMAgent,
+  MultusMavenProfile,
+} from './hybrid-business-manager';
+
 // ── Execution Engine (R-R-S) ────────────────────────────────────────────
 export {
   generateDynamicSteps,
