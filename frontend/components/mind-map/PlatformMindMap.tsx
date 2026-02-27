@@ -797,7 +797,7 @@ export function PlatformMindMap() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium text-slate-800">{node.label}</span>
-                      <span className={`flex items-center gap-1 text-[10px] font-mono uppercase ${style.labelColor}`}>
+                      <span className={`flex items-center gap-1 text-xs font-mono uppercase ${style.labelColor}`}>
                         <span className={`w-1.5 h-1.5 rounded-full ${style.dot}`} />
                         {style.label}
                       </span>

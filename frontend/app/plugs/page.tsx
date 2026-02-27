@@ -22,7 +22,7 @@ const COLOR_MAP: Record<string, { bg: string; border: string; text: string; glow
   emerald: { bg: "bg-emerald-500/10",  border: "border-emerald-500/20", text: "text-emerald-400",  glow: "shadow-[0_0_20px_rgba(16,185,129,0.15)]" },
   blue:    { bg: "bg-blue-500/10",     border: "border-blue-500/20",    text: "text-blue-400",     glow: "shadow-[0_0_20px_rgba(59,130,246,0.15)]" },
   pink:    { bg: "bg-pink-500/10",     border: "border-pink-500/20",    text: "text-pink-400",     glow: "shadow-[0_0_20px_rgba(236,72,153,0.15)]" },
-  violet:  { bg: "bg-violet-500/10",   border: "border-violet-500/20",  text: "text-violet-400",   glow: "shadow-[0_0_20px_rgba(139,92,246,0.15)]" },
+  violet:  { bg: "bg-amber-500/10",   border: "border-amber-500/20",  text: "text-amber-400",   glow: "shadow-[0_0_20px_rgba(139,92,246,0.15)]" },
 };
 
 const TIER_LABELS: Record<string, { label: string; price: string }> = {
@@ -55,7 +55,7 @@ export default function PlugCatalogPage() {
           {Object.entries(TIER_LABELS).map(([key, { label, price }]) => (
             <span
               key={key}
-              className="inline-flex items-center gap-2 rounded-full border border-wireframe-stroke bg-[#18181B] px-3 py-1 text-[10px] uppercase tracking-[0.15em] text-zinc-400"
+              className="inline-flex items-center gap-2 rounded-full border border-wireframe-stroke bg-[#18181B] px-3 py-1 text-xs uppercase tracking-[0.15em] text-zinc-400"
             >
               {label} <span className="text-gold font-display">{price}</span>
             </span>
@@ -114,13 +114,13 @@ export default function PlugCatalogPage() {
                     {plug.features.slice(0, 3).map((f) => (
                       <span
                         key={f}
-                        className="text-[10px] bg-[#18181B] border border-wireframe-stroke text-zinc-500 rounded px-1.5 py-0.5"
+                        className="text-xs bg-[#18181B] border border-wireframe-stroke text-zinc-500 rounded px-1.5 py-0.5"
                       >
                         {f}
                       </span>
                     ))}
                     {plug.features.length > 3 && (
-                      <span className="text-[10px] text-zinc-600">
+                      <span className="text-xs text-zinc-600">
                         +{plug.features.length - 3} more
                       </span>
                     )}

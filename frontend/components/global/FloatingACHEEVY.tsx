@@ -203,7 +203,7 @@ export function FloatingACHEEVY() {
                   />
                 </div>
                 <div className="flex flex-col justify-center">
-                  <span className="text-[11px] font-doto tracking-[0.3em] text-gold-gradient uppercase leading-tight">
+                  <span className="text-sm font-doto tracking-[0.3em] text-gold-gradient uppercase leading-tight">
                     chat w/ A C H E E V Y
                   </span>
                   <p className="text-[9px] text-slate-400 font-mono uppercase tracking-widest mt-0.5">Executive Orchestrator</p>
@@ -287,7 +287,7 @@ export function FloatingACHEEVY() {
                   <SendIcon className="w-3.5 h-3.5" />
                 </button>
               </div>
-              <p className="text-[10px] text-slate-400 text-center mt-1.5 font-mono">
+              <p className="text-xs text-slate-400 text-center mt-1.5 font-mono">
                 <kbd className="px-1 py-0.5 rounded border border-slate-200 bg-white text-[9px]">&#8984;J</kbd> toggle &middot; <kbd className="px-1 py-0.5 rounded border border-slate-200 bg-white text-[9px]">Esc</kbd> close
               </p>
             </div>

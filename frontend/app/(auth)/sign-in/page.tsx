@@ -179,7 +179,7 @@ function SignInContent() {
           {/* Divider */}
           <div className="flex items-center gap-4">
             <div className="h-px flex-1 bg-white/8" />
-            <span className="text-[11px] uppercase tracking-widest text-zinc-500">
+            <span className="text-sm uppercase tracking-widest text-zinc-500">
               or
             </span>
             <div className="h-px flex-1 bg-white/8" />

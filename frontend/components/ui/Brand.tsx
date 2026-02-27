@@ -57,7 +57,7 @@ const sizeClasses: Record<BrandSize, string> = {
 
 const subtitleSizeClasses: Record<BrandSize, string> = {
   xs: 'text-[8px]',
-  sm: 'text-[10px]',
+  sm: 'text-xs',
   md: 'text-xs',
   lg: 'text-sm',
   xl: 'text-base',

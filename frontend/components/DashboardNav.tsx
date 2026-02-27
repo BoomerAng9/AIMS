@@ -180,7 +180,7 @@ function SectionLabel({ label, icon: Icon }: { label: string; icon: typeof Messa
   return (
     <div className="flex items-center gap-2 px-3 py-1.5 text-zinc-500">
       <Icon className="w-3.5 h-3.5 flex-shrink-0" />
-      <span className="font-mono uppercase tracking-[0.15em] text-[10px]">{label}</span>
+      <span className="font-mono uppercase tracking-[0.15em] text-xs">{label}</span>
     </div>
   );
 }

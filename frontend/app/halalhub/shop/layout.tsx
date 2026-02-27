@@ -55,7 +55,7 @@ export default function ShopLayout({ children }: { children: React.ReactNode }) 
                     <div className="flex items-center gap-6">
                         <button className="relative text-[rgba(255,255,255,0.6)] hover:text-[#D4AF37] transition-colors">
                             <ShoppingCart size={22} />
-                            <span className="absolute -top-1.5 -right-1.5 bg-[#D4AF37] text-[#0A0A0A] text-[10px] font-bold h-4 w-4 rounded-full flex items-center justify-center border border-[#111111]">
+                            <span className="absolute -top-1.5 -right-1.5 bg-[#D4AF37] text-[#0A0A0A] text-xs font-bold h-4 w-4 rounded-full flex items-center justify-center border border-[#111111]">
                                 0
                             </span>
                         </button>
@@ -112,10 +112,10 @@ export default function ShopLayout({ children }: { children: React.ReactNode }) 
                     <div className="mt-auto p-6">
                         <div className="p-4 rounded-xl border border-[rgba(255,255,255,0.08)] bg-[rgba(0,0,0,0.2)]">
                             <h3 className="text-xs font-bold text-white mb-1 tracking-wide">Premium Trust</h3>
-                            <p className="text-[11px] text-[rgba(255,255,255,0.5)] mb-3 leading-relaxed">
+                            <p className="text-sm text-[rgba(255,255,255,0.5)] mb-3 leading-relaxed">
                                 All purchases are protected by A.I.M.S. Zero-Trust Escrow.
                             </p>
-                            <span className="inline-block text-[10px] font-mono text-[#10B981] px-2 py-1 bg-[rgba(16,185,129,0.1)] rounded border border-[rgba(16,185,129,0.2)]">
+                            <span className="inline-block text-xs font-mono text-[#10B981] px-2 py-1 bg-[rgba(16,185,129,0.1)] rounded border border-[rgba(16,185,129,0.2)]">
                                 Escrow Active
                             </span>
                         </div>

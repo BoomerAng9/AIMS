@@ -241,7 +241,7 @@ export function FileDownload({
           <p className="text-sm font-medium text-slate-700 truncate">
             {label || resolvedFilename}
           </p>
-          <p className="text-[11px] text-slate-400 flex items-center gap-1.5">
+          <p className="text-sm text-slate-400 flex items-center gap-1.5">
             <span>{config.label}</span>
             <span className="text-slate-200">&middot;</span>
             <span>{sizeKB < 1 ? '<1' : sizeKB}KB</span>
@@ -334,7 +334,7 @@ export function FileDownload({
                 {previewContent}
               </pre>
               {lineCount > 12 && (
-                <p className="text-[10px] text-slate-400 mt-2 flex items-center gap-1">
+                <p className="text-xs text-slate-400 mt-2 flex items-center gap-1">
                   <ChevronDown size={10} />
                   Showing first 12 of {lineCount} lines. Download to see full
                   content.
@@ -381,7 +381,7 @@ export function FileDownloadGroup({ files }: { files: FileDownloadProps[] }) {
         <span className="text-xs text-slate-400 font-medium uppercase tracking-wider group-hover:text-slate-600 transition-colors">
           Deliverables
         </span>
-        <span className="text-[10px] font-mono text-slate-300">
+        <span className="text-xs font-mono text-slate-300">
           {files.length} file{files.length !== 1 ? 's' : ''} &middot;{' '}
           {totalSizeKB < 1 ? '<1' : totalSizeKB}KB total
         </span>

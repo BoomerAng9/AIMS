@@ -649,7 +649,7 @@ export function UserInputModal({
               <div className="flex items-start justify-between">
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="px-2 py-0.5 text-[10px] font-medium bg-orange-500/20 text-orange-400 rounded-full border border-orange-500/30">
+                    <span className="px-2 py-0.5 text-xs font-medium bg-orange-500/20 text-orange-400 rounded-full border border-orange-500/30">
                       CHANGE ORDER
                     </span>
                   </div>

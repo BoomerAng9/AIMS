@@ -31,7 +31,7 @@ const CHAPTER_COLORS: Record<string, { border: string; glow: string; text: strin
   cyan: { border: 'border-cyan-500/30', glow: 'shadow-[0_0_30px_rgba(6,182,212,0.08)]', text: 'text-cyan-400' },
   emerald: { border: 'border-emerald-500/30', glow: 'shadow-[0_0_30px_rgba(16,185,129,0.08)]', text: 'text-emerald-400' },
   blue: { border: 'border-blue-500/30', glow: 'shadow-[0_0_30px_rgba(59,130,246,0.08)]', text: 'text-blue-400' },
-  purple: { border: 'border-purple-500/30', glow: 'shadow-[0_0_30px_rgba(147,51,234,0.08)]', text: 'text-purple-400' },
+  purple: { border: 'border-amber-500/30', glow: 'shadow-[0_0_30px_rgba(147,51,234,0.08)]', text: 'text-amber-400' },
   indigo: { border: 'border-indigo-500/30', glow: 'shadow-[0_0_30px_rgba(99,102,241,0.08)]', text: 'text-indigo-400' },
   rose: { border: 'border-rose-500/30', glow: 'shadow-[0_0_30px_rgba(244,63,94,0.08)]', text: 'text-rose-400' },
   red: { border: 'border-red-500/30', glow: 'shadow-[0_0_30px_rgba(239,68,68,0.08)]', text: 'text-red-400' },
@@ -67,7 +67,7 @@ export default function BookOfVibePage() {
           </motion.h1>
           <motion.p
             variants={fadeIn}
-            className="text-lg md:text-xl text-purple-400/80 uppercase tracking-[0.2em] mb-8"
+            className="text-lg md:text-xl text-amber-400/80 uppercase tracking-[0.2em] mb-8"
             style={{ fontFamily: 'var(--font-doto), "Doto", monospace' }}
           >
             {BOOK_OF_VIBE.subtitle}
@@ -89,7 +89,7 @@ export default function BookOfVibePage() {
                 <a
                   key={chapter.number}
                   href={`#chapter-${chapter.number}`}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-mono uppercase tracking-wider border ${colors.border} ${colors.text} hover:bg-slate-50 transition-colors`}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono uppercase tracking-wider border ${colors.border} ${colors.text} hover:bg-slate-50 transition-colors`}
                 >
                   <span className="opacity-50">{chapter.number}.</span> {chapter.title.split(' — ')[0]}
                 </a>

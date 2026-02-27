@@ -100,7 +100,7 @@ function NavigationHUD({ fuel, onOpenGalaxyMap }: { fuel: number; onOpenGalaxyMa
     <div className="absolute top-4 left-4 right-4 flex items-center justify-between pointer-events-none">
       {/* Left: Coordinates */}
       <div className="pointer-events-auto bg-slate-50/70 backdrop-blur-xl border border-wireframe-stroke rounded-xl px-4 py-2">
-        <p className="text-[10px] text-gray-500 uppercase tracking-wider">Location</p>
+        <p className="text-xs text-gray-500 uppercase tracking-wider">Location</p>
         <p className="text-sm text-gold font-mono">Sector 7-Alpha</p>
       </div>
 
@@ -115,11 +115,11 @@ function NavigationHUD({ fuel, onOpenGalaxyMap }: { fuel: number; onOpenGalaxyMa
       {/* Right: Quick Stats */}
       <div className="pointer-events-auto bg-slate-50/70 backdrop-blur-xl border border-wireframe-stroke rounded-xl px-4 py-2 flex gap-6">
         <div>
-          <p className="text-[10px] text-gray-500 uppercase tracking-wider">Fuel</p>
+          <p className="text-xs text-gray-500 uppercase tracking-wider">Fuel</p>
           <p className="text-sm text-gold font-mono">{fuel} LUC</p>
         </div>
         <div>
-          <p className="text-[10px] text-gray-500 uppercase tracking-wider">Range</p>
+          <p className="text-xs text-gray-500 uppercase tracking-wider">Range</p>
           <p className="text-sm text-green-400 font-mono">{Math.floor(fuel / 10)} LY</p>
         </div>
       </div>

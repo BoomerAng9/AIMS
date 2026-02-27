@@ -166,7 +166,7 @@ const CATEGORY_COLORS: Record<string, string> = {
   pmo: "border-gold/30 text-gold bg-gold/10",
   deploy: "border-emerald-400/30 text-emerald-400 bg-emerald-400/10",
   research: "border-blue-400/30 text-blue-400 bg-blue-400/10",
-  content: "border-violet-400/30 text-violet-400 bg-violet-400/10",
+  content: "border-amber-400/30 text-amber-400 bg-amber-400/10",
   automation: "border-cyan-400/30 text-cyan-400 bg-cyan-400/10",
 };
 
@@ -416,7 +416,7 @@ export default function DeploymentHangarPage() {
 
         {/* n8n Health Indicator */}
         <div className="flex items-center gap-2">
-          <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-[10px] font-mono uppercase tracking-wider ${
+          <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-mono uppercase tracking-wider ${
             n8nHealthy === true
               ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-400"
               : n8nHealthy === false
@@ -486,7 +486,7 @@ export default function DeploymentHangarPage() {
                       <span className={`rounded-full border px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${CATEGORY_COLORS[template.category]}`}>
                         {template.category}
                       </span>
-                      <span className="text-[10px] text-zinc-500 font-mono">{template.nodeCount} nodes</span>
+                      <span className="text-xs text-zinc-500 font-mono">{template.nodeCount} nodes</span>
                     </div>
 
                     <h3 className="text-sm font-semibold text-zinc-100 mb-2">{template.name}</h3>
@@ -503,7 +503,7 @@ export default function DeploymentHangarPage() {
 
                     {/* Trigger Result */}
                     {triggerResult?.templateId === template.id && (
-                      <div className={`mb-3 rounded-lg p-2 text-[10px] ${
+                      <div className={`mb-3 rounded-lg p-2 text-xs ${
                         triggerResult.success ? "bg-emerald-400/10 text-emerald-400 border border-emerald-400/20" : "bg-red-400/10 text-red-400 border border-red-400/20"
                       }`}>
                         {triggerResult.message}
@@ -536,7 +536,7 @@ export default function DeploymentHangarPage() {
                 <button
                   onClick={fetchWorkflows}
                   disabled={loading}
-                  className="flex items-center gap-1.5 text-[10px] text-zinc-500 hover:text-gold transition-colors"
+                  className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-gold transition-colors"
                 >
                   <RefreshCw size={10} className={loading ? "animate-spin" : ""} />
                   Refresh
@@ -558,7 +558,7 @@ export default function DeploymentHangarPage() {
                         <div className={`w-2 h-2 rounded-full ${wf.active ? "bg-emerald-400 animate-pulse" : "bg-[#1F1F23]"}`} />
                         <div>
                           <p className="text-sm font-medium text-zinc-100">{wf.name}</p>
-                          <p className="text-[10px] text-zinc-500 font-mono">ID: {wf.id}</p>
+                          <p className="text-xs text-zinc-500 font-mono">ID: {wf.id}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-3">
@@ -567,7 +567,7 @@ export default function DeploymentHangarPage() {
                         }`}>
                           {wf.active ? "Active" : "Inactive"}
                         </span>
-                        <span className="text-[10px] text-zinc-600 font-mono">
+                        <span className="text-xs text-zinc-600 font-mono">
                           {new Date(wf.updatedAt).toLocaleDateString()}
                         </span>
                       </div>
@@ -597,7 +597,7 @@ export default function DeploymentHangarPage() {
                 </div>
                 <div>
                   <h2 className="text-sm font-semibold text-zinc-100">Workflow Builder</h2>
-                  <p className="text-[10px] text-zinc-500">
+                  <p className="text-xs text-zinc-500">
                     Powered by Juno_Ang + Workflow Smith Squad (AUTHOR → VALIDATE → FAILURE → GATE)
                   </p>
                 </div>
@@ -643,19 +643,19 @@ export default function DeploymentHangarPage() {
 
                   <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-4">
                     <div>
-                      <p className="text-[10px] uppercase tracking-wider text-zinc-500">Nodes</p>
+                      <p className="text-xs uppercase tracking-wider text-zinc-500">Nodes</p>
                       <p className="text-sm text-zinc-100 font-mono">{generatedWorkflow.manifest.nodeCount}</p>
                     </div>
                     <div>
-                      <p className="text-[10px] uppercase tracking-wider text-zinc-500">Dependencies</p>
+                      <p className="text-xs uppercase tracking-wider text-zinc-500">Dependencies</p>
                       <p className="text-sm text-zinc-100 font-mono">{generatedWorkflow.manifest.dependencies.join(", ") || "None"}</p>
                     </div>
                     <div>
-                      <p className="text-[10px] uppercase tracking-wider text-zinc-500">Secrets Required</p>
+                      <p className="text-xs uppercase tracking-wider text-zinc-500">Secrets Required</p>
                       <p className="text-sm text-zinc-100 font-mono">{generatedWorkflow.manifest.secretsRequired.join(", ") || "None"}</p>
                     </div>
                     <div>
-                      <p className="text-[10px] uppercase tracking-wider text-zinc-500">Gate Status</p>
+                      <p className="text-xs uppercase tracking-wider text-zinc-500">Gate Status</p>
                       <p className={`text-sm font-mono font-bold ${generatedWorkflow.gate.approved ? "text-emerald-400" : "text-red-400"}`}>
                         {generatedWorkflow.gate.approved ? "APPROVED" : "BLOCKED"}
                       </p>
@@ -682,7 +682,7 @@ export default function DeploymentHangarPage() {
                   {/* Gate Issues */}
                   {generatedWorkflow.gate.reasons.length > 0 && (
                     <div className="rounded-xl bg-red-400/5 border border-red-400/20 p-3 mb-4">
-                      <p className="text-[10px] uppercase tracking-wider text-red-400 mb-2">Gate Blockers</p>
+                      <p className="text-xs uppercase tracking-wider text-red-400 mb-2">Gate Blockers</p>
                       {generatedWorkflow.gate.reasons.map((reason, i) => (
                         <p key={i} className="text-xs text-red-400/80 flex items-center gap-1.5">
                           <X size={10} /> {reason}
@@ -744,7 +744,7 @@ export default function DeploymentHangarPage() {
               </h2>
               <button
                 onClick={fetchExecutions}
-                className="flex items-center gap-1.5 text-[10px] text-zinc-500 hover:text-gold transition-colors"
+                className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-gold transition-colors"
               >
                 <RefreshCw size={10} /> Refresh
               </button>
@@ -766,7 +766,7 @@ export default function DeploymentHangarPage() {
                       }`} />
                       <div>
                         <p className="text-sm font-mono text-zinc-100">Execution #{exec.id}</p>
-                        <p className="text-[10px] text-zinc-500">Workflow: {exec.workflowId}</p>
+                        <p className="text-xs text-zinc-500">Workflow: {exec.workflowId}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
@@ -778,7 +778,7 @@ export default function DeploymentHangarPage() {
                       }`}>
                         {exec.status}
                       </span>
-                      <span className="text-[10px] text-zinc-600 font-mono">
+                      <span className="text-xs text-zinc-600 font-mono">
                         {new Date(exec.startedAt).toLocaleString()}
                       </span>
                     </div>
@@ -804,7 +804,7 @@ export default function DeploymentHangarPage() {
                   <h2 className="text-sm font-semibold uppercase tracking-widest text-zinc-200">
                     {tier.tier}
                   </h2>
-                  <span className="text-[10px] text-zinc-600 font-mono">{tier.role}</span>
+                  <span className="text-xs text-zinc-600 font-mono">{tier.role}</span>
                 </div>
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                   {tier.members.map((member) => (
@@ -817,7 +817,7 @@ export default function DeploymentHangarPage() {
                       }`} />
                       <div>
                         <p className="text-sm font-medium text-zinc-100">{member.name}</p>
-                        <p className="text-[10px] text-zinc-500">{member.office}</p>
+                        <p className="text-xs text-zinc-500">{member.office}</p>
                       </div>
                       <span className={`ml-auto text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${
                         member.status === "active"

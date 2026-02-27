@@ -65,7 +65,7 @@ function AgentAvatar({ agent, size = 'sm', status }: {
   status?: BoomerAngStatus;
 }) {
   const sizeClasses = {
-    sm: 'w-6 h-6 text-[10px]',
+    sm: 'w-6 h-6 text-xs',
     md: 'w-8 h-8 text-xs',
     lg: 'w-10 h-10 text-sm',
   };
@@ -116,12 +116,12 @@ function HandoffEventItem({ event, isLatest }: { event: HandoffEvent; isLatest: 
           {event.message}
         </p>
         {event.userContext && (
-          <p className="text-[10px] text-gold/50 mt-0.5 truncate">
+          <p className="text-xs text-gold/50 mt-0.5 truncate">
             {event.userContext}
           </p>
         )}
       </div>
-      <span className="text-[10px] text-slate-300 whitespace-nowrap">
+      <span className="text-xs text-slate-300 whitespace-nowrap">
         {timeAgo}
       </span>
     </motion.div>
@@ -141,7 +141,7 @@ function DialogueBubble({ dialogue }: { dialogue: AgentDialogue }) {
     >
       <AgentAvatar agent={dialogue.speaker} size="sm" />
       <div className="flex-1">
-        <span className="text-[10px] text-gold font-medium">
+        <span className="text-xs text-gold font-medium">
           {dialogue.speaker.name}
         </span>
         <p className="text-xs text-slate-600 mt-0.5">
@@ -221,11 +221,11 @@ function ActiveAgentsList({ state }: { state: OrchestrationState }) {
             <p className="text-xs font-medium text-cyan-300 truncate">
               {state.activeManager.name}
             </p>
-            <p className="text-[10px] text-cyan-300/60">
+            <p className="text-xs text-cyan-300/60">
               {state.activeManager.department} Lead
             </p>
           </div>
-          <span className="text-[10px] text-cyan-300/40">Managing</span>
+          <span className="text-xs text-cyan-300/40">Managing</span>
         </div>
       )}
 
@@ -243,7 +243,7 @@ function ActiveAgentsList({ state }: { state: OrchestrationState }) {
             >
               <AgentAvatar agent={ang} size="sm" status={ang.currentStatus} />
               <div className="flex-1 min-w-0">
-                <p className="text-[10px] font-medium text-slate-800 truncate">
+                <p className="text-xs font-medium text-slate-800 truncate">
                   {ang.name}
                 </p>
                 <p className={`text-[9px] ${statusConfig.color}`}>
@@ -336,7 +336,7 @@ export function OperationsOverlay({ state, onClose, onExpand, onMinimize }: Oper
       {/* User Context Bar */}
       {state.userName && (
         <div className="px-4 py-2 bg-gold/5 border-b border-wireframe-stroke">
-          <p className="text-[10px] text-gold/80">
+          <p className="text-xs text-gold/80">
             Working on: <span className="font-medium text-gold">{state.userName}</span>
             {state.projectTitle && ` • ${state.projectTitle}`}
           </p>
@@ -351,7 +351,7 @@ export function OperationsOverlay({ state, onClose, onExpand, onMinimize }: Oper
         {/* Active Agents (expanded view) */}
         {isExpanded && state.activeAngs.length > 0 && (
           <div className="p-3 border-b border-wireframe-stroke">
-            <p className="text-[10px] uppercase tracking-wider text-slate-400 mb-2">
+            <p className="text-xs uppercase tracking-wider text-slate-400 mb-2">
               Active Agents
             </p>
             <ActiveAgentsList state={state} />
@@ -360,7 +360,7 @@ export function OperationsOverlay({ state, onClose, onExpand, onMinimize }: Oper
 
         {/* Event Feed */}
         <div className="p-3 space-y-1">
-          <p className="text-[10px] uppercase tracking-wider text-slate-400 mb-2">
+          <p className="text-xs uppercase tracking-wider text-slate-400 mb-2">
             Operations
           </p>
           <AnimatePresence mode="popLayout">
@@ -377,7 +377,7 @@ export function OperationsOverlay({ state, onClose, onExpand, onMinimize }: Oper
         {/* Agent Dialogue (expanded view) */}
         {isExpanded && latestDialogues.length > 0 && (
           <div className="p-3 border-t border-wireframe-stroke">
-            <p className="text-[10px] uppercase tracking-wider text-slate-400 mb-2">
+            <p className="text-xs uppercase tracking-wider text-slate-400 mb-2">
               Team Discussion
             </p>
             <div className="space-y-1">
@@ -397,7 +397,7 @@ export function OperationsOverlay({ state, onClose, onExpand, onMinimize }: Oper
             <p className="text-xs font-medium">Waiting on your input</p>
           </div>
           {state.blockingQuestion && (
-            <p className="text-[11px] text-orange-300/70 mt-1">
+            <p className="text-sm text-orange-300/70 mt-1">
               {state.blockingQuestion}
             </p>
           )}

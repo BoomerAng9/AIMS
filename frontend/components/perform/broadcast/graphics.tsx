@@ -15,7 +15,7 @@ export function NetworkBug() {
                 </div>
                 <div className="flex flex-col">
                     <span className="text-xl font-bold tracking-[0.2em] text-slate-800 leading-none">PER|FORM</span>
-                    <span className="text-[10px] uppercase font-mono tracking-widest text-gold text-right">Draft Center</span>
+                    <span className="text-xs uppercase font-mono tracking-widest text-gold text-right">Draft Center</span>
                 </div>
             </div>
             <div className="flex items-center gap-2 mt-2 px-3 py-1 bg-red-600 rounded">
@@ -24,7 +24,7 @@ export function NetworkBug() {
                     transition={{ duration: 1.5, repeat: Infinity }}
                     className="w-2 h-2 rounded-full bg-white"
                 />
-                <span className="text-[10px] font-bold text-white tracking-widest uppercase">Live Network</span>
+                <span className="text-xs font-bold text-white tracking-widest uppercase">Live Network</span>
             </div>
         </div>
     );
@@ -45,7 +45,7 @@ export function LowerThird({ title, topic, host }: { title: string; topic: strin
 
                 <div className="relative z-10">
                     <div className="flex items-center gap-3 mb-1">
-                        <span className="px-2 py-0.5 bg-white text-black text-[10px] font-bold uppercase tracking-widest rounded-sm">
+                        <span className="px-2 py-0.5 bg-white text-black text-xs font-bold uppercase tracking-widest rounded-sm">
                             {({
                                 HUMAN: 'Analyst Desk',
                                 ACHEEVY: 'Draft Intelligence',

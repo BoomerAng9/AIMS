@@ -24,14 +24,14 @@ export default function MomentStudioPage() {
       {/* Header */}
       <motion.header variants={staggerItem} className="space-y-3">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-400/10 border border-violet-400/20 text-violet-400">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-400/10 border border-amber-400/20 text-amber-400">
             <BookOpen size={20} />
           </div>
           <div>
             <h1 className="text-2xl font-display text-slate-800 tracking-tight">
               Moment Studio
             </h1>
-            <p className="text-xs text-violet-400/60 font-mono">
+            <p className="text-xs text-amber-400/60 font-mono">
               Turn Days Into Stories
             </p>
           </div>
@@ -50,7 +50,7 @@ export default function MomentStudioPage() {
       >
         <button
           type="button"
-          className="relative flex h-20 w-20 items-center justify-center rounded-full bg-violet-400/10 border-2 border-violet-400/30 text-violet-400 hover:bg-violet-400/20 transition-colors"
+          className="relative flex h-20 w-20 items-center justify-center rounded-full bg-amber-400/10 border-2 border-amber-400/30 text-amber-400 hover:bg-amber-400/20 transition-colors"
         >
           <Mic size={32} />
         </button>
@@ -74,7 +74,7 @@ export default function MomentStudioPage() {
             <button
               key={s}
               type="button"
-              className="text-left px-4 py-3 rounded-xl border border-slate-100 bg-white text-sm text-slate-500 hover:text-violet-400 hover:border-violet-400/20 transition-colors"
+              className="text-left px-4 py-3 rounded-xl border border-slate-100 bg-white text-sm text-slate-500 hover:text-amber-400 hover:border-amber-400/20 transition-colors"
             >
               &quot;{s}&quot;
             </button>
@@ -88,7 +88,7 @@ export default function MomentStudioPage() {
         className="wireframe-card p-6 rounded-2xl space-y-4"
       >
         <div className="flex items-center justify-between">
-          <h2 className="text-xs uppercase tracking-widest text-violet-400/50 font-mono">
+          <h2 className="text-xs uppercase tracking-widest text-amber-400/50 font-mono">
             Sample Entry — Feb 14, 2026
           </h2>
           <span className="text-[0.55rem] font-mono text-slate-300">
@@ -101,13 +101,13 @@ export default function MomentStudioPage() {
           <div className="flex items-center gap-3">
             <button
               type="button"
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-violet-400/10 border border-violet-400/20 text-violet-400"
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-400/10 border border-amber-400/20 text-amber-400"
             >
               <Play size={16} />
             </button>
             <div className="flex-1">
               <div className="h-2 rounded-full bg-slate-50 overflow-hidden">
-                <div className="h-full w-[48%] rounded-full bg-gradient-to-r from-violet-400/60 to-violet-400" />
+                <div className="h-full w-[48%] rounded-full bg-gradient-to-r from-amber-400/60 to-amber-400" />
               </div>
               <div className="flex justify-between mt-1">
                 <span className="text-[0.5rem] font-mono text-slate-400">
@@ -136,7 +136,7 @@ export default function MomentStudioPage() {
               type="button"
               className="flex items-center gap-3 w-full text-left px-3 py-2 rounded-lg hover:bg-white transition-colors"
             >
-              <span className="text-[0.55rem] font-mono text-violet-400/60 w-8">
+              <span className="text-[0.55rem] font-mono text-amber-400/60 w-8">
                 {ch.time}
               </span>
               <span className="text-xs text-slate-500">{ch.title}</span>
@@ -148,8 +148,8 @@ export default function MomentStudioPage() {
         </div>
 
         {/* Reflections */}
-        <div className="p-4 rounded-xl bg-violet-400/5 border border-violet-400/10">
-          <p className="text-[0.55rem] text-violet-400/60 font-mono uppercase mb-2">
+        <div className="p-4 rounded-xl bg-amber-400/5 border border-amber-400/10">
+          <p className="text-[0.55rem] text-amber-400/60 font-mono uppercase mb-2">
             Story_Ang Reflections
           </p>
           <p className="text-xs text-slate-500 italic leading-relaxed">
@@ -165,7 +165,7 @@ export default function MomentStudioPage() {
         <div className="flex gap-2">
           <button
             type="button"
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-violet-400/10 border border-violet-400/20 text-xs text-violet-400 hover:bg-violet-400/20 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-400/10 border border-amber-400/20 text-xs text-amber-400 hover:bg-amber-400/20 transition-colors"
           >
             <Save size={12} />
             Save to Diary

@@ -59,7 +59,7 @@ function RevenueBar({ budget }: { budget: SchoolRevenueBudget }) {
     { value: budget.tvRevenue, color: "bg-blue-400", label: "TV" },
     { value: budget.ticketRevenue, color: "bg-emerald-400", label: "Tickets" },
     { value: budget.donorRevenue, color: "bg-amber-400", label: "Donors" },
-    { value: budget.merchandiseRev, color: "bg-purple-400", label: "Merch" },
+    { value: budget.merchandiseRev, color: "bg-amber-400", label: "Merch" },
     { value: budget.conferenceShare, color: "bg-cyan-400", label: "Conf" },
   ];
 
@@ -81,7 +81,7 @@ function RevenueBar({ budget }: { budget: SchoolRevenueBudget }) {
       </div>
       <div className="flex items-center gap-2 flex-wrap">
         {segments.map((seg, i) => (
-          <span key={i} className="flex items-center gap-1 text-[10px] text-slate-400">
+          <span key={i} className="flex items-center gap-1 text-xs text-slate-400">
             <span className={`inline-block w-1.5 h-1.5 rounded-full ${seg.color} opacity-70`} />
             {seg.label}
           </span>

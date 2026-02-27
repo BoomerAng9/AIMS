@@ -375,10 +375,10 @@ function RepositoriesPanel({ repos }: { repos: Repository[] }) {
             <div className="flex items-center justify-center gap-2 mb-1">
               <SignalBars level={repo.signal} />
             </div>
-            <div className="text-[10px] text-gray-500">Last sync: {repo.lastSync}</div>
+            <div className="text-xs text-gray-500">Last sync: {repo.lastSync}</div>
             {repo.errorCount !== undefined && repo.errorCount > 0 && (
               <span
-                className="inline-block mt-1 px-1.5 py-0.5 rounded text-[10px]"
+                className="inline-block mt-1 px-1.5 py-0.5 rounded text-xs"
                 style={{ backgroundColor: '#ef444420', color: '#ef4444' }}
               >
                 {repo.errorCount} Errors
@@ -482,7 +482,7 @@ function DeploymentPanel({ services }: { services: DeploymentService[] }) {
             <span className="text-sm text-slate-800">{service.name}</span>
             <div className="flex items-center gap-2">
               <Toggle state={service.enabled} />
-              <span className="text-[10px] text-gray-500">Last check: {service.lastCheck}</span>
+              <span className="text-xs text-gray-500">Last check: {service.lastCheck}</span>
             </div>
           </div>
         ))}
@@ -731,7 +731,7 @@ export default function CircuitBox() {
             <div className="text-sm font-bold" style={{ color: AIMS_CIRCUIT_COLORS.secondary }}>
               A.I.M.S.
             </div>
-            <div className="text-[10px]" style={{ color: AIMS_CIRCUIT_COLORS.primary }}>
+            <div className="text-xs" style={{ color: AIMS_CIRCUIT_COLORS.primary }}>
               AI Managed Solutions
             </div>
           </div>

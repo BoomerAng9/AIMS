@@ -26,7 +26,7 @@ type Stage = (typeof STAGES)[number];
 
 const STAGE_META: Record<Stage, { label: string; color: string; bg: string }> = {
   INTAKE:  { label: "Intake",  color: "text-sky-400",     bg: "bg-sky-400" },
-  SCOPE:   { label: "Scope",   color: "text-violet-400",  bg: "bg-violet-400" },
+  SCOPE:   { label: "Scope",   color: "text-amber-400",  bg: "bg-amber-400" },
   BUILD:   { label: "Build",   color: "text-gold",        bg: "bg-gold" },
   REVIEW:  { label: "Review",  color: "text-orange-400",  bg: "bg-orange-400" },
   DEPLOY:  { label: "Deploy",  color: "text-emerald-400", bg: "bg-emerald-400" },
@@ -193,7 +193,7 @@ export default function WorkstreamsPage() {
                   <div className={`w-3 h-3 rounded-full ${meta.bg} ${
                     count > 0 ? "shadow-[0_0_10px_currentColor]" : "opacity-30"
                   }`} />
-                  <span className={`text-[10px] font-mono uppercase tracking-wider ${meta.color}`}>
+                  <span className={`text-xs font-mono uppercase tracking-wider ${meta.color}`}>
                     {meta.label}
                   </span>
                   <span className="text-xs font-bold text-zinc-100">{count}</span>
@@ -296,7 +296,7 @@ export default function WorkstreamsPage() {
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-1">
                         <h3 className="text-lg font-semibold text-zinc-100">{ws.name}</h3>
-                        <span className={`flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-wider ${priorityStyle.text}`}>
+                        <span className={`flex items-center gap-1.5 text-xs font-mono uppercase tracking-wider ${priorityStyle.text}`}>
                           <span className={`w-1.5 h-1.5 rounded-full ${priorityStyle.dot}`} />
                           {priorityStyle.label}
                         </span>
@@ -309,7 +309,7 @@ export default function WorkstreamsPage() {
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-4 text-[10px] text-zinc-500 font-mono mb-4">
+                  <div className="flex flex-wrap items-center gap-4 text-xs text-zinc-500 font-mono mb-4">
                     <span className="flex items-center gap-1.5">
                       <Users size={10} />
                       {ws.director} &middot; {ws.pmoOffice}

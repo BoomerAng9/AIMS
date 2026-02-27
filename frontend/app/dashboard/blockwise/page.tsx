@@ -198,7 +198,7 @@ export default function BlockWisePage() {
         <h1 className="text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-3">
           <span className="text-emerald-400">BlockWise</span>
           <span className="text-zinc-400 font-normal">AI</span>
-          <span className="text-[10px] font-mono px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 ml-1">
+          <span className="text-xs font-mono px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 ml-1">
             FLIP CALCULATOR
           </span>
         </h1>
@@ -236,15 +236,15 @@ export default function BlockWisePage() {
           <div className="grid grid-cols-3 gap-4 text-center">
             <div>
               <p className="text-xl md:text-2xl font-mono font-bold text-emerald-400">{fmtCurrency(results.profit)}</p>
-              <p className="text-[10px] text-zinc-400">NET PROFIT</p>
+              <p className="text-xs text-zinc-400">NET PROFIT</p>
             </div>
             <div>
               <p className="text-xl md:text-2xl font-mono font-bold text-amber-400">{results.roi.toFixed(1)}%</p>
-              <p className="text-[10px] text-zinc-400">ROI</p>
+              <p className="text-xs text-zinc-400">ROI</p>
             </div>
             <div>
               <p className="text-xl md:text-2xl font-mono font-bold text-cyan-400">{results.cashOnCashReturn.toFixed(1)}%</p>
-              <p className="text-[10px] text-zinc-400">CASH-ON-CASH</p>
+              <p className="text-xs text-zinc-400">CASH-ON-CASH</p>
             </div>
           </div>
         </div>
@@ -414,18 +414,18 @@ export default function BlockWisePage() {
                     <div className="grid grid-cols-3 gap-2 text-center">
                       <div className="bg-[#18181B] rounded-lg p-2">
                         <p className="text-sm font-mono font-bold text-emerald-400">{fmtCurrency(opt.yourCash)}</p>
-                        <p className="text-[10px] text-zinc-400">Your Cash</p>
+                        <p className="text-xs text-zinc-400">Your Cash</p>
                       </div>
                       <div className="bg-[#18181B] rounded-lg p-2">
                         <p className="text-sm font-mono font-bold text-cyan-400">{fmtCurrency(opt.partnerCash)}</p>
-                        <p className="text-[10px] text-zinc-400">Partner Cash</p>
+                        <p className="text-xs text-zinc-400">Partner Cash</p>
                       </div>
                       <div className="bg-[#18181B] rounded-lg p-2">
                         <p className="text-sm font-mono font-bold text-amber-400">{fmtCurrency(opt.lenderCash)}</p>
-                        <p className="text-[10px] text-zinc-400">Lender Cash</p>
+                        <p className="text-xs text-zinc-400">Lender Cash</p>
                       </div>
                     </div>
-                    <p className="text-[10px] text-zinc-400 mt-2">Split: {opt.profitSplit}</p>
+                    <p className="text-xs text-zinc-400 mt-2">Split: {opt.profitSplit}</p>
                   </div>
                 ))}
               </motion.div>
@@ -548,7 +548,7 @@ function MetricCard({ label, value, sub, color }: {
     <div className="bg-[#111113] border border-white/10 shadow-[0_1px_2px_rgba(0,0,0,0.3)] rounded-xl p-3">
       <p className="text-xs text-zinc-400 mb-1">{label}</p>
       <p className={`text-lg font-mono font-bold ${textColor}`}>{value}</p>
-      <p className="text-[10px] text-zinc-400 mt-0.5">{sub}</p>
+      <p className="text-xs text-zinc-400 mt-0.5">{sub}</p>
     </div>
   );
 }
@@ -587,22 +587,22 @@ function RentalAnalysis({ arv, totalInvestment, cashRequired }: {
   return (
     <div className="grid grid-cols-2 gap-3">
       <div className="text-center">
-        <p className="text-lg font-mono font-bold text-purple-400">{fmtCurrency(monthlyRent)}</p>
-        <p className="text-[10px] text-zinc-400">Est. Monthly Rent</p>
+        <p className="text-lg font-mono font-bold text-amber-400">{fmtCurrency(monthlyRent)}</p>
+        <p className="text-xs text-zinc-400">Est. Monthly Rent</p>
       </div>
       <div className="text-center">
-        <p className="text-lg font-mono font-bold text-purple-400">{capRate.toFixed(1)}%</p>
-        <p className="text-[10px] text-zinc-400">Cap Rate</p>
+        <p className="text-lg font-mono font-bold text-amber-400">{capRate.toFixed(1)}%</p>
+        <p className="text-xs text-zinc-400">Cap Rate</p>
       </div>
       <div className="text-center">
-        <p className="text-lg font-mono font-bold text-purple-400">{fmtCurrency(noi)}</p>
-        <p className="text-[10px] text-zinc-400">Annual NOI (60%)</p>
+        <p className="text-lg font-mono font-bold text-amber-400">{fmtCurrency(noi)}</p>
+        <p className="text-xs text-zinc-400">Annual NOI (60%)</p>
       </div>
       <div className="text-center">
-        <p className="text-lg font-mono font-bold text-purple-400">{cashOnCash.toFixed(1)}%</p>
-        <p className="text-[10px] text-zinc-400">Cash-on-Cash</p>
+        <p className="text-lg font-mono font-bold text-amber-400">{cashOnCash.toFixed(1)}%</p>
+        <p className="text-xs text-zinc-400">Cash-on-Cash</p>
       </div>
-      <p className="col-span-2 text-[10px] text-zinc-400 text-center mt-1">
+      <p className="col-span-2 text-xs text-zinc-400 text-center mt-1">
         BRRRR Strategy: Buy at {fmtCurrency(totalInvestment)}, rent at {fmtCurrency(monthlyRent)}/mo, refinance at 75% ARV ({fmtCurrency(arv * 0.75)})
       </p>
     </div>

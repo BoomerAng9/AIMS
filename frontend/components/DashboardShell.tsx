@@ -144,7 +144,7 @@ export function DashboardShell({ children }: Props) {
                   onClick={() => setShowAccountMenu(!showAccountMenu)}
                   className="flex items-center gap-2 rounded-lg border border-white/10 bg-[#111113] px-2.5 py-1.5 text-xs text-zinc-300 hover:border-white/20 transition-colors"
                 >
-                  <span className="h-6 w-6 rounded-full bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center text-[10px] font-bold text-black">
+                  <span className="h-6 w-6 rounded-full bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center text-xs font-bold text-black">
                     {userName.charAt(0).toUpperCase()}
                   </span>
                   <span className="hidden sm:inline">{userName}</span>
@@ -158,7 +158,7 @@ export function DashboardShell({ children }: Props) {
                     <div className="absolute right-0 top-full mt-2 w-56 rounded-xl border border-white/10 bg-[#18181B] shadow-lg shadow-black/50 z-40 overflow-hidden">
                       <div className="px-4 py-3 border-b border-white/8">
                         <p className="text-sm text-zinc-100 font-medium truncate">{userName}</p>
-                        <p className="text-[11px] text-zinc-500 truncate">{userEmail}</p>
+                        <p className="text-sm text-zinc-500 truncate">{userEmail}</p>
                         <span className="inline-block mt-1 text-[9px] px-1.5 py-0.5 rounded border border-amber-500/30 bg-amber-500/10 text-amber-400 font-mono uppercase">
                           {userRole}
                         </span>

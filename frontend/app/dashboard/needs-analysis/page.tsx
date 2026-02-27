@@ -62,7 +62,7 @@ const SECTIONS = [
 
 const TIER_DISPLAY: Record<string, { label: string; color: string; description: string }> = {
   starter: { label: "Starter", color: "text-blue-400", description: "Best for small teams and simple workflows" },
-  pro: { label: "Pro", color: "text-violet-400", description: "Full agent capabilities with priority support" },
+  pro: { label: "Pro", color: "text-amber-400", description: "Full agent capabilities with priority support" },
   enterprise: { label: "Enterprise", color: "text-gold", description: "Dedicated resources, compliance, and SLA guarantees" },
 };
 

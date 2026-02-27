@@ -75,12 +75,12 @@ export default function MockDraftSurfacePage() {
                     <div className="flex items-center gap-4">
                         <div className="flex items-center gap-2 text-slate-400">
                             <Activity size={16} />
-                            <span className="text-[10px] font-mono uppercase tracking-widest">Data Integrity: 100%</span>
+                            <span className="text-xs font-mono uppercase tracking-widest">Data Integrity: 100%</span>
                         </div>
                         <div className="h-4 w-px bg-slate-100" />
                         <div className="flex items-center gap-2 text-slate-400">
                             <Shield size={16} />
-                            <span className="text-[10px] font-mono uppercase tracking-widest">ACHEEVY Verified</span>
+                            <span className="text-xs font-mono uppercase tracking-widest">ACHEEVY Verified</span>
                         </div>
                     </div>
                     <div className="flex items-center gap-3">
@@ -144,7 +144,7 @@ export default function MockDraftSurfacePage() {
                                     {/* Score & Stats */}
                                     <div className="pt-4 flex items-end justify-between border-t border-slate-100">
                                         <div>
-                                            <p className="text-[10px] text-slate-400 font-mono uppercase tracking-widest mb-1">P.A.I. Score</p>
+                                            <p className="text-xs text-slate-400 font-mono uppercase tracking-widest mb-1">P.A.I. Score</p>
                                             <div className="flex items-center gap-2">
                                                 <div className="relative flex items-center justify-center w-10 h-10 rounded-full bg-gold/5 border border-gold/20 shadow-[0_0_10px_rgba(218,165,32,0.1)] group-hover:shadow-[0_0_20px_rgba(218,165,32,0.2)] transition-shadow">
                                                     <span className="text-sm font-display text-gold">{p.paiScore}</span>
@@ -153,7 +153,7 @@ export default function MockDraftSurfacePage() {
                                         </div>
 
                                         <div className="text-right">
-                                            <p className="text-[10px] text-slate-400 font-mono uppercase tracking-widest mb-1">NIL Est.</p>
+                                            <p className="text-xs text-slate-400 font-mono uppercase tracking-widest mb-1">NIL Est.</p>
                                             <p className="text-sm font-sans font-semibold text-emerald-400/80 group-hover:text-emerald-400 transition-colors">
                                                 {p.nilEstimate || 'TBD'}
                                             </p>

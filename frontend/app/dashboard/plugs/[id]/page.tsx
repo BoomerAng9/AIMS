@@ -72,7 +72,7 @@ const STATUS_CONFIG: Record<
   live: { label: "Live", color: "text-emerald-400", dot: "bg-emerald-400 animate-pulse" },
   building: { label: "Building", color: "text-blue-400", dot: "bg-blue-400 animate-pulse" },
   review: { label: "In Review", color: "text-amber-400", dot: "bg-amber-400" },
-  ready: { label: "Ready to Deploy", color: "text-violet-400", dot: "bg-violet-400" },
+  ready: { label: "Ready to Deploy", color: "text-amber-400", dot: "bg-amber-400" },
   deployed: { label: "Deployed", color: "text-emerald-400", dot: "bg-emerald-400" },
 };
 
@@ -137,21 +137,21 @@ export default function PlugDetailPage() {
               <h1 className="text-2xl font-bold tracking-tight text-amber-50 font-display">
                 {plug.name}
               </h1>
-              <span className="rounded-full border border-white/8 bg-[#18181B] px-3 py-0.5 text-[10px] font-medium text-amber-100/60 uppercase tracking-wider">
+              <span className="rounded-full border border-white/8 bg-[#18181B] px-3 py-0.5 text-xs font-medium text-amber-100/60 uppercase tracking-wider">
                 {plug.archetype}
               </span>
             </div>
             <div className="mt-1.5 flex items-center gap-3">
               <div className="flex items-center gap-1.5">
                 <span className={`h-2 w-2 rounded-full ${status.dot}`} />
-                <span className={`text-[10px] uppercase font-bold tracking-wider ${status.color}`}>
+                <span className={`text-xs uppercase font-bold tracking-wider ${status.color}`}>
                   {status.label}
                 </span>
               </div>
-              <span className="text-[10px] text-amber-100/20">|</span>
-              <span className="text-[10px] text-amber-100/30 font-mono">{plug.id}</span>
-              <span className="text-[10px] text-amber-100/20">|</span>
-              <span className="text-[10px] text-amber-100/30">
+              <span className="text-xs text-amber-100/20">|</span>
+              <span className="text-xs text-amber-100/30 font-mono">{plug.id}</span>
+              <span className="text-xs text-amber-100/20">|</span>
+              <span className="text-xs text-amber-100/30">
                 Created {plug.createdAt}
               </span>
             </div>
@@ -201,11 +201,11 @@ export default function PlugDetailPage() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowDeleteConfirm(false)}
-              className="rounded-lg border border-white/10 px-3 py-1.5 text-[10px] text-amber-100/60 hover:text-amber-50 transition-colors"
+              className="rounded-lg border border-white/10 px-3 py-1.5 text-xs text-amber-100/60 hover:text-amber-50 transition-colors"
             >
               Cancel
             </button>
-            <button className="rounded-lg bg-red-500 px-3 py-1.5 text-[10px] font-bold text-zinc-100 hover:bg-red-600 transition-colors">
+            <button className="rounded-lg bg-red-500 px-3 py-1.5 text-xs font-bold text-zinc-100 hover:bg-red-600 transition-colors">
               Confirm Delete
             </button>
           </div>
@@ -214,7 +214,7 @@ export default function PlugDetailPage() {
 
       {/* Pipeline Progress */}
       <div className="rounded-3xl border border-white/10 bg-[#18181B]/70 p-6 backdrop-blur-2xl">
-        <p className="text-[10px] uppercase tracking-wider text-amber-100/40 mb-4">
+        <p className="text-xs uppercase tracking-wider text-amber-100/40 mb-4">
           Build Pipeline
         </p>
         <div className="flex items-center justify-between">
@@ -222,7 +222,7 @@ export default function PlugDetailPage() {
             <React.Fragment key={stage}>
               <div className="flex flex-col items-center gap-2">
                 <div
-                  className={`flex h-10 w-10 items-center justify-center rounded-full border text-[10px] font-bold transition-all ${
+                  className={`flex h-10 w-10 items-center justify-center rounded-full border text-xs font-bold transition-all ${
                     i < currentStageIndex
                       ? "border-emerald-400/30 bg-emerald-500/20 text-emerald-400"
                       : i === currentStageIndex
@@ -261,7 +261,7 @@ export default function PlugDetailPage() {
         {plug.status === "building" && plug.progress !== undefined && (
           <div className="mt-4 pt-4 border-t border-white/8">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] text-amber-100/40">Build Progress</span>
+              <span className="text-xs text-amber-100/40">Build Progress</span>
               <span className="text-xs font-mono text-blue-400">{plug.progress}%</span>
             </div>
             <div className="h-2 rounded-full bg-[#18181B] overflow-hidden">
@@ -270,7 +270,7 @@ export default function PlugDetailPage() {
                 style={{ width: `${plug.progress}%` }}
               />
             </div>
-            <p className="mt-2 text-[10px] text-amber-100/30">
+            <p className="mt-2 text-xs text-amber-100/30">
               Engineer_Ang is building your Plug. Quality_Ang will review upon completion.
             </p>
           </div>
@@ -312,7 +312,7 @@ export default function PlugDetailPage() {
             >
               <div className="flex items-center gap-2 mb-2">
                 <stat.icon size={12} className="text-amber-100/30" />
-                <p className="text-[10px] uppercase tracking-widest text-amber-100/40">
+                <p className="text-xs uppercase tracking-widest text-amber-100/40">
                   {stat.label}
                 </p>
               </div>

@@ -81,7 +81,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 const TIER_BADGES: Record<string, { label: string; color: string; border: string }> = {
   free: { label: "Free", color: "text-emerald-400", border: "border-emerald-400/20" },
   starter: { label: "Starter", color: "text-blue-400", border: "border-blue-400/20" },
-  pro: { label: "Pro", color: "text-violet-400", border: "border-violet-400/20" },
+  pro: { label: "Pro", color: "text-amber-400", border: "border-amber-400/20" },
   enterprise: { label: "Enterprise", color: "text-gold", border: "border-gold/20" },
 };
 
@@ -221,7 +221,7 @@ export default function PlugCatalogPage() {
           { label: "Available Tools", value: availableCount, color: "text-zinc-100" },
           { label: "Featured", value: featuredPlugs.length, color: "text-gold" },
           { label: "Categories", value: Object.keys(categories).length, color: "text-blue-400" },
-          { label: "Coming Soon", value: plugs.filter((p) => p.comingSoon).length, color: "text-violet-400" },
+          { label: "Coming Soon", value: plugs.filter((p) => p.comingSoon).length, color: "text-amber-400" },
         ].map((stat) => (
           <motion.div
             key={stat.label}
@@ -340,7 +340,7 @@ export default function PlugCatalogPage() {
                           {plug.name}
                         </h3>
                         {plug.comingSoon && (
-                          <span className="shrink-0 rounded border border-violet-400/20 bg-violet-400/5 px-1.5 py-0.5 text-[0.5rem] font-mono text-violet-400 uppercase">
+                          <span className="shrink-0 rounded border border-amber-400/20 bg-amber-400/5 px-1.5 py-0.5 text-[0.5rem] font-mono text-amber-400 uppercase">
                             Soon
                           </span>
                         )}

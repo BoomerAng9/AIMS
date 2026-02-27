@@ -140,7 +140,7 @@ function AccountCard({ platform }: { platform: Platform }) {
       {/* Features */}
       <div className="flex flex-wrap gap-1.5 mb-4">
         {platform.features.map((f) => (
-          <span key={f} className="rounded-full border border-wireframe-stroke bg-[#18181B] px-2.5 py-0.5 text-[10px] text-zinc-500">
+          <span key={f} className="rounded-full border border-wireframe-stroke bg-[#18181B] px-2.5 py-0.5 text-xs text-zinc-500">
             {f}
           </span>
         ))}
@@ -151,11 +151,11 @@ function AccountCard({ platform }: { platform: Platform }) {
         <div className="grid grid-cols-2 gap-2 mb-4">
           <div className="rounded-lg border border-wireframe-stroke bg-[#18181B] p-2 text-center">
             <p className="text-lg font-bold text-zinc-100">—</p>
-            <p className="text-[10px] text-zinc-500">Posts</p>
+            <p className="text-xs text-zinc-500">Posts</p>
           </div>
           <div className="rounded-lg border border-wireframe-stroke bg-[#18181B] p-2 text-center">
             <p className="text-lg font-bold text-zinc-100">—</p>
-            <p className="text-[10px] text-zinc-500">Engagement</p>
+            <p className="text-xs text-zinc-500">Engagement</p>
           </div>
         </div>
       )}
@@ -216,7 +216,7 @@ export default function ConnectedAccountsPage() {
           <span className="text-xs text-zinc-400">0 of {platforms.length} accounts connected</span>
         </div>
         <div className="flex-1" />
-        <span className="text-[10px] text-zinc-500">Connect accounts to enable the Activity Feed</span>
+        <span className="text-xs text-zinc-500">Connect accounts to enable the Activity Feed</span>
       </motion.div>
 
       {/* Platform grid */}

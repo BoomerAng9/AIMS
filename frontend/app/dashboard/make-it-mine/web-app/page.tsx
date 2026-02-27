@@ -273,8 +273,8 @@ export default function WebAppBuilderPage() {
               height={22}
               className="opacity-90"
             />
-            <span className="text-sm font-medium text-zinc-200">Web App Builder</span>
-            <span className="rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] font-medium text-amber-400">
+            <span className="text-base font-bold text-zinc-100">Web App Builder</span>
+            <span className="rounded-full bg-amber-500/10 px-2 py-0.5 text-xs font-semibold text-amber-400">
               Powered by ACHEEVY
             </span>
           </div>
@@ -285,7 +285,7 @@ export default function WebAppBuilderPage() {
           <div className="relative">
             <button
               onClick={() => setShowModelMenu(v => !v)}
-              className="flex items-center gap-1.5 rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-xs text-zinc-400 transition-colors hover:border-white/20 hover:text-zinc-300"
+              className="flex items-center gap-1.5 rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-sm text-zinc-400 transition-colors hover:border-white/20 hover:text-zinc-300"
             >
               <Bot size={13} />
               {currentModel.label}
@@ -311,7 +311,7 @@ export default function WebAppBuilderPage() {
                     >
                       <div>
                         <p className="font-medium">{m.label}</p>
-                        <p className="text-[11px] text-zinc-600">{m.description}</p>
+                        <p className="text-sm text-zinc-500">{m.description}</p>
                       </div>
                       {selectedModel === m.id && <Check size={14} />}
                     </button>
@@ -327,27 +327,27 @@ export default function WebAppBuilderPage() {
               <button
                 onClick={handleCopy}
                 title="Copy HTML"
-                className="flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs text-zinc-500 transition-colors hover:bg-white/[0.04] hover:text-zinc-300"
+                className="flex items-center gap-1 rounded-lg px-2 py-1.5 text-sm font-medium text-zinc-500 transition-colors hover:bg-white/[0.04] hover:text-zinc-300"
               >
                 {copied ? <Check size={13} className="text-emerald-400" /> : <Copy size={13} />}
               </button>
               <button
                 onClick={handleDownload}
                 title="Download HTML"
-                className="rounded-lg px-2 py-1.5 text-xs text-zinc-500 transition-colors hover:bg-white/[0.04] hover:text-zinc-300"
+                className="rounded-lg px-2 py-1.5 text-sm font-medium text-zinc-500 transition-colors hover:bg-white/[0.04] hover:text-zinc-300"
               >
                 <Download size={13} />
               </button>
               <button
                 onClick={() => setIsFullscreen(v => !v)}
                 title={isFullscreen ? 'Exit fullscreen' : 'Fullscreen preview'}
-                className="rounded-lg px-2 py-1.5 text-xs text-zinc-500 transition-colors hover:bg-white/[0.04] hover:text-zinc-300"
+                className="rounded-lg px-2 py-1.5 text-sm font-medium text-zinc-500 transition-colors hover:bg-white/[0.04] hover:text-zinc-300"
               >
                 {isFullscreen ? <Minimize2 size={13} /> : <Maximize2 size={13} />}
               </button>
               <Link
                 href="/dashboard/plugs"
-                className="flex items-center gap-1.5 rounded-lg bg-amber-500/10 px-3 py-1.5 text-xs font-medium text-amber-400 transition-colors hover:bg-amber-500/20"
+                className="flex items-center gap-1.5 rounded-lg bg-amber-500/10 px-3 py-1.5 text-sm font-semibold text-amber-400 transition-colors hover:bg-amber-500/20"
               >
                 <Rocket size={12} />
                 Deploy as Plug
@@ -376,7 +376,7 @@ export default function WebAppBuilderPage() {
                         {...animProps(prefersReducedMotion ? 0 : i === messages.length - 1 ? 0 : 0)}
                         className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                       >
-                        <div className={`max-w-[88%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
+                        <div className={`max-w-[88%] rounded-2xl px-4 py-2.5 text-base leading-relaxed ${
                           msg.role === 'user'
                             ? 'bg-amber-500/[0.12] text-amber-200'
                             : msg.isError
@@ -389,7 +389,7 @@ export default function WebAppBuilderPage() {
                     ))}
 
                     {isGenerating && (
-                      <div className="flex items-center gap-2 text-xs text-zinc-500">
+                      <div className="flex items-center gap-2 text-sm text-zinc-500">
                         <Loader2 size={13} className="animate-spin" />
                         ACHEEVY is building your web app…
                       </div>
@@ -407,7 +407,7 @@ export default function WebAppBuilderPage() {
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
-                  className="mx-4 mb-2 flex items-start gap-2 rounded-lg bg-red-500/[0.08] px-3 py-2 text-xs text-red-400"
+                  className="mx-4 mb-2 flex items-start gap-2 rounded-lg bg-red-500/[0.08] px-3 py-2 text-sm text-red-400"
                 >
                   <span className="flex-1">{error}</span>
                   <button onClick={() => setError(null)} title="Dismiss error" className="shrink-0 mt-0.5">
@@ -442,7 +442,7 @@ export default function WebAppBuilderPage() {
                   }
                 </button>
               </div>
-              <p className="mt-2 text-[11px] text-zinc-700">
+              <p className="mt-2 text-sm text-zinc-600">
                 Enter to send · Shift+Enter for new line · Describe edits after first build
               </p>
             </div>
@@ -495,7 +495,7 @@ export default function WebAppBuilderPage() {
             {isFullscreen && (
               <button
                 onClick={() => setIsFullscreen(false)}
-                className="flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs text-zinc-500 transition-colors hover:bg-white/[0.04] hover:text-zinc-300"
+                className="flex items-center gap-1 rounded-lg px-2 py-1.5 text-sm font-medium text-zinc-500 transition-colors hover:bg-white/[0.04] hover:text-zinc-300"
               >
                 <Minimize2 size={13} /> Exit Fullscreen
               </button>
@@ -544,7 +544,7 @@ function EmptyState({ onSelect }: { onSelect: (p: string) => void }) {
       </motion.div>
 
       <div className="w-full max-w-sm space-y-2">
-        <p className="mb-3 text-[10px] font-semibold uppercase tracking-widest text-zinc-600">
+        <p className="mb-3 text-xs font-bold uppercase tracking-widest text-zinc-600">
           Quick start
         </p>
         {STARTER_PROMPTS.slice(0, 4).map((sp, i) => (
@@ -554,7 +554,7 @@ function EmptyState({ onSelect }: { onSelect: (p: string) => void }) {
             animate={{ opacity: 1, x: 0 }}
             transition={{ ...transition.enter, delay: pref ? 0 : i * stagger.normal }}
             onClick={() => onSelect(sp)}
-            className="w-full rounded-xl border border-white/[0.06] bg-white/[0.02] p-3 text-left text-xs text-zinc-400 leading-relaxed transition-all hover:border-amber-500/20 hover:bg-amber-500/[0.04] hover:text-zinc-300"
+            className="w-full rounded-xl border border-white/[0.06] bg-white/[0.02] p-3 text-left text-sm font-medium text-zinc-400 leading-relaxed transition-all hover:border-amber-500/20 hover:bg-amber-500/[0.04] hover:text-zinc-300"
           >
             {sp}
           </motion.button>
@@ -642,9 +642,9 @@ function CodePanel({ code, onCodeChange }: { code: string; onCodeChange: (c: str
         spellCheck={false}
         placeholder="Generated HTML code"
         aria-label="Generated HTML code"
-        className="h-full w-full resize-none bg-[#0D0D10] p-4 font-mono text-[13px] leading-relaxed text-emerald-400/85 outline-none selection:bg-amber-500/20"
+        className="h-full w-full resize-none bg-[#0D0D10] p-4 font-mono text-sm leading-relaxed text-emerald-400/85 outline-none selection:bg-amber-500/20"
       />
-      <div className="pointer-events-none absolute bottom-3 right-4 rounded bg-white/[0.04] px-2 py-0.5 text-[10px] text-zinc-600">
+      <div className="pointer-events-none absolute bottom-3 right-4 rounded bg-white/[0.04] px-2 py-0.5 text-xs text-zinc-600">
         {code.split('\n').length.toLocaleString()} lines
       </div>
     </div>

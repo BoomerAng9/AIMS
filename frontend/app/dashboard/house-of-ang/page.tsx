@@ -101,11 +101,11 @@ export default function HouseOfAngPage() {
           <div className="relative z-10 flex h-full min-h-[280px] md:min-h-[380px] flex-col justify-end p-8 md:p-10">
             <div className="flex items-center gap-2 mb-3">
               <Building2 size={14} className="text-gold" />
-              <span className="text-[10px] uppercase font-bold text-gold tracking-widest">
+              <span className="text-xs uppercase font-bold text-gold tracking-widest">
                 Factory Online
               </span>
             </div>
-            <p className="text-[10px] uppercase tracking-[0.3em] text-gold mb-1">
+            <p className="text-xs uppercase tracking-[0.3em] text-gold mb-1">
               Boomer_Ang Factory &amp; Deployment Center
             </p>
             <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-zinc-100 font-display">
@@ -134,7 +134,7 @@ export default function HouseOfAngPage() {
             key={stat.label}
             className="rounded-2xl border border-wireframe-stroke bg-[#18181B]/70 p-4 backdrop-blur-2xl text-center"
           >
-            <p className="text-[10px] uppercase tracking-widest text-zinc-500">
+            <p className="text-xs uppercase tracking-widest text-zinc-500">
               {stat.label}
             </p>
             <p className={`text-2xl font-semibold mt-1 ${stat.color}`}>
@@ -179,7 +179,7 @@ export default function HouseOfAngPage() {
                           : "border-wireframe-stroke bg-[#1F1F23]/60"
                   }`}>
                     <p className="text-xs font-bold text-zinc-100">{level.role}</p>
-                    <p className="text-[10px] text-zinc-500 mt-0.5">{level.label}</p>
+                    <p className="text-xs text-zinc-500 mt-0.5">{level.label}</p>
                     <p className="text-[9px] text-zinc-600 mt-1">
                       Speaks to: {level.speaks_to}
                     </p>
@@ -190,7 +190,7 @@ export default function HouseOfAngPage() {
                 </React.Fragment>
               ))}
             </div>
-            <p className="mt-4 text-[10px] text-zinc-600 text-center max-w-lg mx-auto">
+            <p className="mt-4 text-xs text-zinc-600 text-center max-w-lg mx-auto">
               Lil_Hawks only speak to their Squad Leader or Chicken Hawk.
               Chicken Hawks only speak to Boomer_Angs.
               Boomer_Angs are the only ones that speak to ACHEEVY.
@@ -274,7 +274,7 @@ export default function HouseOfAngPage() {
                         </span>
                       )}
                     </div>
-                    <p className="text-[10px] text-zinc-500 mb-2">{stage.description}</p>
+                    <p className="text-xs text-zinc-500 mb-2">{stage.description}</p>
                     <ul className="space-y-1">
                       {stage.criteria.map((c, i) => (
                         <li key={i} className="text-[9px] text-zinc-600 flex items-start gap-1.5">
@@ -297,9 +297,9 @@ export default function HouseOfAngPage() {
                 {PROMOTION_PATHS.map((path) => (
                   <div key={`${path.from}-${path.to}`} className="rounded-2xl border border-wireframe-stroke bg-[#1F1F23]/40 p-4">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="text-[10px] text-zinc-500">{path.from}</span>
+                      <span className="text-xs text-zinc-500">{path.from}</span>
                       <span className="text-gold">{"\u2192"}</span>
-                      <span className="text-[10px] font-semibold text-zinc-100">{path.to}</span>
+                      <span className="text-xs font-semibold text-zinc-100">{path.to}</span>
                       {path.reversible && (
                         <span className="rounded-full bg-gold/10 px-1.5 py-0.5 text-[7px] text-gold uppercase">
                           Reversible
@@ -342,7 +342,7 @@ export default function HouseOfAngPage() {
                 {LIL_HAWK_SQUADS.map((squad) => (
                   <div key={squad.name} className="rounded-2xl border border-wireframe-stroke bg-[#1F1F23]/60 p-4">
                     <p className="text-xs font-semibold text-gold">{squad.name}</p>
-                    <p className="text-[10px] text-zinc-500 mt-0.5">{squad.purpose}</p>
+                    <p className="text-xs text-zinc-500 mt-0.5">{squad.purpose}</p>
                     <div className="mt-2 flex items-center gap-2">
                       <span className="text-[8px] uppercase tracking-wider text-zinc-600">Squad Leader:</span>
                       <span className="rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 text-[8px] font-bold text-emerald-400">
@@ -401,10 +401,10 @@ export default function HouseOfAngPage() {
             <table className="w-full text-left">
               <thead>
                 <tr className="border-b border-wireframe-stroke">
-                  <th className="pb-2 text-[10px] uppercase tracking-widest text-zinc-500 font-semibold">Agent</th>
-                  <th className="pb-2 text-[10px] uppercase tracking-widest text-zinc-500 font-semibold">Description</th>
-                  <th className="pb-2 text-[10px] uppercase tracking-widest text-zinc-500 font-semibold">Capabilities</th>
-                  <th className="pb-2 text-[10px] uppercase tracking-widest text-zinc-500 font-semibold text-right">Health</th>
+                  <th className="pb-2 text-xs uppercase tracking-widest text-zinc-500 font-semibold">Agent</th>
+                  <th className="pb-2 text-xs uppercase tracking-widest text-zinc-500 font-semibold">Description</th>
+                  <th className="pb-2 text-xs uppercase tracking-widest text-zinc-500 font-semibold">Capabilities</th>
+                  <th className="pb-2 text-xs uppercase tracking-widest text-zinc-500 font-semibold text-right">Health</th>
                 </tr>
               </thead>
               <tbody>
@@ -482,7 +482,7 @@ export default function HouseOfAngPage() {
                         }`}
                       />
                       <span
-                        className={`text-[10px] uppercase font-bold tracking-wider ${
+                        className={`text-xs uppercase font-bold tracking-wider ${
                           ang.healthStatus === "online" ? "text-emerald-400" : "text-red-400/60"
                         }`}
                       >
@@ -498,7 +498,7 @@ export default function HouseOfAngPage() {
                 {ang.capabilities.map((cap) => (
                   <span
                     key={cap}
-                    className="rounded-full border border-wireframe-stroke bg-[#18181B] px-2.5 py-1 text-[10px] text-zinc-400"
+                    className="rounded-full border border-wireframe-stroke bg-[#18181B] px-2.5 py-1 text-xs text-zinc-400"
                   >
                     {cap.replace(/_/g, " ")}
                   </span>
@@ -568,7 +568,7 @@ export default function HouseOfAngPage() {
           {spawnOpen && (
             <div className="mt-6 w-full max-w-lg space-y-4 text-left animate-in fade-in slide-in-from-bottom-4 duration-300">
               <div className="space-y-2">
-                <label className="text-[10px] uppercase tracking-wider text-zinc-500">Agent Name</label>
+                <label className="text-xs uppercase tracking-wider text-zinc-500">Agent Name</label>
                 <input
                   type="text"
                   placeholder="e.g. DesignerAng"
@@ -576,7 +576,7 @@ export default function HouseOfAngPage() {
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] uppercase tracking-wider text-zinc-500">Role / Specialization</label>
+                <label className="text-xs uppercase tracking-wider text-zinc-500">Role / Specialization</label>
                 <input
                   type="text"
                   placeholder="e.g. UI/UX Design Specialist"
@@ -584,7 +584,7 @@ export default function HouseOfAngPage() {
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] uppercase tracking-wider text-zinc-500">Routing Rules</label>
+                <label className="text-xs uppercase tracking-wider text-zinc-500">Routing Rules</label>
                 <textarea
                   rows={3}
                   placeholder="Define when this agent should be invoked..."

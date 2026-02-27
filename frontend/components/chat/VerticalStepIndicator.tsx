@@ -79,7 +79,7 @@ function StepDot({
           isCompleted ? 'completed' : isCurrent ? 'current' : 'pending'
         }`}
         className={`
-          w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold transition-all duration-300 outline-none
+          w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 outline-none
           focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-1
           ${
             isCompleted
@@ -118,7 +118,7 @@ function StepDot({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 4 }}
             transition={{ duration: 0.15 }}
-            className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1.5 bg-slate-800 text-white text-[10px] rounded-lg whitespace-nowrap shadow-lg z-20 pointer-events-none"
+            className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1.5 bg-slate-800 text-white text-xs rounded-lg whitespace-nowrap shadow-lg z-20 pointer-events-none"
           >
             <span className="font-medium">{stepName}</span>
             <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-slate-800" />
@@ -203,7 +203,7 @@ export function VerticalStepIndicator({
             </span>
 
             {!isComplete && !isExecuting && (
-              <span className="text-[11px] text-slate-400 flex items-center gap-1">
+              <span className="text-sm text-slate-400 flex items-center gap-1">
                 <ChevronRight size={10} />
                 Step {currentStep + 1} of {totalSteps}
               </span>
@@ -212,14 +212,14 @@ export function VerticalStepIndicator({
               <motion.span
                 initial={{ opacity: 0, x: -4 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="text-[11px] text-emerald-500 font-medium flex items-center gap-1"
+                className="text-sm text-emerald-500 font-medium flex items-center gap-1"
               >
                 <Check size={10} />
                 Ready to execute
               </motion.span>
             )}
             {isExecuting && (
-              <span className="text-[11px] text-blue-500 font-medium flex items-center gap-1">
+              <span className="text-sm text-blue-500 font-medium flex items-center gap-1">
                 <Loader2 size={10} className="animate-spin" />
                 Executing pipeline
               </span>
@@ -281,7 +281,7 @@ export function VerticalStepIndicator({
                   <p className="text-xs font-medium text-slate-700">
                     {currentChainStep.name}
                   </p>
-                  <p className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">
+                  <p className="text-sm text-slate-400 mt-0.5 leading-relaxed">
                     {currentChainStep.purpose}
                   </p>
                 </div>
@@ -348,7 +348,7 @@ export function VerticalStepIndicator({
                   <p className="text-xs font-medium text-blue-700">
                     Pipeline Running
                   </p>
-                  <p className="text-[10px] text-blue-400">
+                  <p className="text-xs text-blue-400">
                     Agents are executing your request. Updates will appear in
                     chat.
                   </p>

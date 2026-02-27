@@ -244,7 +244,7 @@ export default function SettingsPage() {
                   <p className="text-sm font-medium text-zinc-100">{key.label}</p>
                   <p className="font-mono text-xs text-zinc-500">{key.value}</p>
                 </div>
-                <span className={`text-[10px] uppercase font-bold tracking-wider font-mono ${
+                <span className={`text-xs uppercase font-bold tracking-wider font-mono ${
                   key.status === "Active" ? "text-emerald-400" : "text-zinc-600"
                 }`}>
                   {key.status}

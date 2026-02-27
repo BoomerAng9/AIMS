@@ -76,8 +76,8 @@ const PLAYGROUND_TYPES: Array<{
     name: 'Training Data',
     description: 'Annotation, evaluation, and data labeling tasks',
     icon: 'TD',
-    color: 'text-purple-400',
-    bg: 'bg-purple-500/10 border-purple-500/20',
+    color: 'text-amber-400',
+    bg: 'bg-amber-500/10 border-amber-500/20',
   },
   {
     id: 'education',
@@ -117,7 +117,7 @@ function CodeEditor({
             <option value="node">Node.js</option>
             <option value="bash">Bash</option>
           </select>
-          <span className="text-[10px] text-zinc-600 font-mono">{code.split('\n').length} lines</span>
+          <span className="text-xs text-zinc-600 font-mono">{code.split('\n').length} lines</span>
         </div>
         <button
           onClick={() => onExecute(code, language)}
@@ -164,12 +164,12 @@ function CodeEditor({
           <div className="px-4 py-2 border-b border-white/8 flex items-center gap-2">
             <span className="text-xs text-zinc-500 font-medium">Output</span>
             {result && (
-              <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono ${result.success ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
+              <span className={`text-xs px-1.5 py-0.5 rounded font-mono ${result.success ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
                 exit: {result.exitCode}
               </span>
             )}
             {result?.engine && (
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#18181B] text-zinc-600 font-mono">
+              <span className="text-xs px-1.5 py-0.5 rounded bg-[#18181B] text-zinc-600 font-mono">
                 {result.engine}
               </span>
             )}
@@ -249,7 +249,7 @@ function PromptPlayground() {
     <div className="flex flex-col h-full">
       {/* System Prompt */}
       <div className="px-4 py-3 border-b border-white/8">
-        <label className="text-[10px] text-zinc-500 uppercase tracking-wider font-medium">System Prompt</label>
+        <label className="text-xs text-zinc-500 uppercase tracking-wider font-medium">System Prompt</label>
         <textarea
           value={systemPrompt}
           onChange={(e) => setSystemPrompt(e.target.value)}
@@ -373,7 +373,7 @@ export default function PlaygroundPage() {
           <p className="text-xs text-zinc-500 mt-0.5">Sandbox environments for code, prompts, agents, and training</p>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-[10px] text-zinc-600 font-mono">{sessions.length} sessions</span>
+          <span className="text-xs text-zinc-600 font-mono">{sessions.length} sessions</span>
         </div>
       </div>
 
@@ -391,7 +391,7 @@ export default function PlaygroundPage() {
               }
             `}
           >
-            <span className="text-[10px] font-bold">{type.icon}</span>
+            <span className="text-xs font-bold">{type.icon}</span>
             {type.name}
           </button>
         ))}

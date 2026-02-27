@@ -78,13 +78,13 @@ export default function MatchmakerPage() {
                             <h1 className="text-lg font-bold tracking-tight text-slate-900 leading-none">
                                 Transfer Portal Matchmaker
                             </h1>
-                            <span className="text-[10px] font-mono uppercase tracking-widest text-slate-500">
+                            <span className="text-xs font-mono uppercase tracking-widest text-slate-500">
                                 P.A.I. Analytics Dashboard
                             </span>
                         </div>
                     </div>
                     <div className="flex items-center gap-3">
-                        <span className="text-[10px] uppercase font-bold text-white bg-[#D97706] px-2 py-1 rounded shadow-sm">
+                        <span className="text-xs uppercase font-bold text-white bg-[#D97706] px-2 py-1 rounded shadow-sm">
                             Live Evaluation
                         </span>
                     </div>
@@ -105,7 +105,7 @@ export default function MatchmakerPage() {
                             <div className="aspect-[4/3] bg-slate-100 flex items-center justify-center relative overflow-hidden">
                                 <div className="absolute inset-0 bg-gradient-to-tr from-slate-200 to-slate-100" />
                                 <User size={64} className="text-slate-400 relative z-10" />
-                                <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm border border-slate-200 text-slate-900 text-[10px] font-bold px-2 py-1 rounded">
+                                <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm border border-slate-200 text-slate-900 text-xs font-bold px-2 py-1 rounded">
                                     #{player.transferRank} PORTAL
                                 </div>
                             </div>
@@ -148,7 +148,7 @@ export default function MatchmakerPage() {
                                 <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900">
                                     P.A.I. Grade
                                 </h3>
-                                <div className="bg-amber-100 border border-amber-200 text-[#D97706] text-[10px] font-black uppercase px-2 py-0.5 rounded tracking-widest">
+                                <div className="bg-amber-100 border border-amber-200 text-[#D97706] text-xs font-black uppercase px-2 py-0.5 rounded tracking-widest">
                                     {player.tier}
                                 </div>
                             </div>
@@ -233,7 +233,7 @@ export default function MatchmakerPage() {
                                 </ResponsiveContainer>
 
                                 {/* Legend positioned absolutely or inline */}
-                                <div className="absolute bottom-0 left-0 right-0 flex justify-center gap-4 text-[10px] uppercase font-bold text-slate-500">
+                                <div className="absolute bottom-0 left-0 right-0 flex justify-center gap-4 text-xs uppercase font-bold text-slate-500">
                                     <div className="flex items-center gap-1.5">
                                         <span className="w-2 h-2 rounded-sm bg-slate-900" /> Player Profile
                                     </div>
@@ -261,9 +261,9 @@ export default function MatchmakerPage() {
                                     {player.bio}
                                 </p>
                                 <div className="mt-4 pt-4 border-t border-slate-100 flex gap-2">
-                                    <span className="text-[10px] font-bold uppercase text-slate-500 bg-slate-100 px-2 py-1 rounded">Zone Read</span>
-                                    <span className="text-[10px] font-bold uppercase text-slate-500 bg-slate-100 px-2 py-1 rounded">Arm Magnetism</span>
-                                    <span className="text-[10px] font-bold uppercase text-slate-500 bg-slate-100 px-2 py-1 rounded">Leadership</span>
+                                    <span className="text-xs font-bold uppercase text-slate-500 bg-slate-100 px-2 py-1 rounded">Zone Read</span>
+                                    <span className="text-xs font-bold uppercase text-slate-500 bg-slate-100 px-2 py-1 rounded">Arm Magnetism</span>
+                                    <span className="text-xs font-bold uppercase text-slate-500 bg-slate-100 px-2 py-1 rounded">Leadership</span>
                                 </div>
                             </div>
                         </motion.div>
@@ -288,7 +288,7 @@ export default function MatchmakerPage() {
                                             <h4 className="font-bold text-slate-900 text-sm group-hover:text-[#D97706] transition-colors">{spot.team}</h4>
                                             <span className="text-xs font-black text-emerald-600">{spot.percent}% Match</span>
                                         </div>
-                                        <p className="text-[10px] uppercase font-bold tracking-wider text-slate-400">
+                                        <p className="text-xs uppercase font-bold tracking-wider text-slate-400">
                                             {spot.reason}
                                         </p>
                                         <div className="h-1 w-full bg-slate-100 rounded-full mt-2 overflow-hidden">

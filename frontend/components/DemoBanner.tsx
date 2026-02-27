@@ -16,7 +16,7 @@ export function DemoBanner() {
       transition={{ duration: 0.4, ease: "easeOut" }}
     >
       {/* Status badge */}
-      <span className="rounded-full border border-violet-500/30 bg-violet-500/10 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-violet-400">
+      <span className="rounded-full border border-violet-500/30 bg-violet-500/10 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wider text-violet-400">
         Demo Mode
       </span>
 
@@ -26,7 +26,7 @@ export function DemoBanner() {
       </span>
 
       {/* Live indicator */}
-      <span className="hidden items-center gap-1.5 text-[10px] font-mono text-zinc-500 md:flex">
+      <span className="hidden items-center gap-1.5 text-xs font-mono text-zinc-500 md:flex">
         <Radio className="h-3 w-3 text-violet-500" />
         SANDBOX
       </span>

@@ -341,7 +341,7 @@ export default function DeepScoutPage() {
           {hasResults && (
             <button
               onClick={resetAll}
-              className="ml-auto text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+              className="ml-auto text-sm font-medium text-zinc-500 hover:text-zinc-300 transition-colors"
             >
               New Research
             </button>
@@ -482,13 +482,13 @@ export default function DeepScoutPage() {
                 {/* Starter prompts */}
                 {!idea && (
                   <div>
-                    <p className="text-xs text-zinc-600 mb-2">Or try one of these:</p>
+                    <p className="text-sm text-zinc-500 mb-2">Or try one of these:</p>
                     <div className="flex flex-wrap gap-2">
                       {STARTER_PROMPTS.map((sp) => (
                         <button
                           key={sp.text}
                           onClick={() => { setIdea(sp.text); setIndustry(sp.industry); }}
-                          className="text-xs px-3 py-1.5 rounded-lg border border-white/5 bg-white/[0.02] text-zinc-400 hover:text-zinc-200 hover:border-gold/20 transition-all"
+                          className="text-sm px-3 py-1.5 rounded-lg border border-white/5 bg-white/[0.02] text-zinc-400 hover:text-zinc-200 hover:border-gold/20 transition-all"
                         >
                           {sp.text}
                         </button>
@@ -536,7 +536,7 @@ export default function DeepScoutPage() {
               <p className="mt-2 text-sm text-zinc-500">{pipelineStage || 'Initializing pipeline...'}</p>
               <button
                 onClick={handleStop}
-                className="mt-6 text-xs text-zinc-600 hover:text-zinc-400 transition-colors"
+                className="mt-6 text-sm text-zinc-500 hover:text-zinc-400 transition-colors"
               >
                 Cancel
               </button>
@@ -688,7 +688,7 @@ function ResearchReport({
         </span>
         <h2 className="mt-4 text-2xl font-bold text-zinc-100">{research.facts.productName}</h2>
         <p className="mt-2 text-zinc-400">{research.facts.description}</p>
-        <div className="mt-4 flex flex-wrap gap-2 text-xs">
+        <div className="mt-4 flex flex-wrap gap-2 text-sm font-medium">
           <span className="px-2 py-1 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">
             {research.totalSources} sources analyzed
           </span>
@@ -724,7 +724,7 @@ function ResearchReport({
         </div>
         {research.facts.differentiators.length > 0 && (
           <div className="mt-4">
-            <h4 className="text-xs font-medium text-zinc-500 uppercase tracking-wider mb-2">Current Differentiators</h4>
+            <h4 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-2">Current Differentiators</h4>
             <ul className="space-y-1">
               {research.facts.differentiators.map((d, i) => (
                 <li key={i} className="text-sm text-zinc-400 flex items-start gap-2">
@@ -743,7 +743,7 @@ function ResearchReport({
           {clonePlan.phases.map((phase, i) => (
             <div key={i} className="rounded-xl border border-white/5 bg-black/20 p-4">
               <div className="flex items-center gap-2 mb-2">
-                <span className="text-xs font-bold text-zinc-500">PHASE {i + 1}</span>
+                <span className="text-sm font-bold text-zinc-400">PHASE {i + 1}</span>
                 <span className="text-sm font-medium text-zinc-300">{phase.name}</span>
                 <span className={`ml-auto text-[0.6rem] uppercase tracking-wider px-2 py-0.5 rounded ${
                   phase.estimatedComplexity === 'high'
@@ -774,7 +774,7 @@ function ResearchReport({
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <h4 className="text-xs font-medium text-zinc-500 uppercase tracking-wider mb-2">Differentiators</h4>
+            <h4 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-2">Differentiators</h4>
             <ul className="space-y-1">
               {adaptationPlan.differentiators.map((d, i) => (
                 <li key={i} className="text-sm text-zinc-400">• {d}</li>
@@ -782,7 +782,7 @@ function ResearchReport({
             </ul>
           </div>
           <div>
-            <h4 className="text-xs font-medium text-zinc-500 uppercase tracking-wider mb-2">Launch Steps</h4>
+            <h4 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-2">Launch Steps</h4>
             <ol className="space-y-1">
               {adaptationPlan.launchSteps.map((s, i) => (
                 <li key={i} className="text-sm text-zinc-400">
@@ -793,26 +793,26 @@ function ResearchReport({
           </div>
         </div>
         <div className="mt-4 p-3 rounded-lg border border-white/5 bg-white/[0.02]">
-          <p className="text-xs text-zinc-500 uppercase tracking-wider mb-1">Pricing Strategy</p>
+          <p className="text-sm font-medium text-zinc-500 uppercase tracking-wider mb-1">Pricing Strategy</p>
           <p className="text-sm text-zinc-300">{adaptationPlan.pricingStrategy}</p>
         </div>
       </ReportSection>
 
       {/* Tech Stack */}
-      <ReportSection title="Recommended Stack" icon={<Globe size={16} className="text-purple-400" />}>
+      <ReportSection title="Recommended Stack" icon={<Globe size={16} className="text-amber-400" />}>
         <div className="flex flex-wrap gap-2">
           {clonePlan.recommendedStack.map((tech, i) => (
-            <span key={i} className="text-xs px-2.5 py-1 rounded-lg border border-purple-500/20 bg-purple-500/5 text-purple-300">
+            <span key={i} className="text-sm px-2.5 py-1 rounded-lg border border-amber-500/20 bg-amber-500/5 text-amber-300">
               {tech}
             </span>
           ))}
         </div>
         {clonePlan.requiredServices.length > 0 && (
           <div className="mt-3">
-            <p className="text-xs text-zinc-600 mb-1">Required Services:</p>
+            <p className="text-sm text-zinc-500 mb-1">Required Services:</p>
             <div className="flex flex-wrap gap-2">
               {clonePlan.requiredServices.map((svc, i) => (
-                <span key={i} className="text-xs px-2 py-1 rounded bg-white/[0.03] text-zinc-500">
+                <span key={i} className="text-sm px-2 py-1 rounded bg-white/[0.03] text-zinc-500">
                   {svc}
                 </span>
               ))}
@@ -825,7 +825,7 @@ function ResearchReport({
       <ReportSection title="Sources & Evidence" icon={<Search size={16} className="text-zinc-400" />}>
         {evidence.map((ev) => (
           <div key={ev.id} className="mb-3 last:mb-0">
-            <p className="text-xs text-zinc-600 mb-1">
+            <p className="text-sm text-zinc-500 mb-1">
               Query: &ldquo;{ev.query}&rdquo; — {ev.resultCount} results
             </p>
             <div className="flex flex-wrap gap-1">

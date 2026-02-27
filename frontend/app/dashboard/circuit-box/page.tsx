@@ -515,7 +515,7 @@ function ServiceCard({ service, isOwner }: { service: ServiceStatus; isOwner: bo
   const typeColors: Record<string, { bg: string; border: string; text: string }> = {
     core: { bg: 'bg-gold/10', border: 'border-gold/30', text: 'text-gold' },
     agent: { bg: 'bg-cb-cyan/10', border: 'border-cb-cyan/30', text: 'text-cb-cyan' },
-    tool: { bg: 'bg-purple-500/10', border: 'border-purple-500/30', text: 'text-purple-400' },
+    tool: { bg: 'bg-amber-500/10', border: 'border-amber-500/30', text: 'text-amber-400' },
     external: { bg: 'bg-cb-green/10', border: 'border-cb-green/30', text: 'text-cb-green' },
     social: { bg: 'bg-cb-cyan/10', border: 'border-cb-cyan/30', text: 'text-cb-cyan' },
   };
@@ -534,7 +534,7 @@ function ServiceCard({ service, isOwner }: { service: ServiceStatus; isOwner: bo
           <StatusDot status={service.status} />
           <h3 className="text-sm font-semibold text-zinc-100">{service.name}</h3>
         </div>
-        <span className={`text-[10px] px-2 py-0.5 rounded-lg font-medium ${s.bg} ${s.text}`}>{service.type.toUpperCase()}</span>
+        <span className={`text-xs px-2 py-0.5 rounded-lg font-medium ${s.bg} ${s.text}`}>{service.type.toUpperCase()}</span>
       </div>
       {isOwner && (
         <div className="text-xs text-cb-fog mb-2 font-mono truncate">{service.endpoint}</div>
@@ -542,7 +542,7 @@ function ServiceCard({ service, isOwner }: { service: ServiceStatus; isOwner: bo
       {service.features && (
         <div className="flex flex-wrap gap-1 mb-2">
           {service.features.map((f) => (
-            <span key={f} className="px-1.5 py-0.5 rounded text-[10px] bg-[#1F1F23]/60 text-gray-300">{f}</span>
+            <span key={f} className="px-1.5 py-0.5 rounded text-xs bg-[#1F1F23]/60 text-gray-300">{f}</span>
           ))}
         </div>
       )}
@@ -551,7 +551,7 @@ function ServiceCard({ service, isOwner }: { service: ServiceStatus; isOwner: bo
         <div className="mb-2">
           <div className="flex items-center justify-between mb-1">
             <span className="text-[9px] text-cb-fog">Latency</span>
-            <span className={`text-[10px] font-mono font-semibold ${latency > 300 ? 'text-cb-amber' : latency > 100 ? 'text-gold' : 'text-cb-green'}`}>{latency}ms</span>
+            <span className={`text-xs font-mono font-semibold ${latency > 300 ? 'text-cb-amber' : latency > 100 ? 'text-gold' : 'text-cb-green'}`}>{latency}ms</span>
           </div>
           <ServiceLatencyBar latency={latency} />
         </div>
@@ -615,15 +615,15 @@ function BoomerAngCard({ ang }: { ang: BoomerAngConfig }) {
         </div>
       </div>
       <div className="text-xs text-cb-fog mb-1">{ang.role}</div>
-      <div className="text-[10px] text-gold mb-2 font-mono">Model: {ang.model}</div>
+      <div className="text-xs text-gold mb-2 font-mono">Model: {ang.model}</div>
       <div className="flex flex-wrap gap-1 mb-2">
         {ang.tasks.map((task) => (
-          <span key={task} className="px-2 py-0.5 rounded text-[10px] bg-gold/10 text-gold font-medium">{task}</span>
+          <span key={task} className="px-2 py-0.5 rounded text-xs bg-gold/10 text-gold font-medium">{task}</span>
         ))}
       </div>
       <div className="flex items-center justify-between pt-2 border-t border-wireframe-stroke">
         <div className="flex items-center gap-1">
-          {ang.sandboxed && <span className="flex items-center gap-1 text-[10px] text-cb-cyan"><ShieldIcon className="w-3.5 h-3.5" />Sandboxed</span>}
+          {ang.sandboxed && <span className="flex items-center gap-1 text-xs text-cb-cyan"><ShieldIcon className="w-3.5 h-3.5" />Sandboxed</span>}
         </div>
         <div className="flex gap-1.5">
           <button type="button" className="p-1.5 rounded-lg bg-[#18181B] hover:bg-white/8 transition-colors duration-cb-toggle"><SettingsIcon className="w-3.5 h-3.5 text-cb-fog" /></button>
@@ -731,7 +731,7 @@ function SocialChannelsPanel({ isOwner }: { isOwner: boolean }) {
                     <span className="text-xl">{ch.icon}</span>
                     <h3 className="text-sm font-semibold text-zinc-100">{ch.name}</h3>
                   </div>
-                  <span className={`h-cb-chip flex items-center px-2.5 rounded-lg text-[10px] font-bold tracking-wider border ${badge.cls}`}>
+                  <span className={`h-cb-chip flex items-center px-2.5 rounded-lg text-xs font-bold tracking-wider border ${badge.cls}`}>
                     {badge.label}
                   </span>
                 </div>
@@ -768,7 +768,7 @@ function SocialChannelsPanel({ isOwner }: { isOwner: boolean }) {
 
                     {!ch.configured && (
                       <div className="p-2 rounded-lg bg-cb-amber/5 border border-cb-amber/20 mb-3">
-                        <p className="text-[10px] text-cb-amber">Bot token not set in environment. Set <code className="font-mono">{ch.id === 'whatsapp' ? 'WHATSAPP_API_TOKEN' : `${ch.id.toUpperCase()}_BOT_TOKEN`}</code> to enable.</p>
+                        <p className="text-xs text-cb-amber">Bot token not set in environment. Set <code className="font-mono">{ch.id === 'whatsapp' ? 'WHATSAPP_API_TOKEN' : `${ch.id.toUpperCase()}_BOT_TOKEN`}</code> to enable.</p>
                       </div>
                     )}
 
@@ -778,7 +778,7 @@ function SocialChannelsPanel({ isOwner }: { isOwner: boolean }) {
                         <h4 className="text-xs font-medium text-zinc-400 mb-1.5 uppercase tracking-wider">Commands</h4>
                         <div className="space-y-0.5">
                           {setup.commands.map((cmd, i) => (
-                            <div key={i} className="text-[10px] text-cb-fog font-mono">{cmd}</div>
+                            <div key={i} className="text-xs text-cb-fog font-mono">{cmd}</div>
                           ))}
                         </div>
                       </div>
@@ -816,7 +816,7 @@ function ControlPlanePanel() {
               <BotIcon className="w-4 h-4 text-gold" />
               <h3 className="text-sm font-semibold text-zinc-100">Autonomy Mode</h3>
             </div>
-            <span className="h-cb-chip flex items-center px-2.5 rounded-lg text-[10px] font-bold tracking-wider bg-gold/15 text-gold border border-gold/30">
+            <span className="h-cb-chip flex items-center px-2.5 rounded-lg text-xs font-bold tracking-wider bg-gold/15 text-gold border border-gold/30">
               SUPERVISED
             </span>
           </div>
@@ -825,7 +825,7 @@ function ControlPlanePanel() {
           </p>
           <div className="flex items-center gap-2 cursor-not-allowed opacity-80">
             <ToggleOffIcon className="w-9 h-5 text-gold" />
-            <span className="text-[10px] text-cb-fog uppercase tracking-wider">Auto-execute OFF</span>
+            <span className="text-xs text-cb-fog uppercase tracking-wider">Auto-execute OFF</span>
           </div>
         </div>
 
@@ -838,7 +838,7 @@ function ControlPlanePanel() {
             </div>
             <div className="flex items-center gap-1.5">
               <LockIcon className="w-3.5 h-3.5 text-cb-green" />
-              <span className="h-cb-chip flex items-center px-2 rounded-lg text-[10px] font-bold tracking-wider bg-cb-green/15 text-cb-green border border-cb-green/30">
+              <span className="h-cb-chip flex items-center px-2 rounded-lg text-xs font-bold tracking-wider bg-cb-green/15 text-cb-green border border-cb-green/30">
                 LOCKED ON
               </span>
             </div>
@@ -848,7 +848,7 @@ function ControlPlanePanel() {
           </p>
           <div className="flex items-center gap-2 cursor-not-allowed">
             <ToggleOnIcon className="w-9 h-5 text-cb-green" />
-            <span className="text-[10px] text-cb-green/70 uppercase tracking-wider">Always On</span>
+            <span className="text-xs text-cb-green/70 uppercase tracking-wider">Always On</span>
             <LockIcon className="w-3 h-3 text-cb-green/50" />
           </div>
         </div>
@@ -860,7 +860,7 @@ function ControlPlanePanel() {
               <PowerIcon className="w-4 h-4 text-cb-red" />
               <h3 className="text-sm font-semibold text-zinc-100">Kill Switch</h3>
             </div>
-            <span className="h-cb-chip flex items-center px-2.5 rounded-lg text-[10px] font-bold tracking-wider bg-cb-red/15 text-cb-red border border-cb-red/30 animate-cb-breathe">
+            <span className="h-cb-chip flex items-center px-2.5 rounded-lg text-xs font-bold tracking-wider bg-cb-red/15 text-cb-red border border-cb-red/30 animate-cb-breathe">
               ARMED
             </span>
           </div>
@@ -903,7 +903,7 @@ function ControlPlanePanel() {
                 }`} />
                 <div>
                   <div className="text-xs font-medium text-zinc-100">{tool.name}</div>
-                  <div className={`text-[10px] font-mono ${tool.status === 'warn' ? 'text-cb-amber' : 'text-cb-green'}`}>{tool.label}</div>
+                  <div className={`text-xs font-mono ${tool.status === 'warn' ? 'text-cb-amber' : 'text-cb-green'}`}>{tool.label}</div>
                 </div>
               </div>
             ))}
@@ -923,7 +923,7 @@ function ControlPlanePanel() {
             Daily spend ceiling across all model providers and tool calls.
           </p>
           <div className="space-y-1.5">
-            <div className="flex items-center justify-between text-[10px]">
+            <div className="flex items-center justify-between text-xs">
               <span className="text-cb-fog">Spent today</span>
               <span className="text-gold font-mono">$6.00 (12%)</span>
             </div>
@@ -966,7 +966,7 @@ function ControlPlanePanel() {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cb-cyan opacity-75" />
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-cb-cyan" />
             </span>
-            <span className="text-[10px] text-cb-cyan font-mono uppercase tracking-wider">polling</span>
+            <span className="text-xs text-cb-cyan font-mono uppercase tracking-wider">polling</span>
           </div>
         </div>
         <p className="text-xs text-cb-fog mb-3">
@@ -988,7 +988,7 @@ function TopoTooltip({ active, payload, label, unit = '' }: { active?: boolean; 
   if (!active || !payload?.length) return null;
   return (
     <div className="rounded-lg border border-wireframe-stroke bg-[#111113]/95 backdrop-blur-xl px-3 py-2 shadow-xl">
-      <p className="text-[10px] text-zinc-500 mb-1 font-mono">{label}</p>
+      <p className="text-xs text-zinc-500 mb-1 font-mono">{label}</p>
       {payload.map((entry, i) => (
         <p key={i} className="text-xs font-semibold" style={{ color: entry.color }}>
           {entry.name}: {entry.value}{unit}
@@ -1122,7 +1122,7 @@ function TopologyPanel() {
   const categoryColors: Record<string, { bg: string; border: string; text: string; glow: string }> = {
     core: { bg: 'bg-gold/15', border: 'border-gold/40', text: 'text-gold', glow: 'shadow-[0_0_12px_rgba(212,175,55,0.2)]' },
     agent: { bg: 'bg-cb-cyan/15', border: 'border-cb-cyan/40', text: 'text-cb-cyan', glow: 'shadow-[0_0_12px_rgba(34,211,238,0.2)]' },
-    data: { bg: 'bg-purple-400/15', border: 'border-purple-400/40', text: 'text-purple-400', glow: 'shadow-[0_0_12px_rgba(192,132,252,0.2)]' },
+    data: { bg: 'bg-amber-400/15', border: 'border-amber-400/40', text: 'text-amber-400', glow: 'shadow-[0_0_12px_rgba(192,132,252,0.2)]' },
     external: { bg: 'bg-cb-amber/15', border: 'border-cb-amber/40', text: 'text-cb-amber', glow: 'shadow-[0_0_12px_rgba(245,158,11,0.2)]' },
     social: { bg: 'bg-cb-cyan/15', border: 'border-cb-cyan/40', text: 'text-cb-cyan', glow: 'shadow-[0_0_12px_rgba(34,211,238,0.2)]' },
   };
@@ -1138,7 +1138,7 @@ function TopologyPanel() {
           { cat: 'data', label: 'Data', color: '#C084FC' },
           { cat: 'external', label: 'External', color: '#F59E0B' },
         ].map(c => (
-          <span key={c.cat} className="flex items-center gap-1.5 text-[10px]" style={{ color: c.color }}>
+          <span key={c.cat} className="flex items-center gap-1.5 text-xs" style={{ color: c.color }}>
             <span className="h-2 w-2 rounded-full" style={{ backgroundColor: c.color }} />
             {c.label}
           </span>
@@ -1195,8 +1195,8 @@ function TopologyPanel() {
                     animate={{ opacity: 1, height: 'auto' }}
                     className="mt-2 pt-2 border-t border-wireframe-stroke space-y-0.5"
                   >
-                    <div className="text-[10px] text-cb-fog">Latency: <span className={`font-mono font-bold ${node.latency > 200 ? 'text-cb-amber' : c.text}`}>{node.latency > 0 ? `${node.latency}ms` : '—'}</span></div>
-                    <div className="text-[10px] text-cb-fog">Status: <span className={`font-mono font-bold capitalize ${node.status === 'online' ? 'text-cb-green' : node.status === 'degraded' ? 'text-cb-amber' : 'text-cb-red'}`}>{node.status}</span></div>
+                    <div className="text-xs text-cb-fog">Latency: <span className={`font-mono font-bold ${node.latency > 200 ? 'text-cb-amber' : c.text}`}>{node.latency > 0 ? `${node.latency}ms` : '—'}</span></div>
+                    <div className="text-xs text-cb-fog">Status: <span className={`font-mono font-bold capitalize ${node.status === 'online' ? 'text-cb-green' : node.status === 'degraded' ? 'text-cb-amber' : 'text-cb-red'}`}>{node.status}</span></div>
                   </motion.div>
                 )}
               </div>
@@ -1213,9 +1213,9 @@ function TopologyPanel() {
             <span className="text-gold">⚡</span> Service Latency (ms)
           </h3>
           <div className="flex items-center gap-4 mb-3">
-            <span className="flex items-center gap-1 text-[10px] text-gold"><span className="h-1.5 w-1.5 rounded-full bg-gold" />Gateway</span>
-            <span className="flex items-center gap-1 text-[10px] text-cb-cyan"><span className="h-1.5 w-1.5 rounded-full bg-cb-cyan" />ACHEEVY</span>
-            <span className="flex items-center gap-1 text-[10px] text-purple-400"><span className="h-1.5 w-1.5 rounded-full bg-purple-400" />Agents</span>
+            <span className="flex items-center gap-1 text-xs text-gold"><span className="h-1.5 w-1.5 rounded-full bg-gold" />Gateway</span>
+            <span className="flex items-center gap-1 text-xs text-cb-cyan"><span className="h-1.5 w-1.5 rounded-full bg-cb-cyan" />ACHEEVY</span>
+            <span className="flex items-center gap-1 text-xs text-amber-400"><span className="h-1.5 w-1.5 rounded-full bg-amber-400" />Agents</span>
           </div>
           <ResponsiveContainer width="100%" height={180}>
             <AreaChart data={latencyData} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
@@ -1252,7 +1252,7 @@ function TopologyPanel() {
           <div className="flex items-center justify-center py-12 text-center">
             <div>
               <p className="text-xs text-zinc-500 mb-1">Throughput monitoring not yet instrumented</p>
-              <p className="text-[10px] text-zinc-600">Requires request-level logging in UEF Gateway</p>
+              <p className="text-xs text-zinc-600">Requires request-level logging in UEF Gateway</p>
             </div>
           </div>
         </div>
@@ -1287,7 +1287,7 @@ function LiveEventsPanel({ events }: { events: LiveEvent[] }) {
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cb-cyan opacity-75" />
             <span className="relative inline-flex rounded-full h-2 w-2 bg-cb-cyan" />
           </span>
-          <span className="text-[10px] text-cb-cyan font-mono uppercase tracking-wider">LIVE</span>
+          <span className="text-xs text-cb-cyan font-mono uppercase tracking-wider">LIVE</span>
         </div>
       </div>
 
@@ -1312,8 +1312,8 @@ function LiveEventsPanel({ events }: { events: LiveEvent[] }) {
                 <span className={`inline-block w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${style.dot} shadow-[0_0_6px] ${style.dot}/50`} />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 mb-0.5">
-                    <span className="text-[10px] text-cb-fog font-mono">{time}</span>
-                    <span className={`text-[10px] font-bold uppercase tracking-wider ${style.text}`}>{evt.type}</span>
+                    <span className="text-xs text-cb-fog font-mono">{time}</span>
+                    <span className={`text-xs font-bold uppercase tracking-wider ${style.text}`}>{evt.type}</span>
                   </div>
                   <div className="text-xs text-zinc-100">
                     <span className="text-gold font-medium">{evt.source}</span>
@@ -1355,7 +1355,7 @@ function SecurityPanel({ isOwner }: { isOwner: boolean }) {
             <div key={item.label} className="p-3 rounded-lg bg-[#F8FAFC]/80">
               <CheckCircleIcon className="w-4 h-4 text-cb-green mb-1.5" />
               <div className="text-xs text-zinc-100">{item.label}</div>
-              <div className="text-[10px] text-cb-fog">{item.value}</div>
+              <div className="text-xs text-cb-fog">{item.value}</div>
             </div>
           ))}
         </div>
@@ -1369,7 +1369,7 @@ function SecurityPanel({ isOwner }: { isOwner: boolean }) {
               <h4 className="text-xs font-medium text-cb-red mb-1.5">BLOCKED Operations</h4>
               <div className="flex flex-wrap gap-1.5">
                 {['payment', 'transfer', 'purchase', 'checkout', 'credit_card', 'stripe', 'bank', 'invoice'].map((op) => (
-                  <span key={op} className="px-2 py-0.5 rounded text-[10px] bg-cb-red/20 text-red-300">{op}</span>
+                  <span key={op} className="px-2 py-0.5 rounded text-xs bg-cb-red/20 text-red-300">{op}</span>
                 ))}
               </div>
             </div>
@@ -1377,7 +1377,7 @@ function SecurityPanel({ isOwner }: { isOwner: boolean }) {
               <h4 className="text-xs font-medium text-cb-green mb-1.5">ALLOWED Operations</h4>
               <div className="flex flex-wrap gap-1.5">
                 {['search', 'analyze', 'summarize', 'generate', 'read', 'write', 'code'].map((op) => (
-                  <span key={op} className="px-2 py-0.5 rounded text-[10px] bg-cb-green/20 text-green-300">{op}</span>
+                  <span key={op} className="px-2 py-0.5 rounded text-xs bg-cb-green/20 text-green-300">{op}</span>
                 ))}
               </div>
             </div>
@@ -1495,7 +1495,7 @@ function CircuitBoxContent() {
             </div>
             <div className="flex items-center gap-2">
               {isOwner && (
-                <span className="h-cb-chip flex items-center px-2.5 rounded-lg text-[10px] font-bold tracking-wider bg-gold/15 text-gold border border-gold/30">
+                <span className="h-cb-chip flex items-center px-2.5 rounded-lg text-xs font-bold tracking-wider bg-gold/15 text-gold border border-gold/30">
                   OWNER
                 </span>
               )}
@@ -1510,22 +1510,22 @@ function CircuitBoxContent() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
             <button type="button" onClick={() => setActiveTab('services')} className={`p-3 rounded-xl border transition-all duration-cb-panel text-left ${activeTab === 'services' ? 'border-cb-green/30 bg-cb-green/5' : 'border-wireframe-stroke bg-[#111113] hover:border-cb-green/20'}`}>
               <div className="text-2xl font-bold text-cb-green">{onlineServices}/{visibleServices.length}</div>
-              <div className="text-[10px] text-cb-fog mt-0.5 uppercase tracking-wider">Services Online</div>
+              <div className="text-xs text-cb-fog mt-0.5 uppercase tracking-wider">Services Online</div>
             </button>
             <button type="button" onClick={() => setActiveTab('integrations')} className={`p-3 rounded-xl border transition-all duration-cb-panel text-left ${activeTab === 'integrations' ? 'border-gold/30 bg-gold/5' : 'border-wireframe-stroke bg-[#111113] hover:border-gold/20'}`}>
               <div className="text-2xl font-bold text-gold">{activeIntegrations}</div>
-              <div className="text-[10px] text-cb-fog mt-0.5 uppercase tracking-wider">Integrations</div>
+              <div className="text-xs text-cb-fog mt-0.5 uppercase tracking-wider">Integrations</div>
             </button>
             <button type="button" onClick={() => setActiveTab('boomerangs')} className={`p-3 rounded-xl border transition-all duration-cb-panel text-left ${activeTab === 'boomerangs' ? 'border-cb-cyan/30 bg-cb-cyan/5' : 'border-wireframe-stroke bg-[#111113] hover:border-cb-cyan/20'}`}>
               <div className="text-2xl font-bold text-cb-cyan">{activeAngs}</div>
-              <div className="text-[10px] text-cb-fog mt-0.5 uppercase tracking-wider">Boomer_Angs</div>
+              <div className="text-xs text-cb-fog mt-0.5 uppercase tracking-wider">Boomer_Angs</div>
             </button>
             <button type="button" onClick={() => setActiveTab('security')} className={`p-3 rounded-xl border transition-all duration-cb-panel text-left ${activeTab === 'security' ? 'border-cb-green/30 bg-cb-green/5' : 'border-wireframe-stroke bg-[#111113] hover:border-cb-green/20'}`}>
               <div className="flex items-center gap-1.5">
                 <ShieldIcon className="w-5 h-5 text-cb-green" />
                 <span className="text-lg font-bold text-cb-green">SECURE</span>
               </div>
-              <div className="text-[10px] text-cb-fog mt-0.5 uppercase tracking-wider">Payment Isolation</div>
+              <div className="text-xs text-cb-fog mt-0.5 uppercase tracking-wider">Payment Isolation</div>
             </button>
           </div>
         </header>

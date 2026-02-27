@@ -60,7 +60,7 @@ function RadialScore({ label, value, icon: Icon }: { label: string; value: numbe
 function AgiRow({ label, score }: { label: string, score: number }) {
   return (
     <div className="flex items-center justify-between py-4 border-b border-slate-100 last:border-0">
-      <span className="text-[11px] text-slate-500 font-bold uppercase tracking-tight">{label}</span>
+      <span className="text-sm text-slate-500 font-bold uppercase tracking-tight">{label}</span>
       <div className="flex items-center gap-6">
         <div className="w-40 h-1 bg-slate-50 rounded-full overflow-hidden">
           <div className="h-full bg-emerald-600 rounded-full" style={{ width: `${(score / 10) * 100}%` }} />
@@ -137,7 +137,7 @@ export default function ProspectProfilePage() {
     <div className="pb-20">
       {/* Back Link */}
       <div className="max-w-[1200px] mx-auto px-6 pt-10">
-        <Link href="/perform/ncaa-database" className="inline-flex items-center gap-2 text-[10px] text-slate-400 hover:text-emerald-700 transition-colors font-black uppercase tracking-[0.2em]">
+        <Link href="/perform/ncaa-database" className="inline-flex items-center gap-2 text-xs text-slate-400 hover:text-emerald-700 transition-colors font-black uppercase tracking-[0.2em]">
           <ArrowLeft size={16} /> NCAA Database Registry
         </Link>
       </div>
@@ -162,7 +162,7 @@ export default function ProspectProfilePage() {
               <span className="italic text-emerald-700">{prospect.lastName}</span>
             </h1>
 
-            <div className="flex flex-wrap items-center gap-6 text-[10px] font-black uppercase tracking-[0.2em]">
+            <div className="flex flex-wrap items-center gap-6 text-xs font-black uppercase tracking-[0.2em]">
               <div className="text-emerald-800">{prospect.position}</div>
               <div className="text-slate-300">/</div>
               <div className="text-slate-400">{prospect.conference || prospect.state}</div>
@@ -187,9 +187,9 @@ export default function ProspectProfilePage() {
             <div className={`absolute inset-0 rounded-full blur-3xl opacity-10 ${isPrime ? 'bg-emerald-500' : 'bg-slate-100'}`} />
 
             <div className={`w-72 h-72 rounded-sm border border-slate-200 flex flex-col items-center justify-center relative bg-white z-10 shadow-2xl shadow-slate-200/50`}>
-              <div className="text-[10px] font-black uppercase tracking-[0.3em] mb-4 text-slate-400">Associated Grading Index</div>
+              <div className="text-xs font-black uppercase tracking-[0.3em] mb-4 text-slate-400">Associated Grading Index</div>
               <div className={`text-8xl font-serif font-bold tracking-tighter ${getScoreColor(prospect.paiScore)}`}>{prospect.paiScore}</div>
-              <div className={`mt-6 px-4 py-1.5 rounded-sm text-[10px] font-black tracking-[0.2em] uppercase ${isPrime ? 'bg-emerald-700 text-white' : 'bg-slate-100 text-slate-800'}`}>
+              <div className={`mt-6 px-4 py-1.5 rounded-sm text-xs font-black tracking-[0.2em] uppercase ${isPrime ? 'bg-emerald-700 text-white' : 'bg-slate-100 text-slate-800'}`}>
                 {isPrime ? 'PRIME GRADE' : 'ELITE GRADE'}
               </div>
             </div>
@@ -212,7 +212,7 @@ export default function ProspectProfilePage() {
 
           <div className="grid md:grid-cols-2 gap-12">
             <div>
-              <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-6 pb-2 border-b border-slate-50">Dimensions</h3>
+              <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 mb-6 pb-2 border-b border-slate-50">Dimensions</h3>
               <div className="space-y-1">
                 <AgiRow label="Performance Utility" score={agiCore.game} />
                 <AgiRow label="Biomechanical Metrics" score={agiCore.athletics} />
@@ -221,7 +221,7 @@ export default function ProspectProfilePage() {
               </div>
             </div>
             <div>
-              <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-6 pb-2 border-b border-slate-50">Orchestration Modifiers</h3>
+              <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 mb-6 pb-2 border-b border-slate-50">Orchestration Modifiers</h3>
               <div className="space-y-1">
                 <AgiRow label="Leadership & Signal" score={agiMods.leadership} />
                 <AgiRow label="Athletic Ceiling" score={agiMods.upside} />
@@ -296,7 +296,7 @@ export default function ProspectProfilePage() {
         {/* CROSS PLATFORM BENCHMARK */}
         <motion.div variants={staggerItem} className="space-y-6">
           <div className="flex items-center gap-4">
-            <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Platform Benchmarks</h2>
+            <h2 className="text-xs font-black uppercase tracking-[0.3em] text-slate-400">Platform Benchmarks</h2>
             <div className="h-px flex-1 bg-slate-100" />
           </div>
           <div className="w-full bg-white border border-slate-200 rounded-sm overflow-hidden shadow-sm">
@@ -317,7 +317,7 @@ export default function ProspectProfilePage() {
             </div>
 
             <div className="grid grid-cols-5 px-8 py-8 items-center bg-slate-50/30">
-              <div className="col-span-2 flex items-center gap-2 font-black text-[10px] uppercase tracking-widest text-slate-400">
+              <div className="col-span-2 flex items-center gap-2 font-black text-xs uppercase tracking-widest text-slate-400">
                 Industry Consensus
               </div>
               <div className="text-center font-serif font-bold text-xl text-slate-300">~93.5</div>

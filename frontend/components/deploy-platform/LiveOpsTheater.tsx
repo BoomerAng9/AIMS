@@ -194,7 +194,7 @@ function LilHawkCard({ hawk }: { hawk: LilHawkStatus }) {
       </div>
       <div className="flex-1 min-w-0">
         <div className="text-xs font-medium text-slate-800 truncate">{hawk.personaHandle}</div>
-        <div className="text-[10px] text-gray-500 truncate">{hawk.currentTask || hawk.designation}</div>
+        <div className="text-xs text-gray-500 truncate">{hawk.currentTask || hawk.designation}</div>
       </div>
       <div className={`w-2 h-2 rounded-full ${statusColors[hawk.status]}`} />
     </div>
@@ -220,7 +220,7 @@ function SecurityBar({ indicators }: { indicators: SecurityIndicators }) {
         {items.map((item) => (
           <div
             key={item.key}
-            className={`px-2 py-0.5 rounded text-[10px] font-mono ${
+            className={`px-2 py-0.5 rounded text-xs font-mono ${
               item.active
                 ? 'bg-green-500/20 text-green-400'
                 : 'bg-gray-500/20 text-gray-500'
@@ -267,7 +267,7 @@ function EventFeed({ events }: { events: ShiftEvent[] }) {
               )}
               <span className="text-slate-600">{event.description}</span>
             </div>
-            <div className="text-[10px] text-gray-600 mt-0.5">
+            <div className="text-xs text-gray-600 mt-0.5">
               {event.timestamp.toLocaleTimeString()}
             </div>
           </motion.div>
@@ -436,7 +436,7 @@ export function LiveOpsTheater({ shiftId, isOpen, onClose, minimal = false }: Li
                     }`}
                   />
                   <div
-                    className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${
+                    className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
                       isCurrent
                         ? 'bg-gold text-black'
                         : isActive

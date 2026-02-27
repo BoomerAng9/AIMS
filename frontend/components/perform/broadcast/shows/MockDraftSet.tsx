@@ -30,9 +30,9 @@ export function MockDraftSet({ segment }: { segment: BroadcastSegment }) {
                 className="absolute top-0 w-full flex items-center justify-between px-16 py-6 border-b border-slate-200 bg-slate-100/60 backdrop-blur-sm z-10"
             >
                 <div className="flex items-center gap-4">
-                    <span className="text-[10px] font-bold tracking-[0.4em] uppercase text-gold/80">Per|Form Network</span>
+                    <span className="text-xs font-bold tracking-[0.4em] uppercase text-gold/80">Per|Form Network</span>
                 </div>
-                <span className="text-[10px] font-mono uppercase text-slate-400 tracking-widest">
+                <span className="text-xs font-mono uppercase text-slate-400 tracking-widest">
                     NFL Draft {CURRENT_YEAR} · Round 1
                 </span>
             </motion.div>
@@ -47,7 +47,7 @@ export function MockDraftSet({ segment }: { segment: BroadcastSegment }) {
                 <motion.span
                     animate={{ opacity: [1, 0.5, 1] }}
                     transition={{ duration: 1.4, repeat: Infinity }}
-                    className="text-[11px] font-black tracking-[0.6em] uppercase text-gold mb-3"
+                    className="text-sm font-black tracking-[0.6em] uppercase text-gold mb-3"
                 >
                     ● On The Clock
                 </motion.span>
@@ -97,7 +97,7 @@ export function MockDraftSet({ segment }: { segment: BroadcastSegment }) {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 0.4 }}
                 transition={{ delay: 1 }}
-                className="absolute bottom-6 text-[10px] text-slate-400 tracking-widest uppercase font-mono"
+                className="absolute bottom-6 text-xs text-slate-400 tracking-widest uppercase font-mono"
             >
                 NFL Draft {CURRENT_YEAR} · A.I.M.S. Scoring &amp; Grading System
             </motion.p>

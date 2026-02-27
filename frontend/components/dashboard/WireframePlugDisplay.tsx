@@ -74,14 +74,14 @@ export const WireframePlugDisplay = () => {
                     </h2>
                     <div className="mt-4 flex items-center space-x-2">
                         <div className="h-1 w-8 bg-[#BFFF07]" />
-                        <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-[0.3em]">
+                        <p className="text-xs font-mono text-zinc-500 uppercase tracking-[0.3em]">
                             Select Finished Plugs for Hub Deployment
                         </p>
                     </div>
                 </div>
 
                 <div className="text-right">
-                    <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-[0.2em] mb-1">
+                    <p className="text-xs font-mono text-zinc-500 uppercase tracking-[0.2em] mb-1">
                         Active Selection
                     </p>
                     <p className="text-2xl font-display text-white">
@@ -157,7 +157,7 @@ export const WireframePlugDisplay = () => {
                                     <h3 className="text-md font-bold text-white truncate group-hover:text-[#BFFF07] transition-colors uppercase tracking-tight">
                                         {plug.name}
                                     </h3>
-                                    <p className="text-[10px] font-mono text-zinc-500 mt-1 uppercase">
+                                    <p className="text-xs font-mono text-zinc-500 mt-1 uppercase">
                                         {plug.type} // {plug.id}
                                     </p>
                                 </div>
@@ -179,11 +179,11 @@ export const WireframePlugDisplay = () => {
 
                             {/* Actions Footer */}
                             <div className="grid grid-cols-2 gap-3 mt-8">
-                                <button className="flex items-center justify-center space-x-2 py-2 rounded-lg bg-zinc-900 border border-white/5 text-[10px] text-zinc-400 font-bold uppercase tracking-widest hover:bg-zinc-800 hover:text-white transition-all">
+                                <button className="flex items-center justify-center space-x-2 py-2 rounded-lg bg-zinc-900 border border-white/5 text-xs text-zinc-400 font-bold uppercase tracking-widest hover:bg-zinc-800 hover:text-white transition-all">
                                     <Eye size={12} />
                                     <span>View</span>
                                 </button>
-                                <button className="flex items-center justify-center space-x-2 py-2 rounded-lg bg-zinc-900 border border-white/5 text-[10px] text-zinc-400 font-bold uppercase tracking-widest hover:bg-[#BFFF07] hover:text-black hover:border-transparent transition-all">
+                                <button className="flex items-center justify-center space-x-2 py-2 rounded-lg bg-zinc-900 border border-white/5 text-xs text-zinc-400 font-bold uppercase tracking-widest hover:bg-[#BFFF07] hover:text-black hover:border-transparent transition-all">
                                     <Edit3 size={12} />
                                     <span>Edit</span>
                                 </button>
@@ -205,7 +205,7 @@ export const WireframePlugDisplay = () => {
                     <div className="w-12 h-12 rounded-full bg-zinc-900 flex items-center justify-center border border-white/5">
                         <Plus size={24} className="text-zinc-500" />
                     </div>
-                    <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-[0.2em]">
+                    <p className="text-xs font-bold text-zinc-500 uppercase tracking-[0.2em]">
                         Build Another Plug
                     </p>
                 </motion.div>
@@ -214,7 +214,7 @@ export const WireframePlugDisplay = () => {
             {/* Footer Branding Area */}
             <div className="mt-16 flex items-center justify-between opacity-30">
                 <div className="flex items-center space-x-4">
-                    <p className="text-[10px] font-mono font-bold tracking-[0.3em] text-white uppercase">A.I.M.S.</p>
+                    <p className="text-xs font-mono font-bold tracking-[0.3em] text-white uppercase">A.I.M.S.</p>
                     <div className="h-0.5 w-12 bg-white/20" />
                     <p className="text-[9px] font-mono text-zinc-500 uppercase tracking-widest italic">Autonomous Logistics Matrix</p>
                 </div>

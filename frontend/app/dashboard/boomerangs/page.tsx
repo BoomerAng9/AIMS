@@ -121,7 +121,7 @@ export default function BoomerangsPage() {
                       <h3 className="text-lg font-semibold text-zinc-100">{ang.name}</h3>
                       <div className="flex items-center gap-1.5">
                         <span className="h-2 w-2 rounded-full bg-gold" />
-                        <span className="text-[10px] uppercase font-bold tracking-wider text-gold">
+                        <span className="text-xs uppercase font-bold tracking-wider text-gold">
                           {ang.status}
                         </span>
                       </div>
@@ -134,7 +134,7 @@ export default function BoomerangsPage() {
                   {ang.capabilities.map((cap) => (
                     <span
                       key={cap}
-                      className="rounded-full border border-wireframe-stroke bg-[#18181B] px-2.5 py-1 text-[10px] text-zinc-400"
+                      className="rounded-full border border-wireframe-stroke bg-[#18181B] px-2.5 py-1 text-xs text-zinc-400"
                     >
                       {cap.replace(/_/g, " ")}
                     </span>
@@ -142,7 +142,7 @@ export default function BoomerangsPage() {
                 </div>
 
                 <div className="mt-4 pt-3 border-t border-wireframe-stroke">
-                  <p className="text-[10px] text-zinc-500 uppercase tracking-wider">Endpoint</p>
+                  <p className="text-xs text-zinc-500 uppercase tracking-wider">Endpoint</p>
                   <p className="text-xs text-zinc-500 mt-1 font-mono truncate">{ang.endpoint}</p>
                 </div>
               </div>

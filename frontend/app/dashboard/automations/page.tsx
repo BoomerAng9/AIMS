@@ -193,7 +193,7 @@ function TriggerBadge({ trigger }: { trigger: AutomationTrigger }) {
 function StatCard({ label, value, accent }: { label: string; value: string; accent?: string }) {
   return (
     <div className="p-3 rounded-lg bg-[#111113] border border-white/10">
-      <div className="text-[10px] text-zinc-500 uppercase tracking-wider">{label}</div>
+      <div className="text-xs text-zinc-500 uppercase tracking-wider">{label}</div>
       <div className={`text-lg font-semibold mt-0.5 ${accent || 'text-zinc-100'}`}>{value}</div>
     </div>
   );
@@ -243,7 +243,7 @@ function AutomationsList({ automations, onSelect }: { automations: Automation[];
               </div>
               <div className="flex items-center gap-2 flex-wrap">
                 {auto.triggers.map((t, i) => <TriggerBadge key={i} trigger={t} />)}
-                {auto.tags.map(tag => <span key={tag} className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-500">{tag}</span>)}
+                {auto.tags.map(tag => <span key={tag} className="text-xs px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-500">{tag}</span>)}
               </div>
             </div>
             <div className="flex items-center gap-4 text-xs text-zinc-500 shrink-0">
@@ -353,7 +353,7 @@ function TemplateGrid({ templates, onUse }: { templates: AutomationTemplate[]; o
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex gap-1">
-                    {tpl.requiredServers.map(s => <span key={s} className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-500 capitalize">{s}</span>)}
+                    {tpl.requiredServers.map(s => <span key={s} className="text-xs px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-500 capitalize">{s}</span>)}
                   </div>
                   <button onClick={() => onUse(tpl.id)} className="text-xs px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 hover:bg-amber-500/15 transition-colors font-medium border border-amber-500/20">
                     Use template
@@ -439,7 +439,7 @@ function FormsLibrary({ forms }: { forms: FormEntry[] }) {
                     <span className="flex items-center gap-1"><Eye className="w-3 h-3" />{form.submissionCount} subs</span>
                   </div>
                   <div className="flex gap-1">
-                    {form.tags.slice(0, 3).map(t => <span key={t} className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-500">{t}</span>)}
+                    {form.tags.slice(0, 3).map(t => <span key={t} className="text-xs px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-500">{t}</span>)}
                   </div>
                 </div>
               </div>
@@ -526,11 +526,11 @@ function StepperWorkflows({ workflows }: { workflows: StepperWorkflowEntry[] }) 
                     <span className="flex items-center gap-1"><Radio className="w-3 h-3" />{wf.triggerLabel}</span>
                   </div>
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-500">{wf.stepsCount} steps</span>
+                    <span className="text-xs px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-500">{wf.stepsCount} steps</span>
                     {wf.appsUsed.slice(0, 4).map(app => (
-                      <span key={app} className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-500 capitalize">{app.replace(/_/g, ' ')}</span>
+                      <span key={app} className="text-xs px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-500 capitalize">{app.replace(/_/g, ' ')}</span>
                     ))}
-                    {wf.appsUsed.length > 4 && <span className="text-[10px] text-zinc-600">+{wf.appsUsed.length - 4} more</span>}
+                    {wf.appsUsed.length > 4 && <span className="text-xs text-zinc-600">+{wf.appsUsed.length - 4} more</span>}
                   </div>
                 </div>
               </div>
@@ -681,7 +681,7 @@ export default function AutomationsPage() {
               <Icon className="w-4 h-4" />
               {tab.label}
               {tab.count !== undefined && tab.count > 0 && (
-                <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${isActive ? 'bg-amber-500/15 text-amber-400' : 'bg-zinc-800 text-zinc-500'}`}>
+                <span className={`text-xs px-1.5 py-0.5 rounded-full ${isActive ? 'bg-amber-500/15 text-amber-400' : 'bg-zinc-800 text-zinc-500'}`}>
                   {tab.count}
                 </span>
               )}

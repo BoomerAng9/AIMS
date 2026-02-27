@@ -433,7 +433,7 @@ function ReportView({ report }: { report: ReportData }) {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.06 }}
-                className="px-4 py-2 rounded-xl border border-purple-500/20 bg-purple-500/5 text-purple-300 text-sm"
+                className="px-4 py-2 rounded-xl border border-amber-500/20 bg-amber-500/5 text-amber-300 text-sm"
               >
                 {tech}
               </motion.span>
@@ -627,7 +627,7 @@ function HeroSection({ report }: { report: ReportData }) {
             {report.research.facts.competitors.length} competitors
           </span>
           {report.industry && (
-            <span className="px-2.5 py-1 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20">
+            <span className="px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
               {report.industry}
             </span>
           )}

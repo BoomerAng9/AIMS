@@ -112,7 +112,7 @@ export default function EnvironmentsPage() {
       {/* Header */}
       <header className="flex items-center justify-between">
         <div>
-          <p className="text-[10px] uppercase tracking-[0.3em] text-gold/50 mb-1">
+          <p className="text-xs uppercase tracking-[0.3em] text-gold/50 mb-1">
             Infrastructure
           </p>
           <h1 className="text-3xl font-bold tracking-tight text-zinc-100 font-display">
@@ -124,14 +124,14 @@ export default function EnvironmentsPage() {
         </div>
         <div className="flex items-center gap-3">
           {lastRefresh && (
-            <span className="text-[10px] text-zinc-600 font-mono">
+            <span className="text-xs text-zinc-600 font-mono">
               Updated {lastRefresh}
             </span>
           )}
           <button
             onClick={handleRefresh}
             disabled={refreshing}
-            className="flex items-center gap-1.5 rounded-lg border border-gold/20 bg-gold/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-gold transition-all hover:bg-gold/20 disabled:opacity-50"
+            className="flex items-center gap-1.5 rounded-lg border border-gold/20 bg-gold/10 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-gold transition-all hover:bg-gold/20 disabled:opacity-50"
           >
             <RefreshCw size={12} className={refreshing ? "animate-spin" : ""} />
             Refresh
@@ -153,7 +153,7 @@ export default function EnvironmentsPage() {
           </div>
           {healthData && (
             <span
-              className={`rounded-full border px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${
+              className={`rounded-full border px-3 py-1 text-xs font-bold uppercase tracking-wider ${
                 STATUS_CONFIG[healthData.overall === "healthy" ? "up" : healthData.overall === "degraded" ? "degraded" : "down"]?.badge || STATUS_CONFIG.down.badge
               }`}
             >
@@ -175,7 +175,7 @@ export default function EnvironmentsPage() {
                 key={stat.label}
                 className="rounded-xl border border-wireframe-stroke bg-[#1F1F23]/60 p-3 text-center"
               >
-                <p className="text-[10px] uppercase tracking-widest text-zinc-500">
+                <p className="text-xs uppercase tracking-widest text-zinc-500">
                   {stat.label}
                 </p>
                 <p className={`text-2xl font-semibold mt-1 ${stat.color}`}>
@@ -298,7 +298,7 @@ function ServiceCard({ service }: { service: ServiceHealth }) {
         />
       </div>
 
-      <div className="flex items-center gap-3 text-[10px] text-zinc-500">
+      <div className="flex items-center gap-3 text-xs text-zinc-500">
         <span className={`rounded-full border px-2 py-0.5 font-bold uppercase tracking-wider ${status.badge}`}>
           {status.label}
         </span>
@@ -307,7 +307,7 @@ function ServiceCard({ service }: { service: ServiceHealth }) {
       </div>
 
       {service.error && (
-        <p className="mt-2 text-[10px] text-red-400/60 truncate">{service.error}</p>
+        <p className="mt-2 text-xs text-red-400/60 truncate">{service.error}</p>
       )}
     </div>
   );
@@ -316,7 +316,7 @@ function ServiceCard({ service }: { service: ServiceHealth }) {
 function InfoCard({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-xl border border-wireframe-stroke bg-[#1F1F23]/60 p-3">
-      <p className="text-[10px] uppercase tracking-wider text-zinc-500">{label}</p>
+      <p className="text-xs uppercase tracking-wider text-zinc-500">{label}</p>
       <p className="text-xs font-mono text-gold mt-0.5">{value}</p>
     </div>
   );

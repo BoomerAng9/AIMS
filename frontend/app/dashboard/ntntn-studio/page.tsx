@@ -139,7 +139,7 @@ const EXAMPLE_PROMPTS = [
 function CategoryChip({ category, hits }: { category: NtNtNCategory; hits: number }) {
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${CATEGORY_COLORS[category]}`}
+      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-sm font-semibold border ${CATEGORY_COLORS[category]}`}
     >
       {CATEGORY_LABELS[category]}
       {hits > 1 && (
@@ -154,11 +154,11 @@ function ScopeBadge({ tier }: { tier: ScopeTier }) {
   const colors: Record<ScopeTier, string> = {
     component: "bg-zinc-500/20 text-zinc-400 border-zinc-500/30",
     page: "bg-amber-500/20 text-amber-400 border-amber-500/30",
-    application: "bg-violet-500/20 text-violet-400 border-violet-500/30",
+    application: "bg-amber-500/20 text-amber-400 border-amber-500/30",
     platform: "bg-rose-500/20 text-rose-400 border-rose-500/30",
   };
   return (
-    <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-medium ${colors[tier]}`}>
+    <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border text-sm font-semibold ${colors[tier]}`}>
       <Layers className="w-3.5 h-3.5" />
       <span>{info.label}</span>
       <span className="opacity-60">|</span>
@@ -181,7 +181,7 @@ function StackCard({ label, value, icon: Icon }: { label: string; value: string;
         <Icon className="w-5 h-5 text-zinc-400 group-hover:text-[#D4AF37]" style={{ transition: `color ${transition.fast.duration}s` }} />
       </div>
       <span className="text-[0.65rem] uppercase tracking-wider text-zinc-500">{label}</span>
-      <span className="text-sm font-medium text-zinc-200 text-center">{value}</span>
+      <span className="text-sm font-semibold text-zinc-200 text-center">{value}</span>
     </motion.div>
   );
 }
@@ -208,7 +208,7 @@ function PillarSection({
       <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
         <div className="flex items-center gap-2">
           <Icon className={`w-4 h-4 ${color}`} />
-          <span className="text-sm font-medium text-zinc-200">{title}</span>
+          <span className="text-sm font-semibold text-zinc-200">{title}</span>
         </div>
         <div className="flex items-center gap-2">
           {status === "in_progress" && (
@@ -217,7 +217,7 @@ function PillarSection({
           {status === "complete" && (
             <Check className="w-3.5 h-3.5 text-emerald-400" />
           )}
-          <span className="text-xs text-zinc-500">
+          <span className="text-sm text-zinc-500">
             {doneTasks}/{totalTasks}
           </span>
         </div>
@@ -244,7 +244,7 @@ function PillarSection({
         {tasks.map((task) => (
           <div
             key={task.id}
-            className={`flex items-center gap-2 px-2 py-1 rounded text-xs ${
+            className={`flex items-center gap-2 px-2 py-1 rounded text-sm ${
               task.status === "done"
                 ? "text-zinc-500 line-through"
                 : task.status === "running"
@@ -637,7 +637,7 @@ export default function NtNtNStudioPage() {
             </div>
             <div>
               <h1 className="text-xl font-bold text-zinc-100">Creative Studio</h1>
-              <p className="text-xs text-zinc-500">
+              <p className="text-sm text-zinc-500">
                 Powered by NtNtN Engine
               </p>
             </div>
@@ -650,7 +650,7 @@ export default function NtNtNStudioPage() {
             <button
               key={t.id}
               onClick={() => setTab(t.id)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-semibold transition-colors ${
                 tab === t.id
                   ? "bg-[#D4AF37]/20 text-[#D4AF37] border border-[#D4AF37]/30"
                   : "text-zinc-400 hover:text-zinc-200 border border-transparent"
@@ -679,7 +679,7 @@ export default function NtNtNStudioPage() {
           >
             {/* Creative Brief Input */}
             <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6">
-              <label className="block text-sm font-medium text-zinc-300 mb-3">
+              <label className="block text-sm font-semibold text-zinc-300 mb-3">
                 Describe what you want to build
               </label>
               <textarea
@@ -702,7 +702,7 @@ export default function NtNtNStudioPage() {
                       <button
                         key={i}
                         onClick={() => setBrief(p)}
-                        className="text-xs text-zinc-500 bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-lg border border-white/5 hover:border-white/10 transition-colors text-left"
+                        className="text-sm text-zinc-500 bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-lg border border-white/5 hover:border-white/10 transition-colors text-left"
                       >
                         {p.length > 60 ? p.slice(0, 57) + "..." : p}
                       </button>
@@ -723,7 +723,7 @@ export default function NtNtNStudioPage() {
                 {/* Intent + Scope */}
                 <motion.div variants={staggerItem} className="flex flex-wrap items-center gap-3">
                   <div
-                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium ${
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-sm font-semibold ${
                       analysis.hasBuildIntent
                         ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
                         : "bg-zinc-500/20 text-zinc-400 border-zinc-500/30"
@@ -777,19 +777,19 @@ export default function NtNtNStudioPage() {
 
                     {/* Supplementary tools based on detected categories */}
                     {uniqueCategories.some((c) => c.category === "3d_visual") && (
-                      <div className="mt-3 flex items-center gap-2 text-xs text-zinc-500">
+                      <div className="mt-3 flex items-center gap-2 text-sm text-zinc-500">
                         <Plug className="w-3 h-3" />
                         <span>+ Three.js / React Three Fiber (3D detected)</span>
                       </div>
                     )}
                     {uniqueCategories.some((c) => c.technique_group === "scroll") && (
-                      <div className="mt-1 flex items-center gap-2 text-xs text-zinc-500">
+                      <div className="mt-1 flex items-center gap-2 text-sm text-zinc-500">
                         <Plug className="w-3 h-3" />
                         <span>+ Lenis (smooth scroll detected)</span>
                       </div>
                     )}
                     {uniqueCategories.some((c) => c.category === "backend_fullstack") && (
-                      <div className="mt-1 flex items-center gap-2 text-xs text-zinc-500">
+                      <div className="mt-1 flex items-center gap-2 text-sm text-zinc-500">
                         <Plug className="w-3 h-3" />
                         <span>+ Prisma + NextAuth (backend detected)</span>
                       </div>
@@ -843,7 +843,7 @@ export default function NtNtNStudioPage() {
                 </p>
                 <button
                   onClick={() => setTab("brief")}
-                  className="mt-4 text-xs text-[#D4AF37] hover:underline"
+                  className="mt-4 text-sm text-[#D4AF37] hover:underline"
                 >
                   Go to Brief
                 </button>
@@ -855,7 +855,7 @@ export default function NtNtNStudioPage() {
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-5">
                     <div>
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs text-zinc-500 font-mono">
+                        <span className="text-sm text-zinc-500 font-mono">
                           {activeBuild.manifest.manifest_id}
                         </span>
                         {activeBuild.manifest.signed && (
@@ -869,7 +869,7 @@ export default function NtNtNStudioPage() {
                       </h2>
                     </div>
 
-                    <div className="flex items-center gap-4 text-xs text-zinc-500">
+                    <div className="flex items-center gap-4 text-sm text-zinc-500">
                       <div className="flex items-center gap-1.5">
                         <Clock className="w-3.5 h-3.5" />
                         {formatElapsed(elapsed)}
@@ -911,7 +911,7 @@ export default function NtNtNStudioPage() {
                     icon={Plug}
                     status={activeBuild.manifest.pillars.integrations}
                     tasks={activeBuild.integrationsTasks}
-                    color="text-violet-400"
+                    color="text-amber-400"
                   />
                 </div>
 
@@ -921,7 +921,7 @@ export default function NtNtNStudioPage() {
                   <div className="rounded-2xl border border-white/10 bg-white/[0.02] overflow-hidden">
                     <div className="flex items-center gap-2 px-4 py-3 border-b border-white/5">
                       <Eye className="w-4 h-4 text-zinc-400" />
-                      <span className="text-sm font-medium text-zinc-300">Preview</span>
+                      <span className="text-sm font-semibold text-zinc-300">Preview</span>
                       {activeBuild.manifest.preview_url && (
                         <span className="ml-auto text-[0.6rem] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
                           Live
@@ -932,13 +932,13 @@ export default function NtNtNStudioPage() {
                       {activeBuild.manifest.preview_url ? (
                         <div className="w-full h-full flex flex-col items-center justify-center gap-3 p-6">
                           <Monitor className="w-10 h-10 text-[#D4AF37]" />
-                          <span className="text-xs text-zinc-400 text-center">
+                          <span className="text-sm text-zinc-400 text-center">
                             Preview available at{" "}
                             <span className="text-[#D4AF37] font-mono">
                               {activeBuild.manifest.preview_url}
                             </span>
                           </span>
-                          <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#D4AF37]/20 text-[#D4AF37] text-xs font-medium border border-[#D4AF37]/30 hover:bg-[#D4AF37]/30 transition-colors">
+                          <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#D4AF37]/20 text-[#D4AF37] text-sm font-semibold border border-[#D4AF37]/30 hover:bg-[#D4AF37]/30 transition-colors">
                             <Globe className="w-3.5 h-3.5" />
                             Open Preview
                           </button>
@@ -946,7 +946,7 @@ export default function NtNtNStudioPage() {
                       ) : (
                         <div className="flex flex-col items-center gap-2 text-zinc-600">
                           <Monitor className="w-8 h-8" />
-                          <span className="text-xs">
+                          <span className="text-sm">
                             Preview appears after scaffolding
                           </span>
                         </div>
@@ -958,7 +958,7 @@ export default function NtNtNStudioPage() {
                   <div className="rounded-2xl border border-white/10 bg-white/[0.02] overflow-hidden">
                     <div className="flex items-center gap-2 px-4 py-3 border-b border-white/5">
                       <Cpu className="w-4 h-4 text-zinc-400" />
-                      <span className="text-sm font-medium text-zinc-300">Build Log</span>
+                      <span className="text-sm font-semibold text-zinc-300">Build Log</span>
                       <span className="ml-auto text-[0.6rem] text-zinc-600">
                         {activeBuild.logs.length} entries
                       </span>
@@ -973,7 +973,7 @@ export default function NtNtNStudioPage() {
                               : log.includes("complete")
                               ? "text-emerald-500"
                               : log.includes("Picker_Ang")
-                              ? "text-purple-400"
+                              ? "text-amber-400"
                               : ""
                           }
                         >
@@ -1009,17 +1009,17 @@ export default function NtNtNStudioPage() {
                               href={activeBuild.manifest.live_url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-emerald-500/20 text-emerald-300 text-xs font-medium border border-emerald-500/30 hover:bg-emerald-500/30 transition-colors"
+                              className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-emerald-500/20 text-emerald-300 text-sm font-semibold border border-emerald-500/30 hover:bg-emerald-500/30 transition-colors"
                             >
                               <Globe className="w-3.5 h-3.5" />
                               View Live Site
                             </a>
                           )}
-                          <button className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-white/5 text-zinc-300 text-xs font-medium border border-white/10 hover:bg-white/10 transition-colors">
+                          <button className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-white/5 text-zinc-300 text-sm font-semibold border border-white/10 hover:bg-white/10 transition-colors">
                             <Package className="w-3.5 h-3.5" />
                             Export Bundle
                           </button>
-                          <button className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-white/5 text-zinc-300 text-xs font-medium border border-white/10 hover:bg-white/10 transition-colors">
+                          <button className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-white/5 text-zinc-300 text-sm font-semibold border border-white/10 hover:bg-white/10 transition-colors">
                             <FileImage className="w-3.5 h-3.5" />
                             View Evidence
                           </button>
@@ -1070,7 +1070,7 @@ export default function NtNtNStudioPage() {
                         )}
                       </div>
                       <div className="min-w-0">
-                        <div className="text-sm font-medium text-zinc-200 truncate">
+                        <div className="text-sm font-semibold text-zinc-200 truncate">
                           {m.build_name}
                         </div>
                         <div className="flex items-center gap-2 text-[0.65rem] text-zinc-500 mt-0.5">
@@ -1088,7 +1088,7 @@ export default function NtNtNStudioPage() {
                           href={m.live_url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/5 text-zinc-400 text-xs hover:text-zinc-200 border border-white/10 transition-colors"
+                          className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/5 text-zinc-400 text-sm hover:text-zinc-200 border border-white/10 transition-colors"
                         >
                           <Globe className="w-3 h-3" />
                           View

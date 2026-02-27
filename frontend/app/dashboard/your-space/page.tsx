@@ -137,7 +137,7 @@ export default function YourSpacePage() {
         <div className="w-full lg:w-[45%] space-y-6">
           {/* Header */}
           <header>
-            <p className="text-[10px] uppercase tracking-[0.3em] text-gold/50 mb-1">
+            <p className="text-xs uppercase tracking-[0.3em] text-gold/50 mb-1">
               Profile &amp; Identity
             </p>
             <h1 className="text-3xl font-bold tracking-tight text-zinc-100 font-display">
@@ -163,13 +163,13 @@ export default function YourSpacePage() {
 
             <div className="flex items-center gap-4">
               <div className="space-y-1">
-                <p className="text-[10px] uppercase tracking-wider text-zinc-500">
+                <p className="text-xs uppercase tracking-wider text-zinc-500">
                   Role
                 </p>
                 <p className="text-sm text-zinc-400">{userRole === "OWNER" ? "Platform Owner" : "Member"}</p>
               </div>
               <div className="space-y-1">
-                <p className="text-[10px] uppercase tracking-wider text-zinc-500">
+                <p className="text-xs uppercase tracking-wider text-zinc-500">
                   Status
                 </p>
                 <p className="text-sm text-emerald-400">{memberSince}</p>
@@ -177,7 +177,7 @@ export default function YourSpacePage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] uppercase tracking-wider text-zinc-500">
+              <label className="text-xs uppercase tracking-wider text-zinc-500">
                 Bio
               </label>
               <textarea
@@ -198,7 +198,7 @@ export default function YourSpacePage() {
               >
                 <div className="flex items-center gap-2 mb-2">
                   <stat.icon size={13} className="text-gold" />
-                  <p className="text-[10px] uppercase tracking-wider text-zinc-500">
+                  <p className="text-xs uppercase tracking-wider text-zinc-500">
                     {stat.label}
                   </p>
                 </div>
@@ -296,7 +296,7 @@ export default function YourSpacePage() {
       {/* ── Space Station & Spacecraft ──────────────────────────── */}
       <div className="mt-8 space-y-6">
         <header>
-          <p className="text-[10px] uppercase tracking-[0.3em] text-gold/50 mb-1">
+          <p className="text-xs uppercase tracking-[0.3em] text-gold/50 mb-1">
             Home Base &amp; Fleet
           </p>
           <h2 className="text-2xl font-bold tracking-tight text-slate-800 font-display">

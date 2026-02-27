@@ -66,7 +66,7 @@ export default function PerFormLayout({ children }: { children: React.ReactNode 
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center gap-2 whitespace-nowrap rounded-sm px-4 py-2 text-xs md:text-[11px] font-black uppercase tracking-widest transition-all shrink-0 border-b-2 ${isActive
+                  className={`flex items-center gap-2 whitespace-nowrap rounded-sm px-4 py-2 text-xs md:text-sm font-black uppercase tracking-widest transition-all shrink-0 border-b-2 ${isActive
                       ? "text-emerald-800 border-emerald-600 bg-emerald-50/30"
                       : "text-slate-400 border-transparent hover:text-slate-600 hover:bg-slate-50"
                     }`}

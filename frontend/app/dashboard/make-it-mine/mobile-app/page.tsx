@@ -546,7 +546,7 @@ function MobileCodePanel({ code, onCodeChange }: { code: string; onCodeChange: (
         aria-label="Generated PWA code"
         className="h-full w-full resize-none bg-[#0D0D10] p-4 font-mono text-sm leading-relaxed text-amber-400/85 outline-none selection:bg-amber-500/20"
       />
-      <div className="pointer-events-none absolute bottom-3 right-4 rounded bg-white/[0.04] px-2 py-0.5 text-[10px] text-zinc-600">
+      <div className="pointer-events-none absolute bottom-3 right-4 rounded bg-white/[0.04] px-2 py-0.5 text-xs text-zinc-600">
         {code.split('\n').length.toLocaleString()} lines
       </div>
     </div>

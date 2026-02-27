@@ -165,7 +165,7 @@ function ConnectionBadge({
         />
       </span>
       <span
-        className={`text-[10px] font-medium tracking-wider uppercase ${config.text}`}
+        className={`text-xs font-medium tracking-wider uppercase ${config.text}`}
       >
         {config.label}
       </span>
@@ -249,7 +249,7 @@ export function ChatShell({
         {/* Center: Session/Project info (desktop only) */}
         {projectTitle && (
           <div className="hidden md:flex items-center gap-2 px-3 py-1 rounded-lg bg-slate-50 border border-slate-100">
-            <span className="text-[10px] text-slate-400 uppercase tracking-wider font-medium">
+            <span className="text-xs text-slate-400 uppercase tracking-wider font-medium">
               Session:
             </span>
             <span className="text-xs text-slate-600 font-mono truncate max-w-[200px]">
@@ -265,7 +265,7 @@ export function ChatShell({
             <p className="text-lg font-handwriting text-zinc-100">
               Think it. Speak it. ACHEEVY builds it.
             </p>
-            <p className="text-[10px] uppercase tracking-widest max-w-xs">
+            <p className="text-xs uppercase tracking-widest max-w-xs">
               System is ready for your primary business mission.
             </p>
           </div>
@@ -331,7 +331,7 @@ export function ChatShell({
                     >
                       <span>Agent Orchestration</span>
                       <span
-                        className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${
+                        className={`text-xs font-medium px-1.5 py-0.5 rounded ${
                           orchestrationEnabled
                             ? 'bg-emerald-50 text-emerald-600'
                             : 'bg-slate-100 text-slate-400'
@@ -348,7 +348,7 @@ export function ChatShell({
                     >
                       <span>Voice Responses</span>
                       <span
-                        className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${
+                        className={`text-xs font-medium px-1.5 py-0.5 rounded ${
                           voiceEnabled
                             ? 'bg-emerald-50 text-emerald-600'
                             : 'bg-slate-100 text-slate-400'
@@ -362,7 +362,7 @@ export function ChatShell({
 
                     {/* Connection info */}
                     <div className="px-3 py-2">
-                      <p className="text-[10px] text-slate-400 uppercase tracking-wider font-medium mb-1">
+                      <p className="text-xs text-slate-400 uppercase tracking-wider font-medium mb-1">
                         Connection
                       </p>
                       <div className="flex items-center gap-2">
