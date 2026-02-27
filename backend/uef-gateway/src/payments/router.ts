@@ -15,6 +15,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { agentPayments } from './agent-payments';
 import { agentCommerceRouter } from '../billing/agent-commerce';
+import { lucStripeBridgeRouter } from '../billing/luc-stripe-bridge';
 import logger from '../logger';
 
 export const paymentsRouter = Router();
@@ -184,3 +185,12 @@ paymentsRouter.post('/api/payments/wallet/:agentId/credit', requireInternalCalle
 // Agent Commerce (X402 checkout flow + Stripe/Coinbase)
 // ---------------------------------------------------------------------------
 paymentsRouter.use(agentCommerceRouter);
+
+// ---------------------------------------------------------------------------
+// LUC-Stripe Bridge (LUC as policy layer over Stripe billing)
+// Gates: /api/billing/gate, /api/billing/record, /api/billing/credit,
+//        /api/billing/gate/form-submission, /api/billing/gate/stepper-run,
+//        /api/billing/gate/media, /api/billing/summary/:userId,
+//        /api/billing/state/:userId, /api/billing/sync, /api/billing/services
+// ---------------------------------------------------------------------------
+paymentsRouter.use(lucStripeBridgeRouter);

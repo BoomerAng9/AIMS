@@ -50,6 +50,7 @@ import { lucProjectService } from './shelves/luc-project-service';
 import { allShelfTools } from './shelves/mcp-tools';
 import { ossModels } from './llm/oss-models';
 import { personaplex } from './llm/personaplex';
+import { voiceRouter } from './voice/voice-router';
 import { triggerPmoPipeline } from './pipeline';
 import { plugRouter } from './plug-catalog/router';
 import { instanceLifecycle, autoScaler, cdnDeploy, tenantNetworks } from './plug-catalog';
@@ -222,6 +223,11 @@ app.use(requireApiKey);
 // Agent Payments — X402, Stripe Agent Commerce, Wallets
 // --------------------------------------------------------------------------
 app.use(paymentsRouter);
+
+// --------------------------------------------------------------------------
+// Voice Router — PersonaPlex + Deepgram Nova + ElevenLabs with LUC metering
+// --------------------------------------------------------------------------
+app.use(voiceRouter);
 
 // --------------------------------------------------------------------------
 // Video & Content Pipeline — KIE.ai unified video generation

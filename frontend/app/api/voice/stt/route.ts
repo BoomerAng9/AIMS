@@ -4,6 +4,9 @@
  * Primary: ElevenLabs Scribe v2 (99% accuracy, 90+ languages, word timestamps)
  * Fallback: Deepgram Nova-3 (sub-300ms, 30+ languages)
  *
+ * LUC metering: Records stt_minutes usage after successful transcription.
+ * Duration is calculated from word timestamps (preferred) or estimated from buffer size.
+ *
  * Accepts audio file upload, returns transcription text.
  *
  * NOTE: Groq Whisper was removed — exposed key deprecated.
@@ -14,6 +17,32 @@ import { NextRequest, NextResponse } from 'next/server';
 const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY || '';
 const DEEPGRAM_API_KEY = process.env.DEEPGRAM_API_KEY || '';
 const GROQ_API_KEY = process.env.GROQ_API_KEY || '';
+const UEF_GATEWAY_URL = process.env.NEXT_PUBLIC_API_URL || process.env.UEF_GATEWAY_URL || 'http://localhost:3001';
+const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY || '';
+
+/** Estimate audio duration from buffer size (WebM/Opus ~12kbps) */
+function estimateDurationMinutes(bufferSize: number): number {
+  const bytesPerSecond = 1500; // WebM/Opus average
+  const seconds = bufferSize / bytesPerSecond;
+  return Math.max(0.1, seconds / 60);
+}
+
+/** Fire-and-forget LUC metering call for STT minutes */
+function meterSttUsage(userId: string, durationMinutes: number, provider: string) {
+  fetch(`${UEF_GATEWAY_URL}/api/billing/record`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(INTERNAL_API_KEY ? { 'x-api-key': INTERNAL_API_KEY } : {}),
+    },
+    body: JSON.stringify({
+      userId,
+      serviceKey: 'stt_minutes',
+      units: durationMinutes,
+      metadata: { provider, source: 'frontend-stt' },
+    }),
+  }).catch(() => { /* non-blocking */ });
+}
 
 interface SttResponse {
   text: string;
@@ -146,6 +175,7 @@ export async function POST(req: NextRequest) {
     const audioFile = formData.get('audio') as File | null;
     const provider = formData.get('provider') as string | null;
     const language = formData.get('language') as string | null;
+    const userId = formData.get('userId') as string | null;
 
     if (!audioFile) {
       return NextResponse.json({ error: 'audio file required' }, { status: 400 });
@@ -172,7 +202,19 @@ export async function POST(req: NextRequest) {
       }
 
       if (result && result.text) {
-        return NextResponse.json(result);
+        // Calculate duration from word timestamps or estimate from buffer size
+        const words = result.words;
+        const durationMinutes = words?.length
+          ? Math.max(0.1, (words[words.length - 1].end / 60))
+          : estimateDurationMinutes(audioBuffer.byteLength);
+
+        // Meter stt_minutes through LUC (fire-and-forget)
+        meterSttUsage(userId || 'anonymous', durationMinutes, p);
+
+        return NextResponse.json({
+          ...result,
+          durationMinutes,
+        });
       }
     }
 
