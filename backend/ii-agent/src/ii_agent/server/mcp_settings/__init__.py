@@ -1,1 +1,0 @@
-"""MCP settings management module."""

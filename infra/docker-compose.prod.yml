@@ -177,8 +177,9 @@ services:
       - RESEARCH_ANG_URL=http://research-ang:3020
       - ROUTER_ANG_URL=http://router-ang:3021
       - CHICKENHAWK_URL=http://chickenhawk-core:4001
-      - II_AGENT_HTTP_URL=http://ii-agent:8000
-      - II_AGENT_WS_URL=http://ii-agent:8000
+      # ii-agent runs externally — override these if ii-agent is on a different host
+      - II_AGENT_HTTP_URL=${II_AGENT_HTTP_URL:-http://ii-agent:8000}
+      - II_AGENT_WS_URL=${II_AGENT_WS_URL:-ws://ii-agent:8000}
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
       - INTERNAL_API_KEY=${INTERNAL_API_KEY}
       # Hugging Face — Nvidia models
@@ -638,141 +639,14 @@ services:
           memory: 128M
 
   # ---------------------------------------------------------------------------
-  # II-Agent — Autonomous Execution Backend (Socket.IO on port 8000)
-  # Full-stack dev, deep research, browser automation, code execution.
-  # ACHEEVY orchestrator connects via IIAgentClient (Socket.IO bridge).
+  # II-Agent — Now deployed EXTERNALLY
   # ---------------------------------------------------------------------------
-  ii-agent:
-    build:
-      context: ../backend/ii-agent
-      dockerfile: docker/backend/Dockerfile
-    expose:
-      - "8000"
-    environment:
-      - SERVER_HOST=0.0.0.0
-      - SERVER_PORT=8000
-      - DATABASE_URL=postgresql://${II_AGENT_DB_USER:-iiagent}:${II_AGENT_DB_PASSWORD:-iiagent}@ii-agent-postgres:5432/${II_AGENT_DB_NAME:-iiagentdev}
-      - REDIS_SESSION_URL=redis://:${REDIS_PASSWORD:-aims_redis_secret}@redis:6379/2
-      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
-      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
-      - SANDBOX_SERVER_URL=http://ii-agent-sandbox:8100
-      - TOOL_SERVER_URL=http://ii-agent-tools:1236
-      - FILE_STORE_PATH=/.ii_agent
-    depends_on:
-      ii-agent-postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    healthcheck:
-      test: [ "CMD-SHELL", "curl -fsS http://localhost:8000/health || exit 1" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
-    restart: unless-stopped
-    volumes:
-      - ii-agent-filestore:/.ii_agent
-    networks:
-      - aims-network
-    security_opt:
-      - no-new-privileges:true
-    deploy:
-      resources:
-        limits:
-          cpus: '2'
-          memory: 2G
-
-  ii-agent-postgres:
-    image: postgres:15-alpine
-    environment:
-      - POSTGRES_USER=${II_AGENT_DB_USER:-iiagent}
-      - POSTGRES_PASSWORD=${II_AGENT_DB_PASSWORD:-iiagent}
-      - POSTGRES_DB=${II_AGENT_DB_NAME:-iiagentdev}
-    volumes:
-      - ii-agent-pgdata:/var/lib/postgresql/data
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${II_AGENT_DB_USER:-iiagent}" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    restart: unless-stopped
-    networks:
-      - aims-network
-    security_opt:
-      - no-new-privileges:true
-    deploy:
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 512M
-
-  ii-agent-tools:
-    build:
-      context: ../backend/ii-agent
-      dockerfile: docker/backend/Dockerfile
-    expose:
-      - "1236"
-    entrypoint: [ "/bin/sh", "-c" ]
-    command:
-      - >-
-        exec uvicorn ii_tool.integrations.app.main:app --host 0.0.0.0 --port 1236
-    environment:
-      - DATABASE_URL=postgresql://${II_AGENT_DB_USER:-iiagent}:${II_AGENT_DB_PASSWORD:-iiagent}@ii-agent-postgres:5432/${II_AGENT_DB_NAME:-iiagentdev}
-    depends_on:
-      ii-agent-postgres:
-        condition: service_healthy
-    healthcheck:
-      test: [ "CMD-SHELL", "curl -fsS http://localhost:1236/health || exit 1" ]
-      interval: 15s
-      timeout: 5s
-      retries: 5
-    restart: unless-stopped
-    volumes:
-      - ii-agent-filestore:/.ii_agent
-    networks:
-      - aims-network
-    security_opt:
-      - no-new-privileges:true
-    deploy:
-      resources:
-        limits:
-          cpus: '1'
-          memory: 1G
-
-  ii-agent-sandbox:
-    build:
-      context: ../backend/ii-agent
-      dockerfile: docker/backend/Dockerfile
-    expose:
-      - "8100"
-    entrypoint: [ "/bin/bash", "/app/start_sandbox_server.sh" ]
-    environment:
-      - SERVER_HOST=0.0.0.0
-      - SERVER_PORT=8100
-      # sslmode omitted — traffic stays on internal Docker network (ii-agent-postgres not exposed)
-      - SANDBOX_DATABASE_URL=postgresql+asyncpg://${II_AGENT_DB_USER:-iiagent}:${II_AGENT_DB_PASSWORD:-iiagent}@ii-agent-postgres:5432/${II_AGENT_DB_NAME:-iiagentdev}
-      - REDIS_URL=redis://:${REDIS_PASSWORD:-aims_redis_secret}@redis:6379/3
-      - E2B_API_KEY=${E2B_API_KEY}
-    depends_on:
-      ii-agent-postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    healthcheck:
-      test: [ "CMD-SHELL", "curl -fsS http://localhost:8100/health || exit 1" ]
-      interval: 15s
-      timeout: 5s
-      retries: 5
-    restart: unless-stopped
-    networks:
-      - aims-network
-    security_opt:
-      - no-new-privileges:true
-    deploy:
-      resources:
-        limits:
-          cpus: '1'
-          memory: 1G
+  # ii-agent is no longer embedded in the AIMS repo.
+  # To run ii-agent alongside AIMS, use the overlay from the ii-agent repo:
+  #   docker compose -f infra/docker-compose.prod.yml -f <path-to>/docker-compose.aims.yaml up -d
+  # The overlay provides: ii-agent, ii-agent-postgres, ii-agent-tools, ii-agent-sandbox
+  # UEF Gateway connects via II_AGENT_HTTP_URL and II_AGENT_WS_URL env vars.
+  # ---------------------------------------------------------------------------
 
   # ---------------------------------------------------------------------------
   # LAYER 5: PER|FORM PLATFORM — Sports Analytics
@@ -914,8 +788,6 @@ volumes:
   perform-debate-logs:
   perform-rankings:
   perform-content:
-  ii-agent-filestore:
-  ii-agent-pgdata:
   chickenhawk-data:
   chickenhawk-evidence:
 

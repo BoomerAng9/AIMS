@@ -11,9 +11,10 @@
 
 ---
 
-## 1. ii-agent (Execution Engine)
+## 1. ii-agent (Execution Engine) — External Deployment
 
-**Location:** `backend/ii-agent/`
+**Location:** External repo (`ii-agent`), deployed via `docker-compose.aims.yaml` overlay.
+Source code is NOT embedded in AIMS — ii-agent ships and deploys from its own repository.
 **What ACHEEVY Uses It For:** Autonomous code execution, research, slide generation, browser automation, full-stack development.
 
 ### Capabilities
@@ -25,10 +26,15 @@
 - MCP tool integration (file ops, code execution, web search)
 
 ### How ACHEEVY Calls It
-- WebSocket bridge: `backend/uef-gateway/src/ii-agent/client.ts`
+- WebSocket client: `backend/uef-gateway/src/ii-agent/client.ts` (native WS, not Socket.IO)
 - HTTP router: `backend/uef-gateway/src/ii-agent/router.ts`
 - Endpoints: `/ii-agent/execute`, `/ii-agent/research`, `/ii-agent/build`, `/ii-agent/slides`
-- Ports: 4001 (backend), 4100 (sandbox), 4036 (tools)
+- Ports: 8000 (backend), 8100 (sandbox), 1236 (tools)
+- Connection configured via: `II_AGENT_HTTP_URL`, `II_AGENT_WS_URL` env vars
+
+### Deployment
+- Use ii-agent repo's `integrations/aims/docker-compose.aims.yaml` as Docker Compose overlay
+- Or point `II_AGENT_HTTP_URL` / `II_AGENT_WS_URL` to a remote ii-agent instance
 
 ### Guardrails
 - All execution happens in Docker sandbox (no host access)
@@ -40,7 +46,7 @@
 
 ## 2. II-Commons (Knowledge Layer)
 
-**Location:** To be installed as pip package in ii-agent environment
+**Location:** To be installed as pip package in the external ii-agent environment
 **What ACHEEVY Uses It For:** Dataset management, text embeddings, information retrieval, RAG pipeline support.
 
 ### Capabilities
