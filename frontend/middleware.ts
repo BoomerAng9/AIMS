@@ -297,9 +297,10 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(redirectUrl);
   }
 
-  // 1. Domain routing — plugmein.cloud (app), aimanagedsolutions.cloud (father site), hh.plugmein.cloud
-  const hostname = request.headers.get('host');
-  const isHalalHubDomain = hostname === 'hh.plugmein.cloud' || (!IS_PRODUCTION && hostname?.startsWith('hh.localhost'));
+  // 1. Domain routing — plugmein.cloud (app), aimanagedsolutions.cloud (gateway), hh.plugmein.cloud
+  const hostname = request.headers.get('host') || '';
+  const isHalalHubDomain = hostname === 'hh.plugmein.cloud' || (!IS_PRODUCTION && hostname.startsWith('hh.localhost'));
+  const isAIMSDomain = hostname.includes('aimanagedsolutions');
 
   if (isHalalHubDomain) {
     if (pathname === '/') {
@@ -312,6 +313,23 @@ export function middleware(request: NextRequest) {
       const url = request.nextUrl.clone();
       url.pathname = `/halalhub${pathname}`;
       return NextResponse.rewrite(url);
+    }
+  }
+
+  // 1b. aimanagedsolutions.cloud — OWNER/ADMIN gateway
+  // Enforce authentication on dashboard routes. Only authenticated users
+  // can access /dashboard/* on this domain. Role enforcement happens
+  // client-side in PlatformModeProvider (JWT role is server-signed, not hackable).
+  if (isAIMSDomain && pathname.startsWith('/dashboard')) {
+    const hasSession =
+      request.cookies.has('next-auth.session-token') ||
+      request.cookies.has('__Secure-next-auth.session-token');
+
+    if (!hasSession) {
+      const url = request.nextUrl.clone();
+      url.pathname = '/sign-in';
+      url.searchParams.set('callbackUrl', pathname);
+      return NextResponse.redirect(url);
     }
   }
   if (isHoneypot(pathname)) {
@@ -396,6 +414,10 @@ export function middleware(request: NextRequest) {
   // Device type detection — lightweight classification for wearable routing
   const deviceType = classifyDevice(userAgent);
   response.headers.set('X-Device-Type', deviceType);
+
+  // Platform domain classification — used by server components for domain-aware rendering
+  const platformDomain = isAIMSDomain ? 'aims' : isHalalHubDomain ? 'halalhub' : 'plugmein';
+  response.headers.set('X-Platform-Domain', platformDomain);
 
   return response;
 }

@@ -4,17 +4,16 @@
 /**
  * Consolidated Dashboard Navigation — Dual Mode (PRIVATE / PUBLIC)
  *
- * PRIVATE mode (Owner/Admin): Full technical navigation — all agents, integrations, dev tools
- * PUBLIC mode (Customer): Simplified navigation — plain language, curated features
+ * PRIVATE mode (Owner/Admin on aimanagedsolutions.cloud): Full technical navigation
+ * PUBLIC mode (Customer on plugmein.cloud): Simplified navigation, plain language
  *
- * Owner gets a "Developer Mode" toggle in the nav footer.
+ * Mode is determined by domain + auth role. No toggle — not hackable.
  */
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
 import { usePlatformMode } from "@/lib/platform-mode";
-import { t } from "@/lib/terminology";
 import {
   MessageSquare, Zap, Shield, Bot, BarChart3,
   Settings, Cpu, Wrench, CreditCard, Rocket,
@@ -22,7 +21,7 @@ import {
   Trophy, Activity, Mic, Theater, BookOpen,
   Coins, CircleDot, TrendingUp, Building, Layers,
   Store, ShoppingCart, Calculator, Map, Plug,
-  Code, Eye, Wand2, Briefcase, Target,
+  Code, Wand2, Briefcase, Target,
 } from "lucide-react";
 
 // ── Types ──
@@ -198,48 +197,6 @@ function SectionLabel({ label, icon: Icon }: { label: string; icon: typeof Messa
   );
 }
 
-// ── Developer Mode Toggle ──
-
-function DevModeToggle() {
-  const { mode, canToggle, toggleMode } = usePlatformMode();
-
-  if (!canToggle) return null;
-
-  const isPrivate = mode === 'PRIVATE';
-
-  return (
-    <button
-      onClick={toggleMode}
-      className={clsx(
-        "flex items-center gap-2.5 w-full rounded-lg px-3 py-2 transition-all text-sm border",
-        isPrivate
-          ? "border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100"
-          : "border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100"
-      )}
-      title={isPrivate ? "Switch to Customer View" : "Switch to Developer View"}
-    >
-      {isPrivate ? (
-        <Code className="w-4 h-4 text-amber-500" />
-      ) : (
-        <Eye className="w-4 h-4 text-slate-400" />
-      )}
-      <span className="truncate">
-        {isPrivate ? "Developer Mode" : "Customer View"}
-      </span>
-      <span
-        className={clsx(
-          "ml-auto text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded",
-          isPrivate
-            ? "bg-amber-200 text-amber-800"
-            : "bg-slate-200 text-slate-600"
-        )}
-      >
-        {isPrivate ? "DEV" : "PUB"}
-      </span>
-    </button>
-  );
-}
-
 // ── Main Nav Component ──
 
 export function DashboardNav() {
@@ -284,10 +241,6 @@ export function DashboardNav() {
           ))}
         </div>
 
-        {/* Dev Mode Toggle (only shown to owners viewing public mode) */}
-        <div className="mx-2 mt-4 border-t border-slate-200 pt-3">
-          <DevModeToggle />
-        </div>
       </nav>
     );
   }
@@ -417,10 +370,6 @@ export function DashboardNav() {
         </>
       )}
 
-      {/* Dev Mode Toggle */}
-      <div className="mx-2 mt-4 border-t border-slate-200 pt-3">
-        <DevModeToggle />
-      </div>
     </nav>
   );
 }

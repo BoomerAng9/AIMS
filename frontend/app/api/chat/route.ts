@@ -1,16 +1,14 @@
 /**
- * Chat API Route — Unified LLM Gateway + Agent Orchestrator
+ * Chat API Route — Unified LLM Gateway + ACHEEVY Orchestrator
  *
- * THREE execution paths:
- *   1. Agent dispatch: message classified as actionable → /acheevy/execute → orchestrator
- *      → II-Agent / A2A agents / n8n → structured response
- *   2. LLM stream:    conversational message → /llm/stream → Vertex AI / OpenRouter
- *      → SSE text stream (metered through LUC)
- *   3. Direct fallback: gateway unreachable → AI SDK → OpenRouter
+ * ALL messages route through ACHEEVY first:
+ *   1. M.I.M. fast-path: build/validate intents → UI link (not a bypass, just a UX shortcut)
+ *   2. ACHEEVY orchestrator: /acheevy/execute → II-Agent → Chicken Hawk → conversation
+ *   3. LLM stream fallback: gateway unreachable → /llm/stream (metered)
+ *   4. Direct fallback: everything unreachable → AI SDK → OpenRouter (unmetered)
  *
- * The classify step calls /acheevy/classify to determine intent.
- * If requiresAgent=true, we dispatch to the orchestrator.
- * If requiresAgent=false, we stream via the LLM gateway.
+ * Every message goes through ACHEEVY. The orchestrator decides whether to dispatch
+ * to II-Agent, Chicken Hawk, or handle as conversation. No classification fork.
  *
  * Feature LLM: Claude Opus 4.6
  * Priority Models: Qwen, Minimax, GLM-5, Kimi, WAN, Nano Banana Pro
@@ -413,23 +411,29 @@ export async function POST(req: Request) {
         : 'User is using the Chat Interface.',
     });
 
-    // Step 1: Classify intent via gateway
+    // Step 1: Classify intent for context (optional — orchestrator re-classifies internally)
     const classification = await classifyIntent(lastMessage);
 
-    // Step 2: If agent dispatch is needed, route to orchestrator
-    if (classification?.requiresAgent && classification.confidence > 0.6) {
-      console.log(`[ACHEEVY Chat] Agent dispatch: intent=${classification.intent} confidence=${classification.confidence}`);
-      const agentResponse = await tryAgentDispatch(lastMessage, classification, messages, userId);
-      if (agentResponse) return agentResponse;
-      // If agent dispatch fails, fall through to LLM stream
-      console.warn('[ACHEEVY Chat] Agent dispatch failed, falling through to LLM stream');
-    }
+    // Step 2: ALL messages → ACHEEVY orchestrator first
+    // The orchestrator decides: II-Agent, Chicken Hawk, vertical, PaaS, or conversation.
+    // No fork — every message gets the full ACHEEVY pipeline.
+    const orchestratorClassification = classification || {
+      intent: 'conversation',
+      confidence: 0.5,
+      requiresAgent: false,
+    };
 
-    // Step 3: LLM stream via UEF Gateway (metered, Vertex AI + OpenRouter)
+    console.log(`[ACHEEVY Chat] Routing through orchestrator: intent=${orchestratorClassification.intent} confidence=${orchestratorClassification.confidence}`);
+    const agentResponse = await tryAgentDispatch(lastMessage, orchestratorClassification, messages, userId);
+    if (agentResponse) return agentResponse;
+
+    // Step 3: Fallback — ACHEEVY orchestrator unreachable → LLM stream via gateway (metered)
+    console.warn('[ACHEEVY Chat] Orchestrator unreachable, falling back to LLM stream');
     const gatewayResponse = await tryGatewayStream(modelId, messages, systemPrompt, userId);
     if (gatewayResponse) return gatewayResponse;
 
-    // Step 4: Direct OpenRouter via AI SDK (fallback)
+    // Step 4: Last resort — gateway also unreachable → direct OpenRouter (unmetered)
+    console.warn('[ACHEEVY Chat] Gateway unreachable, falling back to direct OpenRouter');
     const result = await streamText({
       model: openrouter(modelId),
       system: systemPrompt,
