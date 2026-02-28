@@ -6,7 +6,7 @@
 #
 # Deploy:
 #   gcloud run services replace infra/gcp/chicken-hawk-cloudrun-service.yaml \
-#     --region us-central1 --project ai-managed-services
+#     --region us-central1 --project aims-aimanagedsolutions
 #
 # First time — create secrets:
 #   echo -n "YOUR_KEY" | gcloud secrets create openrouter-api-key --data-file=-
@@ -36,9 +36,9 @@ spec:
     spec:
       containerConcurrency: 1                     # One build per instance
       timeoutSeconds: 3600                        # 60 min max per build
-      serviceAccountName: chicken-hawk@ai-managed-services.iam.gserviceaccount.com
+      serviceAccountName: chicken-hawk@aims-aimanagedsolutions.iam.gserviceaccount.com
       containers:
-        - image: us-central1-docker.pkg.dev/ai-managed-services/aims/chicken-hawk:latest
+        - image: us-central1-docker.pkg.dev/aims-aimanagedsolutions/aims/chicken-hawk:latest
           ports:
             - containerPort: 4001
           env:
@@ -47,7 +47,7 @@ spec:
             - name: PORT
               value: "4001"
             - name: FIREBASE_PROJECT_ID
-              value: ai-managed-services
+              value: aims-aimanagedsolutions
             - name: BYTEROUTER_ENDPOINT
               value: http://byterover.internal:7000
             - name: LUC_ENGINE_URL

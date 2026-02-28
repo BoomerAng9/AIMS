@@ -21,7 +21,7 @@ import logger from '../logger';
 // Configuration
 // ---------------------------------------------------------------------------
 
-const GCP_PROJECT = process.env.GCP_PROJECT_ID || process.env.FIREBASE_PROJECT_ID || 'ai-managed-services';
+const GCP_PROJECT = process.env.GCP_PROJECT_ID || process.env.FIREBASE_PROJECT_ID || 'aims-aimanagedsolutions';
 const GCP_REGION = process.env.GCP_REGION || 'us-central1';
 const CLOUD_RUN_JOB_NAME = 'chicken-hawk-build';
 const CLOUD_RUN_SERVICE_NAME = 'chicken-hawk';

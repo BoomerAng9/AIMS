@@ -709,7 +709,7 @@ services:
     environment:
       - PORT=5002
       - NODE_ENV=production
-      - GCP_PROJECT_ID=${GCP_PROJECT_ID:-ai-managed-services}
+      - GCP_PROJECT_ID=${GCP_PROJECT_ID:-aims-aimanagedsolutions}
       - GCP_REGION=${GCP_REGION:-us-central1}
       - VERTEX_ENDPOINT_ID=${VERTEX_SAM2_ENDPOINT_ID}
       - WAR_ROOM_URL=http://war-room:5003

@@ -6,7 +6,7 @@
 #
 # Create:
 #   gcloud run jobs replace infra/gcp/chicken-hawk-cloudrun-job.yaml \
-#     --region us-central1 --project ai-managed-services
+#     --region us-central1 --project aims-aimanagedsolutions
 #
 # Execute:
 #   gcloud run jobs execute chicken-hawk-build \
@@ -15,7 +15,7 @@
 #
 # Execute via API (for n8n/ACHEEVY):
 #   curl -X POST \
-#     "https://us-central1-run.googleapis.com/apis/run.googleapis.com/v1/namespaces/ai-managed-services/jobs/chicken-hawk-build:run" \
+#     "https://us-central1-run.googleapis.com/apis/run.googleapis.com/v1/namespaces/aims-aimanagedsolutions/jobs/chicken-hawk-build:run" \
 #     -H "Authorization: Bearer $(gcloud auth print-access-token)" \
 #     -H "Content-Type: application/json" \
 #     -d '{"overrides":{"containerOverrides":[{"env":[{"name":"TASK_ID","value":"CH-001"}]}]}}'
@@ -42,9 +42,9 @@ spec:
         spec:
           maxRetries: 1                           # Retry once on failure
           timeoutSeconds: 3600                    # 60 min max
-          serviceAccountName: chicken-hawk@ai-managed-services.iam.gserviceaccount.com
+          serviceAccountName: chicken-hawk@aims-aimanagedsolutions.iam.gserviceaccount.com
           containers:
-            - image: us-central1-docker.pkg.dev/ai-managed-services/aims/chicken-hawk:latest
+            - image: us-central1-docker.pkg.dev/aims-aimanagedsolutions/aims/chicken-hawk:latest
               command: ["node"]
               args: ["dist/index.js", "--mode=job"]
               env:
@@ -53,7 +53,7 @@ spec:
                 - name: EXECUTION_MODE
                   value: job
                 - name: FIREBASE_PROJECT_ID
-                  value: ai-managed-services
+                  value: aims-aimanagedsolutions
                 - name: BYTEROUTER_ENDPOINT
                   value: http://byterover.internal:7000
                 - name: LUC_ENGINE_URL

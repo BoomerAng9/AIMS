@@ -55,8 +55,8 @@ export interface RetrieveResult {
 // Configuration
 // ─────────────────────────────────────────────────────────────
 
-const GCS_BUCKET = process.env.GCS_EVIDENCE_BUCKET || "ai-managed-services-evidence-locker";
-const GCS_PROJECT = process.env.GCP_PROJECT_ID || "ai-managed-services";
+const GCS_BUCKET = process.env.GCS_EVIDENCE_BUCKET || "aims-aimanagedsolutions-evidence-locker";
+const GCS_PROJECT = process.env.GCP_PROJECT_ID || "aims-aimanagedsolutions";
 const SIGNED_URL_EXPIRY = 3600; // 1 hour
 
 // Check if running on server
