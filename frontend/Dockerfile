@@ -11,7 +11,7 @@ WORKDIR /app
 
 # Copy package files from frontend/ subdirectory
 COPY frontend/package*.json ./
-RUN npm ci --legacy-peer-deps
+RUN npm ci --legacy-peer-deps --ignore-scripts
 
 # Copy frontend source
 COPY frontend/ ./
