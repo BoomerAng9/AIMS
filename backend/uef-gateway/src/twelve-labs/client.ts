@@ -2,12 +2,20 @@
  * Twelve Labs Video Intelligence API Client
  *
  * Wraps the Twelve Labs REST API for:
- *  - Video indexing (Marengo embeddings)
+ *  - Video indexing (Marengo 3.0 embeddings)
  *  - Semantic search over indexed video
  *  - Video-to-text generation (Pegasus)
  *
  * Used by Per|Form Film Room for game film analysis, scouting reports,
  * and the ScoutVerify pipeline.
+ *
+ * MIGRATION NOTE (March 2026): Updated from Marengo 2.7 → Marengo 3.0
+ *  - Index engine: marengo2.7 → marengo3.0
+ *  - Search response: score/confidence removed, rank added
+ *  - Search request: adjust_confidence_level/sort_option removed
+ *  - Audio search: now non-speech only. Use 'transcription' for spoken content
+ *  - Embedding model: marengo-retrieval-2.7 → marengo3.0
+ *  - Embedding options: visual-text → visual, audio → transcription (for speech)
  */
 
 import logger from '../logger';
@@ -37,12 +45,20 @@ export interface VideoTask {
   metadata?: Record<string, string>;
 }
 
+/**
+ * Marengo 3.0 Search Result
+ *
+ * Breaking changes from 2.7:
+ *  - `score` removed
+ *  - `confidence` removed
+ *  - `rank` added (lower = more relevant, starts at 1)
+ */
 export interface SearchResult {
   id: string;
   videoId: string;
   start: number;
   end: number;
-  score: number;
+  rank: number;
   metadata?: Record<string, unknown>;
   thumbnailUrl?: string;
 }
@@ -61,6 +77,29 @@ export interface VideoSummary {
   id: string;
   summary: string;
   chapters?: Array<{ title: string; start: number; end: number; summary: string }>;
+}
+
+/**
+ * Marengo 3.0 transcription matching options.
+ * Use with search_options: ['transcription'] to control spoken-content matching.
+ *  - 'lexical'  — exact phrase matching
+ *  - 'semantic' — meaning-based matching
+ * Both can be used together.
+ */
+export type TranscriptionOption = 'lexical' | 'semantic';
+
+export interface SearchOptions {
+  /**
+   * Marengo 3.0 search modalities:
+   *  - 'visual'        — visual content search
+   *  - 'audio'         — non-speech audio only (music, SFX, environmental sounds)
+   *  - 'transcription' — spoken content (replaces old 'audio' for speech)
+   */
+  searchOptions?: string[];
+  /** Control transcription matching behavior (only applies when 'transcription' is in searchOptions) */
+  transcriptionOptions?: TranscriptionOption[];
+  limit?: number;
+  page?: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -112,8 +151,8 @@ export class TwelveLabsClient {
     const payload = {
       index_name: name,
       engines: engines || [
-        { name: 'marengo2.7', options: ['visual', 'audio'] },
-        { name: 'pegasus1.2', options: ['visual', 'audio'] },
+        { name: 'marengo3.0', options: ['visual', 'transcription'] },
+        { name: 'pegasus1.2', options: ['visual', 'transcription'] },
       ],
     };
     return this.request<VideoIndex>('/indexes', 'POST', payload);
@@ -152,21 +191,24 @@ export class TwelveLabsClient {
     throw new Error(`Task ${taskId} did not complete within ${timeoutMs}ms`);
   }
 
-  // -- Search ----------------------------------------------------------------
+  // -- Search (Marengo 3.0) --------------------------------------------------
 
   async search(
     indexId: string,
     queryText: string,
-    options?: { searchOptions?: string[]; threshold?: string; limit?: number; page?: number }
+    options?: SearchOptions
   ): Promise<SearchResponse> {
     const payload: Record<string, unknown> = {
       index_id: indexId,
       query_text: queryText,
-      search_options: options?.searchOptions || ['visual', 'audio'],
+      search_options: options?.searchOptions || ['visual', 'transcription'],
     };
-    if (options?.threshold) payload.threshold = options.threshold;
+    if (options?.transcriptionOptions?.length) {
+      payload.transcription_options = options.transcriptionOptions;
+    }
     if (options?.limit) payload.page_limit = options.limit;
     if (options?.page) payload.page = options.page;
+    // NOTE: Marengo 3.0 removed threshold, adjust_confidence_level, sort_option
     return this.request<SearchResponse>('/search', 'POST', payload);
   }
 
@@ -224,6 +266,6 @@ export function getTwelveLabsClient(): TwelveLabsClient | null {
   }
 
   clientInstance = new TwelveLabsClient({ apiKey });
-  logger.info('[TwelveLabs] Client initialized');
+  logger.info('[TwelveLabs] Client initialized (Marengo 3.0)');
   return clientInstance;
 }

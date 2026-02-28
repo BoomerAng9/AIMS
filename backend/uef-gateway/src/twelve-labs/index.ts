@@ -5,6 +5,8 @@ export type {
   VideoTask,
   SearchResult,
   SearchResponse,
+  SearchOptions,
+  TranscriptionOption,
   GenerateResponse,
   VideoSummary,
 } from './client';

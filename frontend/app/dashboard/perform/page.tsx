@@ -98,7 +98,7 @@ interface PerFormStats {
 const LOBBY_CARDS: LobbyCard[] = [
   {
     title: 'Film Room',
-    description: 'AI-powered game film analysis with Twelve Labs Marengo.',
+    description: 'AI-powered game film analysis with Twelve Labs Marengo 3.0.',
     href: '/dashboard/film-room',
     icon: Film,
     status: 'live',
