@@ -331,7 +331,7 @@ app.all('/api/perform/war-room/*', async (req, res) => {
 
 // --------------------------------------------------------------------------
 // Per|Form Film Room — Twelve Labs Video Intelligence + ScoutVerify
-// Powered by Twelve Labs Marengo (search/embeddings) + Pegasus (generation)
+// Powered by Twelve Labs Marengo 3.0 (search/embeddings) + Pegasus (generation)
 // --------------------------------------------------------------------------
 
 // Film Room: Check Twelve Labs integration status

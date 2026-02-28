@@ -1,104 +1,123 @@
 'use client';
 
 /**
- * Platform Mode Context — A.I.M.S. Dual-Layer Access
+ * Platform Mode Context — A.I.M.S. Domain-Based Access
  *
- * Provides PRIVATE vs PUBLIC mode awareness to all components.
+ * Mode is determined by DOMAIN + AUTH ROLE. No toggle. No localStorage. Not hackable.
  *
- * - PRIVATE: Owner/Admin — full technical UI, all agents visible, developer tools
- * - PUBLIC:  Customer — simplified UI, plain language, paywalled features
+ * - aimanagedsolutions.cloud → PRIVATE (OWNER/ADMIN only — enforced)
+ * - plugmein.cloud           → PUBLIC  (customers — always)
+ * - localhost                 → Determined by role (dev convenience)
  *
- * Owner gets a "Developer Mode" toggle to switch between views
- * (useful for testing the customer experience).
+ * If a non-OWNER lands on aimanagedsolutions.cloud, they are redirected to plugmein.cloud.
  */
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useEffect, useMemo } from 'react';
 import { useSession } from 'next-auth/react';
 
 export type PlatformMode = 'PRIVATE' | 'PUBLIC';
 
+type PlatformDomain = 'aims' | 'plugmein' | 'localhost';
+
 interface PlatformModeContextValue {
-  /** Current active mode */
+  /** Current active mode — determined by domain + role, read-only */
   mode: PlatformMode;
+  /** Which domain cluster the user is on */
+  domain: PlatformDomain;
   /** True if user has OWNER role */
   isOwner: boolean;
   /** True if user has OWNER or ADMIN role (PRIVATE-eligible) */
   isAdmin: boolean;
-  /** True if user is a CUSTOMER (PUBLIC mode, no toggle) */
+  /** True if user is a CUSTOMER (PUBLIC mode) */
   isCustomer: boolean;
-  /** True if user can toggle between modes (OWNER/ADMIN only) */
-  canToggle: boolean;
   /** The user's actual role from session */
   role: string;
-  /** Toggle between PRIVATE and PUBLIC (owner/admin only) */
-  toggleMode: () => void;
 }
 
 const PlatformModeCtx = createContext<PlatformModeContextValue>({
   mode: 'PUBLIC',
+  domain: 'plugmein',
   isOwner: false,
   isAdmin: false,
   isCustomer: true,
-  canToggle: false,
   role: 'CUSTOMER',
-  toggleMode: () => {},
 });
 
-const STORAGE_KEY = 'aims-platform-mode';
+/**
+ * Detect which domain cluster we're running on.
+ * - aimanagedsolutions.cloud (any subdomain) → 'aims'
+ * - plugmein.cloud (any subdomain)           → 'plugmein'
+ * - localhost / 127.0.0.1 / dev              → 'localhost'
+ */
+function detectDomain(): PlatformDomain {
+  if (typeof window === 'undefined') return 'plugmein'; // SSR default: safest
+  const host = window.location.hostname.toLowerCase();
+  if (host.includes('aimanagedsolutions')) return 'aims';
+  if (host.includes('plugmein')) return 'plugmein';
+  // localhost, 127.0.0.1, or any dev domain
+  return 'localhost';
+}
+
+/**
+ * Determine platform mode from domain + role.
+ *
+ * Rules:
+ * - aimanagedsolutions.cloud + OWNER/ADMIN → PRIVATE
+ * - aimanagedsolutions.cloud + CUSTOMER    → redirect (handled in useEffect)
+ * - plugmein.cloud + any role              → PUBLIC (always)
+ * - localhost + OWNER/ADMIN                → PRIVATE (dev convenience)
+ * - localhost + CUSTOMER                   → PUBLIC
+ */
+function resolveMode(domain: PlatformDomain, isAdmin: boolean): PlatformMode {
+  switch (domain) {
+    case 'aims':
+      // Only OWNER/ADMIN should be here — enforced by redirect below
+      return isAdmin ? 'PRIVATE' : 'PUBLIC';
+    case 'plugmein':
+      // Always PUBLIC on the customer-facing domain
+      return 'PUBLIC';
+    case 'localhost':
+      // Dev convenience: role determines mode
+      return isAdmin ? 'PRIVATE' : 'PUBLIC';
+    default:
+      return 'PUBLIC';
+  }
+}
+
+/** The app URL for plugmein.cloud (customer domain) */
+const PLUGMEIN_URL =
+  process.env.NEXT_PUBLIC_APP_URL || 'https://plugmein.cloud';
 
 export function PlatformModeProvider({ children }: { children: React.ReactNode }) {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const role = (session?.user as Record<string, unknown> | undefined)?.role as string || 'CUSTOMER';
   const isOwner = role === 'OWNER';
   const isAdmin = role === 'ADMIN' || isOwner;
-  const canToggle = isAdmin;
 
-  // Default: PRIVATE for admin/owner, PUBLIC for customers
-  const defaultMode: PlatformMode = isAdmin ? 'PRIVATE' : 'PUBLIC';
+  const domain = useMemo(() => detectDomain(), []);
+  const mode = resolveMode(domain, isAdmin);
 
-  const [mode, setMode] = useState<PlatformMode>(defaultMode);
-
-  // Load saved preference from localStorage (owner/admin only)
+  // Enforce: non-OWNER/ADMIN on aimanagedsolutions.cloud → redirect to plugmein.cloud
   useEffect(() => {
-    if (!canToggle) {
-      setMode('PUBLIC');
-      return;
+    if (
+      domain === 'aims' &&
+      status === 'authenticated' &&
+      !isAdmin
+    ) {
+      // Non-privileged user on the OWNER domain → send them to plugmein.cloud
+      window.location.href = PLUGMEIN_URL;
     }
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved === 'PRIVATE' || saved === 'PUBLIC') {
-        setMode(saved);
-      } else {
-        setMode('PRIVATE'); // Default for admins
-      }
-    } catch {
-      setMode('PRIVATE');
-    }
-  }, [canToggle]);
-
-  const toggleMode = useCallback(() => {
-    if (!canToggle) return;
-    setMode((prev) => {
-      const next = prev === 'PRIVATE' ? 'PUBLIC' : 'PRIVATE';
-      try {
-        localStorage.setItem(STORAGE_KEY, next);
-      } catch {
-        // localStorage unavailable
-      }
-      return next;
-    });
-  }, [canToggle]);
+  }, [domain, status, isAdmin]);
 
   return (
     <PlatformModeCtx.Provider
       value={{
         mode,
+        domain,
         isOwner,
         isAdmin,
         isCustomer: !isAdmin,
-        canToggle,
         role,
-        toggleMode,
       }}
     >
       {children}

@@ -25,12 +25,21 @@ export default function SignInPage() {
   );
 }
 
+function useIsAIMSDomain(): boolean {
+  const [isAIMS, setIsAIMS] = useState(false);
+  useEffect(() => {
+    setIsAIMS(window.location.hostname.includes('aimanagedsolutions'));
+  }, []);
+  return isAIMS;
+}
+
 function SignInContent() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<string | null>(null);
   const [oauthProviders, setOauthProviders] = useState<OAuthProviderInfo[]>([]);
+  const isAIMSDomain = useIsAIMSDomain();
 
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -135,11 +144,13 @@ function SignInContent() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {/* Header — domain-aware */}
       <div className="text-center">
-        <h1 className="text-2xl font-bold text-zinc-50">Sign in to A.I.M.S.</h1>
+        <h1 className="text-2xl font-bold text-zinc-50">
+          {isAIMSDomain ? 'A.I.M.S. Command Center' : 'Sign in to A.I.M.S.'}
+        </h1>
         <p className="mt-2 text-sm text-zinc-400">
-          Your AI team is waiting
+          {isAIMSDomain ? 'Owner & Admin access' : 'Your AI team is waiting'}
         </p>
       </div>
 

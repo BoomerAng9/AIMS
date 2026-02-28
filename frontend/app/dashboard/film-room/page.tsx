@@ -3,7 +3,7 @@
 /**
  * Film Room — Per|Form Video Intelligence Dashboard
  *
- * Powered by Twelve Labs Marengo (embeddings/search) + Pegasus (generation).
+ * Powered by Twelve Labs Marengo 3.0 (embeddings/search) + Pegasus (generation).
  *
  * Features:
  *   - Upload/index game film via URL
@@ -34,7 +34,7 @@ interface SearchResult {
   videoId: string;
   start: number;
   end: number;
-  score: number;
+  rank: number;
 }
 
 interface ScoutVerifyReport {
@@ -320,7 +320,7 @@ export default function FilmRoomPage() {
                       <span className="text-cyan-400 font-mono text-sm">{formatSeconds(r.start)} — {formatSeconds(r.end)}</span>
                       <span className="text-zinc-400 text-sm ml-3">Video: {r.videoId.slice(0, 8)}...</span>
                     </div>
-                    <span className="text-sm text-zinc-400">Score: {(r.score * 100).toFixed(1)}%</span>
+                    <span className="text-sm text-zinc-400">Rank #{r.rank}</span>
                   </div>
                 ))}
               </div>
@@ -333,7 +333,7 @@ export default function FilmRoomPage() {
           <div className="space-y-6">
             <div>
               <h2 className="text-xl font-semibold">Index Game Film</h2>
-              <p className="text-zinc-400 text-sm mt-1">Upload game film for AI analysis. Videos are processed through Twelve Labs Marengo for embeddings and searchability.</p>
+              <p className="text-zinc-400 text-sm mt-1">Upload game film for AI analysis. Videos are processed through Twelve Labs Marengo 3.0 for embeddings and searchability.</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Create Index */}
