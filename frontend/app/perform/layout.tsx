@@ -23,12 +23,18 @@ import {
   RotateCcw,
   Database,
   Timer,
+  Calendar,
+  BarChart3,
+  Award,
 } from "lucide-react";
 
 const PERFORM_NAV = [
   { href: "/perform", label: "Hub", icon: LayoutGrid },
   { href: "/perform/ncaa-database", label: "Database", icon: Database },
   { href: "/perform/big-board", label: "Big Board", icon: ListOrdered },
+  { href: "/perform/schedule", label: "Scores", icon: Calendar },
+  { href: "/perform/rankings", label: "Rankings", icon: Award },
+  { href: "/perform/leaders", label: "Leaders", icon: BarChart3 },
   { href: "/perform/combine", label: "Combine", icon: Timer },
   { href: "/perform/redraft", label: "Redraft", icon: RotateCcw },
   { href: "/perform/draft", label: "Draft", icon: Trophy },

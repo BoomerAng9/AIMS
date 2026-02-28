@@ -17,7 +17,7 @@ import {
   ArrowRight, TrendingUp, FileText, Swords, Mic, Users, ListOrdered,
   Shuffle, MapPin, Radio, Flame, BarChart3, Activity, ChevronRight,
   Zap, Shield, Target, Star, Search, Building2, Database,
-  Trophy, RotateCcw, ArrowRightLeft,
+  Trophy, RotateCcw, ArrowRightLeft, Calendar, Award,
 } from 'lucide-react';
 import type { Prospect, ContentArticle, Tier } from '@/lib/perform/types';
 import { TIER_STYLES, getScoreColor, getProspectSlug } from '@/lib/perform/types';
@@ -78,6 +78,9 @@ const ANALYSTS = [
 const NAV_TILES = [
   { href: '/perform/ncaa-database', label: 'NCAA Database', sub: 'Depth Indexes · AGI Grades', icon: Database, color: 'text-emerald-700', bg: 'bg-emerald-50', border: 'hover:border-emerald-200' },
   { href: '/perform/big-board', label: 'Big Board', sub: 'Complete 2026 Rankings', icon: ListOrdered, color: 'text-slate-800', bg: 'bg-slate-50', border: 'hover:border-slate-300' },
+  { href: '/perform/schedule', label: 'Schedule & Scores', sub: 'Game Results · Standings', icon: Calendar, color: 'text-blue-700', bg: 'bg-blue-50', border: 'hover:border-blue-200' },
+  { href: '/perform/rankings', label: 'Rankings', sub: 'AP · CFP · Coaches Poll', icon: Award, color: 'text-amber-700', bg: 'bg-amber-50', border: 'hover:border-amber-200' },
+  { href: '/perform/leaders', label: 'Stats Leaders', sub: 'Season Leaderboards', icon: BarChart3, color: 'text-emerald-700', bg: 'bg-emerald-50', border: 'hover:border-emerald-200' },
   { href: '/perform/draft', label: 'NFL Draft Center', sub: 'Mock Cycles · Simulators', icon: Trophy, color: 'text-emerald-950', bg: 'bg-slate-100', border: 'hover:border-emerald-300' },
   { href: '/perform/war-room', label: 'War Room', sub: 'Bull vs Bear Verdicts', icon: Swords, color: 'text-red-700', bg: 'bg-red-50', border: 'hover:border-red-200' },
   { href: '/perform/redraft', label: 'Redraft Logic', sub: 'Accountability Audit', icon: RotateCcw, color: 'text-amber-700', bg: 'bg-amber-50', border: 'hover:border-amber-200' },
