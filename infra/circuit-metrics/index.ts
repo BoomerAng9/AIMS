@@ -11,13 +11,13 @@ const app = express();
 const PORT = parseInt(process.env.PORT || '9090', 10);
 
 // Service endpoints to monitor
-const SERVICES: Record<string, string> = {
-  frontend: process.env.FRONTEND_URL || 'http://frontend:3000',
-  uefGateway: process.env.UEF_GATEWAY_URL || 'http://uef-gateway:4000',
-  houseOfAng: process.env.HOUSE_OF_ANG_URL || 'http://house-of-ang:3002',
-  acheevy: process.env.ACHEEVY_URL || 'http://acheevy:3003',
-  agentBridge: process.env.AGENT_BRIDGE_URL || 'http://agent-bridge:3010',
-  chickenhawkCore: process.env.CHICKENHAWK_CORE_URL || 'http://chickenhawk-core:4001',
+const SERVICES: Record<string, { url: string; type: string }> = {
+  frontend: { url: process.env.FRONTEND_URL || 'http://frontend:3000', type: 'http' },
+  uefGateway: { url: process.env.UEF_GATEWAY_URL || 'http://uef-gateway:4000', type: 'http' },
+  houseOfAng: { url: process.env.HOUSE_OF_ANG_URL || 'http://house-of-ang:3002', type: 'http' },
+  acheevy: { url: process.env.ACHEEVY_URL || 'http://acheevy:3003', type: 'http' },
+  agentBridge: { url: process.env.AGENT_BRIDGE_URL || 'http://agent-bridge:3010', type: 'http' },
+  chickenhawkCore: { url: process.env.CHICKENHAWK_CORE_URL || 'http://chickenhawk-core:4001', type: 'http' },
 };
 
 // UEF Gateway for plug operations data
