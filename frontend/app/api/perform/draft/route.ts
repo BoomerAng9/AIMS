@@ -66,12 +66,25 @@ function seedDraftToApi(p: typeof SEED_DRAFT_PROSPECTS[number], idx: number) {
     seniorBowl: p.seniorBowl,
     projectedRound: p.projectedRound,
     projectedPick: p.projectedPick,
+    projectedTeam: p.projectedTeam,
     bullCase: p.bullCase,
     bearCase: p.bearCase,
     mediationVerdict: p.mediationVerdict,
     debateWinner: p.debateWinner,
     enrichedBy: p.enrichedBy || 'seed-data',
     sourceUrls: [],
+    // Combine measurables
+    armLength: p.armLength,
+    handSize: p.handSize,
+    fortyYard: p.fortyYard,
+    tenYardSplit: p.tenYardSplit,
+    benchPress: p.benchPress,
+    verticalJump: p.verticalJump,
+    broadJump: p.broadJump,
+    threeCone: p.threeCone,
+    shuttle: p.shuttle,
+    combineGrade: p.combineGrade,
+    combineNotes: p.combineNotes,
   };
 }
 
