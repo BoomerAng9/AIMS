@@ -22,12 +22,14 @@ import {
   CreditCard,
   RotateCcw,
   Database,
+  Timer,
 } from "lucide-react";
 
 const PERFORM_NAV = [
   { href: "/perform", label: "Hub", icon: LayoutGrid },
   { href: "/perform/ncaa-database", label: "Database", icon: Database },
   { href: "/perform/big-board", label: "Big Board", icon: ListOrdered },
+  { href: "/perform/combine", label: "Combine", icon: Timer },
   { href: "/perform/redraft", label: "Redraft", icon: RotateCcw },
   { href: "/perform/draft", label: "Draft", icon: Trophy },
   { href: "/perform/war-room", label: "War Room", icon: Swords },
