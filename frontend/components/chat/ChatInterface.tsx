@@ -128,6 +128,49 @@ const BrainCircuitIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
+// ⚡ Bolt: Extracted to a stable module-level constant to prevent ReactMarkdown from re-rendering
+// unnecessarily due to referential inequality of the remarkPlugins array on every render.
+const REMARK_PLUGINS = [remarkGfm];
+
+// ⚡ Bolt: Extracted to a stable module-level constant to prevent ReactMarkdown from re-rendering
+// unnecessarily due to referential inequality of the components object on every render.
+const MARKDOWN_COMPONENTS = {
+  // Custom code block styling
+  code({ node, className, children, ...props }: any) {
+    const isInline = !className;
+    if (isInline) {
+      return (
+        <code className="bg-slate-100/60 px-1.5 py-0.5 rounded text-gold text-[13px]" {...props}>
+          {children}
+        </code>
+      );
+    }
+    return (
+      <div className="relative group my-3">
+        <pre className="bg-slate-50/70 rounded-lg p-4 overflow-x-auto border border-wireframe-stroke">
+          <code className={`${className} text-[13px]`} {...props}>
+            {children}
+          </code>
+        </pre>
+        <button
+          onClick={() => navigator.clipboard.writeText(String(children))}
+          className="absolute top-2 right-2 p-1.5 rounded bg-slate-100 opacity-0 group-hover:opacity-100 transition-opacity"
+        >
+          <CopyIcon className="w-4 h-4" />
+        </button>
+      </div>
+    );
+  },
+  // Links
+  a({ href, children }: any) {
+    return (
+      <a href={href} target="_blank" rel="noopener noreferrer" className="text-gold hover:text-gold underline">
+        {children}
+      </a>
+    );
+  },
+};
+
 // ─────────────────────────────────────────────────────────────
 // Message Bubble Component
 // ─────────────────────────────────────────────────────────────
@@ -191,43 +234,8 @@ const MessageBubble = memo(function MessageBubble({ message, onSpeak, onCopy, is
           ) : (
             <div className="prose prose-invert prose-sm max-w-none">
               <ReactMarkdown
-                remarkPlugins={[remarkGfm]}
-                components={{
-                  // Custom code block styling
-                  code({ node, className, children, ...props }) {
-                    const isInline = !className;
-                    if (isInline) {
-                      return (
-                        <code className="bg-slate-100/60 px-1.5 py-0.5 rounded text-gold text-[13px]" {...props}>
-                          {children}
-                        </code>
-                      );
-                    }
-                    return (
-                      <div className="relative group my-3">
-                        <pre className="bg-slate-50/70 rounded-lg p-4 overflow-x-auto border border-wireframe-stroke">
-                          <code className={`${className} text-[13px]`} {...props}>
-                            {children}
-                          </code>
-                        </pre>
-                        <button
-                          onClick={() => navigator.clipboard.writeText(String(children))}
-                          className="absolute top-2 right-2 p-1.5 rounded bg-slate-100 opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          <CopyIcon className="w-4 h-4" />
-                        </button>
-                      </div>
-                    );
-                  },
-                  // Links
-                  a({ href, children }) {
-                    return (
-                      <a href={href} target="_blank" rel="noopener noreferrer" className="text-gold hover:text-gold underline">
-                        {children}
-                      </a>
-                    );
-                  },
-                }}
+                remarkPlugins={REMARK_PLUGINS}
+                components={MARKDOWN_COMPONENTS}
               >
                 {message.content}
               </ReactMarkdown>
