@@ -33,7 +33,7 @@ const NTNTN_INTENT_MAP = [
   { keywords: ['layout', 'grid', 'flexbox', 'responsive', 'mobile', 'adaptive', 'bento', 'masonry'], category: 'layout_responsive', primaryAng: 'Picker_Ang' },
   { keywords: ['api', 'backend', 'server', 'database', 'auth', 'express', 'fastapi', 'graphql', 'trpc'], category: 'backend_fullstack', primaryAng: 'Picker_Ang' },
   { keywords: ['cms', 'content', 'blog', 'article', 'sanity', 'strapi', 'contentful', 'mdx'], category: 'cms_content', primaryAng: 'Picker_Ang' },
-  { keywords: ['deploy', 'host', 'docker', 'vercel', 'netlify', 'cloud', 'vps', 'ci', 'ssl', 'domain'], category: 'deployment_infra', primaryAng: 'Picker_Ang' },
+  { keywords: ['deploy', 'host', 'docker', 'netlify', 'cloud', 'vps', 'ci', 'ssl', 'domain'], category: 'deployment_infra', primaryAng: 'Picker_Ang' },
   { keywords: ['hover', 'cursor', 'tilt', 'magnetic', 'drag', 'gesture', 'swipe', 'ripple'], category: 'animation_motion', techniqueGroup: 'hover_interaction', primaryAng: 'Picker_Ang' },
   { keywords: ['typewriter', 'text reveal', 'split text', 'counter', 'ticker', 'marquee', 'scramble'], category: 'animation_motion', techniqueGroup: 'text_typography', primaryAng: 'Picker_Ang' },
   { keywords: ['particle', 'grain', 'noise', 'glass', 'glassmorphism', 'blur', 'glow', 'bloom', 'blob', 'morph', 'aurora'], category: 'animation_motion', techniqueGroup: 'visual_effects', primaryAng: 'Picker_Ang' },

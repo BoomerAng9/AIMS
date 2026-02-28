@@ -1,7 +1,7 @@
 /**
  * OpenRouter AI Client
  *
- * Uses the Vercel AI SDK with OpenRouter as the unified model gateway.
+ * Uses the AI SDK with OpenRouter as the unified model gateway.
  * Supports Claude, GPT-4, Gemini, Kimi, and other models.
  */
 

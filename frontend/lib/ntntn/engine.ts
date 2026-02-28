@@ -173,7 +173,7 @@ export const INTENT_MAP: IntentMapping[] = [
     primary_boomer_ang: 'Picker_Ang',
   },
   {
-    keywords: ['deploy', 'host', 'hosting', 'docker', 'vercel', 'netlify', 'cloud', 'vps', 'ci', 'cd', 'pipeline', 'ssl', 'domain'],
+    keywords: ['deploy', 'host', 'hosting', 'docker', 'netlify', 'cloud', 'vps', 'ci', 'cd', 'pipeline', 'ssl', 'domain'],
     category: 'deployment_infra',
     primary_boomer_ang: 'Picker_Ang',
     fallback_boomer_ang: 'Buildsmith',

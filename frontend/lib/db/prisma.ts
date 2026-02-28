@@ -2,7 +2,7 @@
 // Prisma client singleton for Next.js
 //
 // Lazy initialization: avoids crashing at import time when DATABASE_URL is
-// missing (e.g., Vercel deployments where only the frontend is deployed and
+// missing (e.g., frontend-only deployments where only the frontend is deployed and
 // the database lives on the VPS).
 
 import { PrismaClient } from "@prisma/client";

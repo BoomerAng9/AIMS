@@ -125,7 +125,7 @@ const INTEGRATION_SIGNALS = [
   'stripe', 'firebase', 'postgres', 'redis', 'docker',
   'n8n', 'github', 'slack', 'twitter', 'linkedin',
   'openrouter', 'brave', 'gemini', 'anthropic', 'openai',
-  'aws', 'gcp', 'vercel', 'cloudflare', 'elevenlabs',
+  'aws', 'gcp', 'cloudflare', 'elevenlabs',
 ];
 
 const RISK_SIGNALS = [
