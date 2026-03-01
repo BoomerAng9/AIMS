@@ -49,7 +49,6 @@ yarn-error.log*
 infra/.env
 backend/uef-gateway/dist/
 backend/uef-gateway/data/
-aims-tools/**/*.js
 
 # Large media assets (deploy via SCP, not git)
 frontend/public/media/research/*.mp4

@@ -144,7 +144,7 @@ export function OnboardingGateBanner() {
       >
         <button
           onClick={handleExpand}
-          className="flex items-center gap-2 px-4 py-2 rounded-full border border-gold/20 bg-gold/5 text-xs text-slate-500 hover:border-gold/40 hover:bg-gold/10 transition-all"
+          className="flex items-center gap-2 px-4 py-2 rounded-full border border-gold/20 bg-gold/5 text-xs text-zinc-400 hover:border-gold/40 hover:bg-gold/10 transition-all"
         >
           <div className="w-1.5 h-1.5 rounded-full bg-gold animate-pulse" />
           <span>
@@ -165,27 +165,27 @@ export function OnboardingGateBanner() {
         transition={{ duration: 0.4, ease: 'easeOut' }}
         className="mb-6 mx-6 md:mx-8"
       >
-        <div className="relative overflow-hidden rounded-2xl border border-gold/20 bg-white shadow-sm">
+        <div className="relative overflow-hidden rounded-2xl border border-gold/20 bg-surface-raised shadow-sm">
           {/* Dismiss button */}
           <button
             onClick={handleDismiss}
-            className="absolute top-3 right-3 p-1 rounded-md text-slate-300 hover:text-slate-500 hover:bg-slate-50 transition-colors z-10"
+            className="absolute top-3 right-3 p-1 rounded-md text-zinc-500 hover:text-zinc-300 hover:bg-white/5 transition-colors z-10"
             title="Dismiss (you can re-open this)"
           >
             <X size={16} />
           </button>
 
           {/* Header */}
-          <div className="px-5 pt-4 pb-3 border-b border-slate-100">
+          <div className="px-5 pt-4 pb-3 border-b border-wireframe-stroke">
             <div className="flex items-center gap-2.5 pr-8">
               <div className="w-8 h-8 rounded-lg bg-gold/10 border border-gold/20 flex items-center justify-center">
                 <Target size={16} className="text-gold" />
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-slate-800">
+                <h3 className="text-sm font-semibold text-zinc-100">
                   Strategic Onboarding
                 </h3>
-                <p className="text-sm text-slate-400 leading-tight">
+                <p className="text-sm text-zinc-500 leading-tight">
                   ACHEEVY needs your mission profile before full execution
                   capability unlocks.
                 </p>
@@ -196,14 +196,14 @@ export function OnboardingGateBanner() {
           {/* Progress bar */}
           <div className="px-5 pt-3">
             <div className="flex items-center justify-between mb-1.5">
-              <span className="text-xs font-medium text-slate-400 uppercase tracking-wider">
+              <span className="text-xs font-medium text-zinc-500 uppercase tracking-wider">
                 Progress
               </span>
-              <span className="text-xs font-mono text-slate-500">
+              <span className="text-xs font-mono text-zinc-400">
                 {completedCount}/{totalSteps} steps
               </span>
             </div>
-            <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+            <div className="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
               <motion.div
                 className="h-full bg-gold rounded-full"
                 initial={{ width: 0 }}
@@ -233,10 +233,10 @@ export function OnboardingGateBanner() {
                       flex items-center gap-3 px-3 py-2 rounded-lg transition-all group
                       ${
                         isCompleted
-                          ? 'bg-slate-50/50'
+                          ? 'bg-white/3'
                           : isNext
                             ? 'bg-gold/5 border border-gold/15 hover:border-gold/30'
-                            : 'hover:bg-slate-50'
+                            : 'hover:bg-white/5'
                       }
                     `}
                   >
@@ -252,7 +252,7 @@ export function OnboardingGateBanner() {
                           <div className="w-2 h-2 rounded-full bg-gold" />
                         </div>
                       ) : (
-                        <Circle size={18} className="text-slate-200" />
+                        <Circle size={18} className="text-zinc-600" />
                       )}
                     </div>
 
@@ -273,16 +273,16 @@ export function OnboardingGateBanner() {
                       <p
                         className={`text-xs font-medium ${
                           isCompleted
-                            ? 'text-slate-400 line-through'
+                            ? 'text-zinc-500 line-through'
                             : isNext
-                              ? 'text-slate-700'
-                              : 'text-slate-500'
+                              ? 'text-zinc-200'
+                              : 'text-zinc-400'
                         }`}
                       >
                         {step.label}
                       </p>
                       {isNext && (
-                        <p className="text-xs text-slate-400 truncate">
+                        <p className="text-xs text-zinc-500 truncate">
                           {step.description}
                         </p>
                       )}
@@ -303,7 +303,7 @@ export function OnboardingGateBanner() {
 
           {/* CTA */}
           {nextIncompleteStep && (
-            <div className="px-5 pb-4 pt-1">
+            <div className="px-5 pb-2 pt-1">
               <Link
                 href={nextIncompleteStep.href}
                 className="flex items-center justify-center gap-2 w-full rounded-xl bg-gold px-5 py-2.5 text-sm font-bold text-black uppercase tracking-widest transition-all hover:bg-gold/90 active:scale-[0.98] shadow-[0_0_15px_rgba(251,191,36,0.2)]"
@@ -313,6 +313,16 @@ export function OnboardingGateBanner() {
               </Link>
             </div>
           )}
+
+          {/* Guest mode — skip onboarding */}
+          <div className="px-5 pb-4 pt-1 text-center">
+            <button
+              onClick={handleDismiss}
+              className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+            >
+              Skip for now — chat as guest
+            </button>
+          </div>
         </div>
       </motion.div>
     </AnimatePresence>

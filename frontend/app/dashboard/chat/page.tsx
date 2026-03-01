@@ -1,22 +1,22 @@
 'use client';
 
-import { motion } from "framer-motion";
+import { Suspense } from 'react';
 import { ChatInterface } from "@/components/chat/ChatInterface";
 
 export default function ChatPage() {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
-      className="h-[calc(100vh-64px)] rounded-2xl border border-wireframe-stroke bg-[#18181B]/70 backdrop-blur-xl overflow-hidden"
-    >
-      <ChatInterface
-        model="gemini-3-flash"
-        autoPlayVoice={true}
-        welcomeMessage="I'm ACHEEVY, at your service. What will we deploy today?"
-        placeholder="Message ACHEEVY... (or click the mic to speak)"
-      />
-    </motion.div>
+    <Suspense fallback={
+      <div className="flex items-center justify-center h-[calc(100vh-64px)] bg-obsidian">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-gold/30 border-t-gold" />
+      </div>
+    }>
+      <div className="h-[calc(100vh-64px)] overflow-hidden">
+        <ChatInterface
+          autoPlayVoice={true}
+          welcomeMessage="I'm ACHEEVY, at your service. What will we deploy today?"
+          placeholder="Message ACHEEVY... (or click the mic to speak)"
+        />
+      </div>
+    </Suspense>
   );
 }

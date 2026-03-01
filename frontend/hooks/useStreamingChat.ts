@@ -137,6 +137,28 @@ export function useStreamingChat(options: UseStreamingChatOptions = {}): UseStre
               } catch {
                 // Skip malformed tokens
               }
+            } else if (prefix === '8') {
+              // Tool execution event
+              try {
+                const toolEvent = JSON.parse(payload);
+                setMessages(prev => {
+                  const toolMsg: ChatMessage = {
+                    id: `tool-${Date.now()}`,
+                    role: 'assistant',
+                    content: '',
+                    timestamp: new Date(),
+                    metadata: { toolExecution: toolEvent },
+                  };
+                  // Insert before the current streaming assistant message
+                  const lastIdx = prev.length - 1;
+                  if (lastIdx >= 0 && prev[lastIdx].role === 'assistant' && prev[lastIdx].isStreaming) {
+                    return [...prev.slice(0, lastIdx), toolMsg, prev[lastIdx]];
+                  }
+                  return [...prev, toolMsg];
+                });
+              } catch {
+                // Skip malformed tool events
+              }
             } else if (prefix === 'e') {
               // AI SDK finish signal
               setIsStreaming(false);

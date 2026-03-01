@@ -13,6 +13,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import Image from 'next/image';
+import { useConversation } from '@elevenlabs/react';
 import { useStreamingChat } from '@/hooks/useStreamingChat';
 import { useVoiceInput } from '@/hooks/useVoiceInput';
 import { useVoiceOutput } from '@/hooks/useVoiceOutput';
@@ -27,7 +28,9 @@ import { CollaborationSidebar } from '@/components/collaboration/CollaborationFe
 import { VerticalStepIndicator } from '@/components/chat/VerticalStepIndicator';
 import { OnboardingGateBanner } from '@/components/chat/OnboardingGateBanner';
 import { FileDownload, FileDownloadGroup } from '@/components/chat/FileDownload';
+import { ToolExecutionCard } from '@/components/chat/ToolExecutionCard';
 import type { ChatMessage } from '@/lib/chat/types';
+import type { ToolExecutionEvent } from '@/lib/chat/types';
 import type { ChangeOrder } from '@/lib/change-order/types';
 import { formatCurrency } from '@/lib/change-order/types';
 import { PERSONAS } from '@/lib/acheevy/persona';
@@ -43,9 +46,13 @@ const AI_MODELS = [
   { key: 'qwen-max', label: 'Qwen Max', tag: '' },
   { key: 'minimax', label: 'MiniMax-01', tag: '' },
   { key: 'glm', label: 'GLM-4 Plus', tag: '' },
+  { key: 'kimi', label: 'Kimi K2.5', tag: 'fast' },
   { key: 'nano-banana', label: 'Nano Banana Pro', tag: 'fast' },
+  { key: 'gemini-flash', label: 'Gemini 2.5 Flash', tag: 'default' },
   { key: 'gemini-pro', label: 'Gemini 2.5 Pro', tag: '' },
 ];
+
+const ELEVENLABS_AGENT_ID = process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID || '';
 
 // ─────────────────────────────────────────────────────────────
 // Icons (inline SVG for simplicity)
@@ -128,6 +135,20 @@ const BrainCircuitIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
+const PhoneIcon = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
+  </svg>
+);
+
+const PhoneOffIcon = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.42 19.42 0 0 1-3.33-2.67" />
+    <path d="M14.91 3.07a19.79 19.79 0 0 1 3.07 8.63 2 2 0 0 1-2 2.18h-3a2 2 0 0 1-1.72-2c-.127-.96-.361-1.903-.7-2.81a2 2 0 0 1 .45-2.11l1.27-1.27a16 16 0 0 0-2.6-3.41" />
+    <line x1="1" y1="1" x2="23" y2="23" />
+  </svg>
+);
+
 // ⚡ Bolt: Extracted to a stable module-level constant to prevent ReactMarkdown from re-rendering
 // unnecessarily due to referential inequality of the remarkPlugins array on every render.
 const REMARK_PLUGINS = [remarkGfm];
@@ -140,21 +161,21 @@ const MARKDOWN_COMPONENTS = {
     const isInline = !className;
     if (isInline) {
       return (
-        <code className="bg-slate-100/60 px-1.5 py-0.5 rounded text-gold text-[13px]" {...props}>
+        <code className="bg-white/8 px-1.5 py-0.5 rounded text-gold/80 text-[13px]" {...props}>
           {children}
         </code>
       );
     }
     return (
       <div className="relative group my-3">
-        <pre className="bg-slate-50/70 rounded-lg p-4 overflow-x-auto border border-wireframe-stroke">
+        <pre className="bg-white/5 rounded-lg p-4 overflow-x-auto border border-white/8">
           <code className={`${className} text-[13px]`} {...props}>
             {children}
           </code>
         </pre>
         <button
           onClick={() => navigator.clipboard.writeText(String(children))}
-          className="absolute top-2 right-2 p-1.5 rounded bg-slate-100 opacity-0 group-hover:opacity-100 transition-opacity"
+          className="absolute top-2 right-2 p-1.5 rounded bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"
         >
           <CopyIcon className="w-4 h-4" />
         </button>
@@ -186,6 +207,20 @@ const MessageBubble = memo(function MessageBubble({ message, onSpeak, onCopy, is
   const [copied, setCopied] = useState(false);
   const isUser = message.role === 'user';
   const isStreaming = message.isStreaming;
+
+  // Tool execution cards render without avatar/bubble
+  const toolExecution = message.metadata?.toolExecution as ToolExecutionEvent | undefined;
+  if (toolExecution && !message.content) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.2 }}
+      >
+        <ToolExecutionCard event={toolExecution} />
+      </motion.div>
+    );
+  }
 
   const handleCopy = () => {
     navigator.clipboard.writeText(message.content);
@@ -224,8 +259,8 @@ const MessageBubble = memo(function MessageBubble({ message, onSpeak, onCopy, is
           className={`
             inline-block rounded-2xl px-4 py-3 text-[15px] leading-relaxed
             ${isUser
-              ? 'bg-gold/10 text-slate-800 rounded-tr-sm border border-gold/20'
-              : 'wireframe-card text-slate-800 rounded-tl-sm'
+              ? 'bg-gold/10 text-zinc-100 rounded-tr-sm border border-gold/20'
+              : 'wireframe-card text-zinc-100 rounded-tl-sm'
             }
           `}
         >
@@ -269,7 +304,7 @@ const MessageBubble = memo(function MessageBubble({ message, onSpeak, onCopy, is
           <div className="flex items-center gap-2 mt-2 opacity-0 hover:opacity-100 transition-opacity">
             <button
               onClick={handleCopy}
-              className="p-1.5 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
+              className="p-1.5 rounded hover:bg-white/5 text-zinc-500 hover:text-zinc-300 transition-colors"
               title="Copy"
             >
               {copied ? (
@@ -280,7 +315,7 @@ const MessageBubble = memo(function MessageBubble({ message, onSpeak, onCopy, is
             </button>
             <button
               onClick={() => onSpeak?.(message.content)}
-              className="p-1.5 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
+              className="p-1.5 rounded hover:bg-white/5 text-zinc-500 hover:text-zinc-300 transition-colors"
               title="Read aloud"
             >
               <SpeakerIcon className="w-4 h-4" />
@@ -353,7 +388,7 @@ function VoiceInputButton({ isListening, isProcessing, stream, onStart, onStop }
           relative p-3 rounded-xl transition-all
           ${isListening
             ? 'bg-red-500/20 text-red-400'
-            : 'bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-800'
+            : 'bg-surface text-zinc-500 hover:bg-white/5 hover:text-zinc-300'
           }
           ${isProcessing ? 'opacity-50 cursor-not-allowed' : ''}
         `}
@@ -408,7 +443,7 @@ export function ChatInterface({
   userName = 'User',
   projectTitle,
   projectObjective,
-  model = 'gemini-3-flash',
+  model = 'claude-opus',
   placeholder = 'Message ACHEEVY...',
   welcomeMessage,
   autoPlayVoice = true,
@@ -424,6 +459,7 @@ export function ChatInterface({
   const [selectedPersona, setSelectedPersona] = useState(PERSONAS[0].id);
   const [selectedLanguage, setSelectedLanguage] = useState('en');
   const [selectedModel, setSelectedModel] = useState('claude-opus');
+  const [voiceSessionActive, setVoiceSessionActive] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -571,6 +607,28 @@ export function ChatInterface({
     speak(text);
   }, [speak]);
 
+  // ElevenLabs Agent SDK — conversational voice agent
+  const hasAgent = Boolean(ELEVENLABS_AGENT_ID);
+  const conversation = useConversation({});
+
+  const startVoiceSession = useCallback(async () => {
+    if (!ELEVENLABS_AGENT_ID) return;
+    try {
+      await navigator.mediaDevices.getUserMedia({ audio: true });
+      await conversation.startSession({ agentId: ELEVENLABS_AGENT_ID });
+      setVoiceSessionActive(true);
+    } catch (err) {
+      console.error('[Voice Agent] Failed to start session:', err);
+    }
+  }, [conversation]);
+
+  const endVoiceSession = useCallback(async () => {
+    try {
+      if (conversation.status === 'connected') await conversation.endSession();
+    } catch { /* ignore */ }
+    setVoiceSessionActive(false);
+  }, [conversation]);
+
   // ─────────────────────────────────────────────────────────
   // Department/Ang Selection Helpers
   // ─────────────────────────────────────────────────────────
@@ -693,7 +751,7 @@ export function ChatInterface({
   };
 
   return (
-    <div className="relative flex flex-col h-full bg-white aims-page-bg">
+    <div className="relative flex flex-col h-full bg-obsidian">
       {/* Messages Area */}
       <div className="flex-1 overflow-y-auto px-4 py-6">
         <div className="max-w-3xl mx-auto space-y-6">
@@ -720,7 +778,7 @@ export function ChatInterface({
               {/* Persona Selector (Main View) — only show when multiple personas exist */}
               {PERSONAS.length > 1 && (
                 <div className="flex justify-center mb-4">
-                  <div className="flex items-center gap-2 bg-slate-50 rounded-full px-1 py-1 border border-slate-200">
+                  <div className="flex items-center gap-2 bg-surface rounded-full px-1 py-1 border border-wireframe-stroke">
                     {PERSONAS.map(p => (
                       <button
                         key={p.id}
@@ -729,7 +787,7 @@ export function ChatInterface({
                         px-3 py-1.5 rounded-full text-xs font-medium transition-all
                         ${selectedPersona === p.id
                             ? 'bg-gold text-black shadow-lg shadow-gold/20'
-                            : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'}
+                            : 'text-zinc-500 hover:text-zinc-300 hover:bg-white/5'}
                       `}
                       >
                         {p.name}
@@ -746,7 +804,7 @@ export function ChatInterface({
                   </h2>
                 </div>
               </div>
-              <p className="text-slate-400 max-w-md mx-auto">{welcomeMessage}</p>
+              <p className="text-zinc-400 max-w-md mx-auto">{welcomeMessage}</p>
             </motion.div>
           )}
 
@@ -778,7 +836,7 @@ export function ChatInterface({
       </div>
 
       {/* Input Area */}
-      <div className="border-t border-wireframe-stroke bg-white/80 backdrop-blur-xl px-4 py-4">
+      <div className="border-t border-wireframe-stroke bg-obsidian/90 backdrop-blur-xl px-4 py-4">
         <div className="max-w-3xl mx-auto">
           {/* Vertical Step Indicator — Phase A progression */}
           {verticalFlow.isActive && (
@@ -795,7 +853,7 @@ export function ChatInterface({
             <div className="flex justify-center mb-3">
               <button
                 onClick={regenerate}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-slate-400 hover:text-slate-800 hover:bg-slate-50 transition-colors"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-zinc-500 hover:text-zinc-300 hover:bg-white/5 transition-colors"
               >
                 <RegenerateIcon className="w-4 h-4" />
                 Regenerate response
@@ -806,16 +864,16 @@ export function ChatInterface({
           {/* Input Container */}
           <div className="flex justify-end mb-2 gap-2">
             {/* Model Selector */}
-            <div className="flex items-center gap-1 bg-slate-50 rounded-lg px-2 py-1 text-xs text-slate-500 hover:bg-slate-100 transition-colors">
+            <div className="flex items-center gap-1 bg-surface rounded-lg px-2 py-1 text-xs text-zinc-400 hover:bg-white/5 border border-wireframe-stroke transition-colors">
               <BrainCircuitIcon className="w-3 h-3" />
               <select
                 value={selectedModel}
                 onChange={(e) => setSelectedModel(e.target.value)}
-                className="bg-transparent border-none outline-none text-slate-600 text-xs cursor-pointer appearance-none pr-4"
+                className="bg-transparent border-none outline-none text-zinc-300 text-xs cursor-pointer appearance-none pr-4"
                 title="Select AI Model"
               >
                 {AI_MODELS.map(m => (
-                  <option key={m.key} value={m.key} className="bg-white">
+                  <option key={m.key} value={m.key} className="bg-surface">
                     {m.label}{m.tag ? ` (${m.tag})` : ''}
                   </option>
                 ))}
@@ -824,16 +882,16 @@ export function ChatInterface({
 
             {/* Voice/Persona Selector — only show when multiple personas exist */}
             {PERSONAS.length > 1 && (
-              <div className="flex items-center gap-1 bg-slate-50 rounded-lg px-2 py-1 text-xs text-slate-500 hover:bg-slate-100 transition-colors">
+              <div className="flex items-center gap-1 bg-surface rounded-lg px-2 py-1 text-xs text-zinc-400 hover:bg-white/5 border border-wireframe-stroke transition-colors">
                 <SpeakerIcon className="w-3 h-3" />
                 <select
                   value={selectedPersona}
                   onChange={(e) => setSelectedPersona(e.target.value)}
-                  className="bg-transparent border-none outline-none text-slate-600 text-xs cursor-pointer appearance-none pr-4"
+                  className="bg-transparent border-none outline-none text-zinc-300 text-xs cursor-pointer appearance-none pr-4"
                   title="Select Voice Persona"
                 >
                   {PERSONAS.map(p => (
-                    <option key={p.id} value={p.id} className="bg-white">
+                    <option key={p.id} value={p.id} className="bg-surface">
                       {p.name}
                     </option>
                   ))}
@@ -842,22 +900,46 @@ export function ChatInterface({
             )}
 
             {/* Language Selector */}
-            <div className="flex items-center gap-1 bg-slate-50 rounded-lg px-2 py-1 text-xs text-slate-500 hover:bg-slate-100 transition-colors">
+            <div className="flex items-center gap-1 bg-surface rounded-lg px-2 py-1 text-xs text-zinc-400 hover:bg-white/5 border border-wireframe-stroke transition-colors">
               <GlobeIcon className="w-3 h-3" />
               <select
                 value={selectedLanguage}
                 onChange={(e) => setSelectedLanguage(e.target.value)}
-                className="bg-transparent border-none outline-none text-slate-600 text-xs cursor-pointer appearance-none"
+                className="bg-transparent border-none outline-none text-zinc-300 text-xs cursor-pointer appearance-none"
               >
-                <option value="en" className="bg-white">EN</option>
-                <option value="es" className="bg-white">ES</option>
-                <option value="fr" className="bg-white">FR</option>
-                <option value="de" className="bg-white">DE</option>
-                <option value="zh" className="bg-white">ZH</option>
-                <option value="ja" className="bg-white">JA</option>
+                <option value="en" className="bg-surface">EN</option>
+                <option value="es" className="bg-surface">ES</option>
+                <option value="fr" className="bg-surface">FR</option>
+                <option value="de" className="bg-surface">DE</option>
+                <option value="zh" className="bg-surface">ZH</option>
+                <option value="ja" className="bg-surface">JA</option>
               </select>
             </div>
           </div>
+
+          {/* ElevenLabs Voice Agent Status */}
+          {voiceSessionActive && (
+            <div className="flex items-center gap-3 px-3 py-2 mb-2 rounded-lg bg-gold/5 border border-gold/20">
+              <div className="relative flex items-center gap-2">
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-gold opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-gold" />
+                </span>
+                <span className="text-xs font-mono text-gold/80 uppercase tracking-wider">
+                  {conversation.status === 'connected'
+                    ? (conversation.isSpeaking ? 'ACHEEVY Speaking...' : 'ACHEEVY Listening...')
+                    : 'Connecting...'}
+                </span>
+              </div>
+              <button
+                onClick={endVoiceSession}
+                className="ml-auto flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-500/15 text-red-400 text-xs font-mono hover:bg-red-500/25 transition-colors"
+              >
+                <PhoneOffIcon className="w-3 h-3" />
+                End
+              </button>
+            </div>
+          )}
 
           {/* Voice transcript ready indicator */}
           {voiceTranscriptReady && inputValue.trim() && (
@@ -866,7 +948,7 @@ export function ChatInterface({
               <span>Voice transcript ready — review and press Enter to send</span>
               <button
                 onClick={() => { setInputValue(''); setVoiceTranscriptReady(false); }}
-                className="ml-auto text-slate-400 hover:text-slate-500 transition-colors"
+                className="ml-auto text-zinc-500 hover:text-zinc-300 transition-colors"
               >
                 Clear
               </button>
@@ -883,6 +965,21 @@ export function ChatInterface({
               onStop={() => voiceInput.stopListening()}
             />
 
+            {/* ElevenLabs Voice Agent Toggle */}
+            {hasAgent && (
+              <button
+                onClick={voiceSessionActive ? endVoiceSession : startVoiceSession}
+                className={`p-3 rounded-xl transition-all ${
+                  voiceSessionActive
+                    ? 'bg-gold/20 text-gold'
+                    : 'bg-surface text-zinc-500 hover:bg-white/5 hover:text-zinc-300'
+                }`}
+                title={voiceSessionActive ? 'End voice session' : 'Start voice session'}
+              >
+                {voiceSessionActive ? <PhoneOffIcon className="w-5 h-5" /> : <PhoneIcon className="w-5 h-5" />}
+              </button>
+            )}
+
             {/* Text Input */}
             <textarea
               ref={textareaRef}
@@ -892,14 +989,14 @@ export function ChatInterface({
               placeholder={placeholder}
               disabled={isStreaming}
               rows={1}
-              className="flex-1 bg-transparent text-slate-800 placeholder:text-slate-300 resize-none outline-none text-[15px] leading-relaxed max-h-[200px] py-2"
+              className="flex-1 bg-transparent text-zinc-100 placeholder:text-zinc-600 resize-none outline-none text-[15px] leading-relaxed max-h-[200px] py-2"
             />
 
             {/* Agent Viewport Toggle */}
             {showOrchestration && (
               <button
                 onClick={() => setShowCollabFeed(true)}
-                className="p-3 rounded-xl bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors"
+                className="p-3 rounded-xl bg-surface text-zinc-500 hover:bg-white/5 hover:text-zinc-300 transition-colors"
                 title="View Agent Viewport"
               >
                 <GlobeIcon className="w-5 h-5" />
@@ -910,7 +1007,7 @@ export function ChatInterface({
             {showOrchestration && (
               <button
                 onClick={() => setShowBoard(true)}
-                className="p-3 rounded-xl bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors"
+                className="p-3 rounded-xl bg-surface text-zinc-500 hover:bg-white/5 hover:text-zinc-300 transition-colors"
                 title="View Department Board"
               >
                 <BoardIcon className="w-5 h-5" />
@@ -933,7 +1030,7 @@ export function ChatInterface({
                   p-3 rounded-xl transition-all
                   ${inputValue.trim()
                     ? 'bg-gold text-black hover:bg-gold-light'
-                    : 'bg-slate-50 text-slate-300 cursor-not-allowed'
+                    : 'bg-surface text-zinc-600 cursor-not-allowed'
                   }
                 `}
               >
@@ -948,7 +1045,7 @@ export function ChatInterface({
 
           {/* Voice Output Status */}
           {voiceOutput.isPlaying && (
-            <div className="flex items-center justify-center gap-2 mt-3 text-sm text-slate-400">
+            <div className="flex items-center justify-center gap-2 mt-3 text-sm text-zinc-400">
               <div className="flex gap-1">
                 {[...Array(3)].map((_, i) => (
                   <div
@@ -969,7 +1066,7 @@ export function ChatInterface({
           )}
 
           {/* Footer */}
-          <p className="text-center text-xs text-slate-300 mt-3">
+          <p className="text-center text-xs text-zinc-600 mt-3">
             ACHEEVY may produce inaccurate information. Voice powered by ElevenLabs.
           </p>
         </div>
@@ -1031,7 +1128,7 @@ export function ChatInterface({
       {/* Change Order Cost Tracker (bottom-left) */}
       {changeOrder.totalCost > 0 && (
         <div className="fixed bottom-4 left-4 px-3 py-2 wireframe-card text-xs z-40">
-          <p className="text-slate-400">Change Orders</p>
+          <p className="text-zinc-400">Change Orders</p>
           <p className="text-gold font-mono font-medium">
             {formatCurrency(changeOrder.totalCost)} ({changeOrder.totalTokensUsed.toLocaleString()} tokens)
           </p>

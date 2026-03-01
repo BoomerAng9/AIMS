@@ -5,6 +5,7 @@
 // =============================================================================
 
 import type { ToolAdapter, ExecutionContext } from "./base";
+import { codeAngAdapter } from "./code-ang";
 
 /**
  * deploy_workload — SERVICE_WRAPPER → Docker API
@@ -212,6 +213,7 @@ export const runTestsAdapter: ToolAdapter = {
  */
 export function getBuiltInAdapters(): ToolAdapter[] {
   return [
+    codeAngAdapter,
     deployWorkloadAdapter,
     healthCheckAdapter,
     runPipelineWorkflowAdapter,

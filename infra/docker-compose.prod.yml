@@ -459,17 +459,18 @@ services:
       - tier1-agents
 
   # ---------------------------------------------------------------------------
-  # Agent Zero — Autonomous AI Agent (II Agent Vertical)
+  # AVVA NOON — Autonomous AI Agent (NtNtN Engine)
   # Computer-as-tool framework, Docker sandboxed, multi-agent cooperation
+  # Formerly Agent Zero — renamed and integrated into NtNtN Engine
   # ---------------------------------------------------------------------------
-  agent-zero:
+  avva-noon:
     image: frdel/agent-zero-run:latest
     expose:
       - "80"
     environment:
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
     volumes:
-      - agent-zero-data:/app/work_dir
+      - avva-noon-data:/app/work_dir
     healthcheck:
       test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/" ]
       interval: 60s
@@ -505,6 +506,11 @@ services:
     restart: unless-stopped
     networks:
       - aims-network
+    cap_drop:
+      - ALL
+    read_only: true
+    tmpfs:
+      - /tmp:size=50M
     security_opt:
       - no-new-privileges:true
     deploy:
@@ -540,6 +546,11 @@ services:
     restart: unless-stopped
     networks:
       - aims-network
+    cap_drop:
+      - ALL
+    read_only: true
+    tmpfs:
+      - /tmp:size=50M
     security_opt:
       - no-new-privileges:true
     deploy:
@@ -565,14 +576,19 @@ services:
       - NODE_ENV=production
       - POLICY_URL=http://chickenhawk-policy:4002
       - AUDIT_URL=http://chickenhawk-audit:4003
-      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
-      - GEMINI_API_KEY=${GEMINI_API_KEY}
       - GEMINI_MODEL=${GEMINI_MODEL:-gemini-3.0-flash}
       - UEF_GATEWAY_URL=http://uef-gateway:3001
       - ACHEEVY_URL=http://acheevy:3003
       - AGENT_BRIDGE_URL=http://agent-bridge:3010
       - REDIS_URL=redis://:${REDIS_PASSWORD:-aims_redis_secret}@redis:6379
       - CORS_ORIGIN=${CORS_ORIGIN}
+      - MEMORY_DIR=/app/data/memory
+      - LILHAWK_DEPLOY_TARGET=${LILHAWK_DEPLOY_TARGET:-local}
+      - GCP_PROJECT_ID=${GCP_PROJECT_ID:-ai-managed-services}
+      - GCP_REGION=${GCP_REGION:-us-central1}
+    secrets:
+      - openrouter_api_key
+      - gemini_api_key
     volumes:
       - chickenhawk-data:/app/data
     depends_on:
@@ -594,6 +610,12 @@ services:
     networks:
       - aims-network
       - sandbox-network
+    cap_drop:
+      - ALL
+    read_only: true
+    tmpfs:
+      - /tmp:size=100M
+      - /app/workspace:size=500M
     security_opt:
       - no-new-privileges:true
     deploy:
@@ -777,12 +799,18 @@ services:
     profiles:
       - perform
 
+secrets:
+  openrouter_api_key:
+    environment: OPENROUTER_API_KEY
+  gemini_api_key:
+    environment: GEMINI_API_KEY
+
 volumes:
   nginx-conf:
   nginx-logs:
   gateway-data:
   redis-data:
-  agent-zero-data:
+  avva-noon-data:
   luc-data:
   demo-luc-data:
   perform-debate-logs:

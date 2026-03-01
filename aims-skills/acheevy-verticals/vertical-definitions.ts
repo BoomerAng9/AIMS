@@ -24,7 +24,6 @@
  */
 
 import type { VerticalDefinition } from './types';
-import { HBM_VERTICALS } from './hybrid-business-manager';
 
 // ---------------------------------------------------------------------------
 // 10 Revenue Verticals
@@ -1358,9 +1357,6 @@ Return ONLY a JSON array of step description strings.
       transition_prompt: 'Your playground is live. Start coding, testing, or annotating. Everything runs in isolation — safe to experiment.',
     },
   },
-
-  // ── HYBRID BUSINESS MANAGER VERTICALS (merged from HBM module) ──────
-  ...HBM_VERTICALS,
 };
 
 // ---------------------------------------------------------------------------
