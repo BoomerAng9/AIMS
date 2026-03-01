@@ -255,7 +255,7 @@ export default function HomePage() {
                   <span className="relative rounded-full h-2 w-2 bg-amber-500" />
                 </span>
                 <span className="text-xs font-medium text-amber-300">
-                  Platform Live &middot; AI-Powered Infrastructure
+                  A.I.M.S. AI Managed Solutions &middot; Platform Live
                 </span>
               </div>
             </FadeIn>
@@ -272,9 +272,19 @@ export default function HomePage() {
             {/* Subhead */}
             <FadeIn delay={0.2}>
               <p className="text-lg sm:text-xl md:text-2xl text-zinc-300 max-w-2xl mx-auto leading-relaxed mb-10">
-                One-click deployment of open source tools, AI agents, and
-                full-stack platforms. Provisioned, configured, and managed
-                by autonomous AI.
+                A.I.M.S. AI Managed Solutions is an AI-managed deployment platform.
+                We help teams launch and operate open source tools, AI agents,
+                and full-stack apps with autonomous lifecycle management.
+              </p>
+            </FadeIn>
+
+            <FadeIn delay={0.25}>
+              <p className="text-sm text-zinc-500 mb-10">
+                Learn how we handle data in our{' '}
+                <Link href="/privacy-policy" className="text-amber-300 hover:text-amber-200 underline underline-offset-4 transition-colors">
+                  Privacy Policy
+                </Link>
+                .
               </p>
             </FadeIn>
 
@@ -657,7 +667,7 @@ export default function HomePage() {
               <Link href="/terms" className="hover:text-zinc-400 transition-colors">
                 Terms
               </Link>
-              <Link href="/privacy" className="hover:text-zinc-400 transition-colors">
+              <Link href="/privacy-policy" className="hover:text-zinc-400 transition-colors">
                 Privacy
               </Link>
               <Link href="/pricing" className="hover:text-zinc-400 transition-colors">
@@ -713,6 +723,7 @@ function Nav() {
               { href: "/plugs", label: "Catalog" },
               { href: "#how-it-works", label: "How It Works" },
               { href: "/pricing", label: "Pricing" },
+              { href: "/privacy-policy", label: "Privacy" },
               { href: "/about", label: "About" },
             ].map((link) => (
               <Link
@@ -762,6 +773,7 @@ function Nav() {
               { href: "/plugs", label: "Catalog" },
               { href: "#how-it-works", label: "How It Works" },
               { href: "/pricing", label: "Pricing" },
+              { href: "/privacy-policy", label: "Privacy" },
               { href: "/about", label: "About" },
             ].map((link) => (
               <Link
