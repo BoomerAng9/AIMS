@@ -57,6 +57,25 @@ const THREADS_KEY = 'aims_chat_threads';
 const SIDEBAR_KEY = 'aims_chat_sidebar';
 const VOICE_SETTINGS_KEY = 'aims_voice_prefs';
 
+// ⚡ Bolt: Extracted to a stable module-level constant to prevent ReactMarkdown from re-rendering
+// unnecessarily due to referential inequality of the remarkPlugins array on every render.
+const REMARK_PLUGINS = [remarkGfm];
+
+// ⚡ Bolt: Extracted to a stable module-level constant to prevent ReactMarkdown from re-rendering
+// unnecessarily due to referential inequality of the components object on every render.
+const MARKDOWN_COMPONENTS = {
+  code({ className, children, ...props }: any) {
+    if (!className) {
+      return <code className="bg-white/5 px-1 py-0.5 rounded text-gold/80 text-[12px]" {...props}>{children}</code>;
+    }
+    return (
+      <pre className="bg-white/5 rounded-lg p-3 overflow-x-auto border border-white/8 my-2 max-w-full">
+        <code className={`${className} text-[12px]`} {...props}>{children}</code>
+      </pre>
+    );
+  },
+};
+
 interface Thread {
   id: string;
   title: string;
@@ -240,19 +259,8 @@ function MessageBubble({ role, content, isStreaming }: {
               prose-code:text-gold/80 prose-code:bg-white/5 prose-code:px-1 prose-code:py-0.5 prose-code:rounded
               prose-pre:max-w-full prose-pre:overflow-x-auto prose-p:my-1.5 prose-headings:my-2">
               <ReactMarkdown
-                remarkPlugins={[remarkGfm]}
-                components={{
-                  code({ className, children, ...props }) {
-                    if (!className) {
-                      return <code className="bg-white/5 px-1 py-0.5 rounded text-gold/80 text-[12px]" {...props}>{children}</code>;
-                    }
-                    return (
-                      <pre className="bg-white/5 rounded-lg p-3 overflow-x-auto border border-white/8 my-2 max-w-full">
-                        <code className={`${className} text-[12px]`} {...props}>{children}</code>
-                      </pre>
-                    );
-                  },
-                }}
+                remarkPlugins={REMARK_PLUGINS}
+                components={MARKDOWN_COMPONENTS}
               >
                 {content}
               </ReactMarkdown>
