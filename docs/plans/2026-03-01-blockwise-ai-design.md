@@ -80,7 +80,8 @@ Fallback chain: Tier 4 → Tier 3 → Tier 2
 
 | Model | Purpose | Access |
 |-------|---------|--------|
-| Claude (primary) | ACHEEVY orchestration, analysis, verdicts | Anthropic API |
+| Mercury 2 (Inception Labs) | Primary conversation LLM for Blockwise ACHEEVY chat — 1,000 tok/sec, real-time responses for property Q&A, neighborhood analysis, deal verdicts | Inception API (OpenAI-compatible) |
+| Claude (fallback/complex) | ACHEEVY orchestration for multi-step tasks, complex analysis, K1 generation | Anthropic API |
 | Gemini | NotebookLM backend, Maps Grounding | GCP Generative Language API |
 | Nano Banana Pro 2 (Gemini 3.1 Flash Image) | Visual content — property cards, infographics, report graphics with precise text rendering | GCP Generative Language API |
 | ElevenLabs Agent SDK | Conversational voice for ACHEEVY | ElevenLabs API |
@@ -383,6 +384,7 @@ ACHEEVY: Generates via Podcast API, audio player appears in chat via C1 Thesys
 
 | Service | Key Env Var | Required? |
 |---------|------------|-----------|
+| Mercury 2 (Inception) | `MERCURY_API_KEY` | Yes |
 | Google Maps | `NEXT_PUBLIC_GOOGLE_MAPS_KEY` | Yes |
 | Brave Search | `BRAVE_API_KEY` | Yes (already configured) |
 | Firecrawl | `FIRECRAWL_API_KEY` | Yes |
