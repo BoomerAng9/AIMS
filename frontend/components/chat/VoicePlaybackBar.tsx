@@ -12,7 +12,7 @@
  * - Elapsed / remaining time display
  */
 
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Play, Pause, Square, Volume2 } from 'lucide-react';
 
@@ -53,7 +53,8 @@ function formatTime(seconds: number): string {
   return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
-export function VoicePlaybackBar({ voiceOutput }: VoicePlaybackBarProps) {
+// Memoized to prevent re-renders when parent updates but props are stable
+export const VoicePlaybackBar = memo(function VoicePlaybackBar({ voiceOutput }: VoicePlaybackBarProps) {
   const [progress, setProgress] = useState(0);
   const [speed, setSpeed] = useState<PlaybackSpeed>(1);
   const [isDragging, setIsDragging] = useState(false);
@@ -196,7 +197,7 @@ export function VoicePlaybackBar({ voiceOutput }: VoicePlaybackBarProps) {
             </div>
 
             {/* Time display */}
-            <span className="flex-shrink-0 text-sm font-mono text-slate-400 tabular-nums w-[72px] text-right">
+            <span className="flex-shrink-0 text-[11px] font-mono text-slate-400 tabular-nums w-[72px] text-right">
               {formatTime(elapsed)} / {formatTime(estimatedDuration)}
             </span>
           </div>
@@ -228,7 +229,7 @@ export function VoicePlaybackBar({ voiceOutput }: VoicePlaybackBarProps) {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1.5">
               <Volume2 size={12} className="text-slate-300" />
-              <span className="text-xs text-slate-400 uppercase tracking-wider font-medium">
+              <span className="text-[10px] text-slate-400 uppercase tracking-wider font-medium">
                 {voiceOutput.isLoading
                   ? 'Loading audio...'
                   : voiceOutput.isPlaying
@@ -241,7 +242,7 @@ export function VoicePlaybackBar({ voiceOutput }: VoicePlaybackBarProps) {
               {/* Speed control */}
               <button
                 onClick={cycleSpeed}
-                className="px-2 py-0.5 rounded-md text-xs font-bold text-slate-500 bg-slate-50 border border-slate-200 hover:border-gold/30 hover:text-gold transition-colors tabular-nums"
+                className="px-2 py-0.5 rounded-md text-[10px] font-bold text-slate-500 bg-slate-50 border border-slate-200 hover:border-gold/30 hover:text-gold transition-colors tabular-nums"
                 title="Playback speed"
               >
                 {speed}x
@@ -261,4 +262,4 @@ export function VoicePlaybackBar({ voiceOutput }: VoicePlaybackBarProps) {
       </motion.div>
     </AnimatePresence>
   );
-}
+});

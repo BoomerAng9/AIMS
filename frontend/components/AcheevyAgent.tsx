@@ -236,7 +236,7 @@ export default function AcheevyAgent() {
         const { done, value } = await reader.read();
         if (done) break;
         const chunk = decoder.decode(value, { stream: true });
-        // Parse Vercel AI SDK format: 0:"text"\n
+        // Parse AI SDK streaming format: 0:"text"\n
         const lines = chunk.split('\n');
         for (const line of lines) {
           if (line.startsWith('0:')) {
