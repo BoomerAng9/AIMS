@@ -215,7 +215,7 @@ export function DashboardNav() {
           ))}
         </div>
 
-        <div className="mx-2 border-t border-slate-200" />
+        <div className="mx-2 border-t border-white/8" />
 
         {/* Core — simplified */}
         <div className="mt-2 space-y-0.5">
@@ -226,7 +226,7 @@ export function DashboardNav() {
         </div>
 
         {/* Apps */}
-        <div className="mx-2 mt-2 border-t border-emerald-200/50" />
+        <div className="mx-2 mt-2 border-t border-white/8" />
         <div className="mt-1 space-y-0.5">
           <SectionLabel label="Apps" icon={Rocket} />
           {PUBLIC_APPS.map((item) => (
@@ -235,7 +235,7 @@ export function DashboardNav() {
         </div>
 
         {/* Settings — minimal */}
-        <div className="mx-2 mt-2 border-t border-slate-200" />
+        <div className="mx-2 mt-2 border-t border-white/8" />
         <div className="mt-1 space-y-0.5">
           <SectionLabel label="Account" icon={Settings} />
           {PUBLIC_SETTINGS.map((item) => (
@@ -277,7 +277,7 @@ export function DashboardNav() {
       </div>
 
       {/* Live Apps — Direct access tools */}
-      <div className="mx-2 mt-2 border-t border-emerald-200/50" />
+      <div className="mx-2 mt-2 border-t border-white/8" />
       <div className="mt-1 space-y-0.5">
         <SectionLabel label="Live Apps" icon={Rocket} />
         {PRIVATE_LIVE_APPS.map((item) => (
@@ -285,7 +285,7 @@ export function DashboardNav() {
         ))}
       </div>
 
-      <div className="mx-2 mt-2 border-t border-amber-200/50" />
+      <div className="mx-2 mt-2 border-t border-white/8" />
 
       {/* Circuit Box */}
       <div className="mt-2 space-y-0.5">
@@ -295,8 +295,8 @@ export function DashboardNav() {
           className={clsx(
             "flex items-center gap-2.5 rounded-lg px-3 py-2 transition-all text-sm",
             pathname === "/dashboard/circuit-box" && !new URLSearchParams(typeof window !== "undefined" ? window.location.search : "").get("tab")
-              ? "border border-amber-200 bg-amber-50 text-amber-800 shadow-sm"
-              : "border border-amber-100 bg-amber-50/50 text-amber-700 hover:bg-amber-50 hover:border-amber-200"
+              ? "border border-amber-500/20 bg-amber-500/10 text-amber-400 shadow-sm"
+              : "border border-amber-500/10 bg-amber-500/5 text-amber-500 hover:bg-amber-500/10 hover:border-amber-500/20"
           )}
         >
           <Shield className="w-4 h-4 text-amber-500" />
@@ -309,7 +309,7 @@ export function DashboardNav() {
       </div>
 
       {/* Workshop */}
-      <div className="mx-2 mt-2 border-t border-cyan-200/50" />
+      <div className="mx-2 mt-2 border-t border-white/8" />
       <div className="mt-1 space-y-0.5">
         <SectionLabel label="Workshop" icon={Mic} />
         {PRIVATE_WORKSHOP.map((item) => (
@@ -318,7 +318,7 @@ export function DashboardNav() {
       </div>
 
       {/* Sandbox */}
-      <div className="mx-2 mt-2 border-t border-emerald-200/50" />
+      <div className="mx-2 mt-2 border-t border-white/8" />
       <div className="mt-1 space-y-0.5">
         <SectionLabel label="Sandbox" icon={Layers} />
         {PRIVATE_SANDBOX.map((item) => (
@@ -327,7 +327,7 @@ export function DashboardNav() {
       </div>
 
       {/* Per|Form */}
-      <div className="mx-2 mt-2 border-t border-amber-200/50" />
+      <div className="mx-2 mt-2 border-t border-white/8" />
       <div className="mt-1 space-y-0.5">
         <SectionLabel label="Per|Form" icon={Trophy} />
         {PRIVATE_PERFORM.map((item) => (
@@ -336,7 +336,7 @@ export function DashboardNav() {
       </div>
 
       {/* Hybrid Business Manager */}
-      <div className="mx-2 mt-2 border-t border-blue-200/50" />
+      <div className="mx-2 mt-2 border-t border-white/8" />
       <div className="mt-1 space-y-0.5">
         <SectionLabel label="HBM" icon={Briefcase} />
         {PRIVATE_HBM.map((item) => (
@@ -350,7 +350,7 @@ export function DashboardNav() {
       {/* Owner-Only Tabs */}
       {isOwner && (
         <>
-          <div className="mx-2 mt-2 border-t border-red-200/50" />
+          <div className="mx-2 mt-2 border-t border-white/8" />
           <div className="mt-1 space-y-0.5">
             <SectionLabel label="Owner Only" icon={Shield} />
             {PRIVATE_OWNER.map((item) => (
@@ -361,8 +361,8 @@ export function DashboardNav() {
               className={clsx(
                 "flex items-center gap-2.5 rounded-lg px-3 py-2 transition-all text-sm",
                 pathname === "/dashboard/admin"
-                  ? "border border-red-200 bg-red-50 text-red-700"
-                  : "border border-transparent text-red-400 hover:bg-red-50 hover:border-red-200 hover:text-red-600"
+                  ? "border border-red-500/20 bg-red-500/10 text-red-400"
+                  : "border border-transparent text-red-400 hover:bg-red-500/10 hover:border-red-500/20 hover:text-red-300"
               )}
             >
               <Shield className="w-4 h-4" />

@@ -99,6 +99,19 @@ export interface ChatResponse {
 }
 
 // ─────────────────────────────────────────────────────────────
+// Tool Execution Types
+// ─────────────────────────────────────────────────────────────
+
+export interface ToolExecutionEvent {
+  type: string;
+  intent: string;
+  taskId?: string;
+  status: 'dispatched' | 'running' | 'completed' | 'failed';
+  steps?: number;
+  lucUsage?: { service: string; amount: number };
+}
+
+// ─────────────────────────────────────────────────────────────
 // UI State Types
 // ─────────────────────────────────────────────────────────────
 

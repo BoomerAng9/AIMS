@@ -16,6 +16,8 @@
 
 import express, { Request, Response } from "express";
 import { ChickenHawkEngine } from "./core/engine";
+import { secrets } from "./lib/secrets";
+import { llm } from "./lib/llm";
 import type { Manifest } from "./types";
 
 const app = express();
@@ -169,6 +171,8 @@ app.listen(PORT, "0.0.0.0", () => {
   console.log(`\n${"=".repeat(60)}`);
   console.log(`  Chicken Hawk Core — A.I.M.S. Execution Engine v1.0.0`);
   console.log(`  Port: ${PORT}`);
+  console.log(`  Secrets: OpenRouter=${secrets.openrouterApiKey ? "loaded" : "MISSING"}, Gemini=${secrets.geminiApiKey ? "loaded" : "MISSING"}`);
+  console.log(`  LLM Provider: ${llm.getProvider()}`);
   console.log(`  Endpoints:`);
   console.log(`    GET  /health`);
   console.log(`    GET  /status`);

@@ -30,6 +30,17 @@ export interface KYBRegistration {
   flight_recorder_stream: string;  // audit stream ID
 }
 
+export type DeployTarget = "local" | "docker" | "cloud_run";
+
+export interface LilHawkDeployment {
+  target: DeployTarget;
+  container_id?: string;
+  cloud_run_job_id?: string;
+  endpoint?: string;
+  deployed_at: string;
+  terminated_at?: string;
+}
+
 export interface LilHawk {
   id: string;                      // KYB identity
   moniker: string;
@@ -37,6 +48,7 @@ export interface LilHawk {
   kyb: KYBRegistration;
   status: LilHawkStatus;
   task_id: string;
+  deployment?: LilHawkDeployment;
   started_at?: string;
   completed_at?: string;
   output?: unknown;

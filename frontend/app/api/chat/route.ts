@@ -134,10 +134,21 @@ async function tryAgentDispatch(
       ? `${reply}\n\n---\n*${meta.join(' | ')}*`
       : reply;
 
-    // Emit as AI SDK text stream format (single-shot)
+    // Build tool execution event for frontend card
+    const toolEvent = {
+      type: 'tool_dispatch',
+      intent: classification.intent,
+      taskId: result.taskId || undefined,
+      status: result.status || 'completed',
+      steps: result.data?.pipelineSteps?.length || undefined,
+      lucUsage: result.lucUsage || undefined,
+    };
+
+    // Emit as AI SDK text stream format with tool event prefix 8:
     const encoder = new TextEncoder();
     const stream = new ReadableStream({
       start(controller) {
+        controller.enqueue(encoder.encode(`8:${JSON.stringify(toolEvent)}\n`));
         controller.enqueue(encoder.encode(`0:${JSON.stringify(fullReply)}\n`));
         controller.close();
       },

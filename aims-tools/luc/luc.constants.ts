@@ -41,14 +41,6 @@ export const SERVICE_KEYS = {
   // Deployments
   DEPLOY_OPERATIONS: "deploy_operations",
 
-  // Forms & Automation
-  FORM_SUBMISSIONS: "form_submissions",
-  STEPPER_RUNS: "stepper_runs",
-
-  // Video & Image Generation
-  VIDEO_GENERATIONS: "video_generations",
-  IMAGE_GENERATIONS: "image_generations",
-
   // Custom/Generic
   API_CALLS: "api_calls",
 } as const;
@@ -77,9 +69,7 @@ export type ServiceCategory =
   | "infrastructure"
   | "agent"
   | "deployment"
-  | "api"
-  | "forms"
-  | "media";
+  | "api";
 
 export const SERVICE_CATALOG: Record<ServiceKey, ServiceDefinition> = {
   [SERVICE_KEYS.LLM_TOKENS_IN]: {
@@ -222,46 +212,6 @@ export const SERVICE_CATALOG: Record<ServiceKey, ServiceDefinition> = {
     defaultRate: 0.1,
     meterType: "count",
   },
-  [SERVICE_KEYS.FORM_SUBMISSIONS]: {
-    key: SERVICE_KEYS.FORM_SUBMISSIONS,
-    name: "Form Submissions",
-    description: "Paperform form submissions processed",
-    unit: "submission",
-    unitPlural: "submissions",
-    category: "forms",
-    defaultRate: 0.01,
-    meterType: "count",
-  },
-  [SERVICE_KEYS.STEPPER_RUNS]: {
-    key: SERVICE_KEYS.STEPPER_RUNS,
-    name: "Stepper Workflow Runs",
-    description: "Stepper automation workflow executions",
-    unit: "run",
-    unitPlural: "runs",
-    category: "forms",
-    defaultRate: 0.05,
-    meterType: "count",
-  },
-  [SERVICE_KEYS.VIDEO_GENERATIONS]: {
-    key: SERVICE_KEYS.VIDEO_GENERATIONS,
-    name: "Video Generations",
-    description: "AI video clip generations via fal.ai / HuggingFace",
-    unit: "clip",
-    unitPlural: "clips",
-    category: "media",
-    defaultRate: 0.40,
-    meterType: "count",
-  },
-  [SERVICE_KEYS.IMAGE_GENERATIONS]: {
-    key: SERVICE_KEYS.IMAGE_GENERATIONS,
-    name: "Image Generations",
-    description: "AI image generations via fal.ai / Recraft / FLUX",
-    unit: "image",
-    unitPlural: "images",
-    category: "media",
-    defaultRate: 0.05,
-    meterType: "count",
-  },
   [SERVICE_KEYS.API_CALLS]: {
     key: SERVICE_KEYS.API_CALLS,
     name: "API Calls",
@@ -349,8 +299,6 @@ export const TOOL_CATEGORIES = {
   INFRASTRUCTURE: "infrastructure",
   AGENTS: "agents",
   DEPLOYMENT: "deployment",
-  FORMS: "forms",
-  MEDIA: "media",
 } as const;
 
 export type ToolCategory = (typeof TOOL_CATEGORIES)[keyof typeof TOOL_CATEGORIES];
@@ -371,9 +319,5 @@ export const SERVICE_TO_CATEGORY: Record<ServiceKey, ToolCategory> = {
   [SERVICE_KEYS.BOOMER_ANG_INVOCATIONS]: TOOL_CATEGORIES.AGENTS,
   [SERVICE_KEYS.AGENT_EXECUTIONS]: TOOL_CATEGORIES.AGENTS,
   [SERVICE_KEYS.DEPLOY_OPERATIONS]: TOOL_CATEGORIES.DEPLOYMENT,
-  [SERVICE_KEYS.FORM_SUBMISSIONS]: TOOL_CATEGORIES.FORMS,
-  [SERVICE_KEYS.STEPPER_RUNS]: TOOL_CATEGORIES.FORMS,
-  [SERVICE_KEYS.VIDEO_GENERATIONS]: TOOL_CATEGORIES.MEDIA,
-  [SERVICE_KEYS.IMAGE_GENERATIONS]: TOOL_CATEGORIES.MEDIA,
   [SERVICE_KEYS.API_CALLS]: TOOL_CATEGORIES.AUTOMATION,
 };

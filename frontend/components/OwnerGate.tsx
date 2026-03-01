@@ -14,6 +14,11 @@ export default function OwnerGate({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession();
   const router = useRouter();
 
+  // Dev bypass — skip auth gate in local development
+  if (process.env.NODE_ENV === "development") {
+    return <>{children}</>;
+  }
+
   if (status === "loading") {
     return (
       <div className="flex items-center justify-center min-h-[40vh]">
