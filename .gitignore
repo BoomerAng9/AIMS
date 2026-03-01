@@ -37,6 +37,7 @@ yarn-error.log*
 *.db-journal
 !.env.example
 !infra/.env.example
+!infra/.env.*.example
 
 # Docker
 .docker/
