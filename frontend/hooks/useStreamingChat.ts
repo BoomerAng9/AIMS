@@ -111,7 +111,7 @@ export function useStreamingChat(options: UseStreamingChatOptions = {}): UseStre
         const lines = chunk.split('\n');
 
         for (const line of lines) {
-          // Handle Vercel AI SDK format: 0:"text chunk"\n
+          // Handle AI SDK streaming format: 0:"text chunk"\n
           if (/^\d+:/.test(line)) {
             const colonIdx = line.indexOf(':');
             const prefix = line.slice(0, colonIdx);
@@ -138,7 +138,7 @@ export function useStreamingChat(options: UseStreamingChatOptions = {}): UseStre
                 // Skip malformed tokens
               }
             } else if (prefix === 'e') {
-              // Vercel AI SDK finish signal
+              // AI SDK finish signal
               setIsStreaming(false);
               setMessages(prev => {
                 const lastIdx = prev.length - 1;

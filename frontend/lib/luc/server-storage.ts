@@ -1,10 +1,13 @@
 /**
- * LUC Server Storage — Persistent Data Layer
+ * LUC Server Storage — File-Based Persistent Data Layer
  *
  * Production-ready server-side storage for LUC accounts.
- * Uses JSON files for persistence across server restarts (VPS/Docker).
+ * Uses JSON files for persistence across server restarts.
+ * Designed for VPS deployment with easy migration to database.
  */
 
+import * as fs from 'fs';
+import * as path from 'path';
 import {
   LUCAccountRecord,
   LUCServiceKey,
@@ -19,7 +22,6 @@ import {
 // Storage Configuration
 // ─────────────────────────────────────────────────────────────
 
-const path = require('path');
 const DATA_DIR = process.env.LUC_DATA_DIR || path.join(process.cwd(), '.luc-data');
 const ACCOUNTS_FILE = path.join(DATA_DIR, 'accounts.json');
 const USAGE_HISTORY_FILE = path.join(DATA_DIR, 'usage-history.json');
@@ -46,22 +48,32 @@ interface AccountsData {
 interface UsageHistoryData {
   [userId: string]: UsageHistoryEntry[];
 }
+
 // ─────────────────────────────────────────────────────────────
 // File System Utilities
 // ─────────────────────────────────────────────────────────────
 
-async function ensureDataDir(): Promise<void> {
-  const fs = require('fs') as typeof import('fs');
-  try {
-    await fs.promises.access(DATA_DIR);
-  } catch {
-    await fs.promises.mkdir(DATA_DIR, { recursive: true });
+function ensureDataDir(): void {
+  if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
     console.log(`[LUC Server Storage] Created data directory: ${DATA_DIR}`);
   }
 }
 
-async function readJSONFile<T>(filePath: string, defaultValue: T): Promise<T> {
-  const fs = require('fs') as typeof import('fs');
+function readJSONFile<T>(filePath: string, defaultValue: T): T {
+  try {
+    if (!fs.existsSync(filePath)) {
+      return defaultValue;
+    }
+    const content = fs.readFileSync(filePath, 'utf-8');
+    return JSON.parse(content);
+  } catch (error) {
+    console.error(`[LUC Server Storage] Failed to read ${filePath}:`, error);
+    return defaultValue;
+  }
+}
+
+async function readJSONFileAsync<T>(filePath: string, defaultValue: T): Promise<T> {
   try {
     try {
       await fs.promises.access(filePath);
@@ -71,18 +83,27 @@ async function readJSONFile<T>(filePath: string, defaultValue: T): Promise<T> {
     const content = await fs.promises.readFile(filePath, 'utf-8');
     return JSON.parse(content);
   } catch (error) {
-    console.error(`[LUC Server Storage] Failed to read ${filePath}:`, error);
+    console.error(`[LUC Server Storage] Failed to read async ${filePath}:`, error);
     return defaultValue;
   }
 }
 
-async function writeJSONFile<T>(filePath: string, data: T): Promise<void> {
-  const fs = require('fs') as typeof import('fs');
+function writeJSONFile<T>(filePath: string, data: T): void {
   try {
-    await ensureDataDir();
-    await fs.promises.writeFile(filePath, JSON.stringify(data, null, 2), 'utf-8');
+    ensureDataDir();
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8');
   } catch (error) {
     console.error(`[LUC Server Storage] Failed to write ${filePath}:`, error);
+    throw error;
+  }
+}
+
+async function writeJSONFileAsync<T>(filePath: string, data: T): Promise<void> {
+  try {
+    ensureDataDir();
+    await fs.promises.writeFile(filePath, JSON.stringify(data, null, 2), 'utf-8');
+  } catch (error) {
+    console.error(`[LUC Server Storage] Failed to write async ${filePath}:`, error);
     throw error;
   }
 }
@@ -98,7 +119,7 @@ export class ServerStorageAdapter {
   private readonly cacheTTL: number = 5000; // 5 second cache
 
   constructor() {
-    ensureDataDir().catch(console.error);
+    ensureDataDir();
   }
 
   private isCacheValid(): boolean {
@@ -109,13 +130,13 @@ export class ServerStorageAdapter {
     if (this.accountsCache && this.isCacheValid()) {
       return this.accountsCache;
     }
-    this.accountsCache = await readJSONFile<AccountsData>(ACCOUNTS_FILE, {});
+    this.accountsCache = await readJSONFileAsync<AccountsData>(ACCOUNTS_FILE, {});
     this.cacheTimestamp = Date.now();
     return this.accountsCache;
   }
 
   private async saveAccounts(accounts: AccountsData): Promise<void> {
-    await writeJSONFile(ACCOUNTS_FILE, accounts);
+    await writeJSONFileAsync(ACCOUNTS_FILE, accounts);
     this.accountsCache = accounts;
     this.cacheTimestamp = Date.now();
   }
@@ -124,18 +145,19 @@ export class ServerStorageAdapter {
     if (this.historyCache && this.isCacheValid()) {
       return this.historyCache;
     }
-    this.historyCache = await readJSONFile<UsageHistoryData>(USAGE_HISTORY_FILE, {});
+    this.historyCache = await readJSONFileAsync<UsageHistoryData>(USAGE_HISTORY_FILE, {});
     return this.historyCache;
   }
 
   private async saveHistory(history: UsageHistoryData): Promise<void> {
-    await writeJSONFile(USAGE_HISTORY_FILE, history);
+    await writeJSONFileAsync(USAGE_HISTORY_FILE, history);
     this.historyCache = history;
   }
 
   // ─────────────────────────────────────────────────────────
   // Account Operations
   // ─────────────────────────────────────────────────────────
+
   async getAccount(userId: string): Promise<LUCAccountRecord | null> {
     const accounts = await this.getAccounts();
     const accountData = accounts[userId];
@@ -194,6 +216,7 @@ export class ServerStorageAdapter {
   // ─────────────────────────────────────────────────────────
   // Usage History Operations
   // ─────────────────────────────────────────────────────────
+
   async addUsageEntry(entry: UsageHistoryEntry): Promise<void> {
     const history = await this.getHistory();
 
@@ -226,9 +249,12 @@ export class ServerStorageAdapter {
   // ─────────────────────────────────────────────────────────
   // Export/Import Operations
   // ─────────────────────────────────────────────────────────
+
   async exportAll(userId: string): Promise<string> {
-    const account = await this.getAccount(userId);
-    const history = await this.getUsageHistory(userId, 10000);
+    const [account, history] = await Promise.all([
+      this.getAccount(userId),
+      this.getUsageHistory(userId, 10000)
+    ]);
 
     const exportData = {
       version: '1.0',
@@ -266,7 +292,7 @@ export class ServerStorageAdapter {
   async exportCSV(userId: string): Promise<string> {
     const [account, history] = await Promise.all([
       this.getAccount(userId),
-      this.getUsageHistory(userId),
+      this.getUsageHistory(userId)
     ]);
 
     let csv = '=== LUC ACCOUNT EXPORT ===\n\n';
@@ -333,7 +359,7 @@ export class LUCServerAccountManager {
   /**
    * Get or create account for user
    */
-  async getOrCreateAccount(userId: string, planId: string = 'p2p'): Promise<LUCAccountRecord> {
+  async getOrCreateAccount(userId: string, planId: string = 'starter'): Promise<LUCAccountRecord> {
     return this.storage.getOrCreateAccount(userId, planId);
   }
 
