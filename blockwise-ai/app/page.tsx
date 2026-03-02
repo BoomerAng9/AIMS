@@ -5,6 +5,7 @@ import { PropertyMap } from '@/components/PropertyMap';
 import { PropertyCard } from '@/components/PropertyCard';
 import { FilterPanel } from '@/components/FilterPanel';
 import { ChatPanel } from '@/components/ChatPanel';
+import { NavBar } from '@/components/NavBar';
 import type { Property, PropertyFilters } from '@/lib/types';
 
 export default function Home() {
@@ -45,28 +46,19 @@ export default function Home() {
 
   return (
     <div className="h-screen flex flex-col bg-[#0A0A0F]">
-      {/* ── Top Bar ── */}
-      <header className="flex items-center justify-between px-6 py-3 border-b border-white/10">
-        <div className="flex items-center gap-3">
-          <h1 className="text-xl font-bold text-[#D4A843] tracking-wide">
-            BLOCKWISE AI
-          </h1>
-          <span className="text-xs text-zinc-500">by A.I.M.S.</span>
-        </div>
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => setChatOpen(!chatOpen)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              chatOpen
-                ? 'bg-[#D4A843] text-black'
-                : 'bg-white/10 text-white hover:bg-white/15'
-            }`}
-          >
-            {chatOpen ? 'Close Chat' : 'Ask ACHEEVY'}
-          </button>
-        </div>
-      </header>
+      <NavBar>
+        <button
+          type="button"
+          onClick={() => setChatOpen(!chatOpen)}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            chatOpen
+              ? 'bg-[#D4A843] text-black'
+              : 'bg-white/10 text-white hover:bg-white/15'
+          }`}
+        >
+          {chatOpen ? 'Close Chat' : 'Ask ACHEEVY'}
+        </button>
+      </NavBar>
 
       {/* ── Main Layout ── */}
       <div className="flex-1 flex overflow-hidden">

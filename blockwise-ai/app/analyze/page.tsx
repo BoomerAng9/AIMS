@@ -1,12 +1,14 @@
 'use client';
 
-import { Suspense, useState, useEffect } from 'react';
+import { Suspense, useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { BlockScoreCard } from '@/components/BlockScoreCard';
 import { NeighborhoodGrid } from '@/components/NeighborhoodGrid';
 import { VerdictCard } from '@/components/VerdictCard';
+import { ExportMenu } from '@/components/ExportMenu';
+import { NavBar } from '@/components/NavBar';
 import type { NeighborhoodReport } from '@/lib/types';
 
 export default function AnalyzePage() {
@@ -26,6 +28,7 @@ function AnalyzeContent() {
   const [report, setReport] = useState<NeighborhoodReport | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isGeneratingAudio, setIsGeneratingAudio] = useState(false);
 
   useEffect(() => {
     if (!address) return;
@@ -52,25 +55,70 @@ function AnalyzeContent() {
     fetchReport();
   }, [address, lat, lng]);
 
+  const handleGenerateAudio = useCallback(async () => {
+    if (!report) return;
+    setIsGeneratingAudio(true);
+    try {
+      await fetch('/api/notebook', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          propertyAddress: address,
+          sources: [
+            { type: 'text', title: 'Block Score Report', content: JSON.stringify(report.blockScore) },
+            { type: 'text', title: 'Neighborhood Data', content: report.verdictText },
+          ],
+          generateAudio: true,
+        }),
+      });
+    } catch {
+      // Silent fail — NotebookLM may not be configured
+    } finally {
+      setIsGeneratingAudio(false);
+    }
+  }, [report, address]);
+
+  const exportData = report
+    ? {
+        Address: address,
+        'Block Score': report.blockScore.overall,
+        Verdict: report.verdict,
+        'Schools Score': report.blockScore.schools,
+        'Safety Score': report.blockScore.safety,
+        'Appreciation Score': report.blockScore.appreciation,
+        'Livability Score': report.blockScore.livability,
+        'Development Score': report.blockScore.development,
+        Population: report.demographics.population,
+        'Median Income': `$${report.demographics.medianIncome.toLocaleString()}`,
+        'Walk Score': report.walkability.walkScore,
+      }
+    : {};
+
   return (
     <div className="min-h-screen bg-[#0A0A0F] text-white">
-      {/* ── Header ── */}
-      <header className="flex items-center justify-between px-6 py-4 border-b border-white/10">
-        <div className="flex items-center gap-4">
-          <Link
-            href="/"
-            className="text-zinc-400 hover:text-white transition-colors text-sm"
-          >
-            &larr; Back
-          </Link>
-          <h1 className="text-xl font-bold text-[#D4A843]">
-            Neighborhood Intel
-          </h1>
-        </div>
+      <NavBar>
         {address && (
-          <p className="text-sm text-zinc-400 truncate max-w-md">{address}</p>
+          <p className="text-sm text-zinc-400 truncate max-w-md hidden lg:block">
+            {address}
+          </p>
         )}
-      </header>
+        {report && (
+          <>
+            <button
+              type="button"
+              onClick={handleGenerateAudio}
+              disabled={isGeneratingAudio}
+              className="px-4 py-2 rounded-lg text-sm font-medium bg-white/10 text-white hover:bg-white/20 transition-colors disabled:opacity-40"
+            >
+              {isGeneratingAudio ? 'Generating...' : 'Audio Briefing'}
+            </button>
+            <ExportMenu
+              title={`Blockwise AI — ${address}`}
+              data={exportData}
+            />
+          </>
+        )}
+      </NavBar>
 
       {/* ── Content ── */}
       <main className="max-w-6xl mx-auto px-6 py-8 space-y-8">
@@ -113,13 +161,11 @@ function AnalyzeContent() {
         {/* Report */}
         {report && (
           <>
-            {/* Block Score + Verdict */}
             <BlockScoreCard
               blockScore={report.blockScore}
               verdict={report.verdict}
             />
 
-            {/* Verdict Card */}
             <VerdictCard
               verdict={report.verdict}
               verdictText={report.verdictText}
@@ -130,7 +176,6 @@ function AnalyzeContent() {
               arv={report.property.estimatedArv ?? undefined}
             />
 
-            {/* Neighborhood Data Grid */}
             <NeighborhoodGrid
               schools={report.schools}
               safety={report.safety}

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import type { VerdictLevel } from '@/lib/types';
 import { getVerdictLabel, getVerdictColor } from '@/lib/neighborhood';
+import { ExportMenu } from '@/components/ExportMenu';
 
 interface VerdictCardProps {
   verdict: VerdictLevel;
@@ -54,9 +55,18 @@ export function VerdictCard({ verdict, verdictText, address, lat, lng, price, ar
         >
           Generate K1 →
         </Link>
-        <button className="px-4 py-2 rounded-lg bg-white/10 text-white font-medium text-sm hover:bg-white/20 transition-colors">
-          Export PDF
-        </button>
+        <ExportMenu
+          title={`Blockwise AI — ${address}`}
+          data={{
+            Address: address,
+            Verdict: label,
+            'Verdict Text': verdictText,
+            ...(price ? { Price: `$${price.toLocaleString()}` } : {}),
+            ...(arv ? { ARV: `$${arv.toLocaleString()}` } : {}),
+            Latitude: lat,
+            Longitude: lng,
+          }}
+        />
       </div>
     </motion.div>
   );
