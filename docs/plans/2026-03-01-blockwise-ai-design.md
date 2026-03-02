@@ -9,7 +9,9 @@
 
 ## 1. Vision
 
-Blockwise AI is a neighborhood intelligence and real estate investment platform built into A.I.M.S. It helps real estate professionals find properties, analyze neighborhoods deeper than Redfin/Zillow/MLS, run flip calculations via the LUC Real Estate Calculator, and automate K1 tax reporting — all with ACHEEVY as the AI assistant.
+Blockwise AI is a standalone neighborhood intelligence and real estate investment platform — a product created BY A.I.M.S. It helps real estate professionals find properties, analyze neighborhoods deeper than Redfin/Zillow/MLS, run flip calculations via the LUC Real Estate Calculator, and automate K1 tax reporting — all with ACHEEVY as the AI assistant, powered by Mercury 2 and ElevenLabs voice.
+
+Blockwise AI lives in its own repository and deploys as an A.I.M.S. Plug. It connects to the A.I.M.S. platform via APIs for LUC metering, Evidence Locker storage, and SDT token delivery.
 
 **Core value proposition:** Users get investor-grade neighborhood intel, a validated flip calculator, and automated K1 tax documents — capabilities that competitors charge thousands for or don't offer at all.
 
@@ -17,17 +19,27 @@ Blockwise AI is a neighborhood intelligence and real estate investment platform 
 
 ## 2. Architecture
 
-### Approach: Integrated Frontend
+### Approach: Standalone Repo — A.I.M.S. Plug
 
-Blockwise lives directly in the A.I.M.S. frontend as dashboard pages. Google Maps JavaScript API renders in-browser. Neighborhood data comes from a thin API layer in UEF Gateway that aggregates multiple sources. LUC preset engine handles all calculations. ACHEEVY chat panel (with ElevenLabs voice) is present on every Blockwise page.
+Blockwise AI is a **standalone Next.js 14 application** in its own repository (`blockwise-ai/`). It is a **product created BY A.I.M.S.**, not built into A.I.M.S. It deploys as an A.I.M.S. Plug — a Docker container on the VPS (port 51000+ range) with its own nginx reverse proxy, health check, and lifecycle management.
+
+**A.I.M.S. integration is via external APIs:**
+- LUC API — flip calculations, metering, billing
+- ACHEEVY API — orchestration, chat context
+- Evidence Locker API — document storage with SHA-256 custody chain
+- SDT API — Secure Drop Tokens for partner/investor access
+
+**UI framework:** ElevenLabs UI component library (17 pre-built React components) + shadcn/ui + Tailwind CSS.
+
+**Primary LLM:** Mercury 2 (Inception Labs) — 1,000 tok/sec, OpenAI-compatible, real-time property Q&A.
 
 ### Route Structure
 
 ```
-/dashboard/blockwise              → Property Search & Map
-/dashboard/blockwise/analyze      → Deep Neighborhood Intel
-/dashboard/blockwise/flip         → LUC Real Estate Calculator
-/dashboard/blockwise/k1           → K1 Tax Generator
+/                    → Property Search & Map (home)
+/analyze             → Deep Neighborhood Intel
+/flip                → LUC Real Estate Calculator
+/k1                  → K1 Tax Generator
 ```
 
 ### Data Pipeline (4 Tiers)
@@ -400,57 +412,81 @@ ACHEEVY: Generates via Podcast API, audio player appears in chat via C1 Thesys
 
 ---
 
-## 9. File Structure (Planned)
+## 9. File Structure (Standalone Repo)
 
 ```
-frontend/app/dashboard/blockwise/
-├── page.tsx                    → Property Search & Map
-├── analyze/page.tsx            → Deep Neighborhood Intel
-├── flip/page.tsx               → LUC Real Estate Calculator
-└── k1/page.tsx                 → K1 Tax Generator
-
-frontend/components/blockwise/
-├── PropertyMap.tsx             → Google Maps canvas + pins
-├── PropertyCard.tsx            → Pin click detail card
-├── FilterPanel.tsx             → Search filters
-├── BlockScoreCard.tsx          → Block Score (0-100) display
-├── CompMap.tsx                 → Comp sales map overlay
-├── NeighborhoodGrid.tsx        → 6-category intel grid
-├── VerdictCard.tsx             → ACHEEVY buy/hold/pass verdict
-├── FlipCalculator.tsx          → LUC flip form + results
-├── SensitivityTable.tsx        → ARV scenario analysis
-├── OpmCard.tsx                 → Other People's Money breakdown
-├── K1Form.tsx                  → K1 input/review UI
-├── K1Preview.tsx               → C1 Thesys rendered K1 doc
-├── ExportMenu.tsx              → Google Docs/PDF/Sheets/Email
-├── NanoBananaCard.tsx          → AI-generated visual report cards
-└── BlockwiseChatPanel.tsx      → ACHEEVY + ElevenLabs (right panel)
-
-frontend/lib/blockwise/
-├── google-maps.ts              → Maps API client + utilities
-├── neighborhood.ts             → Block Score algorithm
-├── comps.ts                    → Comp analysis helpers
-├── k1-formulas.ts              → K1 tax calculation engine
-├── export.ts                   → Google Docs/Sheets/PDF generation
-├── notebooklm.ts               → NotebookLM API client
-├── nano-banana.ts              → Nano Banana Pro 2 image generation
-└── types.ts                    → Blockwise type definitions
-
-backend/uef-gateway/src/blockwise/
-├── router.ts                   → /api/blockwise/* routes
-├── aggregator.ts               → Multi-source data aggregation
-├── brave-search.ts             → Brave Search queries
-├── firecrawl.ts                → Firecrawl scraping jobs
-├── google-maps.ts              → Server-side Maps API calls
-├── notebooklm.ts               → NotebookLM Enterprise API
-├── nano-banana.ts              → Gemini 3.1 Flash Image generation
-├── paperform-webhook.ts        → Paperform submission handler
-└── export.ts                   → Google Drive/Docs/Sheets API
-
-aims-tools/luc/presets/real-estate-flip/
-├── preset.json                 → Field definitions (existing)
-├── formulas.json               → 19 flip formulas (existing)
-└── k1-formulas.json            → K1 tax formulas (new)
+blockwise-ai/
+├── app/                            → Next.js 14 App Router
+│   ├── page.tsx                    → Property Search & Map (home)
+│   ├── analyze/page.tsx            → Deep Neighborhood Intel
+│   ├── flip/page.tsx               → LUC Real Estate Calculator
+│   ├── k1/page.tsx                 → K1 Tax Generator
+│   ├── layout.tsx                  → Root layout (ElevenLabs + Maps providers)
+│   └── api/                        → API routes (backend)
+│       ├── search/route.ts         → Property search aggregation
+│       ├── analyze/route.ts        → Neighborhood analysis
+│       ├── export/route.ts         → Google Drive/Docs/Sheets/PDF
+│       ├── notebook/route.ts       → NotebookLM Enterprise
+│       ├── visual/route.ts         → Nano Banana Pro 2
+│       ├── k1-webhook/route.ts     → Paperform submission handler
+│       ├── chat/route.ts           → Mercury 2 chat completions
+│       └── health/route.ts         → Health check for Plug lifecycle
+│
+├── components/                     → React components
+│   ├── PropertyMap.tsx             → Google Maps canvas + pins
+│   ├── PropertyCard.tsx            → Pin click detail card
+│   ├── FilterPanel.tsx             → Search filters
+│   ├── BlockScoreCard.tsx          → Block Score (0-100) display
+│   ├── CompMap.tsx                 → Comp sales map overlay
+│   ├── NeighborhoodGrid.tsx        → 6-category intel grid
+│   ├── VerdictCard.tsx             → ACHEEVY buy/hold/pass verdict
+│   ├── FlipCalculator.tsx          → LUC flip form + results
+│   ├── SensitivityTable.tsx        → ARV scenario analysis
+│   ├── OpmCard.tsx                 → Other People's Money breakdown
+│   ├── K1Form.tsx                  → K1 input/review UI
+│   ├── K1Preview.tsx               → C1 Thesys rendered K1 doc
+│   ├── ExportMenu.tsx              → Google Docs/PDF/Sheets/Email
+│   ├── NanoBananaCard.tsx          → AI-generated visual report cards
+│   ├── ChatPanel.tsx               → ACHEEVY + ElevenLabs (right panel)
+│   └── ui/                         → ElevenLabs UI + shadcn components
+│       ├── conversation.tsx        → ElevenLabs Conversation
+│       ├── conversation-bar.tsx    → ElevenLabs ConversationBar
+│       ├── voice-button.tsx        → ElevenLabs VoiceButton
+│       ├── orb.tsx                 → ElevenLabs Orb visualizer
+│       ├── message.tsx             → ElevenLabs Message bubble
+│       ├── response.tsx            → ElevenLabs Response streaming
+│       ├── audio-player.tsx        → ElevenLabs AudioPlayer
+│       ├── transcript-viewer.tsx   → ElevenLabs TranscriptViewer
+│       └── ... (shadcn/ui components)
+│
+├── lib/                            → Shared utilities
+│   ├── types.ts                    → Blockwise type definitions
+│   ├── google-maps.ts              → Maps API client + utilities
+│   ├── neighborhood.ts             → Block Score algorithm
+│   ├── comps.ts                    → Comp analysis helpers
+│   ├── k1-formulas.ts              → K1 tax calculation engine
+│   ├── flip-formulas.ts            → LUC flip calculation engine (19 formulas)
+│   ├── mercury.ts                  → Mercury 2 LLM client (OpenAI-compatible)
+│   ├── aims-api.ts                 → A.I.M.S. API client (LUC, Evidence Locker, SDT)
+│   ├── brave-search.ts             → Brave Search API client
+│   ├── firecrawl.ts                → Firecrawl scraping client
+│   ├── notebooklm.ts               → NotebookLM Enterprise API client
+│   ├── nano-banana.ts              → Nano Banana Pro 2 image generation
+│   └── export.ts                   → Google Drive/Docs/Sheets export
+│
+├── data/                           → Static data & presets
+│   ├── flip-formulas.json          → 19 LUC flip formulas (from aims-tools)
+│   ├── k1-formulas.json            → K1 tax formulas
+│   └── state-tax-rates.json        → State income tax rates
+│
+├── Dockerfile                      → A.I.M.S. Plug container
+├── docker-compose.yml              → Local development
+├── package.json
+├── tailwind.config.ts
+├── tsconfig.json
+├── next.config.mjs
+├── .env.example
+└── CLAUDE.md                       → Project-specific Claude instructions
 ```
 
 ---
@@ -459,15 +495,20 @@ aims-tools/luc/presets/real-estate-flip/
 
 | Decision | Choice | Reasoning |
 |----------|--------|-----------|
-| Architecture | Integrated frontend | Fastest to ship, uses existing infra, LUC integration is native |
-| Map library | Google Maps JavaScript API | All Maps APIs already enabled, best place data |
+| Architecture | Standalone repo / A.I.M.S. Plug | Blockwise is a product created BY A.I.M.S., not built into it. Own repo, own deploy, connects via APIs |
+| UI framework | ElevenLabs UI component library + shadcn/ui | 17 pre-built voice-first components, modern chat UX |
+| Primary LLM | Mercury 2 (Inception Labs) | 1,000 tok/sec, $0.25/$0.75 per 1M tokens, OpenAI-compatible |
+| Fallback LLM | Claude (Anthropic) | Complex multi-step analysis, K1 generation |
+| Map library | Google Maps JavaScript API (@vis.gl/react-google-maps) | All Maps APIs already enabled, best place data |
 | Neighborhood data | 4-tier pipeline with fallback | Maximum coverage, degrades gracefully without paid APIs |
-| Flip calculator | LUC preset engine | Already implemented, 19 formulas tested |
+| Flip calculator | LUC formulas (bundled) | 19 formulas from aims-tools, bundled in repo |
 | K1 intake | Paperform | Handles validation, uploads, partial saves, mobile |
 | K1 review | C1 Thesys Generative UI | Interactive editing in chat, conversational corrections |
 | Document export | Google Drive API (HTML conversion) | Simpler than Docs API, preserves formatting |
 | Audio/Research | NotebookLM Enterprise | Audio overviews, source-grounded Q&A, shareable notebooks |
 | Visual content | Nano Banana Pro 2 (Gemini 3.1 Flash Image) | #1 text-to-image, precise text rendering for report cards and infographics |
-| Voice interface | ElevenLabs Agent SDK | Already integrated in Chat w/ ACHEEVY |
+| Voice interface | ElevenLabs Agent SDK + UI components | Voice-first with Conversation, Orb, VoiceButton, ConversationBar |
 | Video generation | Excluded (Veo 3.1) | NotebookLM audio overviews + Nano Banana visuals cover content needs |
 | Branding | LUC (not Flip Secrets) | All calculator branding is LUC Real Estate Calculator |
+| Deployment | A.I.M.S. Plug (Docker on VPS port 51000+) | Standard Plug lifecycle: provision → deploy → monitor → scale |
+| A.I.M.S. connection | External APIs (LUC, ACHEEVY, Evidence Locker, SDT) | Clean separation, Blockwise can run independently |
