@@ -173,6 +173,8 @@ The Gateway System integrates LUC as the universal calculation engine:
 6. A.I.M.S. manages services with AI — every feature must serve that mission
 7. Plug instances follow the full lifecycle: provision → deploy → monitor → scale → decommission
 8. Human-in-the-loop gates on critical paths — no unauthorized deployments, no unreviewed costs
+9. Abstract spec at `aims-skills/ABSTRACT_SPEC.md` defines roles without identity assumptions
+10. Agent-to-role mapping at `aims-skills/AIMS_ROLE_BINDINGS.md` — edit bindings, not the spec
 
 ## When Modifying ACHEEVY Behavior
 1. Read `aims-skills/ACHEEVY_BRAIN.md` first

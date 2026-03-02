@@ -1,100 +1,108 @@
-# A.I.M.S. — AI Managed Solutions
+A.I.M.S. is an AI-orchestrated Platform-as-a-Service where ACHEEVY manages the full lifecycle of containerized services — from provisioning to monitoring to decommissioning — with human-in-the-loop gates on critical paths.
 
 ## Commands
 
 ```bash
-# Frontend build
-cd frontend && npm run build
+# Frontend
+cd frontend && npm run build        # Build check (MUST pass before shipping)
+cd frontend && npm run dev          # Dev server on :3000
 
-# Backend build
-cd backend/uef-gateway && npm run build
+# Backend
+cd backend/uef-gateway && npm run build   # Gateway build check
+cd backend/uef-gateway && npm run dev     # Dev server on :3001
 
-# Skills/hooks tests
-cd aims-skills && npm test
+# Skills & Hooks
+cd aims-skills && npm test          # Unit tests for hooks, skills, tasks
 
-# Deploy (VPS)
+# Deploy (VPS only — never Vercel/Netlify)
 ./deploy.sh --domain plugmein.cloud --landing-domain aimanagedsolutions.cloud
 ```
 
 ## Architecture
 
-A.I.M.S. is an AI-orchestrated Platform-as-a-Service. Users deploy containers, stacks, and full environments through **ACHEEVY** (the AI orchestrator). The Plug System handles one-click provisioning, monitoring, scaling, and decommissioning.
-
 | Layer | Tech | Location |
 |-------|------|----------|
 | Frontend | Next.js 14 (App Router) | `frontend/` |
-| API Gateway | Express (UEF Gateway) | `backend/uef-gateway/` |
+| API Gateway | Hono.js (UEF Gateway) | `backend/uef-gateway/` |
 | AI Orchestrator | ACHEEVY service | `backend/acheevy/` |
 | Skills Engine | Hooks, tasks, skills, verticals | `aims-skills/` |
+| Chain of Command | Role cards + enforcement engine | `aims-skills/chain-of-command/` |
+| Plug Engine | Container provisioning & lifecycle | Port 51000+ range |
 | Infra | Docker Compose + nginx | `infra/`, `deploy.sh` |
-| Creative Engine | NtNtN — NLP build intent pipeline | `aims-skills/ntntn-engine/` |
 | AI Inference | NVIDIA Nemotron on GCP Vertex AI | via `PERSONAPLEX_ENDPOINT` |
 
-### Key Services (Docker, VPS: 76.13.96.107)
+### VPS Services (76.13.96.107)
 
-nginx, frontend, demo-frontend, uef-gateway, house-of-ang, acheevy, redis, agent-bridge, chickenhawk-core, circuit-metrics, ii-agent, ii-agent-postgres, ii-agent-tools, ii-agent-sandbox
+nginx, frontend, uef-gateway, acheevy, redis, agent-bridge, chickenhawk-core, circuit-metrics, ii-agent
 
-### Plug Instances (dynamic)
+### Agent Hierarchy
 
-User-deployed containers on port 51000+ with auto-allocated nginx reverse proxy, health checks, and lifecycle management.
+```
+ACHEEVY (Executive Orchestrator)
+  → Boomer_Angs (Managers — own objectives, supervise below)
+    → Chicken Hawk (Coordinator — dispatches, enforces SOP)
+      → Lil_Hawks (Workers — execute tasks, ship artifacts)
+```
 
-## Conventions
+See `aims-skills/ABSTRACT_SPEC.md` for the identity-free role-based specification.
+See `aims-skills/AIMS_ROLE_BINDINGS.md` for agent-to-role mapping.
 
-### Code Style
-- TypeScript everywhere (frontend + backend)
+## Code Style
+
+- TypeScript everywhere (frontend + backend + skills)
 - Next.js App Router patterns (`app/` directory)
 - Tailwind CSS for styling
-- Framer Motion for animations — use tokens from `frontend/lib/motion/tokens.ts`, never hard-code durations/easings
+- Framer Motion for animations — import tokens from `frontend/lib/motion/tokens.ts`
+- Skills follow Microsoft Skills format: `skills/<name>/SKILL.md` + `references/`
+- Hooks follow trigger/pre_gsd/post_gsd/stitch_design lifecycle
 
-### Key Rules
-1. All external access through UEF Gateway — no direct service exposure
-2. Only ACHEEVY speaks to users — never expose internal agent names (Boomer_Ang, Lil_Hawk, Chicken Hawk) in customer-facing UI
-3. Every animation MUST respect `prefers-reduced-motion`
-4. Human-in-the-loop gates on destructive actions (deploy, scale, decommission)
-5. Auth roles: `OWNER`, `ADMIN`, `CUSTOMER`, `DEMO_USER` — never use "MEMBER" or "USER"
+✅ **Good:**
+```typescript
+import { DURATION, EASING } from '@/lib/motion/tokens';
+const fadeIn = { duration: DURATION.normal, ease: EASING.smooth };
+```
 
-### Dual-Mode UI
-- **PRIVATE** (Owner/Admin): Full technical vocabulary, all agents visible
-- **PUBLIC** (Customer): Simplified UI, plain language, no agent names
+❌ **Bad:**
+```typescript
+const fadeIn = { duration: 0.3, ease: [0.4, 0, 0.2, 1] }; // magic numbers
+```
 
-Use `usePlatformMode()` from `frontend/lib/platform-mode.tsx` and `t(key, mode)` from `frontend/lib/terminology.ts`.
+## Boundaries
 
-## Design System
+### ✅ Always
+- Route all external access through UEF Gateway
+- Run `npm run build` before considering frontend work complete
+- Enforce evidence gates — no proof, no done
+- Use `usePlatformMode()` for dual OWNER/CUSTOMER UI
+- Follow the chain of command — ACHEEVY → Boomer_Ang → Chicken Hawk → Lil_Hawks
+- Every animation MUST respect `prefers-reduced-motion`
 
-### Motion Components (`frontend/components/motion/`)
-ScrollReveal, ParallaxSection, TiltCard, TypeReveal, ScrollProgress, GlowBorder, BentoGrid
+### ⚠️ Ask First
+- Deploy, scale, or decommission any service
+- Changes to `infra/docker-compose.prod.yml`
+- Modifications to role cards or chain-of-command policies
+- Any action visible to external users (push, PR, message)
 
-### Animation Tokens (`frontend/lib/motion/tokens.ts`)
-Durations, easing curves, spring configs, stagger values, scroll presets — import these instead of writing magic numbers.
-
-### Page Archetype Skills (`.claude/skills/aims-*-ui/`)
-Each page type has a design skill file. Match route to archetype:
-- Landing pages → `aims-landing-ui` + `aims-animated-web`
-- Auth/onboarding → `aims-auth-onboarding-ui`
-- Chat → `aims-chat-ui`
-- Dashboard → `aims-command-center-ui`
-- HalalHub → `aims-landing-ui` (emerald variant)
-
-## Testing
-
-Always run `cd frontend && npm run build` before considering frontend work complete.
-
-Backend: `cd backend/uef-gateway && npm run build`
-
-## PR Instructions
-
-- Review diffs carefully when merging branches from external agents (Gemini/Antigravity have caused destructive changes before)
-- This is **proprietary software** — never add MIT/Apache/GPL headers to A.I.M.S. code files
-- Exception: `backend/ii-agent/` is a third-party fork with its own MIT license
-- Never commit API keys, passwords, or session tokens
-- Use Prisma v5 CLI (`npx prisma@5 generate`) — Prisma v7 has breaking changes
+### 🚫 Never
+- Expose internal agent names (Boomer_Ang, Lil_Hawk, Chicken Hawk) to customers
+- Add MIT/Apache/GPL headers to A.I.M.S. code (proprietary)
+- Commit API keys, passwords, or session tokens
+- Add Vercel, Netlify, or other PaaS-specific code paths
+- Skip hooks (`--no-verify`) or bypass signing
+- Use `docker-compose` v1 syntax (use `docker compose` v2)
 
 ## Key Files
 
-- `CLAUDE.md` — Extended instructions (Claude Code specific)
-- `AIMS_PLAN.md` — Full SOP, PRD, implementation roadmap
-- `aims-skills/ACHEEVY_BRAIN.md` — ACHEEVY behavior source of truth
-- `frontend/lib/platform-mode.tsx` — Dual OWNER/CUSTOMER context
-- `frontend/lib/terminology.ts` — Mode-aware label translations
-- `infra/docker-compose.prod.yml` — Production service definitions
-- `deploy.sh` — VPS deployment script
+| File | Purpose |
+|------|---------|
+| `CLAUDE.md` | Claude Code-specific instructions (extended) |
+| `AGENTS.md` | This file — cross-agent entry point |
+| `aims-skills/ACHEEVY_BRAIN.md` | ACHEEVY behavior source of truth |
+| `aims-skills/ABSTRACT_SPEC.md` | Abstract role-based spec (no identity assumptions) |
+| `aims-skills/AIMS_ROLE_BINDINGS.md` | Concrete agent → role mapping |
+| `aims-skills/sops/` | Standard Operating Procedures (SOP-01 through SOP-04) |
+| `aims-skills/chain-of-command/` | Role cards + enforcement engine |
+| `aims-skills/tools/TOOL_MCP_REGISTRY.md` | Consolidated tool & MCP registry |
+| `frontend/lib/platform-mode.tsx` | Dual OWNER/CUSTOMER context |
+| `infra/docker-compose.prod.yml` | Production service definitions |
+| `deploy.sh` | VPS deployment script |

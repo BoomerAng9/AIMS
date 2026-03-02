@@ -1,0 +1,165 @@
+{
+  "version": "1.0.0",
+  "formulas": [
+    {
+      "id": "contingencyAmount",
+      "name": "Contingency Amount",
+      "description": "Buffer for unexpected costs",
+      "inputs": ["repairCosts", "contingencyPercent"],
+      "expression": "repairCosts * (contingencyPercent / 100)",
+      "outputType": "currency"
+    },
+    {
+      "id": "totalRepairCosts",
+      "name": "Total Repair Costs",
+      "description": "Repairs plus contingency",
+      "inputs": ["repairCosts", "contingencyAmount"],
+      "expression": "repairCosts + contingencyAmount",
+      "outputType": "currency"
+    },
+    {
+      "id": "purchaseClosingCosts",
+      "name": "Purchase Closing Costs",
+      "description": "Closing costs on purchase",
+      "inputs": ["purchasePrice", "purchaseClosingCostPercent"],
+      "expression": "purchasePrice * (purchaseClosingCostPercent / 100)",
+      "outputType": "currency"
+    },
+    {
+      "id": "loanAmount",
+      "name": "Loan Amount",
+      "description": "Amount financed",
+      "inputs": ["purchasePrice", "loanToValue"],
+      "expression": "purchasePrice * (loanToValue / 100)",
+      "outputType": "currency"
+    },
+    {
+      "id": "loanPointsCost",
+      "name": "Loan Points Cost",
+      "description": "Cost of loan origination points",
+      "inputs": ["loanAmount", "loanPoints"],
+      "expression": "loanAmount * (loanPoints / 100)",
+      "outputType": "currency"
+    },
+    {
+      "id": "monthlyInterest",
+      "name": "Monthly Interest Cost",
+      "description": "Monthly interest on loan",
+      "inputs": ["loanAmount", "interestRate"],
+      "expression": "loanAmount * (interestRate / 100 / 12)",
+      "outputType": "currency"
+    },
+    {
+      "id": "totalInterestCost",
+      "name": "Total Interest Cost",
+      "description": "Total interest over holding period",
+      "inputs": ["monthlyInterest", "holdingPeriodMonths"],
+      "expression": "monthlyInterest * holdingPeriodMonths",
+      "outputType": "currency"
+    },
+    {
+      "id": "totalFinancingCosts",
+      "name": "Total Financing Costs",
+      "description": "Points plus interest",
+      "inputs": ["loanPointsCost", "totalInterestCost"],
+      "expression": "loanPointsCost + totalInterestCost",
+      "outputType": "currency"
+    },
+    {
+      "id": "totalHoldingCosts",
+      "name": "Total Holding Costs",
+      "description": "Monthly costs over holding period",
+      "inputs": ["monthlyHoldingCosts", "holdingPeriodMonths"],
+      "expression": "monthlyHoldingCosts * holdingPeriodMonths",
+      "outputType": "currency"
+    },
+    {
+      "id": "saleClosingCosts",
+      "name": "Sale Closing Costs",
+      "description": "Closing costs on sale",
+      "inputs": ["arv", "saleClosingCostPercent"],
+      "expression": "arv * (saleClosingCostPercent / 100)",
+      "outputType": "currency"
+    },
+    {
+      "id": "realtorCommission",
+      "name": "Realtor Commission",
+      "description": "Real estate agent fees",
+      "inputs": ["arv", "realtorCommissionPercent"],
+      "expression": "arv * (realtorCommissionPercent / 100)",
+      "outputType": "currency"
+    },
+    {
+      "id": "totalSellingCosts",
+      "name": "Total Selling Costs",
+      "description": "All costs to sell",
+      "inputs": ["saleClosingCosts", "realtorCommission"],
+      "expression": "saleClosingCosts + realtorCommission",
+      "outputType": "currency"
+    },
+    {
+      "id": "totalInvestment",
+      "name": "Total Investment",
+      "description": "All capital required before sale",
+      "inputs": ["purchasePrice", "purchaseClosingCosts", "totalRepairCosts"],
+      "expression": "purchasePrice + purchaseClosingCosts + totalRepairCosts",
+      "outputType": "currency"
+    },
+    {
+      "id": "cashRequired",
+      "name": "Cash Required",
+      "description": "Actual cash out of pocket",
+      "inputs": ["totalInvestment", "loanAmount", "totalFinancingCosts", "totalHoldingCosts"],
+      "expression": "(totalInvestment - loanAmount) + totalFinancingCosts + totalHoldingCosts",
+      "outputType": "currency"
+    },
+    {
+      "id": "totalCosts",
+      "name": "Total Project Costs",
+      "description": "All costs including sale",
+      "inputs": ["totalInvestment", "totalFinancingCosts", "totalHoldingCosts", "totalSellingCosts"],
+      "expression": "totalInvestment + totalFinancingCosts + totalHoldingCosts + totalSellingCosts",
+      "outputType": "currency"
+    },
+    {
+      "id": "profit",
+      "name": "Net Profit",
+      "description": "Sale price minus all costs",
+      "inputs": ["arv", "totalCosts"],
+      "expression": "arv - totalCosts",
+      "outputType": "currency"
+    },
+    {
+      "id": "roi",
+      "name": "ROI",
+      "description": "Return on total investment",
+      "inputs": ["profit", "totalInvestment"],
+      "expression": "totalInvestment > 0 ? (profit / totalInvestment) * 100 : 0",
+      "outputType": "percentage"
+    },
+    {
+      "id": "cashOnCashReturn",
+      "name": "Cash-on-Cash Return",
+      "description": "Return on actual cash invested",
+      "inputs": ["profit", "cashRequired"],
+      "expression": "cashRequired > 0 ? (profit / cashRequired) * 100 : 0",
+      "outputType": "percentage"
+    },
+    {
+      "id": "maxOffer",
+      "name": "Maximum Offer Price",
+      "description": "70% of ARV minus repairs (70% rule)",
+      "inputs": ["arv", "totalRepairCosts"],
+      "expression": "(arv * 0.70) - totalRepairCosts",
+      "outputType": "currency"
+    },
+    {
+      "id": "dealStatus",
+      "name": "Deal Status",
+      "description": "Quick assessment",
+      "inputs": ["roi", "cashOnCashReturn"],
+      "expression": "roi >= 20 ? 'Excellent Deal' : roi >= 15 ? 'Good Deal' : roi >= 10 ? 'Marginal Deal' : 'Pass'",
+      "outputType": "string"
+    }
+  ]
+}
