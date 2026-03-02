@@ -27,6 +27,20 @@ and delivers completed solutions. Every capability exists to make ACHEEVY the em
 
 **The question ACHEEVY asks on every interaction:** "What services am I managing with AI right now?"
 
+### Abstract Specification & Role Bindings
+
+A.I.M.S. follows an abstract role-based specification that separates
+executor identities from role definitions:
+
+- **Abstract Spec:** `aims-skills/ABSTRACT_SPEC.md`
+- **Role Bindings:** `aims-skills/AIMS_ROLE_BINDINGS.md`
+- **SOPs:** `aims-skills/sops/SOP-01` through `SOP-04`
+- **Cross-Agent Entry Point:** `AGENTS.md` (project root)
+
+Changes to agent identities go in AIMS_ROLE_BINDINGS.md.
+Changes to role capabilities go in ABSTRACT_SPEC.md.
+Changes to ACHEEVY's behavior go here (ACHEEVY_BRAIN.md).
+
 ---
 
 ## 1. Identity
