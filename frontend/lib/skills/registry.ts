@@ -147,6 +147,19 @@ export const SKILL_REGISTRY: SkillDefinition[] = [
     icon: "clipboard-check",
     color: "emerald",
   },
+  {
+    id: "agentic-design-system",
+    name: "Agentic Design System",
+    type: "skill",
+    status: "active",
+    triggers: ["agentic ui", "agentic design", "design system", "chat component", "agent card", "streaming text", "chat input", "message list", "badge", "toast", "agent interface", "ui component", "design tokens", "theme bridge"],
+    description: "Enterprise-grade AI agent UI components (agentic-ui) with obsidian/gold theme bridge, three-tier token architecture, and RAG-backed design best practices.",
+    execution: { target: "internal" },
+    priority: "critical",
+    definitionFile: "aims-skills/skills/agentic-design-system/SKILL.md",
+    icon: "component",
+    color: "amber",
+  },
   // ── ACHEEVY REVENUE VERTICALS (Phase 3.5) ────────────────────
   // NLP-triggered business builder verticals with R-R-S execution
   {

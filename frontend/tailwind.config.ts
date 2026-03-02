@@ -3,6 +3,7 @@ module.exports = {
   content: [
     './app/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',
+    './node_modules/agentic-ui/dist/**/*.{js,mjs,jsx}',
   ],
   theme: {
     extend: {

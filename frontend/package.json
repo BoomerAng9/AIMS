@@ -33,6 +33,7 @@
     "@remotion/transitions": "^4.0.0",
     "@remotion/zod-types": "^4.0.0",
     "@types/three": "^0.169.0",
+    "agentic-ui": "^0.4.0",
     "ai": "^3.4.33",
     "bcryptjs": "^3.0.3",
     "class-variance-authority": "^0.7.1",

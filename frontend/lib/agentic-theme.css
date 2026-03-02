@@ -1,0 +1,280 @@
+/*
+ * Agentic UI → A.I.M.S. Dark Theme Override
+ *
+ * Scoped under .aims-agentic so it only affects agentic-ui components.
+ * Maps light-theme Tailwind classes to A.I.M.S. obsidian/gold/glass tokens.
+ */
+
+/* ── Surface overrides ─────────────────────────────────────── */
+.aims-agentic .bg-white {
+  background-color: #18181B !important; /* surface-raised */
+}
+
+.aims-agentic .bg-gray-50 {
+  background-color: #111113 !important; /* surface */
+}
+
+.aims-agentic .bg-gray-100 {
+  background-color: #1F1F23 !important; /* surface-elevated */
+}
+
+.aims-agentic .bg-gray-200\/60 {
+  background-color: rgba(39, 39, 42, 0.6) !important; /* gunmetal/60 */
+}
+
+.aims-agentic .bg-gray-700 {
+  background-color: #27272A !important; /* gunmetal */
+}
+
+.aims-agentic .bg-gray-800 {
+  background-color: #18181B !important;
+}
+
+/* ── Border overrides ──────────────────────────────────────── */
+.aims-agentic .border-gray-100,
+.aims-agentic .border-gray-200,
+.aims-agentic .border-gray-300 {
+  border-color: rgba(255, 255, 255, 0.08) !important; /* wireframe-stroke */
+}
+
+.aims-agentic .border-gray-400 {
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+.aims-agentic .border-gray-600 {
+  border-color: rgba(255, 255, 255, 0.15) !important; /* wireframe-hover */
+}
+
+/* Gold accent borders instead of blue */
+.aims-agentic .border-blue-200,
+.aims-agentic .border-blue-300 {
+  border-color: rgba(217, 119, 6, 0.2) !important; /* gold/20 */
+}
+
+.aims-agentic .border-blue-400,
+.aims-agentic .border-blue-500 {
+  border-color: rgba(217, 119, 6, 0.4) !important; /* gold/40 */
+}
+
+.aims-agentic .border-blue-700 {
+  border-color: rgba(217, 119, 6, 0.6) !important;
+}
+
+/* ── Text overrides ────────────────────────────────────────── */
+.aims-agentic .text-gray-300 {
+  color: #A1A1AA !important; /* muted */
+}
+
+.aims-agentic .text-gray-400 {
+  color: #A1A1AA !important; /* muted */
+}
+
+.aims-agentic .text-gray-500 {
+  color: #A1A1AA !important; /* muted */
+}
+
+.aims-agentic .text-gray-600 {
+  color: #A1A1AA !important; /* muted */
+}
+
+.aims-agentic .text-gray-700 {
+  color: #E4E4E7 !important; /* zinc-200 */
+}
+
+.aims-agentic .text-gray-800 {
+  color: #FAFAFA !important; /* frosty-white */
+}
+
+.aims-agentic .text-gray-100,
+.aims-agentic .text-gray-200 {
+  color: #FAFAFA !important; /* frosty-white */
+}
+
+/* Blue → Gold accent text */
+.aims-agentic .text-blue-500,
+.aims-agentic .text-blue-600 {
+  color: #D97706 !important; /* gold */
+}
+
+.aims-agentic .text-blue-700,
+.aims-agentic .text-blue-800 {
+  color: #F59E0B !important; /* gold-light */
+}
+
+/* ── Blue accent surfaces → Gold ───────────────────────────── */
+.aims-agentic .bg-blue-50 {
+  background-color: rgba(217, 119, 6, 0.08) !important; /* gold-dim */
+}
+
+.aims-agentic .bg-blue-100 {
+  background-color: rgba(217, 119, 6, 0.12) !important;
+}
+
+.aims-agentic .bg-blue-200\/60 {
+  background-color: rgba(217, 119, 6, 0.15) !important;
+}
+
+.aims-agentic .bg-blue-500 {
+  background-color: #D97706 !important; /* gold */
+}
+
+.aims-agentic .bg-blue-600 {
+  background-color: #B45309 !important; /* gold-dark */
+}
+
+.aims-agentic .bg-blue-700 {
+  background-color: #B45309 !important;
+}
+
+.aims-agentic .bg-blue-900 {
+  background-color: rgba(217, 119, 6, 0.15) !important;
+}
+
+/* ── Green signals (keep but darken backgrounds) ───────────── */
+.aims-agentic .bg-green-50 {
+  background-color: rgba(34, 197, 94, 0.08) !important;
+}
+
+.aims-agentic .bg-green-100 {
+  background-color: rgba(34, 197, 94, 0.12) !important;
+}
+
+.aims-agentic .bg-green-200\/60 {
+  background-color: rgba(34, 197, 94, 0.15) !important;
+}
+
+.aims-agentic .border-green-200,
+.aims-agentic .border-green-300 {
+  border-color: rgba(34, 197, 94, 0.2) !important;
+}
+
+.aims-agentic .text-green-700,
+.aims-agentic .text-green-800 {
+  color: #22C55E !important; /* signal-green */
+}
+
+/* ── Red signals ───────────────────────────────────────────── */
+.aims-agentic .bg-red-50 {
+  background-color: rgba(239, 68, 68, 0.08) !important;
+}
+
+.aims-agentic .border-red-200,
+.aims-agentic .border-red-300 {
+  border-color: rgba(239, 68, 68, 0.2) !important;
+}
+
+.aims-agentic .text-red-700,
+.aims-agentic .text-red-800 {
+  color: #EF4444 !important; /* signal-red */
+}
+
+/* ── Purple signals ────────────────────────────────────────── */
+.aims-agentic .bg-purple-50 {
+  background-color: rgba(168, 85, 247, 0.08) !important;
+}
+
+.aims-agentic .bg-purple-100 {
+  background-color: rgba(168, 85, 247, 0.12) !important;
+}
+
+.aims-agentic .border-purple-200,
+.aims-agentic .border-purple-300 {
+  border-color: rgba(168, 85, 247, 0.2) !important;
+}
+
+.aims-agentic .text-purple-700,
+.aims-agentic .text-purple-800 {
+  color: #A855F7 !important;
+}
+
+/* ── Yellow/Orange signals ─────────────────────────────────── */
+.aims-agentic .bg-yellow-50 {
+  background-color: rgba(245, 158, 11, 0.08) !important;
+}
+
+.aims-agentic .bg-orange-50 {
+  background-color: rgba(245, 158, 11, 0.08) !important;
+}
+
+.aims-agentic .border-yellow-200,
+.aims-agentic .border-yellow-300 {
+  border-color: rgba(245, 158, 11, 0.2) !important;
+}
+
+/* ── Black background override ─────────────────────────────── */
+.aims-agentic .bg-black {
+  background-color: #D97706 !important; /* gold primary buttons */
+}
+
+/* ── Focus ring → Gold ─────────────────────────────────────── */
+.aims-agentic .ring-blue-500,
+.aims-agentic .focus\:ring-blue-500:focus {
+  --tw-ring-color: rgba(217, 119, 6, 0.5) !important;
+}
+
+/* ── Placeholder text ──────────────────────────────────────── */
+.aims-agentic textarea::placeholder,
+.aims-agentic input::placeholder {
+  color: #71717A !important; /* zinc-500 */
+}
+
+/* ── Scrollbar styling ─────────────────────────────────────── */
+.aims-agentic ::-webkit-scrollbar {
+  width: 6px;
+}
+
+.aims-agentic ::-webkit-scrollbar-track {
+  background: #111113;
+}
+
+.aims-agentic ::-webkit-scrollbar-thumb {
+  background: #27272A;
+  border-radius: 3px;
+}
+
+.aims-agentic ::-webkit-scrollbar-thumb:hover {
+  background: #3F3F46;
+}
+
+/* ── Glass panel effect for main containers ────────────────── */
+.aims-agentic > div {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* ── Search menu / dropdown overrides ──────────────────────── */
+.aims-agentic [role="menu"],
+.aims-agentic [role="listbox"],
+.aims-agentic [data-state="open"] {
+  background-color: #18181B !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* ── Hover states ──────────────────────────────────────────── */
+.aims-agentic .hover\:bg-gray-50:hover {
+  background-color: #1F1F23 !important;
+}
+
+.aims-agentic .hover\:bg-gray-100:hover {
+  background-color: #27272A !important;
+}
+
+.aims-agentic .hover\:bg-blue-50:hover {
+  background-color: rgba(217, 119, 6, 0.08) !important;
+}
+
+.aims-agentic .hover\:bg-blue-600:hover {
+  background-color: #B45309 !important;
+}
+
+.aims-agentic .hover\:bg-gray-800:hover {
+  background-color: #27272A !important;
+}
+
+.aims-agentic .hover\:text-red-500:hover {
+  color: #EF4444 !important;
+}
+
+.aims-agentic .hover\:border-gray-300:hover {
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
