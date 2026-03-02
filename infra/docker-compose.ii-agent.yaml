@@ -1,0 +1,155 @@
+# =============================================================================
+# II-Agent Overlay for A.I.M.S. (Same-VPS Deployment)
+# =============================================================================
+#
+# This overlay adds ii-agent and its dependencies to the AIMS stack.
+# ii-agent is ACHEEVY's autonomous execution engine — it writes code,
+# runs research, builds apps, and automates browser tasks.
+#
+# Usage (from project root):
+#   docker compose -f infra/docker-compose.prod.yml -f infra/docker-compose.ii-agent.yaml up -d
+#
+# Or with deploy.sh (after adding --ii-agent flag support):
+#   ./deploy.sh --domain plugmein.cloud --ii-agent
+#
+# Prerequisites:
+#   1. Copy infra/.env.ii-agent.example → infra/.env.ii-agent
+#   2. Fill in ANTHROPIC_API_KEY (required) and OPENROUTER_API_KEY
+#   3. Generate a strong II_AGENT_DB_PASSWORD
+#
+# The overlay joins the aims-network so UEF Gateway can reach ii-agent
+# at http://ii-agent:8000 (the default II_AGENT_HTTP_URL).
+# =============================================================================
+
+services:
+  # ---------------------------------------------------------------------------
+  # II-Agent Backend (Autonomous Execution Engine)
+  # ---------------------------------------------------------------------------
+  ii-agent:
+    image: ghcr.io/intelligentinternet/ii-agent:latest
+    container_name: aims-ii-agent
+    expose:
+      - "8000"
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - DATABASE_URL=postgresql://${II_AGENT_DB_USER:-iiagent}:${II_AGENT_DB_PASSWORD}@ii-agent-postgres:5432/${II_AGENT_DB_NAME:-iiagentdev}
+      - SANDBOX_DATABASE_URL=postgresql://${II_AGENT_DB_USER:-iiagent}:${II_AGENT_DB_PASSWORD}@ii-agent-postgres:5432/${II_AGENT_DB_NAME:-iiagentdev}_sandbox
+      - TOOL_SERVER_URL=http://ii-agent-tools:1236
+      - SANDBOX_URL=http://ii-agent-sandbox:8100
+      - E2B_API_KEY=${E2B_API_KEY:-}
+      - PORT=8000
+      - NODE_ENV=production
+    depends_on:
+      ii-agent-postgres:
+        condition: service_healthy
+      ii-agent-tools:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://127.0.0.1:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    networks:
+      - aims-network
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 512M
+
+  # ---------------------------------------------------------------------------
+  # II-Agent PostgreSQL (Task Persistence)
+  # ---------------------------------------------------------------------------
+  ii-agent-postgres:
+    image: postgres:16-alpine
+    container_name: aims-ii-agent-postgres
+    expose:
+      - "5432"
+    environment:
+      - POSTGRES_USER=${II_AGENT_DB_USER:-iiagent}
+      - POSTGRES_PASSWORD=${II_AGENT_DB_PASSWORD}
+      - POSTGRES_DB=${II_AGENT_DB_NAME:-iiagentdev}
+    volumes:
+      - ii-agent-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${II_AGENT_DB_USER:-iiagent}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - aims-network
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+
+  # ---------------------------------------------------------------------------
+  # II-Agent Tool Server (File ops, code execution, web search)
+  # ---------------------------------------------------------------------------
+  ii-agent-tools:
+    image: ghcr.io/intelligentinternet/ii-agent-tools:latest
+    container_name: aims-ii-agent-tools
+    expose:
+      - "1236"
+    environment:
+      - PORT=1236
+      - BRAVE_API_KEY=${BRAVE_API_KEY:-}
+      - SERPER_API_KEY=${SERPER_API_KEY:-}
+      - TAVILY_API_KEY=${TAVILY_API_KEY:-}
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://127.0.0.1:1236/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
+    networks:
+      - aims-network
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+
+  # ---------------------------------------------------------------------------
+  # II-Agent Sandbox (Isolated Python Execution)
+  # ---------------------------------------------------------------------------
+  ii-agent-sandbox:
+    image: ghcr.io/intelligentinternet/ii-agent-sandbox:latest
+    container_name: aims-ii-agent-sandbox
+    expose:
+      - "8100"
+    environment:
+      - PORT=8100
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://127.0.0.1:8100/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
+    networks:
+      - sandbox-network
+      - aims-network
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+
+volumes:
+  ii-agent-pgdata:
