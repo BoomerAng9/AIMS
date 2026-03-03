@@ -68,7 +68,15 @@ export function useVoiceInput(options: UseVoiceInputOptions = {}): UseVoiceInput
     const updateLevel = () => {
       if (analyserRef.current) {
         analyserRef.current.getByteFrequencyData(dataArray);
-        const average = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
+
+        // Use a for loop instead of .reduce() on Uint8Array for performance in 60fps loop
+        let sum = 0;
+        const len = dataArray.length;
+        for (let i = 0; i < len; i++) {
+          sum += dataArray[i];
+        }
+
+        const average = sum / len;
         setAudioLevel(average / 255); // Normalize to 0-1
         animationFrameRef.current = requestAnimationFrame(updateLevel);
       }

@@ -45,9 +45,14 @@ export const VoiceVisualizer = memo(function VoiceVisualizer({ stream, isListeni
     const draw = () => {
       analyser.getByteFrequencyData(dataArray);
 
-      // Calculate average volume for the "bouncing arch" effect
-      const sum = dataArray.reduce((a, b) => a + b, 0);
-      const average = sum / dataArray.length;
+      // Calculate average volume for the "bouncing arch" effect using a fast for loop (60fps optimized)
+      let sum = 0;
+      const len = dataArray.length;
+      for (let i = 0; i < len; i++) {
+        sum += dataArray[i];
+      }
+
+      const average = sum / len;
       const audioLevel = average / 255;
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
