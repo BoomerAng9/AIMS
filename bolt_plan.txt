@@ -1,0 +1,5 @@
+1. We will wrap the `MessageBubble` component in `React.memo` in `frontend/app/chat/page.tsx`.
+2. This is a common React performance optimization, particularly for lists of components like chat messages, because it prevents re-rendering all messages when only a new one is added or streaming updates the last one.
+3. We will modify the imports to import `memo` from `'react'`.
+4. We will modify the component definition to use `const MessageBubble = memo(function MessageBubble(...) { ... })`.
+5. We will verify the changes pass the build.

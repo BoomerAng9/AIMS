@@ -235,7 +235,6 @@ export function ChatShell({
           </div>
           <div>
             <h1 className="text-sm font-semibold text-slate-800 tracking-wide">
-            <h1 className="text-xl font-semibold text-zinc-100 font-display tracking-wider">
               ACHEEVY
             </h1>
             <ConnectionBadge

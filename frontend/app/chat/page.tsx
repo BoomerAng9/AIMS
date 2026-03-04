@@ -17,7 +17,7 @@
  */
 
 import { useChat } from 'ai/react';
-import { useState, useRef, useEffect, useCallback, Suspense } from 'react';
+import { useState, useRef, useEffect, useCallback, Suspense, memo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
@@ -213,7 +213,7 @@ function VoiceSelector({ voiceId, provider, onSelect }: {
 // Message Bubble (Glass Panel)
 // ─────────────────────────────────────────────────────────────
 
-function MessageBubble({ role, content, isStreaming }: {
+const MessageBubble = memo(function MessageBubble({ role, content, isStreaming }: {
   role: string;
   content: string;
   isStreaming?: boolean;
@@ -281,7 +281,7 @@ function MessageBubble({ role, content, isStreaming }: {
       </div>
     </motion.div>
   );
-}
+});
 
 // ─────────────────────────────────────────────────────────────
 // Threads Sidebar

@@ -158,7 +158,7 @@ export const WireframePlugDisplay = () => {
                                         {plug.name}
                                     </h3>
                                     <p className="text-xs font-mono text-zinc-500 mt-1 uppercase">
-                                        {plug.type} // {plug.id}
+                                        {plug.type} {'//'} {plug.id}
                                     </p>
                                 </div>
                             </div>
