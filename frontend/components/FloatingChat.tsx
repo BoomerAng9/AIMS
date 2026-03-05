@@ -43,7 +43,7 @@ export default function FloatingChat() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-slate-50/80 backdrop-blur-sm sm:bg-slate-50/60"
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm sm:bg-black/40"
               onClick={() => setOpen(false)}
             />
 
@@ -53,13 +53,13 @@ export default function FloatingChat() {
               initial="hidden"
               animate="visible"
               exit="exit"
-              className="relative z-10 flex flex-col w-full sm:w-[540px] h-full sm:h-[750px] sm:max-h-[90vh] sm:rounded-2xl overflow-hidden border-0 sm:border border-wireframe-stroke bg-white shadow-2xl shadow-black/60"
+              className="relative z-10 flex flex-col w-full sm:w-[540px] h-full sm:h-[750px] sm:max-h-[90vh] sm:rounded-2xl overflow-hidden border-0 sm:border border-wireframe-stroke bg-[#111113] shadow-2xl shadow-black/60"
             >
               {/* Console Header */}
-              <div className="flex items-center justify-between px-4 py-3 border-b border-wireframe-stroke bg-white/80 backdrop-blur-xl">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-wireframe-stroke bg-[#111113]/90 backdrop-blur-xl">
                 <div className="flex items-center gap-3">
                   <div className="relative">
-                    <div className="w-8 h-8 rounded-lg bg-slate-50 border border-gold/20 flex items-center justify-center overflow-hidden">
+                    <div className="w-8 h-8 rounded-lg bg-gold/10 border border-gold/20 flex items-center justify-center overflow-hidden">
                       <Image
                         src="/images/acheevy/acheevy-helmet.png"
                         alt="ACHEEVY"
@@ -68,10 +68,10 @@ export default function FloatingChat() {
                         className="object-contain"
                       />
                     </div>
-                    <div className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-400 border border-white animate-pulse" />
+                    <div className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-400 border border-[#111113] animate-pulse" />
                   </div>
                   <div>
-                    <span className="text-base font-semibold text-slate-800 tracking-wide">
+                    <span className="text-base font-semibold text-zinc-100 tracking-wide">
                       {mode === 'chat' ? 'Chat w/ACHEEVY' : 'ACHEEVY Voice'}
                     </span>
                     <div className="flex items-center gap-1 text-xs text-emerald-400/80 font-mono uppercase tracking-widest">
@@ -88,7 +88,7 @@ export default function FloatingChat() {
                     className={`p-2 rounded-lg transition-all ${
                       mode === 'voice'
                         ? 'text-gold bg-gold/10 border border-gold/20'
-                        : 'text-slate-400 hover:text-slate-600 border border-transparent hover:border-wireframe-stroke'
+                        : 'text-zinc-400 hover:text-zinc-200 border border-transparent hover:border-wireframe-stroke'
                     }`}
                   >
                     <Mic size={16} />
@@ -96,7 +96,7 @@ export default function FloatingChat() {
                   <button
                     onClick={() => setOpen(false)}
                     aria-label="Close Console"
-                    className="p-2 rounded-lg text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-all border border-transparent hover:border-wireframe-stroke"
+                    className="p-2 rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-white/10 transition-all border border-transparent hover:border-wireframe-stroke"
                   >
                     <X size={16} />
                   </button>
@@ -126,7 +126,7 @@ export default function FloatingChat() {
             <button
               type="button"
               onClick={() => setOpen(true)}
-              className="group flex items-center gap-3 px-4 py-3 rounded-2xl bg-white/95 border border-wireframe-stroke hover:border-gold/30 backdrop-blur-xl shadow-2xl shadow-black/40 transition-all hover:shadow-[0_0_30px_rgba(212,175,55,0.1)]"
+              className="group flex items-center gap-3 px-4 py-3 rounded-2xl bg-[#111113]/95 border border-wireframe-stroke hover:border-gold/30 backdrop-blur-xl shadow-2xl shadow-black/40 transition-all hover:shadow-[0_0_30px_rgba(212,175,55,0.1)]"
               aria-label="Open ACHEEVY Console"
             >
               {/* ACHEEVY Avatar */}
@@ -140,23 +140,23 @@ export default function FloatingChat() {
                     className="object-contain"
                   />
                 </div>
-                <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-white">
+                <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-[#111113]">
                   <div className="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-40" />
                 </div>
               </div>
 
               {/* Label */}
               <div className="hidden sm:block">
-                <div className="text-sm font-semibold text-slate-700 group-hover:text-gold transition-colors">
+                <div className="text-sm font-semibold text-zinc-200 group-hover:text-gold transition-colors">
                   Chat w/ACHEEVY
                 </div>
-                <div className="text-xs text-slate-400 font-mono uppercase tracking-wider">
+                <div className="text-xs text-zinc-500 font-mono uppercase tracking-wider">
                   Command Console
                 </div>
               </div>
 
               {/* Expand indicator */}
-              <ChevronUp className="w-4 h-4 text-slate-300 group-hover:text-gold/60 transition-colors" />
+              <ChevronUp className="w-4 h-4 text-zinc-500 group-hover:text-gold/60 transition-colors" />
             </button>
           </motion.div>
         )}

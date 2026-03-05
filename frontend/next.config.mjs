@@ -9,6 +9,8 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  // Transpile ESM-only packages so they work during SSR/prerender
+  transpilePackages: ['agentic-ui'],
   eslint: {
     // ESLint checked separately in CI; don't block production builds
     ignoreDuringBuilds: true,

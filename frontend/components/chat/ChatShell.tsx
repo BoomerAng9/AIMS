@@ -143,7 +143,7 @@ function ConnectionBadge({
       onClick={status === 'disconnected' ? onRetry : undefined}
       className={`flex items-center gap-1.5 px-2 py-1 rounded-lg transition-colors ${
         status === 'disconnected'
-          ? 'hover:bg-red-50 cursor-pointer'
+          ? 'hover:bg-red-500/10 cursor-pointer'
           : 'cursor-default'
       }`}
       title={
@@ -211,17 +211,17 @@ export function ChatShell({
   return (
     <div
       className={`
-        flex flex-col bg-white
+        flex flex-col bg-[#09090B]
         ${
           isFullscreen
             ? 'fixed inset-0 z-50'
-            : 'h-[calc(100vh-160px)] md:h-[calc(100vh-120px)] rounded-2xl border border-slate-200 shadow-sm overflow-hidden'
+            : 'h-[calc(100vh-160px)] md:h-[calc(100vh-120px)] rounded-2xl border border-white/8 shadow-sm overflow-hidden'
         }
         ${className}
       `}
     >
       {/* ─── Header Bar ─── */}
-      <header className="flex-shrink-0 flex items-center justify-between border-b border-slate-200 bg-white px-4 py-2.5">
+      <header className="flex-shrink-0 flex items-center justify-between border-b border-white/8 bg-[#111113] px-4 py-2.5">
         {/* Left: ACHEEVY identity */}
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center overflow-hidden shadow-[0_0_12px_rgba(212,175,55,0.15)]">
@@ -234,8 +234,7 @@ export function ChatShell({
             />
           </div>
           <div>
-            <h1 className="text-sm font-semibold text-slate-800 tracking-wide">
-            <h1 className="text-xl font-semibold text-zinc-100 font-display tracking-wider">
+            <h1 className="text-sm font-semibold text-zinc-100 tracking-wide">
               ACHEEVY
             </h1>
             <ConnectionBadge
@@ -248,26 +247,13 @@ export function ChatShell({
 
         {/* Center: Session/Project info (desktop only) */}
         {projectTitle && (
-          <div className="hidden md:flex items-center gap-2 px-3 py-1 rounded-lg bg-slate-50 border border-slate-100">
-            <span className="text-xs text-slate-400 uppercase tracking-wider font-medium">
+          <div className="hidden md:flex items-center gap-2 px-3 py-1 rounded-lg bg-white/5 border border-white/8">
+            <span className="text-xs text-zinc-500 uppercase tracking-wider font-medium">
               Session:
             </span>
-            <span className="text-xs text-slate-600 font-mono truncate max-w-[200px]">
+            <span className="text-xs text-zinc-300 font-mono truncate max-w-[200px]">
               {projectTitle}
             </span>
-      {/* Chat Area */}
-      <div className="flex-1 overflow-y-auto p-6 md:p-8">
-        {children || (
-          <div className="flex flex-col items-center justify-center h-full text-center space-y-4 opacity-30">
-            <div className="h-16 w-16 rounded-full border border-dashed border-gold/20 flex items-center justify-center text-2xl">
-              ?
-            </div>
-            <p className="text-lg font-handwriting text-zinc-100">
-              Think it. Speak it. ACHEEVY builds it.
-            </p>
-            <p className="text-xs uppercase tracking-widest max-w-xs">
-              System is ready for your primary business mission.
-            </p>
           </div>
         )}
 
@@ -279,7 +265,7 @@ export function ChatShell({
             className={`p-2 rounded-lg transition-colors ${
               voiceEnabled
                 ? 'text-gold bg-gold/10 hover:bg-gold/20'
-                : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'
+                : 'text-zinc-500 hover:text-zinc-300 hover:bg-white/5'
             }`}
             title={voiceEnabled ? 'Mute voice responses' : 'Enable voice responses'}
           >
@@ -290,28 +276,10 @@ export function ChatShell({
           <div className="relative">
             <button
               onClick={() => setShowSettings((s) => !s)}
-              className="p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-colors"
+              className="p-2 rounded-lg text-zinc-500 hover:text-zinc-300 hover:bg-white/5 transition-colors"
               title="Chat settings"
             >
               <Settings size={16} />
-      {/* Input Area */}
-      <footer className="p-4 md:p-6">
-        <div className="rounded-3xl border border-wireframe-stroke bg-[#111113] p-2 backdrop-blur-2xl shadow-xl flex items-center gap-2 focus-within:border-gold/30 transition-all">
-          <button disabled className="p-3 text-zinc-600 hover:text-zinc-100 transition-colors">
-            <Paperclip size={20} />
-          </button>
-          <input 
-            type="text" 
-            placeholder="Speak or type your mission directive..." 
-            className="flex-1 bg-transparent py-3 px-2 text-sm text-zinc-100 outline-none placeholder:text-zinc-600"
-            disabled
-          />
-          <div className="flex items-center gap-1 pr-1">
-            <button disabled className="p-3 rounded-full bg-[#18181B] text-zinc-600 hover:text-zinc-100 transition-colors">
-              <Mic size={20} />
-            </button>
-            <button disabled className="p-3 rounded-full bg-gold/10 text-gold/20">
-              <Send size={20} />
             </button>
 
             <AnimatePresence>
@@ -321,20 +289,20 @@ export function ChatShell({
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -4, scale: 0.95 }}
                   transition={{ duration: 0.15 }}
-                  className="absolute right-0 top-full mt-1 w-56 bg-white border border-slate-200 rounded-xl shadow-lg p-2 z-50"
+                  className="absolute right-0 top-full mt-1 w-56 bg-[#111113] border border-white/10 rounded-xl shadow-lg p-2 z-50"
                 >
                   <div className="space-y-1">
                     {/* Orchestration toggle */}
                     <button
                       onClick={() => setOrchestrationEnabled((o) => !o)}
-                      className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs text-slate-600 hover:bg-slate-50 transition-colors"
+                      className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs text-zinc-300 hover:bg-white/5 transition-colors"
                     >
                       <span>Agent Orchestration</span>
                       <span
                         className={`text-xs font-medium px-1.5 py-0.5 rounded ${
                           orchestrationEnabled
-                            ? 'bg-emerald-50 text-emerald-600'
-                            : 'bg-slate-100 text-slate-400'
+                            ? 'bg-emerald-500/10 text-emerald-400'
+                            : 'bg-white/5 text-zinc-500'
                         }`}
                       >
                         {orchestrationEnabled ? 'ON' : 'OFF'}
@@ -344,25 +312,25 @@ export function ChatShell({
                     {/* Voice toggle */}
                     <button
                       onClick={() => setVoiceEnabled((v) => !v)}
-                      className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs text-slate-600 hover:bg-slate-50 transition-colors"
+                      className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs text-zinc-300 hover:bg-white/5 transition-colors"
                     >
                       <span>Voice Responses</span>
                       <span
                         className={`text-xs font-medium px-1.5 py-0.5 rounded ${
                           voiceEnabled
-                            ? 'bg-emerald-50 text-emerald-600'
-                            : 'bg-slate-100 text-slate-400'
+                            ? 'bg-emerald-500/10 text-emerald-400'
+                            : 'bg-white/5 text-zinc-500'
                         }`}
                       >
                         {voiceEnabled ? 'ON' : 'OFF'}
                       </span>
                     </button>
 
-                    <div className="border-t border-slate-100 my-1" />
+                    <div className="border-t border-white/8 my-1" />
 
                     {/* Connection info */}
                     <div className="px-3 py-2">
-                      <p className="text-xs text-slate-400 uppercase tracking-wider font-medium mb-1">
+                      <p className="text-xs text-zinc-500 uppercase tracking-wider font-medium mb-1">
                         Connection
                       </p>
                       <div className="flex items-center gap-2">
@@ -378,7 +346,7 @@ export function ChatShell({
                     {status === 'disconnected' && (
                       <button
                         onClick={retry}
-                        className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-amber-600 hover:bg-amber-50 transition-colors"
+                        className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-amber-400 hover:bg-amber-500/10 transition-colors"
                       >
                         <RotateCcw size={12} />
                         <span>Retry Connection</span>
@@ -393,7 +361,7 @@ export function ChatShell({
           {/* Fullscreen toggle */}
           <button
             onClick={toggleFullscreen}
-            className="p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-colors"
+            className="p-2 rounded-lg text-zinc-500 hover:text-zinc-300 hover:bg-white/5 transition-colors"
             title={isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
           >
             {isFullscreen ? (
@@ -407,7 +375,7 @@ export function ChatShell({
           {onClose && (
             <button
               onClick={onClose}
-              className="p-2 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-50 transition-colors"
+              className="p-2 rounded-lg text-zinc-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
               title="Close chat"
             >
               <X size={16} />

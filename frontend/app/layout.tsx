@@ -1,4 +1,5 @@
 import "./globals.css";
+import "@/lib/agentic-theme.css";
 import type { ReactNode } from "react";
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";

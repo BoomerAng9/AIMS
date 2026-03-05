@@ -33,6 +33,7 @@ Boomer_Ang instances — each defines its own objective, KPIs, and skill bundle 
 | Scribe_Ang | Documentation, knowledge capture | Documentation |
 | Showrunner_Ang | Event coordination, live operations | Events |
 | SME_Ang | MCP routing, integration knowledge | Integration |
+| SME-NLP_Ang | Glossary governance, intent classification, slang normalization, dialect registries | NLP / Language Intelligence |
 | Composio_Ang | Cross-platform OAuth integrations | Integration |
 | Node_Trigger_Ang | n8n orchestration | Automation |
 

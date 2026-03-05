@@ -332,6 +332,124 @@ export const SLANG_INTENT_PHRASES: IntentPhrase[] = [
 ];
 
 // ---------------------------------------------------------------------------
+// A.I.M.S. Platform Dialect — Glossary aliases → canonical terms
+// Generated from SME-NLP_Ang GLOSSARY so casual references normalize to
+// platform-standard vocabulary. e.g. "the boss" → "ACHEEVY"
+// ---------------------------------------------------------------------------
+
+const AIMS_PLATFORM_ENTRIES: SlangEntry[] = [
+  // ── Agents ──
+  { phrase: 'the boss', normalized: 'ACHEEVY', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'main ai', normalized: 'ACHEEVY', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'your ai', normalized: 'ACHEEVY', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'the brain', normalized: 'ACHEEVY', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'specialist', normalized: 'AI Specialist', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'senior agent', normalized: 'AI Specialist', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'expert agent', normalized: 'AI Specialist', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'department head', normalized: 'AI Specialist', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'domain expert', normalized: 'AI Specialist', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'task bot', normalized: 'Task Worker', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'little worker', normalized: 'Task Worker', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'helper', normalized: 'Task Worker', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'minion', normalized: 'Task Worker', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'project manager', normalized: 'Project Manager', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'task runner', normalized: 'Project Manager', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'executor', normalized: 'Project Manager', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'coordinator', normalized: 'Project Manager', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'strategist', normalized: 'Strategy AI', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'planner', normalized: 'Strategy AI', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'architect', normalized: 'Strategy AI', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'thinker', normalized: 'Strategy AI', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'nlp expert', normalized: 'Language Expert', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'language agent', normalized: 'Language Expert', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'text processor', normalized: 'Language Expert', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'understanding engine', normalized: 'Language Expert', domain: 'object', dialect: 'aims-platform' },
+
+  // ── Infrastructure ──
+  { phrase: 'thing i want to run', normalized: 'Tool', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'running app', normalized: 'App Instance', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'launch pad', normalized: 'Deploy Dock', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'deploy area', normalized: 'Deploy Dock', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'start screen', normalized: 'Deploy Dock', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'app store', normalized: 'Deploy Dock', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'tool store', normalized: 'Deploy Dock', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'code runner', normalized: 'OpenSandbox', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'run my code', normalized: 'OpenSandbox', domain: 'action', dialect: 'aims-platform' },
+  { phrase: 'execute code', normalized: 'OpenSandbox', domain: 'action', dialect: 'aims-platform' },
+  { phrase: 'the api', normalized: 'UEF Gateway', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'secure link', normalized: 'WireGuard Tunnel', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'connection between servers', normalized: 'WireGuard Tunnel', domain: 'object', dialect: 'aims-platform' },
+
+  // ── Features ──
+  { phrase: 'context pack', normalized: 'Magazine', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'knowledge pack', normalized: 'Magazine', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'persona pack', normalized: 'Magazine', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'load context', normalized: 'Magazine', domain: 'action', dialect: 'aims-platform' },
+  { phrase: 'switch mode', normalized: 'Magazine', domain: 'action', dialect: 'aims-platform' },
+  { phrase: 'change personality', normalized: 'Magazine', domain: 'action', dialect: 'aims-platform' },
+  { phrase: 'reference document', normalized: 'Data Source', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'source material', normalized: 'Data Source', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'context document', normalized: 'Data Source', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'build it', normalized: 'Make It Mine', domain: 'action', dialect: 'aims-platform' },
+  { phrase: 'make it', normalized: 'Make It Mine', domain: 'action', dialect: 'aims-platform' },
+  { phrase: 'create something', normalized: 'Make It Mine', domain: 'action', dialect: 'aims-platform' },
+  { phrase: 'i want to make', normalized: 'Make It Mine', domain: 'action', dialect: 'aims-platform' },
+  { phrase: 'build me', normalized: 'Make It Mine', domain: 'action', dialect: 'aims-platform' },
+  { phrase: 'can you make', normalized: 'Make It Mine', domain: 'action', dialect: 'aims-platform' },
+  { phrase: 'creative library', normalized: 'NtNtN Engine', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'techniques', normalized: 'NtNtN Engine', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'frameworks', normalized: 'NtNtN Engine', domain: 'object', dialect: 'aims-platform' },
+
+  // ── Billing ──
+  { phrase: 'how much does it cost', normalized: 'LUC Credits', domain: 'money', dialect: 'aims-platform' },
+  { phrase: 'how much', normalized: 'pricing', domain: 'money', dialect: 'aims-platform' },
+  { phrase: 'payment', normalized: 'subscription plans', domain: 'money', dialect: 'aims-platform' },
+
+  // ── Governance ──
+  { phrase: 'quality check', normalized: 'ORACLE Gate', domain: 'quality', dialect: 'aims-platform' },
+  { phrase: 'is it done', normalized: 'ORACLE Gate', domain: 'quality', dialect: 'aims-platform' },
+  { phrase: 'show me proof', normalized: 'Evidence Locker', domain: 'quality', dialect: 'aims-platform' },
+  { phrase: 'verification records', normalized: 'Evidence Locker', domain: 'quality', dialect: 'aims-platform' },
+  { phrase: 'who reports to who', normalized: 'Chain of Command', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'team structure', normalized: 'Chain of Command', domain: 'object', dialect: 'aims-platform' },
+
+  // ── Operations ──
+  { phrase: 'status page', normalized: 'Mission Control', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'what is running', normalized: 'Mission Control', domain: 'action', dialect: 'aims-platform' },
+  { phrase: 'control panel', normalized: 'Mission Control', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'agent refresh', normalized: 'Container Lifecycle', domain: 'action', dialect: 'aims-platform' },
+  { phrase: 'restart agents', normalized: 'Container Lifecycle', domain: 'action', dialect: 'aims-platform' },
+  { phrase: 'memory cleanup', normalized: 'Container Lifecycle', domain: 'action', dialect: 'aims-platform' },
+  { phrase: 'save memory', normalized: 'RAG Sync', domain: 'action', dialect: 'aims-platform' },
+  { phrase: 'backup context', normalized: 'RAG Sync', domain: 'action', dialect: 'aims-platform' },
+  { phrase: 'sync knowledge', normalized: 'RAG Sync', domain: 'action', dialect: 'aims-platform' },
+  { phrase: 'agent management', normalized: 'HR Office', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'health monitor', normalized: 'HR Office', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'container management', normalized: 'HR Office', domain: 'object', dialect: 'aims-platform' },
+
+  // ── Design ──
+  { phrase: 'the look', normalized: 'Agentic UI', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'interface style', normalized: 'Agentic UI', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'see what ai is doing', normalized: 'Glass Box', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'agent activity', normalized: 'Glass Box', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'show me what is happening', normalized: 'Glass Box', domain: 'action', dialect: 'aims-platform' },
+  { phrase: 'action card', normalized: 'Generative Block', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'interactive element', normalized: 'Generative Block', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'rich message', normalized: 'Generative Block', domain: 'object', dialect: 'aims-platform' },
+
+  // ── NLP ──
+  { phrase: 'understand slang', normalized: 'Slang Normalization', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'casual language', normalized: 'Slang Normalization', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'translate what i said', normalized: 'Slang Normalization', domain: 'action', dialect: 'aims-platform' },
+  { phrase: 'what did i mean', normalized: 'Intent Classification', domain: 'action', dialect: 'aims-platform' },
+  { phrase: 'figure out intent', normalized: 'Intent Classification', domain: 'action', dialect: 'aims-platform' },
+  { phrase: 'understand me', normalized: 'Intent Classification', domain: 'action', dialect: 'aims-platform' },
+  { phrase: 'what i want', normalized: 'Intent Classification', domain: 'action', dialect: 'aims-platform' },
+  { phrase: 'category', normalized: 'Vertical Trigger', domain: 'object', dialect: 'aims-platform' },
+  { phrase: 'which department', normalized: 'Vertical Trigger', domain: 'object', dialect: 'aims-platform' },
+];
+
+// ---------------------------------------------------------------------------
 // Registry & Exports
 // ---------------------------------------------------------------------------
 
@@ -339,6 +457,7 @@ export const DIALECT_REGISTRIES: DialectRegistry[] = [
   { name: 'AAVE / Ebonics', code: 'aave', entries: AAVE_ENTRIES },
   { name: 'Gen Z', code: 'genz', entries: GENZ_ENTRIES },
   { name: 'Tech Slang', code: 'tech', entries: TECH_SLANG_ENTRIES },
+  { name: 'A.I.M.S. Platform', code: 'aims-platform', entries: AIMS_PLATFORM_ENTRIES },
 ];
 
 /** All slang entries flattened into a single array */

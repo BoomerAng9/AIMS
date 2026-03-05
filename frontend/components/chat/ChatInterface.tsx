@@ -27,12 +27,13 @@ import { useVerticalFlow } from '@/hooks/useVerticalFlow';
 import { OperationsOverlay, OperationsPulse } from '@/components/orchestration/OperationsOverlay';
 import { DepartmentBoard } from '@/components/orchestration/DepartmentBoard';
 import { UserInputModal } from '@/components/change-order/UserInputModal';
-import { CollaborationSidebar } from '@/components/collaboration/CollaborationFeed';
+import { ChatSidebar, MagazineBadge } from '@/components/chat/ChatSidebar';
 import { VerticalStepIndicator } from '@/components/chat/VerticalStepIndicator';
 import { AcheevyChatInput, AcheevyMessage, AcheevyWelcomeHero } from '@/components/chat/agentic';
 import type { AIModel } from '@/components/chat/agentic';
 import { formatCurrency } from '@/lib/change-order/types';
 import { PERSONAS } from '@/lib/acheevy/persona';
+import type { MagazineSlot } from '@/lib/magazines/types';
 
 // ─────────────────────────────────────────────────────────────
 // Priority Model Roster (mirrors /api/chat PRIORITY_MODELS)
@@ -85,6 +86,8 @@ export function ChatInterface({
   const [inputValue, setInputValue] = useState('');
   const [showBoard, setShowBoard] = useState(false);
   const [showCollabFeed, setShowCollabFeed] = useState(false);
+  const [sidebarTab, setSidebarTab] = useState<'viewport' | 'magazines'>('viewport');
+  const [activeMagazineSlots, setActiveMagazineSlots] = useState<MagazineSlot[]>([]);
   const [showInputModal, setShowInputModal] = useState(false);
   const [voiceTranscriptReady, setVoiceTranscriptReady] = useState(false);
 
@@ -512,10 +515,12 @@ export function ChatInterface({
         department={orchestration.state.blockingDepartment || 'Development'}
       />
 
-      {/* Agent Viewport (Collaboration Feed Sidebar) */}
-      <CollaborationSidebar
+      {/* Tabbed Sidebar (Agent Viewport + Magazines) */}
+      <ChatSidebar
         isOpen={showCollabFeed}
         onClose={() => setShowCollabFeed(false)}
+        initialTab={sidebarTab}
+        activeMagazineCount={activeMagazineSlots.length}
       />
 
       {/* Change Order Cost Tracker (bottom-left) */}

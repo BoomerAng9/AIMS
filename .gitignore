@@ -77,3 +77,52 @@ nul
 sa-key.json
 
 docs/Training_Data/cfb-data/
+
+# ── External repos cloned into workspace (not tracked in A.I.M.S. git) ────
+CG-Cardbox/
+CoT-Lab-Demo/
+CommonGround-legacy/
+Common_Chronicle/
+II-Commons/
+PPTist/
+Symbioism-Nextra/
+Symbioism-TLE/
+blockwise-ai/
+codex/
+codex-as-mcp/
+gemini-cli/
+gemini-cli-mcp-openai-bridge/
+ii-agent/
+ii-agent-community/
+ii-researcher/
+ii-thought/
+ii-zenith-action/
+ii_verl/
+litellm-debugger/
+reveal.js/
+
+# ── .aims mirror directory (self-referencing) ────
+.aims/
+
+# ── Build artifacts / log dumps ────
+build-log.txt
+build-out*.txt
+build-output*.txt
+build-result.txt
+frontend/build-check*.txt
+frontend/build-out*.txt
+
+# ── pnpm lock (using npm, not pnpm) ────
+pnpm-lock.yaml
+
+# ── Misc temp files ────
+tmp_content.html
+tmp_nginx.conf
+stitch_chat_ui.html
+test_kling_mock.ts
+fix-set-spread*.py
+fix-plan-refs.sh
+update_server*.py
+apply-gold-theme*.ps1
+git_log*.txt
+git_status*.txt

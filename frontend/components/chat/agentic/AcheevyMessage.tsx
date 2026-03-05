@@ -26,6 +26,7 @@ import { Copy, Check, Volume2 } from 'lucide-react';
 import { spring } from '@/lib/motion/tokens';
 import { FileDownloadGroup } from '@/components/chat/FileDownload';
 import { ToolExecutionCard } from '@/components/chat/ToolExecutionCard';
+import { GenerativeRenderer } from '@/components/chat/generative';
 import type { ChatMessage } from '@/lib/chat/types';
 import type { ToolExecutionEvent } from '@/lib/chat/types';
 
@@ -180,6 +181,19 @@ export const AcheevyMessage = memo(function AcheevyMessage({
             </div>
           )}
         </div>
+
+        {/* ── Generative Blocks ──────────────────────────── */}
+        {!isUser && Array.isArray(message.blocks) && message.blocks.length > 0 && (
+          <div className="mt-3">
+            <GenerativeRenderer
+              blocks={message.blocks}
+              onAction={(blockId, action, data) => {
+                // Dispatch to bridge or event bus
+                console.log('[GenerativeBlock Action]', { blockId, action, data });
+              }}
+            />
+          </div>
+        )}
 
         {/* ── File Deliverables ────────────────────────────── */}
         {!isUser && !isStreaming && Array.isArray(message.metadata?.files) && (

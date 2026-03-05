@@ -91,6 +91,7 @@ const PLUG_ITEMS: NavItem[] = [
 const PRIVATE_LIVE_APPS: NavItem[] = [
   { href: "/dashboard/luc", label: "LUC Dashboard", icon: Calculator, highlight: true },
   { href: "/dashboard/billing", label: "Billing", icon: CreditCard, highlight: true },
+  { href: "/dashboard/glossary", label: "Glossary", icon: BookOpen, highlight: true },
   { href: "/dashboard/garage-to-global", label: "Garage to Global", icon: Store, highlight: true },
   { href: "/dashboard/buy-in-bulk", label: "Buy in Bulk", icon: ShoppingCart, highlight: true },
 ];
@@ -143,6 +144,7 @@ const PUBLIC_APPS: NavItem[] = [
   { href: "/halalhub", label: "HalalHub", icon: Store },
   { href: "/dashboard/luc", label: "Usage Credits", icon: Calculator },
   { href: "/dashboard/billing", label: "Billing", icon: CreditCard },
+  { href: "/dashboard/glossary", label: "Help & Glossary", icon: BookOpen },
 ];
 
 const PUBLIC_SETTINGS: NavItem[] = [

@@ -59,6 +59,8 @@ import { triggerVerticalWorkflow } from './pipeline/client';
 import { cloudflareRouter, markdownForAgents } from './cloudflare';
 import { paymentsRouter } from './payments';
 import { normalizeInput, getDialectStats, SLANG_ENTRY_COUNT, INTENT_PHRASE_COUNT } from './nlp';
+import { magazineRouter, getMagazineContext } from './magazines';
+import { classifyIntent, searchGlossary, getGlossaryByCategory, submitFeedback, getPipelineStats } from './nlp/sme-nlp-service';
 import { videoRouter } from './video';
 import { liveSim } from './livesim';
 import { composioRouter } from './composio';
@@ -233,6 +235,11 @@ app.use(voiceRouter);
 // Video & Content Pipeline — KIE.ai unified video generation
 // --------------------------------------------------------------------------
 app.use('/api', videoRouter);
+
+// --------------------------------------------------------------------------
+// Magazine System — Context Loading (NotebookLM-style)
+// --------------------------------------------------------------------------
+app.use('/api/magazines', magazineRouter);
 
 // --------------------------------------------------------------------------
 // Agent Registry — list available agents and their profiles
@@ -1233,6 +1240,56 @@ app.post('/api/nlp/normalize', (req, res) => {
 });
 
 // --------------------------------------------------------------------------
+// NLP Glossary & SME-NLP_Ang Endpoints
+// --------------------------------------------------------------------------
+
+/** Glossary — search terms */
+app.get('/api/nlp/glossary', (req, res) => {
+  const { q, category } = req.query;
+  if (q && typeof q === 'string') {
+    const results = searchGlossary(q);
+    res.json({ results, total: results.length });
+    return;
+  }
+  if (category && typeof category === 'string') {
+    const results = getGlossaryByCategory(category);
+    res.json({ results, total: results.length });
+    return;
+  }
+  // Return all
+  const all = searchGlossary('');
+  res.json({ results: all, total: all.length });
+});
+
+/** Intent classification — combines NLP normalization + glossary matching */
+app.post('/api/nlp/classify', (req, res) => {
+  const { text } = req.body;
+  if (!text || typeof text !== 'string') {
+    res.status(400).json({ error: 'text field is required' });
+    return;
+  }
+  const result = classifyIntent(text);
+  res.json(result);
+});
+
+/** Feedback — submit corrections to NLP classifications */
+app.post('/api/nlp/feedback', (req, res) => {
+  const { inputText, expectedIntent, expectedVertical, notes } = req.body;
+  if (!inputText || !expectedIntent) {
+    res.status(400).json({ error: 'inputText and expectedIntent are required' });
+    return;
+  }
+  const fb = submitFeedback({ inputText, expectedIntent, expectedVertical, notes });
+  res.json({ accepted: true, feedbackId: fb.id });
+});
+
+/** Pipeline stats — combined NLP + glossary stats */
+app.get('/api/nlp/pipeline-stats', (_req, res) => {
+  const stats = getPipelineStats();
+  res.json(stats);
+});
+
+// --------------------------------------------------------------------------
 // Chicken Hawk — Execution Engine Proxy
 // Forwards manifests to the Chicken Hawk Core service for real execution.
 // Command chain: ACHEEVY → Boomer_Ang → Chicken Hawk → Squad → Lil_Hawk
@@ -2087,6 +2144,150 @@ app.use(shelfRouter);
 // Plug Catalog & Instance Management — PaaS Operations
 // --------------------------------------------------------------------------
 app.use('/api', plugRouter);
+
+// --------------------------------------------------------------------------
+// OpenSandbox — VPS2 Secure Code Execution Proxy
+// Proxies to aims-open-sandbox on VPS2 (10.0.0.2:4400)
+// --------------------------------------------------------------------------
+const VPS2_SANDBOX_URL = process.env.VPS2_SANDBOX_URL || 'http://10.0.0.2:4400';
+
+app.post('/api/sandbox/execute', async (req, res) => {
+  try {
+    const response = await fetch(`${VPS2_SANDBOX_URL}/api/sandbox/execute`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(req.body),
+    });
+    const data = await response.json();
+    res.status(response.status).json(data);
+  } catch (err) {
+    logger.error({ err }, '[Sandbox] VPS2 sandbox unreachable');
+    res.status(502).json({ error: 'Sandbox service unreachable', service: 'open-sandbox' });
+  }
+});
+
+app.get('/api/sandbox/executions', async (req, res) => {
+  try {
+    const limit = req.query.limit || '50';
+    const response = await fetch(`${VPS2_SANDBOX_URL}/api/sandbox/executions?limit=${limit}`);
+    const data = await response.json();
+    res.json(data);
+  } catch (err) {
+    res.status(502).json({ error: 'Sandbox service unreachable' });
+  }
+});
+
+app.get('/api/sandbox/executions/:id', async (req, res) => {
+  try {
+    const response = await fetch(`${VPS2_SANDBOX_URL}/api/sandbox/executions/${req.params.id}`);
+    const data = await response.json();
+    res.status(response.status).json(data);
+  } catch (err) {
+    res.status(502).json({ error: 'Sandbox service unreachable' });
+  }
+});
+
+app.post('/api/sandbox/executions/:id/cancel', async (req, res) => {
+  try {
+    const response = await fetch(`${VPS2_SANDBOX_URL}/api/sandbox/executions/${req.params.id}/cancel`, {
+      method: 'POST',
+    });
+    const data = await response.json();
+    res.status(response.status).json(data);
+  } catch (err) {
+    res.status(502).json({ error: 'Sandbox service unreachable' });
+  }
+});
+
+app.post('/api/sandbox/sessions', async (req, res) => {
+  try {
+    const response = await fetch(`${VPS2_SANDBOX_URL}/api/sandbox/sessions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(req.body),
+    });
+    const data = await response.json();
+    res.status(response.status).json(data);
+  } catch (err) {
+    res.status(502).json({ error: 'Sandbox service unreachable' });
+  }
+});
+
+app.get('/api/sandbox/sessions', async (_req, res) => {
+  try {
+    const response = await fetch(`${VPS2_SANDBOX_URL}/api/sandbox/sessions`);
+    const data = await response.json();
+    res.json(data);
+  } catch (err) {
+    res.status(502).json({ error: 'Sandbox service unreachable' });
+  }
+});
+
+app.get('/api/sandbox/sessions/:id', async (req, res) => {
+  try {
+    const response = await fetch(`${VPS2_SANDBOX_URL}/api/sandbox/sessions/${req.params.id}`);
+    const data = await response.json();
+    res.status(response.status).json(data);
+  } catch (err) {
+    res.status(502).json({ error: 'Sandbox service unreachable' });
+  }
+});
+
+app.post('/api/sandbox/sessions/:id/execute', async (req, res) => {
+  try {
+    const response = await fetch(`${VPS2_SANDBOX_URL}/api/sandbox/sessions/${req.params.id}/execute`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(req.body),
+    });
+    const data = await response.json();
+    res.status(response.status).json(data);
+  } catch (err) {
+    res.status(502).json({ error: 'Sandbox service unreachable' });
+  }
+});
+
+app.delete('/api/sandbox/sessions/:id', async (req, res) => {
+  try {
+    const response = await fetch(`${VPS2_SANDBOX_URL}/api/sandbox/sessions/${req.params.id}`, {
+      method: 'DELETE',
+    });
+    const data = await response.json();
+    res.status(response.status).json(data);
+  } catch (err) {
+    res.status(502).json({ error: 'Sandbox service unreachable' });
+  }
+});
+
+app.get('/api/sandbox/stats', async (_req, res) => {
+  try {
+    const response = await fetch(`${VPS2_SANDBOX_URL}/api/sandbox/stats`);
+    const data = await response.json();
+    res.json(data);
+  } catch (err) {
+    res.status(502).json({ error: 'Sandbox service unreachable' });
+  }
+});
+
+app.get('/api/sandbox/languages', async (_req, res) => {
+  try {
+    const response = await fetch(`${VPS2_SANDBOX_URL}/api/sandbox/languages`);
+    const data = await response.json();
+    res.json(data);
+  } catch (err) {
+    res.status(502).json({ error: 'Sandbox service unreachable' });
+  }
+});
+
+app.get('/api/sandbox/health', async (_req, res) => {
+  try {
+    const response = await fetch(`${VPS2_SANDBOX_URL}/health`);
+    const data = await response.json();
+    res.json(data);
+  } catch (err) {
+    res.status(502).json({ error: 'Sandbox service unreachable', status: 'down' });
+  }
+});
 
 // --------------------------------------------------------------------------
 // II-Agent — Autonomous Execution Engine (OWNER ONLY)

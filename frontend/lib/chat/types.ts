@@ -18,6 +18,8 @@ export interface ChatMessage {
   audioUrl?: string;
   attachments?: MessageAttachment[];
   metadata?: Record<string, unknown>;
+  /** Generative UI blocks from the bridge protocol */
+  blocks?: import('@/lib/bridge/types').GenerativeBlock[];
 }
 
 export interface MessageAttachment {
