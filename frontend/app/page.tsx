@@ -3,7 +3,13 @@
 import { useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { motion, useScroll, useTransform, useInView } from "framer-motion";
+import {
+  motion,
+  useScroll,
+  useTransform,
+  useInView,
+  useReducedMotion,
+} from "framer-motion";
 import {
   ArrowRight,
   Boxes,
@@ -45,7 +51,13 @@ function FadeIn({
   delay?: number;
 }) {
   const ref = useRef(null);
+  const shouldReduceMotion = useReducedMotion();
   const isInView = useInView(ref, { once: true, margin: "-80px" });
+
+  if (shouldReduceMotion) {
+    return <div className={className}>{children}</div>;
+  }
+
   return (
     <motion.div
       ref={ref}
@@ -220,6 +232,7 @@ function ScrollProgress() {
 // ── Main Page ──
 export default function HomePage() {
   const heroRef = useRef(null);
+  const shouldReduceMotion = useReducedMotion();
   const { scrollYProgress: heroProgress } = useScroll({
     target: heroRef,
     offset: ["start start", "end start"],
@@ -244,7 +257,9 @@ export default function HomePage() {
           className="relative min-h-[92vh] flex items-center justify-center px-4 md:px-6"
         >
           <motion.div
-            style={{ opacity: heroOpacity, y: heroY }}
+            style={
+              shouldReduceMotion ? undefined : { opacity: heroOpacity, y: heroY }
+            }
             className="max-w-5xl mx-auto text-center"
           >
             {/* Status badge */}
@@ -281,7 +296,7 @@ export default function HomePage() {
             <FadeIn delay={0.25}>
               <p className="text-sm text-zinc-500 mb-10">
                 Learn how we handle data in our{' '}
-                <Link href="/privacy-policy" className="text-amber-300 hover:text-amber-200 underline underline-offset-4 transition-colors">
+                <Link href="/privacy" className="text-amber-300 hover:text-amber-200 underline underline-offset-4 transition-colors">
                   Privacy Policy
                 </Link>
                 .
@@ -637,7 +652,7 @@ export default function HomePage() {
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                     </Link>
                     <Link
-                      href="/(auth)/sign-up"
+                      href="/sign-up"
                       className="h-13 px-8 rounded-xl border border-amber-500/20 text-zinc-300 font-semibold text-base inline-flex items-center justify-center gap-2.5 hover:border-amber-500/30 hover:bg-amber-500/[0.04] transition-all"
                     >
                       Create Account
@@ -667,7 +682,7 @@ export default function HomePage() {
               <Link href="/terms" className="hover:text-zinc-400 transition-colors">
                 Terms
               </Link>
-              <Link href="/privacy-policy" className="hover:text-zinc-400 transition-colors">
+              <Link href="/privacy" className="hover:text-zinc-400 transition-colors">
                 Privacy
               </Link>
               <Link href="/pricing" className="hover:text-zinc-400 transition-colors">
@@ -689,6 +704,7 @@ function Nav() {
   const { scrollY } = useScroll();
   const navBorder = useTransform(scrollY, [0, 50], [0, 1]);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const shouldReduceMotion = useReducedMotion();
 
   return (
     <>
@@ -723,7 +739,7 @@ function Nav() {
               { href: "/plugs", label: "Catalog" },
               { href: "#how-it-works", label: "How It Works" },
               { href: "/pricing", label: "Pricing" },
-              { href: "/privacy-policy", label: "Privacy" },
+              { href: "/privacy", label: "Privacy" },
               { href: "/about", label: "About" },
             ].map((link) => (
               <Link
@@ -739,7 +755,7 @@ function Nav() {
           {/* Right */}
           <div className="flex items-center gap-3">
             <Link
-              href="/(auth)/sign-in"
+              href="/sign-in"
               className="text-sm text-zinc-400 hover:text-zinc-200 transition-colors hidden sm:block"
             >
               Sign In
@@ -753,6 +769,9 @@ function Nav() {
             {/* Mobile menu toggle */}
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
+              aria-label={mobileOpen ? "Close menu" : "Open menu"}
+              aria-expanded={mobileOpen}
+              aria-controls="mobile-nav"
               className="md:hidden p-1.5 text-zinc-400 hover:text-zinc-200"
             >
               {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -764,7 +783,8 @@ function Nav() {
       {/* Mobile menu */}
       {mobileOpen && (
         <motion.div
-          initial={{ opacity: 0, y: -8 }}
+          id="mobile-nav"
+          initial={shouldReduceMotion ? false : { opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
           className="fixed top-16 left-0 right-0 z-40 bg-[#09090B]/95 backdrop-blur-xl border-b border-white/[0.06] px-4 py-6"
         >
@@ -773,7 +793,7 @@ function Nav() {
               { href: "/plugs", label: "Catalog" },
               { href: "#how-it-works", label: "How It Works" },
               { href: "/pricing", label: "Pricing" },
-              { href: "/privacy-policy", label: "Privacy" },
+              { href: "/privacy", label: "Privacy" },
               { href: "/about", label: "About" },
             ].map((link) => (
               <Link
