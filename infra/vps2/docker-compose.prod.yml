@@ -1,0 +1,147 @@
+# =============================================================
+# A.I.M.S. VPS2 — Sandbox & Plug Engine
+# Host: srv1318308.hstgr.cloud / 31.97.138.45
+# WireGuard: 10.0.0.2 (VPS1 = 10.0.0.1)
+# =============================================================
+
+networks:
+  vps2-internal:
+    driver: bridge
+
+volumes:
+  plug-data:
+  sandbox-tmp:
+  nginx-certs:
+
+services:
+  # ───────────────────────────────────────────────────
+  # Plug Engine — Container provisioner & lifecycle
+  # ───────────────────────────────────────────────────
+  plug-engine:
+    build:
+      context: ./plug-engine
+      dockerfile: Dockerfile
+    container_name: aims-plug-engine
+    restart: unless-stopped
+    ports:
+      - "10.0.0.2:4200:4200"
+    environment:
+      - NODE_ENV=production
+      - PORT=4200
+      - VPS1_URL=http://10.0.0.1:3001
+      - DOCKER_SOCKET=/var/run/docker.sock
+      - PLUG_PORT_START=51000
+      - PLUG_PORT_END=51999
+      - DATA_DIR=/data
+      - HEALTH_CHECK_INTERVAL=30000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - plug-data:/data
+      - /etc/aims/nginx/plugs:/etc/nginx/plugs:rw
+    networks:
+      - vps2-internal
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:4200/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  # ───────────────────────────────────────────────────
+  # Monitoring Agent — Reports health back to VPS1
+  # ───────────────────────────────────────────────────
+  monitoring:
+    build:
+      context: ./monitoring
+      dockerfile: Dockerfile
+    container_name: aims-monitoring
+    restart: unless-stopped
+    ports:
+      - "10.0.0.2:4300:4300"
+    environment:
+      - NODE_ENV=production
+      - PORT=4300
+      - VPS1_METRICS_URL=http://10.0.0.1:3001/api/v1/metrics/vps2
+      - REPORT_INTERVAL=15000
+      - HOSTNAME=vps2-sandbox
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+    networks:
+      - vps2-internal
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: '0.25'
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:4300/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # ───────────────────────────────────────────────────
+  # nginx — Reverse proxy for plug instances
+  # ───────────────────────────────────────────────────
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: aims-vps2-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - /etc/aims/nginx/plugs:/etc/nginx/plugs:ro
+      - nginx-certs:/etc/nginx/certs
+    networks:
+      - vps2-internal
+    depends_on:
+      - plug-engine
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: '0.25'
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:80/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  # ───────────────────────────────────────────────────
+  # OpenSandbox — Secure Code Execution Engine
+  # ───────────────────────────────────────────────────
+  open-sandbox:
+    build:
+      context: ./sandbox
+      dockerfile: Dockerfile
+    container_name: aims-open-sandbox
+    restart: unless-stopped
+    ports:
+      - "10.0.0.2:4400:4400"
+    environment:
+      - NODE_ENV=production
+      - PORT=4400
+      - VPS1_URL=http://10.0.0.1:3001
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - sandbox-tmp:/tmp/sandbox
+    networks:
+      - vps2-internal
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '1.0'
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:4400/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3

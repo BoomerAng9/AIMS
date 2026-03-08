@@ -21,7 +21,7 @@ import { motion } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import Image from 'next/image';
-import { Button } from 'agentic-ui';
+import { Badge, Button } from 'agentic-ui';
 import { Copy, Check, Volume2 } from 'lucide-react';
 import { spring } from '@/lib/motion/tokens';
 import { FileDownloadGroup } from '@/components/chat/FileDownload';
@@ -96,6 +96,20 @@ export const AcheevyMessage = memo(function AcheevyMessage({
   const [copied, setCopied] = useState(false);
   const isUser = message.role === 'user';
   const isStreaming = message.isStreaming;
+  const agenticMetadata = (message.metadata?.agentic || {}) as {
+    selectedTools?: Array<{ id?: string; name?: string }>;
+    businessFunction?: { id?: string; name?: string; topic?: string };
+    deepResearch?: boolean;
+  };
+  const selectedTools = Array.isArray(agenticMetadata.selectedTools)
+    ? agenticMetadata.selectedTools.filter((tool): tool is { id?: string; name?: string } => Boolean(tool?.name))
+    : [];
+  const businessFunction = agenticMetadata.businessFunction;
+  const attachmentNames = Array.isArray(message.attachments)
+    ? message.attachments
+        .map((attachment) => attachment.name)
+        .filter((name): name is string => Boolean(name))
+    : [];
 
   const handleCopy = useCallback(() => {
     navigator.clipboard.writeText(message.content);
@@ -148,6 +162,30 @@ export const AcheevyMessage = memo(function AcheevyMessage({
 
       {/* ── Message Body ───────────────────────────────────── */}
       <div className={`flex-1 max-w-[85%] ${isUser ? 'text-right' : ''}`}>
+        {(selectedTools.length > 0 || businessFunction?.name || agenticMetadata.deepResearch || attachmentNames.length > 0) && (
+          <div className={`mb-2 flex flex-wrap gap-2 ${isUser ? 'justify-end' : ''}`}>
+            {selectedTools.map((tool) => (
+              <Badge key={tool.id || tool.name} variant="outline">
+                {tool.name}
+              </Badge>
+            ))}
+            {businessFunction?.name && (
+              <Badge variant="secondary">
+                {businessFunction.name}
+                {businessFunction.topic ? ` • ${businessFunction.topic}` : ''}
+              </Badge>
+            )}
+            {agenticMetadata.deepResearch && (
+              <Badge variant="default">Deep Research</Badge>
+            )}
+            {attachmentNames.map((attachmentName) => (
+              <Badge key={attachmentName} variant="outline">
+                {`Attachment: ${attachmentName}`}
+              </Badge>
+            ))}
+          </div>
+        )}
+
         {/* Bubble */}
         <div
           className={`

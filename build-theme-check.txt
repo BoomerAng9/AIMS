@@ -1,0 +1,75 @@
+
+> aims-frontend@0.1.0 build
+> prisma generate && next build
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+
+Γ£ö Generated Prisma Client (v5.22.0) to .\node_modules\@prisma\client in 3.32s
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Help us improve the Prisma ORM for everyone. Share your feedback in a short 2-min survey: https://pris.ly/orm/survey/release-5-22
+
+  Γû▓ Next.js 14.2.35
+  - Environments: .env.local, .env
+  - Experiments (use with caution):
+    ┬╖ externalDir
+
+   Creating an optimized production build ...
+ Γ£ô Compiled successfully
+   Skipping validation of types
+   Skipping linting
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename 'C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\cache\webpack\client-production\3.pack_' -> 'C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\cache\webpack\client-production\3.pack'
+   Collecting page data ...
+   Generating static pages (0/263) ...
+[LUC state] Error: n [Error]: Dynamic server usage: Route /api/luc/state couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at l (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\chunks\8948.js:1:57759)
+    at d (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\chunks\5609.js:25:26443)
+    at s (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\chunks\5609.js:25:19584)
+    at x (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\luc\state\route.js:1:1317)
+    at C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:38417
+    at C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\server\lib\trace\tracer.js:140:36
+    at NoopContextManager.with (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\@opentelemetry\api\build\src\context\NoopContextManager.js:25:19)
+    at ContextAPI.with (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\@opentelemetry\api\build\src\api\context.js:60:46)
+    at NoopTracer.startActiveSpan (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\@opentelemetry\api\build\src\trace\NoopTracer.js:65:31)
+    at ProxyTracer.startActiveSpan (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\@opentelemetry\api\build\src\trace\ProxyTracer.js:36:24) {
+  description: "Route /api/luc/state couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+   Generating static pages (65/263) 
+Search test error: B [Error]: Dynamic server usage: Route /api/test/search couldn't be rendered statically because it used `nextUrl.searchParams`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at V (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:21778)
+    at Object.get (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:29137)
+    at p (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\test\search\route.js:1:543)
+    at C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:38417
+    at C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\server\lib\trace\tracer.js:140:36
+    at NoopContextManager.with (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\@opentelemetry\api\build\src\context\NoopContextManager.js:25:19)
+    at ContextAPI.with (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\@opentelemetry\api\build\src\api\context.js:60:46)
+    at NoopTracer.startActiveSpan (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\@opentelemetry\api\build\src\trace\NoopTracer.js:65:31)
+    at ProxyTracer.startActiveSpan (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\@opentelemetry\api\build\src\trace\ProxyTracer.js:36:24)
+    at C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\server\lib\trace\tracer.js:122:103 {
+  description: "Route /api/test/search couldn't be rendered statically because it used `nextUrl.searchParams`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+[Verticals API] GET error: Dynamic server usage: Route /api/verticals couldn't be rendered statically because it used `nextUrl.searchParams`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+[Subscription] Error: Dynamic server usage: Route /api/stripe/subscription couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+   Generating static pages (131/263) 
+The width(-1) and height(-1) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+   Generating static pages (197/263) 
+ Γ£ô Generating static pages (263/263)
+   Finalizing page optimization ...
+   Collecting build traces ...
+SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\collect-build-traces.js:429:44
+    at async Promise.all (index 0)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\collect-build-traces.js:410:13
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async collectBuildTraces (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\collect-build-traces.js:164:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2134:13
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)

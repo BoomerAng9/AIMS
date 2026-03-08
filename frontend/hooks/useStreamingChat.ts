@@ -6,12 +6,22 @@
  */
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import type { ChatMessage } from '@/lib/chat/types';
+import type { BusinessFunction, Tool, UploadedFile } from 'agentic-ui';
+import type { ChatMessage, MessageAttachment } from '@/lib/chat/types';
+
+export interface AgenticChatPayload {
+  content: string;
+  files?: UploadedFile[];
+  tools?: Tool[];
+  businessFunction?: BusinessFunction;
+  deepResearch?: boolean;
+}
 
 interface UseStreamingChatOptions {
   sessionId?: string;
   model?: string;
-  personaId?: string;
+  contextPackIds?: string[];
+  compatibilityPersonaId?: string;
   onMessageStart?: () => void;
   onMessageComplete?: (message: ChatMessage) => void;
   onError?: (error: string) => void;
@@ -22,15 +32,44 @@ interface UseStreamingChatReturn {
   isStreaming: boolean;
   isLoading: boolean;
   error: string | null;
-  sendMessage: (content: string) => Promise<void>;
+  sendMessage: (input: string | AgenticChatPayload) => Promise<void>;
   regenerate: () => Promise<void>;
   stopGeneration: () => void;
   clearMessages: () => void;
   editMessage: (id: string, newContent: string) => void;
 }
 
+function normalizePayload(input: string | AgenticChatPayload): AgenticChatPayload {
+  if (typeof input === 'string') {
+    return { content: input };
+  }
+
+  return input;
+}
+
+function toMessageAttachments(files: UploadedFile[] | undefined): MessageAttachment[] | undefined {
+  if (!files || files.length === 0) {
+    return undefined;
+  }
+
+  return files.map((file) => ({
+    type: file.type.startsWith('image/') ? 'image' : 'file',
+    name: file.name,
+    url: file.url,
+    mimeType: file.type,
+  }));
+}
+
 export function useStreamingChat(options: UseStreamingChatOptions = {}): UseStreamingChatReturn {
-  const { sessionId, model = 'gemini-3-flash', personaId, onMessageStart, onMessageComplete, onError } = options;
+  const {
+    sessionId,
+    model = 'gemini-3-flash',
+    contextPackIds = [],
+    compatibilityPersonaId,
+    onMessageStart,
+    onMessageComplete,
+    onError,
+  } = options;
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isStreaming, setIsStreaming] = useState(false);
@@ -44,18 +83,29 @@ export function useStreamingChat(options: UseStreamingChatOptions = {}): UseStre
   // Send Message with Streaming
   // ─────────────────────────────────────────────────────────
 
-  const sendMessage = useCallback(async (content: string) => {
-    if (!content.trim() || isStreaming) return;
+  const sendMessage = useCallback(async (input: string | AgenticChatPayload) => {
+    const payload = normalizePayload(input);
+    if (!payload.content.trim() || isStreaming) return;
 
     setError(null);
     setIsLoading(true);
+
+    const attachments = toMessageAttachments(payload.files);
 
     // Add user message
     const userMessage: ChatMessage = {
       id: `user-${Date.now()}`,
       role: 'user',
-      content: content.trim(),
+      content: payload.content.trim(),
       timestamp: new Date(),
+      attachments,
+      metadata: {
+        agentic: {
+          selectedTools: payload.tools || [],
+          businessFunction: payload.businessFunction,
+          deepResearch: Boolean(payload.deepResearch),
+        },
+      },
     };
 
     // Add placeholder assistant message
@@ -81,10 +131,13 @@ export function useStreamingChat(options: UseStreamingChatOptions = {}): UseStre
           messages: [...messages, userMessage].map(m => ({
             role: m.role,
             content: m.content,
+            attachments: m.attachments,
+            metadata: m.metadata,
           })),
           model,
           sessionId,
-          personaId,
+          contextPackIds,
+          personaId: compatibilityPersonaId,
         }),
         signal: abortControllerRef.current.signal,
       });
@@ -266,7 +319,17 @@ export function useStreamingChat(options: UseStreamingChatOptions = {}): UseStre
       setIsLoading(false);
       abortControllerRef.current = null;
     }
-  }, [messages, isStreaming, model, sessionId, onMessageStart, onMessageComplete, onError]);
+  }, [
+    compatibilityPersonaId,
+    contextPackIds,
+    isStreaming,
+    messages,
+    model,
+    onError,
+    onMessageComplete,
+    onMessageStart,
+    sessionId,
+  ]);
 
   // ─────────────────────────────────────────────────────────
   // Regenerate Last Response

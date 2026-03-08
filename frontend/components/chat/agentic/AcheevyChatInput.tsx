@@ -1,70 +1,74 @@
 'use client';
 
 /**
- * AcheevyChatInput — Agentic-UI-powered chat input for ACHEEVY
+ * AcheevyChatInput — AgenticUI-backed Bottom Composer Bezel for ACHEEVY
  *
- * Composes agentic-ui primitives (Button, Badge, AttachmentButton, ToolsButton)
- * with A.I.M.S.-specific controls: voice input, model selector, persona selector,
- * language selector, ElevenLabs voice agent toggle, and orchestration board toggles.
- *
- * The textarea remains controlled (external state) to support voice transcript
- * pre-filling, vertical flow classification, and external input management.
+ * Uses the real agentic-ui ChatInput for prompt composition, attachments,
+ * tool selection, and business-function selection while preserving A.I.M.S.
+ * controls for voice input, model routing, Context Packs, speech output,
+ * and orchestration surfaces.
  */
 
-import { useRef, useEffect, memo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Button } from 'agentic-ui';
-import { Badge } from 'agentic-ui';
+import React, { memo, useEffect, useMemo } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
+  Badge,
+  Button,
+  ChatInput,
+  Toaster,
+  type BusinessFunction,
+  type Tool,
+  type UploadedFile,
+} from 'agentic-ui';
+import {
+  BrainCircuit,
+  Database,
+  Eye,
+  Globe,
+  LayoutDashboard,
+  Loader2,
   Mic,
-  Send,
-  Square,
   Phone,
   PhoneOff,
-  Globe,
-  BrainCircuit,
+  Square,
   Volume2,
-  LayoutDashboard,
-  Eye,
-  Loader2,
+  VolumeX,
 } from 'lucide-react';
-import { transition, spring } from '@/lib/motion/tokens';
-import type { AchievyPersona } from '@/lib/acheevy/persona';
-
-// ─────────────────────────────────────────────────────────────
-// Voice Input Sub-components (isolated for perf)
-// ─────────────────────────────────────────────────────────────
+import { transition } from '@/lib/motion/tokens';
+import type { ContextPackOption } from '@/lib/context-packs/contracts';
 
 interface VoicePingProps {
   audioLevel: number;
 }
 
 function VoicePing({ audioLevel }: VoicePingProps) {
+  if (audioLevel <= 0.05) {
+    return null;
+  }
+
   return (
-    <div
-      className="absolute inset-0 rounded-xl border-2 border-red-400 animate-ping"
-      style={{ opacity: audioLevel * 0.5 }}
-    />
+    <div className="absolute inset-0 rounded-full border-2 border-red-400/60 animate-ping" />
   );
 }
 
 function VoiceEqualizer({ audioLevel }: { audioLevel: number }) {
+  const barHeights = audioLevel > 0.66
+    ? ['h-2', 'h-3', 'h-4', 'h-3', 'h-2']
+    : audioLevel > 0.33
+      ? ['h-1.5', 'h-2.5', 'h-3', 'h-2.5', 'h-1.5']
+      : ['h-1', 'h-1.5', 'h-2', 'h-1.5', 'h-1'];
+
   return (
-    <div className="flex gap-0.5 items-end h-4">
-      {[0.3, 0.6, 1, 0.7, 0.4].map((scale, i) => (
+    <div className="flex h-4 items-end gap-0.5">
+      {barHeights.map((heightClass, index) => (
         <div
-          key={i}
-          className="w-0.5 bg-red-400/60 rounded-full transition-all duration-75"
-          style={{ height: `${Math.max(4, audioLevel * scale * 16)}px` }}
+          key={index}
+          className={`w-0.5 rounded-full bg-red-400/60 transition-all duration-75 ${heightClass}`}
         />
       ))}
     </div>
   );
 }
-
-// ─────────────────────────────────────────────────────────────
-// Model & Persona types
-// ─────────────────────────────────────────────────────────────
 
 export interface AIModel {
   key: string;
@@ -72,22 +76,20 @@ export interface AIModel {
   tag: string;
 }
 
-// ─────────────────────────────────────────────────────────────
-// Main Component Props
-// ─────────────────────────────────────────────────────────────
+export interface AgenticComposerPayload {
+  message: string;
+  files?: UploadedFile[];
+  tools?: Tool[];
+  businessFunction?: BusinessFunction;
+  deepResearch?: boolean;
+}
 
 export interface AcheevyChatInputProps {
-  // Core input state (controlled)
-  value: string;
-  onChange: (value: string) => void;
-  onSend: (text?: string) => void;
-  onKeyDown: (e: React.KeyboardEvent) => void;
+  onSend: (payload: AgenticComposerPayload) => void;
   placeholder?: string;
   disabled?: boolean;
   isStreaming?: boolean;
   isLoading?: boolean;
-
-  // Voice input
   voiceInput: {
     isListening: boolean;
     isProcessing: boolean;
@@ -95,46 +97,35 @@ export interface AcheevyChatInputProps {
     startListening: () => void;
     stopListening: () => void;
   };
-  voiceTranscriptReady?: boolean;
+  voiceTranscript?: string;
+  onSendVoiceTranscript?: () => void;
   onClearTranscript?: () => void;
   audioLevel?: number;
-
-  // ElevenLabs voice agent
   hasVoiceAgent?: boolean;
   voiceSessionActive?: boolean;
   voiceAgentStatus?: string;
   voiceAgentSpeaking?: boolean;
   onStartVoiceSession?: () => void;
   onEndVoiceSession?: () => void;
-
-  // Voice output
   isVoicePlaying?: boolean;
   onStopVoice?: () => void;
-
-  // Model / Persona / Language selectors
+  autoPlayVoice?: boolean;
+  onToggleAutoPlayVoice?: () => void;
   models: AIModel[];
   selectedModel: string;
   onModelChange: (model: string) => void;
-  personas: AchievyPersona[];
-  selectedPersona: string;
-  onPersonaChange: (persona: string) => void;
+  contextPacks: ContextPackOption[];
+  selectedContextPackId: string;
+  onContextPackChange: (contextPackId: string) => void;
   selectedLanguage: string;
   onLanguageChange: (language: string) => void;
-
-  // Orchestration controls
   showOrchestration?: boolean;
   onOpenBoard?: () => void;
   onOpenCollabFeed?: () => void;
-
-  // Stop / Regenerate
   onStop?: () => void;
   onRegenerate?: () => void;
   hasMessages?: boolean;
 }
-
-// ─────────────────────────────────────────────────────────────
-// VoiceInputButton (with timer)
-// ─────────────────────────────────────────────────────────────
 
 const VoiceInputBtn = memo(function VoiceInputBtn({
   isListening,
@@ -151,57 +142,51 @@ const VoiceInputBtn = memo(function VoiceInputBtn({
 }) {
   const [elapsed, setElapsed] = React.useState(0);
 
-  React.useEffect(() => {
-    if (!isListening) { setElapsed(0); return; }
-    const t = setInterval(() => setElapsed((s) => s + 1), 1000);
-    return () => clearInterval(t);
+  useEffect(() => {
+    if (!isListening) {
+      setElapsed(0);
+      return;
+    }
+
+    const timer = setInterval(() => setElapsed((seconds) => seconds + 1), 1000);
+    return () => clearInterval(timer);
   }, [isListening]);
 
-  const fmt = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+  const formattedTime = `${Math.floor(elapsed / 60)}:${String(elapsed % 60).padStart(2, '0')}`;
 
   return (
     <div className="flex items-center gap-2">
       <button
+        type="button"
         onClick={isListening ? onStop : onStart}
         disabled={isProcessing}
-        className={`
-          relative p-3 rounded-xl transition-all
-          ${isListening
-            ? 'bg-red-500/20 text-red-400'
-            : 'bg-surface text-zinc-500 hover:bg-white/5 hover:text-zinc-300'
-          }
-          ${isProcessing ? 'opacity-50 cursor-not-allowed' : ''}
-        `}
+        className={`relative flex h-10 w-10 items-center justify-center rounded-full border transition-all ${
+          isListening
+            ? 'border-red-400/40 bg-red-500/15 text-red-300'
+            : 'border-white/10 bg-black/10 text-zinc-400 hover:border-white/20 hover:text-zinc-200'
+        } ${isProcessing ? 'cursor-not-allowed opacity-60' : ''}`}
+        title={isListening ? 'Stop voice capture' : 'Start voice capture'}
+        aria-label="Voice Capture Toggle"
       >
         {isListening && <VoicePing audioLevel={audioLevel} />}
-        {isProcessing ? (
-          <Loader2 className="w-5 h-5 animate-spin text-gold" />
-        ) : (
-          <Mic className="w-5 h-5" />
-        )}
+        {isProcessing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mic className="h-4 w-4" />}
       </button>
 
-      {isListening && (
-        <div className="flex items-center gap-1.5">
-          <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-          <span className="text-xs font-mono text-red-400">{fmt(elapsed)}</span>
-          <VoiceEqualizer audioLevel={audioLevel} />
+      {(isListening || isProcessing) && (
+        <div className="flex items-center gap-2 text-[11px] font-label text-zinc-400">
+          {isListening && (
+            <>
+              <span className="h-2 w-2 animate-pulse rounded-full bg-red-500" />
+              <span className="font-mono text-red-300">{formattedTime}</span>
+              <VoiceEqualizer audioLevel={audioLevel} />
+            </>
+          )}
+          {isProcessing && <span className="text-gold/80">TRANSCRIBING</span>}
         </div>
-      )}
-
-      {isProcessing && (
-        <span className="text-xs text-gold/60 animate-pulse">Transcribing...</span>
       )}
     </div>
   );
 });
-
-// Need React for the sub-component useState/useEffect
-import React from 'react';
-
-// ─────────────────────────────────────────────────────────────
-// Language options
-// ─────────────────────────────────────────────────────────────
 
 const LANGUAGES = [
   { code: 'en', label: 'EN' },
@@ -212,21 +197,15 @@ const LANGUAGES = [
   { code: 'ja', label: 'JA' },
 ] as const;
 
-// ─────────────────────────────────────────────────────────────
-// AcheevyChatInput
-// ─────────────────────────────────────────────────────────────
-
 export function AcheevyChatInput({
-  value,
-  onChange,
   onSend,
-  onKeyDown,
   placeholder = 'Message ACHEEVY...',
   disabled = false,
   isStreaming = false,
   isLoading = false,
   voiceInput,
-  voiceTranscriptReady = false,
+  voiceTranscript,
+  onSendVoiceTranscript,
   onClearTranscript,
   audioLevel = 0,
   hasVoiceAgent = false,
@@ -237,12 +216,14 @@ export function AcheevyChatInput({
   onEndVoiceSession,
   isVoicePlaying = false,
   onStopVoice,
+  autoPlayVoice = true,
+  onToggleAutoPlayVoice,
   models,
   selectedModel,
   onModelChange,
-  personas,
-  selectedPersona,
-  onPersonaChange,
+  contextPacks,
+  selectedContextPackId,
+  onContextPackChange,
   selectedLanguage,
   onLanguageChange,
   showOrchestration = false,
@@ -252,290 +233,345 @@ export function AcheevyChatInput({
   onRegenerate,
   hasMessages = false,
 }: AcheevyChatInputProps) {
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const availableTools = useMemo<Tool[]>(() => [
+    {
+      id: 'working-notebook',
+      name: 'Working Notebook',
+      description: 'Use the current Working Notebook and active Context Packs as structured context.',
+      icon: '📓',
+    },
+    {
+      id: 'session-snapshot',
+      name: 'Session Snapshot',
+      description: 'Pull persisted session context, selections, and recent workflow state.',
+      icon: '🧠',
+    },
+    {
+      id: 'data-source-catalog',
+      name: 'Data Source Catalog',
+      description: 'Use the active Data Source Catalog selections in this response.',
+      icon: '🗂️',
+    },
+    {
+      id: 'technical-knowledge-index',
+      name: 'Technical Knowledge Index',
+      description: 'Map plain-language inputs to canonical technical terminology.',
+      icon: '📚',
+    },
+    {
+      id: 'sandbox-control-plane',
+      name: 'Sandbox Control Plane',
+      description: 'Reason about deployment, execution, and environment state.',
+      icon: '🚀',
+    },
+    {
+      id: 'speech-output',
+      name: 'Speech Output',
+      description: 'Optimize the response for read-aloud playback and interruption handling.',
+      icon: '🔊',
+    },
+  ], []);
 
-  // Auto-resize textarea
-  useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 200)}px`;
-    }
-  }, [value]);
+  const businessFunctions = useMemo<BusinessFunction[]>(() => [
+    {
+      id: 'build-intent-resolution',
+      name: 'Build Intent Resolver',
+      description: 'Clarify what the user is trying to build and route toward execution.',
+      icon: '🧭',
+      topic: 'Intent',
+    },
+    {
+      id: 'prompt-reconstruction',
+      name: 'Prompt Reconstruction',
+      description: 'Rewrite user language into build-ready prompts and technical requirements.',
+      icon: '✍️',
+      topic: 'Prompting',
+    },
+    {
+      id: 'deep-research',
+      name: 'Deep Research',
+      description: 'Run a broader discovery pass before execution.',
+      icon: '🔎',
+      topic: 'Research',
+    },
+    {
+      id: 'service-deployment',
+      name: 'Service Deployment',
+      description: 'Plan or execute managed service deployment work.',
+      icon: '⚙️',
+      topic: 'Execution',
+    },
+    {
+      id: 'workflow-automation',
+      name: 'Workflow Automation',
+      description: 'Design or execute workflow and orchestration changes.',
+      icon: '🔁',
+      topic: 'Automation',
+    },
+  ], []);
 
-  const canSend = value.trim() && !isStreaming && !isLoading;
+  const selectedModelLabel = models.find((entry) => entry.key === selectedModel)?.label || selectedModel;
+  const selectedContextPackName = contextPacks.find((entry) => entry.id === selectedContextPackId)?.name || 'Context Pack';
 
   return (
-    <div className="aims-agentic border-t border-wireframe-stroke bg-obsidian/90 backdrop-blur-xl px-4 py-4">
-      <div className="max-w-3xl mx-auto space-y-3">
-        {/* ── Regenerate button ──────────────────────────────── */}
-        {hasMessages && !isStreaming && onRegenerate && (
-          <div className="flex justify-center">
+    <div className="aims-agentic border-t border-wireframe-stroke bg-obsidian/90 px-4 py-4 backdrop-blur-xl">
+      <div className="mx-auto max-w-4xl space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-3 px-1">
+          <div className="flex items-center gap-2">
+            <p className="font-label text-[11px] uppercase tracking-[0.28em] text-zinc-500">
+              CHAT W/ ACHEEVY
+            </p>
+            <Badge variant="outline">{selectedContextPackName}</Badge>
+            <Badge variant="outline">{selectedModelLabel}</Badge>
+          </div>
+
+          {hasMessages && !isStreaming && onRegenerate && (
             <Button
               variant="ghost"
               size="sm"
               onClick={onRegenerate}
-              className="text-zinc-500 hover:text-zinc-300 gap-2"
+              className="gap-2 text-zinc-400 hover:text-zinc-100"
             >
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <polyline points="23 4 23 10 17 10" />
-                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
-              </svg>
               Regenerate response
             </Button>
-          </div>
-        )}
+          )}
+        </div>
 
-        {/* ── Selector Row ──────────────────────────────────── */}
-        <div className="flex justify-end gap-2">
-          {/* Model Selector */}
-          <div className="flex items-center gap-1.5 bg-surface/80 rounded-lg px-2.5 py-1.5 text-xs border border-wireframe-stroke hover:border-white/15 transition-colors">
-            <BrainCircuit className="w-3.5 h-3.5 text-zinc-500" />
-            <select
-              value={selectedModel}
-              onChange={(e) => onModelChange(e.target.value)}
-              className="bg-transparent border-none outline-none text-zinc-300 text-xs cursor-pointer appearance-none pr-4"
-              title="Select AI Model"
-            >
-              {models.map((m) => (
-                <option key={m.key} value={m.key} className="bg-[#18181B]">
-                  {m.label}{m.tag ? ` (${m.tag})` : ''}
-                </option>
-              ))}
-            </select>
-          </div>
+        <div className="aims-agentic-panel rounded-[28px] px-4 py-4">
+          <div className="flex flex-wrap items-center gap-2 pb-3">
+            <VoiceInputBtn
+              isListening={voiceInput.isListening}
+              isProcessing={voiceInput.isProcessing}
+              audioLevel={audioLevel}
+              onStart={voiceInput.startListening}
+              onStop={voiceInput.stopListening}
+            />
 
-          {/* Persona Selector — only when multiple */}
-          {personas.length > 1 && (
-            <div className="flex items-center gap-1.5 bg-surface/80 rounded-lg px-2.5 py-1.5 text-xs border border-wireframe-stroke hover:border-white/15 transition-colors">
-              <Volume2 className="w-3.5 h-3.5 text-zinc-500" />
+            <div className="flex items-center gap-1.5 rounded-full border border-wireframe-stroke bg-surface/80 px-3 py-2 text-xs font-label transition-colors hover:border-white/15">
+              <BrainCircuit className="h-3.5 w-3.5 text-zinc-500" />
               <select
-                value={selectedPersona}
-                onChange={(e) => onPersonaChange(e.target.value)}
-                className="bg-transparent border-none outline-none text-zinc-300 text-xs cursor-pointer appearance-none pr-4"
-                title="Select Voice Persona"
+                value={selectedModel}
+                onChange={(event) => onModelChange(event.target.value)}
+                className="cursor-pointer appearance-none border-none bg-transparent pr-4 text-[11px] text-zinc-300 outline-none"
+                title="Select AI Model"
               >
-                {personas.map((p) => (
-                  <option key={p.id} value={p.id} className="bg-[#18181B]">
-                    {p.name}
+                {models.map((modelOption) => (
+                  <option key={modelOption.key} value={modelOption.key} className="bg-[#18181B]">
+                    {modelOption.label}{modelOption.tag ? ` (${modelOption.tag})` : ''}
                   </option>
                 ))}
               </select>
             </div>
+
+            {contextPacks.length > 0 && (
+              <div className="flex items-center gap-1.5 rounded-full border border-wireframe-stroke bg-surface/80 px-3 py-2 text-xs font-label transition-colors hover:border-white/15">
+                <Database className="h-3.5 w-3.5 text-zinc-500" />
+                <select
+                  value={selectedContextPackId}
+                  onChange={(event) => onContextPackChange(event.target.value)}
+                  className="cursor-pointer appearance-none border-none bg-transparent pr-4 text-[11px] text-zinc-300 outline-none"
+                  title="Select Data Source"
+                >
+                  {contextPacks.map((contextPack) => (
+                    <option key={contextPack.id} value={contextPack.id} className="bg-[#18181B]">
+                      {contextPack.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            <button
+              type="button"
+              onClick={onToggleAutoPlayVoice}
+              disabled={!onToggleAutoPlayVoice}
+              className={`flex items-center gap-1.5 rounded-full border px-3 py-2 text-[11px] font-label transition-colors ${
+                autoPlayVoice
+                  ? 'border-gold/30 bg-gold/10 text-gold'
+                  : 'border-wireframe-stroke bg-surface/80 text-zinc-400 hover:border-white/15'
+              } ${!onToggleAutoPlayVoice ? 'cursor-default opacity-70' : ''}`}
+              title={autoPlayVoice ? 'Disable speech output' : 'Enable speech output'}
+            >
+              {autoPlayVoice ? <Volume2 className="h-3.5 w-3.5" /> : <VolumeX className="h-3.5 w-3.5" />}
+              <span>{autoPlayVoice ? 'Speech On' : 'Speech Off'}</span>
+            </button>
+
+            <div className="flex items-center gap-1.5 rounded-full border border-wireframe-stroke bg-surface/80 px-3 py-2 text-xs font-label transition-colors hover:border-white/15">
+              <Globe className="h-3.5 w-3.5 text-zinc-500" />
+              <select
+                value={selectedLanguage}
+                onChange={(event) => onLanguageChange(event.target.value)}
+                className="cursor-pointer appearance-none border-none bg-transparent text-[11px] text-zinc-300 outline-none"
+                title="Select Language"
+              >
+                {LANGUAGES.map((language) => (
+                  <option key={language.code} value={language.code} className="bg-[#18181B]">
+                    {language.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {showOrchestration && onOpenCollabFeed && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={onOpenCollabFeed}
+                className="h-10 w-10 rounded-full border border-wireframe-stroke text-zinc-400 hover:text-zinc-100"
+                title="Open Agent Viewport"
+              >
+                <Eye className="h-4 w-4" />
+              </Button>
+            )}
+
+            {showOrchestration && onOpenBoard && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={onOpenBoard}
+                className="h-10 w-10 rounded-full border border-wireframe-stroke text-zinc-400 hover:text-zinc-100"
+                title="Open Department Board"
+              >
+                <LayoutDashboard className="h-4 w-4" />
+              </Button>
+            )}
+
+            {hasVoiceAgent && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={voiceSessionActive ? onEndVoiceSession : onStartVoiceSession}
+                className={`h-10 w-10 rounded-full border ${
+                  voiceSessionActive
+                    ? 'border-gold/30 bg-gold/10 text-gold'
+                    : 'border-wireframe-stroke text-zinc-400 hover:text-zinc-100'
+                }`}
+                title={voiceSessionActive ? 'End voice session' : 'Start voice session'}
+              >
+                {voiceSessionActive ? <PhoneOff className="h-4 w-4" /> : <Phone className="h-4 w-4" />}
+              </Button>
+            )}
+          </div>
+
+          <AnimatePresence>
+            {voiceSessionActive && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={transition.fast}
+                className="overflow-hidden pb-3"
+              >
+                <div className="flex items-center gap-3 rounded-2xl border border-gold/20 bg-gold/5 px-3 py-2">
+                  <span className="relative flex h-2.5 w-2.5">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-gold opacity-75" />
+                    <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-gold" />
+                  </span>
+                  <span className="text-xs font-label text-gold/80">
+                    {voiceAgentStatus === 'connected'
+                      ? (voiceAgentSpeaking ? 'ACHEEVY SPEAKING' : 'ACHEEVY LISTENING')
+                      : 'CONNECTING'}
+                  </span>
+                  <span className="text-xs text-zinc-500">Voice session remains available while the rest of chat stays interactive.</span>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <AnimatePresence>
+            {voiceTranscript && voiceTranscript.trim() && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={transition.fast}
+                className="overflow-hidden pb-3"
+              >
+                <div className="rounded-2xl border border-gold/15 bg-gold/5 p-3">
+                  <div className="mb-2 flex items-center gap-2 text-xs font-label text-gold/80">
+                    <Mic className="h-3.5 w-3.5" />
+                    Voice transcript ready for review
+                  </div>
+                  <p className="whitespace-pre-wrap text-sm leading-6 text-zinc-200">{voiceTranscript}</p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <Button type="button" size="sm" onClick={onSendVoiceTranscript}>
+                      Send transcript
+                    </Button>
+                    <Button type="button" variant="ghost" size="sm" onClick={onClearTranscript}>
+                      Clear
+                    </Button>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {isStreaming && onStop && (
+            <div className="pb-3">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={onStop}
+                className="gap-2 border-red-400/25 text-red-300 hover:bg-red-500/10 hover:text-red-200"
+              >
+                <Square className="h-3.5 w-3.5" />
+                Stop response
+              </Button>
+            </div>
           )}
 
-          {/* Language Selector */}
-          <div className="flex items-center gap-1.5 bg-surface/80 rounded-lg px-2.5 py-1.5 text-xs border border-wireframe-stroke hover:border-white/15 transition-colors">
-            <Globe className="w-3.5 h-3.5 text-zinc-500" />
-            <select
-              value={selectedLanguage}
-              onChange={(e) => onLanguageChange(e.target.value)}
-              title="Select Language"
-              className="bg-transparent border-none outline-none text-zinc-300 text-xs cursor-pointer appearance-none"
-            >
-              {LANGUAGES.map((l) => (
-                <option key={l.code} value={l.code} className="bg-[#18181B]">
-                  {l.label}
-                </option>
-              ))}
-            </select>
+          <div className="rounded-[24px] border border-white/10 bg-black/10 p-2">
+            <ChatInput
+              onSendMessage={(message, files, tools, businessFunction, deepResearch) =>
+                onSend({
+                  message,
+                  files,
+                  tools,
+                  businessFunction,
+                  deepResearch,
+                })
+              }
+              placeholder={placeholder}
+              disabled={disabled || isLoading}
+              showAttachment={true}
+              showVoice={false}
+              showTools={true}
+              showDeepResearch={true}
+              tools={availableTools}
+              businessFunctions={businessFunctions}
+              isStreaming={isStreaming}
+              maxFiles={5}
+              maxFileSize={10 * 1024 * 1024}
+              enableSlashTools={true}
+              toolsLabel="Tools"
+              deepResearchLabel="Deep Research"
+              attachmentTooltip="Attachment Trigger"
+              className="w-full"
+            />
+          </div>
+
+          <div className="flex flex-wrap items-center justify-between gap-2 pt-3 text-[11px]">
+            <div className="flex flex-wrap items-center gap-2 text-zinc-500">
+              <Badge variant="outline">/ for tools</Badge>
+              <Badge variant="outline">@ for business functions</Badge>
+              {isVoicePlaying && (
+                <button type="button" onClick={onStopVoice} className="text-gold hover:text-gold-light">
+                  Stop read-aloud
+                </button>
+              )}
+            </div>
+            <p className="font-label tracking-[0.14em] text-zinc-600">
+              ACHEEVY may produce inaccurate information. Voice powered by ElevenLabs.
+            </p>
           </div>
         </div>
-
-        {/* ── ElevenLabs Voice Agent Status ──────────────────── */}
-        <AnimatePresence>
-          {voiceSessionActive && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={transition.fast}
-              className="overflow-hidden"
-            >
-              <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-gold/5 border border-gold/20">
-                <div className="relative flex items-center gap-2">
-                  <span className="relative flex h-2.5 w-2.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-gold opacity-75" />
-                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-gold" />
-                  </span>
-                  <span className="text-xs font-mono text-gold/80 uppercase tracking-wider">
-                    {voiceAgentStatus === 'connected'
-                      ? (voiceAgentSpeaking ? 'ACHEEVY Speaking...' : 'ACHEEVY Listening...')
-                      : 'Connecting...'}
-                  </span>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={onEndVoiceSession}
-                  className="ml-auto gap-1.5 text-red-400 hover:text-red-300 hover:bg-red-500/15"
-                >
-                  <PhoneOff className="w-3 h-3" />
-                  End
-                </Button>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* ── Voice Transcript Ready ────────────────────────── */}
-        <AnimatePresence>
-          {voiceTranscriptReady && value.trim() && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={transition.fast}
-              className="overflow-hidden"
-            >
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gold/5 border border-gold/15 text-xs text-gold/70">
-                <Mic className="w-3 h-3" />
-                <span>Voice transcript ready — review and press Enter to send</span>
-                <button
-                  onClick={onClearTranscript}
-                  className="ml-auto text-zinc-500 hover:text-zinc-300 transition-colors"
-                >
-                  Clear
-                </button>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* ── Main Input Card ───────────────────────────────── */}
-        <div
-          className={`
-            relative flex items-end gap-3 rounded-2xl p-3
-            bg-surface-raised/50 border transition-colors
-            ${voiceTranscriptReady
-              ? 'border-gold/20'
-              : 'border-wireframe-stroke focus-within:border-gold/30'
-            }
-          `}
-        >
-          {/* Voice Input Button */}
-          <VoiceInputBtn
-            isListening={voiceInput.isListening}
-            isProcessing={voiceInput.isProcessing}
-            audioLevel={audioLevel}
-            onStart={voiceInput.startListening}
-            onStop={voiceInput.stopListening}
-          />
-
-          {/* ElevenLabs Voice Agent Toggle */}
-          {hasVoiceAgent && (
-            <button
-              onClick={voiceSessionActive ? onEndVoiceSession : onStartVoiceSession}
-              className={`p-3 rounded-xl transition-all ${
-                voiceSessionActive
-                  ? 'bg-gold/20 text-gold'
-                  : 'bg-surface text-zinc-500 hover:bg-white/5 hover:text-zinc-300'
-              }`}
-              title={voiceSessionActive ? 'End voice session' : 'Start voice session'}
-            >
-              {voiceSessionActive ? <PhoneOff className="w-5 h-5" /> : <Phone className="w-5 h-5" />}
-            </button>
-          )}
-
-          {/* Textarea */}
-          <textarea
-            ref={textareaRef}
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-            onKeyDown={onKeyDown}
-            placeholder={placeholder}
-            disabled={isStreaming}
-            rows={1}
-            className="flex-1 bg-transparent text-zinc-100 placeholder:text-zinc-600 resize-none outline-none text-[15px] leading-relaxed max-h-[200px] py-2"
-          />
-
-          {/* Agent Viewport Toggle */}
-          {showOrchestration && onOpenCollabFeed && (
-            <button
-              onClick={onOpenCollabFeed}
-              className="p-3 rounded-xl bg-surface text-zinc-500 hover:bg-white/5 hover:text-zinc-300 transition-colors"
-              title="View Agent Viewport"
-            >
-              <Eye className="w-5 h-5" />
-            </button>
-          )}
-
-          {/* Department Board Toggle */}
-          {showOrchestration && onOpenBoard && (
-            <button
-              onClick={onOpenBoard}
-              className="p-3 rounded-xl bg-surface text-zinc-500 hover:bg-white/5 hover:text-zinc-300 transition-colors"
-              title="View Department Board"
-            >
-              <LayoutDashboard className="w-5 h-5" />
-            </button>
-          )}
-
-          {/* Send / Stop Button */}
-          {isStreaming ? (
-            <motion.button
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={spring.snappy}
-              onClick={onStop}
-              className="p-3 rounded-xl bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors"
-            >
-              <Square className="w-5 h-5" />
-            </motion.button>
-          ) : (
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              transition={spring.snappy}
-              onClick={() => onSend()}
-              disabled={!canSend}
-              className={`
-                p-3 rounded-xl transition-all
-                ${canSend
-                  ? 'bg-gold text-black hover:bg-gold-light shadow-lg shadow-gold/20'
-                  : 'bg-surface text-zinc-600 cursor-not-allowed'
-                }
-              `}
-            >
-              {isLoading ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
-              ) : (
-                <Send className="w-5 h-5" />
-              )}
-            </motion.button>
-          )}
-        </div>
-
-        {/* ── Voice Output Status ───────────────────────────── */}
-        <AnimatePresence>
-          {isVoicePlaying && (
-            <motion.div
-              initial={{ opacity: 0, y: 5 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 5 }}
-              transition={transition.fast}
-              className="flex items-center justify-center gap-2 text-sm text-zinc-400"
-            >
-              <div className="flex gap-1">
-                {[0, 1, 2].map((i) => (
-                  <div
-                    key={i}
-                    className="w-1 h-3 bg-gold rounded-full animate-pulse"
-                    style={{ animationDelay: `${i * 150}ms` }}
-                  />
-                ))}
-              </div>
-              <span>Speaking...</span>
-              <button onClick={onStopVoice} className="text-gold hover:text-gold-light">
-                Stop
-              </button>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* ── Footer ────────────────────────────────────────── */}
-        <p className="text-center text-xs text-zinc-600">
-          ACHEEVY may produce inaccurate information. Voice powered by ElevenLabs.
-        </p>
       </div>
+
+      <Toaster />
     </div>
   );
 }

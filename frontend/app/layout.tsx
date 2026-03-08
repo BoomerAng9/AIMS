@@ -97,7 +97,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         className={`
           ${doto.variable} ${permanentMarker.variable} ${caveat.variable}
           ${patrickHand.variable} ${nabla.variable}
-          antialiased bg-[#09090B] text-zinc-100 font-sans overflow-x-hidden
+          antialiased bg-[#09090B] text-zinc-100 font-body overflow-x-hidden
         `}
       >
         <Providers>

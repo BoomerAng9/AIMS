@@ -1,0 +1,24 @@
+FROM node:20-alpine AS builder
+WORKDIR /app
+
+COPY package.json package-lock.json* ./
+RUN npm install
+
+COPY src/ ./src/
+COPY tsconfig.json ./
+
+RUN npx tsc
+
+FROM node:20-alpine
+WORKDIR /app
+
+RUN apk add --no-cache docker-cli wget
+
+COPY package.json package-lock.json* ./
+RUN npm install --omit=dev
+
+COPY --from=builder /app/dist ./dist/
+
+EXPOSE 4200
+
+CMD ["node", "dist/server.js"]

@@ -7,7 +7,9 @@
 
 import { Router, Request, Response } from 'express';
 import { getOrchestrator, AcheevyExecuteRequest } from './orchestrator';
+import { resolveIntentFromRoutingDecision } from './routing-contract';
 import { registry } from '../agents/registry';
+import logger from '../logger';
 
 const router = Router();
 
@@ -33,23 +35,28 @@ router.post('/execute', async (req: Request, res: Response) => {
       body.userId = 'anon';
     }
 
+    if (!body.intent && body.routingDecision) {
+      body.intent = resolveIntentFromRoutingDecision(body.routingDecision);
+    }
+
     if (!body.intent) {
-      body.intent = 'internal-llm';
+      body.intent = 'conversation';
     }
 
     const orchestrator = getOrchestrator();
     const result = await orchestrator.execute(body);
 
-    console.log(`[ACHEEVY] ${result.requestId} → ${body.intent} → ${result.status}`);
+    logger.info({ requestId: result.requestId, intent: body.intent, status: result.status }, '[ACHEEVY] Routed request');
 
     return res.json(result);
-  } catch (error: any) {
-    console.error('[ACHEEVY] Router error:', error.message);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Unknown router error';
+    logger.error({ err: error, message }, '[ACHEEVY] Router error');
     return res.status(500).json({
       status: 'error',
       reply: 'Internal server error.',
       requestId: '',
-      error: error.message,
+      error: message,
     });
   }
 });

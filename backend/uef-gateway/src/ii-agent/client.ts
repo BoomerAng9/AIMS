@@ -24,12 +24,29 @@ export interface IIAgentTask {
     sessionId?: string;
     previousMessages?: Array<{ role: string; content: string }>;
     workingDirectory?: string;
+    routing?: {
+      intent?: string;
+      intentType?: string;
+      executionLane?: string;
+      taskComplexity?: string;
+      researchLevel?: string;
+      verticalId?: string;
+    };
   };
   options?: {
     timeout?: number;
     maxTokens?: number;
     streaming?: boolean;
   };
+}
+
+interface TaskRoutingHint {
+  intent?: string;
+  intentType?: string;
+  executionLane?: string;
+  taskComplexity?: string;
+  researchLevel?: string;
+  verticalId?: string;
 }
 
 export interface IIAgentResponse {
@@ -64,6 +81,26 @@ const TASK_TYPE_TO_AGENT_TYPE: Record<string, string> = {
   fullstack: 'coder',
   browser: 'browser',
 };
+
+function resolveTaskTypeFromRouting(routing?: TaskRoutingHint): IIAgentTask['type'] | null {
+  if (!routing) return null;
+
+  if (routing.executionLane === 'delegated_execution') {
+    return routing.researchLevel === 'deep' ? 'research' : 'fullstack';
+  }
+
+  if (routing.executionLane === 'direct_ii_agent') {
+    if (routing.intentType === 'research' || routing.researchLevel === 'deep' || routing.researchLevel === 'standard') {
+      return 'research';
+    }
+
+    if (routing.intentType === 'plug_fabrication' || routing.taskComplexity === 'high') {
+      return 'fullstack';
+    }
+  }
+
+  return null;
+}
 
 /**
  * IIAgentClient — WebSocket bridge to external ii-agent backend.
@@ -235,6 +272,12 @@ export class IIAgentClient extends EventEmitter {
           aims_task_type: task.type,
           aims_user_id: task.context?.userId,
           aims_session_id: task.context?.sessionId,
+          aims_routing_intent: task.context?.routing?.intent,
+          aims_routing_intent_type: task.context?.routing?.intentType,
+          aims_execution_lane: task.context?.routing?.executionLane,
+          aims_task_complexity: task.context?.routing?.taskComplexity,
+          aims_research_level: task.context?.routing?.researchLevel,
+          aims_vertical_id: task.context?.routing?.verticalId,
         },
       };
 
@@ -285,6 +328,16 @@ export class IIAgentClient extends EventEmitter {
         agent_type: TASK_TYPE_TO_AGENT_TYPE[task.type] || 'general',
         resume: false,
         files: [],
+        metadata: {
+          aims_user_id: task.context?.userId,
+          aims_session_id: task.context?.sessionId,
+          aims_routing_intent: task.context?.routing?.intent,
+          aims_routing_intent_type: task.context?.routing?.intentType,
+          aims_execution_lane: task.context?.routing?.executionLane,
+          aims_task_complexity: task.context?.routing?.taskComplexity,
+          aims_research_level: task.context?.routing?.researchLevel,
+          aims_vertical_id: task.context?.routing?.verticalId,
+        },
       },
     });
 
@@ -327,7 +380,12 @@ export class IIAgentClient extends EventEmitter {
   /**
    * Map ACHEEVY intent to ii-agent task type
    */
-  static mapIntentToTaskType(intent: string): IIAgentTask['type'] {
+  static mapIntentToTaskType(intent: string, options?: { routing?: TaskRoutingHint }): IIAgentTask['type'] {
+    const routedTaskType = resolveTaskTypeFromRouting(options?.routing);
+    if (routedTaskType) {
+      return routedTaskType;
+    }
+
     const intentMap: Record<string, IIAgentTask['type']> = {
       'build': 'fullstack',
       'code': 'code',

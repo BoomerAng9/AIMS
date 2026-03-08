@@ -6,7 +6,7 @@
  */
 
 export { AcheevyChatInput } from './AcheevyChatInput';
-export type { AcheevyChatInputProps, AIModel } from './AcheevyChatInput';
+export type { AcheevyChatInputProps, AIModel, AgenticComposerPayload } from './AcheevyChatInput';
 
 export { AcheevyMessage } from './AcheevyMessage';
 export type { AcheevyMessageProps } from './AcheevyMessage';

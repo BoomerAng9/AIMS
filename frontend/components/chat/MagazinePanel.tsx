@@ -244,7 +244,7 @@ function CreateMagazineForm({
     >
       <div className="flex items-center justify-between">
         <span className="text-sm font-medium text-gold">New Magazine</span>
-        <button onClick={onCancel} className="text-zinc-500 hover:text-zinc-300">
+        <button onClick={onCancel} className="text-zinc-500 hover:text-zinc-300" title="Close create magazine form">
           <X className="w-4 h-4" />
         </button>
       </div>
@@ -288,7 +288,7 @@ function CreateMagazineForm({
         onChange={(e) => setSystemPrompt(e.target.value)}
         placeholder="Custom system prompt (optional)..."
         rows={3}
-        className="w-full px-3 py-2 text-sm rounded-md bg-white/5 border border-wireframe-stroke text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-gold/30 resize-none font-mono text-xs"
+        className="w-full px-3 py-2 rounded-md bg-white/5 border border-wireframe-stroke text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-gold/30 resize-none font-mono text-xs"
       />
 
       {/* Tags */}
@@ -326,16 +326,30 @@ function CreateMagazineForm({
 interface MagazinePanelProps {
   onClose?: () => void;
   compact?: boolean;
+  activeSlots?: MagazineSlot[];
+  onActiveSlotsChange?: (slots: MagazineSlot[]) => void;
 }
 
-export function MagazinePanel({ onClose, compact = false }: MagazinePanelProps) {
+export function MagazinePanel({
+  onClose,
+  compact = false,
+  activeSlots: controlledActiveSlots,
+  onActiveSlotsChange,
+}: MagazinePanelProps) {
   const [magazines, setMagazines] = useState<Magazine[]>([]);
-  const [activeSlots, setActiveSlots] = useState<MagazineSlot[]>([]);
+  const [internalActiveSlots, setInternalActiveSlots] = useState<MagazineSlot[]>([]);
   const [maxSlots, setMaxSlots] = useState(3);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [error, setError] = useState('');
+
+  const activeSlots = controlledActiveSlots ?? internalActiveSlots;
+
+  const updateActiveSlots = useCallback((slots: MagazineSlot[]) => {
+    setInternalActiveSlots(slots);
+    onActiveSlotsChange?.(slots);
+  }, [onActiveSlotsChange]);
 
   // Fetch magazines and active state
   const refresh = useCallback(async () => {
@@ -345,24 +359,24 @@ export function MagazinePanel({ onClose, compact = false }: MagazinePanelProps) 
         magazineApi.getActiveMagazines(),
       ]);
       setMagazines(magRes.magazines);
-      setActiveSlots(activeRes.slots);
+      updateActiveSlots(activeRes.slots);
       setMaxSlots(activeRes.maxSlots);
       setError('');
     } catch {
       // Gateway may not be running — show empty state
       setMagazines([]);
-      setActiveSlots([]);
+      updateActiveSlots([]);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [updateActiveSlots]);
 
   useEffect(() => { refresh(); }, [refresh]);
 
   const handleLoad = async (magazineId: string) => {
     try {
       const res = await magazineApi.loadMagazine(magazineId);
-      setActiveSlots(res.slots);
+      updateActiveSlots(res.slots);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to load');
     }
@@ -371,7 +385,7 @@ export function MagazinePanel({ onClose, compact = false }: MagazinePanelProps) 
   const handleUnload = async (magazineId: string) => {
     try {
       const res = await magazineApi.unloadMagazine(magazineId);
-      setActiveSlots(res.slots);
+      updateActiveSlots(res.slots);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to unload');
     }

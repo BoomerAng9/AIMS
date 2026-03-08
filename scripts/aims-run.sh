@@ -17,7 +17,7 @@ require_context() {
   [[ -f "$CTX_PATH" ]] || fail "Missing context: ${CTX_PATH}. Create it before running governed commands."
 }
 
-# Minimal JSON reader without jq (expects stable keys).
+# Minimal JSON reader without jq (expects stable keys).4381
 # For production, prefer jq in the container image; this is a safe fallback.
 json_get() {
   local key="$1"

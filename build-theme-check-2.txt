@@ -1,0 +1,1422 @@
+
+> aims-frontend@0.1.0 build
+> prisma generate && next build
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+
+Γ£ö Generated Prisma Client (v5.22.0) to .\node_modules\@prisma\client in 3.25s
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Want to turn off tips and other hints? https://pris.ly/tip-4-nohints
+
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+  Γû▓ Next.js 14.2.35
+  - Environments: .env.local, .env
+  - Experiments (use with caution):
+    ┬╖ externalDir
+
+   Creating an optimized production build ...
+ Γ£ô Compiled successfully
+   Skipping validation of types
+   Skipping linting
+   Collecting page data ...
+   Generating static pages (0/263) ...
+[LUC state] Error: n [Error]: Dynamic server usage: Route /api/luc/state couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at l (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\chunks\8948.js:1:57759)
+    at d (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\chunks\5609.js:25:26443)
+    at s (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\chunks\5609.js:25:19584)
+    at x (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\luc\state\route.js:1:1317)
+    at C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:38417
+    at C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\server\lib\trace\tracer.js:140:36
+    at NoopContextManager.with (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\@opentelemetry\api\build\src\context\NoopContextManager.js:25:19)
+    at ContextAPI.with (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\@opentelemetry\api\build\src\api\context.js:60:46)
+    at NoopTracer.startActiveSpan (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\@opentelemetry\api\build\src\trace\NoopTracer.js:65:31)
+    at ProxyTracer.startActiveSpan (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\@opentelemetry\api\build\src\trace\ProxyTracer.js:36:24) {
+  description: "Route /api/luc/state couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+   Generating static pages (65/263) 
+[Subscription] Error: Dynamic server usage: Route /api/stripe/subscription couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+Search test error: B [Error]: Dynamic server usage: Route /api/test/search couldn't be rendered statically because it used `nextUrl.searchParams`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at V (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:21778)
+    at Object.get (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:29137)
+    at p (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\test\search\route.js:1:543)
+    at C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:38417
+    at C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\server\lib\trace\tracer.js:140:36
+    at NoopContextManager.with (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\@opentelemetry\api\build\src\context\NoopContextManager.js:25:19)
+    at ContextAPI.with (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\@opentelemetry\api\build\src\api\context.js:60:46)
+    at NoopTracer.startActiveSpan (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\@opentelemetry\api\build\src\trace\NoopTracer.js:65:31)
+    at ProxyTracer.startActiveSpan (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\@opentelemetry\api\build\src\trace\ProxyTracer.js:36:24)
+    at C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\server\lib\trace\tracer.js:122:103 {
+  description: "Route /api/test/search couldn't be rendered statically because it used `nextUrl.searchParams`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+[Verticals API] GET error: Dynamic server usage: Route /api/verticals couldn't be rendered statically because it used `nextUrl.searchParams`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+   Generating static pages (131/263) 
+The width(-1) and height(-1) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+   Generating static pages (197/263) 
+ Γ£ô Generating static pages (263/263)
+   Finalizing page optimization ...
+   Collecting build traces ...
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\pages\_app.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1451:9)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\pages\_error.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1451:9)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\pages\_document.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1451:9)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\_not-found\page.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\about\page.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\acheevy\chat\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\acheevy\classify\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\acheevy\diy\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\acheevy\idea-validation\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\acheevy\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\acp\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\admin\api-keys\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\admin\chicken-hawk\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\admin\ii-agent\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\admin\lil-hawks\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\arena\contests\[id]\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\arena\contests\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\arena\generate\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\arena\import\trivia\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\arena\leaderboard\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\auth\[...nextauth]\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\auth\demo-session\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\auth\forgot-password\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\auth\register\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\auth\reset-password\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\boomerangs\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\chat\classify\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\chat\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\circuit-box\boomerangs\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\circuit-box\integrations\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\circuit-box\policy\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\circuit-box\services\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\circuit-box\social\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\code\execute\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\collaboration\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\composio\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\content\pipeline\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\custom-hawks\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\deploy-dock\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\deploy\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\discord\webhook\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\edge\classify\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\edge\ping\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\edge\relay\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\evidence-locker\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\files\generate\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\forms\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\health\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\house-of-ang\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\intake\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\integrations\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\invite\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\luc\billing\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\luc\can-execute\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\luc\credit\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\luc\estimate\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\luc\meter\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\luc\record\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\luc\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\luc\state\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\luc\status\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\luc\summary\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\luc\usage\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\make-it-mine\generate-automation\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\make-it-mine\generate-mobile\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\make-it-mine\generate\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\make-it-mine\mobile\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\make-it-mine\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\memory\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\needs-analysis\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\onboarding\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\operations\alerts\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\operations\metrics\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\operations\services\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\perform\automation\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\perform\coaching-carousel\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\perform\content\news\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\perform\content\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\perform\deep-research\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\perform\draft\debate\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\perform\draft\generate\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\perform\draft\news\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\perform\draft\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\perform\draft\simulate\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\perform\enrich\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\perform\gridiron\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\perform\ingest\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\perform\nil\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\perform\prospects\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\perform\revenue-budget\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\perform\search\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\perform\state-boards\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\perform\stats\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\perform\teams\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\perform\transfer-portal\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\pipelines\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\plug-catalog\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\plug-instances\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\plugs\[plugId]\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\plugs\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\projects\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\reports\[id]\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\reports\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\research\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\sellers\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+ ΓÜá Failed to copy traced files for C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\api\shopping\route.js SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at handleTraceFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1385:32)
+    at async copyTracedFiles (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js:1464:13)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:224:9
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async writeStandaloneDirectory (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:223:5)
+    at async C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:2143:17
+    at async Span.traceAsyncFn (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\trace\trace.js:154:20)
+    at async build (C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\index.js:368:9)
+
+Route (app)                                 Size     First Load JS
+Γöî Γùï /                                       8.29 kB         176 kB
+Γö£ Γùï /_not-found                             880 B            89 kB
+Γö£ Γùï /about                                  5.16 kB         142 kB
+Γö£ ╞Æ /api/acheevy                            0 B                0 B
+Γö£ ╞Æ /api/acheevy/chat                       0 B                0 B
+Γö£ ╞Æ /api/acheevy/classify                   0 B                0 B
+Γö£ ╞Æ /api/acheevy/diy                        0 B                0 B
+Γö£ ╞Æ /api/acheevy/idea-validation            0 B                0 B
+Γö£ ╞Æ /api/acp                                0 B                0 B
+Γö£ ╞Æ /api/admin/api-keys                     0 B                0 B
+Γö£ ╞Æ /api/admin/chicken-hawk                 0 B                0 B
+Γö£ ╞Æ /api/admin/chicken-hawk/events          0 B                0 B
+Γö£ ╞Æ /api/admin/ii-agent                     0 B                0 B
+Γö£ ╞Æ /api/admin/lil-hawks                    0 B                0 B
+Γö£ ╞Æ /api/arena/contests                     0 B                0 B
+Γö£ ╞Æ /api/arena/contests/[id]                0 B                0 B
+Γö£ ╞Æ /api/arena/generate                     0 B                0 B
+Γö£ ╞Æ /api/arena/import/trivia                0 B                0 B
+Γö£ ╞Æ /api/arena/leaderboard                  0 B                0 B
+Γö£ ╞Æ /api/auth/[...nextauth]                 0 B                0 B
+Γö£ ╞Æ /api/auth/demo-session                  0 B                0 B
+Γö£ ╞Æ /api/auth/forgot-password               0 B                0 B
+Γö£ ╞Æ /api/auth/register                      0 B                0 B
+Γö£ ╞Æ /api/auth/reset-password                0 B                0 B
+Γö£ ╞Æ /api/boomerangs                         0 B                0 B
+Γö£ ╞Æ /api/boost-bridge/[...path]             0 B                0 B
+Γö£ ╞Æ /api/chat                               0 B                0 B
+Γö£ ╞Æ /api/chat/classify                      0 B                0 B
+Γö£ ╞Æ /api/circuit-box/boomerangs             0 B                0 B
+Γö£ ╞Æ /api/circuit-box/integrations           0 B                0 B
+Γö£ ╞Æ /api/circuit-box/policy                 0 B                0 B
+Γö£ ╞Æ /api/circuit-box/services               0 B                0 B
+Γö£ Γùï /api/circuit-box/social                 0 B                0 B
+Γö£ ╞Æ /api/code/execute                       0 B                0 B
+Γö£ ╞Æ /api/collaboration                      0 B                0 B
+Γö£ ╞Æ /api/composio                           0 B                0 B
+Γö£ ╞Æ /api/content/pipeline                   0 B                0 B
+Γö£ ╞Æ /api/custom-hawks                       0 B                0 B
+Γö£ ╞Æ /api/deploy                             0 B                0 B
+Γö£ ╞Æ /api/deploy-dock                        0 B                0 B
+Γö£ ╞Æ /api/discord/webhook                    0 B                0 B
+Γö£ ╞Æ /api/edge/classify                      0 B                0 B
+Γö£ ╞Æ /api/edge/ping                          0 B                0 B
+Γö£ ╞Æ /api/edge/relay                         0 B                0 B
+Γö£ ╞Æ /api/estate/[...path]                   0 B                0 B
+Γö£ ╞Æ /api/evidence-locker                    0 B                0 B
+Γö£ ╞Æ /api/files/generate                     0 B                0 B
+Γö£ ╞Æ /api/forms                              0 B                0 B
+Γö£ ╞Æ /api/health                             0 B                0 B
+Γö£ ╞Æ /api/house-of-ang                       0 B                0 B
+Γö£ ╞Æ /api/intake                             0 B                0 B
+Γö£ ╞Æ /api/integrations                       0 B                0 B
+Γö£ ╞Æ /api/invite                             0 B                0 B
+Γö£ ╞Æ /api/luc                                0 B                0 B
+Γö£ ╞Æ /api/luc/billing                        0 B                0 B
+Γö£ ╞Æ /api/luc/can-execute                    0 B                0 B
+Γö£ ╞Æ /api/luc/credit                         0 B                0 B
+Γö£ ╞Æ /api/luc/estimate                       0 B                0 B
+Γö£ ╞Æ /api/luc/meter                          0 B                0 B
+Γö£ ╞Æ /api/luc/record                         0 B                0 B
+Γö£ ╞Æ /api/luc/state                          0 B                0 B
+Γö£ ╞Æ /api/luc/status                         0 B                0 B
+Γö£ ╞Æ /api/luc/summary                        0 B                0 B
+Γö£ Γùï /api/luc/usage                          0 B                0 B
+Γö£ ╞Æ /api/make-it-mine                       0 B                0 B
+Γö£ ╞Æ /api/make-it-mine/generate              0 B                0 B
+Γö£ ╞Æ /api/make-it-mine/generate-automation   0 B                0 B
+Γö£ ╞Æ /api/make-it-mine/generate-mobile       0 B                0 B
+Γö£ ╞Æ /api/make-it-mine/mobile                0 B                0 B
+Γö£ ╞Æ /api/memory                             0 B                0 B
+Γö£ ╞Æ /api/needs-analysis                     0 B                0 B
+Γö£ ╞Æ /api/onboarding                         0 B                0 B
+Γö£ Γùï /api/operations/alerts                  0 B                0 B
+Γö£ Γùï /api/operations/metrics                 0 B                0 B
+Γö£ Γùï /api/operations/services                0 B                0 B
+Γö£ ╞Æ /api/perform/automation                 0 B                0 B
+Γö£ ╞Æ /api/perform/coaching-carousel          0 B                0 B
+Γö£ Γùï /api/perform/content                    0 B                0 B
+Γö£ ╞Æ /api/perform/content/news               0 B                0 B
+Γö£ ╞Æ /api/perform/deep-research              0 B                0 B
+Γö£ ╞Æ /api/perform/draft                      0 B                0 B
+Γö£ ╞Æ /api/perform/draft/debate               0 B                0 B
+Γö£ ╞Æ /api/perform/draft/generate             0 B                0 B
+Γö£ Γùï /api/perform/draft/news                 0 B                0 B
+Γö£ ╞Æ /api/perform/draft/simulate             0 B                0 B
+Γö£ ╞Æ /api/perform/enrich                     0 B                0 B
+Γö£ Γùï /api/perform/gridiron                   0 B                0 B
+Γö£ ╞Æ /api/perform/ingest                     0 B                0 B
+Γö£ ╞Æ /api/perform/nil                        0 B                0 B
+Γö£ ╞Æ /api/perform/prospects                  0 B                0 B
+Γö£ ╞Æ /api/perform/revenue-budget             0 B                0 B
+Γö£ ╞Æ /api/perform/search                     0 B                0 B
+Γö£ ╞Æ /api/perform/state-boards               0 B                0 B
+Γö£ Γùï /api/perform/stats                      0 B                0 B
+Γö£ ╞Æ /api/perform/teams                      0 B                0 B
+Γö£ ╞Æ /api/perform/transfer-portal            0 B                0 B
+Γö£ ╞Æ /api/pipelines                          0 B                0 B
+Γö£ ╞Æ /api/plug-catalog                       0 B                0 B
+Γö£ ╞Æ /api/plug-instances                     0 B                0 B
+Γö£ ╞Æ /api/plugs                              0 B                0 B
+Γö£ ╞Æ /api/plugs/[plugId]                     0 B                0 B
+Γö£ ╞Æ /api/projects                           0 B                0 B
+Γö£ ╞Æ /api/reports                            0 B                0 B
+Γö£ ╞Æ /api/reports/[id]                       0 B                0 B
+Γö£ ╞Æ /api/research                           0 B                0 B
+Γö£ ╞Æ /api/sellers                            0 B                0 B
+Γö£ ╞Æ /api/shopping                           0 B                0 B
+Γö£ ╞Æ /api/skills/[skillId]                   0 B                0 B
+Γö£ ╞Æ /api/social/feed                        0 B                0 B
+Γö£ ╞Æ /api/social/gateway                     0 B                0 B
+Γö£ ╞Æ /api/social/github                      0 B                0 B
+Γö£ ╞Æ /api/social/link                        0 B                0 B
+Γö£ ╞Æ /api/social/stats                       0 B                0 B
+Γö£ ╞Æ /api/sports/tracker                     0 B                0 B
+Γö£ ╞Æ /api/stepper                            0 B                0 B
+Γö£ ╞Æ /api/stripe/checkout                    0 B                0 B
+Γö£ ╞Æ /api/stripe/subscription                0 B                0 B
+Γö£ ╞Æ /api/stripe/webhook                     0 B                0 B
+Γö£ ╞Æ /api/telegram/notify                    0 B                0 B
+Γö£ ╞Æ /api/telegram/webhook                   0 B                0 B
+Γö£ ╞Æ /api/templates                          0 B                0 B
+Γö£ ╞Æ /api/test/e2b                           0 B                0 B
+Γö£ ╞Æ /api/test/groq                          0 B                0 B
+Γö£ ╞Æ /api/test/search                        0 B                0 B
+Γö£ ╞Æ /api/test/tts                           0 B                0 B
+Γö£ ╞Æ /api/tts                                0 B                0 B
+Γö£ ╞Æ /api/upload                             0 B                0 B
+Γö£ ╞Æ /api/veritas/[...path]                  0 B                0 B
+Γö£ ╞Æ /api/verticals                          0 B                0 B
+Γö£ ╞Æ /api/video/analyze                      0 B                0 B
+Γö£ ╞Æ /api/video/generate                     0 B                0 B
+Γö£ ╞Æ /api/voice/personaplex                  0 B                0 B
+Γö£ ╞Æ /api/voice/stt                          0 B                0 B
+Γö£ ╞Æ /api/voice/tts                          0 B                0 B
+Γö£ Γùï /api/voice/voices                       0 B                0 B
+Γö£ ╞Æ /api/whatsapp/webhook                   0 B                0 B
+Γö£ Γùï /arena                                  5.22 kB         136 kB
+Γö£ ╞Æ /arena/contests/[slug]                  5.69 kB         136 kB
+Γö£ Γùï /arena/how-it-works                     4.29 kB         135 kB
+Γö£ Γùï /arena/leaderboard                      4.25 kB         135 kB
+Γö£ Γùï /arena/mock-draft                       3.68 kB         125 kB
+Γö£ Γùï /arena/wallet                           3.94 kB         134 kB
+Γö£ Γùï /chat                                   16.9 kB         335 kB
+Γö£ ╞Æ /dashboard                              6.76 kB         137 kB
+Γö£ ╞Æ /dashboard/acheevy                      583 B           370 kB
+Γö£ ╞Æ /dashboard/admin                        7.42 kB         139 kB
+Γö£ ╞Æ /dashboard/admin/chicken-hawk           11.7 kB         157 kB
+Γö£ ╞Æ /dashboard/admin/ii-agent               6.04 kB         146 kB
+Γö£ ╞Æ /dashboard/admin/lil-hawks              8.41 kB         149 kB
+Γö£ ╞Æ /dashboard/automations                  8.97 kB          97 kB
+Γö£ ╞Æ /dashboard/billing                      4.01 kB         140 kB
+Γö£ ╞Æ /dashboard/blockwise                    6.23 kB         128 kB
+Γö£ ╞Æ /dashboard/boomerangs                   3.01 kB        91.1 kB
+Γö£ ╞Æ /dashboard/boost-bridge                 6.33 kB         138 kB
+Γö£ ╞Æ /dashboard/build                        8.57 kB         130 kB
+Γö£ ╞Æ /dashboard/buy-in-bulk                  5.54 kB         127 kB
+Γö£ ╞Æ /dashboard/chat                         566 B           370 kB
+Γö£ ╞Æ /dashboard/circuit-box                  14.2 kB         261 kB
+Γö£ ╞Æ /dashboard/custom-hawks                 5.92 kB         128 kB
+Γö£ ╞Æ /dashboard/deep-scout                   9.23 kB         145 kB
+Γö£ ╞Æ /dashboard/deploy-dock                  12.3 kB         134 kB
+Γö£ ╞Æ /dashboard/editors-desk                 6.58 kB         138 kB
+Γö£ ╞Æ /dashboard/environments                 3.41 kB        91.5 kB
+Γö£ ╞Æ /dashboard/film-room                    4.47 kB        92.5 kB
+Γö£ ╞Æ /dashboard/garage-to-global             8.64 kB         130 kB
+Γö£ ╞Æ /dashboard/gates                        6.35 kB        94.4 kB
+Γö£ ╞Æ /dashboard/glossary                     5.81 kB         144 kB
+Γö£ ╞Æ /dashboard/house-of-ang                 5.99 kB         104 kB
+Γö£ ╞Æ /dashboard/lab                          2.8 kB         90.9 kB
+Γö£ ╞Æ /dashboard/livesim                      4.75 kB         126 kB
+Γö£ ╞Æ /dashboard/luc                          3.17 kB         251 kB
+Γö£ ╞Æ /dashboard/luc/calculator               8.69 kB         130 kB
+Γö£ ╞Æ /dashboard/make-it-mine                 309 B          97.1 kB
+Γö£ ╞Æ /dashboard/make-it-mine/automation      6.24 kB         145 kB
+Γö£ ╞Æ /dashboard/make-it-mine/diy             7.99 kB        96.1 kB
+Γö£ ╞Æ /dashboard/make-it-mine/mobile-app      6.25 kB         145 kB
+Γö£ ╞Æ /dashboard/make-it-mine/web-app         6.46 kB         145 kB
+Γö£ ╞Æ /dashboard/map                          8.86 kB         142 kB
+Γö£ ╞Æ /dashboard/model-garden                 9.57 kB         131 kB
+Γö£ ╞Æ /dashboard/needs-analysis               7.39 kB         138 kB
+Γö£ ╞Æ /dashboard/nil                          12.1 kB         100 kB
+Γö£ ╞Æ /dashboard/ntntn-studio                 11.3 kB         136 kB
+Γö£ ╞Æ /dashboard/operations                   31.2 kB         263 kB
+Γö£ ╞Æ /dashboard/perform                      6.7 kB          137 kB
+Γö£ ╞Æ /dashboard/plan                         2.74 kB        90.8 kB
+Γö£ ╞Æ /dashboard/playground                   4.71 kB         126 kB
+Γö£ ╞Æ /dashboard/plug-catalog                 6.17 kB         139 kB
+Γö£ ╞Æ /dashboard/plugs                        4.61 kB         135 kB
+Γö£ ╞Æ /dashboard/plugs/[id]                   5.99 kB         103 kB
+Γö£ ╞Æ /dashboard/project-management           161 B          88.2 kB
+Γö£ ╞Æ /dashboard/research                     4.48 kB         135 kB
+Γö£ ╞Æ /dashboard/research/activity-feed       5.22 kB         136 kB
+Γö£ ╞Æ /dashboard/research/codebase-sync       5.07 kB         135 kB
+Γö£ ╞Æ /dashboard/research/connected-accounts  4.22 kB         135 kB
+Γö£ ╞Æ /dashboard/research/google-ecosystem    5.25 kB         136 kB
+Γö£ ╞Æ /dashboard/research/notebook-lm         5.21 kB         136 kB
+Γö£ ╞Æ /dashboard/research/protocols           4.92 kB         135 kB
+Γö£ ╞Æ /dashboard/research/revenue-platform    5.71 kB         136 kB
+Γö£ ╞Æ /dashboard/security                     5.1 kB         93.2 kB
+Γö£ ╞Æ /dashboard/settings                     5.65 kB         127 kB
+Γö£ ╞Æ /dashboard/sports-tracker               6 kB            128 kB
+Γö£ ╞Æ /dashboard/the-hangar                   10.8 kB         144 kB
+Γö£ ╞Æ /dashboard/veritas                      5.45 kB         137 kB
+Γö£ ╞Æ /dashboard/war-room                     4.56 kB         136 kB
+Γö£ ╞Æ /dashboard/workstreams                  5.12 kB         136 kB
+Γö£ ╞Æ /dashboard/your-space                   4.39 kB         147 kB
+Γö£ Γùï /discover                               3.36 kB         134 kB
+Γö£ Γùï /forgot-password                        1.92 kB        98.7 kB
+Γö£ Γùï /gallery                                2.31 kB         158 kB
+Γö£ Γùï /halalhub                               4.81 kB         140 kB
+Γö£ Γùï /halalhub/login                         3.14 kB         148 kB
+Γö£ Γùï /halalhub/shop                          2.21 kB        90.3 kB
+Γö£ ╞Æ /halalhub/shop/[category]               4.43 kB         135 kB
+Γö£ Γùï /halalhub/shop/calculator               3.06 kB        91.1 kB
+Γö£ Γùï /halalhub/shop/meetups                  2.75 kB        90.8 kB
+Γö£ Γùï /halalhub/signup/customer               3.56 kB         149 kB
+Γö£ Γùï /halalhub/signup/vendor                 4.43 kB         150 kB
+Γö£ ╞Æ /hangar                                 10.5 kB         135 kB
+Γö£ Γùï /integrations                           9.16 kB         147 kB
+Γö£ Γùï /merch                                  1.64 kB         152 kB
+Γö£ Γùï /mission-control                        8.44 kB         139 kB
+Γö£ Γùï /new                                    6.64 kB         149 kB
+Γö£ Γùï /onboarding                             6.61 kB         144 kB
+Γö£ ╞Æ /onboarding/[step]                      2.83 kB        90.9 kB
+Γö£ Γùï /perform                                10.7 kB         155 kB
+Γö£ Γùï /perform/analysts                       5.66 kB         136 kB
+Γö£ Γùï /perform/big-board                      9.12 kB         140 kB
+Γö£ Γùï /perform/coaching-carousel              4 kB           92.1 kB
+Γö£ Γùï /perform/content                        4.35 kB         135 kB
+Γö£ Γùï /perform/directory                      4.37 kB         115 kB
+Γö£ Γùï /perform/draft                          7.26 kB         156 kB
+Γö£ Γùï /perform/draft/mock                     7.35 kB         138 kB
+Γö£ Γùï /perform/draft/simulator                6.49 kB         137 kB
+Γö£ Γùï /perform/ncaa-database                  15.1 kB         125 kB
+Γö£ Γùï /perform/nil-tracker                    4.32 kB        92.4 kB
+Γö£ Γùï /perform/pricing                        8.2 kB          105 kB
+Γö£ ╞Æ /perform/prospects/[slug]               5.87 kB         136 kB
+Γö£ Γùï /perform/redraft                        5.27 kB         136 kB
+Γö£ Γùï /perform/revenue-budget                 4.4 kB         92.5 kB
+Γö£ Γùï /perform/state-boards                   9.17 kB         131 kB
+Γö£ Γùï /perform/transfer-portal                4.62 kB        92.7 kB
+Γö£ Γùï /perform/war-room                       5.7 kB          136 kB
+Γö£ Γùï /plugs                                  4.95 kB         135 kB
+Γö£ ╞Æ /plugs/[plugId]                         12.4 kB         150 kB
+Γö£ Γùï /pol                                    161 B          88.2 kB
+Γö£ Γùï /pricing                                11.6 kB         148 kB
+Γö£ Γùï /privacy                                2.18 kB        98.9 kB
+Γö£ ╞Æ /report/[id]                            5.57 kB         145 kB
+Γö£ Γùï /reset-password                         2.39 kB        99.2 kB
+Γö£ Γùï /sandbox                                4.38 kB         135 kB
+Γö£ Γùï /sandbox/agentic-ui                     2.73 kB         117 kB
+Γö£ Γùï /sandbox/blockwise                      3.68 kB         125 kB
+Γö£ Γùï /sandbox/perform                        8.93 kB         139 kB
+Γö£ Γùï /sandbox/perform/analysts               5.86 kB         136 kB
+Γö£ Γùï /sandbox/perform/big-board              10 kB           140 kB
+Γö£ Γùï /sandbox/perform/content                4.44 kB         135 kB
+Γö£ Γùï /sandbox/perform/directory              6.67 kB         151 kB
+Γö£ Γùï /sandbox/perform/draft                  7.32 kB         156 kB
+Γö£ Γùï /sandbox/perform/draft/mock             7.36 kB         138 kB
+Γö£ Γùï /sandbox/perform/draft/simulator        6.5 kB          137 kB
+Γö£ Γùï /sandbox/perform/matchmaker             12.6 kB         229 kB
+Γö£ ╞Æ /sandbox/perform/prospects/[slug]       5.03 kB         135 kB
+Γö£ Γùï /sandbox/perform/redraft                4.91 kB         135 kB
+Γö£ Γùï /sandbox/perform/state-boards           9.46 kB         140 kB
+Γö£ Γùï /sandbox/perform/transfer-portal        4.88 kB         135 kB
+Γö£ Γùï /sandbox/perform/war-room               5.95 kB         145 kB
+Γö£ Γùï /sandbox/verticals                      3.7 kB          125 kB
+Γö£ Γùï /showroom                               161 B          88.2 kB
+Γö£ Γùï /sign-in                                3.81 kB         110 kB
+Γö£ Γùï /sign-up                                9.55 kB         150 kB
+Γö£ Γùï /terms                                  2.16 kB        98.9 kB
+Γö£ Γùï /terms/savings-plan                     161 B          88.2 kB
+Γö£ Γùï /the-book-of-vibe                       1.99 kB         152 kB
+Γö£ Γùï /workshop                               4.39 kB         135 kB
+Γö£ Γùï /workshop/creator-circles               3.72 kB         125 kB
+Γö£ Γùï /workshop/life-scenes                   3.79 kB         126 kB
+Γö£ Γùï /workshop/moment-studio                 3.4 kB          125 kB
+Γö£ Γùï /workshop/money-moves                   3.07 kB         125 kB
+Γö£ Γùï /workspace/luc                          20.3 kB         152 kB
+Γöö Γùï /your-space                             5.41 kB         131 kB
++ First Load JS shared by all               88.1 kB
+  Γö£ chunks/2117-882880a48b9d14d7.js         31.9 kB
+  Γö£ chunks/fd9d1056-0326dbe8e7c08bd6.js     53.6 kB
+  Γöö other shared chunks (total)             2.53 kB
+
+
+╞Æ Middleware                                28.2 kB
+
+Γùï  (Static)   prerendered as static content
+╞Æ  (Dynamic)  server-rendered on demand
+

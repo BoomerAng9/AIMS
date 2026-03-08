@@ -14,6 +14,33 @@ import logger from '../logger';
 
 const router = Router();
 
+function buildRoutingContext(body: Record<string, unknown>): NonNullable<IIAgentTask['context']>['routing'] | undefined {
+  const routingDecision = body.routingDecision as Record<string, unknown> | undefined;
+  if (!routingDecision) {
+    return undefined;
+  }
+
+  return {
+    intent: typeof routingDecision.intent === 'string' ? routingDecision.intent : undefined,
+    intentType: typeof routingDecision.intent_type === 'string' ? routingDecision.intent_type : undefined,
+    executionLane: typeof routingDecision.execution_lane === 'string' ? routingDecision.execution_lane : undefined,
+    taskComplexity: typeof routingDecision.task_complexity === 'string' ? routingDecision.task_complexity : undefined,
+    researchLevel: typeof routingDecision.research_level === 'string' ? routingDecision.research_level : undefined,
+    verticalId: typeof routingDecision.vertical_id === 'string' ? routingDecision.vertical_id : undefined,
+  };
+}
+
+function annotateResultWithRouting(result: unknown, routing: NonNullable<IIAgentTask['context']>['routing']) {
+  if (!routing || typeof result !== 'object' || result === null) {
+    return result;
+  }
+
+  return {
+    ...result,
+    routing,
+  };
+}
+
 // ---------------------------------------------------------------------------
 // OWNER-Only Middleware — A.I.M.S. Gateway System Protocol
 // ---------------------------------------------------------------------------
@@ -86,6 +113,7 @@ function auditLog(action: string, userId: string, meta: Record<string, unknown> 
 router.post('/execute', async (req: Request, res: Response) => {
   try {
     const { prompt, type, streaming } = req.body;
+    const routing = buildRoutingContext(req.body as Record<string, unknown>);
 
     const userId = req.headers['x-user-id'] as string || req.body.userId || 'owner';
 
@@ -93,12 +121,14 @@ router.post('/execute', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Prompt is required' });
     }
 
-    auditLog('execute', userId, { taskType: type, streaming, promptLength: prompt.length });
+    auditLog('execute', userId, { taskType: type, streaming, promptLength: prompt.length, routing });
 
     const client = getIIAgentClient();
 
     // Determine task type from intent or explicit type
-    const taskType = type || IIAgentClient.mapIntentToTaskType(prompt);
+    const taskType = type || IIAgentClient.mapIntentToTaskType(prompt, {
+      routing,
+    });
 
     const task: IIAgentTask = {
       type: taskType,
@@ -107,6 +137,7 @@ router.post('/execute', async (req: Request, res: Response) => {
         userId: req.body.userId,
         sessionId: req.body.sessionId,
         previousMessages: req.body.history,
+        routing,
       },
       options: {
         streaming: streaming || false,
@@ -128,7 +159,7 @@ router.post('/execute', async (req: Request, res: Response) => {
       res.end();
     } else {
       const result = await client.executeTask(task);
-      res.json(result);
+      res.json(annotateResultWithRouting(result, routing));
     }
 
   } catch (error: any) {
@@ -147,6 +178,7 @@ router.post('/execute', async (req: Request, res: Response) => {
 router.post('/research', async (req: Request, res: Response) => {
   try {
     const { topic, depth, outputFormat } = req.body;
+    const routing = buildRoutingContext(req.body as Record<string, unknown>);
 
     const userId = req.headers['x-user-id'] as string || req.body.userId || 'owner';
 
@@ -154,7 +186,7 @@ router.post('/research', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Topic is required' });
     }
 
-    auditLog('research', userId, { topic, depth });
+    auditLog('research', userId, { topic, depth, routing });
 
     const client = getIIAgentClient();
 
@@ -176,10 +208,11 @@ Please provide:
       context: {
         userId: req.body.userId,
         sessionId: req.body.sessionId,
+        routing,
       },
     });
 
-    res.json(result);
+    res.json(annotateResultWithRouting(result, routing));
 
   } catch (error: any) {
     console.error('[II-Agent Router] Research error:', error);
@@ -197,6 +230,7 @@ Please provide:
 router.post('/build', async (req: Request, res: Response) => {
   try {
     const { description, stack, features } = req.body;
+    const routing = buildRoutingContext(req.body as Record<string, unknown>);
 
     const userId = req.headers['x-user-id'] as string || req.body.userId || 'owner';
 
@@ -204,7 +238,7 @@ router.post('/build', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Description is required' });
     }
 
-    auditLog('build', userId, { description: description.substring(0, 100), stack });
+    auditLog('build', userId, { description: description.substring(0, 100), stack, routing });
 
     const client = getIIAgentClient();
 
@@ -235,6 +269,7 @@ Please:
       context: {
         userId: req.body.userId,
         sessionId: req.body.sessionId,
+        routing,
       },
       options: { streaming: true, timeout: 600000 }, // 10 min timeout for builds
     })) {
@@ -260,6 +295,7 @@ Please:
 router.post('/slides', async (req: Request, res: Response) => {
   try {
     const { topic, slideCount, audience, style } = req.body;
+    const routing = buildRoutingContext(req.body as Record<string, unknown>);
 
     const userId = req.headers['x-user-id'] as string || req.body.userId || 'owner';
 
@@ -267,7 +303,7 @@ router.post('/slides', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Topic is required' });
     }
 
-    auditLog('slides', userId, { topic, slideCount, audience });
+    auditLog('slides', userId, { topic, slideCount, audience, routing });
 
     const client = getIIAgentClient();
 
@@ -291,10 +327,11 @@ Include:
       context: {
         userId: req.body.userId,
         sessionId: req.body.sessionId,
+        routing,
       },
     });
 
-    res.json(result);
+    res.json(annotateResultWithRouting(result, routing));
 
   } catch (error: any) {
     console.error('[II-Agent Router] Slides error:', error);

@@ -19,6 +19,23 @@
         "ii-agent", "ii-agent-postgres", "ii-agent-tools", "ii-agent-sandbox"
       ],
       "tags": ["core", "gateway", "primary-db"]
+    },
+    {
+      "id": "vps-sandbox",
+      "host": "31.97.138.45",
+      "sshAlias": "srv1318308.hstgr.cloud",
+      "wireGuardIP": "10.0.0.2",
+      "role": "sandbox",
+      "region": "eu-west",
+      "cores": 2,
+      "memoryGB": 8,
+      "diskGB": 100,
+      "maxPlugInstances": 20,
+      "portRange": { "start": 51000, "end": 51999 },
+      "services": [
+        "plug-engine", "monitoring", "nginx"
+      ],
+      "tags": ["sandbox", "plugs", "isolation"]
     }
   ],
   "placement": {

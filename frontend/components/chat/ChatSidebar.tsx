@@ -13,7 +13,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CollaborationFeed } from '@/components/collaboration/CollaborationFeed';
 import { MagazinePanel } from '@/components/chat/MagazinePanel';
-import type { Magazine, MagazineSlot } from '@/lib/magazines/types';
+import type { MagazineSlot } from '@/lib/magazines/types';
 
 type SidebarTab = 'viewport' | 'magazines';
 
@@ -24,6 +24,8 @@ interface ChatSidebarProps {
   initialTab?: SidebarTab;
   /** Active magazine count for badge */
   activeMagazineCount?: number;
+  activeMagazineSlots?: MagazineSlot[];
+  onActiveMagazineSlotsChange?: (slots: MagazineSlot[]) => void;
 }
 
 export function ChatSidebar({
@@ -31,6 +33,8 @@ export function ChatSidebar({
   onClose,
   initialTab = 'viewport',
   activeMagazineCount = 0,
+  activeMagazineSlots = [],
+  onActiveMagazineSlotsChange,
 }: ChatSidebarProps) {
   const [activeTab, setActiveTab] = useState<SidebarTab>(initialTab);
 
@@ -85,6 +89,8 @@ export function ChatSidebar({
                 <MagazinePanel
                   onClose={onClose}
                   compact
+                  activeSlots={activeMagazineSlots}
+                  onActiveSlotsChange={onActiveMagazineSlotsChange}
                 />
               )}
             </div>

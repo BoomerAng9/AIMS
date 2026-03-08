@@ -27,6 +27,8 @@ import { liveSim } from '../livesim';
 import { dispatchChickenHawkBuild } from '../agents/cloudrun-dispatcher';
 import { getFactoryController } from '../factory/controller';
 import type { FactoryEvent, FactoryEventSource } from '../factory/types';
+import type { NtntnRoutingDecision } from './routing-contract';
+import { normalizeCompatibilityIntent, resolveIntentFromRoutingDecision } from './routing-contract';
 
 // NtNtN Engine: loaded at runtime to avoid tsconfig rootDir compilation issues
 let _ntntnEngine: any = null;
@@ -199,11 +201,12 @@ async function dispatchToChickenHawk(manifest: ChickenHawkManifest): Promise<{
 export interface AcheevyExecuteRequest {
   userId: string;
   message: string;
-  intent: string;              // from frontend classifier: plug-factory, skill:*, perform-stack, internal-llm, etc.
+  intent?: string;             // compatibility hint; authoritative lane now comes from routingDecision when present.
   conversationId?: string;
   plugId?: string;
   skillId?: string;
   skillRoute?: string;
+  routingDecision?: NtntnRoutingDecision;
   context?: Record<string, any>;
 }
 
@@ -258,37 +261,77 @@ export class AcheevyOrchestrator {
       const estimate = LUCEngine.estimate(req.message);
 
       // 2. Route based on classified intent
-      const routedTo = req.intent;
+      const routedTo = req.routingDecision
+        ? resolveIntentFromRoutingDecision(req.routingDecision)
+        : normalizeCompatibilityIntent(req.intent || 'conversation');
+      const executionLane = req.routingDecision?.execution_lane;
+      const intentType = req.routingDecision?.intent_type;
+
+      req.intent = routedTo;
 
       let routeResponse: AcheevyExecuteResponse | null = null;
 
-      if (routedTo === 'build:ntntn' || (routedTo === 'BUILD_PLUG' && getNtNtN().detectBuildIntent(req.message))) {
-        routeResponse = await this.handleNtNtNBuild(requestId, req);
-      } else if (routedTo.startsWith('plug-factory:')) {
-        routeResponse = await this.handlePlugFabrication(requestId, req);
-      } else if (routedTo === 'perform-stack') {
-        routeResponse = await this.handlePerformStack(requestId, req);
-      } else if (routedTo.startsWith('skill:')) {
-        routeResponse = await this.handleSkillExecution(requestId, req);
-      } else if (routedTo.startsWith('vertical:')) {
-        routeResponse = await this.handleVerticalExecution(requestId, req);
-      } else if (routedTo === 'pmo-route' || routedTo.startsWith('pmo:')) {
-        routeResponse = await this.handlePmoRouting(requestId, req);
-      } else if (routedTo.startsWith('spawn:') || routedTo === 'deployment-hub') {
-        routeResponse = await this.handleDeploymentHub(requestId, req);
-      } else if (routedTo.startsWith('paas_')) {
-        routeResponse = await this.handlePaaSOperations(requestId, req);
-      } else if (routedTo === 'manage_it' || routedTo.startsWith('factory:')) {
-        routeResponse = await this.handleFactoryController(requestId, req);
+      // Lane-first dispatch: execution_lane is the primary runtime decision when present.
+      if (executionLane === 'direct_ii_agent') {
+        if (routedTo === 'build:ntntn' || (routedTo === 'BUILD_PLUG' && getNtNtN().detectBuildIntent(req.message))) {
+          routeResponse = await this.handleNtNtNBuild(requestId, req);
+        } else if (routedTo.startsWith('plug-factory:')) {
+          routeResponse = await this.handlePlugFabrication(requestId, req);
+        } else if (routedTo === 'perform-stack') {
+          routeResponse = await this.handlePerformStack(requestId, req);
+        } else if (routedTo.startsWith('skill:') || intentType === 'research' || intentType === 'plug_fabrication') {
+          routeResponse = await this.handleSkillExecution(requestId, req);
+        }
+      } else if (executionLane === 'platform_workflow') {
+        if (routedTo.startsWith('vertical:') || intentType === 'vertical') {
+          routeResponse = await this.handleVerticalExecution(requestId, req);
+        } else if (routedTo === 'pmo-route' || routedTo.startsWith('pmo:') || intentType === 'workflow') {
+          routeResponse = await this.handlePmoRouting(requestId, req);
+        } else if (routedTo.startsWith('spawn:') || routedTo === 'deployment-hub' || intentType === 'deployment') {
+          routeResponse = await this.handleDeploymentHub(requestId, req);
+        } else if (routedTo.startsWith('paas_') || routedTo.startsWith('paas-') || intentType === 'platform_operations') {
+          routeResponse = await this.handlePaaSOperations(requestId, req);
+        } else if (routedTo === 'manage_it' || routedTo.startsWith('factory:')) {
+          routeResponse = await this.handleFactoryController(requestId, req);
+        }
+      } else if (executionLane === 'delegated_execution') {
+        routeResponse = await this.handleDelegatedExecution(requestId, req);
+      }
+
+      // Compatibility fallback for legacy callers and delegated_execution placeholders.
+      if (!routeResponse) {
+        if (routedTo === 'build:ntntn' || (routedTo === 'BUILD_PLUG' && getNtNtN().detectBuildIntent(req.message))) {
+          routeResponse = await this.handleNtNtNBuild(requestId, req);
+        } else if (routedTo.startsWith('plug-factory:')) {
+          routeResponse = await this.handlePlugFabrication(requestId, req);
+        } else if (routedTo === 'perform-stack') {
+          routeResponse = await this.handlePerformStack(requestId, req);
+        } else if (routedTo.startsWith('skill:')) {
+          routeResponse = await this.handleSkillExecution(requestId, req);
+        } else if (routedTo.startsWith('vertical:')) {
+          routeResponse = await this.handleVerticalExecution(requestId, req);
+        } else if (routedTo === 'pmo-route' || routedTo.startsWith('pmo:')) {
+          routeResponse = await this.handlePmoRouting(requestId, req);
+        } else if (routedTo.startsWith('spawn:') || routedTo === 'deployment-hub') {
+          routeResponse = await this.handleDeploymentHub(requestId, req);
+        } else if (routedTo.startsWith('paas_') || routedTo.startsWith('paas-')) {
+          routeResponse = await this.handlePaaSOperations(requestId, req);
+        } else if (routedTo === 'manage_it' || routedTo.startsWith('factory:')) {
+          routeResponse = await this.handleFactoryController(requestId, req);
+        }
       }
 
       if (routeResponse) {
-        this.autoRememberOutcome(req, routeResponse, startMs);
-        return routeResponse;
+        const annotatedResponse = this.annotateResponseWithRouting(req, routeResponse);
+        this.autoRememberOutcome(req, annotatedResponse, startMs);
+        return annotatedResponse;
       }
 
       // Default: conversational AI via II-Agent → Chicken Hawk fallback
-      const response = await this.handleConversation(requestId, req, estimate);
+      const response = this.annotateResponseWithRouting(
+        req,
+        await this.handleConversation(requestId, req, estimate),
+      );
 
       // Auto-remember: store execution outcome for learning
       this.autoRememberOutcome(req, response, startMs);
@@ -326,7 +369,7 @@ export class AcheevyOrchestrator {
     const outcome: ExecutionOutcome = {
       userId: req.userId,
       projectId: req.plugId || req.context?.projectId as string,
-      intent: req.intent,
+        intent: req.intent || 'conversation',
       message: req.message,
       status: response.status as ExecutionOutcome['status'],
       reply: response.reply,
@@ -339,22 +382,66 @@ export class AcheevyOrchestrator {
     this.memory.autoRemember(outcome);
   }
 
-  // ── Route Handlers ───────────────────────────────────────
+  private annotateResponseWithRouting(
+    req: AcheevyExecuteRequest,
+    response: AcheevyExecuteResponse,
+  ): AcheevyExecuteResponse {
+    return {
+      ...response,
+      data: {
+        ...response.data,
+        routingDecision: req.routingDecision,
+        executionLane: req.routingDecision?.execution_lane,
+        intentType: req.routingDecision?.intent_type,
+        compatibilityIntent: req.intent || 'conversation',
+      },
+    };
+  }
+
+  private buildRoutingMetadata(req: AcheevyExecuteRequest): Record<string, unknown> {
+    return {
+      routingDecision: req.routingDecision,
+      executionLane: req.routingDecision?.execution_lane,
+      intentType: req.routingDecision?.intent_type,
+      taskComplexity: req.routingDecision?.task_complexity,
+      researchLevel: req.routingDecision?.research_level,
+      originalIntent: req.routingDecision?.intent || req.intent || 'conversation',
+      compatibilityIntent: req.intent || 'conversation',
+      verticalId: req.routingDecision?.vertical_id,
+    };
+  }
+
+  private buildIIAgentContext(req: AcheevyExecuteRequest): NonNullable<IIAgentTask['context']> {
+    return {
+      userId: req.userId,
+      sessionId: req.conversationId,
+      previousMessages: req.context?.history,
+      routing: {
+        intent: req.routingDecision?.intent || req.intent || 'conversation',
+        intentType: req.routingDecision?.intent_type,
+        executionLane: req.routingDecision?.execution_lane,
+        taskComplexity: req.routingDecision?.task_complexity,
+        researchLevel: req.routingDecision?.research_level,
+        verticalId: req.routingDecision?.vertical_id,
+      },
+    };
+  }
 
   /**
    * Plug fabrication: try II-Agent fullstack mode → fallback to Chicken Hawk
-   */
+  */
   private async handlePlugFabrication(
     requestId: string,
     req: AcheevyExecuteRequest
   ): Promise<AcheevyExecuteResponse> {
-    const plugId = req.plugId || req.intent.split(':')[1];
+    const intent = req.intent || 'plug-factory:unknown';
+    const plugId = req.plugId || intent.split(':')[1] || 'unknown';
 
     // Try II-Agent first
     const iiTask: IIAgentTask = {
       type: 'fullstack',
       prompt: `Build the "${plugId}" plug for A.I.M.S. User request: ${req.message}`,
-      context: { userId: req.userId, sessionId: req.conversationId },
+      context: this.buildIIAgentContext(req),
       options: { streaming: false, timeout: 600000 },
     };
 
@@ -375,7 +462,10 @@ export class AcheevyOrchestrator {
 
     // Fallback: Chicken Hawk
     try {
-      const manifest = buildManifest(requestId, 'fullstack', req.message, req.userId, { plugId });
+      const manifest = buildManifest(requestId, 'fullstack', req.message, req.userId, {
+        plugId,
+        ...this.buildRoutingMetadata(req),
+      });
       const chResult = await dispatchToChickenHawk(manifest);
       return {
         requestId,
@@ -406,7 +496,7 @@ export class AcheevyOrchestrator {
     const task: IIAgentTask = {
       type: 'research',
       prompt: `Sports analytics request: ${req.message}. Analyze athlete data, provide scouting reports, and recruitment recommendations.`,
-      context: { userId: req.userId, sessionId: req.conversationId },
+      context: this.buildIIAgentContext(req),
     };
 
     try {
@@ -422,7 +512,10 @@ export class AcheevyOrchestrator {
       logger.warn({ err: iiErr instanceof Error ? iiErr.message : iiErr, requestId }, '[ACHEEVY] II-Agent offline for Perform, trying Chicken Hawk');
       // Fallback: Chicken Hawk
       try {
-        const manifest = buildManifest(requestId, 'research', req.message, req.userId, { vertical: 'perform' });
+        const manifest = buildManifest(requestId, 'research', req.message, req.userId, {
+          vertical: 'perform',
+          ...this.buildRoutingMetadata(req),
+        });
         const chResult = await dispatchToChickenHawk(manifest);
         return {
           requestId,
@@ -451,7 +544,8 @@ export class AcheevyOrchestrator {
     requestId: string,
     req: AcheevyExecuteRequest
   ): Promise<AcheevyExecuteResponse> {
-    const skillId = req.skillId || req.intent.split(':')[1];
+    const intent = req.intent || 'skill:unknown';
+    const skillId = req.skillId || intent.split(':')[1] || 'unknown';
 
     const skillTaskMap: Record<string, IIAgentTask['type']> = {
       'remotion': 'code',
@@ -466,7 +560,7 @@ export class AcheevyOrchestrator {
     const task: IIAgentTask = {
       type: taskType,
       prompt: `Execute A.I.M.S. skill "${skillId}". User request: ${req.message}`,
-      context: { userId: req.userId, sessionId: req.conversationId },
+      context: this.buildIIAgentContext(req),
     };
 
     try {
@@ -482,7 +576,10 @@ export class AcheevyOrchestrator {
       logger.warn({ err: iiErr instanceof Error ? iiErr.message : iiErr, requestId, skillId }, '[ACHEEVY] II-Agent offline for skill, trying Chicken Hawk');
       // Fallback: Chicken Hawk
       try {
-        const manifest = buildManifest(requestId, taskType, req.message, req.userId, { skillId });
+        const manifest = buildManifest(requestId, taskType, req.message, req.userId, {
+          skillId,
+          ...this.buildRoutingMetadata(req),
+        });
         const chResult = await dispatchToChickenHawk(manifest);
         return {
           requestId,
@@ -567,7 +664,8 @@ export class AcheevyOrchestrator {
     requestId: string,
     req: AcheevyExecuteRequest
   ): Promise<AcheevyExecuteResponse> {
-    const verticalId = req.intent.split(':')[1];
+    const intent = req.intent || 'vertical:unknown';
+    const verticalId = intent.split(':')[1] || 'unknown';
     const vertical = getVertical(verticalId);
 
     if (!vertical) {
@@ -661,6 +759,7 @@ export class AcheevyOrchestrator {
     req: AcheevyExecuteRequest
   ): Promise<AcheevyExecuteResponse> {
     const action = req.context?.action as string || 'spawn';
+    const intent = req.intent || 'deployment-hub';
 
     if (action === 'roster') {
       const roster = getRoster();
@@ -703,8 +802,8 @@ export class AcheevyOrchestrator {
     }
 
     // Spawn
-    const handle = req.intent.startsWith('spawn:')
-      ? req.intent.split(':')[1]
+    const handle = intent.startsWith('spawn:')
+      ? intent.split(':')[1]
       : (req.context?.handle as string || '');
 
     if (!handle) {
@@ -1316,6 +1415,75 @@ export class AcheevyOrchestrator {
   }
 
   /**
+   * Delegated execution lane: explicit runtime branch for work that should leave
+   * direct ii-agent/platform workflow paths. Until a dedicated delegated runtime
+   * is wired, Chicken Hawk acts as the execution substrate placeholder.
+   */
+  private async handleDelegatedExecution(
+    requestId: string,
+    req: AcheevyExecuteRequest,
+  ): Promise<AcheevyExecuteResponse> {
+    const routingDecision = req.routingDecision;
+    const delegatedTaskType = routingDecision?.research_level === 'deep'
+      ? 'research'
+      : routingDecision?.intent_type === 'plug_fabrication' || routingDecision?.task_complexity === 'high'
+        ? 'fullstack'
+        : 'research';
+
+    const delegatedMetadata: Record<string, unknown> = {
+      delegatedExecution: true,
+      delegatedRuntime: 'chickenhawk-placeholder',
+      executionLane: routingDecision?.execution_lane || 'delegated_execution',
+      intentType: routingDecision?.intent_type || 'unknown',
+      taskComplexity: routingDecision?.task_complexity || 'medium',
+      researchLevel: routingDecision?.research_level || 'none',
+      originalIntent: routingDecision?.intent || req.intent || 'conversation',
+    };
+
+    liveSim.emitAgentActivity(
+      'ACHEEVY',
+      'delegated_execution',
+      `Delegated execution lane selected: ${delegatedTaskType}`,
+      delegatedMetadata,
+    );
+
+    try {
+      const manifest = buildManifest(requestId, delegatedTaskType, req.message, req.userId, delegatedMetadata);
+      const chResult = await dispatchToChickenHawk(manifest);
+
+      return {
+        requestId,
+        status: 'dispatched',
+        reply: [
+          'Delegated execution lane activated.',
+          `Runtime: Chicken Hawk placeholder until dedicated delegated runtime is wired.`,
+          `Task type: ${delegatedTaskType}.`,
+          `Shift ID: ${chResult.shiftId}.`,
+        ].join(' '),
+        data: {
+          chickenhawk: chResult,
+          delegatedExecution: delegatedMetadata,
+        },
+        lucUsage: { service: 'delegated_execution', amount: delegatedTaskType === 'fullstack' ? 2 : 1 },
+        taskId: chResult.manifestId,
+      };
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Delegated runtime unavailable';
+      logger.warn({ err: message, requestId, delegatedTaskType }, '[ACHEEVY] Delegated execution dispatch failed');
+      return {
+        requestId,
+        status: 'queued',
+        reply: 'Delegated execution lane selected, but the delegated runtime is unavailable right now. The request has been queued for delegated processing.',
+        data: {
+          delegatedExecution: delegatedMetadata,
+          queuedReason: message,
+        },
+        taskId: `queued_delegated_${requestId}`,
+      };
+    }
+  }
+
+  /**
    * Default conversation: try II-Agent → fallback to Chicken Hawk
    */
   private async handleConversation(
@@ -1323,16 +1491,21 @@ export class AcheevyOrchestrator {
     req: AcheevyExecuteRequest,
     estimate: any
   ): Promise<AcheevyExecuteResponse> {
-    const taskType = IIAgentClient.mapIntentToTaskType(req.message);
+    const taskType = IIAgentClient.mapIntentToTaskType(req.message, {
+      routing: {
+        intent: req.routingDecision?.intent || req.intent || 'conversation',
+        intentType: req.routingDecision?.intent_type,
+        executionLane: req.routingDecision?.execution_lane,
+        taskComplexity: req.routingDecision?.task_complexity,
+        researchLevel: req.routingDecision?.research_level,
+        verticalId: req.routingDecision?.vertical_id,
+      },
+    });
 
     const task: IIAgentTask = {
       type: taskType,
       prompt: req.message,
-      context: {
-        userId: req.userId,
-        sessionId: req.conversationId,
-        previousMessages: req.context?.history,
-      },
+      context: this.buildIIAgentContext(req),
     };
 
     try {
@@ -1350,7 +1523,7 @@ export class AcheevyOrchestrator {
     } catch {
       // II-Agent offline — try Chicken Hawk
       try {
-        const manifest = buildManifest(requestId, taskType, req.message, req.userId);
+        const manifest = buildManifest(requestId, taskType, req.message, req.userId, this.buildRoutingMetadata(req));
         const chResult = await dispatchToChickenHawk(manifest);
         return {
           requestId,

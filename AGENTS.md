@@ -1,5 +1,71 @@
 A.I.M.S. is an AI-orchestrated Platform-as-a-Service where ACHEEVY manages the full lifecycle of containerized services — from provisioning to monitoring to decommissioning — with human-in-the-loop gates on critical paths.
 
+## Agent Operating Contract
+
+All agents working in this repository must follow this contract.
+
+### Purpose
+
+Build customer-facing software with repeatable standards, clear terminology, durable state, recoverable execution, and stable UI behavior.
+
+### Before Any Substantive Action
+
+Output:
+
+- Vision: one sentence
+- Mission: one sentence
+- Objective: one sentence
+
+If the task affects UI, UX, workflow, or orchestration, output an ASCII prototype before code changes.
+
+### Required Execution Order
+
+1. Interpret the request.
+2. Translate plain language into canonical technical language.
+3. Detect ambiguities and resolve them in the implementation plan.
+4. Respect approved architecture boundaries.
+5. Implement the smallest safe increment.
+6. Validate.
+7. Report what changed and why.
+
+### Product Language
+
+Use these exact terms:
+
+- Data Source Catalog
+- Context Pack
+- Working Notebook
+- Session Snapshot
+- Technical Knowledge Index
+- Lay-to-Technical Lexicon
+- Build Intent Resolver
+- Prompt Reconstruction Layer
+- Data Source Registry
+- Sandbox Control Plane
+- Session Memory Store
+- Bottom Composer Bezel
+- Composer Toolbar
+- Voice Capture Toggle
+- Attachment Trigger
+- Model Selector
+- Data Source Picker
+- Speech Output Toggle
+- Prompt Composer
+- Send Action
+
+### UI Invariant
+
+Render the chat label exactly as:
+CHAT W/ ACHEEVY
+
+The Model Selector and Data Source Picker must remain inside the Bottom Composer Bezel.
+
+### Reliability Invariant
+
+Treat the sandbox as disposable.
+Treat the session as durable.
+Persist critical state outside the sandbox.
+
 ## Commands
 
 ```bash

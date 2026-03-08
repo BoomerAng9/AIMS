@@ -17,6 +17,11 @@
 import { streamText } from 'ai';
 import { createOpenAI } from '@ai-sdk/openai';
 import { buildSystemPrompt } from '@/lib/acheevy/persona';
+import {
+  buildNtntnRoutingDecision,
+  normalizeAcheevyClassification,
+  type LegacyAcheevyClassification,
+} from '@/lib/acheevy/routing';
 
 // ── UEF Gateway (primary — metered through LUC) ─────────────
 const UEF_GATEWAY_URL = process.env.UEF_GATEWAY_URL || process.env.NEXT_PUBLIC_UEF_GATEWAY_URL || '';
@@ -67,13 +72,7 @@ function gatewayHeaders(): Record<string, string> {
 // Step 1: Classify intent — determines if we need agent dispatch or LLM chat
 // ---------------------------------------------------------------------------
 
-interface ClassifyResult {
-  intent: string;
-  confidence: number;
-  requiresAgent: boolean;
-}
-
-async function classifyIntent(lastMessage: string): Promise<ClassifyResult | null> {
+async function classifyIntent(lastMessage: string): Promise<(LegacyAcheevyClassification & { routingDecision: ReturnType<typeof buildNtntnRoutingDecision> }) | null> {
   if (!UEF_GATEWAY_URL) return null;
 
   try {
@@ -84,7 +83,8 @@ async function classifyIntent(lastMessage: string): Promise<ClassifyResult | nul
     });
 
     if (!res.ok) return null;
-    return await res.json() as ClassifyResult;
+    const data = await res.json() as LegacyAcheevyClassification;
+    return normalizeAcheevyClassification(lastMessage, data);
   } catch {
     return null;
   }
@@ -96,7 +96,7 @@ async function classifyIntent(lastMessage: string): Promise<ClassifyResult | nul
 
 async function tryAgentDispatch(
   lastMessage: string,
-  classification: ClassifyResult,
+  classification: LegacyAcheevyClassification & { routingDecision: ReturnType<typeof buildNtntnRoutingDecision> },
   conversationHistory: Array<{ role: string; content: string }>,
   userId: string,
 ): Promise<Response | null> {
@@ -110,9 +110,11 @@ async function tryAgentDispatch(
         userId,
         message: lastMessage,
         intent: classification.intent,
+        routingDecision: classification.routingDecision,
         conversationId: `session-${userId}`,
         context: {
           history: conversationHistory.slice(-6), // last 6 messages for context
+          routingDecision: classification.routingDecision,
           classification,
         },
       }),
@@ -138,6 +140,8 @@ async function tryAgentDispatch(
     const toolEvent = {
       type: 'tool_dispatch',
       intent: classification.intent,
+      intentType: classification.routingDecision.intent_type,
+      executionLane: classification.routingDecision.execution_lane,
       taskId: result.taskId || undefined,
       status: result.status || 'completed',
       steps: result.data?.pipelineSteps?.length || undefined,
@@ -295,6 +299,52 @@ interface MIMDetection {
   confidence: number;
 }
 
+interface RequestAttachment {
+  type?: string;
+  name?: string;
+  mimeType?: string;
+}
+
+interface RequestMessage {
+  role: string;
+  content: string;
+  attachments?: RequestAttachment[];
+  metadata?: {
+    agentic?: {
+      selectedTools?: Array<{ id?: string; name?: string }>;
+      businessFunction?: { id?: string; name?: string; topic?: string };
+      deepResearch?: boolean;
+    };
+  };
+}
+
+function buildAgenticSelectionNote(message?: RequestMessage): string {
+  if (!message) return '';
+
+  const agentic = message.metadata?.agentic;
+  const selectedTools = Array.isArray(agentic?.selectedTools)
+    ? agentic.selectedTools
+        .map((tool) => tool?.name)
+        .filter((name): name is string => Boolean(name))
+    : [];
+  const attachmentNames = Array.isArray(message.attachments)
+    ? message.attachments
+        .map((attachment) => attachment?.name)
+        .filter((name): name is string => Boolean(name))
+    : [];
+
+  const lines = [
+    selectedTools.length > 0 ? `Requested tools: ${selectedTools.join(', ')}` : '',
+    agentic?.businessFunction?.name
+      ? `Business function: ${agentic.businessFunction.name}${agentic.businessFunction.topic ? ` (${agentic.businessFunction.topic})` : ''}`
+      : '',
+    agentic?.deepResearch ? 'Deep research mode enabled.' : '',
+    attachmentNames.length > 0 ? `Attached files: ${attachmentNames.join(', ')}` : '',
+  ].filter(Boolean);
+
+  return lines.join('\n');
+}
+
 function detectMIMIntent(message: string): MIMDetection {
   const lower = message.toLowerCase();
 
@@ -377,7 +427,13 @@ function buildMIMResponse(detection: MIMDetection, originalMessage: string): str
 
 export async function POST(req: Request) {
   try {
-    const { messages, model, personaId, userId: bodyUserId } = await req.json();
+    const { messages, model, personaId, contextPackIds = [], userId: bodyUserId } = await req.json() as {
+      messages: RequestMessage[];
+      model?: string;
+      personaId?: string;
+      contextPackIds?: string[];
+      userId?: string;
+    };
 
     // Derive userId: body > cookie > header > anon fallback
     const userId = bodyUserId
@@ -386,11 +442,23 @@ export async function POST(req: Request) {
     const modelId = resolveModelId(model);
 
     // Get the last user message for classification
-    const lastUserMessage = [...messages].reverse().find((m: { role: string }) => m.role === 'user');
+    const lastUserMessage = [...messages].reverse().find((m: RequestMessage) => m.role === 'user');
     const lastMessage = lastUserMessage?.content || '';
+    const agenticSelectionNote = buildAgenticSelectionNote(lastUserMessage);
+    const enrichedLastMessage = agenticSelectionNote
+      ? `${lastMessage}\n\n--- Agentic UI Context ---\n${agenticSelectionNote}`
+      : lastMessage;
+    const enrichedMessages = messages.map((message, index) => {
+      const isLastUserMessage = message === lastUserMessage;
+
+      return {
+        role: message.role,
+        content: isLastUserMessage ? enrichedLastMessage : message.content,
+      };
+    });
 
     // Step 0: Local M.I.M. intent detection — fast-path for build/validate intents
-    const mimDetection = detectMIMIntent(lastMessage);
+    const mimDetection = detectMIMIntent(enrichedLastMessage);
     if (mimDetection.type && mimDetection.confidence > 0.7) {
       const mimResponse = buildMIMResponse(mimDetection, lastMessage);
       if (mimResponse) {
@@ -413,34 +481,42 @@ export async function POST(req: Request) {
     }
 
     // Memory recall: fetch relevant memories for this user's message
-    const memoryContext = await recallMemories(lastMessage, userId);
+    const memoryContext = await recallMemories(enrichedLastMessage, userId);
+    const activeContextPackNote = Array.isArray(contextPackIds) && contextPackIds.length > 0
+      ? `\nActive Context Packs: ${contextPackIds.join(', ')}`
+      : '';
+    const agenticContextNote = agenticSelectionNote
+      ? `\nAgentic UI selections:\n${agenticSelectionNote}`
+      : '';
 
     const systemPrompt = buildSystemPrompt({
       personaId,
       additionalContext: memoryContext
-        ? `User is using the Chat Interface.\n\n${memoryContext}`
-        : 'User is using the Chat Interface.',
+        ? `User is using the Chat Interface.${activeContextPackNote}${agenticContextNote}\n\n${memoryContext}`
+        : `User is using the Chat Interface.${activeContextPackNote}${agenticContextNote}`,
     });
 
     // Step 1: Classify intent for context (optional — orchestrator re-classifies internally)
-    const classification = await classifyIntent(lastMessage);
+    const classification = await classifyIntent(enrichedLastMessage);
 
     // Step 2: ALL messages → ACHEEVY orchestrator first
     // The orchestrator decides: II-Agent, Chicken Hawk, vertical, PaaS, or conversation.
     // No fork — every message gets the full ACHEEVY pipeline.
-    const orchestratorClassification = classification || {
+    const orchestratorClassification = classification || normalizeAcheevyClassification(enrichedLastMessage, {
       intent: 'conversation',
       confidence: 0.5,
       requiresAgent: false,
-    };
+    });
 
-    console.log(`[ACHEEVY Chat] Routing through orchestrator: intent=${orchestratorClassification.intent} confidence=${orchestratorClassification.confidence}`);
-    const agentResponse = await tryAgentDispatch(lastMessage, orchestratorClassification, messages, userId);
+    console.log(
+      `[ACHEEVY Chat] Routing through orchestrator: intent=${orchestratorClassification.intent} lane=${orchestratorClassification.routingDecision.execution_lane} confidence=${orchestratorClassification.confidence}`,
+    );
+    const agentResponse = await tryAgentDispatch(enrichedLastMessage, orchestratorClassification, enrichedMessages, userId);
     if (agentResponse) return agentResponse;
 
     // Step 3: Fallback — ACHEEVY orchestrator unreachable → LLM stream via gateway (metered)
     console.warn('[ACHEEVY Chat] Orchestrator unreachable, falling back to LLM stream');
-    const gatewayResponse = await tryGatewayStream(modelId, messages, systemPrompt, userId);
+  const gatewayResponse = await tryGatewayStream(modelId, enrichedMessages, systemPrompt, userId);
     if (gatewayResponse) return gatewayResponse;
 
     // Step 4: Last resort — gateway also unreachable → direct OpenRouter (unmetered)
@@ -448,7 +524,7 @@ export async function POST(req: Request) {
     const result = await streamText({
       model: openrouter(modelId),
       system: systemPrompt,
-      messages,
+      messages: enrichedMessages,
     });
 
     return result.toDataStreamResponse();

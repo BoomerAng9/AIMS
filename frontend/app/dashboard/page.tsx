@@ -179,17 +179,17 @@ export default function DashboardPage() {
       {/* Header */}
       <motion.header
         variants={staggerItem}
-        className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/10 pb-6"
+        className="flex flex-col justify-between gap-4 border-b border-white/10 pb-6 md:flex-row md:items-end"
       >
         <div>
-          <p className="text-[0.6rem] uppercase tracking-[0.25em] text-amber-500/60 mb-1 font-mono">
+          <p className="aims-agentic-kicker mb-2 text-gold/70">
             Platform Overview
           </p>
-          <h1 className="text-3xl md:text-4xl font-display text-zinc-100 tracking-tight">
+          <h1 className="font-heading text-4xl tracking-tight text-zinc-100 md:text-5xl">
             Managed AI Systems
           </h1>
         </div>
-        <div className="flex items-center gap-3 bg-[#111113] py-2 px-4 rounded-full border border-white/10 shadow-[0_1px_2px_rgba(0,0,0,0.3)]">
+        <div className="aims-agentic-panel flex items-center gap-3 rounded-full px-4 py-2">
           <span
             className={`h-2 w-2 rounded-full ${statusDotClass(healthStatus)}`}
           />
@@ -259,10 +259,10 @@ export default function DashboardPage() {
             <Link
               href={tile.href}
               className={`
-                group block p-6 h-full rounded-2xl border transition-all relative overflow-hidden
+                aims-agentic-panel group relative block h-full overflow-hidden rounded-[28px] p-6 transition-all
                 ${tile.highlight
-                  ? 'bg-amber-500/10 border-amber-500/20 hover:bg-amber-500/15 hover:shadow-[0_1px_2px_rgba(0,0,0,0.3)]'
-                  : 'bg-[#111113] border-white/10 hover:border-white/15 hover:shadow-[0_1px_2px_rgba(0,0,0,0.3)]'}
+                  ? 'border-gold/20 bg-[radial-gradient(circle_at_top,rgba(212,175,55,0.12),transparent_55%),linear-gradient(180deg,rgba(24,24,27,0.9),rgba(17,17,19,0.95))] hover:border-gold/30'
+                  : 'hover:border-white/15'}
               `}
             >
               <div className={`
@@ -274,11 +274,11 @@ export default function DashboardPage() {
                 <tile.icon size={20} />
               </div>
 
-              <h3 className={`text-base font-medium mb-1 ${tile.highlight ? 'text-amber-400' : 'text-zinc-100 group-hover:text-amber-400 transition-colors'}`}>
+              <h3 className={`mb-2 font-heading text-2xl leading-none ${tile.highlight ? 'text-amber-300' : 'text-zinc-100 group-hover:text-amber-300 transition-colors'}`}>
                 {tile.title}
               </h3>
 
-              <p className="text-xs text-zinc-400 leading-relaxed">
+              <p className="text-sm leading-relaxed text-zinc-400">
                 {tile.desc}
               </p>
 

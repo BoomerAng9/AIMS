@@ -59,12 +59,14 @@ import { triggerVerticalWorkflow } from './pipeline/client';
 import { cloudflareRouter, markdownForAgents } from './cloudflare';
 import { paymentsRouter } from './payments';
 import { normalizeInput, getDialectStats, SLANG_ENTRY_COUNT, INTENT_PHRASE_COUNT } from './nlp';
-import { magazineRouter, getMagazineContext } from './magazines';
+import { magazineRouter } from './magazines';
 import { classifyIntent, searchGlossary, getGlossaryByCategory, submitFeedback, getPipelineStats } from './nlp/sme-nlp-service';
+import type { GlossaryCategory } from './nlp/sme-nlp-service';
 import { videoRouter } from './video';
 import { liveSim } from './livesim';
 import { composioRouter } from './composio';
 import { iiAgentRouter } from './ii-agent';
+import { buildNtntnRoutingDecision, resolveIntentFromRoutingDecision } from './acheevy/routing-contract';
 import logger from './logger';
 
 // Custom Lil_Hawks — User-Created Bots
@@ -96,6 +98,16 @@ import type { ScoutVerifyInput } from './perform/scout-verify';
 const app = express();
 const PORT = process.env.PORT || 3001;
 const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY || '';
+const GLOSSARY_CATEGORIES: readonly GlossaryCategory[] = [
+  'agents',
+  'infrastructure',
+  'features',
+  'operations',
+  'billing',
+  'design',
+  'governance',
+  'nlp',
+];
 
 // --------------------------------------------------------------------------
 // Security Middleware
@@ -714,13 +726,19 @@ app.use('/factory', factoryRouter);
 // --------------------------------------------------------------------------
 app.post('/acheevy/execute', async (req, res) => {
   try {
-    const { userId, message, intent, conversationId, plugId, skillId, context } = req.body;
+    const { userId, message, intent, conversationId, plugId, skillId, context, routingDecision } = req.body;
     if (!message || typeof message !== 'string') {
       res.status(400).json({ error: 'Missing message field' });
       return;
     }
-    if (!intent || typeof intent !== 'string') {
-      res.status(400).json({ error: 'Missing intent field' });
+    const resolvedIntent = typeof intent === 'string' && intent
+      ? intent
+      : routingDecision
+        ? resolveIntentFromRoutingDecision(routingDecision)
+        : 'conversation';
+
+    if (typeof resolvedIntent !== 'string' || !resolvedIntent) {
+      res.status(400).json({ error: 'Missing intent or routingDecision field' });
       return;
     }
 
@@ -728,10 +746,11 @@ app.post('/acheevy/execute', async (req, res) => {
     const result = await orchestrator.execute({
       userId: userId || req.headers['x-user-id'] as string || 'anon-unknown',
       message,
-      intent,
+      intent: resolvedIntent,
       conversationId: conversationId || 'chat-ui',
       plugId,
       skillId,
+      routingDecision,
       context,
     });
 
@@ -788,6 +807,14 @@ app.post('/acheevy/classify', (req, res) => {
       res.status(400).json({ error: 'Missing message field' });
       return;
     }
+
+    const sendClassification = (payload: Record<string, unknown>) => {
+      const classification = payload as { intent: string; confidence: number; requiresAgent: boolean };
+      res.json({
+        ...payload,
+        routingDecision: buildNtntnRoutingDecision(message, classification),
+      });
+    };
 
     // ── Vertical Trigger Patterns ────────────────────────────────
     // Mirrors aims-skills/acheevy-verticals/vertical-definitions.ts
@@ -1085,7 +1112,7 @@ app.post('/acheevy/classify', (req, res) => {
         // Find the matching refinement
         const domain = di.intent.split(':')[1];
         const vague = VAGUE_INTENT_MAP.find(v => v.domain === domain);
-        res.json({
+        sendClassification({
           intent: di.intent,
           confidence: di.confidence,
           requiresAgent: false,
@@ -1102,7 +1129,7 @@ app.post('/acheevy/classify', (req, res) => {
       const verticalId = isVertical ? di.intent.replace('vertical:', '') : di.intent;
       const verticalMatch = VERTICAL_TRIGGERS.find(v => v.id === verticalId);
 
-      res.json({
+      sendClassification({
         intent: isVertical ? di.intent : `vertical:${di.intent}`,
         verticalName: verticalMatch?.name || di.intent,
         confidence: di.confidence,
@@ -1120,7 +1147,7 @@ app.post('/acheevy/classify', (req, res) => {
     // ── Try vertical trigger matching ───────────────────────────
     for (const vertical of VERTICAL_TRIGGERS) {
       if (vertical.patterns.some(p => p.test(classifyText) || p.test(message))) {
-        res.json({
+        sendClassification({
           intent: `vertical:${vertical.id}`,
           verticalName: vertical.name,
           confidence: 0.9,
@@ -1140,40 +1167,40 @@ app.post('/acheevy/classify', (req, res) => {
     // ── Plug fabrication (build app/site/tool) ────────────────────
     if (/\b(build|create|scaffold|deploy|generate|implement|code|develop|launch)\b/.test(lower)) {
       if (/\b(plug|app|site|website|saas|platform|tool)\b/.test(lower)) {
-        res.json({ intent: 'plug-factory:custom', confidence: 0.9, requiresAgent: true });
+        sendClassification({ intent: 'plug-factory:custom', confidence: 0.9, requiresAgent: true });
         return;
       }
-      res.json({ intent: 'skill:build', confidence: 0.75, requiresAgent: true });
+      sendClassification({ intent: 'skill:build', confidence: 0.75, requiresAgent: true });
       return;
     }
 
     // ── Research intents ──────────────────────────────────────────
     if (/\b(research|analyze|investigate|study|compare|benchmark|audit)\b/.test(lower)) {
-      res.json({ intent: 'skill:research', confidence: 0.8, requiresAgent: true });
+      sendClassification({ intent: 'skill:research', confidence: 0.8, requiresAgent: true });
       return;
     }
 
     // ── Broad business intent (catches anything the verticals missed) ──
     if (/\b(business|startup|monetize|revenue|scale|profit|income)\b/.test(lower)) {
-      res.json({ intent: 'vertical:idea-generator', confidence: 0.7, requiresAgent: true });
+      sendClassification({ intent: 'vertical:idea-generator', confidence: 0.7, requiresAgent: true });
       return;
     }
 
     // ── Per|Form sports analytics ─────────────────────────────────
     if (/\b(draft|prospect|athlete|scout|football|nfl|recruit|big\s*board|mock\s*draft|gridiron)\b/.test(lower)) {
-      res.json({ intent: 'perform-stack', confidence: 0.85, requiresAgent: true });
+      sendClassification({ intent: 'perform-stack', confidence: 0.85, requiresAgent: true });
       return;
     }
 
     // ── PMO/workflow routing ──────────────────────────────────────
     if (/\b(workflow|pipeline|chain|team|assign|delegate)\b/.test(lower)) {
-      res.json({ intent: 'pmo-route', confidence: 0.7, requiresAgent: true });
+      sendClassification({ intent: 'pmo-route', confidence: 0.7, requiresAgent: true });
       return;
     }
 
     // ── Spawn agent ───────────────────────────────────────────────
     if (/\b(spawn|activate|deploy)\s*(an?\s*)?(agent|boomer|ang)\b/.test(lower)) {
-      res.json({ intent: 'deployment-hub', confidence: 0.85, requiresAgent: true });
+      sendClassification({ intent: 'deployment-hub', confidence: 0.85, requiresAgent: true });
       return;
     }
 
@@ -1252,7 +1279,12 @@ app.get('/api/nlp/glossary', (req, res) => {
     return;
   }
   if (category && typeof category === 'string') {
-    const results = getGlossaryByCategory(category);
+    if (!GLOSSARY_CATEGORIES.includes(category as GlossaryCategory)) {
+      res.status(400).json({ error: 'invalid glossary category' });
+      return;
+    }
+
+    const results = getGlossaryByCategory(category as GlossaryCategory);
     res.json({ results, total: results.length });
     return;
   }
@@ -1274,14 +1306,22 @@ app.post('/api/nlp/classify', (req, res) => {
 
 /** Feedback — submit corrections to NLP classifications */
 app.post('/api/nlp/feedback', (req, res) => {
-  const { inputText, expectedIntent, expectedVertical, notes } = req.body;
+  const { inputText, expectedIntent, actualIntent } = req.body;
   if (!inputText || !expectedIntent) {
     res.status(400).json({ error: 'inputText and expectedIntent are required' });
     return;
   }
-  const fb = submitFeedback({ inputText, expectedIntent, expectedVertical, notes });
+
+  const fb = submitFeedback({
+    input: inputText,
+    expectedIntent,
+    actualIntent: typeof actualIntent === 'string' && actualIntent.length > 0
+      ? actualIntent
+      : classifyIntent(inputText).intent,
+  });
   res.json({ accepted: true, feedbackId: fb.id });
 });
+
 
 /** Pipeline stats — combined NLP + glossary stats */
 app.get('/api/nlp/pipeline-stats', (_req, res) => {

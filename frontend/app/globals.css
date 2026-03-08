@@ -13,9 +13,13 @@
   --background: #09090B;
   --background-secondary: #0F0F12;
   --foreground: #FAFAFA;
+  --font-geist: 'Geist', system-ui, sans-serif;
   --font-doto: 'Doto', monospace;
   --font-marker: 'Permanent Marker', cursive;
   --font-caveat: 'Caveat', cursive;
+  --font-heading: 'New York Large', 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', 'Cormorant Garamond', 'Times New Roman', serif;
+  --font-body: var(--font-geist);
+  --font-label: 'Departure Mono', 'SFMono-Regular', 'Cascadia Mono', 'JetBrains Mono', 'IBM Plex Mono', 'Consolas', monospace;
 
   /* Text — light-on-dark hierarchy */
   --text-primary: #FAFAFA;
@@ -61,13 +65,13 @@ html, body {
 body {
   color: var(--text-primary);
   background: var(--background);
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 ::selection {
-  background: rgba(139, 92, 246, 0.25);
+  background: rgba(212, 175, 55, 0.22);
   color: #FAFAFA;
 }
 
@@ -195,7 +199,7 @@ body {
 
   /* Accent gradient text — violet to cyan */
   .text-gold-gradient {
-    background: linear-gradient(135deg, #8B5CF6, #06B6D4);
+    background: linear-gradient(135deg, #F5E6A8, #D4AF37, #F2C94C);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -229,6 +233,58 @@ body {
 /* ─── Utility Layer ───────────────────────────────────────── */
 
 @layer utilities {
+  .font-heading {
+    font-family: var(--font-heading);
+  }
+
+  .font-body {
+    font-family: var(--font-body);
+  }
+
+  .font-label {
+    font-family: var(--font-label);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .aims-agentic-shell {
+    background:
+      radial-gradient(circle at top left, rgba(212, 175, 55, 0.12), transparent 32%),
+      radial-gradient(circle at top right, rgba(125, 211, 252, 0.08), transparent 28%),
+      linear-gradient(180deg, rgba(9, 9, 11, 0.98) 0%, rgba(9, 9, 11, 1) 48%, rgba(15, 15, 18, 1) 100%);
+  }
+
+  .aims-agentic-panel {
+    background: linear-gradient(180deg, rgba(24, 24, 27, 0.82) 0%, rgba(17, 17, 19, 0.88) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.02),
+      0 24px 64px rgba(0, 0, 0, 0.32),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    -webkit-backdrop-filter: blur(24px);
+    backdrop-filter: blur(24px);
+  }
+
+  .aims-agentic-kicker {
+    font-family: var(--font-label);
+    font-size: 0.68rem;
+    line-height: 1;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: rgba(228, 228, 231, 0.64);
+  }
+
+  .aims-agentic-title {
+    font-family: var(--font-heading);
+    letter-spacing: -0.03em;
+    color: #F5F5F4;
+  }
+
+  .aims-agentic-copy {
+    font-family: var(--font-body);
+    color: #A1A1AA;
+  }
+
   .text-balance {
     text-wrap: balance;
   }

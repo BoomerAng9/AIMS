@@ -7,15 +7,16 @@
  * and Glass Box orchestration visibility.
  *
  * Refactored to use agentic-ui wrapper components:
- * - AcheevyChatInput (input area with voice, model/persona selectors)
+ * - AcheevyChatInput (input area with voice, model/Data Source selectors)
  * - AcheevyMessage (message bubble with markdown, copy/speak, file deliverables)
- * - AcheevyWelcomeHero (welcome screen with persona selector)
+ * - AcheevyWelcomeHero (welcome screen with Context Pack selector)
  *
  * Inspired by Claude, ChatGPT, and Kimi interfaces
  */
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { usePathname } from 'next/navigation';
 import { useConversation } from '@elevenlabs/react';
 import { useStreamingChat } from '@/hooks/useStreamingChat';
 import { useVoiceInput } from '@/hooks/useVoiceInput';
@@ -30,10 +31,27 @@ import { UserInputModal } from '@/components/change-order/UserInputModal';
 import { ChatSidebar, MagazineBadge } from '@/components/chat/ChatSidebar';
 import { VerticalStepIndicator } from '@/components/chat/VerticalStepIndicator';
 import { AcheevyChatInput, AcheevyMessage, AcheevyWelcomeHero } from '@/components/chat/agentic';
-import type { AIModel } from '@/components/chat/agentic';
+import type { AIModel, AgenticComposerPayload } from '@/components/chat/agentic';
 import { formatCurrency } from '@/lib/change-order/types';
 import { PERSONAS } from '@/lib/acheevy/persona';
+import type { ChatMessage } from '@/lib/chat/types';
+import {
+  buildCompatibilityContextPackDefinitions,
+  buildCompatibilityContextPacks,
+  buildMagazineContextPackDefinitions,
+  buildMagazineContextPacks,
+  composeWorkingNotebook,
+  mergeContextPackOptions,
+  resolveCompatibilityPersonaId,
+  resolveContextPackVoiceId,
+} from '@/lib/context-packs/contracts';
+import {
+  loadSessionSnapshot,
+  resolveSessionSnapshotScope,
+  saveSessionSnapshot,
+} from '@/lib/context-packs/session-snapshot';
 import type { MagazineSlot } from '@/lib/magazines/types';
+import { getActiveMagazines } from '@/lib/magazines/client';
 
 // ─────────────────────────────────────────────────────────────
 // Priority Model Roster (mirrors /api/chat PRIORITY_MODELS)
@@ -53,6 +71,8 @@ const AI_MODELS: AIModel[] = [
 ];
 
 const ELEVENLABS_AGENT_ID = process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID || '';
+const COMPATIBILITY_CONTEXT_PACK_OPTIONS = buildCompatibilityContextPacks(PERSONAS);
+const COMPATIBILITY_CONTEXT_PACK_DEFINITIONS = buildCompatibilityContextPackDefinitions(PERSONAS);
 
 // ─────────────────────────────────────────────────────────────
 // Main Chat Interface
@@ -83,21 +103,72 @@ export function ChatInterface({
   autoPlayVoice = true,
   showOrchestration = true,
 }: ChatInterfaceProps) {
-  const [inputValue, setInputValue] = useState('');
+  const pathname = usePathname();
   const [showBoard, setShowBoard] = useState(false);
   const [showCollabFeed, setShowCollabFeed] = useState(false);
   const [sidebarTab, setSidebarTab] = useState<'viewport' | 'magazines'>('viewport');
   const [activeMagazineSlots, setActiveMagazineSlots] = useState<MagazineSlot[]>([]);
   const [showInputModal, setShowInputModal] = useState(false);
-  const [voiceTranscriptReady, setVoiceTranscriptReady] = useState(false);
+  const [pendingVoiceTranscript, setPendingVoiceTranscript] = useState('');
+  const [sessionSnapshotHydrated, setSessionSnapshotHydrated] = useState(false);
 
-  // New State for Persona and Language
-  const [selectedPersona, setSelectedPersona] = useState(PERSONAS[0].id);
+  const [selectedContextPackIds, setSelectedContextPackIds] = useState<string[]>(
+    COMPATIBILITY_CONTEXT_PACK_OPTIONS[0] ? [COMPATIBILITY_CONTEXT_PACK_OPTIONS[0].id] : []
+  );
   const [selectedLanguage, setSelectedLanguage] = useState('en');
-  const [selectedModel, setSelectedModel] = useState('claude-opus');
+  const [selectedModel, setSelectedModel] = useState(model);
   const [voiceSessionActive, setVoiceSessionActive] = useState(false);
 
+  const sessionSnapshotScope = useMemo(
+    () => resolveSessionSnapshotScope(sessionId, pathname),
+    [pathname, sessionId],
+  );
+
+  const activeMagazineContextPacks = buildMagazineContextPacks(activeMagazineSlots);
+  const activeMagazineContextPackDefinitions = buildMagazineContextPackDefinitions(activeMagazineSlots);
+  const contextPackOptions = mergeContextPackOptions(
+    COMPATIBILITY_CONTEXT_PACK_OPTIONS,
+    activeMagazineContextPacks,
+  );
+  const workingNotebookSessionId = sessionId || sessionSnapshotScope;
+  const workingNotebook = useMemo(
+    () => composeWorkingNotebook(
+      `${sessionSnapshotScope}:working-notebook`,
+      workingNotebookSessionId,
+      selectedContextPackIds,
+      [
+        ...COMPATIBILITY_CONTEXT_PACK_DEFINITIONS,
+        ...activeMagazineContextPackDefinitions,
+      ],
+    ),
+    [
+      activeMagazineContextPackDefinitions,
+      selectedContextPackIds,
+      sessionSnapshotScope,
+      workingNotebookSessionId,
+    ],
+  );
+
+  const selectedContextPackId = selectedContextPackIds[0] || '';
+  const compatibilityPersonaId =
+    resolveCompatibilityPersonaId(selectedContextPackIds, contextPackOptions) || PERSONAS[0]?.id;
+
+  useEffect(() => {
+    if (selectedContextPackIds.length === 0 && contextPackOptions.length > 0) {
+      setSelectedContextPackIds([contextPackOptions[0].id]);
+      return;
+    }
+
+    const validIds = new Set(contextPackOptions.map((option) => option.id));
+    const nextIds = selectedContextPackIds.filter((contextPackId) => validIds.has(contextPackId));
+
+    if (nextIds.length !== selectedContextPackIds.length) {
+      setSelectedContextPackIds(nextIds.length > 0 ? nextIds : (contextPackOptions[0] ? [contextPackOptions[0].id] : []));
+    }
+  }, [contextPackOptions, selectedContextPackIds]);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const lastSubmittedPromptRef = useRef('');
 
   // Orchestration
   const orchestration = useOrchestration({
@@ -154,7 +225,8 @@ export function ChatInterface({
     stopGeneration,
   } = useStreamingChat({
     sessionId,
-    personaId: selectedPersona, // Pass selected persona
+    contextPackIds: selectedContextPackIds,
+    compatibilityPersonaId,
     model: selectedModel,
     onMessageStart: () => {
       // Start orchestration when streaming begins
@@ -162,7 +234,8 @@ export function ChatInterface({
         orchestration.updatePhase('execute');
 
         // Simulate agent assignment for demo
-        const deptId = selectDepartment(inputValue);
+        const activePrompt = lastSubmittedPromptRef.current;
+        const deptId = selectDepartment(activePrompt);
         if (deptId) {
           const manager = orchestration.assignManager(deptId);
           if (manager) {
@@ -174,7 +247,7 @@ export function ChatInterface({
 
             // Assign an ang
             setTimeout(() => {
-              const angId = selectAng(inputValue, deptId);
+              const angId = selectAng(activePrompt, deptId);
               if (angId) {
                 const ang = orchestration.assignAng(angId);
                 if (ang) {
@@ -193,7 +266,7 @@ export function ChatInterface({
         }
       }
     },
-    onMessageComplete: (message) => {
+    onMessageComplete: (message: ChatMessage) => {
       // Complete orchestration
       if (showOrchestration) {
         orchestration.updatePhase('deliver');
@@ -218,9 +291,7 @@ export function ChatInterface({
       language: selectedLanguage,
     },
     onTranscript: (result) => {
-      // Populate textarea for user to review/edit before sending
-      setInputValue(result.text);
-      setVoiceTranscriptReady(true);
+      setPendingVoiceTranscript(result.text);
     },
     enableAudioLevelState: false,
   });
@@ -230,9 +301,87 @@ export function ChatInterface({
     config: {
       autoPlay: autoPlayVoice,
       provider: 'elevenlabs',
-      voiceId: PERSONAS.find(p => p.id === selectedPersona)?.voiceId
+      voiceId: resolveContextPackVoiceId(selectedContextPackIds, contextPackOptions)
     },
   });
+  const { autoPlayEnabled, setAutoPlay: setVoiceAutoPlay } = voiceOutput;
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function hydrateSessionSnapshot() {
+      const snapshot = await loadSessionSnapshot(sessionSnapshotScope);
+      const restoredContext = snapshot?.context;
+      const restoredActiveMagazineIds = new Set(restoredContext?.activeMagazineIds || []);
+
+      if (restoredContext?.selectedContextPackIds?.length) {
+        setSelectedContextPackIds(restoredContext.selectedContextPackIds);
+      } else if (snapshot?.workingNotebook?.contextPackIds?.length) {
+        setSelectedContextPackIds(snapshot.workingNotebook.contextPackIds);
+      }
+
+      if (restoredContext?.selectedModel) {
+        setSelectedModel(restoredContext.selectedModel);
+      }
+
+      if (restoredContext?.selectedLanguage) {
+        setSelectedLanguage(restoredContext.selectedLanguage);
+      }
+
+      if (typeof restoredContext?.speechOutputEnabled === 'boolean') {
+        setVoiceAutoPlay(restoredContext.speechOutputEnabled);
+      }
+
+      try {
+        const { slots } = await getActiveMagazines();
+        if (!cancelled) {
+          setActiveMagazineSlots(
+            restoredActiveMagazineIds.size > 0
+              ? slots.filter((slot) => restoredActiveMagazineIds.has(slot.magazineId))
+              : slots,
+          );
+        }
+      } catch {
+        // Magazine state hydration is best-effort.
+      } finally {
+        if (!cancelled) {
+          setSessionSnapshotHydrated(true);
+        }
+      }
+    }
+
+    hydrateSessionSnapshot();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [sessionSnapshotScope, setVoiceAutoPlay]);
+
+  useEffect(() => {
+    if (!sessionSnapshotHydrated) {
+      return;
+    }
+
+    void saveSessionSnapshot(sessionSnapshotScope, {
+      sessionId: sessionId || sessionSnapshotScope,
+      selectedContextPackIds,
+      activeMagazineIds: activeMagazineSlots.map((slot) => slot.magazineId),
+      selectedModel,
+      selectedLanguage,
+      speechOutputEnabled: autoPlayEnabled,
+      workingNotebookId: workingNotebook.id,
+    }, [], workingNotebook);
+  }, [
+    activeMagazineSlots,
+    autoPlayEnabled,
+    selectedContextPackIds,
+    selectedLanguage,
+    selectedModel,
+    sessionId,
+    sessionSnapshotHydrated,
+    sessionSnapshotScope,
+    workingNotebook,
+  ]);
 
   // Memoize handleSpeak to prevent re-renders of MessageBubble
   const { speak } = voiceOutput;
@@ -301,7 +450,7 @@ export function ChatInterface({
   // ─────────────────────────────────────────────────────────
 
   // Classify message for vertical match (non-blocking)
-  // Uses the gateway /acheevy/classify endpoint which returns { intent, confidence, requiresAgent }
+  // Uses the gateway /acheevy/classify endpoint which now returns a routing decision.
   const classifyForVertical = useCallback(async (message: string) => {
     try {
       const res = await fetch('/api/acheevy/classify', {
@@ -311,8 +460,9 @@ export function ChatInterface({
       });
       if (!res.ok) return;
       const data = await res.json();
+      const routingDecision = data.routingDecision;
       // The gateway returns intent as 'vertical:<id>' (e.g. 'vertical:idea-generator')
-      if (data.requiresAgent && data.confidence > 0.6 && data.intent) {
+      if (routingDecision?.intent_type === 'vertical' && data.confidence > 0.6 && data.intent) {
         const intent = data.intent as string;
         if (intent.startsWith('vertical:')) {
           verticalFlow.startVertical(intent.replace('vertical:', ''));
@@ -323,19 +473,30 @@ export function ChatInterface({
     }
   }, [verticalFlow]);
 
-  const handleSend = useCallback(async (text?: string) => {
-    const messageText = text || inputValue;
+  const handleSend = useCallback(async (payload: AgenticComposerPayload | string) => {
+    const normalizedPayload = typeof payload === 'string'
+      ? { message: payload }
+      : payload;
+    const messageText = normalizedPayload.message;
     if (!messageText.trim() || isStreaming || isLoading) return;
+
+    lastSubmittedPromptRef.current = messageText;
 
     // If in vertical flow Phase A, advance the step and enrich the message
     if (verticalFlow.isPhaseA) {
       verticalFlow.advanceStep(messageText);
       const stepContext = verticalFlow.getCurrentStepContext();
       // Send message with step context injected for the LLM
-      const enrichedMessage = stepContext
-        ? `${messageText}\n\n---\n[SYSTEM_CONTEXT: ${stepContext}]`
-        : messageText;
-      sendMessage(enrichedMessage);
+      const enrichedPayload = stepContext
+        ? { ...normalizedPayload, message: `${messageText}\n\n---\n[SYSTEM_CONTEXT: ${stepContext}]` }
+        : normalizedPayload;
+      sendMessage({
+        content: enrichedPayload.message,
+        files: enrichedPayload.files,
+        tools: enrichedPayload.tools,
+        businessFunction: enrichedPayload.businessFunction,
+        deepResearch: enrichedPayload.deepResearch,
+      });
     } else {
       // Start orchestration task
       if (showOrchestration) {
@@ -344,7 +505,13 @@ export function ChatInterface({
         orchestration.updatePhase('route');
       }
 
-      sendMessage(messageText);
+      sendMessage({
+        content: messageText,
+        files: normalizedPayload.files,
+        tools: normalizedPayload.tools,
+        businessFunction: normalizedPayload.businessFunction,
+        deepResearch: normalizedPayload.deepResearch,
+      });
 
       // Check if this message triggers a vertical (async, non-blocking)
       if (!verticalFlow.isActive) {
@@ -352,42 +519,30 @@ export function ChatInterface({
       }
     }
 
-    setInputValue('');
-    setVoiceTranscriptReady(false);
-  }, [inputValue, isStreaming, isLoading, sendMessage, showOrchestration, orchestration, verticalFlow, classifyForVertical]);
-
-  // ─────────────────────────────────────────────────────────
-  // Keyboard Handling
-  // ─────────────────────────────────────────────────────────
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
-    }
-  };
+    setPendingVoiceTranscript('');
+  }, [isLoading, isStreaming, sendMessage, showOrchestration, orchestration, verticalFlow, classifyForVertical]);
 
   // Audio level for voice input visualization
   const audioLevel = useAudioLevel(voiceInput.stream, voiceInput.isListening);
 
   return (
-    <div className="relative flex flex-col h-full bg-obsidian">
+    <div className="relative flex h-full flex-col bg-transparent">
       {/* ── Messages Area ───────────────────────────────────── */}
-      <div className="flex-1 overflow-y-auto px-4 py-6">
-        <div className="max-w-3xl mx-auto space-y-6">
+      <div className="flex-1 overflow-y-auto px-4 py-6 md:px-6">
+        <div className="mx-auto max-w-4xl space-y-6">
           {/* Welcome Hero (shown when empty) */}
           {messages.length === 0 && (
             <AcheevyWelcomeHero
               welcomeMessage={welcomeMessage}
-              personas={PERSONAS}
-              selectedPersona={selectedPersona}
-              onPersonaChange={setSelectedPersona}
+              contextPacks={contextPackOptions}
+              selectedContextPackId={selectedContextPackId}
+              onContextPackChange={(contextPackId) => setSelectedContextPackIds([contextPackId])}
             />
           )}
 
           {/* Message List */}
           <AnimatePresence>
-            {messages.map((message, index) => (
+            {messages.map((message: ChatMessage, index: number) => (
               <AcheevyMessage
                 key={message.id}
                 message={message}
@@ -402,7 +557,7 @@ export function ChatInterface({
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 text-red-400 text-sm"
+              className="aims-agentic-panel rounded-[24px] border border-red-500/25 bg-red-500/10 p-4 text-sm text-red-300"
             >
               {error}
             </motion.div>
@@ -415,7 +570,7 @@ export function ChatInterface({
       {/* ── Vertical Step Indicator (above input) ───────────── */}
       {verticalFlow.isActive && (
         <div className="px-4">
-          <div className="max-w-3xl mx-auto">
+          <div className="mx-auto max-w-4xl">
             <VerticalStepIndicator
               state={verticalFlow.state}
               transitionPrompt={verticalFlow.getTransitionPrompt()}
@@ -428,10 +583,7 @@ export function ChatInterface({
 
       {/* ── Input Area (AcheevyChatInput) ───────────────────── */}
       <AcheevyChatInput
-        value={inputValue}
-        onChange={setInputValue}
         onSend={handleSend}
-        onKeyDown={handleKeyDown}
         placeholder={placeholder}
         isStreaming={isStreaming}
         isLoading={isLoading}
@@ -442,8 +594,15 @@ export function ChatInterface({
           startListening: voiceInput.startListening,
           stopListening: () => voiceInput.stopListening(),
         }}
-        voiceTranscriptReady={voiceTranscriptReady}
-        onClearTranscript={() => { setInputValue(''); setVoiceTranscriptReady(false); }}
+        voiceTranscript={pendingVoiceTranscript}
+        onSendVoiceTranscript={() => {
+          if (!pendingVoiceTranscript.trim()) {
+            return;
+          }
+
+          void handleSend({ message: pendingVoiceTranscript });
+        }}
+        onClearTranscript={() => { setPendingVoiceTranscript(''); }}
         audioLevel={audioLevel}
         hasVoiceAgent={hasAgent}
         voiceSessionActive={voiceSessionActive}
@@ -453,12 +612,14 @@ export function ChatInterface({
         onEndVoiceSession={endVoiceSession}
         isVoicePlaying={voiceOutput.isPlaying}
         onStopVoice={voiceOutput.stop}
+        autoPlayVoice={voiceOutput.autoPlayEnabled}
+        onToggleAutoPlayVoice={() => voiceOutput.setAutoPlay(!voiceOutput.autoPlayEnabled)}
         models={AI_MODELS}
         selectedModel={selectedModel}
         onModelChange={setSelectedModel}
-        personas={PERSONAS}
-        selectedPersona={selectedPersona}
-        onPersonaChange={setSelectedPersona}
+        contextPacks={contextPackOptions}
+        selectedContextPackId={selectedContextPackId}
+        onContextPackChange={(contextPackId) => setSelectedContextPackIds([contextPackId])}
         selectedLanguage={selectedLanguage}
         onLanguageChange={setSelectedLanguage}
         showOrchestration={showOrchestration}
@@ -521,6 +682,8 @@ export function ChatInterface({
         onClose={() => setShowCollabFeed(false)}
         initialTab={sidebarTab}
         activeMagazineCount={activeMagazineSlots.length}
+        activeMagazineSlots={activeMagazineSlots}
+        onActiveMagazineSlotsChange={setActiveMagazineSlots}
       />
 
       {/* Change Order Cost Tracker (bottom-left) */}

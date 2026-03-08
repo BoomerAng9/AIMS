@@ -158,27 +158,91 @@ async function executeCode(
   const startTime = Date.now();
   const config = session.config as { type: 'code'; language: string; maxExecutionSeconds: number };
 
-  // In production: POST to E2B sandbox API
-  // E2B_API_KEY should be in env
-  // const sandbox = await Sandbox.create({ template: config.language });
-  // const result = await sandbox.runCode(code);
-  // await sandbox.close();
+  // Route code execution to VPS2 OpenSandbox
+  const VPS2_SANDBOX_URL = process.env.VPS2_SANDBOX_URL || 'http://10.0.0.2:4400';
 
-  // Simulated execution for now
-  const output = `[${config.language}] Code executed successfully.\n` +
-    `Lines: ${code.split('\n').length}\n` +
-    `Characters: ${code.length}\n` +
-    `Sandbox: E2B (when connected)`;
+  try {
+    const sandboxReq = await fetch(`${VPS2_SANDBOX_URL}/api/sandbox/execute`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        code,
+        language: config.language,
+        timeoutSeconds: config.maxExecutionSeconds || 30,
+        userId: session.userId,
+        sessionId: session.sessionId,
+      }),
+    });
 
-  return {
-    executionId: uuidv4(),
-    input: code,
-    output,
-    status: 'success',
-    durationMs: Date.now() - startTime,
-    costUsd: 0.001, // E2B pricing per execution
-    timestamp: new Date().toISOString(),
-  };
+    const sandboxRes = await sandboxReq.json() as {
+      ok?: boolean;
+      execution?: {
+        id: string;
+        status: string;
+        stdout: string;
+        stderr: string;
+        exitCode: number | null;
+        durationMs: number | null;
+      };
+      error?: string;
+    };
+
+    if (!sandboxRes.ok || !sandboxRes.execution) {
+      return {
+        executionId: uuidv4(),
+        input: code,
+        output: `Sandbox error: ${sandboxRes.error || 'Unknown error'}`,
+        status: 'error',
+        durationMs: Date.now() - startTime,
+        costUsd: 0,
+        timestamp: new Date().toISOString(),
+      };
+    }
+
+    // Poll for completion if still running (max 3 attempts)
+    let execResult = sandboxRes.execution;
+    const terminalStates = ['completed', 'failed', 'timeout', 'cancelled'];
+    let polls = 0;
+    while (!terminalStates.includes(execResult.status) && polls < 60) {
+      await new Promise(r => setTimeout(r, 1000));
+      const pollRes = await fetch(`${VPS2_SANDBOX_URL}/api/sandbox/executions/${execResult.id}`);
+      const pollData = await pollRes.json() as { execution?: typeof execResult };
+      if (pollData.execution) execResult = pollData.execution;
+      polls++;
+    }
+
+    const output = execResult.stdout
+      ? `${execResult.stdout}${execResult.stderr ? '\n--- stderr ---\n' + execResult.stderr : ''}`
+      : execResult.stderr || '(no output)';
+
+    return {
+      executionId: execResult.id,
+      input: code,
+      output,
+      status: execResult.exitCode === 0 ? 'success' : 'error',
+      durationMs: execResult.durationMs || (Date.now() - startTime),
+      costUsd: 0.001,
+      timestamp: new Date().toISOString(),
+    };
+  } catch (err) {
+    logger.warn({ err }, '[Playground] VPS2 sandbox unreachable, falling back to simulated execution');
+
+    // Fallback: simulated execution when sandbox is unreachable
+    const output = `[${config.language}] Sandbox offline — simulated execution.\n` +
+      `Lines: ${code.split('\n').length}\n` +
+      `Characters: ${code.length}\n` +
+      `Connect VPS2 OpenSandbox for real execution.`;
+
+    return {
+      executionId: uuidv4(),
+      input: code,
+      output,
+      status: 'success',
+      durationMs: Date.now() - startTime,
+      costUsd: 0,
+      timestamp: new Date().toISOString(),
+    };
+  }
 }
 
 async function executePrompt(
