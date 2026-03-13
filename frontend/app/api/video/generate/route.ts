@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { klingVideo } from "@/lib/kling-video";
+import { requireAuth } from "@/lib/auth/require-role";
 
 const UEF_GATEWAY = process.env.UEF_GATEWAY_URL || process.env.NEXT_PUBLIC_UEF_GATEWAY_URL || 'http://localhost:3001';
 const API_KEY = process.env.INTERNAL_API_KEY || '';
@@ -12,6 +13,9 @@ const API_KEY = process.env.INTERNAL_API_KEY || '';
  * Falls back to direct Kling API if gateway unreachable.
  */
 export async function POST(request: NextRequest) {
+  const auth = await requireAuth();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const body = await request.json();
     const { prompt, model = "seedance-2.0", ...options } = body;
@@ -66,6 +70,9 @@ export async function POST(request: NextRequest) {
  * Check status — routes through gateway or direct Kling API
  */
 export async function GET(request: NextRequest) {
+  const auth = await requireAuth();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const url = new URL(request.url);
     const jobId = url.searchParams.get("jobId");

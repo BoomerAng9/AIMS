@@ -12,8 +12,11 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 
 const OPENTDB_URL = 'https://opentdb.com/api.php';
+const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY || '';
 
 interface OpenTDBQuestion {
   category: string;
@@ -47,6 +50,15 @@ function decodeHtml(html: string): string {
 }
 
 export async function POST(req: NextRequest) {
+  const apiKey = req.headers.get('x-api-key');
+  if (apiKey !== INTERNAL_API_KEY) {
+    const session = await getServerSession(authOptions);
+    const role = (session?.user as Record<string, unknown> | undefined)?.role as string | undefined;
+    if (!session?.user || (role !== 'OWNER' && role !== 'ADMIN')) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    }
+  }
+
   const { searchParams } = new URL(req.url);
   const amount = Math.min(parseInt(searchParams.get('amount') || '50', 10), 50);
   const category = searchParams.get('category'); // OpenTDB category ID

@@ -7,24 +7,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
 import bcrypt from 'bcryptjs';
+import { resetPasswordSchema, validateInput } from '@/lib/validation/schemas';
 
 export async function POST(req: NextRequest) {
   try {
-    const { token, password } = await req.json();
+    const body = await req.json();
+    const validation = validateInput(resetPasswordSchema, body);
 
-    if (!token || !password) {
+    if (!validation.success) {
       return NextResponse.json(
-        { error: 'Token and new password are required' },
+        { error: 'Invalid reset password request', details: validation.errors },
         { status: 400 }
       );
     }
 
-    if (password.length < 6) {
-      return NextResponse.json(
-        { error: 'Password must be at least 6 characters' },
-        { status: 400 }
-      );
-    }
+    const { token, password } = validation.data;
 
     // Find user with this reset token
     const user = await prisma.user.findFirst({

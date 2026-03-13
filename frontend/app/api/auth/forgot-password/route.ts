@@ -10,19 +10,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
 import crypto from 'crypto';
+import { forgotPasswordSchema, validateInput } from '@/lib/validation/schemas';
 
 const TOKEN_EXPIRY_HOURS = 1;
 
 export async function POST(req: NextRequest) {
   try {
-    const { email } = await req.json();
+    const body = await req.json();
+    const validation = validateInput(forgotPasswordSchema, body);
 
-    if (!email) {
+    if (!validation.success) {
       return NextResponse.json(
-        { error: 'Email is required' },
+        { error: 'Invalid forgot password request', details: validation.errors },
         { status: 400 }
       );
     }
+
+    const { email } = validation.data;
 
     const normalizedEmail = email.toLowerCase().trim();
 

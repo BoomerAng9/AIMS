@@ -449,7 +449,7 @@ cd aims-skills && npm test
 ./deploy.sh --domain plugmein.cloud --landing-domain aimanagedsolutions.cloud
 
 # First-time cert
-./deploy.sh --domain plugmein.cloud --landing-domain aimanagedsolutions.cloud --email admin@aimanagedsolutions.cloud
+./deploy.sh --domain plugmein.cloud --landing-domain aimanagedsolutions.cloud --email acheevy@aimanagedsolutions.cloud
 ```
 
 ---
@@ -471,3 +471,4 @@ When spinning up a new Claude Code session, point it here:
 
 *Last verified: Feb 20, 2026 — All file counts confirmed on disk.*
 *— ACHIEVEMOR / A.I.M.S.*
+

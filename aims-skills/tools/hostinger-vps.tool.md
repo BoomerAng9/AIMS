@@ -37,7 +37,7 @@ AIMS runs on a **single Hostinger KVM2 VPS** that hosts all core platform servic
 ### AIMS Core (76.13.96.107)
 ```bash
 ./deploy.sh --domain plugmein.cloud --landing-domain aimanagedsolutions.cloud
-# First-time cert: add --email admin@aimanagedsolutions.cloud
+# First-time cert: add --email acheevy@aimanagedsolutions.cloud
 # SSH: ssh root@76.13.96.107
 ```
 
@@ -71,3 +71,4 @@ All other ports blocked. Internal services communicate via Docker network.
 | Docker not starting | Run `systemctl start docker` |
 | Disk full | Check `df -h`; prune Docker: `docker system prune -a` |
 | DNS not resolving | Update A record at Hostinger DNS to point to `76.13.96.107` |
+

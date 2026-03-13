@@ -6,6 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAuth } from '@/lib/auth/require-role';
 
 const UEF_GATEWAY = process.env.UEF_GATEWAY_URL || process.env.NEXT_PUBLIC_UEF_GATEWAY_URL || 'http://localhost:3001';
 const API_KEY = process.env.INTERNAL_API_KEY || '';
@@ -27,6 +28,9 @@ async function gatewayFetch(path: string, options?: RequestInit): Promise<Respon
 }
 
 export async function POST(request: NextRequest) {
+  const auth = await requireAuth();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const body = await request.json();
     const { source, sourceType, platforms, style, model, duration, withAudio, tone, userId, hook, cta } = body;
@@ -46,7 +50,7 @@ export async function POST(request: NextRequest) {
         duration: duration || 15,
         withAudio: withAudio !== false,
         tone,
-        userId: userId || 'web-user',
+        userId: auth.user.email,
         hook,
         cta,
       }),
@@ -67,12 +71,15 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
+  const auth = await requireAuth();
+  if (auth instanceof NextResponse) return auth;
+
   const { searchParams } = new URL(request.url);
   const pipelineId = searchParams.get('id');
 
   if (!pipelineId) {
     // List all pipelines
-    const res = await gatewayFetch(`/api/content/pipelines?userId=web-user`);
+    const res = await gatewayFetch(`/api/content/pipelines?userId=${encodeURIComponent(auth.user.email)}`);
     if (res?.ok) {
       const data = await res.json();
       return NextResponse.json(data);

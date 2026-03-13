@@ -13,6 +13,8 @@ import { authOptions } from "@/lib/auth";
 import { LucAdapter } from "@/aims-tools/luc/luc.adapters";
 import { getLucStorage, getLucPolicy } from "@/lib/db/luc-storage";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(req: NextRequest) {
   try {
     // Auth check

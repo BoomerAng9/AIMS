@@ -6,6 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAuth } from '@/lib/auth/require-role';
 
 // ─────────────────────────────────────────────────────────────
 // Types
@@ -46,8 +47,12 @@ const billingLedger: BillingRecord[] = [];
 // ─────────────────────────────────────────────────────────────
 
 export async function POST(request: NextRequest) {
+  const auth = await requireAuth();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const event: ChangeOrderBillingEvent = await request.json();
+    event.userId = auth.user.email;
 
     // Validate required fields
     if (!event.orderId || !event.userId || !event.sessionId) {
@@ -112,10 +117,16 @@ export async function POST(request: NextRequest) {
 // ─────────────────────────────────────────────────────────────
 
 export async function GET(request: NextRequest) {
+  const auth = await requireAuth();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const { searchParams } = new URL(request.url);
     const sessionId = searchParams.get('sessionId');
-    const userId = searchParams.get('userId');
+    const requestedUserId = searchParams.get('userId');
+    const userId = auth.user.role === 'OWNER' || auth.user.role === 'ADMIN'
+      ? requestedUserId
+      : auth.user.email;
 
     let records = billingLedger;
 

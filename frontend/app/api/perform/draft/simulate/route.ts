@@ -8,9 +8,13 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db/prisma';
+import { requireAuth } from '@/lib/auth/require-role';
 import { getSimulatorState, makeSimulatorPick } from '@/lib/perform/mock-draft-engine';
 
 export async function GET(req: NextRequest) {
+  const auth = await requireAuth();
+  if (auth instanceof NextResponse) return auth;
+
   const { searchParams } = new URL(req.url);
   const id = searchParams.get('id');
 
@@ -27,6 +31,9 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST() {
+  const auth = await requireAuth();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     // Create a new empty mock draft for the simulator
     const slug = `sim-${Date.now()}`;
@@ -69,6 +76,9 @@ export async function POST() {
 }
 
 export async function PUT(req: NextRequest) {
+  const auth = await requireAuth();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const { mockDraftId, prospectId, teamName, overall, round, pickInRound, rationale } = await req.json();
 

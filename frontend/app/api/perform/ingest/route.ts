@@ -11,6 +11,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { requireOwner } from '@/lib/auth/require-role';
 import {
   seedConferencesAndTeams,
   upsertProspect,
@@ -51,6 +52,9 @@ async function seedNcaaData() {
 }
 
 export async function POST(req: NextRequest) {
+  const auth = await requireOwner();
+  if (auth instanceof NextResponse) return auth;
+
   const { searchParams } = new URL(req.url);
   const action = searchParams.get('action');
 

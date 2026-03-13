@@ -11,6 +11,8 @@ import { getServerSession } from 'next-auth';
 import { authOptions, isOwnerEmail } from '@/lib/auth';
 import Stripe from 'stripe';
 
+export const dynamic = 'force-dynamic';
+
 // Lazy-initialized Stripe client — avoids instantiation with empty key at module load
 let _stripe: Stripe | null = null;
 function getStripe(): Stripe {

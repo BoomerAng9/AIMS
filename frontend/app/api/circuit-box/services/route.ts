@@ -5,10 +5,14 @@
  */
 
 import { NextResponse } from 'next/server';
+import { requireAdmin } from '@/lib/auth/require-role';
 
 const CIRCUIT_METRICS_URL = process.env.CIRCUIT_METRICS_URL || 'http://circuit-metrics:9090';
 
 export async function GET() {
+  const auth = await requireAdmin();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 8000);

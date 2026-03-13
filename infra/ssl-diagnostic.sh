@@ -276,7 +276,7 @@ header "Summary"
 # =============================================================================
 echo ""
 info "If certs are expired or missing:"
-info "  ./deploy.sh --domain plugmein.cloud --landing-domain aimanagedsolutions.cloud --email admin@aimanagedsolutions.cloud"
+info "  ./deploy.sh --domain plugmein.cloud --landing-domain aimanagedsolutions.cloud --email acheevy@aimanagedsolutions.cloud"
 echo ""
 info "If certs exist but nginx doesn't have SSL configs:"
 info "  Re-run deploy.sh (it writes ssl.conf and ssl-landing.conf into nginx)"
@@ -287,3 +287,4 @@ echo ""
 info "To force-renew all certs:"
 info "  ./deploy.sh --ssl-renew"
 echo ""
+

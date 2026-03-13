@@ -7,26 +7,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
 import bcrypt from 'bcryptjs';
+import { registerSchema, validateInput } from '@/lib/validation/schemas';
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { firstName, lastName, email, password, businessName, businessType, country, state, city, postalCode } = body;
+    const validation = validateInput(registerSchema, body);
 
-    // ── Validate required fields ──────────────────────────
-    if (!email || !password || !firstName) {
+    if (!validation.success) {
       return NextResponse.json(
-        { error: 'Email, password, and first name are required' },
+        { error: 'Invalid registration input', details: validation.errors },
         { status: 400 }
       );
     }
 
-    if (password.length < 6) {
-      return NextResponse.json(
-        { error: 'Password must be at least 6 characters' },
-        { status: 400 }
-      );
-    }
+    const { firstName, lastName, email, password, businessName, businessType, country, state, city, postalCode } = validation.data;
 
     // ── Check for existing user ──────────────────────────
     const existingUser = await prisma.user.findUnique({
@@ -59,7 +54,7 @@ export async function POST(req: NextRequest) {
         email: email.toLowerCase().trim(),
         name,
         passwordHash,
-        role: 'MEMBER',
+        role: 'CUSTOMER',
         status: 'ACTIVE',
         metadata: Object.keys(meta).length > 0 ? JSON.stringify(meta) : null,
       },

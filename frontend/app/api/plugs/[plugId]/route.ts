@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { findPlugById, PLUG_REGISTRY } from "@/lib/plugs/registry";
+import { requireAuth } from '@/lib/auth/require-role';
 
 // ─── GET /api/plugs/:plugId ─────────────────────────────────
 // Returns the plug definition + mock data for the plug UI.
@@ -51,6 +52,9 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ plugId: string }> }
 ) {
+  const auth = await requireAuth();
+  if (auth instanceof NextResponse) return auth;
+
   const { plugId } = await params;
   const plug = findPlugById(plugId);
 

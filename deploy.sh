@@ -1,4 +1,4 @@
-  !/usr/bin/env bash
+#!/usr/bin/env bash
 # =============================================================================
 # A.I.M.S. Production Deployment Script
 # =============================================================================
@@ -63,7 +63,7 @@ while [[ $# -gt 0 ]]; do
             echo ""
             echo "Examples:"
             echo "  ./deploy.sh --domain plugmein.cloud --landing-domain aimanagedsolutions.cloud"
-            echo "  ./deploy.sh --domain plugmein.cloud --email admin@aimanagedsolutions.cloud  # first-time cert"
+            echo "  ./deploy.sh --domain plugmein.cloud --email acheevy@aimanagedsolutions.cloud  # first-time cert"
             echo "  ./deploy.sh --ssl-renew"
             exit 0 ;;
         *) error "Unknown option: $1"; exit 1 ;;
@@ -377,3 +377,4 @@ info "  Stop     : ${COMPOSE_CMD} -f ${COMPOSE_FILE} down"
 info "  Restart  : ${COMPOSE_CMD} -f ${COMPOSE_FILE} restart"
 info "  SSL renew: certbot renew --webroot -w /var/www/certbot"
 echo ""
+

@@ -10,8 +10,12 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { enrichProspectViaBrave } from '@/lib/perform/data-service';
+import { requireAuth } from '@/lib/auth/require-role';
 
 export async function POST(req: NextRequest) {
+  const auth = await requireAuth();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const { prospectId } = await req.json();
 

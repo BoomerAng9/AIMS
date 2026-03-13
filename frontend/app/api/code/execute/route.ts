@@ -15,6 +15,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { codeExecuteSchema, validateInput } from '@/lib/validation/schemas';
 
 const UEF_GATEWAY_URL = process.env.UEF_GATEWAY_URL || process.env.NEXT_PUBLIC_UEF_GATEWAY_URL || '';
 const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY || '';
@@ -25,35 +27,19 @@ type Language = (typeof ALLOWED_LANGUAGES)[number];
 export async function POST(request: NextRequest) {
   try {
     // Auth check — require session or API key
-    const session = await getServerSession().catch(() => null);
+    const session = await getServerSession(authOptions).catch(() => null);
     const apiKey = request.headers.get('x-api-key');
-    if (!session && apiKey !== INTERNAL_API_KEY && process.env.NODE_ENV === 'production') {
+    if (!session && apiKey !== INTERNAL_API_KEY) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
     const body = await request.json();
-    const { code, language = 'python', packages } = body;
-
-    // Validate code
-    if (!code || typeof code !== 'string') {
-      return NextResponse.json({ error: 'code is required and must be a string' }, { status: 400 });
-    }
-    if (code.length > MAX_CODE_LENGTH) {
-      return NextResponse.json({ error: `Code exceeds maximum length of ${MAX_CODE_LENGTH} characters` }, { status: 400 });
+    const validation = validateInput(codeExecuteSchema, body);
+    if (!validation.success) {
+      return NextResponse.json({ error: 'Invalid execution request', details: validation.errors }, { status: 400 });
     }
 
-    // Validate language
-    if (!ALLOWED_LANGUAGES.includes(language as Language)) {
-      return NextResponse.json(
-        { error: `Invalid language: ${language}. Allowed: ${ALLOWED_LANGUAGES.join(', ')}` },
-        { status: 400 },
-      );
-    }
-
-    // Validate packages
-    if (packages && (!Array.isArray(packages) || packages.some((p: unknown) => typeof p !== 'string'))) {
-      return NextResponse.json({ error: 'packages must be an array of strings' }, { status: 400 });
-    }
+    const { code, language = 'python', packages } = validation.data;
 
     // Path 1: Try E2B direct execution (if API key is set)
     if (process.env.E2B_API_KEY) {

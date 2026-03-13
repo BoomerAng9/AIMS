@@ -11,6 +11,8 @@
  */
 
 import { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
+import { requireAuth } from '@/lib/auth/require-role';
 import { createOpenAI } from '@ai-sdk/openai';
 import { streamText } from 'ai';
 
@@ -84,6 +86,9 @@ The user has an existing HTML file and wants changes. You MUST:
 6. Maintain mobile-first design patterns (bottom nav, safe areas, touch targets).`;
 
 export async function POST(request: NextRequest) {
+  const auth = await requireAuth();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const body = await request.json();
     const {

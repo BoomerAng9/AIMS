@@ -6,6 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAuth } from '@/lib/auth/require-role';
 
 const UEF_GATEWAY_URL = process.env.UEF_GATEWAY_URL || process.env.NEXT_PUBLIC_UEF_GATEWAY_URL || 'http://localhost:3001';
 const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY || '';
@@ -18,6 +19,9 @@ function gatewayHeaders(): Record<string, string> {
 
 // GET /api/memory — List memories or stats
 export async function GET(request: NextRequest) {
+  const auth = await requireAuth();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const userId = request.nextUrl.searchParams.get('userId')
       || request.headers.get('x-user-id')
@@ -55,6 +59,9 @@ export async function GET(request: NextRequest) {
 
 // POST /api/memory — remember, recall, feedback, preference
 export async function POST(request: NextRequest) {
+  const auth = await requireAuth();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const body = await request.json();
     const action = body.action as string;

@@ -19,8 +19,11 @@
  */
 
 import { NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY || '';
 
 interface GeneratedContest {
   title: string;
@@ -37,7 +40,16 @@ interface GeneratedContest {
   prizeStructure: Record<string, number>;
 }
 
-export async function POST() {
+export async function POST(request: Request) {
+  const apiKey = request.headers.get('x-api-key');
+  if (apiKey !== INTERNAL_API_KEY) {
+    const session = await getServerSession(authOptions);
+    const role = (session?.user as Record<string, unknown> | undefined)?.role as string | undefined;
+    if (!session?.user || (role !== 'OWNER' && role !== 'ADMIN')) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    }
+  }
+
   const now = new Date();
   const generated: GeneratedContest[] = [];
   const errors: string[] = [];

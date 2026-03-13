@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { findSkillById, SKILL_REGISTRY, getSkillsByType } from "@/lib/skills/registry";
+import { requireAdmin, requireAuth } from "@/lib/auth/require-role";
 
 // ─── GET /api/skills/:skillId ────────────────────────────────
 // Returns the skill definition. Use "catalog" for all skills.
@@ -7,6 +8,9 @@ export async function GET(
   _request: Request,
   { params }: { params: Promise<{ skillId: string }> }
 ) {
+  const auth = await requireAuth();
+  if (auth instanceof NextResponse) return auth;
+
   const { skillId } = await params;
 
   if (skillId === "catalog") {
@@ -35,6 +39,9 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ skillId: string }> }
 ) {
+  const auth = await requireAdmin();
+  if (auth instanceof NextResponse) return auth;
+
   const { skillId } = await params;
   const skill = findSkillById(skillId);
 

@@ -19536,7 +19536,7 @@ Continue to iterate?
 Made changes.
 
 User: # Before (needed email for certbot):
-./deploy.sh --domain plugmein.cloud --landing-domain aimanagedsolutions.cloud --email admin@aimanagedsolutions.cloud
+./deploy.sh --domain plugmein.cloud --landing-domain aimanagedsolutions.cloud --email acheevy@aimanagedsolutions.cloud
 
 # After (Hostinger handles SSL):
 ./deploy.sh --domain plugmein.cloud --landing-domain aimanagedsolutions.cloud
@@ -19751,7 +19751,7 @@ Now commit and push:
 Made changes.
 
 User: # Before (needed email for certbot):
-./deploy.sh --domain plugmein.cloud --landing-domain aimanagedsolutions.cloud --email admin@aimanagedsolutions.cloud
+./deploy.sh --domain plugmein.cloud --landing-domain aimanagedsolutions.cloud --email acheevy@aimanagedsolutions.cloud
 
 # After (Hostinger handles SSL):
 ./deploy.sh --domain plugmein.cloud --landing-domain aimanagedsolutions.cloud
@@ -20344,7 +20344,7 @@ Searched for text `acheevy@aimanagedsolutions.cloud`, 8 results
 
 The question was skipped. What is the correct email address to replace `acheevy@aimanagedsolutions.cloud` with?
 
-User: admin@aimanagedsolutions.cloud
+User: acheevy@aimanagedsolutions.cloud
 
 GitHub Copilot: 
 
@@ -20352,7 +20352,7 @@ GitHub Copilot:
 
 Created 3 todos
 
-Found 8 occurrences across 6 files. Replacing `acheevy@aimanagedsolutions.cloud` → `admin@aimanagedsolutions.cloud` in all tracked files:     
+Found 8 occurrences across 6 files. Replacing `acheevy@aimanagedsolutions.cloud` → `acheevy@aimanagedsolutions.cloud` in all tracked files:     
 
 Read [](file:///c%3A/Users/rishj/OneDrive/Desktop/A.I.M.S/deploy.sh#62-62), lines 62 to 68
 
@@ -20465,11 +20465,11 @@ Ran terminal command: (Get-Content deploy.sh | Select-String "acheevy@").Count ;
 
 Same issue as before — VS Code buffer edit didn't save to disk. Let me fix it directly: 
 
-Ran terminal command: python -c "p='deploy.sh'; t=open(p,'r',encoding='utf-8').read().replace('acheevy@aimanagedsolutions.cloud','admin@aimanagedsolutions.cloud'); open(p,'w',encoding='utf-8',newline='\n').write(t)"
+Ran terminal command: python -c "p='deploy.sh'; t=open(p,'r',encoding='utf-8').read().replace('acheevy@aimanagedsolutions.cloud','acheevy@aimanagedsolutions.cloud'); open(p,'w',encoding='utf-8',newline='\n').write(t)"
 
 Also check the aims-ssl-setup.sh (untracked file that had 2 occurrences): 
 
-Ran terminal command: (Get-Content deploy.sh | Select-String "admin@aimanaged").Count ; python -c "p='aims-ssl-setup.sh'; t=open(p,'r',encoding='utf-8').read().replace('acheevy@aimanagedsolutions.cloud','admin@aimanagedsolutions.cloud'); open(p,'w',encoding='utf-8',newline='\n').write(t)"
+Ran terminal command: (Get-Content deploy.sh | Select-String "admin@aimanaged").Count ; python -c "p='aims-ssl-setup.sh'; t=open(p,'r',encoding='utf-8').read().replace('acheevy@aimanagedsolutions.cloud','acheevy@aimanagedsolutions.cloud'); open(p,'w',encoding='utf-8',newline='\n').write(t)"
 
 Now let me also check that the local repo has our latest changes (it might be behind `f0d30fe` from PR #77):  
 
@@ -20486,7 +20486,7 @@ Completed with input: git merge origin/main --strategy-option ours -m "Merge PR 
 
 Need to commit email fixes first:  
 
-Ran terminal command: git add deploy.sh aims-skills/tools/certbot.tool.md aims-skills/tools/hostinger-vps.tool.md infra/ssl-diagnostic.sh evidence/AUDIT.md ; git commit -m "fix: replace acheevy@ email with admin@aimanagedsolutions.cloud everywhere"
+Ran terminal command: git add deploy.sh aims-skills/tools/certbot.tool.md aims-skills/tools/hostinger-vps.tool.md infra/ssl-diagnostic.sh evidence/AUDIT.md ; git commit -m "fix: replace acheevy@ email with acheevy@aimanagedsolutions.cloud everywhere"
 
 Now merge PR #77, keeping our versions for conflicts:     
 
@@ -20550,7 +20550,7 @@ Ran terminal command: ssh -i ~/.ssh/id_ed25519_aims root@aims-vps "cd /root/aims
 
 VPS is now at `a01d535` with:
 - **4** `SSL_CHANGED` occurrences (correct)
-- **1** `admin@aimanagedsolutions.cloud` (correct email)
+- **1** `acheevy@aimanagedsolutions.cloud` (correct email)
 - **2** `certbot certonly` calls (host certbot for both domains)
 - **3** ACME challenge locations in nginx.conf (for cert renewal)
 
@@ -20567,7 +20567,7 @@ Everything is working. Here's a summary:
 **Done:**
 1. **VPS Git auth fixed** — generated SSH deploy key on VPS, added to GitHub repo, `git fetch`/`reset` now works
 2. **VPS repo cleaned** — reset to `a01d535` (latest `origin/main`)
-3. **Email fixed** — `acheevy@` → `admin@aimanagedsolutions.cloud` across 6 files
+3. **Email fixed** — `acheevy@` → `acheevy@aimanagedsolutions.cloud` across 6 files
 4. **PR #77 selectively merged** — accepted compose/Dockerfile cleanup, rejected removal of ACME challenge locations and "Hostinger Lifetime SSL" rewrites
 5. **Deploy succeeded without `--email`:**
 
@@ -20647,12 +20647,12 @@ Once the A records are updated (can take up to 24h but often minutes), I'll issu
 # plugmein.cloud (re-issue to add demo subdomain)
 certbot certonly --webroot -w /var/www/certbot \
   -d plugmein.cloud -d www.plugmein.cloud -d demo.plugmein.cloud \
-  --email admin@aimanagedsolutions.cloud --agree-tos --no-eff-email
+  --email acheevy@aimanagedsolutions.cloud --agree-tos --no-eff-email
 
 # aimanagedsolutions.cloud (new cert)
 certbot certonly --webroot -w /var/www/certbot \
   -d aimanagedsolutions.cloud -d www.aimanagedsolutions.cloud \
-  --email admin@aimanagedsolutions.cloud --agree-tos --no-eff-email
+  --email acheevy@aimanagedsolutions.cloud --agree-tos --no-eff-email
 ```
 
 Tell Kodee: **"HTTP-01 webroot — I already have certbot installed and nginx serving `/.well-known/acme-challenge/` from `/var/www/certbot`."**
@@ -20720,12 +20720,12 @@ Here's your response to Kodee:
 # Re-issue plugmein.cloud cert to include demo subdomain
 certbot certonly --webroot -w /var/www/certbot \
   -d plugmein.cloud -d www.plugmein.cloud -d demo.plugmein.cloud \
-  --email admin@aimanagedsolutions.cloud --agree-tos --no-eff-email
+  --email acheevy@aimanagedsolutions.cloud --agree-tos --no-eff-email
 
 # Issue new cert for aimanagedsolutions.cloud
 certbot certonly --webroot -w /var/www/certbot \
   -d aimanagedsolutions.cloud -d www.aimanagedsolutions.cloud \
-  --email admin@aimanagedsolutions.cloud --agree-tos --no-eff-email
+  --email acheevy@aimanagedsolutions.cloud --agree-tos --no-eff-email
 ```
 
 The DNS update is the only blocker right now.
@@ -20746,8 +20746,8 @@ Ran terminal command: ssh -i ~/.ssh/id_ed25519_aims root@aims-vps "dig +short ai
 
 `aimanagedsolutions.cloud` DNS is already propagated! `plugmein.cloud` still goes through Hostinger CDN (not our VPS), but we already have a cert for it. Let me issue the cert for `aimanagedsolutions.cloud` now: 
 
-Ran terminal command: ssh -i ~/.ssh/id_ed25519_aims root@aims-vps "certbot certonly --webroot -w /var/www/certbot -d aimanagedsolutions.cloud -d www.aimanagedsolutions.cloud --email admin@aimanagedsolutions.cloud --agree-tos --no-eff-email --non-interactive" 2>&1
-Completed with input: ssh -i ~/.ssh/id_ed25519_aims root@aims-vps "certbot certonly --webroot -w /var/www/certbot -d aimanagedsolutions.cloud -d www.aimanagedsolutions.cloud --email admin@aimanagedsolutions.cloud --agree-tos --no-eff-email --non-interactive" 2>&1
+Ran terminal command: ssh -i ~/.ssh/id_ed25519_aims root@aims-vps "certbot certonly --webroot -w /var/www/certbot -d aimanagedsolutions.cloud -d www.aimanagedsolutions.cloud --email acheevy@aimanagedsolutions.cloud --agree-tos --no-eff-email --non-interactive" 2>&1
+Completed with input: ssh -i ~/.ssh/id_ed25519_aims root@aims-vps "certbot certonly --webroot -w /var/www/certbot -d aimanagedsolutions.cloud -d www.aimanagedsolutions.cloud --email acheevy@aimanagedsolutions.cloud --agree-tos --no-eff-email --non-interactive" 2>&1
 
 ACME challenge returns 404 — nginx needs to serve the webroot for that domain. Let me check the nginx config: 
 
@@ -20806,7 +20806,7 @@ Ran terminal command: ssh -i ~/.ssh/id_ed25519_aims root@aims-vps "cd /root/aims
 
 Nginx recreated with certbot webroot mounted. Now let me issue the cert:        
 
-Ran terminal command: ssh -i ~/.ssh/id_ed25519_aims root@aims-vps "certbot certonly --webroot -w /var/www/certbot -d aimanagedsolutions.cloud -d www.aimanagedsolutions.cloud --email admin@aimanagedsolutions.cloud --agree-tos --no-eff-email --non-interactive" 2>&1
+Ran terminal command: ssh -i ~/.ssh/id_ed25519_aims root@aims-vps "certbot certonly --webroot -w /var/www/certbot -d aimanagedsolutions.cloud -d www.aimanagedsolutions.cloud --email acheevy@aimanagedsolutions.cloud --agree-tos --no-eff-email --non-interactive" 2>&1
 
 Cert issued! Now activate the HTTPS server block for `aimanagedsolutions.cloud`:        
 
@@ -20827,12 +20827,12 @@ Ran terminal command: ssh -i ~/.ssh/id_ed25519_aims root@aims-vps "echo '---AIMS
 
 Both domains are serving HTTPS (HTTP/2 403 is expected — that's the auth middleware, not an error). Let me also issue the cert for `demo.plugmein.cloud`:       
 
-Ran terminal command: ssh -i ~/.ssh/id_ed25519_aims root@aims-vps "certbot certonly --webroot -w /var/www/certbot -d plugmein.cloud -d www.plugmein.cloud -d demo.plugmein.cloud --email admin@aimanagedsolutions.cloud --agree-tos --no-eff-email --non-interactive --expand" 2>&1
-Completed with input: ssh -i ~/.ssh/id_ed25519_aims root@aims-vps "certbot certonly --webroot -w /var/www/certbot -d plugmein.cloud -d www.plugmein.cloud -d demo.plugmein.cloud --email admin@aimanagedsolutions.cloud --agree-tos --no-eff-email --non-interactive --expand" 2>&1
+Ran terminal command: ssh -i ~/.ssh/id_ed25519_aims root@aims-vps "certbot certonly --webroot -w /var/www/certbot -d plugmein.cloud -d www.plugmein.cloud -d demo.plugmein.cloud --email acheevy@aimanagedsolutions.cloud --agree-tos --no-eff-email --non-interactive --expand" 2>&1
+Completed with input: ssh -i ~/.ssh/id_ed25519_aims root@aims-vps "certbot certonly --webroot -w /var/www/certbot -d plugmein.cloud -d www.plugmein.cloud -d demo.plugmein.cloud --email acheevy@aimanagedsolutions.cloud --agree-tos --no-eff-email --non-interactive --expand" 2>&1
 
 `www.plugmein.cloud` still routes through Hostinger CDN (IPv6 `2a02:4780:...`), not to our VPS. The `plugmein.cloud` DNS A records haven't been updated yet. Let me issue for just `demo.plugmein.cloud` which already points to us:       
 
-Ran terminal command: ssh -i ~/.ssh/id_ed25519_aims root@aims-vps "certbot certonly --webroot -w /var/www/certbot -d demo.plugmein.cloud --email admin@aimanagedsolutions.cloud --agree-tos --no-eff-email --non-interactive" 2>&1
+Ran terminal command: ssh -i ~/.ssh/id_ed25519_aims root@aims-vps "certbot certonly --webroot -w /var/www/certbot -d demo.plugmein.cloud --email acheevy@aimanagedsolutions.cloud --agree-tos --no-eff-email --non-interactive" 2>&1
 
 Here's the summary:
 
@@ -20966,7 +20966,7 @@ Ran terminal command: ssh -i ~/.ssh/id_ed25519_aims root@aims-vps "dig +short ww
 
 `www.plugmein.cloud` resolves to our VPS. `plugmein.cloud` root still goes through CDN — but the existing cert covers it. Let me expand the cert to include `www` and `demo`: 
 
-Ran terminal command: ssh -i ~/.ssh/id_ed25519_aims root@aims-vps "certbot certonly --webroot -w /var/www/certbot -d plugmein.cloud -d www.plugmein.cloud -d demo.plugmein.cloud --email admin@aimanagedsolutions.cloud --agree-tos --no-eff-email --non-interactive --expand" 2>&1
+Ran terminal command: ssh -i ~/.ssh/id_ed25519_aims root@aims-vps "certbot certonly --webroot -w /var/www/certbot -d plugmein.cloud -d www.plugmein.cloud -d demo.plugmein.cloud --email acheevy@aimanagedsolutions.cloud --agree-tos --no-eff-email --non-interactive --expand" 2>&1
 
 Cert expanded! Now reload nginx to pick up the renewed cert and verify all domains: 
 

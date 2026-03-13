@@ -16,6 +16,7 @@
 
 import { streamText } from 'ai';
 import { createOpenAI } from '@ai-sdk/openai';
+import { requireAuth } from '@/lib/auth/require-role';
 
 const openrouter = createOpenAI({
   apiKey: process.env.OPENROUTER_API_KEY || '',
@@ -205,6 +206,9 @@ interface ValidationRequest {
 /* ── Route Handler ─────────────────────────────────────────────────── */
 
 export async function POST(req: Request) {
+  const auth = await requireAuth();
+  if (auth instanceof Response) return auth;
+
   try {
     const body: ValidationRequest = await req.json();
 

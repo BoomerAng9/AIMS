@@ -6,10 +6,14 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { requireOwner } from '@/lib/auth/require-role';
 
 const VERITAS_URL = process.env.VERITAS_URL || 'http://localhost:7001';
 
 async function proxy(req: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
+  const auth = await requireOwner();
+  if (auth instanceof NextResponse) return auth;
+
   const { path } = await params;
   const targetPath = '/api/' + path.join('/');
   const url = `${VERITAS_URL}${targetPath}`;

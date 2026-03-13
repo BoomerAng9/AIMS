@@ -12,6 +12,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionUserId } from '@/lib/api-proxy';
+import { requireAuth } from '@/lib/auth/require-role';
 
 const UEF_GATEWAY = process.env.UEF_GATEWAY_URL || process.env.NEXT_PUBLIC_UEF_GATEWAY_URL || 'http://localhost:3001';
 const API_KEY = process.env.INTERNAL_API_KEY || '';
@@ -106,6 +107,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const auth = await requireAuth();
+  if (auth instanceof NextResponse) return auth;
+
   const body = await request.json();
   const { plugId, instanceName, deliveryMode, customizations, envOverrides, domain } = body;
 
@@ -113,7 +117,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'plugId and instanceName are required' }, { status: 400 });
   }
 
-  const userId = await getSessionUserId() || 'anonymous';
+  const userId = await getSessionUserId() || auth.user.email;
 
   // Proxy to UEF Gateway's real spin-up endpoint
   const res = await gatewayFetch('/api/plug-instances/spin-up', {

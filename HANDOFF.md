@@ -16,7 +16,7 @@ cd frontend && npm run build   # verify clean build
 - All core services deploy to AIMS VPS (`76.13.96.107` / `srv1328075.hstgr.cloud`)
 - Cloud Run deploys removed from CI — `cloudbuild.yaml` is build+push only
 - SSL via host certbot (apt) — certs at `/etc/letsencrypt`, bind-mounted into nginx
-- First-time cert: `./deploy.sh --domain plugmein.cloud --landing-domain aimanagedsolutions.cloud --email admin@aimanagedsolutions.cloud`
+- First-time cert: `./deploy.sh --domain plugmein.cloud --landing-domain aimanagedsolutions.cloud --email acheevy@aimanagedsolutions.cloud`
 - PersonaPlex inference on GCP Vertex AI Endpoints (GPU), not Cloud Run
 
 ### 2. Landing Page Rewritten (`frontend/app/page.tsx`)
@@ -120,3 +120,4 @@ cd ../../aims-skills && npm test  # Skills
 ## Branch
 
 All work is on `main`. Feature branches merge via PR.
+

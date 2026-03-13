@@ -206,15 +206,15 @@ export function Breadcrumbs({ pageTitle, showHomeIcon = true, className = '' }: 
   return (
     <nav
       aria-label="Breadcrumb"
-      className={`flex items-center gap-1 text-xs text-zinc-500 ${className}`}
+      className={`flex items-center gap-1 text-xs text-slate-500 ${className}`}
     >
       {crumbs.map((crumb, index) => (
         <span key={crumb.href} className="flex items-center gap-1">
           {index > 0 && (
-            <ChevronRight className="w-3 h-3 text-zinc-600 flex-shrink-0" />
+            <ChevronRight className="w-3 h-3 text-slate-400 flex-shrink-0" />
           )}
           {crumb.isLast ? (
-            <span className="text-zinc-300 font-medium truncate max-w-[200px]">
+            <span className="text-slate-900 font-medium truncate max-w-[200px]">
               {index === 0 && showHomeIcon ? (
                 <span className="flex items-center gap-1">
                   <Home className="w-3 h-3" />
@@ -227,7 +227,7 @@ export function Breadcrumbs({ pageTitle, showHomeIcon = true, className = '' }: 
           ) : (
             <Link
               href={crumb.href}
-              className="hover:text-amber-500 transition-colors truncate max-w-[150px]"
+              className="hover:text-amber-700 transition-colors truncate max-w-[150px]"
             >
               {index === 0 && showHomeIcon ? (
                 <span className="flex items-center gap-1">

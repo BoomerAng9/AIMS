@@ -13,6 +13,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAuth } from '@/lib/auth/require-role';
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || '';
 const BRAVE_API_KEY = process.env.BRAVE_API_KEY || '';
@@ -234,6 +235,9 @@ async function tier3Search(query: string, context?: string, state?: string): Pro
 
 // ── Main Handler ────────────────────────────────────────────
 export async function POST(req: NextRequest) {
+    const auth = await requireAuth();
+    if (auth instanceof NextResponse) return auth;
+
     try {
         const body: SearchRequest = await req.json();
         const { query, context, state, position } = body;

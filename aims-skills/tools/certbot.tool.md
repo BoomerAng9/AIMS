@@ -41,7 +41,7 @@ certbot certonly --webroot \
   -w /var/www/certbot \
   -d plugmein.cloud \
   -d aimanagedsolutions.cloud \
-  --email admin@aimanagedsolutions.cloud \
+  --email acheevy@aimanagedsolutions.cloud \
   --agree-tos --no-eff-email
 ```
 
@@ -64,3 +64,4 @@ certbot certonly --webroot \
 | Challenge failed | Ensure port 80 is open and Nginx serves `.well-known/acme-challenge` |
 | Rate limited | Let's Encrypt has 5 certs/domain/week limit; use staging for testing |
 | Cert not found | Check volume mount: `certbot-certs:/etc/letsencrypt` |
+

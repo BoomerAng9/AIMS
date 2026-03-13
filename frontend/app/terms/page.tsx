@@ -90,8 +90,8 @@ export default function TermsPage() {
             <h2 className="text-xl font-bold text-slate-800 mb-3">8. Contact</h2>
             <p className="text-slate-600 leading-relaxed">
               For questions about these terms, contact us at{' '}
-              <a href="mailto:admin@aimanagedsolutions.cloud" className="text-amber-600 hover:text-amber-700 underline">
-                admin@aimanagedsolutions.cloud
+              <a href="mailto:acheevy@aimanagedsolutions.cloud" className="text-amber-600 hover:text-amber-700 underline">
+                acheevy@aimanagedsolutions.cloud
               </a>.
             </p>
           </section>
@@ -100,3 +100,4 @@ export default function TermsPage() {
     </main>
   );
 }
+

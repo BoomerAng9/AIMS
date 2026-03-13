@@ -6,17 +6,26 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/lib/auth';
+import { requireAuth } from '@/lib/auth/require-role';
 import { claimLinkCode, generateLinkCode } from '@/lib/social/gateway';
 
 export async function POST(req: NextRequest) {
-  try {
-    const { code, platform_user_id } = await req.json();
+  const auth = await requireAuth();
+  if (auth instanceof NextResponse) return auth;
 
-    if (!code || !platform_user_id) {
-      return NextResponse.json({ error: 'code and platform_user_id required' }, { status: 400 });
+  try {
+    const session = await getServerSession(authOptions);
+    const { code } = await req.json();
+    const platformUserId = (session?.user as Record<string, unknown> | undefined)?.id as string | undefined;
+    const fallbackUserId = auth.user.email;
+
+    if (!code) {
+      return NextResponse.json({ error: 'code is required' }, { status: 400 });
     }
 
-    const success = claimLinkCode(code, platform_user_id);
+    const success = claimLinkCode(code, platformUserId || fallbackUserId);
     if (!success) {
       return NextResponse.json({ error: 'Invalid, expired, or already claimed code' }, { status: 400 });
     }
@@ -28,6 +37,9 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
+  const auth = await requireAuth();
+  if (auth instanceof NextResponse) return auth;
+
   const code = req.nextUrl.searchParams.get('code');
   if (!code) {
     return NextResponse.json({ error: 'code parameter required' }, { status: 400 });

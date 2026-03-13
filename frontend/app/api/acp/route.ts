@@ -1,21 +1,16 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/lib/auth';
+import { requireAuth } from '@/lib/auth/require-role';
 
 const UEF_URL = process.env.UEF_GATEWAY_URL || process.env.UEF_ENDPOINT || 'http://uef-gateway:3001';
 const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY || '';
 
 export async function POST(request: Request) {
+  const auth = await requireAuth();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const body = await request.json();
-
-    // Try to get authenticated user — but don't block if not signed in
-    const session = await getServerSession(authOptions);
-    if (session?.user) {
-      body.userId = (session.user as Record<string, unknown>).id || session.user.email;
-    } else {
-      body.userId = 'guest';
-    }
+    body.userId = auth.user.email;
 
     const res = await fetch(`${UEF_URL}/ingress/acp`, {
       method: 'POST',

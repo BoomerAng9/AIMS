@@ -38,7 +38,7 @@ IF core platform service (ACHEEVY API, UEF Gateway, Per|Form, House of Ang, Redi
   THEN → AIMS Core VPS (76.13.96.107 / srv1328075.hstgr.cloud) in Docker
   Files: infra/docker-compose.prod.yml, deploy.sh
   Deploy: ./deploy.sh --domain plugmein.cloud --landing-domain aimanagedsolutions.cloud
-  First-time cert: ./deploy.sh --domain plugmein.cloud --landing-domain aimanagedsolutions.cloud --email admin@aimanagedsolutions.cloud
+  First-time cert: ./deploy.sh --domain plugmein.cloud --landing-domain aimanagedsolutions.cloud --email acheevy@aimanagedsolutions.cloud
 
 IF user-deployed Plug instance (one-click tool/agent/platform deployment)
   THEN → AIMS VPS in Docker (port 51000+ range, auto-allocated)
@@ -302,3 +302,4 @@ Every recurring mistake is documented here. Read this BEFORE making changes. Add
 13. **Sensitive data in logs** — Never log API keys, user passwords, or session tokens.
 14. **No auth on destructive actions** — Deploy, scale, decommission actions MUST check user role via `requireRole()` middleware before executing.
 15. **Prisma v7 breaking change** — Prisma v7 removed `url` from schema `datasource`. Use Prisma v5 CLI (`npx prisma@5 generate`) until migration complete.
+

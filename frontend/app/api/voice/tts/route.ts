@@ -9,6 +9,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAuth } from '@/lib/auth/require-role';
 import { ELEVENLABS_ACHEEVY_PRESET, DEEPGRAM_ACHEEVY_PRESET } from '@/lib/acheevy/voiceConfig';
 
 const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY || '';
@@ -100,6 +101,9 @@ async function synthesizeDeepgram(
 }
 
 export async function POST(req: NextRequest) {
+  const auth = await requireAuth();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const { text, provider, voiceId, model, userId } = await req.json();
 

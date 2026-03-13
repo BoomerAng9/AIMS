@@ -8,12 +8,14 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { requireAdmin } from "@/lib/auth/require-role";
 
 const HOUSE_OF_ANG_URL = process.env.HOUSE_OF_ANG_URL || "http://house-of-ang:3002";
 
 export async function GET(req: NextRequest) {
+  const auth = await requireAdmin();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const { searchParams } = new URL(req.url);
     const action = searchParams.get("action") || "list";
@@ -72,12 +74,10 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+  const auth = await requireAdmin();
+  if (auth instanceof NextResponse) return auth;
 
+  try {
     const body = await req.json();
     const { action, agentId, capabilities, intent, payload } = body;
 

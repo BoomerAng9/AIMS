@@ -494,7 +494,7 @@ Verify at three breakpoints:
 ./deploy.sh --domain plugmein.cloud --landing-domain aimanagedsolutions.cloud
 
 # First-time cert
-./deploy.sh --domain plugmein.cloud --landing-domain aimanagedsolutions.cloud --email admin@aimanagedsolutions.cloud
+./deploy.sh --domain plugmein.cloud --landing-domain aimanagedsolutions.cloud --email acheevy@aimanagedsolutions.cloud
 ```
 
 **Architecture:**
@@ -527,3 +527,4 @@ When switching between tools, the shared files are:
 
 *This document is the master reference for all Antigravity work on A.I.M.S.
 When in doubt, follow the RESET UI spec. When the RESET spec is unclear, ask the user.*
+

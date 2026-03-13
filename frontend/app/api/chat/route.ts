@@ -17,6 +17,7 @@
 import { streamText } from 'ai';
 import { createOpenAI } from '@ai-sdk/openai';
 import { buildSystemPrompt } from '@/lib/acheevy/persona';
+import { chatRequestSchema, validateInput } from '@/lib/validation/schemas';
 import {
   buildNtntnRoutingDecision,
   normalizeAcheevyClassification,
@@ -427,7 +428,23 @@ function buildMIMResponse(detection: MIMDetection, originalMessage: string): str
 
 export async function POST(req: Request) {
   try {
-    const { messages, model, personaId, contextPackIds = [], userId: bodyUserId } = await req.json() as {
+    const payload = await req.json();
+    const validation = validateInput(chatRequestSchema, payload);
+
+    if (!validation.success) {
+      return new Response(JSON.stringify({ error: 'Invalid chat request', details: validation.errors }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    const {
+      messages,
+      model,
+      personaId,
+      contextPackIds = [],
+      userId: bodyUserId,
+    } = validation.data as {
       messages: RequestMessage[];
       model?: string;
       personaId?: string;

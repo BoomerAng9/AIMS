@@ -7,6 +7,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { normalizeAcheevyClassification } from '@/lib/acheevy/routing';
+import { requireAuth } from '@/lib/auth/require-role';
 
 const UEF_GATEWAY_URL = process.env.UEF_GATEWAY_URL || process.env.NEXT_PUBLIC_UEF_GATEWAY_URL || 'http://localhost:3001';
 const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY || '';
@@ -18,6 +19,9 @@ function gatewayHeaders(): Record<string, string> {
 }
 
 export async function POST(request: NextRequest) {
+  const auth = await requireAuth();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const body = await request.json();
     const message = typeof body?.message === 'string' ? body.message : '';

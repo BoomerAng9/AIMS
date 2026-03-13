@@ -8,6 +8,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { requireOwner } from '@/lib/auth/require-role';
 
 const UEF_GATEWAY_URL = process.env.UEF_GATEWAY_URL || process.env.NEXT_PUBLIC_UEF_GATEWAY_URL || 'http://localhost:3001';
 
@@ -52,6 +53,9 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  const auth = await requireOwner();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const body = await req.json();
 

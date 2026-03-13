@@ -9,6 +9,9 @@
  * Supports both fire-and-forget (async) and synchronous request modes.
  */
 
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/lib/auth';
+
 const UEF_GATEWAY_URL = process.env.UEF_GATEWAY_URL || process.env.NEXT_PUBLIC_UEF_GATEWAY_URL || '';
 const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY || '';
 
@@ -28,6 +31,17 @@ export async function POST(req: Request) {
     return new Response(
       JSON.stringify({ error: 'Gateway not configured' }),
       { status: 503, headers: { 'Content-Type': 'application/json' } },
+    );
+  }
+
+  const session = await getServerSession(authOptions);
+  const providedApiKey = req.headers.get('x-api-key');
+  const isTrustedInternalCaller = Boolean(INTERNAL_API_KEY) && providedApiKey === INTERNAL_API_KEY;
+
+  if (!session?.user && !isTrustedInternalCaller) {
+    return new Response(
+      JSON.stringify({ error: 'Authentication required' }),
+      { status: 401, headers: { 'Content-Type': 'application/json' } },
     );
   }
 

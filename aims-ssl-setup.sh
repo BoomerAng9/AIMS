@@ -21,7 +21,7 @@ if [ "$CERT_EXISTS" -gt 0 ]; then
     echo 'SSL cert already exists for plugmein.cloud'
 else
     echo 'Issuing SSL for plugmein.cloud...'
-    docker compose -f $COMPOSE_FILE run --rm certbot certonly --webroot -w /var/www/certbot -d plugmein.cloud --email admin@aimanagedsolutions.cloud --agree-tos --non-interactive
+    docker compose -f $COMPOSE_FILE run --rm certbot certonly --webroot -w /var/www/certbot -d plugmein.cloud --email acheevy@aimanagedsolutions.cloud --agree-tos --non-interactive
 fi
 
 # SSL for aimanagedsolutions.cloud
@@ -31,7 +31,7 @@ if [ "$LANDING_CERT_EXISTS" -gt 0 ]; then
     echo 'SSL cert already exists for aimanagedsolutions.cloud'
 else
     echo 'Issuing SSL for aimanagedsolutions.cloud + www...'
-    docker compose -f $COMPOSE_FILE run --rm certbot certonly --webroot -w /var/www/certbot -d aimanagedsolutions.cloud -d www.aimanagedsolutions.cloud --email admin@aimanagedsolutions.cloud --agree-tos --non-interactive
+    docker compose -f $COMPOSE_FILE run --rm certbot certonly --webroot -w /var/www/certbot -d aimanagedsolutions.cloud -d www.aimanagedsolutions.cloud --email acheevy@aimanagedsolutions.cloud --agree-tos --non-interactive
 fi
 
 # Activate SSL nginx configs
@@ -55,3 +55,4 @@ fi
 echo '[5/5] Reloading nginx...'
 docker compose -f $COMPOSE_FILE exec nginx nginx -s reload
 echo 'DONE! Both domains configured with SSL.'
+

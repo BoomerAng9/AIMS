@@ -9,6 +9,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAuth } from '@/lib/auth/require-role';
 import {
   trackPlayer,
   getStatsForNixieDisplay,
@@ -17,6 +18,9 @@ import {
 } from '@/lib/sports/tracker';
 
 export async function POST(req: NextRequest) {
+  const auth = await requireAuth();
+  if (auth instanceof NextResponse) return auth;
+
   const body = await req.json();
   const { playerName, team } = body;
 

@@ -45,7 +45,7 @@
 - Hero copy locked: "Welcome to AI Managed Solutions." / "I'm ACHEEVY, at your service." / "What will we deploy today?"
 - Card links redirect to `plugmein.cloud/chat` (app domain)
 - Footer platform links redirect to `plugmein.cloud` dashboard routes
-- Support email: admin@aimanagedsolutions.cloud
+- Support email: acheevy@aimanagedsolutions.cloud
 - GitHub link: BoomerAng9/AIMS
 
 ### 8. Brand Locks Enforced
@@ -59,7 +59,7 @@
 - SPF: v=spf1 include:_spf.mail.hostinger.com ~all
 - DKIM: hostingermail-a/b/c._domainkey CNAMEs
 - DMARC: v=DMARC1; p=none
-- First email: admin@aimanagedsolutions.cloud
+- First email: acheevy@aimanagedsolutions.cloud
 
 ## What Is Now Working
 - Circuit Box with full owner/user role gating
@@ -94,3 +94,4 @@
 | `frontend/app/api/discord/webhook/route.ts` | New — Discord adapter |
 | `evidence/*.json` | New — evidence artifacts |
 | `evidence/AUDIT.md` | New — this file |
+

@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
+import { requireOwner } from '@/lib/auth/require-role';
 import { elevenLabsService } from "@/lib/services/elevenlabs";
 
 export async function POST(request: NextRequest) {
+  const auth = await requireOwner();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const { text } = await request.json();
 

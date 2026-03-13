@@ -245,7 +245,7 @@ cd ../../aims-skills && npm test        # Skills/hooks
 ./deploy.sh --domain plugmein.cloud --landing-domain aimanagedsolutions.cloud
 
 # First-time cert
-./deploy.sh --domain plugmein.cloud --landing-domain aimanagedsolutions.cloud --email admin@aimanagedsolutions.cloud
+./deploy.sh --domain plugmein.cloud --landing-domain aimanagedsolutions.cloud --email acheevy@aimanagedsolutions.cloud
 ```
 
 ---
@@ -269,3 +269,4 @@ cd ../../aims-skills && npm test        # Skills/hooks
 4. **Data Source Migration** — Add ncaa-api container, create clients
 5. **Voice I/O wiring** — End-to-end Groq STT → ElevenLabs TTS pipeline
 6. **Stripe integration** — Webhook + plan setup for 3-6-9 tiers
+

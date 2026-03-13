@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
+import { requireOwner } from '@/lib/auth/require-role';
 import { unifiedSearch } from "@/lib/services/search";
 
 export async function GET(request: NextRequest) {
+  const auth = await requireOwner();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const searchParams = request.nextUrl.searchParams;
     const query = searchParams.get("q");

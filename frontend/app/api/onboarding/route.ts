@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { onboardingRequestSchema, validateInput } from '@/lib/validation/schemas';
 
 const GATEWAY_URL = process.env.UEF_GATEWAY_URL || process.env.NEXT_PUBLIC_UEF_GATEWAY_URL || 'http://uef-gateway:4000';
 
@@ -11,11 +12,13 @@ const GATEWAY_URL = process.env.UEF_GATEWAY_URL || process.env.NEXT_PUBLIC_UEF_G
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { fullName, region, objective, industry, companyName } = body;
+    const validation = validateInput(onboardingRequestSchema, body);
 
-    if (!fullName || typeof fullName !== 'string') {
-      return NextResponse.json({ error: 'fullName is required' }, { status: 400 });
+    if (!validation.success) {
+      return NextResponse.json({ error: 'Invalid onboarding request', details: validation.errors }, { status: 400 });
     }
+
+    const { fullName, region, objective, industry, companyName } = validation.data;
 
     // Forward to UEF Gateway
     const res = await fetch(`${GATEWAY_URL}/api/onboarding`, {

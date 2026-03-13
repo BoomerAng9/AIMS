@@ -11,6 +11,7 @@
  */
 
 import { NextResponse } from 'next/server';
+import { requireAuth } from '@/lib/auth/require-role';
 
 const UEF_GATEWAY = process.env.UEF_GATEWAY_URL || process.env.NEXT_PUBLIC_UEF_GATEWAY_URL || 'http://localhost:3001';
 const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY || '';
@@ -60,6 +61,9 @@ async function checkEndpoint(name: string, url: string): Promise<ServiceHealthEn
 }
 
 export async function GET() {
+  const auth = await requireAuth();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const checks = await Promise.allSettled([
       checkEndpoint('UEF Gateway', `${UEF_GATEWAY}/health`),

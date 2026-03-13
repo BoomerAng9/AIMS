@@ -11,6 +11,8 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAuth } from '@/lib/auth/require-role';
+import { personaplexRequestSchema, validateInput } from '@/lib/validation/schemas';
 
 const GATEWAY_URL = process.env.UEF_GATEWAY_URL || process.env.NEXT_PUBLIC_UEF_GATEWAY_URL || 'http://uef-gateway:4000';
 
@@ -24,18 +26,23 @@ const GATEWAY_URL = process.env.UEF_GATEWAY_URL || process.env.NEXT_PUBLIC_UEF_G
  *   - { action: 'status', type, projectName, summary, sessionId } — Deliver status update
  */
 export async function POST(request: NextRequest) {
+  const auth = await requireAuth();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const body = await request.json();
-    const { action } = body;
+    const validation = validateInput(personaplexRequestSchema, body);
 
-    if (!action) {
-      return NextResponse.json({ error: 'action is required' }, { status: 400 });
+    if (!validation.success) {
+      return NextResponse.json({ error: 'Invalid PersonaPlex request', details: validation.errors }, { status: 400 });
     }
+
+    const { action } = validation.data;
 
     const res = await fetch(`${GATEWAY_URL}/api/personaplex/${action}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
+      body: JSON.stringify(validation.data),
       signal: AbortSignal.timeout(30000),
     });
 
@@ -63,6 +70,9 @@ export async function POST(request: NextRequest) {
  * Get PersonaPlex session status and capabilities.
  */
 export async function GET(request: NextRequest) {
+  const auth = await requireAuth();
+  if (auth instanceof NextResponse) return auth;
+
   const sessionId = request.nextUrl.searchParams.get('sessionId');
 
   try {
@@ -91,6 +101,9 @@ export async function GET(request: NextRequest) {
  * End a PersonaPlex voice session.
  */
 export async function DELETE(request: NextRequest) {
+  const auth = await requireAuth();
+  if (auth instanceof NextResponse) return auth;
+
   const sessionId = request.nextUrl.searchParams.get('sessionId');
   if (!sessionId) {
     return NextResponse.json({ error: 'sessionId required' }, { status: 400 });

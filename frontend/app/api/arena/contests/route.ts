@@ -9,6 +9,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db/prisma';
+import { requireAdmin } from '@/lib/auth/require-role';
+import { arenaContestCreateSchema, validateInput } from '@/lib/validation/schemas';
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -62,13 +64,18 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const auth = await requireAdmin();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const body = await req.json();
-    const { title, description, type, category, entryFee, maxEntries, startsAt, endsAt, contestData, prizeStructure, difficulty } = body;
+    const validation = validateInput(arenaContestCreateSchema, body);
 
-    if (!title || !type || !startsAt || !endsAt) {
-      return NextResponse.json({ error: 'Missing required fields: title, type, startsAt, endsAt' }, { status: 400 });
+    if (!validation.success) {
+      return NextResponse.json({ error: 'Invalid contest input', details: validation.errors }, { status: 400 });
     }
+
+    const { title, description, type, category, entryFee, maxEntries, startsAt, endsAt, contestData, prizeStructure, difficulty } = validation.data;
 
     const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 

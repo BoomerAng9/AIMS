@@ -255,7 +255,7 @@ export class AlertEngine {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        to: process.env.ALERT_EMAIL_TO || 'admin@aimanagedsolutions.cloud',
+        to: process.env.ALERT_EMAIL_TO || 'acheevy@aimanagedsolutions.cloud',
         subject: `[AIMS ${event.severity.toUpperCase()}] ${event.name}`,
         body: `Alert: ${event.name}\nMetric: ${event.metric}\nValue: ${event.value} (threshold: ${event.threshold})\nSeverity: ${event.severity}\nTriggered: ${event.triggeredAt}`,
         alert: event,
@@ -746,3 +746,4 @@ export function initObservabilityPersistence(): void {
 
   logger.info('[Observability] Persistence initialized — flush every 5m, prune every 24h');
 }
+
