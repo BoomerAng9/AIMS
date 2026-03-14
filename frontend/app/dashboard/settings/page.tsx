@@ -12,8 +12,8 @@ interface Settings {
   industry: string;
   timezone: string;
   sessionTimeout: string;
-  chatInterfaceUrl: string;
-  chatInterfaceBridgeSecret: string;
+  chatRuntimeUrl: string;
+  chatRuntimeBridgeSecret: string;
   openRouterApiKey: string;
   openRouterBaseUrl: string;
   openRouterModel: string;
@@ -25,8 +25,8 @@ const DEFAULT_SETTINGS: Settings = {
   industry: "Technology / SaaS",
   timezone: "America/New_York (EST)",
   sessionTimeout: "30 minutes",
-  chatInterfaceUrl: "https://chat.your-domain.com",
-  chatInterfaceBridgeSecret: "",
+  chatRuntimeUrl: "https://chat.your-domain.com",
+  chatRuntimeBridgeSecret: "",
   openRouterApiKey: "",
   openRouterBaseUrl: "https://openrouter.ai/api/v1",
   openRouterModel: "anthropic/claude-sonnet-4-5-20250929",
@@ -42,7 +42,19 @@ function loadSettings(): Settings {
   if (typeof window === "undefined") return DEFAULT_SETTINGS;
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? { ...DEFAULT_SETTINGS, ...JSON.parse(raw) } : DEFAULT_SETTINGS;
+    if (!raw) return DEFAULT_SETTINGS;
+
+    const parsed = JSON.parse(raw) as Partial<Settings> & {
+      chatInterfaceUrl?: string;
+      chatInterfaceBridgeSecret?: string;
+    };
+
+    return {
+      ...DEFAULT_SETTINGS,
+      ...parsed,
+      chatRuntimeUrl: parsed.chatRuntimeUrl ?? parsed.chatInterfaceUrl ?? DEFAULT_SETTINGS.chatRuntimeUrl,
+      chatRuntimeBridgeSecret: parsed.chatRuntimeBridgeSecret ?? parsed.chatInterfaceBridgeSecret ?? DEFAULT_SETTINGS.chatRuntimeBridgeSecret,
+    };
   } catch {
     return DEFAULT_SETTINGS;
   }
@@ -84,12 +96,12 @@ export default function SettingsPage() {
   }, []);
 
   const chatEnvBlock = useMemo(() => [
-    `CHAT_INTERFACE_URL=${settings.chatInterfaceUrl || "https://chat.your-domain.com"}`,
-    `CHAT_INTERFACE_BRIDGE_SECRET=${settings.chatInterfaceBridgeSecret}`,
+    `CHAT_RUNTIME_URL=${settings.chatRuntimeUrl || "https://chat.your-domain.com"}`,
+    `CHAT_RUNTIME_BRIDGE_SECRET=${settings.chatRuntimeBridgeSecret}`,
     `OPENROUTER_API_KEY=${settings.openRouterApiKey}`,
     `OPENROUTER_BASE_URL=${settings.openRouterBaseUrl || "https://openrouter.ai/api/v1"}`,
     `OPENROUTER_MODEL=${settings.openRouterModel || "anthropic/claude-sonnet-4-5-20250929"}`,
-  ].join("\n"), [settings.chatInterfaceBridgeSecret, settings.chatInterfaceUrl, settings.openRouterApiKey, settings.openRouterBaseUrl, settings.openRouterModel]);
+  ].join("\n"), [settings.chatRuntimeBridgeSecret, settings.chatRuntimeUrl, settings.openRouterApiKey, settings.openRouterBaseUrl, settings.openRouterModel]);
 
   const handleSave = () => {
     saveSettings(settings);
@@ -210,12 +222,12 @@ export default function SettingsPage() {
             <div className="space-y-4">
               <div className="space-y-2">
                 <label className="font-mono text-[0.6rem] uppercase tracking-[0.2em] text-zinc-500">Chat Runtime URL</label>
-                <input type="url" aria-label="Chat Runtime URL" value={settings.chatInterfaceUrl} onChange={(e) => updateField("chatInterfaceUrl", e.target.value)} className="w-full rounded-xl border border-wireframe-stroke bg-[#18181B] p-3 text-sm text-zinc-100 outline-none transition-all focus:border-gold/40 focus:ring-1 focus:ring-gold/20" placeholder="https://chat.your-domain.com" />
+                <input type="url" aria-label="Chat Runtime URL" value={settings.chatRuntimeUrl} onChange={(e) => updateField("chatRuntimeUrl", e.target.value)} className="w-full rounded-xl border border-wireframe-stroke bg-[#18181B] p-3 text-sm text-zinc-100 outline-none transition-all focus:border-gold/40 focus:ring-1 focus:ring-gold/20" placeholder="https://chat.your-domain.com" />
               </div>
               <div className="space-y-2">
                 <label className="font-mono text-[0.6rem] uppercase tracking-[0.2em] text-zinc-500">OpenRouter API Key</label>
                 <input type="password" aria-label="OpenRouter API Key" value={settings.openRouterApiKey} onChange={(e) => updateField("openRouterApiKey", e.target.value)} className="w-full rounded-xl border border-wireframe-stroke bg-[#18181B] p-3 text-sm text-zinc-100 outline-none transition-all focus:border-gold/40 focus:ring-1 focus:ring-gold/20" placeholder="sk-or-v1-..." autoComplete="off" />
-                <p className="text-xs text-zinc-500">Stored locally on this device. This repo does not push the key to the chat runtime automatically.</p>
+                <p className="text-xs text-zinc-500">Stored locally on this device. This repo does not push the key to the external chat runtime automatically.</p>
               </div>
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
@@ -229,7 +241,7 @@ export default function SettingsPage() {
               </div>
               <div className="space-y-2">
                 <label className="font-mono text-[0.6rem] uppercase tracking-[0.2em] text-zinc-500">Chat Runtime Bridge Secret</label>
-                <input type="password" aria-label="Chat Runtime Bridge Secret" value={settings.chatInterfaceBridgeSecret} onChange={(e) => updateField("chatInterfaceBridgeSecret", e.target.value)} className="w-full rounded-xl border border-wireframe-stroke bg-[#18181B] p-3 text-sm text-zinc-100 outline-none transition-all focus:border-gold/40 focus:ring-1 focus:ring-gold/20" placeholder="generate-a-random-secret" autoComplete="off" />
+                <input type="password" aria-label="Chat Runtime Bridge Secret" value={settings.chatRuntimeBridgeSecret} onChange={(e) => updateField("chatRuntimeBridgeSecret", e.target.value)} className="w-full rounded-xl border border-wireframe-stroke bg-[#18181B] p-3 text-sm text-zinc-100 outline-none transition-all focus:border-gold/40 focus:ring-1 focus:ring-gold/20" placeholder="generate-a-random-secret" autoComplete="off" />
               </div>
             </div>
             <div className="rounded-2xl border border-wireframe-stroke bg-[#111113] p-4">
@@ -245,7 +257,7 @@ export default function SettingsPage() {
               <pre className="overflow-x-auto rounded-xl border border-white/10 bg-black/30 p-4 font-mono text-xs leading-6 text-amber-200 whitespace-pre-wrap">{chatEnvBlock}</pre>
               <div className="mt-4 space-y-3 text-xs text-zinc-500">
                 <p>Configured key status: <span className="font-mono text-zinc-300">{maskValue(settings.openRouterApiKey)}</span></p>
-                <p>Preferred runtime variable names are `CHAT_INTERFACE_URL` and `CHAT_INTERFACE_BRIDGE_SECRET`. Legacy `LIBRECHAT_*` aliases are still supported server-side.</p>
+                <p>Preferred runtime variable names are `CHAT_RUNTIME_URL` and `CHAT_RUNTIME_BRIDGE_SECRET`. `CHAT_INTERFACE_*` and `LIBRECHAT_*` remain supported as legacy aliases.</p>
               </div>
             </div>
           </div>
@@ -258,9 +270,9 @@ export default function SettingsPage() {
           </div>
           <div className="space-y-4">
             {[
-              { label: "Chat Runtime URL", value: settings.chatInterfaceUrl || "Not configured", status: settings.chatInterfaceUrl ? "Active" : "Inactive" },
+              { label: "Chat Runtime URL", value: settings.chatRuntimeUrl || "Not configured", status: settings.chatRuntimeUrl ? "Active" : "Inactive" },
               { label: "OpenRouter", value: maskValue(settings.openRouterApiKey), status: settings.openRouterApiKey ? "Active" : "Inactive" },
-              { label: "Bridge Secret", value: maskValue(settings.chatInterfaceBridgeSecret), status: settings.chatInterfaceBridgeSecret ? "Active" : "Inactive" },
+              { label: "Bridge Secret", value: maskValue(settings.chatRuntimeBridgeSecret), status: settings.chatRuntimeBridgeSecret ? "Active" : "Inactive" },
             ].map((keyStatus) => (
               <div key={keyStatus.label} className="flex items-center justify-between rounded-xl border border-wireframe-stroke bg-[#111113] p-4 transition-all hover:border-gold/20">
                 <div>

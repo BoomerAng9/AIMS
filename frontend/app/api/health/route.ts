@@ -6,7 +6,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { isLibreChatEnabled } from '@/lib/librechat';
+import { isChatRuntimeEnabled } from '@/lib/chat-runtime';
 
 interface ServiceHealth {
   name: string;
@@ -62,7 +62,7 @@ export async function GET() {
   }
   if (process.env.II_AGENT_BRIDGE_URL || process.env.II_AGENT_HTTP_URL) {
     const baseUrl = process.env.II_AGENT_BRIDGE_URL || `${process.env.II_AGENT_HTTP_URL}/bridge`;
-    serviceChecks.push({ name: 'ACHEEVY 009 Bridge', url: `${baseUrl.replace(/\/$/, '')}/health` });
+    serviceChecks.push({ name: 'Chat w/ ACHEEVY Bridge', url: `${baseUrl.replace(/\/$/, '')}/health` });
   }
 
   // Run health checks in parallel
@@ -84,7 +84,7 @@ export async function GET() {
     responseTime: Date.now() - startTime,
     version: process.env.npm_package_version || '1.0.0',
     environment: process.env.NODE_ENV || 'development',
-    chatInterfaceConfigured: isLibreChatEnabled(),
+    chatInterfaceConfigured: isChatRuntimeEnabled(),
     services,
   };
 

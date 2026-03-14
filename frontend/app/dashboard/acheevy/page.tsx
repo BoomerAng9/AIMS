@@ -1,5 +1,5 @@
-import { LibreChatEntry } from '@/components/chat/LibreChatEntry';
+import { ChatRuntimeEntry } from '@/components/chat/ChatRuntimeEntry';
 
 export default function AcheevyChatPage() {
-  return <LibreChatEntry source="dashboard-acheevy" entryLabel="ACHEEVY Executive Chat" />;
+  return <ChatRuntimeEntry source="dashboard-acheevy" entryLabel="Chat w/ ACHEEVY" />;
 }

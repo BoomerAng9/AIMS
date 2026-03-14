@@ -1,5 +1,5 @@
-import { LibreChatEntry } from '@/components/chat/LibreChatEntry';
+import { ChatRuntimeEntry } from '@/components/chat/ChatRuntimeEntry';
 
 export default function ChatPage() {
-  return <LibreChatEntry source="chat-route" entryLabel="Chat w/ ACHEEVY" />;
+  return <ChatRuntimeEntry source="chat-route" entryLabel="Chat w/ ACHEEVY" />;
 }

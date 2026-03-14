@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * FloatingACHEEVY — LibreChat Launcher
+ * FloatingACHEEVY — Chat Launcher
  *
  * Bottom-right floating button that launches the primary chat route.
  */
