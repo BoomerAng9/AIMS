@@ -20,6 +20,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 COMPOSE_FILE="${SCRIPT_DIR}/infra/docker-compose.prod.yml"
 ENV_FILE="${SCRIPT_DIR}/infra/.env.production"
 ENV_EXAMPLE="${SCRIPT_DIR}/infra/.env.production.example"
+ENV_VALIDATOR="${SCRIPT_DIR}/scripts/validate-env.sh"
 SSL_TEMPLATE="${SCRIPT_DIR}/infra/nginx/ssl.conf.template"
 SSL_DEMO_TEMPLATE="${SCRIPT_DIR}/infra/nginx/demo-ssl.conf.template"
 SSL_LANDING_TEMPLATE="${SCRIPT_DIR}/infra/nginx/ssl-landing.conf.template"
@@ -80,6 +81,8 @@ else
     exit 1
 fi
 
+COMPOSE_BASE_ARGS=(--env-file "${ENV_FILE}" -f "${COMPOSE_FILE}")
+
 # =============================================================================
 # Pre-flight Checks
 # =============================================================================
@@ -101,6 +104,15 @@ if [ ! -f "${ENV_FILE}" ]; then
     exit 1
 fi
 info "Environment file: ${ENV_FILE}"
+
+# Enforce env correctness before any build/deploy action.
+if [ ! -f "${ENV_VALIDATOR}" ]; then
+    error "Env validator missing: ${ENV_VALIDATOR}"
+    exit 1
+fi
+header "Env Validation"
+bash "${ENV_VALIDATOR}" --path "${ENV_FILE}" --strict
+info "Env validator passed."
 
 # Validate critical environment variables
 ENV_WARNINGS=0
@@ -182,7 +194,7 @@ if [ "${NO_CACHE}" = "true" ]; then
     BUILD_FLAGS="--no-cache --pull"
     info "Force rebuilding with --no-cache --pull (fresh images)..."
 fi
-${COMPOSE_CMD} -f "${COMPOSE_FILE}" build ${BUILD_FLAGS}
+${COMPOSE_CMD} "${COMPOSE_BASE_ARGS[@]}" build ${BUILD_FLAGS}
 info "Images built successfully."
 
 # =============================================================================
@@ -190,8 +202,8 @@ info "Images built successfully."
 # =============================================================================
 header "Starting Services"
 info "Stopping orphaned containers from previous deployments..."
-${COMPOSE_CMD} -f "${COMPOSE_FILE}" down --remove-orphans --timeout 30
-${COMPOSE_CMD} -f "${COMPOSE_FILE}" up -d --remove-orphans
+${COMPOSE_CMD} "${COMPOSE_BASE_ARGS[@]}" down --remove-orphans --timeout 30
+${COMPOSE_CMD} "${COMPOSE_BASE_ARGS[@]}" up -d --remove-orphans
 info "Services started. Orphaned containers removed."
 
 # Wait for core services to be ready before SSL provisioning
@@ -199,11 +211,11 @@ info "Waiting for core services to come up..."
 MAX_WAIT=120
 WAITED=0
 while [ $WAITED -lt $MAX_WAIT ]; do
-    HEALTHY=$(${COMPOSE_CMD} -f "${COMPOSE_FILE}" ps --format json 2>/dev/null | grep -c '"healthy"' || true)
-    RUNNING=$(${COMPOSE_CMD} -f "${COMPOSE_FILE}" ps --format json 2>/dev/null | grep -c '"running"' || true)
+    HEALTHY=$(${COMPOSE_CMD} "${COMPOSE_BASE_ARGS[@]}" ps --format json 2>/dev/null | grep -c '"healthy"' || true)
+    RUNNING=$(${COMPOSE_CMD} "${COMPOSE_BASE_ARGS[@]}" ps --format json 2>/dev/null | grep -c '"running"' || true)
     info "  Services: ${RUNNING} running, ${HEALTHY} healthy (${WAITED}s / ${MAX_WAIT}s)"
     # nginx must be running for ACME challenges — check it specifically
-    NGINX_UP=$(${COMPOSE_CMD} -f "${COMPOSE_FILE}" ps nginx --format '{{.State}}' 2>/dev/null || echo "")
+    NGINX_UP=$(${COMPOSE_CMD} "${COMPOSE_BASE_ARGS[@]}" ps nginx --format '{{.State}}' 2>/dev/null || echo "")
     if echo "${NGINX_UP}" | grep -qi "running"; then
         info "nginx is running — proceeding."
         break

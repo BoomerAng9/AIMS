@@ -576,6 +576,8 @@ services:
       - NODE_ENV=production
       - POLICY_URL=http://chickenhawk-policy:4002
       - AUDIT_URL=http://chickenhawk-audit:4003
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
       - GEMINI_MODEL=${GEMINI_MODEL:-gemini-3.0-flash}
       - UEF_GATEWAY_URL=http://uef-gateway:3001
       - ACHEEVY_URL=http://acheevy:3003
@@ -586,9 +588,6 @@ services:
       - LILHAWK_DEPLOY_TARGET=${LILHAWK_DEPLOY_TARGET:-local}
       - GCP_PROJECT_ID=${GCP_PROJECT_ID:-ai-managed-services}
       - GCP_REGION=${GCP_REGION:-us-central1}
-    secrets:
-      - openrouter_api_key
-      - gemini_api_key
     volumes:
       - chickenhawk-data:/app/data
     depends_on:

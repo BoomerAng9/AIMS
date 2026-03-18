@@ -9,6 +9,10 @@
     "postinstall": "prisma generate",
     "start": "next start",
     "lint": "next lint",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
     "discord:register": "ts-node --project tsconfig.json scripts/register-discord-commands.ts",
     "remotion:studio": "remotion studio remotion/Root.tsx --port 3001",
     "remotion:render": "remotion render remotion/Root.tsx"
@@ -62,7 +66,11 @@
     "zustand": "^4.5.5"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "@remotion/cli": "^4.0.0",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20",
     "@types/react": "^18",
@@ -71,10 +79,12 @@
     "autoprefixer": "^10.0.1",
     "eslint": "^8.56.0",
     "eslint-config-next": "14.0.4",
+    "jsdom": "^29.0.0",
     "postcss": "^8",
     "prisma": "^5.22.0",
     "tailwindcss": "^3.3.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.0"
   }
 }

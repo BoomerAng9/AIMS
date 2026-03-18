@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MyClaw</title>
+  <meta name="description" content="Your personal AI agent. Powered by NemoClaw." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #fff;
+      color: #0a0a0a;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+    nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 24px 48px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .logo { font-size: 18px; font-weight: 800; letter-spacing: -0.02em; }
+    .logo span { color: #0066ff; }
+    .nav-links { display: flex; align-items: center; gap: 32px; }
+    .nav-links a { font-size: 14px; color: #666; text-decoration: none; font-weight: 500; transition: color 0.15s; }
+    .nav-links a:hover { color: #0a0a0a; }
+    .btn-signin {
+      padding: 10px 22px; border-radius: 8px;
+      background: #0a0a0a; color: #fff;
+      font-size: 14px; font-weight: 600;
+      border: none; cursor: pointer; text-decoration: none; transition: background 0.15s;
+    }
+    .btn-signin:hover { background: #222; }
+
+    .hero {
+      max-width: 1100px; margin: 0 auto;
+      padding: 80px 48px 60px;
+      display: grid; grid-template-columns: 1fr 1fr;
+      align-items: center; gap: 80px;
+    }
+    .hero-text h1 { font-size: 56px; font-weight: 900; letter-spacing: -0.04em; line-height: 1.0; margin-bottom: 20px; }
+    .hero-text h1 em { font-style: normal; color: #0066ff; }
+    .hero-text p { font-size: 17px; color: #555; line-height: 1.65; max-width: 420px; margin-bottom: 36px; }
+    .hero-actions { display: flex; align-items: center; gap: 16px; }
+    .btn-primary {
+      padding: 14px 28px; border-radius: 10px; background: #0066ff; color: #fff;
+      font-size: 15px; font-weight: 700; border: none; cursor: pointer; text-decoration: none;
+      transition: background 0.15s, transform 0.1s;
+    }
+    .btn-primary:hover { background: #0052cc; transform: translateY(-1px); }
+    .btn-secondary { font-size: 14px; font-weight: 600; color: #555; text-decoration: none; transition: color 0.15s; }
+    .btn-secondary:hover { color: #0a0a0a; }
+    .hero-image { display: flex; justify-content: center; align-items: center; }
+    .hero-image img { width: 100%; max-width: 380px; filter: drop-shadow(0 20px 60px rgba(0,102,255,0.15)); transition: transform 0.4s ease; }
+    .hero-image img:hover { transform: scale(1.02) translateY(-4px); }
+    .hero-image .placeholder {
+      width: 320px; height: 320px; border-radius: 32px;
+      background: linear-gradient(135deg, #f0f4ff, #e8edff);
+      border: 2px dashed #c7d2fe;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 12px; color: #818cf8; font-size: 14px; font-weight: 500;
+    }
+    .placeholder-icon { font-size: 48px; }
+
+    .trust { border-top: 1px solid #f0f0f0; padding: 28px 48px; max-width: 1100px; margin: 0 auto; display: flex; align-items: center; gap: 48px; }
+    .trust-label { font-size: 12px; font-weight: 600; color: #bbb; text-transform: uppercase; letter-spacing: 0.1em; white-space: nowrap; }
+    .trust-items { display: flex; gap: 40px; flex-wrap: wrap; }
+    .trust-items span { font-size: 13px; font-weight: 600; color: #ccc; }
+
+    .features { background: #fafafa; border-top: 1px solid #f0f0f0; border-bottom: 1px solid #f0f0f0; padding: 80px 48px; }
+    .features-inner { max-width: 1100px; margin: 0 auto; }
+    .features-header { text-align: center; margin-bottom: 60px; }
+    .features-header h2 { font-size: 36px; font-weight: 800; letter-spacing: -0.03em; }
+    .features-header p { font-size: 16px; color: #666; margin-top: 10px; }
+    .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .feature-item { background: #fff; border: 1px solid #eee; border-radius: 14px; padding: 28px; transition: border-color 0.2s, transform 0.2s; }
+    .feature-item:hover { border-color: rgba(0,102,255,0.2); transform: translateY(-2px); }
+    .feature-icon { font-size: 28px; margin-bottom: 14px; }
+    .feature-item h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .feature-item p { font-size: 14px; color: #666; line-height: 1.6; }
+
+    .signin-section { padding: 80px 48px; max-width: 480px; margin: 0 auto; text-align: center; }
+    .signin-section h2 { font-size: 30px; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 10px; }
+    .signin-section p { font-size: 15px; color: #666; margin-bottom: 36px; }
+    .signin-card { background: #fff; border: 1px solid #eee; border-radius: 18px; padding: 36px; text-align: left; }
+    .form-group { margin-bottom: 16px; }
+    .form-label { display: block; font-size: 12px; font-weight: 600; color: #888; letter-spacing: 0.05em; margin-bottom: 7px; }
+    .form-input {
+      width: 100%; padding: 12px 14px; border-radius: 8px;
+      border: 1.5px solid #eee; font-size: 14px;
+      font-family: inherit; outline: none; transition: border-color 0.15s;
+      color: #0a0a0a; background: #fafafa;
+    }
+    .form-input:focus { border-color: #0066ff; background: #fff; }
+    .form-input::placeholder { color: #ccc; }
+    .form-submit {
+      width: 100%; padding: 13px; border-radius: 8px; margin-top: 6px;
+      background: #0066ff; color: #fff; font-size: 15px; font-weight: 700;
+      border: none; cursor: pointer; font-family: inherit; transition: background 0.15s;
+    }
+    .form-submit:hover { background: #0052cc; }
+    .form-submit:disabled { background: #93c5fd; cursor: not-allowed; }
+    .form-error {
+      display: none; margin-top: 12px; padding: 10px 14px;
+      background: #fff0f0; border: 1px solid #fecaca; border-radius: 8px;
+      font-size: 13px; color: #dc2626; text-align: center;
+    }
+    .form-error.visible { display: block; }
+
+    footer { border-top: 1px solid #f0f0f0; padding: 28px 48px; display: flex; align-items: center; justify-content: space-between; }
+    .footer-copy { font-size: 13px; color: #bbb; }
+    .footer-links { display: flex; gap: 28px; }
+    .footer-links a { font-size: 13px; color: #bbb; text-decoration: none; transition: color 0.15s; }
+    .footer-links a:hover { color: #555; }
+
+    @media (max-width: 768px) {
+      nav { padding: 20px 24px; }
+      .hero { grid-template-columns: 1fr; padding: 48px 24px 40px; gap: 40px; }
+      .hero-image { order: -1; }
+      .hero-text h1 { font-size: 40px; }
+      .trust { padding: 24px; flex-direction: column; gap: 16px; }
+      .features { padding: 60px 24px; }
+      .feature-grid { grid-template-columns: 1fr; }
+      .signin-section { padding: 60px 24px; }
+      footer { padding: 24px; flex-direction: column; gap: 16px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="logo">My<span>Claw</span></div>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#signin" class="btn-signin">Sign in</a>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-text">
+      <h1>Your personal<br /><em>AI agent.</em></h1>
+      <p>MyClaw gives you private, encrypted AI — powered by NemoClaw. Chat, build, and automate with models that are completely yours.</p>
+      <div class="hero-actions">
+        <a href="#signin" class="btn-primary">Get started</a>
+        <a href="#features" class="btn-secondary">See how it works →</a>
+      </div>
+    </div>
+    <div class="hero-image">
+      <img src="hero-image.jpg" alt="MyClaw AI Agent" onerror="this.style.display='none';document.getElementById('logo-placeholder').style.display='flex';" />
+      <div class="placeholder" id="logo-placeholder" style="display:none;">
+        <span class="placeholder-icon">⚡</span>
+        <span>MyClaw</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="trust">
+    <span class="trust-label">Powered by</span>
+    <div class="trust-items">
+      <span>NVIDIA NIM</span>
+      <span>NemoClaw</span>
+      <span>foai.cloud</span>
+      <span>Docker</span>
+    </div>
+  </div>
+
+  <section class="features" id="features">
+    <div class="features-inner">
+      <div class="features-header">
+        <h2>Everything you need. Nothing you don't.</h2>
+        <p>Simple, fast, and private by design.</p>
+      </div>
+      <div class="feature-grid">
+        <div class="feature-item"><div class="feature-icon">🔒</div><h3>Private by default</h3><p>Your conversations stay on your cluster. No third-party data sharing, ever.</p></div>
+        <div class="feature-item"><div class="feature-icon">⚡</div><h3>Fast inference</h3><p>NVIDIA NIM-backed inference means near-instant responses on any model you choose.</p></div>
+        <div class="feature-item"><div class="feature-icon">🤖</div><h3>Any model</h3><p>Switch between LLaMA, Nemotron, Mistral and more — without losing your context.</p></div>
+        <div class="feature-item"><div class="feature-icon">🌐</div><h3>Access anywhere</h3><p>Secure remote access from any device through your personal encrypted gateway.</p></div>
+        <div class="feature-item"><div class="feature-icon">🛠️</div><h3>Build with agents</h3><p>Set up autonomous agents that research, code, and execute tasks on your behalf.</p></div>
+        <div class="feature-item"><div class="feature-icon">📁</div><h3>File & web search</h3><p>Upload PDFs, images, and docs. Pull live web results directly into your chats.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="signin-section" id="signin">
+    <h2>Sign in to MyClaw</h2>
+    <p>Access your private AI environment.</p>
+    <div class="signin-card">
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label class="form-label" for="email">Email</label>
+          <input class="form-input" id="email" type="email" placeholder="asg@achievemor.io" required autocomplete="email" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="password">Password</label>
+          <input class="form-input" id="password" type="password" placeholder="••••••••" required autocomplete="current-password" />
+        </div>
+        <button class="form-submit" type="submit" id="submitBtn">Sign in →</button>
+        <div class="form-error" id="formError">Incorrect credentials. Please try again.</div>
+      </form>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-copy">© 2026 MyClaw · foai.cloud</div>
+    <nav class="footer-links">
+      <a href="#">Privacy</a>
+      <a href="#">Terms</a>
+    </nav>
+  </footer>
+
+  <script>
+    // Credentials stored as SHA-256 hashes — never plaintext in source
+    const VALID_EMAIL = 'asg@achievemor.io';
+    const VALID_PASS_HASH = '9066d9b7f8af4cca0b2445d5b264d509381c97b50a2a85aba9519eb27a2c7bd2';
+    const OC_TOKEN = 'achievemor-admin-session';
+
+    async function sha256(str) {
+      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      const err = document.getElementById('formError');
+      const email = document.getElementById('email').value.trim().toLowerCase();
+      const password = document.getElementById('password').value;
+
+      btn.textContent = 'Signing in...';
+      btn.disabled = true;
+      err.classList.remove('visible');
+
+      const passHash = await sha256(password);
+
+      if (email === VALID_EMAIL && passHash === VALID_PASS_HASH) {
+        // Build seamless SSO form to log the user directly into the private app interface
+        // without them ever seeing the Hostinger gateway prompt
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = 'https://app.myclaw.foai.cloud/login';
+        
+        const tokenInput = document.createElement('input');
+        tokenInput.type = 'hidden';
+        tokenInput.name = 'token';
+        tokenInput.value = OC_TOKEN;
+        
+        form.appendChild(tokenInput);
+        document.body.appendChild(form);
+        
+        // Submit will navigate the browser to app.myclaw, setting the secure cookies natively
+        form.submit();
+      } else {
+        err.classList.add('visible');
+        btn.textContent = 'Sign in →';
+        btn.disabled = false;
+      }
+    }
+  </script>
+
+</body>
+</html>

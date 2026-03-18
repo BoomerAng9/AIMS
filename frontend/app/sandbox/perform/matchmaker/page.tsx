@@ -204,7 +204,7 @@ export default function MatchmakerPage() {
 
 
                             <div className="flex-1 w-full relative min-h-[300px]">
-                                <ResponsiveContainer width="100%" height="100%">
+                                <ResponsiveContainer width="100%" height={300}>
                                     <RadarChart cx="50%" cy="50%" outerRadius="80%" data={player.radarData}>
                                         <PolarGrid stroke="#e2e8f0" />
                                         <PolarAngleAxis

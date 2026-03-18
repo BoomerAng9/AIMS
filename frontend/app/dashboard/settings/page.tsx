@@ -5,19 +5,23 @@ import { motion, AnimatePresence } from "framer-motion";
 import { staggerContainer, staggerItem } from "@/lib/motion";
 import { Save, Shield, Bell, Globe, Key, Check, Bot, Copy } from "lucide-react";
 
-const STORAGE_KEY = "aims_settings";
-
 interface Settings {
   workspaceName: string;
   industry: string;
   timezone: string;
   sessionTimeout: string;
   chatRuntimeUrl: string;
-  chatRuntimeBridgeSecret: string;
-  openRouterApiKey: string;
   openRouterBaseUrl: string;
   openRouterModel: string;
   notifications: Record<string, boolean>;
+}
+
+interface OperatorConfigResponse {
+  config: Settings;
+  keyStatus: {
+    openRouterApiKeyConfigured: boolean;
+    chatRuntimeBridgeSecretConfigured: boolean;
+  };
 }
 
 const DEFAULT_SETTINGS: Settings = {
@@ -26,8 +30,6 @@ const DEFAULT_SETTINGS: Settings = {
   timezone: "America/New_York (EST)",
   sessionTimeout: "30 minutes",
   chatRuntimeUrl: "https://chat.your-domain.com",
-  chatRuntimeBridgeSecret: "",
-  openRouterApiKey: "",
   openRouterBaseUrl: "https://openrouter.ai/api/v1",
   openRouterModel: "anthropic/claude-sonnet-4-5-20250929",
   notifications: {
@@ -38,47 +40,42 @@ const DEFAULT_SETTINGS: Settings = {
   },
 };
 
-function loadSettings(): Settings {
-  if (typeof window === "undefined") return DEFAULT_SETTINGS;
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return DEFAULT_SETTINGS;
-
-    const parsed = JSON.parse(raw) as Partial<Settings> & {
-      chatInterfaceUrl?: string;
-      chatInterfaceBridgeSecret?: string;
-    };
-
-    return {
-      ...DEFAULT_SETTINGS,
-      ...parsed,
-      chatRuntimeUrl: parsed.chatRuntimeUrl ?? parsed.chatInterfaceUrl ?? DEFAULT_SETTINGS.chatRuntimeUrl,
-      chatRuntimeBridgeSecret: parsed.chatRuntimeBridgeSecret ?? parsed.chatInterfaceBridgeSecret ?? DEFAULT_SETTINGS.chatRuntimeBridgeSecret,
-    };
-  } catch {
-    return DEFAULT_SETTINGS;
-  }
-}
-
-function saveSettings(settings: Settings) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
-  } catch {}
-}
-
-function maskValue(value: string) {
-  if (!value) return "Not configured";
-  if (value.length <= 8) return "Configured";
-  return `${value.slice(0, 4)}****${value.slice(-4)}`;
-}
-
 export default function SettingsPage() {
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
   const [saved, setSaved] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [keyStatus, setKeyStatus] = useState({
+    openRouterApiKeyConfigured: false,
+    chatRuntimeBridgeSecretConfigured: false,
+  });
 
   useEffect(() => {
-    setSettings(loadSettings());
+    let active = true;
+
+    async function loadServerConfig() {
+      try {
+        setLoading(true);
+        const response = await fetch('/api/operator/config');
+        if (!response.ok) throw new Error('Failed to load operator config');
+        const data = (await response.json()) as OperatorConfigResponse;
+        if (!active) return;
+        setSettings({ ...DEFAULT_SETTINGS, ...data.config });
+        setKeyStatus(data.keyStatus);
+      } catch (err) {
+        if (!active) return;
+        setError(err instanceof Error ? err.message : 'Failed to load operator config');
+      } finally {
+        if (active) setLoading(false);
+      }
+    }
+
+    loadServerConfig();
+    return () => {
+      active = false;
+    };
   }, []);
 
   const updateField = useCallback(<K extends keyof Settings>(key: K, value: Settings[K]) => {
@@ -97,17 +94,38 @@ export default function SettingsPage() {
 
   const chatEnvBlock = useMemo(() => [
     `CHAT_RUNTIME_URL=${settings.chatRuntimeUrl || "https://chat.your-domain.com"}`,
-    `CHAT_RUNTIME_BRIDGE_SECRET=${settings.chatRuntimeBridgeSecret}`,
-    `OPENROUTER_API_KEY=${settings.openRouterApiKey}`,
+    'CHAT_RUNTIME_BRIDGE_SECRET=<server-managed>',
+    'OPENROUTER_API_KEY=<server-managed>',
     `OPENROUTER_BASE_URL=${settings.openRouterBaseUrl || "https://openrouter.ai/api/v1"}`,
     `OPENROUTER_MODEL=${settings.openRouterModel || "anthropic/claude-sonnet-4-5-20250929"}`,
-  ].join("\n"), [settings.chatRuntimeBridgeSecret, settings.chatRuntimeUrl, settings.openRouterApiKey, settings.openRouterBaseUrl, settings.openRouterModel]);
+  ].join("\n"), [settings.chatRuntimeUrl, settings.openRouterBaseUrl, settings.openRouterModel]);
 
-  const handleSave = () => {
-    saveSettings(settings);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
-  };
+  const handleSave = useCallback(async () => {
+    try {
+      setSaving(true);
+      setError(null);
+      const response = await fetch('/api/operator/config', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(settings),
+      });
+
+      if (!response.ok) {
+        const body = (await response.json().catch(() => ({}))) as { error?: string };
+        throw new Error(body.error || 'Failed to save operator config');
+      }
+
+      const data = (await response.json()) as OperatorConfigResponse;
+      setSettings({ ...DEFAULT_SETTINGS, ...data.config });
+      setKeyStatus(data.keyStatus);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to save operator config');
+    } finally {
+      setSaving(false);
+    }
+  }, [settings]);
 
   const handleCopyBlock = async () => {
     try {
@@ -116,6 +134,19 @@ export default function SettingsPage() {
       setTimeout(() => setCopied(false), 2000);
     } catch {}
   };
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="h-10 w-56 animate-pulse rounded-lg bg-white/5" />
+        <div className="grid gap-6 lg:grid-cols-2">
+          <div className="h-56 animate-pulse rounded-2xl bg-white/5" />
+          <div className="h-56 animate-pulse rounded-2xl bg-white/5" />
+          <div className="h-72 animate-pulse rounded-2xl bg-white/5 lg:col-span-2" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <motion.div variants={staggerContainer} initial="hidden" animate="visible" className="space-y-6">
@@ -128,9 +159,10 @@ export default function SettingsPage() {
         <motion.button
           type="button"
           onClick={handleSave}
+          disabled={saving}
           whileHover={{ scale: 1.04 }}
           whileTap={{ scale: 0.96 }}
-          className="flex items-center gap-2 rounded-xl bg-gold px-5 py-2.5 text-sm font-medium text-black transition-colors hover:bg-gold-light"
+          className="flex items-center gap-2 rounded-xl bg-gold px-5 py-2.5 text-sm font-medium text-black transition-colors hover:bg-gold-light disabled:cursor-not-allowed disabled:opacity-60"
         >
           <AnimatePresence mode="wait">
             {saved ? (
@@ -139,12 +171,18 @@ export default function SettingsPage() {
               </motion.span>
             ) : (
               <motion.span key="save" initial={{ scale: 0 }} animate={{ scale: 1 }} className="flex items-center gap-2">
-                <Save size={14} /> Save Changes
+                <Save size={14} /> {saving ? 'Saving...' : 'Save Changes'}
               </motion.span>
             )}
           </AnimatePresence>
         </motion.button>
       </motion.header>
+
+      {error && (
+        <motion.div variants={staggerItem} className="rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-200">
+          {error}
+        </motion.div>
+      )}
 
       <div className="grid gap-6 lg:grid-cols-2">
         <motion.section variants={staggerItem} className="wireframe-card p-6">
@@ -226,8 +264,10 @@ export default function SettingsPage() {
               </div>
               <div className="space-y-2">
                 <label className="font-mono text-[0.6rem] uppercase tracking-[0.2em] text-zinc-500">OpenRouter API Key</label>
-                <input type="password" aria-label="OpenRouter API Key" value={settings.openRouterApiKey} onChange={(e) => updateField("openRouterApiKey", e.target.value)} className="w-full rounded-xl border border-wireframe-stroke bg-[#18181B] p-3 text-sm text-zinc-100 outline-none transition-all focus:border-gold/40 focus:ring-1 focus:ring-gold/20" placeholder="sk-or-v1-..." autoComplete="off" />
-                <p className="text-xs text-zinc-500">Stored locally on this device. This repo does not push the key to the external chat runtime automatically.</p>
+                <div className="w-full rounded-xl border border-wireframe-stroke bg-[#18181B] p-3 text-sm text-zinc-300">
+                  Server-managed via environment secret.
+                </div>
+                <p className="text-xs text-zinc-500">Set OPENROUTER_API_KEY in secure server environment management. The dashboard does not collect or store this key in the browser.</p>
               </div>
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
@@ -241,7 +281,10 @@ export default function SettingsPage() {
               </div>
               <div className="space-y-2">
                 <label className="font-mono text-[0.6rem] uppercase tracking-[0.2em] text-zinc-500">Chat Runtime Bridge Secret</label>
-                <input type="password" aria-label="Chat Runtime Bridge Secret" value={settings.chatRuntimeBridgeSecret} onChange={(e) => updateField("chatRuntimeBridgeSecret", e.target.value)} className="w-full rounded-xl border border-wireframe-stroke bg-[#18181B] p-3 text-sm text-zinc-100 outline-none transition-all focus:border-gold/40 focus:ring-1 focus:ring-gold/20" placeholder="generate-a-random-secret" autoComplete="off" />
+                <div className="w-full rounded-xl border border-wireframe-stroke bg-[#18181B] p-3 text-sm text-zinc-300">
+                  Server-managed via environment secret.
+                </div>
+                <p className="text-xs text-zinc-500">Set CHAT_RUNTIME_BRIDGE_SECRET (or legacy alias) in secure server environment management.</p>
               </div>
             </div>
             <div className="rounded-2xl border border-wireframe-stroke bg-[#111113] p-4">
@@ -256,7 +299,7 @@ export default function SettingsPage() {
               </div>
               <pre className="overflow-x-auto rounded-xl border border-white/10 bg-black/30 p-4 font-mono text-xs leading-6 text-amber-200 whitespace-pre-wrap">{chatEnvBlock}</pre>
               <div className="mt-4 space-y-3 text-xs text-zinc-500">
-                <p>Configured key status: <span className="font-mono text-zinc-300">{maskValue(settings.openRouterApiKey)}</span></p>
+                <p>Configured key status: <span className="font-mono text-zinc-300">{keyStatus.openRouterApiKeyConfigured ? 'Configured on server' : 'Not configured'}</span></p>
                 <p>Preferred runtime variable names are `CHAT_RUNTIME_URL` and `CHAT_RUNTIME_BRIDGE_SECRET`. `CHAT_INTERFACE_*` and `LIBRECHAT_*` remain supported as legacy aliases.</p>
               </div>
             </div>
@@ -271,8 +314,16 @@ export default function SettingsPage() {
           <div className="space-y-4">
             {[
               { label: "Chat Runtime URL", value: settings.chatRuntimeUrl || "Not configured", status: settings.chatRuntimeUrl ? "Active" : "Inactive" },
-              { label: "OpenRouter", value: maskValue(settings.openRouterApiKey), status: settings.openRouterApiKey ? "Active" : "Inactive" },
-              { label: "Bridge Secret", value: maskValue(settings.chatRuntimeBridgeSecret), status: settings.chatRuntimeBridgeSecret ? "Active" : "Inactive" },
+              {
+                label: "OpenRouter",
+                value: keyStatus.openRouterApiKeyConfigured ? "Configured on server" : "Not configured",
+                status: keyStatus.openRouterApiKeyConfigured ? "Active" : "Inactive",
+              },
+              {
+                label: "Bridge Secret",
+                value: keyStatus.chatRuntimeBridgeSecretConfigured ? "Configured on server" : "Not configured",
+                status: keyStatus.chatRuntimeBridgeSecretConfigured ? "Active" : "Inactive",
+              },
             ].map((keyStatus) => (
               <div key={keyStatus.label} className="flex items-center justify-between rounded-xl border border-wireframe-stroke bg-[#111113] p-4 transition-all hover:border-gold/20">
                 <div>

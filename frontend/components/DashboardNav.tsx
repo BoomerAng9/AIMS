@@ -21,7 +21,7 @@ import {
   Trophy, Activity, Mic, Theater, BookOpen,
   Coins, CircleDot, TrendingUp, Building, Layers,
   Store, ShoppingCart, Calculator, Map, Plug,
-  Code, Wand2, Briefcase, Target,
+  Code, Wand2, Briefcase, Target, History,
 } from "lucide-react";
 
 // ── Types ──
@@ -40,6 +40,7 @@ interface NavItem {
 
 const PRIVATE_PRIMARY: NavItem[] = [
   { href: "/dashboard/chat", label: "Chat w/ACHEEVY", icon: MessageSquare, highlight: true },
+  { href: "/dashboard/history", label: "History", icon: History, highlight: true },
   { href: "/dashboard/acheevy", label: "ACHEEVY", icon: Zap, highlight: true },
 ];
 
@@ -128,6 +129,7 @@ const PRIVATE_OWNER: NavItem[] = [
 
 const PUBLIC_PRIMARY: NavItem[] = [
   { href: "/dashboard/chat", label: "Talk to ACHEEVY", icon: MessageSquare, highlight: true },
+  { href: "/dashboard/history", label: "History", icon: History },
 ];
 
 const PUBLIC_CORE: NavItem[] = [
@@ -149,7 +151,7 @@ const PUBLIC_APPS: NavItem[] = [
 
 const PUBLIC_SETTINGS: NavItem[] = [
   { href: "/dashboard/circuit-box?tab=services", label: "My Services", icon: Shield },
-  { href: "/dashboard/circuit-box?tab=settings", label: "Settings", icon: Settings },
+  { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ];
 
 // ── NavLink Component ──

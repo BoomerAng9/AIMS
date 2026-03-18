@@ -33,6 +33,7 @@ const SEGMENT_LABELS: Record<string, string> = {
 
   // Dashboard core
   chat: 'Chat',
+  history: 'History',
   acheevy: 'ACHEEVY',
   'deploy-dock': 'Deploy Dock',
   'plug-catalog': 'Plug Catalog',

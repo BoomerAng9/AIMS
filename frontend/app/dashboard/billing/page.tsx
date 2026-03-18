@@ -2,30 +2,9 @@
 
 import { motion } from 'framer-motion';
 import useSWR from 'swr';
-import { usePlatformMode } from '@/lib/platform-mode';
-import { t } from '@/lib/terminology';
 import { staggerContainer, staggerItem } from '@/lib/motion/variants';
-import { QuotaBar } from '@/components/ui/QuotaBar';
 
-interface BillingStatus {
-    plan: string;
-    price: string;
-    renewalDate: string;
-}
-
-interface PaymentMethod {
-    cardBrand: string;
-    last4: string;
-    expiry: string;
-}
-
-interface Invoice {
-    id: string;
-    date: string;
-    amount: number;
-    status: 'paid' | 'pending' | 'failed';
-    pdfUrl: string;
-}
+import { mapBillingRecordsToInvoices, type BillingResponse } from '@/lib/billing/transform';
 
 const fetcher = (url: string) => fetch(url).then(res => {
     if (!res.ok) throw new Error('API Error');
@@ -33,20 +12,9 @@ const fetcher = (url: string) => fetch(url).then(res => {
 });
 
 export default function BillingPage() {
-    const { mode } = usePlatformMode();
+    const { data: billing, isLoading, error } = useSWR<BillingResponse>('/api/luc/billing', fetcher);
 
-    const { data: billing, isLoading, error } = useSWR('/api/luc/billing', fetcher);
-
-    // Fallback styling data for layout purposes if API not ready
-    const safeBilling = billing || {
-        status: { plan: 'Starter', price: '$29/mo', renewalDate: 'Mar 15, 2026' },
-        paymentMethod: { cardBrand: 'Visa', last4: '4242', expiry: '12/28' },
-        invoices: [
-            { id: 'inv_123', date: 'Feb 15, 2026', amount: 29.00, status: 'paid', pdfUrl: '#' },
-            { id: 'inv_122', date: 'Jan 15, 2026', amount: 29.00, status: 'paid', pdfUrl: '#' },
-        ],
-        usageCycle: { used: 3247, quota: 10000 }
-    };
+    const invoices = mapBillingRecordsToInvoices(billing);
 
     const handleStripeCheckout = async () => {
         // Route to Stripe checkout
@@ -70,6 +38,19 @@ export default function BillingPage() {
         );
     }
 
+    if (error) {
+        return (
+            <div className="p-6 max-w-5xl mx-auto">
+                <div className="rounded-2xl border border-rose-500/25 bg-rose-500/5 p-6">
+                    <h1 className="text-xl font-semibold text-white">Billing data unavailable</h1>
+                    <p className="mt-2 text-sm text-zinc-300">
+                        We could not load billing data from the LUC billing API. No fallback billing values are displayed.
+                    </p>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <motion.div
             variants={staggerContainer}
@@ -82,7 +63,7 @@ export default function BillingPage() {
                     <h1 className="text-3xl font-bold tracking-tight text-white/90">
                         Billing Management
                     </h1>
-                    <p className="text-zinc-400 mt-1">Manage your subscriptions, payments, and view invoices.</p>
+                    <p className="text-zinc-400 mt-1">View API-backed billing usage and event records.</p>
                 </div>
             </motion.div>
 
@@ -95,11 +76,10 @@ export default function BillingPage() {
                     <div>
                         <h2 className="text-lg font-bold text-white">Current Plan</h2>
                         <div className="mt-6 flex items-baseline gap-2">
-                            <span className="text-4xl font-extrabold text-[#D4AF37]">{safeBilling.status.plan}</span>
-                            <span className="text-zinc-400 text-lg">{safeBilling.status.price}</span>
+                            <span className="text-2xl font-extrabold text-[#D4AF37]">Unavailable</span>
                         </div>
                         <p className="text-zinc-500 mt-2 text-sm">
-                            Renews automatically on <span className="text-zinc-300 font-medium">{safeBilling.status.renewalDate}</span>
+                            Subscription plan metadata is not returned by <span className="text-zinc-300 font-medium">/api/luc/billing</span>.
                         </p>
                     </div>
                     <div className="mt-8 flex gap-3">
@@ -123,15 +103,15 @@ export default function BillingPage() {
                     <div>
                         <h2 className="text-lg font-bold text-white">Payment Method</h2>
                         <div className="mt-6 flex items-center gap-4 bg-[#18181B] p-4 rounded-xl border border-white/5">
-                            <div className="w-12 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-md flex items-center justify-center text-white font-bold italic shadow-md">
-                                {safeBilling.paymentMethod.cardBrand}
+                            <div className="w-12 h-8 bg-gradient-to-br from-zinc-600 to-zinc-800 rounded-md flex items-center justify-center text-white font-bold shadow-md">
+                                --
                             </div>
                             <div className="flex-1">
                                 <p className="text-white font-medium">
-                                    •••• •••• •••• {safeBilling.paymentMethod.last4}
+                                    Not available
                                 </p>
                                 <p className="text-sm text-zinc-500">
-                                    Expires {safeBilling.paymentMethod.expiry}
+                                    Payment details are managed in Stripe and not exposed by this endpoint.
                                 </p>
                             </div>
                         </div>
@@ -150,11 +130,20 @@ export default function BillingPage() {
                 className="rounded-2xl border border-white/[0.06] bg-[#111113]/80 backdrop-blur-sm p-6 shadow-lg"
             >
                 <h2 className="text-lg font-bold text-white mb-6">Usage Summary</h2>
-                <QuotaBar
-                    used={safeBilling.usageCycle.used}
-                    total={safeBilling.usageCycle.quota}
-                    label="LUC Credits used this billing period"
-                />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+                        <p className="text-xs uppercase tracking-wide text-zinc-400">Events</p>
+                        <p className="mt-2 text-2xl font-bold text-white">{billing?.totals.count ?? 0}</p>
+                    </div>
+                    <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+                        <p className="text-xs uppercase tracking-wide text-zinc-400">Tokens</p>
+                        <p className="mt-2 text-2xl font-bold text-white">{billing?.totals.tokens ?? 0}</p>
+                    </div>
+                    <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+                        <p className="text-xs uppercase tracking-wide text-zinc-400">Cost</p>
+                        <p className="mt-2 text-2xl font-bold text-white">${(billing?.totals.cost ?? 0).toFixed(2)}</p>
+                    </div>
+                </div>
             </motion.div>
 
             {/* INVOICES */}
@@ -174,31 +163,24 @@ export default function BillingPage() {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-white/5 text-zinc-300">
-                            {safeBilling.invoices.map((inv: any) => (
+                            {invoices.length === 0 && (
+                                <tr>
+                                    <td colSpan={4} className="py-8 text-center text-zinc-500">
+                                        No billing records found for this account.
+                                    </td>
+                                </tr>
+                            )}
+                            {invoices.map((inv) => (
                                 <tr key={inv.id} className="hover:bg-white/[0.02]">
                                     <td className="py-4 pr-4">{inv.date}</td>
                                     <td className="py-4 px-4 font-mono">${inv.amount.toFixed(2)}</td>
                                     <td className="py-4 px-4">
-                                        <span className={`px-2.5 py-1 flex items-center w-max gap-1.5 rounded-full text-xs font-medium border ${inv.status === 'paid'
-                                                ? 'bg-[#10B981]/10 text-[#10B981] border-[#10B981]/20'
-                                                : 'bg-[#F59E0B]/10 text-[#F59E0B] border-[#F59E0B]/20'
-                                            }`}>
-                                            <span className={`w-1.5 h-1.5 rounded-full ${inv.status === 'paid' ? 'bg-[#10B981]' : 'bg-[#F59E0B]'
-                                                }`} />
+                                        <span className="px-2.5 py-1 flex items-center w-max gap-1.5 rounded-full text-xs font-medium border bg-cyan-500/10 text-cyan-300 border-cyan-500/25">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-cyan-300" />
                                             {inv.status.toUpperCase()}
                                         </span>
                                     </td>
-                                    <td className="py-4 pl-4 text-right">
-                                        <a
-                                            href={inv.pdfUrl}
-                                            className="text-[#22D3EE] hover:text-[#22D3EE]/80 transition-colors inline-flex items-center gap-1"
-                                        >
-                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                                            </svg>
-                                            PDF
-                                        </a>
-                                    </td>
+                                    <td className="py-4 pl-4 text-right text-zinc-400">{inv.eventType}</td>
                                 </tr>
                             ))}
                         </tbody>

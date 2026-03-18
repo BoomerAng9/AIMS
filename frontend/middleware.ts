@@ -32,6 +32,11 @@ const ALLOWED_ORIGINS = IS_PRODUCTION
       'https://www.aims.plugmein.cloud',
       'https://api.aims.plugmein.cloud',
       'https://luc.plugmein.cloud',
+      // foai.cloud — new primary AIMS domain
+      'https://foai.cloud',
+      'https://www.foai.cloud',
+      'https://nemoclaw.foai.cloud',
+      // aimanagedsolutions.cloud — legacy (keep for transition period)
       'https://aimanagedsolutions.cloud',
       'https://www.aimanagedsolutions.cloud',
       'https://hh.aimanagedsolutions.cloud',
@@ -297,10 +302,13 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(redirectUrl);
   }
 
-  // 1. Domain routing — plugmein.cloud (app), aimanagedsolutions.cloud (gateway), hh.plugmein.cloud
+  // 1. Domain routing — foai.cloud (primary AIMS), plugmein.cloud (app), hh.plugmein.cloud, nemoclaw.foai.cloud (NemoClaw panel)
   const hostname = request.headers.get('host') || '';
   const isHalalHubDomain = hostname === 'hh.plugmein.cloud' || (!IS_PRODUCTION && hostname.startsWith('hh.localhost'));
-  const isAIMSDomain = hostname.includes('aimanagedsolutions');
+  // nemoclaw.foai.cloud → NemoClaw control panel (/nemo routes)
+  const isNemoDomain = hostname === 'nemoclaw.foai.cloud' || (!IS_PRODUCTION && hostname.startsWith('nemo.localhost'));
+  // foai.cloud is the new primary AIMS domain (replaces aimanagedsolutions.cloud)
+  const isAIMSDomain = (hostname === 'foai.cloud' || hostname === 'www.foai.cloud' || hostname.includes('aimanagedsolutions')) && !isNemoDomain;
 
   if (isHalalHubDomain) {
     if (pathname === '/') {
@@ -316,7 +324,22 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  // 1b. aimanagedsolutions.cloud — OWNER/ADMIN gateway
+  // 1c. NemoClaw Whitelabel Subdomain
+  if (isNemoDomain) {
+    if (pathname === '/') {
+      const url = request.nextUrl.clone();
+      url.pathname = '/nemo';
+      return NextResponse.rewrite(url);
+    }
+    // Forward all other paths directly under /nemo if not already specified
+    if (!pathname.startsWith('/nemo') && !pathname.startsWith('/api') && !pathname.startsWith('/(auth)')) {
+      const url = request.nextUrl.clone();
+      url.pathname = `/nemo${pathname}`;
+      return NextResponse.rewrite(url);
+    }
+  }
+
+  // 1b. foai.cloud / aimanagedsolutions.cloud — OWNER/ADMIN gateway
   // Enforce authentication on dashboard routes. Only authenticated users
   // can access /dashboard/* on this domain. Role enforcement happens
   // client-side in PlatformModeProvider (JWT role is server-signed, not hackable).
@@ -416,7 +439,7 @@ export function middleware(request: NextRequest) {
   response.headers.set('X-Device-Type', deviceType);
 
   // Platform domain classification — used by server components for domain-aware rendering
-  const platformDomain = isAIMSDomain ? 'aims' : isHalalHubDomain ? 'halalhub' : 'plugmein';
+  const platformDomain = isAIMSDomain ? 'aims' : isNemoDomain ? 'nemoclaw' : isHalalHubDomain ? 'halalhub' : 'plugmein';
   response.headers.set('X-Platform-Domain', platformDomain);
 
   return response;
