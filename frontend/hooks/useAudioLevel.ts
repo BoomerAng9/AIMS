@@ -27,7 +27,13 @@ export function useAudioLevel(stream: MediaStream | null, isListening: boolean):
     const updateLevel = () => {
       analyser.getByteFrequencyData(dataArray);
       // Calculate average volume
-      const sum = dataArray.reduce((a, b) => a + b, 0);
+      // ⚡ Bolt Optimization: Using a for-loop over TypedArray.reduce()
+      // is significantly faster in V8 for high-frequency (60fps) animation loops
+      // and prevents excessive garbage collection.
+      let sum = 0;
+      for (let i = 0; i < dataArray.length; i++) {
+        sum += dataArray[i];
+      }
       const average = sum / dataArray.length;
 
       setAudioLevel(average / 255); // Normalize to 0-1
