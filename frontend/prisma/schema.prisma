@@ -511,6 +511,7 @@ model DraftProspect {
   threeCone        Float?
   shuttle          Float?
   paiScore         Int         @default(0)
+  performScore     Float?
   tier             String      @default("DAY_3")
   performance      Int         @default(0)
   athleticism      Int         @default(0)

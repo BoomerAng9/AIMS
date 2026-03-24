@@ -32,6 +32,12 @@ import {
   SEED_NIL_TEAM_RANKINGS,
   SEED_SCHOOL_BUDGETS,
 } from '@/lib/perform/seed-ncaa-data';
+import { SEED_DRAFT_PROSPECTS } from '@/lib/perform/seed-draft-data';
+import {
+  batchEnrichDraftProspects,
+  enrichDraftProspect,
+  persistEnrichment,
+} from '@/lib/perform/draft-enrichment-service';
 
 /** Seed all NCAA operational data (coaching, portal, NIL, budgets) */
 async function seedNcaaData() {
@@ -73,6 +79,35 @@ export async function POST(req: NextRequest) {
     if (action === 'ncaa') {
       const ncaa = await seedNcaaData();
       return NextResponse.json({ ok: true, seeded: { ncaa } });
+    }
+
+    // Enrich draft prospects via CFBD + Brave (Lil_Scout_Hawk pipeline)
+    if (action === 'enrich-draft') {
+      const body = await req.json().catch(() => ({}));
+      const prospects = body.prospects || SEED_DRAFT_PROSPECTS;
+      const limit = Math.min(body.limit || prospects.length, prospects.length);
+      const batch = prospects.slice(0, limit);
+
+      const results = await batchEnrichDraftProspects(batch, {
+        delayMs: body.delayMs || 2000,
+      });
+
+      const summary = {
+        total: results.length,
+        success: results.filter((r: any) => r.status === 'SUCCESS').length,
+        partial: results.filter((r: any) => r.status === 'PARTIAL').length,
+        failed: results.filter((r: any) => r.status === 'FAILED').length,
+      };
+
+      return NextResponse.json({ ok: true, enrichment: summary, results });
+    }
+
+    // Enrich a single draft prospect
+    if (action === 'enrich-prospect') {
+      const body = await req.json();
+      const result = await enrichDraftProspect(body);
+      await persistEnrichment(body, result);
+      return NextResponse.json({ ok: true, result });
     }
 
     // Full seed: conferences + teams + prospects + NCAA data
