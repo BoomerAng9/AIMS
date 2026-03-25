@@ -302,6 +302,19 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(redirectUrl);
   }
 
+  // 0b. Chat-first: authenticated users landing on / go directly to /chat
+  // This enforces Chat w/ ACHEEVY as the default product surface.
+  if (pathname === '/') {
+    const hasSession =
+      request.cookies.has('next-auth.session-token') ||
+      request.cookies.has('__Secure-next-auth.session-token');
+    if (hasSession) {
+      const redirectUrl = request.nextUrl.clone();
+      redirectUrl.pathname = '/chat';
+      return NextResponse.redirect(redirectUrl);
+    }
+  }
+
   // 1. Domain routing — foai.cloud (primary AIMS), plugmein.cloud (app), hh.plugmein.cloud, nemoclaw.foai.cloud (NemoClaw panel)
   const hostname = request.headers.get('host') || '';
   const isHalalHubDomain = hostname === 'hh.plugmein.cloud' || (!IS_PRODUCTION && hostname.startsWith('hh.localhost'));

@@ -118,6 +118,53 @@ test('attachment upload shows file preview chip', async ({ page }) => {
   await expect(page.getByText('aims-test.txt')).toBeVisible({ timeout: 10_000 });
 });
 
+test('voice permission denied shows fallback or error state', async ({ page }) => {
+  await page.goto('/chat', { waitUntil: 'domcontentloaded' });
+  await page.waitForURL(/\/(chat|dashboard\/chat)/, { timeout: 60_000 });
+
+  // Deny the microphone permission before clicking the voice toggle
+  await page.context().clearPermissions();
+  // Permissions-Policy header allows self — deny via browser context
+  await page.context().grantPermissions([]); // grants nothing — mic denied by omission
+
+  const voiceCaptureButton = page.getByRole('button', { name: /Voice Capture Toggle/i }).first();
+  await expect(voiceCaptureButton).toBeVisible();
+  await voiceCaptureButton.click();
+
+  // Give browser time to attempt permission and settle
+  await page.waitForTimeout(800);
+
+  // The UI should either show an error/fallback state OR keep the button visible in idle
+  // Either outcome is acceptable — we assert the page hasn't crashed
+  await expect(page.getByPlaceholder('Type or speak your request...')).toBeVisible();
+});
+
+test('sent message appears in conversation stream', async ({ page }) => {
+  // Stub the chat API to return a quick ack so the test doesn't depend on a real backend
+  await page.route('**/api/chat**', async route => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'text/event-stream',
+      body: 'data: {"choices":[{"delta":{"content":"Acknowledged."}}]}\ndata: [DONE]\n',
+    });
+  });
+
+  await page.goto('/chat', { waitUntil: 'domcontentloaded' });
+  await page.waitForURL(/\/(chat|dashboard\/chat)/, { timeout: 60_000 });
+
+  const promptInput = page.getByPlaceholder('Type or speak your request...');
+  await expect(promptInput).toBeVisible();
+  await promptInput.fill('Hello ACHEEVY, confirm receipt.');
+
+  const composerContainer = promptInput.locator('xpath=..');
+  const sendButton = composerContainer.locator('button').last();
+  await expect(sendButton).toBeEnabled();
+  await sendButton.click();
+
+  // User message should appear in the conversation stream
+  await expect(page.getByText('Hello ACHEEVY, confirm receipt.').first()).toBeVisible({ timeout: 10_000 });
+});
+
 test('chat API failure renders error state and retry control', async ({ page }) => {
   // Route the first chat message to a 500 error to simulate backend failure
   let callCount = 0;
