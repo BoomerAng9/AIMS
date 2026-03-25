@@ -2,9 +2,7 @@
  * POST /api/auth/forgot-password
  *
  * Generates a time-limited password reset token and stores it on the user.
- * In production this would send an email via SendGrid/Resend/etc.
- * For now it logs the reset link to the server console (dev-friendly).
- *
+ * Sends email via Resend if configured, otherwise logs to console.
  * Always returns 200 regardless of whether the email exists (prevents enumeration).
  */
 import { NextRequest, NextResponse } from 'next/server';
@@ -27,16 +25,13 @@ export async function POST(req: NextRequest) {
     }
 
     const { email } = validation.data;
-
     const normalizedEmail = email.toLowerCase().trim();
 
-    // Look up user — but always return 200 to prevent email enumeration
     const user = await prisma.user.findUnique({
       where: { email: normalizedEmail },
     });
 
     if (user) {
-      // Generate a secure random token
       const resetToken = crypto.randomBytes(32).toString('hex');
       const resetTokenExpiry = new Date(Date.now() + TOKEN_EXPIRY_HOURS * 60 * 60 * 1000);
 
@@ -45,22 +40,34 @@ export async function POST(req: NextRequest) {
         data: { resetToken, resetTokenExpiry },
       });
 
-      // Build reset URL
       const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
       const resetUrl = `${baseUrl}/reset-password?token=${resetToken}`;
 
-      // In production, send via email service (SendGrid, Resend, etc.)
-      // For now, log to console so the dev can use it
-      console.log(`[forgot-password] Reset link for ${normalizedEmail}: ${resetUrl}`);
-
-      // If an email service is configured, send the email
-      if (process.env.SENDGRID_API_KEY || process.env.RESEND_API_KEY) {
-        console.log('[forgot-password] Email service configured — email would be sent here');
-        // TODO: Wire SendGrid/Resend when API keys are available
+      if (process.env.RESEND_API_KEY) {
+        const { Resend } = await import('resend');
+        const resend = new Resend(process.env.RESEND_API_KEY);
+        await resend.emails.send({
+          from: process.env.EMAIL_FROM || 'ACHEEVY <noreply@foai.cloud>',
+          to: normalizedEmail,
+          subject: 'Reset your A.I.M.S. password',
+          html: `
+            <div style="font-family: system-ui, sans-serif; max-width: 480px; margin: 0 auto;">
+              <h2 style="color: #1e293b;">Reset Your Password</h2>
+              <p>Click the button below to reset your password. This link expires in ${TOKEN_EXPIRY_HOURS} hour.</p>
+              <a href="${resetUrl}" style="display: inline-block; padding: 12px 24px; background: #D4AF37; color: #1e293b; text-decoration: none; border-radius: 8px; font-weight: 600;">
+                Reset Password
+              </a>
+              <p style="margin-top: 24px; font-size: 13px; color: #94a3b8;">
+                If you didn't request this, you can safely ignore this email.
+              </p>
+            </div>
+          `,
+        });
+      } else {
+        console.log(`[forgot-password] Reset link for ${normalizedEmail}: ${resetUrl}`);
       }
     }
 
-    // Always return success to prevent email enumeration
     return NextResponse.json({
       message: 'If an account exists with that email, a reset link has been sent.',
     });
