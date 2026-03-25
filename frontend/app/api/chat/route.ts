@@ -39,7 +39,7 @@ const openrouter = createOpenAI({
 });
 
 // ── Feature LLM ─────────────────────────────────────────────
-const DEFAULT_MODEL = process.env.ACHEEVY_MODEL || process.env.OPENROUTER_MODEL || 'google/gemini-2.5-flash';
+const DEFAULT_MODEL = process.env.ACHEEVY_MODEL || process.env.OPENROUTER_MODEL || 'anthropic/claude-sonnet-4-5-20250929';
 
 // ── Priority Model Roster (all accessible via OpenRouter) ───
 // Model IDs must match OpenRouter's catalog exactly (use dashes, not dots for versions)
@@ -519,11 +519,18 @@ export async function POST(req: Request) {
     // Step 2: ALL messages → ACHEEVY orchestrator first
     // The orchestrator decides: II-Agent, Chicken Hawk, vertical, PaaS, or conversation.
     // No fork — every message gets the full ACHEEVY pipeline.
-    const orchestratorClassification = classification || normalizeAcheevyClassification(enrichedLastMessage, {
-      intent: 'conversation',
-      confidence: 0.5,
-      requiresAgent: false,
-    });
+    const orchestratorClassification = classification || (() => {
+      // If gateway classification failed, use keyword heuristics to determine if this needs an agent
+      const lower = enrichedLastMessage.toLowerCase();
+      const actionKeywords = /\b(build|deploy|create|launch|spin up|research|automate|analyze|generate|make|set up|configure|install)\b/i;
+      const isLikelyAction = actionKeywords.test(lower);
+
+      return normalizeAcheevyClassification(enrichedLastMessage, {
+        intent: isLikelyAction ? 'task_execution' : 'conversation',
+        confidence: isLikelyAction ? 0.7 : 0.5,
+        requiresAgent: isLikelyAction,
+      });
+    })();
 
     console.log(
       `[ACHEEVY Chat] Routing through orchestrator: intent=${orchestratorClassification.intent} lane=${orchestratorClassification.routingDecision.execution_lane} confidence=${orchestratorClassification.confidence}`,
@@ -532,6 +539,46 @@ export async function POST(req: Request) {
     if (agentResponse) return agentResponse;
 
     // Step 3: Fallback — ACHEEVY orchestrator unreachable → LLM stream via gateway (metered)
+    // If agent dispatch was attempted (requiresAgent=true) but failed, surface this to the user
+    if (orchestratorClassification.requiresAgent) {
+      console.warn('[ACHEEVY Chat] Agent dispatch failed for action intent — prepending notice to LLM stream');
+      const dispatchFailureNote = `I wasn't able to reach my execution engine right now, so I'll handle this conversationally for the moment. Here's what I can tell you:\n\n`;
+      const encoder = new TextEncoder();
+      const prefixStream = new ReadableStream({
+        start(controller) {
+          controller.enqueue(encoder.encode(`0:${JSON.stringify(dispatchFailureNote)}\n`));
+          controller.close();
+        },
+      });
+      // Attempt gateway stream and prepend the notice if successful
+      const gatewayStreamForAction = await tryGatewayStream(modelId, enrichedMessages, systemPrompt, userId);
+      if (gatewayStreamForAction && gatewayStreamForAction.body) {
+        const combined = new ReadableStream({
+          async start(controller) {
+            const prefixReader = prefixStream.getReader();
+            const mainReader = gatewayStreamForAction.body!.getReader();
+            for (;;) {
+              const { done, value } = await prefixReader.read();
+              if (done) break;
+              controller.enqueue(value);
+            }
+            for (;;) {
+              const { done, value } = await mainReader.read();
+              if (done) break;
+              controller.enqueue(value);
+            }
+            controller.close();
+          },
+        });
+        return new Response(combined, {
+          headers: {
+            'Content-Type': 'text/plain; charset=utf-8',
+            'X-ACHEEVY-Intent': orchestratorClassification.intent,
+            'X-ACHEEVY-Fallback': 'dispatch-failed',
+          },
+        });
+      }
+    }
     console.warn('[ACHEEVY Chat] Orchestrator unreachable, falling back to LLM stream');
   const gatewayResponse = await tryGatewayStream(modelId, enrichedMessages, systemPrompt, userId);
     if (gatewayResponse) return gatewayResponse;
