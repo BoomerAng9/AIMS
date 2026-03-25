@@ -179,9 +179,9 @@
       "repo": "BoomerAng9/CH-Docs",
       "tier": 2,
       "role": "documentation",
-      "label": "CH-Docs — Documentation Hub",
-      "description": "Centralized documentation for the entire AIMS ecosystem. API docs, architecture guides, SOPs.",
-      "provides": ["documentation", "api-docs", "architecture-guides", "sop-reference"],
+      "label": "CH-Docs — Chicken Hawk Documentation",
+      "description": "All Chicken Hawk documentation files. System prompts, gateway configs, dispatch SOPs, safety policies, coordinator architecture, Lil_Hawk management rules. CH = Chicken Hawk.",
+      "provides": ["chickenhawk-docs", "dispatch-sops", "safety-policies", "coordinator-architecture", "lil-hawk-management-docs"],
       "consumes": []
     }
   },
@@ -204,14 +204,15 @@
     {"from": "agent-acheevy-009", "to": "grammar", "type": "consumes", "label": "NLP processing"},
     {"from": "agent-acheevy-009", "to": "acheevy-whisper-build", "type": "consumes", "label": "voice commands"},
     {"from": "myclaw", "to": "aims", "type": "serves", "label": "runtime substrate"},
-    {"from": "ch-docs", "to": "aims", "type": "documents", "label": "platform docs"},
-    {"from": "ch-docs", "to": "myclaw", "type": "documents", "label": "infra docs"}
+    {"from": "ch-docs", "to": "chicken-hawk", "type": "documents", "label": "Chicken Hawk docs"},
+    {"from": "ch-docs", "to": "aims", "type": "documents", "label": "coordinator reference"}
   ],
   "rules": {
     "singleNarrator": "Only ACHEEVY speaks to users. Never expose Boomer_Ang, Lil_Hawk, or Chicken Hawk names in public UI.",
     "noDuplicateBrains": "If two repos both claim authority over the same domain, one must become the adapter. ACHEEVY is the digital CEO duplicated across repos for consistency.",
     "evidenceRequired": "Every completed task requires evidence. No proof, no done.",
     "noMockData": "This is commercial software. Done means safely distributable to anyone.",
-    "reflexPromotion": "A pathway only becomes reflex after a validation run produces artifacts/logs meeting ship-block standards."
+    "reflexPromotion": "A pathway only becomes reflex after a validation run produces artifacts/logs meeting ship-block standards.",
+    "apiKeyStorage": "All real API keys are stored on the OpenClaw VPS platform. Never in repos. Repos use .env.example templates only."
   }
 }
