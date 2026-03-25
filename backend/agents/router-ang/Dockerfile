@@ -1,7 +1,7 @@
 # Router_Ang — Smart Routing A2A Agent
 # Tier 1 Agent: Capability discovery, intent routing, agent delegation
 
-FROM node:20-alpine AS builder
+FROM node:22-alpine AS builder
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci --production=false
@@ -9,7 +9,7 @@ COPY tsconfig.json ./
 COPY src/ ./src/
 RUN npm run build
 
-FROM node:20-alpine
+FROM node:22-alpine
 WORKDIR /app
 RUN addgroup -g 1001 -S ang && adduser -u 1001 -S ang -G ang
 COPY --from=builder /app/dist ./dist

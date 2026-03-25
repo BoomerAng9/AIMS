@@ -1,7 +1,7 @@
 # Research_Ang — Containerized A2A Agent
 # Tier 1 Agent: Market research, competitive analysis, data interpretation
 
-FROM node:20-alpine AS builder
+FROM node:22-alpine AS builder
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci --production=false
@@ -9,7 +9,7 @@ COPY tsconfig.json ./
 COPY src/ ./src/
 RUN npm run build
 
-FROM node:20-alpine
+FROM node:22-alpine
 WORKDIR /app
 RUN addgroup -g 1001 -S ang && adduser -u 1001 -S ang -G ang
 COPY --from=builder /app/dist ./dist

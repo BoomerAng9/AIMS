@@ -5,7 +5,7 @@
 # Build context is the REPO ROOT (..) so we can access aims-tools/.
 # Standalone mode produces a self-contained server (~150MB vs ~500MB).
 
-FROM node:20-alpine AS builder
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 
@@ -29,7 +29,7 @@ RUN npm run build
 # ---------------------------------------------------------------------------
 # Production image — minimal footprint (standalone output)
 # ---------------------------------------------------------------------------
-FROM node:20-alpine
+FROM node:22-alpine
 
 WORKDIR /app
 
