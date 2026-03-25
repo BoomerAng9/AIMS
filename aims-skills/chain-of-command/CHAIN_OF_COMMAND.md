@@ -238,12 +238,12 @@ Every wrapper ships with:
 | `gemini-cli` | `Runner_Ang` | CLI execution pack |
 | `gemini-cli-mcp-openai-bridge` | `Bridge_Ang` | Protocol translation pack |
 
-### Pack D — "LLM Gateway + Debug"
-*Primary: debug/route model calls in OpenAI-format style.*
+### Pack D — "LLM Gateway (Gemini API)"
+*Primary: Route model calls through Gemini API and approved direct SDKs. LiteLLM is BLOCKED.*
 
 | Repo | Owner | Role |
 |------|-------|------|
-| `litellm-debugger` | `Gatekeeper_Ang` | Debug + policy + routing validation |
+| ~~`litellm-debugger`~~ (BLOCKED) | `Gatekeeper_Ang` | Gemini API gateway + routing (litellm blocked — see SECURITY-LITELLM-BLOCKED.md) |
 
 ### Pack E — "Docs + Presentation Factory"
 *Primary: build user-facing decks and docs (with licensing discipline).*
