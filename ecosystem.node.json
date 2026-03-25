@@ -2,40 +2,33 @@
   "$schema": "aims-ecosystem-node/v1",
   "nodeId": "aims",
   "repo": "BoomerAng9/AIMS",
-  "role": "platform-core",
-  "label": "A.I.M.S. — Platform Core",
-  "description": "Primary Next.js frontend + Firebase backend, ACHEEVY chat, aiPLUGS system, CRM, command center.",
-  "provides": ["aims-frontend", "aims-backend", "acheevy-chat", "aiplugs-system", "crm", "command-center"],
-  "consumes": ["luc-engine", "grammar-engine", "whisper-stt", "destinations-data", "perform-analytics", "agent-framework"],
+  "tier": 0,
+  "role": "hub",
+  "label": "A.I.M.S. — Execution Hub",
+  "description": "AI Managed Solutions — the brain, orchestrator, and single source of truth. AIMS owns the ecosystem registry. All satellites register here.",
+  "provides": ["aims-frontend", "aims-backend", "uef-gateway", "acheevy-chat", "aiplugs-system", "crm", "command-center", "plug-engine", "ecosystem-registry"],
+  "consumes": ["luc-engine", "grammar-engine", "whisper-stt", "destinations-data", "perform-analytics", "agent-framework", "openclaw-runtime", "market-intel"],
   "endpoints": {
-    "frontend": "https://aims.acheevy.digital",
-    "api": "https://api.aims.acheevy.digital",
-    "chat": "https://chat.acheevy.digital"
+    "platform": "https://plugmein.cloud",
+    "admin": "https://admin.aimanagedsolutions.cloud",
+    "api": "https://plugmein.cloud/api"
   },
-  "hub": "BoomerAng9/myclaw",
+  "hub": "BoomerAng9/AIMS",
   "peers": [
     "BoomerAng9/myclaw",
+    "BoomerAng9/acheevy.digital",
+    "BoomerAng9/Chicken-Hawk",
+    "BoomerAng9/Agent-ACHEEVY-009",
     "BoomerAng9/GRAMMAR",
     "BoomerAng9/acheevy-whisper-build",
     "BoomerAng9/destinations-ai",
-    "BoomerAng9/LUC-Locale-Universal-Calculator",
-    "BoomerAng9/Agent-ACHEEVY-009",
     "BoomerAng9/the-perform-platform",
-    "BoomerAng9/acheevy.digital",
-    "BoomerAng9/Chicken-Hawk",
-    "BoomerAng9/CH-Docs",
-    "BoomerAng9/Locale-by-ACHIEVEMOR-2"
+    "BoomerAng9/LUC-Locale-Universal-Calculator",
+    "BoomerAng9/Locale-by-ACHIEVEMOR-2",
+    "BoomerAng9/CH-Docs"
   ],
-  "branding": {
-    "chatIcon": "ACHEEVY Helmet — always used as the chat interface icon/avatar",
-    "chatIconPath": "public/images/acheevy-helmet.png",
-    "colors": {
-      "primary": "#C8A84E",
-      "primaryDark": "#8B7635",
-      "surface": "#1A1A2E",
-      "surfaceGlass": "rgba(26,26,46,0.85)",
-      "accent": "#FFD700",
-      "text": "#FFFFFF"
-    }
+  "chatIcon": {
+    "asset": "public/images/acheevy-helmet.png",
+    "rule": "ACHEEVY Helmet is the ONLY primary chat avatar everywhere. One narrator (ACHEEVY). aiPLUGs get secondary badges only."
   }
 }

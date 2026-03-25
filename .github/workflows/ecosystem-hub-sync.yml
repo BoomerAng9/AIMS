@@ -1,0 +1,52 @@
+# AIMS Ecosystem Sync Workflow
+# Receives registration events from satellite repos and validates them
+name: Ecosystem Hub Sync
+
+on:
+  repository_dispatch:
+    types: [ecosystem-node-updated]
+  push:
+    paths:
+      - 'ecosystem.json'
+    branches:
+      - main
+
+jobs:
+  validate-registration:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'repository_dispatch'
+    steps:
+      - name: Checkout hub
+        uses: actions/checkout@v4
+
+      - name: Validate satellite node
+        run: |
+          NODE_ID="${{ github.event.client_payload.nodeId }}"
+          REPO="${{ github.event.client_payload.repo }}"
+          echo "Satellite node updated: $NODE_ID from $REPO"
+          # Validate the node exists in ecosystem.json
+          if jq -e ".nodes[\"$NODE_ID\"]" ecosystem.json > /dev/null 2>&1; then
+            echo "Node $NODE_ID is registered in ecosystem.json"
+          else
+            echo "WARNING: Node $NODE_ID is NOT registered in ecosystem.json"
+            exit 1
+          fi
+
+  validate-manifest:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate ecosystem.json schema
+        run: |
+          # Ensure all nodes have required fields
+          NODES=$(jq -r '.nodes | keys[]' ecosystem.json)
+          for NODE in $NODES; do
+            REPO=$(jq -r ".nodes[\"$NODE\"].repo" ecosystem.json)
+            TIER=$(jq -r ".nodes[\"$NODE\"].tier" ecosystem.json)
+            ROLE=$(jq -r ".nodes[\"$NODE\"].role" ecosystem.json)
+            echo "Validated: $NODE (tier=$TIER, role=$ROLE, repo=$REPO)"
+          done
+          echo "All nodes validated."

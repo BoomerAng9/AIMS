@@ -1,0 +1,217 @@
+{
+  "$schema": "aims-ecosystem/v1",
+  "name": "A.I.M.S. Ecosystem",
+  "version": "1.0.0",
+  "hub": "BoomerAng9/AIMS",
+  "description": "A.I.M.S. (AI Managed Solutions) — the unified platform ecosystem. AIMS is the execution hub. ACHEEVY is the digital CEO, consistent across all platforms. PlugMeIn is the immersion and marketing hub. All repos are feeder and development satellites serving the ecosystem.",
+  "domains": {
+    "platform": "plugmein.cloud",
+    "admin": "admin.aimanagedsolutions.cloud",
+    "acheevy": "acheevy.digital",
+    "landing": "aimanagedsolutions.cloud"
+  },
+  "agentHierarchy": {
+    "tier0": { "name": "ACHEEVY", "role": "Digital CEO / Executive Orchestrator", "scope": "all platforms" },
+    "tier1": { "name": "Chicken Hawk", "role": "Coordinator / Safety Bot / Dispatcher", "scope": "cross-repo" },
+    "tier2": { "name": "Boomer_Ang", "role": "Manager-level agents", "pattern": "Name_Ang", "scope": "per-domain" },
+    "tier3": { "name": "Lil_Hawk", "role": "Worker-level agents", "pattern": "Lil_X_Hawk", "scope": "per-task" }
+  },
+  "branding": {
+    "logo": "assets/branding/aims-logo.png",
+    "chatIcon": "assets/branding/acheevy-helmet.png",
+    "chatIconRule": "ACHEEVY Helmet is the ONLY primary avatar for all chat interfaces across all repos. One narrator (ACHEEVY). Many capabilities (aiPLUGs). aiPLUGs may have secondary icon/badge inside their card/module UI.",
+    "colors": {
+      "primary": "#C8A84E",
+      "primaryDark": "#8B7635",
+      "surface": "#1A1A2E",
+      "surfaceGlass": "rgba(26,26,46,0.85)",
+      "accent": "#FFD700",
+      "text": "#FFFFFF"
+    }
+  },
+  "pathways": {
+    "_doc": "ClawReflex: pathways become reflex (deterministic, no deliberation) after validation. Otherwise reasoning (allowed to deliberate, propose alternates, request HITL).",
+    "aims-to-gateway": {
+      "pathway_mode": "reasoning",
+      "stability_grade": "experimental",
+      "evidence_bundle_required": true,
+      "last_validated": null,
+      "owner_repo": "BoomerAng9/AIMS",
+      "description": "AIMS frontend to UEF Gateway for all external API access"
+    },
+    "acheevy-to-plugs": {
+      "pathway_mode": "reasoning",
+      "stability_grade": "experimental",
+      "evidence_bundle_required": true,
+      "last_validated": null,
+      "owner_repo": "BoomerAng9/AIMS",
+      "description": "ACHEEVY selects and invokes aiPLUGs from the catalog"
+    },
+    "chickenhawk-dispatch": {
+      "pathway_mode": "reasoning",
+      "stability_grade": "experimental",
+      "evidence_bundle_required": true,
+      "last_validated": null,
+      "owner_repo": "BoomerAng9/Chicken-Hawk",
+      "description": "Chicken Hawk dispatches Lil_Hawks and enforces SOP"
+    },
+    "luc-calculation": {
+      "pathway_mode": "reasoning",
+      "stability_grade": "stable",
+      "evidence_bundle_required": false,
+      "last_validated": null,
+      "owner_repo": "BoomerAng9/LUC-Locale-Universal-Calculator",
+      "description": "LUC calculation engine for financial/locale computations"
+    },
+    "grammar-nlp": {
+      "pathway_mode": "reasoning",
+      "stability_grade": "stable",
+      "evidence_bundle_required": false,
+      "last_validated": null,
+      "owner_repo": "BoomerAng9/GRAMMAR",
+      "description": "GRAMMAR NLP + LibreChat integration for text intelligence"
+    }
+  },
+  "nodes": {
+    "aims": {
+      "repo": "BoomerAng9/AIMS",
+      "tier": 0,
+      "role": "hub",
+      "label": "A.I.M.S. — Execution Hub",
+      "description": "AI Managed Solutions — the brain, orchestrator, and single source of truth. Next.js frontend, UEF Gateway, ACHEEVY service, aiPLUGS, CRM, command center. Deploys to VPS Docker.",
+      "domains": ["plugmein.cloud", "aimanagedsolutions.cloud"],
+      "provides": ["aims-frontend", "aims-backend", "uef-gateway", "acheevy-chat", "aiplugs-system", "crm", "command-center", "plug-engine", "ecosystem-registry"],
+      "consumes": ["luc-engine", "grammar-engine", "whisper-stt", "destinations-data", "perform-analytics", "agent-framework", "openclaw-runtime", "market-intel"]
+    },
+    "myclaw": {
+      "repo": "BoomerAng9/myclaw",
+      "tier": 1,
+      "role": "infrastructure",
+      "label": "MyClaw — Infra & Runtime Substrate",
+      "description": "Hub for OpenClaw and Foai.cloud. Container templates, Docker compositions, deployment scripts. Serves the ecosystem but does not define it.",
+      "domains": ["foai.cloud"],
+      "provides": ["openclaw-runtime", "docker-templates", "container-deployments", "foai-hosting"],
+      "consumes": ["aims-backend", "acheevy-chat"]
+    },
+    "acheevy-digital": {
+      "repo": "BoomerAng9/acheevy.digital",
+      "tier": 1,
+      "role": "brand-portal",
+      "label": "ACHEEVY.digital — Official ACHEEVY Domain",
+      "description": "Builds ACHEEVY capabilities officially. Has its own domain. The public face of ACHEEVY — brand, onboarding, showcase. Routes through AIMS for registry and orchestration.",
+      "domains": ["acheevy.digital"],
+      "provides": ["acheevy-brand", "public-onboarding", "acheevy-showcase"],
+      "consumes": ["aims-frontend", "acheevy-chat", "aiplugs-system"]
+    },
+    "chicken-hawk": {
+      "repo": "BoomerAng9/Chicken-Hawk",
+      "tier": 1,
+      "role": "coordinator",
+      "label": "Chicken Hawk — Coordinator & Safety",
+      "description": "Master execution agent embodied as OpenClaw. Dispatches Lil_Hawks, enforces SOP, runs gateway system. Chicken Hawk = OpenClaw = NemoClaw = MyClaw runtime identity.",
+      "provides": ["coordinator-dispatch", "safety-enforcement", "sop-compliance", "market-intel", "gateway-runtime"],
+      "consumes": ["aims-backend", "grammar-engine", "destinations-data", "agent-framework"]
+    },
+    "agent-acheevy-009": {
+      "repo": "BoomerAng9/Agent-ACHEEVY-009",
+      "tier": 2,
+      "role": "agent-runtime",
+      "label": "Agent ACHEEVY-009 — Boomer_Ang Runtime",
+      "description": "Autonomous AI agent framework. Python-based agent with E2B sandbox, Playwright MCP, chat server. Powers Boomer_Ang agent execution.",
+      "provides": ["agent-framework", "boomer-ang-runtime", "autonomous-tasks", "sandbox-execution"],
+      "consumes": ["aims-backend", "acheevy-chat", "grammar-engine", "whisper-stt"]
+    },
+    "grammar": {
+      "repo": "BoomerAng9/GRAMMAR",
+      "tier": 2,
+      "role": "service",
+      "label": "GRAMMAR — NLP & Chat Engine",
+      "description": "Next.js frontend + LibreChat-based backend for natural language processing, grammar analysis, text intelligence, and Remotion video generation.",
+      "provides": ["grammar-engine", "nlp-processing", "text-analysis", "librechat-integration", "remotion-videos"],
+      "consumes": ["aims-backend"]
+    },
+    "acheevy-whisper-build": {
+      "repo": "BoomerAng9/acheevy-whisper-build",
+      "tier": 2,
+      "role": "service",
+      "label": "ACHEEVY Whisper — Speech-to-Text",
+      "description": "Whisper-based STT service powering voice input across the AIMS platform. Voice-first is default.",
+      "provides": ["whisper-stt", "voice-transcription", "audio-processing"],
+      "consumes": ["aims-backend"]
+    },
+    "destinations-ai": {
+      "repo": "BoomerAng9/destinations-ai",
+      "tier": 2,
+      "role": "service",
+      "label": "Destinations AI — Location Intelligence",
+      "description": "AI-powered location, travel, and destination intelligence engine.",
+      "provides": ["destinations-data", "location-intel", "travel-ai"],
+      "consumes": ["aims-backend", "grammar-engine"]
+    },
+    "the-perform-platform": {
+      "repo": "BoomerAng9/the-perform-platform",
+      "tier": 2,
+      "role": "service",
+      "label": "Per|Form — Analytics & KPI Platform",
+      "description": "Performance tracking, KPI analytics, business intelligence. Houses OKAI (Open|Klass AI), scout-hub, film-room, war-room.",
+      "provides": ["perform-analytics", "kpi-tracking", "business-intel", "okai-engine"],
+      "consumes": ["aims-backend", "luc-engine"]
+    },
+    "luc": {
+      "repo": "BoomerAng9/LUC-Locale-Universal-Calculator",
+      "tier": 2,
+      "role": "service",
+      "label": "LUC — Locale Universal Calculator",
+      "description": "Multi-locale financial calculator, currency conversion, cost-of-living, K1 taxation, Zakat/VAT. Foundation built from Flip Secrets real estate calculator. Gates all billable actions.",
+      "provides": ["luc-engine", "currency-conversion", "cost-of-living", "financial-calc", "billing-gate"],
+      "consumes": ["aims-backend", "destinations-data"]
+    },
+    "locale-v2": {
+      "repo": "BoomerAng9/Locale-by-ACHIEVEMOR-2",
+      "tier": 2,
+      "role": "frontend",
+      "label": "Locale by ACHIEVEMOR v2 — Locale Frontend",
+      "description": "Next-gen Locale frontend with ACHIEVEMOR integration. Consumer UI for the LUC calculation engine.",
+      "provides": ["locale-frontend", "locale-ui", "achievemor-integration"],
+      "consumes": ["luc-engine", "aims-frontend", "destinations-data", "currency-conversion"]
+    },
+    "ch-docs": {
+      "repo": "BoomerAng9/CH-Docs",
+      "tier": 2,
+      "role": "documentation",
+      "label": "CH-Docs — Documentation Hub",
+      "description": "Centralized documentation for the entire AIMS ecosystem. API docs, architecture guides, SOPs.",
+      "provides": ["documentation", "api-docs", "architecture-guides", "sop-reference"],
+      "consumes": []
+    }
+  },
+  "edges": [
+    {"from": "aims", "to": "myclaw", "type": "orchestrates", "label": "deploys via Docker"},
+    {"from": "aims", "to": "grammar", "type": "consumes", "label": "NLP + text intelligence"},
+    {"from": "aims", "to": "acheevy-whisper-build", "type": "consumes", "label": "voice input (STT)"},
+    {"from": "aims", "to": "destinations-ai", "type": "consumes", "label": "location intelligence"},
+    {"from": "aims", "to": "luc", "type": "consumes", "label": "financial calculations + billing gate"},
+    {"from": "aims", "to": "agent-acheevy-009", "type": "consumes", "label": "agent runtime"},
+    {"from": "aims", "to": "the-perform-platform", "type": "consumes", "label": "analytics + KPI"},
+    {"from": "aims", "to": "chicken-hawk", "type": "delegates", "label": "dispatch + safety"},
+    {"from": "acheevy-digital", "to": "aims", "type": "consumes", "label": "platform API + registry"},
+    {"from": "chicken-hawk", "to": "aims", "type": "consumes", "label": "backend services"},
+    {"from": "chicken-hawk", "to": "destinations-ai", "type": "consumes", "label": "geo intelligence"},
+    {"from": "chicken-hawk", "to": "grammar", "type": "consumes", "label": "text processing"},
+    {"from": "locale-v2", "to": "luc", "type": "consumes", "label": "calculation engine"},
+    {"from": "locale-v2", "to": "destinations-ai", "type": "consumes", "label": "location data"},
+    {"from": "the-perform-platform", "to": "luc", "type": "consumes", "label": "financial metrics"},
+    {"from": "agent-acheevy-009", "to": "grammar", "type": "consumes", "label": "NLP processing"},
+    {"from": "agent-acheevy-009", "to": "acheevy-whisper-build", "type": "consumes", "label": "voice commands"},
+    {"from": "myclaw", "to": "aims", "type": "serves", "label": "runtime substrate"},
+    {"from": "ch-docs", "to": "aims", "type": "documents", "label": "platform docs"},
+    {"from": "ch-docs", "to": "myclaw", "type": "documents", "label": "infra docs"}
+  ],
+  "rules": {
+    "singleNarrator": "Only ACHEEVY speaks to users. Never expose Boomer_Ang, Lil_Hawk, or Chicken Hawk names in public UI.",
+    "noDuplicateBrains": "If two repos both claim authority over the same domain, one must become the adapter. ACHEEVY is the digital CEO duplicated across repos for consistency.",
+    "evidenceRequired": "Every completed task requires evidence. No proof, no done.",
+    "noMockData": "This is commercial software. Done means safely distributable to anyone.",
+    "reflexPromotion": "A pathway only becomes reflex after a validation run produces artifacts/logs meeting ship-block standards."
+  }
+}
