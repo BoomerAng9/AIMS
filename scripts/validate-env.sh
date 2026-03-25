@@ -136,6 +136,12 @@ if [[ "$STRICT" == true ]]; then
   if [[ -z "${VALUES[II_AGENT_BRIDGE_KEY]+x}" || -z "${VALUES[II_AGENT_BRIDGE_KEY]}" ]] || is_placeholder "${VALUES[II_AGENT_BRIDGE_KEY]:-}"; then
     ISSUES+=("Strict mode: II_AGENT_BRIDGE_KEY must be set to a non-placeholder value")
   fi
+  if [[ -z "${VALUES[GEMINI_API_KEY]+x}" || -z "${VALUES[GEMINI_API_KEY]}" ]]; then
+    WARNINGS+=("GEMINI_API_KEY not set — Chicken Hawk vision features will be unavailable")
+  fi
+  if [[ -z "${VALUES[RESEND_API_KEY]+x}" || -z "${VALUES[RESEND_API_KEY]}" ]]; then
+    WARNINGS+=("RESEND_API_KEY not set — password reset emails will only log to console")
+  fi
 fi
 
 echo ""
