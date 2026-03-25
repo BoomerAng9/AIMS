@@ -173,7 +173,8 @@ async function fetchAlertsFromAPI(): Promise<{ active: ActiveAlert[]; history: u
  * Hook: Periodically refreshes service health (real API → fallback).
  */
 function useServiceHealth() {
-  const [services, setServices] = useState<ServiceHealth[]>(() => generateServiceHealth());
+  const IS_DEMO = process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
+  const [services, setServices] = useState<ServiceHealth[]>(() => IS_DEMO ? generateServiceHealth() : []);
   const [isLiveData, setIsLiveData] = useState(false);
 
   useEffect(() => {
@@ -219,13 +220,15 @@ function useLiveAlerts() {
 /* ------------------------------------------------------------------ */
 
 function useLiveTelemetry() {
-  const [responseTimeData, setResponseTimeData] = useState(() => generateTimeSeriesData(60, 142, 80, -5));
-  const [requestRateData, setRequestRateData] = useState(() => generateRequestData(60));
-  const [cpuData, setCpuData] = useState(() => generateTimeSeriesData(60, 23, 15));
-  const [memoryData, setMemoryData] = useState(() => generateTimeSeriesData(60, 512, 120, 10));
-  const [errorRateData, setErrorRateData] = useState(() => generateTimeSeriesData(60, 0.8, 1.5));
+  const IS_DEMO = process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
+  const [responseTimeData, setResponseTimeData] = useState(() => IS_DEMO ? generateTimeSeriesData(60, 142, 80, -5) : []);
+  const [requestRateData, setRequestRateData] = useState(() => IS_DEMO ? generateRequestData(60) : []);
+  const [cpuData, setCpuData] = useState(() => IS_DEMO ? generateTimeSeriesData(60, 23, 15) : []);
+  const [memoryData, setMemoryData] = useState(() => IS_DEMO ? generateTimeSeriesData(60, 512, 120, 10) : []);
+  const [errorRateData, setErrorRateData] = useState(() => IS_DEMO ? generateTimeSeriesData(60, 0.8, 1.5) : []);
 
   useEffect(() => {
+    if (!IS_DEMO) return;
     const interval = setInterval(() => {
       const now = Date.now();
       const timeStr = new Date(now).toLocaleTimeString("en-US", { hour12: false, hour: "2-digit", minute: "2-digit" });
@@ -271,7 +274,8 @@ function useLiveTelemetry() {
 }
 
 function useLiveEvents() {
-  const [events, setEvents] = useState<Array<{ id: string; time: string; type: string; source: string; message: string; severity: "info" | "warn" | "error" | "success" }>>(() => [
+  const IS_DEMO = process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
+  const [events, setEvents] = useState<Array<{ id: string; time: string; type: string; source: string; message: string; severity: "info" | "warn" | "error" | "success" }>>(() => IS_DEMO ? [
     { id: "1", time: "14:23:01", type: "ROUTE", source: "ACHEEVY", message: "Prompt classified → Engineer_Ang (code generation)", severity: "info" },
     { id: "2", time: "14:22:58", type: "SECURITY", source: "Agent Bridge", message: "Blocked payment tool call from Seller_Ang (policy: deny)", severity: "warn" },
     { id: "3", time: "14:22:45", type: "BUILD", source: "Chicken Hawk", message: "Lil_Hawk #4821 completed — 3 files modified, tests passing", severity: "success" },
@@ -280,9 +284,10 @@ function useLiveEvents() {
     { id: "6", time: "14:21:55", type: "MODEL", source: "OpenRouter", message: "Claude Opus 4.6 — 12,500 tokens consumed ($0.45)", severity: "info" },
     { id: "7", time: "14:21:40", type: "DEPLOY", source: "Nginx", message: "SSL cert renewal — 47 days remaining", severity: "success" },
     { id: "8", time: "14:21:22", type: "RATE", source: "UEF Gateway", message: "Rate limit check passed (42/100 rpm)", severity: "info" },
-  ]);
+  ] : []);
 
   useEffect(() => {
+    if (!IS_DEMO) return;
     const templates = [
       { type: "ROUTE", source: "ACHEEVY", messages: ["Prompt classified → Researcher_Ang (analysis)", "Intent resolved → Engineer_Ang (refactor)", "Task queued for Quality_Ang (review)"], severity: "info" as const },
       { type: "HEALTH", source: "Circuit Metrics", messages: ["All services responding within SLA", "Memory usage stable at 25%", "Heartbeat OK — 10/10 services"], severity: "success" as const },
@@ -507,6 +512,7 @@ function ServiceHealthGrid({ services }: { services: ServiceHealth[] }) {
 /* ------------------------------------------------------------------ */
 
 export default function OperationsPage() {
+  const IS_DEMO = process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
   const [activeTab, setActiveTab] = useState<"overview" | "alerts" | "incidents" | "traces">("overview");
   const [timeRange, setTimeRange] = useState<TimeRange>("1h");
   const [isLive, setIsLive] = useState(true);
@@ -730,8 +736,16 @@ export default function OperationsPage() {
           {/* ═══ OVERVIEW TAB ═══ */}
           {activeTab === "overview" && (
             <div className="space-y-4">
+              {/* Connect monitoring placeholder (non-demo mode) */}
+              {!IS_DEMO && (
+                <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-wireframe-stroke bg-[#18181B]/70 py-16 text-center">
+                  <Activity size={32} className="text-zinc-600" />
+                  <p className="text-sm font-semibold text-zinc-400">Connect monitoring to see real metrics</p>
+                  <p className="text-xs text-zinc-600">Telemetry data will appear here once the Circuit Metrics service is connected.</p>
+                </div>
+              )}
               {/* Charts Row */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {IS_DEMO && <><div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {/* Response Time Chart */}
                 <div className="rounded-2xl border border-wireframe-stroke bg-[#18181B]/70 p-5 backdrop-blur-xl">
                   <div className="flex items-center justify-between mb-4">
@@ -940,6 +954,7 @@ export default function OperationsPage() {
                   </ResponsiveContainer>
                 </div>
               </div>
+              </>}
             </div>
           )}
 

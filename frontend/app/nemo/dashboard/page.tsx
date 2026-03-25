@@ -28,14 +28,15 @@ import { Button } from "@/components/ui/button";
  * Minimalist, dark, professional interface.
  */
 export default function NemoDashboard() {
+  const IS_DEMO = process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
   const [loading, setLoading] = useState(true);
-  const [logs, setLogs] = useState<string[]>([
+  const [logs, setLogs] = useState<string[]>(IS_DEMO ? [
     "[system] initializing secure gateway v2.2.1...",
     "[gateway] tunnel established via ssh://31.97.133.29",
     "[status] scanning local sandbox cluster...",
     "[onboard] discovered sandbox 'my-assistant'",
     "[inference] nim cloud telemetry healthy",
-  ]);
+  ] : []);
 
   useEffect(() => {
     // Simulate loading
@@ -78,8 +79,8 @@ export default function NemoDashboard() {
            <div className="p-3 bg-white/[0.02] border border-white/5 rounded-2xl hidden md:block">
               <p className="text-[10px] text-zinc-600 mb-2 uppercase font-bold">Secure Access</p>
               <div className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-[10px] font-mono text-zinc-400">31.97.133.29</span>
+                <div className={`w-1.5 h-1.5 rounded-full ${IS_DEMO ? 'bg-emerald-500 animate-pulse' : 'bg-zinc-700'}`} />
+                <span className="text-[10px] font-mono text-zinc-400">{IS_DEMO ? '31.97.133.29' : 'Not connected'}</span>
               </div>
            </div>
            
@@ -211,7 +212,9 @@ export default function NemoDashboard() {
                 </div>
                 
                 <div className="flex-1 p-6 font-mono text-[11px] leading-relaxed overflow-y-auto custom-scrollbar bg-black/40">
-                   {logs.map((log, i) => (
+                   {!IS_DEMO && logs.length === 0 ? (
+                      <p className="text-zinc-600 italic">System logs will appear here when connected.</p>
+                   ) : logs.map((log, i) => (
                       <div key={i} className="mb-1.5 flex gap-3">
                          <span className="text-zinc-700 select-none">[{i+1}]</span>
                          <span className={log.includes('error') ? 'text-red-400' : log.includes('[gateway]') ? 'text-cyan-400' : 'text-zinc-400'}>

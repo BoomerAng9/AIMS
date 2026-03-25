@@ -160,10 +160,11 @@ function CategoryVendorCard({
 }
 
 export default function CategoryPage() {
+  const IS_DEMO = process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
   const params = useParams();
   const categorySlug = params.category as string;
   const meta = CATEGORY_META[categorySlug];
-  const vendors = MOCK_VENDORS[categorySlug] || [];
+  const vendors = IS_DEMO ? (MOCK_VENDORS[categorySlug] || []) : [];
   const [search, setSearch] = React.useState('');
 
   const filtered = vendors.filter(
@@ -250,6 +251,14 @@ export default function CategoryPage() {
           filtered.map((vendor) => (
             <CategoryVendorCard key={vendor.id} vendor={vendor} emoji={meta.emoji} />
           ))
+        ) : !IS_DEMO ? (
+          <div className="flex flex-col items-center gap-3 py-16 text-center">
+            <span className="text-4xl opacity-40">{meta.emoji}</span>
+            <p className="text-sm font-medium text-slate-700">No vendors available yet</p>
+            <p className="text-xs text-slate-400">
+              Vendors in {meta.label} will appear here once connected.
+            </p>
+          </div>
         ) : (
           <div className="flex flex-col items-center gap-3 py-16 text-center">
             <Search className="h-10 w-10 text-slate-300" />
