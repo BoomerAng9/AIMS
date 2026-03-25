@@ -1432,7 +1432,7 @@ export class AcheevyOrchestrator {
 
     const delegatedMetadata: Record<string, unknown> = {
       delegatedExecution: true,
-      delegatedRuntime: 'chickenhawk-placeholder',
+      delegatedRuntime: process.env.CHICKENHAWK_URL || 'http://chickenhawk-core:4100',
       executionLane: routingDecision?.execution_lane || 'delegated_execution',
       intentType: routingDecision?.intent_type || 'unknown',
       taskComplexity: routingDecision?.task_complexity || 'medium',
