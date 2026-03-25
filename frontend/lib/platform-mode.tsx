@@ -5,11 +5,12 @@
  *
  * Mode is determined by DOMAIN + AUTH ROLE. No toggle. No localStorage. Not hackable.
  *
- * - aimanagedsolutions.cloud → PRIVATE (OWNER/ADMIN only — enforced)
- * - plugmein.cloud           → PUBLIC  (customers — always)
- * - localhost                 → Determined by role (dev convenience)
+ * - foai.cloud                  → PRIVATE (OWNER/ADMIN only — enforced)
+ * - aimanagedsolutions.cloud    → PRIVATE (legacy, same behavior)
+ * - plugmein.cloud              → PUBLIC  (customers — always)
+ * - localhost                   → Determined by role (dev convenience)
  *
- * If a non-OWNER lands on aimanagedsolutions.cloud, they are redirected to plugmein.cloud.
+ * If a non-OWNER lands on foai.cloud or aimanagedsolutions.cloud, they are redirected to plugmein.cloud.
  */
 
 import React, { createContext, useContext, useEffect, useMemo } from 'react';
@@ -45,14 +46,15 @@ const PlatformModeCtx = createContext<PlatformModeContextValue>({
 
 /**
  * Detect which domain cluster we're running on.
- * - aimanagedsolutions.cloud (any subdomain) → 'aims'
- * - plugmein.cloud (any subdomain)           → 'plugmein'
- * - localhost / 127.0.0.1 / dev              → 'localhost'
+ * - foai.cloud (any subdomain)                → 'aims'
+ * - aimanagedsolutions.cloud (any subdomain)  → 'aims' (legacy)
+ * - plugmein.cloud (any subdomain)            → 'plugmein'
+ * - localhost / 127.0.0.1 / dev               → 'localhost'
  */
 function detectDomain(): PlatformDomain {
   if (typeof window === 'undefined') return 'plugmein'; // SSR default: safest
   const host = window.location.hostname.toLowerCase();
-  if (host.includes('aimanagedsolutions')) return 'aims';
+  if (host.includes('foai') || host.includes('aimanagedsolutions')) return 'aims';
   if (host.includes('plugmein')) return 'plugmein';
   // localhost, 127.0.0.1, or any dev domain
   return 'localhost';
