@@ -1,0 +1,37 @@
+# AIMS Ecosystem Sync Workflow
+# Triggers when ecosystem.node.json changes and notifies the hub
+name: Ecosystem Sync
+
+on:
+  push:
+    paths:
+      - 'ecosystem.node.json'
+    branches:
+      - main
+
+jobs:
+  notify-hub:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Read node manifest
+        id: manifest
+        run: |
+          echo "node_id=$(jq -r '.nodeId' ecosystem.node.json)" >> $GITHUB_OUTPUT
+          echo "role=$(jq -r '.role' ecosystem.node.json)" >> $GITHUB_OUTPUT
+
+      - name: Notify ecosystem hub
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.ECOSYSTEM_TOKEN }}
+          repository: BoomerAng9/myclaw
+          event-type: ecosystem-node-updated
+          client-payload: |
+            {
+              "nodeId": "${{ steps.manifest.outputs.node_id }}",
+              "role": "${{ steps.manifest.outputs.role }}",
+              "repo": "${{ github.repository }}",
+              "sha": "${{ github.sha }}"
+            }

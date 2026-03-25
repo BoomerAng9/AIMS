@@ -5,8 +5,11 @@
 #   - CommonGround: Multi-agent team collaboration
 #   - ii-researcher: Deep search/research agents
 #   - Common_Chronicle: Structured audit timelines
-#   - litellm-debugger: LLM gateway proxy (100+ APIs)
 #   - codex-as-mcp: Coding agent as MCP server
+#
+# NOTE: litellm-debugger has been REMOVED — blocked due to security
+# vulnerabilities. All LLM routing goes through Gemini API and direct SDKs.
+# See SECURITY-LITELLM-BLOCKED.md for details.
 # =============================================================================
 
 set -euo pipefail
@@ -18,7 +21,7 @@ repos=(
   "CommonGround"
   "ii-researcher"
   "Common_Chronicle"
-  "litellm-debugger"
+  # "litellm-debugger"  # BLOCKED — see SECURITY-LITELLM-BLOCKED.md
   "codex-as-mcp"
 )
 

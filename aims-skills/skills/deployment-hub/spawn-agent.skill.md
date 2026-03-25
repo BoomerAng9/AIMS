@@ -174,7 +174,7 @@ ACHEEVY → DECOMMISSION_ORDER → Agent stops accepting tasks
 | Scout_Ang        | ii-researcher                | 7010  | Cyan     | Ready     |
 | OpsConsole_Ang   | CommonGround                 | 7011  | Green    | Ready     |
 | Chronicle_Ang    | Common_Chronicle             | GCP   | Champagne| Ready     |
-| Gatekeeper_Ang   | litellm-debugger             | 7012  | Red      | Ready     |
+| Gatekeeper_Ang   | Gemini API gateway (~~litellm~~ BLOCKED) | 7012  | Red      | Ready     |
 | Patchsmith_Ang   | codex + codex-as-mcp         | 7013  | Amber    | Ready     |
 | Runner_Ang       | gemini-cli + bridge          | 7014  | Cyan     | Ready     |
 | Showrunner_Ang   | reveal.js                    | 7015  | Champagne| Ready     |
