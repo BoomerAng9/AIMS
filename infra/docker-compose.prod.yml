@@ -464,7 +464,7 @@ services:
   # Formerly Agent Zero — renamed and integrated into NtNtN Engine
   # ---------------------------------------------------------------------------
   avva-noon:
-    image: frdel/agent-zero-run:latest
+    image: frdel/agent-zero-run:v0.9.2
     expose:
       - "80"
     environment:
