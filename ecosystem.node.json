@@ -1,0 +1,41 @@
+{
+  "$schema": "aims-ecosystem-node/v1",
+  "nodeId": "aims",
+  "repo": "BoomerAng9/AIMS",
+  "role": "platform-core",
+  "label": "A.I.M.S. — Platform Core",
+  "description": "Primary Next.js frontend + Firebase backend, ACHEEVY chat, aiPLUGS system, CRM, command center.",
+  "provides": ["aims-frontend", "aims-backend", "acheevy-chat", "aiplugs-system", "crm", "command-center"],
+  "consumes": ["luc-engine", "grammar-engine", "whisper-stt", "destinations-data", "perform-analytics", "agent-framework"],
+  "endpoints": {
+    "frontend": "https://aims.acheevy.digital",
+    "api": "https://api.aims.acheevy.digital",
+    "chat": "https://chat.acheevy.digital"
+  },
+  "hub": "BoomerAng9/myclaw",
+  "peers": [
+    "BoomerAng9/myclaw",
+    "BoomerAng9/GRAMMAR",
+    "BoomerAng9/acheevy-whisper-build",
+    "BoomerAng9/destinations-ai",
+    "BoomerAng9/LUC-Locale-Universal-Calculator",
+    "BoomerAng9/Agent-ACHEEVY-009",
+    "BoomerAng9/the-perform-platform",
+    "BoomerAng9/acheevy.digital",
+    "BoomerAng9/Chicken-Hawk",
+    "BoomerAng9/CH-Docs",
+    "BoomerAng9/Locale-by-ACHIEVEMOR-2"
+  ],
+  "branding": {
+    "chatIcon": "ACHEEVY Helmet — always used as the chat interface icon/avatar",
+    "chatIconPath": "public/images/acheevy-helmet.png",
+    "colors": {
+      "primary": "#C8A84E",
+      "primaryDark": "#8B7635",
+      "surface": "#1A1A2E",
+      "surfaceGlass": "rgba(26,26,46,0.85)",
+      "accent": "#FFD700",
+      "text": "#FFFFFF"
+    }
+  }
+}
