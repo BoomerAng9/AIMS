@@ -11,7 +11,8 @@
     { "name": "ai-plugs", "path": "aiPLUGS/", "description": "AI integration plug-ins for verticals" },
     { "name": "luc-engine", "path": "luc/", "description": "LUC calculation and financial engine" },
     { "name": "mcp-tools", "path": "mcp-tools/", "description": "MCP tool definitions for agent integration" },
-    { "name": "blockwise-ai", "path": "blockwise-ai/", "description": "Blockchain/token intelligence module" }
+    { "name": "blockwise-ai", "path": "blockwise-ai/", "description": "Blockchain/token intelligence module" },
+    { "name": "live-look-in", "path": "aims-skills/skills/live-look-in/", "description": "Real-time animated workspace viewer for observing the digital workforce" }
   ],
   "consumes": [
     { "node": "chicken-hawk", "capability": "gateway", "endpoint": "https://gateway.acheevy.digital" },

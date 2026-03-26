@@ -673,6 +673,26 @@ export const SKILL_REGISTRY: SkillDefinition[] = [
     icon: "sparkles",
     color: "violet",
   },
+
+  // ── OBSERVABILITY & MONITORING ────────────────────────────────
+  {
+    id: "live-look-in",
+    name: "Live Look In",
+    type: "skill",
+    status: "beta",
+    triggers: [
+      "live look in", "workspace viewer", "office view", "agent viewer",
+      "workforce view", "floor plan", "live view", "agent activity",
+      "who is working", "agent monitoring", "digital office", "agent simulation",
+      "workforce dashboard", "watch agents", "office floor plan", "boomer_ang viewer",
+    ],
+    description: "Real-time animated workspace viewer rendering ACHIEVEMOR's digital workforce as characters in a virtual office floor plan. Observe Boomer_Angs, Lil_Hawks, ACHEEVY, and Chicken Hawk working, moving between departments, and completing tasks.",
+    execution: { target: "internal", route: "/api/live-look-in/state" },
+    priority: "high",
+    definitionFile: "aims-skills/skills/live-look-in/SKILL.md",
+    icon: "eye",
+    color: "cyan",
+  },
 ];
 
 // ─── Lookup Helpers ──────────────────────────────────────────

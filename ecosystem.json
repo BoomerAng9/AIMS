@@ -70,6 +70,14 @@
       "last_validated": null,
       "owner_repo": "BoomerAng9/GRAMMAR",
       "description": "GRAMMAR NLP + LibreChat integration for text intelligence"
+    },
+    "live-look-in": {
+      "pathway_mode": "reasoning",
+      "stability_grade": "experimental",
+      "evidence_bundle_required": false,
+      "last_validated": null,
+      "owner_repo": "BoomerAng9/AIMS",
+      "description": "Live Look In real-time workspace viewer — observes agent activity across the ecosystem via Redis event bus"
     }
   },
   "nodes": {
