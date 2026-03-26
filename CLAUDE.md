@@ -247,6 +247,7 @@ When building or modifying ANY frontend page, you MUST follow these rules:
 | `app/dashboard/automations/**`, `app/workstreams/**` | `.claude/skills/aims-workflow-ui/SKILL.md` | — |
 | `app/dashboard/research/**`, `app/tools/**` | `.claude/skills/aims-content-tools-ui/SKILL.md` | — |
 | `app/halalhub/**` | `.claude/skills/aims-landing-ui/SKILL.md` (emerald variant) | + `aims-animated-web` |
+| `app/dashboard/live-look-in/**`, `app/live-view/**` | `.claude/skills/live-look-in/SKILL.md` | + `aims-animated-web` |
 | **Global (always)** | `.claude/skills/aims-global-ui/SKILL.md` | — |
 
 ### Motion Component Library
