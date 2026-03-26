@@ -78,7 +78,7 @@ const FOOTER_NAV = {
       { label: 'Chat w/ACHEEVY', href: `${APP_DOMAIN}/chat` },
       { label: 'Dashboard', href: `${APP_DOMAIN}/dashboard` },
       { label: 'Per|Form', href: '/sandbox/perform' },
-      { label: 'Blockwise AI', href: '/sandbox/blockwise' },
+      { label: 'Destinations AI', href: '/sandbox/destinations-ai' },
       { label: 'Circuit Box', href: `${APP_DOMAIN}/dashboard/circuit-box` },
       { label: 'House of Ang', href: `${APP_DOMAIN}/dashboard/house-of-ang` },
     ],
