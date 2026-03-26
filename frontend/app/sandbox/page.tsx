@@ -38,9 +38,9 @@ const LIVE_PROJECTS = [
     ports: "5001–5003",
   },
   {
-    slug: "blockwise",
-    name: "Blockwise AI",
-    tagline: "Wealth Tech for the Culture",
+    slug: "destinations-ai",
+    name: "Destinations AI",
+    tagline: "AI-Powered Real Estate Intelligence",
     description:
       "AI finds deals BEFORE Zillow. Know your numbers, fund with OPM, close in 90 days. From renter to landlord. Voice-driven property discovery and analysis.",
     icon: Zap,

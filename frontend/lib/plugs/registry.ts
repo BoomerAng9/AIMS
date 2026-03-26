@@ -21,6 +21,7 @@ export interface PlugDefinition {
   color: string; // tailwind color prefix (e.g. "amber", "emerald", "cyan")
   priority: "critical" | "high" | "medium" | "low";
   definitionFile: string; // path in aiPLUGS/ directory
+  platformUrl?: string; // external platform URL — opens the vertical's dedicated site
 }
 
 // ─── Plug Catalog ────────────────────────────────────────────
@@ -53,17 +54,18 @@ export const PLUG_REGISTRY: PlugDefinition[] = [
     color: "amber",
     priority: "critical",
     definitionFile: "perform_plug.md",
+    platformUrl: "/sandbox/perform",
   },
   {
-    id: "blockwise",
-    name: "BlockWise AI",
-    slug: "blockwise",
+    id: "destinations-ai",
+    name: "Destinations AI",
+    slug: "destinations-ai",
     vertical: "Real Estate",
     type: "Full-Stack Platform",
     description: "AI-powered real estate intelligence for wealth building — Scout, Flip, Capital, Counsel, Mentor.",
     longDescription:
-      "BlockWise AI is a wealth-building ecosystem. Scout finds deals before Zillow. Flip analyzes ROI with the 70% Rule. Capital structures OPM financing. Counsel generates legal docs. Mentor teaches from renter to landlord in 90 days.",
-    icon: "building-2",
+      "Destinations AI is a wealth-building ecosystem. Scout finds deals before Zillow. Flip analyzes ROI with the 70% Rule. Capital structures OPM financing. Counsel generates legal docs. Mentor teaches from renter to landlord in 90 days.",
+    icon: "map-pin",
     status: "active",
     tier: "starter",
     infrastructure: ["Next.js", "Bun", "Brave Search", "Homesage.ai", "Mashvisor", "ElevenLabs"],
@@ -77,7 +79,8 @@ export const PLUG_REGISTRY: PlugDefinition[] = [
     ],
     color: "emerald",
     priority: "critical",
-    definitionFile: "blockwise_plug.md",
+    definitionFile: "destinations_ai_plug.md",
+    platformUrl: "/sandbox/destinations-ai",
   },
   {
     id: "flip-scorecard",
@@ -96,6 +99,7 @@ export const PLUG_REGISTRY: PlugDefinition[] = [
     color: "emerald",
     priority: "high",
     definitionFile: "flip_scorecard.md",
+    platformUrl: "/sandbox/destinations-ai",
   },
   {
     id: "lease-analyzer",

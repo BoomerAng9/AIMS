@@ -5,7 +5,7 @@
  *
  * "The Workshop" landing page showing:
  *   - Featured case study ("How We Caught a $180M Error")
- *   - Vertical showcase grid (Veritas, BlockWise, Strategos, etc.)
+ *   - Vertical showcase grid (Veritas, Destinations AI, Strategos, etc.)
  *   - Live agent activity feed
  *   - "Try it free" CTA
  */
@@ -24,12 +24,12 @@ const VERTICALS = [
     status: 'live',
   },
   {
-    name: 'BlockWise AI',
-    tagline: 'Wealth Tech for the Culture',
+    name: 'Destinations AI',
+    tagline: 'AI-Powered Real Estate Intelligence',
     description: 'AI finds deals BEFORE Zillow. Know your numbers, fund with OPM, close in 90 days. From renter to landlord.',
-    icon: 'building',
+    icon: 'map-pin',
     color: 'emerald',
-    href: '/dashboard/blockwise',
+    href: '/sandbox/destinations-ai',
     status: 'live',
   },
   {
@@ -125,7 +125,7 @@ export default function DiscoverPage() {
               Try Veritas Free
             </Link>
             <Link
-              href="/dashboard/blockwise"
+              href="/sandbox/destinations-ai"
               className="px-6 py-3 bg-[#1F1F23] text-zinc-300 border border-white/10 rounded-xl font-medium hover:bg-[#1F1F23] transition-all"
             >
               Analyze a Deal

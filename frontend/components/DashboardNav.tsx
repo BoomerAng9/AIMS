@@ -78,7 +78,7 @@ const PRIVATE_WORKSHOP: NavItem[] = [
 const PRIVATE_SANDBOX: NavItem[] = [
   { href: "/sandbox", label: "Sandbox Hub", icon: Layers, highlight: true },
   { href: "/sandbox/perform", label: "Per|Form", icon: TrendingUp },
-  { href: "/sandbox/blockwise", label: "Blockwise AI", icon: Building },
+  { href: "/sandbox/destinations-ai", label: "Destinations AI", icon: Map },
   { href: "/sandbox/verticals", label: "Verticals", icon: Shield },
 ];
 
