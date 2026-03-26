@@ -215,13 +215,13 @@ export function ChatShell({
         ${
           isFullscreen
             ? 'fixed inset-0 z-50'
-            : 'h-[calc(100vh-160px)] md:h-[calc(100vh-120px)] rounded-2xl border border-white/8 shadow-sm overflow-hidden'
+            : 'h-[70dvh] min-h-[480px] md:h-[calc(100dvh-180px)] rounded-2xl border border-white/8 shadow-sm overflow-hidden'
         }
         ${className}
       `}
     >
       {/* ─── Header Bar ─── */}
-      <header className="flex-shrink-0 flex items-center justify-between border-b border-white/8 bg-[#111113] px-4 py-2.5">
+      <header className="flex-shrink-0 flex items-center justify-between border-b border-white/8 bg-[#111113] px-3 py-2.5 sm:px-4 overflow-x-hidden gap-2">
         {/* Left: ACHEEVY identity */}
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center overflow-hidden shadow-[0_0_12px_rgba(212,175,55,0.15)]">

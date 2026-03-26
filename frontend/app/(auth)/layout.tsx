@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#09090B] px-4 py-8">
+    <div className="flex min-h-screen items-center justify-center bg-[#09090B] px-3 py-6 sm:px-4 sm:py-8 overflow-x-hidden">
       {/* Background effects */}
       <div className="fixed inset-0 bg-grid pointer-events-none" />
       <div className="fixed inset-0 pointer-events-none">
@@ -13,7 +13,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
 
       <div className="relative z-10 w-full max-w-[420px]">
         {/* Logo */}
-        <div className="flex justify-center mb-8">
+        <div className="flex justify-center mb-6 sm:mb-8">
           <Link href="/">
             <Image
               src="/images/logos/achievemor-gold.png"
@@ -27,7 +27,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
         </div>
 
         {/* Auth card */}
-        <section className="auth-glass-card rounded-[24px] px-8 py-10 sm:px-10 sm:py-12">
+        <section className="auth-glass-card rounded-[20px] sm:rounded-[24px] px-5 py-8 sm:px-8 sm:py-10 md:px-10 md:py-12">
           {children}
         </section>
 

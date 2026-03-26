@@ -526,10 +526,10 @@ export function ChatInterface({
   const audioLevel = useAudioLevel(voiceInput.stream, voiceInput.isListening);
 
   return (
-    <div className="relative flex h-full flex-col bg-transparent">
+    <div className="relative flex h-full flex-col bg-transparent overflow-x-hidden">
       {/* ── Messages Area ───────────────────────────────────── */}
-      <div className="flex-1 overflow-y-auto px-4 py-6 md:px-6">
-        <div className="mx-auto max-w-4xl space-y-6">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden px-3 py-4 sm:px-4 sm:py-6 md:px-6">
+        <div className="mx-auto max-w-4xl space-y-6 w-full">
           {/* Welcome Hero (shown when empty) */}
           {messages.length === 0 && (
             <AcheevyWelcomeHero
