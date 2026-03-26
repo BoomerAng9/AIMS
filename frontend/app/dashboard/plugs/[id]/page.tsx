@@ -94,22 +94,30 @@ export default function PlugDetailPage() {
   const id = params.id as string;
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  // Find plug data, fallback to default if id not found
-  const plug = PLUG_DATA[id] || {
-    id,
-    name: `Plug ${id}`,
-    archetype: "Custom",
-    status: "building" as PlugStatus,
-    stage: "BUILD",
-    progress: 30,
-    createdAt: "2025-12-01",
-    files: [
-      { path: "/app", type: "folder" as const },
-      { path: "/app/page.tsx", type: "file" as const },
-      { path: "/package.json", type: "file" as const },
-    ],
-    integrations: [],
-  };
+  // Find plug data — empty state if not yet loaded from API
+  const plug = PLUG_DATA[id] || null;
+
+  if (!plug) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4 text-center">
+        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#18181B] text-amber-200/30">
+          <Layers size={32} />
+        </div>
+        <div>
+          <h2 className="text-lg font-bold text-amber-50">Plug details loading...</h2>
+          <p className="mt-1 text-sm text-amber-100/40">
+            Fetching data for plug <span className="font-mono">{id}</span>
+          </p>
+        </div>
+        <Link
+          href="/dashboard/plugs"
+          className="mt-2 flex items-center gap-1.5 text-xs text-amber-100/40 hover:text-amber-200 transition-colors"
+        >
+          <ArrowLeft size={12} /> Back to Plugs
+        </Link>
+      </div>
+    );
+  }
 
   const status = STATUS_CONFIG[plug.status];
   const ArchetypeIcon = ARCHETYPE_ICON[plug.archetype] || Layers;

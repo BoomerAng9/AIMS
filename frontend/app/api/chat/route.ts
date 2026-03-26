@@ -39,7 +39,7 @@ const openrouter = createOpenAI({
 });
 
 // ── Feature LLM ─────────────────────────────────────────────
-const DEFAULT_MODEL = process.env.ACHEEVY_MODEL || process.env.OPENROUTER_MODEL || 'anthropic/claude-sonnet-4-5-20250929';
+const DEFAULT_MODEL = process.env.ACHEEVY_MODEL || process.env.OPENROUTER_MODEL || 'minimax/minimax-m1-80k';
 
 // ── Priority Model Roster (all accessible via OpenRouter) ───
 // Model IDs must match OpenRouter's catalog exactly (use dashes, not dots for versions)
@@ -48,7 +48,7 @@ const PRIORITY_MODELS: Record<string, { id: string; label: string; provider: str
   'claude-sonnet':  { id: 'anthropic/claude-sonnet-4-5-20250929', label: 'Claude Sonnet 4.5', provider: 'Anthropic' },
   'qwen':           { id: 'qwen/qwen-2.5-coder-32b-instruct', label: 'Qwen 2.5 Coder 32B', provider: 'Qwen' },
   'qwen-max':       { id: 'qwen/qwen-max',                   label: 'Qwen Max',             provider: 'Qwen' },
-  'minimax':        { id: 'minimax/minimax-01',               label: 'MiniMax-01',           provider: 'MiniMax' },
+  'minimax':        { id: 'minimax/minimax-m1-80k',            label: 'MiniMax M1 (80K)',     provider: 'MiniMax' },
   'glm':            { id: 'thudm/glm-4-plus',                label: 'GLM-4 Plus',           provider: 'Zhipu' },
   'kimi':           { id: 'moonshotai/moonshot-v1-auto',      label: 'Moonshot v1',          provider: 'Moonshot' },
   'nano-banana':    { id: 'google/gemini-2.5-flash',          label: 'Nano Banana Pro',      provider: 'Google' },
