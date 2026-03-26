@@ -5,7 +5,7 @@
  * Tracks billing, token usage, and integrates with LUC billing engine.
  */
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useMemo } from 'react';
 import type {
   ChangeOrder,
   ChangeOrderInput,
@@ -80,18 +80,26 @@ export function useChangeOrder(options: UseChangeOrderOptions): UseChangeOrderRe
   // Computed values
   const isWaitingForInput = currentOrder?.status === 'pending';
 
-  const totalTokensUsed = changeOrders.reduce((sum, order) => {
-    return sum + order.inputs.reduce((s, input) => s + estimateInputTokens(input), 0);
-  }, 0);
+  const { totalTokensUsed, totalCost, averageWaitTime } = useMemo(() => {
+    const tokens = changeOrders.reduce((sum, order) => {
+      return sum + order.inputs.reduce((s, input) => s + estimateInputTokens(input), 0);
+    }, 0);
 
-  const totalCost = changeOrders.reduce((sum, order) => {
-    return sum + (order.actualCost || order.estimatedCost || 0);
-  }, 0);
+    const cost = changeOrders.reduce((sum, order) => {
+      return sum + (order.actualCost || order.estimatedCost || 0);
+    }, 0);
 
-  const completedOrders = changeOrders.filter(o => o.completedAt && o.submittedAt);
-  const averageWaitTime = completedOrders.length > 0
-    ? completedOrders.reduce((sum, o) => sum + (o.waitDuration || 0), 0) / completedOrders.length
-    : 0;
+    const completed = changeOrders.filter(o => o.completedAt && o.submittedAt);
+    const waitTime = completed.length > 0
+      ? completed.reduce((sum, o) => sum + (o.waitDuration || 0), 0) / completed.length
+      : 0;
+
+    return {
+      totalTokensUsed: tokens,
+      totalCost: cost,
+      averageWaitTime: waitTime,
+    };
+  }, [changeOrders]);
 
   // ─────────────────────────────────────────────────────────
   // Create Change Order
