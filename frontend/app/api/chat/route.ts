@@ -591,7 +591,7 @@ export async function POST(req: Request) {
       messages: enrichedMessages,
     });
 
-    return result.toDataStreamResponse();
+    return result.toTextStreamResponse();
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Chat API error';
     console.error('[ACHEEVY Chat]', message);

@@ -240,7 +240,7 @@ export async function POST(req: Request) {
       prompt: promptBuilder(ctx),
     });
 
-    return result.toDataStreamResponse();
+    return result.toTextStreamResponse();
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Idea validation failed';
     console.error('[ACHEEVY Idea Validation]', message);

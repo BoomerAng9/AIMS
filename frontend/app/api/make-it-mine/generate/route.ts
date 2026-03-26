@@ -126,7 +126,7 @@ export async function POST(request: NextRequest) {
       temperature: 0.3,
     });
 
-    return result.toDataStreamResponse();
+    return result.toTextStreamResponse();
   } catch (err: unknown) {
     console.error('[MIM:generate] Error:', err);
     const message = err instanceof Error ? err.message : 'Generation failed';
