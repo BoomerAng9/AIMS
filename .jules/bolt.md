@@ -5,3 +5,7 @@
 ## 2026-03-24 - TypedArray reduce in 60fps loops
 **Learning:** Using functional array methods like `reduce` on TypedArrays (e.g., `Uint8Array`) inside `requestAnimationFrame` loops causes unnecessary V8 overhead and garbage collection, severely impacting 60fps animation performance.
 **Action:** Replace functional array methods like `reduce` with standard `for` loops when working with TypedArrays in high-frequency React animation loops.
+
+## 2025-05-15 - Blob byte length vs TextEncoder
+**Learning:** For calculating the byte length of a string in browser environments, avoid using `new Blob([string]).size` as it introduces measurable performance overhead due to object instantiation.
+**Action:** Replace `new Blob([string]).size` with `new TextEncoder().encode(string).length` for significantly better performance.
