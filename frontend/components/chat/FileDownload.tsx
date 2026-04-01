@@ -133,7 +133,8 @@ export function FileDownload({
 
   const resolvedFilename = filename || `aims-export.${format}`;
   const sizeKB = useMemo(
-    () => Math.round(new Blob([content]).size / 1024),
+    // ⚡ Bolt Optimization: Replace new Blob().size with TextEncoder().encode().length to avoid object instantiation overhead
+    () => Math.round(new TextEncoder().encode(content).length / 1024),
     [content]
   );
   const lineCount = useMemo(
@@ -358,7 +359,8 @@ export function FileDownloadGroup({ files }: { files: FileDownloadProps[] }) {
   if (files.length === 0) return null;
 
   const totalSizeKB = files.reduce(
-    (sum, f) => sum + Math.round(new Blob([f.content]).size / 1024),
+    // ⚡ Bolt Optimization: Replace new Blob().size with TextEncoder().encode().length to avoid object instantiation overhead
+    (sum, f) => sum + Math.round(new TextEncoder().encode(f.content).length / 1024),
     0
   );
 
