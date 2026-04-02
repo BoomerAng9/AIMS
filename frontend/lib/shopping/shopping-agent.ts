@@ -109,35 +109,43 @@ export class ShoppingAgent {
     const findings: ProductFinding[] = [];
     const warnings: ScoutingWarning[] = [];
 
-    // Scout for each item in the task
-    for (const item of task.items) {
-      const itemFindings = await this.scoutItem(item);
+    // Scout for each item in the task concurrently
+    const scoutingResults = await Promise.all(
+      task.items.map(async (item) => {
+        const itemFindings = await this.scoutItem(item);
+        const itemWarnings: ScoutingWarning[] = [];
 
-      if (itemFindings.length === 0) {
-        warnings.push({
-          type: 'no_results',
-          itemId: item.id,
-          message: `No results found for "${item.name || item.description}"`,
-          severity: 'high',
-        });
-        continue;
-      }
+        if (itemFindings.length === 0) {
+          itemWarnings.push({
+            type: 'no_results',
+            itemId: item.id,
+            message: `No results found for "${item.name || item.description}"`,
+            severity: 'high',
+          });
+          return { itemFindings: [], itemWarnings };
+        }
 
-      // Check price constraints
-      const withinBudget = itemFindings.filter(
-        (f) => !item.maxPrice || f.price <= item.maxPrice
-      );
+        // Check price constraints
+        const withinBudget = itemFindings.filter(
+          (f) => !item.maxPrice || f.price <= item.maxPrice
+        );
 
-      if (withinBudget.length === 0 && item.maxPrice) {
-        warnings.push({
-          type: 'price_exceeded',
-          itemId: item.id,
-          message: `All options for "${item.name || item.description}" exceed max price of $${item.maxPrice}. Lowest found: $${Math.min(...itemFindings.map((f) => f.price || 0))}`,
-          severity: 'high',
-        });
-      }
+        if (withinBudget.length === 0 && item.maxPrice) {
+          itemWarnings.push({
+            type: 'price_exceeded',
+            itemId: item.id,
+            message: `All options for "${item.name || item.description}" exceed max price of $${item.maxPrice}. Lowest found: $${Math.min(...itemFindings.map((f) => f.price || 0))}`,
+            severity: 'high',
+          });
+        }
 
-      findings.push(...itemFindings);
+        return { itemFindings, itemWarnings };
+      })
+    );
+
+    for (const result of scoutingResults) {
+      findings.push(...result.itemFindings);
+      warnings.push(...result.itemWarnings);
     }
 
     // Build cart options from findings
