@@ -36,6 +36,7 @@ import {
 } from 'lucide-react';
 import { transition } from '@/lib/motion/tokens';
 import type { ContextPackOption } from '@/lib/context-packs/contracts';
+import { useAudioLevel } from '@/hooks/useAudioLevel';
 
 interface VoicePingProps {
   audioLevel: number;
@@ -100,7 +101,6 @@ export interface AcheevyChatInputProps {
   voiceTranscript?: string;
   onSendVoiceTranscript?: () => void;
   onClearTranscript?: () => void;
-  audioLevel?: number;
   hasVoiceAgent?: boolean;
   voiceSessionActive?: boolean;
   voiceAgentStatus?: string;
@@ -207,7 +207,6 @@ export function AcheevyChatInput({
   voiceTranscript,
   onSendVoiceTranscript,
   onClearTranscript,
-  audioLevel = 0,
   hasVoiceAgent = false,
   voiceSessionActive = false,
   voiceAgentStatus,
@@ -312,6 +311,13 @@ export function AcheevyChatInput({
 
   const selectedModelLabel = models.find((entry) => entry.key === selectedModel)?.label || selectedModel;
   const selectedContextPackName = contextPacks.find((entry) => entry.id === selectedContextPackId)?.name || 'Context Pack';
+
+  // ⚡ Bolt Optimization:
+  // Moved useAudioLevel from ChatInterface down to AcheevyChatInput
+  // This prevents ChatInterface (which contains the entire message history and complex state)
+  // from re-rendering at 60fps when voice input is active, significantly improving
+  // performance and input lag. Now only the chat input re-renders for the audio visualizer.
+  const audioLevel = useAudioLevel(voiceInput.stream, voiceInput.isListening);
 
   return (
     <div className="aims-agentic border-t border-wireframe-stroke bg-obsidian/90 px-4 py-4 backdrop-blur-xl">

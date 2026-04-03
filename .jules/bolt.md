@@ -5,3 +5,6 @@
 ## 2026-03-24 - TypedArray reduce in 60fps loops
 **Learning:** Using functional array methods like `reduce` on TypedArrays (e.g., `Uint8Array`) inside `requestAnimationFrame` loops causes unnecessary V8 overhead and garbage collection, severely impacting 60fps animation performance.
 **Action:** Replace functional array methods like `reduce` with standard `for` loops when working with TypedArrays in high-frequency React animation loops.
+## 2026-04-03 - [Push High-Frequency Hooks Down the Component Tree]
+**Learning:** High-frequency state hooks like `useAudioLevel` (updating at 60fps) placed high up in the component tree (e.g., `ChatInterface`) cause massive re-renders of the entire component tree, leading to performance degradation and input lag.
+**Action:** Move high-frequency hooks as close to the leaf components as possible (e.g., down to `AcheevyChatInput`) where the state is actually consumed, reducing unnecessary renders of sibling or parent components.
