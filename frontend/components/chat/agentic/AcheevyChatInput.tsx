@@ -36,6 +36,7 @@ import {
 } from 'lucide-react';
 import { transition } from '@/lib/motion/tokens';
 import type { ContextPackOption } from '@/lib/context-packs/contracts';
+import { useAudioLevel } from '@/hooks/useAudioLevel';
 
 interface VoicePingProps {
   audioLevel: number;
@@ -100,7 +101,6 @@ export interface AcheevyChatInputProps {
   voiceTranscript?: string;
   onSendVoiceTranscript?: () => void;
   onClearTranscript?: () => void;
-  audioLevel?: number;
   hasVoiceAgent?: boolean;
   voiceSessionActive?: boolean;
   voiceAgentStatus?: string;
@@ -207,7 +207,6 @@ export function AcheevyChatInput({
   voiceTranscript,
   onSendVoiceTranscript,
   onClearTranscript,
-  audioLevel = 0,
   hasVoiceAgent = false,
   voiceSessionActive = false,
   voiceAgentStatus,
@@ -233,6 +232,8 @@ export function AcheevyChatInput({
   onRegenerate,
   hasMessages = false,
 }: AcheevyChatInputProps) {
+  const calculatedAudioLevel = useAudioLevel(voiceInput.stream, voiceInput.isListening);
+
   const availableTools = useMemo<Tool[]>(() => [
     {
       id: 'working-notebook',
@@ -342,7 +343,7 @@ export function AcheevyChatInput({
             <VoiceInputBtn
               isListening={voiceInput.isListening}
               isProcessing={voiceInput.isProcessing}
-              audioLevel={audioLevel}
+              audioLevel={calculatedAudioLevel}
               onStart={voiceInput.startListening}
               onStop={voiceInput.stopListening}
             />
