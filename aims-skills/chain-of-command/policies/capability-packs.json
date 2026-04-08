@@ -1,9 +1,17 @@
 {
   "policy_id": "aims_capability_packs.v2",
-  "version": "2.0.0",
-  "effective_date": "2026-02-12",
+  "version": "2.1.0",
+  "effective_date": "2026-03-25",
   "description": "Repo-to-Boomer_Ang capability mapping. All Intelligent Internet repos are Boomer_Ang-only capability sources.",
   "scope_lock": "Chicken Hawk and Lil_Hawks do NOT get direct coupling to these repos.",
+
+  "blocked_dependencies": {
+    "litellm": {
+      "reason": "Security vulnerabilities — blocked permanently",
+      "replacement": "Gemini API + direct provider SDKs",
+      "policy_doc": "SECURITY-LITELLM-BLOCKED.md"
+    }
+  },
 
   "packs": [
     {
@@ -13,7 +21,7 @@
       "repos": [
         {
           "repo": "ii-agent",
-          "delegated_owner": "Forge_Ang",
+          "delegated_owner": "Buildsmith",
           "role": "Agent runtime packaging + deployment",
           "wrapper_type": "SERVICE_WRAPPER"
         },
@@ -89,16 +97,10 @@
     },
     {
       "pack_id": "D",
-      "name": "LLM Gateway + Debug",
-      "primary": "Debug/route model calls in OpenAI-format style.",
-      "repos": [
-        {
-          "repo": "litellm-debugger",
-          "delegated_owner": "Gatekeeper_Ang",
-          "role": "Debug + policy + routing validation",
-          "wrapper_type": "SERVICE_WRAPPER"
-        }
-      ]
+      "name": "LLM Gateway (Gemini API)",
+      "primary": "Route model calls through Gemini API and approved direct SDKs. LiteLLM is BLOCKED.",
+      "repos": [],
+      "note": "litellm-debugger has been removed. Gatekeeper_Ang now routes through Gemini API and direct provider SDKs. See SECURITY-LITELLM-BLOCKED.md."
     },
     {
       "pack_id": "E",
@@ -155,6 +157,79 @@
           "delegated_owner": "Lab_Ang",
           "role": "Chain-of-thought demos",
           "wrapper_type": "JOB_RUNNER_WRAPPER"
+        }
+      ]
+    },
+    {
+      "pack_id": "G",
+      "name": "MCP Bridge Integrations",
+      "primary": "Third-party services wired through MCP bridge gateways (Pipedream, Composio, Claude Code Connectors).",
+      "repos": [
+        {
+          "repo": "pipedream-mcp",
+          "delegated_owner": "Plug_Ang",
+          "role": "Hosted MCP server platform \u2014 3,000+ app integrations via SSE",
+          "wrapper_type": "MCP_BRIDGE_WRAPPER"
+        },
+        {
+          "repo": "paperform",
+          "delegated_owner": "Plug_Ang",
+          "role": "Form builder \u2014 client intake, needs analysis, surveys, bookings via Pipedream MCP",
+          "wrapper_type": "MCP_BRIDGE_WRAPPER"
+        },
+        {
+          "repo": "google-drive-mcp",
+          "delegated_owner": "Scout_Ang",
+          "role": "File storage, search, collaboration \u2014 docs, sheets, PDFs via Claude Code Connector",
+          "wrapper_type": "MCP_BRIDGE_WRAPPER"
+        },
+        {
+          "repo": "github-mcp",
+          "delegated_owner": "Patchsmith_Ang",
+          "role": "Source control \u2014 repos, issues, PRs, code search, releases via Claude Code Connector",
+          "wrapper_type": "MCP_BRIDGE_WRAPPER"
+        },
+        {
+          "repo": "notion-mcp",
+          "delegated_owner": "Scribe_Ang",
+          "role": "Knowledge base \u2014 pages, databases, blocks, comments via Claude Code Connector",
+          "wrapper_type": "MCP_BRIDGE_WRAPPER"
+        },
+        {
+          "repo": "gmail-mcp",
+          "delegated_owner": "Plug_Ang",
+          "role": "Email \u2014 search, read, compose, reply, label via Claude Code Connector (HITL on send)",
+          "wrapper_type": "MCP_BRIDGE_WRAPPER"
+        },
+        {
+          "repo": "google-calendar-mcp",
+          "delegated_owner": "OpsConsole_Ang",
+          "role": "Scheduling \u2014 events, availability, bookings via Claude Code Connector",
+          "wrapper_type": "MCP_BRIDGE_WRAPPER"
+        },
+        {
+          "repo": "cloudflare-browser-mcp",
+          "delegated_owner": "Scout_Ang",
+          "role": "Headless browser \u2014 screenshots, PDF, scraping, DOM interaction via Cloudflare edge",
+          "wrapper_type": "MCP_BRIDGE_WRAPPER"
+        },
+        {
+          "repo": "cloudflare-containers-mcp",
+          "delegated_owner": "Runner_Ang",
+          "role": "Edge containers \u2014 deploy, manage, scale containers on Cloudflare edge",
+          "wrapper_type": "MCP_BRIDGE_WRAPPER"
+        },
+        {
+          "repo": "cloudflare-workers-mcp",
+          "delegated_owner": "Buildsmith",
+          "role": "Edge functions \u2014 deploy, manage Workers for webhooks, API proxies, protocol bridges",
+          "wrapper_type": "MCP_BRIDGE_WRAPPER"
+        },
+        {
+          "repo": "cloudflare-builds-mcp",
+          "delegated_owner": "Buildsmith",
+          "role": "Edge CI/CD \u2014 build, bundle, deploy Workers with build pipelines",
+          "wrapper_type": "MCP_BRIDGE_WRAPPER"
         }
       ]
     }

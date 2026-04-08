@@ -14,7 +14,7 @@
   },
   "chain_of_command": {
     "reports_to": null,
-    "can_message": ["Betty-Ann_Ang", "Forge_Ang", "Juno_Ang"],
+    "can_message": ["Betty-Ann_Ang", "Buildsmith", "Juno_Ang"],
     "cannot_message": ["Chicken Hawk"]
   },
   "capabilities": {

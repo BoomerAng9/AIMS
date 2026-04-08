@@ -1,16 +1,49 @@
 /**
  * STT API Route — Speech-to-Text for ACHEEVY Voice Input
  *
- * Primary: Groq Whisper (whisper-large-v3-turbo, 216x real-time)
+ * Primary: ElevenLabs Scribe v2 (99% accuracy, 90+ languages, word timestamps)
  * Fallback: Deepgram Nova-3 (sub-300ms, 30+ languages)
  *
+ * LUC metering: Records stt_minutes usage after successful transcription.
+ * Duration is calculated from word timestamps (preferred) or estimated from buffer size.
+ *
  * Accepts audio file upload, returns transcription text.
+ *
+ * NOTE: Groq Whisper was removed — exposed key deprecated.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAuth } from '@/lib/auth/require-role';
 
-const GROQ_API_KEY = process.env.GROQ_API_KEY || '';
+const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY || '';
 const DEEPGRAM_API_KEY = process.env.DEEPGRAM_API_KEY || '';
+const GROQ_API_KEY = process.env.GROQ_API_KEY || '';
+const UEF_GATEWAY_URL = process.env.NEXT_PUBLIC_API_URL || process.env.UEF_GATEWAY_URL || 'http://localhost:3001';
+const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY || '';
+
+/** Estimate audio duration from buffer size (WebM/Opus ~12kbps) */
+function estimateDurationMinutes(bufferSize: number): number {
+  const bytesPerSecond = 1500; // WebM/Opus average
+  const seconds = bufferSize / bytesPerSecond;
+  return Math.max(0.1, seconds / 60);
+}
+
+/** Fire-and-forget LUC metering call for STT minutes */
+function meterSttUsage(userId: string, durationMinutes: number, provider: string) {
+  fetch(`${UEF_GATEWAY_URL}/api/billing/record`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(INTERNAL_API_KEY ? { 'x-api-key': INTERNAL_API_KEY } : {}),
+    },
+    body: JSON.stringify({
+      userId,
+      serviceKey: 'stt_minutes',
+      units: durationMinutes,
+      metadata: { provider, source: 'frontend-stt' },
+    }),
+  }).catch(() => { /* non-blocking */ });
+}
 
 interface SttResponse {
   text: string;
@@ -20,55 +53,52 @@ interface SttResponse {
   words?: Array<{ word: string; start: number; end: number }>;
 }
 
-async function transcribeGroq(
+async function transcribeElevenLabs(
   audioBuffer: ArrayBuffer,
-  model: string,
   language?: string,
 ): Promise<SttResponse | null> {
-  if (!GROQ_API_KEY) return null;
+  if (!ELEVENLABS_API_KEY) return null;
 
   try {
     const formData = new FormData();
     formData.append('file', new Blob([audioBuffer], { type: 'audio/webm' }), 'audio.webm');
-    formData.append('model', model || 'whisper-large-v3-turbo');
-    formData.append('response_format', 'verbose_json');
-    formData.append('timestamp_granularities[]', 'word');
-    if (language) formData.append('language', language);
+    formData.append('model_id', 'scribe_v2');
+    if (language) formData.append('language_code', language);
 
-    const res = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
+    const res = await fetch('https://api.elevenlabs.io/v1/speech-to-text', {
       method: 'POST',
-      headers: { Authorization: `Bearer ${GROQ_API_KEY}` },
+      headers: { 'xi-api-key': ELEVENLABS_API_KEY },
       body: formData,
     });
 
     if (!res.ok) {
-      console.error(`[STT] Groq returned ${res.status}`);
+      console.error(`[STT] ElevenLabs Scribe returned ${res.status}`);
       return null;
     }
 
     const data = await res.json();
     return {
       text: data.text || '',
-      provider: 'groq',
-      model: model || 'whisper-large-v3-turbo',
-      words: data.words?.map((w: any) => ({ word: w.word, start: w.start, end: w.end })),
+      provider: 'elevenlabs',
+      model: 'scribe_v2',
+      confidence: data.language_probability,
+      words: data.words?.map((w: any) => ({ word: w.text, start: w.start, end: w.end })),
     };
   } catch (err) {
-    console.error('[STT] Groq error:', err);
+    console.error('[STT] ElevenLabs Scribe error:', err);
     return null;
   }
 }
 
 async function transcribeDeepgram(
   audioBuffer: ArrayBuffer,
-  model: string,
   language?: string,
 ): Promise<SttResponse | null> {
   if (!DEEPGRAM_API_KEY) return null;
 
   try {
     const params = new URLSearchParams({
-      model: model || 'nova-3',
+      model: 'nova-3',
       smart_format: 'true',
       punctuate: 'true',
     });
@@ -93,7 +123,7 @@ async function transcribeDeepgram(
     return {
       text: alt?.transcript || '',
       provider: 'deepgram',
-      model: model || 'nova-3',
+      model: 'nova-3',
       confidence: alt?.confidence,
       words: alt?.words?.map((w: any) => ({ word: w.word, start: w.start, end: w.end })),
     };
@@ -103,13 +133,53 @@ async function transcribeDeepgram(
   }
 }
 
+async function transcribeGroq(
+  audioBuffer: ArrayBuffer,
+  language?: string,
+): Promise<SttResponse | null> {
+  if (!GROQ_API_KEY) return null;
+
+  try {
+    const formData = new FormData();
+    formData.append('file', new Blob([audioBuffer], { type: 'audio/webm' }), 'audio.webm');
+    formData.append('model', 'whisper-large-v3-turbo');
+    if (language) formData.append('language', language);
+
+    const res = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${GROQ_API_KEY}`,
+      },
+      body: formData,
+    });
+
+    if (!res.ok) {
+      console.error(`[STT] Groq returned ${res.status}`);
+      return null;
+    }
+
+    const data = await res.json();
+    return {
+      text: data.text || '',
+      provider: 'groq',
+      model: 'whisper-large-v3-turbo',
+    };
+  } catch (err) {
+    console.error('[STT] Groq error:', err);
+    return null;
+  }
+}
+
 export async function POST(req: NextRequest) {
+  const auth = await requireAuth();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const formData = await req.formData();
     const audioFile = formData.get('audio') as File | null;
     const provider = formData.get('provider') as string | null;
-    const model = formData.get('model') as string | null;
     const language = formData.get('language') as string | null;
+    const userId = formData.get('userId') as string | null;
 
     if (!audioFile) {
       return NextResponse.json({ error: 'audio file required' }, { status: 400 });
@@ -118,21 +188,37 @@ export async function POST(req: NextRequest) {
     const audioBuffer = await audioFile.arrayBuffer();
 
     // Try primary provider first, then fallback
-    const tryOrder = provider === 'deepgram'
-      ? ['deepgram', 'groq'] as const
-      : ['groq', 'deepgram'] as const;
+    const tryOrder = provider === 'groq'
+      ? ['groq', 'elevenlabs', 'deepgram'] as const
+      : provider === 'deepgram'
+        ? ['deepgram', 'groq', 'elevenlabs'] as const
+        : ['elevenlabs', 'groq', 'deepgram'] as const;
 
     for (const p of tryOrder) {
       let result: SttResponse | null = null;
 
-      if (p === 'groq') {
-        result = await transcribeGroq(audioBuffer, model || 'whisper-large-v3-turbo', language || undefined);
-      } else {
-        result = await transcribeDeepgram(audioBuffer, model || 'nova-3', language || undefined);
+      if (p === 'elevenlabs') {
+        result = await transcribeElevenLabs(audioBuffer, language || undefined);
+      } else if (p === 'deepgram') {
+        result = await transcribeDeepgram(audioBuffer, language || undefined);
+      } else if (p === 'groq') {
+        result = await transcribeGroq(audioBuffer, language || undefined);
       }
 
       if (result && result.text) {
-        return NextResponse.json(result);
+        // Calculate duration from word timestamps or estimate from buffer size
+        const words = result.words;
+        const durationMinutes = words?.length
+          ? Math.max(0.1, (words[words.length - 1].end / 60))
+          : estimateDurationMinutes(audioBuffer.byteLength);
+
+        // Meter stt_minutes through LUC (fire-and-forget)
+        meterSttUsage(userId || 'anonymous', durationMinutes, p);
+
+        return NextResponse.json({
+          ...result,
+          durationMinutes,
+        });
       }
     }
 

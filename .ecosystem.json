@@ -1,0 +1,40 @@
+{
+  "node": "aims",
+  "role": "platform",
+  "network": "boomerang9-ecosystem",
+  "version": "1.0.0",
+  "description": "A.I.M.S. — the main platform frontend, backend, and services hub",
+  "provides": [
+    { "name": "web-app", "path": "frontend/", "description": "Next.js frontend application" },
+    { "name": "api-backend", "path": "backend/", "description": "Express/Node API server" },
+    { "name": "firebase-functions", "path": "functions/", "description": "Cloud Functions for Firebase" },
+    { "name": "ai-plugs", "path": "aiPLUGS/", "description": "AI integration plug-ins for verticals" },
+    { "name": "luc-engine", "path": "luc/", "description": "LUC calculation and financial engine" },
+    { "name": "mcp-tools", "path": "mcp-tools/", "description": "MCP tool definitions for agent integration" },
+    { "name": "blockwise-ai", "path": "blockwise-ai/", "description": "Blockchain/token intelligence module" },
+    { "name": "live-look-in", "path": "aims-skills/skills/live-look-in/", "description": "Real-time animated workspace viewer for observing the digital workforce" }
+  ],
+  "consumes": [
+    { "node": "chicken-hawk", "capability": "gateway", "endpoint": "https://gateway.acheevy.digital" },
+    { "node": "agent-acheevy-009", "capability": "agent-api", "endpoint": "/api/agent/v1/chat" },
+    { "node": "grammar", "capability": "chat-api", "endpoint": "/api/chat/v1" },
+    { "node": "myclaw", "capability": "shared-skills", "endpoint": null }
+  ],
+  "connections": {
+    "myclaw": { "type": "inherits", "purpose": "Shared skills, Docker config, and deployment scripts" },
+    "chicken-hawk": { "type": "routes-through", "purpose": "All external API traffic routes through gateway" },
+    "agent-acheevy-009": { "type": "invokes", "purpose": "AI agent for chat, tasks, and intelligent operations" },
+    "grammar": { "type": "embeds", "purpose": "Chat UI embedded via iframe, API for video generation" },
+    "destinations-ai": { "type": "hosts-vertical", "purpose": "Travel vertical receives AI plugs and auth" },
+    "estatemind-ai": { "type": "hosts-vertical", "purpose": "Real estate vertical receives AI plugs and auth" },
+    "acheevy-whisper-build": { "type": "provides-auth", "purpose": "Whisper UI authenticates through AIMS" },
+    "acheevy-digital": { "type": "linked-from", "purpose": "Marketing site funnels users into AIMS" }
+  },
+  "file_index": {
+    "entrypoints": ["frontend/", "backend/"],
+    "config": ["firebase.json", "cloudbuild.yaml", ".firebaserc"],
+    "services": ["services/", "functions/"],
+    "data": ["data/"],
+    "infra": ["infra/", "deploy.sh"]
+  }
+}

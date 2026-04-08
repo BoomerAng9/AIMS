@@ -4,13 +4,13 @@
  * Transforms raw user intent into clean, structured, execution-ready
  * task packets before anything touches execution engines.
  *
- * Command chain:
- *   INTAKE_LIL_HAWK  → Intent ingestion & normalization
- *   DECOMP_LIL_HAWK  → Task decomposition (DAG-ready)
- *   CONTEXT_LIL_HAWK → Context shaping & minimization
- *   POLICY_LIL_HAWK  → Governance & readiness (KYB, risk, sandbox)
- *   COST_LIL_HAWK    → Pre-cost intelligence (token prediction)
- *   ROUTER_LIL_HAWK  → Final handoff (engine selection + routing)
+ * Command chain (Lil_<Role>_Hawk — ACHEEVY Brain §16.2):
+ *   Lil_Intake_Hawk   → Intent ingestion & normalization
+ *   Lil_Decomp_Hawk   → Task decomposition (DAG-ready)
+ *   Lil_Context_Hawk  → Context shaping & minimization
+ *   Lil_Policy_Hawk   → Governance & readiness (KYB, risk, sandbox)
+ *   Lil_Cost_Hawk     → Pre-cost intelligence (token prediction)
+ *   Lil_Router_Hawk   → Final handoff (engine selection + routing)
  *
  * Governance rules (non-negotiable):
  *   1. Users never see Lil_Hawks or execution engines
@@ -35,48 +35,48 @@ import {
 } from './types';
 
 // ---------------------------------------------------------------------------
-// Squad profiles — canonical NAME_LIL_HAWK convention
+// Squad profiles — Lil_<Role>_Hawk convention (ACHEEVY Brain §16.2)
 // ---------------------------------------------------------------------------
 
 export const PREP_SQUAD_PROFILES: LilHawkProfile[] = [
   {
-    id: 'INTAKE_LIL_HAWK',
-    name: 'INTAKE_LIL_HAWK',
+    id: 'Lil_Intake_Hawk',
+    name: 'Lil_Intake_Hawk',
     squad: 'prep-squad-alpha',
     role: 'Intent ingestion & normalization — NLP parsing, ambiguity detection, signal vs noise filtering',
     gate: false,
   },
   {
-    id: 'DECOMP_LIL_HAWK',
-    name: 'DECOMP_LIL_HAWK',
+    id: 'Lil_Decomp_Hawk',
+    name: 'Lil_Decomp_Hawk',
     squad: 'prep-squad-alpha',
     role: 'Task decomposition — break intent into atomic objectives, identify dependencies, flag missing inputs',
     gate: false,
   },
   {
-    id: 'CONTEXT_LIL_HAWK',
-    name: 'CONTEXT_LIL_HAWK',
+    id: 'Lil_Context_Hawk',
+    name: 'Lil_Context_Hawk',
     squad: 'prep-squad-alpha',
     role: 'Context shaping — identify required knowledge domains, minimize context payload size',
     gate: false,
   },
   {
-    id: 'POLICY_LIL_HAWK',
-    name: 'POLICY_LIL_HAWK',
+    id: 'Lil_Policy_Hawk',
+    name: 'Lil_Policy_Hawk',
     squad: 'prep-squad-alpha',
     role: 'Governance & readiness — KYB permission checks, risk classification, sandbox tagging',
     gate: true,
   },
   {
-    id: 'COST_LIL_HAWK',
-    name: 'COST_LIL_HAWK',
+    id: 'Lil_Cost_Hawk',
+    name: 'Lil_Cost_Hawk',
     squad: 'prep-squad-alpha',
     role: 'Pre-cost intelligence — predict token classes, estimate execution depth, flag high-cost patterns',
     gate: true,
   },
   {
-    id: 'ROUTER_LIL_HAWK',
-    name: 'ROUTER_LIL_HAWK',
+    id: 'Lil_Router_Hawk',
+    name: 'Lil_Router_Hawk',
     squad: 'prep-squad-alpha',
     role: 'Final handoff — select execution engine, choose Boomer_Ang owner, package execution packet',
     gate: false,
@@ -84,7 +84,7 @@ export const PREP_SQUAD_PROFILES: LilHawkProfile[] = [
 ];
 
 // ---------------------------------------------------------------------------
-// INTAKE_LIL_HAWK — Intent ingestion & normalization
+// Lil_Intake_Hawk — Intent ingestion & normalization
 // ---------------------------------------------------------------------------
 
 function intakeNormalize(rawQuery: string): NormalizedIntent {
@@ -134,7 +134,7 @@ function intakeNormalize(rawQuery: string): NormalizedIntent {
 }
 
 // ---------------------------------------------------------------------------
-// DECOMP_LIL_HAWK — Task decomposition
+// Lil_Decomp_Hawk — Task decomposition
 // ---------------------------------------------------------------------------
 
 function decomposeTask(intent: NormalizedIntent): TaskGraph {
@@ -204,7 +204,7 @@ function computeCriticalPath(nodes: TaskNode[]): string[] {
 }
 
 // ---------------------------------------------------------------------------
-// CONTEXT_LIL_HAWK — Context shaping
+// Lil_Context_Hawk — Context shaping
 // ---------------------------------------------------------------------------
 
 function shapeContext(intent: NormalizedIntent, taskGraph: TaskGraph): ContextBundle {
@@ -233,7 +233,7 @@ function shapeContext(intent: NormalizedIntent, taskGraph: TaskGraph): ContextBu
 }
 
 // ---------------------------------------------------------------------------
-// POLICY_LIL_HAWK — Governance & readiness
+// Lil_Policy_Hawk — Governance & readiness
 // ---------------------------------------------------------------------------
 
 function checkPolicy(intent: NormalizedIntent, taskGraph: TaskGraph, _context: ContextBundle): PolicyManifest {
@@ -286,7 +286,7 @@ function checkPolicy(intent: NormalizedIntent, taskGraph: TaskGraph, _context: C
 }
 
 // ---------------------------------------------------------------------------
-// COST_LIL_HAWK — Pre-cost intelligence
+// Lil_Cost_Hawk — Pre-cost intelligence
 // ---------------------------------------------------------------------------
 
 function estimateCost(taskGraph: TaskGraph, context: ContextBundle): CostEstimate {
@@ -321,7 +321,7 @@ function estimateCost(taskGraph: TaskGraph, context: ContextBundle): CostEstimat
 }
 
 // ---------------------------------------------------------------------------
-// ROUTER_LIL_HAWK — Final handoff
+// Lil_Router_Hawk — Final handoff
 // ---------------------------------------------------------------------------
 
 function routeExecution(
@@ -355,28 +355,28 @@ function routeExecution(
 export async function runPrepSquad(rawQuery: string, reqId: string): Promise<ExecutionPacket> {
   const packetId = `prep-${uuidv4().slice(0, 8)}`;
 
-  // Phase 1: INTAKE_LIL_HAWK
-  logger.info({ reqId, packetId }, '[INTAKE_LIL_HAWK] Normalizing intent');
+  // Phase 1: Lil_Intake_Hawk
+  logger.info({ reqId, packetId }, '[Lil_Intake_Hawk] Normalizing intent');
   const normalizedIntent = intakeNormalize(rawQuery);
 
-  // Phase 2: DECOMP_LIL_HAWK
-  logger.info({ reqId, packetId }, '[DECOMP_LIL_HAWK] Decomposing task');
+  // Phase 2: Lil_Decomp_Hawk
+  logger.info({ reqId, packetId }, '[Lil_Decomp_Hawk] Decomposing task');
   const taskGraph = decomposeTask(normalizedIntent);
 
-  // Phase 3: CONTEXT_LIL_HAWK
-  logger.info({ reqId, packetId }, '[CONTEXT_LIL_HAWK] Shaping context');
+  // Phase 3: Lil_Context_Hawk
+  logger.info({ reqId, packetId }, '[Lil_Context_Hawk] Shaping context');
   const contextBundle = shapeContext(normalizedIntent, taskGraph);
 
-  // Phase 4: POLICY_LIL_HAWK
-  logger.info({ reqId, packetId }, '[POLICY_LIL_HAWK] Checking governance');
+  // Phase 4: Lil_Policy_Hawk
+  logger.info({ reqId, packetId }, '[Lil_Policy_Hawk] Checking governance');
   const policyManifest = checkPolicy(normalizedIntent, taskGraph, contextBundle);
 
-  // Phase 5: COST_LIL_HAWK
-  logger.info({ reqId, packetId }, '[COST_LIL_HAWK] Estimating cost');
+  // Phase 5: Lil_Cost_Hawk
+  logger.info({ reqId, packetId }, '[Lil_Cost_Hawk] Estimating cost');
   const costEstimate = estimateCost(taskGraph, contextBundle);
 
-  // Phase 6: ROUTER_LIL_HAWK
-  logger.info({ reqId, packetId }, '[ROUTER_LIL_HAWK] Routing execution');
+  // Phase 6: Lil_Router_Hawk
+  logger.info({ reqId, packetId }, '[Lil_Router_Hawk] Routing execution');
   const routingDecision = routeExecution(normalizedIntent, taskGraph, policyManifest, costEstimate);
 
   const packet: ExecutionPacket = {

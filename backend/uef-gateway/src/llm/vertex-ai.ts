@@ -31,20 +31,20 @@ export const VERTEX_MODELS: Record<string, ModelSpec & { vertexId: string; provi
     contextWindow: 1000000,
     tier: 'premium',
   },
-  'claude-sonnet-4.5': {
-    id: 'anthropic/claude-sonnet-4.5',
-    vertexId: 'claude-sonnet-4-5-v2@20250514',
-    name: 'Claude Sonnet 4.5',
+  'claude-sonnet-4.6': {
+    id: 'anthropic/claude-sonnet-4.6',
+    vertexId: 'claude-sonnet-4-6@20250218',
+    name: 'Claude Sonnet 4.6',
     provider: 'anthropic',
     inputPer1M: 3.0,
     outputPer1M: 15.0,
     contextWindow: 1000000,
     tier: 'standard',
   },
-  'claude-haiku-4.5': {
-    id: 'anthropic/claude-haiku-4.5',
-    vertexId: 'claude-haiku-4-5@20250514',
-    name: 'Claude Haiku 4.5',
+  'claude-haiku-4.6': {
+    id: 'anthropic/claude-haiku-4.6',
+    vertexId: 'claude-haiku-4-6@20250218',
+    name: 'Claude Haiku 4.6',
     provider: 'anthropic',
     inputPer1M: 0.80,
     outputPer1M: 4.0,
@@ -55,7 +55,7 @@ export const VERTEX_MODELS: Record<string, ModelSpec & { vertexId: string; provi
   // Google Gemini (native Vertex AI)
   'gemini-3-pro': {
     id: 'google/gemini-3-pro',
-    vertexId: 'gemini-2.0-pro',
+    vertexId: 'gemini-3.0-pro',
     name: 'Gemini 3 Pro',
     provider: 'google',
     inputPer1M: 1.25,
@@ -63,14 +63,14 @@ export const VERTEX_MODELS: Record<string, ModelSpec & { vertexId: string; provi
     contextWindow: 1000000,
     tier: 'standard',
   },
-  'gemini-2.5-flash': {
-    id: 'google/gemini-2.5-flash',
-    vertexId: 'gemini-2.0-flash',
-    name: 'Gemini 2.5 Flash',
+  'gemini-3.0-flash': {
+    id: 'google/gemini-3.0-flash',
+    vertexId: 'gemini-3.0-flash',
+    name: 'Gemini 3.0 Flash',
     provider: 'google',
-    inputPer1M: 0.30,
-    outputPer1M: 2.50,
-    contextWindow: 1050000,
+    inputPer1M: 0.10,
+    outputPer1M: 0.40,
+    contextWindow: 1000000,
     tier: 'fast',
   },
 };

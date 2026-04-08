@@ -1,9 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAuth } from '@/lib/auth/require-role';
 
 const UEF_GATEWAY = process.env.UEF_GATEWAY_URL || 'http://localhost:3001';
 
 export async function GET(req: NextRequest) {
-  const userId = req.nextUrl.searchParams.get('userId') || 'anon';
+  const auth = await requireAuth();
+  if (auth instanceof NextResponse) return auth;
+
+  const requestedUserId = req.nextUrl.searchParams.get('userId');
+  const userId = auth.user.role === 'OWNER' || auth.user.role === 'ADMIN'
+    ? requestedUserId || auth.user.email
+    : auth.user.email;
 
   try {
     const res = await fetch(`${UEF_GATEWAY}/luc/status?userId=${encodeURIComponent(userId)}`);

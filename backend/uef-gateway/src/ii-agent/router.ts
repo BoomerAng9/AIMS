@@ -1,14 +1,110 @@
 /**
  * ACHEEVY → II-Agent Integration Router
- * 
+ *
  * This module routes ACHEEVY orchestrator requests to ii-agent
  * for autonomous task execution.
+ *
+ * Access: OWNER only — gated via requireOwnerRole middleware.
+ * All executions are audit-logged to the Gateway Evidence Locker.
  */
 
-import { Router, Request, Response } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import { getIIAgentClient, IIAgentClient, IIAgentTask } from './client';
+import logger from '../logger';
 
 const router = Router();
+
+function buildRoutingContext(body: Record<string, unknown>): NonNullable<IIAgentTask['context']>['routing'] | undefined {
+  const routingDecision = body.routingDecision as Record<string, unknown> | undefined;
+  if (!routingDecision) {
+    return undefined;
+  }
+
+  return {
+    intent: typeof routingDecision.intent === 'string' ? routingDecision.intent : undefined,
+    intentType: typeof routingDecision.intent_type === 'string' ? routingDecision.intent_type : undefined,
+    executionLane: typeof routingDecision.execution_lane === 'string' ? routingDecision.execution_lane : undefined,
+    taskComplexity: typeof routingDecision.task_complexity === 'string' ? routingDecision.task_complexity : undefined,
+    researchLevel: typeof routingDecision.research_level === 'string' ? routingDecision.research_level : undefined,
+    verticalId: typeof routingDecision.vertical_id === 'string' ? routingDecision.vertical_id : undefined,
+  };
+}
+
+function annotateResultWithRouting(result: unknown, routing: NonNullable<IIAgentTask['context']>['routing']) {
+  if (!routing || typeof result !== 'object' || result === null) {
+    return result;
+  }
+
+  return {
+    ...result,
+    routing,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// OWNER-Only Middleware — A.I.M.S. Gateway System Protocol
+// ---------------------------------------------------------------------------
+
+/**
+ * Validates the caller has OWNER role before allowing ii-agent access.
+ *
+ * Role is resolved from (in priority order):
+ *  1. X-User-Role header (set by frontend API proxy after NextAuth session check)
+ *  2. X-API-Key match against INTERNAL_API_KEY (service-to-service calls from ACHEEVY orchestrator)
+ *
+ * All non-health endpoints are gated. Health check remains open for monitoring.
+ */
+function requireOwnerRole(req: Request, res: Response, next: NextFunction): void {
+  // Health check is open for monitoring / Circuit Box
+  if (req.path === '/health') {
+    next();
+    return;
+  }
+
+  const userRole = req.headers['x-user-role'] as string | undefined;
+  const userId = req.headers['x-user-id'] as string | undefined || req.body?.userId || 'unknown';
+  const apiKey = req.headers['x-api-key'] as string | undefined;
+  const internalKey = process.env.INTERNAL_API_KEY || '';
+
+  // Path 1: Frontend proxy sets X-User-Role after NextAuth session validation
+  if (userRole === 'OWNER') {
+    logger.info({ userId, path: req.path }, '[II-Agent] OWNER access granted via role header');
+    next();
+    return;
+  }
+
+  // Path 2: Internal service calls (ACHEEVY orchestrator) use INTERNAL_API_KEY
+  if (internalKey && apiKey === internalKey) {
+    logger.info({ userId, path: req.path }, '[II-Agent] Access granted via internal API key');
+    next();
+    return;
+  }
+
+  // Deny all others
+  logger.warn(
+    { userId, userRole, path: req.path },
+    '[II-Agent] Access DENIED — OWNER role required',
+  );
+  res.status(403).json({
+    error: 'Forbidden — OWNER role required',
+    code: 'II_AGENT_OWNER_ONLY',
+    hint: 'ii-agent is restricted to platform owner via A.I.M.S. Gateway System',
+  });
+}
+
+// Apply OWNER gate to all routes in this router
+router.use(requireOwnerRole);
+
+// ---------------------------------------------------------------------------
+// Audit helper — logs every ii-agent execution for Gateway evidence trail
+// ---------------------------------------------------------------------------
+
+function auditLog(action: string, userId: string, meta: Record<string, unknown> = {}): void {
+  logger.info(
+    { action, userId, service: 'ii-agent', timestamp: new Date().toISOString(), ...meta },
+    `[II-Agent Audit] ${action}`,
+  );
+}
 
 /**
  * POST /ii-agent/execute
@@ -17,15 +113,22 @@ const router = Router();
 router.post('/execute', async (req: Request, res: Response) => {
   try {
     const { prompt, type, streaming } = req.body;
+    const routing = buildRoutingContext(req.body as Record<string, unknown>);
+
+    const userId = req.headers['x-user-id'] as string || req.body.userId || 'owner';
 
     if (!prompt) {
       return res.status(400).json({ error: 'Prompt is required' });
     }
 
+    auditLog('execute', userId, { taskType: type, streaming, promptLength: prompt.length, routing });
+
     const client = getIIAgentClient();
-    
+
     // Determine task type from intent or explicit type
-    const taskType = type || IIAgentClient.mapIntentToTaskType(prompt);
+    const taskType = type || IIAgentClient.mapIntentToTaskType(prompt, {
+      routing,
+    });
 
     const task: IIAgentTask = {
       type: taskType,
@@ -34,6 +137,7 @@ router.post('/execute', async (req: Request, res: Response) => {
         userId: req.body.userId,
         sessionId: req.body.sessionId,
         previousMessages: req.body.history,
+        routing,
       },
       options: {
         streaming: streaming || false,
@@ -55,7 +159,7 @@ router.post('/execute', async (req: Request, res: Response) => {
       res.end();
     } else {
       const result = await client.executeTask(task);
-      res.json(result);
+      res.json(annotateResultWithRouting(result, routing));
     }
 
   } catch (error: any) {
@@ -74,13 +178,18 @@ router.post('/execute', async (req: Request, res: Response) => {
 router.post('/research', async (req: Request, res: Response) => {
   try {
     const { topic, depth, outputFormat } = req.body;
+    const routing = buildRoutingContext(req.body as Record<string, unknown>);
+
+    const userId = req.headers['x-user-id'] as string || req.body.userId || 'owner';
 
     if (!topic) {
       return res.status(400).json({ error: 'Topic is required' });
     }
 
+    auditLog('research', userId, { topic, depth, routing });
+
     const client = getIIAgentClient();
-    
+
     const prompt = `Conduct comprehensive research on: ${topic}
     
 Research depth: ${depth || 'comprehensive'}
@@ -99,10 +208,11 @@ Please provide:
       context: {
         userId: req.body.userId,
         sessionId: req.body.sessionId,
+        routing,
       },
     });
 
-    res.json(result);
+    res.json(annotateResultWithRouting(result, routing));
 
   } catch (error: any) {
     console.error('[II-Agent Router] Research error:', error);
@@ -120,13 +230,18 @@ Please provide:
 router.post('/build', async (req: Request, res: Response) => {
   try {
     const { description, stack, features } = req.body;
+    const routing = buildRoutingContext(req.body as Record<string, unknown>);
+
+    const userId = req.headers['x-user-id'] as string || req.body.userId || 'owner';
 
     if (!description) {
       return res.status(400).json({ error: 'Description is required' });
     }
 
+    auditLog('build', userId, { description: description.substring(0, 100), stack, routing });
+
     const client = getIIAgentClient();
-    
+
     const prompt = `Build a web application with the following requirements:
 
 Description: ${description}
@@ -154,6 +269,7 @@ Please:
       context: {
         userId: req.body.userId,
         sessionId: req.body.sessionId,
+        routing,
       },
       options: { streaming: true, timeout: 600000 }, // 10 min timeout for builds
     })) {
@@ -179,13 +295,18 @@ Please:
 router.post('/slides', async (req: Request, res: Response) => {
   try {
     const { topic, slideCount, audience, style } = req.body;
+    const routing = buildRoutingContext(req.body as Record<string, unknown>);
+
+    const userId = req.headers['x-user-id'] as string || req.body.userId || 'owner';
 
     if (!topic) {
       return res.status(400).json({ error: 'Topic is required' });
     }
 
+    auditLog('slides', userId, { topic, slideCount, audience, routing });
+
     const client = getIIAgentClient();
-    
+
     const prompt = `Create a professional presentation:
 
 Topic: ${topic}
@@ -206,10 +327,11 @@ Include:
       context: {
         userId: req.body.userId,
         sessionId: req.body.sessionId,
+        routing,
       },
     });
 
-    res.json(result);
+    res.json(annotateResultWithRouting(result, routing));
 
   } catch (error: any) {
     console.error('[II-Agent Router] Slides error:', error);
@@ -249,6 +371,8 @@ router.get('/health', async (_req: Request, res: Response) => {
 router.post('/cancel/:taskId', async (req: Request, res: Response) => {
   try {
     const { taskId } = req.params;
+    const userId = req.headers['x-user-id'] as string || req.body?.userId || 'owner';
+    auditLog('cancel', userId, { taskId });
     const client = getIIAgentClient();
     await client.cancelTask(taskId);
     res.json({ success: true, taskId });

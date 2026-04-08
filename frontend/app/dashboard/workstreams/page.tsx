@@ -26,7 +26,7 @@ type Stage = (typeof STAGES)[number];
 
 const STAGE_META: Record<Stage, { label: string; color: string; bg: string }> = {
   INTAKE:  { label: "Intake",  color: "text-sky-400",     bg: "bg-sky-400" },
-  SCOPE:   { label: "Scope",   color: "text-violet-400",  bg: "bg-violet-400" },
+  SCOPE:   { label: "Scope",   color: "text-amber-400",  bg: "bg-amber-400" },
   BUILD:   { label: "Build",   color: "text-gold",        bg: "bg-gold" },
   REVIEW:  { label: "Review",  color: "text-orange-400",  bg: "bg-orange-400" },
   DEPLOY:  { label: "Deploy",  color: "text-emerald-400", bg: "bg-emerald-400" },
@@ -79,7 +79,7 @@ const PRIORITY_STYLES: Record<string, { dot: string; label: string; text: string
   critical: { dot: "bg-red-400 animate-pulse", label: "CRITICAL", text: "text-red-400" },
   high:     { dot: "bg-orange-400", label: "HIGH", text: "text-orange-400" },
   normal:   { dot: "bg-gold/70", label: "NORMAL", text: "text-gold/70" },
-  low:      { dot: "bg-white/30", label: "LOW", text: "text-white/50" },
+  low:      { dot: "bg-white/30", label: "LOW", text: "text-zinc-400" },
 };
 
 // ── Component ──
@@ -139,10 +139,10 @@ export default function WorkstreamsPage() {
         <p className="text-[0.6rem] uppercase tracking-[0.25em] text-gold/50 mb-1 font-mono">
           Pipeline &amp; Delivery
         </p>
-        <h1 className="text-2xl md:text-3xl font-display uppercase tracking-wider text-white">
+        <h1 className="text-2xl md:text-3xl font-display uppercase tracking-wider text-zinc-100">
           Workstreams
         </h1>
-        <p className="mt-1 text-xs text-white/40">
+        <p className="mt-1 text-xs text-zinc-500">
           Track every project from intake to deployment across all PMO offices.
         </p>
       </header>
@@ -158,11 +158,11 @@ export default function WorkstreamsPage() {
           <div key={m.label} className="wireframe-card p-4">
             <div className="flex items-center gap-2 mb-2">
               <m.icon size={14} className={m.accent} />
-              <p className="text-[0.55rem] uppercase tracking-widest text-white/30 font-mono">
+              <p className="text-[0.55rem] uppercase tracking-widest text-zinc-500 font-mono">
                 {m.label}
               </p>
             </div>
-            <p className="text-xl font-display text-white">{m.value}</p>
+            <p className="text-xl font-display text-zinc-100">{m.value}</p>
           </div>
         ))}
       </div>
@@ -171,7 +171,7 @@ export default function WorkstreamsPage() {
       <div className="wireframe-card p-4">
         <div className="flex items-center gap-2 mb-4">
           <BarChart3 size={14} className="text-gold/70" />
-          <p className="text-[0.55rem] uppercase tracking-[0.2em] text-white/40 font-mono">
+          <p className="text-[0.55rem] uppercase tracking-[0.2em] text-zinc-500 font-mono">
             Pipeline Stages
           </p>
         </div>
@@ -193,13 +193,13 @@ export default function WorkstreamsPage() {
                   <div className={`w-3 h-3 rounded-full ${meta.bg} ${
                     count > 0 ? "shadow-[0_0_10px_currentColor]" : "opacity-30"
                   }`} />
-                  <span className={`text-[10px] font-mono uppercase tracking-wider ${meta.color}`}>
+                  <span className={`text-xs font-mono uppercase tracking-wider ${meta.color}`}>
                     {meta.label}
                   </span>
-                  <span className="text-xs font-bold text-white">{count}</span>
+                  <span className="text-xs font-bold text-zinc-100">{count}</span>
                 </button>
                 {i < STAGES.length - 1 && (
-                  <ChevronRight size={14} className="text-white/15 flex-shrink-0" />
+                  <ChevronRight size={14} className="text-zinc-600 flex-shrink-0" />
                 )}
               </React.Fragment>
             );
@@ -209,14 +209,14 @@ export default function WorkstreamsPage() {
 
       {/* ── Filter Bar ── */}
       <div className="flex items-center gap-3">
-        <Filter size={13} className="text-white/30" />
+        <Filter size={13} className="text-zinc-500" />
         <button
           type="button"
           onClick={() => setFilter("all")}
           className={`text-xs px-3 py-1.5 rounded-full border transition-all ${
             filter === "all"
               ? "border-gold/30 bg-gold/10 text-gold"
-              : "border-wireframe-stroke text-white/50 hover:text-white/80"
+              : "border-wireframe-stroke text-zinc-400 hover:text-zinc-200"
           }`}
         >
           All ({workstreams.length})
@@ -232,7 +232,7 @@ export default function WorkstreamsPage() {
               className={`text-xs px-3 py-1.5 rounded-full border transition-all ${
                 filter === stage
                   ? "border-gold/30 bg-gold/10 text-gold"
-                  : "border-wireframe-stroke text-white/50 hover:text-white/80"
+                  : "border-wireframe-stroke text-zinc-400 hover:text-zinc-200"
               }`}
             >
               {STAGE_META[stage].label} ({count})
@@ -248,10 +248,10 @@ export default function WorkstreamsPage() {
             <div key={i} className="wireframe-card p-6 animate-pulse">
               <div className="flex items-center gap-4">
                 <div className="flex-1 space-y-2">
-                  <div className="h-4 w-48 bg-white/5 rounded" />
-                  <div className="h-2 w-32 bg-white/5 rounded" />
+                  <div className="h-4 w-48 bg-[#18181B] rounded" />
+                  <div className="h-2 w-32 bg-[#18181B] rounded" />
                 </div>
-                <div className="h-8 w-16 bg-white/5 rounded" />
+                <div className="h-8 w-16 bg-[#18181B] rounded" />
               </div>
             </div>
           ))}
@@ -295,21 +295,21 @@ export default function WorkstreamsPage() {
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-1">
-                        <h3 className="text-lg font-semibold text-white">{ws.name}</h3>
-                        <span className={`flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-wider ${priorityStyle.text}`}>
+                        <h3 className="text-lg font-semibold text-zinc-100">{ws.name}</h3>
+                        <span className={`flex items-center gap-1.5 text-xs font-mono uppercase tracking-wider ${priorityStyle.text}`}>
                           <span className={`w-1.5 h-1.5 rounded-full ${priorityStyle.dot}`} />
                           {priorityStyle.label}
                         </span>
                       </div>
-                      <p className="text-xs text-white/40 leading-relaxed">{ws.description}</p>
+                      <p className="text-xs text-zinc-500 leading-relaxed">{ws.description}</p>
                     </div>
                     <div className="text-right ml-4 flex-shrink-0">
-                      <p className="text-2xl font-bold text-white font-display">{progress}%</p>
-                      <p className="text-[9px] text-white/20 uppercase tracking-wider font-mono">Complete</p>
+                      <p className="text-2xl font-bold text-zinc-100 font-display">{progress}%</p>
+                      <p className="text-[9px] text-zinc-600 uppercase tracking-wider font-mono">Complete</p>
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-4 text-[10px] text-white/30 font-mono mb-4">
+                  <div className="flex flex-wrap items-center gap-4 text-xs text-zinc-500 font-mono mb-4">
                     <span className="flex items-center gap-1.5">
                       <Users size={10} />
                       {ws.director} &middot; {ws.pmoOffice}
@@ -344,7 +344,7 @@ export default function WorkstreamsPage() {
                       return (
                         <React.Fragment key={stage}>
                           <div className="flex-1 relative">
-                            <div className="h-2 rounded-full bg-white/5 overflow-hidden">
+                            <div className="h-2 rounded-full bg-[#18181B] overflow-hidden">
                               <div
                                 className={`h-full rounded-full transition-all duration-700 ${
                                   isComplete
@@ -361,7 +361,7 @@ export default function WorkstreamsPage() {
                             <div className="flex items-center justify-between mt-1.5">
                               <span
                                 className={`text-[8px] font-mono uppercase tracking-wider ${
-                                  isComplete ? "text-white/40" : isCurrent ? meta.color : "text-white/15"
+                                  isComplete ? "text-zinc-500" : isCurrent ? meta.color : "text-zinc-600"
                                 }`}
                               >
                                 {meta.label}
@@ -373,7 +373,7 @@ export default function WorkstreamsPage() {
                           {i < STAGES.length - 1 && (
                             <ChevronRight
                               size={10}
-                              className={`flex-shrink-0 mx-0.5 ${isFuture ? "text-white/[0.08]" : "text-white/20"}`}
+                              className={`flex-shrink-0 mx-0.5 ${isFuture ? "text-zinc-600" : "text-zinc-600"}`}
                             />
                           )}
                         </React.Fragment>
@@ -391,7 +391,7 @@ export default function WorkstreamsPage() {
       {!loading && !error && filtered.length === 0 && (
         <div className="wireframe-card border-dashed p-10 text-center">
           <AlertTriangle size={32} className="mx-auto text-gold/30 mb-3" />
-          <p className="text-sm text-white/50">
+          <p className="text-sm text-zinc-400">
             {filter === "all"
               ? "No active workstreams. Start one from Build."
               : "No workstreams in this stage."}
@@ -407,7 +407,7 @@ export default function WorkstreamsPage() {
           ) : (
             <Link
               href="/dashboard/build"
-              className="mt-4 inline-flex items-center gap-2 rounded-xl border border-wireframe-stroke bg-white/5 px-5 py-2 text-xs text-white/60 hover:bg-gold hover:text-black hover:border-gold transition-all"
+              className="mt-4 inline-flex items-center gap-2 rounded-xl border border-wireframe-stroke bg-[#18181B] px-5 py-2 text-xs text-zinc-400 hover:bg-gold hover:text-black hover:border-gold transition-all"
             >
               Open Build Wizard <ArrowRight size={12} />
             </Link>
@@ -417,7 +417,7 @@ export default function WorkstreamsPage() {
 
       {/* ── Footer ── */}
       <div className="text-center pt-2 pb-4">
-        <p className="text-[9px] font-mono text-white/15 uppercase tracking-[0.2em]">
+        <p className="text-[9px] font-mono text-zinc-600 uppercase tracking-[0.2em]">
           A.I.M.S. Workstream Pipeline &bull; {workstreams.length} active streams
         </p>
       </div>

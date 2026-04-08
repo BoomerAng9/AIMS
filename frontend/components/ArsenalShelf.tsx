@@ -48,7 +48,7 @@ export function ArsenalShelf() {
         </h2>
         <Link
           href="/dashboard/plugs"
-          className="text-[0.6rem] text-white/30 hover:text-gold transition-colors flex items-center gap-1"
+          className="text-[0.6rem] text-slate-400 hover:text-gold transition-colors flex items-center gap-1"
         >
           View all <ArrowRight size={10} />
         </Link>
@@ -67,9 +67,9 @@ export function ArsenalShelf() {
               key={i}
               className="wireframe-card flex-shrink-0 w-[120px] h-[160px] animate-pulse p-3"
             >
-              <div className="h-8 w-8 rounded-lg bg-white/5 mb-3" />
-              <div className="h-2 w-16 bg-white/5 rounded mb-2" />
-              <div className="h-2 w-10 bg-white/5 rounded" />
+              <div className="h-8 w-8 rounded-lg bg-slate-50 mb-3" />
+              <div className="h-2 w-16 bg-slate-50 rounded mb-2" />
+              <div className="h-2 w-10 bg-slate-50 rounded" />
             </div>
           ))}
 
@@ -81,17 +81,17 @@ export function ArsenalShelf() {
                 href={`/dashboard/plugs/${plug.id}`}
                 className="wireframe-card flex-shrink-0 w-[120px] h-[160px] p-3 flex flex-col items-center justify-between text-center hover:border-gold/20 transition-all group"
               >
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-wireframe-stroke bg-white/[0.02] text-white/30 group-hover:text-gold group-hover:border-gold/30 transition-colors">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-wireframe-stroke bg-white text-slate-400 group-hover:text-gold group-hover:border-gold/30 transition-colors">
                   <Layers size={18} />
                 </div>
                 <div className="mt-2 flex-1 flex flex-col justify-center">
-                  <p className="text-[0.65rem] font-medium text-white/70 leading-tight line-clamp-2 group-hover:text-white transition-colors">
+                  <p className="text-[0.65rem] font-medium text-slate-600 leading-tight line-clamp-2 group-hover:text-slate-800 transition-colors">
                     {plug.name}
                   </p>
                 </div>
                 <div className="flex items-center gap-1.5 mt-2">
                   <span className={`h-1.5 w-1.5 rounded-full ${statusDot(plug.status)}`} />
-                  <span className="text-[0.5rem] uppercase font-mono text-white/30 tracking-wider">
+                  <span className="text-[0.5rem] uppercase font-mono text-slate-400 tracking-wider">
                     {plug.status}
                   </span>
                 </div>
@@ -105,10 +105,10 @@ export function ArsenalShelf() {
             href="/dashboard/build"
             className="wireframe-card border-dashed flex-shrink-0 w-[120px] h-[160px] p-3 flex flex-col items-center justify-center text-center hover:border-gold/20 transition-all group"
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-dashed border-white/15 text-white/20 group-hover:border-gold/30 group-hover:text-gold transition-all">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-dashed border-slate-200 text-slate-300 group-hover:border-gold/30 group-hover:text-gold transition-all">
               <Plus size={18} />
             </div>
-            <p className="mt-3 text-[0.6rem] text-white/30 group-hover:text-gold/80 transition-colors">
+            <p className="mt-3 text-[0.6rem] text-slate-400 group-hover:text-gold/80 transition-colors">
               New Plug
             </p>
           </Link>

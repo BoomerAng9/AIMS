@@ -1,7 +1,7 @@
 /**
  * A.I.M.S. Next.js Middleware
  *
- * Global security layer that runs on every request.
+ * Global security layer + device-aware routing that runs on every request.
  * Protects against bots, attacks, and abuse.
  *
  * NO BACK DOORS. TRUE PENTESTING-READY.
@@ -19,23 +19,9 @@ const IS_DEMO = process.env.DEMO_MODE === 'true';
 // ─────────────────────────────────────────────────────────────
 // Domain Routing Configuration
 // ─────────────────────────────────────────────────────────────
-// plugmein.cloud = LEARN (lore, Book of V.I.B.E., galleries, merch, about)
-// aimanagedsolutions.cloud = DO (chat, dashboard, build aiPLUGs, deploy)
+// plugmein.cloud serves everything (landing + app)
 
-const LANDING_HOST = 'plugmein.cloud';          // Lore & learn domain
-const APP_HOST = 'aimanagedsolutions.cloud';     // Functional app domain
-
-// Routes that belong ONLY on the app domain (aimanagedsolutions.cloud)
-const APP_ONLY_ROUTES = [
-  '/dashboard', '/chat', '/api', '/sign-in', '/sign-up',
-  '/forgot-password', '/onboarding', '/workspace',
-];
-
-// Routes that belong ONLY on the landing domain (plugmein.cloud)
-const LANDING_ONLY_ROUTES = [
-  '/the-book-of-vibe', '/gallery', '/merch', '/about',
-  '/mission', '/team', '/careers', '/blog', '/lore',
-];
+const PRIMARY_HOST = 'plugmein.cloud';
 
 const ALLOWED_ORIGINS = IS_PRODUCTION
   ? [
@@ -46,19 +32,26 @@ const ALLOWED_ORIGINS = IS_PRODUCTION
       'https://www.aims.plugmein.cloud',
       'https://api.aims.plugmein.cloud',
       'https://luc.plugmein.cloud',
+      // foai.cloud — new primary AIMS domain
+      'https://foai.cloud',
+      'https://www.foai.cloud',
+      'https://nemoclaw.foai.cloud',
+      // aimanagedsolutions.cloud — legacy (keep for transition period)
       'https://aimanagedsolutions.cloud',
       'https://www.aimanagedsolutions.cloud',
+      'https://hh.aimanagedsolutions.cloud',
+      'https://hh.plugmein.cloud',
     ]
   : [
-      'http://localhost:3000',
-      'http://localhost:3001',
-      'http://localhost:3002',
-      'http://localhost:8080',
-      'http://127.0.0.1:3000',
-      'http://127.0.0.1:3001',
-      'http://127.0.0.1:3002',
-      'http://127.0.0.1:8080',
-    ];
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'http://localhost:3002',
+    'http://localhost:8080',
+    'http://127.0.0.1:3000',
+    'http://127.0.0.1:3001',
+    'http://127.0.0.1:3002',
+    'http://127.0.0.1:8080',
+  ];
 
 // Extended list of attack tools and malicious bots
 const BLOCKED_USER_AGENTS = [
@@ -98,11 +91,12 @@ const HONEYPOT_PATHS = [
 // Content Security Policy - strict but functional
 const CSP_DIRECTIVES = IS_PRODUCTION ? [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live",
+  // unsafe-inline required for Next.js inline scripts; unsafe-eval for dynamic imports
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' https://fonts.gstatic.com",
   "img-src 'self' data: https: blob:",
-  "connect-src 'self' https://api.aims.plugmein.cloud https://api.anthropic.com https://generativelanguage.googleapis.com https://api.moonshot.cn https://api.groq.com https://api.openai.com https://api.elevenlabs.io wss:",
+  "connect-src 'self' https://plugmein.cloud https://api.aims.plugmein.cloud https://aimanagedsolutions.cloud https://hh.aimanagedsolutions.cloud https://api.anthropic.com https://generativelanguage.googleapis.com https://api.moonshot.cn https://api.groq.com https://api.openai.com https://api.elevenlabs.io wss://plugmein.cloud wss://api.aims.plugmein.cloud",
   "media-src 'self' blob:",
   "object-src 'none'",
   "frame-ancestors 'none'",
@@ -115,7 +109,7 @@ const CSP_DIRECTIVES = IS_PRODUCTION ? [
   "style-src 'self' 'unsafe-inline'",
   "font-src 'self' data:",
   "img-src 'self' data: https: blob:",
-  "connect-src *",
+  "connect-src 'self' http://localhost:* http://127.0.0.1:* ws://localhost:* ws://127.0.0.1:*",
   "media-src 'self' blob:",
 ].join('; ');
 
@@ -133,6 +127,9 @@ const SECURITY_HEADERS = {
 
 // Rate limit store (in-memory, resets on deploy)
 const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
+const RATE_LIMIT_CLEANUP_INTERVAL_MS = 10000; // 10 seconds
+const RATE_LIMIT_MAP_MAX_SIZE = 10000; // Start cleaning when map grows too large
+let lastCleanup = 0;
 
 // ─────────────────────────────────────────────────────────────
 // Helper Functions
@@ -158,6 +155,20 @@ function isHoneypot(path: string): boolean {
 
 function checkRateLimit(ip: string, limit: number, windowMs: number): boolean {
   const now = Date.now();
+
+  // Periodic cleanup of expired entries to prevent memory leaks
+  if (
+    rateLimitStore.size > RATE_LIMIT_MAP_MAX_SIZE &&
+    now - lastCleanup > RATE_LIMIT_CLEANUP_INTERVAL_MS
+  ) {
+    rateLimitStore.forEach((value, key) => {
+      if (value.resetAt < now) {
+        rateLimitStore.delete(key);
+      }
+    });
+    lastCleanup = now;
+  }
+
   const key = `global:${ip}`;
   const state = rateLimitStore.get(key);
 
@@ -244,6 +255,27 @@ function createErrorResponse(message: string, status: number): NextResponse {
 }
 
 // ─────────────────────────────────────────────────────────────
+// Device Classification (edge-fast, no external deps)
+// ─────────────────────────────────────────────────────────────
+
+type DeviceType = 'wearable' | 'mobile' | 'tablet' | 'desktop' | 'bot' | 'unknown';
+
+function classifyDevice(userAgent: string): DeviceType {
+  const ua = userAgent.toLowerCase();
+  // Wearable patterns (watchOS, Wear OS, Tizen, Fitbit, custom AIMS wearable SDK)
+  if (/watch|wearable|tizen|fitbit|garmin|aims-wearable/i.test(ua)) return 'wearable';
+  // Tablet before mobile (iPad, Android tablet, etc.)
+  if (/ipad|tablet|kindle|silk|playbook/i.test(ua)) return 'tablet';
+  // Mobile (iPhone, Android phone, etc.)
+  if (/mobile|iphone|android|webos|ipod|blackberry|opera mini|opera mobi/i.test(ua)) return 'mobile';
+  // Bot detection (common crawlers)
+  if (/bot|crawler|spider|slurp|bingbot|googlebot/i.test(ua)) return 'bot';
+  // Anything with a real browser engine = desktop
+  if (/mozilla|chrome|safari|firefox|edge|opera/i.test(ua)) return 'desktop';
+  return 'unknown';
+}
+
+// ─────────────────────────────────────────────────────────────
 // Middleware
 // ─────────────────────────────────────────────────────────────
 
@@ -270,28 +302,72 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(redirectUrl);
   }
 
-  // 1. Domain routing — redirect wrong-domain requests to the right place
-  if (IS_PRODUCTION) {
-    const host = request.headers.get('host')?.replace(/^www\./, '') || '';
-
-    // On plugmein.cloud: redirect app routes → aimanagedsolutions.cloud
-    if (host === LANDING_HOST || host === `www.${LANDING_HOST}`) {
-      const isAppRoute = APP_ONLY_ROUTES.some(r => pathname.startsWith(r));
-      if (isAppRoute) {
-        return NextResponse.redirect(`https://${APP_HOST}${pathname}${request.nextUrl.search}`);
-      }
-    }
-
-    // On aimanagedsolutions.cloud: redirect lore routes → plugmein.cloud
-    if (host === APP_HOST || host === `www.${APP_HOST}`) {
-      const isLandingRoute = LANDING_ONLY_ROUTES.some(r => pathname.startsWith(r));
-      if (isLandingRoute) {
-        return NextResponse.redirect(`https://${LANDING_HOST}${pathname}${request.nextUrl.search}`);
-      }
+  // 0b. Chat-first: authenticated users landing on / go directly to /chat
+  // This enforces Chat w/ ACHEEVY as the default product surface.
+  if (pathname === '/') {
+    const hasSession =
+      request.cookies.has('next-auth.session-token') ||
+      request.cookies.has('__Secure-next-auth.session-token');
+    if (hasSession) {
+      const redirectUrl = request.nextUrl.clone();
+      redirectUrl.pathname = '/chat';
+      return NextResponse.redirect(redirectUrl);
     }
   }
 
-  // 2. Honeypot check (block bots probing for vulnerabilities)
+  // 1. Domain routing — foai.cloud (primary AIMS), plugmein.cloud (app), hh.plugmein.cloud, nemoclaw.foai.cloud (NemoClaw panel)
+  const hostname = request.headers.get('host') || '';
+  const isHalalHubDomain = hostname === 'hh.plugmein.cloud' || (!IS_PRODUCTION && hostname.startsWith('hh.localhost'));
+  // nemoclaw.foai.cloud → NemoClaw control panel (/nemo routes)
+  const isNemoDomain = hostname === 'nemoclaw.foai.cloud' || (!IS_PRODUCTION && hostname.startsWith('nemo.localhost'));
+  // foai.cloud is the new primary AIMS domain (replaces aimanagedsolutions.cloud)
+  const isAIMSDomain = (hostname === 'foai.cloud' || hostname === 'www.foai.cloud' || hostname.includes('aimanagedsolutions')) && !isNemoDomain;
+
+  if (isHalalHubDomain) {
+    if (pathname === '/') {
+      const url = request.nextUrl.clone();
+      url.pathname = '/halalhub';
+      return NextResponse.rewrite(url);
+    }
+    // Prevent recursive rewrites and ensure we're serving out of the /halalhub group
+    if (!pathname.startsWith('/halalhub') && !pathname.startsWith('/api')) {
+      const url = request.nextUrl.clone();
+      url.pathname = `/halalhub${pathname}`;
+      return NextResponse.rewrite(url);
+    }
+  }
+
+  // 1c. NemoClaw Whitelabel Subdomain
+  if (isNemoDomain) {
+    if (pathname === '/') {
+      const url = request.nextUrl.clone();
+      url.pathname = '/nemo';
+      return NextResponse.rewrite(url);
+    }
+    // Forward all other paths directly under /nemo if not already specified
+    if (!pathname.startsWith('/nemo') && !pathname.startsWith('/api') && !pathname.startsWith('/(auth)')) {
+      const url = request.nextUrl.clone();
+      url.pathname = `/nemo${pathname}`;
+      return NextResponse.rewrite(url);
+    }
+  }
+
+  // 1b. foai.cloud / aimanagedsolutions.cloud — OWNER/ADMIN gateway
+  // Enforce authentication on dashboard routes. Only authenticated users
+  // can access /dashboard/* on this domain. Role enforcement happens
+  // client-side in PlatformModeProvider (JWT role is server-signed, not hackable).
+  if (isAIMSDomain && pathname.startsWith('/dashboard')) {
+    const hasSession =
+      request.cookies.has('next-auth.session-token') ||
+      request.cookies.has('__Secure-next-auth.session-token');
+
+    if (!hasSession) {
+      const url = request.nextUrl.clone();
+      url.pathname = '/sign-in';
+      url.searchParams.set('callbackUrl', pathname);
+      return NextResponse.redirect(url);
+    }
+  }
   if (isHoneypot(pathname)) {
     console.warn(`[SECURITY] Honeypot triggered: ${ip} -> ${pathname}`);
     return createErrorResponse('Not Found', 404);
@@ -366,10 +442,18 @@ export function middleware(request: NextRequest) {
     if (origin && (ALLOWED_ORIGINS.includes(origin) || !IS_PRODUCTION)) {
       response.headers.set('Access-Control-Allow-Origin', origin);
       response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-      response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-API-Key');
+      response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-API-Key, X-Device-Type');
       response.headers.set('Access-Control-Max-Age', '86400');
     }
   }
+
+  // Device type detection — lightweight classification for wearable routing
+  const deviceType = classifyDevice(userAgent);
+  response.headers.set('X-Device-Type', deviceType);
+
+  // Platform domain classification — used by server components for domain-aware rendering
+  const platformDomain = isAIMSDomain ? 'aims' : isNemoDomain ? 'nemoclaw' : isHalalHubDomain ? 'halalhub' : 'plugmein';
+  response.headers.set('X-Platform-Domain', platformDomain);
 
   return response;
 }

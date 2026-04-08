@@ -141,77 +141,101 @@ export interface LUCPlan {
 // Pre-defined Plans
 // ─────────────────────────────────────────────────────────────
 
+/**
+ * Plans: 5-tier model aligned to aims-skills/luc/types.ts.
+ * No tier is "unlimited". Enterprise gets the highest caps, but all usage is finite.
+ * The 3-6-9 commitment model (P2P/3mo/6mo/9mo) applies as a separate dimension
+ * controlling token markup rates.
+ */
 export const LUC_PLANS: Record<string, LUCPlan> = {
-  free: {
-    id: 'free',
-    name: 'Free Tier',
+  p2p: {
+    id: 'p2p',
+    name: 'Pay-per-Use',
     monthlyPrice: 0,
-    overageThreshold: 0, // No overage allowed
+    overageThreshold: 0, // No overage — metered per execution
+    quotas: {
+      brave_searches: 10,
+      elevenlabs_chars: 0,
+      container_hours: 0,
+      n8n_executions: 0,
+      storage_gb: 0.5,
+      api_calls: 100,
+      openrouter_tokens: 0, // metered per-use
+      vision_analyses: 5,
+      code_generations: 0,
+      embeddings: 10,
+    },
+  },
+  coffee: {
+    id: 'coffee',
+    name: 'Buy Me a Coffee',
+    monthlyPrice: 7.99,
+    overageThreshold: 0.05, // 5% overage allowed
     quotas: {
       brave_searches: 100,
-      elevenlabs_chars: 10000,
-      container_hours: 1,
+      elevenlabs_chars: 10_000,
+      container_hours: 2,
       n8n_executions: 50,
-      storage_gb: 1,
-      api_calls: 1000,
-      openrouter_tokens: 100, // 100K tokens
+      storage_gb: 2,
+      api_calls: 1_000,
+      openrouter_tokens: 50,
       vision_analyses: 20,
       code_generations: 10,
       embeddings: 50,
     },
   },
-  starter: {
-    id: 'starter',
-    name: 'Starter',
-    monthlyPrice: 29,
+  data_entry: {
+    id: 'data_entry',
+    name: 'Data Entry',
+    monthlyPrice: 29.99,
     overageThreshold: 0.1, // 10% overage allowed
     quotas: {
-      brave_searches: 1000,
-      elevenlabs_chars: 100000,
+      brave_searches: 1_000,
+      elevenlabs_chars: 50_000,
       container_hours: 10,
       n8n_executions: 500,
       storage_gb: 10,
-      api_calls: 10000,
-      openrouter_tokens: 1000,
+      api_calls: 10_000,
+      openrouter_tokens: 500,
       vision_analyses: 200,
       code_generations: 100,
       embeddings: 500,
     },
   },
-  professional: {
-    id: 'professional',
-    name: 'Professional',
-    monthlyPrice: 99,
+  pro: {
+    id: 'pro',
+    name: 'Pro',
+    monthlyPrice: 99.99,
     overageThreshold: 0.25, // 25% overage allowed
     quotas: {
-      brave_searches: 5000,
-      elevenlabs_chars: 500000,
+      brave_searches: 10_000,
+      elevenlabs_chars: 200_000,
       container_hours: 50,
-      n8n_executions: 2000,
-      storage_gb: 50,
-      api_calls: 50000,
-      openrouter_tokens: 5000,
-      vision_analyses: 1000,
+      n8n_executions: 5_000,
+      storage_gb: 100,
+      api_calls: 100_000,
+      openrouter_tokens: 5_000,
+      vision_analyses: 1_000,
       code_generations: 500,
-      embeddings: 2000,
+      embeddings: 2_000,
     },
   },
   enterprise: {
     id: 'enterprise',
     name: 'Enterprise',
-    monthlyPrice: 499,
-    overageThreshold: 0.5, // 50% overage allowed
+    monthlyPrice: 299,
+    overageThreshold: 0.5, // 50% overage allowed (most generous, NOT unlimited)
     quotas: {
-      brave_searches: 50000,
-      elevenlabs_chars: 5000000,
+      brave_searches: 50_000,
+      elevenlabs_chars: 2_000_000,
       container_hours: 500,
-      n8n_executions: 20000,
+      n8n_executions: 25_000,
       storage_gb: 500,
-      api_calls: 500000,
-      openrouter_tokens: 50000,
-      vision_analyses: 10000,
-      code_generations: 5000,
-      embeddings: 20000,
+      api_calls: 500_000,
+      openrouter_tokens: 50_000,
+      vision_analyses: 10_000,
+      code_generations: 5_000,
+      embeddings: 20_000,
     },
   },
 };
@@ -288,7 +312,7 @@ export class LUCEngine {
 
   constructor(account: LUCAccountRecord) {
     this.account = account;
-    this.plan = LUC_PLANS[account.planId] || LUC_PLANS.free;
+    this.plan = LUC_PLANS[account.planId] || LUC_PLANS.p2p;
   }
 
   // ─────────────────────────────────────────────────────────
@@ -589,9 +613,9 @@ export class LUCEngine {
 
 export function createLUCAccount(
   userId: string,
-  planId: string = 'free'
+  planId: string = 'p2p'
 ): LUCAccountRecord {
-  const plan = LUC_PLANS[planId] || LUC_PLANS.free;
+  const plan = LUC_PLANS[planId] || LUC_PLANS.p2p;
   const now = new Date();
   const nextMonth = new Date(now);
   nextMonth.setMonth(nextMonth.getMonth() + 1);

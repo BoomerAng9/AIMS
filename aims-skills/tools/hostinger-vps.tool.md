@@ -4,7 +4,7 @@ name: "Hostinger VPS"
 type: "tool"
 category: "infra"
 provider: "Hostinger"
-description: "Cloud Startup VPS hosting at 76.13.96.107 — AIMS deployment target."
+description: "Hostinger KVM2 VPS — AIMS Core (76.13.96.107) runs all platform services."
 env_vars: []
 docs_url: "https://support.hostinger.com/en/articles/vps"
 aims_files:
@@ -17,16 +17,29 @@ aims_files:
 
 ## Overview
 
-AIMS runs on a Hostinger Cloud Startup VPS. The VPS hosts all Docker containers (frontend, UEF gateway, n8n, Redis, Nginx) and is provisioned via `vps-setup.sh`.
+AIMS runs on a **single Hostinger KVM2 VPS** that hosts all core platform services and automation workloads.
 
 ## Server Details
 
-| Property | Value |
-|----------|-------|
-| IP | 76.13.96.107 |
-| OS | Ubuntu 22.04+ |
-| Plan | Cloud Startup |
-| Deploy user | `aims` |
+| | AIMS Core |
+|---|---|
+| **Hostname** | `srv1328075.hstgr.cloud` |
+| **IP** | `76.13.96.107` |
+| **Plan** | KVM 2 |
+| **Expires** | 2027-02-03 |
+| **OS** | Ubuntu 22.04+ |
+| **Deploy user** | `aims` |
+| **What runs here** | Frontend, UEF Gateway, ACHEEVY, Redis, Nginx, n8n, all agents |
+| **Compose file** | `infra/docker-compose.prod.yml` |
+
+## Deployment
+
+### AIMS Core (76.13.96.107)
+```bash
+./deploy.sh --domain plugmein.cloud --landing-domain aimanagedsolutions.cloud
+# First-time cert: add --email acheevy@aimanagedsolutions.cloud
+# SSH: ssh root@76.13.96.107
+```
 
 ## MCP Integration
 
@@ -38,13 +51,7 @@ Hostinger API is available via MCP server: `mcp-tools/hostinger-config.json`
 sudo ./infra/vps-setup.sh
 ```
 
-Installs: Node.js 20, Bun, Docker, Docker Compose, UFW firewall, Fail2ban, Claude Code CLI, Gemini CLI.
-
-## Deployment
-
-```bash
-./deploy.sh --domain plugmein.cloud --email acheevy@aimanagedsolutions.cloud
-```
+Installs: Node.js 22, Bun, Docker, Docker Compose, UFW firewall, Fail2ban, Claude Code CLI, Gemini CLI.
 
 ## Firewall Rules (UFW)
 
@@ -63,4 +70,5 @@ All other ports blocked. Internal services communicate via Docker network.
 | SSH timeout | Check UFW allows port 22; verify Hostinger firewall rules |
 | Docker not starting | Run `systemctl start docker` |
 | Disk full | Check `df -h`; prune Docker: `docker system prune -a` |
-| DNS not resolving | Update A record at Hostinger DNS to point to 76.13.96.107 |
+| DNS not resolving | Update A record at Hostinger DNS to point to `76.13.96.107` |
+

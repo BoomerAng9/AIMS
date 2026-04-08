@@ -177,11 +177,12 @@ async function delegateToAgent(
       };
     }
 
-    const data = await response.json();
+    const data = (await response.json()) as Record<string, unknown>;
+    const task = data.task as Record<string, unknown> | undefined;
     return {
       success: true,
       delegatedTo: agent.id,
-      taskId: data.task?.id || taskId,
+      taskId: (task?.id as string) || taskId,
       response: data,
     };
   } catch (err) {

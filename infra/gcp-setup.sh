@@ -28,7 +28,7 @@ error() { printf "${RED}[AIMS]${NC}  %s\n" "$1"; }
 header(){ printf "\n${CYAN}━━━ %s ━━━${NC}\n\n" "$1"; }
 
 # Parse arguments
-PROJECT_ID="ai-managed-services"
+PROJECT_ID="aims-aimanagedsolutions"
 REGION="us-central1"
 REPO_NAME="aims-docker"
 
@@ -127,7 +127,7 @@ gcloud builds triggers create github \
 
 info ""
 info "If the trigger creation failed, connect GitHub manually:"
-info "  1. Go to: https://console.cloud.google.com/cloud-build/triggers?project=ai-managed-services"
+info "  1. Go to: https://console.cloud.google.com/cloud-build/triggers?project=aims-aimanagedsolutions"
 info "  2. Click 'Connect Repository' → GitHub → BoomerAng9/AIMS"
 info "  3. Create trigger: branch=main, config=cloudbuild.yaml"
 info "  4. Set substitutions: _REGION=us-central1, _REPO=aims-docker"

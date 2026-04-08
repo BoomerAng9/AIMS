@@ -1,0 +1,20 @@
+ Container aims-acheevy-1 Started 
+ Container aims-house-of-ang-1 Waiting 
+ Container aims-acheevy-1 Waiting 
+ Container aims-uef-gateway-1 Waiting 
+ Container aims-uef-gateway-1 Healthy 
+ Container aims-house-of-ang-1 Healthy 
+ Container aims-acheevy-1 Healthy 
+ Container aims-frontend-1 Starting 
+ Container aims-frontend-1 Started 
+ Container aims-uef-gateway-1 Waiting 
+ Container aims-frontend-1 Waiting 
+ Container aims-uef-gateway-1 Healthy 
+ Container aims-frontend-1 Healthy 
+ Container aims-nginx-1 Starting 
+ Container aims-nginx-1 Started 
+[0;32m[AIMS][0m  Services started. Orphaned containers removed.
+[0;32m[AIMS][0m  Waiting for services to pass health checks...
+
+[0;36mΓöüΓöüΓöü SSL Certificate Setup ΓÇö Landing Domain (aimanagedsolutions.cloud) ΓöüΓöüΓöü[0m
+

@@ -99,7 +99,7 @@
     "Boomer_Ang": {
       "pattern": "^[A-Za-z0-9\\-]+_Ang$",
       "rule": "<Nickname>_Ang — role-fitting, not generic.",
-      "examples": ["Forge_Ang", "Chronicle_Ang", "Gatekeeper_Ang", "Scout_Ang", "Bridge_Ang"]
+      "examples": ["Buildsmith", "Chronicle_Ang", "Gatekeeper_Ang", "Scout_Ang", "Bridge_Ang"]
     },
     "Chicken Hawk": {
       "pattern": "^Chicken Hawk$",

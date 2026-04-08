@@ -1,0 +1,3 @@
+[submodule "vendor/common-ground-core"]
+	path = vendor/common-ground-core
+	url = https://github.com/Intelligent-Internet/CommonGround.git

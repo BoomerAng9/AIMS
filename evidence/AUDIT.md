@@ -94,3 +94,4 @@
 | `frontend/app/api/discord/webhook/route.ts` | New — Discord adapter |
 | `evidence/*.json` | New — evidence artifacts |
 | `evidence/AUDIT.md` | New — this file |
+

@@ -152,7 +152,7 @@ function StatBar({
           {current} / {max}
         </span>
       </div>
-      <div className="h-1.5 bg-black/50 rounded-full overflow-hidden">
+      <div className="h-1.5 bg-slate-50/60 rounded-full overflow-hidden">
         <motion.div
           className="h-full rounded-full"
           style={{ backgroundColor: color }}
@@ -184,7 +184,7 @@ export function Spacecraft({
 
   return (
     <motion.div
-      className="bg-black/40 backdrop-blur-xl border border-wireframe-stroke rounded-2xl p-6"
+      className="bg-slate-100/60 backdrop-blur-xl border border-wireframe-stroke rounded-2xl p-6"
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
     >
@@ -196,7 +196,7 @@ export function Spacecraft({
         <div className="flex-1">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="text-lg font-bold text-white">{name}</h3>
+              <h3 className="text-lg font-bold text-slate-800">{name}</h3>
               <p className="text-sm" style={{ color: config.color }}>
                 {config.label} Class
               </p>
@@ -242,7 +242,7 @@ export function Spacecraft({
           {onCustomize && (
             <button
               onClick={onCustomize}
-              className="mt-4 w-full py-2 px-4 rounded-lg bg-white/5 border border-wireframe-stroke text-sm text-gray-300 hover:bg-white/10 hover:text-white transition-colors"
+              className="mt-4 w-full py-2 px-4 rounded-lg bg-slate-50 border border-wireframe-stroke text-sm text-gray-300 hover:bg-slate-100 hover:text-slate-800 transition-colors"
             >
               🔧 Customize with Claude Code
             </button>

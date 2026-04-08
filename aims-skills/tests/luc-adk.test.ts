@@ -18,11 +18,11 @@ describe('LucAdk', () => {
   });
 
   describe('LUC_PLANS', () => {
-    it('should have free plan', () => {
-      const free = LUC_PLANS.free;
-      expect(free.price_monthly).toBe(0);
-      expect(free.quotas.brave_searches).toBe(10);
-      expect(free.quotas.api_calls).toBe(100);
+    it('should have p2p (pay-per-use) plan', () => {
+      const p2p = LUC_PLANS.p2p;
+      expect(p2p.price_monthly).toBe(0);
+      expect(p2p.quotas.brave_searches).toBe(10);
+      expect(p2p.quotas.api_calls).toBe(100);
     });
 
     it('should have coffee plan', () => {
@@ -45,12 +45,12 @@ describe('LucAdk', () => {
       expect(pro.features).toContain('API access');
     });
 
-    it('should have enterprise plan with unlimited quotas', () => {
+    it('should have enterprise plan with highest allocations', () => {
       const enterprise = LUC_PLANS.enterprise;
       expect(enterprise.price_monthly).toBe(299);
-      expect(enterprise.quotas.brave_searches).toBe(-1); // unlimited
-      expect(enterprise.quotas.api_calls).toBe(-1); // unlimited
-      expect(enterprise.features).toContain('Unlimited everything');
+      expect(enterprise.quotas.brave_searches).toBe(50_000);
+      expect(enterprise.quotas.api_calls).toBe(500_000);
+      expect(enterprise.features).toContain('Highest allocations across all services');
     });
   });
 
@@ -87,13 +87,13 @@ describe('LucAdk', () => {
   });
 
   describe('recommendPlan', () => {
-    it('should recommend free plan for minimal usage', () => {
+    it('should recommend p2p plan for minimal usage', () => {
       const result = LucAdk.recommendPlan({
         brave_searches: 5,
         api_calls: 50
       });
-      
-      expect(result.recommended_plan).toBe('free');
+
+      expect(result.recommended_plan).toBe('p2p');
     });
 
     it('should recommend coffee plan for light usage', () => {

@@ -31,7 +31,7 @@ const PHASE_CONFIG: Record<OrchestrationPhase, {
   color: string;
 }> = {
   ingest: { label: 'Receiving', icon: '📥', color: 'text-blue-400' },
-  route: { label: 'Routing', icon: '🔀', color: 'text-purple-400' },
+  route: { label: 'Routing', icon: '🔀', color: 'text-amber-400' },
   delegate: { label: 'Delegating', icon: '👥', color: 'text-cyan-400' },
   execute: { label: 'Working', icon: '⚙️', color: 'text-gold' },
   verify: { label: 'Verifying', icon: '✓', color: 'text-green-400' },
@@ -65,7 +65,7 @@ function AgentAvatar({ agent, size = 'sm', status }: {
   status?: BoomerAngStatus;
 }) {
   const sizeClasses = {
-    sm: 'w-6 h-6 text-[10px]',
+    sm: 'w-6 h-6 text-xs',
     md: 'w-8 h-8 text-xs',
     lg: 'w-10 h-10 text-sm',
   };
@@ -73,14 +73,14 @@ function AgentAvatar({ agent, size = 'sm', status }: {
   const roleColors = {
     acheevy: 'bg-gradient-to-br from-gold to-gold/60',
     manager: 'bg-gradient-to-br from-cyan-500 to-blue-600',
-    boomerang: 'bg-gradient-to-br from-purple-500 to-indigo-600',
+    boomerang: 'bg-gradient-to-br from-amber-500 to-amber-600',
   };
 
   return (
     <div className="relative">
       <div className={`
         ${sizeClasses[size]} ${roleColors[agent.role]}
-        rounded-full flex items-center justify-center font-bold text-white
+        rounded-full flex items-center justify-center font-bold text-obsidian
       `}>
         {agent.avatar || agent.name[0]}
       </div>
@@ -107,21 +107,21 @@ function HandoffEventItem({ event, isLatest }: { event: HandoffEvent; isLatest: 
       animate={{ opacity: 1, x: 0 }}
       className={`
         flex items-start gap-2 py-2 px-3 rounded-lg
-        ${isLatest ? 'bg-gold/10' : 'bg-white/[0.02]'}
+        ${isLatest ? 'bg-gold/10' : 'bg-surface'}
       `}
     >
       <AgentAvatar agent={event.fromAgent} size="sm" />
       <div className="flex-1 min-w-0">
-        <p className="text-xs text-white/70 truncate">
+        <p className="text-xs text-zinc-400 truncate">
           {event.message}
         </p>
         {event.userContext && (
-          <p className="text-[10px] text-gold/50 mt-0.5 truncate">
+          <p className="text-xs text-gold/50 mt-0.5 truncate">
             {event.userContext}
           </p>
         )}
       </div>
-      <span className="text-[10px] text-white/20 whitespace-nowrap">
+      <span className="text-xs text-zinc-600 whitespace-nowrap">
         {timeAgo}
       </span>
     </motion.div>
@@ -141,10 +141,10 @@ function DialogueBubble({ dialogue }: { dialogue: AgentDialogue }) {
     >
       <AgentAvatar agent={dialogue.speaker} size="sm" />
       <div className="flex-1">
-        <span className="text-[10px] text-gold font-medium">
+        <span className="text-xs text-gold font-medium">
           {dialogue.speaker.name}
         </span>
-        <p className="text-xs text-white/70 mt-0.5">
+        <p className="text-xs text-zinc-400 mt-0.5">
           {highlightUserName(dialogue.content, dialogue.userNameMention)}
         </p>
       </div>
@@ -188,7 +188,7 @@ function PhaseProgress({ currentPhase }: { currentPhase: OrchestrationPhase }) {
                 w-2 h-2 rounded-full transition-all
                 ${isActive && !isBlocked ? 'bg-gold animate-pulse' : ''}
                 ${isComplete ? 'bg-green-400' : ''}
-                ${!isActive && !isComplete ? 'bg-white/20' : ''}
+                ${!isActive && !isComplete ? 'bg-zinc-700' : ''}
                 ${isBlocked && isActive ? 'bg-orange-400 animate-pulse' : ''}
               `}
               title={config.label}
@@ -196,7 +196,7 @@ function PhaseProgress({ currentPhase }: { currentPhase: OrchestrationPhase }) {
             {i < phases.length - 1 && (
               <div className={`
                 w-3 h-0.5 mx-0.5
-                ${isComplete ? 'bg-green-400/50' : 'bg-white/10'}
+                ${isComplete ? 'bg-green-400/50' : 'bg-zinc-700'}
               `} />
             )}
           </div>
@@ -221,11 +221,11 @@ function ActiveAgentsList({ state }: { state: OrchestrationState }) {
             <p className="text-xs font-medium text-cyan-300 truncate">
               {state.activeManager.name}
             </p>
-            <p className="text-[10px] text-cyan-300/60">
+            <p className="text-xs text-cyan-300/60">
               {state.activeManager.department} Lead
             </p>
           </div>
-          <span className="text-[10px] text-cyan-300/40">Managing</span>
+          <span className="text-xs text-cyan-300/40">Managing</span>
         </div>
       )}
 
@@ -243,7 +243,7 @@ function ActiveAgentsList({ state }: { state: OrchestrationState }) {
             >
               <AgentAvatar agent={ang} size="sm" status={ang.currentStatus} />
               <div className="flex-1 min-w-0">
-                <p className="text-[10px] font-medium text-white truncate">
+                <p className="text-xs font-medium text-zinc-200 truncate">
                   {ang.name}
                 </p>
                 <p className={`text-[9px] ${statusConfig.color}`}>
@@ -292,7 +292,7 @@ export function OperationsOverlay({ state, onClose, onExpand, onMinimize }: Oper
       className={`
         fixed bottom-24 right-4 z-50
         ${isExpanded ? 'w-96' : 'w-72'}
-        bg-black/90 backdrop-blur-xl border border-wireframe-stroke rounded-2xl
+        bg-surface-raised/95 backdrop-blur-xl border border-wireframe-stroke rounded-2xl
         shadow-2xl shadow-black/50
         overflow-hidden transition-all duration-300
       `}
@@ -314,19 +314,19 @@ export function OperationsOverlay({ state, onClose, onExpand, onMinimize }: Oper
         <div className="flex items-center gap-1">
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="p-1.5 rounded-lg hover:bg-white/10 text-white/40 hover:text-white transition-colors"
+            className="p-1.5 rounded-lg hover:bg-white/5 text-zinc-500 hover:text-zinc-300 transition-colors"
           >
             {isExpanded ? '⊖' : '⊕'}
           </button>
           <button
             onClick={onExpand}
-            className="p-1.5 rounded-lg hover:bg-white/10 text-white/40 hover:text-white transition-colors"
+            className="p-1.5 rounded-lg hover:bg-white/5 text-zinc-500 hover:text-zinc-300 transition-colors"
           >
             ⊡
           </button>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg hover:bg-white/10 text-white/40 hover:text-white transition-colors"
+            className="p-1.5 rounded-lg hover:bg-white/5 text-zinc-500 hover:text-zinc-300 transition-colors"
           >
             ✕
           </button>
@@ -336,7 +336,7 @@ export function OperationsOverlay({ state, onClose, onExpand, onMinimize }: Oper
       {/* User Context Bar */}
       {state.userName && (
         <div className="px-4 py-2 bg-gold/5 border-b border-wireframe-stroke">
-          <p className="text-[10px] text-gold/80">
+          <p className="text-xs text-gold/80">
             Working on: <span className="font-medium text-gold">{state.userName}</span>
             {state.projectTitle && ` • ${state.projectTitle}`}
           </p>
@@ -351,7 +351,7 @@ export function OperationsOverlay({ state, onClose, onExpand, onMinimize }: Oper
         {/* Active Agents (expanded view) */}
         {isExpanded && state.activeAngs.length > 0 && (
           <div className="p-3 border-b border-wireframe-stroke">
-            <p className="text-[10px] uppercase tracking-wider text-white/30 mb-2">
+            <p className="text-xs uppercase tracking-wider text-zinc-500 mb-2">
               Active Agents
             </p>
             <ActiveAgentsList state={state} />
@@ -360,7 +360,7 @@ export function OperationsOverlay({ state, onClose, onExpand, onMinimize }: Oper
 
         {/* Event Feed */}
         <div className="p-3 space-y-1">
-          <p className="text-[10px] uppercase tracking-wider text-white/30 mb-2">
+          <p className="text-xs uppercase tracking-wider text-slate-400 mb-2">
             Operations
           </p>
           <AnimatePresence mode="popLayout">
@@ -377,7 +377,7 @@ export function OperationsOverlay({ state, onClose, onExpand, onMinimize }: Oper
         {/* Agent Dialogue (expanded view) */}
         {isExpanded && latestDialogues.length > 0 && (
           <div className="p-3 border-t border-wireframe-stroke">
-            <p className="text-[10px] uppercase tracking-wider text-white/30 mb-2">
+            <p className="text-xs uppercase tracking-wider text-zinc-500 mb-2">
               Team Discussion
             </p>
             <div className="space-y-1">
@@ -397,7 +397,7 @@ export function OperationsOverlay({ state, onClose, onExpand, onMinimize }: Oper
             <p className="text-xs font-medium">Waiting on your input</p>
           </div>
           {state.blockingQuestion && (
-            <p className="text-[11px] text-orange-300/70 mt-1">
+            <p className="text-sm text-orange-300/70 mt-1">
               {state.blockingQuestion}
             </p>
           )}
@@ -406,7 +406,7 @@ export function OperationsOverlay({ state, onClose, onExpand, onMinimize }: Oper
 
       {/* Working Animation */}
       {state.phase === 'execute' && (
-        <div className="h-1 bg-white/5 overflow-hidden">
+        <div className="h-1 bg-zinc-800 overflow-hidden">
           <motion.div
             className="h-full bg-gold"
             initial={{ x: '-100%' }}
@@ -438,8 +438,8 @@ export function OperationsPulse({ phase, onClick }: {
       className={`
         fixed bottom-24 right-4 z-50
         flex items-center gap-2 px-3 py-2
-        bg-black/80 backdrop-blur-xl border border-wireframe-stroke rounded-full
-        hover:bg-black/90 transition-colors
+        bg-surface-raised/80 backdrop-blur-xl border border-wireframe-stroke rounded-full
+        hover:bg-surface-raised/90 transition-colors
       `}
     >
       <span className="text-sm">{config.icon}</span>

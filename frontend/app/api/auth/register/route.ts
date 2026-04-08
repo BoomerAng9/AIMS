@@ -7,26 +7,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
 import bcrypt from 'bcryptjs';
+import { registerSchema, validateInput } from '@/lib/validation/schemas';
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { firstName, lastName, email, password, businessName, businessType, country, state, city, postalCode } = body;
+    const validation = validateInput(registerSchema, body);
 
-    // ── Validate required fields ──────────────────────────
-    if (!email || !password || !firstName) {
+    if (!validation.success) {
       return NextResponse.json(
-        { error: 'Email, password, and first name are required' },
+        { error: 'Invalid registration input', details: validation.errors },
         { status: 400 }
       );
     }
 
-    if (password.length < 6) {
-      return NextResponse.json(
-        { error: 'Password must be at least 6 characters' },
-        { status: 400 }
-      );
-    }
+    const { firstName, lastName, email, password, businessName, businessType, country, state, city, postalCode } = validation.data;
 
     // ── Check for existing user ──────────────────────────
     const existingUser = await prisma.user.findUnique({
@@ -43,6 +38,15 @@ export async function POST(req: NextRequest) {
     // ── Hash password ────────────────────────────────────
     const passwordHash = await bcrypt.hash(password, 12);
 
+    // ── Build metadata JSON for business/region info ─────
+    const meta: Record<string, string> = {};
+    if (businessName) meta.businessName = businessName;
+    if (businessType) meta.businessType = businessType;
+    if (country) meta.country = country;
+    if (state) meta.state = state;
+    if (city) meta.city = city;
+    if (postalCode) meta.postalCode = postalCode;
+
     // ── Create user ──────────────────────────────────────
     const name = [firstName, lastName].filter(Boolean).join(' ');
     const user = await prisma.user.create({
@@ -50,14 +54,11 @@ export async function POST(req: NextRequest) {
         email: email.toLowerCase().trim(),
         name,
         passwordHash,
-        role: 'MEMBER',
+        role: 'CUSTOMER',
         status: 'ACTIVE',
+        metadata: Object.keys(meta).length > 0 ? JSON.stringify(meta) : null,
       },
     });
-
-    // ── Optionally store business/region metadata ────────
-    // TODO: When workspace model supports metadata, store businessName,
-    // businessType, country, state, city, postalCode as workspace config.
 
     return NextResponse.json(
       { success: true, userId: user.id },

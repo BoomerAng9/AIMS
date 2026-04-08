@@ -1,24 +1,27 @@
 /**
  * useUserTier — Runtime subscription tier check
  *
- * Reads the user's current 3-6-9 plan and exposes feature gates.
+ * Reads the user's current plan and exposes feature gates.
  * Persists tier in localStorage and refreshes from /api/stripe/subscription.
  *
+ * 5-tier model: p2p | coffee | data_entry | pro | enterprise
+ * The 3-6-9 commitment duration applies as a separate axis for token markup.
+ *
  * Tier Feature Matrix:
- *   Feature          | P2P (Free) | Garage ($99) | Community ($89) | Enterprise ($67)
- *   Chat             |     ✓      |      ✓       |       ✓         |       ✓
- *   File Upload      |     ✓      |      ✓       |       ✓         |       ✓
- *   Voice STT (mic)  |     ✗      |      ✓       |       ✓         |       ✓
- *   Auto-TTS         |     ✗      |      ✓       |       ✓         |       ✓
- *   Collab Feed      |   View     |     Full     |      Full       |      Full
- *   Code Sandbox     |     ✗      |      ✓       |       ✓         |       ✓
- *   Max agents       |   Unlim.   |      3       |       10        |       50
- *   Concurrent       |     1      |      1       |        5        |       25
+ *   Feature          | P2P       | Coffee    | Data Entry | Pro        | Enterprise
+ *   Chat             |     Y     |     Y     |     Y      |     Y      |     Y
+ *   File Upload      |     Y     |     Y     |     Y      |     Y      |     Y
+ *   Voice STT (mic)  |     N     |     Y     |     Y      |     Y      |     Y
+ *   Auto-TTS         |     N     |     Y     |     Y      |     Y      |     Y
+ *   Collab Feed      |   View    |   View    |    Full    |    Full    |    Full
+ *   Code Sandbox     |     N     |     N     |     Y      |     Y      |     Y
+ *   Max agents       |     0     |     5     |     15     |     50     |    100
+ *   Concurrent       |     1     |     1     |      3     |     10     |     25
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 
-export type TierId = 'p2p' | 'garage' | 'community' | 'enterprise';
+export type TierId = 'p2p' | 'coffee' | 'data_entry' | 'pro' | 'enterprise';
 
 export interface UserTier {
   id: TierId;
@@ -57,7 +60,7 @@ const TIER_STORAGE_KEY = 'aims_user_tier';
 
 const DEFAULT_TIER: UserTier = {
   id: 'p2p',
-  name: 'P2P (Free)',
+  name: 'Pay-per-Use',
   isPaid: false,
   monthlyPrice: 0,
   tokensIncluded: 0,
@@ -68,13 +71,14 @@ const DEFAULT_TIER: UserTier = {
 
 function buildGates(tier: UserTier): FeatureGates {
   const isPaid = tier.id !== 'p2p';
+  const isDataEntryPlus = ['data_entry', 'pro', 'enterprise'].includes(tier.id);
   return {
-    chat: true,                   // All tiers
-    fileUpload: true,             // All tiers
-    voiceStt: isPaid,             // Paid only
-    autoTts: isPaid,              // Paid only
-    collabFeedFull: isPaid,       // Paid = full, free = view-only
-    codeSandbox: isPaid,          // Paid only
+    chat: true,                         // All tiers
+    fileUpload: true,                   // All tiers
+    voiceStt: isPaid,                   // Coffee+
+    autoTts: isPaid,                    // Coffee+
+    collabFeedFull: isDataEntryPlus,    // Data Entry+ = full, below = view-only
+    codeSandbox: isDataEntryPlus,       // Data Entry+
     maxAgents: tier.agents,
     maxConcurrent: tier.concurrent,
   };
@@ -84,19 +88,6 @@ export function useUserTier(): UseUserTierReturn {
   const [tier, setTier] = useState<UserTier>(DEFAULT_TIER);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  // Load from localStorage on mount
-  useEffect(() => {
-    try {
-      const cached = localStorage.getItem(TIER_STORAGE_KEY);
-      if (cached) {
-        const parsed = JSON.parse(cached) as UserTier;
-        setTier(parsed);
-      }
-    } catch {}
-    // Fetch fresh from API
-    refresh();
-  }, []);
 
   const refresh = useCallback(async () => {
     setIsLoading(true);
@@ -108,7 +99,7 @@ export function useUserTier(): UseUserTierReturn {
         const data = await res.json();
         const newTier: UserTier = {
           id: data.tierId || 'p2p',
-          name: data.tierName || 'P2P (Free)',
+          name: data.tierName || 'Pay-per-Use',
           isPaid: data.tierId !== 'p2p',
           monthlyPrice: data.monthlyPrice || 0,
           tokensIncluded: data.tokensIncluded || 0,
@@ -134,6 +125,18 @@ export function useUserTier(): UseUserTierReturn {
       setIsLoading(false);
     }
   }, []);
+
+  // Load from localStorage on mount, then fetch fresh
+  useEffect(() => {
+    try {
+      const cached = localStorage.getItem(TIER_STORAGE_KEY);
+      if (cached) {
+        const parsed = JSON.parse(cached) as UserTier;
+        setTier(parsed);
+      }
+    } catch {}
+    refresh();
+  }, [refresh]);
 
   const gates = useMemo(() => buildGates(tier), [tier]);
 

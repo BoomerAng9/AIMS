@@ -18,6 +18,8 @@ export interface ChatMessage {
   audioUrl?: string;
   attachments?: MessageAttachment[];
   metadata?: Record<string, unknown>;
+  /** Generative UI blocks from the bridge protocol */
+  blocks?: import('@/lib/bridge/types').GenerativeBlock[];
 }
 
 export interface MessageAttachment {
@@ -36,13 +38,13 @@ export type VoiceInputState = 'idle' | 'listening' | 'processing' | 'error';
 export type VoiceOutputState = 'idle' | 'loading' | 'playing' | 'paused' | 'error';
 
 export interface VoiceInputConfig {
-  provider: 'groq' | 'deepgram' | 'openai' | 'browser';
+  provider: 'elevenlabs' | 'deepgram' | 'groq' | 'browser';
   language?: string;
   continuous?: boolean;
 }
 
 export interface VoiceOutputConfig {
-  provider: 'elevenlabs' | 'deepgram' | 'browser';
+  provider: 'elevenlabs' | 'deepgram' | 'browser' | 'groq';
   voiceId?: string;
   autoPlay: boolean;
   speed?: number;
@@ -96,6 +98,19 @@ export interface ChatResponse {
     completionTokens: number;
     totalTokens: number;
   };
+}
+
+// ─────────────────────────────────────────────────────────────
+// Tool Execution Types
+// ─────────────────────────────────────────────────────────────
+
+export interface ToolExecutionEvent {
+  type: string;
+  intent: string;
+  taskId?: string;
+  status: 'dispatched' | 'running' | 'completed' | 'failed';
+  steps?: number;
+  lucUsage?: { service: string; amount: number };
 }
 
 // ─────────────────────────────────────────────────────────────

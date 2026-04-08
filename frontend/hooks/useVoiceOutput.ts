@@ -9,8 +9,9 @@
  * - Audio caching for repeated phrases
  */
 
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import type { VoiceOutputState, VoiceOutputConfig } from '@/lib/chat/types';
+import { sanitizeForTTS } from '@/lib/voice/sanitize';
 
 interface UseVoiceOutputOptions {
   config?: VoiceOutputConfig;
@@ -26,7 +27,7 @@ interface UseVoiceOutputReturn {
   isLoading: boolean;
   currentText: string | null;
   error: string | null;
-  progress: number;
+  onProgress: (callback: (p: number) => void) => () => void;
   speak: (text: string, immediate?: boolean) => Promise<void>;
   pause: () => void;
   resume: () => void;
@@ -44,7 +45,6 @@ export function useVoiceOutput(options: UseVoiceOutputOptions = {}): UseVoiceOut
   const [state, setState] = useState<VoiceOutputState>('idle');
   const [currentText, setCurrentText] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [progress, setProgress] = useState(0);
   const [autoPlayEnabled, setAutoPlayEnabled] = useState(config?.autoPlay ?? true);
 
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -55,6 +55,7 @@ export function useVoiceOutput(options: UseVoiceOutputOptions = {}): UseVoiceOut
   const startTimeRef = useRef<number>(0);
   const durationRef = useRef<number>(0);
   const pausedAtRef = useRef<number>(0);
+  const progressListeners = useRef<Set<(p: number) => void>>(new Set());
 
   // ─────────────────────────────────────────────────────────
   // Initialize Audio Context
@@ -74,8 +75,12 @@ export function useVoiceOutput(options: UseVoiceOutputOptions = {}): UseVoiceOut
   // ─────────────────────────────────────────────────────────
 
   const fetchAudio = useCallback(async (text: string): Promise<ArrayBuffer> => {
+    // Strip markdown before sending to TTS — prevents reading "asterisk", "pound sign" etc.
+    const cleanText = sanitizeForTTS(text);
+    if (!cleanText) throw new Error('No speakable text after sanitization');
+
     // Check cache first
-    const cacheKey = `${config?.voiceId || 'default'}-${text}`;
+    const cacheKey = `${config?.voiceId || 'default'}-${cleanText}`;
     if (audioCache.has(cacheKey)) {
       return audioCache.get(cacheKey)!;
     }
@@ -84,7 +89,7 @@ export function useVoiceOutput(options: UseVoiceOutputOptions = {}): UseVoiceOut
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        text,
+        text: cleanText,
         provider: config?.provider || 'elevenlabs',
         voiceId: config?.voiceId,
       }),
@@ -97,7 +102,7 @@ export function useVoiceOutput(options: UseVoiceOutputOptions = {}): UseVoiceOut
     const audioData = await response.arrayBuffer();
 
     // Cache short phrases (under 200 chars)
-    if (text.length < 200) {
+    if (cleanText.length < 200) {
       audioCache.set(cacheKey, audioData);
     }
 
@@ -138,7 +143,7 @@ export function useVoiceOutput(options: UseVoiceOutputOptions = {}): UseVoiceOut
     source.onended = () => {
       if (isPlayingRef.current) {
         isPlayingRef.current = false;
-        setProgress(1);
+        progressListeners.current.forEach(cb => cb(1));
         setState('idle');
         setCurrentText(null);
         onEnd?.();
@@ -159,7 +164,8 @@ export function useVoiceOutput(options: UseVoiceOutputOptions = {}): UseVoiceOut
     const updateProgress = () => {
       if (isPlayingRef.current && audioContextRef.current) {
         const elapsed = audioContextRef.current.currentTime - startTimeRef.current;
-        setProgress(Math.min(elapsed / durationRef.current, 1));
+        const p = Math.min(elapsed / durationRef.current, 1);
+        progressListeners.current.forEach(cb => cb(p));
         requestAnimationFrame(updateProgress);
       }
     };
@@ -187,7 +193,7 @@ export function useVoiceOutput(options: UseVoiceOutputOptions = {}): UseVoiceOut
     setError(null);
     setCurrentText(text);
     setState('loading');
-    setProgress(0);
+    progressListeners.current.forEach(cb => cb(0));
 
     try {
       const audioData = await fetchAudio(text);
@@ -245,13 +251,20 @@ export function useVoiceOutput(options: UseVoiceOutputOptions = {}): UseVoiceOut
 
     isPlayingRef.current = false;
     queueRef.current = [];
-    setProgress(0);
+    progressListeners.current.forEach(cb => cb(0));
     setCurrentText(null);
     setState('idle');
   }, []);
 
   const setAutoPlay = useCallback((enabled: boolean) => {
     setAutoPlayEnabled(enabled);
+  }, []);
+
+  const onProgress = useCallback((callback: (p: number) => void) => {
+    progressListeners.current.add(callback);
+    return () => {
+      progressListeners.current.delete(callback);
+    };
   }, []);
 
   // ─────────────────────────────────────────────────────────
@@ -267,19 +280,31 @@ export function useVoiceOutput(options: UseVoiceOutputOptions = {}): UseVoiceOut
     };
   }, [stop]);
 
-  return {
+  // Memoize return object to prevent unnecessary re-renders in consumers
+  return useMemo(() => ({
     state,
     isPlaying: state === 'playing',
     isPaused: state === 'paused',
     isLoading: state === 'loading',
     currentText,
     error,
-    progress,
+    onProgress,
     speak,
     pause,
     resume,
     stop,
     setAutoPlay,
     autoPlayEnabled,
-  };
+  }), [
+    state,
+    currentText,
+    error,
+    onProgress,
+    speak,
+    pause,
+    resume,
+    stop,
+    setAutoPlay,
+    autoPlayEnabled
+  ]);
 }

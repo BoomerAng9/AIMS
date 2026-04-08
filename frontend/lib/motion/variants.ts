@@ -6,7 +6,7 @@
  */
 
 import type { Variants } from "framer-motion";
-import { transition, stagger, spring } from "./tokens";
+import { transition, stagger, spring, scrollTransition } from "./tokens";
 
 // ── Fade ──
 
@@ -166,4 +166,57 @@ export const heroStagger: Variants = {
 export const heroItem: Variants = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } },
+};
+
+// ── Scroll Reveal (viewport entry animations) ──
+
+/** Viewport reveal — fade + slide up on scroll entry */
+export const scrollReveal: Variants = {
+  hidden: { opacity: 0, y: 40 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: scrollTransition.reveal,
+  },
+};
+
+/** Viewport reveal from left */
+export const scrollRevealLeft: Variants = {
+  hidden: { opacity: 0, x: -60 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: scrollTransition.reveal,
+  },
+};
+
+/** Viewport reveal from right */
+export const scrollRevealRight: Variants = {
+  hidden: { opacity: 0, x: 60 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: scrollTransition.reveal,
+  },
+};
+
+/** Scale reveal — element grows into view */
+export const scrollRevealScale: Variants = {
+  hidden: { opacity: 0, scale: 0.9 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: scrollTransition.pop,
+  },
+};
+
+/** Blur reveal — element un-blurs as it appears */
+export const scrollRevealBlur: Variants = {
+  hidden: { opacity: 0, filter: "blur(10px)", y: 20 },
+  visible: {
+    opacity: 1,
+    filter: "blur(0px)",
+    y: 0,
+    transition: scrollTransition.cinematic,
+  },
 };

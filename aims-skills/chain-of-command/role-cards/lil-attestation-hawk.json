@@ -15,7 +15,7 @@
   "chain_of_command": {
     "reports_to": "Chicken Hawk",
     "can_message": ["Chicken Hawk"],
-    "cannot_message": ["ACHEEVY", "Forge_Ang"]
+    "cannot_message": ["ACHEEVY", "Buildsmith"]
   },
   "capabilities": {
     "specialties": ["attestation", "manifest_generation", "deploy_verification"],

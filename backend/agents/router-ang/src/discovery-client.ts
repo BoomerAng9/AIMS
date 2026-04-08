@@ -146,7 +146,7 @@ class DiscoveryClient {
         return;
       }
 
-      const data = await response.json();
+      const data = (await response.json()) as Record<string, unknown>;
       const cards: Array<{
         id: string;
         name: string;
@@ -155,7 +155,7 @@ class DiscoveryClient {
         capabilities: DiscoveredAgent['capabilities'];
         hosting: DiscoveredAgent['hosting'];
         status: DiscoveredAgent['status'];
-      }> = data.agents || [];
+      }> = (data.agents as typeof cards) || [];
 
       for (const card of cards) {
         const existing = this.agents.get(card.id);

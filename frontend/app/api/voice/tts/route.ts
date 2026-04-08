@@ -1,16 +1,38 @@
 /**
  * TTS API Route — Text-to-Speech for ACHEEVY Replies
  *
- * Primary: ElevenLabs (pulls premium voices from user's account)
+ * Primary: ElevenLabs (eleven_turbo_v2_5)
  * Fallback: Deepgram Aura-2 (premium voices, sub-200ms TTFB)
  *
+ * LUC metering: Records voice_chars usage after successful synthesis.
  * Returns audio/mpeg stream for browser autoplay.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAuth } from '@/lib/auth/require-role';
+import { ELEVENLABS_ACHEEVY_PRESET, DEEPGRAM_ACHEEVY_PRESET } from '@/lib/acheevy/voiceConfig';
 
 const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY || '';
 const DEEPGRAM_API_KEY = process.env.DEEPGRAM_API_KEY || '';
+const UEF_GATEWAY_URL = process.env.NEXT_PUBLIC_API_URL || process.env.UEF_GATEWAY_URL || 'http://localhost:3001';
+const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY || '';
+
+/** Fire-and-forget LUC metering call to the backend voice router */
+function meterTtsUsage(userId: string, charCount: number, provider: string) {
+  fetch(`${UEF_GATEWAY_URL}/api/billing/record`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(INTERNAL_API_KEY ? { 'x-api-key': INTERNAL_API_KEY } : {}),
+    },
+    body: JSON.stringify({
+      userId,
+      serviceKey: 'voice_chars',
+      units: charCount,
+      metadata: { provider, source: 'frontend-tts' },
+    }),
+  }).catch(() => { /* non-blocking */ });
+}
 
 async function synthesizeElevenLabs(
   text: string,
@@ -30,12 +52,12 @@ async function synthesizeElevenLabs(
         },
         body: JSON.stringify({
           text,
-          model_id: model || 'eleven_turbo_v2_5',
+          model_id: model || ELEVENLABS_ACHEEVY_PRESET.model,
           voice_settings: {
-            stability: 0.5,
-            similarity_boost: 0.75,
-            style: 0.0,
-            use_speaker_boost: true,
+            stability: ELEVENLABS_ACHEEVY_PRESET.stability,
+            similarity_boost: ELEVENLABS_ACHEEVY_PRESET.similarity_boost,
+            style: ELEVENLABS_ACHEEVY_PRESET.style,
+            use_speaker_boost: ELEVENLABS_ACHEEVY_PRESET.use_speaker_boost,
           },
         }),
       },
@@ -79,8 +101,11 @@ async function synthesizeDeepgram(
 }
 
 export async function POST(req: NextRequest) {
+  const auth = await requireAuth();
+  if (auth instanceof NextResponse) return auth;
+
   try {
-    const { text, provider, voiceId, model } = await req.json();
+    const { text, provider, voiceId, model, userId } = await req.json();
 
     if (!text || typeof text !== 'string') {
       return NextResponse.json({ error: 'text required' }, { status: 400 });
@@ -98,24 +123,27 @@ export async function POST(req: NextRequest) {
       let audioRes: Response | null = null;
 
       if (p === 'elevenlabs') {
-        // Use provided voiceId or fall back to first available voice
         audioRes = await synthesizeElevenLabs(
           safeText,
-          voiceId || 'pNInz6obpgDQGcFmaJgB', // Default: Adam
-          model || 'eleven_turbo_v2_5',
+          voiceId || ELEVENLABS_ACHEEVY_PRESET.voiceId,
+          model || ELEVENLABS_ACHEEVY_PRESET.model,
         );
       } else {
         audioRes = await synthesizeDeepgram(
           safeText,
-          voiceId || 'aura-2-orion-en',
+          voiceId || DEEPGRAM_ACHEEVY_PRESET.model,
         );
       }
 
       if (audioRes?.body) {
+        // Meter voice_chars through LUC (fire-and-forget)
+        meterTtsUsage(userId || 'anonymous', safeText.length, p);
+
         return new NextResponse(audioRes.body, {
           headers: {
             'Content-Type': 'audio/mpeg',
             'X-TTS-Provider': p,
+            'X-Voice-Chars': String(safeText.length),
             'Cache-Control': 'no-cache',
           },
         });

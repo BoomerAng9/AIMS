@@ -1,0 +1,73 @@
+# =============================================================================
+# Cloud Build — Chicken Hawk Image Build & Push
+# =============================================================================
+# Builds the Chicken Hawk Docker image and pushes to Artifact Registry.
+#
+# Trigger manually:
+#   gcloud builds submit --config infra/gcp/cloudbuild-chicken-hawk.yaml \
+#     --substitutions=_TAG=latest .
+#
+# Or configure a Cloud Build trigger on push to main with path filter:
+#   services/chicken-hawk/**
+# =============================================================================
+
+steps:
+  # Step 1: Build the Chicken Hawk image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'us-central1-docker.pkg.dev/$PROJECT_ID/aims/chicken-hawk:${_TAG}'
+      - '-t'
+      - 'us-central1-docker.pkg.dev/$PROJECT_ID/aims/chicken-hawk:$SHORT_SHA'
+      - '-f'
+      - 'services/chicken-hawk/Dockerfile'
+      - 'services/chicken-hawk'
+
+  # Step 2: Push both tags
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'us-central1-docker.pkg.dev/$PROJECT_ID/aims/chicken-hawk:${_TAG}'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'us-central1-docker.pkg.dev/$PROJECT_ID/aims/chicken-hawk:$SHORT_SHA'
+
+  # Step 3: Deploy to Cloud Run service
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'services'
+      - 'update'
+      - 'chicken-hawk'
+      - '--image'
+      - 'us-central1-docker.pkg.dev/$PROJECT_ID/aims/chicken-hawk:${_TAG}'
+      - '--region'
+      - 'us-central1'
+
+  # Step 4: Update Cloud Run job image
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'jobs'
+      - 'update'
+      - 'chicken-hawk-build'
+      - '--image'
+      - 'us-central1-docker.pkg.dev/$PROJECT_ID/aims/chicken-hawk:${_TAG}'
+      - '--region'
+      - 'us-central1'
+
+images:
+  - 'us-central1-docker.pkg.dev/$PROJECT_ID/aims/chicken-hawk:${_TAG}'
+  - 'us-central1-docker.pkg.dev/$PROJECT_ID/aims/chicken-hawk:$SHORT_SHA'
+
+substitutions:
+  _TAG: 'latest'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: 'E2_HIGHCPU_8'

@@ -109,7 +109,7 @@ A.I.M.S. is a Next.js 15 + Express microservice platform with 32 API route group
 | `acp/` | Agent Communication Protocol | Types defined, no runtime |
 | `make-it-mine/` | Research pipeline | Proxy to frontend route |
 | `integrations/` | Integration framework | Schema only |
-| `sandbox/` | Sandbox execution | OpenClaw removed, needs Chicken Hawk |
+| `sandbox/` | Sandbox execution | Removed (commit `98de4fe`) — succeeded by Chicken Hawk (`docs/CHICKENHAWK_SPEC.md`) |
 | `ii-agent/` | Intelligent Interface agent | Python service, separate deploy |
 
 ### DEMO / Reference Only
@@ -191,7 +191,7 @@ A.I.M.S. is a Next.js 15 + Express microservice platform with 32 API route group
 | Circuit Metrics | **PARTIAL** | Health aggregator, services list stale |
 | Docker Compose (VPS) | **REAL** | Multi-layer network isolation |
 | Nginx Proxy | **REAL** | TLS termination, reverse proxy |
-| Chicken Hawk | **NOT BUILT** | Replacement for OpenClaw execution engine |
+| Chicken Hawk | **SPEC DEFINED** | Execution engine — see `docs/CHICKENHAWK_SPEC.md` |
 
 ---
 

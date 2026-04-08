@@ -48,7 +48,7 @@ const InstagramIcon = ({ className }: { className?: string }) => (
 // Footer Navigation
 // ─────────────────────────────────────────────────────────────
 
-const APP_DOMAIN = process.env.NEXT_PUBLIC_APP_URL || 'https://aimanagedsolutions.cloud';
+const APP_DOMAIN = process.env.NEXT_PUBLIC_APP_URL || 'https://plugmein.cloud';
 
 const FOOTER_NAV = {
   lore: {
@@ -61,12 +61,24 @@ const FOOTER_NAV = {
       { label: 'Pricing', href: '/pricing' },
     ],
   },
+  experiences: {
+    title: 'Experiences',
+    links: [
+      { label: 'Workshop', href: '/workshop' },
+      { label: 'Life Scenes', href: '/workshop/life-scenes' },
+      { label: 'Moment Studio', href: '/workshop/moment-studio' },
+      { label: 'Money Moves', href: '/workshop/money-moves' },
+      { label: 'Creator Circles', href: '/workshop/creator-circles' },
+      { label: 'Sandbox', href: '/sandbox' },
+    ],
+  },
   platform: {
     title: 'Platform',
     links: [
       { label: 'Chat w/ACHEEVY', href: `${APP_DOMAIN}/chat` },
       { label: 'Dashboard', href: `${APP_DOMAIN}/dashboard` },
-      { label: 'Model Garden', href: `${APP_DOMAIN}/dashboard/model-garden` },
+      { label: 'Per|Form', href: '/sandbox/perform' },
+      { label: 'Destinations AI', href: '/sandbox/destinations-ai' },
       { label: 'Circuit Box', href: `${APP_DOMAIN}/dashboard/circuit-box` },
       { label: 'House of Ang', href: `${APP_DOMAIN}/dashboard/house-of-ang` },
     ],
@@ -78,13 +90,14 @@ const FOOTER_NAV = {
       { label: 'GitHub Repository', href: 'https://github.com/BoomerAng9/AIMS' },
       { label: 'Documentation', href: '/docs' },
       { label: 'FAQ', href: '/faq' },
-      { label: 'Support', href: 'mailto:acheevy@aimanagedsolutions.cloud' },
+      { label: 'Support', href: 'mailto:acheevy@plugmein.cloud' },
     ],
   },
   legal: {
     title: 'Legal & Security',
     links: [
       { label: 'Terms of Service', href: '/terms' },
+      { label: 'Savings Plan Terms', href: '/terms/savings-plan' },
       { label: 'Privacy Policy', href: '/privacy' },
       { label: 'Security Policy', href: '/security' },
       { label: 'Cookie Policy', href: '/cookies' },
@@ -101,15 +114,16 @@ export function Footer() {
 
   return (
     <footer
-      className="py-16 px-6"
+      className="relative z-20 mt-0 py-8 px-6"
       style={{
-        backgroundColor: '#0f1219',
+        backgroundColor: '#F1F5F9',
         borderTop: `1px solid ${AIMS_CIRCUIT_COLORS.dimLine}`,
+        clear: 'both',
       }}
     >
       <div className="max-w-7xl mx-auto">
         {/* Main Footer Content */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-12 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8 mb-8">
           {/* Brand Column */}
           <div className="lg:col-span-2">
             {/* Logo */}
@@ -134,42 +148,13 @@ export function Footer() {
 
             {/* Tagline */}
             <p className="text-gray-400 mb-6 max-w-xs">
-              <span className="font-semibold text-white">Think It. Prompt It.</span>
+              <span className="font-semibold text-slate-800">Think It. Prompt It.</span>
               <br />
-              <span className="font-semibold text-white">Let&apos;s Build It.</span>
+              <span className="font-semibold text-slate-800">Let&apos;s Build It.</span>
             </p>
-            <p className="text-sm text-gray-500 mb-6">
-              Join the AI revolution with A.I.M.S.
+            <p className="text-sm text-gray-500 mb-4">
+              AI-managed platform orchestrated by ACHEEVY.
             </p>
-
-            {/* Newsletter */}
-            <div className="mb-6">
-              <h4
-                className="text-sm font-semibold mb-3"
-                style={{ color: AIMS_CIRCUIT_COLORS.secondary }}
-              >
-                Newsletter Signup
-              </h4>
-              <p className="text-xs text-gray-500 mb-3">
-                Get updates and news delivered to your email.
-              </p>
-              <div className="flex gap-2">
-                <input
-                  type="email"
-                  placeholder="Email"
-                  className="flex-1 px-4 py-2 rounded-lg bg-black/40 border border-wireframe-stroke text-white text-sm placeholder:text-gray-500 outline-none focus:border-gold/50"
-                />
-                <button
-                  className="px-4 py-2 rounded-lg transition-colors"
-                  style={{
-                    backgroundColor: AIMS_CIRCUIT_COLORS.primary,
-                    color: '#000',
-                  }}
-                >
-                  →
-                </button>
-              </div>
-            </div>
           </div>
 
           {/* Navigation Columns */}
@@ -186,7 +171,7 @@ export function Footer() {
                   <li key={link.label}>
                     <Link
                       href={link.href}
-                      className="text-sm text-gray-400 hover:text-white transition-colors"
+                      className="text-sm text-gray-400 hover:text-slate-800 transition-colors"
                     >
                       {link.label}
                     </Link>
@@ -204,53 +189,68 @@ export function Footer() {
         >
           {/* Social Links */}
           <div className="flex items-center gap-4">
-            <Link
-              href="https://github.com/aims"
-              className="text-gray-400 hover:text-white transition-colors"
+            <a
+              href="https://github.com/BoomerAng9/AIMS"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="GitHub"
+              className="text-gray-400 hover:text-slate-800 transition-colors"
             >
               <GitHubIcon className="w-6 h-6" />
-            </Link>
-            <Link
+            </a>
+            <a
               href="https://twitter.com/aims"
-              className="text-gray-400 hover:text-white transition-colors"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="X (Twitter)"
+              className="text-gray-400 hover:text-slate-800 transition-colors"
             >
               <XIcon className="w-6 h-6" />
-            </Link>
-            <Link
+            </a>
+            <a
               href="https://linkedin.com/company/aims"
-              className="text-gray-400 hover:text-white transition-colors"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="LinkedIn"
+              className="text-gray-400 hover:text-slate-800 transition-colors"
             >
               <LinkedInIcon className="w-6 h-6" />
-            </Link>
-            <Link
+            </a>
+            <a
               href="https://discord.gg/aims"
-              className="text-gray-400 hover:text-white transition-colors"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Discord"
+              className="text-gray-400 hover:text-slate-800 transition-colors"
             >
               <DiscordIcon className="w-6 h-6" />
-            </Link>
-            <Link
+            </a>
+            <a
               href="https://instagram.com/aims"
-              className="text-gray-400 hover:text-white transition-colors"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram"
+              className="text-gray-400 hover:text-slate-800 transition-colors"
             >
               <InstagramIcon className="w-6 h-6" />
-            </Link>
+            </a>
           </div>
 
           {/* Related Links */}
-          <div className="flex items-center gap-4 text-sm">
-            <Link href={`${APP_DOMAIN}/dashboard`} className="text-gray-400 hover:text-white transition-colors">
+          <div className="flex items-center gap-4 text-sm flex-wrap">
+            <Link href="/workshop" className="text-gray-400 hover:text-slate-800 transition-colors">
+              Workshop
+            </Link>
+            <span className="text-gray-600">·</span>
+            <Link href="/sandbox" className="text-gray-400 hover:text-slate-800 transition-colors">
+              Sandbox
+            </Link>
+            <span className="text-gray-600">·</span>
+            <Link href={`${APP_DOMAIN}/dashboard`} className="text-gray-400 hover:text-slate-800 transition-colors">
               ACHEEVY
             </Link>
             <span className="text-gray-600">·</span>
-            <Link href={`${APP_DOMAIN}/dashboard/house-of-ang`} className="text-gray-400 hover:text-white transition-colors">
-              House of Ang
-            </Link>
-            <span className="text-gray-600">·</span>
-            <Link href={`${APP_DOMAIN}/dashboard/model-garden`} className="text-gray-400 hover:text-white transition-colors">
-              Model Garden
-            </Link>
-            <span className="text-gray-600">·</span>
-            <Link href={`${APP_DOMAIN}/dashboard/circuit-box`} className="text-gray-400 hover:text-white transition-colors">
+            <Link href={`${APP_DOMAIN}/dashboard/circuit-box`} className="text-gray-400 hover:text-slate-800 transition-colors">
               Circuit Box
             </Link>
           </div>

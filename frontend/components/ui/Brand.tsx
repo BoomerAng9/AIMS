@@ -57,7 +57,7 @@ const sizeClasses: Record<BrandSize, string> = {
 
 const subtitleSizeClasses: Record<BrandSize, string> = {
   xs: 'text-[8px]',
-  sm: 'text-[10px]',
+  sm: 'text-xs',
   md: 'text-xs',
   lg: 'text-sm',
   xl: 'text-base',
@@ -78,7 +78,7 @@ export function Brand({
 }: BrandProps) {
   const colorClasses = {
     gold: 'text-gold',
-    white: 'text-white',
+    white: 'text-slate-800',
     inherit: '',
   };
 

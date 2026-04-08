@@ -94,7 +94,7 @@ This prevents systems "sounding" senior while acting outside their lane.
 
 | Class | Pattern | Examples |
 |-------|---------|----------|
-| Boomer_Ang | `<Nickname>_Ang` | `Forge_Ang`, `Chronicle_Ang`, `Gatekeeper_Ang` |
+| Boomer_Ang | `<Nickname>_Ang` | `Buildsmith`, `Chronicle_Ang`, `Gatekeeper_Ang` |
 | Chicken Hawk | `Chicken Hawk` | Singular coordinator identity |
 | Lil_Hawk | `Lil_<Role>_Hawk` (exact pattern) | `Lil_Messenger_Hawk`, `Lil_Render_Hawk` |
 
@@ -115,7 +115,7 @@ One schema for ACHEEVY, Boomer_Angs, Chicken Hawk, Lil_Hawks:
 
 | Field | Description |
 |-------|-------------|
-| `handle` | e.g., `Forge_Ang`, `Lil_Messenger_Hawk` |
+| `handle` | e.g., `Buildsmith`, `Lil_Messenger_Hawk` |
 | `class` | `ACHEEVY` \| `Boomer_Ang` \| `Chicken Hawk` \| `Lil_Hawk` |
 | `mission` | Core mission statement |
 | `authority_scope` | What decisions it can make |
@@ -215,7 +215,7 @@ Every wrapper ships with:
 
 | Repo | Owner | Role |
 |------|-------|------|
-| `ii-agent` | `Forge_Ang` | Agent runtime packaging + deployment |
+| `ii-agent` | `Buildsmith` | Agent runtime packaging + deployment |
 | `ii-agent-community` | `Dockmaster_Ang` | Example ingestion + safe templates |
 | `CommonGround` | `OpsConsole_Ang` | Multi-agent observability + collaboration surface |
 
@@ -238,12 +238,12 @@ Every wrapper ships with:
 | `gemini-cli` | `Runner_Ang` | CLI execution pack |
 | `gemini-cli-mcp-openai-bridge` | `Bridge_Ang` | Protocol translation pack |
 
-### Pack D — "LLM Gateway + Debug"
-*Primary: debug/route model calls in OpenAI-format style.*
+### Pack D — "LLM Gateway (Gemini API)"
+*Primary: Route model calls through Gemini API and approved direct SDKs. LiteLLM is BLOCKED.*
 
 | Repo | Owner | Role |
 |------|-------|------|
-| `litellm-debugger` | `Gatekeeper_Ang` | Debug + policy + routing validation |
+| ~~`litellm-debugger`~~ (BLOCKED) | `Gatekeeper_Ang` | Gemini API gateway + routing (litellm blocked — see SECURITY-LITELLM-BLOCKED.md) |
 
 ### Pack E — "Docs + Presentation Factory"
 *Primary: build user-facing decks and docs (with licensing discipline).*

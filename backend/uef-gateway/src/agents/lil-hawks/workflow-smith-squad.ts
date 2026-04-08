@@ -4,10 +4,11 @@
  * Four Lil_Hawks that ensure every n8n workflow is safe, tested,
  * and auditable before deployment.
  *
- *   AUTHOR_LIL_HAWK    — authors n8n workflows (node graph + params)
- *   VALIDATE_LIL_HAWK  — validates schema + node configs + required fields
- *   FAILURE_LIL_HAWK   — hunts failure paths, infinite loops, rate-limit bombs
- *   GATE_LIL_HAWK      — final gate: "no deploy unless deterministic + audited"
+ * Lil_<Role>_Hawk convention (ACHEEVY Brain §16.2):
+ *   Lil_Author_Hawk    — authors n8n workflows (node graph + params)
+ *   Lil_Validate_Hawk  — validates schema + node configs + required fields
+ *   Lil_Failure_Hawk   — hunts failure paths, infinite loops, rate-limit bombs
+ *   Lil_Gate_Hawk      — final gate: "no deploy unless deterministic + audited"
  *
  * Doctrine: "Activity breeds Activity — shipped beats perfect."
  */
@@ -25,34 +26,34 @@ import {
 } from './types';
 
 // ---------------------------------------------------------------------------
-// Squad profiles — canonical NAME_LIL_HAWK convention
+// Squad profiles — Lil_<Role>_Hawk convention (ACHEEVY Brain §16.2)
 // ---------------------------------------------------------------------------
 
 export const SQUAD_PROFILES: LilHawkProfile[] = [
   {
-    id: 'AUTHOR_LIL_HAWK',
-    name: 'AUTHOR_LIL_HAWK',
+    id: 'Lil_Author_Hawk',
+    name: 'Lil_Author_Hawk',
     squad: 'workflow-smith',
     role: 'Workflow Author — designs n8n node graphs with params and connections',
     gate: false,
   },
   {
-    id: 'VALIDATE_LIL_HAWK',
-    name: 'VALIDATE_LIL_HAWK',
+    id: 'Lil_Validate_Hawk',
+    name: 'Lil_Validate_Hawk',
     squad: 'workflow-smith',
     role: 'Schema Validator — checks node configs, required fields, type contracts',
     gate: true,
   },
   {
-    id: 'FAILURE_LIL_HAWK',
-    name: 'FAILURE_LIL_HAWK',
+    id: 'Lil_Failure_Hawk',
+    name: 'Lil_Failure_Hawk',
     squad: 'workflow-smith',
     role: 'Failure Hunter — finds infinite loops, rate-limit bombs, bad retries, unhandled errors',
     gate: true,
   },
   {
-    id: 'GATE_LIL_HAWK',
-    name: 'GATE_LIL_HAWK',
+    id: 'Lil_Gate_Hawk',
+    name: 'Lil_Gate_Hawk',
     squad: 'workflow-smith',
     role: 'Final Gate — signs off only when deterministic + audited + versioned',
     gate: true,
@@ -60,7 +61,7 @@ export const SQUAD_PROFILES: LilHawkProfile[] = [
 ];
 
 // ---------------------------------------------------------------------------
-// AUTHOR_LIL_HAWK — authors the workflow
+// Lil_Author_Hawk — authors the workflow
 // ---------------------------------------------------------------------------
 
 function authorWorkflow(query: string): { workflowJson: Record<string, unknown>; manifest: WorkflowManifest } {
@@ -136,7 +137,7 @@ function detectSecrets(nodes: Array<{ name: string }>): string[] {
 }
 
 // ---------------------------------------------------------------------------
-// VALIDATE_LIL_HAWK — validates schema
+// Lil_Validate_Hawk — validates schema
 // ---------------------------------------------------------------------------
 
 function validateWorkflow(
@@ -162,7 +163,7 @@ function validateWorkflow(
 }
 
 // ---------------------------------------------------------------------------
-// FAILURE_LIL_HAWK — hunts failure paths
+// Lil_Failure_Hawk — hunts failure paths
 // ---------------------------------------------------------------------------
 
 function huntFailures(workflowJson: Record<string, unknown>, _manifest: WorkflowManifest): FailureCase[] {
@@ -204,7 +205,7 @@ function huntFailures(workflowJson: Record<string, unknown>, _manifest: Workflow
 }
 
 // ---------------------------------------------------------------------------
-// GATE_LIL_HAWK — final gate
+// Lil_Gate_Hawk — final gate
 // ---------------------------------------------------------------------------
 
 function finalGate(
@@ -224,8 +225,8 @@ function finalGate(
   const approved = reasons.length === 0;
   const stamp: VersionStamp = {
     version: '1.0.0',
-    author: 'AUTHOR_LIL_HAWK',
-    reviewedBy: ['VALIDATE_LIL_HAWK', 'FAILURE_LIL_HAWK', 'GATE_LIL_HAWK'],
+    author: 'Lil_Author_Hawk',
+    reviewedBy: ['Lil_Validate_Hawk', 'Lil_Failure_Hawk', 'Lil_Gate_Hawk'],
     timestamp: new Date().toISOString(),
     changeSummary: `Workflow "${manifest.name}" — ${approved ? 'APPROVED' : 'BLOCKED'}`,
     checksum: `sha256-${uuidv4().replace(/-/g, '').slice(0, 16)}`,
@@ -256,18 +257,18 @@ async function execute(input: AgentTaskInput): Promise<AgentTaskOutput> {
   const logs: string[] = [];
 
   try {
-    logger.info({ taskId: input.taskId }, '[AUTHOR_LIL_HAWK] Authoring workflow');
+    logger.info({ taskId: input.taskId }, '[Lil_Author_Hawk] Authoring workflow');
     const { workflowJson, manifest } = authorWorkflow(input.query);
-    logs.push(`[AUTHOR_LIL_HAWK] Authored: ${manifest.name} (${manifest.nodeCount} nodes)`);
+    logs.push(`[Lil_Author_Hawk] Authored: ${manifest.name} (${manifest.nodeCount} nodes)`);
 
-    logger.info({ taskId: input.taskId }, '[VALIDATE_LIL_HAWK] Validating schema');
+    logger.info({ taskId: input.taskId }, '[Lil_Validate_Hawk] Validating schema');
     const validation = validateWorkflow(workflowJson, manifest);
-    logs.push(`[VALIDATE_LIL_HAWK] Validation: ${validation.valid ? 'PASS' : 'FAIL'} (${validation.issues.length} issues)`);
+    logs.push(`[Lil_Validate_Hawk] Validation: ${validation.valid ? 'PASS' : 'FAIL'} (${validation.issues.length} issues)`);
 
-    logger.info({ taskId: input.taskId }, '[FAILURE_LIL_HAWK] Hunting failure paths');
+    logger.info({ taskId: input.taskId }, '[Lil_Failure_Hawk] Hunting failure paths');
     const failures = huntFailures(workflowJson, manifest);
     const criticalCount = failures.filter(f => f.impact === 'CRITICAL').length;
-    logs.push(`[FAILURE_LIL_HAWK] Found ${failures.length} failure paths (${criticalCount} CRITICAL)`);
+    logs.push(`[Lil_Failure_Hawk] Found ${failures.length} failure paths (${criticalCount} CRITICAL)`);
 
     const testPack: TestPack = {
       cases: [
@@ -279,9 +280,9 @@ async function execute(input: AgentTaskInput): Promise<AgentTaskOutput> {
     };
     logs.push(`[TestPack] ${testPack.cases.length} test cases, ${testPack.coveragePercent}% coverage`);
 
-    logger.info({ taskId: input.taskId }, '[GATE_LIL_HAWK] Running final gate');
+    logger.info({ taskId: input.taskId }, '[Lil_Gate_Hawk] Running final gate');
     const gate = finalGate(validation, failures, manifest, testPack);
-    logs.push(`[GATE_LIL_HAWK] ${gate.approved ? 'APPROVED' : 'BLOCKED'}: ${gate.reasons.length > 0 ? gate.reasons.join('; ') : 'All checks pass'}`);
+    logs.push(`[Lil_Gate_Hawk] ${gate.approved ? 'APPROVED' : 'BLOCKED'}: ${gate.reasons.length > 0 ? gate.reasons.join('; ') : 'All checks pass'}`);
     logs.push(`[VersionStamp] ${gate.stamp.version} @ ${gate.stamp.timestamp}`);
 
     const artifacts: WorkflowArtifacts = { workflowJson, manifest, testPack, failureMatrix: failures, versionStamp: gate.stamp };

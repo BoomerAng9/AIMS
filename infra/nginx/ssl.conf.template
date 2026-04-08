@@ -4,11 +4,27 @@
 # Copied to /etc/nginx/conf.d/ssl.conf inside the nginx container.
 # =============================================================================
 
+# Redirect www → apex
 server {
-    listen 443 ssl http2;
+    listen 443 ssl;
+    http2 on;
+    server_name www.DOMAIN_PLACEHOLDER;
+
+    ssl_certificate     /etc/letsencrypt/live/DOMAIN_PLACEHOLDER/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/DOMAIN_PLACEHOLDER/privkey.pem;
+    ssl_protocols       TLSv1.2 TLSv1.3;
+    ssl_ciphers         HIGH:!aNULL:!MD5;
+
+    return 301 https://DOMAIN_PLACEHOLDER$request_uri;
+}
+
+# Main app domain
+server {
+    listen 443 ssl;
+    http2 on;
     server_name DOMAIN_PLACEHOLDER;
 
-    # SSL certificates (managed by certbot)
+    # SSL certificates (managed by host certbot, bind-mounted)
     ssl_certificate     /etc/letsencrypt/live/DOMAIN_PLACEHOLDER/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/DOMAIN_PLACEHOLDER/privkey.pem;
     ssl_protocols       TLSv1.2 TLSv1.3;
@@ -49,8 +65,37 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_read_timeout 60s;
+        # SSE streaming: disable buffering so chunks flow immediately
+        proxy_buffering off;
+        proxy_cache off;
+        proxy_read_timeout 120s;
         proxy_send_timeout 60s;
+    }
+
+    # -----------------------------------------------------------------
+    # House of Ang — Boomer_Ang Registry
+    # -----------------------------------------------------------------
+    location /api/ang/ {
+        limit_req zone=api burst=10 nodelay;
+        rewrite ^/api/ang/(.*)$ /$1 break;
+        proxy_pass http://house_of_ang;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # -----------------------------------------------------------------
+    # ACHEEVY — Executive Orchestrator (payments)
+    # -----------------------------------------------------------------
+    location /api/acheevy/ {
+        limit_req zone=api burst=5 nodelay;
+        rewrite ^/api/acheevy/(.*)$ /$1 break;
+        proxy_pass http://acheevy_backend;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
     }
 
     # -----------------------------------------------------------------

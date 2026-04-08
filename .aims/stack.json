@@ -30,10 +30,9 @@
       "region": "us-central1"
     },
     "frontend": {
-      "provider": "Vercel",
-      "reason": "Next.js optimized (ISR, Edge Functions, CDN)",
-      "fallback": "VPS Docker",
-      "vercelProject": "aims-frontend"
+      "provider": "VPS Docker",
+      "reason": "Self-hosted Next.js standalone in Docker container",
+      "port": 3000
     }
   },
 

@@ -21,6 +21,7 @@ import {
   resetCounters,
   resolveCrewRole,
 } from "../lib/moniker";
+import { jobDeployer } from "./job-deployer";
 
 let batchCounter = 0;
 
@@ -92,6 +93,24 @@ export class SquadManager {
   }
 
   /**
+   * Deploy a Lil_Hawk for a specific task via the job deployer.
+   * Attaches deployment info to the hawk.
+   */
+  async deployLilHawk(squadId: string, lilHawkId: string, task: ManifestTask): Promise<void> {
+    const squad = this.activeSquads.get(squadId);
+    if (!squad) return;
+    const hawk = squad.lil_hawks.find((lh) => lh.id === lilHawkId);
+    if (!hawk) return;
+    try {
+      hawk.deployment = await jobDeployer.deploy(hawk, task);
+    } catch (err) {
+      console.warn(`[squad-manager] Deploy failed for ${hawk.moniker}: ${err}`);
+      // Fall back to local if deployment fails
+      hawk.deployment = { target: "local", deployed_at: new Date().toISOString() };
+    }
+  }
+
+  /**
    * Get a Lil_Hawk from a squad by task_id
    */
   getLilHawkForTask(squadId: string, taskId: string): LilHawk | undefined {
@@ -126,16 +145,17 @@ export class SquadManager {
   /**
    * Mark squad as completed/aborted
    */
-  finalizeSquad(squadId: string, status: "completed" | "aborted"): void {
+  async finalizeSquad(squadId: string, status: "completed" | "aborted"): Promise<void> {
     const squad = this.activeSquads.get(squadId);
     if (!squad) return;
     squad.status = status;
-    squad.lil_hawks.forEach((lh) => {
+    for (const lh of squad.lil_hawks) {
       if (lh.status !== "terminated") {
         lh.status = "terminated";
         lh.completed_at = new Date().toISOString();
+        await jobDeployer.terminate(lh);
       }
-    });
+    }
   }
 
   getSquad(squadId: string): Squad | undefined {

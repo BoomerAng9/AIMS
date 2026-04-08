@@ -1,17 +1,25 @@
 /**
  * useVoiceInput Hook
- * Captures audio from microphone and transcribes via Groq Whisper
+ * Captures audio from microphone and transcribes via ElevenLabs Scribe v2
  *
- * Flow: Mic → MediaRecorder → Blob → API → Groq Whisper → Text
+ * Flow: Mic → MediaRecorder → Blob → API → ElevenLabs Scribe v2 → Text
+ * Fallback: Deepgram Nova-3
  */
 
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import type { VoiceInputState, TranscriptionResult, VoiceInputConfig } from '@/lib/chat/types';
 
 interface UseVoiceInputOptions {
   onTranscript?: (result: TranscriptionResult) => void;
   onError?: (error: string) => void;
   config?: VoiceInputConfig;
+  /**
+   * Whether to update audioLevel state internally.
+   * Disable this and use the returned `stream` with `useAudioLevel` hook
+   * to prevent high-frequency re-renders in the parent component.
+   * @default true
+   */
+  enableAudioLevelState?: boolean;
 }
 
 interface UseVoiceInputReturn {
@@ -24,10 +32,11 @@ interface UseVoiceInputReturn {
   stopListening: () => Promise<TranscriptionResult | null>;
   cancelListening: () => void;
   audioLevel: number;
+  stream: MediaStream | null;
 }
 
 export function useVoiceInput(options: UseVoiceInputOptions = {}): UseVoiceInputReturn {
-  const { onTranscript, onError, config } = options;
+  const { onTranscript, onError, config, enableAudioLevelState = true } = options;
 
   const [state, setState] = useState<VoiceInputState>('idle');
   const [transcript, setTranscript] = useState<string | null>(null);
@@ -45,6 +54,8 @@ export function useVoiceInput(options: UseVoiceInputOptions = {}): UseVoiceInput
   // ─────────────────────────────────────────────────────────
 
   const startAudioLevelMonitoring = useCallback((stream: MediaStream) => {
+    if (!enableAudioLevelState) return;
+
     const audioContext = new AudioContext();
     const source = audioContext.createMediaStreamSource(stream);
     const analyser = audioContext.createAnalyser();
@@ -57,14 +68,22 @@ export function useVoiceInput(options: UseVoiceInputOptions = {}): UseVoiceInput
     const updateLevel = () => {
       if (analyserRef.current) {
         analyserRef.current.getByteFrequencyData(dataArray);
-        const average = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
+
+        // ⚡ Bolt Optimization: Replace reduce with for-loop
+        // Reduces V8 overhead and GC in 60fps loop
+        let sum = 0;
+        for (let i = 0; i < dataArray.length; i++) {
+          sum += dataArray[i];
+        }
+        const average = sum / dataArray.length;
+
         setAudioLevel(average / 255); // Normalize to 0-1
         animationFrameRef.current = requestAnimationFrame(updateLevel);
       }
     };
 
     updateLevel();
-  }, []);
+  }, [enableAudioLevelState]);
 
   const stopAudioLevelMonitoring = useCallback(() => {
     if (animationFrameRef.current) {
@@ -165,7 +184,7 @@ export function useVoiceInput(options: UseVoiceInputOptions = {}): UseVoiceInput
           // Send to transcription API
           const formData = new FormData();
           formData.append('audio', audioBlob, 'recording.webm');
-          formData.append('provider', config?.provider || 'groq');
+          formData.append('provider', config?.provider || 'elevenlabs');
           if (config?.language) {
             formData.append('language', config.language);
           }
@@ -227,7 +246,8 @@ export function useVoiceInput(options: UseVoiceInputOptions = {}): UseVoiceInput
     };
   }, [stopAudioLevelMonitoring]);
 
-  return {
+  // Memoize return object to prevent unnecessary re-renders in consumers
+  return useMemo(() => ({
     state,
     isListening: state === 'listening',
     isProcessing: state === 'processing',
@@ -237,5 +257,14 @@ export function useVoiceInput(options: UseVoiceInputOptions = {}): UseVoiceInput
     stopListening,
     cancelListening,
     audioLevel,
-  };
+    stream: streamRef.current,
+  }), [
+    state,
+    transcript,
+    error,
+    startListening,
+    stopListening,
+    cancelListening,
+    audioLevel
+  ]);
 }

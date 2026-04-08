@@ -31,7 +31,7 @@ const PMO_LEVELS = PMO_MANAGERS.flatMap(manager => {
 const ANOMALY_BOOMER_ANGS = [
   'Betty-Ann_Ang',   // HR PMO Manager / LUC specialist
   'Buildsmith_Ang',  // Builder specialist
-  'AVVA-NOON_Ang',   // Holdings Operational Excellence rotator
+  'AVVA NOON',       // SmelterOS Overseer (System-Level Entity — NOT a Boomer_Ang)
 ] as const;
 
 // Blocked patterns - these should NEVER appear in PMO naming

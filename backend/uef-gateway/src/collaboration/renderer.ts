@@ -9,7 +9,7 @@
  * "Activity breeds Activity — shipped beats perfect."
  */
 
-import type { CollaborationSession, FeedEntry, FeedEntryType } from './types';
+import type { CollaborationSession, FeedEntryType } from './types';
 
 // ---------------------------------------------------------------------------
 // Type → Visual Mapping

@@ -1,8 +1,22 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
-const VERBS = ["manage", "build", "deploy", "run", "scale"] as const;
+const VERBS = [
+  "manage",
+  "build",
+  "deploy",
+  "run",
+  "scale",
+  "monitor",
+  "automate",
+  "orchestrate",
+  "ship",
+  "secure",
+  "optimize",
+  "launch",
+] as const;
 
 type Props = {
   /** Override the rotating verb with a fixed one */
@@ -15,16 +29,11 @@ type Props = {
 
 export function DynamicTagline({ verb, interval = 3000, compact = false }: Props) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [fade, setFade] = useState(true);
 
   useEffect(() => {
     if (verb) return; // fixed verb — no rotation
     const timer = setInterval(() => {
-      setFade(false);
-      setTimeout(() => {
-        setCurrentIndex((i) => (i + 1) % VERBS.length);
-        setFade(true);
-      }, 300);
+      setCurrentIndex((i) => (i + 1) % VERBS.length);
     }, interval);
     return () => clearInterval(timer);
   }, [verb, interval]);
@@ -33,14 +42,21 @@ export function DynamicTagline({ verb, interval = 3000, compact = false }: Props
 
   if (compact) {
     return (
-      <p className="font-marker text-xs text-white/40 tracking-wider">
+      <p className="font-marker text-xs text-slate-400 tracking-wider">
         Think it. Prompt it. Let ACHEEVY{" "}
-        <span
-          className={`inline-block text-gold/70 transition-opacity duration-300 ${
-            fade ? "opacity-100" : "opacity-0"
-          }`}
-        >
-          {activeVerb}
+        <span className="relative inline-block min-w-[6ch] text-amber-600">
+          <AnimatePresence mode="wait">
+            <motion.span
+              key={activeVerb}
+              className="inline-block"
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+            >
+              {activeVerb}
+            </motion.span>
+          </AnimatePresence>
         </span>{" "}
         it.
       </p>
@@ -49,24 +65,38 @@ export function DynamicTagline({ verb, interval = 3000, compact = false }: Props
 
   return (
     <div className="relative overflow-hidden wireframe-card px-6 py-4">
-      {/* Soft pulse glow */}
-      <div className="absolute inset-0 bg-gradient-to-r from-gold/[0.03] via-transparent to-gold/[0.03] animate-pulse pointer-events-none" />
+      {/* Soft animated gradient background */}
+      <motion.div
+        className="absolute inset-0 bg-gradient-to-r from-amber-50/60 via-transparent to-amber-50/60 pointer-events-none"
+        animate={{ opacity: [0.4, 0.7, 0.4] }}
+        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+      />
 
-      <p className="relative font-marker text-sm md:text-base text-white/70 tracking-wide text-center">
+      <p className="relative font-marker text-sm md:text-base text-slate-500 tracking-wide text-center">
         Think it. Prompt it.
       </p>
       <p className="relative font-marker text-lg md:text-xl text-center mt-1 tracking-wide">
-        <span className="text-white/60">Let </span>
-        <span className="text-gold">ACHEEVY</span>
-        <span className="text-white/60"> </span>
-        <span
-          className={`inline-block min-w-[5ch] text-gold-light transition-all duration-300 ${
-            fade ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-1"
-          }`}
-        >
-          {activeVerb}
+        <span className="text-slate-500">Let </span>
+        <span className="text-amber-600">ACHEEVY</span>
+        <span className="text-slate-500"> </span>
+        <span className="inline-flex min-w-[7ch] justify-start text-amber-500">
+          <AnimatePresence mode="wait">
+            <motion.span
+              key={activeVerb}
+              className="inline-block"
+              initial={{ opacity: 0, y: 10, filter: "blur(3px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              exit={{ opacity: 0, y: -10, filter: "blur(3px)" }}
+              transition={{
+                duration: 0.35,
+                ease: [0.25, 0.46, 0.45, 0.94],
+              }}
+            >
+              {activeVerb}
+            </motion.span>
+          </AnimatePresence>
         </span>
-        <span className="text-white/60"> it.</span>
+        <span className="text-slate-500"> it.</span>
       </p>
     </div>
   );

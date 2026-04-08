@@ -26,5 +26,7 @@ export {
   STT_MODELS,
 } from './types';
 
+export { sanitizeForTTS } from './sanitize';
+
 export { useVoice } from './use-voice';
 export type { VoiceSettings, UseVoiceReturn } from './use-voice';

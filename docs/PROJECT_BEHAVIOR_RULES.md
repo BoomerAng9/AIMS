@@ -115,7 +115,7 @@ User (Owner)
 |------|------------|----------------|
 | ACHEEVY | Any Boomer_Ang | Lil_Hawks directly |
 | Boomer_Ang | ACHEEVY, other Boomer_Angs, Chicken Hawk | Users directly |
-| Chicken Hawk | Forge_Ang (supervisor), Lil_Hawks | ACHEEVY, Users |
+| Chicken Hawk | Buildsmith (supervisor), Lil_Hawks | ACHEEVY, Users |
 | Lil_Hawks | Chicken Hawk only (log reports) | Anyone else |
 
 ### 3.3 Scope Rules
@@ -246,8 +246,8 @@ Available through Circuit Box:
 ```
 Anomaly detected
   → SafetyOps Lil_Hawk reports to Chicken Hawk
-  → Chicken Hawk escalates to Forge_Ang
-  → Forge_Ang escalates to ACHEEVY
+  → Chicken Hawk escalates to Buildsmith
+  → Buildsmith escalates to ACHEEVY
   → ACHEEVY notifies User
   → If no response: auto-halt via kill switch
 ```

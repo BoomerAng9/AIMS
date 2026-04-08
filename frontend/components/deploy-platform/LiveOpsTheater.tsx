@@ -108,11 +108,11 @@ function YardAnimation({ phase, progress }: { phase: string; progress: number })
     { x: 30, y: 60, color: '#22C55E' },
     { x: 50, y: 60, color: '#EAB308' },
     { x: 70, y: 60, color: '#EF4444' },
-    { x: 90, y: 60, color: '#8B5CF6' },
+    { x: 90, y: 60, color: '#F59E0B' },
   ];
 
   return (
-    <div className="relative h-24 bg-black/30 rounded-lg overflow-hidden border border-wireframe-stroke">
+    <div className="relative h-24 bg-slate-100/40 rounded-lg overflow-hidden border border-wireframe-stroke">
       <svg className="w-full h-full" viewBox="0 0 100 80">
         {/* Ground */}
         <rect x="0" y="70" width="100" height="10" fill="#1a2234" />
@@ -188,13 +188,13 @@ function LilHawkCard({ hawk }: { hawk: LilHawkStatus }) {
   };
 
   return (
-    <div className="p-2 rounded-lg bg-black/30 border border-wireframe-stroke flex items-center gap-2">
+    <div className="p-2 rounded-lg bg-slate-100/40 border border-wireframe-stroke flex items-center gap-2">
       <div className="w-8 h-8 rounded-full bg-gold/20 flex items-center justify-center">
         <BirdIcon className="w-4 h-4 text-gold" />
       </div>
       <div className="flex-1 min-w-0">
-        <div className="text-xs font-medium text-white truncate">{hawk.personaHandle}</div>
-        <div className="text-[10px] text-gray-500 truncate">{hawk.currentTask || hawk.designation}</div>
+        <div className="text-xs font-medium text-slate-800 truncate">{hawk.personaHandle}</div>
+        <div className="text-xs text-gray-500 truncate">{hawk.currentTask || hawk.designation}</div>
       </div>
       <div className={`w-2 h-2 rounded-full ${statusColors[hawk.status]}`} />
     </div>
@@ -220,7 +220,7 @@ function SecurityBar({ indicators }: { indicators: SecurityIndicators }) {
         {items.map((item) => (
           <div
             key={item.key}
-            className={`px-2 py-0.5 rounded text-[10px] font-mono ${
+            className={`px-2 py-0.5 rounded text-xs font-mono ${
               item.active
                 ? 'bg-green-500/20 text-green-400'
                 : 'bg-gray-500/20 text-gray-500'
@@ -259,15 +259,15 @@ function EventFeed({ events }: { events: ShiftEvent[] }) {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0 }}
-            className="p-2 rounded bg-black/20 text-xs"
+            className="p-2 rounded bg-slate-50/30 text-xs"
           >
             <div className="flex items-center gap-2">
               {event.lilHawk && (
                 <span className="text-gold font-medium">{event.lilHawk}:</span>
               )}
-              <span className="text-white/70">{event.description}</span>
+              <span className="text-slate-600">{event.description}</span>
             </div>
-            <div className="text-[10px] text-gray-600 mt-0.5">
+            <div className="text-xs text-gray-600 mt-0.5">
               {event.timestamp.toLocaleTimeString()}
             </div>
           </motion.div>
@@ -368,7 +368,7 @@ export function LiveOpsTheater({ shiftId, isOpen, onClose, minimal = false }: Li
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-white/80 backdrop-blur-sm p-4"
       onClick={onClose}
     >
       <motion.div
@@ -387,7 +387,7 @@ export function LiveOpsTheater({ shiftId, isOpen, onClose, minimal = false }: Li
               <CraneIcon className="w-5 h-5 text-gold" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-white">Live Ops Theater</h2>
+              <h2 className="text-lg font-bold text-slate-800">Live Ops Theater</h2>
               <p className="text-xs text-gray-500">
                 {status?.squadName} | Shift {status?.shiftId?.slice(0, 12)}
               </p>
@@ -405,7 +405,7 @@ export function LiveOpsTheater({ shiftId, isOpen, onClose, minimal = false }: Li
             </label>
             <button
               onClick={onClose}
-              className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+              className="p-2 rounded-lg hover:bg-slate-100 transition-colors"
             >
               <XIcon className="w-5 h-5 text-gray-400" />
             </button>
@@ -436,11 +436,11 @@ export function LiveOpsTheater({ shiftId, isOpen, onClose, minimal = false }: Li
                     }`}
                   />
                   <div
-                    className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${
+                    className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
                       isCurrent
                         ? 'bg-gold text-black'
                         : isActive
-                        ? 'bg-gold/50 text-white'
+                        ? 'bg-gold/50 text-slate-800'
                         : 'bg-gray-700 text-gray-500'
                     }`}
                   >

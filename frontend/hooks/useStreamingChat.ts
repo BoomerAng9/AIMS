@@ -6,12 +6,22 @@
  */
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import type { ChatMessage } from '@/lib/chat/types';
+import type { BusinessFunction, Tool, UploadedFile } from 'agentic-ui';
+import type { ChatMessage, MessageAttachment } from '@/lib/chat/types';
+
+export interface AgenticChatPayload {
+  content: string;
+  files?: UploadedFile[];
+  tools?: Tool[];
+  businessFunction?: BusinessFunction;
+  deepResearch?: boolean;
+}
 
 interface UseStreamingChatOptions {
   sessionId?: string;
   model?: string;
-  personaId?: string;
+  contextPackIds?: string[];
+  compatibilityPersonaId?: string;
   onMessageStart?: () => void;
   onMessageComplete?: (message: ChatMessage) => void;
   onError?: (error: string) => void;
@@ -22,15 +32,44 @@ interface UseStreamingChatReturn {
   isStreaming: boolean;
   isLoading: boolean;
   error: string | null;
-  sendMessage: (content: string) => Promise<void>;
+  sendMessage: (input: string | AgenticChatPayload) => Promise<void>;
   regenerate: () => Promise<void>;
   stopGeneration: () => void;
   clearMessages: () => void;
   editMessage: (id: string, newContent: string) => void;
 }
 
+function normalizePayload(input: string | AgenticChatPayload): AgenticChatPayload {
+  if (typeof input === 'string') {
+    return { content: input };
+  }
+
+  return input;
+}
+
+function toMessageAttachments(files: UploadedFile[] | undefined): MessageAttachment[] | undefined {
+  if (!files || files.length === 0) {
+    return undefined;
+  }
+
+  return files.map((file) => ({
+    type: file.type.startsWith('image/') ? 'image' : 'file',
+    name: file.name,
+    url: file.url,
+    mimeType: file.type,
+  }));
+}
+
 export function useStreamingChat(options: UseStreamingChatOptions = {}): UseStreamingChatReturn {
-  const { sessionId, model = 'gemini-3-flash', personaId, onMessageStart, onMessageComplete, onError } = options;
+  const {
+    sessionId,
+    model = 'gemini-3-flash',
+    contextPackIds = [],
+    compatibilityPersonaId,
+    onMessageStart,
+    onMessageComplete,
+    onError,
+  } = options;
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isStreaming, setIsStreaming] = useState(false);
@@ -44,18 +83,29 @@ export function useStreamingChat(options: UseStreamingChatOptions = {}): UseStre
   // Send Message with Streaming
   // ─────────────────────────────────────────────────────────
 
-  const sendMessage = useCallback(async (content: string) => {
-    if (!content.trim() || isStreaming) return;
+  const sendMessage = useCallback(async (input: string | AgenticChatPayload) => {
+    const payload = normalizePayload(input);
+    if (!payload.content.trim() || isStreaming) return;
 
     setError(null);
     setIsLoading(true);
+
+    const attachments = toMessageAttachments(payload.files);
 
     // Add user message
     const userMessage: ChatMessage = {
       id: `user-${Date.now()}`,
       role: 'user',
-      content: content.trim(),
+      content: payload.content.trim(),
       timestamp: new Date(),
+      attachments,
+      metadata: {
+        agentic: {
+          selectedTools: payload.tools || [],
+          businessFunction: payload.businessFunction,
+          deepResearch: Boolean(payload.deepResearch),
+        },
+      },
     };
 
     // Add placeholder assistant message
@@ -81,10 +131,13 @@ export function useStreamingChat(options: UseStreamingChatOptions = {}): UseStre
           messages: [...messages, userMessage].map(m => ({
             role: m.role,
             content: m.content,
+            attachments: m.attachments,
+            metadata: m.metadata,
           })),
           model,
           sessionId,
-          personaId,
+          contextPackIds,
+          personaId: compatibilityPersonaId,
         }),
         signal: abortControllerRef.current.signal,
       });
@@ -111,7 +164,7 @@ export function useStreamingChat(options: UseStreamingChatOptions = {}): UseStre
         const lines = chunk.split('\n');
 
         for (const line of lines) {
-          // Handle Vercel AI SDK format: 0:"text chunk"\n
+          // Handle AI SDK streaming format: 0:"text chunk"\n
           if (/^\d+:/.test(line)) {
             const colonIdx = line.indexOf(':');
             const prefix = line.slice(0, colonIdx);
@@ -124,28 +177,54 @@ export function useStreamingChat(options: UseStreamingChatOptions = {}): UseStre
                 if (typeof text === 'string') {
                   currentMessageRef.current += text;
                   setMessages(prev => {
-                    const updated = [...prev];
-                    const lastMsg = updated[updated.length - 1];
+                    const lastIdx = prev.length - 1;
+                    if (lastIdx < 0) return prev;
+                    const lastMsg = prev[lastIdx];
                     if (lastMsg.role === 'assistant' && lastMsg.isStreaming) {
-                      lastMsg.content = currentMessageRef.current;
+                      const newMsg = { ...lastMsg, content: currentMessageRef.current };
+                      return [...prev.slice(0, lastIdx), newMsg];
                     }
-                    return [...updated];
+                    return prev;
                   });
                 }
               } catch {
                 // Skip malformed tokens
               }
+            } else if (prefix === '8') {
+              // Tool execution event
+              try {
+                const toolEvent = JSON.parse(payload);
+                setMessages(prev => {
+                  const toolMsg: ChatMessage = {
+                    id: `tool-${Date.now()}`,
+                    role: 'assistant',
+                    content: '',
+                    timestamp: new Date(),
+                    metadata: { toolExecution: toolEvent },
+                  };
+                  // Insert before the current streaming assistant message
+                  const lastIdx = prev.length - 1;
+                  if (lastIdx >= 0 && prev[lastIdx].role === 'assistant' && prev[lastIdx].isStreaming) {
+                    return [...prev.slice(0, lastIdx), toolMsg, prev[lastIdx]];
+                  }
+                  return [...prev, toolMsg];
+                });
+              } catch {
+                // Skip malformed tool events
+              }
             } else if (prefix === 'e') {
-              // Vercel AI SDK finish signal
+              // AI SDK finish signal
               setIsStreaming(false);
               setMessages(prev => {
-                const updated = [...prev];
-                const lastMsg = updated[updated.length - 1];
+                const lastIdx = prev.length - 1;
+                if (lastIdx < 0) return prev;
+                const lastMsg = prev[lastIdx];
                 if (lastMsg.role === 'assistant') {
-                  lastMsg.isStreaming = false;
-                  onMessageComplete?.(lastMsg);
+                  const newMsg = { ...lastMsg, isStreaming: false };
+                  onMessageComplete?.(newMsg);
+                  return [...prev.slice(0, lastIdx), newMsg];
                 }
-                return updated;
+                return prev;
               });
               return;
             }
@@ -159,13 +238,15 @@ export function useStreamingChat(options: UseStreamingChatOptions = {}): UseStre
             if (data === '[DONE]') {
               setIsStreaming(false);
               setMessages(prev => {
-                const updated = [...prev];
-                const lastMsg = updated[updated.length - 1];
+                const lastIdx = prev.length - 1;
+                if (lastIdx < 0) return prev;
+                const lastMsg = prev[lastIdx];
                 if (lastMsg.role === 'assistant') {
-                  lastMsg.isStreaming = false;
-                  onMessageComplete?.(lastMsg);
+                  const newMsg = { ...lastMsg, isStreaming: false };
+                  onMessageComplete?.(newMsg);
+                  return [...prev.slice(0, lastIdx), newMsg];
                 }
-                return updated;
+                return prev;
               });
               return;
             }
@@ -176,12 +257,14 @@ export function useStreamingChat(options: UseStreamingChatOptions = {}): UseStre
               if (parsed.content) {
                 currentMessageRef.current += parsed.content;
                 setMessages(prev => {
-                  const updated = [...prev];
-                  const lastMsg = updated[updated.length - 1];
+                  const lastIdx = prev.length - 1;
+                  if (lastIdx < 0) return prev;
+                  const lastMsg = prev[lastIdx];
                   if (lastMsg.role === 'assistant' && lastMsg.isStreaming) {
-                    lastMsg.content = currentMessageRef.current;
+                    const newMsg = { ...lastMsg, content: currentMessageRef.current };
+                    return [...prev.slice(0, lastIdx), newMsg];
                   }
-                  return [...updated];
+                  return prev;
                 });
               }
             } catch {
@@ -195,26 +278,33 @@ export function useStreamingChat(options: UseStreamingChatOptions = {}): UseStre
       if (currentMessageRef.current) {
         setIsStreaming(false);
         setMessages(prev => {
-          const updated = [...prev];
-          const lastMsg = updated[updated.length - 1];
+          const lastIdx = prev.length - 1;
+          if (lastIdx < 0) return prev;
+          const lastMsg = prev[lastIdx];
           if (lastMsg.role === 'assistant' && lastMsg.isStreaming) {
-            lastMsg.isStreaming = false;
-            onMessageComplete?.(lastMsg);
+            const newMsg = { ...lastMsg, isStreaming: false };
+            onMessageComplete?.(newMsg);
+            return [...prev.slice(0, lastIdx), newMsg];
           }
-          return updated;
+          return prev;
         });
       }
     } catch (err: any) {
       if (err.name === 'AbortError') {
         // User cancelled
         setMessages(prev => {
-          const updated = [...prev];
-          const lastMsg = updated[updated.length - 1];
+          const lastIdx = prev.length - 1;
+          if (lastIdx < 0) return prev;
+          const lastMsg = prev[lastIdx];
           if (lastMsg.role === 'assistant') {
-            lastMsg.isStreaming = false;
-            lastMsg.content = currentMessageRef.current || '(cancelled)';
+            const newMsg = {
+              ...lastMsg,
+              isStreaming: false,
+              content: currentMessageRef.current || '(cancelled)'
+            };
+            return [...prev.slice(0, lastIdx), newMsg];
           }
-          return updated;
+          return prev;
         });
       } else {
         const errorMsg = err.message || 'Unknown error';
@@ -229,7 +319,17 @@ export function useStreamingChat(options: UseStreamingChatOptions = {}): UseStre
       setIsLoading(false);
       abortControllerRef.current = null;
     }
-  }, [messages, isStreaming, model, sessionId, onMessageStart, onMessageComplete, onError]);
+  }, [
+    compatibilityPersonaId,
+    contextPackIds,
+    isStreaming,
+    messages,
+    model,
+    onError,
+    onMessageComplete,
+    onMessageStart,
+    sessionId,
+  ]);
 
   // ─────────────────────────────────────────────────────────
   // Regenerate Last Response

@@ -1,0 +1,91 @@
+award_id,award_name,year,player_name,team_id,position,class_year,notes
+HEISMAN_1935,Heisman Trophy,1935,Jay Berwanger,CHICAGO,HB,SR,First Heisman Trophy winner (University of Chicago)
+HEISMAN_1936,Heisman Trophy,1936,Larry Kelley,YALE,E,SR,
+HEISMAN_1937,Heisman Trophy,1937,Clint Frank,YALE,HB,SR,
+HEISMAN_1938,Heisman Trophy,1938,Davey O'Brien,TCU,QB,SR,Led TCU to 11-0 record and national championship
+HEISMAN_1939,Heisman Trophy,1939,Nile Kinnick,IOWA,HB,SR,Iowa's stadium renamed in his honor; died in WWII
+HEISMAN_1940,Heisman Trophy,1940,Tom Harmon,MICHIGAN,HB,SR,
+HEISMAN_1941,Heisman Trophy,1941,Bruce Smith,MINNESOTA,HB,SR,
+HEISMAN_1942,Heisman Trophy,1942,Frank Sinkwich,GEORGIA,HB,SR,
+HEISMAN_1943,Heisman Trophy,1943,Angelo Bertelli,NOTRE_DAME,QB,SR,
+HEISMAN_1944,Heisman Trophy,1944,Les Horvath,OHIO_ST,QB/HB,SR,
+HEISMAN_1945,Heisman Trophy,1945,Doc Blanchard,ARMY,FB,JR,Mr. Inside
+HEISMAN_1946,Heisman Trophy,1946,Glenn Davis,ARMY,HB,SR,Mr. Outside
+HEISMAN_1947,Heisman Trophy,1947,Johnny Lujack,NOTRE_DAME,QB,SR,
+HEISMAN_1948,Heisman Trophy,1948,Doak Walker,SMU,HB,JR,
+HEISMAN_1949,Heisman Trophy,1949,Leon Hart,NOTRE_DAME,E,SR,
+HEISMAN_1950,Heisman Trophy,1950,Vic Janowicz,OHIO_ST,HB,JR,
+HEISMAN_1951,Heisman Trophy,1951,Dick Kazmaier,PRINCETON,HB,SR,
+HEISMAN_1952,Heisman Trophy,1952,Billy Vessels,OKLAHOMA,HB,SR,First Oklahoma Heisman winner
+HEISMAN_1953,Heisman Trophy,1953,Johnny Lattner,NOTRE_DAME,HB,SR,
+HEISMAN_1954,Heisman Trophy,1954,Alan Ameche,WISCONSIN,FB,SR,
+HEISMAN_1955,Heisman Trophy,1955,Howard Cassady,OHIO_ST,HB,SR,
+HEISMAN_1956,Heisman Trophy,1956,Paul Hornung,NOTRE_DAME,QB,SR,Only Heisman winner from a team with a losing record
+HEISMAN_1957,Heisman Trophy,1957,John David Crow,TEXAS_AM,HB,SR,
+HEISMAN_1958,Heisman Trophy,1958,Pete Dawkins,ARMY,HB,SR,
+HEISMAN_1959,Heisman Trophy,1959,Billy Cannon,LSU,HB,SR,
+HEISMAN_1960,Heisman Trophy,1960,Joe Bellino,NAVY,HB,SR,
+HEISMAN_1961,Heisman Trophy,1961,Ernie Davis,SYRACUSE,HB,SR,First Black Heisman Trophy winner
+HEISMAN_1962,Heisman Trophy,1962,Terry Baker,OREGON_ST,QB,SR,
+HEISMAN_1963,Heisman Trophy,1963,Roger Staubach,NAVY,QB,JR,
+HEISMAN_1964,Heisman Trophy,1964,John Huarte,NOTRE_DAME,QB,SR,
+HEISMAN_1965,Heisman Trophy,1965,Mike Garrett,USC,HB,SR,
+HEISMAN_1966,Heisman Trophy,1966,Steve Spurrier,FLORIDA,QB,SR,
+HEISMAN_1967,Heisman Trophy,1967,Gary Beban,UCLA,QB,SR,
+HEISMAN_1968,Heisman Trophy,1968,O.J. Simpson,USC,RB,SR,
+HEISMAN_1969,Heisman Trophy,1969,Steve Owens,OKLAHOMA,RB,SR,
+HEISMAN_1970,Heisman Trophy,1970,Jim Plunkett,STANFORD,QB,SR,
+HEISMAN_1971,Heisman Trophy,1971,Pat Sullivan,AUBURN,QB,SR,
+HEISMAN_1972,Heisman Trophy,1972,Johnny Rodgers,NEBRASKA,FL,SR,
+HEISMAN_1973,Heisman Trophy,1973,John Cappelletti,PENN_ST,RB,SR,
+HEISMAN_1974,Heisman Trophy,1974,Archie Griffin,OHIO_ST,RB,JR,First of two consecutive Heismans
+HEISMAN_1975,Heisman Trophy,1975,Archie Griffin,OHIO_ST,RB,SR,Only two-time Heisman winner
+HEISMAN_1976,Heisman Trophy,1976,Tony Dorsett,PITT,RB,SR,Led Pitt to national championship
+HEISMAN_1977,Heisman Trophy,1977,Earl Campbell,TEXAS,RB,SR,
+HEISMAN_1978,Heisman Trophy,1978,Billy Sims,OKLAHOMA,RB,JR,
+HEISMAN_1979,Heisman Trophy,1979,Charles White,USC,RB,SR,
+HEISMAN_1980,Heisman Trophy,1980,George Rogers,SOUTH_CAROLINA,RB,SR,Only Heisman winner from South Carolina
+HEISMAN_1981,Heisman Trophy,1981,Marcus Allen,USC,RB,SR,
+HEISMAN_1982,Heisman Trophy,1982,Herschel Walker,GEORGIA,RB,JR,
+HEISMAN_1983,Heisman Trophy,1983,Mike Rozier,NEBRASKA,RB,SR,
+HEISMAN_1984,Heisman Trophy,1984,Doug Flutie,BOSTON_COLLEGE,QB,SR,Famous Hail Mary vs Miami
+HEISMAN_1985,Heisman Trophy,1985,Bo Jackson,AUBURN,RB,SR,
+HEISMAN_1986,Heisman Trophy,1986,Vinny Testaverde,MIAMI_FL,QB,SR,
+HEISMAN_1987,Heisman Trophy,1987,Tim Brown,NOTRE_DAME,WR,SR,
+HEISMAN_1988,Heisman Trophy,1988,Barry Sanders,OKLAHOMA_ST,RB,JR,Set single-season rushing record (2628 yards)
+HEISMAN_1989,Heisman Trophy,1989,Andre Ware,HOUSTON,QB,JR,First Black QB to win Heisman
+HEISMAN_1990,Heisman Trophy,1990,Ty Detmer,BYU,QB,JR,
+HEISMAN_1991,Heisman Trophy,1991,Desmond Howard,MICHIGAN,WR,SR,
+HEISMAN_1992,Heisman Trophy,1992,Gino Torretta,MIAMI_FL,QB,SR,
+HEISMAN_1993,Heisman Trophy,1993,Charlie Ward,FLORIDA_ST,QB,SR,Also played basketball
+HEISMAN_1994,Heisman Trophy,1994,Rashaan Salaam,COLORADO,RB,JR,
+HEISMAN_1995,Heisman Trophy,1995,Eddie George,OHIO_ST,RB,SR,
+HEISMAN_1996,Heisman Trophy,1996,Danny Wuerffel,FLORIDA,QB,SR,
+HEISMAN_1997,Heisman Trophy,1997,Charles Woodson,MICHIGAN,CB/WR,SR,First primarily defensive player to win
+HEISMAN_1998,Heisman Trophy,1998,Ricky Williams,TEXAS,RB,SR,Set all-time rushing record at time
+HEISMAN_1999,Heisman Trophy,1999,Ron Dayne,WISCONSIN,RB,SR,NCAA all-time rushing leader at time
+HEISMAN_2000,Heisman Trophy,2000,Chris Weinke,FLORIDA_ST,QB,SR,Oldest Heisman winner (28 years old)
+HEISMAN_2001,Heisman Trophy,2001,Eric Crouch,NEBRASKA,QB,SR,
+HEISMAN_2002,Heisman Trophy,2002,Carson Palmer,USC,QB,SR,
+HEISMAN_2003,Heisman Trophy,2003,Jason White,OKLAHOMA,QB,SR,
+HEISMAN_2004,Heisman Trophy,2004,Matt Leinart,USC,QB,JR,
+HEISMAN_2005,Heisman Trophy,2005,Reggie Bush,USC,RB,JR,Trophy forfeited in 2010; reinstated in 2024
+HEISMAN_2006,Heisman Trophy,2006,Troy Smith,OHIO_ST,QB,SR,
+HEISMAN_2007,Heisman Trophy,2007,Tim Tebow,FLORIDA,QB,SO,First sophomore to win Heisman
+HEISMAN_2008,Heisman Trophy,2008,Sam Bradford,OKLAHOMA,QB,SO,
+HEISMAN_2009,Heisman Trophy,2009,Mark Ingram Jr.,ALABAMA,RB,SO,First Alabama Heisman winner
+HEISMAN_2010,Heisman Trophy,2010,Cam Newton,AUBURN,QB,SR,
+HEISMAN_2011,Heisman Trophy,2011,Robert Griffin III,BAYLOR,QB,JR,First Baylor Heisman winner
+HEISMAN_2012,Heisman Trophy,2012,Johnny Manziel,TEXAS_AM,QB,FR,First freshman to win Heisman
+HEISMAN_2013,Heisman Trophy,2013,Jameis Winston,FLORIDA_ST,QB,FR,
+HEISMAN_2014,Heisman Trophy,2014,Marcus Mariota,OREGON,QB,JR,First Oregon Heisman winner
+HEISMAN_2015,Heisman Trophy,2015,Derrick Henry,ALABAMA,RB,JR,
+HEISMAN_2016,Heisman Trophy,2016,Lamar Jackson,LOUISVILLE,QB,SO,Youngest Heisman winner at the time
+HEISMAN_2017,Heisman Trophy,2017,Baker Mayfield,OKLAHOMA,QB,SR,First walk-on to win since 1950s
+HEISMAN_2018,Heisman Trophy,2018,Kyler Murray,OKLAHOMA,QB,JR,Back-to-back OU Heisman QBs
+HEISMAN_2019,Heisman Trophy,2019,Joe Burrow,LSU,QB,SR,Record-setting season (60 TDs)
+HEISMAN_2020,Heisman Trophy,2020,DeVonta Smith,ALABAMA,WR,SR,First WR to win since 1991
+HEISMAN_2021,Heisman Trophy,2021,Bryce Young,ALABAMA,QB,SO,
+HEISMAN_2022,Heisman Trophy,2022,Caleb Williams,USC,QB,SO,
+HEISMAN_2023,Heisman Trophy,2023,Jayden Daniels,LSU,QB,SR,
+HEISMAN_2024,Heisman Trophy,2024,Travis Hunter,COLORADO,CB/WR,SR,Two-way player; first primarily defensive player since Woodson (1997)

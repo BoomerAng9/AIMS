@@ -1,0 +1,32 @@
+# =============================================================================
+# .dockerignore for frontend build (context = repo root)
+# Include frontend/ and aims-tools/ — ignore heavy/unnecessary dirs
+# =============================================================================
+
+# Large directories that are never needed in the build
+**/node_modules
+**/.next
+**/.git
+**/coverage
+**/.vscode
+**/.idea
+
+# Backend (not needed for frontend build)
+backend/
+AIMS/
+
+# Infrastructure (not needed for frontend build)
+infra/
+
+# Env files (secrets)
+**/.env*
+!**/.env.example
+
+# Logs and temp
+**/*.log
+**/tmp
+
+# Scripts and docs (not needed)
+scripts/
+*.md
+!frontend/README.md

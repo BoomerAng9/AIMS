@@ -16,7 +16,7 @@ import TokenMeter from './TokenMeter';
 import { Eye, EyeOff, RotateCcw } from 'lucide-react';
 
 const GLASS =
-  'bg-black/40 backdrop-blur-md border border-white/10 rounded-xl';
+  'bg-slate-100/60 backdrop-blur-md border border-slate-200 rounded-xl';
 
 export default function OverlayGlassUI() {
   const overlayVisible = useHangarStore((s) => s.overlayVisible);
@@ -35,14 +35,14 @@ export default function OverlayGlassUI() {
       <div className="absolute top-4 right-4 pointer-events-auto flex gap-2">
         <button
           onClick={() => setOverlayVisible(!overlayVisible)}
-          className={`${GLASS} p-2 text-white/70 hover:text-white transition-colors`}
+          className={`${GLASS} p-2 text-slate-600 hover:text-slate-800 transition-colors`}
           title={overlayVisible ? 'Hide overlay' : 'Show overlay'}
         >
           {overlayVisible ? <EyeOff size={18} /> : <Eye size={18} />}
         </button>
         <button
           onClick={resetHangar}
-          className={`${GLASS} p-2 text-white/70 hover:text-white transition-colors`}
+          className={`${GLASS} p-2 text-slate-600 hover:text-slate-800 transition-colors`}
           title="Reset hangar"
         >
           <RotateCcw size={18} />
@@ -64,11 +64,11 @@ export default function OverlayGlassUI() {
                 <div className="text-xs text-[#2BD4FF]/70 uppercase tracking-widest mb-1">
                   {isAnimating ? 'Animating' : 'Phase'}
                 </div>
-                <div className="text-sm font-medium text-white">
+                <div className="text-sm font-medium text-slate-800">
                   {currentPhase ? getPhaseLabel(currentPhase) : 'Awaiting Input'}
                 </div>
                 {/* Phase progress bar */}
-                <div className="mt-2 h-1 bg-white/10 rounded-full overflow-hidden">
+                <div className="mt-2 h-1 bg-slate-100 rounded-full overflow-hidden">
                   <motion.div
                     className="h-full bg-gradient-to-r from-[#C6A74E] to-[#2BD4FF] rounded-full"
                     animate={{ width: `${progress * 100}%` }}
@@ -83,7 +83,7 @@ export default function OverlayGlassUI() {
                       className={`w-2 h-2 rounded-full transition-colors duration-300 ${
                         i <= phaseIndex
                           ? 'bg-[#C6A74E]'
-                          : 'bg-white/15'
+                          : 'bg-slate-100'
                       }`}
                       title={getPhaseLabel(phase)}
                     />

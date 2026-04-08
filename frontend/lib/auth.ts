@@ -3,11 +3,15 @@
  *
  * Supports:
  * - Google OAuth (primary)
+ * - GitHub OAuth
+ * - Discord OAuth
  * - Credentials (email/password) for dev/fallback
  *
  * Roles:
- * - OWNER: Platform super admin (env: OWNER_EMAILS)
- * - USER: Regular customer
+ * - OWNER:     Platform operator — full developer access, all agents, raw ACHEEVY
+ * - ADMIN:     Trusted team — same UI as owner, cannot change billing/infra
+ * - CUSTOMER:  Public paying user — simplified UI, paywalled features, plain language
+ * - DEMO_USER: Trial access — read-only, time-limited session
  *
  * Add GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, NEXTAUTH_SECRET to .env
  */
@@ -19,7 +23,15 @@ import DiscordProvider from 'next-auth/providers/discord';
 import { prisma } from '@/lib/db/prisma';
 import bcrypt from 'bcryptjs';
 
-export type UserRole = 'OWNER' | 'USER' | 'DEMO_USER';
+export type UserRole = 'OWNER' | 'ADMIN' | 'CUSTOMER' | 'DEMO_USER';
+
+/** Roles that have PRIVATE (developer) mode access */
+export const PRIVATE_ROLES: UserRole[] = ['OWNER', 'ADMIN'];
+
+/** Check if a role has private/developer access */
+export function isPrivateRole(role: string | undefined | null): boolean {
+  return PRIVATE_ROLES.includes(role as UserRole);
+}
 
 const IS_DEMO = process.env.DEMO_MODE === 'true';
 
@@ -160,7 +172,7 @@ export const authOptions: NextAuthOptions = {
                data: {
                  email: user.email,
                  name: user.name || profile?.name || user.email.split('@')[0],
-                 role: isOwnerEmail(user.email) ? 'OWNER' : 'USER',
+                 role: isOwnerEmail(user.email) ? 'OWNER' : 'CUSTOMER',
                  status: 'ACTIVE',
                },
              });
@@ -185,9 +197,9 @@ export const authOptions: NextAuthOptions = {
                  where: { email: user.email },
                  select: { role: true }
              });
-             token.role = dbUser?.role || (isOwnerEmail(user.email) ? 'OWNER' : 'USER');
+             token.role = dbUser?.role || (isOwnerEmail(user.email) ? 'OWNER' : 'CUSTOMER');
         } else {
-             token.role = 'USER';
+             token.role = 'CUSTOMER';
         }
       }
       
@@ -201,7 +213,7 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (session.user) {
         (session.user as any).id = token.userId;
-        (session.user as any).role = token.role || 'USER';
+        (session.user as any).role = token.role || 'CUSTOMER';
       }
       return session;
     },

@@ -66,9 +66,80 @@ export const cinematic = {
   ease: [0.16, 1, 0.3, 1] as const,
 };
 
+// ── Scroll-Driven Presets ──
+
+export const scrollTransition = {
+  /** Standard scroll reveal */
+  reveal: { duration: 0.6, ease: [0.16, 1, 0.3, 1] as const },
+  /** Slow cinematic reveal for hero sections */
+  cinematic: { duration: 0.8, ease: [0.16, 1, 0.3, 1] as const },
+  /** Quick pop-in for smaller elements */
+  pop: { duration: 0.4, ease: [0.16, 1, 0.3, 1] as const },
+};
+
+/** IntersectionObserver margin presets for useInView */
+export const viewportMargin = {
+  /** Trigger early — element enters 100px before visible */
+  early: "-100px",
+  /** Standard — trigger at ~80px before visible */
+  standard: "-80px",
+  /** Late — trigger only when nearly fully visible */
+  late: "-20px",
+};
+
 // ── Reduced Motion ──
 
 export const reducedMotion = {
   duration: 0,
   ease: "linear" as const,
 };
+
+// ── Application Variants ──
+
+import type { Variants } from "framer-motion";
+
+export const fadeInUp: Variants = {
+  hidden: { opacity: 0, y: 10 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      ...spring.snappy,
+      staggerChildren: stagger.fast
+    }
+  },
+};
+
+export const hoverLiftGlow: Variants = {
+  rest: {
+    y: 0,
+    boxShadow: "0 0 0 rgba(212, 175, 55, 0)",
+    borderColor: "rgba(255, 255, 255, 0.1)",
+  },
+  hover: {
+    y: -4,
+    boxShadow: "0 8px 16px -4px rgba(212, 175, 55, 0.15)",
+    borderColor: "rgba(212, 175, 55, 0.3)",
+    transition: spring.snappy
+  },
+  tap: {
+    y: 0,
+    scale: 0.98,
+    transition: spring.bouncy
+  }
+};
+
+export const fadeOpacity: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: transition.normal
+  },
+  exit: {
+    opacity: 0,
+    transition: transition.fast
+  }
+};
+
+
+

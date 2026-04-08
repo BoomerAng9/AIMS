@@ -45,7 +45,7 @@ import {
  * Calculate the percentage of quota used
  */
 export function calculatePercentUsed(quota: Quota): number {
-  if (quota.limit === -1) return 0; // Unlimited
+  if (quota.limit <= 0) return 0; // Metered / P2P
   if (quota.limit === 0) return 100;
   return Math.min(100, Math.round((quota.used / quota.limit) * 100));
 }
@@ -54,7 +54,7 @@ export function calculatePercentUsed(quota: Quota): number {
  * Calculate remaining quota
  */
 export function calculateRemaining(quota: Quota): number {
-  if (quota.limit === -1) return Infinity;
+  if (quota.limit <= 0) return 0; // Metered/P2P — no included allocation remaining
   return Math.max(0, quota.limit - quota.used - quota.reserved);
 }
 
@@ -62,7 +62,7 @@ export function calculateRemaining(quota: Quota): number {
  * Calculate overage amount
  */
 export function calculateOverage(quota: Quota): number {
-  if (quota.limit === -1) return 0;
+  if (quota.limit <= 0) return 0;
   return Math.max(0, quota.used - quota.limit);
 }
 
@@ -133,15 +133,15 @@ export function canExecute(
     };
   }
 
-  // Unlimited quota
-  if (quota.limit === -1) {
+  // P2P / metered quota — no included allocation, always allow, bill per use
+  if (quota.limit <= 0) {
     return {
       canExecute: true,
-      quotaRemaining: Infinity,
-      quotaLimit: -1,
+      quotaRemaining: 0,
+      quotaLimit: 0,
       percentUsed: 0,
       wouldExceed: false,
-      overage: 0,
+      overage: units, // all usage is overage (billed per use)
       warningLevel: "none",
     };
   }
@@ -223,9 +223,9 @@ export function estimate(
     }
 
     const remaining = calculateRemaining(quota);
-    const wouldExceed = quota.limit !== -1 && svc.units > remaining;
+    const wouldExceed = quota.limit > 0 && svc.units > remaining;
     const percentAfter =
-      quota.limit === -1
+      quota.limit <= 0
         ? 0
         : Math.round(((quota.used + svc.units) / quota.limit) * 100);
     const warningLevel = determineWarningLevel(percentAfter);
@@ -400,7 +400,7 @@ export function generateSummary(
 
   // Calculate overall metrics
   const totalLimit = quotas.reduce(
-    (sum: number, q) => (q.limit === -1 ? sum : sum + q.limit),
+    (sum: number, q) => (q.limit <= 0 ? sum : sum + q.limit),
     0
   );
   const totalUsed = quotas.reduce((sum: number, q) => sum + q.used, 0);
@@ -435,7 +435,7 @@ export function generateLucState(
 
   // Get top 3 services by percent used
   const topServices = summary.quotas
-    .filter((q) => q.limit !== -1)
+    .filter((q) => q.limit > 0)
     .sort((a, b) => b.percentUsed - a.percentUsed)
     .slice(0, 3)
     .map((q) => ({

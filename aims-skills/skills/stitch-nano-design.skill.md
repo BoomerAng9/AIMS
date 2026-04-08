@@ -77,7 +77,7 @@ It takes:
 1. **AIMS Style Pack** (rules above)
 2. **Screen intent** (Chat w/ACHEEVY, Plugs, Integrations, etc.)
 3. **Asset Manifest** (logo, textures, background tiles, hero images)
-4. **Motion Rules** (Framer Motion spec)
+4. **Motion Rules** (Motion v12 spec)
    …and outputs:
 
 * Page-level layout directives (grid, margins, responsive breakpoints)
@@ -158,12 +158,12 @@ Create a single manifest that Stitch and Nano Banana both reference:
   * Any hero imagery you already approved
 * **Motion references**
 
-  * “Framer Motion patterns” library (entry/hover/loading)
+  * “Motion patterns” library (entry/hover/loading)
 
 **Trigger behavior**
 
 * If the prompt includes: *“retro”, “lo-fi”, “Mr. Robot”, “polished but imperfect”, “motion”*
-  → attach **AIMS_TEXTURE_RETROFUTURE** + **AIMS_MOTION_FRAMER** automatically.
+  → attach **AIMS_TEXTURE_RETROFUTURE** + **AIMS_MOTION** automatically.
 * If the prompt includes: *“cut off”, “header not visible”, “loading issue”, “mobile”*
   → attach **AIMS_PERFORMANCE_LOADING** automatically.
 
@@ -181,7 +181,7 @@ Create a single manifest that Stitch and Nano Banana both reference:
 * Constraints (responsive, safe areas, “header always visible,” chat composer never cropped)
 * Style Pack: AIMS v1
 * Asset Manifest: [list asset IDs/names]
-* Motion Rules: Framer Motion pack
+* Motion Rules: Motion v12 pack
 
 **Outputs required**
 
@@ -248,7 +248,7 @@ Use this wording as a bug ticket:
 
 ---
 
-## 8) “Use my images + Framer Motion” directive (how to explain it to the builder)
+## 8) “Use my images + Motion” directive (how to explain it to the builder)
 
 ### Image usage directive
 
@@ -258,7 +258,7 @@ Use this wording as a bug ticket:
 
 ### Motion directive
 
-* Framer Motion is used for:
+* Motion is used for:
 
   * **Entrance choreography:** subtle, fast, never theatrical
   * **Hover feedback:** micro-lift + glow, minimal travel
@@ -271,7 +271,7 @@ Use this wording as a bug ticket:
 
 1. **AIMS Style Pack v1** (this doc section 2, frozen)
 2. **Asset Manifest v1** (single list of approved files + intended usage)
-3. **Motion Library v1** (Framer Motion patterns by component type)
+3. **Motion Library v1** (Motion patterns by component type)
 4. **Stitch Build Sheets** for:
 
    * Chat w/ACHEEVY

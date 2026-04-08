@@ -223,6 +223,9 @@ export async function generateDynamicSteps(
       ],
       max_tokens: 2000,
       temperature: 0.3,
+      // Pipeline architecture is agent_orchestration — MEDIUM thinking.
+      // Not routine (LOW) but not deep math/code reasoning (HIGH).
+      thinking_level: 'medium',
     });
 
     const responseText = llmResponse.content || '';
@@ -340,6 +343,14 @@ export async function executeVertical(
       },
       requestedBy: userId,
       capability: undefined,
+    });
+
+    // Fire post-execution hooks (RAG store + audit) — non-blocking
+    postExecutionHooks(vertical.id, userId, sessionId, pipeline, []).catch(err => {
+      auditLedger.write(createAuditEntry(
+        vertical.id, userId, sessionId, 'verification_failed',
+        { phase: 'post_execution_hooks', error: err instanceof Error ? err.message : String(err) },
+      ));
     });
 
     return { taskId: task.id, status: 'executing', pipeline, auditSessionId };

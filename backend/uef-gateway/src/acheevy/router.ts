@@ -7,6 +7,9 @@
 
 import { Router, Request, Response } from 'express';
 import { getOrchestrator, AcheevyExecuteRequest } from './orchestrator';
+import { resolveIntentFromRoutingDecision } from './routing-contract';
+import { registry } from '../agents/registry';
+import logger from '../logger';
 
 const router = Router();
 
@@ -32,23 +35,28 @@ router.post('/execute', async (req: Request, res: Response) => {
       body.userId = 'anon';
     }
 
+    if (!body.intent && body.routingDecision) {
+      body.intent = resolveIntentFromRoutingDecision(body.routingDecision);
+    }
+
     if (!body.intent) {
-      body.intent = 'internal-llm';
+      body.intent = 'conversation';
     }
 
     const orchestrator = getOrchestrator();
     const result = await orchestrator.execute(body);
 
-    console.log(`[ACHEEVY] ${result.requestId} → ${body.intent} → ${result.status}`);
+    logger.info({ requestId: result.requestId, intent: body.intent, status: result.status }, '[ACHEEVY] Routed request');
 
     return res.json(result);
-  } catch (error: any) {
-    console.error('[ACHEEVY] Router error:', error.message);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Unknown router error';
+    logger.error({ err: error, message }, '[ACHEEVY] Router error');
     return res.status(500).json({
       status: 'error',
       reply: 'Internal server error.',
       requestId: '',
-      error: error.message,
+      error: message,
     });
   }
 });
@@ -56,18 +64,36 @@ router.post('/execute', async (req: Request, res: Response) => {
 /**
  * GET /acheevy/health
  *
- * Health check for the ACHEEVY orchestrator.
+ * Live health check — verifies agent registry, memory engine, and
+ * reports actual service state instead of hardcoded "online".
  */
-router.get('/health', (_req: Request, res: Response) => {
-  res.json({
+router.get('/health', async (_req: Request, res: Response) => {
+  const agents = registry.list();
+  const agentCount = agents.length;
+  const agentNames = agents.map(a => a.name);
+
+  // Check critical agents
+  const hasChickenHawk = registry.has('chicken-hawk');
+  const hasEngineer = registry.has('engineer-ang');
+
+  const healthy = agentCount >= 5 && hasChickenHawk && hasEngineer;
+
+  res.status(healthy ? 200 : 503).json({
     service: 'ACHEEVY Orchestrator',
-    status: 'online',
+    status: healthy ? 'online' : 'degraded',
     version: '1.0.0',
+    agents: {
+      count: agentCount,
+      names: agentNames,
+      critical: {
+        'chicken-hawk': hasChickenHawk,
+        'engineer-ang': hasEngineer,
+      },
+    },
     capabilities: [
       'plug-fabrication',
       'skill-execution',
       'perform-analytics',
-      'scaffolding',
       'conversation',
     ],
   });
@@ -85,7 +111,7 @@ router.get('/capabilities', (_req: Request, res: Response) => {
       { pattern: 'perform-stack', description: 'Sports analytics and scouting' },
       { pattern: 'skill:remotion', description: 'Video composition generation' },
       { pattern: 'skill:gemini-research', description: 'Deep research with Gemini' },
-      { pattern: 'skill:n8n-workflow', description: 'Workflow automation' },
+      { pattern: 'skill:automation-workflow', description: 'Workflow automation' },
       { pattern: 'skill:stitch', description: 'Design system generation' },
       { pattern: 'skill:best-practices', description: 'PRD/SOP/KPI generation' },
       { pattern: 'scaffolding', description: 'Platform cloning and scaffolding via Make It Mine' },

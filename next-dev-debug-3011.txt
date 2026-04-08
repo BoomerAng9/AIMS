@@ -1,0 +1,61 @@
+
+> aims-frontend@0.1.0 dev
+> next dev
+
+  Γû▓ Next.js 14.2.35
+  - Local:        http://localhost:3011
+  - Environments: .env.local, .env
+  - Experiments (use with caution):
+    ┬╖ externalDir
+
+ Γ£ô Starting...
+ Γ£ô Ready in 18.8s
+ Γùï Compiling /middleware ...
+ Γ£ô Compiled /middleware in 17.3s (117 modules)
+ Γùï Compiling /dashboard/chat ...
+ Γ£ô Compiled /dashboard/chat in 125.5s (2168 modules)
+ GET /dashboard/chat 200 in 131046ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, lstat 'C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server'
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../../.next/server/app/dashboard/chat/page' in C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\server for build dependencies doesn't lead to expected result 'C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\dashboard\chat\page.js', but to 'Error: Can't resolve '../../../../.next/server/app/dashboard/chat/page' in 'C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ../../../../.next/server/app/dashboard/chat/page (expected C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\dashboard\chat\page.js)
+<w>  at file dependencies C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\server\require.js
+<w>  at file C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\server\require.js
+<w>  at file dependencies C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\server\load-components.js
+<w>  at file C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\server\load-components.js
+<w>  at file dependencies C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js
+<w>  at file C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js
+<w>  at file dependencies C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\webpack\loaders\next-app-loader.js
+<w>  at file C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\webpack\loaders\next-app-loader.js
+<w>  at file dependencies C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\compiled\loader-runner\LoaderRunner.js
+<w>  at file C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\compiled\loader-runner\LoaderRunner.js
+<w>  at file dependencies C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\compiled\webpack\bundle5.js
+<w>  at file C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\compiled\webpack\bundle5.js
+<w>  at file dependencies C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\compiled\webpack\webpack.js
+<w>  at file C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\compiled\webpack\webpack.js
+<w>  at file dependencies C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\webpack\plugins\define-env-plugin.js
+<w>  at file C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\webpack\plugins\define-env-plugin.js
+<w>  at file dependencies C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\swc\index.js
+<w>  at file C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\swc\index.js
+<w>  at file dependencies C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\webpack\loaders\next-barrel-loader.js
+<w>  at file C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\webpack\loaders\next-barrel-loader.js
+<w>  at resolve commonjs C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\webpack\loaders\next-barrel-loader.js
+ Γùï Compiling /_not-found ...
+ Γ£ô Compiled /_not-found in 25.3s (1353 modules)
+ GET /_next/static/chunks/app/dashboard/layout.js 404 in 26982ms
+ GET /_next/static/chunks/app/layout.js 404 in 27267ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, lstat 'C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\_not-found'
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../../.next/server/app/_not-found/page' in C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\server for build dependencies doesn't lead to expected result 'C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\_not-found\page.js', but to 'Error: Can't resolve '../../../../.next/server/app/_not-found/page' in 'C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ../../../../.next/server/app/_not-found/page (expected C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\.next\server\app\_not-found\page.js)
+<w>  at file dependencies C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\server\require.js
+<w>  at file C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\server\require.js
+<w>  at file dependencies C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\server\load-components.js
+<w>  at file C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\server\load-components.js
+<w>  at file dependencies C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js
+<w>  at file C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\utils.js
+<w>  at file dependencies C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\handle-externals.js
+<w>  at file C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\handle-externals.js
+<w>  at file dependencies C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\webpack\loaders\next-swc-loader.js
+<w>  at file C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\webpack\loaders\next-swc-loader.js
+<w>  at resolve commonjs C:\Users\rishj\OneDrive\Desktop\A.I.M.S\frontend\node_modules\next\dist\build\webpack\loaders\next-swc-loader.js
+ ΓÜá Cross origin request detected from 127.0.0.1 to /_next/* resource. In a future major version of Next.js, you will need to explicitly configure "allowedDevOrigins" in next.config to allow this.
+Read more: https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins

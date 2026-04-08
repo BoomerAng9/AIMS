@@ -52,14 +52,14 @@ function TypeaheadDropdown({
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
           transition={{ duration: 0.15 }}
-          className="absolute z-50 w-full mt-1 bg-black/95 backdrop-blur-xl border border-wireframe-stroke rounded-xl shadow-2xl overflow-hidden"
+          className="absolute z-50 w-full mt-1 bg-white/95 backdrop-blur-xl border border-wireframe-stroke rounded-xl shadow-2xl overflow-hidden"
         >
           {loading ? (
-            <div className="px-4 py-3 text-sm text-white/40">
+            <div className="px-4 py-3 text-sm text-slate-400">
               <span className="inline-block animate-pulse">Searching...</span>
             </div>
           ) : options.length === 0 ? (
-            <div className="px-4 py-3 text-sm text-white/40">
+            <div className="px-4 py-3 text-sm text-slate-400">
               {emptyMessage}
             </div>
           ) : (
@@ -73,8 +73,8 @@ function TypeaheadDropdown({
                       w-full px-4 py-2.5 text-left flex items-center gap-3
                       transition-colors
                       ${option.value === selectedValue
-                        ? 'bg-gold/10 text-white'
-                        : 'hover:bg-white/5 text-white/70'
+                        ? 'bg-gold/10 text-slate-800'
+                        : 'hover:bg-slate-50 text-slate-600'
                       }
                     `}
                   >
@@ -86,7 +86,7 @@ function TypeaheadDropdown({
                         {option.label}
                       </p>
                       {option.sublabel && (
-                        <p className="text-xs text-white/40 truncate">
+                        <p className="text-xs text-slate-400 truncate">
                           {option.sublabel}
                         </p>
                       )}
@@ -192,7 +192,7 @@ export function CountrySelect({
   return (
     <div ref={containerRef} className="relative">
       {label && (
-        <label className="block text-xs text-white/50 mb-1.5">
+        <label className="block text-xs text-slate-500 mb-1.5">
           {label}
         </label>
       )}
@@ -215,8 +215,8 @@ export function CountrySelect({
           placeholder={placeholder}
           disabled={disabled}
           className={`
-            w-full h-11 rounded-xl border bg-black/60 px-3 text-sm text-white
-            outline-none transition-all placeholder:text-white/20
+            w-full h-11 rounded-xl border bg-slate-50/70 px-3 text-sm text-slate-800
+            outline-none transition-all placeholder:text-slate-300
             ${selectedCountry && !isOpen ? 'pl-10' : ''}
             ${error
               ? 'border-red-500/50 focus:border-red-500'
@@ -230,7 +230,7 @@ export function CountrySelect({
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/50"
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-500"
         >
           <motion.span
             animate={{ rotate: isOpen ? 180 : 0 }}
@@ -358,7 +358,7 @@ export function StateSelect({
   return (
     <div ref={containerRef} className="relative">
       {label && (
-        <label className="block text-xs text-white/50 mb-1.5">
+        <label className="block text-xs text-slate-500 mb-1.5">
           {label}
         </label>
       )}
@@ -374,8 +374,8 @@ export function StateSelect({
           placeholder={placeholder}
           disabled={disabled || !countryCode}
           className={`
-            w-full h-11 rounded-xl border bg-black/60 px-3 text-sm text-white
-            outline-none transition-all placeholder:text-white/20
+            w-full h-11 rounded-xl border bg-slate-50/70 px-3 text-sm text-slate-800
+            outline-none transition-all placeholder:text-slate-300
             ${error
               ? 'border-red-500/50 focus:border-red-500'
               : 'border-wireframe-stroke focus:border-gold/30'
@@ -388,7 +388,7 @@ export function StateSelect({
           <button
             type="button"
             onClick={() => setIsOpen(!isOpen)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/50"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-500"
           >
             <motion.span
               animate={{ rotate: isOpen ? 180 : 0 }}
@@ -442,7 +442,7 @@ export function CityInput({
   return (
     <div>
       {label && (
-        <label className="block text-xs text-white/50 mb-1.5">
+        <label className="block text-xs text-slate-500 mb-1.5">
           {label}
         </label>
       )}
@@ -454,8 +454,8 @@ export function CityInput({
         placeholder={placeholder}
         disabled={disabled}
         className={`
-          w-full h-11 rounded-xl border bg-black/60 px-3 text-sm text-white
-          outline-none transition-all placeholder:text-white/20
+          w-full h-11 rounded-xl border bg-slate-50/70 px-3 text-sm text-slate-800
+          outline-none transition-all placeholder:text-slate-300
           ${error
             ? 'border-red-500/50 focus:border-red-500'
             : 'border-wireframe-stroke focus:border-gold/30'
@@ -512,7 +512,7 @@ export function PostalCodeInput({
   return (
     <div>
       {label && (
-        <label className="block text-xs text-white/50 mb-1.5">
+        <label className="block text-xs text-slate-500 mb-1.5">
           {label}
         </label>
       )}
@@ -524,8 +524,8 @@ export function PostalCodeInput({
         placeholder={getPlaceholder()}
         disabled={disabled}
         className={`
-          w-full h-11 rounded-xl border bg-black/60 px-3 text-sm text-white
-          outline-none transition-all placeholder:text-white/20
+          w-full h-11 rounded-xl border bg-slate-50/70 px-3 text-sm text-slate-800
+          outline-none transition-all placeholder:text-slate-300
           ${error
             ? 'border-red-500/50 focus:border-red-500'
             : 'border-wireframe-stroke focus:border-gold/30'

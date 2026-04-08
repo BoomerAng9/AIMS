@@ -21,7 +21,7 @@
 # ┌────────────┴────────────────────────────────────────────────────┐
 # │  Agent Sandbox Network (Isolated)                               │
 # │  ┌──────────────┐  ┌──────────────┐                            │
-# │  │   n8n        │  │  Agent Zero  │                            │
+# │  │  Pipeline    │  │  Agent Zero  │                            │
 # │  │ (Automation) │  │  (Research)  │                            │
 # │  └──────────────┘  └──────────────┘                            │
 # └─────────────────────────────────────────────────────────────────┘
@@ -61,8 +61,6 @@ volumes:
   aims-data:
     driver: local
   luc-data:
-    driver: local
-  n8n-data:
     driver: local
   redis-data:
     driver: local
@@ -297,37 +295,6 @@ services:
         limits:
           cpus: '0.5'
           memory: 256M
-
-  # ═════════════════════════════════════════════════════════════════
-  # LAYER 3.1: AUTOMATION TOOLS
-  # ═════════════════════════════════════════════════════════════════
-
-  # n8n - Workflow Automation (Sandboxed)
-  n8n:
-    image: n8nio/n8n:latest
-    container_name: aims-n8n
-    environment:
-      - N8N_BASIC_AUTH_ACTIVE=true
-      - N8N_BASIC_AUTH_USER=${N8N_USER:-admin}
-      - N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD}
-      - N8N_HOST=0.0.0.0
-      - N8N_PORT=5678
-      - N8N_PROTOCOL=http
-      - WEBHOOK_URL=${N8N_WEBHOOK_URL:-http://localhost:5678}
-      # Security
-      - N8N_HIRING_BANNER_ENABLED=false
-      - N8N_DIAGNOSTICS_ENABLED=false
-    volumes:
-      - n8n-data:/home/node/.n8n
-    networks:
-      - sandbox-network
-    restart: unless-stopped
-    user: "1000:1000"
-    deploy:
-      resources:
-        limits:
-          cpus: '1'
-          memory: 1G
 
   # ═════════════════════════════════════════════════════════════════
   # LAYER 4: MONITORING & OBSERVABILITY

@@ -15,6 +15,8 @@ import { PolicyClient } from "../policy/client";
 import { AuditClient } from "../audit/client";
 import { getBuiltInAdapters } from "../adapters/built-in";
 import { llm } from "../lib/llm";
+import { memory } from "../lib/memory";
+import { verifyOracle } from "./oracle";
 
 export class ChickenHawkEngine {
   private squadManager: SquadManager;
@@ -179,6 +181,14 @@ export class ChickenHawkEngine {
       waveResults.push(waveResult);
       budgetRemaining -= waveResult.task_results.reduce((sum, r) => sum + r.luc_cost_usd, 0);
 
+      // Record outcomes in persistent memory for each task result
+      for (const tr of waveResult.task_results) {
+        const lesson = tr.status === "success"
+          ? `Completed ${tr.task_id} in ${tr.duration_ms}ms ($${tr.luc_cost_usd.toFixed(4)})`
+          : `Failed ${tr.task_id}: ${tr.error || "unknown error"}`;
+        memory.recordOutcome(tr.lil_hawk_id, tr.task_id, tr.status, lesson);
+      }
+
       // If wave failed and gate was all_pass, stop execution
       if (waveResult.status === "failed" && wave.gate === "all_pass") {
         console.log(`[engine] Wave ${wave.wave_id} failed with all_pass gate — halting execution`);
@@ -187,11 +197,44 @@ export class ChickenHawkEngine {
       }
     }
 
-    // Step 4: Finalize
+    // Step 4: ORACLE 7-Gate Verification
+    this.activeManifests.set(manifest.manifest_id, "verifying");
+
+    // Build a preliminary result for ORACLE to evaluate
+    const preliminaryResult: ManifestResult = {
+      manifest_id: manifest.manifest_id,
+      shift_id: manifest.shift_id,
+      status: "verifying",
+      wave_results: waveResults,
+      total_duration_ms: Date.now() - startTime,
+      total_luc_cost_usd: waveResults.reduce(
+        (sum, w) => sum + w.task_results.reduce((s, r) => s + r.luc_cost_usd, 0), 0,
+      ),
+      completed_at: new Date().toISOString(),
+    };
+
+    const oracleVerdict = verifyOracle(preliminaryResult, manifest.budget_limit_usd);
+
+    await this.auditClient.emit({
+      event_type: "oracle_verification",
+      shift_id: manifest.shift_id,
+      manifest_id: manifest.manifest_id,
+      action: "oracle_verify",
+      status: oracleVerdict.approved ? "approved" : "rejected",
+      metadata: {
+        gates_passed: oracleVerdict.gates.filter((g) => g.passed).length,
+        gates_total: oracleVerdict.gates.length,
+        blocking_failures: oracleVerdict.blocking_failures.map((g) => g.name),
+        advisory_warnings: oracleVerdict.advisory_warnings.map((g) => g.name),
+      },
+    });
+
+    // Step 5: Finalize
     const allSucceeded = waveResults.every((w) => w.status === "success");
-    const finalStatus: ManifestStatus = aborted ? "aborted" : allSucceeded ? "completed" : "failed";
+    const oracleBlocked = !oracleVerdict.approved;
+    const finalStatus: ManifestStatus = aborted ? "aborted" : oracleBlocked ? "failed" : allSucceeded ? "completed" : "failed";
     this.activeManifests.set(manifest.manifest_id, finalStatus);
-    this.squadManager.finalizeSquad(squad.squad_id, aborted ? "aborted" : "completed");
+    await this.squadManager.finalizeSquad(squad.squad_id, aborted ? "aborted" : "completed");
 
     const totalCost = waveResults.reduce(
       (sum, w) => sum + w.task_results.reduce((s, r) => s + r.luc_cost_usd, 0),
@@ -218,6 +261,13 @@ export class ChickenHawkEngine {
       duration_ms: result.total_duration_ms,
       luc_cost_usd: totalCost,
     });
+
+    // Save manifest-level decision to memory
+    memory.recordDecision(
+      "chickenhawk-core",
+      `Manifest ${manifest.manifest_id} → ${finalStatus}`,
+      `${waveResults.length} waves, $${totalCost.toFixed(4)} spent, ${result.total_duration_ms}ms`,
+    );
 
     console.log(`\n${"=".repeat(72)}`);
     console.log(`[engine] Manifest ${manifest.manifest_id} → ${finalStatus.toUpperCase()}`);
@@ -257,6 +307,7 @@ export class ChickenHawkEngine {
       buffered_audit_events: this.auditClient.getBuffer().length,
       llm_provider: llm.getProvider(),
       llm_configured: llm.isConfigured(),
+      memory_agents: memory.listAgents().length,
     };
   }
 

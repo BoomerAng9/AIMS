@@ -14,10 +14,13 @@ import { runAthletePageFactory } from './perform/pipeline/athlete-page-factory';
 import { SQUAD_PROFILES } from './agents/lil-hawks/workflow-smith-squad';
 import { VISION_SQUAD_PROFILES } from './agents/lil-hawks/vision-scout-squad';
 import { PREP_SQUAD_PROFILES, runPrepSquad } from './agents/lil-hawks/prep-squad-alpha';
+import { JSON_SQUAD_PROFILES } from './agents/lil-hawks/json-expert-squad';
 import { pmoRegistry } from './pmo/registry';
 import { houseOfAng } from './pmo/house-of-ang';
 import { runCollaborationDemo, renderJSON } from './collaboration';
-import { TIER_CONFIGS, TASK_MULTIPLIERS as BILLING_MULTIPLIERS, PILLAR_CONFIGS, checkAllowance, calculatePillarAddon, checkAgentLimit } from './billing';
+import { TIER_CONFIGS, TASK_MULTIPLIERS as BILLING_MULTIPLIERS, PILLAR_CONFIGS, checkAllowance, calculatePillarAddon, checkAgentLimit, meterAndRecord } from './billing';
+import { billingProvisions, paymentSessionStore, x402ReceiptStore } from './billing/persistence';
+import { agentPayments } from './payments/agent-payments';
 import { openrouter, MODELS as LLM_MODELS, llmGateway, usageTracker } from './llm';
 import { verticalRegistry } from './verticals';
 import { projectStore, plugStore, deploymentStore, auditStore, evidenceStore, startCleanupSchedule, stopCleanupSchedule, closeDb } from './db';
@@ -35,29 +38,105 @@ import { secrets } from './secrets';
 import { supplyChain } from './supply-chain';
 import { sandboxEnforcer } from './sandbox';
 import { securityTester } from './security';
-import { alertEngine, correlationManager, metricsExporter } from './observability';
+import { alertEngine, correlationManager, metricsExporter, initObservabilityPersistence } from './observability';
 import { releaseManager } from './release';
 import { backupManager } from './backup';
 import { incidentManager } from './backup/incident-runbook';
 
 import { a2aRouter } from './a2a';
 import { getOrchestrator } from './acheevy/orchestrator';
+import { shelfRouter } from './shelves/shelf-router';
+import { lucProjectService } from './shelves/luc-project-service';
+import { allShelfTools } from './shelves/mcp-tools';
+import { ossModels } from './llm/oss-models';
+import { personaplex } from './llm/personaplex';
+import { voiceRouter } from './voice/voice-router';
+import { triggerPmoPipeline } from './pipeline';
+import { plugRouter } from './plug-catalog/router';
+import { instanceLifecycle, autoScaler, cdnDeploy, tenantNetworks } from './plug-catalog';
+import { dispatchChickenHawkBuild } from './agents/cloudrun-dispatcher';
+import { triggerVerticalWorkflow } from './pipeline/client';
+import { cloudflareRouter, markdownForAgents } from './cloudflare';
+import { paymentsRouter } from './payments';
+import { normalizeInput, getDialectStats, SLANG_ENTRY_COUNT, INTENT_PHRASE_COUNT } from './nlp';
+import { magazineRouter } from './magazines';
+import { classifyIntent, searchGlossary, getGlossaryByCategory, submitFeedback, getPipelineStats } from './nlp/sme-nlp-service';
+import type { GlossaryCategory } from './nlp/sme-nlp-service';
+import { videoRouter } from './video';
+import { liveSim } from './livesim';
+import { composioRouter } from './composio';
+import { iiAgentRouter } from './ii-agent';
+import { buildNtntnRoutingDecision, resolveIntentFromRoutingDecision } from './acheevy/routing-contract';
 import logger from './logger';
+
+// Custom Lil_Hawks — User-Created Bots
+import {
+  createCustomHawk, listUserHawks, getHawk, updateHawkStatus, deleteHawk,
+  executeHawk, getAvailableDomains, getAvailableTools, getHawkExecutionHistory,
+  getGlobalStats as getHawkGlobalStats,
+  initHawkScheduler, stopHawkScheduler,
+} from './custom-hawks';
+import type { CustomHawkSpec, HawkExecutionRequest } from './custom-hawks';
+
+// Playground/Sandbox — Isolated Execution Environments
+import {
+  createPlayground, executeInPlayground, getPlayground, listPlaygrounds,
+  pausePlayground, resumePlayground, completePlayground, addFile,
+  getPlaygroundStats,
+} from './playground';
+import type { CreatePlaygroundRequest, ExecuteInPlaygroundRequest } from './playground';
+
+// Memory System — Persistent Agent Memory
+import { getMemoryEngine } from './memory';
+import type { RememberInput, RecallQuery, MemoryFeedback } from './memory';
+
+// Twelve Labs Video Intelligence + ScoutVerify
+import { getTwelveLabsClient } from './twelve-labs';
+import { runScoutVerify } from './perform/scout-verify';
+import type { ScoutVerifyInput } from './perform/scout-verify';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY || '';
+const GLOSSARY_CATEGORIES: readonly GlossaryCategory[] = [
+  'agents',
+  'infrastructure',
+  'features',
+  'operations',
+  'billing',
+  'design',
+  'governance',
+  'nlp',
+];
 
 // --------------------------------------------------------------------------
 // Security Middleware
 // --------------------------------------------------------------------------
-app.use(helmet({ contentSecurityPolicy: false }));
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"], // Frontend may need inline scripts
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", 'data:', 'https:'],
+      connectSrc: ["'self'", 'https:'],
+      fontSrc: ["'self'", 'https:', 'data:'],
+      objectSrc: ["'none'"],
+      frameAncestors: ["'none'"],
+    },
+  },
+  crossOriginEmbedderPolicy: false, // Allow loading external resources (fonts, images)
+}));
 
 const corsOrigin = process.env.CORS_ORIGIN || 'http://localhost:3000';
 app.use(cors({
   origin: corsOrigin.split(',').map(o => o.trim()),
-  methods: ['GET', 'POST'],
+  methods: ['GET', 'POST', 'DELETE', 'PUT', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'x-api-key', 'x-user-id', 'x-internal-caller', 'Authorization'],
+  credentials: true,
 }));
+// Raw body for Stripe webhook signature verification (must be before express.json())
+app.use('/api/payments/stripe/webhook', express.raw({ type: 'application/json' }));
 app.use(express.json());
 
 // Correlation ID middleware — every request gets a trace ID
@@ -108,9 +187,17 @@ const acpLimiter = rateLimit({
 // API Key Authentication — all routes except /health require X-API-Key
 // --------------------------------------------------------------------------
 function requireApiKey(req: express.Request, res: express.Response, next: express.NextFunction): void {
-  // In dev without a key configured, allow requests through
-  if (!INTERNAL_API_KEY && process.env.NODE_ENV !== 'production') {
+  // Stripe webhook uses its own signature verification — exempt from API key
+  if (req.path === '/api/payments/stripe/webhook') {
     next();
+    return;
+  }
+
+  // SECURITY: If no API key is configured, reject all requests.
+  // No dev-mode bypass — set INTERNAL_API_KEY in all environments.
+  if (!INTERNAL_API_KEY) {
+    logger.error({ path: req.path }, '[UEF] INTERNAL_API_KEY not configured — rejecting request');
+    res.status(503).json({ error: 'API key not configured — server misconfiguration' });
     return;
   }
 
@@ -136,9 +223,35 @@ app.get('/health', (_req, res) => {
 app.use(a2aRouter);
 
 // --------------------------------------------------------------------------
+// Cloudflare — LLM.txt, AI Index, and markdown-for-agents (public)
+// --------------------------------------------------------------------------
+app.use(cloudflareRouter);
+app.use(markdownForAgents);
+
+// --------------------------------------------------------------------------
 // Apply API key gate to ALL subsequent routes
 // --------------------------------------------------------------------------
 app.use(requireApiKey);
+
+// --------------------------------------------------------------------------
+// Agent Payments — X402, Stripe Agent Commerce, Wallets
+// --------------------------------------------------------------------------
+app.use(paymentsRouter);
+
+// --------------------------------------------------------------------------
+// Voice Router — PersonaPlex + Deepgram Nova + ElevenLabs with LUC metering
+// --------------------------------------------------------------------------
+app.use(voiceRouter);
+
+// --------------------------------------------------------------------------
+// Video & Content Pipeline — KIE.ai unified video generation
+// --------------------------------------------------------------------------
+app.use('/api', videoRouter);
+
+// --------------------------------------------------------------------------
+// Magazine System — Context Loading (NotebookLM-style)
+// --------------------------------------------------------------------------
+app.use('/api/magazines', magazineRouter);
 
 // --------------------------------------------------------------------------
 // Agent Registry — list available agents and their profiles
@@ -179,6 +292,211 @@ app.post('/perform/athlete', async (req, res) => {
     const message = error instanceof Error ? error.message : 'Unknown error';
     logger.error({ err: error }, 'Per|Form Pipeline Error');
     res.status(500).json({ status: 'ERROR', message });
+  }
+});
+
+// --------------------------------------------------------------------------
+// Per|Form Platform — Sports Analytics Pipeline Proxy
+// Routes /api/perform/* to the Per|Form service containers
+// Gridiron (football) is one category within Per|Form
+// --------------------------------------------------------------------------
+const PERFORM_SCOUT_HUB = process.env.PERFORM_SCOUT_HUB_URL || 'http://scout-hub:5001';
+const PERFORM_FILM_ROOM = process.env.PERFORM_FILM_ROOM_URL || 'http://film-room:5002';
+const PERFORM_WAR_ROOM = process.env.PERFORM_WAR_ROOM_URL || 'http://war-room:5003';
+
+async function performProxy(serviceUrl: string, path: string, method: string, body?: unknown): Promise<unknown> {
+  const url = `${serviceUrl}${path}`;
+  const opts: RequestInit = {
+    method,
+    headers: { 'Content-Type': 'application/json' },
+  };
+  if (body && method !== 'GET') opts.body = JSON.stringify(body);
+  const res = await fetch(url, opts);
+  return res.json();
+}
+
+app.all('/api/perform/scout-hub/*', async (req, res) => {
+  try {
+    const path = req.path.replace('/api/perform/scout-hub', '');
+    const data = await performProxy(PERFORM_SCOUT_HUB, path || '/health', req.method, req.body);
+    res.json(data);
+  } catch (error: unknown) {
+    logger.error({ err: error }, 'Per|Form Scout Hub proxy error');
+    res.status(502).json({ error: 'Scout Hub unreachable' });
+  }
+});
+
+app.all('/api/perform/film-room/*', async (req, res) => {
+  try {
+    const path = req.path.replace('/api/perform/film-room', '');
+    const data = await performProxy(PERFORM_FILM_ROOM, path || '/health', req.method, req.body);
+    res.json(data);
+  } catch (error: unknown) {
+    logger.error({ err: error }, 'Per|Form Film Room proxy error');
+    res.status(502).json({ error: 'Film Room unreachable' });
+  }
+});
+
+app.all('/api/perform/war-room/*', async (req, res) => {
+  try {
+    const path = req.path.replace('/api/perform/war-room', '');
+    const data = await performProxy(PERFORM_WAR_ROOM, path || '/health', req.method, req.body);
+    res.json(data);
+  } catch (error: unknown) {
+    logger.error({ err: error }, 'Per|Form War Room proxy error');
+    res.status(502).json({ error: 'War Room unreachable' });
+  }
+});
+
+// --------------------------------------------------------------------------
+// Per|Form Film Room — Twelve Labs Video Intelligence + ScoutVerify
+// Powered by Twelve Labs Marengo 3.0 (search/embeddings) + Pegasus (generation)
+// --------------------------------------------------------------------------
+
+// Film Room: Check Twelve Labs integration status
+app.get('/api/perform/film-room/status', async (_req, res) => {
+  const client = getTwelveLabsClient();
+  if (!client) {
+    res.json({ status: 'disabled', reason: 'TWELVELABS_API_KEY not configured' });
+    return;
+  }
+  const healthy = await client.healthCheck();
+  res.json({ status: healthy ? 'connected' : 'error', provider: 'twelve-labs' });
+});
+
+// Film Room: List video indexes
+app.get('/api/perform/film-room/indexes', async (_req, res) => {
+  const client = getTwelveLabsClient();
+  if (!client) { res.status(503).json({ error: 'Twelve Labs not configured' }); return; }
+  try {
+    const indexes = await client.listIndexes();
+    res.json(indexes);
+  } catch (err) {
+    logger.error({ err }, '[FilmRoom] Failed to list indexes');
+    res.status(500).json({ error: 'Failed to list indexes' });
+  }
+});
+
+// Film Room: Create a new video index
+app.post('/api/perform/film-room/indexes', async (req, res) => {
+  const client = getTwelveLabsClient();
+  if (!client) { res.status(503).json({ error: 'Twelve Labs not configured' }); return; }
+  const { name } = req.body;
+  if (!name || typeof name !== 'string') {
+    res.status(400).json({ error: 'name is required' });
+    return;
+  }
+  try {
+    const index = await client.createIndex(name);
+    res.json(index);
+  } catch (err) {
+    logger.error({ err }, '[FilmRoom] Failed to create index');
+    res.status(500).json({ error: 'Failed to create index' });
+  }
+});
+
+// Film Room: Index a video by URL
+app.post('/api/perform/film-room/videos', async (req, res) => {
+  const client = getTwelveLabsClient();
+  if (!client) { res.status(503).json({ error: 'Twelve Labs not configured' }); return; }
+  const { indexId, videoUrl, metadata } = req.body;
+  if (!indexId || !videoUrl) {
+    res.status(400).json({ error: 'indexId and videoUrl are required' });
+    return;
+  }
+  try {
+    const task = await client.indexVideoByUrl(indexId, videoUrl, metadata);
+    res.json(task);
+  } catch (err) {
+    logger.error({ err }, '[FilmRoom] Failed to index video');
+    res.status(500).json({ error: 'Failed to index video' });
+  }
+});
+
+// Film Room: Check video indexing task status
+app.get('/api/perform/film-room/tasks/:taskId', async (req, res) => {
+  const client = getTwelveLabsClient();
+  if (!client) { res.status(503).json({ error: 'Twelve Labs not configured' }); return; }
+  try {
+    const task = await client.getTask(req.params.taskId);
+    res.json(task);
+  } catch (err) {
+    logger.error({ err }, '[FilmRoom] Failed to get task status');
+    res.status(500).json({ error: 'Failed to get task status' });
+  }
+});
+
+// Film Room: Semantic search over game film
+app.post('/api/perform/film-room/search', async (req, res) => {
+  const client = getTwelveLabsClient();
+  if (!client) { res.status(503).json({ error: 'Twelve Labs not configured' }); return; }
+  const { indexId, query, options } = req.body;
+  if (!indexId || !query) {
+    res.status(400).json({ error: 'indexId and query are required' });
+    return;
+  }
+  try {
+    const results = await client.search(indexId, query, options);
+    res.json(results);
+  } catch (err) {
+    logger.error({ err }, '[FilmRoom] Search failed');
+    res.status(500).json({ error: 'Search failed' });
+  }
+});
+
+// Film Room: Generate scouting report from video
+app.post('/api/perform/film-room/report', async (req, res) => {
+  const client = getTwelveLabsClient();
+  if (!client) { res.status(503).json({ error: 'Twelve Labs not configured' }); return; }
+  const { videoId, prompt } = req.body;
+  if (!videoId) {
+    res.status(400).json({ error: 'videoId is required' });
+    return;
+  }
+  try {
+    const report = await client.generate(
+      videoId,
+      prompt || 'Generate a professional scouting report from this game film. Include strengths, areas for improvement, bull case, bear case, and an overall verdict with specific play examples.'
+    );
+    res.json(report);
+  } catch (err) {
+    logger.error({ err }, '[FilmRoom] Report generation failed');
+    res.status(500).json({ error: 'Report generation failed' });
+  }
+});
+
+// Film Room: Summarize game film
+app.post('/api/perform/film-room/summarize', async (req, res) => {
+  const client = getTwelveLabsClient();
+  if (!client) { res.status(503).json({ error: 'Twelve Labs not configured' }); return; }
+  const { videoId, type, prompt } = req.body;
+  if (!videoId) {
+    res.status(400).json({ error: 'videoId is required' });
+    return;
+  }
+  try {
+    const summary = await client.summarize(videoId, type || 'summary', prompt);
+    res.json(summary);
+  } catch (err) {
+    logger.error({ err }, '[FilmRoom] Summarize failed');
+    res.status(500).json({ error: 'Summarize failed' });
+  }
+});
+
+// ScoutVerify: Automated prospect evaluation verification
+app.post('/api/perform/scout-verify', async (req, res) => {
+  const { prospectName, videoId, videoUrl, position, school, classYear } = req.body;
+  if (!prospectName || typeof prospectName !== 'string') {
+    res.status(400).json({ error: 'prospectName is required' });
+    return;
+  }
+  try {
+    const input: ScoutVerifyInput = { prospectName, videoId, videoUrl, position, school, classYear };
+    const report = await runScoutVerify(input);
+    res.json(report);
+  } catch (err) {
+    logger.error({ err }, '[ScoutVerify] Verification failed');
+    res.status(500).json({ error: 'ScoutVerify pipeline failed' });
   }
 });
 
@@ -317,12 +635,12 @@ app.get('/admin/models', (_req, res) => {
 // --------------------------------------------------------------------------
 app.post('/llm/chat', async (req, res) => {
   try {
-    const { model, messages, max_tokens, temperature, agentId, userId, sessionId } = req.body;
+    const { model, messages, max_tokens, temperature, agentId, userId, sessionId, thinking_level } = req.body;
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
       res.status(400).json({ error: 'Missing or empty messages array' });
       return;
     }
-    const result = await llmGateway.chat({ model, messages, max_tokens, temperature, agentId, userId, sessionId });
+    const result = await llmGateway.chat({ model, messages, max_tokens, temperature, agentId, userId, sessionId, thinking_level });
     res.json(result);
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'LLM chat failed';
@@ -333,13 +651,13 @@ app.post('/llm/chat', async (req, res) => {
 
 app.post('/llm/stream', async (req, res) => {
   try {
-    const { model, messages, max_tokens, temperature, agentId, userId, sessionId } = req.body;
+    const { model, messages, max_tokens, temperature, agentId, userId, sessionId, thinking_level } = req.body;
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
       res.status(400).json({ error: 'Missing or empty messages array' });
       return;
     }
 
-    const { stream, provider, model: resolvedModel } = await llmGateway.stream({ model, messages, max_tokens, temperature, agentId, userId, sessionId });
+    const { stream, provider, model: resolvedModel } = await llmGateway.stream({ model, messages, max_tokens, temperature, agentId, userId, sessionId, thinking_level });
 
     res.writeHead(200, {
       'Content-Type': 'text/event-stream',
@@ -393,31 +711,46 @@ app.get('/llm/usage', (req, res) => {
 });
 
 // --------------------------------------------------------------------------
+// Factory Controller — Always-On Orchestration (FDH Pipeline)
+// Persistent factory loop: watches events → auto-kicks FDH → drives to completion
+// Integrates with Manage It / Guide Me paths for human-in-the-loop gates
+// --------------------------------------------------------------------------
+import { factoryRouter } from './factory';
+app.use('/factory', factoryRouter);
+
+// --------------------------------------------------------------------------
 // ACHEEVY Orchestrator — Intent classification → agent dispatch
 // This is the PRIMARY execution path for the chat interface.
 // Frontend sends: { userId, message, intent, context }
-// Gateway routes to II-Agent, A2A agents, n8n, or verticals.
+// Gateway routes to II-Agent, A2A agents, pipeline, or verticals.
 // --------------------------------------------------------------------------
 app.post('/acheevy/execute', async (req, res) => {
   try {
-    const { userId, message, intent, conversationId, plugId, skillId, context } = req.body;
+    const { userId, message, intent, conversationId, plugId, skillId, context, routingDecision } = req.body;
     if (!message || typeof message !== 'string') {
       res.status(400).json({ error: 'Missing message field' });
       return;
     }
-    if (!intent || typeof intent !== 'string') {
-      res.status(400).json({ error: 'Missing intent field' });
+    const resolvedIntent = typeof intent === 'string' && intent
+      ? intent
+      : routingDecision
+        ? resolveIntentFromRoutingDecision(routingDecision)
+        : 'conversation';
+
+    if (typeof resolvedIntent !== 'string' || !resolvedIntent) {
+      res.status(400).json({ error: 'Missing intent or routingDecision field' });
       return;
     }
 
     const orchestrator = getOrchestrator();
     const result = await orchestrator.execute({
-      userId: userId || 'web-user',
+      userId: userId || req.headers['x-user-id'] as string || 'anon-unknown',
       message,
-      intent,
+      intent: resolvedIntent,
       conversationId: conversationId || 'chat-ui',
       plugId,
       skillId,
+      routingDecision,
       context,
     });
 
@@ -425,6 +758,40 @@ app.post('/acheevy/execute', async (req, res) => {
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'Orchestrator execution failed';
     logger.error({ err }, '[ACHEEVY] Execute error');
+    res.status(500).json({ error: msg });
+  }
+});
+
+// --------------------------------------------------------------------------
+// Vertical Execute — Phase B: dispatch vertical to chain-of-command pipeline
+// Called by the frontend after Phase A step-progression completes.
+// --------------------------------------------------------------------------
+app.post('/vertical/execute', async (req, res) => {
+  try {
+    const { verticalId, userId, collectedData, sessionId } = req.body;
+    if (!verticalId || !userId) {
+      res.status(400).json({ error: 'Missing verticalId or userId' });
+      return;
+    }
+
+    const { triggerVerticalWorkflow } = await import('./pipeline/client');
+    const result = await triggerVerticalWorkflow({
+      verticalId,
+      userId: userId || req.headers['x-user-id'] as string || 'anon-unknown',
+      collectedData: collectedData || {},
+      sessionId: sessionId || `session-${userId}`,
+      requestId: `VRT-${Date.now()}`,
+    });
+
+    logger.info(
+      { verticalId, userId, requestId: result.requestId, status: result.status },
+      '[Vertical] Phase B execution dispatched',
+    );
+
+    res.json(result);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Vertical execution failed';
+    logger.error({ err }, '[Vertical] Execute error');
     res.status(500).json({ error: msg });
   }
 });
@@ -441,42 +808,594 @@ app.post('/acheevy/classify', (req, res) => {
       return;
     }
 
-    // Intent classification based on keywords
-    const lower = message.toLowerCase();
+    const sendClassification = (payload: Record<string, unknown>) => {
+      const classification = payload as { intent: string; confidence: number; requiresAgent: boolean };
+      res.json({
+        ...payload,
+        routingDecision: buildNtntnRoutingDecision(message, classification),
+      });
+    };
 
-    // Check for build/engineering intents
-    if (/\b(build|create|scaffold|deploy|generate|implement|code|develop|launch|mvp)\b/.test(lower)) {
-      if (/\b(plug|app|site|website|saas|platform|tool)\b/.test(lower)) {
-        res.json({ intent: 'plug-factory:custom', confidence: 0.9, requiresAgent: true });
+    // ── Vertical Trigger Patterns ────────────────────────────────
+    // Mirrors aims-skills/acheevy-verticals/vertical-definitions.ts
+    // Each vertical has NLP trigger patterns; we test them in priority order.
+    const VERTICAL_TRIGGERS: Array<{ id: string; name: string; patterns: RegExp[] }> = [
+      // Custom Hawk creation (high priority — user wants to create a bot)
+      {
+        id: 'custom-hawk',
+        name: 'Custom Lil_Hawks',
+        patterns: [
+          /custom\s*(hawk|bot|agent)/i,
+          /create\s*(a|my|an?)?\s*(hawk|bot|agent)/i,
+          /make\s*(a|my|an?)?\s*(hawk|bot|agent)/i,
+          /build\s*me\s*(a|an?)?\s*(hawk|bot|agent)/i,
+          /my\s*own\s*(hawk|bot|agent|assistant)/i,
+          /personal\s*(assistant|agent|bot)/i,
+          /lil_\w+_hawk/i,
+        ],
+      },
+      // Playground / Sandbox (high priority — user wants to test/run code)
+      {
+        id: 'playground',
+        name: 'Playground/Sandbox',
+        patterns: [
+          /playground/i,
+          /sandbox/i,
+          /run\s*(some|this|my)?\s*code/i,
+          /test\s*(some|this|my)?\s*(code|prompt|agent)/i,
+          /code\s*sandbox/i,
+          /training\s*(data|task|annotation)/i,
+          /student\s*workspace/i,
+          /prompt\s*(test|playground)/i,
+        ],
+      },
+      // Chicken Hawk (code/deploy agent)
+      {
+        id: 'chicken-hawk',
+        name: 'Chicken Hawk Code Agent',
+        patterns: [
+          /chicken\s*hawk/i,
+          /build\s*me\s*(an?\s*)?(app|tool|website|api|service)/i,
+          /deploy\s*(my|this|the)\s*(app|project|code)/i,
+          /claw\s*(agent|build|code)/i,
+          /code\s*agent/i,
+        ],
+      },
+      // LiveSim
+      {
+        id: 'livesim',
+        name: 'LiveSim Agent Space',
+        patterns: [
+          /live\s*sim/i,
+          /simulation\s*space/i,
+          /autonomous\s*space/i,
+          /agent\s*simulation/i,
+          /let\s*the\s*agents?\s*work/i,
+          /watch\s*the\s*team/i,
+        ],
+      },
+      // Business Idea Generator
+      {
+        id: 'idea-generator',
+        name: 'Business Idea Generator',
+        patterns: [
+          /business\s*ideas?/i,
+          /startup\s*ideas?/i,
+          /what\s*should\s*i\s*build/i,
+          /suggest.*ideas/i,
+          /start(ing)?\s*(a|my)?\s*business/i,
+          /entrepreneur/i,
+          /side\s*hustle/i,
+        ],
+      },
+      // Pain Points
+      {
+        id: 'pain-points',
+        name: 'Customer Pain Point Finder',
+        patterns: [
+          /pain\s*points?/i,
+          /problems?\s*in/i,
+          /market\s*gaps?/i,
+          /customer\s*frustrations?/i,
+        ],
+      },
+      // Brand Name
+      {
+        id: 'brand-name',
+        name: 'Brand Name Generator',
+        patterns: [
+          /brand\s*name/i,
+          /company\s*name/i,
+          /what\s*to\s*call/i,
+          /name.*business/i,
+        ],
+      },
+      // Value Proposition
+      {
+        id: 'value-prop',
+        name: 'Value Proposition Builder',
+        patterns: [
+          /value\s*proposition/i,
+          /why\s*us/i,
+          /unique\s*selling/i,
+          /\busp\b/i,
+        ],
+      },
+      // MVP Plan
+      {
+        id: 'mvp-plan',
+        name: 'MVP Launch Planner',
+        patterns: [
+          /\bmvp\b/i,
+          /launch\s*plan/i,
+          /get\s*started/i,
+          /first\s*steps?/i,
+          /minimum\s*viable/i,
+        ],
+      },
+      // Customer Persona
+      {
+        id: 'persona',
+        name: 'Customer Persona Builder',
+        patterns: [
+          /target\s*customer/i,
+          /who\s*buys/i,
+          /ideal\s*customer/i,
+          /customer\s*persona/i,
+          /buyer\s*persona/i,
+        ],
+      },
+      // Social Hooks
+      {
+        id: 'social-hooks',
+        name: 'Social Media Hooks',
+        patterns: [
+          /launch\s*tweet/i,
+          /social\s*post/i,
+          /announce/i,
+          /twitter\s*hook/i,
+          /x\s*hook/i,
+        ],
+      },
+      // Cold Outreach
+      {
+        id: 'cold-outreach',
+        name: 'Cold Outreach Engine',
+        patterns: [
+          /cold\s*email/i,
+          /outreach/i,
+          /pitch\s*email/i,
+          /reach\s*out/i,
+        ],
+      },
+      // Automation
+      {
+        id: 'automation',
+        name: 'Automation Builder',
+        patterns: [
+          /automat/i,
+          /save\s*time/i,
+          /streamline/i,
+          /repetitive\s*tasks?/i,
+        ],
+      },
+      // Content Calendar
+      {
+        id: 'content-calendar',
+        name: 'Content Calendar Planner',
+        patterns: [
+          /content\s*plan/i,
+          /posting\s*schedule/i,
+          /content\s*calendar/i,
+          /social\s*media\s*plan/i,
+        ],
+      },
+
+      // ── PaaS / Plug Operations ──────────────────────────────────────
+      {
+        id: 'paas-catalog',
+        name: 'Browse Plug Catalog',
+        patterns: [
+          /what\s*(tools?|plugs?|agents?)\s*(do\s*you|are|can)/i,
+          /show\s*me.*catalog/i,
+          /browse.*tools/i,
+          /what\s*can\s*(you|i)\s*(deploy|use|install|set\s*up)/i,
+          /available\s*(tools?|services?|plugs?)/i,
+        ],
+      },
+      {
+        id: 'paas-deploy',
+        name: 'Deploy Plug Instance',
+        patterns: [
+          /deploy\s*(a|an|the)?\s*(plug|tool|agent|instance|container)/i,
+          /spin\s*up/i,
+          /install\s*(a|an|the)?\s*(tool|agent|service)/i,
+          /set\s*up\s*(a|an)?\s*(tool|agent|service|openclaw)/i,
+          /launch\s*(a|an)?\s*(tool|agent|container)/i,
+          /\brun\s*(a|an)?\s*(tool|agent|service)\b/i,
+        ],
+      },
+      {
+        id: 'paas-status',
+        name: 'Check Instance Status',
+        patterns: [
+          /status\s*of\s*my/i,
+          /what('s|\s*is)\s*running/i,
+          /my\s*(instances?|services?|containers?)/i,
+          /check\s*(on|up\s*on)?\s*my/i,
+          /how('s|\s*is)\s*my.*doing/i,
+        ],
+      },
+
+      // ── Content / Video / UGC Pipeline ──────────────────────────────
+      {
+        id: 'content-pipeline',
+        name: 'Content Generation Pipeline',
+        patterns: [
+          /make.*video/i,
+          /generate.*video/i,
+          /create.*content/i,
+          /ugc/i,
+          /product\s*(video|ad|content)/i,
+          /turn.*into.*(video|content|ad)/i,
+          /amazon.*link.*video/i,
+          /seedance/i,
+          /marketing\s*(video|content|campaign)/i,
+          /ad\s*(creative|video|content)/i,
+          /social\s*(media\s*)?(video|content|ad)/i,
+        ],
+      },
+
+      // ── Automation / Workflow Pipeline ───────────────────────────────
+      {
+        id: 'workflow-pipeline',
+        name: 'Automation Pipeline Builder',
+        patterns: [
+          /whenever.*then/i,
+          /when.*happens.*do/i,
+          /automatically/i,
+          /every\s*(day|hour|week|morning|night)/i,
+          /schedule/i,
+          /trigger\s*when/i,
+          /if\s*this\s*then\s*that/i,
+          /connect.*to/i,
+          /integrate.*with/i,
+        ],
+      },
+    ];
+
+    // ── Vague Intent Refinement ───────────────────────────────────
+    // When input is too vague for keyword matching, detect the DOMAIN
+    // the user is thinking about and offer guided clarification.
+    const VAGUE_INTENT_MAP: Array<{ domain: string; hints: RegExp[]; refinement: string }> = [
+      {
+        domain: 'creation',
+        hints: [/i\s*want\s*to\s*make/i, /i\s*need\s*to\s*create/i, /help\s*me\s*(make|build|create)/i, /can\s*you\s*(make|build|create)/i],
+        refinement: 'I can help you create that. Are you looking to: (1) Build an app/website, (2) Generate content/videos, (3) Set up an automation, or (4) Deploy an AI tool?',
+      },
+      {
+        domain: 'money',
+        hints: [/make\s*money/i, /earn/i, /income/i, /revenue/i, /profit/i, /sell/i, /charge/i],
+        refinement: 'I can help with monetization. Are you looking to: (1) Launch a product/service, (2) Set up payment processing, (3) Build a business plan, or (4) Automate sales/outreach?',
+      },
+      {
+        domain: 'growth',
+        hints: [/grow/i, /scale/i, /more\s*(users|customers|traffic)/i, /marketing/i, /get\s*the\s*word\s*out/i],
+        refinement: 'Let\'s grow your reach. Are you looking to: (1) Create marketing content, (2) Automate outreach, (3) Build a content calendar, or (4) Set up analytics?',
+      },
+      {
+        domain: 'frustration',
+        hints: [/too\s*slow/i, /wasting\s*time/i, /takes\s*forever/i, /boring\s*task/i, /hate\s*doing/i, /repetitive/i],
+        refinement: 'Sounds like you need automation. Tell me what task is eating your time and I\'ll set up a workflow to handle it.',
+      },
+      {
+        domain: 'curiosity',
+        hints: [/what\s*can\s*you\s*do/i, /how\s*does\s*this\s*work/i, /what\s*is\s*this/i, /tell\s*me\s*about/i],
+        refinement: 'I\'m ACHEEVY — I deploy AI tools, build apps, automate workflows, and manage infrastructure. What are you working on? I\'ll match you with the right tools.',
+      },
+    ];
+
+    // ── NLP Normalization (slang → standard terms) ────────────────
+    // Run BEFORE pattern matching so colloquial language maps to
+    // recognizable trigger words. "finna whip up a vid" → content-pipeline
+    const nlpResult = normalizeInput(message);
+
+    // If the normalizer found a direct intent match from a full slang
+    // phrase, return it immediately (highest priority).
+    if (nlpResult.directIntent) {
+      const di = nlpResult.directIntent;
+      // Map intent IDs that start with "vertical:" through
+      const isVertical = di.intent.startsWith('vertical:');
+      const isRefine = di.intent.startsWith('refine:');
+
+      if (isRefine) {
+        // Find the matching refinement
+        const domain = di.intent.split(':')[1];
+        const vague = VAGUE_INTENT_MAP.find(v => v.domain === domain);
+        sendClassification({
+          intent: di.intent,
+          confidence: di.confidence,
+          requiresAgent: false,
+          refinement: vague?.refinement || `I detected you're thinking about ${domain}. Tell me more so I can help.`,
+          domain,
+          slangDetected: true,
+          dialectsDetected: nlpResult.dialectsDetected,
+          normalized: nlpResult.normalized,
+        });
         return;
       }
-      res.json({ intent: 'skill:build', confidence: 0.75, requiresAgent: true });
+
+      // For vertical intents or direct action intents
+      const verticalId = isVertical ? di.intent.replace('vertical:', '') : di.intent;
+      const verticalMatch = VERTICAL_TRIGGERS.find(v => v.id === verticalId);
+
+      sendClassification({
+        intent: isVertical ? di.intent : `vertical:${di.intent}`,
+        verticalName: verticalMatch?.name || di.intent,
+        confidence: di.confidence,
+        requiresAgent: true,
+        slangDetected: true,
+        dialectsDetected: nlpResult.dialectsDetected,
+        normalized: nlpResult.normalized,
+      });
       return;
     }
 
-    // Check for research intents
+    // Use the normalized text for subsequent pattern matching
+    const classifyText = nlpResult.slangDetected ? nlpResult.normalized : message;
+
+    // ── Try vertical trigger matching ───────────────────────────
+    for (const vertical of VERTICAL_TRIGGERS) {
+      if (vertical.patterns.some(p => p.test(classifyText) || p.test(message))) {
+        sendClassification({
+          intent: `vertical:${vertical.id}`,
+          verticalName: vertical.name,
+          confidence: 0.9,
+          requiresAgent: true,
+          ...(nlpResult.slangDetected ? {
+            slangDetected: true,
+            dialectsDetected: nlpResult.dialectsDetected,
+            normalized: nlpResult.normalized,
+          } : {}),
+        });
+        return;
+      }
+    }
+
+    const lower = classifyText.toLowerCase();
+
+    // ── Plug fabrication (build app/site/tool) ────────────────────
+    if (/\b(build|create|scaffold|deploy|generate|implement|code|develop|launch)\b/.test(lower)) {
+      if (/\b(plug|app|site|website|saas|platform|tool)\b/.test(lower)) {
+        sendClassification({ intent: 'plug-factory:custom', confidence: 0.9, requiresAgent: true });
+        return;
+      }
+      sendClassification({ intent: 'skill:build', confidence: 0.75, requiresAgent: true });
+      return;
+    }
+
+    // ── Research intents ──────────────────────────────────────────
     if (/\b(research|analyze|investigate|study|compare|benchmark|audit)\b/.test(lower)) {
-      res.json({ intent: 'skill:research', confidence: 0.8, requiresAgent: true });
+      sendClassification({ intent: 'skill:research', confidence: 0.8, requiresAgent: true });
       return;
     }
 
-    // Check for vertical/business intents
-    if (/\b(business|startup|entrepreneur|side hustle|monetize|revenue|scale)\b/.test(lower)) {
-      res.json({ intent: 'vertical:idea-generator', confidence: 0.85, requiresAgent: true });
+    // ── Broad business intent (catches anything the verticals missed) ──
+    if (/\b(business|startup|monetize|revenue|scale|profit|income)\b/.test(lower)) {
+      sendClassification({ intent: 'vertical:idea-generator', confidence: 0.7, requiresAgent: true });
       return;
     }
 
-    // Check for PMO/workflow intents
-    if (/\b(workflow|pipeline|automate|chain|team|assign|delegate)\b/.test(lower)) {
-      res.json({ intent: 'pmo-route', confidence: 0.7, requiresAgent: true });
+    // ── Per|Form sports analytics ─────────────────────────────────
+    if (/\b(draft|prospect|athlete|scout|football|nfl|recruit|big\s*board|mock\s*draft|gridiron)\b/.test(lower)) {
+      sendClassification({ intent: 'perform-stack', confidence: 0.85, requiresAgent: true });
       return;
+    }
+
+    // ── PMO/workflow routing ──────────────────────────────────────
+    if (/\b(workflow|pipeline|chain|team|assign|delegate)\b/.test(lower)) {
+      sendClassification({ intent: 'pmo-route', confidence: 0.7, requiresAgent: true });
+      return;
+    }
+
+    // ── Spawn agent ───────────────────────────────────────────────
+    if (/\b(spawn|activate|deploy)\s*(an?\s*)?(agent|boomer|ang)\b/.test(lower)) {
+      sendClassification({ intent: 'deployment-hub', confidence: 0.85, requiresAgent: true });
+      return;
+    }
+
+    // ── Vague intent refinement ─────────────────────────────────
+    // User's input didn't match any specific trigger. Try to detect
+    // the domain they're thinking about and offer guided refinement.
+    for (const vague of VAGUE_INTENT_MAP) {
+      if (vague.hints.some(h => h.test(message) || h.test(classifyText))) {
+        res.json({
+          intent: `refine:${vague.domain}`,
+          confidence: 0.6,
+          requiresAgent: false,
+          refinement: vague.refinement,
+          domain: vague.domain,
+          ...(nlpResult.slangDetected ? {
+            slangDetected: true,
+            dialectsDetected: nlpResult.dialectsDetected,
+            normalized: nlpResult.normalized,
+          } : {}),
+        });
+        return;
+      }
     }
 
     // Default: conversational (no agent needed, use LLM stream)
-    res.json({ intent: 'conversational', confidence: 0.5, requiresAgent: false });
+    res.json({
+      intent: 'conversational',
+      confidence: 0.5,
+      requiresAgent: false,
+      ...(nlpResult.slangDetected ? {
+        slangDetected: true,
+        dialectsDetected: nlpResult.dialectsDetected,
+        normalized: nlpResult.normalized,
+      } : {}),
+    });
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'Classification failed';
     res.status(500).json({ error: msg });
+  }
+});
+
+// --------------------------------------------------------------------------
+// NLP Stats & Normalization Test Endpoint
+// --------------------------------------------------------------------------
+
+app.get('/api/nlp/stats', (_req, res) => {
+  res.json({
+    dialects: getDialectStats(),
+    totalSlangEntries: SLANG_ENTRY_COUNT,
+    totalIntentPhrases: INTENT_PHRASE_COUNT,
+    supportedLanguages: ['en'],
+    plannedLanguages: ['es', 'pt', 'fr'],
+  });
+});
+
+app.post('/api/nlp/normalize', (req, res) => {
+  const { text } = req.body;
+  if (!text || typeof text !== 'string') {
+    res.status(400).json({ error: 'text field is required' });
+    return;
+  }
+  const result = normalizeInput(text);
+  res.json(result);
+});
+
+// --------------------------------------------------------------------------
+// NLP Glossary & SME-NLP_Ang Endpoints
+// --------------------------------------------------------------------------
+
+/** Glossary — search terms */
+app.get('/api/nlp/glossary', (req, res) => {
+  const { q, category } = req.query;
+  if (q && typeof q === 'string') {
+    const results = searchGlossary(q);
+    res.json({ results, total: results.length });
+    return;
+  }
+  if (category && typeof category === 'string') {
+    if (!GLOSSARY_CATEGORIES.includes(category as GlossaryCategory)) {
+      res.status(400).json({ error: 'invalid glossary category' });
+      return;
+    }
+
+    const results = getGlossaryByCategory(category as GlossaryCategory);
+    res.json({ results, total: results.length });
+    return;
+  }
+  // Return all
+  const all = searchGlossary('');
+  res.json({ results: all, total: all.length });
+});
+
+/** Intent classification — combines NLP normalization + glossary matching */
+app.post('/api/nlp/classify', (req, res) => {
+  const { text } = req.body;
+  if (!text || typeof text !== 'string') {
+    res.status(400).json({ error: 'text field is required' });
+    return;
+  }
+  const result = classifyIntent(text);
+  res.json(result);
+});
+
+/** Feedback — submit corrections to NLP classifications */
+app.post('/api/nlp/feedback', (req, res) => {
+  const { inputText, expectedIntent, actualIntent } = req.body;
+  if (!inputText || !expectedIntent) {
+    res.status(400).json({ error: 'inputText and expectedIntent are required' });
+    return;
+  }
+
+  const fb = submitFeedback({
+    input: inputText,
+    expectedIntent,
+    actualIntent: typeof actualIntent === 'string' && actualIntent.length > 0
+      ? actualIntent
+      : classifyIntent(inputText).intent,
+  });
+  res.json({ accepted: true, feedbackId: fb.id });
+});
+
+
+/** Pipeline stats — combined NLP + glossary stats */
+app.get('/api/nlp/pipeline-stats', (_req, res) => {
+  const stats = getPipelineStats();
+  res.json(stats);
+});
+
+// --------------------------------------------------------------------------
+// Chicken Hawk — Execution Engine Proxy
+// Forwards manifests to the Chicken Hawk Core service for real execution.
+// Command chain: ACHEEVY → Boomer_Ang → Chicken Hawk → Squad → Lil_Hawk
+// --------------------------------------------------------------------------
+const CHICKENHAWK_URL = process.env.CHICKENHAWK_URL || 'http://chickenhawk-core:4001';
+
+app.post('/chickenhawk/manifest', async (req, res) => {
+  try {
+    const manifest = req.body;
+    if (!manifest.manifest_id || !manifest.shift_id || !manifest.plan?.waves) {
+      res.status(400).json({ error: 'Invalid manifest: requires manifest_id, shift_id, and plan.waves' });
+      return;
+    }
+    logger.info({ manifestId: manifest.manifest_id }, '[CH] Forwarding manifest to Chicken Hawk');
+    const chRes = await fetch(`${CHICKENHAWK_URL}/api/manifest`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(manifest),
+    });
+    const data = await chRes.json();
+    res.status(chRes.status).json(data);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Chicken Hawk unreachable';
+    logger.error({ err }, '[CH] Manifest dispatch error');
+    res.status(502).json({ error: `Chicken Hawk unreachable: ${msg}` });
+  }
+});
+
+app.get('/chickenhawk/status', async (_req, res) => {
+  try {
+    const chRes = await fetch(`${CHICKENHAWK_URL}/status`);
+    const data = await chRes.json();
+    res.json(data);
+  } catch (err) {
+    res.status(502).json({ error: 'Chicken Hawk unreachable' });
+  }
+});
+
+app.get('/chickenhawk/health', async (_req, res) => {
+  try {
+    const chRes = await fetch(`${CHICKENHAWK_URL}/health`);
+    const data = await chRes.json();
+    res.json(data);
+  } catch (err) {
+    res.status(502).json({ error: 'Chicken Hawk offline' });
+  }
+});
+
+app.get('/chickenhawk/squads', async (_req, res) => {
+  try {
+    const chRes = await fetch(`${CHICKENHAWK_URL}/api/squads`);
+    const data = await chRes.json();
+    res.json(data);
+  } catch (err) {
+    res.status(502).json({ error: 'Chicken Hawk unreachable' });
+  }
+});
+
+app.post('/chickenhawk/emergency-stop', async (_req, res) => {
+  try {
+    logger.warn('[CH] EMERGENCY STOP triggered via gateway');
+    const chRes = await fetch(`${CHICKENHAWK_URL}/api/emergency-stop`, { method: 'POST' });
+    const data = await chRes.json();
+    res.json(data);
+  } catch (err) {
+    res.status(502).json({ error: 'Chicken Hawk unreachable for emergency stop' });
   }
 });
 
@@ -815,6 +1734,208 @@ app.post('/billing/check-agents', (req, res) => {
   res.json(result);
 });
 
+// Provision tier — called by Stripe webhook after checkout/subscription events
+// Persisted to SQLite via billingProvisions (replaces in-memory Map)
+
+// SECURITY: Billing provision is a privileged operation — requires internal caller
+app.post('/billing/provision', (req, res) => {
+  // Only internal services (Stripe webhook, ACHEEVY) should set billing tiers
+  const caller = req.headers['x-internal-caller'];
+  if (caller !== 'acheevy' && caller !== 'uef-gateway' && caller !== 'stripe-webhook') {
+    logger.warn({ path: req.path, ip: req.ip }, '[Billing] Rejected: provision requires x-internal-caller header');
+    res.status(403).json({ error: 'Forbidden — billing provision is restricted to internal services' });
+    return;
+  }
+
+  const { userId, tierId, tierName, stripeCustomerId, stripeSubscriptionId, provisionedAt, reason } = req.body;
+  if (!userId || !tierId) {
+    res.status(400).json({ error: 'Missing userId or tierId' });
+    return;
+  }
+
+  const now = new Date().toISOString();
+  billingProvisions.upsert({
+    userId,
+    tierId,
+    tierName: tierName || tierId,
+    stripeCustomerId: stripeCustomerId || '',
+    stripeSubscriptionId: stripeSubscriptionId || '',
+    provisionedAt: provisionedAt || now,
+    updatedAt: now,
+  });
+
+  logger.info({ userId, tierId, tierName, reason }, '[Billing] Tier provisioned (persisted)');
+  res.json({ success: true, userId, tierId, tierName, provisionedAt: provisionedAt || now });
+});
+
+app.get('/billing/provision', (req, res) => {
+  const queryUserId = req.query.userId as string;
+  const authUserId = req.headers['x-user-id'] as string | undefined;
+  const userId = authUserId || queryUserId;
+
+  if (!userId) {
+    res.status(400).json({ error: 'Missing userId' });
+    return;
+  }
+
+  // SECURITY: Users can only query their own billing provision
+  if (authUserId && queryUserId && authUserId !== queryUserId) {
+    logger.warn({ authUserId, queryUserId }, '[Billing] SECURITY: User tried to read another user\'s provision');
+    res.status(403).json({ error: 'Forbidden — you can only view your own billing status' });
+    return;
+  }
+
+  const tier = billingProvisions.get(userId);
+  if (!tier) {
+    res.json({ userId, tierId: 'p2p', tierName: 'Pay-per-Use', provisioned: false });
+    return;
+  }
+  const { userId: _uid, ...tierData } = tier;
+  res.json({ userId, ...tierData, provisioned: true });
+});
+
+// --------------------------------------------------------------------------
+// Billing — Invoice Generation & History
+// --------------------------------------------------------------------------
+
+import { invoiceStore } from './billing/persistence';
+import { generateInvoiceLineItems, calculateFees, generateSavingsLedgerEntries } from './billing';
+
+// Generate an invoice for a user's current billing period
+app.post('/billing/invoice/generate', (req, res) => {
+  // SECURITY: Only internal callers can generate invoices
+  const caller = req.headers['x-internal-caller'];
+  if (caller !== 'acheevy' && caller !== 'uef-gateway' && caller !== 'stripe-webhook') {
+    res.status(403).json({ error: 'Forbidden — invoice generation restricted to internal services' });
+    return;
+  }
+
+  const { userId, overageTokens, p2pTransactionCount } = req.body;
+  if (!userId) {
+    res.status(400).json({ error: 'userId is required' });
+    return;
+  }
+
+  const provision = billingProvisions.get(userId);
+  const tierId = provision?.tierId || 'p2p';
+
+  const lineItems = generateInvoiceLineItems(
+    tierId,
+    overageTokens || 0,
+    p2pTransactionCount || 0,
+  );
+
+  // Calculate fees breakdown for ledger entries
+  const isP2p = tierId === 'p2p';
+  const feeBreakdown = calculateFees(isP2p, p2pTransactionCount || 0);
+
+  const subtotal = lineItems.reduce((sum, item) => sum + item.total, 0);
+  // Tax rate from env (default 0 — set BILLING_TAX_RATE for jurisdictions that require it)
+  const taxRate = parseFloat(process.env.BILLING_TAX_RATE || '0');
+  const taxableAmount = lineItems
+    .filter(i => i.category !== 'savings_credit')
+    .reduce((sum, i) => sum + i.total, 0);
+  const tax = Math.round(taxableAmount * taxRate * 100) / 100;
+  const total = Math.round((subtotal + tax) * 100) / 100;
+
+  const now = new Date();
+  const periodEnd = now.toISOString();
+  const periodStart = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString();
+
+  const invoiceId = `inv_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+  const invoiceRecord = {
+    id: invoiceId,
+    userId,
+    tierId,
+    periodStart,
+    periodEnd,
+    status: 'issued' as const,
+    subtotal,
+    tax,
+    total,
+    currency: 'usd',
+    lineItems: JSON.stringify(lineItems),
+    createdAt: now.toISOString(),
+    updatedAt: now.toISOString(),
+  };
+
+  invoiceStore.create(invoiceRecord);
+
+  // Generate triple-ledger savings entries from fee events
+  const savingsLedger = [];
+  if (feeBreakdown.maintenanceFee > 0) {
+    savingsLedger.push(...generateSavingsLedgerEntries(userId, 'maintenance_fee', feeBreakdown.maintenanceFee));
+  }
+  if (feeBreakdown.transactionFee > 0) {
+    savingsLedger.push(...generateSavingsLedgerEntries(userId, 'transaction_fee', feeBreakdown.transactionFee));
+  }
+
+  logger.info({
+    invoiceId, userId, total, lineItemCount: lineItems.length,
+    feeBreakdown: { maintenance: feeBreakdown.maintenanceFee, transaction: feeBreakdown.transactionFee },
+    savingsEntries: savingsLedger.length,
+  }, '[Billing] Invoice generated with fee breakdown and savings ledger');
+
+  res.json({
+    invoice: {
+      ...invoiceRecord,
+      lineItems,
+    },
+    feeBreakdown,
+    savingsLedger,
+  });
+});
+
+// List a user's invoices
+app.get('/billing/invoices', (req, res) => {
+  const authUserId = req.headers['x-user-id'] as string | undefined;
+  const queryUserId = req.query.userId as string;
+  const userId = authUserId || queryUserId;
+
+  if (!userId) {
+    res.status(400).json({ error: 'userId required' });
+    return;
+  }
+
+  // SECURITY: Users can only see their own invoices
+  if (authUserId && queryUserId && authUserId !== queryUserId) {
+    res.status(403).json({ error: 'Forbidden — you can only view your own invoices' });
+    return;
+  }
+
+  const invoices = invoiceStore.listByUser(userId);
+  res.json({
+    invoices: invoices.map(inv => ({
+      ...inv,
+      lineItems: JSON.parse(inv.lineItems),
+    })),
+    count: invoices.length,
+  });
+});
+
+// Get a specific invoice
+app.get('/billing/invoice/:id', (req, res) => {
+  const invoice = invoiceStore.get(req.params.id);
+  if (!invoice) {
+    res.status(404).json({ error: 'Invoice not found' });
+    return;
+  }
+
+  // SECURITY: Verify ownership
+  const authUserId = req.headers['x-user-id'] as string | undefined;
+  if (authUserId && invoice.userId !== authUserId) {
+    res.status(403).json({ error: 'Forbidden — you do not own this invoice' });
+    return;
+  }
+
+  res.json({
+    invoice: {
+      ...invoice,
+      lineItems: JSON.parse(invoice.lineItems),
+    },
+  });
+});
+
 // --------------------------------------------------------------------------
 // Lil_Hawks — Squad profiles
 // --------------------------------------------------------------------------
@@ -824,8 +1945,804 @@ app.get('/lil-hawks', (_req, res) => {
       'prep-squad-alpha': PREP_SQUAD_PROFILES,
       'workflow-smith': SQUAD_PROFILES,
       'vision-scout': VISION_SQUAD_PROFILES,
+      'json-expert': JSON_SQUAD_PROFILES,
     },
   });
+});
+
+// --------------------------------------------------------------------------
+// Custom Lil_Hawks — User-Created Bots
+// Users can create their own Lil_Hawks with custom names and specialties.
+// "Lil_Increase_My_Money_Hawk", "Lil_Grade_My_Essay_Hawk", etc.
+// --------------------------------------------------------------------------
+app.post('/custom-hawks', (req, res) => {
+  try {
+    const { userId, spec } = req.body as { userId: string; spec: CustomHawkSpec };
+    if (!userId || !spec) {
+      res.status(400).json({ error: 'Missing userId or spec' });
+      return;
+    }
+    const result = createCustomHawk(userId, spec);
+    if (!result.success) {
+      res.status(400).json(result);
+      return;
+    }
+    res.status(201).json(result);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Custom hawk creation failed';
+    logger.error({ err }, '[CustomHawks] Create error');
+    res.status(500).json({ error: msg });
+  }
+});
+
+app.get('/custom-hawks', (req, res) => {
+  const userId = req.query.userId as string;
+  if (!userId) {
+    res.status(400).json({ error: 'Missing userId query param' });
+    return;
+  }
+  res.json(listUserHawks(userId));
+});
+
+app.get('/custom-hawks/domains', (_req, res) => {
+  res.json({ domains: getAvailableDomains(), tools: getAvailableTools() });
+});
+
+app.get('/custom-hawks/stats', (_req, res) => {
+  res.json(getHawkGlobalStats());
+});
+
+app.get('/custom-hawks/:hawkId', (req, res) => {
+  const userId = req.query.userId as string;
+  if (!userId) {
+    res.status(400).json({ error: 'Missing userId query param' });
+    return;
+  }
+  const hawk = getHawk(req.params.hawkId, userId);
+  if (!hawk) {
+    res.status(404).json({ error: 'Hawk not found' });
+    return;
+  }
+  res.json({ hawk });
+});
+
+app.patch('/custom-hawks/:hawkId/status', (req, res) => {
+  const { userId, status } = req.body as { userId: string; status: 'active' | 'paused' | 'retired' };
+  if (!userId || !status) {
+    res.status(400).json({ error: 'Missing userId or status' });
+    return;
+  }
+  const hawk = updateHawkStatus(req.params.hawkId, userId, status);
+  if (!hawk) {
+    res.status(404).json({ error: 'Hawk not found or not authorized' });
+    return;
+  }
+  res.json({ hawk });
+});
+
+app.delete('/custom-hawks/:hawkId', (req, res) => {
+  const userId = req.query.userId as string;
+  if (!userId) {
+    res.status(400).json({ error: 'Missing userId query param' });
+    return;
+  }
+  const deleted = deleteHawk(req.params.hawkId, userId);
+  if (!deleted) {
+    res.status(404).json({ error: 'Hawk not found or not authorized' });
+    return;
+  }
+  res.json({ deleted: true });
+});
+
+app.post('/custom-hawks/:hawkId/execute', async (req, res) => {
+  try {
+    const { userId, message, context } = req.body as HawkExecutionRequest;
+    if (!userId || !message) {
+      res.status(400).json({ error: 'Missing userId or message' });
+      return;
+    }
+    const result = await executeHawk({
+      hawkId: req.params.hawkId,
+      userId,
+      message,
+      context,
+    });
+    res.json(result);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Hawk execution failed';
+    logger.error({ err }, '[CustomHawks] Execute error');
+    res.status(500).json({ error: msg });
+  }
+});
+
+app.get('/custom-hawks/:hawkId/history', (req, res) => {
+  const limit = parseInt(req.query.limit as string) || 20;
+  res.json({ executions: getHawkExecutionHistory(req.params.hawkId, limit) });
+});
+
+// --------------------------------------------------------------------------
+// Playground/Sandbox — Isolated Execution Environments
+// Code sandboxes, prompt testing, agent testing, training data, education
+// --------------------------------------------------------------------------
+app.post('/playground', (req, res) => {
+  try {
+    const request = req.body as CreatePlaygroundRequest;
+    if (!request.userId || !request.type || !request.name || !request.config) {
+      res.status(400).json({ error: 'Missing required fields: userId, type, name, config' });
+      return;
+    }
+    const result = createPlayground(request);
+    if (!result.success) {
+      res.status(400).json(result);
+      return;
+    }
+    res.status(201).json(result);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Playground creation failed';
+    logger.error({ err }, '[Playground] Create error');
+    res.status(500).json({ error: msg });
+  }
+});
+
+app.get('/playground', (req, res) => {
+  const userId = req.query.userId as string;
+  if (!userId) {
+    res.status(400).json({ error: 'Missing userId query param' });
+    return;
+  }
+  res.json({ sessions: listPlaygrounds(userId) });
+});
+
+app.get('/playground/stats', (_req, res) => {
+  res.json(getPlaygroundStats());
+});
+
+app.get('/playground/:sessionId', (req, res) => {
+  const userId = req.query.userId as string;
+  if (!userId) {
+    res.status(400).json({ error: 'Missing userId query param' });
+    return;
+  }
+  const session = getPlayground(req.params.sessionId, userId);
+  if (!session) {
+    res.status(404).json({ error: 'Playground session not found' });
+    return;
+  }
+  res.json({ session });
+});
+
+app.post('/playground/:sessionId/execute', async (req, res) => {
+  try {
+    const { userId, input, target } = req.body as ExecuteInPlaygroundRequest;
+    if (!userId || !input) {
+      res.status(400).json({ error: 'Missing userId or input' });
+      return;
+    }
+    const result = await executeInPlayground({
+      sessionId: req.params.sessionId,
+      userId,
+      input,
+      target,
+    });
+    res.json(result);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Playground execution failed';
+    logger.error({ err }, '[Playground] Execute error');
+    res.status(500).json({ error: msg });
+  }
+});
+
+app.post('/playground/:sessionId/pause', (req, res) => {
+  const { userId } = req.body as { userId: string };
+  if (!userId) {
+    res.status(400).json({ error: 'Missing userId' });
+    return;
+  }
+  res.json(pausePlayground(req.params.sessionId, userId));
+});
+
+app.post('/playground/:sessionId/resume', (req, res) => {
+  const { userId } = req.body as { userId: string };
+  if (!userId) {
+    res.status(400).json({ error: 'Missing userId' });
+    return;
+  }
+  res.json(resumePlayground(req.params.sessionId, userId));
+});
+
+app.post('/playground/:sessionId/complete', (req, res) => {
+  const { userId } = req.body as { userId: string };
+  if (!userId) {
+    res.status(400).json({ error: 'Missing userId' });
+    return;
+  }
+  res.json(completePlayground(req.params.sessionId, userId));
+});
+
+app.post('/playground/:sessionId/files', (req, res) => {
+  const { userId, file } = req.body as { userId: string; file: { path: string; content: string; language: string } };
+  if (!userId || !file) {
+    res.status(400).json({ error: 'Missing userId or file' });
+    return;
+  }
+  const result = addFile(req.params.sessionId, userId, {
+    ...file,
+    sizeBytes: file.content.length,
+    lastModified: new Date().toISOString(),
+  });
+  res.json(result);
+});
+
+// --------------------------------------------------------------------------
+// Shelving System — First-Class Data Collections (Firestore + Memory)
+// All shelves: projects, luc_projects, plugs, boomer_angs, workflows,
+// runs, logs, assets
+// --------------------------------------------------------------------------
+app.use(shelfRouter);
+
+// --------------------------------------------------------------------------
+// Plug Catalog & Instance Management — PaaS Operations
+// --------------------------------------------------------------------------
+app.use('/api', plugRouter);
+
+// --------------------------------------------------------------------------
+// OpenSandbox — VPS2 Secure Code Execution Proxy
+// Proxies to aims-open-sandbox on VPS2 (10.0.0.2:4400)
+// --------------------------------------------------------------------------
+const VPS2_SANDBOX_URL = process.env.VPS2_SANDBOX_URL || 'http://10.0.0.2:4400';
+
+app.post('/api/sandbox/execute', async (req, res) => {
+  try {
+    const response = await fetch(`${VPS2_SANDBOX_URL}/api/sandbox/execute`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(req.body),
+    });
+    const data = await response.json();
+    res.status(response.status).json(data);
+  } catch (err) {
+    logger.error({ err }, '[Sandbox] VPS2 sandbox unreachable');
+    res.status(502).json({ error: 'Sandbox service unreachable', service: 'open-sandbox' });
+  }
+});
+
+app.get('/api/sandbox/executions', async (req, res) => {
+  try {
+    const limit = req.query.limit || '50';
+    const response = await fetch(`${VPS2_SANDBOX_URL}/api/sandbox/executions?limit=${limit}`);
+    const data = await response.json();
+    res.json(data);
+  } catch (err) {
+    res.status(502).json({ error: 'Sandbox service unreachable' });
+  }
+});
+
+app.get('/api/sandbox/executions/:id', async (req, res) => {
+  try {
+    const response = await fetch(`${VPS2_SANDBOX_URL}/api/sandbox/executions/${req.params.id}`);
+    const data = await response.json();
+    res.status(response.status).json(data);
+  } catch (err) {
+    res.status(502).json({ error: 'Sandbox service unreachable' });
+  }
+});
+
+app.post('/api/sandbox/executions/:id/cancel', async (req, res) => {
+  try {
+    const response = await fetch(`${VPS2_SANDBOX_URL}/api/sandbox/executions/${req.params.id}/cancel`, {
+      method: 'POST',
+    });
+    const data = await response.json();
+    res.status(response.status).json(data);
+  } catch (err) {
+    res.status(502).json({ error: 'Sandbox service unreachable' });
+  }
+});
+
+app.post('/api/sandbox/sessions', async (req, res) => {
+  try {
+    const response = await fetch(`${VPS2_SANDBOX_URL}/api/sandbox/sessions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(req.body),
+    });
+    const data = await response.json();
+    res.status(response.status).json(data);
+  } catch (err) {
+    res.status(502).json({ error: 'Sandbox service unreachable' });
+  }
+});
+
+app.get('/api/sandbox/sessions', async (_req, res) => {
+  try {
+    const response = await fetch(`${VPS2_SANDBOX_URL}/api/sandbox/sessions`);
+    const data = await response.json();
+    res.json(data);
+  } catch (err) {
+    res.status(502).json({ error: 'Sandbox service unreachable' });
+  }
+});
+
+app.get('/api/sandbox/sessions/:id', async (req, res) => {
+  try {
+    const response = await fetch(`${VPS2_SANDBOX_URL}/api/sandbox/sessions/${req.params.id}`);
+    const data = await response.json();
+    res.status(response.status).json(data);
+  } catch (err) {
+    res.status(502).json({ error: 'Sandbox service unreachable' });
+  }
+});
+
+app.post('/api/sandbox/sessions/:id/execute', async (req, res) => {
+  try {
+    const response = await fetch(`${VPS2_SANDBOX_URL}/api/sandbox/sessions/${req.params.id}/execute`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(req.body),
+    });
+    const data = await response.json();
+    res.status(response.status).json(data);
+  } catch (err) {
+    res.status(502).json({ error: 'Sandbox service unreachable' });
+  }
+});
+
+app.delete('/api/sandbox/sessions/:id', async (req, res) => {
+  try {
+    const response = await fetch(`${VPS2_SANDBOX_URL}/api/sandbox/sessions/${req.params.id}`, {
+      method: 'DELETE',
+    });
+    const data = await response.json();
+    res.status(response.status).json(data);
+  } catch (err) {
+    res.status(502).json({ error: 'Sandbox service unreachable' });
+  }
+});
+
+app.get('/api/sandbox/stats', async (_req, res) => {
+  try {
+    const response = await fetch(`${VPS2_SANDBOX_URL}/api/sandbox/stats`);
+    const data = await response.json();
+    res.json(data);
+  } catch (err) {
+    res.status(502).json({ error: 'Sandbox service unreachable' });
+  }
+});
+
+app.get('/api/sandbox/languages', async (_req, res) => {
+  try {
+    const response = await fetch(`${VPS2_SANDBOX_URL}/api/sandbox/languages`);
+    const data = await response.json();
+    res.json(data);
+  } catch (err) {
+    res.status(502).json({ error: 'Sandbox service unreachable' });
+  }
+});
+
+app.get('/api/sandbox/health', async (_req, res) => {
+  try {
+    const response = await fetch(`${VPS2_SANDBOX_URL}/health`);
+    const data = await response.json();
+    res.json(data);
+  } catch (err) {
+    res.status(502).json({ error: 'Sandbox service unreachable', status: 'down' });
+  }
+});
+
+// --------------------------------------------------------------------------
+// II-Agent — Autonomous Execution Engine (OWNER ONLY)
+// Gated by requireOwnerRole middleware inside iiAgentRouter.
+// Access: admin.aimanagedsolutions.cloud → OWNER role only
+// --------------------------------------------------------------------------
+app.use('/ii-agent', iiAgentRouter);
+
+// --------------------------------------------------------------------------
+// Composio Integration — Cross-Platform Actions
+// Composio = real-time, on-demand actions | Companion workflows = scheduled pipelines
+// --------------------------------------------------------------------------
+app.use('/composio', composioRouter);
+
+// --------------------------------------------------------------------------
+// Circuit Metrics Proxy — Forward to circuit-metrics container
+// --------------------------------------------------------------------------
+const CIRCUIT_METRICS_URL = process.env.CIRCUIT_METRICS_URL || 'http://circuit-metrics:9090';
+
+app.get('/api/circuit-metrics/:path(*)', async (req, res) => {
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+    const upstream = await fetch(`${CIRCUIT_METRICS_URL}/${req.params.path}`, {
+      signal: controller.signal,
+    });
+    clearTimeout(timeout);
+    const data = await upstream.json();
+    res.status(upstream.status).json(data);
+  } catch (err) {
+    res.status(502).json({ error: 'Circuit Metrics unreachable', detail: err instanceof Error ? err.message : 'unknown' });
+  }
+});
+
+// --------------------------------------------------------------------------
+// LiveSim — Real-Time Agent Feed REST Endpoints
+// --------------------------------------------------------------------------
+
+app.get('/api/livesim/stats', (_req, res) => {
+  res.json(liveSim.getStats());
+});
+
+app.get('/api/livesim/events', (req, res) => {
+  const limit = parseInt(req.query.limit as string) || 50;
+  res.json({ events: liveSim.getRecentEvents(limit) });
+});
+
+app.post('/api/livesim/emit', (req, res) => {
+  const { type, room, data } = req.body;
+  if (!type || !room) {
+    res.status(400).json({ error: 'type and room are required' });
+    return;
+  }
+  liveSim.broadcast({ type, room, data: data || {} });
+  res.json({ emitted: true });
+});
+
+/**
+ * SSE stream endpoint for the frontend LiveSim page.
+ * Clients connect via EventSource and receive real-time agent events.
+ * The frontend expects `data: JSON` per SSE spec.
+ */
+app.get('/api/livesim/stream', (req, res) => {
+  const sessionId = req.query.sessionId as string;
+
+  // Set up SSE headers
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.setHeader('X-Accel-Buffering', 'no'); // Disable nginx buffering
+  res.flushHeaders();
+
+  // Send initial connection event
+  res.write(`data: ${JSON.stringify({ id: Date.now().toString(), type: 'coordination', agent: 'ACHEEVY', content: 'LiveSim connected — streaming real-time events', timestamp: new Date().toISOString() })}\n\n`);
+
+  // Poll recent events and send new ones as SSE
+  let lastSeen = 0;
+  const pollInterval = setInterval(() => {
+    const events = liveSim.getRecentEvents(20);
+    const newEvents = events.filter((_, i) => i >= lastSeen);
+    for (const evt of newEvents) {
+      // Map LiveSim events to the frontend's SimLogEntry format
+      const logEntry = {
+        id: evt.timestamp,
+        type: evt.type === 'agent_activity' ? 'action' :
+              evt.type === 'deploy_event' ? 'result' :
+              evt.type === 'health_update' ? 'coordination' :
+              evt.type === 'vertical_step' ? 'thought' : 'coordination',
+        agent: (evt.data as any).agent || 'ACHEEVY',
+        content: (evt.data as any).detail || (evt.data as any).message || JSON.stringify(evt.data),
+        timestamp: evt.timestamp,
+        sessionId,
+      };
+      res.write(`data: ${JSON.stringify(logEntry)}\n\n`);
+    }
+    lastSeen = events.length;
+  }, 2000);
+
+  // Heartbeat to keep connection alive
+  const heartbeat = setInterval(() => {
+    res.write(': heartbeat\n\n');
+  }, 15000);
+
+  // Clean up on disconnect
+  req.on('close', () => {
+    clearInterval(pollInterval);
+    clearInterval(heartbeat);
+  });
+});
+
+// --------------------------------------------------------------------------
+// PersonaPlex Voice API — Full-Duplex Voice Sessions
+// --------------------------------------------------------------------------
+
+app.post('/api/personaplex/:action', async (req, res) => {
+  const { action } = req.params;
+  const body = req.body;
+
+  switch (action) {
+    case 'start': {
+      const session = await personaplex.startSession();
+      if (!session) {
+        res.json({ started: false, configured: personaplex.isConfigured(), error: 'Failed to start session' });
+        return;
+      }
+      res.json({ started: true, session });
+      break;
+    }
+    case 'speak': {
+      const { text, sessionId } = body;
+      if (!text) { res.status(400).json({ error: 'text required' }); return; }
+      const result = await personaplex.speak(text, sessionId);
+      res.json(result);
+      break;
+    }
+    case 'chat': {
+      const { messages } = body;
+      if (!messages || !Array.isArray(messages)) { res.status(400).json({ error: 'messages array required' }); return; }
+      try {
+        const result = await personaplex.chat(messages);
+        res.json(result);
+      } catch (err) {
+        res.status(502).json({ error: err instanceof Error ? err.message : 'PersonaPlex chat failed' });
+      }
+      break;
+    }
+    case 'status': {
+      const { type, projectName, summary, sessionId } = body;
+      await personaplex.deliverStatusUpdate({ type, projectName, summary, sessionId });
+      res.json({ delivered: true });
+      break;
+    }
+    default:
+      res.status(404).json({ error: `Unknown PersonaPlex action: ${action}` });
+  }
+});
+
+app.get('/api/personaplex/status', (_req, res) => {
+  res.json({
+    configured: personaplex.isConfigured(),
+    available: personaplex.isConfigured(),
+    capabilities: ['voice', 'text', 'status-query'],
+  });
+});
+
+app.get('/api/personaplex/session/:sessionId', (_req, res) => {
+  // Session tracking is handled by the PersonaPlex service itself
+  res.json({ sessionId: _req.params.sessionId, status: 'active' });
+});
+
+app.delete('/api/personaplex/session/:sessionId', async (req, res) => {
+  await personaplex.endSession(req.params.sessionId);
+  res.json({ ended: true });
+});
+
+// --------------------------------------------------------------------------
+// Onboarding — New User Profile Persistence
+// --------------------------------------------------------------------------
+
+const onboardingProfiles = new Map<string, Record<string, unknown>>();
+
+app.post('/api/onboarding', (req, res) => {
+  const { fullName, region, objective, industry, companyName, onboardedAt } = req.body;
+  if (!fullName) {
+    res.status(400).json({ error: 'fullName required' });
+    return;
+  }
+
+  const profileId = `profile-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  const profile = {
+    profileId,
+    fullName,
+    region: region || 'Not specified',
+    objective: objective || 'Just exploring',
+    industry: industry || 'Technology / SaaS',
+    companyName: companyName || '',
+    onboardedAt: onboardedAt || new Date().toISOString(),
+    tier: 'free',
+  };
+
+  onboardingProfiles.set(profileId, profile);
+  logger.info({ profileId, fullName }, '[UEF] New user onboarded');
+  res.json({ profileId, saved: true });
+});
+
+// --------------------------------------------------------------------------
+// Auto-Scaler — Horizontal & Vertical Scaling for Plug Instances
+// --------------------------------------------------------------------------
+
+app.get('/api/autoscaler/stats', (_req, res) => {
+  res.json(autoScaler.getStats());
+});
+
+app.post('/api/autoscaler/policy', (req, res) => {
+  const { instanceId, ...policy } = req.body;
+  if (!instanceId) {
+    res.status(400).json({ error: 'instanceId required' });
+    return;
+  }
+  const result = autoScaler.setPolicy(instanceId, policy);
+  res.json({ policy: result });
+});
+
+app.post('/api/autoscaler/tier', (req, res) => {
+  const { instanceId, tier } = req.body;
+  if (!instanceId || !tier) {
+    res.status(400).json({ error: 'instanceId and tier required' });
+    return;
+  }
+  const result = autoScaler.applyTierLimits(instanceId, tier);
+  res.json({ policy: result });
+});
+
+app.delete('/api/autoscaler/policy/:instanceId', (req, res) => {
+  autoScaler.removePolicy(req.params.instanceId);
+  res.json({ removed: true });
+});
+
+// --------------------------------------------------------------------------
+// CDN Deploy — Static Site Hosting Pipeline
+// --------------------------------------------------------------------------
+
+app.post('/api/cdn/deploy', async (req, res) => {
+  const { projectId, userId, projectName, files, customDomain, paywallEnabled } = req.body;
+  if (!projectId || !userId || !projectName || !files) {
+    res.status(400).json({ error: 'Missing required fields: projectId, userId, projectName, files' });
+    return;
+  }
+  try {
+    const result = await cdnDeploy.deploy({ projectId, userId, projectName, files, customDomain, paywallEnabled });
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err instanceof Error ? err.message : 'Deploy failed' });
+  }
+});
+
+app.get('/api/cdn/deployments', (_req, res) => {
+  res.json({ deployments: cdnDeploy.listDeployments() });
+});
+
+app.get('/api/cdn/deployments/:slug', (req, res) => {
+  const deployment = cdnDeploy.getDeployment(req.params.slug);
+  if (!deployment) {
+    res.status(404).json({ error: 'Deployment not found' });
+    return;
+  }
+  res.json(deployment);
+});
+
+app.delete('/api/cdn/deployments/:slug', async (req, res) => {
+  const result = await cdnDeploy.decommission(req.params.slug);
+  res.json(result);
+});
+
+// --------------------------------------------------------------------------
+// Cloud Run Dispatcher — Chicken Hawk Build Jobs
+// --------------------------------------------------------------------------
+
+app.post('/api/cloudrun/dispatch', async (req, res) => {
+  const { taskId, manifestUrl, preferService } = req.body;
+  if (!taskId) {
+    res.status(400).json({ error: 'taskId required' });
+    return;
+  }
+  try {
+    const result = await dispatchChickenHawkBuild(taskId, manifestUrl, preferService);
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err instanceof Error ? err.message : 'Dispatch failed' });
+  }
+});
+
+// --------------------------------------------------------------------------
+// Tenant Network Isolation — Per-User Docker Networks
+// --------------------------------------------------------------------------
+
+app.get('/api/tenant-networks', async (_req, res) => {
+  const networks = await tenantNetworks.listTenantNetworks();
+  res.json({ networks });
+});
+
+// --------------------------------------------------------------------------
+// Vertical Workflow Triggers — Pipeline Integration
+// --------------------------------------------------------------------------
+
+app.post('/api/vertical/trigger', async (req, res) => {
+  const { verticalId, userId, collectedData, sessionId } = req.body;
+  if (!verticalId || !userId) {
+    res.status(400).json({ error: 'verticalId and userId required' });
+    return;
+  }
+  try {
+    const result = await triggerVerticalWorkflow({
+      verticalId,
+      userId,
+      collectedData: collectedData || {},
+      sessionId,
+    });
+    res.json(result);
+  } catch (err) {
+    res.status(502).json({ error: err instanceof Error ? err.message : 'Workflow trigger failed' });
+  }
+});
+
+// --------------------------------------------------------------------------
+// LUC Project Service — Pricing & Effort Oracle
+// --------------------------------------------------------------------------
+app.post('/luc/project', async (req, res) => {
+  try {
+    const { projectId, userId, scope, requirements, models } = req.body;
+    if (!projectId || !userId || !scope) {
+      res.status(400).json({ error: 'Missing required fields: projectId, userId, scope' });
+      return;
+    }
+    const lucProject = await lucProjectService.createLucProject({
+      projectId,
+      userId,
+      scope,
+      requirements: requirements || '',
+      requestedModels: models,
+    });
+    res.status(201).json({ lucProject });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'LUC project creation failed';
+    logger.error({ err }, '[LUC] Project creation error');
+    res.status(500).json({ error: msg });
+  }
+});
+
+app.post('/luc/estimate-project', async (req, res) => {
+  try {
+    const { scope, models } = req.body;
+    if (!scope || typeof scope !== 'string') {
+      res.status(400).json({ error: 'Missing scope field' });
+      return;
+    }
+    const estimate = await lucProjectService.estimate(scope, models);
+    res.json({ estimate });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'LUC estimation failed';
+    res.status(500).json({ error: msg });
+  }
+});
+
+app.get('/luc/project/:id', async (req, res) => {
+  try {
+    const project = await lucProjectService.getProject(req.params.id);
+    if (!project) {
+      res.status(404).json({ error: 'LUC project not found' });
+      return;
+    }
+    res.json({ lucProject: project });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'LUC project retrieval failed';
+    res.status(500).json({ error: msg });
+  }
+});
+
+// --------------------------------------------------------------------------
+// MCP Tool Definitions — Exposed for agent discovery
+// --------------------------------------------------------------------------
+app.get('/mcp/tools', (_req, res) => {
+  res.json({ tools: allShelfTools, count: allShelfTools.length });
+});
+
+// --------------------------------------------------------------------------
+// OSS Models — Self-hosted model catalog
+// --------------------------------------------------------------------------
+app.get('/llm/oss-models', (_req, res) => {
+  res.json({
+    configured: ossModels.isConfigured(),
+    models: ossModels.listModels(),
+  });
+});
+
+// --------------------------------------------------------------------------
+// Personaplex — Voice agent status
+// --------------------------------------------------------------------------
+app.get('/personaplex/status', (_req, res) => {
+  res.json({ configured: personaplex.isConfigured() });
+});
+
+app.post('/personaplex/speak', async (req, res) => {
+  try {
+    const { text, sessionId } = req.body;
+    if (!text || typeof text !== 'string') {
+      res.status(400).json({ error: 'Missing text field' });
+      return;
+    }
+    const result = await personaplex.speak(text, sessionId);
+    res.json(result);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Personaplex speak failed';
+    res.status(500).json({ error: msg });
+  }
 });
 
 // --------------------------------------------------------------------------
@@ -1075,6 +2992,51 @@ app.get('/observability/metrics', (_req, res) => {
 app.get('/observability/metrics/prometheus', (_req, res) => {
   res.set('Content-Type', 'text/plain; version=0.0.4; charset=utf-8');
   res.send(metricsExporter.exportPrometheus());
+});
+
+// Per-tenant observability: instance alerts and health for a specific user
+app.get('/observability/tenant/:userId', (req, res) => {
+  const userId = req.params.userId;
+
+  // Get user's instances
+  const { plugDeployEngine: deployEngine } = require('./plug-catalog/deploy-engine');
+  const instances = deployEngine.listByUser(userId);
+
+  // Filter alerts relevant to this user's instances
+  const instanceIds = instances.map((i: any) => i.instanceId);
+  const allActive = alertEngine.getActiveAlerts();
+  const allHistory = alertEngine.getAlertHistory(100);
+
+  const tenantAlerts = allActive.filter((a: any) =>
+    instanceIds.some((id: string) => a.metric.includes(id))
+  );
+  const tenantHistory = allHistory.filter((a: any) =>
+    instanceIds.some((id: string) => a.metric.includes(id))
+  );
+
+  // Aggregate health stats for this tenant
+  const healthSummary = {
+    total: instances.length,
+    healthy: instances.filter((i: any) => i.healthStatus === 'healthy').length,
+    unhealthy: instances.filter((i: any) => i.healthStatus === 'unhealthy').length,
+    unknown: instances.filter((i: any) => !i.healthStatus || i.healthStatus === 'unknown').length,
+  };
+
+  res.json({
+    userId,
+    instances: instances.map((i: any) => ({
+      instanceId: i.instanceId,
+      plugId: i.plugId,
+      name: i.name,
+      status: i.status,
+      healthStatus: i.healthStatus,
+      uptimeSeconds: i.uptimeSeconds,
+      lastHealthCheck: i.lastHealthCheck,
+    })),
+    healthSummary,
+    activeAlerts: tenantAlerts,
+    alertHistory: tenantHistory,
+  });
 });
 
 // --------------------------------------------------------------------------
@@ -1409,9 +3371,32 @@ app.post('/ingress/acp', acpLimiter, async (req, res) => {
 
     logger.info({ passed: oracleResult.passed, score: oracleResult.score }, '[UEF] ORACLE result');
 
-    // 5. Agent dispatch (only if ORACLE passes AND policy is cleared)
+    // 5. Pre-execution affordability check
+    const estimatedLucCost = quote.variants[0]?.estimate?.totalTokens
+      ? Math.floor((quote.variants[0].estimate.totalUsd || 0) * 100)
+      : 0;
+
+    let insufficientFunds = false;
+    const isGuest = acpReq.userId === 'guest';
+
+    // Guest users get estimates only — never full agent execution
+    if (isGuest) {
+      insufficientFunds = true;
+      logger.info({ userId: acpReq.userId }, '[UEF] Guest user — estimate only, no agent execution');
+    } else if (estimatedLucCost > 0) {
+      const affordable = agentPayments.canAfford(acpReq.userId, estimatedLucCost);
+      if (!affordable) {
+        insufficientFunds = true;
+        logger.warn(
+          { userId: acpReq.userId, estimatedLucCost },
+          '[UEF] Insufficient LUC balance — blocking execution',
+        );
+      }
+    }
+
+    // 6. Agent dispatch (only if ORACLE passes, policy cleared, AND affordable)
     let agentResult = { executed: false, agentOutputs: [] as Array<{ status: string; agentId: string; result: { summary: string; artifacts: string[] } }>, primaryAgent: null as string | null };
-    if (oracleResult.passed && prepPacket.policyManifest.cleared) {
+    if (oracleResult.passed && prepPacket.policyManifest.cleared && !insufficientFunds) {
       agentResult = await routeToAgents(
         acpReq.intent,
         acpReq.naturalLanguage,
@@ -1420,11 +3405,39 @@ app.post('/ingress/acp', acpLimiter, async (req, res) => {
       );
     }
 
-    // 6. Construct response
+    // 7. Post-execution metering — record actual token usage to SQLite
+    if (agentResult.executed && acpReq.userId !== 'guest') {
+      const taskType = acpReq.intent === 'BUILD_PLUG' ? 'DEPLOYMENT'
+        : acpReq.intent === 'RESEARCH' ? 'BIZ_INTEL'
+        : acpReq.intent === 'AGENTIC_WORKFLOW' ? 'AGENT_SWARM'
+        : 'CODE_GEN';
+      const rawTokens = quote.variants[0]?.estimate?.totalTokens || 0;
+      const provision = billingProvisions.get(acpReq.userId);
+      const tierId = provision?.tierId || 'p2p';
+
+      meterAndRecord(
+        rawTokens,
+        taskType as any,
+        tierId,
+        acpReq.userId,
+        `ACP ${acpReq.intent}: ${acpReq.naturalLanguage.slice(0, 80)}`,
+      );
+    }
+
+    // 8. Construct response
+    const acpStatus = isGuest ? 'ESTIMATE_ONLY'
+      : insufficientFunds ? 'PAYMENT_REQUIRED'
+      : (oracleResult.passed ? 'SUCCESS' : 'ERROR');
+    const acpMessage = isGuest
+      ? 'Sign in to execute tasks. Here is your cost estimate.'
+      : insufficientFunds
+      ? 'Insufficient LUC balance. Please top up your wallet to continue.'
+      : buildResponseMessage(acpReq.intent, oracleResult.passed, agentResult.executed);
+
     const response: ACPResponse = {
       reqId: acpReq.reqId,
-      status: oracleResult.passed ? 'SUCCESS' : 'ERROR',
-      message: buildResponseMessage(acpReq.intent, oracleResult.passed, agentResult.executed),
+      status: acpStatus as any,
+      message: acpMessage,
       quote: quote,
       executionPlan: executionPlan,
     };
@@ -1464,21 +3477,215 @@ app.post('/ingress/acp', acpLimiter, async (req, res) => {
 });
 
 // --------------------------------------------------------------------------
-// Start Server
+// PMO Pipeline — Direct chain-of-command execution
 // --------------------------------------------------------------------------
-export const server = app.listen(PORT, () => {
-  const agents = registry.list();
-  logger.info({ port: PORT, agents: agents.length }, 'UEF Gateway (Layer 2) running');
-  logger.info(`Agents online: ${agents.map(a => a.name).join(', ')}`);
-  logger.info(`ACP Ingress available at http://localhost:${PORT}/ingress/acp`);
+
+app.post('/pipeline/trigger', async (req, res) => {
+  try {
+    const { userId, message, context } = req.body;
+    if (!userId || !message) {
+      res.status(400).json({ error: 'Missing userId or message' });
+      return;
+    }
+    const result = await triggerPmoPipeline({ userId, message, context });
+    res.json(result);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Pipeline trigger failed';
+    res.status(500).json({ error: msg });
+  }
 });
+
+// --------------------------------------------------------------------------
+// Memory System — Persistent Agent Memory
+// --------------------------------------------------------------------------
+
+const memoryEngine = getMemoryEngine();
+
+// Remember: store a memory
+app.post('/memory/remember', (req, res) => {
+  try {
+    const input = req.body as RememberInput;
+    if (!input.userId || !input.summary || !input.content || !input.type) {
+      res.status(400).json({ error: 'Missing required fields: userId, type, summary, content' });
+      return;
+    }
+    const memory = memoryEngine.remember(input);
+    res.status(201).json({ success: true, memory });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Memory store failed';
+    logger.error({ err }, '[Memory] Remember error');
+    res.status(500).json({ error: msg });
+  }
+});
+
+// Recall: search memories by query
+app.post('/memory/recall', (req, res) => {
+  try {
+    const query = req.body as RecallQuery;
+    if (!query.userId || !query.query) {
+      res.status(400).json({ error: 'Missing required fields: userId, query' });
+      return;
+    }
+    const result = memoryEngine.recall(query);
+    res.json(result);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Memory recall failed';
+    logger.error({ err }, '[Memory] Recall error');
+    res.status(500).json({ error: msg });
+  }
+});
+
+// Feedback: apply feedback signal to a memory
+app.post('/memory/feedback', (req, res) => {
+  try {
+    const feedback = req.body as MemoryFeedback;
+    if (!feedback.memoryId || !feedback.signal) {
+      res.status(400).json({ error: 'Missing required fields: memoryId, signal' });
+      return;
+    }
+    memoryEngine.feedback(feedback);
+    res.json({ success: true });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Memory feedback failed';
+    res.status(500).json({ error: msg });
+  }
+});
+
+// List memories for a user
+app.get('/memory', (req, res) => {
+  try {
+    const userId = req.query.userId as string;
+    if (!userId) {
+      res.status(400).json({ error: 'Missing userId query parameter' });
+      return;
+    }
+    const type = req.query.type as string | undefined;
+    const projectId = req.query.projectId as string | undefined;
+    const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : undefined;
+    const memories = memoryEngine.listMemories(userId, {
+      type: type as any,
+      projectId,
+      limit,
+    });
+    res.json({ memories, count: memories.length, userId });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Memory list failed';
+    res.status(500).json({ error: msg });
+  }
+});
+
+// Get memory stats for a user
+app.get('/memory/stats', (req, res) => {
+  try {
+    const userId = req.query.userId as string;
+    if (!userId) {
+      res.status(400).json({ error: 'Missing userId query parameter' });
+      return;
+    }
+    const stats = memoryEngine.getStats(userId);
+    res.json(stats);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Memory stats failed';
+    res.status(500).json({ error: msg });
+  }
+});
+
+// Delete a memory
+app.delete('/memory/:memoryId', (req, res) => {
+  try {
+    const deleted = memoryEngine.deleteMemory(req.params.memoryId);
+    res.json({ success: deleted });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Memory delete failed';
+    res.status(500).json({ error: msg });
+  }
+});
+
+/// Maintenance: purge expired + decay relevance + evict over-cap
+app.post('/memory/maintenance', (_req, res) => {
+  try {
+    const result = memoryEngine.runMaintenance();
+    res.json(result);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Memory maintenance failed';
+    res.status(500).json({ error: msg });
+  }
+});
+
+// Store a user preference
+app.post('/memory/preference', (req, res) => {
+  try {
+    const { userId, key, value, context } = req.body;
+    if (!userId || !key || !value) {
+      res.status(400).json({ error: 'Missing required fields: userId, key, value' });
+      return;
+    }
+    const memory = memoryEngine.rememberPreference(userId, key, value, context);
+    res.status(201).json({ success: true, memory });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Preference store failed';
+    res.status(500).json({ error: msg });
+  }
+});
+
+// --------------------------------------------------------------------------
+// Start Server — initialize deploy engine lifecycle before listening
+// --------------------------------------------------------------------------
+async function startServer(): Promise<void> {
+  // Initialize plug instance lifecycle: loads port state, wires health monitor,
+  // starts background health sweeps, and reconciles with Docker state.
+  try {
+    await instanceLifecycle.initialize();
+    autoScaler.start(60000); // Evaluate scaling every 60s
+    logger.info('[UEF] Instance lifecycle initialized — health monitor + auto-scaler running');
+  } catch (err) {
+    logger.error({ err }, '[UEF] Instance lifecycle init failed — continuing without health monitoring');
+  }
+
+  // ── Observability Persistence (restore + periodic flush) ────────────────
+  initObservabilityPersistence();
+
+  // ── Hawk Scheduler (register cron schedules for active hawks) ──────────
+  initHawkScheduler();
+
+  // ── Billing Maintenance Cron (every 5 minutes) ──────────────────────────
+  setInterval(() => {
+    try {
+      const expiredSessions = paymentSessionStore.expireStaleSessions();
+      const expiredReceipts = x402ReceiptStore.cleanup();
+      if (expiredSessions > 0 || expiredReceipts > 0) {
+        logger.info({ expiredSessions, expiredReceipts }, '[BillingCron] Cleaned up expired records');
+      }
+    } catch (err) {
+      logger.error({ err }, '[BillingCron] Cleanup failed');
+    }
+  }, 5 * 60 * 1000);
+
+  server.listen(PORT, () => {
+    const agents = registry.list();
+    logger.info({ port: PORT, agents: agents.length }, 'UEF Gateway (Layer 2) running');
+    logger.info(`Agents online: ${agents.map(a => a.name).join(', ')}`);
+    logger.info(`ACP Ingress available at http://localhost:${PORT}/ingress/acp`);
+  });
+}
+
+export const server = require('http').createServer(app);
+
+// Attach LiveSim WebSocket to the HTTP server
+liveSim.attach(server);
+
+startServer();
 
 // --------------------------------------------------------------------------
 // Graceful Shutdown — let Docker stop containers cleanly
 // --------------------------------------------------------------------------
 function shutdown(signal: string) {
   logger.info({ signal }, '[UEF] Received shutdown signal, draining connections...');
+  metricsExporter.flushToDb(); // Persist metrics before shutdown
+  stopHawkScheduler(); // Stop all hawk cron schedules
   stopCleanupSchedule();
+  memoryEngine.stopMaintenance();
+  instanceLifecycle.getHealthMonitor().stop();
   server.close(() => {
     closeDb();
     logger.info('[UEF] All connections drained. DB closed. Exiting.');

@@ -20,8 +20,24 @@ export type AgentId =
   | 'chicken-hawk'
   | 'research-ang'
   | 'router-ang'
+  | 'node-trigger-ang'
+  | 'composio-ang'
   | 'workflow-smith-squad'
-  | 'vision-scout-squad';
+  | 'vision-scout-squad'
+  | 'json-expert-squad'
+  | 'sme-ang'
+  | 'lil-creddy-hawk'
+  // Boomer_Ang roster (spawnable via Deployment Hub)
+  | 'scout-ang'
+  | 'opsconsole-ang'
+  | 'chronicle-ang'
+  | 'gatekeeper-ang'
+  | 'patchsmith-ang'
+  | 'runner-ang'
+  | 'showrunner-ang'
+  | 'scribe-ang'
+  | 'lab-ang'
+  | 'index-ang';
 
 export type AgentStatus = 'IDLE' | 'BUSY' | 'OFFLINE';
 

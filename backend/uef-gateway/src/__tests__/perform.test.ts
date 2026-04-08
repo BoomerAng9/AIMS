@@ -104,10 +104,10 @@ describe('WorkflowSmith Squad', () => {
     expect(result.status).toBe('COMPLETED');
     expect(result.result.summary).toContain('Workflow');
     expect(result.result.logs.length).toBeGreaterThan(0);
-    expect(result.result.logs.some(l => l.includes('[AUTHOR_LIL_HAWK]'))).toBe(true);
-    expect(result.result.logs.some(l => l.includes('[VALIDATE_LIL_HAWK]'))).toBe(true);
-    expect(result.result.logs.some(l => l.includes('[FAILURE_LIL_HAWK]'))).toBe(true);
-    expect(result.result.logs.some(l => l.includes('[GATE_LIL_HAWK]'))).toBe(true);
+    expect(result.result.logs.some(l => l.includes('[Lil_Author_Hawk]'))).toBe(true);
+    expect(result.result.logs.some(l => l.includes('[Lil_Validate_Hawk]'))).toBe(true);
+    expect(result.result.logs.some(l => l.includes('[Lil_Failure_Hawk]'))).toBe(true);
+    expect(result.result.logs.some(l => l.includes('[Lil_Gate_Hawk]'))).toBe(true);
   });
 
   it('generates a complete workflow for search + render + publish', async () => {
@@ -142,9 +142,9 @@ describe('VisionScout Squad', () => {
     });
     expect(result.status).toBe('COMPLETED');
     expect(result.result.summary).toContain('Film Assessment');
-    expect(result.result.logs.some(l => l.includes('[VISION_LIL_HAWK]'))).toBe(true);
-    expect(result.result.logs.some(l => l.includes('[SIGNAL_LIL_HAWK]'))).toBe(true);
-    expect(result.result.logs.some(l => l.includes('[COMPLIANCE_LIL_HAWK]'))).toBe(true);
+    expect(result.result.logs.some(l => l.includes('[Lil_Vision_Hawk]'))).toBe(true);
+    expect(result.result.logs.some(l => l.includes('[Lil_Signal_Hawk]'))).toBe(true);
+    expect(result.result.logs.some(l => l.includes('[Lil_Compliance_Hawk]'))).toBe(true);
   });
 
   it('generates film signals for WR footage', async () => {
@@ -162,12 +162,12 @@ describe('PREP_SQUAD_ALPHA', () => {
   it('has 6 hawk profiles', () => {
     expect(PREP_SQUAD_PROFILES).toHaveLength(6);
     const ids = PREP_SQUAD_PROFILES.map(p => p.id);
-    expect(ids).toContain('INTAKE_LIL_HAWK');
-    expect(ids).toContain('DECOMP_LIL_HAWK');
-    expect(ids).toContain('CONTEXT_LIL_HAWK');
-    expect(ids).toContain('POLICY_LIL_HAWK');
-    expect(ids).toContain('COST_LIL_HAWK');
-    expect(ids).toContain('ROUTER_LIL_HAWK');
+    expect(ids).toContain('Lil_Intake_Hawk');
+    expect(ids).toContain('Lil_Decomp_Hawk');
+    expect(ids).toContain('Lil_Context_Hawk');
+    expect(ids).toContain('Lil_Policy_Hawk');
+    expect(ids).toContain('Lil_Cost_Hawk');
+    expect(ids).toContain('Lil_Router_Hawk');
   });
 
   it('all hawks belong to prep-squad-alpha', () => {
@@ -177,8 +177,8 @@ describe('PREP_SQUAD_ALPHA', () => {
   });
 
   it('POLICY and COST hawks are gates', () => {
-    const policy = PREP_SQUAD_PROFILES.find(p => p.id === 'POLICY_LIL_HAWK');
-    const cost = PREP_SQUAD_PROFILES.find(p => p.id === 'COST_LIL_HAWK');
+    const policy = PREP_SQUAD_PROFILES.find(p => p.id === 'Lil_Policy_Hawk');
+    const cost = PREP_SQUAD_PROFILES.find(p => p.id === 'Lil_Cost_Hawk');
     expect(policy!.gate).toBe(true);
     expect(cost!.gate).toBe(true);
   });

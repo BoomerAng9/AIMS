@@ -12,6 +12,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import type { TtsProvider, SttProvider } from './types';
 import { DEFAULT_TTS_CONFIG, DEFAULT_STT_CONFIG } from './types';
+import { sanitizeForTTS } from './sanitize';
 
 export interface VoiceSettings {
   ttsEnabled: boolean;
@@ -94,6 +95,10 @@ export function useVoice(): UseVoiceReturn {
   const speak = useCallback(async (text: string) => {
     if (!settings.ttsEnabled || !text.trim()) return;
 
+    // Strip markdown formatting so TTS doesn't read "star star", "pound", etc.
+    const cleanText = sanitizeForTTS(text);
+    if (!cleanText) return;
+
     // Stop any current playback
     if (audioRef.current) {
       audioRef.current.pause();
@@ -105,7 +110,7 @@ export function useVoice(): UseVoiceReturn {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          text,
+          text: cleanText,
           provider: settings.ttsProvider,
           voiceId: settings.ttsVoiceId,
         }),

@@ -81,3 +81,47 @@ export interface EvidenceArtifact {
   storage_path: string;
   created_at: string;
 }
+
+// ---------------------------------------------------------------------------
+// ORACLE Gate Types
+// ---------------------------------------------------------------------------
+
+export interface OracleGateResult {
+  gate: number;
+  name: string;
+  passed: boolean;
+  blocking: boolean;
+  reason: string;
+}
+
+export interface OracleVerdict {
+  approved: boolean;
+  gates: OracleGateResult[];
+  blocking_failures: OracleGateResult[];
+  advisory_warnings: OracleGateResult[];
+  verified_at: string;
+}
+
+// ---------------------------------------------------------------------------
+// Memory Types
+// ---------------------------------------------------------------------------
+
+export interface MemorySnapshot {
+  agent_id: string;
+  shift_id: string;
+  manifest_id: string;
+  state: Record<string, unknown>;
+  outcomes: Array<{
+    task_id: string;
+    status: string;
+    lesson: string;
+  }>;
+  preferences: Record<string, unknown>;
+  decisions: Array<{
+    decision: string;
+    reason: string;
+    timestamp: string;
+  }>;
+  created_at: string;
+  updated_at: string;
+}

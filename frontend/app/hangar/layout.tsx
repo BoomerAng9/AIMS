@@ -15,7 +15,7 @@ export default function HangarLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="fixed inset-0 bg-[#0B0F14] overflow-hidden">
+    <div className="fixed inset-0 bg-[#F8FAFC] overflow-hidden">
       {children}
     </div>
   );

@@ -1,0 +1,25 @@
+{
+  "name": "@aims/cli",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A.I.M.S. CLI — Single-command platform bootstrapper",
+  "bin": {
+    "aims": "./aims-cli.ts"
+  },
+  "scripts": {
+    "aims": "ts-node aims-cli.ts",
+    "init": "ts-node aims-cli.ts init",
+    "status": "ts-node aims-cli.ts status",
+    "shelves": "ts-node aims-cli.ts shelves",
+    "deploy": "ts-node aims-cli.ts deploy",
+    "seed": "ts-node aims-cli.ts seed"
+  },
+  "dependencies": {
+    "firebase-tools": "^13.0.0"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3",
+    "@types/node": "^20.10.0"
+  }
+}

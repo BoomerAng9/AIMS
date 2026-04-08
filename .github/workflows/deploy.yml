@@ -1,0 +1,91 @@
+name: CI — Build & Push Docker Images
+
+# Builds Docker images directly on GitHub Actions runner (no Cloud Build).
+# Images pushed to Artifact Registry for VPS to pull via deploy.sh.
+on:
+  # push:
+  #   branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+env:
+  REGISTRY: us-central1-docker.pkg.dev
+  PROJECT_ID: ai-managed-services
+  REPO: aims-docker
+
+jobs:
+  build:
+    name: Build & Push Images
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: auth
+        name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker ${{ env.REGISTRY }} --quiet
+
+      - name: Set SHORT_SHA
+        run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
+
+      # ── UEF Gateway ──
+      - name: Build uef-gateway
+        run: |
+          docker build \
+            -t ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPO }}/uef-gateway:${{ env.SHORT_SHA }} \
+            -t ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPO }}/uef-gateway:latest \
+            -f backend/uef-gateway/Dockerfile \
+            backend/uef-gateway
+
+      - name: Push uef-gateway
+        run: docker push --all-tags ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPO }}/uef-gateway
+
+      # ── Frontend ──
+      - name: Build frontend
+        run: |
+          docker build \
+            -t ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPO }}/frontend:${{ env.SHORT_SHA }} \
+            -t ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPO }}/frontend:latest \
+            -f frontend/Dockerfile \
+            .
+
+      - name: Push frontend
+        run: docker push --all-tags ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPO }}/frontend
+
+      # ── Research Ang ──
+      - name: Build research-ang
+        run: |
+          docker build \
+            -t ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPO }}/research-ang:${{ env.SHORT_SHA }} \
+            -t ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPO }}/research-ang:latest \
+            -f backend/agents/research-ang/Dockerfile \
+            backend/agents/research-ang
+
+      - name: Push research-ang
+        run: docker push --all-tags ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPO }}/research-ang
+
+      # ── Router Ang ──
+      - name: Build router-ang
+        run: |
+          docker build \
+            -t ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPO }}/router-ang:${{ env.SHORT_SHA }} \
+            -t ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPO }}/router-ang:latest \
+            -f backend/agents/router-ang/Dockerfile \
+            backend/agents/router-ang
+
+      - name: Push router-ang
+        run: docker push --all-tags ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPO }}/router-ang

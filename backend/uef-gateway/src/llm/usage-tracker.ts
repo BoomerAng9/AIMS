@@ -14,10 +14,12 @@ import logger from '../logger';
 // Types
 // ---------------------------------------------------------------------------
 
+export type LLMProvider = 'vertex-ai' | 'openrouter' | 'oss-hosted' | 'personaplex' | 'stub';
+
 export interface UsageRecord {
   timestamp: string;
   model: string;
-  provider: 'vertex-ai' | 'openrouter';
+  provider: LLMProvider;
   agentId: string;
   tokens: { prompt: number; completion: number; total: number };
   cost: { usd: number };
@@ -50,7 +52,7 @@ class LLMUsageTracker {
     userId: string;
     sessionId: string;
     model: string;
-    provider: 'vertex-ai' | 'openrouter';
+    provider: LLMProvider;
     agentId: string;
     tokens: { prompt: number; completion: number; total: number };
     cost: { usd: number };

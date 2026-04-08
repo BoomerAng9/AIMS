@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { klingVideo } from "@/lib/kling-video";
+import { requireAuth } from "@/lib/auth/require-role";
 
 /**
  * POST /api/video/analyze
  * Analyze a video prompt and get optimization suggestions
  */
 export async function POST(request: NextRequest) {
+  const auth = await requireAuth();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const { prompt, model = "kling-2.6-motion" } = await request.json();
 

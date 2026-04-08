@@ -44,9 +44,11 @@ export type VerticalCategory =
   | 'branding'
   | 'marketing'
   | 'engineering'
-  | 'automation';
+  | 'automation'
+  | 'simulation'
+  | 'devops';
 
-export type AcheevyMode = 'business-builder' | 'growth-mode';
+export type AcheevyMode = 'business-builder' | 'growth-mode' | 'livesim' | 'default';
 
 // ---------------------------------------------------------------------------
 // Vertical Definition — Both conversation chain AND execution blueprint
@@ -169,7 +171,11 @@ export type AuditAction =
   | 'vertical_completed'
   | 'pipeline_dispatched'
   | 'verification_passed'
-  | 'verification_failed';
+  | 'verification_failed'
+  | 'fee_charged'
+  | 'savings_credited'
+  | 'invoice_generated'
+  | 'transaction_metered';
 
 export interface AuditEntry {
   id: string;

@@ -1,11 +1,17 @@
 // =============================================================================
-// Chicken Hawk — LLM Client
-// Unified LLM interface defaulting to Google Gemini 3.
-// Used by the execution engine for manifest planning, task decomposition,
-// and intelligent error recovery.
+// Chicken Hawk — LLM Client with Task-Type Routing
+// Unified LLM interface with intelligent model selection.
 //
-// Priority chain: Gemini 3 → OpenRouter fallback
+// Routing table:
+//   Standard build   → Claude Opus via OpenRouter → Gemini Flash fallback
+//   Deep research    → Gemini Pro → Kimi K2.5 fallback
+//   Departmental     → Kimi K2.5 → Gemini Flash fallback
+//   Default          → Gemini Flash → OpenRouter fallback
+//
+// Reads API keys from Docker secrets (via secrets.ts) with env fallback.
 // =============================================================================
+
+import { secrets } from "./secrets";
 
 export interface LLMMessage {
   role: "system" | "user" | "assistant";
@@ -19,35 +25,82 @@ export interface LLMResponse {
   provider: "gemini" | "openrouter" | "stub";
 }
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || process.env.GOOGLE_AI_API_KEY || "";
-const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.0-flash";
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || "";
-const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || "google/gemini-3.0-flash";
+export type TaskType = "build" | "research" | "departmental" | "default";
+
+interface ModelRoute {
+  primary: { provider: "gemini" | "openrouter"; model: string };
+  fallback: { provider: "gemini" | "openrouter"; model: string };
+}
+
+const ROUTING_TABLE: Record<TaskType, ModelRoute> = {
+  build: {
+    primary: { provider: "openrouter", model: "anthropic/claude-opus-4-5" },
+    fallback: { provider: "gemini", model: "gemini-3.0-flash-thinking" },
+  },
+  research: {
+    primary: { provider: "gemini", model: "gemini-3.0-pro" },
+    fallback: { provider: "openrouter", model: "moonshotai/kimi-k2.5" },
+  },
+  departmental: {
+    primary: { provider: "openrouter", model: "moonshotai/kimi-k2.5" },
+    fallback: { provider: "gemini", model: "gemini-3.0-flash-thinking" },
+  },
+  default: {
+    primary: { provider: "gemini", model: process.env.GEMINI_MODEL || "gemini-3.0-flash" },
+    fallback: { provider: "openrouter", model: "google/gemini-3.0-flash" },
+  },
+};
 
 export class LLMClient {
   /**
-   * Send a chat completion. Tries Gemini first, falls back to OpenRouter.
+   * Route a task type to the right model combo.
+   */
+  routeModel(taskType: TaskType): ModelRoute {
+    return ROUTING_TABLE[taskType] || ROUTING_TABLE.default;
+  }
+
+  /**
+   * Send a chat completion with automatic routing.
    */
   async chat(messages: LLMMessage[], opts?: {
     model?: string;
     maxTokens?: number;
     temperature?: number;
+    taskType?: TaskType;
   }): Promise<LLMResponse> {
-    // Try Gemini native API first
-    if (GEMINI_API_KEY) {
-      try {
-        return await this.callGemini(messages, opts);
-      } catch (err) {
-        console.warn("[llm] Gemini failed, falling back to OpenRouter:", err);
+    const route = opts?.taskType ? this.routeModel(opts.taskType) : ROUTING_TABLE.default;
+
+    // Try primary provider
+    try {
+      if (opts?.model) {
+        // Explicit model override — use whichever provider has a key
+        if (secrets.geminiApiKey) return await this.callGemini(messages, { ...opts, model: opts.model });
+        if (secrets.openrouterApiKey) return await this.callOpenRouter(messages, { ...opts, model: opts.model });
       }
+
+      if (route.primary.provider === "gemini" && secrets.geminiApiKey) {
+        return await this.callGemini(messages, { ...opts, model: route.primary.model });
+      }
+      if (route.primary.provider === "openrouter" && secrets.openrouterApiKey) {
+        return await this.callOpenRouter(messages, { ...opts, model: route.primary.model });
+      }
+    } catch (err) {
+      console.warn(`[llm] Primary (${route.primary.provider}/${route.primary.model}) failed:`, err);
     }
 
-    // Fallback: OpenRouter (route to Gemini model there too)
-    if (OPENROUTER_API_KEY) {
-      return await this.callOpenRouter(messages, opts);
+    // Try fallback
+    try {
+      if (route.fallback.provider === "gemini" && secrets.geminiApiKey) {
+        return await this.callGemini(messages, { ...opts, model: route.fallback.model });
+      }
+      if (route.fallback.provider === "openrouter" && secrets.openrouterApiKey) {
+        return await this.callOpenRouter(messages, { ...opts, model: route.fallback.model });
+      }
+    } catch (err) {
+      console.warn(`[llm] Fallback (${route.fallback.provider}/${route.fallback.model}) failed:`, err);
     }
 
-    // No provider — return stub
+    // No provider available
     console.warn("[llm] No LLM provider configured (set GEMINI_API_KEY or OPENROUTER_API_KEY)");
     return {
       content: "[LLM unavailable — no API key configured]",
@@ -58,37 +111,46 @@ export class LLMClient {
   }
 
   /**
-   * Quick single prompt helper
+   * Quick single prompt helper with optional task type routing.
    */
-  async prompt(text: string, system?: string): Promise<string> {
+  async prompt(text: string, system?: string, taskType?: TaskType): Promise<string> {
     const messages: LLMMessage[] = [];
     if (system) messages.push({ role: "system", content: system });
     messages.push({ role: "user", content: text });
-    const result = await this.chat(messages);
+    const result = await this.chat(messages, { taskType });
     return result.content;
   }
 
   isConfigured(): boolean {
-    return !!(GEMINI_API_KEY || OPENROUTER_API_KEY);
+    return !!(secrets.geminiApiKey || secrets.openrouterApiKey);
   }
 
   getProvider(): string {
-    if (GEMINI_API_KEY) return `gemini (${GEMINI_MODEL})`;
-    if (OPENROUTER_API_KEY) return `openrouter (${OPENROUTER_MODEL})`;
-    return "none";
+    const providers: string[] = [];
+    if (secrets.geminiApiKey) providers.push("gemini");
+    if (secrets.openrouterApiKey) providers.push("openrouter");
+    return providers.length ? providers.join("+") : "none";
+  }
+
+  getRoutingTable(): Record<string, { primary: string; fallback: string }> {
+    return Object.fromEntries(
+      Object.entries(ROUTING_TABLE).map(([k, v]) => [
+        k,
+        { primary: `${v.primary.provider}/${v.primary.model}`, fallback: `${v.fallback.provider}/${v.fallback.model}` },
+      ]),
+    );
   }
 
   // ---------------------------------------------------------------------------
-  // Google Gemini native API (generativelanguage.googleapis.com)
+  // Google Gemini native API
   // ---------------------------------------------------------------------------
   private async callGemini(messages: LLMMessage[], opts?: {
     model?: string;
     maxTokens?: number;
     temperature?: number;
   }): Promise<LLMResponse> {
-    const model = opts?.model || GEMINI_MODEL;
+    const model = opts?.model || "gemini-3.0-flash";
 
-    // Convert chat messages to Gemini format
     const systemInstruction = messages.find((m) => m.role === "system")?.content;
     const contents = messages
       .filter((m) => m.role !== "system")
@@ -109,7 +171,7 @@ export class LLMClient {
       body.systemInstruction = { parts: [{ text: systemInstruction }] };
     }
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${secrets.geminiApiKey}`;
     const res = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -143,20 +205,20 @@ export class LLMClient {
   }
 
   // ---------------------------------------------------------------------------
-  // OpenRouter fallback (defaults to Gemini model via OpenRouter)
+  // OpenRouter (Claude, Kimi K2.5, Gemini, etc.)
   // ---------------------------------------------------------------------------
   private async callOpenRouter(messages: LLMMessage[], opts?: {
     model?: string;
     maxTokens?: number;
     temperature?: number;
   }): Promise<LLMResponse> {
-    const model = opts?.model || OPENROUTER_MODEL;
+    const model = opts?.model || "google/gemini-3.0-flash";
 
     const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
+        Authorization: `Bearer ${secrets.openrouterApiKey}`,
         "HTTP-Referer": "https://aims.plugmein.cloud",
         "X-Title": "AIMS Chicken Hawk",
       },

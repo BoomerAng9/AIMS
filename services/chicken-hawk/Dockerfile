@@ -1,9 +1,16 @@
 FROM node:20-slim AS base
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 RUN npm install -g bun@latest
 WORKDIR /app
 COPY package.json bun.lockb* ./
 RUN bun install --frozen-lockfile || bun install
 COPY . .
+
+# Run as non-root user for security
+RUN groupadd -g 1001 appuser && \
+    useradd -u 1001 -g appuser -s /bin/sh appuser && \
+    chown -R appuser:appuser /app
+USER appuser
 
 # Default to core service — override CMD per service in docker-compose
 ARG SERVICE=core

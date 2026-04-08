@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
+import { requireOwner } from '@/lib/auth/require-role';
 import { e2bService } from "@/lib/services/e2b";
 
 export async function POST(request: NextRequest) {
+  const auth = await requireOwner();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const { code, language = "python" } = await request.json();
 

@@ -49,7 +49,7 @@ function PermissionGate({
   if (isChecking) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-pulse text-white/50">Checking permissions...</div>
+        <div className="animate-pulse text-zinc-400">Checking permissions...</div>
       </div>
     );
   }
@@ -65,10 +65,10 @@ function PermissionGate({
   return (
     <div className="max-w-lg mx-auto text-center space-y-6 py-12">
       <div className="text-6xl mb-4">🎥🎤</div>
-      <h2 className="text-xl font-semibold text-white">
+      <h2 className="text-xl font-semibold text-zinc-100">
         Camera & Microphone Access Required
       </h2>
-      <p className="text-white/50">
+      <p className="text-zinc-400">
         DIY Mode uses your camera to see your project and your microphone for voice interaction.
         This allows ACHEEVY to provide real-time guidance as you work.
       </p>
@@ -76,11 +76,11 @@ function PermissionGate({
       <div className="flex flex-col gap-3 mt-6">
         {/* Permission Status */}
         <div className="flex justify-center gap-8 text-sm">
-          <div className={`flex items-center gap-2 ${cameraGranted ? 'text-green-400' : 'text-white/40'}`}>
+          <div className={`flex items-center gap-2 ${cameraGranted ? 'text-green-400' : 'text-zinc-500'}`}>
             <span>{cameraGranted ? '✓' : '○'}</span>
             <span>Camera</span>
           </div>
-          <div className={`flex items-center gap-2 ${micGranted ? 'text-green-400' : 'text-white/40'}`}>
+          <div className={`flex items-center gap-2 ${micGranted ? 'text-green-400' : 'text-zinc-500'}`}>
             <span>{micGranted ? '✓' : '○'}</span>
             <span>Microphone</span>
           </div>
@@ -102,7 +102,7 @@ function PermissionGate({
 
         {/* Platform-specific instructions */}
         {(permissions.camera === 'denied' || permissions.microphone === 'denied') && (
-          <div className="mt-4 text-sm text-white/40">
+          <div className="mt-4 text-sm text-zinc-500">
             <p className="mb-2">If the button doesn&apos;t work, you may need to enable permissions manually:</p>
             <button
               onClick={openSystemSettings}
@@ -110,7 +110,7 @@ function PermissionGate({
             >
               Open Settings Instructions
             </button>
-            <p className="mt-2 text-xs text-white/20">
+            <p className="mt-2 text-xs text-zinc-600">
               Platform detected: {platform}
             </p>
           </div>
@@ -197,11 +197,11 @@ function ConsultationFlow({
     <div className="max-w-2xl mx-auto py-8">
       {/* Progress Bar */}
       <div className="mb-8">
-        <div className="flex justify-between text-xs text-white/30 mb-2">
+        <div className="flex justify-between text-xs text-zinc-500 mb-2">
           <span>Consultation</span>
           <span>{progress}%</span>
         </div>
-        <div className="h-1 bg-white/10 rounded-full overflow-hidden">
+        <div className="h-1 bg-[#1F1F23] rounded-full overflow-hidden">
           <div
             className="h-full bg-gradient-to-r from-gold to-gold transition-all duration-500"
             style={{ width: `${progress}%` }}
@@ -210,8 +210,8 @@ function ConsultationFlow({
       </div>
 
       {/* Question Card */}
-      <div className="bg-white/[0.03] border border-gold/20 rounded-2xl p-8">
-        <p className="text-lg text-white whitespace-pre-line">
+      <div className="bg-[#111113] border border-gold/20 rounded-2xl p-8">
+        <p className="text-lg text-zinc-100 whitespace-pre-line">
           {currentQuestion.prompt}
         </p>
 
@@ -233,25 +233,25 @@ function ConsultationFlow({
 
       {/* Project Summary Preview */}
       {Object.keys(state.projectDraft).length > 0 && state.currentStep === 'plan_review' && (
-        <div className="mt-6 bg-white/[0.02] border border-wireframe-stroke rounded-xl p-6">
+        <div className="mt-6 bg-[#111113] border border-wireframe-stroke rounded-xl p-6">
           <h3 className="text-sm font-medium text-gold mb-3">Project Summary</h3>
           <dl className="space-y-2 text-sm">
             {state.projectDraft.title && (
               <div className="flex">
-                <dt className="w-24 text-white/30">Project:</dt>
-                <dd className="text-white">{state.projectDraft.title}</dd>
+                <dt className="w-24 text-zinc-500">Project:</dt>
+                <dd className="text-zinc-100">{state.projectDraft.title}</dd>
               </div>
             )}
             {state.projectDraft.category && (
               <div className="flex">
-                <dt className="w-24 text-white/30">Category:</dt>
-                <dd className="text-white capitalize">{state.projectDraft.category.replace('_', ' ')}</dd>
+                <dt className="w-24 text-zinc-500">Category:</dt>
+                <dd className="text-zinc-100 capitalize">{state.projectDraft.category.replace('_', ' ')}</dd>
               </div>
             )}
             {state.projectDraft.skillLevel && (
               <div className="flex">
-                <dt className="w-24 text-white/30">Level:</dt>
-                <dd className="text-white capitalize">{state.projectDraft.skillLevel}</dd>
+                <dt className="w-24 text-zinc-500">Level:</dt>
+                <dd className="text-zinc-100 capitalize">{state.projectDraft.skillLevel}</dd>
               </div>
             )}
           </dl>
@@ -270,7 +270,7 @@ function TextInput({ onSubmit }: { onSubmit: (value: string) => void }) {
       <textarea
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        className="w-full h-32 bg-black/40 border border-wireframe-stroke rounded-xl p-4 text-white placeholder:text-white/20 outline-none focus:border-gold/30 transition-colors resize-none"
+        className="w-full h-32 bg-[#1F1F23]/60 border border-wireframe-stroke rounded-xl p-4 text-zinc-100 placeholder:text-zinc-600 outline-none focus:border-gold/30 transition-colors resize-none"
         placeholder="Describe your project..."
         autoFocus
       />
@@ -292,7 +292,7 @@ function SelectInput({ options, onSelect }: { options: string[]; onSelect: (valu
         <button
           key={option}
           onClick={() => onSelect(option)}
-          className="text-left px-4 py-3 rounded-xl border border-wireframe-stroke bg-white/[0.02] text-white/70 hover:border-gold/20 hover:bg-white/[0.05] transition-all"
+          className="text-left px-4 py-3 rounded-xl border border-wireframe-stroke bg-[#111113] text-zinc-300 hover:border-gold/20 hover:bg-white/5 transition-all"
         >
           {option}
         </button>
@@ -323,8 +323,8 @@ function MultiSelectInput({ options, onSubmit }: { options: string[]; onSubmit: 
             onClick={() => toggle(option)}
             className={`text-left px-4 py-3 rounded-xl border transition-all ${
               selected.has(option)
-                ? 'border-gold/30 bg-gold/10 text-white'
-                : 'border-wireframe-stroke bg-white/[0.02] text-white/70 hover:border-white/20'
+                ? 'border-gold/30 bg-gold/10 text-zinc-100'
+                : 'border-wireframe-stroke bg-[#111113] text-zinc-300 hover:border-white/10'
             }`}
           >
             <span className="mr-2">{selected.has(option) ? '✓' : '○'}</span>
@@ -349,7 +349,7 @@ function ConfirmInput({ options, onSelect }: { options: string[]; onSelect: (val
         <button
           key={option}
           onClick={() => onSelect(option)}
-          className="px-5 py-2 rounded-full border border-gold/20 bg-gold/10 text-white/50 hover:border-gold/30 hover:bg-gold/10 transition-all"
+          className="px-5 py-2 rounded-full border border-gold/20 bg-gold/10 text-zinc-400 hover:border-gold/30 hover:bg-gold/10 transition-all"
         >
           {option}
         </button>
@@ -371,6 +371,8 @@ function VoiceVisionMode({
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [messages, setMessages] = useState<VoiceMessage[]>([
@@ -454,11 +456,18 @@ function VoiceVisionMode({
         };
         setMessages(prev => [...prev, acheevyMessage]);
 
-        // TODO: Play TTS audio if available
+        // Play TTS audio if available
         if (data.audioUrl) {
           setIsSpeaking(true);
-          // Play audio...
-          setTimeout(() => setIsSpeaking(false), 3000);
+          if (audioRef.current) {
+            audioRef.current.pause();
+            audioRef.current = null;
+          }
+          const audio = new Audio(data.audioUrl);
+          audioRef.current = audio;
+          audio.onended = () => setIsSpeaking(false);
+          audio.onerror = () => setIsSpeaking(false);
+          audio.play().catch(() => setIsSpeaking(false));
         }
       }
     } catch (err) {
@@ -466,10 +475,37 @@ function VoiceVisionMode({
     }
   }, [project.id, captureFrame]);
 
-  // Toggle voice listening
+  // Toggle voice listening via Web Speech API
   const toggleListening = () => {
-    setIsListening(!isListening);
-    // TODO: Implement Web Speech API recognition
+    if (isListening) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+      return;
+    }
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      console.error('Web Speech API not supported in this browser');
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = 'en-US';
+
+    recognition.onresult = (event: SpeechRecognitionEvent) => {
+      const transcript = event.results[0]?.[0]?.transcript;
+      if (transcript) {
+        sendMessage(transcript, true);
+      }
+    };
+    recognition.onerror = () => setIsListening(false);
+    recognition.onend = () => setIsListening(false);
+
+    recognitionRef.current = recognition;
+    recognition.start();
+    setIsListening(true);
   };
 
   useEffect(() => {
@@ -480,6 +516,13 @@ function VoiceVisionMode({
         const stream = videoRef.current.srcObject as MediaStream;
         stream.getTracks().forEach(track => track.stop());
       }
+      // Cleanup: stop audio playback
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+      // Cleanup: stop speech recognition
+      recognitionRef.current?.stop();
     };
   }, [startCamera]);
 
@@ -488,12 +531,12 @@ function VoiceVisionMode({
       {/* Header */}
       <header className="flex items-center justify-between px-4 py-3 border-b border-wireframe-stroke">
         <div>
-          <h2 className="font-semibold text-white">{project.title}</h2>
-          <p className="text-xs text-white/30 capitalize">{project.category.replace('_', ' ')} • {project.skillLevel}</p>
+          <h2 className="font-semibold text-zinc-100">{project.title}</h2>
+          <p className="text-xs text-zinc-500 capitalize">{project.category.replace('_', ' ')} • {project.skillLevel}</p>
         </div>
         <button
           onClick={onSwitchToConsole}
-          className="text-sm text-white/50 hover:text-gold transition-colors"
+          className="text-sm text-zinc-400 hover:text-gold transition-colors"
         >
           Switch to Console Mode
         </button>
@@ -501,7 +544,7 @@ function VoiceVisionMode({
 
       <div className="flex-1 flex gap-4 p-4 overflow-hidden">
         {/* Camera View */}
-        <div className="w-1/2 relative rounded-xl overflow-hidden bg-black">
+        <div className="w-1/2 relative rounded-xl overflow-hidden bg-[#111113]">
           <video
             ref={videoRef}
             autoPlay
@@ -522,14 +565,14 @@ function VoiceVisionMode({
           </div>
 
           {!cameraActive && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/80">
-              <p className="text-white/50">Starting camera...</p>
+            <div className="absolute inset-0 flex items-center justify-center bg-[#111113]/80">
+              <p className="text-zinc-400">Starting camera...</p>
             </div>
           )}
         </div>
 
         {/* Chat Area */}
-        <div className="w-1/2 flex flex-col bg-white/[0.02] rounded-xl border border-wireframe-stroke">
+        <div className="w-1/2 flex flex-col bg-[#111113] rounded-xl border border-wireframe-stroke">
           {/* Messages */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
             {messages.map((msg) => (
@@ -540,8 +583,8 @@ function VoiceVisionMode({
                 <div
                   className={`max-w-[85%] rounded-2xl px-4 py-3 ${
                     msg.role === 'user'
-                      ? 'bg-gold/10 text-white'
-                      : 'bg-white/5 text-white/70'
+                      ? 'bg-gold/10 text-zinc-100'
+                      : 'bg-[#18181B] text-zinc-300'
                   }`}
                 >
                   {msg.hasImage && (
@@ -549,7 +592,7 @@ function VoiceVisionMode({
                   )}
                   <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
                   {msg.imageAnalysis && (
-                    <div className="mt-2 pt-2 border-t border-wireframe-stroke text-xs text-white/40">
+                    <div className="mt-2 pt-2 border-t border-wireframe-stroke text-xs text-zinc-500">
                       <p>Detected: {msg.imageAnalysis.analysis.labels.slice(0, 3).map(l => l.description).join(', ')}</p>
                     </div>
                   )}
@@ -566,7 +609,7 @@ function VoiceVisionMode({
                 className={`p-3 rounded-xl transition-all ${
                   isListening
                     ? 'bg-red-500/20 text-red-400 animate-pulse'
-                    : 'bg-white/5 text-white/50 hover:bg-white/10'
+                    : 'bg-[#18181B] text-zinc-400 hover:bg-white/8'
                 }`}
               >
                 🎤
@@ -574,7 +617,7 @@ function VoiceVisionMode({
               <input
                 type="text"
                 placeholder="Type or speak your question..."
-                className="flex-1 bg-black/40 border border-wireframe-stroke rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/20 outline-none focus:border-gold/30"
+                className="flex-1 bg-[#1F1F23]/60 border border-wireframe-stroke rounded-xl px-4 py-3 text-sm text-zinc-100 placeholder:text-zinc-600 outline-none focus:border-gold/30"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && e.currentTarget.value.trim()) {
                     sendMessage(e.currentTarget.value.trim());
@@ -584,7 +627,7 @@ function VoiceVisionMode({
               />
               <button
                 onClick={() => sendMessage('Show me what you see', true)}
-                className="p-3 rounded-xl bg-white/5 text-white/50 hover:bg-white/10 transition-colors"
+                className="p-3 rounded-xl bg-[#18181B] text-zinc-400 hover:bg-white/8 transition-colors"
               >
                 📷
               </button>
@@ -594,7 +637,7 @@ function VoiceVisionMode({
       </div>
 
       {/* Status Bar */}
-      <footer className="px-4 py-2 border-t border-wireframe-stroke flex items-center justify-between text-xs text-white/30">
+      <footer className="px-4 py-2 border-t border-wireframe-stroke flex items-center justify-between text-xs text-zinc-500">
         <div className="flex items-center gap-4">
           <span className={cameraActive ? 'text-green-400' : 'text-red-400'}>
             ● Camera {cameraActive ? 'Active' : 'Inactive'}
@@ -674,8 +717,8 @@ function ConsoleMode({
       {/* Header */}
       <header className="flex items-center justify-between px-4 py-3 border-b border-wireframe-stroke">
         <div>
-          <h2 className="font-semibold text-white">{project.title}</h2>
-          <p className="text-xs text-white/30">Console Mode • Voice Active • Camera Off</p>
+          <h2 className="font-semibold text-zinc-100">{project.title}</h2>
+          <p className="text-xs text-zinc-500">Console Mode • Voice Active • Camera Off</p>
         </div>
         <button
           onClick={onSwitchToVision}
@@ -695,8 +738,8 @@ function ConsoleMode({
             <div
               className={`max-w-[80%] rounded-2xl px-4 py-3 ${
                 msg.role === 'user'
-                  ? 'bg-gold/10 text-white'
-                  : 'bg-white/5 text-white/70'
+                  ? 'bg-gold/10 text-zinc-100'
+                  : 'bg-[#18181B] text-zinc-300'
               }`}
             >
               <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
@@ -720,7 +763,7 @@ function ConsoleMode({
             className={`p-3 rounded-xl transition-all ${
               isListening
                 ? 'bg-red-500/20 text-red-400 animate-pulse'
-                : 'bg-white/5 text-white/50 hover:bg-white/10'
+                : 'bg-[#18181B] text-zinc-400 hover:bg-white/8'
             }`}
           >
             🎤
@@ -730,7 +773,7 @@ function ConsoleMode({
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Type your question..."
-            className="flex-1 bg-black/40 border border-wireframe-stroke rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/20 outline-none focus:border-gold/30"
+            className="flex-1 bg-[#1F1F23]/60 border border-wireframe-stroke rounded-xl px-4 py-3 text-sm text-zinc-100 placeholder:text-zinc-600 outline-none focus:border-gold/30"
           />
           <button
             type="submit"

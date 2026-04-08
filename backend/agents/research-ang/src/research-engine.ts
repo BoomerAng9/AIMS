@@ -51,12 +51,13 @@ async function callLLM(systemPrompt: string, userPrompt: string): Promise<LLMRes
       return null;
     }
 
-    const data = await response.json();
+    const data = (await response.json()) as Record<string, unknown>;
+    const result = data.result as Record<string, unknown> | undefined;
     return {
-      content: data.content || data.result?.content || '',
-      model: data.model || 'unknown',
-      tokens: data.tokens || { prompt: 0, completion: 0, total: 0 },
-      cost: data.cost || { usd: 0 },
+      content: (data.content as string) || (result?.content as string) || '',
+      model: (data.model as string) || 'unknown',
+      tokens: (data.tokens as { prompt: number; completion: number; total: number }) || { prompt: 0, completion: 0, total: 0 },
+      cost: (data.cost as { usd: number }) || { usd: 0 },
     };
   } catch (err) {
     logger.warn({ err: (err as Error).message }, '[Research_Ang] LLM gateway unreachable — using heuristic');

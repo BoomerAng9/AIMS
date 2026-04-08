@@ -21,6 +21,7 @@ export interface PlugDefinition {
   color: string; // tailwind color prefix (e.g. "amber", "emerald", "cyan")
   priority: "critical" | "high" | "medium" | "low";
   definitionFile: string; // path in aiPLUGS/ directory
+  platformUrl?: string; // external platform URL — opens the vertical's dedicated site
 }
 
 // ─── Plug Catalog ────────────────────────────────────────────
@@ -53,6 +54,33 @@ export const PLUG_REGISTRY: PlugDefinition[] = [
     color: "amber",
     priority: "critical",
     definitionFile: "perform_plug.md",
+    platformUrl: "/sandbox/perform",
+  },
+  {
+    id: "destinations-ai",
+    name: "Destinations AI",
+    slug: "destinations-ai",
+    vertical: "Real Estate",
+    type: "Full-Stack Platform",
+    description: "AI-powered real estate intelligence for wealth building — Scout, Flip, Capital, Counsel, Mentor.",
+    longDescription:
+      "Destinations AI is a wealth-building ecosystem. Scout finds deals before Zillow. Flip analyzes ROI with the 70% Rule. Capital structures OPM financing. Counsel generates legal docs. Mentor teaches from renter to landlord in 90 days.",
+    icon: "map-pin",
+    status: "active",
+    tier: "starter",
+    infrastructure: ["Next.js", "Bun", "Brave Search", "Homesage.ai", "Mashvisor", "ElevenLabs"],
+    features: [
+      "Flip calculator with 70% Rule + OPM structuring",
+      "Neighborhood intel (Gentrification/Investment/Stability scores)",
+      "Deal pipeline (leads → analyzed → under contract → closed)",
+      "Creator Investment Club management",
+      "Legal doc generation (LLC, JV, Assignment contracts)",
+      "90-day Renter-to-Landlord curriculum",
+    ],
+    color: "emerald",
+    priority: "critical",
+    definitionFile: "destinations_ai_plug.md",
+    platformUrl: "/sandbox/destinations-ai",
   },
   {
     id: "flip-scorecard",
@@ -64,13 +92,14 @@ export const PLUG_REGISTRY: PlugDefinition[] = [
     longDescription:
       "A real estate investment calculator that factors in purchase price, renovation budget, holding costs, and After Repair Value to produce projected ROI and profit margins.",
     icon: "calculator",
-    status: "coming-soon",
+    status: "active",
     tier: "starter",
     infrastructure: ["Next.js", "Postgres"],
     features: ["ROI calculation", "Cost breakdown", "PDF export", "CTA funnel"],
     color: "emerald",
     priority: "high",
-    definitionFile: "",
+    definitionFile: "flip_scorecard.md",
+    platformUrl: "/sandbox/destinations-ai",
   },
   {
     id: "lease-analyzer",
@@ -109,6 +138,56 @@ export const PLUG_REGISTRY: PlugDefinition[] = [
     definitionFile: "",
   },
   {
+    id: "veritas",
+    name: "Veritas",
+    slug: "veritas",
+    vertical: "Consulting",
+    type: "Research Agent",
+    description: "Autonomous fact-checking and business data verification — catches million-dollar errors.",
+    longDescription:
+      "Veritas is the 'red team' for business data. Upload a PDF/CSV business plan, pitch deck, or grant application. The Boss (Claude) identifies high-stakes claims, dispatches Grunts to verify against live data, and produces a consultant-grade Risk Assessment Report.",
+    icon: "shield-check",
+    status: "coming-soon",
+    tier: "pro",
+    infrastructure: ["Claude Opus", "Perplexity Sonar", "LangGraph", "PDF Parse"],
+    features: [
+      "PDF/CSV document ingestion",
+      "High-stakes claim extraction",
+      "Live web verification (SerpAPI/Tavily)",
+      "Variance detection (>10% = Critical Risk)",
+      "Consultant-grade Risk Assessment Report",
+      "Citation tracking with source URLs",
+    ],
+    color: "red",
+    priority: "critical",
+    definitionFile: "veritas_plug.md",
+  },
+  {
+    id: "strategos",
+    name: "Strategos",
+    slug: "strategos",
+    vertical: "Marketing",
+    type: "Research Agent",
+    description: "AI customer segmentation — builds McKinsey-grade personas from real Census + social data.",
+    longDescription:
+      "Strategos replicates high-end consulting: product analysis, Census API demographics, Reddit/social sentiment, and 3-tiered persona generation. Outputs a polished report with 'Day in the Life' narratives backed by real data.",
+    icon: "users",
+    status: "coming-soon",
+    tier: "pro",
+    infrastructure: ["Claude Opus", "Census API", "Reddit API", "OpenRouter"],
+    features: [
+      "Product value driver analysis",
+      "Census-backed demographic profiling",
+      "Social sentiment analysis (Reddit/Twitter)",
+      "3-tier persona generation (Budget/Middle/Premium)",
+      "Day-in-the-Life narratives",
+      "McKinsey-grade PDF output",
+    ],
+    color: "violet",
+    priority: "high",
+    definitionFile: "strategos_plug.md",
+  },
+  {
     id: "market-intel",
     name: "Market Intel Report",
     slug: "market-intel",
@@ -125,6 +204,33 @@ export const PLUG_REGISTRY: PlugDefinition[] = [
     color: "violet",
     priority: "high",
     definitionFile: "",
+  },
+  {
+    id: "deepsite",
+    name: "DeepSite v4",
+    slug: "deepsite",
+    vertical: "Web Development",
+    type: "AI Website Builder",
+    description: "AI-powered vibe-coding platform — generate complete websites and web apps from natural language prompts.",
+    longDescription:
+      "DeepSite v4 is a Hugging Face open-source (MIT) website builder that generates multi-file web projects from prompts. Features Monaco editor, Sandpack live preview, chat-based iterative editing with SEARCH/REPLACE diffs, URL-based website redesign, and support for 6+ open-source LLMs via HF Inference Router. Includes auto-deploy to Hugging Face Spaces and ZIP export.",
+    icon: "globe",
+    status: "active",
+    tier: "starter",
+    infrastructure: ["Next.js 16", "MongoDB", "HF Inference API", "Sandpack", "Monaco Editor"],
+    features: [
+      "Natural language to website generation",
+      "Multi-file projects (HTML/CSS/JS)",
+      "Chat-based iterative editing",
+      "Website redesign from URL",
+      "6+ open-source LLM models",
+      "Auto-deploy to HF Spaces",
+      "ZIP project export",
+      "Live preview with Sandpack",
+    ],
+    color: "orange",
+    priority: "high",
+    definitionFile: "deepsite_plug.md",
   },
 ];
 

@@ -197,7 +197,7 @@ export const EVOLUTION_STAGES: EvolutionStage[] = [
     id: 'green',
     name: 'Lil_Hawk',
     visual: 'Small green pixelated chick',
-    image: '/images/brand/hawks/lil-hawk-green.png',
+    image: '/images/acheevy/acheevy-helmet.png',
     color: 'text-emerald-400',
     description: 'Learning phase — probation, bounded execution, proving ground.',
     criteria: [
@@ -212,7 +212,7 @@ export const EVOLUTION_STAGES: EvolutionStage[] = [
     id: 'surge',
     name: 'Power Surge',
     visual: 'Mid-size hawk with wings spread, green energy halo',
-    image: '/images/brand/hawks/lil-hawk-surge.png',
+    image: '/images/acheevy/acheevy-office-plug.png',
     color: 'text-emerald-300',
     description: 'Temporary peak efficiency — successful streaks, load handling under pressure.',
     criteria: [
@@ -227,7 +227,7 @@ export const EVOLUTION_STAGES: EvolutionStage[] = [
     id: 'evolved',
     name: 'Chicken Hawk Candidate',
     visual: 'Large muscular hawk with green energy aura',
-    image: '/images/brand/hawks/lil-hawk-evolved.png',
+    image: '/images/acheevy/hero-character.png',
     color: 'text-gold',
     description: 'Ready for Chicken Hawk status — proven long-term consistency.',
     criteria: [
@@ -242,7 +242,7 @@ export const EVOLUTION_STAGES: EvolutionStage[] = [
 ];
 
 // Chicken Hawk image path
-export const CHICKEN_HAWK_IMAGE = '/images/brand/hawks/chicken-hawk.png';
+export const CHICKEN_HAWK_IMAGE = '/images/acheevy/acheevy-helmet.png';
 
 // ---------------------------------------------------------------------------
 // Promotion Criteria (Corrected Canon)

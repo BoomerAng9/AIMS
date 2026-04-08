@@ -900,6 +900,463 @@ Return ONLY a JSON array of step description strings.
       transition_prompt: 'Ready to fill your calendar? I\'ll generate 30 days of content, write the copy, and create templates for every content type.',
     },
   },
+
+  // ── 11. LIVESIM — AUTONOMOUS SIMULATION SPACE ───────────────────────────
+
+  'livesim': {
+    id: 'livesim',
+    name: 'LiveSim Autonomous Space',
+    category: 'simulation',
+    tags: ['simulation', 'autonomous', 'agents', 'live', 'multi-agent', 'blog', 'content farm'],
+    triggers: [
+      /live\s*sim/i,
+      /simulation\s*space/i,
+      /autonomous\s*space/i,
+      /agent\s*simulation/i,
+      /let\s*the\s*agents?\s*work/i,
+      /watch\s*the\s*team/i,
+    ],
+
+    chain_steps: [
+      {
+        step: 1,
+        name: 'Simulation Topic',
+        purpose: 'Define what the agents will work on autonomously',
+        acheevy_behavior: 'Ask: "What should the crew work on? Give me a topic, project, or content objective. They\'ll handle the rest autonomously."',
+        output_schema: { topic: 'string', objective: 'string' },
+      },
+      {
+        step: 2,
+        name: 'Agent Selection',
+        purpose: 'Choose which agents participate',
+        acheevy_behavior: 'Present available agents: MarketingAng, AnalystAng, Lil_Research_Hawk, Lil_Builder_Hawk, etc. "Who do you want on this crew?"',
+        output_schema: { seed_agents: 'string[]' },
+      },
+      {
+        step: 3,
+        name: 'Scope & Duration',
+        purpose: 'Set simulation boundaries',
+        acheevy_behavior: 'Ask: "How long should they run? And do you want to jump in and ask questions along the way, or just watch?"',
+        output_schema: { max_rounds: 'number', user_interaction: 'boolean' },
+      },
+      {
+        step: 4,
+        name: 'Launch Confirmation',
+        purpose: 'Confirm and launch the simulation',
+        acheevy_behavior: 'Summarize: "[N] agents will work on [topic] for [duration]. Ready to launch?" Then spawn the room.',
+        output_schema: { confirmed: 'boolean' },
+      },
+    ],
+
+    acheevy_mode: 'livesim',
+    expert_domain: ['simulation', 'automation'],
+
+    execution: {
+      primary_agent: 'router-ang',
+      step_generation_prompt: `
+Launch an autonomous simulation for:
+Topic: {topic}
+Objective: {objective}
+Agents: {seed_agents}
+Max rounds: {max_rounds}
+User interaction allowed: {user_interaction}
+
+The simulation loop runs autonomously. ACHEEVY acts as conductor,
+routing sub-tasks to the selected agents. Each round produces:
+- Agent action description (what they worked on)
+- Artifacts produced (drafts, data, analysis)
+- Status update for the timeline
+
+This is NOT a step-generation task — the simulation loop runs
+via SKILL:spawn_simulation_room.
+      `.trim(),
+      required_context: ['topic', 'objective', 'seed_agents', 'max_rounds'],
+      fallback_steps: [
+        'Initialize simulation room with selected agents',
+        'Research phase: agents gather data on the topic',
+        'Analysis phase: agents process and synthesize findings',
+        'Creation phase: agents produce content/artifacts',
+        'Review phase: agents cross-check and refine output',
+        'Delivery: compile all artifacts into final deliverable',
+      ],
+      requires_verification: true,
+      max_steps: 50,
+    },
+
+    revenue_signal: {
+      service: 'Autonomous Ops (Multi-Agent Simulation)',
+      transition_prompt: 'Want to see the team in action? I\'ll spin up a live simulation — you can watch them work, jump in with questions, or just let them run.',
+    },
+  },
+
+  // ── 12. CHICKEN HAWK — CODE & DEPLOY VERTICAL ─────────────────────────
+
+  'chicken-hawk': {
+    id: 'chicken-hawk',
+    name: 'Chicken Hawk Code & Deploy',
+    category: 'devops',
+    tags: ['code', 'deploy', 'build', 'app', 'tool', 'automation', 'chicken hawk', 'claw'],
+    triggers: [
+      /chicken\s*hawk/i,
+      /build\s*me\s*(an?\s*)?(app|tool|website|api|service)/i,
+      /deploy\s*(my|this|the)\s*(app|project|code)/i,
+      /claw\s*(agent|build|code)/i,
+      /code\s*agent/i,
+    ],
+
+    chain_steps: [
+      {
+        step: 1,
+        name: 'Project Scope',
+        purpose: 'Define what to build',
+        acheevy_behavior: 'Ask: "What are we building? Give me the one-liner. App, API, automation, or something else?"',
+        output_schema: { project_type: 'string', description: 'string' },
+      },
+      {
+        step: 2,
+        name: 'Technical Requirements',
+        purpose: 'Nail down the tech stack and constraints',
+        acheevy_behavior: 'Ask: "What tech stack? Any constraints? Existing code to build on? Deployment target (VPS, GCP, Vercel)?"',
+        output_schema: { tech_stack: 'string', constraints: 'string[]', deploy_target: 'string' },
+      },
+      {
+        step: 3,
+        name: 'Acceptance Criteria',
+        purpose: 'Define what "done" looks like',
+        acheevy_behavior: 'Ask: "What does \'done\' look like? List the must-have features for v1. Everything else is v2."',
+        output_schema: { acceptance_criteria: 'string[]', nice_to_have: 'string[]' },
+      },
+      {
+        step: 4,
+        name: 'Launch Confirmation',
+        purpose: 'Confirm and dispatch to Chicken Hawk',
+        acheevy_behavior: 'Summarize the build spec. "Ready? Chicken Hawk will handle the build, tests, and deploy."',
+        output_schema: { confirmed: 'boolean' },
+      },
+    ],
+
+    acheevy_mode: 'default',
+    expert_domain: ['engineering', 'automation'],
+
+    execution: {
+      primary_agent: 'chicken-hawk',
+      step_generation_prompt: `
+Generate a build and deploy pipeline for:
+Project type: {project_type}
+Description: {description}
+Tech stack: {tech_stack}
+Constraints: {constraints}
+Deploy target: {deploy_target}
+Acceptance criteria: {acceptance_criteria}
+
+Generate 6-10 step descriptions. Keywords for routing:
+- "scaffold" or "generate" or "implement" for code generation
+- "test" or "verify" for testing and QA
+- "deploy" for deployment
+- "research" for technical research or API docs
+- "audit" or "security" for security review
+
+All steps execute via live HTTP/gRPC against the CLAW replacement.
+No mock results. Return logs and status as natural-language updates.
+
+Return ONLY a JSON array of step description strings.
+      `.trim(),
+      required_context: ['project_type', 'description', 'tech_stack', 'deploy_target', 'acceptance_criteria'],
+      fallback_steps: [
+        'Scaffold project structure with the specified tech stack',
+        'Generate core application code and configuration files',
+        'Implement primary features from acceptance criteria',
+        'Generate and run unit tests for all core modules',
+        'Implement API endpoints and data models',
+        'Run security audit on generated code',
+        'Deploy to staging environment on target platform',
+        'Run end-to-end tests against staging',
+        'Deploy to production and verify health checks',
+      ],
+      requires_verification: true,
+      max_steps: 12,
+    },
+
+    revenue_signal: {
+      service: 'Code Factory (Chicken Hawk + CLAW Agent)',
+      transition_prompt: 'Ready to build? Chicken Hawk will scaffold, code, test, and deploy — from zero to production.',
+    },
+  },
+
+  // ── 13. CUSTOM LIL_HAWK CREATOR ────────────────────────────────────────
+
+  'custom-hawk': {
+    id: 'custom-hawk',
+    name: 'Custom Lil_Hawk Creator',
+    category: 'automation',
+    tags: ['custom bot', 'personal agent', 'lil hawk', 'create agent', 'my own bot', 'assistant'],
+    triggers: [
+      /custom\s*(hawk|bot|agent)/i,
+      /create\s*(a|my|an?)?\s*(hawk|bot|agent)/i,
+      /make\s*(a|my|an?)?\s*(hawk|bot|agent)/i,
+      /build\s*me\s*(a|an?)?\s*(hawk|bot|agent)/i,
+      /my\s*own\s*(hawk|bot|agent|assistant)/i,
+      /personal\s*(assistant|agent|bot)/i,
+      /lil_\w+_hawk/i,
+    ],
+
+    chain_steps: [
+      {
+        step: 1,
+        name: 'Name Your Hawk',
+        purpose: 'Let the user name their custom Lil_Hawk',
+        acheevy_behavior: 'Ask: "What should we call your hawk? It follows the pattern Lil_<YourName>_Hawk. Examples: Lil_Track_My_Stocks_Hawk, Lil_Write_My_Blogs_Hawk, Lil_Find_Me_Clients_Hawk. Be creative — this is YOUR bot."',
+        output_schema: { hawk_name: 'string' },
+      },
+      {
+        step: 2,
+        name: 'Define Purpose',
+        purpose: 'What this hawk does in plain English',
+        acheevy_behavior: 'Ask: "What does this hawk DO? One sentence, be specific. Like: \'Monitor my crypto portfolio and alert me when any holding moves more than 5% in a day.\'"',
+        output_schema: { purpose: 'string', domain: 'string' },
+      },
+      {
+        step: 3,
+        name: 'Pick Tools & Capabilities',
+        purpose: 'Select what tools and abilities the hawk has',
+        acheevy_behavior: 'Present available tools: web search, code sandbox, email, data analysis, file generation, etc. Ask: "Which tools does your hawk need?"',
+        output_schema: { tools: 'string[]', capabilities: 'string[]' },
+      },
+      {
+        step: 4,
+        name: 'Set Budget & Deploy',
+        purpose: 'Set budget cap, autonomy level, and deploy',
+        acheevy_behavior: 'Ask: "How much can this hawk spend per run? And should it ask before every action (manual), act on pre-approved tasks (semi-auto), or run fully autonomous?" Then deploy.',
+        output_schema: { budget_cap: 'number', autonomy: 'string', confirmed: 'boolean' },
+      },
+    ],
+
+    acheevy_mode: 'default',
+    expert_domain: ['automation', 'engineering'],
+
+    execution: {
+      primary_agent: 'chicken-hawk',
+      step_generation_prompt: `
+Create and deploy a custom Lil_Hawk for the user:
+Hawk name: {hawk_name}
+Purpose: {purpose}
+Domain: {domain}
+Tools: {tools}
+Capabilities: {capabilities}
+Budget cap: {budget_cap} USD per execution
+Autonomy: {autonomy}
+
+Steps:
+1. Validate hawk name against naming rules
+2. Compile system prompt from purpose + domain + tools
+3. Assign supervisor Boomer_Ang based on domain
+4. Run gate checks (budget, security, chain of command)
+5. Create hawk record and activate
+6. Confirm to user with hawk details
+
+Return ONLY a JSON array of step description strings.
+      `.trim(),
+      required_context: ['hawk_name', 'purpose', 'domain', 'tools', 'capabilities', 'budget_cap', 'autonomy'],
+      fallback_steps: [
+        'Validate hawk name follows Lil_<Name>_Hawk pattern',
+        'Research domain requirements and assign supervisor Boomer_Ang',
+        'Generate system prompt from purpose and capabilities',
+        'Implement gate checks: budget, security, chain of command',
+        'Deploy hawk to active status with full audit trail',
+        'Verify hawk responds correctly with a test execution',
+      ],
+      requires_verification: true,
+      max_steps: 8,
+    },
+
+    revenue_signal: {
+      service: 'Custom Hawk Factory (User Bot Creation)',
+      transition_prompt: 'Your hawk is ready. Want to deploy it now? It will be supervised by the right Boomer_Ang and start handling tasks immediately.',
+    },
+  },
+
+  // ── 14. PLUG CATALOG / PaaS OPERATIONS ──────────────────────────────
+
+  'plug-catalog': {
+    id: 'plug-catalog',
+    name: 'Plug Catalog & PaaS Operations',
+    category: 'paas',
+    tags: ['deploy', 'instance', 'container', 'plug', 'spin up', 'service', 'provision', 'catalog', 'self-host', 'export'],
+    triggers: [
+      /spin\s*up/i,
+      /deploy\s+(a\s+)?(tool|agent|instance|service|container)/i,
+      /launch\s+(a\s+)?(tool|agent|instance|service)/i,
+      /start\s+(an?\s+)?instance/i,
+      /one\s*click\s*(deploy|setup)/i,
+      /provision/i,
+      /what.?s\s*running/i,
+      /instance\s*status/i,
+      /show\s*(me\s+)?(my\s+)?(instances|services|containers)/i,
+      /deploy\s*dock/i,
+      /list\s*(my\s+)?(instances|services|deployments)/i,
+      /shut\s*down/i,
+      /decommission/i,
+      /tear\s*down/i,
+      /scale\s*(up|down|out)/i,
+      /export/i,
+      /self.?host/i,
+      /browse\s*(tools?|catalog|plugs?)/i,
+      /what\s*(tools?|agents?|services?)\s*(are\s+)?(available|can\s+i)/i,
+      /plug\s*catalog/i,
+      /what\s*can\s*(i|you)\s*deploy/i,
+      /needs?\s*analysis/i,
+      /recommend\s*(tools?|services?)/i,
+      /help\s*me\s*choose/i,
+    ],
+
+    chain_steps: [
+      {
+        step: 1,
+        name: 'Detect PaaS Intent',
+        purpose: 'Determine whether user wants to browse, deploy, manage, scale, export, or get recommendations',
+        acheevy_behavior: 'Classify the sub-intent: catalog_browse, spin_up, status, scale, decommission, export, or needs_analysis. If ambiguous, ask: "Are you looking to deploy a new tool, check on something running, or explore what\'s available?"',
+        output_schema: { paas_action: 'string', target_plug: 'string' },
+      },
+      {
+        step: 2,
+        name: 'Gather Requirements',
+        purpose: 'Collect deployment-specific details if needed',
+        acheevy_behavior: 'For spin_up: ask which tool and any customization. For scale: ask which instance and direction. For export: ask which instance. For needs_analysis: ask about business requirements.',
+        output_schema: { plug_id: 'string', customizations: 'object', instance_id: 'string' },
+      },
+      {
+        step: 3,
+        name: 'LUC Quote & Confirmation',
+        purpose: 'Present cost estimate and get human approval before execution',
+        acheevy_behavior: 'Present the LUC quote: "This will cost approximately X LUCs. Includes: container hours, port allocation, health monitoring. Approve?" For decommission: "This will shut down [instance]. Data will be preserved for 30 days. Confirm?"',
+        output_schema: { luc_estimate: 'number', approved: 'boolean' },
+      },
+      {
+        step: 4,
+        name: 'Execute PaaS Operation',
+        purpose: 'Carry out the approved operation via the Plug Engine',
+        acheevy_behavior: 'Execute the operation and stream Glass Box events: validate → configure → provision → deploy → health → ready. Present the result with URL and status.',
+        output_schema: { operation_result: 'object', instance_url: 'string', health_status: 'string' },
+      },
+    ],
+
+    acheevy_mode: 'ServiceManager',
+    expert_domain: ['paas', 'devops', 'automation'],
+
+    execution: {
+      primary_agent: 'plug-ang',
+      step_generation_prompt: `
+Execute a PaaS operation for the user:
+Action: {paas_action}
+Target plug: {target_plug}
+Instance ID: {instance_id}
+Customizations: {customizations}
+LUC approved: {approved}
+
+This routes to the Plug Engine for execution. Operations:
+- catalog_browse → GET /api/plug-catalog
+- spin_up → POST /api/plug-catalog/spin-up (validate → provision → deploy → health)
+- status → GET /api/plug-catalog/instances
+- scale → PATCH /api/plug-catalog/instances/:id/scale
+- decommission → DELETE /api/plug-catalog/instances/:id (requires confirmation)
+- export → POST /api/plug-catalog/instances/:id/export
+- needs_analysis → POST /api/plug-catalog/needs-analysis
+
+All operations emit Glass Box events for Deploy Dock visibility.
+
+Return ONLY a JSON array of step description strings.
+      `.trim(),
+      required_context: ['paas_action', 'target_plug'],
+      fallback_steps: [
+        'Validate the requested PaaS operation and target plug',
+        'Check user permissions and LUC budget for this operation',
+        'Execute the plug operation via the Plug Engine',
+        'Run health check and verify operation success',
+        'Report result with instance URL, status, and Glass Box summary',
+      ],
+      requires_verification: true,
+      max_steps: 8,
+    },
+
+    revenue_signal: {
+      service: 'Plug Engine (PaaS Operations — Container Deployment + Management)',
+      transition_prompt: 'Ready to deploy? I\'ll provision the container, configure networking, run health checks, and hand you the URL — one click.',
+    },
+  },
+
+  // ── 15. PLAYGROUND / SANDBOX ──────────────────────────────────────────
+
+  'playground': {
+    id: 'playground',
+    name: 'Playground & Sandbox',
+    category: 'engineering',
+    tags: ['playground', 'sandbox', 'code', 'test', 'run', 'execute', 'training', 'education'],
+    triggers: [
+      /playground/i,
+      /sandbox/i,
+      /run\s*(some|this|my)?\s*code/i,
+      /test\s*(some|this|my)?\s*(code|prompt|agent)/i,
+      /code\s*sandbox/i,
+      /training\s*(data|task|annotation)/i,
+      /student\s*workspace/i,
+      /prompt\s*(test|playground)/i,
+    ],
+
+    chain_steps: [
+      {
+        step: 1,
+        name: 'Choose Playground Type',
+        purpose: 'What kind of environment the user needs',
+        acheevy_behavior: 'Ask: "What kind of playground? Code sandbox (run code), Prompt lab (test prompts), Agent testing (test your hawks), Training data (annotation work), or Education workspace (learn + practice)?"',
+        output_schema: { playground_type: 'string' },
+      },
+      {
+        step: 2,
+        name: 'Configure Environment',
+        purpose: 'Set up the specific playground config',
+        acheevy_behavior: 'Based on type: Code → ask language + packages. Prompt → ask models + system prompt. Agent → ask which hawk. Training → ask task type + labels. Education → ask subject + difficulty.',
+        output_schema: { config: 'object' },
+      },
+      {
+        step: 3,
+        name: 'Launch',
+        purpose: 'Create and launch the playground session',
+        acheevy_behavior: 'Summarize the config: "Launching a [type] playground. [Duration] session. Ready?" Then create.',
+        output_schema: { confirmed: 'boolean' },
+      },
+    ],
+
+    acheevy_mode: 'default',
+    expert_domain: ['engineering', 'automation'],
+
+    execution: {
+      primary_agent: 'chicken-hawk',
+      step_generation_prompt: `
+Set up a playground/sandbox environment:
+Type: {playground_type}
+Config: {config}
+
+This is a session creation task, not a multi-step pipeline.
+The playground engine handles execution internally.
+
+Return ONLY a JSON array of step description strings.
+      `.trim(),
+      required_context: ['playground_type', 'config'],
+      fallback_steps: [
+        'Validate playground configuration and user permissions',
+        'Scaffold isolated environment with requested tools and language',
+        'Deploy sandbox with security constraints and time limits',
+        'Verify environment is ready and execute test run',
+      ],
+      requires_verification: true,
+      max_steps: 6,
+    },
+
+    revenue_signal: {
+      service: 'Playground (Sandbox Execution + Training Contracts)',
+      transition_prompt: 'Your playground is live. Start coding, testing, or annotating. Everything runs in isolation — safe to experiment.',
+    },
+  },
 };
 
 // ---------------------------------------------------------------------------

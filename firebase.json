@@ -25,6 +25,18 @@
       "predeploy": [
         "npm --prefix \"$RESOURCE_DIR\" run build"
       ]
+    },
+    {
+      "source": "functions",
+      "codebase": "aims-functions",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "lib"
+      ],
+      "predeploy": [
+        "npm --prefix \"$RESOURCE_DIR\" run build"
+      ]
     }
   ],
   "extensions": {

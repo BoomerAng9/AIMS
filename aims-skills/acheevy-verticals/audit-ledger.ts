@@ -260,6 +260,10 @@ class TripleAuditLedger {
       pipeline_dispatched: 'handoff',
       verification_passed: 'verification',
       verification_failed: 'verification',
+      fee_charged: 'billing',
+      savings_credited: 'billing',
+      invoice_generated: 'receipt',
+      transaction_metered: 'billing',
     };
     return mapping[action] || 'system';
   }

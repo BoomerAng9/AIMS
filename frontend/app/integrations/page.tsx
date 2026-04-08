@@ -189,7 +189,7 @@ export default function IntegrationsPage() {
       <main className="flex-1 container max-w-6xl py-8 px-4">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-display text-white tracking-widest uppercase mb-2">
+          <h1 className="text-4xl font-display text-slate-800 tracking-widest uppercase mb-2">
             API Integrations
           </h1>
           <p className="text-zinc-400">
@@ -198,7 +198,7 @@ export default function IntegrationsPage() {
         </div>
 
         {/* Summary */}
-        <Card className="mb-6 bg-black/60 border-gold/20">
+        <Card className="mb-6 bg-slate-50/70 border-gold/20">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div className="flex gap-6">
@@ -240,7 +240,7 @@ export default function IntegrationsPage() {
             return (
               <Card
                 key={index}
-                className="bg-black/40 border-wireframe-stroke hover:border-gold/20 transition-colors"
+                className="bg-slate-100/60 border-wireframe-stroke hover:border-gold/20 transition-colors"
               >
                 <CardHeader>
                   <div className="flex items-center justify-between">
@@ -248,7 +248,7 @@ export default function IntegrationsPage() {
                       <div className="p-2 rounded bg-gold/10">
                         <Icon className="h-5 w-5 text-gold" />
                       </div>
-                      <CardTitle className="text-lg text-white">{service.name}</CardTitle>
+                      <CardTitle className="text-lg text-slate-800">{service.name}</CardTitle>
                     </div>
                     {getStatusIcon(service.status)}
                   </div>
@@ -290,9 +290,9 @@ export default function IntegrationsPage() {
         </div>
 
         {/* Environment Check */}
-        <Card className="mt-6 bg-black/40 border-wireframe-stroke">
+        <Card className="mt-6 bg-slate-100/60 border-wireframe-stroke">
           <CardHeader>
-            <CardTitle className="text-white">Environment Variables</CardTitle>
+            <CardTitle className="text-slate-800">Environment Variables</CardTitle>
             <CardDescription>
               Required API keys and credentials
             </CardDescription>

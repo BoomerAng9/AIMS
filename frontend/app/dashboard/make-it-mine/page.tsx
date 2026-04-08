@@ -3,6 +3,31 @@ import Link from 'next/link';
 
 const PROJECT_TYPES = [
   {
+    id: 'deep-scout',
+    title: 'Deep Scout',
+    description: 'AI research engine — validate ideas, clone competitors, and map markets before building',
+    icon: '🔬',
+    href: '/dashboard/deep-scout',
+    features: ['4-step idea validation', 'Competitor research', 'Clone & adaptation plans', 'Scrollytelling reports'],
+    recommended: true,
+  },
+  {
+    id: 'creative-studio',
+    title: 'Creative Studio',
+    description: 'AI-powered creative builds with the NtNtN Engine — from brief to deployed site',
+    icon: '✨',
+    href: '/dashboard/ntntn-studio',
+    features: ['NtNtN Engine', '3-pillar pipeline', 'Buildsmith delivery', 'Live preview'],
+  },
+  {
+    id: 'web-app',
+    title: 'Web Application',
+    description: 'AI-powered web app builder — describe your idea and ACHEEVY builds it live',
+    icon: '🌐',
+    href: '/dashboard/make-it-mine/web-app',
+    features: ['AI code generation', 'Live preview', 'Iterative editing', 'Plug deployment'],
+  },
+  {
     id: 'diy',
     title: 'DIY Projects',
     description: 'Hands-on home projects with voice and vision guidance',
@@ -11,22 +36,12 @@ const PROJECT_TYPES = [
     features: ['Voice interaction', 'Camera guidance', 'Step-by-step help'],
   },
   {
-    id: 'web-app',
-    title: 'Web Application',
-    description: 'Build a custom web application from scratch',
-    icon: '🌐',
-    href: '/dashboard/make-it-mine/web-app',
-    features: ['Full-stack development', 'Deployment included', 'Custom domain'],
-    comingSoon: true,
-  },
-  {
     id: 'mobile-app',
     title: 'Mobile App',
     description: 'Create iOS or Android applications',
     icon: '📱',
     href: '/dashboard/make-it-mine/mobile-app',
     features: ['Cross-platform', 'App store ready', 'Push notifications'],
-    comingSoon: true,
   },
   {
     id: 'automation',
@@ -35,7 +50,6 @@ const PROJECT_TYPES = [
     icon: '⚡',
     href: '/dashboard/make-it-mine/automation',
     features: ['n8n integration', 'API connections', 'Scheduled tasks'],
-    comingSoon: true,
   },
 ];
 
@@ -43,9 +57,9 @@ export default function MakeItMinePage() {
   return (
     <div className="p-6 max-w-6xl mx-auto">
       <header className="mb-8">
-        <h1 className="text-2xl font-bold text-white">Make It Mine</h1>
-        <p className="mt-2 text-white/50">
-          Choose a project type and let A.I.M.S. guide you through the creation process
+        <h1 className="text-2xl font-bold text-zinc-100">Make It Mine</h1>
+        <p className="mt-2 text-zinc-400">
+          Deep Universal Meticulous Build — research, validate, build, and deploy real software
         </p>
       </header>
 
@@ -53,29 +67,26 @@ export default function MakeItMinePage() {
         {PROJECT_TYPES.map((project) => (
           <Link
             key={project.id}
-            href={project.comingSoon ? '#' : project.href}
+            href={project.href}
             className={`
               group relative overflow-hidden rounded-2xl border p-6
               transition-all duration-300
-              ${project.comingSoon
-                ? 'border-wireframe-stroke bg-white/[0.02] cursor-not-allowed opacity-60'
-                : 'border-gold/20 bg-white/[0.03] hover:border-gold/20 hover:bg-white/[0.05]'
-              }
+              border-gold/20 bg-[#111113] hover:border-gold/20 hover:bg-white/5
             `}
           >
-            {project.comingSoon && (
-              <span className="absolute top-4 right-4 text-[0.65rem] uppercase tracking-wider text-gold bg-gold/10 px-2 py-1 rounded">
-                Coming Soon
+            {(project as any).recommended && (
+              <span className="absolute top-4 right-4 text-[0.65rem] uppercase tracking-wider text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-1 rounded">
+                Recommended
               </span>
             )}
 
             <div className="flex items-start gap-4">
               <span className="text-4xl">{project.icon}</span>
               <div className="flex-1">
-                <h2 className="text-lg font-semibold text-white group-hover:text-gold transition-colors">
+                <h2 className="text-lg font-semibold text-zinc-100 group-hover:text-gold transition-colors">
                   {project.title}
                 </h2>
-                <p className="mt-1 text-sm text-white/40">
+                <p className="mt-1 text-base font-medium text-zinc-400">
                   {project.description}
                 </p>
 
@@ -83,7 +94,7 @@ export default function MakeItMinePage() {
                   {project.features.map((feature) => (
                     <li
                       key={feature}
-                      className="text-[0.7rem] text-white/30 bg-white/5 px-2 py-1 rounded"
+                      className="text-[0.7rem] text-zinc-500 bg-[#18181B] px-2 py-1 rounded"
                     >
                       {feature}
                     </li>

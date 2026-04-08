@@ -34,7 +34,7 @@ interface Planet {
 // ─────────────────────────────────────────────────────────────
 
 const NEARBY_PLANETS: Planet[] = [
-  { id: 'p1', name: 'Zephyr-7', type: 'unexplored', distance: 12, resources: ['Helium-3', 'Iron'], x: 75, y: 20, color: '#8B5CF6' },
+  { id: 'p1', name: 'Zephyr-7', type: 'unexplored', distance: 12, resources: ['Helium-3', 'Iron'], x: 75, y: 20, color: '#F59E0B' },
   { id: 'p2', name: 'Nova Prime', type: 'friendly', owner: 'Captain_Stellar', distance: 24, resources: ['Gold', 'Titanium'], x: 20, y: 35, color: '#F59E0B' },
   { id: 'p3', name: 'Darkholme', type: 'unexplored', distance: 48, resources: ['Dark Matter', 'Crystals'], x: 85, y: 65, color: '#6366F1' },
   { id: 'p4', name: 'Eden-12', type: 'explored', distance: 8, resources: ['Water', 'Organics'], x: 40, y: 80, color: '#22C55E' },
@@ -82,8 +82,8 @@ function PlanetMarker({ planet, onClick }: { planet: Planet; onClick: () => void
       </motion.div>
 
       {/* Tooltip */}
-      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-black/90 rounded-lg text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-        <p className="font-bold text-white">{planet.name}</p>
+      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-white/90 rounded-lg text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+        <p className="font-bold text-slate-800">{planet.name}</p>
         <p className="text-gray-400">{planet.distance} LY away</p>
         {planet.owner && <p className="text-gold">👤 {planet.owner}</p>}
       </div>
@@ -99,8 +99,8 @@ function NavigationHUD({ fuel, onOpenGalaxyMap }: { fuel: number; onOpenGalaxyMa
   return (
     <div className="absolute top-4 left-4 right-4 flex items-center justify-between pointer-events-none">
       {/* Left: Coordinates */}
-      <div className="pointer-events-auto bg-black/60 backdrop-blur-xl border border-wireframe-stroke rounded-xl px-4 py-2">
-        <p className="text-[10px] text-gray-500 uppercase tracking-wider">Location</p>
+      <div className="pointer-events-auto bg-slate-50/70 backdrop-blur-xl border border-wireframe-stroke rounded-xl px-4 py-2">
+        <p className="text-xs text-gray-500 uppercase tracking-wider">Location</p>
         <p className="text-sm text-gold font-mono">Sector 7-Alpha</p>
       </div>
 
@@ -113,13 +113,13 @@ function NavigationHUD({ fuel, onOpenGalaxyMap }: { fuel: number; onOpenGalaxyMa
       </button>
 
       {/* Right: Quick Stats */}
-      <div className="pointer-events-auto bg-black/60 backdrop-blur-xl border border-wireframe-stroke rounded-xl px-4 py-2 flex gap-6">
+      <div className="pointer-events-auto bg-slate-50/70 backdrop-blur-xl border border-wireframe-stroke rounded-xl px-4 py-2 flex gap-6">
         <div>
-          <p className="text-[10px] text-gray-500 uppercase tracking-wider">Fuel</p>
+          <p className="text-xs text-gray-500 uppercase tracking-wider">Fuel</p>
           <p className="text-sm text-gold font-mono">{fuel} LUC</p>
         </div>
         <div>
-          <p className="text-[10px] text-gray-500 uppercase tracking-wider">Range</p>
+          <p className="text-xs text-gray-500 uppercase tracking-wider">Range</p>
           <p className="text-sm text-green-400 font-mono">{Math.floor(fuel / 10)} LY</p>
         </div>
       </div>
@@ -137,14 +137,14 @@ function PlanetDetail({ planet, onClose, onTravel }: { planet: Planet; onClose: 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-50/80 backdrop-blur-sm p-4"
       onClick={onClose}
     >
       <motion.div
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
-        className="bg-[#0a0a0a] border border-wireframe-stroke rounded-2xl p-6 max-w-md w-full"
+        className="bg-white border border-wireframe-stroke rounded-2xl p-6 max-w-md w-full"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Planet Visual */}
@@ -161,7 +161,7 @@ function PlanetDetail({ planet, onClose, onTravel }: { planet: Planet; onClose: 
             transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
           />
           <div>
-            <h2 className="text-xl font-bold text-white">{planet.name}</h2>
+            <h2 className="text-xl font-bold text-slate-800">{planet.name}</h2>
             <p className="text-sm text-gray-400">{planet.distance} Light Years</p>
             {planet.owner && (
               <p className="text-sm text-gold">👤 Owned by {planet.owner}</p>
@@ -176,7 +176,7 @@ function PlanetDetail({ planet, onClose, onTravel }: { planet: Planet; onClose: 
             {planet.resources.map((resource) => (
               <span
                 key={resource}
-                className="px-3 py-1 text-sm bg-white/5 border border-wireframe-stroke rounded-full text-gray-300"
+                className="px-3 py-1 text-sm bg-slate-50 border border-wireframe-stroke rounded-full text-gray-300"
               >
                 {resource}
               </span>
@@ -196,7 +196,7 @@ function PlanetDetail({ planet, onClose, onTravel }: { planet: Planet; onClose: 
         <div className="flex gap-3">
           <button
             onClick={onClose}
-            className="flex-1 py-3 rounded-xl bg-white/5 border border-wireframe-stroke text-gray-300 hover:bg-white/10 transition-colors"
+            className="flex-1 py-3 rounded-xl bg-slate-50 border border-wireframe-stroke text-gray-300 hover:bg-slate-100 transition-colors"
           >
             Cancel
           </button>
@@ -255,12 +255,13 @@ export default function YourSpacePage() {
 
   return (
     <div className="relative min-h-screen overflow-hidden">
-      {/* Starfield Background */}
+      {/* Starfield Background — light theme to match platform style */}
       <StarfieldBackground
         starCount={300}
         showPlanets
         showNebulae
-        showShootingStars
+        showShootingStars={false}
+        theme="light"
       />
 
       {/* Navigation HUD */}
@@ -367,7 +368,7 @@ export default function YourSpacePage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-white/80"
           >
             <div className="text-center">
               <motion.div
@@ -383,7 +384,7 @@ export default function YourSpacePage() {
               >
                 🚀
               </motion.div>
-              <p className="text-xl text-white mb-2">Traveling...</p>
+              <p className="text-xl text-slate-800 mb-2">Traveling...</p>
               <p className="text-sm text-gray-400">Hold tight, explorer!</p>
             </div>
           </motion.div>

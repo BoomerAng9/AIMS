@@ -22,36 +22,22 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - certbot-webroot:/var/www/certbot:ro
-      - certbot-certs:/etc/letsencrypt:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /var/www/certbot:/var/www/certbot:ro
       - nginx-conf:/etc/nginx/conf.d
       - nginx-logs:/var/log/nginx
     depends_on:
       frontend:
-        condition: service_healthy
+        condition: service_started
       uef-gateway:
-        condition: service_healthy
+        condition: service_started
     healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://127.0.0.1:80/health || exit 1"]
+      test: [ "CMD-SHELL", "curl -sf http://127.0.0.1:80/health || exit 1" ]
       interval: 30s
       timeout: 10s
-      retries: 3
-      start_period: 10s
+      retries: 5
+      start_period: 30s
     restart: always
-    networks:
-      - aims-network
-
-  # ---------------------------------------------------------------------------
-  # Certbot (Let's Encrypt) — renewal loop (every 12h)
-  # Initial cert issuance is done by deploy.sh before starting this.
-  # ---------------------------------------------------------------------------
-  certbot:
-    image: certbot/certbot:latest
-    volumes:
-      - certbot-webroot:/var/www/certbot
-      - certbot-certs:/etc/letsencrypt
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do sleep 12h & wait $${!}; certbot renew --webroot -w /var/www/certbot --quiet; done'"
-    restart: unless-stopped
     networks:
       - aims-network
 
@@ -71,26 +57,54 @@ services:
       - NEXTAUTH_URL=${NEXTAUTH_URL}
       - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
       - UEF_ENDPOINT=http://uef-gateway:3001
+      - UEF_GATEWAY_URL=http://uef-gateway:3001
       - HOUSE_OF_ANG_URL=http://house-of-ang:3002
       - ACHEEVY_URL=http://acheevy:3003
+      # SQLite for LUC — persisted to luc-data volume
+      - DATABASE_URL=file:/app/.luc-data/luc.db
+      # LLM — OpenRouter for direct fallback
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      # Stripe — payments
+      - STRIPE_PUBLISHABLE_KEY=${STRIPE_PUBLISHABLE_KEY}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
+      - STRIPE_PRICE_ID=${STRIPE_PRICE_ID}
+      # PayPal — payments
+      - PAYPAL_CLIENT_ID=${PAYPAL_CLIENT_ID}
+      - PAYPAL_CLIENT_SECRET=${PAYPAL_CLIENT_SECRET}
+      # Voice — ElevenLabs (TTS + STT Scribe v2) + Deepgram (fallback)
+      - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY}
+      - DEEPGRAM_API_KEY=${DEEPGRAM_API_KEY}
+      # Search
+      - BRAVE_API_KEY=${BRAVE_API_KEY}
+      - SERPER_API_KEY=${SERPER_API_KEY}
+      - TAVILY_API_KEY=${TAVILY_API_KEY}
+      # MCP integrations
+      - E2B_API_KEY=${E2B_API_KEY}
+      - COMPOSIO_API_KEY=${COMPOSIO_API_KEY}
+      # Communication
+      - RESEND_API_KEY=${RESEND_API_KEY}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
     depends_on:
       uef-gateway:
         condition: service_healthy
       house-of-ang:
-        condition: service_healthy
+        condition: service_started
       acheevy:
-        condition: service_healthy
+        condition: service_started
     healthcheck:
-      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>{process.exit(r.ok?0:1)}).catch(()=>process.exit(1))"]
+      test: [ "CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>{process.exit(r.ok?0:1)}).catch(()=>process.exit(1))" ]
       interval: 30s
       timeout: 10s
-      retries: 3
-      start_period: 30s
+      retries: 5
+      start_period: 60s
     volumes:
       - luc-data:/app/.luc-data
     restart: always
     networks:
       - aims-network
+    security_opt:
+      - no-new-privileges:true
 
   # ---------------------------------------------------------------------------
   # Demo Frontend (Next.js 14 — sandbox mode)
@@ -110,22 +124,32 @@ services:
       - NEXTAUTH_URL=https://demo.plugmein.cloud
       - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
       - UEF_ENDPOINT=http://uef-gateway:3001
+      - UEF_GATEWAY_URL=http://uef-gateway:3001
       - HOUSE_OF_ANG_URL=http://house-of-ang:3002
       - ACHEEVY_URL=http://acheevy:3003
+      # SQLite for LUC — persisted to demo-luc-data volume
+      - DATABASE_URL=file:/app/.luc-data/luc.db
+      # LLM — OpenRouter for direct fallback
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      # Voice — ElevenLabs (TTS + STT Scribe v2) + Deepgram (fallback)
+      - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY}
+      - DEEPGRAM_API_KEY=${DEEPGRAM_API_KEY}
     depends_on:
       uef-gateway:
-        condition: service_healthy
+        condition: service_started
     healthcheck:
-      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>{process.exit(r.ok?0:1)}).catch(()=>process.exit(1))"]
+      test: [ "CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>{process.exit(r.ok?0:1)}).catch(()=>process.exit(1))" ]
       interval: 30s
       timeout: 10s
-      retries: 3
-      start_period: 30s
+      retries: 5
+      start_period: 60s
     volumes:
       - demo-luc-data:/app/.luc-data
     restart: always
     networks:
       - aims-network
+    security_opt:
+      - no-new-privileges:true
     deploy:
       resources:
         limits:
@@ -149,15 +173,49 @@ services:
       - CORS_ORIGIN=${CORS_ORIGIN}
       - LOG_LEVEL=${LOG_LEVEL:-info}
       - AGENT_BRIDGE_URL=http://agent-bridge:3010
-      - REDIS_URL=redis://:${REDIS_PASSWORD:-aims_redis_secret}@redis:6379
-      - N8N_URL=http://n8n:5678
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379
       - RESEARCH_ANG_URL=http://research-ang:3020
       - ROUTER_ANG_URL=http://router-ang:3021
+      - CHICKENHAWK_URL=http://chickenhawk-core:4001
+      # ii-agent runs externally — override these if ii-agent is on a different host
+      - II_AGENT_HTTP_URL=${II_AGENT_HTTP_URL:-http://ii-agent:8000}
+      - II_AGENT_WS_URL=${II_AGENT_WS_URL:-ws://ii-agent:8000}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - INTERNAL_API_KEY=${INTERNAL_API_KEY}
+      # Hugging Face — Nvidia models
+      - HF_TOKEN=${HF_TOKEN}
+      # Kimi K2.5 — Moonshot AI via Together.ai + Fireworks.ai
+      - TOGETHER_API_KEY=${TOGETHER_API_KEY}
+      - FIREWORKS_API_KEY=${FIREWORKS_API_KEY}
+      # Voice — ElevenLabs + Deepgram + Nvidia PersonaPlex
+      - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY}
+      - DEEPGRAM_API_KEY=${DEEPGRAM_API_KEY}
+      - PERSONAPLEX_ENDPOINT=${PERSONAPLEX_ENDPOINT}
+      - PERSONAPLEX_API_KEY=${PERSONAPLEX_API_KEY}
+      - PERSONAPLEX_AVATAR_ID=${PERSONAPLEX_AVATAR_ID}
+      # Search
+      - BRAVE_API_KEY=${BRAVE_API_KEY}
+      - SERPER_API_KEY=${SERPER_API_KEY}
+      - TAVILY_API_KEY=${TAVILY_API_KEY}
+      - APIFY_API_KEY=${APIFY_API_KEY}
+      # MCP integrations
+      - E2B_API_KEY=${E2B_API_KEY}
+      - COMPOSIO_API_KEY=${COMPOSIO_API_KEY}
+      - FIRECRAWL_API_KEY=${FIRECRAWL_API_KEY}
+      # Communication
+      - RESEND_API_KEY=${RESEND_API_KEY}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      # Stripe (gateway validates billing)
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - STRIPE_PRICE_ID=${STRIPE_PRICE_ID}
+      # PayPal
+      - PAYPAL_CLIENT_ID=${PAYPAL_CLIENT_ID}
+      - PAYPAL_CLIENT_SECRET=${PAYPAL_CLIENT_SECRET}
       - DEBUG=false
     volumes:
       - gateway-data:/app/data
     healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3001/health',r=>{process.exit(r.statusCode===200?0:1)}).on('error',()=>process.exit(1))"]
+      test: [ "CMD", "node", "-e", "require('http').get('http://127.0.0.1:3001/health',r=>{process.exit(r.statusCode===200?0:1)}).on('error',()=>process.exit(1))" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -166,6 +224,8 @@ services:
     restart: always
     networks:
       - aims-network
+    security_opt:
+      - no-new-privileges:true
 
   # ---------------------------------------------------------------------------
   # House of Ang — Boomer_Ang Registry
@@ -180,14 +240,14 @@ services:
       - PORT=3002
       - NODE_ENV=production
       - REGISTRY_PATH=/app/registry/registry.json
-      - REDIS_URL=redis://:${REDIS_PASSWORD:-aims_redis_secret}@redis:6379
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379
     volumes:
       - ./boomerangs:/app/registry:ro
     depends_on:
       redis:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3002/health',r=>{process.exit(r.statusCode===200?0:1)}).on('error',()=>process.exit(1))"]
+      test: [ "CMD", "node", "-e", "require('http').get('http://127.0.0.1:3002/health',r=>{process.exit(r.statusCode===200?0:1)}).on('error',()=>process.exit(1))" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -196,6 +256,8 @@ services:
     networks:
       - aims-network
     user: "1000:1000"
+    security_opt:
+      - no-new-privileges:true
     deploy:
       resources:
         limits:
@@ -216,16 +278,19 @@ services:
       - NODE_ENV=production
       - HOUSE_OF_ANG_URL=http://house-of-ang:3002
       - UEF_GATEWAY_URL=http://uef-gateway:3001
-      - REDIS_URL=redis://:${REDIS_PASSWORD:-aims_redis_secret}@redis:6379
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379
       - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
       - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
+      - STRIPE_PRICE_ID=${STRIPE_PRICE_ID}
+      - PAYPAL_CLIENT_ID=${PAYPAL_CLIENT_ID}
+      - PAYPAL_CLIENT_SECRET=${PAYPAL_CLIENT_SECRET}
     depends_on:
       redis:
         condition: service_healthy
       house-of-ang:
-        condition: service_healthy
+        condition: service_started
     healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3003/health',r=>{process.exit(r.statusCode===200?0:1)}).on('error',()=>process.exit(1))"]
+      test: [ "CMD", "node", "-e", "require('http').get('http://127.0.0.1:3003/health',r=>{process.exit(r.statusCode===200?0:1)}).on('error',()=>process.exit(1))" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -234,6 +299,8 @@ services:
     networks:
       - aims-network
     user: "1000:1000"
+    security_opt:
+      - no-new-privileges:true
     deploy:
       resources:
         limits:
@@ -245,18 +312,21 @@ services:
   # ---------------------------------------------------------------------------
   redis:
     image: redis:7-alpine
-    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-aims_redis_secret}
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
     volumes:
       - redis-data:/data
     networks:
       - aims-network
       - sandbox-network
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     healthcheck:
-      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-aims_redis_secret}", "ping"]
+      test: [ "CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping" ]
       interval: 10s
       timeout: 5s
-      retries: 3
+      retries: 5
+      start_period: 15s
     deploy:
       resources:
         limits:
@@ -293,8 +363,10 @@ services:
       - sandbox-network
     restart: unless-stopped
     user: "1000:1000"
+    security_opt:
+      - no-new-privileges:true
     healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:3010/health"]
+      test: [ "CMD", "wget", "-q", "--spider", "http://127.0.0.1:3010/health" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -330,7 +402,7 @@ services:
       uef-gateway:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3020/health',r=>{process.exit(r.statusCode===200?0:1)}).on('error',()=>process.exit(1))"]
+      test: [ "CMD", "node", "-e", "require('http').get('http://127.0.0.1:3020/health',r=>{process.exit(r.statusCode===200?0:1)}).on('error',()=>process.exit(1))" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -339,6 +411,8 @@ services:
     networks:
       - aims-network
     user: "1000:1000"
+    security_opt:
+      - no-new-privileges:true
     deploy:
       resources:
         limits:
@@ -365,7 +439,7 @@ services:
       uef-gateway:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3021/health',r=>{process.exit(r.statusCode===200?0:1)}).on('error',()=>process.exit(1))"]
+      test: [ "CMD", "node", "-e", "require('http').get('http://127.0.0.1:3021/health',r=>{process.exit(r.statusCode===200?0:1)}).on('error',()=>process.exit(1))" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -374,6 +448,8 @@ services:
     networks:
       - aims-network
     user: "1000:1000"
+    security_opt:
+      - no-new-privileges:true
     deploy:
       resources:
         limits:
@@ -383,19 +459,20 @@ services:
       - tier1-agents
 
   # ---------------------------------------------------------------------------
-  # Agent Zero — Autonomous AI Agent (II Agent Vertical)
+  # AVVA NOON — Autonomous AI Agent (NtNtN Engine)
   # Computer-as-tool framework, Docker sandboxed, multi-agent cooperation
+  # Formerly Agent Zero — renamed and integrated into NtNtN Engine
   # ---------------------------------------------------------------------------
-  agent-zero:
-    image: frdel/agent-zero-run:latest
+  avva-noon:
+    image: frdel/agent-zero-run:v0.9.2
     expose:
       - "80"
     environment:
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
     volumes:
-      - agent-zero-data:/app/work_dir
+      - avva-noon-data:/app/work_dir
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/"]
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/" ]
       interval: 60s
       timeout: 10s
       retries: 3
@@ -407,43 +484,144 @@ services:
       - ii-agents
 
   # ---------------------------------------------------------------------------
-  # n8n — Workflow Automation (Boomer_Ang Build Layer)
-  # Factory floor for Chicken Hawk and Lil_Hawk workflow execution
+  # Chicken Hawk — Policy Enforcement (port 4002)
+  # Circuit Box: badge-level gating, tool permissions, budget caps, kill switch
   # ---------------------------------------------------------------------------
-  n8n:
-    image: n8nio/n8n:latest
+  chickenhawk-policy:
+    build:
+      context: ../services/chicken-hawk
+      dockerfile: Dockerfile
+    command: [ "bun", "run", "src/policy/server.ts" ]
     expose:
-      - "5678"
+      - "4002"
     environment:
-      - N8N_BASIC_AUTH_ACTIVE=true
-      - N8N_BASIC_AUTH_USER=${N8N_AUTH_USER:-aims}
-      - N8N_BASIC_AUTH_PASSWORD=${N8N_AUTH_PASSWORD}
-      - N8N_HOST=0.0.0.0
-      - N8N_PORT=5678
-      - N8N_PROTOCOL=http
-      - WEBHOOK_URL=${N8N_WEBHOOK_URL:-http://n8n:5678}
-      - N8N_HIRING_BANNER_ENABLED=false
-      - N8N_DIAGNOSTICS_ENABLED=false
-    volumes:
-      - n8n-data:/home/node/.n8n
+      - PORT=4002
+      - NODE_ENV=production
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5678/healthz"]
+      test: [ "CMD-SHELL", "curl -sf http://127.0.0.1:4002/health || exit 1" ]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 20s
+      start_period: 10s
     restart: unless-stopped
-    user: "1000:1000"
+    networks:
+      - aims-network
+    cap_drop:
+      - ALL
+    read_only: true
+    tmpfs:
+      - /tmp:size=50M
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+
+  # ---------------------------------------------------------------------------
+  # Chicken Hawk — Audit Log & Evidence Locker (port 4003)
+  # Immutable JSONL event log, structured timelines, 90-day retention
+  # ---------------------------------------------------------------------------
+  chickenhawk-audit:
+    build:
+      context: ../services/chicken-hawk
+      dockerfile: Dockerfile
+    command: [ "bun", "run", "src/audit/server.ts" ]
+    expose:
+      - "4003"
+    environment:
+      - PORT=4003
+      - NODE_ENV=production
+      - EVIDENCE_DIR=/data/evidence
+      - RETENTION_DAYS=90
+    volumes:
+      - chickenhawk-evidence:/data/evidence
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -sf http://127.0.0.1:4003/health || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - aims-network
+    cap_drop:
+      - ALL
+    read_only: true
+    tmpfs:
+      - /tmp:size=50M
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+
+  # ---------------------------------------------------------------------------
+  # Chicken Hawk — Core Execution Engine (port 4001)
+  # Receives manifests from ACHEEVY orchestrator, spawns Lil_Hawk squads,
+  # executes waves, collects evidence, reports up.
+  # Command chain: ACHEEVY → Boomer_Ang → Chicken Hawk → Squad → Lil_Hawk
+  # ---------------------------------------------------------------------------
+  chickenhawk-core:
+    build:
+      context: ../services/chicken-hawk
+      dockerfile: Dockerfile
+    expose:
+      - "4001"
+    environment:
+      - PORT=4001
+      - NODE_ENV=production
+      - POLICY_URL=http://chickenhawk-policy:4002
+      - AUDIT_URL=http://chickenhawk-audit:4003
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GEMINI_MODEL=${GEMINI_MODEL:-gemini-3.0-flash}
+      - UEF_GATEWAY_URL=http://uef-gateway:3001
+      - ACHEEVY_URL=http://acheevy:3003
+      - AGENT_BRIDGE_URL=http://agent-bridge:3010
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379
+      - CORS_ORIGIN=${CORS_ORIGIN}
+      - MEMORY_DIR=/app/data/memory
+      - LILHAWK_DEPLOY_TARGET=${LILHAWK_DEPLOY_TARGET:-local}
+      - GCP_PROJECT_ID=${GCP_PROJECT_ID:-ai-managed-services}
+      - GCP_REGION=${GCP_REGION:-us-central1}
+    volumes:
+      - chickenhawk-data:/app/data
+    depends_on:
+      chickenhawk-policy:
+        condition: service_healthy
+      chickenhawk-audit:
+        condition: service_healthy
+      uef-gateway:
+        condition: service_healthy
+      agent-bridge:
+        condition: service_started
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -sf http://127.0.0.1:4001/health || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
     networks:
       - aims-network
       - sandbox-network
+    cap_drop:
+      - ALL
+    read_only: true
+    tmpfs:
+      - /tmp:size=100M
+      - /app/workspace:size=500M
+    security_opt:
+      - no-new-privileges:true
     deploy:
       resources:
         limits:
           cpus: '1'
           memory: 1G
-    profiles:
-      - n8n
 
   # ---------------------------------------------------------------------------
   # Circuit Metrics — Service Health Dashboard
@@ -460,34 +638,186 @@ services:
       - HOUSE_OF_ANG_URL=http://house-of-ang:3002
       - ACHEEVY_URL=http://acheevy:3003
       - AGENT_BRIDGE_URL=http://agent-bridge:3010
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     depends_on:
       uef-gateway:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:9090/health"]
+      test: [ "CMD", "wget", "-q", "--spider", "http://127.0.0.1:9090/health" ]
       interval: 30s
       timeout: 10s
       retries: 3
     restart: unless-stopped
     networks:
       - aims-network
+    security_opt:
+      - no-new-privileges:true
     deploy:
       resources:
         limits:
           cpus: '0.25'
           memory: 128M
 
+  # ---------------------------------------------------------------------------
+  # II-Agent — Now deployed EXTERNALLY
+  # ---------------------------------------------------------------------------
+  # ii-agent is no longer embedded in the AIMS repo.
+  # To run ii-agent alongside AIMS, use the overlay from the ii-agent repo:
+  #   docker compose -f infra/docker-compose.prod.yml -f <path-to>/docker-compose.aims.yaml up -d
+  # The overlay provides: ii-agent, ii-agent-postgres, ii-agent-tools, ii-agent-sandbox
+  # UEF Gateway connects via II_AGENT_HTTP_URL and II_AGENT_WS_URL env vars.
+  # ---------------------------------------------------------------------------
+
+  # ---------------------------------------------------------------------------
+  # LAYER 5: PER|FORM PLATFORM — Sports Analytics
+  # Three containers: Scout Hub, Film Room, War Room
+  # Gridiron (football) is one category within Per|Form
+  # Enable with: docker compose --profile perform up -d
+  # ---------------------------------------------------------------------------
+
+  # Scout Hub — Lil_Hawk Adversarial Scouting (nightly cron)
+  scout-hub:
+    build:
+      context: ../services/gridiron/scout-hub
+      dockerfile: Dockerfile
+    container_name: gridiron-scout-hub
+    expose:
+      - "5001"
+    environment:
+      - PORT=5001
+      - NODE_ENV=production
+      - BRAVE_API_KEY=${BRAVE_API_KEY}
+      - FIRECRAWL_URL=${FIRECRAWL_URL:-http://firecrawl:3002}
+      - WAR_ROOM_URL=http://war-room:5003
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - SCOUT_CRON=${SCOUT_CRON:-0 2 * * *}
+      - HS_POOL_SIZE=${HS_POOL_SIZE:-300}
+      - COLLEGE_POOL_SIZE=${COLLEGE_POOL_SIZE:-551}
+    volumes:
+      - perform-debate-logs:/data/debate-logs
+    healthcheck:
+      test: [ "CMD", "wget", "-q", "--spider", "http://127.0.0.1:5001/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
+    depends_on:
+      war-room:
+        condition: service_healthy
+    networks:
+      - aims-network
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+    profiles:
+      - perform
+
+  # Film Room — Vertex AI SAM 2 Bridge
+  film-room:
+    build:
+      context: ../services/gridiron/film-room
+      dockerfile: Dockerfile
+    container_name: gridiron-film-room
+    expose:
+      - "5002"
+    environment:
+      - PORT=5002
+      - NODE_ENV=production
+      - GCP_PROJECT_ID=${GCP_PROJECT_ID:-aims-aimanagedsolutions}
+      - GCP_REGION=${GCP_REGION:-us-central1}
+      - VERTEX_ENDPOINT_ID=${VERTEX_SAM2_ENDPOINT_ID}
+      - WAR_ROOM_URL=http://war-room:5003
+    healthcheck:
+      test: [ "CMD", "wget", "-q", "--spider", "http://127.0.0.1:5002/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - aims-network
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+    profiles:
+      - perform
+
+  # War Room — Boomer_Angs + Chicken Hawk Grading & Content
+  war-room:
+    build:
+      context: ../services/gridiron/war-room
+      dockerfile: Dockerfile
+    container_name: gridiron-war-room
+    expose:
+      - "5003"
+    environment:
+      - PORT=5003
+      - NODE_ENV=production
+      - CHICKENHAWK_CORE_URL=${CHICKENHAWK_CORE_URL:-http://chickenhawk-core:4001}
+      - FILM_ROOM_URL=http://film-room:5002
+      - SCOUT_HUB_URL=http://scout-hub:5001
+      - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY}
+      - ELEVENLABS_VOICE_ID=${ELEVENLABS_VOICE_ID:-pNInz6obpgDQGcFmaJgB}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - BRAVE_API_KEY=${BRAVE_API_KEY}
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379
+    volumes:
+      - perform-debate-logs:/data/debate-logs:ro
+      - perform-rankings:/data/rankings
+      - perform-content:/data/content
+    healthcheck:
+      test: [ "CMD", "wget", "-q", "--spider", "http://127.0.0.1:5003/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - aims-network
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+    profiles:
+      - perform
+
+secrets:
+  openrouter_api_key:
+    environment: OPENROUTER_API_KEY
+  gemini_api_key:
+    environment: GEMINI_API_KEY
+
 volumes:
-  certbot-webroot:
-  certbot-certs:
   nginx-conf:
   nginx-logs:
   gateway-data:
   redis-data:
-  agent-zero-data:
-  n8n-data:
+  avva-noon-data:
   luc-data:
   demo-luc-data:
+  perform-debate-logs:
+  perform-rankings:
+  perform-content:
+  chickenhawk-data:
+  chickenhawk-evidence:
+
 
 networks:
   aims-network:

@@ -211,8 +211,8 @@ export class LucAdapter {
  * Format quota for display
  */
 export function formatQuota(quota: Quota): string {
-  if (quota.limit === -1) {
-    return `${quota.used.toLocaleString()} / Unlimited`;
+  if (quota.limit <= 0) {
+    return `${quota.used.toLocaleString()} / Metered`;
   }
   return `${quota.used.toLocaleString()} / ${quota.limit.toLocaleString()}`;
 }

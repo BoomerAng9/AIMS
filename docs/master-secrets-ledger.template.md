@@ -1,0 +1,192 @@
+# Master Secrets Ledger Template
+
+This document is a private vault template for A.I.M.S. credentials. Do not commit filled values back into the repository.
+
+## Usage Rules
+
+- Store real values only in your password manager, encrypted notes system, or a private offline vault.
+- Keep this file as a template or working checklist only.
+- Rotate any secret that has ever been exposed in chat, terminal history, screenshots, or commits.
+
+## Core App and Auth Secrets
+
+```text
+INTERNAL_API_KEY=
+NEXTAUTH_SECRET=
+OWNER_EMAILS=
+POSTGRES_PASSWORD=
+DATABASE_URL=
+REDIS_PASSWORD=
+N8N_AUTH_PASSWORD=
+```
+
+## Chat w/ ACHEEVY Runtime Secrets
+
+```text
+CHAT_RUNTIME_URL=
+CHAT_RUNTIME_BRIDGE_SECRET=
+OPENROUTER_API_KEY=
+OPENROUTER_BASE_URL=
+OPENROUTER_MODEL=
+
+# Legacy aliases still supported
+CHAT_INTERFACE_URL=
+CHAT_INTERFACE_BRIDGE_SECRET=
+
+LIBRECHAT_URL=
+LIBRECHAT_BRIDGE_SECRET=
+
+II_AGENT_BRIDGE_URL=
+II_AGENT_BRIDGE_KEY=
+AIMS_BRIDGE_SHARED_SECRET=
+II_AGENT_HTTP_URL=
+II_AGENT_WS_URL=
+II_AGENT_SERVICE_TOKEN=
+II_AGENT_DB_USER=
+II_AGENT_DB_PASSWORD=
+II_AGENT_DB_NAME=
+ACHEEVY_URL=
+HOUSE_OF_ANG_URL=
+UEF_GATEWAY_URL=
+UEF_ENDPOINT=
+NEXT_PUBLIC_UEF_GATEWAY_URL=
+NEXT_PUBLIC_ACP_ENDPOINT=
+NEXT_PUBLIC_APP_URL=
+NEXT_PUBLIC_LANDING_URL=
+NEXT_PUBLIC_API_URL=
+NEXT_PUBLIC_BASE_URL=
+NEXT_PUBLIC_DEMO_MODE=
+DEMO_MODE=
+```
+
+## LLM and AI Provider Secrets
+
+```text
+ANTHROPIC_API_KEY=
+GEMINI_API_KEY=
+GEMINI_MODEL=
+GOOGLE_AI_API_KEY=
+GROK_API_KEY=
+HF_TOKEN=
+TOGETHER_API_KEY=
+FIREWORKS_API_KEY=
+MERCURY_API_KEY=
+MERCURY_BASE_URL=
+MERCURY_MODEL=
+COMPOSIO_API_KEY=
+E2B_API_KEY=
+FIRECRAWL_API_KEY=
+CODESANDBOX_API_KEY=
+FAL_KEY=
+TWELVELABS_API_KEY=
+KLING_API_KEY=
+SAM_API_ENDPOINT=
+VERITAS_URL=
+ESTATE_SCOUT_URL=
+ENABLE_AGENT_ZERO=
+```
+
+## Voice, Search, and Research Secrets
+
+```text
+NEXT_PUBLIC_ELEVENLABS_AGENT_ID=
+ELEVENLABS_API_KEY=
+ELEVENLABS_VOICE_ID=
+DEEPGRAM_API_KEY=
+GROQ_API_KEY=
+BRAVE_API_KEY=
+BRAVE_SEARCH_API_KEY=
+SERPER_API_KEY=
+TAVILY_API_KEY=
+APIFY_API_KEY=
+CFBD_API_KEY=
+PERSONAPLEX_ENDPOINT=
+PERSONAPLEX_API_KEY=
+PERSONAPLEX_AVATAR_ID=
+QWEN3_TTS_URL=
+```
+
+## Payments and Billing Secrets
+
+```text
+STRIPE_PUBLISHABLE_KEY=
+STRIPE_SECRET_KEY=
+STRIPE_WEBHOOK_SECRET=
+STRIPE_PRICE_P2P=
+STRIPE_PRICE_3MO=
+STRIPE_PRICE_6MO=
+STRIPE_PRICE_9MO=
+STRIPE_PRICE_COFFEE_MONTHLY=
+STRIPE_PRICE_DATA_ENTRY_MONTHLY=
+STRIPE_PRICE_PRO_MONTHLY=
+STRIPE_PRICE_ENTERPRISE_MONTHLY=
+STRIPE_PRICE_LTD_BYOK=
+STRIPE_PRICE_LTD_PLATFORM=
+STRIPE_PRICE_LTD_WHITELABEL=
+PAYPAL_CLIENT_ID=
+PAYPAL_CLIENT_SECRET=
+```
+
+## OAuth and Identity Provider Secrets
+
+```text
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+GITHUB_CLIENT_ID=
+GITHUB_CLIENT_SECRET=
+DISCORD_CLIENT_ID=
+DISCORD_CLIENT_SECRET=
+DISCORD_BOT_TOKEN=
+DISCORD_PUBLIC_KEY=
+```
+
+## Messaging and Social Secrets
+
+```text
+RESEND_API_KEY=
+SENDGRID_API_KEY=
+TELEGRAM_BOT_TOKEN=
+TELEGRAM_CHAT_ID=
+WHATSAPP_VERIFY_TOKEN=
+WHATSAPP_API_TOKEN=
+WHATSAPP_PHONE_NUMBER_ID=
+```
+
+## Cloud and Infrastructure Secrets
+
+```text
+CLOUDFLARE_API_TOKEN=
+CLOUDFLARE_ACCOUNT_ID=
+CLOUDFLARE_ZONE_IDS=
+CLOUDFLARE_R2_BUCKET=
+CLOUDFLARE_R2_SIGNER_URL=
+CLOUDFLARE_AGENT_GATEWAY_URL=
+GCS_EVIDENCE_BUCKET=
+GCP_PROJECT_ID=
+AGENT_BRIDGE_URL=
+NEXT_PUBLIC_AGENT_BRIDGE_URL=
+CIRCUIT_METRICS_URL=
+LUC_DATA_DIR=
+```
+
+## Source Files To Review While Filling This Out
+
+- `frontend/.env.example`
+- `infra/.env.example`
+- `infra/.env.production.example`
+- `infra/.env.ii-agent.example`
+- `frontend/lib/auth.ts`
+- `frontend/app/api/chat/route.ts`
+- `frontend/lib/librechat.ts`
+
+## Rotation Checklist
+
+```text
+[ ] OpenRouter rotated
+[ ] Bridge secrets rotated
+[ ] Auth secrets rotated
+[ ] Stripe and PayPal secrets rotated
+[ ] Messaging tokens rotated
+[ ] Cloudflare and storage credentials rotated
+[ ] Vault updated
+```

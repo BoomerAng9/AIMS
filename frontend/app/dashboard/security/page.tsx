@@ -147,7 +147,7 @@ const severityColor = (severity: string) => {
     case "low":
       return "text-blue-400 bg-blue-400/10 border-blue-400/20";
     default:
-      return "text-white/30 bg-white/5 border-wireframe-stroke";
+      return "text-zinc-500 bg-[#18181B] border-wireframe-stroke";
   }
 };
 
@@ -182,7 +182,7 @@ export default function SecurityCenterPage() {
   return (
     <div className="space-y-6 animate-in fade-in duration-700">
       {/* ── Header ─────────────────────────────────────────────────── */}
-      <section className="rounded-3xl border border-gold/20 bg-gradient-to-r from-gold/10 to-black/80 p-6 shadow-[0_0_40px_rgba(251,191,36,0.08)]">
+      <section className="rounded-3xl border border-gold/20 bg-gradient-to-r from-gold/10 to-white/80 p-6 shadow-[0_0_40px_rgba(251,191,36,0.08)]">
         <div className="flex items-center justify-between">
           <div>
             <div className="flex items-center gap-3">
@@ -190,22 +190,22 @@ export default function SecurityCenterPage() {
                 <Shield size={20} className="text-gold" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-white font-display">
+                <h1 className="text-2xl font-bold text-zinc-100 font-display">
                   Security Center
                 </h1>
-                <p className="text-[10px] uppercase tracking-[0.3em] text-gold/50">
+                <p className="text-xs uppercase tracking-[0.3em] text-gold/50">
                   Quality_Ang &middot; ORACLE Gate Verification
                 </p>
               </div>
             </div>
-            <p className="mt-2 text-xs text-white/30 max-w-xl">
+            <p className="mt-2 text-xs text-zinc-500 max-w-xl">
               Unified security operations dashboard — SAST analysis, dependency audits,
               supply chain integrity, and sandbox posture. Verified by Quality_Ang through
               ORACLE methodology gates.
             </p>
           </div>
           <div className="hidden md:flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-400/10 border border-emerald-400/20 px-3 py-1 text-[10px] font-semibold text-emerald-400 uppercase tracking-wider">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-400/10 border border-emerald-400/20 px-3 py-1 text-xs font-semibold text-emerald-400 uppercase tracking-wider">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
               All Gates Passed
             </span>
@@ -218,7 +218,7 @@ export default function SecurityCenterPage() {
         {SUMMARY_CARDS.map((card) => (
           <div
             key={card.label}
-            className="group rounded-2xl border border-gold/20 bg-black/60 p-5 backdrop-blur-2xl transition-all hover:border-gold/20 hover:shadow-[0_0_20px_rgba(251,191,36,0.05)]"
+            className="group rounded-2xl border border-gold/20 bg-[#18181B]/70 p-5 backdrop-blur-2xl transition-all hover:border-gold/20 hover:shadow-[0_0_20px_rgba(251,191,36,0.05)]"
           >
             <div className="flex items-center justify-between mb-3">
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gold/10 text-gold group-hover:bg-gold group-hover:text-black transition-colors">
@@ -239,40 +239,40 @@ export default function SecurityCenterPage() {
                 {card.status}
               </span>
             </div>
-            <p className="text-[10px] uppercase tracking-widest text-white/30">
+            <p className="text-xs uppercase tracking-widest text-zinc-500">
               {card.label}
             </p>
-            <p className="text-2xl font-bold text-white mt-1">{card.value}</p>
-            <p className="text-[10px] text-white/20 mt-1">{card.detail}</p>
+            <p className="text-2xl font-bold text-zinc-100 mt-1">{card.value}</p>
+            <p className="text-xs text-zinc-600 mt-1">{card.detail}</p>
           </div>
         ))}
       </div>
 
       {/* ── SAST Findings ──────────────────────────────────────────── */}
-      <section className="rounded-3xl border border-wireframe-stroke bg-black/60 p-6 backdrop-blur-2xl">
+      <section className="rounded-3xl border border-wireframe-stroke bg-[#18181B]/70 p-6 backdrop-blur-2xl">
         <div className="flex items-center gap-3 mb-1">
           <Eye size={16} className="text-gold" />
-          <h2 className="text-sm font-semibold uppercase tracking-widest text-white/80 font-display">
+          <h2 className="text-sm font-semibold uppercase tracking-widest text-zinc-200 font-display">
             SAST Findings
           </h2>
         </div>
-        <p className="text-[0.65rem] text-white/30 uppercase tracking-wider mb-4">
+        <p className="text-[0.65rem] text-zinc-500 uppercase tracking-wider mb-4">
           Static Application Security Testing — pattern scan results
         </p>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="border-b border-wireframe-stroke">
-                <th className="p-3 text-left text-[10px] uppercase tracking-widest text-white/30">
+                <th className="p-3 text-left text-xs uppercase tracking-widest text-zinc-500">
                   Pattern
                 </th>
-                <th className="p-3 text-left text-[10px] uppercase tracking-widest text-white/30">
+                <th className="p-3 text-left text-xs uppercase tracking-widest text-zinc-500">
                   Severity
                 </th>
-                <th className="p-3 text-left text-[10px] uppercase tracking-widest text-white/30">
+                <th className="p-3 text-left text-xs uppercase tracking-widest text-zinc-500">
                   Scope
                 </th>
-                <th className="p-3 text-center text-[10px] uppercase tracking-widest text-white/30">
+                <th className="p-3 text-center text-xs uppercase tracking-widest text-zinc-500">
                   Status
                 </th>
               </tr>
@@ -281,10 +281,10 @@ export default function SecurityCenterPage() {
               {SAST_FINDINGS.map((finding) => (
                 <tr
                   key={finding.pattern}
-                  className="border-t border-wireframe-stroke hover:bg-white/[0.02] transition-colors"
+                  className="border-t border-wireframe-stroke hover:bg-[#111113] transition-colors"
                 >
                   <td className="p-3">
-                    <p className="text-xs font-semibold text-white">
+                    <p className="text-xs font-semibold text-zinc-100">
                       {finding.pattern}
                     </p>
                   </td>
@@ -296,7 +296,7 @@ export default function SecurityCenterPage() {
                     </span>
                   </td>
                   <td className="p-3">
-                    <code className="rounded bg-black/60 border border-wireframe-stroke px-2 py-0.5 text-[10px] font-mono text-gold">
+                    <code className="rounded bg-[#18181B]/70 border border-wireframe-stroke px-2 py-0.5 text-xs font-mono text-gold">
                       {finding.file}
                     </code>
                   </td>
@@ -312,7 +312,7 @@ export default function SecurityCenterPage() {
           </table>
         </div>
         <div className="mt-4 rounded-2xl border border-dashed border-emerald-400/10 bg-emerald-400/[0.02] p-4">
-          <p className="text-[10px] text-emerald-400/60 flex items-center gap-2">
+          <p className="text-xs text-emerald-400/60 flex items-center gap-2">
             <ShieldCheck size={12} />
             All 10 SAST patterns scanned — 0 findings. Score: 98/100 (2 pts deducted for
             informational complexity warnings).
@@ -321,14 +321,14 @@ export default function SecurityCenterPage() {
       </section>
 
       {/* ── Dependency Audit ───────────────────────────────────────── */}
-      <section className="rounded-3xl border border-wireframe-stroke bg-black/60 p-6 backdrop-blur-2xl">
+      <section className="rounded-3xl border border-wireframe-stroke bg-[#18181B]/70 p-6 backdrop-blur-2xl">
         <div className="flex items-center gap-3 mb-1">
           <Bug size={16} className="text-gold" />
-          <h2 className="text-sm font-semibold uppercase tracking-widest text-white/80 font-display">
+          <h2 className="text-sm font-semibold uppercase tracking-widest text-zinc-200 font-display">
             Dependency Audit
           </h2>
         </div>
-        <p className="text-[0.65rem] text-white/30 uppercase tracking-wider mb-4">
+        <p className="text-[0.65rem] text-zinc-500 uppercase tracking-wider mb-4">
           npm audit results &middot; {DEPENDENCY_AUDIT.total} packages scanned
         </p>
 
@@ -339,9 +339,9 @@ export default function SecurityCenterPage() {
           ).map(([level, count]) => (
             <div
               key={level}
-              className="rounded-2xl border border-wireframe-stroke bg-black/40 p-4 text-center"
+              className="rounded-2xl border border-wireframe-stroke bg-[#1F1F23]/60 p-4 text-center"
             >
-              <p className="text-[10px] uppercase tracking-widest text-white/30">
+              <p className="text-xs uppercase tracking-widest text-zinc-500">
                 {level}
               </p>
               <p
@@ -354,7 +354,7 @@ export default function SecurityCenterPage() {
                         ? "text-orange-400"
                         : level === "moderate"
                           ? "text-yellow-400"
-                          : "text-white"
+                          : "text-zinc-100"
                 }`}
               >
                 {count}
@@ -365,7 +365,7 @@ export default function SecurityCenterPage() {
 
         {/* Moderate Vulnerabilities */}
         <div className="mb-4">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-yellow-400/80 mb-3">
+          <p className="text-xs font-bold uppercase tracking-widest text-yellow-400/80 mb-3">
             Moderate ({DEPENDENCY_AUDIT.moderateDetails.length})
           </p>
           <div className="space-y-2">
@@ -377,10 +377,10 @@ export default function SecurityCenterPage() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <FileWarning size={14} className="text-yellow-400" />
-                    <span className="text-xs font-semibold text-white">
+                    <span className="text-xs font-semibold text-zinc-100">
                       {vuln.package}
                     </span>
-                    <code className="rounded bg-black/60 border border-wireframe-stroke px-1.5 py-0.5 text-[9px] font-mono text-gold/50">
+                    <code className="rounded bg-[#18181B]/70 border border-wireframe-stroke px-1.5 py-0.5 text-[9px] font-mono text-gold/50">
                       {vuln.version}
                     </code>
                   </div>
@@ -388,8 +388,8 @@ export default function SecurityCenterPage() {
                     moderate
                   </span>
                 </div>
-                <p className="text-[11px] text-white/40 mt-2">{vuln.advisory}</p>
-                <p className="text-[10px] text-emerald-400/70 mt-1">
+                <p className="text-sm text-zinc-500 mt-2">{vuln.advisory}</p>
+                <p className="text-xs text-emerald-400/70 mt-1">
                   Fix: {vuln.fix}
                 </p>
               </div>
@@ -399,7 +399,7 @@ export default function SecurityCenterPage() {
 
         {/* High Vulnerabilities */}
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-orange-400/80 mb-3">
+          <p className="text-xs font-bold uppercase tracking-widest text-orange-400/80 mb-3">
             High ({DEPENDENCY_AUDIT.highDetails.length})
           </p>
           <div className="space-y-2">
@@ -411,10 +411,10 @@ export default function SecurityCenterPage() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <ShieldAlert size={14} className="text-orange-400" />
-                    <span className="text-xs font-semibold text-white">
+                    <span className="text-xs font-semibold text-zinc-100">
                       {vuln.package}
                     </span>
-                    <code className="rounded bg-black/60 border border-wireframe-stroke px-1.5 py-0.5 text-[9px] font-mono text-gold/50">
+                    <code className="rounded bg-[#18181B]/70 border border-wireframe-stroke px-1.5 py-0.5 text-[9px] font-mono text-gold/50">
                       {vuln.version}
                     </code>
                   </div>
@@ -422,8 +422,8 @@ export default function SecurityCenterPage() {
                     high
                   </span>
                 </div>
-                <p className="text-[11px] text-white/40 mt-2">{vuln.advisory}</p>
-                <p className="text-[10px] text-emerald-400/70 mt-1">
+                <p className="text-sm text-zinc-500 mt-2">{vuln.advisory}</p>
+                <p className="text-xs text-emerald-400/70 mt-1">
                   Fix: {vuln.fix}
                 </p>
               </div>
@@ -435,14 +435,14 @@ export default function SecurityCenterPage() {
       {/* ── Supply Chain + Sandbox ─ two-column ────────────────────── */}
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Supply Chain */}
-        <section className="rounded-3xl border border-wireframe-stroke bg-black/60 p-6 backdrop-blur-2xl">
+        <section className="rounded-3xl border border-wireframe-stroke bg-[#18181B]/70 p-6 backdrop-blur-2xl">
           <div className="flex items-center gap-3 mb-1">
             <BarChart3 size={16} className="text-gold" />
-            <h2 className="text-sm font-semibold uppercase tracking-widest text-white/80 font-display">
+            <h2 className="text-sm font-semibold uppercase tracking-widest text-zinc-200 font-display">
               Supply Chain
             </h2>
           </div>
-          <p className="text-[0.65rem] text-white/30 uppercase tracking-wider mb-4">
+          <p className="text-[0.65rem] text-zinc-500 uppercase tracking-wider mb-4">
             SBOM &middot; Lockfile &middot; Registry integrity
           </p>
           <div className="space-y-3">
@@ -474,16 +474,16 @@ export default function SecurityCenterPage() {
             ].map((item) => (
               <div
                 key={item.label}
-                className="flex items-center justify-between rounded-2xl border border-wireframe-stroke bg-black/40 p-4"
+                className="flex items-center justify-between rounded-2xl border border-wireframe-stroke bg-[#1F1F23]/60 p-4"
               >
                 <div>
-                  <p className="text-[10px] uppercase tracking-widest text-white/30">
+                  <p className="text-xs uppercase tracking-widest text-zinc-500">
                     {item.label}
                   </p>
-                  <p className="text-xs font-semibold text-white mt-0.5">
+                  <p className="text-xs font-semibold text-zinc-100 mt-0.5">
                     {item.value}
                   </p>
-                  <p className="text-[9px] text-white/20 mt-0.5">{item.detail}</p>
+                  <p className="text-[9px] text-zinc-600 mt-0.5">{item.detail}</p>
                 </div>
                 <span
                   className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[9px] font-bold uppercase ${
@@ -500,21 +500,21 @@ export default function SecurityCenterPage() {
               </div>
             ))}
           </div>
-          <div className="mt-4 flex items-center gap-2 text-[10px] text-white/20">
+          <div className="mt-4 flex items-center gap-2 text-xs text-zinc-600">
             <Clock size={10} className="text-gold" />
             Last audit: {formatTimestamp(SUPPLY_CHAIN.lastAudit)}
           </div>
         </section>
 
         {/* Sandbox Configuration */}
-        <section className="rounded-3xl border border-wireframe-stroke bg-black/60 p-6 backdrop-blur-2xl">
+        <section className="rounded-3xl border border-wireframe-stroke bg-[#18181B]/70 p-6 backdrop-blur-2xl">
           <div className="flex items-center gap-3 mb-1">
             <Lock size={16} className="text-gold" />
-            <h2 className="text-sm font-semibold uppercase tracking-widest text-white/80 font-display">
+            <h2 className="text-sm font-semibold uppercase tracking-widest text-zinc-200 font-display">
               Sandbox Configuration
             </h2>
           </div>
-          <p className="text-[0.65rem] text-white/30 uppercase tracking-wider mb-4">
+          <p className="text-[0.65rem] text-zinc-500 uppercase tracking-wider mb-4">
             Container isolation &middot; Defense-grade posture
           </p>
           <div className="space-y-3">
@@ -552,16 +552,16 @@ export default function SecurityCenterPage() {
             ].map((item) => (
               <div
                 key={item.label}
-                className="flex items-center gap-3 rounded-2xl border border-wireframe-stroke bg-black/40 p-4"
+                className="flex items-center gap-3 rounded-2xl border border-wireframe-stroke bg-[#1F1F23]/60 p-4"
               >
                 <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gold/10 text-gold shrink-0">
                   <item.icon size={14} />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-[10px] uppercase tracking-widest text-white/30">
+                  <p className="text-xs uppercase tracking-widest text-zinc-500">
                     {item.label}
                   </p>
-                  <p className="text-xs font-semibold text-white mt-0.5 truncate">
+                  <p className="text-xs font-semibold text-zinc-100 mt-0.5 truncate">
                     {item.value}
                   </p>
                 </div>
@@ -571,7 +571,7 @@ export default function SecurityCenterPage() {
 
           {/* Resource Limits */}
           <div className="mt-4">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-gold mb-3">
+            <p className="text-xs font-bold uppercase tracking-widest text-gold mb-3">
               Resource Limits
             </p>
             <div className="grid grid-cols-2 gap-2">
@@ -589,12 +589,12 @@ export default function SecurityCenterPage() {
               ].map((limit) => (
                 <div
                   key={limit.label}
-                  className="rounded-xl border border-wireframe-stroke bg-black/40 p-3 text-center"
+                  className="rounded-xl border border-wireframe-stroke bg-[#1F1F23]/60 p-3 text-center"
                 >
-                  <p className="text-[9px] uppercase tracking-widest text-white/30">
+                  <p className="text-[9px] uppercase tracking-widest text-zinc-500">
                     {limit.label}
                   </p>
-                  <p className="text-sm font-bold text-white mt-0.5">
+                  <p className="text-sm font-bold text-zinc-100 mt-0.5">
                     {limit.value}
                   </p>
                 </div>
@@ -606,7 +606,7 @@ export default function SecurityCenterPage() {
 
       {/* ── Footer Note ────────────────────────────────────────────── */}
       <section className="rounded-2xl border border-dashed border-gold/20 bg-gold/[0.02] p-4">
-        <p className="text-[10px] text-white/30 leading-relaxed">
+        <p className="text-xs text-zinc-500 leading-relaxed">
           Security posture is continuously verified by{" "}
           <span className="text-gold font-semibold">Quality_Ang</span> through
           the ORACLE methodology (7-gate verification). SAST scans run on every CI push

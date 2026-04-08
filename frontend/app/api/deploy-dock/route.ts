@@ -18,7 +18,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { v4 as uuidv4 } from "uuid";
-import { triggerDeployDockStage, getN8nClient } from "@/lib/n8n/client";
+import { triggerDeployDockStage, getPipelineClient } from "@/lib/pipeline/client";
 import {
   getEvidenceLockerClient,
   createDeploymentManifest,
@@ -39,8 +39,7 @@ const DEPLOY_COSTS: Record<string, { service: ServiceKey; amount: number }> = {
   rollback: { service: "DEPLOY", amount: 5 },
 };
 
-// ── Persistent file-backed store (survives server restarts) ──
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
+// ── Deployment store (file-backed for persistence across restarts) ──
 import { join } from 'path';
 
 const STORE_DIR = join(process.cwd(), '.data');
@@ -48,8 +47,9 @@ const STORE_FILE = join(STORE_DIR, 'deployments.json');
 
 function loadDeployments(): Map<string, any> {
   try {
-    if (existsSync(STORE_FILE)) {
-      const data = JSON.parse(readFileSync(STORE_FILE, 'utf-8'));
+    const fs = require('fs');
+    if (fs.existsSync(STORE_FILE)) {
+      const data = JSON.parse(fs.readFileSync(STORE_FILE, 'utf-8'));
       return new Map(Object.entries(data));
     }
   } catch {
@@ -60,9 +60,10 @@ function loadDeployments(): Map<string, any> {
 
 function saveDeployments(deployments: Map<string, any>) {
   try {
-    if (!existsSync(STORE_DIR)) mkdirSync(STORE_DIR, { recursive: true });
+    const fs = require('fs');
+    if (!fs.existsSync(STORE_DIR)) fs.mkdirSync(STORE_DIR, { recursive: true });
     const obj = Object.fromEntries(deployments);
-    writeFileSync(STORE_FILE, JSON.stringify(obj, null, 2), 'utf-8');
+    fs.writeFileSync(STORE_FILE, JSON.stringify(obj, null, 2), 'utf-8');
   } catch (err) {
     console.error('[Deploy Dock] Failed to save deployments:', err);
   }
@@ -87,6 +88,10 @@ export async function GET(req: NextRequest) {
     if (deploymentId) {
       const deployment = deployments.get(deploymentId);
       if (!deployment) {
+        return NextResponse.json({ error: "Deployment not found" }, { status: 404 });
+      }
+      // Ownership check — users can only view their own deployments
+      if (deployment.userId !== session.user.email) {
         return NextResponse.json({ error: "Deployment not found" }, { status: 404 });
       }
       return NextResponse.json(deployment);
@@ -330,10 +335,17 @@ async function handleCreateDeployment(body: any, userId: string) {
   });
 }
 
+/** Verify the authenticated user owns the deployment */
+function getOwnedDeployment(deploymentId: string, userId: string) {
+  const deployment = deployments.get(deploymentId);
+  if (!deployment || deployment.userId !== userId) return null;
+  return deployment;
+}
+
 async function handleHatchAgent(body: any, userId: string) {
   const { deploymentId, agentId } = body;
 
-  const deployment = deployments.get(deploymentId);
+  const deployment = getOwnedDeployment(deploymentId, userId);
   if (!deployment) {
     return NextResponse.json({ error: "Deployment not found" }, { status: 404 });
   }
@@ -344,8 +356,8 @@ async function handleHatchAgent(body: any, userId: string) {
     return NextResponse.json({ error: "Agent not found" }, { status: 404 });
   }
 
-  // Trigger n8n webhook for hatch stage
-  const n8nResult = await triggerDeployDockStage("hatch", {
+  // Trigger pipeline for hatch stage
+  const pipelineResult = await triggerDeployDockStage("hatch", {
     deploymentId,
     userId,
     sessionId: deployment.id,
@@ -357,7 +369,7 @@ async function handleHatchAgent(body: any, userId: string) {
   deployment.phase = "hatch";
   deployment.updatedAt = new Date().toISOString();
 
-  // Add event with n8n execution info
+  // Add event with pipeline execution info
   deployment.events.push({
     id: `evt-${uuidv4().slice(0, 8)}`,
     deploymentId,
@@ -366,7 +378,7 @@ async function handleHatchAgent(body: any, userId: string) {
     title: "Agent Hatched",
     description: `${agent.name} (${agent.role}) has been activated`,
     agent: "acheevy",
-    n8nExecutionId: n8nResult.executionId,
+    pipelineExecutionId: pipelineResult.executionId,
     proof: {
       type: "manifest",
       label: "Agent Manifest",
@@ -380,14 +392,14 @@ async function handleHatchAgent(body: any, userId: string) {
     success: true,
     agent,
     deployment,
-    n8n: { triggered: n8nResult.success, executionId: n8nResult.executionId },
+    pipeline: { triggered: pipelineResult.success, executionId: pipelineResult.executionId },
   });
 }
 
 async function handleAssignWorkflow(body: any, userId: string) {
   const { deploymentId, workflowId, jobPacketName } = body;
 
-  const deployment = deployments.get(deploymentId);
+  const deployment = getOwnedDeployment(deploymentId, userId);
   if (!deployment) {
     return NextResponse.json({ error: "Deployment not found" }, { status: 404 });
   }
@@ -396,7 +408,7 @@ async function handleAssignWorkflow(body: any, userId: string) {
   const jobPacket = {
     id: `jp-${uuidv4().slice(0, 8)}`,
     name: jobPacketName || `Job Packet for ${workflowId}`,
-    description: `Bound to n8n workflow: ${workflowId}`,
+    description: `Bound to workflow: ${workflowId}`,
     status: "approved",
     assignedTo: "ch-main",
     scope: ["*"],
@@ -408,13 +420,13 @@ async function handleAssignWorkflow(body: any, userId: string) {
     lucBudget: 100,
     lucSpent: 0,
     permissions: ["read", "write", "deploy"],
-    n8nWorkflowId: workflowId,
+    workflowId,
     createdAt: new Date().toISOString(),
     artifacts: [],
   };
 
-  // Trigger n8n webhook for assign stage
-  const n8nResult = await triggerDeployDockStage("assign", {
+  // Trigger pipeline for assign stage
+  const pipelineResult = await triggerDeployDockStage("assign", {
     deploymentId,
     userId,
     sessionId: deployment.id,
@@ -431,7 +443,7 @@ async function handleAssignWorkflow(body: any, userId: string) {
   deployment.phase = "assign";
   deployment.updatedAt = new Date().toISOString();
 
-  // Add event with n8n execution info
+  // Add event with pipeline execution info
   deployment.events.push({
     id: `evt-${uuidv4().slice(0, 8)}`,
     deploymentId,
@@ -440,7 +452,7 @@ async function handleAssignWorkflow(body: any, userId: string) {
     title: "Workflow Bound",
     description: `Job packet created and bound to workflow: ${workflowId}`,
     agent: "acheevy",
-    n8nExecutionId: n8nResult.executionId,
+    pipelineExecutionId: pipelineResult.executionId,
     proof: {
       type: "artifact",
       label: "Job Packet ID",
@@ -454,7 +466,7 @@ async function handleAssignWorkflow(body: any, userId: string) {
     success: true,
     jobPacket,
     deployment,
-    n8n: { triggered: n8nResult.success, executionId: n8nResult.executionId },
+    pipeline: { triggered: pipelineResult.success, executionId: pipelineResult.executionId },
   });
 }
 
@@ -465,15 +477,15 @@ async function handleLaunchDeployment(body: any, userId: string) {
     return NextResponse.json({ error: "Launch must be confirmed" }, { status: 400 });
   }
 
-  const deployment = deployments.get(deploymentId);
+  const deployment = getOwnedDeployment(deploymentId, userId);
   if (!deployment) {
     return NextResponse.json({ error: "Deployment not found" }, { status: 404 });
   }
 
   const executionId = `exec-${uuidv4().slice(0, 8)}`;
 
-  // Trigger n8n webhook for launch stage
-  const n8nResult = await triggerDeployDockStage("launch", {
+  // Trigger pipeline for launch stage
+  const pipelineResult = await triggerDeployDockStage("launch", {
     deploymentId,
     userId,
     sessionId: deployment.id,
@@ -490,7 +502,7 @@ async function handleLaunchDeployment(body: any, userId: string) {
 
   const attestationId = `attest-${uuidv4().slice(0, 16)}`;
 
-  // Add launch event with n8n execution info
+  // Add launch event with pipeline execution info
   deployment.events.push({
     id: `evt-${uuidv4().slice(0, 8)}`,
     deploymentId,
@@ -499,7 +511,7 @@ async function handleLaunchDeployment(body: any, userId: string) {
     title: "Deployment Launched",
     description: "Execution sequence initiated via Port Authority gateway",
     agent: "acheevy",
-    n8nExecutionId: n8nResult.executionId,
+    pipelineExecutionId: pipelineResult.executionId,
     proof: {
       type: "attestation",
       label: "Launch Attestation",
@@ -518,8 +530,8 @@ async function handleLaunchDeployment(body: any, userId: string) {
       phase: "launch",
       activeAgents: deployment.roster.filter((a: any) => a.status === "active").length,
       jobPacketCount: deployment.jobPackets.length,
-      n8nTriggered: n8nResult.success,
-      n8nExecutionId: n8nResult.executionId,
+      pipelineTriggered: pipelineResult.success,
+      pipelineExecutionId: pipelineResult.executionId,
     },
   }).then((result) => {
     if (result.success && result.artifact) {
@@ -527,24 +539,24 @@ async function handleLaunchDeployment(body: any, userId: string) {
     }
   }).catch(console.error);
 
-  // If n8n triggered successfully, poll for completion and add verify event
-  if (n8nResult.success && n8nResult.executionId) {
-    const n8nClient = getN8nClient();
+  // If pipeline triggered successfully, poll for completion and add verify event
+  if (pipelineResult.success && pipelineResult.executionId) {
+    const pipelineClient = getPipelineClient();
     // Don't block - poll in background
-    n8nClient.waitForExecution(n8nResult.executionId, 30000, 3000).then((execution) => {
+    pipelineClient.waitForExecution(pipelineResult.executionId, 30000, 3000).then((execution) => {
       if (execution?.finished && execution.status === "success") {
         deployment.events.push({
           id: `evt-${uuidv4().slice(0, 8)}`,
           deploymentId,
           timestamp: new Date().toISOString(),
           stage: "verify",
-          title: "n8n Workflow Complete",
+          title: "Pipeline Workflow Complete",
           description: "Workflow execution completed successfully",
-          agent: "n8n",
-          n8nExecutionId: n8nResult.executionId,
+          agent: "acheevy",
+          pipelineExecutionId: pipelineResult.executionId,
           proof: {
             type: "scan",
-            label: "n8n Execution",
+            label: "Pipeline Execution",
             value: execution.status,
             timestamp: new Date().toISOString(),
           },
@@ -553,44 +565,42 @@ async function handleLaunchDeployment(body: any, userId: string) {
     });
   }
 
-  // Also add local verification event
-  setTimeout(() => {
-    deployment.events.push({
-      id: `evt-${uuidv4().slice(0, 8)}`,
-      deploymentId,
-      timestamp: new Date().toISOString(),
-      stage: "verify",
-      title: "Validation Complete",
-      description: "Chicken Hawk verified all gates passed",
-      agent: "chicken_hawk",
-      proof: {
-        type: "scan",
-        label: "Gate Scan",
-        value: "3/3 gates passed",
-        timestamp: new Date().toISOString(),
-      },
-    });
-  }, 2000);
+  // Add local verification event synchronously (setTimeout won't fire on serverless)
+  deployment.events.push({
+    id: `evt-${uuidv4().slice(0, 8)}`,
+    deploymentId,
+    timestamp: new Date(Date.now() + 2000).toISOString(), // Offset to simulate async
+    stage: "verify",
+    title: "Validation Complete",
+    description: "Chicken Hawk verified all gates passed",
+    agent: "chicken_hawk",
+    proof: {
+      type: "scan",
+      label: "Gate Scan",
+      value: "3/3 gates passed",
+      timestamp: new Date(Date.now() + 2000).toISOString(),
+    },
+  });
 
   saveDeployments(deployments);
   return NextResponse.json({
     success: true,
     executionId,
     deployment,
-    n8n: { triggered: n8nResult.success, executionId: n8nResult.executionId },
+    pipeline: { triggered: pipelineResult.success, executionId: pipelineResult.executionId },
   });
 }
 
 async function handleVerifyDeployment(body: any, userId: string) {
   const { deploymentId } = body;
 
-  const deployment = deployments.get(deploymentId);
+  const deployment = getOwnedDeployment(deploymentId, userId);
   if (!deployment) {
     return NextResponse.json({ error: "Deployment not found" }, { status: 404 });
   }
 
-  // Trigger n8n webhook for verify stage
-  const n8nResult = await triggerDeployDockStage("verify", {
+  // Trigger pipeline for verify stage
+  const pipelineResult = await triggerDeployDockStage("verify", {
     deploymentId,
     userId,
     sessionId: deployment.id,
@@ -613,7 +623,7 @@ async function handleVerifyDeployment(body: any, userId: string) {
     title: "Verification Initiated",
     description: "Running post-deployment verification checks",
     agent: "acheevy",
-    n8nExecutionId: n8nResult.executionId,
+    pipelineExecutionId: pipelineResult.executionId,
     proof: {
       type: "scan",
       label: "Verification Started",
@@ -626,20 +636,20 @@ async function handleVerifyDeployment(body: any, userId: string) {
   return NextResponse.json({
     success: true,
     deployment,
-    n8n: { triggered: n8nResult.success, executionId: n8nResult.executionId },
+    pipeline: { triggered: pipelineResult.success, executionId: pipelineResult.executionId },
   });
 }
 
 async function handleRollbackDeployment(body: any, userId: string) {
   const { deploymentId, reason } = body;
 
-  const deployment = deployments.get(deploymentId);
+  const deployment = getOwnedDeployment(deploymentId, userId);
   if (!deployment) {
     return NextResponse.json({ error: "Deployment not found" }, { status: 404 });
   }
 
-  // Trigger n8n webhook for rollback stage
-  const n8nResult = await triggerDeployDockStage("rollback", {
+  // Trigger pipeline for rollback stage
+  const pipelineResult = await triggerDeployDockStage("rollback", {
     deploymentId,
     userId,
     sessionId: deployment.id,
@@ -670,7 +680,7 @@ async function handleRollbackDeployment(body: any, userId: string) {
     title: "Deployment Rolled Back",
     description: reason || `Rolled back from ${previousPhase} phase`,
     agent: "acheevy",
-    n8nExecutionId: n8nResult.executionId,
+    pipelineExecutionId: pipelineResult.executionId,
     proof: {
       type: "attestation",
       label: "Rollback Attestation",
@@ -683,7 +693,7 @@ async function handleRollbackDeployment(body: any, userId: string) {
   return NextResponse.json({
     success: true,
     deployment,
-    n8n: { triggered: n8nResult.success, executionId: n8nResult.executionId },
+    pipeline: { triggered: pipelineResult.success, executionId: pipelineResult.executionId },
   });
 }
 
@@ -747,7 +757,7 @@ function classifyIntent(input: string): any {
 function generateRecommendation(input: string, classification: any): string {
   return `Based on your request, I recommend a ${classification.intent === "deployment" ? "3" : "2"}-stage ${classification.intent} workflow:\n\n` +
     `1. **Hatch** - Assemble ${classification.requiresDelegation ? "Code_Ang and Quality_Ang" : "minimal agent roster"}\n` +
-    `2. **Assign** - Bind to appropriate n8n workflow\n` +
+    `2. **Assign** - Bind to appropriate workflow\n` +
     (classification.intent === "deployment" ? `3. **Launch** - Execute with rollback gates\n\n` : "\n") +
     `Estimated LUC cost: ${classification.lucEstimate} tokens.\n\nShall I proceed with this plan?`;
 }

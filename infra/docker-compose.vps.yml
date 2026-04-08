@@ -6,7 +6,7 @@ name: aims
 # =============================================================================
 # Used in HYBRID deployment mode:
 #   Cloud Run → frontend, uef-gateway (stateless, auto-scaling)
-#   VPS       → Redis, n8n, Agent Bridge, agents (stateful)
+#   VPS       → Redis, Agent Bridge, agents (stateful)
 #
 # The stateless services (frontend, uef-gateway) are deployed to Cloud Run
 # and connect back to these VPS services via the public IP / reverse proxy.
@@ -14,7 +14,7 @@ name: aims
 # Usage:
 #   docker compose -f infra/docker-compose.vps.yml up -d
 #   docker compose -f infra/docker-compose.vps.yml --profile tier1-agents up -d
-#   docker compose -f infra/docker-compose.vps.yml --profile n8n up -d
+#   docker compose -f infra/docker-compose.vps.yml --profile ii-agents up -d
 # =============================================================================
 
 services:
@@ -30,8 +30,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - certbot-webroot:/var/www/certbot:ro
-      - certbot-certs:/etc/letsencrypt:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
       - nginx-conf:/etc/nginx/conf.d
       - nginx-logs:/var/log/nginx
     depends_on:
@@ -44,19 +43,6 @@ services:
       retries: 3
       start_period: 10s
     restart: always
-    networks:
-      - aims-network
-
-  # ---------------------------------------------------------------------------
-  # Certbot (Let's Encrypt) — renewal loop
-  # ---------------------------------------------------------------------------
-  certbot:
-    image: certbot/certbot:latest
-    volumes:
-      - certbot-webroot:/var/www/certbot
-      - certbot-certs:/etc/letsencrypt
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do sleep 12h & wait $${!}; certbot renew --webroot -w /var/www/certbot --quiet; done'"
-    restart: unless-stopped
     networks:
       - aims-network
 
@@ -190,46 +176,6 @@ services:
       - tier1-agents
 
   # ---------------------------------------------------------------------------
-  # n8n — Workflow Automation (STATEFUL)
-  # ---------------------------------------------------------------------------
-  n8n:
-    image: n8nio/n8n:latest
-    expose:
-      - "5678"
-    ports:
-      - "127.0.0.1:5678:5678"
-    environment:
-      - N8N_BASIC_AUTH_ACTIVE=true
-      - N8N_BASIC_AUTH_USER=${N8N_AUTH_USER:-aims}
-      - N8N_BASIC_AUTH_PASSWORD=${N8N_AUTH_PASSWORD}
-      - N8N_HOST=0.0.0.0
-      - N8N_PORT=5678
-      - N8N_PROTOCOL=http
-      - WEBHOOK_URL=${N8N_WEBHOOK_URL:-http://n8n:5678}
-      - N8N_HIRING_BANNER_ENABLED=false
-      - N8N_DIAGNOSTICS_ENABLED=false
-    volumes:
-      - n8n-data:/home/node/.n8n
-    healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5678/healthz"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 20s
-    restart: unless-stopped
-    user: "1000:1000"
-    networks:
-      - aims-network
-      - sandbox-network
-    deploy:
-      resources:
-        limits:
-          cpus: '1'
-          memory: 1G
-    profiles:
-      - n8n
-
-  # ---------------------------------------------------------------------------
   # Circuit Metrics — Service Health Dashboard
   # ---------------------------------------------------------------------------
   circuit-metrics:
@@ -262,12 +208,9 @@ services:
           memory: 128M
 
 volumes:
-  certbot-webroot:
-  certbot-certs:
   nginx-conf:
   nginx-logs:
   redis-data:
-  n8n-data:
 
 networks:
   aims-network:

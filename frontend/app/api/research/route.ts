@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { geminiResearch } from "@/lib/gemini-research";
+import { requireAuth } from "@/lib/auth/require-role";
 
 export async function POST(request: NextRequest) {
+  const auth = await requireAuth();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const { prompt } = await request.json();
 

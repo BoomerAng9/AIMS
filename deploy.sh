@@ -2,16 +2,15 @@
 # =============================================================================
 # A.I.M.S. Production Deployment Script
 # =============================================================================
-# Builds, deploys, and optionally provisions SSL certificates.
+# Builds, deploys, and activates SSL for configured domains.
+# SSL managed by host certbot (apt) — certs at /etc/letsencrypt, bind-mounted into nginx.
 # Supports dual-domain architecture:
 #   --domain          = plugmein.cloud (functional app)
 #   --landing-domain  = aimanagedsolutions.cloud (father site)
 #
 # Usage:
-#   ./deploy.sh                                                  # HTTP only
-#   ./deploy.sh --domain plugmein.cloud --email a@b              # App SSL only
-#   ./deploy.sh --domain plugmein.cloud --landing-domain aimanagedsolutions.cloud --email a@b  # Both
-#   ./deploy.sh --landing-domain aimanagedsolutions.cloud --email a@b  # Landing SSL only
+#   ./deploy.sh --domain plugmein.cloud --landing-domain aimanagedsolutions.cloud  # Standard deploy
+#   ./deploy.sh --domain plugmein.cloud --email a@b              # Issue new cert + deploy
 #   ./deploy.sh --ssl-renew                                      # Renew all certs
 #   ./deploy.sh --no-cache                                       # Force rebuild
 # =============================================================================
@@ -21,7 +20,9 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 COMPOSE_FILE="${SCRIPT_DIR}/infra/docker-compose.prod.yml"
 ENV_FILE="${SCRIPT_DIR}/infra/.env.production"
 ENV_EXAMPLE="${SCRIPT_DIR}/infra/.env.production.example"
+ENV_VALIDATOR="${SCRIPT_DIR}/scripts/validate-env.sh"
 SSL_TEMPLATE="${SCRIPT_DIR}/infra/nginx/ssl.conf.template"
+SSL_DEMO_TEMPLATE="${SCRIPT_DIR}/infra/nginx/demo-ssl.conf.template"
 SSL_LANDING_TEMPLATE="${SCRIPT_DIR}/infra/nginx/ssl-landing.conf.template"
 
 # Colors
@@ -42,6 +43,7 @@ LANDING_DOMAIN=""
 EMAIL=""
 SSL_RENEW=false
 NO_CACHE=false
+SSL_CHANGED=false
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -56,12 +58,13 @@ while [[ $# -gt 0 ]]; do
             echo "Options:"
             echo "  --domain DOMAIN           Functional app domain (e.g. plugmein.cloud)"
             echo "  --landing-domain DOMAIN   Landing/brand domain (e.g. aimanagedsolutions.cloud)"
-            echo "  --email EMAIL             Email for Let's Encrypt registration"
+            echo "  --email EMAIL             Email for initial cert issuance (optional if certs exist)"
             echo "  --ssl-renew               Force renewal of all SSL certificates"
             echo "  --no-cache                Force fresh Docker image rebuild"
             echo ""
             echo "Examples:"
-            echo "  ./deploy.sh --domain plugmein.cloud --landing-domain aimanagedsolutions.cloud --email acheevy@aimanagedsolutions.cloud"
+            echo "  ./deploy.sh --domain plugmein.cloud --landing-domain aimanagedsolutions.cloud"
+            echo "  ./deploy.sh --domain plugmein.cloud --email acheevy@aimanagedsolutions.cloud  # first-time cert"
             echo "  ./deploy.sh --ssl-renew"
             exit 0 ;;
         *) error "Unknown option: $1"; exit 1 ;;
@@ -77,6 +80,8 @@ else
     error "docker compose is not available. Please install Docker Compose."
     exit 1
 fi
+
+COMPOSE_BASE_ARGS=(--env-file "${ENV_FILE}" -f "${COMPOSE_FILE}")
 
 # =============================================================================
 # Pre-flight Checks
@@ -99,6 +104,55 @@ if [ ! -f "${ENV_FILE}" ]; then
     exit 1
 fi
 info "Environment file: ${ENV_FILE}"
+
+# Enforce env correctness before any build/deploy action.
+if [ ! -f "${ENV_VALIDATOR}" ]; then
+    error "Env validator missing: ${ENV_VALIDATOR}"
+    exit 1
+fi
+header "Env Validation"
+bash "${ENV_VALIDATOR}" --path "${ENV_FILE}" --strict
+info "Env validator passed."
+
+# Validate critical environment variables
+ENV_WARNINGS=0
+check_env() {
+    local var_name="$1"
+    local severity="$2"  # "critical" or "warn"
+    local desc="$3"
+    local val
+    val=$({ grep "^${var_name}=" "${ENV_FILE}" || true; } | cut -d'=' -f2-)
+    if [ -z "${val}" ]; then
+        if [ "${severity}" = "critical" ]; then
+            error "MISSING: ${var_name} — ${desc}"
+            ENV_WARNINGS=$((ENV_WARNINGS + 1))
+        else
+            warn "EMPTY:   ${var_name} — ${desc}"
+        fi
+    fi
+}
+
+header "Environment Validation"
+check_env "NEXTAUTH_SECRET"         "critical" "Auth will not work without this"
+check_env "INTERNAL_API_KEY"        "critical" "Frontend ↔ backend communication key"
+check_env "OPENROUTER_API_KEY"      "critical" "LLM inference (all Boomer_Angs)"
+check_env "REDIS_PASSWORD"          "critical" "Redis auth (sessions + cache)"
+check_env "N8N_AUTH_PASSWORD"       "critical" "n8n admin UI has no password — exposed"
+check_env "STRIPE_SECRET_KEY"       "warn"     "Payments disabled"
+check_env "STRIPE_WEBHOOK_SECRET"   "warn"     "Stripe webhooks will fail verification"
+check_env "STRIPE_PRICE_STARTER"    "warn"     "Starter tier subscription broken"
+check_env "STRIPE_PRICE_PRO"        "warn"     "Pro tier subscription broken"
+check_env "STRIPE_PRICE_ENTERPRISE" "warn"     "Enterprise tier subscription broken"
+check_env "ELEVENLABS_API_KEY"      "warn"     "Voice (TTS + STT) disabled"
+check_env "DEEPGRAM_API_KEY"        "warn"     "Deepgram fallback STT disabled"
+check_env "GOOGLE_CLIENT_ID"        "warn"     "Google OAuth login disabled"
+check_env "GOOGLE_CLIENT_SECRET"    "warn"     "Google OAuth login disabled"
+
+if [ "${ENV_WARNINGS}" -gt 0 ]; then
+    error "${ENV_WARNINGS} critical variable(s) missing. Fix ${ENV_FILE} before deploying."
+    exit 1
+fi
+info "Environment validation passed."
 
 # If domain provided, update CORS and NEXTAUTH_URL in .env.production
 if [ -n "${DOMAIN}" ]; then
@@ -140,7 +194,7 @@ if [ "${NO_CACHE}" = "true" ]; then
     BUILD_FLAGS="--no-cache --pull"
     info "Force rebuilding with --no-cache --pull (fresh images)..."
 fi
-${COMPOSE_CMD} -f "${COMPOSE_FILE}" build ${BUILD_FLAGS}
+${COMPOSE_CMD} "${COMPOSE_BASE_ARGS[@]}" build ${BUILD_FLAGS}
 info "Images built successfully."
 
 # =============================================================================
@@ -148,108 +202,133 @@ info "Images built successfully."
 # =============================================================================
 header "Starting Services"
 info "Stopping orphaned containers from previous deployments..."
-${COMPOSE_CMD} -f "${COMPOSE_FILE}" down --remove-orphans --timeout 30
-${COMPOSE_CMD} -f "${COMPOSE_FILE}" up -d --remove-orphans
+${COMPOSE_CMD} "${COMPOSE_BASE_ARGS[@]}" down --remove-orphans --timeout 30
+${COMPOSE_CMD} "${COMPOSE_BASE_ARGS[@]}" up -d --remove-orphans
 info "Services started. Orphaned containers removed."
 
-# Wait for health checks
-info "Waiting for services to pass health checks..."
-sleep 10
-
-# =============================================================================
-# SSL Certificate Provisioning — App Domain (plugmein.cloud)
-# =============================================================================
-if [ -n "${DOMAIN}" ] && [ -n "${EMAIL}" ]; then
-    header "SSL Certificate Setup — App Domain (${DOMAIN})"
-
-    # Check if certs already exist
-    CERT_EXISTS=$(${COMPOSE_CMD} -f "${COMPOSE_FILE}" run --rm certbot \
-        sh -c "test -f /etc/letsencrypt/live/${DOMAIN}/fullchain.pem && echo 'yes' || echo 'no'" 2>/dev/null || echo "no")
-
-    if [ "${CERT_EXISTS}" = "yes" ] && [ "${SSL_RENEW}" = "false" ]; then
-        info "SSL certificate already exists for ${DOMAIN}."
-    else
-        info "Requesting SSL certificate for ${DOMAIN}..."
-
-        # Issue certificate via webroot challenge
-        ${COMPOSE_CMD} -f "${COMPOSE_FILE}" run --rm certbot \
-            certonly \
-            --webroot \
-            -w /var/www/certbot \
-            -d "${DOMAIN}" \
-            --email "${EMAIL}" \
-            --agree-tos \
-            --no-eff-email \
-            --force-renewal
-
-        info "SSL certificate issued for ${DOMAIN}."
+# Wait for core services to be ready before SSL provisioning
+info "Waiting for core services to come up..."
+MAX_WAIT=120
+WAITED=0
+while [ $WAITED -lt $MAX_WAIT ]; do
+    HEALTHY=$(${COMPOSE_CMD} "${COMPOSE_BASE_ARGS[@]}" ps --format json 2>/dev/null | grep -c '"healthy"' || true)
+    RUNNING=$(${COMPOSE_CMD} "${COMPOSE_BASE_ARGS[@]}" ps --format json 2>/dev/null | grep -c '"running"' || true)
+    info "  Services: ${RUNNING} running, ${HEALTHY} healthy (${WAITED}s / ${MAX_WAIT}s)"
+    # nginx must be running for ACME challenges — check it specifically
+    NGINX_UP=$(${COMPOSE_CMD} "${COMPOSE_BASE_ARGS[@]}" ps nginx --format '{{.State}}' 2>/dev/null || echo "")
+    if echo "${NGINX_UP}" | grep -qi "running"; then
+        info "nginx is running — proceeding."
+        break
     fi
-
-    # Activate HTTPS nginx config for app domain
-    info "Activating HTTPS server block for ${DOMAIN}..."
-    SSL_CONF=$(sed "s/DOMAIN_PLACEHOLDER/${DOMAIN}/g" "${SSL_TEMPLATE}")
-
-    # Write SSL config into the nginx conf.d volume
-    ${COMPOSE_CMD} -f "${COMPOSE_FILE}" exec -T nginx \
-        sh -c "cat > /etc/nginx/conf.d/ssl.conf" <<< "${SSL_CONF}"
-
-    info "App domain HTTPS config written."
+    sleep 5
+    WAITED=$((WAITED + 5))
+done
+if [ $WAITED -ge $MAX_WAIT ]; then
+    warn "Timed out waiting for services. Continuing anyway — check logs."
 fi
 
 # =============================================================================
-# SSL Certificate Provisioning — Landing Domain (aimanagedsolutions.cloud)
+# SSL Certificate Setup — App Domain (plugmein.cloud)
+# Uses host certbot (apt-installed). Certs live at /etc/letsencrypt on the host,
+# bind-mounted into the nginx container.
 # =============================================================================
-if [ -n "${LANDING_DOMAIN}" ] && [ -n "${EMAIL}" ]; then
-    header "SSL Certificate Setup — Landing Domain (${LANDING_DOMAIN})"
+if [ -n "${DOMAIN}" ]; then
+    header "SSL Setup — App Domain (${DOMAIN})"
 
-    # Check if certs already exist
-    LANDING_CERT_EXISTS=$(${COMPOSE_CMD} -f "${COMPOSE_FILE}" run --rm certbot \
-        sh -c "test -f /etc/letsencrypt/live/${LANDING_DOMAIN}/fullchain.pem && echo 'yes' || echo 'no'" 2>/dev/null || echo "no")
-
-    if [ "${LANDING_CERT_EXISTS}" = "yes" ] && [ "${SSL_RENEW}" = "false" ]; then
-        info "SSL certificate already exists for ${LANDING_DOMAIN}."
-    else
-        info "Requesting SSL certificate for ${LANDING_DOMAIN} + www.${LANDING_DOMAIN}..."
-
-        # Issue certificate via webroot challenge (includes www subdomain)
-        ${COMPOSE_CMD} -f "${COMPOSE_FILE}" run --rm certbot \
-            certonly \
-            --webroot \
-            -w /var/www/certbot \
-            -d "${LANDING_DOMAIN}" \
-            -d "www.${LANDING_DOMAIN}" \
-            --email "${EMAIL}" \
-            --agree-tos \
-            --no-eff-email \
-            --force-renewal
-
-        info "SSL certificate issued for ${LANDING_DOMAIN}."
+    # Issue cert only if --email provided AND certs don't exist (or --ssl-renew)
+    if [ -n "${EMAIL}" ]; then
+        if [ ! -f "/etc/letsencrypt/live/${DOMAIN}/fullchain.pem" ] || [ "${SSL_RENEW}" = "true" ]; then
+            info "Requesting SSL certificate for ${DOMAIN}..."
+            certbot certonly \
+                --webroot \
+                -w /var/www/certbot \
+                -d "${DOMAIN}" \
+                -d "www.${DOMAIN}" \
+                --email "${EMAIL}" \
+                --agree-tos \
+                --no-eff-email \
+                --force-renewal
+            info "SSL certificate issued for ${DOMAIN}."
+        else
+            info "SSL certificate already exists for ${DOMAIN}."
+        fi
     fi
 
-    # Activate HTTPS nginx config for landing domain
-    info "Activating HTTPS server block for ${LANDING_DOMAIN}..."
-    SSL_LANDING_CONF=$(sed "s/LANDING_DOMAIN_PLACEHOLDER/${LANDING_DOMAIN}/g" "${SSL_LANDING_TEMPLATE}")
+    # Activate HTTPS config if certs exist on disk
+    if [ -f "/etc/letsencrypt/live/${DOMAIN}/fullchain.pem" ]; then
+        info "Activating HTTPS server block for ${DOMAIN}..."
+        SSL_CONF=$(sed "s/DOMAIN_PLACEHOLDER/${DOMAIN}/g" "${SSL_TEMPLATE}")
+        ${COMPOSE_CMD} -f "${COMPOSE_FILE}" exec -T nginx \
+            sh -c "cat > /etc/nginx/conf.d/ssl.conf" <<< "${SSL_CONF}"
+        info "App domain HTTPS config written."
+        SSL_CHANGED=true
+    else
+        warn "No SSL cert found for ${DOMAIN}. Run with --email to issue one."
+    fi
 
-    # Write SSL config into the nginx conf.d volume (separate file from app domain)
-    ${COMPOSE_CMD} -f "${COMPOSE_FILE}" exec -T nginx \
-        sh -c "cat > /etc/nginx/conf.d/ssl-landing.conf" <<< "${SSL_LANDING_CONF}"
+    # Activate demo HTTPS config if demo cert exists on disk
+    if [ -f "/etc/letsencrypt/live/demo.${DOMAIN}/fullchain.pem" ]; then
+        info "Activating HTTPS server block for demo.${DOMAIN}..."
+        SSL_DEMO_CONF=$(sed "s/DOMAIN_PLACEHOLDER/${DOMAIN}/g" "${SSL_DEMO_TEMPLATE}")
+        ${COMPOSE_CMD} -f "${COMPOSE_FILE}" exec -T nginx \
+            sh -c "cat > /etc/nginx/conf.d/ssl-demo.conf" <<< "${SSL_DEMO_CONF}"
+        info "Demo domain HTTPS config written."
+        SSL_CHANGED=true
+    else
+        warn "No SSL cert found for demo.${DOMAIN} — demo HTTPS not activated."
+    fi
+fi
 
-    info "Landing domain HTTPS config written."
+# =============================================================================
+# SSL Certificate Setup — Landing Domain (aimanagedsolutions.cloud)
+# =============================================================================
+if [ -n "${LANDING_DOMAIN}" ]; then
+    header "SSL Setup — Landing Domain (${LANDING_DOMAIN})"
+
+    # Issue cert only if --email provided AND certs don't exist (or --ssl-renew)
+    if [ -n "${EMAIL}" ]; then
+        if [ ! -f "/etc/letsencrypt/live/${LANDING_DOMAIN}/fullchain.pem" ] || [ "${SSL_RENEW}" = "true" ]; then
+            info "Requesting SSL certificate for ${LANDING_DOMAIN} + www.${LANDING_DOMAIN}..."
+            certbot certonly \
+                --webroot \
+                -w /var/www/certbot \
+                -d "${LANDING_DOMAIN}" \
+                -d "www.${LANDING_DOMAIN}" \
+                --email "${EMAIL}" \
+                --agree-tos \
+                --no-eff-email \
+                --force-renewal
+            info "SSL certificate issued for ${LANDING_DOMAIN}."
+        else
+            info "SSL certificate already exists for ${LANDING_DOMAIN}."
+        fi
+    fi
+
+    # Activate HTTPS config if certs exist on disk
+    if [ -f "/etc/letsencrypt/live/${LANDING_DOMAIN}/fullchain.pem" ]; then
+        info "Activating HTTPS server block for ${LANDING_DOMAIN}..."
+        SSL_LANDING_CONF=$(sed "s/LANDING_DOMAIN_PLACEHOLDER/${LANDING_DOMAIN}/g" "${SSL_LANDING_TEMPLATE}")
+        ${COMPOSE_CMD} -f "${COMPOSE_FILE}" exec -T nginx \
+            sh -c "cat > /etc/nginx/conf.d/ssl-landing.conf" <<< "${SSL_LANDING_CONF}"
+        info "Landing domain HTTPS config written."
+        SSL_CHANGED=true
+    else
+        warn "No SSL cert found for ${LANDING_DOMAIN}. Run with --email to issue one."
+    fi
 fi
 
 # =============================================================================
 # Reload nginx (once, after all SSL configs are written)
 # =============================================================================
-if [ -n "${DOMAIN}" ] || [ -n "${LANDING_DOMAIN}" ]; then
-    if [ -n "${EMAIL}" ]; then
-        info "Testing and reloading nginx..."
-        ${COMPOSE_CMD} -f "${COMPOSE_FILE}" exec -T nginx \
-            sh -c "nginx -t && nginx -s reload"
-        info "HTTPS activated. nginx reloaded."
-    fi
-elif [ "${SSL_RENEW}" = "true" ]; then
+if [ "${SSL_CHANGED}" = "true" ]; then
+    info "Testing and reloading nginx..."
+    ${COMPOSE_CMD} -f "${COMPOSE_FILE}" exec -T nginx \
+        sh -c "nginx -t && nginx -s reload"
+    info "HTTPS activated. nginx reloaded."
+fi
+if [ "${SSL_RENEW}" = "true" ] && [ -z "${DOMAIN}" ] && [ -z "${LANDING_DOMAIN}" ]; then
     header "SSL Certificate Renewal"
-    ${COMPOSE_CMD} -f "${COMPOSE_FILE}" run --rm certbot renew --webroot -w /var/www/certbot
+    certbot renew --webroot -w /var/www/certbot
     ${COMPOSE_CMD} -f "${COMPOSE_FILE}" exec -T nginx sh -c "nginx -s reload"
     info "Certificates renewed and nginx reloaded."
 fi
@@ -258,11 +337,29 @@ fi
 # Cleanup (reclaim disk space)
 # =============================================================================
 header "Cleanup"
-info "Pruning unused images and build cache..."
-docker image prune -f --filter "until=24h" 2>/dev/null || true
-docker builder prune -f --filter "until=24h" 2>/dev/null || true
-RECLAIMED=$(docker system df --format '{{.Reclaimable}}' 2>/dev/null | head -1 || echo "unknown")
-info "Cleanup complete. Reclaimable space: ${RECLAIMED}"
+info "Pruning stopped containers..."
+docker container prune -f 2>/dev/null || true
+
+info "Pruning dangling images..."
+docker image prune -f 2>/dev/null || true
+
+info "Pruning unused images older than 48h..."
+docker image prune -a -f --filter "until=48h" 2>/dev/null || true
+
+info "Pruning build cache..."
+docker builder prune -f 2>/dev/null || true
+
+info "Pruning unused volumes..."
+docker volume prune -f 2>/dev/null || true
+
+info "Pruning unused networks..."
+docker network prune -f 2>/dev/null || true
+
+DISK_USAGE=$(df -h / | awk 'NR==2{print $3 " used / " $2 " total (" $5 " full)"}')
+DOCKER_USAGE=$(docker system df --format 'Images: {{.Size}} | Containers: {{.Size}} | Volumes: {{.Size}}' 2>/dev/null | head -1 || echo "unknown")
+info "Disk: ${DISK_USAGE}"
+info "Docker: ${DOCKER_USAGE}"
+info "Cleanup complete."
 
 # =============================================================================
 # Status
@@ -290,5 +387,6 @@ info "Commands:"
 info "  Logs     : ${COMPOSE_CMD} -f ${COMPOSE_FILE} logs -f"
 info "  Stop     : ${COMPOSE_CMD} -f ${COMPOSE_FILE} down"
 info "  Restart  : ${COMPOSE_CMD} -f ${COMPOSE_FILE} restart"
-info "  SSL renew: ./deploy.sh --ssl-renew"
+info "  SSL renew: certbot renew --webroot -w /var/www/certbot"
 echo ""
+

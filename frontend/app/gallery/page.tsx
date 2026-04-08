@@ -4,7 +4,7 @@
  * Character Gallery — Meet the A.I.M.S. Universe
  *
  * Full character roster: The Elder, SOLAYNJ, Aether Vos, ACHEEVY,
- * Boomer_Angs, Chicken Hawk, Lil_Hawks, and NIL.
+ * Boomer_Angs, Chicken Hawk, Lil_Hawks, and The Void.
  *
  * Plus the five Races of the Aether.
  *
@@ -25,13 +25,13 @@ const COLOR_MAP: Record<string, { border: string; bg: string; text: string; badg
   amber: { border: 'border-amber-500/30', bg: 'bg-amber-500/5', text: 'text-amber-400', badge: 'bg-amber-500/10 text-amber-400 border-amber-500/30' },
   rose: { border: 'border-rose-500/30', bg: 'bg-rose-500/5', text: 'text-rose-400', badge: 'bg-rose-500/10 text-rose-400 border-rose-500/30' },
   indigo: { border: 'border-indigo-500/30', bg: 'bg-indigo-500/5', text: 'text-indigo-400', badge: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/30' },
-  purple: { border: 'border-purple-500/30', bg: 'bg-purple-500/5', text: 'text-purple-400', badge: 'bg-purple-500/10 text-purple-400 border-purple-500/30' },
+  purple: { border: 'border-amber-500/30', bg: 'bg-amber-500/5', text: 'text-amber-400', badge: 'bg-amber-500/10 text-amber-400 border-amber-500/30' },
   slate: { border: 'border-slate-500/30', bg: 'bg-slate-500/5', text: 'text-slate-400', badge: 'bg-slate-500/10 text-slate-400 border-slate-500/30' },
 };
 
 export default function GalleryPage() {
   return (
-    <main className="flex flex-col min-h-full bg-ink text-white">
+    <main className="flex flex-col min-h-full bg-[#F8FAFC] text-slate-800">
       <SiteHeader />
 
       {/* Hero */}
@@ -50,9 +50,9 @@ export default function GalleryPage() {
           >
             Character Gallery
           </h1>
-          <p className="text-sm text-white/40 max-w-lg mx-auto">
+          <p className="text-sm text-slate-400 max-w-lg mx-auto">
             The beings, forces, and entities that shape the V.I.B.E. universe.
-            From the primordial void of NIL to the Executive Orchestrator.
+            From The Void to the Executive Orchestrator.
           </p>
         </div>
       </section>
@@ -96,18 +96,18 @@ export default function GalleryPage() {
                 {/* Content */}
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
-                    <h2 className="text-xl md:text-2xl font-bold text-white">{char.name}</h2>
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider border ${colors.badge}`}>
+                    <h2 className="text-xl md:text-2xl font-bold text-slate-800">{char.name}</h2>
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-bold uppercase tracking-wider border ${colors.badge}`}>
                       {char.title}
                     </span>
                   </div>
                   <p className={`text-xs ${colors.text} mb-1 font-mono uppercase tracking-wider`}>
                     {char.role}
                   </p>
-                  <p className="text-[10px] text-white/25 mb-3 font-mono uppercase tracking-wider">
+                  <p className="text-xs text-slate-400 mb-3 font-mono uppercase tracking-wider">
                     {char.race}
                   </p>
-                  <p className="text-sm text-white/50 leading-relaxed mb-4">
+                  <p className="text-sm text-slate-500 leading-relaxed mb-4">
                     {char.bio}
                   </p>
 
@@ -116,7 +116,7 @@ export default function GalleryPage() {
                     {char.abilities.map((ability) => (
                       <span
                         key={ability}
-                        className="px-2 py-0.5 rounded text-[10px] bg-white/5 text-white/60 border border-wireframe-stroke"
+                        className="px-2 py-0.5 rounded text-xs bg-slate-50 text-slate-500 border border-wireframe-stroke"
                       >
                         {ability}
                       </span>
@@ -137,14 +137,14 @@ export default function GalleryPage() {
       {/* Races of the Aether */}
       <section className="max-w-6xl mx-auto px-4 pb-20">
         <div className="flex items-center gap-3 mb-8">
-          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-purple-500/20 to-transparent" />
+          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-amber-500/20 to-transparent" />
           <span
-            className="text-xs tracking-[0.3em] uppercase text-purple-400/50"
+            className="text-xs tracking-[0.3em] uppercase text-amber-400/50"
             style={{ fontFamily: 'var(--font-doto), "Doto", monospace' }}
           >
             Races of the Aether
           </span>
-          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-purple-500/20 to-transparent" />
+          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-amber-500/20 to-transparent" />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -160,16 +160,16 @@ export default function GalleryPage() {
                 className={`wireframe-card p-5 ${colors.border}`}
               >
                 <h3 className={`text-base font-bold ${colors.text} mb-1`}>{race.name}</h3>
-                <p className="text-[10px] text-white/25 font-mono uppercase tracking-wider mb-3">
+                <p className="text-xs text-slate-400 font-mono uppercase tracking-wider mb-3">
                   {race.harmonic}
                 </p>
-                <p className="text-xs text-white/50 leading-relaxed mb-3">
+                <p className="text-xs text-slate-500 leading-relaxed mb-3">
                   {race.description}
                 </p>
-                <div className={`text-[10px] ${colors.text}/60 border-t border-wireframe-stroke pt-2 mt-auto`}>
-                  <span className="text-white/25 uppercase tracking-wider">Trait:</span> {race.trait}
+                <div className={`text-xs ${colors.text}/60 border-t border-wireframe-stroke pt-2 mt-auto`}>
+                  <span className="text-slate-400 uppercase tracking-wider">Trait:</span> {race.trait}
                 </div>
-                <div className="text-[10px] text-white/25 mt-1.5">
+                <div className="text-xs text-slate-400 mt-1.5">
                   <span className="uppercase tracking-wider">Known:</span> {race.examples}
                 </div>
               </motion.div>

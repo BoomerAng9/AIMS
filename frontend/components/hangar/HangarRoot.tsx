@@ -15,10 +15,10 @@ import OverlayGlassUI from './OverlayGlassUI';
 const HangarScene = dynamic(() => import('./HangarScene'), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-full flex items-center justify-center bg-[#0B0F14]">
+    <div className="w-full h-full flex items-center justify-center bg-[#F8FAFC]">
       <div className="text-center">
         <div className="w-8 h-8 border-2 border-[#C6A74E] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-        <div className="text-xs text-[#C6A74E]/60 uppercase tracking-widest">
+        <div className="text-xs text-slate-400 uppercase tracking-widest">
           Initializing Hangar
         </div>
       </div>
@@ -33,7 +33,7 @@ interface HangarRootProps {
 
 export default function HangarRoot({ mode = 'demo', sseUrl }: HangarRootProps) {
   return (
-    <div className="relative w-full h-full bg-[#0B0F14] overflow-hidden">
+    <div className="relative w-full h-full bg-[#F8FAFC] overflow-hidden">
       {/* 3D Canvas — fills entire container */}
       <div className="absolute inset-0">
         <HangarScene />

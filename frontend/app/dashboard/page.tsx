@@ -58,13 +58,13 @@ function useHealthStatus() {
 function statusDotClass(status: HealthStatus): string {
   switch (status) {
     case "healthy":
-      return "bg-emerald-400 animate-pulse";
+      return "bg-emerald-500 animate-pulse";
     case "degraded":
-      return "bg-gold animate-pulse";
+      return "bg-amber-500 animate-pulse";
     case "unhealthy":
-      return "bg-red-400 animate-pulse";
+      return "bg-red-500 animate-pulse";
     default:
-      return "bg-white/30 animate-pulse";
+      return "bg-slate-400 animate-pulse";
   }
 }
 
@@ -84,13 +84,13 @@ function statusText(status: HealthStatus): string {
 function statusTextColor(status: HealthStatus): string {
   switch (status) {
     case "healthy":
-      return "text-emerald-400/80";
+      return "text-emerald-700";
     case "degraded":
-      return "text-gold/80";
+      return "text-amber-700";
     case "unhealthy":
-      return "text-red-400/80";
+      return "text-red-600";
     default:
-      return "text-white/40";
+      return "text-slate-500";
   }
 }
 
@@ -179,17 +179,17 @@ export default function DashboardPage() {
       {/* Header */}
       <motion.header
         variants={staggerItem}
-        className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/5 pb-6"
+        className="flex flex-col justify-between gap-4 border-b border-slate-200 pb-6 md:flex-row md:items-end"
       >
         <div>
-          <p className="text-[0.6rem] uppercase tracking-[0.25em] text-gold/50 mb-1 font-mono">
+          <p className="aims-agentic-kicker mb-2 text-amber-700">
             Platform Overview
           </p>
-          <h1 className="text-3xl md:text-4xl font-display text-white tracking-tight">
+          <h1 className="font-heading text-4xl tracking-tight text-slate-900 md:text-5xl">
             Managed AI Systems
           </h1>
         </div>
-        <div className="flex items-center gap-3 bg-white/5 py-2 px-4 rounded-full border border-white/5">
+        <div className="flex items-center gap-3 rounded-full border border-slate-200 bg-white px-4 py-2 shadow-sm">
           <span
             className={`h-2 w-2 rounded-full ${statusDotClass(healthStatus)}`}
           />
@@ -209,29 +209,29 @@ export default function DashboardPage() {
             initial="hidden"
             animate="visible"
             exit={{ opacity: 0, y: -8, transition: { duration: 0.15 } }}
-            className="wireframe-card overflow-hidden hover:border-gold/20 transition-colors"
+            className="rounded-xl border border-amber-200 bg-amber-50/70 overflow-hidden hover:border-amber-300 transition-colors"
           >
-            <div className="h-px bg-gradient-to-r from-transparent via-gold/20 to-transparent" />
+            <div className="h-px bg-gradient-to-r from-transparent via-amber-400 to-transparent" />
             <div className="flex flex-col md:flex-row items-center justify-between p-6 gap-4">
               <div className="space-y-1 text-center md:text-left">
-                <h2 className="text-sm font-medium text-white">
+                <h2 className="text-sm font-medium text-slate-900">
                   Welcome to A.I.M.S.
                 </h2>
-                <p className="text-xs text-white/40 max-w-sm">
+                <p className="text-xs text-slate-600 max-w-sm">
                   Ready to deploy your first tool? Launch the builder.
                 </p>
               </div>
               <div className="flex items-center gap-2">
                 <Link
                   href="/dashboard/build"
-                  className="flex items-center gap-2 rounded-xl bg-gold px-5 py-2.5 text-sm font-medium text-black transition-colors hover:bg-gold-light"
+                  className="flex items-center gap-2 rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-slate-800"
                 >
                   Launch Builder <ArrowRight size={14} />
                 </Link>
                 <button
                   type="button"
                   onClick={dismissAlert}
-                  className="flex h-9 w-9 items-center justify-center rounded-lg border border-wireframe-stroke text-white/40 hover:text-white/70 hover:border-white/20 transition-colors"
+                  className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 text-slate-500 hover:text-slate-900 hover:border-slate-300 transition-colors"
                   aria-label="Dismiss onboarding alert"
                 >
                   <X size={14} />
@@ -259,31 +259,31 @@ export default function DashboardPage() {
             <Link
               href={tile.href}
               className={`
-                group block p-6 h-full rounded-2xl border transition-all relative overflow-hidden
-                ${tile.highlight 
-                  ? 'bg-gold/10 border-gold/30 hover:bg-gold/15' 
-                  : 'bg-white/[0.02] border-white/5 hover:border-white/10 hover:bg-white/[0.04]'}
+                group relative block h-full overflow-hidden rounded-[28px] border p-6 transition-all shadow-sm
+                ${tile.highlight
+                  ? 'border-amber-200 bg-[radial-gradient(circle_at_top,rgba(245,158,11,0.18),transparent_55%),linear-gradient(180deg,#ffffff,#f8fafc)] hover:border-amber-300'
+                  : 'border-slate-200 bg-white hover:border-slate-300'}
               `}
             >
               <div className={`
                 mb-4 flex h-10 w-10 items-center justify-center rounded-xl border transition-colors
                 ${tile.highlight
-                  ? 'bg-gold text-black border-gold'
-                  : 'bg-white/5 border-white/10 text-white/50 group-hover:text-gold group-hover:border-gold/30'}
+                  ? 'bg-slate-900 text-white border-slate-900'
+                  : 'bg-slate-50 border-slate-200 text-slate-500 group-hover:text-amber-700 group-hover:border-amber-200'}
               `}>
                 <tile.icon size={20} />
               </div>
-              
-              <h3 className={`text-base font-medium mb-1 ${tile.highlight ? 'text-gold' : 'text-white group-hover:text-gold transition-colors'}`}>
+
+              <h3 className={`mb-2 font-heading text-2xl leading-none ${tile.highlight ? 'text-slate-900' : 'text-slate-900 group-hover:text-amber-700 transition-colors'}`}>
                 {tile.title}
               </h3>
-              
-              <p className="text-xs text-white/40 leading-relaxed">
+
+              <p className="text-sm leading-relaxed text-slate-600">
                 {tile.desc}
               </p>
-              
+
               <div className="absolute top-6 right-6 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all">
-                <ArrowRight size={16} className={tile.highlight ? 'text-gold' : 'text-white/30'} />
+                <ArrowRight size={16} className={tile.highlight ? 'text-amber-700' : 'text-slate-500'} />
               </div>
             </Link>
           </motion.div>

@@ -59,6 +59,17 @@ const CONFIRM_PATTERNS = [
   /make (it|this) (real|happen)/i,
 ];
 
+// Automation intent patterns — these route to the Automations system
+const AUTOMATION_INTENT_PATTERNS = [
+  /automat(e|ion)/i,
+  /run\s*(this|it)?\s*(on\s*a\s*)?schedul/i,
+  /set\s*up\s*(a|an)?\s*trigger/i,
+  /when\s*(a|an)?\s*(pr|pull\s*request|issue|error|deploy)/i,
+  /every\s*(hour|day|week|month|morning|night)/i,
+  /on\s*(a\s*)?(cron|schedule|timer)/i,
+  /auto[- ]?(fix|review|scan|monitor|report)/i,
+];
+
 function isExecutionConfirmation(message: string): boolean {
   return CONFIRM_PATTERNS.some(p => p.test(message.trim()));
 }

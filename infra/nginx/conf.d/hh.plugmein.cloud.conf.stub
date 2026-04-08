@@ -1,0 +1,33 @@
+server {
+    listen 80;
+    server_name hh.plugmein.cloud;
+
+    # Let's Encrypt ACME challenge — always HTTP
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    # Health check
+    location /health {
+        access_log off;
+        add_header 'Content-Type' 'application/json';
+        return 200 '{"status":"UP","service":"nginx-hh"}';
+    }
+
+    # Redirect all other traffic to HTTPS (uncomment after certbot runs)
+    # location / {
+    #     return 301 https://$host$request_uri;
+    # }
+
+    # Pre-SSL proxy (Testing only, remove after certbot)
+    location / {
+        limit_req zone=general burst=40 nodelay;
+        proxy_pass http://frontend; # Assuming frontend handles hh.plugmein.cloud via Next.js middleware, otherwise point to a dedicated HalalHub container
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+    }
+}

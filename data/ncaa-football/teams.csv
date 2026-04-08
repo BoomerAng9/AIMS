@@ -1,0 +1,69 @@
+team_id,school_name,mascot,primary_color,secondary_color,city,state,current_conference_id,stadium_id,enrollment,founded_year,football_start_year,division,subdivision,national_championships,heisman_winners
+ALABAMA,University of Alabama,Crimson Tide,#9E1B32,#FFFFFF,Tuscaloosa,AL,SEC,BRYANT_DENNY,42360,1820,1892,FBS,Power 4,18,4
+ARKANSAS,University of Arkansas,Razorbacks,#9D2235,#FFFFFF,Fayetteville,AR,SEC,RAZORBACK,34175,1871,1894,FBS,Power 4,1,0
+AUBURN,Auburn University,Tigers,#0C2340,#E87722,Auburn,AL,SEC,JORDAN_HARE,35172,1856,1892,FBS,Power 4,2,3
+FLORIDA,University of Florida,Gators,#FA4616,#0021A5,Gainesville,FL,SEC,BEN_HILL_GRIFFIN,56311,1853,1906,FBS,Power 4,3,3
+GEORGIA,University of Georgia,Bulldogs,#BA0C2F,#000000,Athens,GA,SEC,SANFORD,43888,1785,1892,FBS,Power 4,4,2
+KENTUCKY,University of Kentucky,Wildcats,#0033A0,#FFFFFF,Lexington,KY,SEC,KROGER_FIELD,27209,1865,1881,FBS,Power 4,0,0
+LSU,Louisiana State University,Tigers,#461D7C,#FDD023,Baton Rouge,LA,SEC,TIGER_STADIUM,36452,1860,1893,FBS,Power 4,4,3
+MISS_ST,Mississippi State University,Bulldogs,#5D1725,#FFFFFF,Starkville,MS,SEC,DAVIS_WADE,17039,1878,1895,FBS,Power 4,0,0
+MISSOURI,University of Missouri,Tigers,#F1B82D,#000000,Columbia,MO,SEC,FAUROT_FIELD,31121,1839,1890,FBS,Power 4,0,0
+OKLAHOMA,University of Oklahoma,Sooners,#841617,#FDF9D8,Norman,OK,SEC,GAYLORD_MEMORIAL,36500,1890,1895,FBS,Power 4,7,7
+OLE_MISS,University of Mississippi,Rebels,#CE1126,#14213D,Oxford,MS,SEC,VAUGHT_HEMINGWAY,24000,1844,1893,FBS,Power 4,3,0
+SOUTH_CAROLINA,University of South Carolina,Gamecocks,#73000A,#000000,Columbia,SC,SEC,WILLIAMS_BRICE,35000,1801,1892,FBS,Power 4,0,1
+TENNESSEE,University of Tennessee,Volunteers,#FF8200,#FFFFFF,Knoxville,TN,SEC,NEYLAND,40421,1794,1891,FBS,Power 4,6,0
+TEXAS,University of Texas,Longhorns,#BF5700,#FFFFFF,Austin,TX,SEC,DKR_MEMORIAL,55000,1883,1893,FBS,Power 4,4,2
+TEXAS_AM,Texas A&M University,Aggies,#500000,#FFFFFF,College Station,TX,SEC,KYLE_FIELD,72560,1876,1894,FBS,Power 4,3,2
+VANDERBILT,Vanderbilt University,Commodores,#000000,#CFAE70,Nashville,TN,SEC,FIRSTBANK,13575,1873,1890,FBS,Power 4,0,0
+ILLINOIS,University of Illinois Urbana-Champaign,Fighting Illini,#E84A27,#13294B,Champaign,IL,BIG_TEN,MEMORIAL_IL,59000,1867,1890,FBS,Power 4,5,0
+INDIANA,Indiana University Bloomington,Hoosiers,#990000,#EEEDEB,Bloomington,IN,BIG_TEN,MEMORIAL_IN,48626,1820,1884,FBS,Power 4,1,1
+IOWA,University of Iowa,Hawkeyes,#FFCD00,#000000,Iowa City,IA,BIG_TEN,KINNICK,32199,1847,1889,FBS,Power 4,5,1
+MARYLAND,University of Maryland,Terrapins,#E03A3E,#FFD520,College Park,MD,BIG_TEN,SECU,41725,1856,1892,FBS,Power 4,1,0
+MICHIGAN,University of Michigan,Wolverines,#00274C,#FFCB05,Ann Arbor,MI,BIG_TEN,MICHIGAN_STADIUM,53000,1817,1879,FBS,Power 4,12,3
+MICHIGAN_ST,Michigan State University,Spartans,#18453B,#FFFFFF,East Lansing,MI,BIG_TEN,SPARTAN,50000,1855,1896,FBS,Power 4,6,0
+MINNESOTA,University of Minnesota,Golden Gophers,#7A0019,#FFCC33,Minneapolis,MN,BIG_TEN,HUNTINGTON_BANK,56666,1851,1882,FBS,Power 4,7,1
+NEBRASKA,University of Nebraska-Lincoln,Cornhuskers,#E41C38,#FDF2D9,Lincoln,NE,BIG_TEN,MEMORIAL_NE,23986,1869,1890,FBS,Power 4,5,3
+NORTHWESTERN,Northwestern University,Wildcats,#4E2A84,#FFFFFF,Evanston,IL,BIG_TEN,RYAN_FIELD,23856,1851,1882,FBS,Power 4,0,0
+OHIO_ST,The Ohio State University,Buckeyes,#BB0000,#666666,Columbus,OH,BIG_TEN,OHIO_STADIUM,67255,1870,1890,FBS,Power 4,9,7
+OREGON,University of Oregon,Ducks,#154733,#FEE123,Eugene,OR,BIG_TEN,AUTZEN,24462,1876,1894,FBS,Power 4,0,1
+PENN_ST,The Pennsylvania State University,Nittany Lions,#041E42,#FFFFFF,University Park,PA,BIG_TEN,BEAVER,46000,1855,1887,FBS,Power 4,2,1
+PURDUE,Purdue University,Boilermakers,#CFB991,#000000,West Lafayette,IN,BIG_TEN,ROSS_ADE,57310,1869,1887,FBS,Power 4,0,0
+RUTGERS,Rutgers University,Scarlet Knights,#CC0033,#5F6A72,Piscataway,NJ,BIG_TEN,SHI,52269,1766,1869,FBS,Power 4,1,0
+UCLA,University of California Los Angeles,Bruins,#2774AE,#FFD100,Los Angeles,CA,BIG_TEN,ROSE_BOWL,48651,1919,1919,FBS,Power 4,1,1
+USC,University of Southern California,Trojans,#990000,#FFCC00,Los Angeles,CA,BIG_TEN,LA_COLISEUM,46566,1880,1888,FBS,Power 4,11,8
+WASHINGTON,University of Washington,Huskies,#4B2E83,#B7A57A,Seattle,WA,BIG_TEN,HUSKY,60081,1861,1889,FBS,Power 4,2,0
+WISCONSIN,University of Wisconsin-Madison,Badgers,#C5050C,#FFFFFF,Madison,WI,BIG_TEN,CAMP_RANDALL,51822,1848,1889,FBS,Power 4,0,2
+ARIZONA,University of Arizona,Wildcats,#CC0033,#003366,Tucson,AZ,BIG_12,CASINO_DEL_SOL,54384,1885,1899,FBS,Power 4,0,0
+ARIZONA_ST,Arizona State University,Sun Devils,#8C1D40,#FFC627,Tempe,AZ,BIG_12,MOUNTAIN_AMERICA,80000,1885,1897,FBS,Power 4,0,0
+BAYLOR,Baylor University,Bears,#154734,#FFB81C,Waco,TX,BIG_12,MCLANE,20626,1845,1899,FBS,Power 4,0,1
+BYU,Brigham Young University,Cougars,#002E5D,#FFFFFF,Provo,UT,BIG_12,LAVELL_EDWARDS,35743,1875,1922,FBS,Power 4,1,1
+CINCINNATI,University of Cincinnati,Bearcats,#E00122,#000000,Cincinnati,OH,BIG_12,NIPPERT,53235,1819,1885,FBS,Power 4,0,0
+COLORADO,University of Colorado Boulder,Buffaloes,#CFB87C,#000000,Boulder,CO,BIG_12,FOLSOM,39000,1876,1890,FBS,Power 4,1,2
+HOUSTON,University of Houston,Cougars,#C8102E,#FFFFFF,Houston,TX,BIG_12,TDECU,48972,1927,1946,FBS,Power 4,0,1
+IOWA_ST,Iowa State University,Cyclones,#C8102E,#F1BE48,Ames,IA,BIG_12,JACK_TRICE,31105,1858,1892,FBS,Power 4,0,0
+KANSAS,University of Kansas,Jayhawks,#0051BA,#E8000D,Lawrence,KS,BIG_12,MEMORIAL_KS,31169,1865,1890,FBS,Power 4,0,0
+KANSAS_ST,Kansas State University,Wildcats,#512888,#FFFFFF,Manhattan,KS,BIG_12,BILL_SNYDER,20295,1863,1896,FBS,Power 4,0,0
+OKLAHOMA_ST,Oklahoma State University,Cowboys,#FF7300,#000000,Stillwater,OK,BIG_12,BOONE_PICKENS,27241,1890,1901,FBS,Power 4,1,1
+TCU,Texas Christian University,Horned Frogs,#4D1979,#FFFFFF,Fort Worth,TX,BIG_12,AMON_CARTER,12980,1873,1896,FBS,Power 4,2,1
+TEXAS_TECH,Texas Tech University,Red Raiders,#CC0000,#000000,Lubbock,TX,BIG_12,JONES_ATT,42272,1923,1925,FBS,Power 4,0,0
+UCF,University of Central Florida,Knights,#000000,#FFC904,Orlando,FL,BIG_12,BOUNCE_HOUSE,71000,1963,1979,FBS,Power 4,1,0
+UTAH,University of Utah,Utes,#BE0000,#FFFFFF,Salt Lake City,UT,BIG_12,RICE_ECCLES,35236,1850,1892,FBS,Power 4,0,0
+WEST_VIRGINIA,West Virginia University,Mountaineers,#002855,#EAAA00,Morgantown,WV,BIG_12,MILAN_PUSKAR,25998,1867,1891,FBS,Power 4,0,0
+BOSTON_COLLEGE,Boston College,Eagles,#98002E,#BC9B6A,Chestnut Hill,MA,ACC,ALUMNI,15000,1863,1893,FBS,Power 4,0,1
+CAL,University of California Berkeley,Golden Bears,#003262,#FDB515,Berkeley,CA,ACC,CAL_MEMORIAL,45000,1868,1886,FBS,Power 4,5,0
+CLEMSON,Clemson University,Tigers,#F56600,#522D80,Clemson,SC,ACC,MEMORIAL_CLEMSON,81500,1889,1896,FBS,Power 4,3,0
+DUKE,Duke University,Blue Devils,#003087,#FFFFFF,Durham,NC,ACC,WALLACE_WADE,35018,1838,1888,FBS,Power 4,0,0
+FLORIDA_ST,Florida State University,Seminoles,#782F40,#CEB888,Tallahassee,FL,ACC,DOAK_CAMPBELL,67277,1851,1947,FBS,Power 4,3,3
+GEORGIA_TECH,Georgia Institute of Technology,Yellow Jackets,#B3A369,#003057,Atlanta,GA,ACC,BOBBY_DODD,51913,1885,1892,FBS,Power 4,4,0
+LOUISVILLE,University of Louisville,Cardinals,#AD0000,#000000,Louisville,KY,ACC,LN_STADIUM,60000,1798,1912,FBS,Power 4,0,1
+MIAMI_FL,University of Miami,Hurricanes,#F47321,#005030,Coral Gables,FL,ACC,HARD_ROCK,64767,1925,1926,FBS,Power 4,5,2
+NC_STATE,North Carolina State University,Wolfpack,#CC0000,#000000,Raleigh,NC,ACC,CARTER_FINLEY,56919,1887,1892,FBS,Power 4,0,0
+NORTH_CAROLINA,University of North Carolina at Chapel Hill,Tar Heels,#4B9CD3,#13294B,Chapel Hill,NC,ACC,KENAN,31700,1789,1888,FBS,Power 4,0,0
+PITT,University of Pittsburgh,Panthers,#003594,#FFB81C,Pittsburgh,PA,ACC,ACRISURE,36000,1787,1890,FBS,Power 4,9,1
+SMU,Southern Methodist University,Mustangs,#0033A0,#C8102E,University Park,TX,ACC,GERALD_FORD,12400,1911,1915,FBS,Power 4,3,1
+STANFORD,Stanford University,Cardinal,#8C1515,#FFFFFF,Stanford,CA,ACC,STANFORD_STADIUM,18000,1885,1891,FBS,Power 4,2,1
+SYRACUSE,Syracuse University,Orange,#F76900,#000E54,Syracuse,NY,ACC,JMA_DOME,49250,1870,1889,FBS,Power 4,1,1
+VIRGINIA,University of Virginia,Cavaliers,#232D4B,#F84C1E,Charlottesville,VA,ACC,SCOTT,26000,1819,1887,FBS,Power 4,0,0
+VIRGINIA_TECH,Virginia Polytechnic Institute and State University,Hokies,#630031,#CF4420,Blacksburg,VA,ACC,LANE,38000,1872,1892,FBS,Power 4,0,0
+WAKE_FOREST,Wake Forest University,Demon Deacons,#9E7E38,#000000,Winston-Salem,NC,ACC,ALLEGACY,9300,1834,1888,FBS,Power 4,0,0
+NOTRE_DAME,University of Notre Dame,Fighting Irish,#0C2340,#C99700,Notre Dame,IN,IND,NOTRE_DAME_STADIUM,13000,1842,1887,FBS,Independent,13,7

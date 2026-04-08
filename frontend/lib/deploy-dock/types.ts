@@ -65,7 +65,7 @@ export interface JobPacket {
   lucBudget: number;
   lucSpent: number;
   permissions: string[];
-  n8nWorkflowId?: string;
+  workflowId?: string;
   createdAt: Date;
   startedAt?: Date;
   completedAt?: Date;
@@ -173,10 +173,10 @@ export interface AcheevyIntent {
 }
 
 // ─────────────────────────────────────────────────────────────
-// n8n Workflow Integration
+// Workflow Integration
 // ─────────────────────────────────────────────────────────────
 
-export interface N8nWorkflowBinding {
+export interface WorkflowBinding {
   id: string;
   workflowId: string;
   workflowName: string;
@@ -186,7 +186,7 @@ export interface N8nWorkflowBinding {
   linkedJobPacketId?: string;
 }
 
-export interface N8nExecutionResult {
+export interface WorkflowExecutionResult {
   executionId: string;
   workflowId: string;
   status: "running" | "success" | "error";

@@ -1,16 +1,14 @@
 /**
- * Chat API Route — Unified LLM Gateway + Agent Orchestrator
+ * Chat API Route — Unified LLM Gateway + ACHEEVY Orchestrator
  *
- * THREE execution paths:
- *   1. Agent dispatch: message classified as actionable → /acheevy/execute → orchestrator
- *      → II-Agent / A2A agents / n8n → structured response
- *   2. LLM stream:    conversational message → /llm/stream → Vertex AI / OpenRouter
- *      → SSE text stream (metered through LUC)
- *   3. Direct fallback: gateway unreachable → Vercel AI SDK → OpenRouter
+ * ALL messages route through ACHEEVY first:
+ *   1. M.I.M. fast-path: build/validate intents → UI link (not a bypass, just a UX shortcut)
+ *   2. ACHEEVY orchestrator: /acheevy/execute → II-Agent → Chicken Hawk → conversation
+ *   3. LLM stream fallback: gateway unreachable → /llm/stream (metered)
+ *   4. Direct fallback: everything unreachable → AI SDK → OpenRouter (unmetered)
  *
- * The classify step calls /acheevy/classify to determine intent.
- * If requiresAgent=true, we dispatch to the orchestrator.
- * If requiresAgent=false, we stream via the LLM gateway.
+ * Every message goes through ACHEEVY. The orchestrator decides whether to dispatch
+ * to II-Agent, Chicken Hawk, or handle as conversation. No classification fork.
  *
  * Feature LLM: Claude Opus 4.6
  * Priority Models: Qwen, Minimax, GLM-5, Kimi, WAN, Nano Banana Pro
@@ -19,8 +17,12 @@
 import { streamText } from 'ai';
 import { createOpenAI } from '@ai-sdk/openai';
 import { buildSystemPrompt } from '@/lib/acheevy/persona';
-
-export const maxDuration = 120;
+import { chatRequestSchema, validateInput } from '@/lib/validation/schemas';
+import {
+  buildNtntnRoutingDecision,
+  normalizeAcheevyClassification,
+  type LegacyAcheevyClassification,
+} from '@/lib/acheevy/routing';
 
 // ── UEF Gateway (primary — metered through LUC) ─────────────
 const UEF_GATEWAY_URL = process.env.UEF_GATEWAY_URL || process.env.NEXT_PUBLIC_UEF_GATEWAY_URL || '';
@@ -37,18 +39,18 @@ const openrouter = createOpenAI({
 });
 
 // ── Feature LLM ─────────────────────────────────────────────
-const DEFAULT_MODEL = process.env.ACHEEVY_MODEL || process.env.OPENROUTER_MODEL || 'google/gemini-3.0-flash';
+const DEFAULT_MODEL = process.env.ACHEEVY_MODEL || process.env.OPENROUTER_MODEL || 'minimax/minimax-m1-80k';
 
 // ── Priority Model Roster (all accessible via OpenRouter) ───
+// Model IDs must match OpenRouter's catalog exactly (use dashes, not dots for versions)
 const PRIORITY_MODELS: Record<string, { id: string; label: string; provider: string }> = {
-  'claude-opus':    { id: 'anthropic/claude-opus-4.6',        label: 'Claude Opus 4.6',      provider: 'Anthropic' },
-  'claude-sonnet':  { id: 'anthropic/claude-sonnet-4.6',      label: 'Claude Sonnet 4.6',    provider: 'Anthropic' },
-  'qwen':           { id: 'qwen/qwen-2.5-coder-32b',         label: 'Qwen 2.5 Coder 32B',  provider: 'Qwen' },
+  'claude-opus':    { id: 'anthropic/claude-opus-4-6',        label: 'Claude Opus 4.6',      provider: 'Anthropic' },
+  'claude-sonnet':  { id: 'anthropic/claude-sonnet-4-5-20250929', label: 'Claude Sonnet 4.5', provider: 'Anthropic' },
+  'qwen':           { id: 'qwen/qwen-2.5-coder-32b-instruct', label: 'Qwen 2.5 Coder 32B', provider: 'Qwen' },
   'qwen-max':       { id: 'qwen/qwen-max',                   label: 'Qwen Max',             provider: 'Qwen' },
-  'minimax':        { id: 'minimax/minimax-01',               label: 'MiniMax-01',           provider: 'MiniMax' },
-  'glm':            { id: 'z-ai/glm-5',                      label: 'GLM-5',                provider: 'Z.ai' },
-  'kimi':           { id: 'moonshot/kimi-k2.5',               label: 'Kimi K2.5',            provider: 'Moonshot' },
-  'wan':            { id: 'alibaba/wan-2.1-t2v-turbo',        label: 'WAN 2.1',              provider: 'Alibaba' },
+  'minimax':        { id: 'minimax/minimax-m1-80k',            label: 'MiniMax M1 (80K)',     provider: 'MiniMax' },
+  'glm':            { id: 'thudm/glm-4-plus',                label: 'GLM-4 Plus',           provider: 'Zhipu' },
+  'kimi':           { id: 'moonshotai/moonshot-v1-auto',      label: 'Moonshot v1',          provider: 'Moonshot' },
   'nano-banana':    { id: 'google/gemini-2.5-flash',          label: 'Nano Banana Pro',      provider: 'Google' },
   'gemini-flash':   { id: 'google/gemini-2.5-flash',          label: 'Gemini 2.5 Flash',     provider: 'Google' },
   'gemini-pro':     { id: 'google/gemini-2.5-pro',            label: 'Gemini 2.5 Pro',       provider: 'Google' },
@@ -71,13 +73,7 @@ function gatewayHeaders(): Record<string, string> {
 // Step 1: Classify intent — determines if we need agent dispatch or LLM chat
 // ---------------------------------------------------------------------------
 
-interface ClassifyResult {
-  intent: string;
-  confidence: number;
-  requiresAgent: boolean;
-}
-
-async function classifyIntent(lastMessage: string): Promise<ClassifyResult | null> {
+async function classifyIntent(lastMessage: string): Promise<(LegacyAcheevyClassification & { routingDecision: ReturnType<typeof buildNtntnRoutingDecision> }) | null> {
   if (!UEF_GATEWAY_URL) return null;
 
   try {
@@ -88,7 +84,8 @@ async function classifyIntent(lastMessage: string): Promise<ClassifyResult | nul
     });
 
     if (!res.ok) return null;
-    return await res.json() as ClassifyResult;
+    const data = await res.json() as LegacyAcheevyClassification;
+    return normalizeAcheevyClassification(lastMessage, data);
   } catch {
     return null;
   }
@@ -100,8 +97,9 @@ async function classifyIntent(lastMessage: string): Promise<ClassifyResult | nul
 
 async function tryAgentDispatch(
   lastMessage: string,
-  classification: ClassifyResult,
+  classification: LegacyAcheevyClassification & { routingDecision: ReturnType<typeof buildNtntnRoutingDecision> },
   conversationHistory: Array<{ role: string; content: string }>,
+  userId: string,
 ): Promise<Response | null> {
   if (!UEF_GATEWAY_URL) return null;
 
@@ -110,12 +108,14 @@ async function tryAgentDispatch(
       method: 'POST',
       headers: gatewayHeaders(),
       body: JSON.stringify({
-        userId: 'web-user',
+        userId,
         message: lastMessage,
         intent: classification.intent,
-        conversationId: 'chat-ui',
+        routingDecision: classification.routingDecision,
+        conversationId: `session-${userId}`,
         context: {
           history: conversationHistory.slice(-6), // last 6 messages for context
+          routingDecision: classification.routingDecision,
           classification,
         },
       }),
@@ -125,7 +125,7 @@ async function tryAgentDispatch(
 
     const result = await res.json();
 
-    // Format orchestrator response as Vercel AI SDK text stream
+    // Format orchestrator response as AI SDK text stream
     const reply = result.reply || 'Task received. Processing...';
     const meta = [];
     if (result.taskId) meta.push(`Task ID: ${result.taskId}`);
@@ -137,10 +137,23 @@ async function tryAgentDispatch(
       ? `${reply}\n\n---\n*${meta.join(' | ')}*`
       : reply;
 
-    // Emit as Vercel AI SDK text stream format (single-shot)
+    // Build tool execution event for frontend card
+    const toolEvent = {
+      type: 'tool_dispatch',
+      intent: classification.intent,
+      intentType: classification.routingDecision.intent_type,
+      executionLane: classification.routingDecision.execution_lane,
+      taskId: result.taskId || undefined,
+      status: result.status || 'completed',
+      steps: result.data?.pipelineSteps?.length || undefined,
+      lucUsage: result.lucUsage || undefined,
+    };
+
+    // Emit as AI SDK text stream format with tool event prefix 8:
     const encoder = new TextEncoder();
     const stream = new ReadableStream({
       start(controller) {
+        controller.enqueue(encoder.encode(`8:${JSON.stringify(toolEvent)}\n`));
         controller.enqueue(encoder.encode(`0:${JSON.stringify(fullReply)}\n`));
         controller.close();
       },
@@ -167,6 +180,7 @@ async function tryGatewayStream(
   modelId: string,
   messages: Array<{ role: string; content: string }>,
   systemPrompt: string,
+  userId: string,
 ): Promise<Response | null> {
   if (!UEF_GATEWAY_URL) return null;
 
@@ -183,14 +197,18 @@ async function tryGatewayStream(
         model: modelId,
         messages: gatewayMessages,
         agentId: 'acheevy-chat',
-        userId: 'web-user',
-        sessionId: 'chat-ui',
+        userId,
+        sessionId: `session-${userId}`,
+        // Conversational chat → MEDIUM thinking (balanced quality/cost).
+        // Model Intelligence auto-selects for agent dispatch; here we set explicitly
+        // because this is the direct LLM stream path (not via agentChat()).
+        thinking_level: 'medium',
       }),
     });
 
     if (!res.ok || !res.body) return null;
 
-    // Transform gateway SSE format to Vercel AI SDK format
+    // Transform gateway SSE format to AI SDK data-stream format
     const encoder = new TextEncoder();
     const decoder = new TextDecoder();
     const reader = res.body.getReader();
@@ -211,7 +229,7 @@ async function tryGatewayStream(
           try {
             const parsed = JSON.parse(data);
             if (parsed.text) {
-              // Emit as Vercel AI SDK text stream format
+              // Emit as AI SDK text stream format
               controller.enqueue(encoder.encode(`0:${JSON.stringify(parsed.text)}\n`));
             }
           } catch { /* skip malformed */ }
@@ -233,43 +251,347 @@ async function tryGatewayStream(
 }
 
 // ---------------------------------------------------------------------------
+// Memory recall — fetch relevant context from the memory system
+// ---------------------------------------------------------------------------
+
+async function recallMemories(message: string, userId: string): Promise<string> {
+  if (!UEF_GATEWAY_URL) return '';
+
+  try {
+    const res = await fetch(`${UEF_GATEWAY_URL}/memory/recall`, {
+      method: 'POST',
+      headers: gatewayHeaders(),
+      body: JSON.stringify({
+        userId,
+        query: message,
+        limit: 5,
+        minRelevance: 0.3,
+      }),
+    });
+
+    if (!res.ok) return '';
+
+    const result = await res.json();
+    if (!result.memories || result.memories.length === 0) return '';
+
+    const lines = result.memories.map((s: any, i: number) => {
+      const m = s.memory;
+      const typeLabel = (m.type || '').replace(/_/g, ' ');
+      return `  ${i + 1}. [${typeLabel}] ${m.summary}`;
+    });
+
+    return [
+      '--- ACHEEVY Memory Context ---',
+      `Recalled ${result.memories.length} relevant memories:`,
+      ...lines,
+      '--- End Memory Context ---',
+    ].join('\n');
+  } catch {
+    return '';
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Local M.I.M. Intent Detection — routes build/validate intents to builders
+// ---------------------------------------------------------------------------
+
+interface MIMDetection {
+  type: 'idea-validation' | 'build-web' | 'build-mobile' | 'build-automation' | 'deep-scout' | null;
+  confidence: number;
+}
+
+interface RequestAttachment {
+  type?: string;
+  name?: string;
+  mimeType?: string;
+}
+
+interface RequestMessage {
+  role: string;
+  content: string;
+  attachments?: RequestAttachment[];
+  metadata?: {
+    agentic?: {
+      selectedTools?: Array<{ id?: string; name?: string }>;
+      businessFunction?: { id?: string; name?: string; topic?: string };
+      deepResearch?: boolean;
+    };
+  };
+}
+
+function buildAgenticSelectionNote(message?: RequestMessage): string {
+  if (!message) return '';
+
+  const agentic = message.metadata?.agentic;
+  const selectedTools = Array.isArray(agentic?.selectedTools)
+    ? agentic.selectedTools
+        .map((tool) => tool?.name)
+        .filter((name): name is string => Boolean(name))
+    : [];
+  const attachmentNames = Array.isArray(message.attachments)
+    ? message.attachments
+        .map((attachment) => attachment?.name)
+        .filter((name): name is string => Boolean(name))
+    : [];
+
+  const lines = [
+    selectedTools.length > 0 ? `Requested tools: ${selectedTools.join(', ')}` : '',
+    agentic?.businessFunction?.name
+      ? `Business function: ${agentic.businessFunction.name}${agentic.businessFunction.topic ? ` (${agentic.businessFunction.topic})` : ''}`
+      : '',
+    agentic?.deepResearch ? 'Deep research mode enabled.' : '',
+    attachmentNames.length > 0 ? `Attached files: ${attachmentNames.join(', ')}` : '',
+  ].filter(Boolean);
+
+  return lines.join('\n');
+}
+
+function detectMIMIntent(message: string): MIMDetection {
+  const lower = message.toLowerCase();
+
+  // Idea validation patterns
+  const ideaPatterns = [
+    /\b(validate|test|check|assess|evaluate)\b.*\b(idea|concept|business|startup)\b/,
+    /\bi have (an? )?idea\b/,
+    /\b(is this|would this|could this)\b.*\b(work|viable|good idea)\b/,
+    /\b(idea validation|validate my idea)\b/,
+    /\bwhat do you think (about|of)\b.*\b(idea|concept|app|business)\b/,
+  ];
+
+  // Build/create patterns
+  const buildWebPatterns = [
+    /\b(build|create|make|generate)\b.*\b(website|web app|web page|landing page|webapp|site)\b/,
+    /\b(website|web app|landing page)\b.*\b(for me|for my|that)\b/,
+  ];
+
+  const buildMobilePatterns = [
+    /\b(build|create|make|generate)\b.*\b(mobile app|ios app|android app|phone app|app)\b/,
+    /\b(mobile|ios|android)\b.*\b(app|application)\b/,
+  ];
+
+  const buildAutomationPatterns = [
+    /\b(build|create|make|set up|automate)\b.*\b(automation|workflow|pipeline|integration)\b/,
+    /\b(automate|connect|integrate)\b.*\b(when|every|if)\b/,
+    /\b(n8n|zapier|make\.com)\b.*\b(workflow|automation)\b/,
+  ];
+
+  const deepScoutPatterns = [
+    /\b(research|investigate|analyse|analyze|scout|explore)\b.*\b(market|industry|competitor|niche)\b/,
+    /\bdeep (scout|research|dive)\b/,
+    /\b(market research|competitor analysis|industry analysis)\b/,
+  ];
+
+  for (const p of ideaPatterns) {
+    if (p.test(lower)) return { type: 'idea-validation', confidence: 0.85 };
+  }
+  for (const p of deepScoutPatterns) {
+    if (p.test(lower)) return { type: 'deep-scout', confidence: 0.85 };
+  }
+  for (const p of buildMobilePatterns) {
+    if (p.test(lower)) return { type: 'build-mobile', confidence: 0.8 };
+  }
+  for (const p of buildAutomationPatterns) {
+    if (p.test(lower)) return { type: 'build-automation', confidence: 0.8 };
+  }
+  for (const p of buildWebPatterns) {
+    if (p.test(lower)) return { type: 'build-web', confidence: 0.8 };
+  }
+
+  return { type: null, confidence: 0 };
+}
+
+function buildMIMResponse(detection: MIMDetection, originalMessage: string): string | null {
+  switch (detection.type) {
+    case 'idea-validation':
+      return `I can help validate that idea. I've got a full 4-step validation pipeline ready — it covers clarity, gap analysis, audience resonance, and expert perspective.\n\n**→ [Open Deep Scout](/dashboard/deep-scout)** to run the full validation\n\nOr describe your idea right here and I'll give you quick initial feedback.`;
+
+    case 'deep-scout':
+      return `My research engine is ready. Deep Scout runs competitive analysis, market research, and opportunity mapping.\n\n**→ [Open Deep Scout](/dashboard/deep-scout)** for the full research pipeline\n\nI can also do a quick analysis right here if you tell me more about what you want to explore.`;
+
+    case 'build-web':
+      return `Let's build it. I have a full web app builder with live preview, multi-model support, and iterative editing.\n\n**→ [Open Web App Builder](/dashboard/make-it-mine/web-app)** for the full build experience\n\nOr describe exactly what you need and I'll get started.`;
+
+    case 'build-mobile':
+      return `Mobile app — got it. I'll generate a native-looking PWA prototype with bottom nav, touch gestures, and mobile-first design.\n\n**→ [Open Mobile App Builder](/dashboard/make-it-mine/mobile-app)** for the full build experience with phone frame preview\n\nDescribe your app concept and I can start building.`;
+
+    case 'build-automation':
+      return `Workflow automation ready. I'll create a visual workflow with triggers, actions, conditions, and connections.\n\n**→ [Open Automation Builder](/dashboard/make-it-mine/automation)** for the visual workflow builder\n\nTell me what you want to automate and I'll map it out.`;
+
+    default:
+      return null;
+  }
+}
+
+// ---------------------------------------------------------------------------
 // POST handler — the unified entry point
 // ---------------------------------------------------------------------------
 
 export async function POST(req: Request) {
   try {
-    const { messages, model, personaId } = await req.json();
-    const modelId = resolveModelId(model);
-    const systemPrompt = buildSystemPrompt({ personaId, additionalContext: 'User is using the Chat Interface.' });
+    const payload = await req.json();
+    const validation = validateInput(chatRequestSchema, payload);
 
-    // Get the last user message for classification
-    const lastUserMessage = [...messages].reverse().find((m: { role: string }) => m.role === 'user');
-    const lastMessage = lastUserMessage?.content || '';
-
-    // Step 1: Classify intent via gateway
-    const classification = await classifyIntent(lastMessage);
-
-    // Step 2: If agent dispatch is needed, route to orchestrator
-    if (classification?.requiresAgent && classification.confidence > 0.6) {
-      console.log(`[ACHEEVY Chat] Agent dispatch: intent=${classification.intent} confidence=${classification.confidence}`);
-      const agentResponse = await tryAgentDispatch(lastMessage, classification, messages);
-      if (agentResponse) return agentResponse;
-      // If agent dispatch fails, fall through to LLM stream
-      console.warn('[ACHEEVY Chat] Agent dispatch failed, falling through to LLM stream');
+    if (!validation.success) {
+      return new Response(JSON.stringify({ error: 'Invalid chat request', details: validation.errors }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
     }
 
-    // Step 3: LLM stream via UEF Gateway (metered, Vertex AI + OpenRouter)
-    const gatewayResponse = await tryGatewayStream(modelId, messages, systemPrompt);
+    const {
+      messages,
+      model,
+      personaId,
+      contextPackIds = [],
+      userId: bodyUserId,
+    } = validation.data as {
+      messages: RequestMessage[];
+      model?: string;
+      personaId?: string;
+      contextPackIds?: string[];
+      userId?: string;
+    };
+
+    // Derive userId: body > cookie > header > anon fallback
+    const userId = bodyUserId
+      || req.headers.get('x-user-id')
+      || `anon-${req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'}`;
+    const modelId = resolveModelId(model);
+
+    // Get the last user message for classification
+    const lastUserMessage = [...messages].reverse().find((m: RequestMessage) => m.role === 'user');
+    const lastMessage = lastUserMessage?.content || '';
+    const agenticSelectionNote = buildAgenticSelectionNote(lastUserMessage);
+    const enrichedLastMessage = agenticSelectionNote
+      ? `${lastMessage}\n\n--- Agentic UI Context ---\n${agenticSelectionNote}`
+      : lastMessage;
+    const enrichedMessages = messages.map((message, index) => {
+      const isLastUserMessage = message === lastUserMessage;
+
+      return {
+        role: message.role,
+        content: isLastUserMessage ? enrichedLastMessage : message.content,
+      };
+    });
+
+    // Step 0: Local M.I.M. intent detection — fast-path for build/validate intents
+    const mimDetection = detectMIMIntent(enrichedLastMessage);
+    if (mimDetection.type && mimDetection.confidence > 0.7) {
+      const mimResponse = buildMIMResponse(mimDetection, lastMessage);
+      if (mimResponse) {
+        console.log(`[ACHEEVY Chat] M.I.M. intent detected: ${mimDetection.type} (${mimDetection.confidence})`);
+        const encoder = new TextEncoder();
+        const stream = new ReadableStream({
+          start(controller) {
+            controller.enqueue(encoder.encode(`0:${JSON.stringify(mimResponse)}\n`));
+            controller.close();
+          },
+        });
+        return new Response(stream, {
+          headers: {
+            'Content-Type': 'text/plain; charset=utf-8',
+            'X-ACHEEVY-Intent': `mim:${mimDetection.type}`,
+            'X-ACHEEVY-MIM': 'true',
+          },
+        });
+      }
+    }
+
+    // Memory recall: fetch relevant memories for this user's message
+    const memoryContext = await recallMemories(enrichedLastMessage, userId);
+    const activeContextPackNote = Array.isArray(contextPackIds) && contextPackIds.length > 0
+      ? `\nActive Context Packs: ${contextPackIds.join(', ')}`
+      : '';
+    const agenticContextNote = agenticSelectionNote
+      ? `\nAgentic UI selections:\n${agenticSelectionNote}`
+      : '';
+
+    const systemPrompt = buildSystemPrompt({
+      personaId,
+      additionalContext: memoryContext
+        ? `User is using the Chat Interface.${activeContextPackNote}${agenticContextNote}\n\n${memoryContext}`
+        : `User is using the Chat Interface.${activeContextPackNote}${agenticContextNote}`,
+    });
+
+    // Step 1: Classify intent for context (optional — orchestrator re-classifies internally)
+    const classification = await classifyIntent(enrichedLastMessage);
+
+    // Step 2: ALL messages → ACHEEVY orchestrator first
+    // The orchestrator decides: II-Agent, Chicken Hawk, vertical, PaaS, or conversation.
+    // No fork — every message gets the full ACHEEVY pipeline.
+    const orchestratorClassification = classification || (() => {
+      // If gateway classification failed, use keyword heuristics to determine if this needs an agent
+      const lower = enrichedLastMessage.toLowerCase();
+      const actionKeywords = /\b(build|deploy|create|launch|spin up|research|automate|analyze|generate|make|set up|configure|install)\b/i;
+      const isLikelyAction = actionKeywords.test(lower);
+
+      return normalizeAcheevyClassification(enrichedLastMessage, {
+        intent: isLikelyAction ? 'task_execution' : 'conversation',
+        confidence: isLikelyAction ? 0.7 : 0.5,
+        requiresAgent: isLikelyAction,
+      });
+    })();
+
+    console.log(
+      `[ACHEEVY Chat] Routing through orchestrator: intent=${orchestratorClassification.intent} lane=${orchestratorClassification.routingDecision.execution_lane} confidence=${orchestratorClassification.confidence}`,
+    );
+    const agentResponse = await tryAgentDispatch(enrichedLastMessage, orchestratorClassification, enrichedMessages, userId);
+    if (agentResponse) return agentResponse;
+
+    // Step 3: Fallback — ACHEEVY orchestrator unreachable → LLM stream via gateway (metered)
+    // If agent dispatch was attempted (requiresAgent=true) but failed, surface this to the user
+    if (orchestratorClassification.requiresAgent) {
+      console.warn('[ACHEEVY Chat] Agent dispatch failed for action intent — prepending notice to LLM stream');
+      const dispatchFailureNote = `I wasn't able to reach my execution engine right now, so I'll handle this conversationally for the moment. Here's what I can tell you:\n\n`;
+      const encoder = new TextEncoder();
+      const prefixStream = new ReadableStream({
+        start(controller) {
+          controller.enqueue(encoder.encode(`0:${JSON.stringify(dispatchFailureNote)}\n`));
+          controller.close();
+        },
+      });
+      // Attempt gateway stream and prepend the notice if successful
+      const gatewayStreamForAction = await tryGatewayStream(modelId, enrichedMessages, systemPrompt, userId);
+      if (gatewayStreamForAction && gatewayStreamForAction.body) {
+        const combined = new ReadableStream({
+          async start(controller) {
+            const prefixReader = prefixStream.getReader();
+            const mainReader = gatewayStreamForAction.body!.getReader();
+            for (;;) {
+              const { done, value } = await prefixReader.read();
+              if (done) break;
+              controller.enqueue(value);
+            }
+            for (;;) {
+              const { done, value } = await mainReader.read();
+              if (done) break;
+              controller.enqueue(value);
+            }
+            controller.close();
+          },
+        });
+        return new Response(combined, {
+          headers: {
+            'Content-Type': 'text/plain; charset=utf-8',
+            'X-ACHEEVY-Intent': orchestratorClassification.intent,
+            'X-ACHEEVY-Fallback': 'dispatch-failed',
+          },
+        });
+      }
+    }
+    console.warn('[ACHEEVY Chat] Orchestrator unreachable, falling back to LLM stream');
+  const gatewayResponse = await tryGatewayStream(modelId, enrichedMessages, systemPrompt, userId);
     if (gatewayResponse) return gatewayResponse;
 
-    // Step 4: Direct OpenRouter via Vercel AI SDK (fallback)
+    // Step 4: Last resort — gateway also unreachable → direct OpenRouter (unmetered)
+    console.warn('[ACHEEVY Chat] Gateway unreachable, falling back to direct OpenRouter');
     const result = await streamText({
       model: openrouter(modelId),
       system: systemPrompt,
-      messages,
+      messages: enrichedMessages,
     });
 
-    return result.toAIStreamResponse();
+    return result.toTextStreamResponse();
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Chat API error';
     console.error('[ACHEEVY Chat]', message);

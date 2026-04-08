@@ -49,17 +49,14 @@
 | **Port** | `3012` |
 | **Integration** | ACHEEVY routes `intent: timeline / analysis / intelligence` → Intel_Ang |
 
-### 4. `litellm-debugger` (fork of LiteLLM) → **Router_Ang** 🔀
+### 4. ~~`litellm-debugger`~~ → **BLOCKED** 🚫
 | Field | Detail |
 |---|---|
-| **Repo** | `Intelligent-Internet/litellm-debugger` |
-| **Stars** | 5.1k (fork of BerriAI/litellm) |
-| **Language** | Python |
-| **What It Does** | LLM Gateway — proxy server to call 100+ LLM APIs in OpenAI format (Bedrock, Azure, OpenAI, VertexAI, Cohere, Anthropic, Groq, etc.) |
-| **Boomer_Ang Role** | **Router_Ang** — the ACHEEVY model router. Instead of hardcoding OpenRouter or individual API keys, all LLM traffic flows through Router_Ang which handles load balancing, fallbacks, cost tracking, and model selection |
-| **Docker Complexity** | LOW — well-documented Docker setup |
-| **Port** | `4000` (LiteLLM default) |
-| **Integration** | Replace direct OpenRouter calls → `http://litellm:4000/v1/chat/completions`. This also feeds real data into LUC! |
+| **Repo** | ~~`Intelligent-Internet/litellm-debugger`~~ |
+| **Status** | **BLOCKED — security vulnerabilities. See SECURITY-LITELLM-BLOCKED.md** |
+| **Replacement** | **Gemini API** (`https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent`) + direct provider SDKs (OpenAI, Anthropic, Google GenAI) |
+| **Boomer_Ang Role** | **Gatekeeper_Ang** — now routes through Gemini API and approved direct SDKs instead of LiteLLM |
+| **Integration** | All LLM routing goes through Gemini API. Do NOT re-add litellm. |
 
 ---
 
@@ -155,7 +152,7 @@
 ### Prerequisites
 - n8n VPS at `76.13.96.107`
 - Docker + Docker Compose installed
-- Ports: 3010-3015, 4000 available
+- Ports: 3010-3015 available
 
 ### `docker-compose.boomerangs.yml`
 
@@ -163,7 +160,7 @@
 version: '3.8'
 
 services:
-  # ── Tier 1: Immediate Deploy ─────────────────────────────
+  # ── Tier 1: Immediate Deploy ─────────────────────────
   
   research-ang:
     image: ghcr.io/intelligent-internet/ii-researcher:latest
@@ -210,25 +207,11 @@ services:
     networks:
       - boomerang-net
 
-  router-ang:
-    image: ghcr.io/berriai/litellm:main-latest
-    container_name: router_ang
-    restart: unless-stopped
-    ports:
-      - "4000:4000"
-    environment:
-      - LITELLM_MASTER_KEY=${LITELLM_MASTER_KEY}
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
-      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
-      - GROQ_API_KEY=${GROQ_API_KEY}
-    volumes:
-      - ./litellm-config.yaml:/app/config.yaml
-    command: ["--config", "/app/config.yaml", "--port", "4000"]
-    networks:
-      - boomerang-net
+  # router-ang: REMOVED — LiteLLM is BLOCKED (security vulnerabilities)
+  # All LLM routing now goes through Gemini API and direct provider SDKs.
+  # See SECURITY-LITELLM-BLOCKED.md for approved endpoints.
 
-  # ── Tier 2: Next Wave ────────────────────────────────────
+  # ── Tier 2: Next Wave ────────────────────────────
 
   deck-ang:
     build:
@@ -260,7 +243,7 @@ Once deployed, update the frontend's `.env.local`:
 RESEARCH_ANG_URL=http://76.13.96.107:3010
 STRATEGY_ANG_URL=http://76.13.96.107:3011
 INTEL_ANG_URL=http://76.13.96.107:3012
-ROUTER_ANG_URL=http://76.13.96.107:4000
+# ROUTER_ANG_URL — REMOVED (LiteLLM blocked, use Gemini API instead)
 DECK_ANG_URL=http://76.13.96.107:3014
 ```
 
@@ -280,15 +263,15 @@ User says "Research competitor X"
 | `ii-researcher` | ~500MB |
 | `CommonGround` | ~800MB |
 | `Common_Chronicle` | ~300MB |
-| `litellm` | ~400MB |
+| ~~`litellm`~~ | REMOVED (blocked) |
 | `PPTist` | ~200MB |
-| **Total** | **~2.2 GB** |
+| **Total** | **~1.8 GB** |
 
 ### Next Steps
 
 1. SSH into VPS → check disk with `df -h`
 2. Clone Tier 1 repos into `/opt/boomerangs/repos/`
-3. Create `litellm-config.yaml` with model routing
+3. Configure Gemini API keys for LLM routing (litellm is BLOCKED)
 4. `docker compose -f docker-compose.boomerangs.yml up -d`
 5. Wire ACHEEVY intent router to new endpoints
-6. Update LUC to track usage through Router_Ang (real data!)
+6. Update LUC to track usage through Gemini API (real data!)

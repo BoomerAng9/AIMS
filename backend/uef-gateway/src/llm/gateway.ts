@@ -11,8 +11,9 @@
  * This replaces all direct OpenRouter/API calls throughout the codebase.
  */
 
-import { vertexAI, VERTEX_MODELS } from './vertex-ai';
+import { vertexAI } from './vertex-ai';
 import { openrouter, MODELS as OPENROUTER_MODELS, DEFAULT_MODEL } from './openrouter';
+import { ossModels } from './oss-models';
 import { usageTracker } from './usage-tracker';
 import type { LLMResult, ChatMessage, ModelSpec } from './openrouter';
 import logger from '../logger';
@@ -32,13 +33,21 @@ export interface GatewayRequest {
   userId?: string;
   /** Session ID — used for per-session usage tracking */
   sessionId?: string;
+  /**
+   * Thinking level for models that support configurable reasoning depth.
+   * Gemini 3.1 Pro: 'low' | 'medium' | 'high' (default: 'high')
+   *
+   * Set explicitly on every call — Gemini 3.1 defaults to HIGH (most expensive).
+   * 80/20 Rule: 80% of calls should use low/medium, 20% use high.
+   */
+  thinking_level?: 'low' | 'medium' | 'high';
 }
 
 export interface GatewayStreamRequest extends GatewayRequest {
   onToken?: (token: string) => void;
 }
 
-type ProviderUsed = 'vertex-ai' | 'openrouter' | 'stub';
+type ProviderUsed = 'vertex-ai' | 'openrouter' | 'oss-hosted' | 'personaplex' | 'stub';
 
 // ---------------------------------------------------------------------------
 // Gateway
@@ -60,6 +69,7 @@ class LLMGateway {
       messages: request.messages,
       max_tokens: request.max_tokens,
       temperature: request.temperature,
+      thinking_level: request.thinking_level,
     };
 
     let result: LLMResult;
@@ -72,12 +82,23 @@ class LLMGateway {
         provider = 'vertex-ai';
       } catch (err) {
         logger.warn({ model, err }, '[Gateway] Vertex AI failed, falling back to OpenRouter');
-        // Fall through to OpenRouter
         result = await this.callOpenRouter(chatReq);
         provider = result.model === 'stub' ? 'stub' : 'openrouter';
       }
-    } else {
-      // Strategy 2: OpenRouter for everything else
+    }
+    // Strategy 2: OSS models on Hostinger VPS or self-hosted infra
+    else if (ossModels.canHandle(model)) {
+      try {
+        result = await ossModels.chat(chatReq);
+        provider = 'oss-hosted';
+      } catch (err) {
+        logger.warn({ model, err }, '[Gateway] OSS model failed, falling back to OpenRouter');
+        result = await this.callOpenRouter(chatReq);
+        provider = result.model === 'stub' ? 'stub' : 'openrouter';
+      }
+    }
+    // Strategy 3: OpenRouter for everything else
+    else {
       result = await this.callOpenRouter(chatReq);
       provider = result.model === 'stub' ? 'stub' : 'openrouter';
     }
@@ -142,6 +163,7 @@ class LLMGateway {
       messages: request.messages,
       max_tokens: request.max_tokens,
       temperature: request.temperature,
+      thinking_level: request.thinking_level,
     };
 
     // Try Vertex AI streaming for supported models
@@ -155,7 +177,18 @@ class LLMGateway {
       }
     }
 
-    // Fall back to non-streaming OpenRouter and simulate stream
+    // Try real streaming from OpenRouter (true token-by-token)
+    if (openrouter.isConfigured()) {
+      try {
+        const rawStream = await openrouter.streamChat(streamReq);
+        const metered = this.meterStream(rawStream, { userId, sessionId, model, provider: 'openrouter', agentId });
+        return { stream: metered, provider: 'openrouter', model };
+      } catch (err) {
+        logger.warn({ model, err }, '[Gateway] OpenRouter streaming failed, falling back to non-stream');
+      }
+    }
+
+    // Last resort: non-streaming OpenRouter call, simulate stream
     const result = await this.callOpenRouter(streamReq);
     const provider: ProviderUsed = result.model === 'stub' ? 'stub' : 'openrouter';
 
@@ -163,11 +196,9 @@ class LLMGateway {
       usageTracker.record({ userId, sessionId, model: result.model, provider, agentId, tokens: result.tokens, cost: result.cost });
     }
 
-    // Convert non-streaming response to a one-shot stream
     const content = result.content;
     const stream = new ReadableStream<string>({
       start(controller) {
-        // Emit in chunks to simulate streaming
         const chunkSize = 20;
         for (let i = 0; i < content.length; i += chunkSize) {
           controller.enqueue(content.slice(i, i + chunkSize));
@@ -183,7 +214,7 @@ class LLMGateway {
    * Check if the gateway has any LLM provider configured.
    */
   isConfigured(): boolean {
-    return vertexAI.isConfigured() || openrouter.isConfigured();
+    return vertexAI.isConfigured() || openrouter.isConfigured() || ossModels.isConfigured();
   }
 
   /**
@@ -209,17 +240,23 @@ class LLMGateway {
       }
     }
 
+    // Add OSS models (self-hosted)
+    for (const spec of ossModels.listModels()) {
+      combined.set(spec.id, { ...spec, availableOn: ['oss-hosted'] });
+    }
+
     return Array.from(combined.values());
   }
 
   // ── Internal ───────────────────────────────────────────────────────
 
-  private async callOpenRouter(request: { model: string; messages: ChatMessage[]; max_tokens?: number; temperature?: number }): Promise<LLMResult> {
+  private async callOpenRouter(request: { model: string; messages: ChatMessage[]; max_tokens?: number; temperature?: number; thinking_level?: 'low' | 'medium' | 'high' }): Promise<LLMResult> {
     return openrouter.chat({
       model: request.model,
       messages: request.messages,
       max_tokens: request.max_tokens,
       temperature: request.temperature,
+      thinking_level: request.thinking_level,
     });
   }
 
@@ -230,7 +267,7 @@ class LLMGateway {
    */
   private meterStream(
     source: ReadableStream<string>,
-    meta: { userId: string; sessionId: string; model: string; provider: 'vertex-ai' | 'openrouter'; agentId: string },
+    meta: { userId: string; sessionId: string; model: string; provider: ProviderUsed; agentId: string },
   ): ReadableStream<string> {
     const reader = source.getReader();
     let totalChars = 0;

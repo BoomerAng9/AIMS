@@ -46,6 +46,7 @@ VPS_USER="${VPS_USER:-root}"
 VPS_DEPLOY_PATH="${VPS_DEPLOY_PATH:-/root/aims}"
 COMPOSE_VPS="infra/docker-compose.vps.yml"
 ENV_FILE="infra/.env.production"
+ENV_VALIDATOR="scripts/validate-env.sh"
 
 # ── Parse Arguments ──
 DEPLOY_CLOUD=true
@@ -105,6 +106,24 @@ echo "    VPS Host:     ${VPS_HOST}"
 echo "    Dry Run:      ${DRY_RUN}"
 echo ""
 
+# Validate env file when deploying VPS/stateful tier.
+if [ "${DEPLOY_VPS}" = "true" ]; then
+    if [ ! -f "${PROJECT_ROOT}/${ENV_FILE}" ]; then
+        error "Missing env file for VPS deployment: ${PROJECT_ROOT}/${ENV_FILE}"
+        exit 1
+    fi
+    if [ ! -f "${PROJECT_ROOT}/${ENV_VALIDATOR}" ]; then
+        error "Env validator missing: ${PROJECT_ROOT}/${ENV_VALIDATOR}"
+        exit 1
+    fi
+    info "Running env validator for VPS deployment..."
+    bash "${PROJECT_ROOT}/${ENV_VALIDATOR}" --path "${PROJECT_ROOT}/${ENV_FILE}" --strict
+fi
+
+# Initialize Cloud Run URL variables (set within TIER 1 block if deploying)
+FRONTEND_URL=""
+GATEWAY_URL=""
+
 # =============================================================================
 # TIER 1: Cloud Run (Stateless Services)
 # =============================================================================
@@ -139,7 +158,7 @@ if [ "${DEPLOY_CLOUD}" = "true" ]; then
         -t "${REGISTRY}/frontend:${TAG}" \
         -t "${REGISTRY}/frontend:latest" \
         -f "${PROJECT_ROOT}/frontend/Dockerfile" \
-        "${PROJECT_ROOT}/frontend"
+        "${PROJECT_ROOT}"
 
     info "Pushing Frontend image..."
     run docker push "${REGISTRY}/frontend:${TAG}"
@@ -262,8 +281,8 @@ echo "  │  A.I.M.S. Hybrid Deployment Summary              │"
 echo "  ├──────────────────────────────────────────────────┤"
 if [ "${DEPLOY_CLOUD}" = "true" ]; then
 echo "  │  CLOUD RUN (stateless, auto-scaling)             │"
-echo "  │    Frontend:     ${FRONTEND_URL:-N/A}"
-echo "  │    UEF Gateway:  ${GATEWAY_URL:-N/A}"
+echo "  │    Frontend:     ${FRONTEND_URL:-not deployed}"
+echo "  │    UEF Gateway:  ${GATEWAY_URL:-not deployed}"
 fi
 if [ "${DEPLOY_VPS}" = "true" ]; then
 echo "  │  VPS @ ${VPS_HOST} (stateful, persistent)         │"

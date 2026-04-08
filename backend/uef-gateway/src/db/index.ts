@@ -179,6 +179,10 @@ const TABLE_SCHEMAS: Record<string, TableSchema> = {
     jsonColumns: ['report'],
     boolColumns: ['passed'],
   },
+  payment_sessions: {
+    jsonColumns: ['metadata'],
+    boolColumns: [],
+  },
 };
 
 // ---------------------------------------------------------------------------

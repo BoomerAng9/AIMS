@@ -248,16 +248,95 @@ async function initSchema() {
     });
     console.log('  ✅ Jobs collection created\n');
 
-    console.log('✨ Firestore schema initialization complete!');
-    console.log('\nCollections created:');
+    // ==========================================
+    // A.I.M.S. SHELVING SYSTEM COLLECTIONS
+    // ==========================================
+
+    console.log('Creating Shelving System collections...\n');
+
+    // ── Projects ──────────────────────────────
+    await db.collection('projects').doc('_SCHEMA').set({
+      _description: 'Top-level project records',
+      _created_at: FieldValue.serverTimestamp(),
+      _fields: 'id, userId, name, description, status, complexity, archetype, tags, lucProjectId, features, integrations, branding, techStack, teamAssignment, createdAt, updatedAt'
+    });
+    console.log('  ✅ projects shelf');
+
+    // ── LUC Projects ──────────────────────────
+    await db.collection('luc_projects').doc('_SCHEMA').set({
+      _description: 'LUC pricing & effort oracle records',
+      _created_at: FieldValue.serverTimestamp(),
+      _fields: 'id, projectId, userId, scope, requirements, status, timeBand, estimatedTimeBands, modelMix, totalEstimatedTokens, costBand, actualTokensUsed, actualCostUsd, historicalSimilarity, linkedRunIds, linkedAssetIds, createdAt, updatedAt, completedAt'
+    });
+    console.log('  ✅ luc_projects shelf');
+
+    // ── Plugs ─────────────────────────────────
+    await db.collection('plugs').doc('_SCHEMA').set({
+      _description: 'Built artifacts (aiPlugs)',
+      _created_at: FieldValue.serverTimestamp(),
+      _fields: 'id, projectId, userId, name, version, description, status, type, files, deploymentId, lucProjectId, parentPlugId, tags, metrics, createdAt, updatedAt'
+    });
+    console.log('  ✅ plugs shelf');
+
+    // ── Boomer_Angs ───────────────────────────
+    await db.collection('boomer_angs').doc('_SCHEMA').set({
+      _description: 'Agent roster (Chicken Hawk, Lil_Hawks, directors)',
+      _created_at: FieldValue.serverTimestamp(),
+      _fields: 'id, agentId, name, tier, role, squad, capabilities, state, maxConcurrency, currentTasks, specialization, parentAgentId, spawnedAt, lastActiveAt, totalTasksCompleted, totalTokensUsed, totalCostUsd, benchScore, config'
+    });
+    console.log('  ✅ boomer_angs shelf');
+
+    // ── Workflows ─────────────────────────────
+    await db.collection('workflows').doc('_SCHEMA').set({
+      _description: 'Automation definitions and pipelines',
+      _created_at: FieldValue.serverTimestamp(),
+      _fields: 'id, projectId, userId, name, description, engine, status, trigger, steps, externalWorkflowId, tags, lastRunId, totalRuns, createdAt, updatedAt'
+    });
+    console.log('  ✅ workflows shelf');
+
+    // ── Runs ──────────────────────────────────
+    await db.collection('runs').doc('_SCHEMA').set({
+      _description: 'Execution run records with step-level detail',
+      _created_at: FieldValue.serverTimestamp(),
+      _fields: 'id, projectId, workflowId, lucProjectId, userId, trigger, status, executorAgentId, steps, totalTokensUsed, totalCostUsd, totalDurationMs, artifacts, error, metadata, startedAt, completedAt'
+    });
+    console.log('  ✅ runs shelf');
+
+    // ── Logs ──────────────────────────────────
+    await db.collection('logs').doc('_SCHEMA').set({
+      _description: 'Structured log entries across all services',
+      _created_at: FieldValue.serverTimestamp(),
+      _fields: 'id, runId, projectId, agentId, userId, level, source, message, data, timestamp'
+    });
+    console.log('  ✅ logs shelf');
+
+    // ── Assets ────────────────────────────────
+    await db.collection('assets').doc('_SCHEMA').set({
+      _description: 'Files, diagrams, screenshots, configs',
+      _created_at: FieldValue.serverTimestamp(),
+      _fields: 'id, projectId, plugId, runId, userId, name, type, mimeType, size, storageUrl, storageBucket, storagePath, metadata, tags, createdAt'
+    });
+    console.log('  ✅ assets shelf');
+
+    console.log('\n✨ Firestore schema initialization complete!');
+    console.log('\nLegacy collections:');
     console.log('  - luc (quotas & billing)');
     console.log('  - users (with onboarding_state, conversations, templates, validations)');
     console.log('  - industry_knowledge (pre-populated with 5 industries)');
     console.log('  - invoices');
     console.log('  - jobs');
+    console.log('\nShelving System:');
+    console.log('  - projects       Top-level project records');
+    console.log('  - luc_projects   LUC pricing & effort oracle');
+    console.log('  - plugs          Built artifacts (aiPlugs)');
+    console.log('  - boomer_angs    Agent roster');
+    console.log('  - workflows      Automation definitions');
+    console.log('  - runs           Execution run records');
+    console.log('  - logs           Structured log entries');
+    console.log('  - assets         Files, diagrams, configs');
 
   } catch (error) {
-    console.error('❌ Error initializing schema:', error);
+    console.error('Error initializing schema:', error);
     throw error;
   }
 }

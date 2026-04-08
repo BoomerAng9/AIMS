@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ACHEEVY AI Chat Interface</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#dab22f",
+            "background-light": "#f8f7f6",
+            "background-dark": "#0a0a0a",
+            "glass-charcoal": "rgba(22, 22, 22, 0.8)",
+            "glass-gold": "rgba(218, 178, 47, 0.05)",
+          },
+          fontFamily: {
+            "display": ["Space Grotesk", "sans-serif"]
+          },
+          borderRadius: {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+        },
+      },
+    }
+  </script>
+<style>
+    .glass-box {
+      background: rgba(22, 22, 22, 0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .glass-box-gold {
+      background: rgba(218, 178, 47, 0.03);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(218, 178, 47, 0.2);
+      box-shadow: inset 0 0 15px rgba(218, 178, 47, 0.05);
+    }
+    .status-pulse {
+      box-shadow: 0 0 8px rgba(218, 178, 47, 0.6);
+    }
+    ::-webkit-scrollbar {
+      width: 4px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(218, 178, 47, 0.2);
+      border-radius: 10px;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 antialiased overflow-hidden selection:bg-primary/30 selection:text-primary">
+<!-- Main Mobile Container -->
+<div class="relative flex h-screen w-full max-w-md mx-auto flex-col bg-background-light dark:bg-background-dark overflow-hidden border-x border-slate-200 dark:border-white/5">
+<!-- Fixed Header -->
+<header class="sticky top-0 z-50 glass-box border-b border-white/10 px-4 py-4 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded flex items-center justify-center bg-primary/10 border border-primary/30 text-primary">
+<span class="material-symbols-outlined text-2xl">memory</span>
+</div>
+<div>
+<h1 class="text-sm font-bold tracking-[0.2em] uppercase text-slate-100">Acheevy AI</h1>
+<div class="flex items-center gap-1.5">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+</span>
+<span class="text-[10px] font-medium tracking-wider text-primary uppercase">Systems: Nominal</span>
+</div>
+</div>
+</div>
+<button class="text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</header>
+<!-- Chat Area -->
+<main class="flex-1 overflow-y-auto p-4 space-y-6">
+<!-- Date Divider -->
+<div class="flex items-center justify-center gap-4 py-2">
+<div class="h-[1px] flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+<span class="text-[10px] font-bold tracking-[0.3em] text-slate-500 uppercase">Initialization Sequence 04-24</span>
+<div class="h-[1px] flex-1 bg-gradient-to-l from-transparent via-white/10 to-transparent"></div>
+</div>
+<!-- AI Message -->
+<div class="flex flex-col items-start gap-2 max-w-[85%] group">
+<div class="flex items-center gap-2 pl-1">
+<span class="text-[10px] font-bold tracking-widest text-primary uppercase">Acheevy Core</span>
+<span class="text-[9px] text-slate-600">14:02:44</span>
+</div>
+<div class="glass-box-gold rounded-lg rounded-tl-none p-4 relative">
+<div class="absolute -left-[1px] top-0 h-full w-[2px] bg-primary"></div>
+<p class="text-[15px] leading-relaxed text-slate-200 font-light tracking-wide">
+            Neural pathways aligned. Orchestrating workflows for <span class="text-primary font-medium">Project Delta</span>. The current API integration sequence shows a 14% latency overhead. How shall we proceed with the optimization?
+          </p>
+</div>
+</div>
+<!-- User Message -->
+<div class="flex flex-col items-end gap-2 max-w-[85%] ml-auto group">
+<div class="flex items-center gap-2 pr-1">
+<span class="text-[9px] text-slate-600">14:03:12</span>
+<span class="text-[10px] font-bold tracking-widest text-slate-400 uppercase">Operator</span>
+</div>
+<div class="glass-box rounded-lg rounded-tr-none p-4 border border-white/10">
+<p class="text-[15px] leading-relaxed text-slate-300 font-light tracking-wide">
+            Analyze the bottleneck in the authentication middleware and optimize the sequence for edge deployment.
+          </p>
+</div>
+</div>
+<!-- AI Thinking State -->
+<div class="flex flex-col items-start gap-2 max-w-[85%]">
+<div class="flex items-center gap-2 pl-1">
+<span class="text-[10px] font-bold tracking-widest text-primary uppercase">Acheevy Core</span>
+</div>
+<div class="glass-box-gold rounded-lg rounded-tl-none p-4 flex gap-2 items-center">
+<span class="material-symbols-outlined text-primary text-sm animate-spin">data_usage</span>
+<p class="text-[13px] italic text-slate-400 tracking-wider">Processing heuristics...</p>
+</div>
+</div>
+<!-- AI Detailed Response with Data Points -->
+<div class="flex flex-col items-start gap-2 max-w-[90%] group">
+<div class="flex items-center gap-2 pl-1">
+<span class="text-[10px] font-bold tracking-widest text-primary uppercase">Acheevy Core</span>
+<span class="text-[9px] text-slate-600">14:03:28</span>
+</div>
+<div class="glass-box-gold rounded-lg rounded-tl-none p-4 relative overflow-hidden">
+<div class="absolute -left-[1px] top-0 h-full w-[2px] bg-primary"></div>
+<p class="text-[15px] leading-relaxed text-slate-200 font-light tracking-wide mb-4">
+            Analysis complete. I recommend the following recalibration for the <span class="text-primary">Edge Node 7</span>:
+          </p>
+<div class="space-y-3">
+<div class="p-3 bg-white/5 border border-white/10 rounded">
+<div class="flex justify-between items-center mb-1">
+<span class="text-[11px] font-bold uppercase text-slate-400 tracking-tighter">Auth Pipeline</span>
+<span class="text-[11px] text-primary">REFACTORED</span>
+</div>
+<div class="w-full bg-white/10 h-1 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[85%]"></div>
+</div>
+</div>
+<div class="p-3 bg-white/5 border border-white/10 rounded">
+<div class="flex justify-between items-center mb-1">
+<span class="text-[11px] font-bold uppercase text-slate-400 tracking-tighter">Latency Delta</span>
+<span class="text-[11px] text-primary">-42.4ms</span>
+</div>
+<div class="w-full bg-white/10 h-1 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[20%]"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Composer -->
+<footer class="p-4 bg-background-dark/80 backdrop-blur-xl border-t border-white/5">
+<div class="flex flex-col gap-3">
+<!-- Quick Actions -->
+<div class="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+<button class="px-3 py-1.5 rounded bg-white/5 border border-white/10 text-[10px] font-bold uppercase tracking-widest text-slate-400 whitespace-nowrap hover:border-primary/50 transition-colors">
+            Generate Log
+          </button>
+<button class="px-3 py-1.5 rounded bg-white/5 border border-white/10 text-[10px] font-bold uppercase tracking-widest text-slate-400 whitespace-nowrap hover:border-primary/50 transition-colors">
+            Deploy Patch
+          </button>
+<button class="px-3 py-1.5 rounded bg-white/5 border border-white/10 text-[10px] font-bold uppercase tracking-widest text-slate-400 whitespace-nowrap hover:border-primary/50 transition-colors">
+            Flush Cache
+          </button>
+</div>
+<!-- Input Box -->
+<div class="flex items-center gap-3">
+<div class="flex-1 glass-box rounded-lg flex items-center px-3 border border-white/10 focus-within:border-primary/40 transition-all">
+<button class="text-slate-500 hover:text-primary p-1">
+<span class="material-symbols-outlined text-xl">attach_file</span>
+</button>
+<input class="w-full bg-transparent border-none focus:ring-0 text-sm text-slate-200 placeholder:text-slate-600 py-3 font-light tracking-wide" placeholder="Command ACHEEVY..." type="text"/>
+<button class="text-slate-500 hover:text-primary p-1">
+<span class="material-symbols-outlined text-xl">mic</span>
+</button>
+</div>
+<button class="bg-primary hover:bg-primary/90 text-background-dark p-3 rounded shadow-lg shadow-primary/20 flex items-center justify-center transition-all active:scale-95">
+<span class="material-symbols-outlined font-bold">send</span>
+</button>
+</div>
+</div>
+<!-- iOS Safe Area -->
+<div class="h-6"></div>
+</footer>
+<!-- Bottom Nav Bar Component -->
+<nav class="absolute bottom-0 w-full glass-box border-t border-white/10 flex items-center justify-around py-3 px-6 z-[60]">
+<a class="text-primary flex flex-col items-center gap-0.5" href="#">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1">chat_bubble</span>
+<span class="text-[8px] font-bold uppercase tracking-[0.2em]">Agent</span>
+</a>
+<a class="text-slate-500 hover:text-slate-300 flex flex-col items-center gap-0.5" href="#">
+<span class="material-symbols-outlined text-2xl">account_tree</span>
+<span class="text-[8px] font-bold uppercase tracking-[0.2em]">Flow</span>
+</a>
+<a class="text-slate-500 hover:text-slate-300 flex flex-col items-center gap-0.5" href="#">
+<span class="material-symbols-outlined text-2xl">folder_open</span>
+<span class="text-[8px] font-bold uppercase tracking-[0.2em]">Vault</span>
+</a>
+<a class="text-slate-500 hover:text-slate-300 flex flex-col items-center gap-0.5" href="#">
+<span class="material-symbols-outlined text-2xl">monitoring</span>
+<span class="text-[8px] font-bold uppercase tracking-[0.2em]">Node</span>
+</a>
+</nav>
+</div>
+<style>
+    /* Utility for hiding scrollbar but allowing scroll */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</body></html>

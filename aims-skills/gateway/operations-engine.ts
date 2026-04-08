@@ -35,6 +35,7 @@ import type {
 } from '../types/gateway';
 
 import type { PipelineStage } from '../types/chain-of-command';
+import { createHash } from 'crypto';
 
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                           */
@@ -51,13 +52,7 @@ function nowISO(): string {
 }
 
 function simpleHash(input: string): string {
-  let hash = 0;
-  for (let i = 0; i < input.length; i++) {
-    const char = input.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash |= 0;
-  }
-  return 'sha256:' + Math.abs(hash).toString(16).padStart(8, '0');
+  return 'sha256:' + createHash('sha256').update(input).digest('hex');
 }
 
 /** Map operation phases to pipeline stages */
