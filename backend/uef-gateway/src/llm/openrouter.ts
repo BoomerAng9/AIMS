@@ -136,6 +136,15 @@ export const MODELS: Record<string, ModelSpec> = {
     contextWindow: 1000000,
     tier: 'standard',
   },
+  'glm-5.1': {
+    id: 'z-ai/glm-5.1',
+    name: 'GLM-5.1',
+    provider: 'Z.ai',
+    inputPer1M: 1.0,
+    outputPer1M: 3.2,
+    contextWindow: 202752,
+    tier: 'standard',
+  },
 
   // ── Fast Tier ────────────────────────────────────────────────────────
   'gemini-3.0-flash': {
