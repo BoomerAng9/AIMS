@@ -92,6 +92,12 @@ const FORMAT_CONFIG: Record<string, FormatConfig> = {
 };
 
 // ─────────────────────────────────────────────────────────────
+// Shared TextEncoder for string byte length calculation
+// ─────────────────────────────────────────────────────────────
+
+const textEncoder = new TextEncoder();
+
+// ─────────────────────────────────────────────────────────────
 // Client-side download fallback
 // ─────────────────────────────────────────────────────────────
 
@@ -133,7 +139,8 @@ export function FileDownload({
 
   const resolvedFilename = filename || `aims-export.${format}`;
   const sizeKB = useMemo(
-    () => Math.round(new Blob([content]).size / 1024),
+    // ⚡ Bolt Optimization: Using TextEncoder is much faster than new Blob().size
+    () => Math.round(textEncoder.encode(content).length / 1024),
     [content]
   );
   const lineCount = useMemo(
@@ -358,7 +365,8 @@ export function FileDownloadGroup({ files }: { files: FileDownloadProps[] }) {
   if (files.length === 0) return null;
 
   const totalSizeKB = files.reduce(
-    (sum, f) => sum + Math.round(new Blob([f.content]).size / 1024),
+    // ⚡ Bolt Optimization: Using TextEncoder is much faster than new Blob().size
+    (sum, f) => sum + Math.round(textEncoder.encode(f.content).length / 1024),
     0
   );
 
