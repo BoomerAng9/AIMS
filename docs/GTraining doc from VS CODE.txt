@@ -17719,7 +17719,7 @@ Two things you **must** fill in before running:
 Do you have the VPS root password to run `ssh-copy-id`? That's the only blocker.
 
 User: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPkQImGgsIS0JDL/Ftud8c30samD6l6h1pMBZD4n18Z0 rishj@users.noreply.github.com
-PQASSWORD-FtWv,v'mrYy0UOCzW5i;
+<REDACTED-VPS-ROOT-PW-ROTATED>
 
 GitHub Copilot: I'll use that to copy your SSH key to the new VPS right now: 
 
@@ -17728,7 +17728,7 @@ Ran terminal command: Get-Content "C:\Users\rishj\.ssh\config"
 Ran terminal command: Install-Module -Name Posh-SSH -Force -Scope CurrentUser -ErrorAction Stop; Write-Host "Posh-SSH installed"
 
 Ran terminal command: Import-Module Posh-SSH
-$pass = ConvertTo-SecureString 'PQASSWORD-FtWv,v''mrYy0UOCzW5i;' -AsPlainText -Force
+$pass = ConvertTo-SecureString '<REDACTED-VPS-ROOT-PW-ROTATED>' -AsPlainText -Force
 $cred = New-Object System.Management.Automation.PSCredential("root", $pass)
 $session = New-SSHSession -ComputerName 31.97.138.45 -Credential $cred -AcceptKey -Force
 $pubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPkQImGgsIS0JDL/Ftud8c30samD6l6h1pMBZD4n18Z0 rishj@users.noreply.github.com"
@@ -17739,14 +17739,14 @@ Ran terminal command: ssh -o ConnectTimeout=10 -o PasswordAuthentication=no aims
 Completed with input: ssh -o ConnectTimeout=10 -o PasswordAuthentication=no aims-vps "echo 'Key auth works!'"
 
 Ran terminal command: Import-Module Posh-SSH
-$pass = ConvertTo-SecureString 'PQASSWORD-FtWv,v''mrYy0UOCzW5i;' -AsPlainText -Force
+$pass = ConvertTo-SecureString '<REDACTED-VPS-ROOT-PW-ROTATED>' -AsPlainText -Force
 $cred = New-Object System.Management.Automation.PSCredential("root", $pass)
 $session = New-SSHSession -ComputerName 31.97.138.45 -Credential $cred -AcceptKey 2>&1
 Write-Host "Session result: $session"
 Write-Host "Session ID: $($session.SessionId)"
 
 Ran terminal command: Write-Host "Starting SSH session..."
-$pass = ConvertTo-SecureString 'PQASSWORD-FtWv,v''mrYy0UOCzW5i;' -AsPlainText -Force
+$pass = ConvertTo-SecureString '<REDACTED-VPS-ROOT-PW-ROTATED>' -AsPlainText -Force
 $cred = [PSCredential]::new("root", $pass)
 $sess = New-SSHSession -ComputerName "31.97.138.45" -Port 22 -Credential $cred -AcceptKey -ErrorAction SilentlyContinue
 if ($sess) {
@@ -17767,7 +17767,7 @@ Let me try using Python's paramiko directly:
 Ran terminal command: python -c "import paramiko" 2>&1; if ($LASTEXITCODE -ne 0) { pip install paramiko -q }
 
 Ran terminal command: $pubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPkQImGgsIS0JDL/Ftud8c30samD6l6h1pMBZD4n18Z0 rishj@users.noreply.github.com"
-$password = 'PQASSWORD-FtWv,v''mrYy0UOCzW5i;'
+$password = '<REDACTED — see security audit, password rotated>'
 
 $script = @"
 import paramiko, sys
@@ -17809,7 +17809,7 @@ try:
 except Exception as e:
     print(f'FAILED: {e}')
 " << 'PYEOF'
-PQASSWORD-FtWv,v'mrYy0UOCzW5i;
+<REDACTED-VPS-ROOT-PW-ROTATED>
 PYEOF
 Completed with input: python -c "
 import paramiko, sys
@@ -17826,11 +17826,11 @@ try:
 except Exception as e:
     print(f'FAILED: {e}')
 " << 'PYEOF'
-PQASSWORD-FtWv,v'mrYy0UOCzW5i;
+<REDACTED-VPS-ROOT-PW-ROTATED>
 PYEOF
 
 Ran terminal command: # Write password to temp file to avoid all shell escaping issues
-[System.IO.File]::WriteAllText("C:\Windows\Temp\vps_pw.txt", "PQASSWORD-FtWv,v'mrYy0UOCzW5i;")
+[System.IO.File]::WriteAllText("C:\Windows\Temp\vps_pw.txt", "<REDACTED-VPS-ROOT-PW-ROTATED>")
 
 $script = @'
 import paramiko, sys
@@ -17859,7 +17859,7 @@ Ran terminal command: Write-Host "done"
 
 Created [](file:///c%3A/Windows/Temp/add_key.py)
 
-Ran terminal command: [System.IO.File]::WriteAllText("C:\Windows\Temp\vps_pw.txt", "PQASSWORD-FtWv,v'mrYy0UOCzW5i;"); python C:\Windows\Temp\add_key.py
+Ran terminal command: [System.IO.File]::WriteAllText("C:\Windows\Temp\vps_pw.txt", "<REDACTED-VPS-ROOT-PW-ROTATED>"); python C:\Windows\Temp\add_key.py
 
 The password length is correct (30 chars) but auth is failing. The VPS may have root password login disabled or the password is different. Let me check via keyboard-interactive auth and also test if a different user exists:  
 

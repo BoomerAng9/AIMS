@@ -7,7 +7,15 @@
 
 import Redis from 'ioredis';
 
-const REDIS_URL = process.env.REDIS_URL || 'redis://:aims_redis_secret@redis:6379';
+// REDIS_URL must be provided in production via env. Local fallback uses
+// the docker-network hostname WITHOUT an embedded password — the password
+// (if any) must come from REDIS_PASSWORD or be baked into REDIS_URL by the
+// operator. Hardcoded secret-shaped strings have been removed per audit.
+const REDIS_URL =
+  process.env.REDIS_URL ||
+  (process.env.REDIS_PASSWORD
+    ? `redis://:${encodeURIComponent(process.env.REDIS_PASSWORD)}@redis:6379`
+    : 'redis://redis:6379');
 
 let redis: Redis | null = null;
 let redisReady = false;

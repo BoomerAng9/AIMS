@@ -40,7 +40,7 @@ services:
       - BRAVE_API_KEY=${BRAVE_API_KEY}
       - FIRECRAWL_URL=${FIRECRAWL_URL:-http://firecrawl:3002}
       - WAR_ROOM_URL=http://war-room:5003
-      - REDIS_URL=redis://:${REDIS_PASSWORD:-aims_redis_secret}@redis:6379
+      - REDIS_URL=redis://:${REDIS_PASSWORD:?REDIS_PASSWORD must be set in env}@redis:6379
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
       - GEMINI_API_KEY=${GEMINI_API_KEY}
       - SCOUT_CRON=${SCOUT_CRON:-0 2 * * *}
@@ -139,7 +139,7 @@ services:
       - GEMINI_API_KEY=${GEMINI_API_KEY}
       - GEMINI_MODEL=${GEMINI_MODEL:-gemini-3.0-flash}
       - BRAVE_API_KEY=${BRAVE_API_KEY}
-      - REDIS_URL=redis://:${REDIS_PASSWORD:-aims_redis_secret}@redis:6379
+      - REDIS_URL=redis://:${REDIS_PASSWORD:?REDIS_PASSWORD must be set in env}@redis:6379
       - FIREBASE_PROJECT_ID=${FIREBASE_PROJECT_ID}
       - FIREBASE_SA_KEY=/secrets/firebase-sa.json
     volumes:
