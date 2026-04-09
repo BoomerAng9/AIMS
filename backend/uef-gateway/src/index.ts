@@ -3363,7 +3363,7 @@ app.post('/ingress/acp', acpLimiter, async (req, res) => {
     // 3. LUC cost estimate
     const quote = LUCEngine.estimate(acpReq.naturalLanguage);
 
-    // 4. ORACLE 7-Gate pre-flight
+    // 4. ORACLE 8-Gate pre-flight
     const oracleResult = await Oracle.runGates(
       { intent: acpReq.intent, query: acpReq.naturalLanguage, budget: acpReq.budget },
       { quote }

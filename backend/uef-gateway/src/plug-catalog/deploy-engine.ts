@@ -22,6 +22,7 @@ import { instanceStore } from './instance-store';
 import { tenantNetworks } from './tenant-networks';
 import { liveSim } from '../livesim';
 import { Oracle } from '../oracle';
+import { LUCEngine } from '../luc';
 import { integrationRegistry } from '../integrations';
 import type {
   PlugDefinition,
@@ -118,17 +119,15 @@ export class PlugDeployEngine {
     };
 
     // 0. ORACLE 8-gate verification — pre-flight security and governance check
+    const deployDescription = `Deploy plug "${plug.name}" (${plug.id}) for user ${request.userId} in ${request.deliveryMode} mode`;
+    const lucDeployQuote = LUCEngine.estimate(deployDescription, undefined, 'deployment' as any);
     const oracleSpec = {
-      query: `Deploy plug "${plug.name}" (${plug.id}) for user ${request.userId} in ${request.deliveryMode} mode`,
+      query: deployDescription,
       intent: 'BUILD_PLUG',
       userId: request.userId,
       budget: { maxUsd: 10 }, // Default per-deploy budget cap
     };
-    const oracleOutput = {
-      quote: {
-        variants: [{ model: 'docker-deploy', estimate: { totalTokens: 1000, totalUsd: (plug as any).pricing?.hourlyUsd || 0.01 } }],
-      },
-    };
+    const oracleOutput = { quote: lucDeployQuote };
     const oracleResult = await Oracle.runGates(oracleSpec, oracleOutput);
     addEvent('oracle', `ORACLE 8-gate: ${oracleResult.passed ? 'PASS' : 'FAIL'} (score: ${oracleResult.score}/100)`);
 
