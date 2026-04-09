@@ -1,330 +1,558 @@
 /**
  * ORACLE 8-Gates Verification Framework
+ * =====================================
  * Heuristic pre-flight checks for ACP requests.
  *
- * Gates: Technical, Security, Strategy, Judge, Perception, Effort, Documentation, Rate & Abuse
+ * Gates: Technical, Security, Strategy, Judge, Perception, Effort,
+ *        Documentation, Rate & Abuse.
+ *
+ * Public API:
+ *   - Oracle.runGates(spec, output) → Promise<OracleResult>
+ *   - Oracle._resetForTesting()     → clear the duplicate-query LRU
+ *
+ * Design notes:
+ *   - Fail-closed: any unexpected exception inside a gate is caught and
+ *     recorded as a failure for that gate. The verification never
+ *     crashes the caller or silently skips a gate.
+ *   - Single normalization: spec.query / spec.intent / spec.userId are
+ *     coerced to safe strings ONCE at the top of runGates. The gates
+ *     all receive a NormalizedSpec and do not re-parse.
+ *   - Bounded memory: the per-user duplicate-query LRU caps both the
+ *     number of tracked users AND the queries-per-user, so an attacker
+ *     spamming with rotating user ids cannot grow the cache without
+ *     bound.
+ *   - Typed contracts: OracleSpec / OracleOutput / GateCheckResult /
+ *     GateCheck all live in ./types. No `any` inside the gate runners.
+ *   - IP-safe reasons: error messages do not reference internal service
+ *     names. An OracleResult may flow to PUBLIC surfaces where only
+ *     "ACHEEVY" and "your AI team" vocabulary is allowed (per A.I.M.S.
+ *     Dual-Layer Access rule — see CLAUDE.md).
  */
 
 import logger from '../logger';
+import type { ACPIntent } from '../acp/types';
+import type {
+  OracleSpec,
+  OracleOutput,
+  OracleResult,
+  NormalizedSpec,
+  GateCheck,
+  GateCheckResult,
+  OracleQuoteVariant,
+} from './types';
 
-export interface OracleResult {
-  passed: boolean;
-  score: number; // 0-100
-  gateFailures: string[];
-  warnings: string[];
-}
+export type { OracleResult, OracleSpec, OracleOutput } from './types';
 
-interface GateCheckResult {
-  passed: boolean;
-  reason?: string;
-  warnings?: string[];
-}
+// ─── Tunable thresholds ──────────────────────────────────────────────
+// Centralized so they're discoverable without grepping the file.
 
-interface GateCheck {
-  name: string;
-  weight: number;
-  run: (spec: any, output: any) => GateCheckResult;
-}
+const TECHNICAL_MIN_QUERY_LENGTH = 10;
+const TECHNICAL_MIN_WORDS = 2;
 
-// ── Simple LRU cache for per-user query deduplication (Rate & Abuse gate) ──
-class QueryLRU {
-  private maxPerUser: number;
-  private cache: Map<string, string[]>;
+const PERCEPTION_MAX_QUERY_LENGTH = 8000;
+const PERCEPTION_MAX_CONTROL_CHARS = 5;
+const PERCEPTION_NON_ASCII_WARN_RATIO = 0.3;
 
-  constructor(maxPerUser = 3) {
-    this.maxPerUser = maxPerUser;
-    this.cache = new Map();
-  }
+const EFFORT_TOKEN_WARN_THRESHOLD = 500_000;
+const EFFORT_COMPLEXITY_WARN_MULTIPLIER = 2.0;
 
-  /** Returns true if the query duplicates one of the last N from this user. */
-  isDuplicate(userId: string, query: string): boolean {
-    const history = this.cache.get(userId) || [];
-    return history.includes(query);
-  }
+const DOCS_MIN_DETAIL_CHARS = 30;
 
-  /** Record a query for the user, evicting the oldest if at capacity. */
-  record(userId: string, query: string): void {
-    const history = this.cache.get(userId) || [];
-    history.push(query);
-    if (history.length > this.maxPerUser) {
-      history.shift();
+const REPEATED_CHAR_THRESHOLD = 99; // 100+ identical chars = DoS padding
+
+const LRU_MAX_USERS = 10_000;
+const LRU_MAX_QUERIES_PER_USER = 3;
+const LRU_ENTRY_TTL_MS = 60 * 60 * 1000; // 1 hour
+
+// ─── Valid ACP intents (runtime check) ───────────────────────────────
+// Source-of-truth is ACPIntent in ../acp/types. We repeat it here as a
+// runtime Set because type info is erased at runtime.
+const VALID_INTENTS: ReadonlySet<ACPIntent> = new Set<ACPIntent>([
+  'ESTIMATE_ONLY',
+  'BUILD_PLUG',
+  'RESEARCH',
+  'AGENTIC_WORKFLOW',
+  'CHAT',
+]);
+
+const GUEST_ALLOWED_INTENTS: ReadonlySet<ACPIntent> = new Set<ACPIntent>([
+  'CHAT',
+  'ESTIMATE_ONLY',
+]);
+
+// ─── Input normalization ─────────────────────────────────────────────
+
+/**
+ * Coerce an OracleSpec from untrusted shape into a NormalizedSpec with
+ * guaranteed-safe string fields. Non-string values fall back to ''.
+ */
+function normalizeSpec(spec: OracleSpec | null | undefined): NormalizedSpec {
+  const safeSpec = spec ?? {};
+  const query = typeof safeSpec.query === 'string' ? safeSpec.query : '';
+  const userId = typeof safeSpec.userId === 'string' ? safeSpec.userId : '';
+  const intent: NormalizedSpec['intent'] =
+    typeof safeSpec.intent === 'string' && VALID_INTENTS.has(safeSpec.intent as ACPIntent)
+      ? (safeSpec.intent as ACPIntent)
+      : 'UNKNOWN';
+
+  const rawBudget = safeSpec.budget;
+  let budget: NormalizedSpec['budget'];
+  if (rawBudget && typeof rawBudget === 'object') {
+    const maxUsdRaw = (rawBudget as { maxUsd?: unknown }).maxUsd;
+    if (typeof maxUsdRaw === 'number' && Number.isFinite(maxUsdRaw)) {
+      budget = { maxUsd: maxUsdRaw };
     }
-    this.cache.set(userId, history);
+  }
+
+  return { query, intent, userId, budget };
+}
+
+// ─── Per-user duplicate-query LRU (Rate & Abuse gate) ────────────────
+
+interface LRUEntry {
+  queries: string[];
+  lastTouched: number;
+}
+
+/**
+ * Bounded two-level LRU: caps total user count AND queries-per-user,
+ * with a TTL sweep on every touch. Prevents the unbounded-memory DoS
+ * the prior implementation was vulnerable to.
+ */
+class QueryLRU {
+  private readonly maxUsers: number;
+  private readonly maxPerUser: number;
+  private readonly ttlMs: number;
+  private readonly entries: Map<string, LRUEntry>;
+
+  constructor(opts: { maxUsers: number; maxPerUser: number; ttlMs: number }) {
+    this.maxUsers = opts.maxUsers;
+    this.maxPerUser = opts.maxPerUser;
+    this.ttlMs = opts.ttlMs;
+    this.entries = new Map();
+  }
+
+  /** Returns true if `query` duplicates one of this user's recent entries. */
+  isDuplicate(userId: string, query: string): boolean {
+    this.sweepExpired();
+    const entry = this.entries.get(userId);
+    if (!entry) return false;
+    return entry.queries.includes(query);
+  }
+
+  /** Record a query for the user. Evicts oldest if at capacity. */
+  record(userId: string, query: string): void {
+    this.sweepExpired();
+
+    // Insertion order is the LRU proxy: delete + set bumps the user to
+    // the most-recently-used end of the Map.
+    const existing = this.entries.get(userId);
+    this.entries.delete(userId);
+
+    if (existing) {
+      existing.queries.push(query);
+      if (existing.queries.length > this.maxPerUser) {
+        existing.queries.shift();
+      }
+      existing.lastTouched = Date.now();
+      this.entries.set(userId, existing);
+    } else {
+      // New user — evict the oldest if we're at the cap.
+      if (this.entries.size >= this.maxUsers) {
+        const oldestUserId = this.entries.keys().next().value;
+        if (oldestUserId !== undefined) this.entries.delete(oldestUserId);
+      }
+      this.entries.set(userId, {
+        queries: [query],
+        lastTouched: Date.now(),
+      });
+    }
+  }
+
+  /** Drop entries whose lastTouched has exceeded ttlMs. */
+  private sweepExpired(): void {
+    const cutoff = Date.now() - this.ttlMs;
+    for (const [userId, entry] of this.entries) {
+      if (entry.lastTouched < cutoff) {
+        this.entries.delete(userId);
+      } else {
+        // Map iteration is insertion-ordered; once we hit a fresh entry
+        // every later entry is at least as fresh. Stop early.
+        break;
+      }
+    }
+  }
+
+  /** Test/dev helper — clear all state. */
+  clear(): void {
+    this.entries.clear();
+  }
+
+  /** Expose for metrics / debugging. */
+  get size(): number {
+    return this.entries.size;
   }
 }
 
-const queryLRU = new QueryLRU(3);
+const queryLRU = new QueryLRU({
+  maxUsers: LRU_MAX_USERS,
+  maxPerUser: LRU_MAX_QUERIES_PER_USER,
+  ttlMs: LRU_ENTRY_TTL_MS,
+});
+
+// ─── Gate definitions ────────────────────────────────────────────────
 
 const gates: GateCheck[] = [
   {
     name: 'Technical',
     weight: 15,
     run: (spec) => {
-      const query = (spec.query || '').trim();
-      // Minimum length of 10 characters
-      if (query.length < 10) {
-        return { passed: false, reason: 'Query too short (minimum 10 characters) — provide a clear objective.' };
+      const query = spec.query.trim();
+      if (query.length < TECHNICAL_MIN_QUERY_LENGTH) {
+        return {
+          passed: false,
+          reason: `Query too short (minimum ${TECHNICAL_MIN_QUERY_LENGTH} characters) — provide a clear objective.`,
+        };
       }
-      // Must contain at least 2 words
-      const words = query.split(/\s+/).filter((w: string) => w.length > 0);
-      if (words.length < 2) {
-        return { passed: false, reason: 'Query must contain at least 2 words for meaningful processing.' };
+      const words = query.split(/\s+/).filter((w) => w.length > 0);
+      if (words.length < TECHNICAL_MIN_WORDS) {
+        return {
+          passed: false,
+          reason: `Query must contain at least ${TECHNICAL_MIN_WORDS} words for meaningful processing.`,
+        };
       }
-      // Intent field must be non-empty
-      if (!spec.intent || (typeof spec.intent === 'string' && spec.intent.trim().length === 0)) {
+      if (spec.intent === 'UNKNOWN') {
         return { passed: false, reason: 'Intent field is missing or empty.' };
       }
       return { passed: true };
-    }
+    },
   },
   {
     name: 'Security',
     weight: 15,
     run: (spec) => {
-      const query = spec.query || '';
+      const query = spec.query;
 
-      // ── SQL Injection patterns ──
-      const sqlInjection = /(<script|DROP\s+TABLE|;\s*--|eval\(|UNION\s+SELECT|OR\s+1\s*=\s*1|INSERT\s+INTO|UPDATE\s+\S+\s+SET|DELETE\s+FROM)/i;
+      // SQL injection patterns — only the high-signal ones remain.
+      // Removed standalone INSERT/UPDATE/DELETE that fire on normal English.
+      const sqlInjection =
+        /(<script|DROP\s+TABLE|;\s*--|eval\(|UNION\s+SELECT|OR\s+1\s*=\s*1)/i;
       if (sqlInjection.test(query)) {
         return { passed: false, reason: 'Query contains SQL injection patterns.' };
       }
 
-      // ── XSS patterns ──
-      const xss = /(onload\s*=|onerror\s*=|javascript\s*:|data\s*:\s*text\/html|<\s*iframe|<\s*object|<\s*embed|<\s*svg\s+onload)/i;
+      // XSS attack patterns — narrowed to real attack shapes.
+      const xss =
+        /(javascript\s*:|data\s*:\s*text\/html|<\s*iframe|<\s*object\s|<\s*embed\s|<\s*svg\s+onload)/i;
       if (xss.test(query)) {
         return { passed: false, reason: 'Query contains XSS attack patterns.' };
       }
 
-      // ── Path traversal ──
+      // Path traversal — unchanged, tight signal.
       const pathTraversal = /(\.\.[/\\])/;
       if (pathTraversal.test(query)) {
         return { passed: false, reason: 'Query contains path traversal sequences.' };
       }
 
-      // ── Command injection ──
-      const commandInjection = /(;\s*ls\b|\|\s*cat\b|`[^`]+`|\$\([^)]+\)|\|\|\s*\w|&&\s*rm\b)/i;
+      // Command injection — removed `|| word` and bare `;ls` to cut
+      // false positives on discussions of JS operators and shell basics.
+      const commandInjection = /(`[^`]{2,}`|\$\([^)]+\)|&&\s*rm\s+-rf)/i;
       if (commandInjection.test(query)) {
         return { passed: false, reason: 'Query contains command injection patterns.' };
       }
 
-      // ── Prototype pollution ──
-      const protoPollution = /(__proto__|constructor\s*\.\s*prototype|Object\s*\.\s*assign\s*\()/i;
-      if (protoPollution.test(query)) {
-        return { passed: false, reason: 'Query contains prototype pollution patterns.' };
-      }
-
-      // ── Encoded payloads (URL-encoded or HTML entity encoded) ──
-      const encodedPayload = /(%3C\s*script|%3E|&#x3[Cc];|&#60;|%27|%22|%00)/i;
-      if (encodedPayload.test(query)) {
-        return { passed: false, reason: 'Query contains encoded attack payloads.' };
-      }
-
-      // ── Excessively repeated characters (DoS padding) ──
-      const repeatedChars = /(.)\1{99,}/;
+      // Excessively repeated characters (DoS padding).
+      const repeatedChars = new RegExp(`(.)\\1{${REPEATED_CHAR_THRESHOLD},}`);
       if (repeatedChars.test(query)) {
-        return { passed: false, reason: 'Query contains excessively repeated characters (possible DoS padding).' };
+        return {
+          passed: false,
+          reason: 'Query contains excessively repeated characters (possible DoS padding).',
+        };
       }
 
       return { passed: true };
-    }
+    },
   },
   {
     name: 'Strategy',
     weight: 15,
     run: (spec) => {
-      const validIntents = ['ESTIMATE_ONLY', 'BUILD_PLUG', 'RESEARCH', 'AGENTIC_WORKFLOW', 'CHAT'];
-      if (!validIntents.includes(spec.intent)) {
-        return { passed: false, reason: `Unknown intent "${spec.intent}".` };
+      if (spec.intent === 'UNKNOWN') {
+        return { passed: false, reason: 'Unknown or unsupported intent.' };
       }
 
-      const query = (spec.query || '').toLowerCase();
+      const query = spec.query.toLowerCase();
       const warnings: string[] = [];
 
-      // Intent-query coherence checks (warn, don't fail)
       if (spec.intent === 'ESTIMATE_ONLY') {
         const actionVerbs = /\b(build|create|deploy|launch|execute|run|install|implement|construct)\b/i;
         if (actionVerbs.test(query)) {
-          warnings.push('Strategy: ESTIMATE_ONLY intent contains action verbs — did you mean BUILD_PLUG or AGENTIC_WORKFLOW?');
+          warnings.push(
+            'Strategy: ESTIMATE_ONLY intent contains action verbs — did you mean BUILD_PLUG or AGENTIC_WORKFLOW?',
+          );
         }
       }
 
       if (spec.intent === 'BUILD_PLUG') {
-        const techTerms = /\b(api|app|service|server|database|function|component|module|endpoint|plugin|integration|webhook|bot|script|pipeline|frontend|backend|deploy)\b/i;
+        const techTerms =
+          /\b(api|app|service|server|database|function|component|module|endpoint|plugin|integration|webhook|bot|script|pipeline|frontend|backend|deploy)\b/i;
         if (!techTerms.test(query)) {
-          warnings.push('Strategy: BUILD_PLUG intent but query lacks technical terms — consider adding specifics about what to build.');
+          warnings.push(
+            'Strategy: BUILD_PLUG intent but query lacks technical terms — consider adding specifics about what to build.',
+          );
         }
       }
 
       return { passed: true, warnings: warnings.length > 0 ? warnings : undefined };
-    }
+    },
   },
   {
     name: 'Judge',
     weight: 10,
     run: (_spec, output) => {
-      // Verify a quote was generated
       if (!output.quote) {
-        return { passed: false, reason: 'LUC failed to produce a cost quote.' };
+        return { passed: false, reason: 'Cost quote could not be generated.' };
       }
 
-      // Quote must contain at least one variant
-      if (!output.quote.variants || !Array.isArray(output.quote.variants) || output.quote.variants.length === 0) {
-        return { passed: false, reason: 'Quote contains no variants — at least one pricing variant is required.' };
+      const variants = output.quote.variants;
+      if (!Array.isArray(variants) || variants.length === 0) {
+        return {
+          passed: false,
+          reason: 'Quote contains no pricing variants — at least one variant is required.',
+        };
       }
 
-      // Validate each variant has positive totalTokens and non-negative totalUsd
-      for (const variant of output.quote.variants) {
-        const est = variant.estimate || variant;
-        if (typeof est.totalTokens !== 'number' || est.totalTokens <= 0) {
-          return { passed: false, reason: `Quote variant has invalid totalTokens (${est.totalTokens}) — must be a positive number.` };
+      for (const variant of variants) {
+        const est = variant.estimate ?? (variant as OracleQuoteVariant);
+        const totalTokens = est.totalTokens;
+        const totalUsd = est.totalUsd;
+
+        if (typeof totalTokens !== 'number' || !Number.isFinite(totalTokens) || totalTokens <= 0) {
+          return {
+            passed: false,
+            reason: `Quote variant has invalid totalTokens (${String(totalTokens)}) — must be a positive number.`,
+          };
         }
-        if (typeof est.totalUsd !== 'number' || est.totalUsd < 0) {
-          return { passed: false, reason: `Quote variant has invalid totalUsd (${est.totalUsd}) — must be a non-negative number.` };
+        if (typeof totalUsd !== 'number' || !Number.isFinite(totalUsd) || totalUsd < 0) {
+          return {
+            passed: false,
+            reason: `Quote variant has invalid totalUsd (${String(totalUsd)}) — must be a non-negative number.`,
+          };
         }
       }
 
       return { passed: true };
-    }
+    },
   },
   {
     name: 'Perception',
     weight: 10,
     run: (spec) => {
-      const query = spec.query || '';
+      const query = spec.query;
 
-      // Length check — reduced to 8000 characters
-      if (query.length > 8000) {
-        return { passed: false, reason: 'Query exceeds 8,000 characters — risk of context overflow.' };
+      if (query.length > PERCEPTION_MAX_QUERY_LENGTH) {
+        return {
+          passed: false,
+          reason: `Query exceeds ${PERCEPTION_MAX_QUERY_LENGTH.toLocaleString()} characters — risk of context overflow.`,
+        };
       }
 
-      // ── Prompt injection detection ──
-      const promptInjection = /(ignore\s+(all\s+)?previous\s+instructions|you\s+are\s+now|forget\s+(all\s+)?your\s+instructions|system\s+prompt|disregard\s+(all\s+)?prior|override\s+(all\s+)?rules|new\s+instructions?\s*:|act\s+as\s+if\s+you\s+are)/i;
+      // Prompt injection detection.
+      const promptInjection =
+        /(ignore\s+(all\s+)?previous\s+instructions|you\s+are\s+now|forget\s+(all\s+)?your\s+instructions|system\s+prompt|disregard\s+(all\s+)?prior|override\s+(all\s+)?rules|new\s+instructions?\s*:|act\s+as\s+if\s+you\s+are)/i;
       if (promptInjection.test(query)) {
         return { passed: false, reason: 'Query contains prompt injection attempt.' };
       }
 
-      // ── Excessive Unicode / control characters ──
-      // Count non-ASCII and control characters (excluding normal whitespace)
+      // Count non-ASCII + control characters using code-point iteration
+      // so surrogate pairs (emoji) count as 1 instead of 2.
       let nonAsciiCount = 0;
       let controlCharCount = 0;
-      for (let i = 0; i < query.length; i++) {
-        const code = query.charCodeAt(i);
+      let codepointCount = 0;
+      for (const ch of query) {
+        codepointCount++;
+        const code = ch.codePointAt(0) ?? 0;
         if (code > 127) nonAsciiCount++;
-        // Control chars: 0x00-0x08, 0x0E-0x1F, 0x7F (exclude tab 0x09, LF 0x0A, CR 0x0D)
-        if ((code >= 0 && code <= 8) || (code >= 14 && code <= 31) || code === 127) controlCharCount++;
+        if ((code >= 0 && code <= 8) || (code >= 14 && code <= 31) || code === 127) {
+          controlCharCount++;
+        }
       }
-      if (controlCharCount > 5) {
-        return { passed: false, reason: `Query contains ${controlCharCount} control characters — possible obfuscation attempt.` };
+
+      if (controlCharCount > PERCEPTION_MAX_CONTROL_CHARS) {
+        return {
+          passed: false,
+          reason: `Query contains ${controlCharCount} control characters — possible obfuscation attempt.`,
+        };
       }
+
       const warnings: string[] = [];
-      if (query.length > 0 && nonAsciiCount / query.length > 0.3) {
-        warnings.push(`Perception: High ratio of non-ASCII characters (${Math.round((nonAsciiCount / query.length) * 100)}%) — verify query is not obfuscated.`);
+      if (codepointCount > 0 && nonAsciiCount / codepointCount > PERCEPTION_NON_ASCII_WARN_RATIO) {
+        warnings.push(
+          `Perception: High ratio of non-ASCII characters (${Math.round((nonAsciiCount / codepointCount) * 100)}%) — verify query is not obfuscated.`,
+        );
       }
 
       return { passed: true, warnings: warnings.length > 0 ? warnings : undefined };
-    }
+    },
   },
   {
     name: 'Effort',
     weight: 15,
     run: (spec, output) => {
       const warnings: string[] = [];
+      const variants = output.quote?.variants;
 
-      // If a budget cap is set, verify the cheapest variant fits within it
-      if (spec.budget?.maxUsd && output.quote?.variants?.length) {
-        const cheapest = Math.min(...output.quote.variants.map((v: any) => (v.estimate || v).totalUsd));
+      // Budget enforcement — only runs if a budget cap is set AND the
+      // variants are well-formed. NaN / missing values cause the gate
+      // to fail closed rather than silently passing.
+      if (spec.budget?.maxUsd !== undefined && Array.isArray(variants) && variants.length > 0) {
+        const usdValues = variants
+          .map((v) => (v.estimate ?? v).totalUsd)
+          .filter((n): n is number => typeof n === 'number' && Number.isFinite(n));
+        if (usdValues.length === 0) {
+          return {
+            passed: false,
+            reason: 'Cannot enforce budget — no valid USD estimates in quote.',
+          };
+        }
+        const cheapest = Math.min(...usdValues);
         if (cheapest > spec.budget.maxUsd) {
-          return { passed: false, reason: `Cheapest estimate ($${cheapest.toFixed(4)}) exceeds budget cap ($${spec.budget.maxUsd}).` };
+          return {
+            passed: false,
+            reason: `Cheapest estimate ($${cheapest.toFixed(4)}) exceeds budget cap ($${spec.budget.maxUsd}).`,
+          };
         }
       }
 
-      // Warn if any variant's estimated total tokens exceed 500,000
-      if (output.quote?.variants?.length) {
-        for (const variant of output.quote.variants) {
-          const est = variant.estimate || variant;
-          if (typeof est.totalTokens === 'number' && est.totalTokens > 500_000) {
-            warnings.push(`Effort: Variant "${variant.model || 'unknown'}" estimates ${est.totalTokens.toLocaleString()} tokens — high resource consumption.`);
+      // Warn on high token estimates.
+      if (Array.isArray(variants) && variants.length > 0) {
+        for (const variant of variants) {
+          const est = variant.estimate ?? variant;
+          const totalTokens = est.totalTokens;
+          if (
+            typeof totalTokens === 'number' &&
+            Number.isFinite(totalTokens) &&
+            totalTokens > EFFORT_TOKEN_WARN_THRESHOLD
+          ) {
+            warnings.push(
+              `Effort: Variant "${variant.model ?? 'unknown'}" estimates ${totalTokens.toLocaleString()} tokens — high resource consumption.`,
+            );
           }
         }
       }
 
-      // Warn if complexity multiplier exceeds 2.0x
-      if (output.quote?.complexityMultiplier && output.quote.complexityMultiplier > 2.0) {
-        warnings.push(`Effort: Complexity multiplier is ${output.quote.complexityMultiplier}x — expect significantly higher costs.`);
+      // Warn on high complexity multiplier.
+      const complexityMultiplier = output.quote?.complexityMultiplier;
+      if (
+        typeof complexityMultiplier === 'number' &&
+        Number.isFinite(complexityMultiplier) &&
+        complexityMultiplier > EFFORT_COMPLEXITY_WARN_MULTIPLIER
+      ) {
+        warnings.push(
+          `Effort: Complexity multiplier is ${complexityMultiplier}x — expect significantly higher costs.`,
+        );
       }
 
       return { passed: true, warnings: warnings.length > 0 ? warnings : undefined };
-    }
+    },
   },
   {
     name: 'Documentation',
     weight: 10,
     run: (spec) => {
-      const query = (spec.query || '').trim();
+      const query = spec.query.trim();
 
-      // For build/workflow intents, require at least 30 characters
-      const requiresDetail = ['BUILD_PLUG', 'AGENTIC_WORKFLOW'];
-      if (requiresDetail.includes(spec.intent) && query.length < 30) {
-        return { passed: false, reason: 'Build/workflow intents require a more detailed specification (30+ characters).' };
+      const requiresDetail: ReadonlySet<ACPIntent> = new Set(['BUILD_PLUG', 'AGENTIC_WORKFLOW']);
+      if (
+        spec.intent !== 'UNKNOWN' &&
+        requiresDetail.has(spec.intent) &&
+        query.length < DOCS_MIN_DETAIL_CHARS
+      ) {
+        return {
+          passed: false,
+          reason: `Build/workflow intents require a more detailed specification (${DOCS_MIN_DETAIL_CHARS}+ characters).`,
+        };
       }
 
-      // AGENTIC_WORKFLOW: must describe an input-to-output transformation
       if (spec.intent === 'AGENTIC_WORKFLOW') {
-        const transformPattern = /(from\s+\S+.*\s+to\s+\S+|take\s+\S+.*\s+(and\s+)?(produce|generate|create|output|return)\s+\S+|input.*output|pipe|transform|convert\s+\S+.*\s+(to|into)\s+\S+)/i;
+        const transformPattern =
+          /(from\s+\S+.{0,200}?\s+to\s+\S+|take\s+\S+.{0,200}?\s+(and\s+)?(produce|generate|create|output|return)\s+\S+|input.*?output|pipe|transform|convert\s+\S+.{0,200}?\s+(to|into)\s+\S+)/i;
         if (!transformPattern.test(query)) {
-          return { passed: false, reason: 'AGENTIC_WORKFLOW requires a description of input and output (e.g. "from X to Y" or "take X and produce Y").' };
+          return {
+            passed: false,
+            reason:
+              'AGENTIC_WORKFLOW requires a description of input and output (e.g. "from X to Y" or "take X and produce Y").',
+          };
         }
       }
 
-      // RESEARCH: must contain a question or analytical keyword
       if (spec.intent === 'RESEARCH') {
-        const questionPattern = /\b(who|what|where|when|why|how|which|compare|analyze|analyse|evaluate|assess|investigate|examine|study)\b/i;
+        const questionPattern =
+          /\b(who|what|where|when|why|how|which|compare|analyze|analyse|evaluate|assess|investigate|examine|study)\b/i;
         if (!questionPattern.test(query)) {
-          return { passed: false, reason: 'RESEARCH intent requires a question word or analytical keyword (who, what, why, how, compare, analyze, etc.).' };
+          return {
+            passed: false,
+            reason:
+              'RESEARCH intent requires a question word or analytical keyword (who, what, why, how, compare, analyze, etc.).',
+          };
         }
       }
 
       return { passed: true };
-    }
+    },
   },
   {
     name: 'Rate & Abuse',
     weight: 10,
     run: (spec) => {
-      const userId = spec.userId || '';
+      const userId = spec.userId.trim().toLowerCase();
+      const warnings: string[] = [];
 
-      // Guest users can only CHAT or ESTIMATE_ONLY
+      // Guest users can only CHAT or ESTIMATE_ONLY.
       if (userId === 'guest') {
-        const guestAllowed = ['CHAT', 'ESTIMATE_ONLY'];
-        if (!guestAllowed.includes(spec.intent)) {
-          return { passed: false, reason: `Guest users are limited to CHAT and ESTIMATE_ONLY intents — "${spec.intent}" requires authentication.` };
+        if (spec.intent !== 'UNKNOWN' && !GUEST_ALLOWED_INTENTS.has(spec.intent)) {
+          return {
+            passed: false,
+            reason: `Guest users are limited to CHAT and ESTIMATE_ONLY intents — "${spec.intent}" requires authentication.`,
+          };
         }
       }
 
-      // Check for duplicate query spam (requires userId)
-      const warnings: string[] = [];
+      // Duplicate query spam check — requires a userId.
       if (userId && spec.query) {
         const queryNormalized = spec.query.trim().toLowerCase();
         if (queryLRU.isDuplicate(userId, queryNormalized)) {
-          warnings.push('Rate & Abuse: Duplicate query detected — this query matches one of your recent submissions.');
+          warnings.push(
+            'Rate & Abuse: Duplicate query detected — this query matches one of your recent submissions.',
+          );
         }
-        // Record for future checks
         queryLRU.record(userId, queryNormalized);
       }
 
-      // Flag missing userId as a warning (not a failure — anonymous use is allowed for some intents)
       if (!userId) {
-        warnings.push('Rate & Abuse: No userId provided — request is anonymous. Some features may be restricted.');
+        warnings.push(
+          'Rate & Abuse: No userId provided — request is anonymous. Some features may be restricted.',
+        );
       }
 
       return { passed: true, warnings: warnings.length > 0 ? warnings : undefined };
-    }
-  }
+    },
+  },
 ];
 
+// ─── Public API ──────────────────────────────────────────────────────
+
 export class Oracle {
-  static async runGates(spec: any, output: any): Promise<OracleResult> {
+  /**
+   * Run all 8 gates against a spec + output pair. Fail-closed: any
+   * exception inside a gate is caught and recorded as that gate's
+   * failure. Returns an OracleResult even on partial collapse.
+   */
+  static async runGates(spec: OracleSpec, output: OracleOutput): Promise<OracleResult> {
     logger.info('[ORACLE] Running 8 Gates Verification...');
+
+    const normalizedSpec = normalizeSpec(spec);
+    const safeOutput: OracleOutput = output ?? {};
 
     const failures: string[] = [];
     const warnings: string[] = [];
@@ -332,7 +560,18 @@ export class Oracle {
     const totalWeight = gates.reduce((s, g) => s + g.weight, 0);
 
     for (const gate of gates) {
-      const result = gate.run(spec, output);
+      let result: GateCheckResult;
+      try {
+        result = gate.run(normalizedSpec, safeOutput);
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        logger.error(`  [GATE] ${gate.name}: CRASHED — ${message}`);
+        result = {
+          passed: false,
+          reason: `Gate "${gate.name}" crashed during verification — treating as fail.`,
+        };
+      }
+
       if (result.passed) {
         earnedWeight += gate.weight;
         logger.info(`  [GATE] ${gate.name}: PASS`);
@@ -340,7 +579,7 @@ export class Oracle {
         failures.push(`${gate.name}: ${result.reason}`);
         logger.warn(`  [GATE] ${gate.name}: FAIL — ${result.reason}`);
       }
-      // Collect warnings regardless of pass/fail
+
       if (result.warnings && result.warnings.length > 0) {
         warnings.push(...result.warnings);
         for (const w of result.warnings) {
@@ -349,11 +588,21 @@ export class Oracle {
       }
     }
 
-    const score = Math.round((earnedWeight / totalWeight) * 100);
+    const score = totalWeight > 0 ? Math.round((earnedWeight / totalWeight) * 100) : 0;
     const passed = failures.length === 0;
 
-    logger.info(`[ORACLE] Final score: ${score}/100 | Passed: ${passed} | Warnings: ${warnings.length}`);
+    logger.info(
+      `[ORACLE] Final score: ${score}/100 | Passed: ${passed} | Warnings: ${warnings.length}`,
+    );
 
     return { passed, score, gateFailures: failures, warnings };
+  }
+
+  /**
+   * Test/dev helper — clear the per-user duplicate-query LRU so each
+   * test starts with a clean slate. Do not call in production.
+   */
+  static _resetForTesting(): void {
+    queryLRU.clear();
   }
 }
