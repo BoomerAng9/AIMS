@@ -247,14 +247,14 @@ export async function generateDynamicSteps(
     usedFallback = true;
   }
 
-  // 5. ORACLE 8-Gate
+  // 5. ORACLE 8-Gate — use a real LUC estimate, not fabricated numbers
+  const stepSpec = steps.join('\n');
+  const lucPreFlightQuote = LUCEngine.estimate(stepSpec, undefined, 'AGENTIC_WORKFLOW' as any);
   const oracleSpec = {
-    query: steps.join('\n'), intent: 'AGENTIC_WORKFLOW', userId,
+    query: stepSpec, intent: 'AGENTIC_WORKFLOW', userId,
     budget: { maxUsd: 50, maxTokens: 500000 },
   };
-  const oracleOutput = {
-    quote: { variants: [{ estimate: { totalTokens: steps.length * 2000, totalUsd: steps.length * 0.02 } }] },
-  };
+  const oracleOutput = { quote: lucPreFlightQuote };
 
   const oracleResult: OracleResult = await Oracle.runGates(oracleSpec, oracleOutput);
 
