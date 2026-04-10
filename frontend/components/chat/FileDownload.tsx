@@ -19,6 +19,10 @@
 
 import { useState, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+
+// ⚡ Bolt Optimization: Instantiate TextEncoder once outside the component
+// to prevent memory allocation and garbage collection overhead on every render.
+const textEncoder = new TextEncoder();
 import {
   Download,
   Check,
@@ -133,7 +137,8 @@ export function FileDownload({
 
   const resolvedFilename = filename || `aims-export.${format}`;
   const sizeKB = useMemo(
-    () => Math.round(new Blob([content]).size / 1024),
+    // ⚡ Bolt Optimization: Use TextEncoder instead of Blob for faster string byte length calculation
+    () => Math.round(textEncoder.encode(content).length / 1024),
     [content]
   );
   const lineCount = useMemo(
@@ -358,7 +363,8 @@ export function FileDownloadGroup({ files }: { files: FileDownloadProps[] }) {
   if (files.length === 0) return null;
 
   const totalSizeKB = files.reduce(
-    (sum, f) => sum + Math.round(new Blob([f.content]).size / 1024),
+    // ⚡ Bolt Optimization: Use TextEncoder instead of Blob for faster string byte length calculation
+    (sum, f) => sum + Math.round(textEncoder.encode(f.content).length / 1024),
     0
   );
 
