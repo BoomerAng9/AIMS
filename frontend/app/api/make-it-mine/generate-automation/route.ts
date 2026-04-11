@@ -29,7 +29,7 @@ const MODELS: Record<string, string> = {
   'gpt-4.1-mini':  'openai/gpt-4.1-mini',
 };
 
-const DEFAULT_MODEL = 'deepseek-v3';
+const DEFAULT_MODEL = 'gemini-flash';
 
 const SYSTEM_PROMPT = `You are an expert automation architect. You create visual workflow automation prototypes as single-file HTML applications.
 
