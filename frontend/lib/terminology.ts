@@ -101,7 +101,7 @@ export const TERMS: Record<string, TermEntry> = {
 
   // ── Plans & Tiers ──────────────────────────────────────────
   yourSpace: { technical: 'Your Space', simple: 'My Workspace', definition: 'Personal workspace with projects, deployments, and customizations.', category: 'features', aliases: ['my workspace', 'my stuff', 'personal space'] },
-  modelGarden: { technical: 'Model Garden', simple: 'AI Models', definition: 'Selection of available AI models (Claude, GPT-4, Gemini, Qwen) with cost and capability comparison.', category: 'features', aliases: ['ai models', 'model picker', 'which ai'] },
+  theLab: { technical: 'The Lab', simple: 'AI Models', definition: 'Catalog of every tool, model, and service available — filterable, sortable, with cost and capability comparison.', category: 'features', aliases: ['ai models', 'model picker', 'which ai', 'the lab'] },
   workbench: { technical: 'Workbench', simple: 'Tools', definition: 'Development environment with IDE, terminal, and debugging tools for hands-on work.', category: 'features', aliases: ['tools', 'editor', 'dev environment'] },
   workstreams: { technical: 'Workstreams', simple: 'Projects', definition: 'Organized project streams with task tracking, agent assignments, and progress monitoring.', category: 'features', aliases: ['projects', 'tasks', 'work items'] },
 

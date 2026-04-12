@@ -27,7 +27,7 @@ import {
 // ─────────────────────────────────────────────────────────────
 
 const LUCPanel = lazy(() => import('@/app/dashboard/luc/page'));
-const ModelGardenPanel = lazy(() => import('@/app/dashboard/model-garden/page'));
+const TheLabPanel = lazy(() => import('@/app/dashboard/the-lab/page'));
 const SettingsPanel = lazy(() => import('@/app/dashboard/settings/page'));
 const WorkstreamsPanel = lazy(() => import('@/app/dashboard/workstreams/page'));
 const PlanPanel = lazy(() => import('@/app/dashboard/plan/page'));
@@ -40,7 +40,7 @@ const ResearchPanel = lazy(() => import('@/app/dashboard/research/page'));
 
 type CircuitBoxTab =
   | 'services' | 'topology' | 'integrations' | 'social-channels' | 'security' | 'control-plane'
-  | 'model-garden' | 'boomerangs' | 'live-events'
+  | 'the-lab' | 'boomerangs' | 'live-events'
   | 'luc' | 'workbench' | 'workstreams' | 'plan'
   | 'settings' | 'research';
 
@@ -112,7 +112,7 @@ const OWNER_SECTIONS: SectionGroup[] = [
   {
     label: 'Intelligence',
     tabs: [
-      { id: 'model-garden', label: 'Model Garden', icon: '🌱' },
+      { id: 'the-lab', label: 'The Lab', icon: '🧪' },
       { id: 'boomerangs', label: 'Boomer_Angs', icon: '🤖' },
     ],
   },
@@ -235,7 +235,7 @@ const ToggleOffIcon = ({ className }: { className?: string }) => (
 // ─────────────────────────────────────────────────────────────
 
 const DEFAULT_SERVICES: ServiceStatus[] = [
-  { id: 'frontend', name: 'Frontend', type: 'core', status: 'offline', endpoint: 'https://plugmein.cloud', features: ['Dashboard', 'LUC', 'Model Garden'] },
+  { id: 'frontend', name: 'Frontend', type: 'core', status: 'offline', endpoint: 'https://plugmein.cloud', features: ['Dashboard', 'LUC', 'The Lab'] },
   { id: 'uef-gateway', name: 'UEF Gateway', type: 'core', status: 'offline', endpoint: 'http://uef-gateway:4000', features: ['ACP', 'UCP', 'Orchestration'], ownerOnly: true },
   { id: 'acheevy', name: 'ACHEEVY', type: 'core', status: 'offline', endpoint: 'http://acheevy:3003', features: ['Intent Analysis', 'Executive Control'] },
   { id: 'house-of-ang', name: 'House of Ang', type: 'core', status: 'offline', endpoint: 'http://house-of-ang:3002', features: ['Agent Registry', 'Routing'], ownerOnly: true },
@@ -1632,9 +1632,9 @@ function CircuitBoxContent() {
               <LiveEventsPanel events={liveEvents} />
             )}
 
-            {activeTab === 'model-garden' && (
+            {activeTab === 'the-lab' && (
               <Suspense fallback={<PanelLoader />}>
-                <div className="circuit-box-panel"><ModelGardenPanel /></div>
+                <div className="circuit-box-panel"><TheLabPanel /></div>
               </Suspense>
             )}
 
