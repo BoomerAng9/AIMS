@@ -36,8 +36,10 @@ import {
 } from 'lucide-react';
 
 // ─────────────────────────────────────────────────────────────
-// Types
+// Types & Constants
 // ─────────────────────────────────────────────────────────────
+
+const TEXT_ENCODER = new TextEncoder();
 
 interface FileDownloadProps {
   content: string;
@@ -133,7 +135,7 @@ export function FileDownload({
 
   const resolvedFilename = filename || `aims-export.${format}`;
   const sizeKB = useMemo(
-    () => Math.round(new Blob([content]).size / 1024),
+    () => Math.round(TEXT_ENCODER.encode(content).length / 1024),
     [content]
   );
   const lineCount = useMemo(
@@ -358,7 +360,7 @@ export function FileDownloadGroup({ files }: { files: FileDownloadProps[] }) {
   if (files.length === 0) return null;
 
   const totalSizeKB = files.reduce(
-    (sum, f) => sum + Math.round(new Blob([f.content]).size / 1024),
+    (sum, f) => sum + Math.round(TEXT_ENCODER.encode(f.content).length / 1024),
     0
   );
 
