@@ -47,7 +47,16 @@ const storage = new Storage({ projectId: PROJECT_ID });
 
 const ComposeRequestSchema = z.object({
   environmentVideoUrl: z.string().url(),
-  characterVideoUrl: z.string().url(),
+  /**
+   * URL of the character clip with **honest per-pixel alpha** (VP9 in
+   * WebM or ProRes 4444 in MOV). Produced by the Operations Floor
+   * matting service (`services/operations-floor-matting/`). The old
+   * `characterVideoUrl` + `mix-blend-mode: screen` path was retired —
+   * that fake alpha bled at low-luminance edges and wasn't
+   * production-grade. Callers must route raw Seedance output through
+   * the matting service first and pass the resulting cutout URL here.
+   */
+  characterCutoutUrl: z.string().url(),
   durationSeconds: z.number().positive().max(60).default(6),
   fps: z.union([z.literal(24), z.literal(30)]).default(24),
   characterStartFrame: z.number().int().min(0).optional(),
@@ -116,7 +125,7 @@ app.post('/compose', async (req: Request, res: Response) => {
       outputLocation: outFile,
       inputProps: {
         environmentVideoUrl: body.environmentVideoUrl,
-        characterVideoUrl: body.characterVideoUrl,
+        characterCutoutUrl: body.characterCutoutUrl,
         fps: body.fps,
         durationInFrames,
         characterStartFrame: body.characterStartFrame ?? 0,

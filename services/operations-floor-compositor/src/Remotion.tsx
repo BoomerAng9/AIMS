@@ -13,7 +13,7 @@ import {
 
 const DEFAULT_PROPS: NightPortCompositeProps = {
   environmentVideoUrl: '',
-  characterVideoUrl: '',
+  characterCutoutUrl: '',
   fps: 24,
   durationInFrames: 144, // 6s @ 24fps
   characterStartFrame: 0,

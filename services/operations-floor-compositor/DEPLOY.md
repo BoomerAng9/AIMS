@@ -94,7 +94,7 @@ The UEF Gateway's `operations-floor/compositor-client.ts` reads this env var to 
 ```json
 {
   "environmentVideoUrl": "https://storage.googleapis.com/.../cosmos-render.mp4",
-  "characterVideoUrl":   "https://openrouter.ai/.../seedance-clip.mp4",
+  "characterCutoutUrl":  "https://storage.googleapis.com/.../character-matte.webm",
   "durationSeconds": 6,
   "fps": 24,
   "characterStartFrame": 0,
@@ -133,15 +133,19 @@ Response:
 
 Scale-to-zero when idle. Cold-start of a fresh instance: ~15s (npm bundle load + first Chromium launch). Warm-start: ~500ms.
 
-## Alpha / matting note
+## Alpha / matting
 
-**Gate 2.e MVP assumption:** Seedance character clips are composited via CSS `mix-blend-mode: screen` over the environment — this works for the dry-run and reads as watchable, but is **not production-grade alpha**. Character edges will bleed at low-luminance zones.
+Character cutout is expected to be produced by the `operations-floor-matting` service (Stage 7.5) — a VP9-alpha WebM with honest per-pixel alpha. Remotion's `<Video>` composites the alpha directly; there is no `mix-blend-mode` or colorkey step. Orchestrator flow:
 
-**Gate 2.e.2 upgrade path:**
-1. Swap `mix-blend-mode: screen` for a real alpha channel from a matting service (rembg, MODNet, or BiRefNet on a Cloud Run GPU instance).
-2. Alternatively, prompt-engineer Seedance to render on a solid chromakey background and use FFmpeg `colorkey` filter in this service's pipeline.
+```
+Seedance character MP4
+  → POST /matte (operations-floor-matting)
+     → matted WebM in GCS
+       → POST /compose (this service) with characterCutoutUrl
+         → composed MP4 in GCS
+```
 
-The Remotion scene is structured to accept an alpha-aware character video without code changes — swap the `characterVideoUrl` for an RGBA WebM and remove the `mixBlendMode` line in `NightPortComposite.tsx`.
+If a caller passes a non-alpha clip as `characterCutoutUrl`, the scene still renders but edges will look wrong. That's a caller bug, not a scene bug — route through the matting service first.
 
 ## Gate 2.e exit criteria
 

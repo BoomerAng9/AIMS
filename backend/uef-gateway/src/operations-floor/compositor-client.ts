@@ -25,7 +25,15 @@ export interface CharacterPositioning {
 
 export interface ComposeRequest {
   environmentVideoUrl: string;
-  characterVideoUrl: string;
+  /**
+   * HTTPS URL of the **matted character clip** (VP9-alpha WebM or
+   * ProRes 4444 MOV) produced by the operations-floor-matting service.
+   * Raw Seedance output must be routed through that service first;
+   * the compositor no longer accepts non-alpha character video
+   * (`characterVideoUrl` was retired with the `mix-blend-mode: screen`
+   * fake-alpha path).
+   */
+  characterCutoutUrl: string;
   durationSeconds?: number;
   fps?: 24 | 30;
   characterStartFrame?: number;

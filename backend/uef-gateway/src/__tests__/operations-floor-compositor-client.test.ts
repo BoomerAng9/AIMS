@@ -8,7 +8,8 @@ import {
 function fixtureReq(overrides: Partial<ComposeRequest> = {}): ComposeRequest {
   return {
     environmentVideoUrl: 'https://storage.googleapis.com/test/env.mp4',
-    characterVideoUrl: 'https://openrouter.ai/test/char.mp4',
+    characterCutoutUrl:
+      'https://storage.googleapis.com/cosmos-operations-floor-artifacts/matte/char.webm',
     durationSeconds: 6,
     fps: 24,
     characterStartFrame: 0,

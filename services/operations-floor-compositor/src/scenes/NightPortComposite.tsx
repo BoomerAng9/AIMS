@@ -3,7 +3,8 @@
  *
  * Composition order (back -> front):
  *   1. Environment video (Cosmos-Transfer2.5 output, full frame)
- *   2. Character video (Seedance 2.0 output, positioned, scaled, faded)
+ *   2. Character cutout (matted WebM/VP9-alpha output, positioned,
+ *      scaled, faded)
  *   3. HUD overlay (optional, brand tokens from deploy-landing)
  *
  * All layer positioning / timing is pure-data so unit tests can
@@ -11,11 +12,13 @@
  * <Composition> registration lives in Remotion.tsx so server.ts can
  * pass props in at render time.
  *
- * Alpha for the character video: Gate 2.e MVP assumes the Seedance
- * clip is rendered on a neutral background. Proper matting (rembg /
- * MODNet / chromakey) is a Gate 2.e.2 refinement. Placeholder
- * CSS mix-blend-mode + opacity masking gets us a watchable composite
- * for the dry-run; production-grade alpha lands later.
+ * Alpha: character cutout is expected to be produced by the
+ * operations-floor-matting service (VP9-alpha WebM or ProRes 4444
+ * MOV). Remotion's <Video> composites honest per-pixel alpha
+ * directly — no mix-blend-mode or colorkey filter needed. If a
+ * caller passes a non-alpha character video, the scene still
+ * composites it, but edges will look wrong — that's a caller bug,
+ * not a scene bug.
  */
 
 import React from 'react';
@@ -24,8 +27,12 @@ import { AbsoluteFill, Video, Sequence, interpolate, useCurrentFrame } from 'rem
 export interface NightPortCompositeProps {
   /** Signed or public HTTPS URL to the environment MP4 (from Cosmos Stage 5). */
   environmentVideoUrl: string;
-  /** Signed or public HTTPS URL to the character MP4 (from Seedance Stage 6). */
-  characterVideoUrl: string;
+  /**
+   * Signed or public HTTPS URL to the **matted character clip**
+   * (VP9-alpha WebM produced by operations-floor-matting, Stage 7.5).
+   * Honest per-pixel alpha — no mix-blend-mode or colorkey needed.
+   */
+  characterCutoutUrl: string;
   /** Target output frame rate (match both inputs — 24 or 30). */
   fps: number;
   /** Total duration in frames. */
@@ -89,7 +96,7 @@ export function lockupVisibility(
 
 export const NightPortComposite: React.FC<NightPortCompositeProps> = ({
   environmentVideoUrl,
-  characterVideoUrl,
+  characterCutoutUrl,
   durationInFrames,
   characterStartFrame = 0,
   characterPositioning,
@@ -111,13 +118,14 @@ export const NightPortComposite: React.FC<NightPortCompositeProps> = ({
       {/* Layer 1 -- environment. Guarded against empty defaultProps. */}
       {environmentVideoUrl ? <Video src={environmentVideoUrl} /> : null}
 
-      {/* Layer 2 -- character (positioned, faded, scaled) */}
-      {characterVideoUrl ? (
+      {/* Layer 2 -- character cutout (VP9-alpha WebM; positioned,
+           faded, scaled). Honest per-pixel alpha from the matting
+           service — no mix-blend-mode or colorkey. */}
+      {characterCutoutUrl ? (
         <Sequence from={characterStartFrame}>
           <AbsoluteFill
             style={{
               opacity: characterOpacity,
-              mixBlendMode: 'screen',
               pointerEvents: 'none',
             }}
           >
@@ -132,7 +140,7 @@ export const NightPortComposite: React.FC<NightPortCompositeProps> = ({
               }}
             >
               <Video
-                src={characterVideoUrl}
+                src={characterCutoutUrl}
                 style={{ width: '100%', height: '100%', objectFit: 'contain' }}
               />
             </div>
