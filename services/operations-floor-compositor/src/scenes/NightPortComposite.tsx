@@ -108,35 +108,37 @@ export const NightPortComposite: React.FC<NightPortCompositeProps> = ({
 
   return (
     <AbsoluteFill style={{ backgroundColor: '#0A0A0A' }}>
-      {/* Layer 1 — environment (full frame, back) */}
-      <Video src={environmentVideoUrl} />
+      {/* Layer 1 -- environment. Guarded against empty defaultProps. */}
+      {environmentVideoUrl ? <Video src={environmentVideoUrl} /> : null}
 
-      {/* Layer 2 — character (positioned, faded, scaled) */}
-      <Sequence from={characterStartFrame}>
-        <AbsoluteFill
-          style={{
-            opacity: characterOpacity,
-            mixBlendMode: 'screen',
-            pointerEvents: 'none',
-          }}
-        >
-          <div
+      {/* Layer 2 -- character (positioned, faded, scaled) */}
+      {characterVideoUrl ? (
+        <Sequence from={characterStartFrame}>
+          <AbsoluteFill
             style={{
-              position: 'absolute',
-              left: `${pos.anchorX * 100}%`,
-              top: `${pos.anchorY * 100}%`,
-              transform: 'translate(-50%, -100%)',
-              height: `${pos.scale * 100}%`,
-              aspectRatio: '9 / 16',
+              opacity: characterOpacity,
+              mixBlendMode: 'screen',
+              pointerEvents: 'none',
             }}
           >
-            <Video
-              src={characterVideoUrl}
-              style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-            />
-          </div>
-        </AbsoluteFill>
-      </Sequence>
+            <div
+              style={{
+                position: 'absolute',
+                left: `${pos.anchorX * 100}%`,
+                top: `${pos.anchorY * 100}%`,
+                transform: 'translate(-50%, -100%)',
+                height: `${pos.scale * 100}%`,
+                aspectRatio: '9 / 16',
+              }}
+            >
+              <Video
+                src={characterVideoUrl}
+                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+              />
+            </div>
+          </AbsoluteFill>
+        </Sequence>
+      ) : null}
 
       {/* Layer 3 — optional end-frame lockup */}
       {endLockupText && (

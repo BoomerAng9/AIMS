@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import { Composition } from 'remotion';
+import { Composition, registerRoot } from 'remotion';
 import {
   NightPortComposite,
   type NightPortCompositeProps,
@@ -32,3 +32,5 @@ export const RemotionRoot: React.FC = () => {
     />
   );
 };
+
+registerRoot(RemotionRoot);
