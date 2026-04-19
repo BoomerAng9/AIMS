@@ -10,9 +10,13 @@ character → Compositor → Puter.fs → **this viewer**.
 
 ## Files
 
-- `index.html` — single HTML file. Loads `puter.js` v2 SDK from
-  CDN, resolves a video source, renders a brand-coherent
-  `<video>` player.
+- `index.html` — single HTML file. CSP-locked (no third-party scripts,
+  no network fetches beyond Google Fonts + known video origins).
+  Resolves a video source from `?src=` or `window.PUTER_SRC`, renders
+  a brand-coherent `<video>` player. If a future Gate-3 feature needs
+  the Puter SDK (auth-gated file playback, cross-app messaging),
+  reintroduce `<script src="https://js.puter.com/v2/">` alongside a CSP
+  update that adds `js.puter.com` to `script-src`.
 
 ## Source resolution order
 
@@ -44,7 +48,8 @@ firebase deploy --only hosting:operations-floor-viewer
 ### Option C — direct open
 
 `index.html` is a single file with no build step. Opens directly from
-disk or any static host. Puter SDK loads from `js.puter.com`.
+disk or any static host. Zero third-party scripts load (Puter SDK is
+intentionally not included — see the Files section above for why).
 
 ## Launch URL shape
 

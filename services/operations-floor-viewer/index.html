@@ -17,8 +17,36 @@
         2. Deploy brand palette: #0A0A0A + #E8A020 + cyan circuit grid
         3. Reads `?src=<public_url>` query param, OR window.PUTER_SRC
         4. Falls back to a placeholder message if no source is provided
-        5. Loads puter.js SDK when available (for auth-gated files)
+        5. CSP-locked: no third-party scripts, no inline-script leakage,
+           media restricted to known origins (puter.com, GCS, googleusercontent).
+           The inline <script> at the bottom is whitelisted by its sha256
+           hash in the CSP meta -- update the hash when the script body
+           changes (see CSP_HASH_NOTE below).
     -->
+
+    <!--
+      CSP_HASH_NOTE: the script-src sha256 is computed from the exact
+      bytes between <script> ... </script> below, including whitespace.
+      Regenerate with:
+          python -c "import hashlib,sys,base64,re; \
+            h=open(sys.argv[1]).read(); \
+            m=re.search(r'<script>(.*?)</script>', h, re.S); \
+            print(base64.b64encode(hashlib.sha256(m.group(1).encode()).digest()).decode())" \
+            services/operations-floor-viewer/index.html
+      Paste the result into the script-src 'sha256-...' slot below.
+    -->
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'none';
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+      font-src https://fonts.gstatic.com;
+      script-src 'sha256-RBPotmTFtxCmUn/NuZv6xxULLKHFxdoRh2BClaQdvR0=';
+      media-src https://puter.com https://*.puter.com https://storage.googleapis.com https://*.googleusercontent.com;
+      img-src 'self' data:;
+      connect-src 'none';
+      frame-ancestors 'none';
+      base-uri 'none';
+      form-action 'none';
+    " />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -26,8 +54,6 @@
       href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=JetBrains+Mono:wght@400;600&display=swap"
       rel="stylesheet"
     />
-
-    <script src="https://js.puter.com/v2/"></script>
 
     <style>
       :root {
@@ -206,7 +232,10 @@
         video.controls = true;
         video.autoplay = true;
         video.playsInline = true;
-        video.muted = false;
+        // Muted autoplay is the only autoplay browsers honor without a
+        // user gesture. Viewer defaults to muted; users can unmute via
+        // the controls the instant they interact with the page.
+        video.muted = true;
         video.addEventListener("timeupdate", () => {
           const t = Math.floor(video.currentTime);
           const mm = String(Math.floor(t / 60)).padStart(2, "0");
