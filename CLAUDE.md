@@ -48,9 +48,27 @@ IF user-deployed Plug instance (one-click tool/agent/platform deployment)
 
 IF GPU-accelerated AI inference (PersonaPlex / Nemotron model serving)
   THEN → GCP Vertex AI Endpoints (GPU: L4 or A100)
-  Model: nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-Base-BF16 (MoE, 3B active params)
-  License: NVIDIA Nemotron Open Model License (commercial OK)
-  The UEF Gateway calls this via PERSONAPLEX_ENDPOINT env var.
+  Two-tier deployment (2026-04-19 alignment):
+    HEAVY  → PERSONAPLEX_SUPER_ENDPOINT
+             Model: nvidia/Nemotron-3-Super (MoE Hybrid Mamba-Transformer)
+             Use for: CRUCIBLE Planner + Judge_Hawk, FORGE plan synthesis,
+             aiPLUG autonomous runtimes, TTD-DR research phases,
+             Hermes Deep Think consensus, PersonaPlex heavy-analysis calls.
+             Any long-running agentic-reasoning workload.
+    EDGE   → PERSONAPLEX_NANO_ENDPOINT (legacy alias: PERSONAPLEX_ENDPOINT)
+             Model: nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-Base-BF16 (MoE, 3B active)
+             Use for: light lookups, edge classification, latency-critical
+             paths, cost-sensitive short turns. Also the fallback when Super
+             is undeployed.
+  License: NVIDIA Open Model License (commercial OK for both tiers)
+  Router:  backend/uef-gateway/src/personaplex/ — endpointForProfile(name)
+           returns { tier, endpoint } per KNOWN_PROFILES catalog.
+  Deploy guide: services/personaplex-super/DEPLOY.md (Super tier).
+
+  RULE: Real-time surfaces (ACHEEVY main chat, Spinner Realtime voice,
+  3-Consultant Engagement) do NOT route through PersonaPlex — they stay on
+  Gemini 3.1 Flash per the Gemini-first model policy. PersonaPlex is for
+  sustained reasoning work, not conversational latency.
 
 IF autonomous build/execution job (Chicken Hawk builds, scheduled tasks)
   THEN → GCP Cloud Run Jobs (sandboxed, scale-to-zero, 60 min timeout)
