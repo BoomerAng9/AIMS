@@ -31,7 +31,12 @@ from fastapi import FastAPI, HTTPException
 from google.cloud import storage
 from pydantic import BaseModel, Field
 
-from cosmos_runner import run_inference, CosmosRuntimeError, cosmos_version_info
+from cosmos_runner import (
+    CosmosNotImplemented,
+    CosmosRuntimeError,
+    cosmos_version_info,
+    run_inference,
+)
 
 # ─── Logging ─────────────────────────────────────────────────────────
 
@@ -40,6 +45,15 @@ logging.basicConfig(
     format="%(asctime)s %(levelname)s %(name)s %(message)s",
 )
 log = logging.getLogger("cosmos-transfer25")
+
+# ─── Project attribution (preemptive fix from Compositor smoke test) ─
+# Google SDKs may hit a "billing for owning project absent" 403 on
+# resumable-upload init if the project-attribution chain is ambiguous.
+# Pin the project explicitly via env + Storage() kwargs.
+
+GCP_PROJECT = os.environ.get("GCP_PROJECT_ID") or "foai-aims"
+os.environ.setdefault("GOOGLE_CLOUD_PROJECT", GCP_PROJECT)
+os.environ.setdefault("GCLOUD_PROJECT", GCP_PROJECT)
 
 # ─── FastAPI app ─────────────────────────────────────────────────────
 
@@ -55,7 +69,7 @@ _gcs: storage.Client | None = None
 def gcs_client() -> storage.Client:
     global _gcs
     if _gcs is None:
-        _gcs = storage.Client()
+        _gcs = storage.Client(project=GCP_PROJECT)
     return _gcs
 
 
@@ -120,25 +134,63 @@ def health() -> dict[str, Any]:
     info = cosmos_version_info()
     return {
         "status": "ok",
+        "service": "operations-floor-cosmos",
+        "stage": "5 (stub)",
+        "project": GCP_PROJECT,
         "gpu_available": info["gpu_available"],
         "cuda_version": info["cuda_version"],
         "cosmos_version": info["cosmos_version"],
         "model_loaded": info["model_loaded"],
+        "stub_mode": info.get("stub_mode", False),
+        "note": info.get("note"),
     }
 
 
 # ─── Predict ─────────────────────────────────────────────────────────
 
 
-@app.post("/predict", response_model=PredictResponse)
-def predict(req: PredictRequest) -> PredictResponse:
+@app.post("/predict")
+def predict(req: PredictRequest):
     if not req.instances:
         raise HTTPException(status_code=400, detail="instances is empty")
 
+    # Gate 2.c.1 STUB: short-circuit to 501 BEFORE any GCS I/O. Exercises
+    # the full input-schema validation via Pydantic (ensures callers
+    # send a well-formed payload) but does NOT attempt to download any
+    # source video, run any inference, or upload any output. Keeps the
+    # stub truly stateless -- zero side effects.
+    info = cosmos_version_info()
+    if info.get("stub_mode"):
+        raise HTTPException(
+            status_code=501,
+            detail={
+                "error": "inference_pending",
+                "stage": "Gate 2.c.1 stub -- real inference lands at 2.c.2",
+                "service": "operations-floor-cosmos",
+                "instances_seen": len(req.instances),
+                "first_instance": {
+                    "video_gcs_uri": req.instances[0].video_gcs_uri,
+                    "prompt_len": len(req.instances[0].prompt),
+                    "output_gcs_prefix": req.instances[0].output_gcs_prefix,
+                    "controls_enabled": [
+                        name for name in ("depth", "edge", "segmentation", "blur")
+                        if getattr(req.instances[0].multicontrol_spec, name).enabled
+                    ],
+                },
+                "note": info.get("note"),
+                "next": (
+                    "Gate 2.c.2 will replace this Dockerfile with one "
+                    "based on nvidia-cosmos/cosmos-transfer1's own "
+                    "Dockerfile + weight mounts. The /predict contract "
+                    "stays identical -- no downstream consumer changes."
+                ),
+            },
+        )
+
+    # Real inference path (Gate 2.c.2+): download -> infer -> upload.
     results: list[PredictionResult] = []
     for inst in req.instances:
         results.append(_run_one(inst))
-
     return PredictResponse(
         predictions=results,
         deployedModelId=os.environ.get("DEPLOYED_MODEL_ID"),
@@ -186,6 +238,10 @@ def _run_one(inst: PredictInstance) -> PredictionResult:
                 seed=inst.inference.seed,
                 output_dir=tmp / "out",
             )
+        except CosmosNotImplemented:
+            # Let the outer predict() handler translate to a 501 with
+            # a structured "inference_pending" body.
+            raise
         except CosmosRuntimeError as e:
             log.exception("cosmos failure")
             raise HTTPException(status_code=500, detail=f"cosmos error: {e}")
@@ -243,8 +299,14 @@ def _upload(local: Path, gcs_prefix: str) -> str:
     if not prefix.endswith("/"):
         prefix += "/"
     target_key = prefix + local.name
+    # resumable=False bypasses the "initialize resumable session" call
+    # that returns 403 "billing for owning project absent" on Cloud Run
+    # when the attribution chain is ambiguous. Simple upload is faster
+    # for files under 20MB and the Python SDK falls back to multipart
+    # automatically for larger ones.
     gcs_client().bucket(bucket_name).blob(target_key).upload_from_filename(
-        str(local)
+        str(local),
+        num_retries=3,
     )
     return f"gs://{bucket_name}/{target_key}"
 
