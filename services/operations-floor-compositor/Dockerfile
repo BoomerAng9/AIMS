@@ -43,19 +43,20 @@ ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium \
 
 WORKDIR /app
 
+# Install prod deps only from the lockfile.
 COPY package.json package-lock.json* ./
 RUN npm ci --omit=dev && npm cache clean --force
+
+# Globally install tsx so the TypeScript runtime is on PATH -- simpler
+# than relying on node_modules/.bin resolution after npm ci.
+RUN npm install -g tsx
 
 COPY tsconfig.json ./
 COPY src ./src
 
-# Compile TypeScript ahead of serve
-RUN npm install --save-dev typescript @types/express @types/node \
-    @types/react @types/react-dom \
-    && npx tsc \
-    && npm prune --omit=dev
-
-ENV PORT=8080
+ENV PORT=8080 \
+    NODE_OPTIONS=--no-warnings
 EXPOSE 8080
 
-CMD ["node", "dist/server.js"]
+# Serve TypeScript directly -- no compile step, predictable at runtime.
+CMD ["tsx", "src/server.ts"]
