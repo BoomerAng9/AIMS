@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en" data-operations-floor-viewer>
+  <head>
+    <meta charset="utf-8" />
+    <title>Operations Floor -- Run a Company, Without the Company</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow" />
+
+    <!--
+      Gate 2.f MVP viewer. Loads a composed MP4 from Puter.fs (or any
+      public URL) into a minimal, brand-coherent <video> player. Hosted
+      as a Puter-native app: bundle with `puter deploy` OR open the
+      index.html directly via puter.com.
+
+      Acceptance criteria the page satisfies:
+        1. Zero humans visible (canon rule upheld at the presentation layer too)
+        2. Deploy brand palette: #0A0A0A + #E8A020 + cyan circuit grid
+        3. Reads `?src=<public_url>` query param, OR window.PUTER_SRC
+        4. Falls back to a placeholder message if no source is provided
+        5. Loads puter.js SDK when available (for auth-gated files)
+    -->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=JetBrains+Mono:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <script src="https://js.puter.com/v2/"></script>
+
+    <style>
+      :root {
+        --bg: #0a0a0a;
+        --accent-warm: #e8a020;
+        --accent-cool: #06b6d4;
+        --fg: #ffffff;
+        --fg-dim: rgba(255, 255, 255, 0.55);
+      }
+
+      * { box-sizing: border-box; }
+
+      html, body {
+        margin: 0; padding: 0;
+        width: 100%; height: 100%;
+        background: var(--bg);
+        color: var(--fg);
+        font-family: "JetBrains Mono", ui-monospace, monospace;
+        overflow: hidden;
+      }
+
+      #shell {
+        position: relative;
+        width: 100%; height: 100%;
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+      }
+
+      /* --- Top bar --- */
+      header {
+        padding: 16px 28px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        border-bottom: 1px solid rgba(232, 160, 32, 0.15);
+        background:
+          radial-gradient(ellipse 80% 100% at 50% -20%, rgba(232,160,32,0.08), transparent 60%),
+          var(--bg);
+      }
+      header .wordmark {
+        font-family: "Barlow Condensed", Impact, sans-serif;
+        font-weight: 900;
+        font-size: 22px;
+        letter-spacing: 0.28em;
+        color: var(--fg);
+      }
+      header .sub {
+        font-size: 10px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--accent-warm);
+      }
+
+      /* --- Stage --- */
+      main {
+        position: relative;
+        overflow: hidden;
+        background: radial-gradient(ellipse 70% 60% at 50% 50%, #0e0a05 0%, #050505 70%, #000 100%);
+      }
+      /* Cyan circuit grid (matches deploy-landing pattern) */
+      main::before {
+        content: "";
+        position: absolute; inset: 0;
+        background-image:
+          linear-gradient(rgba(6, 182, 212, 0.12) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(6, 182, 212, 0.12) 1px, transparent 1px);
+        background-size: 60px 60px;
+        pointer-events: none;
+      }
+
+      #player {
+        width: 100%; height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      #player video {
+        max-width: 96%;
+        max-height: 92%;
+        background: #000;
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.7),
+                    0 0 0 1px rgba(232, 160, 32, 0.25);
+      }
+
+      /* Empty-state message */
+      #empty {
+        max-width: 520px;
+        padding: 28px 32px;
+        border: 1px solid rgba(232, 160, 32, 0.35);
+        background: rgba(255, 255, 255, 0.02);
+        text-align: center;
+        color: var(--fg-dim);
+      }
+      #empty h2 {
+        margin: 0 0 12px 0;
+        font-family: "Barlow Condensed", Impact, sans-serif;
+        letter-spacing: 0.22em;
+        font-size: 18px;
+        color: var(--fg);
+      }
+      #empty code {
+        color: var(--accent-warm);
+        font-size: 11px;
+      }
+
+      /* --- Bottom status strip --- */
+      footer {
+        padding: 12px 28px;
+        border-top: 1px solid rgba(232, 160, 32, 0.15);
+        display: flex;
+        justify-content: space-between;
+        font-size: 10px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--fg-dim);
+      }
+      footer .live-dot {
+        display: inline-block;
+        width: 7px; height: 7px;
+        margin-right: 8px;
+        border-radius: 50%;
+        background: var(--accent-warm);
+        box-shadow: 0 0 8px var(--accent-warm);
+        animation: pulse 1.6s ease-in-out infinite;
+      }
+      @keyframes pulse {
+        0%, 100% { opacity: 0.5; }
+        50%      { opacity: 1;   }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="shell">
+      <header>
+        <span class="wordmark">OPERATIONS FLOOR</span>
+        <span class="sub">Run a company, without the company</span>
+      </header>
+
+      <main>
+        <div id="player"></div>
+      </main>
+
+      <footer>
+        <span><span class="live-dot"></span>Playback live</span>
+        <span id="meta">TC 00:00 &middot; SRC --</span>
+      </footer>
+    </div>
+
+    <script>
+      /* Resolve source from ?src=<url>, window.PUTER_SRC, or empty. */
+      function resolveSource() {
+        const q = new URLSearchParams(window.location.search);
+        const fromQuery = q.get("src");
+        if (fromQuery) return fromQuery;
+        if (typeof window.PUTER_SRC === "string") return window.PUTER_SRC;
+        return "";
+      }
+
+      function render(src) {
+        const player = document.getElementById("player");
+        const meta = document.getElementById("meta");
+
+        if (!src) {
+          player.innerHTML =
+            '<div id="empty">' +
+            "<h2>Awaiting composed clip</h2>" +
+            "<p>Pass the clip URL as <code>?src=&lt;url&gt;</code> " +
+            "or set <code>window.PUTER_SRC</code> before load.</p>" +
+            "</div>";
+          meta.textContent = "TC 00:00 \u00B7 SRC --";
+          return;
+        }
+
+        const video = document.createElement("video");
+        video.src = src;
+        video.controls = true;
+        video.autoplay = true;
+        video.playsInline = true;
+        video.muted = false;
+        video.addEventListener("timeupdate", () => {
+          const t = Math.floor(video.currentTime);
+          const mm = String(Math.floor(t / 60)).padStart(2, "0");
+          const ss = String(t % 60).padStart(2, "0");
+          meta.textContent =
+            "TC " + mm + ":" + ss + " \u00B7 SRC " + truncate(src, 40);
+        });
+        player.replaceChildren(video);
+      }
+
+      function truncate(s, n) {
+        return s.length <= n ? s : s.slice(0, n - 1) + "\u2026";
+      }
+
+      render(resolveSource());
+    </script>
+  </body>
+</html>
