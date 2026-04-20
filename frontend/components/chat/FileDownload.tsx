@@ -35,6 +35,9 @@ import {
   Package,
 } from 'lucide-react';
 
+// ⚡ Bolt Optimization: Instantiate TextEncoder outside component to avoid reallocation
+const TEXT_ENCODER = new TextEncoder();
+
 // ─────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────
@@ -133,7 +136,8 @@ export function FileDownload({
 
   const resolvedFilename = filename || `aims-export.${format}`;
   const sizeKB = useMemo(
-    () => Math.round(new Blob([content]).size / 1024),
+    // ⚡ Bolt Optimization: Use TextEncoder over Blob for string size calculation performance
+    () => Math.round(TEXT_ENCODER.encode(content).length / 1024),
     [content]
   );
   const lineCount = useMemo(
@@ -358,7 +362,8 @@ export function FileDownloadGroup({ files }: { files: FileDownloadProps[] }) {
   if (files.length === 0) return null;
 
   const totalSizeKB = files.reduce(
-    (sum, f) => sum + Math.round(new Blob([f.content]).size / 1024),
+    // ⚡ Bolt Optimization: Use TextEncoder over Blob for string size calculation performance
+    (sum, f) => sum + Math.round(TEXT_ENCODER.encode(f.content).length / 1024),
     0
   );
 
