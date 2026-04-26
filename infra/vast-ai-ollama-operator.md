@@ -1,16 +1,20 @@
-# Vast.ai GPU Lane Operator Runbook (Wave 1 Step E — REVISED)
+# Vast.ai GPU Lane Operator Runbook (Wave 1 Step E)
 
-The OSS GPU lane for the FOAI/AOF stack. Three model lanes, one Vast.ai
-instance, one LiteLLM-fronted chat surface, one direct video adapter:
+The chat-lane Vast.ai deploy for the Coastal Brewing CwoaC stack. Two
+chat model lanes through one LiteLLM-fronted surface:
 
 | Lane | Where | Model | Surface |
 |---|---|---|---|
 | Chat (OSS) | Vast.ai instance, Ollama | **Gemma 4 31B Dense** | LiteLLM `model_name: gemma-4-max` |
 | Chat (frontier) | Moonshot/Fireworks API | **Kimi K2.6** (1T MoE / 32B active) | LiteLLM `model_name: kimi-k2.6` |
-| Video gen | Same Vast.ai instance | **LTX-2.3** (Lightricks audio-video DiT) | Direct adapter — NOT in LiteLLM (job/poll/download shape, not OpenAI-compat) |
 
-Step E was scope-evaluated by Betty-Anne_Ang 2026-04-26 (revised after
-owner specified Gemma + Kimi K2.6 + LTX-2.3 mix). Layer A +15/+18,
+**Scope boundary:** This runbook is **Coastal Brewing's chat-lane**.
+Video generation (LTX-2.3, Cosmos-Transfer2.5, Lyra 2.0) is **Broad|Cast
+Studio's product** and lives under that platform's deploy plan, not
+this one. If Coastal ever needs video, it calls Broad|Cast as a vendor
+API — not by co-hosting Broad|Cast's models on Coastal's GPU.
+
+Step E was scope-evaluated by Betty-Anne_Ang 2026-04-26. Layer A +14/+18,
 Layer B 27/30, Layer C V.I.B.E. 0.925. Example Leader, cleared.
 
 ---
@@ -22,28 +26,25 @@ Layer B 27/30, Layer C V.I.B.E. 0.925. Example Leader, cleared.
 - Owner workstation SSH public key
 - LITELLM_MASTER_KEY already provisioned on AIMS Core
 - Step D LiteLLM healthy (`docker ps | grep aims-litellm`)
-- MOONSHOT_API_KEY (free tier 100K tokens) OR FIREWORKS_API_KEY for Kimi
+- MOONSHOT_API_KEY (free tier 100K tokens) AND/OR FIREWORKS_API_KEY for Kimi
 - Template hash `0df0db4d9bef84e51f3a514bc5a9b96e` confirmed (CUDA + Python + ssh base — owner-supplied)
 
 ## Stage 1 — Provision Vast.ai instance via CLI
 
 ```bash
 vastai create instance --template_hash 0df0db4d9bef84e51f3a514bc5a9b96e \
-  --disk 200 \
+  --disk 80 \
   --ssh-key "$(cat ~/.ssh/id_ed25519.pub)"
 ```
 
-200 GB disk fits Gemma 4 31B Dense (~18 GB) + LTX-2.3 weights (~12 GB)
-+ workspace + buffer.
+80 GB disk fits Gemma 4 31B Dense (~18 GB pull) + workspace + buffer.
 
-VRAM math (one instance, 32 GB RTX 5090):
-- Gemma 4 31B Dense Q4_K_M: ~22 GB resident when active
-- LTX-2.3: ~10-12 GB resident when active
-- Concurrent residence (~32+ GB) is **tight** — recommend model-swap-on-demand
-- Cold-swap latency: ~30s per workload switch
-- Alternative: 48 GB A6000 instance (~$0.5/hr, both resident concurrently)
+VRAM math (32 GB RTX 5090):
+- Gemma 4 31B Dense Q4_K_M: ~22 GB resident
+- KV cache @ 8K context: ~3 GB
+- ~7 GB headroom on 32 GB. Single-model-resident — no swap concerns.
 
-After `vastai create instance` returns, capture the new instance id and:
+After `vastai create instance`:
 ```bash
 vastai show instances   # find instance public IP + SSH port
 ```
@@ -57,32 +58,16 @@ Host vast-gpu
     IdentityFile ~/.ssh/id_ed25519
 ```
 
-## Stage 2 — Bootstrap Ollama + Gemma + LTX-2.3
+## Stage 2 — Bootstrap Ollama + Gemma
 
 ```bash
 ssh vast-gpu '
   set -euo pipefail
-
-  # GPU sanity
   nvidia-smi | head -10
-
-  # ---- Ollama install + Gemma pull ----
   curl -fsSL https://ollama.com/install.sh | sh
   systemctl enable --now ollama
   OLLAMA_HOST=0.0.0.0:11434 ollama pull gemma-4-max:31b
   ollama list
-
-  # ---- LTX-2.3 install ----
-  apt-get update && apt-get install -y python3.12-venv git ffmpeg
-  pip install --upgrade uv huggingface_hub
-  cd /opt
-  git clone https://github.com/Lightricks/LTX-2 ltx
-  cd ltx && uv sync
-  source .venv/bin/activate
-  huggingface-cli download Lightricks/LTX-2.3 --local-dir /opt/ltx/weights
-
-  # Start LTX HTTP server (FastAPI shim — see Stage 4 adapter)
-  # For Wave 1, runs as a systemd service binding 127.0.0.1:8000
 '
 ```
 
@@ -97,53 +82,49 @@ ssh vast-gpu '
   curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
   dpkg -i cloudflared.deb
   cloudflared tunnel login
-  cloudflared tunnel create gpu-vast
-  cloudflared tunnel route dns gpu-vast ollama.foai.cloud
-  cloudflared tunnel route dns gpu-vast ltx.foai.cloud
-  # Run as service, multi-hostname config
+  cloudflared tunnel create coastal-gpu
+  cloudflared tunnel route dns coastal-gpu ollama.foai.cloud
 '
 ```
+
+LiteLLM `api_base`: `https://ollama.foai.cloud`
 
 ### Option E.b — WireGuard between AIMS Core ↔ Vast.ai
 
 Persistent tunnel, ~30 min setup. Better for 24/7.
 
-### Option E.c — Public ports with IP allowlist
+### Option E.c — Public Ollama with IP allowlist
 
 ```bash
 ssh vast-gpu '
-  ufw allow from 76.13.96.107 to any port 11434  # Ollama from AIMS Core
-  ufw allow from 31.97.138.45 to any port 11434  # Ollama from aims-vps
-  ufw allow from 76.13.96.107 to any port 8000   # LTX from AIMS Core
+  ufw allow from 76.13.96.107 to any port 11434  # AIMS Core
+  ufw allow from 31.97.138.45 to any port 11434  # aims-vps
   ufw enable
 '
 ```
 
-⚠ Ollama has no built-in auth. Allowlist is the only protection. Recommend
-nginx-bearer-front for any non-trivial use.
+⚠ Ollama has no built-in auth. Allowlist is the only protection.
+Recommend nginx-bearer-front for any non-trivial use.
 
 ## Stage 4 — Register in LiteLLM
 
-Edit `/root/aims/infra/litellm-config.yaml` and add THREE entries:
+Edit `/root/aims/infra/litellm-config.yaml`:
 
 ```yaml
 model_list:
   # ...existing entries...
 
-  # Gemma 4 via Vast.ai-hosted Ollama
   - model_name: gemma-4-max
     litellm_params:
       model: ollama/gemma-4-max:31b
       api_base: <chosen URL from Stage 3>:11434
 
-  # Kimi K2.6 via Moonshot API (NOT hosted — frontier 1T MoE)
   - model_name: kimi-k2.6
     litellm_params:
       model: moonshot/kimi-k2.6
       api_base: https://api.moonshot.ai/v1
       api_key: os.environ/MOONSHOT_API_KEY
 
-  # Optional Fireworks fallback for Kimi if Moonshot rate-limits
   - model_name: kimi-k2.6-fireworks
     litellm_params:
       model: fireworks_ai/fireworks/kimi-k2p6
@@ -156,42 +137,20 @@ litellm_settings:
     - kimi-k2.6: ["kimi-k2.6-fireworks", "claude-opus-4-7"]
 ```
 
-Stage `MOONSHOT_API_KEY` and `FIREWORKS_API_KEY` in
-`/root/aims/infra/.env.production` via SSH-pipe from openclaw.
+Stage `MOONSHOT_API_KEY` and `FIREWORKS_API_KEY` in `/root/aims/infra/.env.production`
+via SSH-pipe from openclaw.
 
 Reload:
 ```bash
 ssh root@76.13.96.107 'cd /root/aims/infra && docker compose restart litellm'
 ```
 
-## Stage 5 — LTX-2.3 video adapter (NOT LiteLLM)
-
-Video gen is a job/poll/download shape, not OpenAI-compat. Lives as a
-direct adapter in `coastal-brewing/adapters/ltx_video.py`. Surface:
-
-```python
-from coastal-brewing.adapters.ltx_video import (
-    submit_video_job, poll_status, download_when_ready
-)
-
-job_id = submit_video_job(prompt="...", duration_s=10, audio=True)
-result = await poll_status(job_id)  # blocks until done or fails
-mp4_path = download_when_ready(job_id, target_dir="/data/video/")
-```
-
-Full adapter implementation lands as a separate PR after this runbook
-merges (Betty-Anne_Ang's coaching note: "video gen has different failure
-modes than chat — run it through its own scope-eval gate, don't fold it
-under Step E").
-
-## Stage 6 — V0–V5 verification
+## Stage 5 — V0–V4 verification
 
 ```bash
-# (V0) Three models pulled / configured
+# (V0) Gemma pulled
 ssh vast-gpu 'curl -s http://127.0.0.1:11434/api/tags | jq .models[].name'
 # expect: gemma-4-max:31b
-ssh vast-gpu 'ls /opt/ltx/weights/' | grep -i ltx
-# expect: LTX-2.3 weight files present
 
 # (V1) Direct Ollama completion
 ssh vast-gpu 'curl -X POST http://127.0.0.1:11434/api/generate \
@@ -216,58 +175,57 @@ req = urllib.request.Request(\"http://127.0.0.1:4000/v1/chat/completions\", data
 print(json.loads(urllib.request.urlopen(req,timeout=60).read())[\"choices\"][0][\"message\"][\"content\"][:200])
 '"
 
-# (V4) Failover demonstration: kill Ollama, retry gemma-4-max → openrouter-omnibus picks up
+# (V4) Failover: kill Ollama, retry gemma-4-max → openrouter-omnibus picks up
 ssh vast-gpu 'systemctl stop ollama'
-# Same V2 curl → should still return a completion (from openrouter)
-
-# (V5) LTX video gen smoke (after adapter PR merges):
-ssh vast-gpu 'cd /opt/ltx && source .venv/bin/activate && python -m ltx generate \
-  --prompt "a coastal coffee shop, morning light" --duration 5 --output /tmp/smoke.mp4'
-# expect: /tmp/smoke.mp4 produced, valid mp4 by ffprobe
+# Same V2 curl → still returns a completion, from openrouter
 ```
 
-## Stage 7 — Cost controls
+Per Betty-Anne_Ang's coaching: capture V4 output as the AOF buyer
+demonstration (kill GPU mid-request, prove fallback lands within
+acceptable latency).
+
+## Stage 6 — Cost controls
 
 Vast.ai dashboard:
 - Monthly budget alert: $50 (warning), $100 (hard cap)
 - Auto-stop at hard cap
 
-Burn rate (single 32 GB RTX 5090 instance):
-- Episodic 8h/day @ $0.303/hr = ~$73/mo
-- 24/7 = ~$218/mo
-- 48 GB A6000 alternative: ~$0.5/hr × 24/7 = ~$365/mo
+Burn rate (32 GB RTX 5090):
+- Episodic 8h/day @ $0.303/hr ≈ $73/mo
+- 24/7 ≈ $218/mo
 
 LiteLLM virtual-key per-customer budgets land in Wave 1.5.
 
-## Stage 8 — Tear-down
+## Stage 7 — Tear-down
 
 ```bash
 vastai destroy instance <instance-id>
-```
 
-LiteLLM-side:
-```bash
-# Comment out gemma-4-max + kimi-k2.6 entries in litellm-config.yaml
+# LiteLLM-side: comment out gemma-4-max entry, keep Kimi (Moonshot
+# API works regardless of Vast.ai state)
 ssh root@76.13.96.107 'cd /root/aims/infra && docker compose restart litellm'
 ```
 
 Consumers calling `gemma-4-max` after teardown fall through to
-`openrouter-omnibus` per the failover rules. Kimi K2.6 keeps working
-via Moonshot API directly (it was never on Vast.ai).
+`openrouter-omnibus` per the failover rules.
 
-## What's the same as before
+## Why this runbook covers chat ONLY
 
-- Three network plane options (E.a Cloudflare Tunnel recommended)
-- LiteLLM failover discipline preserved
-- 5 owner approval gates
-- Cost monitoring + tear-down clean exit
+Wave 1 plan + 2026-04-26 owner directive: **Coastal Brewing's product is
+humanless brewing, not video.** Video generation is Broad|Cast Studio's
+product — different platform, different deployment plan, different Vast.ai
+instance when that platform's deploy thaws (currently a side quest).
 
-## What's different from the original runbook
+If Coastal needs a promo video down the line, it calls Broad|Cast's API
+the same way an external customer would — through Broad|Cast's surface,
+not by sharing GPU memory.
 
-| Was | Now |
-|---|---|
-| Web console provision | `vastai create instance --template_hash` CLI |
-| Gemma + Nemotron + qwen2.5 | Gemma + Kimi K2.6 (API) + LTX-2.3 (video) |
-| Single workload type (chat) | Two workload types (chat + video) |
-| All models in LiteLLM | Chat in LiteLLM; video in separate adapter |
-| 80 GB disk | 200 GB disk (LTX weights ~12 GB extra) |
+---
+
+## Owner action gates
+
+1. ✋ Provision authorization (Vast CLI command + template hash confirmed)
+2. ✋ Network plane: E.a Cloudflare Tunnel (recommended) / E.b WireGuard / E.c IP allowlist
+3. ✋ Burn cap: $50 / $100 / $200 / unlimited
+4. ✋ MOONSHOT_API_KEY (free tier covers Wave 1 testing)
+5. ✋ Workstation SSH public key for Vast.ai
