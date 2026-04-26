@@ -806,8 +806,11 @@ services:
   # per-provider clients. Provider failover + key rotation + cost tracking
   # all centralized here.
   #
-  # Pinned to v1.83.4 — first stable patch after the 2026-03-24 hack vector
-  # (/config/update being unauthenticated, used to redirect provider traffic).
+  # Pinned to v1.83.7-stable.patch.1 — latest stable + post-2026-03-24-hack
+  # patch published 2026-04-23. Note: v1.83.4 referenced in the original
+  # plan does not exist as a published tag; corrected after V0 SHA-pin
+  # verification per Betty-Anne_Ang's coaching note from Step C.
+  # Image SHA: sha256:95d4bd975e39d33c3d5e0add0439d9a9e40f534ec79b2132133e96b3994d3192
   # Hardening discipline shipped with this service:
   #   - Specific patch tag, not :latest or :main (no tag drift)
   #   - master_key in env-only via LITELLM_MASTER_KEY (NEVER in repo)
@@ -819,12 +822,13 @@ services:
   #
   # Verification: see infra/litellm-operator.md V0–V7 chain.
   litellm:
-    image: ghcr.io/berriai/litellm:v1.83.4
+    image: ghcr.io/berriai/litellm:v1.83.7-stable.patch.1
     container_name: aims-litellm
     expose:
       - "4000"
-    env_file:
-      - .env.production
+    # NO env_file — explicit-only env keeps the secret surface minimum and
+    # prevents LiteLLM from inheriting DATABASE_URL pointing at the host
+    # Postgres which isn't reachable from the bridge network.
     environment:
       - LITELLM_MASTER_KEY=${LITELLM_MASTER_KEY}
       - LITELLM_LOG=INFO
@@ -832,11 +836,17 @@ services:
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
       - GEMINI_API_KEY=${GEMINI_API_KEY:-}
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
+      # Disable the internal Prisma DB. Wave 1 runs LiteLLM stateless;
+      # state persistence (cost tracking, key partitioning) is Wave 1.5.
+      - DISABLE_PRISMA_SCHEMA_UPDATE=true
+      - DATABASE_URL=
     volumes:
       - ./litellm-config.yaml:/app/config.yaml:ro
     command: ["--config", "/app/config.yaml", "--port", "4000", "--num_workers", "2"]
+    # python3 is the only HTTP-capable tool in the v1.83.7 image (no curl,
+    # no wget). Verified by `docker exec aims-litellm which curl python3 wget`.
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:4000/health/liveliness"]
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:4000/health/liveliness', timeout=3)"]
       interval: 30s
       timeout: 10s
       retries: 3

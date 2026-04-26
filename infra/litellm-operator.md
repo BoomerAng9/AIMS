@@ -1,16 +1,37 @@
 # LiteLLM — Operator Runbook (Wave 1 Step D)
 
-LiteLLM v1.83.4+ runs on AIMS Core VPS (76.13.96.107) as the central
+LiteLLM v1.83.7-stable.patch.1 runs on AIMS Core VPS (76.13.96.107) as the central
 OpenAI-compatible model gateway. Every downstream consumer (Hermes Agent,
 ACHEEVY, AgentScope, ii-agent, AOF children) hits a single URL instead
 of bespoke per-provider clients. Failover + cost tracking + key rotation
 centralized here.
 
-## Why `v1.83.4` is the floor
+## Lessons from the 2026-04-26 first deploy
+
+Three corrections discovered during live deploy that the original Step D
+PR (#242) didn't catch — folded back into this runbook:
+
+1. **Tag**: original PR pinned `v1.83.4` which doesn't exist as a published
+   tag. Verified upstream via `gh api repos/BerriAI/litellm/releases`.
+   Canonical post-hack stable is `v1.83.7-stable.patch.1` (published
+   2026-04-23). Image SHA: `sha256:95d4bd975e39d33c3d5e0add0439d9a9e40f534ec79b2132133e96b3994d3192`.
+
+2. **Healthcheck tool**: original PR used `wget --spider`, but the v1.83.7
+   image has neither `wget` nor `curl` in PATH — only `python3`. Updated
+   healthcheck uses `python3 -c "import urllib.request; ..."`.
+
+3. **env_file scope**: original PR used `env_file: - .env.production`,
+   which inherits the broader AIMS `DATABASE_URL` pointing at host
+   Postgres on `76.13.96.107:5432`. LiteLLM's Prisma migration tried that
+   DB and failed (P1001 — not reachable from bridge). Fix: drop
+   `env_file`, set explicit env vars only, set `DISABLE_PRISMA_SCHEMA_UPDATE=true`
+   and `DATABASE_URL=` empty so LiteLLM runs stateless.
+
+## Why `v1.83.7-stable.patch.1` is the floor
 
 The 2026-03-24 hack exploited an unauthenticated `/config/update`
 endpoint to swap model configs and redirect provider traffic to attacker
-endpoints (often exfiltrating prompts/PII in the process). v1.83.4 is
+endpoints (often exfiltrating prompts/PII in the process). v1.83.7-stable.patch.1 is
 the first stable patch release after upstream's hardening pass. We pin
 specific patches, never `:latest` or `:main`.
 
@@ -18,14 +39,14 @@ specific patches, never `:latest` or `:main`.
 
 ```bash
 ssh aims-vps-core
-docker pull ghcr.io/berriai/litellm:v1.83.4
-docker inspect ghcr.io/berriai/litellm:v1.83.4 --format '{{.Id}}'
+docker pull ghcr.io/berriai/litellm:v1.83.7-stable.patch.1
+docker inspect ghcr.io/berriai/litellm:v1.83.7-stable.patch.1 --format '{{.Id}}'
 # record the SHA — paste into PR description for audit
 ```
 
 If cosign is installed and upstream signs releases:
 ```bash
-cosign verify ghcr.io/berriai/litellm:v1.83.4 \
+cosign verify ghcr.io/berriai/litellm:v1.83.7-stable.patch.1 \
   --certificate-identity-regexp '.*berri.*' \
   --certificate-oidc-issuer-regexp '.*github.*'
 ```
@@ -99,7 +120,7 @@ docker compose -f infra/docker-compose.prod.yml exec nginx nginx -s reload
 
 ```bash
 # (V0) Image SHA matches what we pinned
-docker inspect ghcr.io/berriai/litellm:v1.83.4 --format '{{.Id}}'
+docker inspect ghcr.io/berriai/litellm:v1.83.7-stable.patch.1 --format '{{.Id}}'
 
 # (V1) Container healthy, master key required
 docker compose -f infra/docker-compose.prod.yml ps litellm | grep healthy
