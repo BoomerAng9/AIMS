@@ -1,0 +1,91 @@
+# =============================================================================
+# LiteLLM Model Registry — AIMS Core (Wave 1 Step D)
+# =============================================================================
+#
+# Central model gateway for the entire FOAI/AOF stack. Every downstream
+# consumer (Hermes Agent, ACHEEVY, AgentScope, ii-agent, AOF children)
+# resolves models against this registry.
+#
+# Add a model: append a `model_list` entry. Owner can drop any provider
+# without code changes downstream — the model_name stays stable.
+#
+# Failover: when a provider returns an error, LiteLLM tries the next entry
+# matching the same model_name (LiteLLM's "fallbacks" routing). Wave 1
+# ships explicit per-tier fallbacks; cost-aware routing is Wave 2.
+# =============================================================================
+
+model_list:
+  # ── Anthropic ──────────────────────────────────────────────────────────────
+  - model_name: claude-opus-4-7
+    litellm_params:
+      model: anthropic/claude-opus-4-7
+      api_key: os.environ/ANTHROPIC_API_KEY
+
+  - model_name: claude-sonnet-4-6
+    litellm_params:
+      model: anthropic/claude-sonnet-4-6
+      api_key: os.environ/ANTHROPIC_API_KEY
+
+  - model_name: claude-haiku-4-5
+    litellm_params:
+      model: anthropic/claude-haiku-4-5-20251001
+      api_key: os.environ/ANTHROPIC_API_KEY
+
+  # ── OpenAI ─────────────────────────────────────────────────────────────────
+  - model_name: gpt-5
+    litellm_params:
+      model: openai/gpt-5
+      api_key: os.environ/OPENAI_API_KEY
+
+  - model_name: gpt-5-mini
+    litellm_params:
+      model: openai/gpt-5-mini
+      api_key: os.environ/OPENAI_API_KEY
+
+  # ── Google Gemini ──────────────────────────────────────────────────────────
+  - model_name: gemini-3-flash
+    litellm_params:
+      model: gemini/gemini-3-flash
+      api_key: os.environ/GEMINI_API_KEY
+
+  - model_name: gemini-3-pro
+    litellm_params:
+      model: gemini/gemini-3-pro
+      api_key: os.environ/GEMINI_API_KEY
+
+  # ── OpenRouter (omnibus fallback — Grok, DeepSeek, Kimi, etc.) ────────────
+  - model_name: openrouter-omnibus
+    litellm_params:
+      model: openrouter/auto
+      api_key: os.environ/OPENROUTER_API_KEY
+
+  # ── Step E placeholder (Vast.ai-hosted Ollama) ────────────────────────────
+  # Uncomment + set api_base when the GPU lane is provisioned. Until then,
+  # gpt-oss requests fall through to OpenRouter via the failover block below.
+  # - model_name: gpt-oss-20b
+  #   litellm_params:
+  #     model: ollama/gpt-oss-20b
+  #     api_base: http://<vast-ai-tailscale-ip>:11434
+
+# Routing — explicit fallbacks per model_name. If primary errors, try next.
+litellm_settings:
+  set_verbose: false
+  drop_params: true
+  redact_messages_in_exceptions: true
+  fallbacks:
+    - claude-opus-4-7: ["claude-sonnet-4-6", "openrouter-omnibus"]
+    - claude-sonnet-4-6: ["claude-haiku-4-5", "openrouter-omnibus"]
+    - gpt-5: ["gpt-5-mini", "openrouter-omnibus"]
+    - gemini-3-pro: ["gemini-3-flash", "openrouter-omnibus"]
+
+# General settings — security discipline post-2026-03-24 hack.
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY
+  # JWT auth was the hack vector — keep this off unless we have a specific
+  # reason to enable it (and a fresh review of the JWT path's hardening).
+  enable_jwt_auth: false
+  # Disable the admin UI — operations go through compose + config edits,
+  # never through a public web admin surface.
+  disable_admin_ui: true
+  # Telemetry off — no outbound calls from the proxy itself.
+  telemetry: false
