@@ -26,7 +26,19 @@ services:
   # II-Agent Backend (Autonomous Execution Engine)
   # ---------------------------------------------------------------------------
   ii-agent:
-    image: ghcr.io/intelligentinternet/ii-agent:latest
+    # Wave 1 Step H: extend upstream image to bake in II-Commons. Compose
+    # builds locally on first `up`; the resulting tag is `aims-ii-agent:custom`.
+    # Falls back to pulling the upstream image directly if no build context
+    # is reachable (e.g. CI lint without docker daemon).
+    image: aims-ii-agent:custom
+    build:
+      context: ..
+      dockerfile: infra/dockerfiles/ii-agent.Dockerfile
+      args:
+        II_AGENT_BASE: ghcr.io/intelligentinternet/ii-agent:latest
+        # Pin a specific version here once verified at PyPI to lock the
+        # II-Commons release across redeploys (Wave 1 ships unpinned `latest`).
+        II_COMMONS_VERSION: latest
     container_name: aims-ii-agent
     expose:
       - "8000"
