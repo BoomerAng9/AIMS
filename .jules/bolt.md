@@ -5,3 +5,4 @@
 ## 2026-03-24 - TypedArray reduce in 60fps loops
 **Learning:** Using functional array methods like `reduce` on TypedArrays (e.g., `Uint8Array`) inside `requestAnimationFrame` loops causes unnecessary V8 overhead and garbage collection, severely impacting 60fps animation performance.
 **Action:** Replace functional array methods like `reduce` with standard `for` loops when working with TypedArrays in high-frequency React animation loops.
+## 2025-05-24 - TextEncoder instantiations in high volume API streams\n**Learning:** Instantiating `new TextEncoder()` inside the `ReadableStream` block or within the API route handler itself causes repeated memory allocation on every request and chunk write, contributing to garbage collection overhead in Node/V8.\n**Action:** `TextEncoder` is stateless and thread-safe. Always hoist it to a module-level constant (e.g., `const ENCODER = new TextEncoder()`) for serverless API endpoints that perform heavy streaming.

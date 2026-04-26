@@ -1,3 +1,6 @@
+// ⚡ Bolt Optimization: Define module-level ENCODER to prevent repeated instantiation
+const ENCODER = new TextEncoder();
+
 /**
  * Chat API Route — Unified LLM Gateway + ACHEEVY Orchestrator
  *
@@ -150,11 +153,10 @@ async function tryAgentDispatch(
     };
 
     // Emit as AI SDK text stream format with tool event prefix 8:
-    const encoder = new TextEncoder();
     const stream = new ReadableStream({
       start(controller) {
-        controller.enqueue(encoder.encode(`8:${JSON.stringify(toolEvent)}\n`));
-        controller.enqueue(encoder.encode(`0:${JSON.stringify(fullReply)}\n`));
+        controller.enqueue(ENCODER.encode(`8:${JSON.stringify(toolEvent)}\n`));
+        controller.enqueue(ENCODER.encode(`0:${JSON.stringify(fullReply)}\n`));
         controller.close();
       },
     });
@@ -209,7 +211,6 @@ async function tryGatewayStream(
     if (!res.ok || !res.body) return null;
 
     // Transform gateway SSE format to AI SDK data-stream format
-    const encoder = new TextEncoder();
     const decoder = new TextDecoder();
     const reader = res.body.getReader();
 
@@ -480,10 +481,9 @@ export async function POST(req: Request) {
       const mimResponse = buildMIMResponse(mimDetection, lastMessage);
       if (mimResponse) {
         console.log(`[ACHEEVY Chat] M.I.M. intent detected: ${mimDetection.type} (${mimDetection.confidence})`);
-        const encoder = new TextEncoder();
         const stream = new ReadableStream({
           start(controller) {
-            controller.enqueue(encoder.encode(`0:${JSON.stringify(mimResponse)}\n`));
+            controller.enqueue(ENCODER.encode(`0:${JSON.stringify(mimResponse)}\n`));
             controller.close();
           },
         });
@@ -543,10 +543,9 @@ export async function POST(req: Request) {
     if (orchestratorClassification.requiresAgent) {
       console.warn('[ACHEEVY Chat] Agent dispatch failed for action intent — prepending notice to LLM stream');
       const dispatchFailureNote = `I wasn't able to reach my execution engine right now, so I'll handle this conversationally for the moment. Here's what I can tell you:\n\n`;
-      const encoder = new TextEncoder();
       const prefixStream = new ReadableStream({
         start(controller) {
-          controller.enqueue(encoder.encode(`0:${JSON.stringify(dispatchFailureNote)}\n`));
+          controller.enqueue(ENCODER.encode(`0:${JSON.stringify(dispatchFailureNote)}\n`));
           controller.close();
         },
       });
