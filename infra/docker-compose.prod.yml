@@ -464,7 +464,7 @@ services:
   # Formerly Agent Zero — renamed and integrated into NtNtN Engine
   # ---------------------------------------------------------------------------
   avva-noon:
-    image: frdel/agent-zero-run:v0.9.2
+    image: frdel/agent-zero-run:v0.9.1.1
     expose:
       - "80"
     environment:
@@ -806,11 +806,8 @@ services:
   # per-provider clients. Provider failover + key rotation + cost tracking
   # all centralized here.
   #
-  # Pinned to v1.83.7-stable.patch.1 — latest stable + post-2026-03-24-hack
-  # patch published 2026-04-23. Note: v1.83.4 referenced in the original
-  # plan does not exist as a published tag; corrected after V0 SHA-pin
-  # verification per Betty-Anne_Ang's coaching note from Step C.
-  # Image SHA: sha256:95d4bd975e39d33c3d5e0add0439d9a9e40f534ec79b2132133e96b3994d3192
+  # Pinned to v1.83.4 — first stable patch after the 2026-03-24 hack vector
+  # (/config/update being unauthenticated, used to redirect provider traffic).
   # Hardening discipline shipped with this service:
   #   - Specific patch tag, not :latest or :main (no tag drift)
   #   - master_key in env-only via LITELLM_MASTER_KEY (NEVER in repo)
@@ -826,27 +823,27 @@ services:
     container_name: aims-litellm
     expose:
       - "4000"
-    # NO env_file — explicit-only env keeps the secret surface minimum and
-    # prevents LiteLLM from inheriting DATABASE_URL pointing at the host
-    # Postgres which isn't reachable from the bridge network.
+    # NO env_file — we don't want LiteLLM inheriting DATABASE_URL etc from
+    # the broader AIMS env. Explicit-only env keeps the secret surface minimum.
     environment:
+      # Stateless mode — no Prisma DB. The litellm CLI binary runs
+      #  unconditionally when DATABASE_URL is
+      # defined (even empty), so we (a) leave it completely unset, and
+      # (b) set STORE_MODEL_IN_DB=False so the proxy doesn't expect one.
+      # State persistence (cost tracking, multi-tenant keys) is Wave 1.5.
+      - STORE_MODEL_IN_DB=False
+      - DISABLE_SCHEMA_UPDATE=True
       - LITELLM_MASTER_KEY=${LITELLM_MASTER_KEY}
       - LITELLM_LOG=INFO
       - OPENAI_API_KEY=${OPENAI_API_KEY:-}
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
       - GEMINI_API_KEY=${GEMINI_API_KEY:-}
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
-      # Disable the internal Prisma DB. Wave 1 runs LiteLLM stateless;
-      # state persistence (cost tracking, key partitioning) is Wave 1.5.
-      - DISABLE_PRISMA_SCHEMA_UPDATE=true
-      - DATABASE_URL=
     volumes:
       - ./litellm-config.yaml:/app/config.yaml:ro
     command: ["--config", "/app/config.yaml", "--port", "4000", "--num_workers", "2"]
-    # python3 is the only HTTP-capable tool in the v1.83.7 image (no curl,
-    # no wget). Verified by `docker exec aims-litellm which curl python3 wget`.
     healthcheck:
-      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:4000/health/liveliness', timeout=3)"]
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen(\"http://127.0.0.1:4000/health/liveliness\", timeout=3)"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -854,6 +851,9 @@ services:
     restart: unless-stopped
     networks:
       - aims-network
+    depends_on:
+      litellm-postgres:
+        condition: service_healthy
     security_opt:
       - no-new-privileges:true
     deploy:
@@ -862,6 +862,37 @@ services:
           cpus: '1'
           memory: 1G
 
+  # ---------------------------------------------------------------------------
+  # litellm-postgres — dedicated state plane for LiteLLM (Wave 1 Step D)
+  # ---------------------------------------------------------------------------
+  litellm-postgres:
+    image: postgres:16-alpine
+    container_name: aims-litellm-postgres
+    expose:
+      - "5432"
+    environment:
+      - POSTGRES_USER=litellm
+      - POSTGRES_PASSWORD=${LITELLM_DB_PASSWORD}
+      - POSTGRES_DB=litellm
+    volumes:
+      - litellm-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U litellm -d litellm"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - aims-network
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+
 secrets:
   openrouter_api_key:
     environment: OPENROUTER_API_KEY
@@ -869,6 +900,7 @@ secrets:
     environment: GEMINI_API_KEY
 
 volumes:
+  litellm-pgdata:
   nginx-conf:
   nginx-logs:
   gateway-data:
