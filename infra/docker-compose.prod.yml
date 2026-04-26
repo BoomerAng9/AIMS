@@ -798,6 +798,60 @@ services:
     profiles:
       - perform
 
+  # ---------------------------------------------------------------------------
+  # LiteLLM — Central Model Gateway (Wave 1 Step D)
+  # ---------------------------------------------------------------------------
+  # OpenAI-compatible proxy: every downstream consumer (Hermes Agent, ACHEEVY,
+  # AgentScope, ii-agent, AOF children) hits a single URL instead of bespoke
+  # per-provider clients. Provider failover + key rotation + cost tracking
+  # all centralized here.
+  #
+  # Pinned to v1.83.4 — first stable patch after the 2026-03-24 hack vector
+  # (/config/update being unauthenticated, used to redirect provider traffic).
+  # Hardening discipline shipped with this service:
+  #   - Specific patch tag, not :latest or :main (no tag drift)
+  #   - master_key in env-only via LITELLM_MASTER_KEY (NEVER in repo)
+  #   - enable_jwt_auth: false (the hack vector exploited the JWT path)
+  #   - Internal-only on :4000; public route at litellm.foai.cloud is mTLS
+  #   - nginx /config/update returns 444 unless source IP is allowlisted
+  #     (operator workstation only)
+  #   - redact_messages_in_exceptions: true (no prompt PII in error logs)
+  #
+  # Verification: see infra/litellm-operator.md V0–V7 chain.
+  litellm:
+    image: ghcr.io/berriai/litellm:v1.83.4
+    container_name: aims-litellm
+    expose:
+      - "4000"
+    env_file:
+      - .env.production
+    environment:
+      - LITELLM_MASTER_KEY=${LITELLM_MASTER_KEY}
+      - LITELLM_LOG=INFO
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
+    volumes:
+      - ./litellm-config.yaml:/app/config.yaml:ro
+    command: ["--config", "/app/config.yaml", "--port", "4000", "--num_workers", "2"]
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:4000/health/liveliness"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped
+    networks:
+      - aims-network
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+
 secrets:
   openrouter_api_key:
     environment: OPENROUTER_API_KEY
