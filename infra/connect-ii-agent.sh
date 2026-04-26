@@ -159,6 +159,17 @@ show_status() {
   gw_test=$(docker exec aims-uef-gateway sh -c 'curl -sf http://ii-agent:8000/health 2>/dev/null' || echo '{"error":"unreachable"}')
   info "UEF Gateway → ii-agent connectivity: $gw_test"
   echo ""
+
+  # Wave 1 Step H: verify II-Commons is baked into the image.
+  local ic_version
+  ic_version=$(docker exec aims-ii-agent python -c "import ii_commons; print(getattr(ii_commons, '__version__', 'unknown'))" 2>/dev/null || echo "MISSING")
+  if [ "$ic_version" = "MISSING" ]; then
+    warn "ii-commons NOT installed inside aims-ii-agent — rebuild with:"
+    warn "  docker compose -f infra/docker-compose.prod.yml -f infra/docker-compose.ii-agent.yaml --env-file infra/.env.ii-agent build ii-agent"
+  else
+    info "ii-commons in aims-ii-agent: $ic_version"
+  fi
+  echo ""
 }
 
 # ---------------------------------------------------------------------------
