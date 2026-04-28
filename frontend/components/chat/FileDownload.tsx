@@ -58,6 +58,10 @@ interface FormatConfig {
 // Format configuration
 // ─────────────────────────────────────────────────────────────
 
+// ⚡ Bolt Optimization: Instantiate TextEncoder once at module level
+// for faster byte length calculations without unnecessary Blob allocation.
+const textEncoder = new TextEncoder();
+
 const FORMAT_CONFIG: Record<string, FormatConfig> = {
   md: {
     icon: FileText,
@@ -133,7 +137,9 @@ export function FileDownload({
 
   const resolvedFilename = filename || `aims-export.${format}`;
   const sizeKB = useMemo(
-    () => Math.round(new Blob([content]).size / 1024),
+    () => Math.round(
+      (typeof content === 'string' ? textEncoder.encode(content).length : new Blob([content]).size) / 1024
+    ),
     [content]
   );
   const lineCount = useMemo(
@@ -358,7 +364,9 @@ export function FileDownloadGroup({ files }: { files: FileDownloadProps[] }) {
   if (files.length === 0) return null;
 
   const totalSizeKB = files.reduce(
-    (sum, f) => sum + Math.round(new Blob([f.content]).size / 1024),
+    (sum, f) => sum + Math.round(
+      (typeof f.content === 'string' ? textEncoder.encode(f.content).length : new Blob([f.content]).size) / 1024
+    ),
     0
   );
 
