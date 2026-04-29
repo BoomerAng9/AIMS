@@ -35,6 +35,10 @@ import {
   Package,
 } from 'lucide-react';
 
+// ⚡ Bolt Optimization: Instantiate TextEncoder outside of component to avoid
+// repeated memory allocation and re-instantiation on every render for byte length calculations.
+const textEncoder = new TextEncoder();
+
 // ─────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────
@@ -133,7 +137,9 @@ export function FileDownload({
 
   const resolvedFilename = filename || `aims-export.${format}`;
   const sizeKB = useMemo(
-    () => Math.round(new Blob([content]).size / 1024),
+    () => Math.round(
+      (typeof content === 'string' ? textEncoder.encode(content).length : new Blob([content]).size) / 1024
+    ),
     [content]
   );
   const lineCount = useMemo(
@@ -358,7 +364,9 @@ export function FileDownloadGroup({ files }: { files: FileDownloadProps[] }) {
   if (files.length === 0) return null;
 
   const totalSizeKB = files.reduce(
-    (sum, f) => sum + Math.round(new Blob([f.content]).size / 1024),
+    (sum, f) => sum + Math.round(
+      (typeof f.content === 'string' ? textEncoder.encode(f.content).length : new Blob([f.content]).size) / 1024
+    ),
     0
   );
 
