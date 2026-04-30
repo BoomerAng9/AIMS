@@ -13,6 +13,9 @@ import { authOptions } from '@/lib/auth';
 
 const CHICKENHAWK_URL = process.env.CHICKENHAWK_URL || 'http://chickenhawk-core:4001';
 
+// Optimization: Reusing a single TextEncoder at the module scope prevents repetitive memory allocations on each request.
+const globalEncoder = new TextEncoder();
+
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
@@ -31,8 +34,6 @@ export async function GET() {
   }
 
   // Create a readable stream that proxies from Chicken Hawk
-  const encoder = new TextEncoder();
-
   const stream = new ReadableStream({
     async start(controller) {
       try {
@@ -42,7 +43,7 @@ export async function GET() {
 
         if (!res.ok || !res.body) {
           controller.enqueue(
-            encoder.encode(`data: ${JSON.stringify({ type: 'error', message: 'Chicken Hawk not reachable' })}\n\n`),
+            globalEncoder.encode(`data: ${JSON.stringify({ type: 'error', message: 'Chicken Hawk not reachable' })}\n\n`),
           );
           controller.close();
           return;
@@ -54,14 +55,14 @@ export async function GET() {
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
-          controller.enqueue(encoder.encode(decoder.decode(value, { stream: true })));
+          controller.enqueue(globalEncoder.encode(decoder.decode(value, { stream: true })));
         }
 
         controller.close();
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Connection failed';
         controller.enqueue(
-          encoder.encode(`data: ${JSON.stringify({ type: 'error', message })}\n\n`),
+          globalEncoder.encode(`data: ${JSON.stringify({ type: 'error', message })}\n\n`),
         );
         controller.close();
       }
