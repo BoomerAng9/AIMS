@@ -241,23 +241,24 @@ export class EvidenceLockerClient {
         prefix: `evidence/${deploymentId}/`,
       });
 
-      const artifacts: EvidenceArtifact[] = [];
-
-      for (const file of files) {
-        const [metadata] = await file.getMetadata();
-        artifacts.push({
-          id: metadata.metadata?.artifactId || file.name.split("/").pop() || "",
-          deploymentId,
-          type: metadata.metadata?.type || "log",
-          label: metadata.metadata?.label || file.name,
-          contentHash: metadata.metadata?.contentHash || "",
-          contentType: metadata.contentType || "application/octet-stream",
-          size: parseInt(metadata.size, 10) || 0,
-          gcsPath: file.name,
-          metadata: metadata.metadata || {},
-          createdAt: metadata.timeCreated || new Date().toISOString(),
-        });
-      }
+      // ⚡ Bolt Performance Optimization: Fetch all file metadata concurrently instead of sequentially
+      const artifacts: EvidenceArtifact[] = await Promise.all(
+        files.map(async (file) => {
+          const [metadata] = await file.getMetadata();
+          return {
+            id: metadata.metadata?.artifactId || file.name.split("/").pop() || "",
+            deploymentId,
+            type: metadata.metadata?.type || "log",
+            label: metadata.metadata?.label || file.name,
+            contentHash: metadata.metadata?.contentHash || "",
+            contentType: metadata.contentType || "application/octet-stream",
+            size: parseInt(metadata.size, 10) || 0,
+            gcsPath: file.name,
+            metadata: metadata.metadata || {},
+            createdAt: metadata.timeCreated || new Date().toISOString(),
+          };
+        })
+      );
 
       return artifacts;
     } catch (error: any) {
@@ -357,14 +358,17 @@ export class EvidenceLockerClient {
     }
 
     // Verify each artifact exists in GCS
-    for (const artifact of locker.artifacts) {
-      const result = await this.retrieveArtifact(locker.deploymentId, artifact.id);
-      if (!result.success) {
-        errors.push(`Missing artifact: ${artifact.id}`);
-      } else if (result.artifact?.contentHash !== artifact.contentHash) {
-        errors.push(`Hash mismatch for artifact: ${artifact.id}`);
-      }
-    }
+    // ⚡ Bolt Performance Optimization: Retrieve and verify all artifacts concurrently to reduce latency
+    await Promise.all(
+      locker.artifacts.map(async (artifact) => {
+        const result = await this.retrieveArtifact(locker.deploymentId, artifact.id);
+        if (!result.success) {
+          errors.push(`Missing artifact: ${artifact.id}`);
+        } else if (result.artifact?.contentHash !== artifact.contentHash) {
+          errors.push(`Hash mismatch for artifact: ${artifact.id}`);
+        }
+      })
+    );
 
     return { valid: errors.length === 0, errors };
   }
