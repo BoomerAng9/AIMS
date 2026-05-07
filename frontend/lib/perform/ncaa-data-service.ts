@@ -270,15 +270,49 @@ export async function seedCoachingChanges(entries: Array<{
   let created = 0;
   let skipped = 0;
 
+  // Batch resolve teams
+  const teamAbbrevs = new Set<string>();
   for (const entry of entries) {
-    const previousTeamId = await resolveTeamId(entry.previousTeamAbbrev);
-    const newTeamId = await resolveTeamId(entry.newTeamAbbrev);
+    if (entry.previousTeamAbbrev) teamAbbrevs.add(entry.previousTeamAbbrev);
+    if (entry.newTeamAbbrev) teamAbbrevs.add(entry.newTeamAbbrev);
+  }
 
+  const teams = await prisma.performTeam.findMany({
+    where: { abbreviation: { in: Array.from(teamAbbrevs) } }
+  });
+
+  const teamMap = new Map<string, string>();
+  for (const t of teams) {
+    teamMap.set(t.abbreviation, t.id);
+  }
+
+  // Batch resolve existing records
+  const orConditions = entries.map(e => ({
+    coachName: e.coachName,
+    season: e.season,
+    changeType: e.changeType
+  }));
+
+  // Prevent empty OR which might return all/error
+  const existingRecords = orConditions.length > 0
+    ? await prisma.coachingChange.findMany({ where: { OR: orConditions } })
+    : [];
+
+  const existingSet = new Set<string>();
+  for (const r of existingRecords) {
+    existingSet.add(`${r.coachName}-${r.season}-${r.changeType}`);
+  }
+
+  for (const entry of entries) {
+    const previousTeamId = entry.previousTeamAbbrev ? (teamMap.get(entry.previousTeamAbbrev) || null) : null;
+    const newTeamId = entry.newTeamAbbrev ? (teamMap.get(entry.newTeamAbbrev) || null) : null;
+
+    const key = `${entry.coachName}-${entry.season}-${entry.changeType}`;
     // Skip if already exists (same coach + season + changeType)
-    const existing = await prisma.coachingChange.findFirst({
-      where: { coachName: entry.coachName, season: entry.season, changeType: entry.changeType },
-    });
-    if (existing) { skipped++; continue; }
+    if (existingSet.has(key)) { skipped++; continue; }
+
+    // Add to existingSet so we don't insert duplicate if present in entries
+    existingSet.add(key);
 
     await prisma.coachingChange.create({
       data: {
@@ -329,14 +363,45 @@ export async function seedTransferPortalEntries(entries: Array<{
   let created = 0;
   let skipped = 0;
 
+  // Batch resolve teams
+  const teamAbbrevs = new Set<string>();
   for (const entry of entries) {
-    const previousTeamId = await resolveTeamId(entry.previousTeamAbbrev);
-    const newTeamId = await resolveTeamId(entry.newTeamAbbrev);
+    if (entry.previousTeamAbbrev) teamAbbrevs.add(entry.previousTeamAbbrev);
+    if (entry.newTeamAbbrev) teamAbbrevs.add(entry.newTeamAbbrev);
+  }
 
-    const existing = await prisma.transferPortalEntry.findFirst({
-      where: { playerName: entry.playerName, season: entry.season },
-    });
-    if (existing) { skipped++; continue; }
+  const teams = await prisma.performTeam.findMany({
+    where: { abbreviation: { in: Array.from(teamAbbrevs) } }
+  });
+
+  const teamMap = new Map<string, string>();
+  for (const t of teams) {
+    teamMap.set(t.abbreviation, t.id);
+  }
+
+  // Batch resolve existing records
+  const orConditions = entries.map(e => ({
+    playerName: e.playerName,
+    season: e.season
+  }));
+
+  const existingRecords = orConditions.length > 0
+    ? await prisma.transferPortalEntry.findMany({ where: { OR: orConditions } })
+    : [];
+
+  const existingSet = new Set<string>();
+  for (const r of existingRecords) {
+    existingSet.add(`${r.playerName}-${r.season}`);
+  }
+
+  for (const entry of entries) {
+    const previousTeamId = entry.previousTeamAbbrev ? (teamMap.get(entry.previousTeamAbbrev) || null) : null;
+    const newTeamId = entry.newTeamAbbrev ? (teamMap.get(entry.newTeamAbbrev) || null) : null;
+
+    const key = `${entry.playerName}-${entry.season}`;
+    if (existingSet.has(key)) { skipped++; continue; }
+
+    existingSet.add(key);
 
     await prisma.transferPortalEntry.create({
       data: {
@@ -382,13 +447,44 @@ export async function seedNilDeals(entries: Array<{
   let created = 0;
   let skipped = 0;
 
+  // Batch resolve teams
+  const teamAbbrevs = new Set<string>();
   for (const entry of entries) {
-    const teamId = await resolveTeamId(entry.teamAbbrev);
+    if (entry.teamAbbrev) teamAbbrevs.add(entry.teamAbbrev);
+  }
 
-    const existing = await prisma.nilDeal.findFirst({
-      where: { playerName: entry.playerName, brandOrCollective: entry.brandOrCollective, season: entry.season },
-    });
-    if (existing) { skipped++; continue; }
+  const teams = await prisma.performTeam.findMany({
+    where: { abbreviation: { in: Array.from(teamAbbrevs) } }
+  });
+
+  const teamMap = new Map<string, string>();
+  for (const t of teams) {
+    teamMap.set(t.abbreviation, t.id);
+  }
+
+  // Batch resolve existing records
+  const orConditions = entries.map(e => ({
+    playerName: e.playerName,
+    brandOrCollective: e.brandOrCollective,
+    season: e.season
+  }));
+
+  const existingRecords = orConditions.length > 0
+    ? await prisma.nilDeal.findMany({ where: { OR: orConditions } })
+    : [];
+
+  const existingSet = new Set<string>();
+  for (const r of existingRecords) {
+    existingSet.add(`${r.playerName}-${r.brandOrCollective}-${r.season}`);
+  }
+
+  for (const entry of entries) {
+    const teamId = entry.teamAbbrev ? (teamMap.get(entry.teamAbbrev) || null) : null;
+
+    const key = `${entry.playerName}-${entry.brandOrCollective}-${entry.season}`;
+    if (existingSet.has(key)) { skipped++; continue; }
+
+    existingSet.add(key);
 
     await prisma.nilDeal.create({
       data: {

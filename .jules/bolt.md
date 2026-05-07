@@ -8,3 +8,7 @@
 ## 2024-05-18 - [Parallelize Evidence Locker GCS network calls]
 **Learning:** Sequential asynchronous network requests inside `for...of` loops are a hidden bottleneck for latency, especially when dealing with high-volume remote operations like fetching Google Cloud Storage metadata. Refactoring these loops to use `Promise.all` with `.map()` significantly cuts down total execution time by allowing concurrent requests.
 **Action:** Always scan for `for...of` loops that purely execute independent `await` calls and refactor them to use `Promise.all` mapping to reduce latency.
+
+## 2024-06-15 - Prisma Seeding N+1 Queries
+**Learning:** Seeding functions in Prisma often suffer from N+1 query performance issues when resolving related entity IDs or checking for existing records sequentially inside a `for` loop.
+**Action:** When working with database seeds, fetch foreign keys (e.g., using `findMany` with `in`) and existing records (e.g., using `findMany` with `OR`) in batches before the loop. Use in-memory data structures like `Map` and `Set` to lookup relations and track deduplication efficiently inside the insert loop.
