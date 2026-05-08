@@ -109,10 +109,15 @@ export class ShoppingAgent {
     const findings: ProductFinding[] = [];
     const warnings: ScoutingWarning[] = [];
 
-    // Scout for each item in the task
-    for (const item of task.items) {
+    // Scout for each item in the task concurrently
+    const scoutPromises = task.items.map(async (item) => {
       const itemFindings = await this.scoutItem(item);
+      return { item, itemFindings };
+    });
 
+    const scoutResults = await Promise.all(scoutPromises);
+
+    for (const { item, itemFindings } of scoutResults) {
       if (itemFindings.length === 0) {
         warnings.push({
           type: 'no_results',
@@ -508,16 +513,17 @@ export class ShoppingAgent {
    * Compare prices for a specific product across retailers
    */
   async comparePrices(productName: string): Promise<ProductFinding[]> {
-    const findings: ProductFinding[] = [];
-
-    for (const [, adapter] of Array.from(this.adapters.entries())) {
+    const searchPromises = Array.from(this.adapters.values()).map(async (adapter) => {
       try {
-        const results = await adapter.search(productName, { maxResults: 3 });
-        findings.push(...results);
+        return await adapter.search(productName, { maxResults: 3 });
       } catch (error) {
         console.error(`[ShoppingAgent] Price comparison error:`, error);
+        return [];
       }
-    }
+    });
+
+    const resultsArray = await Promise.all(searchPromises);
+    const findings = resultsArray.flat();
 
     return findings.sort((a, b) => (a.price || 0) - (b.price || 0));
   }
