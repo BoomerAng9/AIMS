@@ -156,23 +156,26 @@ export async function GET(req: NextRequest) {
                 });
 
                 if (stateCounts.length > 0) {
-                    const stateData = [];
-                    for (const sc of stateCounts) {
-                        if (!sc.state) continue;
-                        const topProspect = await prisma.performProspect.findFirst({
-                            where: { state: sc.state },
-                            orderBy: { paiScore: 'desc' },
-                            select: { firstName: true, lastName: true, position: true, paiScore: true },
+                    // Bolt: Optimize N+1 query by concurrently fetching the top prospect for each state
+                    const stateDataPromises = stateCounts
+                        .filter(sc => sc.state)
+                        .map(async (sc) => {
+                            const topProspect = await prisma.performProspect.findFirst({
+                                where: { state: sc.state },
+                                orderBy: { paiScore: 'desc' },
+                                select: { firstName: true, lastName: true, position: true, paiScore: true },
+                            });
+
+                            return {
+                                code: sc.state,
+                                count: sc._count._all,
+                                topProducer: topProspect ? `${topProspect.firstName} ${topProspect.lastName}` : null,
+                                topPosition: topProspect?.position || null,
+                                topPai: topProspect?.paiScore || null,
+                            };
                         });
 
-                        stateData.push({
-                            code: sc.state,
-                            count: sc._count._all,
-                            topProducer: topProspect ? `${topProspect.firstName} ${topProspect.lastName}` : null,
-                            topPosition: topProspect?.position || null,
-                            topPai: topProspect?.paiScore || null,
-                        });
-                    }
+                    const stateData = await Promise.all(stateDataPromises);
 
                     return NextResponse.json({
                         source: 'database',
