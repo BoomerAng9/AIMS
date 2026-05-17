@@ -21,7 +21,6 @@ import { useConversation } from '@elevenlabs/react';
 import { useStreamingChat } from '@/hooks/useStreamingChat';
 import { useVoiceInput } from '@/hooks/useVoiceInput';
 import { useVoiceOutput } from '@/hooks/useVoiceOutput';
-import { useAudioLevel } from '@/hooks/useAudioLevel';
 import { useOrchestration } from '@/hooks/useOrchestration';
 import { useChangeOrder } from '@/hooks/useChangeOrder';
 import { useVerticalFlow } from '@/hooks/useVerticalFlow';
@@ -522,9 +521,6 @@ export function ChatInterface({
     setPendingVoiceTranscript('');
   }, [isLoading, isStreaming, sendMessage, showOrchestration, orchestration, verticalFlow, classifyForVertical]);
 
-  // Audio level for voice input visualization
-  const audioLevel = useAudioLevel(voiceInput.stream, voiceInput.isListening);
-
   return (
     <div className="relative flex h-full flex-col bg-transparent overflow-x-hidden">
       {/* ── Messages Area ───────────────────────────────────── */}
@@ -603,7 +599,6 @@ export function ChatInterface({
           void handleSend({ message: pendingVoiceTranscript });
         }}
         onClearTranscript={() => { setPendingVoiceTranscript(''); }}
-        audioLevel={audioLevel}
         hasVoiceAgent={hasAgent}
         voiceSessionActive={voiceSessionActive}
         voiceAgentStatus={conversation.status}
