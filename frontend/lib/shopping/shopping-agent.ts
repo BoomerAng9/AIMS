@@ -106,12 +106,10 @@ export class ShoppingAgent {
    * Execute a shopping task (scouting mission)
    */
   async executeTask(task: ShoppingTask): Promise<ScoutingResult> {
-    const findings: ProductFinding[] = [];
-    const warnings: ScoutingWarning[] = [];
-
-    // Scout for each item in the task
-    for (const item of task.items) {
+    // ⚡ Bolt: Parallelize scoutItem calls to significantly reduce network latency
+    const results = await Promise.all(task.items.map(async (item) => {
       const itemFindings = await this.scoutItem(item);
+      const warnings: ScoutingWarning[] = [];
 
       if (itemFindings.length === 0) {
         warnings.push({
@@ -120,7 +118,7 @@ export class ShoppingAgent {
           message: `No results found for "${item.name || item.description}"`,
           severity: 'high',
         });
-        continue;
+        return { findings: [], warnings };
       }
 
       // Check price constraints
@@ -137,8 +135,11 @@ export class ShoppingAgent {
         });
       }
 
-      findings.push(...itemFindings);
-    }
+      return { findings: itemFindings, warnings };
+    }));
+
+    const findings = results.flatMap((r) => r.findings);
+    const warnings = results.flatMap((r) => r.warnings);
 
     // Build cart options from findings
     const cartOptions = await this.buildCartOptions(task.items, findings);
