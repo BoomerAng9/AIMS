@@ -156,23 +156,23 @@ export async function GET(req: NextRequest) {
                 });
 
                 if (stateCounts.length > 0) {
-                    const stateData = [];
-                    for (const sc of stateCounts) {
-                        if (!sc.state) continue;
-                        const topProspect = await prisma.performProspect.findFirst({
-                            where: { state: sc.state },
-                            orderBy: { paiScore: 'desc' },
-                            select: { firstName: true, lastName: true, position: true, paiScore: true },
-                        });
+                    const stateData = await Promise.all(
+                        stateCounts.filter(sc => sc.state).map(async (sc) => {
+                            const topProspect = await prisma.performProspect.findFirst({
+                                where: { state: sc.state as string },
+                                orderBy: { paiScore: 'desc' },
+                                select: { firstName: true, lastName: true, position: true, paiScore: true },
+                            });
 
-                        stateData.push({
-                            code: sc.state,
-                            count: sc._count._all,
-                            topProducer: topProspect ? `${topProspect.firstName} ${topProspect.lastName}` : null,
-                            topPosition: topProspect?.position || null,
-                            topPai: topProspect?.paiScore || null,
-                        });
-                    }
+                            return {
+                                code: sc.state,
+                                count: sc._count._all,
+                                topProducer: topProspect ? `${topProspect.firstName} ${topProspect.lastName}` : null,
+                                topPosition: topProspect?.position || null,
+                                topPai: topProspect?.paiScore || null,
+                            };
+                        })
+                    );
 
                     return NextResponse.json({
                         source: 'database',
