@@ -43,9 +43,8 @@ model_list:
       api_key: os.environ/OPENAI_API_KEY
 
   # ── Google Gemini ──────────────────────────────────────────────────────────
-  # Default `gemini-3-flash` virtual is aliased to 3.5 Flash (current canon
-  # post 2026-05-19 Google I/O GA). Old `3-flash` callers keep working; new
-  # callers can opt in to `gemini-3-5-flash` explicitly.
+  # gemini-3-flash aliases to 3.5 Flash (current canon post 2026-05-19 I/O GA).
+  # Old callers keep working; new callers can pin to gemini-3-5-flash explicitly.
   - model_name: gemini-3-flash
     litellm_params:
       model: gemini/gemini-3.5-flash
@@ -56,27 +55,47 @@ model_list:
       model: gemini/gemini-3.5-flash
       api_key: os.environ/GEMINI_API_KEY
 
+  - model_name: gemini-3-1-flash
+    litellm_params:
+      model: gemini/gemini-3.1-flash
+      api_key: os.environ/GEMINI_API_KEY
+
+  - model_name: gemini-3-1-flash-lite
+    litellm_params:
+      model: gemini/gemini-3.1-flash-lite
+      api_key: os.environ/GEMINI_API_KEY
+
   - model_name: gemini-3-pro
     litellm_params:
       model: gemini/gemini-3-pro
       api_key: os.environ/GEMINI_API_KEY
 
-  # Gemini 3.5 Pro is internal-only at Google (public rollout June 2026).
-  # Reserve the model_name so consumers can target it as soon as it lands;
-  # for now this entry falls back via routing block below.
-  # - model_name: gemini-3-5-pro
-  #   litellm_params:
-  #     model: gemini/gemini-3.5-pro
-  #     api_key: os.environ/GEMINI_API_KEY
+  - model_name: gemini-3-1-pro
+    litellm_params:
+      model: gemini/gemini-3.1-pro
+      api_key: os.environ/GEMINI_API_KEY
 
-  # ── DeepSeek V4 (added 2026-05-20) ────────────────────────────────────────
-  # DeepSeek V4 Flash: 284B/13B MoE, 1M context, $0.112/$0.224 per M tokens.
-  # Routed through OpenRouter until DEEPSEEK_API_KEY lands in the vault for
-  # direct-provider access. Owner-pull procedure in docs/security/SECRETS.md
-  # over in AIMS-Charlotte. When direct key lands, swap to deepseek/deepseek-v4-flash.
+  # Gemini 3.5 Pro: Google internal-only until June 2026 public rollout.
+  # Reserve the model_name; routes via openrouter fallback until GA.
+  - model_name: gemini-3-5-pro
+    litellm_params:
+      model: openrouter/google/gemini-3-pro
+      api_key: os.environ/OPENROUTER_API_KEY
+      api_base: https://openrouter.ai/api/v1
+
+  # ── DeepSeek V4 family ────────────────────────────────────────────────────
+  # All DeepSeek V4 entries. Routed through OpenRouter until DEEPSEEK_API_KEY
+  # lands in the vault for direct-provider access; swap to deepseek/...
+  # when that key lands (~50% cheaper, lower latency, no margin to OpenRouter).
   - model_name: deepseek-v4-flash
     litellm_params:
       model: openrouter/deepseek/deepseek-v4-flash
+      api_key: os.environ/OPENROUTER_API_KEY
+      api_base: https://openrouter.ai/api/v1
+
+  - model_name: deepseek-v4-flash-free
+    litellm_params:
+      model: openrouter/deepseek/deepseek-v4-flash:free
       api_key: os.environ/OPENROUTER_API_KEY
       api_base: https://openrouter.ai/api/v1
 
@@ -86,7 +105,77 @@ model_list:
       api_key: os.environ/OPENROUTER_API_KEY
       api_base: https://openrouter.ai/api/v1
 
-  # ── OpenRouter (omnibus fallback — Grok, Kimi, etc.) ──────────────────────
+  # ── Moonshot Kimi ─────────────────────────────────────────────────────────
+  # Kimi K2.6: 1T MoE, 32B active, 256K context. Released 2026-04-20.
+  # Long-horizon coding + multi-agent orchestration (up to 300 sub-agents).
+  - model_name: kimi-k2-6
+    litellm_params:
+      model: openrouter/moonshotai/kimi-k2.6
+      api_key: os.environ/OPENROUTER_API_KEY
+      api_base: https://openrouter.ai/api/v1
+
+  # ── NVIDIA Nemotron ───────────────────────────────────────────────────────
+  # Nemotron 3 Super (120B/12B hybrid Mamba-Transformer MoE).
+  # super-nemotron = paid tier, nemotron-super = free tier (legacy alias).
+  - model_name: super-nemotron
+    litellm_params:
+      model: openrouter/nvidia/nemotron-3-super-120b-a12b
+      api_key: os.environ/OPENROUTER_API_KEY
+      api_base: https://openrouter.ai/api/v1
+
+  - model_name: nemotron-super
+    litellm_params:
+      model: openrouter/nvidia/nemotron-3-super-120b-a12b:free
+      api_key: os.environ/OPENROUTER_API_KEY
+      api_base: https://openrouter.ai/api/v1
+
+  - model_name: nemotron-super-paid
+    litellm_params:
+      model: openrouter/nvidia/nemotron-3-super-120b-a12b
+      api_key: os.environ/OPENROUTER_API_KEY
+      api_base: https://openrouter.ai/api/v1
+
+  - model_name: nemotron-nano-reasoning
+    litellm_params:
+      model: openrouter/nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free
+      api_key: os.environ/OPENROUTER_API_KEY
+      api_base: https://openrouter.ai/api/v1
+
+  # ── xAI Grok ──────────────────────────────────────────────────────────────
+  - model_name: grok-4-3
+    litellm_params:
+      model: openrouter/x-ai/grok-4.3
+      api_key: os.environ/OPENROUTER_API_KEY
+      api_base: https://openrouter.ai/api/v1
+
+  # ── OpenAI 5.5 line (newer than gpt-5 above) ──────────────────────────────
+  # Via OpenRouter because OPENAI_API_KEY is currently empty in the vault.
+  - model_name: gpt-5-5
+    litellm_params:
+      model: openrouter/openai/gpt-5.5
+      api_key: os.environ/OPENROUTER_API_KEY
+      api_base: https://openrouter.ai/api/v1
+
+  - model_name: gpt-5-5-pro
+    litellm_params:
+      model: openrouter/openai/gpt-5.5-pro
+      api_key: os.environ/OPENROUTER_API_KEY
+      api_base: https://openrouter.ai/api/v1
+
+  # ── Qwen 3.6 line (high-utility cost/perf tier on OpenRouter) ─────────────
+  - model_name: qwen-3-6-flash
+    litellm_params:
+      model: openrouter/qwen/qwen3.6-flash
+      api_key: os.environ/OPENROUTER_API_KEY
+      api_base: https://openrouter.ai/api/v1
+
+  - model_name: qwen-3-6-max
+    litellm_params:
+      model: openrouter/qwen/qwen3.6-max-preview
+      api_key: os.environ/OPENROUTER_API_KEY
+      api_base: https://openrouter.ai/api/v1
+
+  # ── OpenRouter (omnibus fallback) ─────────────────────────────────────────
   - model_name: openrouter-omnibus
     litellm_params:
       model: openrouter/auto
@@ -106,15 +195,38 @@ litellm_settings:
   drop_params: true
   redact_messages_in_exceptions: true
   fallbacks:
-    - claude-opus-4-7: ["claude-sonnet-4-6", "openrouter-omnibus"]
-    - claude-sonnet-4-6: ["claude-haiku-4-5", "openrouter-omnibus"]
+    # Anthropic tier
+    - claude-opus-4-7: ["claude-sonnet-4-6", "gpt-5-5-pro", "openrouter-omnibus"]
+    - claude-sonnet-4-6: ["claude-haiku-4-5", "deepseek-v4-pro", "openrouter-omnibus"]
     - claude-haiku-4-5: ["deepseek-v4-flash", "openrouter-omnibus"]
+    # OpenAI tier
+    - gpt-5-5-pro: ["gpt-5-5", "claude-opus-4-7", "openrouter-omnibus"]
+    - gpt-5-5: ["gpt-5", "gpt-5-mini", "openrouter-omnibus"]
     - gpt-5: ["gpt-5-mini", "openrouter-omnibus"]
-    - gemini-3-pro: ["gemini-3-flash", "openrouter-omnibus"]
+    # Google Gemini tier
+    - gemini-3-5-pro: ["gemini-3-1-pro", "gemini-3-pro", "openrouter-omnibus"]
+    - gemini-3-1-pro: ["gemini-3-pro", "gemini-3-5-flash", "openrouter-omnibus"]
+    - gemini-3-pro: ["gemini-3-1-pro", "gemini-3-5-flash", "openrouter-omnibus"]
+    - gemini-3-5-flash: ["gemini-3-1-flash", "gemini-3-flash", "deepseek-v4-flash", "openrouter-omnibus"]
+    - gemini-3-1-flash: ["gemini-3-5-flash", "gemini-3-1-flash-lite", "deepseek-v4-flash", "openrouter-omnibus"]
     - gemini-3-flash: ["gemini-3-5-flash", "deepseek-v4-flash", "openrouter-omnibus"]
-    - gemini-3-5-flash: ["gemini-3-flash", "deepseek-v4-flash", "openrouter-omnibus"]
-    - deepseek-v4-pro: ["deepseek-v4-flash", "openrouter-omnibus"]
-    - deepseek-v4-flash: ["gemini-3-5-flash", "openrouter-omnibus"]
+    - gemini-3-1-flash-lite: ["gemini-3-1-flash", "deepseek-v4-flash-free", "openrouter-omnibus"]
+    # DeepSeek tier
+    - deepseek-v4-pro: ["deepseek-v4-flash", "kimi-k2-6", "openrouter-omnibus"]
+    - deepseek-v4-flash: ["gemini-3-5-flash", "kimi-k2-6", "openrouter-omnibus"]
+    - deepseek-v4-flash-free: ["deepseek-v4-flash", "nemotron-super", "openrouter-omnibus"]
+    # Moonshot
+    - kimi-k2-6: ["deepseek-v4-pro", "openrouter-omnibus"]
+    # xAI
+    - grok-4-3: ["claude-opus-4-7", "openrouter-omnibus"]
+    # NVIDIA
+    - super-nemotron: ["nemotron-super-paid", "nemotron-super", "openrouter-omnibus"]
+    - nemotron-super-paid: ["nemotron-super", "openrouter-omnibus"]
+    - nemotron-super: ["super-nemotron", "openrouter-omnibus"]
+    - nemotron-nano-reasoning: ["nemotron-super", "openrouter-omnibus"]
+    # Qwen
+    - qwen-3-6-max: ["qwen-3-6-flash", "deepseek-v4-pro", "openrouter-omnibus"]
+    - qwen-3-6-flash: ["deepseek-v4-flash", "openrouter-omnibus"]
 
 # General settings — security discipline post-2026-03-24 hack.
 general_settings:
