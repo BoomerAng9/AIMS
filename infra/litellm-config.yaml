@@ -43,9 +43,17 @@ model_list:
       api_key: os.environ/OPENAI_API_KEY
 
   # ── Google Gemini ──────────────────────────────────────────────────────────
+  # Default `gemini-3-flash` virtual is aliased to 3.5 Flash (current canon
+  # post 2026-05-19 Google I/O GA). Old `3-flash` callers keep working; new
+  # callers can opt in to `gemini-3-5-flash` explicitly.
   - model_name: gemini-3-flash
     litellm_params:
-      model: gemini/gemini-3-flash
+      model: gemini/gemini-3.5-flash
+      api_key: os.environ/GEMINI_API_KEY
+
+  - model_name: gemini-3-5-flash
+    litellm_params:
+      model: gemini/gemini-3.5-flash
       api_key: os.environ/GEMINI_API_KEY
 
   - model_name: gemini-3-pro
@@ -53,7 +61,32 @@ model_list:
       model: gemini/gemini-3-pro
       api_key: os.environ/GEMINI_API_KEY
 
-  # ── OpenRouter (omnibus fallback — Grok, DeepSeek, Kimi, etc.) ────────────
+  # Gemini 3.5 Pro is internal-only at Google (public rollout June 2026).
+  # Reserve the model_name so consumers can target it as soon as it lands;
+  # for now this entry falls back via routing block below.
+  # - model_name: gemini-3-5-pro
+  #   litellm_params:
+  #     model: gemini/gemini-3.5-pro
+  #     api_key: os.environ/GEMINI_API_KEY
+
+  # ── DeepSeek V4 (added 2026-05-20) ────────────────────────────────────────
+  # DeepSeek V4 Flash: 284B/13B MoE, 1M context, $0.112/$0.224 per M tokens.
+  # Routed through OpenRouter until DEEPSEEK_API_KEY lands in the vault for
+  # direct-provider access. Owner-pull procedure in docs/security/SECRETS.md
+  # over in AIMS-Charlotte. When direct key lands, swap to deepseek/deepseek-v4-flash.
+  - model_name: deepseek-v4-flash
+    litellm_params:
+      model: openrouter/deepseek/deepseek-v4-flash
+      api_key: os.environ/OPENROUTER_API_KEY
+      api_base: https://openrouter.ai/api/v1
+
+  - model_name: deepseek-v4-pro
+    litellm_params:
+      model: openrouter/deepseek/deepseek-v4-pro
+      api_key: os.environ/OPENROUTER_API_KEY
+      api_base: https://openrouter.ai/api/v1
+
+  # ── OpenRouter (omnibus fallback — Grok, Kimi, etc.) ──────────────────────
   - model_name: openrouter-omnibus
     litellm_params:
       model: openrouter/auto
@@ -75,8 +108,13 @@ litellm_settings:
   fallbacks:
     - claude-opus-4-7: ["claude-sonnet-4-6", "openrouter-omnibus"]
     - claude-sonnet-4-6: ["claude-haiku-4-5", "openrouter-omnibus"]
+    - claude-haiku-4-5: ["deepseek-v4-flash", "openrouter-omnibus"]
     - gpt-5: ["gpt-5-mini", "openrouter-omnibus"]
     - gemini-3-pro: ["gemini-3-flash", "openrouter-omnibus"]
+    - gemini-3-flash: ["gemini-3-5-flash", "deepseek-v4-flash", "openrouter-omnibus"]
+    - gemini-3-5-flash: ["gemini-3-flash", "deepseek-v4-flash", "openrouter-omnibus"]
+    - deepseek-v4-pro: ["deepseek-v4-flash", "openrouter-omnibus"]
+    - deepseek-v4-flash: ["gemini-3-5-flash", "openrouter-omnibus"]
 
 # General settings — security discipline post-2026-03-24 hack.
 general_settings:
