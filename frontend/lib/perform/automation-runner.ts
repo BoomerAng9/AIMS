@@ -335,39 +335,45 @@ export async function runBudgetCalc(season: number = 2025): Promise<string> {
       where: { season },
     });
 
+    const BATCH_SIZE = 10;
     let updatedCount = 0;
 
-    for (const budget of budgets) {
-      // Sum active NIL deals for this team
-      const nilResult = await prisma.nilDeal.aggregate({
-        where: { teamId: budget.teamId, season, status: 'ACTIVE' },
-        _sum: { estimatedValue: true },
-      });
+    for (let i = 0; i < budgets.length; i += BATCH_SIZE) {
+      const batch = budgets.slice(i, i + BATCH_SIZE);
+      await Promise.all(
+        batch.map(async (budget) => {
+          // Sum active NIL deals for this team
+          const nilResult = await prisma.nilDeal.aggregate({
+            where: { teamId: budget.teamId, season, status: 'ACTIVE' },
+            _sum: { estimatedValue: true },
+          });
 
-      const nilSpent = nilResult._sum.estimatedValue || 0;
-      const nilRemaining = budget.nilBudget - nilSpent;
-      const capSpace = budget.nilBudget - nilSpent;
+          const nilSpent = nilResult._sum.estimatedValue || 0;
+          const nilRemaining = budget.nilBudget - nilSpent;
+          const capSpace = budget.nilBudget - nilSpent;
 
-      // Determine spending tier
-      let spendingTier = 'MID';
-      if (budget.nilBudget >= 25000000) spendingTier = 'ELITE';
-      else if (budget.nilBudget >= 15000000) spendingTier = 'HIGH';
-      else if (budget.nilBudget >= 8000000) spendingTier = 'MID';
-      else if (budget.nilBudget >= 4000000) spendingTier = 'LOW';
-      else spendingTier = 'MINIMAL';
+          // Determine spending tier
+          let spendingTier = 'MID';
+          if (budget.nilBudget >= 25000000) spendingTier = 'ELITE';
+          else if (budget.nilBudget >= 15000000) spendingTier = 'HIGH';
+          else if (budget.nilBudget >= 8000000) spendingTier = 'MID';
+          else if (budget.nilBudget >= 4000000) spendingTier = 'LOW';
+          else spendingTier = 'MINIMAL';
 
-      await prisma.schoolRevenueBudget.update({
-        where: { id: budget.id },
-        data: {
-          nilSpent,
-          nilRemaining,
-          capSpace,
-          spendingTier,
-          lastUpdated: new Date(),
-          updatedBy: 'boomer_ang',
-        },
-      });
-      updatedCount++;
+          await prisma.schoolRevenueBudget.update({
+            where: { id: budget.id },
+            data: {
+              nilSpent,
+              nilRemaining,
+              capSpace,
+              spendingTier,
+              lastUpdated: new Date(),
+              updatedBy: 'boomer_ang',
+            },
+          });
+        })
+      );
+      updatedCount += batch.length;
     }
 
     // Rank by cap space
@@ -376,11 +382,16 @@ export async function runBudgetCalc(season: number = 2025): Promise<string> {
       orderBy: { capSpace: 'desc' },
     });
 
-    for (let i = 0; i < ranked.length; i++) {
-      await prisma.schoolRevenueBudget.update({
-        where: { id: ranked[i].id },
-        data: { capRank: i + 1 },
-      });
+    for (let i = 0; i < ranked.length; i += BATCH_SIZE) {
+      const batch = ranked.slice(i, i + BATCH_SIZE);
+      await Promise.all(
+        batch.map((budget, idx) =>
+          prisma.schoolRevenueBudget.update({
+            where: { id: budget.id },
+            data: { capRank: i + idx + 1 },
+          })
+        )
+      );
     }
 
     await completeAutomationRun(run.id, {
