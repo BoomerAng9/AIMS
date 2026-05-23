@@ -59,7 +59,7 @@ NODE CATEGORIES TO SUPPORT:
 - Outputs: Save to database, Send notification, Generate report, Export CSV, Deploy
 
 DESIGN PRINCIPLES:
-- Dark minimal UI inspired by n8n, Zapier, Make.com
+- Dark minimal UI inspired by n8n, Stepper, Make.com
 - Clean node cards with subtle glow on hover/select
 - Bezier curve connections with animated gradient lines
 - Configuration panel slides in from right when node selected

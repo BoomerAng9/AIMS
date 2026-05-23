@@ -753,7 +753,7 @@ Return ONLY a JSON array of step description strings.
         step: 2,
         name: 'Tool Ecosystem',
         purpose: 'Understand current tools',
-        acheevy_behavior: 'Ask: "What tools do you already use? (Slack, Gmail, Sheets, Zapier, n8n, Notion, etc.) I\'ll build bridges between them."',
+        acheevy_behavior: 'Ask: "What tools do you already use? (Slack, Gmail, Sheets, Stepper, n8n, Notion, Paperform, etc.) I\'ll build bridges between them."',
         output_schema: { current_tools: 'string[]', desired_integrations: 'string[]' },
       },
       {
