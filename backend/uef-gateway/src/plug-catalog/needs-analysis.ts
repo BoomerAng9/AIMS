@@ -101,8 +101,8 @@ const NEEDS_QUESTIONS: NeedsQuestion[] = [
     type: 'multi-select',
     options: [
       'slack', 'microsoft-teams', 'google-workspace', 'notion', 'jira',
-      'salesforce', 'hubspot', 'shopify', 'quickbooks', 'zapier',
-      'n8n', 'airtable', 'zoho', 'none',
+      'salesforce', 'hubspot', 'shopify', 'quickbooks', 'stepper',
+      'n8n', 'airtable', 'zoho', 'paperform', 'none',
     ],
     required: false,
     helpText: 'We can integrate with your existing stack.',

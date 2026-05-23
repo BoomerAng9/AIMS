@@ -268,7 +268,7 @@ const CRM: PlugTemplate = {
     'sendgrid',
     'google-calendar',
     'slack',
-    'zapier',
+    'stepper',
     'google-analytics',
     'twilio',
   ],

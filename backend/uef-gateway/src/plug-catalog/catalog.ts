@@ -1073,7 +1073,7 @@ const PLUG_REGISTRY: PlugDefinition[] = [
     id: 'typebot',
     name: 'Typebot',
     tagline: 'Visual chatbot builder with conversational forms and integrations',
-    description: 'Build advanced chatbots and conversational forms with a beautiful drag-and-drop builder. Embed anywhere — websites, apps, WhatsApp, Messenger. Features conditional logic, variables, integrations (Zapier, webhooks, Google Sheets), and analytics.',
+    description: 'Build advanced chatbots and conversational forms with a beautiful drag-and-drop builder. Embed anywhere — websites, apps, WhatsApp, Messenger. Features conditional logic, variables, integrations (Stepper workflow automation, webhooks, Google Sheets), and analytics.',
     category: 'chatbot',
     tags: ['chatbot', 'forms', 'conversational', 'no-code', 'embed', 'whatsapp'],
     tier: 'starter',
