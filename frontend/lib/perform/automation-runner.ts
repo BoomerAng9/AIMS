@@ -337,37 +337,44 @@ export async function runBudgetCalc(season: number = 2025): Promise<string> {
 
     let updatedCount = 0;
 
-    for (const budget of budgets) {
-      // Sum active NIL deals for this team
-      const nilResult = await prisma.nilDeal.aggregate({
-        where: { teamId: budget.teamId, season, status: 'ACTIVE' },
-        _sum: { estimatedValue: true },
-      });
+    // ⚡ Bolt: Chunk budgets into batches to prevent Prisma connection pool exhaustion
+    // while executing N+1 independent queries concurrently via Promise.all
+    const batchSize = 10;
+    for (let i = 0; i < budgets.length; i += batchSize) {
+      const batch = budgets.slice(i, i + batchSize);
 
-      const nilSpent = nilResult._sum.estimatedValue || 0;
-      const nilRemaining = budget.nilBudget - nilSpent;
-      const capSpace = budget.nilBudget - nilSpent;
+      await Promise.all(batch.map(async (budget) => {
+        // Sum active NIL deals for this team
+        const nilResult = await prisma.nilDeal.aggregate({
+          where: { teamId: budget.teamId, season, status: 'ACTIVE' },
+          _sum: { estimatedValue: true },
+        });
 
-      // Determine spending tier
-      let spendingTier = 'MID';
-      if (budget.nilBudget >= 25000000) spendingTier = 'ELITE';
-      else if (budget.nilBudget >= 15000000) spendingTier = 'HIGH';
-      else if (budget.nilBudget >= 8000000) spendingTier = 'MID';
-      else if (budget.nilBudget >= 4000000) spendingTier = 'LOW';
-      else spendingTier = 'MINIMAL';
+        const nilSpent = nilResult._sum.estimatedValue || 0;
+        const nilRemaining = budget.nilBudget - nilSpent;
+        const capSpace = budget.nilBudget - nilSpent;
 
-      await prisma.schoolRevenueBudget.update({
-        where: { id: budget.id },
-        data: {
-          nilSpent,
-          nilRemaining,
-          capSpace,
-          spendingTier,
-          lastUpdated: new Date(),
-          updatedBy: 'boomer_ang',
-        },
-      });
-      updatedCount++;
+        // Determine spending tier
+        let spendingTier = 'MID';
+        if (budget.nilBudget >= 25000000) spendingTier = 'ELITE';
+        else if (budget.nilBudget >= 15000000) spendingTier = 'HIGH';
+        else if (budget.nilBudget >= 8000000) spendingTier = 'MID';
+        else if (budget.nilBudget >= 4000000) spendingTier = 'LOW';
+        else spendingTier = 'MINIMAL';
+
+        await prisma.schoolRevenueBudget.update({
+          where: { id: budget.id },
+          data: {
+            nilSpent,
+            nilRemaining,
+            capSpace,
+            spendingTier,
+            lastUpdated: new Date(),
+            updatedBy: 'boomer_ang',
+          },
+        });
+      }));
+      updatedCount += batch.length;
     }
 
     // Rank by cap space
