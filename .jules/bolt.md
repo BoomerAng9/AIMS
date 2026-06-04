@@ -8,3 +8,6 @@
 ## 2024-05-18 - [Parallelize Evidence Locker GCS network calls]
 **Learning:** Sequential asynchronous network requests inside `for...of` loops are a hidden bottleneck for latency, especially when dealing with high-volume remote operations like fetching Google Cloud Storage metadata. Refactoring these loops to use `Promise.all` with `.map()` significantly cuts down total execution time by allowing concurrent requests.
 **Action:** Always scan for `for...of` loops that purely execute independent `await` calls and refactor them to use `Promise.all` mapping to reduce latency.
+## 2025-05-18 - [Parallelize Magazine File Loading]
+**Learning:** Sequential file reads (`await readFile`) inside `for...of` loops cause I/O bottlenecks during directory scanning or initialization. Using `Promise.all()` with `map()` enables concurrent reads and reduces load time significantly.
+**Action:** When loading multiple local files in loops without side dependencies, use `Promise.all()` instead of `for...of`.
