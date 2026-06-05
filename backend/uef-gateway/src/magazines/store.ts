@@ -21,7 +21,6 @@ import type {
   AddDataSourceRequest,
   LoadMagazineRequest,
 } from '../types/magazine';
-import { DEFAULT_MAGAZINES } from '../types/magazine';
 
 // ─────────────────────────────────────────────────────────────
 // Config
@@ -52,16 +51,21 @@ async function loadFromDisk(): Promise<void> {
   await ensureDir();
   try {
     const files = await readdir(DATA_DIR);
-    for (const file of files) {
-      if (!file.endsWith('.json')) continue;
-      try {
-        const raw = await readFile(join(DATA_DIR, file), 'utf-8');
-        const mag: Magazine = JSON.parse(raw);
-        magazines.set(mag.id, mag);
-      } catch {
-        // Skip corrupt files
-      }
-    }
+
+    // Bolt Optimization: Concurrently load files rather than sequentially awaiting each
+    const jsonFiles = files.filter(f => f.endsWith('.json'));
+    await Promise.all(
+      jsonFiles.map(async (file) => {
+        try {
+          const raw = await readFile(join(DATA_DIR, file), 'utf-8');
+          const mag: Magazine = JSON.parse(raw);
+          magazines.set(mag.id, mag);
+        } catch {
+          // Skip corrupt files
+        }
+      })
+    );
+
     initialized = true;
   } catch {
     initialized = true; // Empty dir, that's fine
