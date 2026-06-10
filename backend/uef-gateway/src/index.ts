@@ -23,7 +23,9 @@ import { billingProvisions, paymentSessionStore, x402ReceiptStore } from './bill
 import { agentPayments } from './payments/agent-payments';
 import { openrouter, MODELS as LLM_MODELS, llmGateway, usageTracker } from './llm';
 import { verticalRegistry } from './verticals';
-import { projectStore, plugStore, deploymentStore, auditStore, evidenceStore, startCleanupSchedule, stopCleanupSchedule, closeDb } from './db';
+import { getDb, projectStore, plugStore, deploymentStore, auditStore, evidenceStore, startCleanupSchedule, stopCleanupSchedule, closeDb } from './db';
+import { createLucRouter } from './luc/routes';
+import { SqliteLedgerAdapter } from './luc/sqlite-ledger';
 import { getQuestions, analyzeRequirements, generateProjectSpec, createProject } from './intake';
 import { riskAssessor, definitionOfDone, acceptanceCriteria } from './intake/requirements';
 import { templateLibrary } from './templates';
@@ -227,6 +229,16 @@ app.use(a2aRouter);
 // --------------------------------------------------------------------------
 app.use(cloudflareRouter);
 app.use(markdownForAgents);
+
+// --------------------------------------------------------------------------
+// LUC allocator — in-mesh budget enforcement (gate / reserve / settle / balance)
+// Mounted BEFORE the global API-key gate because the router self-authenticates
+// with its own fail-closed internal-key middleware (requireInternalKey, same
+// INTERNAL_API_KEY). Verticals (Charlotte, Warehouse) call POST /luc/* with
+// `Authorization: Bearer <INTERNAL_API_KEY>`. Backed by the durable SQLite
+// ledger (SqliteLedgerAdapter over getDb()).
+// --------------------------------------------------------------------------
+app.use('/luc', createLucRouter({ ledger: new SqliteLedgerAdapter(getDb()), internalApiKey: INTERNAL_API_KEY }));
 
 // --------------------------------------------------------------------------
 // Apply API key gate to ALL subsequent routes

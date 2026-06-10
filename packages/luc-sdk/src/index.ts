@@ -96,6 +96,26 @@ export {
 } from './adapters/local-storage';
 
 // ─────────────────────────────────────────────────────────────
+// Monetary Ledger (atomic wallet: reserve -> settle)
+// ─────────────────────────────────────────────────────────────
+
+export {
+  MemoryLedgerAdapter,
+  createMemoryLedgerAdapter,
+} from './ledger/memory-ledger';
+
+export type {
+  WalletRecord,
+  CreateWalletInput,
+  ReserveResult,
+  SettleResult,
+  WalletBalance,
+  ReservationStatus,
+  ReservationRecord,
+  LedgerAdapter,
+} from './ledger/types';
+
+// ─────────────────────────────────────────────────────────────
 // Utilities
 // ─────────────────────────────────────────────────────────────
 

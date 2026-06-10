@@ -8,6 +8,7 @@
 
 import Database from 'better-sqlite3';
 import logger from '../logger';
+import { LUC_LEDGER_SCHEMA_SQL, LUC_EVENTS_SCHEMA_SQL } from '../luc/schema';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -372,6 +373,25 @@ const migrations: Migration[] = [
         CREATE INDEX IF NOT EXISTS idx_alert_history_triggered_at ON alert_history(triggered_at);
         CREATE INDEX IF NOT EXISTS idx_alert_history_severity ON alert_history(severity);
       `);
+    },
+  },
+  {
+    version: '009',
+    name: 'create_luc_ledger_tables',
+    // LUC allocator — the durable reserve->settle wallet (SqliteLedgerAdapter).
+    // Schema is single-sourced in src/luc/schema.ts so the adapter test and this
+    // boot migration can never drift. Distinct from agent_wallets (migration 005,
+    // the X402 agent-commerce balance).
+    up: (db: Database.Database): void => {
+      db.exec(LUC_LEDGER_SCHEMA_SQL);
+    },
+  },
+  {
+    version: '010',
+    name: 'create_luc_processed_events',
+    // Webhook idempotency for v6 Stripe provisioning (single-sourced in luc/schema.ts).
+    up: (db: Database.Database): void => {
+      db.exec(LUC_EVENTS_SCHEMA_SQL);
     },
   },
 ];
