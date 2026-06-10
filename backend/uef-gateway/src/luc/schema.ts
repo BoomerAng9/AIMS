@@ -62,3 +62,15 @@ export const LUC_LEDGER_SCHEMA_SQL = `
 
   CREATE INDEX IF NOT EXISTS idx_luc_ledger_entries_wallet ON luc_ledger_entries(wallet_id, created_at);
 `;
+
+/**
+ * Webhook idempotency: one row per processed Stripe event id. INSERT OR IGNORE
+ * makes "process this event exactly once" atomic so a duplicate webhook delivery
+ * cannot double-provision or double-credit a BMC reload.
+ */
+export const LUC_EVENTS_SCHEMA_SQL = `
+  CREATE TABLE IF NOT EXISTS luc_processed_events (
+    event_id  TEXT PRIMARY KEY,
+    ts        TEXT NOT NULL
+  );
+`;

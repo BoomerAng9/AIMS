@@ -8,7 +8,7 @@
 
 import Database from 'better-sqlite3';
 import logger from '../logger';
-import { LUC_LEDGER_SCHEMA_SQL } from '../luc/schema';
+import { LUC_LEDGER_SCHEMA_SQL, LUC_EVENTS_SCHEMA_SQL } from '../luc/schema';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -384,6 +384,14 @@ const migrations: Migration[] = [
     // the X402 agent-commerce balance).
     up: (db: Database.Database): void => {
       db.exec(LUC_LEDGER_SCHEMA_SQL);
+    },
+  },
+  {
+    version: '010',
+    name: 'create_luc_processed_events',
+    // Webhook idempotency for v6 Stripe provisioning (single-sourced in luc/schema.ts).
+    up: (db: Database.Database): void => {
+      db.exec(LUC_EVENTS_SCHEMA_SQL);
     },
   },
 ];

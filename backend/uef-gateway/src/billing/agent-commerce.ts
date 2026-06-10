@@ -25,6 +25,7 @@ import { paymentSessionStore, billingProvisions, agentWalletStore } from './pers
 import logger from '../logger';
 import { handleCheckout, createCheckoutSession } from '../luc/stripe-bridge';
 import { SqliteLedgerAdapter } from '../luc/sqlite-ledger';
+import { markEventProcessed, unmarkEvent } from '../luc/idempotency';
 import { getDb } from '../db';
 
 // ---------------------------------------------------------------------------
@@ -659,12 +660,19 @@ agentCommerceRouter.post('/api/payments/stripe/webhook', async (req: Request, re
         // sessions skip this and fall through to the legacy tier path below.
         const skuKey = data.metadata?.skuKey;
         if (skuKey) {
+          const db = getDb();
+          // Idempotency: claim the event id atomically. A duplicate delivery
+          // loses the claim and is skipped (no double-credit / double-provision).
+          if (!markEventProcessed(db, event.id)) {
+            logger.info({ eventId: event.id, skuKey }, '[StripeWebhook] duplicate event — v6 provision skipped');
+            break;
+          }
           const v6Wallet = data.metadata?.walletId || data.client_reference_id;
           const v6Account = data.metadata?.accountId || v6Wallet;
           if (v6Wallet && v6Account) {
             try {
               const outcome = await handleCheckout(
-                new SqliteLedgerAdapter(getDb()),
+                new SqliteLedgerAdapter(db),
                 { skuKey, walletId: v6Wallet, accountId: v6Account },
                 process.env,
               );
@@ -673,8 +681,11 @@ agentCommerceRouter.post('/api/payments/stripe/webhook', async (req: Request, re
                 '[StripeWebhook] v6 LUC provisioned',
               );
             } catch (err: any) {
+              unmarkEvent(db, event.id); // release the claim so a Stripe retry can re-process
               logger.error({ err: err?.message, skuKey, walletId: v6Wallet }, '[StripeWebhook] v6 LUC provisioning failed');
             }
+          } else {
+            unmarkEvent(db, event.id); // nothing to provision — don't consume the event id
           }
           break; // v6 SKU handled — do not run legacy tier provisioning
         }
