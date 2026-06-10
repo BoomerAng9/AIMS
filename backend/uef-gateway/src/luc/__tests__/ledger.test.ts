@@ -3,9 +3,9 @@
  *
  * This re-proves the money-safety invariant inside the gateway's own suite: a
  * reserve may never over-commit, and concurrent reserves can never collectively
- * exceed the budget. The NeonLedgerAdapter implements the SAME LedgerAdapter
- * contract via a conditional SQL UPDATE; its cross-process atomicity is proven
- * against real Postgres at the deploy gate.
+ * exceed the budget. SqliteLedgerAdapter (sqlite-ledger.test.ts) proves the SAME
+ * LedgerAdapter contract on a real SQLite engine — the durable store the gateway
+ * actually runs.
  */
 
 import { InMemoryLedger } from '../ledger';

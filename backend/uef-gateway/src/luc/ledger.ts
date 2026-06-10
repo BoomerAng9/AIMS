@@ -9,8 +9,11 @@
  *
  * Money is held as integer micro-USD (1 USD = 1_000_000) so repeated arithmetic
  * never accumulates float drift. InMemoryLedger is the process-local reference
- * (tests, fallback); NeonLedgerAdapter implements the same contract via a
- * conditional SQL UPDATE for durable, cross-process atomicity.
+ * (tests, fallback); SqliteLedgerAdapter (sqlite-ledger.ts) is the DURABLE
+ * production store, backing the wallet with the gateway's better-sqlite3 DB via
+ * a single conditional SQL UPDATE. The gateway is single-replica, so SQLite is
+ * sufficient; if it ever goes multi-instance, a NeonLedgerAdapter implements the
+ * same contract with zero changes above this seam (see migrations/0001_*.sql).
  *
  * PROPRIETARY — A.I.M.S.
  */

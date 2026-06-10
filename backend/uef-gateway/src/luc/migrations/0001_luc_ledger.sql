@@ -1,5 +1,10 @@
 -- LUC allocator — ledger schema (Neon / Postgres). Idempotent.
 --
+-- ⚠️ NOT ACTIVE. The gateway is single-replica and runs the SQLite store
+-- (src/luc/schema.ts + db migration 009 + SqliteLedgerAdapter). This file is the
+-- dormant Postgres reference for a FUTURE NeonLedgerAdapter, used only if the
+-- gateway ever goes multi-instance. Do not wire it into the boot path.
+--
 -- Money is stored as integer micro-USD (1 USD = 1_000_000) to avoid float drift.
 -- Money-safety: reserve() is a conditional UPDATE that succeeds ONLY when
 --   (budget - reserved - spent) >= est
