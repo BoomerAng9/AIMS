@@ -69,6 +69,27 @@ export async function creditBmc(ledger: LedgerAdapter, walletId: string): Promis
   await ledger.credit(walletId, BMC.priceUsd);
 }
 
+/**
+ * Apply a BMC purchase — the reload SKU. BMC is buyable at ANY time and STACKS:
+ * a fresh account gets a new $6.54 (654 LUC) wallet; an existing wallet (BMC or
+ * commitment) is topped up by $6.54. This is the no-commitment lane — same
+ * per-LUC rate as the base tier, no advance commitment. The repeatable Stripe
+ * one-time SKU fires this on checkout.session.completed.
+ */
+export async function applyBmcPurchase(
+  ledger: LedgerAdapter,
+  input: { id: string; accountId: string; byok?: boolean }
+): Promise<{ created: boolean; available: number }> {
+  const existing = await ledger.getWallet(input.id);
+  if (existing) {
+    await ledger.credit(input.id, BMC.priceUsd);
+  } else {
+    await provisionBmc(ledger, input);
+  }
+  const bal = await ledger.balance(input.id);
+  return { created: !existing, available: bal?.available ?? 0 };
+}
+
 export async function getBalance(
   ledger: LedgerAdapter,
   { walletId }: { walletId: string }
