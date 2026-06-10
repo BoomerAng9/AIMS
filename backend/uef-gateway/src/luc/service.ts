@@ -23,12 +23,50 @@ import {
 } from './ledger';
 import { evaluateModelAccess, AccessDecision } from './gate';
 import { estimateCostUsd } from './model-catalog';
+import { planWalletUsdBudget, BMC } from './pricing';
 
 export async function provisionWallet(
   ledger: LedgerAdapter,
   input: CreateWalletInput
 ): Promise<WalletRecord> {
   return ledger.createWallet(input);
+}
+
+/**
+ * Provision a wallet for a v6 Tesla-Matrix plan. The wallet budget is the plan's
+ * LUC allotment valued in platform-$ (luc x $0.01). planId = `${tier}-${cadence}`.
+ */
+export async function provisionPlan(
+  ledger: LedgerAdapter,
+  input: { id: string; accountId: string; tier: string; cadence: string; seatId?: string; byok?: boolean }
+): Promise<WalletRecord> {
+  return provisionWallet(ledger, {
+    id: input.id,
+    accountId: input.accountId,
+    planId: `${input.tier}-${input.cadence}`,
+    usdBudget: planWalletUsdBudget(input.tier, input.cadence),
+    seatId: input.seatId,
+    byok: input.byok,
+  });
+}
+
+/** Provision the BMC starter wallet: $6.54 once -> 654 LUC. */
+export async function provisionBmc(
+  ledger: LedgerAdapter,
+  input: { id: string; accountId: string; byok?: boolean }
+): Promise<WalletRecord> {
+  return provisionWallet(ledger, {
+    id: input.id,
+    accountId: input.accountId,
+    planId: BMC.id,
+    usdBudget: BMC.priceUsd,
+    byok: input.byok,
+  });
+}
+
+/** Top up an existing wallet with the BMC grant (the mandatory starter purchase). */
+export async function creditBmc(ledger: LedgerAdapter, walletId: string): Promise<void> {
+  await ledger.credit(walletId, BMC.priceUsd);
 }
 
 export async function getBalance(
