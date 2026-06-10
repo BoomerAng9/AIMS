@@ -23,6 +23,9 @@ import { generateReceipt, getAllPricing, getResourcePricing } from './x402';
 import { TASK_MULTIPLIERS } from './index';
 import { paymentSessionStore, billingProvisions, agentWalletStore } from './persistence';
 import logger from '../logger';
+import { handleCheckout, createCheckoutSession } from '../luc/stripe-bridge';
+import { SqliteLedgerAdapter } from '../luc/sqlite-ledger';
+import { getDb } from '../db';
 
 // ---------------------------------------------------------------------------
 // Stripe SDK — conditional import (graceful when key not configured)
@@ -580,6 +583,33 @@ agentCommerceRouter.post('/api/payments/agent/usage', (req: Request, res: Respon
 });
 
 // ---------------------------------------------------------------------------
+// POST /api/payments/luc/checkout — create a v6 Tesla-Matrix Checkout session
+// Body: { skuKey, walletId, accountId, customerEmail?, successUrl, cancelUrl }
+// Subscription for plans, one-time for the BMC reload. Wallet/account ride in
+// metadata so the webhook can provision the luc_wallets ledger on completion.
+// ---------------------------------------------------------------------------
+agentCommerceRouter.post('/api/payments/luc/checkout', async (req: Request, res: Response) => {
+  if (!stripe) {
+    res.status(503).json({ error: 'Stripe not configured' });
+    return;
+  }
+  const { skuKey, walletId, accountId, customerEmail, successUrl, cancelUrl } = req.body ?? {};
+  if (!skuKey || !walletId || !accountId || !successUrl || !cancelUrl) {
+    res.status(400).json({ error: 'skuKey, walletId, accountId, successUrl, cancelUrl required' });
+    return;
+  }
+  try {
+    const session = await createCheckoutSession(stripe, {
+      skuKey, env: process.env, walletId, accountId, customerEmail, successUrl, cancelUrl,
+    });
+    res.json(session);
+  } catch (err: any) {
+    logger.error({ err: err?.message, skuKey }, '[LUC] checkout session creation failed');
+    res.status(400).json({ error: err?.message ?? 'checkout failed' });
+  }
+});
+
+// ---------------------------------------------------------------------------
 // POST /api/payments/stripe/webhook — Backend Stripe Webhook Receiver
 //
 // Handles subscription lifecycle events directly on the backend:
@@ -624,6 +654,31 @@ agentCommerceRouter.post('/api/payments/stripe/webhook', async (req: Request, re
     switch (eventType) {
       // ── Checkout completed → provision tier ─────────────────────────
       case 'checkout.session.completed': {
+        // ── v6 LUC provisioning (alongside legacy tier provisioning) ──
+        // Fires only for v6 SKUs (session metadata carries skuKey). Non-v6
+        // sessions skip this and fall through to the legacy tier path below.
+        const skuKey = data.metadata?.skuKey;
+        if (skuKey) {
+          const v6Wallet = data.metadata?.walletId || data.client_reference_id;
+          const v6Account = data.metadata?.accountId || v6Wallet;
+          if (v6Wallet && v6Account) {
+            try {
+              const outcome = await handleCheckout(
+                new SqliteLedgerAdapter(getDb()),
+                { skuKey, walletId: v6Wallet, accountId: v6Account },
+                process.env,
+              );
+              logger.info(
+                { skuKey, walletId: v6Wallet, handled: outcome.handled, planId: outcome.planId, available: outcome.available },
+                '[StripeWebhook] v6 LUC provisioned',
+              );
+            } catch (err: any) {
+              logger.error({ err: err?.message, skuKey, walletId: v6Wallet }, '[StripeWebhook] v6 LUC provisioning failed');
+            }
+          }
+          break; // v6 SKU handled — do not run legacy tier provisioning
+        }
+
         const userId = data.metadata?.userId || data.client_reference_id;
         const tierId = data.metadata?.tierId;
         const customerId = data.customer;
