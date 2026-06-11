@@ -8,3 +8,6 @@
 ## 2024-05-18 - [Parallelize Evidence Locker GCS network calls]
 **Learning:** Sequential asynchronous network requests inside `for...of` loops are a hidden bottleneck for latency, especially when dealing with high-volume remote operations like fetching Google Cloud Storage metadata. Refactoring these loops to use `Promise.all` with `.map()` significantly cuts down total execution time by allowing concurrent requests.
 **Action:** Always scan for `for...of` loops that purely execute independent `await` calls and refactor them to use `Promise.all` mapping to reduce latency.
+## 2026-06-11 - [Optimize Firestore Writes in Chicken Hawk]
+**Learning:** In `backend/uef-gateway/src/agents/chicken-hawk.ts`, tracking run steps within an execution pipeline was writing to Firestore individually for every single step using `updateRunStep` inside a loop, resulting in a severe N+1 database write bottleneck.
+**Action:** Firestore writes should be optimized by aggregating step updates in-memory (e.g., using a synchronous helper) and then performing a single consolidated database write when completing the run. Always look out for sequential database updates within pipeline execution loops.
