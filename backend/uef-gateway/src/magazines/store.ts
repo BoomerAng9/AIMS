@@ -52,16 +52,22 @@ async function loadFromDisk(): Promise<void> {
   await ensureDir();
   try {
     const files = await readdir(DATA_DIR);
-    for (const file of files) {
-      if (!file.endsWith('.json')) continue;
-      try {
-        const raw = await readFile(join(DATA_DIR, file), 'utf-8');
-        const mag: Magazine = JSON.parse(raw);
-        magazines.set(mag.id, mag);
-      } catch {
-        // Skip corrupt files
-      }
-    }
+
+    // ⚡ Bolt: Parallelize magazine reads to eliminate sequential I/O latency
+    await Promise.all(
+      files
+        .filter(file => file.endsWith('.json'))
+        .map(async file => {
+          try {
+            const raw = await readFile(join(DATA_DIR, file), 'utf-8');
+            const mag: Magazine = JSON.parse(raw);
+            magazines.set(mag.id, mag);
+          } catch {
+            // Skip corrupt files
+          }
+        })
+    );
+
     initialized = true;
   } catch {
     initialized = true; // Empty dir, that's fine
