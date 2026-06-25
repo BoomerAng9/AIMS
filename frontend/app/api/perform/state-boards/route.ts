@@ -157,20 +157,36 @@ export async function GET(req: NextRequest) {
 
                 if (stateCounts.length > 0) {
                     const stateData = [];
-                    for (const sc of stateCounts) {
-                        if (!sc.state) continue;
-                        const topProspect = await prisma.performProspect.findFirst({
-                            where: { state: sc.state },
-                            orderBy: { paiScore: 'desc' },
-                            select: { firstName: true, lastName: true, position: true, paiScore: true },
-                        });
 
-                        stateData.push({
-                            code: sc.state,
-                            count: sc._count._all,
-                            topProducer: topProspect ? `${topProspect.firstName} ${topProspect.lastName}` : null,
-                            topPosition: topProspect?.position || null,
-                            topPai: topProspect?.paiScore || null,
+                    // Bolt ⚡ Optimization: Batch state queries to prevent N+1 bottleneck
+                    // We chunk the requests into groups of 10 to limit DB connection pool usage
+                    const chunkSize = 10;
+                    const validCounts = stateCounts.filter(sc => sc.state);
+
+                    for (let i = 0; i < validCounts.length; i += chunkSize) {
+                        const chunk = validCounts.slice(i, i + chunkSize);
+
+                        // Run findFirst queries concurrently for this chunk
+                        const topProspects = await Promise.all(
+                            chunk.map(sc =>
+                                prisma.performProspect.findFirst({
+                                    where: { state: sc.state! },
+                                    orderBy: { paiScore: 'desc' },
+                                    select: { firstName: true, lastName: true, position: true, paiScore: true },
+                                })
+                            )
+                        );
+
+                        // Map the results back to the state data
+                        chunk.forEach((sc, index) => {
+                            const topProspect = topProspects[index];
+                            stateData.push({
+                                code: sc.state,
+                                count: sc._count._all,
+                                topProducer: topProspect ? `${topProspect.firstName} ${topProspect.lastName}` : null,
+                                topPosition: topProspect?.position || null,
+                                topPai: topProspect?.paiScore || null,
+                            });
                         });
                     }
 
