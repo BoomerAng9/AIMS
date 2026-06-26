@@ -1,0 +1,47 @@
+{
+  "$schema": "https://operations-floor.aims.local/schemas/camera-pose-v1.json",
+  "fixture_id": "night-port-v1",
+  "scene_hint": "night-port",
+  "description": "Canonical camera fixture for the Night Port scene. Gate 2's dry-run fakes this as a slow dolly-in via FFmpeg zoompan on the source still. Gate 3+ will produce this authoritatively via Project Lyra navigating a real USD scene.",
+  "fps": 24,
+  "duration_seconds": 6,
+  "resolution": {
+    "width": 1024,
+    "height": 1024
+  },
+  "camera": {
+    "fov_degrees": 38,
+    "near_plane": 0.1,
+    "far_plane": 250,
+    "intrinsics_note": "FOV chosen to match the source hero's apparent focal length (~50mm equivalent on full-frame). Adjust at Gate 3 when Lyra produces real intrinsics."
+  },
+  "keyframes": [
+    {
+      "t": 0.0,
+      "position": { "x": 0.0, "y": 1.6, "z": 10.0 },
+      "rotation_euler_degrees": { "pitch": -5, "yaw": 0, "roll": 0 },
+      "note": "Wide establishing — matches the source hero framing"
+    },
+    {
+      "t": 3.0,
+      "position": { "x": 0.0, "y": 1.55, "z": 7.0 },
+      "rotation_euler_degrees": { "pitch": -4, "yaw": 0, "roll": 0 },
+      "note": "Mid dolly — reveals more of the rail-line convergence"
+    },
+    {
+      "t": 6.0,
+      "position": { "x": 0.0, "y": 1.5, "z": 4.0 },
+      "rotation_euler_degrees": { "pitch": -3, "yaw": 0, "roll": 0 },
+      "note": "Close — the cyan holographic grid is now centered"
+    }
+  ],
+  "interpolation": "ease_in_out_cubic",
+  "motion_intent": {
+    "dolly_in": true,
+    "orbit": false,
+    "pan": false,
+    "tilt": false,
+    "follow_subject": false
+  },
+  "note_for_downstream": "This camera pose is consumed BOTH by Cosmos-Transfer2.5 (as a hint for maintaining geometric consistency across frames) AND by Seedance 2.0 i2v at Stage 6 (so the character motion animation is shot from a compatible viewpoint). The Event Translator's `camera_intent.dolly_in: true` output maps to this fixture's `motion_intent.dolly_in: true`."
+}

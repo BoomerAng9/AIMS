@@ -1,0 +1,6 @@
+# Binary derivatives produced by scripts/generate-control-bundle.sh
+# — never commit these; regenerate them per-box.
+proxy-video.mp4
+depth.exr
+depth.png
+canny/

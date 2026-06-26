@@ -1,0 +1,40 @@
+{
+  "$schema": "https://docs.nvidia.com/cosmos/latest/transfer2.5/multicontrol-spec.json",
+  "fixture_id": "night-port-v1",
+  "note": "Cosmos-Transfer2.5 params file — multicontrol variant (depth + edge combined). Shape mirrors the robot_multicontrol_spec.json pattern scraped from the Cosmos Transfer2.5 quickstart. The proxy-video.mp4, depth.exr, and canny/ directory referenced here are produced by scripts/generate-control-bundle.sh — they are gitignored binary derivatives.",
+  "prompt_path": "prompt.json",
+  "output_dir": "../../../outputs/operations-floor/night-port",
+  "video_path": "proxy-video.mp4",
+  "controls": {
+    "depth": {
+      "enabled": true,
+      "strength": 0.85,
+      "source": "depth.exr",
+      "note": "Depth from MiDaS monocular estimation on the proxy video. Gate 3+ will replace with Lyra's authoritative per-frame depth."
+    },
+    "edge": {
+      "enabled": true,
+      "strength": 0.70,
+      "source": "canny/",
+      "canny_low_threshold": 100,
+      "canny_high_threshold": 200,
+      "note": "Canny edges from OpenCV per-frame. Thresholds are defaults — tune if Cosmos rejects."
+    },
+    "segmentation": {
+      "enabled": false,
+      "note": "Not used in Gate 2 dry-run. Revisit if Cosmos output has object-identity drift across frames."
+    },
+    "blur": {
+      "enabled": false,
+      "note": "Not used in Gate 2 dry-run. Useful for camera-motion-blur stylization at Gate 4 productization."
+    }
+  },
+  "inference": {
+    "guidance": 3.0,
+    "steps": 30,
+    "seed": 2604180001,
+    "note": "Guidance 3.0 matches the Cosmos Transfer2.5 quickstart default. Seed locked for reproducibility during Gate 2.c benchmarking."
+  },
+  "camera_pose_path": "camera-pose.json",
+  "downstream_consumer": "Stage 5 — Cosmos-Transfer2.5 NIM on GCP Cloud Run GPU (L4 dev / A100 prod)"
+}
