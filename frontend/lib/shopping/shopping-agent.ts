@@ -109,36 +109,38 @@ export class ShoppingAgent {
     const findings: ProductFinding[] = [];
     const warnings: ScoutingWarning[] = [];
 
-    // Scout for each item in the task
-    for (const item of task.items) {
-      const itemFindings = await this.scoutItem(item);
+    // Scout for each item concurrently
+    await Promise.all(
+      task.items.map(async (item) => {
+        const itemFindings = await this.scoutItem(item);
 
-      if (itemFindings.length === 0) {
-        warnings.push({
-          type: 'no_results',
-          itemId: item.id,
-          message: `No results found for "${item.name || item.description}"`,
-          severity: 'high',
-        });
-        continue;
-      }
+        if (itemFindings.length === 0) {
+          warnings.push({
+            type: 'no_results',
+            itemId: item.id,
+            message: `No results found for "${item.name || item.description}"`,
+            severity: 'high',
+          });
+          return;
+        }
 
-      // Check price constraints
-      const withinBudget = itemFindings.filter(
-        (f) => !item.maxPrice || f.price <= item.maxPrice
-      );
+        // Check price constraints
+        const withinBudget = itemFindings.filter(
+          (f) => !item.maxPrice || f.price <= item.maxPrice
+        );
 
-      if (withinBudget.length === 0 && item.maxPrice) {
-        warnings.push({
-          type: 'price_exceeded',
-          itemId: item.id,
-          message: `All options for "${item.name || item.description}" exceed max price of $${item.maxPrice}. Lowest found: $${Math.min(...itemFindings.map((f) => f.price || 0))}`,
-          severity: 'high',
-        });
-      }
+        if (withinBudget.length === 0 && item.maxPrice) {
+          warnings.push({
+            type: 'price_exceeded',
+            itemId: item.id,
+            message: `All options for "${item.name || item.description}" exceed max price of $${item.maxPrice}. Lowest found: $${Math.min(...itemFindings.map((f) => f.price || 0))}`,
+            severity: 'high',
+          });
+        }
 
-      findings.push(...itemFindings);
-    }
+        findings.push(...itemFindings);
+      })
+    );
 
     // Build cart options from findings
     const cartOptions = await this.buildCartOptions(task.items, findings);
@@ -510,14 +512,16 @@ export class ShoppingAgent {
   async comparePrices(productName: string): Promise<ProductFinding[]> {
     const findings: ProductFinding[] = [];
 
-    for (const [, adapter] of Array.from(this.adapters.entries())) {
-      try {
-        const results = await adapter.search(productName, { maxResults: 3 });
-        findings.push(...results);
-      } catch (error) {
-        console.error(`[ShoppingAgent] Price comparison error:`, error);
-      }
-    }
+    await Promise.all(
+      Array.from(this.adapters.values()).map(async (adapter) => {
+        try {
+          const results = await adapter.search(productName, { maxResults: 3 });
+          findings.push(...results);
+        } catch (error) {
+          console.error(`[ShoppingAgent] Price comparison error:`, error);
+        }
+      })
+    );
 
     return findings.sort((a, b) => (a.price || 0) - (b.price || 0));
   }
