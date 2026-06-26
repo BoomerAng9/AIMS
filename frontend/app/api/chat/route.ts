@@ -40,6 +40,9 @@ const openrouter = createOpenAI({
 
 // ── Feature LLM ─────────────────────────────────────────────
 const DEFAULT_MODEL = process.env.ACHEEVY_MODEL || process.env.OPENROUTER_MODEL || 'minimax/minimax-m1-80k';
+// ⚡ Bolt Performance: Extracted TextEncoder and TextDecoder to module-level constants to prevent repeated memory allocation and re-instantiation on every API request.
+const sharedEncoder = new TextEncoder();
+const sharedDecoder = new TextDecoder();
 
 // ── Priority Model Roster (all accessible via OpenRouter) ───
 // Model IDs must match OpenRouter's catalog exactly (use dashes, not dots for versions)
@@ -150,11 +153,11 @@ async function tryAgentDispatch(
     };
 
     // Emit as AI SDK text stream format with tool event prefix 8:
-    const encoder = new TextEncoder();
+
     const stream = new ReadableStream({
       start(controller) {
-        controller.enqueue(encoder.encode(`8:${JSON.stringify(toolEvent)}\n`));
-        controller.enqueue(encoder.encode(`0:${JSON.stringify(fullReply)}\n`));
+        controller.enqueue(sharedEncoder.encode(`8:${JSON.stringify(toolEvent)}\n`));
+        controller.enqueue(sharedEncoder.encode(`0:${JSON.stringify(fullReply)}\n`));
         controller.close();
       },
     });
@@ -209,8 +212,8 @@ async function tryGatewayStream(
     if (!res.ok || !res.body) return null;
 
     // Transform gateway SSE format to AI SDK data-stream format
-    const encoder = new TextEncoder();
-    const decoder = new TextDecoder();
+
+
     const reader = res.body.getReader();
 
     const stream = new ReadableStream({
@@ -220,7 +223,7 @@ async function tryGatewayStream(
           controller.close();
           return;
         }
-        const chunk = decoder.decode(value, { stream: true });
+        const chunk = sharedDecoder.decode(value, { stream: true });
         const lines = chunk.split('\n');
         for (const line of lines) {
           if (!line.startsWith('data: ')) continue;
@@ -230,7 +233,7 @@ async function tryGatewayStream(
             const parsed = JSON.parse(data);
             if (parsed.text) {
               // Emit as AI SDK text stream format
-              controller.enqueue(encoder.encode(`0:${JSON.stringify(parsed.text)}\n`));
+              controller.enqueue(sharedEncoder.encode(`0:${JSON.stringify(parsed.text)}\n`));
             }
           } catch { /* skip malformed */ }
         }
@@ -480,10 +483,10 @@ export async function POST(req: Request) {
       const mimResponse = buildMIMResponse(mimDetection, lastMessage);
       if (mimResponse) {
         console.log(`[ACHEEVY Chat] M.I.M. intent detected: ${mimDetection.type} (${mimDetection.confidence})`);
-        const encoder = new TextEncoder();
+
         const stream = new ReadableStream({
           start(controller) {
-            controller.enqueue(encoder.encode(`0:${JSON.stringify(mimResponse)}\n`));
+            controller.enqueue(sharedEncoder.encode(`0:${JSON.stringify(mimResponse)}\n`));
             controller.close();
           },
         });
@@ -543,10 +546,10 @@ export async function POST(req: Request) {
     if (orchestratorClassification.requiresAgent) {
       console.warn('[ACHEEVY Chat] Agent dispatch failed for action intent — prepending notice to LLM stream');
       const dispatchFailureNote = `I wasn't able to reach my execution engine right now, so I'll handle this conversationally for the moment. Here's what I can tell you:\n\n`;
-      const encoder = new TextEncoder();
+
       const prefixStream = new ReadableStream({
         start(controller) {
-          controller.enqueue(encoder.encode(`0:${JSON.stringify(dispatchFailureNote)}\n`));
+          controller.enqueue(sharedEncoder.encode(`0:${JSON.stringify(dispatchFailureNote)}\n`));
           controller.close();
         },
       });
