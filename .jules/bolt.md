@@ -8,3 +8,10 @@
 ## 2024-05-18 - [Parallelize Evidence Locker GCS network calls]
 **Learning:** Sequential asynchronous network requests inside `for...of` loops are a hidden bottleneck for latency, especially when dealing with high-volume remote operations like fetching Google Cloud Storage metadata. Refactoring these loops to use `Promise.all` with `.map()` significantly cuts down total execution time by allowing concurrent requests.
 **Action:** Always scan for `for...of` loops that purely execute independent `await` calls and refactor them to use `Promise.all` mapping to reduce latency.
+## 2024-05-24 - Prisma Aggregate Object Returns
+**Learning:** When using Prisma's `aggregate()` function, passing `_count: true` inside the selection block is invalid or at least returns an object (e.g., `{ _all: number }`), not a primitive number. Directly mapping `aggr._count` will cause runtime type mismatches.
+**Action:** Always use explicit keys inside `_count` (e.g., `_count: { _all: true }`) and unpack the result explicitly (`aggr._count._all`).
+
+## 2024-05-24 - In-Memory Array Aggregation vs Prisma
+**Learning:** Fetching large datasets via `prisma.findMany()` only to run array `.reduce()` or `.filter()` inside Node.js creates massive memory overhead and CPU bottlenecks (O(N) data transfer and V8 GC pressure).
+**Action:** Always scan for patterns where `findMany()` results are only used for statistical aggregation and refactor them into `prisma.<model>.aggregate` queries, pushing the math to the SQL layer. Execute multiple aggregations concurrently via `Promise.all` to avoid sequential delays.
