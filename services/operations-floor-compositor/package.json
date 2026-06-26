@@ -1,0 +1,31 @@
+{
+  "name": "operations-floor-compositor",
+  "version": "1.0.0",
+  "description": "3D Operations Floor — Stage 8 + Stage 9 compositor (Remotion timeline + FFmpeg final encode)",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/server.ts",
+    "start": "tsx src/server.ts",
+    "test": "echo 'compositor tests run in backend/uef-gateway jest suite (see operations-floor-compositor-client.test.ts)' && exit 0"
+  },
+  "dependencies": {
+    "@google-cloud/storage": "^7.19.0",
+    "@remotion/bundler": "^4.0.300",
+    "@remotion/cli": "^4.0.300",
+    "@remotion/renderer": "^4.0.300",
+    "express": "^4.21.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "remotion": "^4.0.300",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.10.2",
+    "@types/react": "^18.3.17",
+    "@types/react-dom": "^18.3.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}
