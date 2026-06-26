@@ -14,58 +14,102 @@
  * Priority Models: Qwen, Minimax, GLM-5, Kimi, WAN, Nano Banana Pro
  */
 
-import { streamText } from 'ai';
-import { createOpenAI } from '@ai-sdk/openai';
-import { buildSystemPrompt } from '@/lib/acheevy/persona';
-import { chatRequestSchema, validateInput } from '@/lib/validation/schemas';
+import { streamText } from "ai";
+import { createOpenAI } from "@ai-sdk/openai";
+import { buildSystemPrompt } from "@/lib/acheevy/persona";
+import { chatRequestSchema, validateInput } from "@/lib/validation/schemas";
 import {
   buildNtntnRoutingDecision,
   normalizeAcheevyClassification,
   type LegacyAcheevyClassification,
-} from '@/lib/acheevy/routing';
+} from "@/lib/acheevy/routing";
 
 // ── UEF Gateway (primary — metered through LUC) ─────────────
-const UEF_GATEWAY_URL = process.env.UEF_GATEWAY_URL || process.env.NEXT_PUBLIC_UEF_GATEWAY_URL || '';
-const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY || '';
+const UEF_GATEWAY_URL =
+  process.env.UEF_GATEWAY_URL || process.env.NEXT_PUBLIC_UEF_GATEWAY_URL || "";
+const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY || "";
 
 // ── OpenRouter (fallback — direct, unmetered) ───────────────
 const openrouter = createOpenAI({
-  apiKey: process.env.OPENROUTER_API_KEY || '',
-  baseURL: process.env.OPENROUTER_BASE_URL || 'https://openrouter.ai/api/v1',
+  apiKey: process.env.OPENROUTER_API_KEY || "",
+  baseURL: process.env.OPENROUTER_BASE_URL || "https://openrouter.ai/api/v1",
   headers: {
-    'HTTP-Referer': process.env.NEXT_PUBLIC_APP_URL || 'https://plugmein.cloud',
-    'X-Title': 'A.I.M.S. AI Managed Solutions',
+    "HTTP-Referer": process.env.NEXT_PUBLIC_APP_URL || "https://plugmein.cloud",
+    "X-Title": "A.I.M.S. AI Managed Solutions",
   },
 });
 
 // ── Feature LLM ─────────────────────────────────────────────
-const DEFAULT_MODEL = process.env.ACHEEVY_MODEL || process.env.OPENROUTER_MODEL || 'minimax/minimax-m1-80k';
+// Optimization: Reusing a single TextEncoder at the module scope prevents repetitive memory allocations on each request.
+const globalEncoder = new TextEncoder();
+
+const DEFAULT_MODEL =
+  process.env.ACHEEVY_MODEL ||
+  process.env.OPENROUTER_MODEL ||
+  "minimax/minimax-m1-80k";
 
 // ── Priority Model Roster (all accessible via OpenRouter) ───
 // Model IDs must match OpenRouter's catalog exactly (use dashes, not dots for versions)
-const PRIORITY_MODELS: Record<string, { id: string; label: string; provider: string }> = {
-  'claude-opus':    { id: 'anthropic/claude-opus-4-6',        label: 'Claude Opus 4.6',      provider: 'Anthropic' },
-  'claude-sonnet':  { id: 'anthropic/claude-sonnet-4-5-20250929', label: 'Claude Sonnet 4.5', provider: 'Anthropic' },
-  'qwen':           { id: 'qwen/qwen-2.5-coder-32b-instruct', label: 'Qwen 2.5 Coder 32B', provider: 'Qwen' },
-  'qwen-max':       { id: 'qwen/qwen-max',                   label: 'Qwen Max',             provider: 'Qwen' },
-  'minimax':        { id: 'minimax/minimax-m1-80k',            label: 'MiniMax M1 (80K)',     provider: 'MiniMax' },
-  'glm':            { id: 'thudm/glm-4-plus',                label: 'GLM-4 Plus',           provider: 'Zhipu' },
-  'kimi':           { id: 'moonshotai/moonshot-v1-auto',      label: 'Moonshot v1',          provider: 'Moonshot' },
-  'nano-banana':    { id: 'google/gemini-2.5-flash',          label: 'Nano Banana Pro',      provider: 'Google' },
-  'gemini-flash':   { id: 'google/gemini-2.5-flash',          label: 'Gemini 2.5 Flash',     provider: 'Google' },
-  'gemini-pro':     { id: 'google/gemini-2.5-pro',            label: 'Gemini 2.5 Pro',       provider: 'Google' },
+const PRIORITY_MODELS: Record<
+  string,
+  { id: string; label: string; provider: string }
+> = {
+  "claude-opus": {
+    id: "anthropic/claude-opus-4-6",
+    label: "Claude Opus 4.6",
+    provider: "Anthropic",
+  },
+  "claude-sonnet": {
+    id: "anthropic/claude-sonnet-4-5-20250929",
+    label: "Claude Sonnet 4.5",
+    provider: "Anthropic",
+  },
+  qwen: {
+    id: "qwen/qwen-2.5-coder-32b-instruct",
+    label: "Qwen 2.5 Coder 32B",
+    provider: "Qwen",
+  },
+  "qwen-max": { id: "qwen/qwen-max", label: "Qwen Max", provider: "Qwen" },
+  minimax: {
+    id: "minimax/minimax-m1-80k",
+    label: "MiniMax M1 (80K)",
+    provider: "MiniMax",
+  },
+  glm: { id: "thudm/glm-4-plus", label: "GLM-4 Plus", provider: "Zhipu" },
+  kimi: {
+    id: "moonshotai/moonshot-v1-auto",
+    label: "Moonshot v1",
+    provider: "Moonshot",
+  },
+  "nano-banana": {
+    id: "google/gemini-2.5-flash",
+    label: "Nano Banana Pro",
+    provider: "Google",
+  },
+  "gemini-flash": {
+    id: "google/gemini-2.5-flash",
+    label: "Gemini 2.5 Flash",
+    provider: "Google",
+  },
+  "gemini-pro": {
+    id: "google/gemini-2.5-pro",
+    label: "Gemini 2.5 Pro",
+    provider: "Google",
+  },
 };
 
 function resolveModelId(model?: string): string {
   if (model && PRIORITY_MODELS[model]) return PRIORITY_MODELS[model].id;
-  if (model && model.includes('/')) return model;
+  if (model && model.includes("/")) return model;
   return DEFAULT_MODEL;
 }
 
 // ── Headers helper ──────────────────────────────────────────
 function gatewayHeaders(): Record<string, string> {
-  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-  if (INTERNAL_API_KEY) headers['X-API-Key'] = INTERNAL_API_KEY;
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+  if (INTERNAL_API_KEY) headers["X-API-Key"] = INTERNAL_API_KEY;
   return headers;
 }
 
@@ -73,18 +117,25 @@ function gatewayHeaders(): Record<string, string> {
 // Step 1: Classify intent — determines if we need agent dispatch or LLM chat
 // ---------------------------------------------------------------------------
 
-async function classifyIntent(lastMessage: string): Promise<(LegacyAcheevyClassification & { routingDecision: ReturnType<typeof buildNtntnRoutingDecision> }) | null> {
+async function classifyIntent(
+  lastMessage: string,
+): Promise<
+  | (LegacyAcheevyClassification & {
+      routingDecision: ReturnType<typeof buildNtntnRoutingDecision>;
+    })
+  | null
+> {
   if (!UEF_GATEWAY_URL) return null;
 
   try {
     const res = await fetch(`${UEF_GATEWAY_URL}/acheevy/classify`, {
-      method: 'POST',
+      method: "POST",
       headers: gatewayHeaders(),
       body: JSON.stringify({ message: lastMessage }),
     });
 
     if (!res.ok) return null;
-    const data = await res.json() as LegacyAcheevyClassification;
+    const data = (await res.json()) as LegacyAcheevyClassification;
     return normalizeAcheevyClassification(lastMessage, data);
   } catch {
     return null;
@@ -97,7 +148,9 @@ async function classifyIntent(lastMessage: string): Promise<(LegacyAcheevyClassi
 
 async function tryAgentDispatch(
   lastMessage: string,
-  classification: LegacyAcheevyClassification & { routingDecision: ReturnType<typeof buildNtntnRoutingDecision> },
+  classification: LegacyAcheevyClassification & {
+    routingDecision: ReturnType<typeof buildNtntnRoutingDecision>;
+  },
   conversationHistory: Array<{ role: string; content: string }>,
   userId: string,
 ): Promise<Response | null> {
@@ -105,7 +158,7 @@ async function tryAgentDispatch(
 
   try {
     const res = await fetch(`${UEF_GATEWAY_URL}/acheevy/execute`, {
-      method: 'POST',
+      method: "POST",
       headers: gatewayHeaders(),
       body: JSON.stringify({
         userId,
@@ -126,48 +179,55 @@ async function tryAgentDispatch(
     const result = await res.json();
 
     // Format orchestrator response as AI SDK text stream
-    const reply = result.reply || 'Task received. Processing...';
+    const reply = result.reply || "Task received. Processing...";
     const meta = [];
     if (result.taskId) meta.push(`Task ID: ${result.taskId}`);
     if (result.status) meta.push(`Status: ${result.status}`);
-    if (result.data?.pipelineSteps) meta.push(`Pipeline: ${result.data.pipelineSteps.length} steps`);
-    if (result.lucUsage) meta.push(`LUC: ${result.lucUsage.amount} ${result.lucUsage.service}`);
+    if (result.data?.pipelineSteps)
+      meta.push(`Pipeline: ${result.data.pipelineSteps.length} steps`);
+    if (result.lucUsage)
+      meta.push(`LUC: ${result.lucUsage.amount} ${result.lucUsage.service}`);
 
-    const fullReply = meta.length > 0
-      ? `${reply}\n\n---\n*${meta.join(' | ')}*`
-      : reply;
+    const fullReply =
+      meta.length > 0 ? `${reply}\n\n---\n*${meta.join(" | ")}*` : reply;
 
     // Build tool execution event for frontend card
     const toolEvent = {
-      type: 'tool_dispatch',
+      type: "tool_dispatch",
       intent: classification.intent,
       intentType: classification.routingDecision.intent_type,
       executionLane: classification.routingDecision.execution_lane,
       taskId: result.taskId || undefined,
-      status: result.status || 'completed',
+      status: result.status || "completed",
       steps: result.data?.pipelineSteps?.length || undefined,
       lucUsage: result.lucUsage || undefined,
     };
 
     // Emit as AI SDK text stream format with tool event prefix 8:
-    const encoder = new TextEncoder();
     const stream = new ReadableStream({
       start(controller) {
-        controller.enqueue(encoder.encode(`8:${JSON.stringify(toolEvent)}\n`));
-        controller.enqueue(encoder.encode(`0:${JSON.stringify(fullReply)}\n`));
+        controller.enqueue(
+          globalEncoder.encode(`8:${JSON.stringify(toolEvent)}\n`),
+        );
+        controller.enqueue(
+          globalEncoder.encode(`0:${JSON.stringify(fullReply)}\n`),
+        );
         controller.close();
       },
     });
 
     return new Response(stream, {
       headers: {
-        'Content-Type': 'text/plain; charset=utf-8',
-        'X-ACHEEVY-Intent': classification.intent,
-        'X-ACHEEVY-Agent': 'true',
+        "Content-Type": "text/plain; charset=utf-8",
+        "X-ACHEEVY-Intent": classification.intent,
+        "X-ACHEEVY-Agent": "true",
       },
     });
   } catch (err) {
-    console.warn('[ACHEEVY Chat] Agent dispatch failed:', err instanceof Error ? err.message : err);
+    console.warn(
+      "[ACHEEVY Chat] Agent dispatch failed:",
+      err instanceof Error ? err.message : err,
+    );
     return null;
   }
 }
@@ -186,30 +246,29 @@ async function tryGatewayStream(
 
   try {
     const gatewayMessages = [
-      { role: 'system', content: systemPrompt },
+      { role: "system", content: systemPrompt },
       ...messages,
     ];
 
     const res = await fetch(`${UEF_GATEWAY_URL}/llm/stream`, {
-      method: 'POST',
+      method: "POST",
       headers: gatewayHeaders(),
       body: JSON.stringify({
         model: modelId,
         messages: gatewayMessages,
-        agentId: 'acheevy-chat',
+        agentId: "acheevy-chat",
         userId,
         sessionId: `session-${userId}`,
         // Conversational chat → MEDIUM thinking (balanced quality/cost).
         // Model Intelligence auto-selects for agent dispatch; here we set explicitly
         // because this is the direct LLM stream path (not via agentChat()).
-        thinking_level: 'medium',
+        thinking_level: "medium",
       }),
     });
 
     if (!res.ok || !res.body) return null;
 
     // Transform gateway SSE format to AI SDK data-stream format
-    const encoder = new TextEncoder();
     const decoder = new TextDecoder();
     const reader = res.body.getReader();
 
@@ -221,31 +280,41 @@ async function tryGatewayStream(
           return;
         }
         const chunk = decoder.decode(value, { stream: true });
-        const lines = chunk.split('\n');
+        const lines = chunk.split("\n");
         for (const line of lines) {
-          if (!line.startsWith('data: ')) continue;
+          if (!line.startsWith("data: ")) continue;
           const data = line.slice(6).trim();
-          if (data === '[DONE]') { controller.close(); return; }
+          if (data === "[DONE]") {
+            controller.close();
+            return;
+          }
           try {
             const parsed = JSON.parse(data);
             if (parsed.text) {
               // Emit as AI SDK text stream format
-              controller.enqueue(encoder.encode(`0:${JSON.stringify(parsed.text)}\n`));
+              controller.enqueue(
+                globalEncoder.encode(`0:${JSON.stringify(parsed.text)}\n`),
+              );
             }
-          } catch { /* skip malformed */ }
+          } catch {
+            /* skip malformed */
+          }
         }
       },
     });
 
     return new Response(stream, {
       headers: {
-        'Content-Type': 'text/plain; charset=utf-8',
-        'X-LLM-Provider': res.headers.get('X-LLM-Provider') || 'gateway',
-        'X-LLM-Model': res.headers.get('X-LLM-Model') || modelId,
+        "Content-Type": "text/plain; charset=utf-8",
+        "X-LLM-Provider": res.headers.get("X-LLM-Provider") || "gateway",
+        "X-LLM-Model": res.headers.get("X-LLM-Model") || modelId,
       },
     });
   } catch (err) {
-    console.warn('[ACHEEVY Chat] Gateway unreachable, falling back to direct OpenRouter:', err instanceof Error ? err.message : err);
+    console.warn(
+      "[ACHEEVY Chat] Gateway unreachable, falling back to direct OpenRouter:",
+      err instanceof Error ? err.message : err,
+    );
     return null;
   }
 }
@@ -254,12 +323,15 @@ async function tryGatewayStream(
 // Memory recall — fetch relevant context from the memory system
 // ---------------------------------------------------------------------------
 
-async function recallMemories(message: string, userId: string): Promise<string> {
-  if (!UEF_GATEWAY_URL) return '';
+async function recallMemories(
+  message: string,
+  userId: string,
+): Promise<string> {
+  if (!UEF_GATEWAY_URL) return "";
 
   try {
     const res = await fetch(`${UEF_GATEWAY_URL}/memory/recall`, {
-      method: 'POST',
+      method: "POST",
       headers: gatewayHeaders(),
       body: JSON.stringify({
         userId,
@@ -269,25 +341,25 @@ async function recallMemories(message: string, userId: string): Promise<string> 
       }),
     });
 
-    if (!res.ok) return '';
+    if (!res.ok) return "";
 
     const result = await res.json();
-    if (!result.memories || result.memories.length === 0) return '';
+    if (!result.memories || result.memories.length === 0) return "";
 
     const lines = result.memories.map((s: any, i: number) => {
       const m = s.memory;
-      const typeLabel = (m.type || '').replace(/_/g, ' ');
+      const typeLabel = (m.type || "").replace(/_/g, " ");
       return `  ${i + 1}. [${typeLabel}] ${m.summary}`;
     });
 
     return [
-      '--- ACHEEVY Memory Context ---',
+      "--- ACHEEVY Memory Context ---",
       `Recalled ${result.memories.length} relevant memories:`,
       ...lines,
-      '--- End Memory Context ---',
-    ].join('\n');
+      "--- End Memory Context ---",
+    ].join("\n");
   } catch {
-    return '';
+    return "";
   }
 }
 
@@ -296,7 +368,13 @@ async function recallMemories(message: string, userId: string): Promise<string> 
 // ---------------------------------------------------------------------------
 
 interface MIMDetection {
-  type: 'idea-validation' | 'build-web' | 'build-mobile' | 'build-automation' | 'deep-scout' | null;
+  type:
+    | "idea-validation"
+    | "build-web"
+    | "build-mobile"
+    | "build-automation"
+    | "deep-scout"
+    | null;
   confidence: number;
 }
 
@@ -320,7 +398,7 @@ interface RequestMessage {
 }
 
 function buildAgenticSelectionNote(message?: RequestMessage): string {
-  if (!message) return '';
+  if (!message) return "";
 
   const agentic = message.metadata?.agentic;
   const selectedTools = Array.isArray(agentic?.selectedTools)
@@ -335,15 +413,19 @@ function buildAgenticSelectionNote(message?: RequestMessage): string {
     : [];
 
   const lines = [
-    selectedTools.length > 0 ? `Requested tools: ${selectedTools.join(', ')}` : '',
+    selectedTools.length > 0
+      ? `Requested tools: ${selectedTools.join(", ")}`
+      : "",
     agentic?.businessFunction?.name
-      ? `Business function: ${agentic.businessFunction.name}${agentic.businessFunction.topic ? ` (${agentic.businessFunction.topic})` : ''}`
-      : '',
-    agentic?.deepResearch ? 'Deep research mode enabled.' : '',
-    attachmentNames.length > 0 ? `Attached files: ${attachmentNames.join(', ')}` : '',
+      ? `Business function: ${agentic.businessFunction.name}${agentic.businessFunction.topic ? ` (${agentic.businessFunction.topic})` : ""}`
+      : "",
+    agentic?.deepResearch ? "Deep research mode enabled." : "",
+    attachmentNames.length > 0
+      ? `Attached files: ${attachmentNames.join(", ")}`
+      : "",
   ].filter(Boolean);
 
-  return lines.join('\n');
+  return lines.join("\n");
 }
 
 function detectMIMIntent(message: string): MIMDetection {
@@ -382,39 +464,42 @@ function detectMIMIntent(message: string): MIMDetection {
   ];
 
   for (const p of ideaPatterns) {
-    if (p.test(lower)) return { type: 'idea-validation', confidence: 0.85 };
+    if (p.test(lower)) return { type: "idea-validation", confidence: 0.85 };
   }
   for (const p of deepScoutPatterns) {
-    if (p.test(lower)) return { type: 'deep-scout', confidence: 0.85 };
+    if (p.test(lower)) return { type: "deep-scout", confidence: 0.85 };
   }
   for (const p of buildMobilePatterns) {
-    if (p.test(lower)) return { type: 'build-mobile', confidence: 0.8 };
+    if (p.test(lower)) return { type: "build-mobile", confidence: 0.8 };
   }
   for (const p of buildAutomationPatterns) {
-    if (p.test(lower)) return { type: 'build-automation', confidence: 0.8 };
+    if (p.test(lower)) return { type: "build-automation", confidence: 0.8 };
   }
   for (const p of buildWebPatterns) {
-    if (p.test(lower)) return { type: 'build-web', confidence: 0.8 };
+    if (p.test(lower)) return { type: "build-web", confidence: 0.8 };
   }
 
   return { type: null, confidence: 0 };
 }
 
-function buildMIMResponse(detection: MIMDetection, originalMessage: string): string | null {
+function buildMIMResponse(
+  detection: MIMDetection,
+  originalMessage: string,
+): string | null {
   switch (detection.type) {
-    case 'idea-validation':
+    case "idea-validation":
       return `I can help validate that idea. I've got a full 4-step validation pipeline ready — it covers clarity, gap analysis, audience resonance, and expert perspective.\n\n**→ [Open Deep Scout](/dashboard/deep-scout)** to run the full validation\n\nOr describe your idea right here and I'll give you quick initial feedback.`;
 
-    case 'deep-scout':
+    case "deep-scout":
       return `My research engine is ready. Deep Scout runs competitive analysis, market research, and opportunity mapping.\n\n**→ [Open Deep Scout](/dashboard/deep-scout)** for the full research pipeline\n\nI can also do a quick analysis right here if you tell me more about what you want to explore.`;
 
-    case 'build-web':
+    case "build-web":
       return `Let's build it. I have a full web app builder with live preview, multi-model support, and iterative editing.\n\n**→ [Open Web App Builder](/dashboard/make-it-mine/web-app)** for the full build experience\n\nOr describe exactly what you need and I'll get started.`;
 
-    case 'build-mobile':
+    case "build-mobile":
       return `Mobile app — got it. I'll generate a native-looking PWA prototype with bottom nav, touch gestures, and mobile-first design.\n\n**→ [Open Mobile App Builder](/dashboard/make-it-mine/mobile-app)** for the full build experience with phone frame preview\n\nDescribe your app concept and I can start building.`;
 
-    case 'build-automation':
+    case "build-automation":
       return `Workflow automation ready. I'll create a visual workflow with triggers, actions, conditions, and connections.\n\n**→ [Open Automation Builder](/dashboard/make-it-mine/automation)** for the visual workflow builder\n\nTell me what you want to automate and I'll map it out.`;
 
     default:
@@ -432,10 +517,16 @@ export async function POST(req: Request) {
     const validation = validateInput(chatRequestSchema, payload);
 
     if (!validation.success) {
-      return new Response(JSON.stringify({ error: 'Invalid chat request', details: validation.errors }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return new Response(
+        JSON.stringify({
+          error: "Invalid chat request",
+          details: validation.errors,
+        }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
     }
 
     const {
@@ -453,14 +544,17 @@ export async function POST(req: Request) {
     };
 
     // Derive userId: body > cookie > header > anon fallback
-    const userId = bodyUserId
-      || req.headers.get('x-user-id')
-      || `anon-${req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'}`;
+    const userId =
+      bodyUserId ||
+      req.headers.get("x-user-id") ||
+      `anon-${req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown"}`;
     const modelId = resolveModelId(model);
 
     // Get the last user message for classification
-    const lastUserMessage = [...messages].reverse().find((m: RequestMessage) => m.role === 'user');
-    const lastMessage = lastUserMessage?.content || '';
+    const lastUserMessage = [...messages]
+      .reverse()
+      .find((m: RequestMessage) => m.role === "user");
+    const lastMessage = lastUserMessage?.content || "";
     const agenticSelectionNote = buildAgenticSelectionNote(lastUserMessage);
     const enrichedLastMessage = agenticSelectionNote
       ? `${lastMessage}\n\n--- Agentic UI Context ---\n${agenticSelectionNote}`
@@ -479,19 +573,22 @@ export async function POST(req: Request) {
     if (mimDetection.type && mimDetection.confidence > 0.7) {
       const mimResponse = buildMIMResponse(mimDetection, lastMessage);
       if (mimResponse) {
-        console.log(`[ACHEEVY Chat] M.I.M. intent detected: ${mimDetection.type} (${mimDetection.confidence})`);
-        const encoder = new TextEncoder();
+        console.log(
+          `[ACHEEVY Chat] M.I.M. intent detected: ${mimDetection.type} (${mimDetection.confidence})`,
+        );
         const stream = new ReadableStream({
           start(controller) {
-            controller.enqueue(encoder.encode(`0:${JSON.stringify(mimResponse)}\n`));
+            controller.enqueue(
+              globalEncoder.encode(`0:${JSON.stringify(mimResponse)}\n`),
+            );
             controller.close();
           },
         });
         return new Response(stream, {
           headers: {
-            'Content-Type': 'text/plain; charset=utf-8',
-            'X-ACHEEVY-Intent': `mim:${mimDetection.type}`,
-            'X-ACHEEVY-MIM': 'true',
+            "Content-Type": "text/plain; charset=utf-8",
+            "X-ACHEEVY-Intent": `mim:${mimDetection.type}`,
+            "X-ACHEEVY-MIM": "true",
           },
         });
       }
@@ -499,12 +596,13 @@ export async function POST(req: Request) {
 
     // Memory recall: fetch relevant memories for this user's message
     const memoryContext = await recallMemories(enrichedLastMessage, userId);
-    const activeContextPackNote = Array.isArray(contextPackIds) && contextPackIds.length > 0
-      ? `\nActive Context Packs: ${contextPackIds.join(', ')}`
-      : '';
+    const activeContextPackNote =
+      Array.isArray(contextPackIds) && contextPackIds.length > 0
+        ? `\nActive Context Packs: ${contextPackIds.join(", ")}`
+        : "";
     const agenticContextNote = agenticSelectionNote
       ? `\nAgentic UI selections:\n${agenticSelectionNote}`
-      : '';
+      : "";
 
     const systemPrompt = buildSystemPrompt({
       personaId,
@@ -519,39 +617,55 @@ export async function POST(req: Request) {
     // Step 2: ALL messages → ACHEEVY orchestrator first
     // The orchestrator decides: II-Agent, Chicken Hawk, vertical, PaaS, or conversation.
     // No fork — every message gets the full ACHEEVY pipeline.
-    const orchestratorClassification = classification || (() => {
-      // If gateway classification failed, use keyword heuristics to determine if this needs an agent
-      const lower = enrichedLastMessage.toLowerCase();
-      const actionKeywords = /\b(build|deploy|create|launch|spin up|research|automate|analyze|generate|make|set up|configure|install)\b/i;
-      const isLikelyAction = actionKeywords.test(lower);
+    const orchestratorClassification =
+      classification ||
+      (() => {
+        // If gateway classification failed, use keyword heuristics to determine if this needs an agent
+        const lower = enrichedLastMessage.toLowerCase();
+        const actionKeywords =
+          /\b(build|deploy|create|launch|spin up|research|automate|analyze|generate|make|set up|configure|install)\b/i;
+        const isLikelyAction = actionKeywords.test(lower);
 
-      return normalizeAcheevyClassification(enrichedLastMessage, {
-        intent: isLikelyAction ? 'task_execution' : 'conversation',
-        confidence: isLikelyAction ? 0.7 : 0.5,
-        requiresAgent: isLikelyAction,
-      });
-    })();
+        return normalizeAcheevyClassification(enrichedLastMessage, {
+          intent: isLikelyAction ? "task_execution" : "conversation",
+          confidence: isLikelyAction ? 0.7 : 0.5,
+          requiresAgent: isLikelyAction,
+        });
+      })();
 
     console.log(
       `[ACHEEVY Chat] Routing through orchestrator: intent=${orchestratorClassification.intent} lane=${orchestratorClassification.routingDecision.execution_lane} confidence=${orchestratorClassification.confidence}`,
     );
-    const agentResponse = await tryAgentDispatch(enrichedLastMessage, orchestratorClassification, enrichedMessages, userId);
+    const agentResponse = await tryAgentDispatch(
+      enrichedLastMessage,
+      orchestratorClassification,
+      enrichedMessages,
+      userId,
+    );
     if (agentResponse) return agentResponse;
 
     // Step 3: Fallback — ACHEEVY orchestrator unreachable → LLM stream via gateway (metered)
     // If agent dispatch was attempted (requiresAgent=true) but failed, surface this to the user
     if (orchestratorClassification.requiresAgent) {
-      console.warn('[ACHEEVY Chat] Agent dispatch failed for action intent — prepending notice to LLM stream');
+      console.warn(
+        "[ACHEEVY Chat] Agent dispatch failed for action intent — prepending notice to LLM stream",
+      );
       const dispatchFailureNote = `I wasn't able to reach my execution engine right now, so I'll handle this conversationally for the moment. Here's what I can tell you:\n\n`;
-      const encoder = new TextEncoder();
       const prefixStream = new ReadableStream({
         start(controller) {
-          controller.enqueue(encoder.encode(`0:${JSON.stringify(dispatchFailureNote)}\n`));
+          controller.enqueue(
+            globalEncoder.encode(`0:${JSON.stringify(dispatchFailureNote)}\n`),
+          );
           controller.close();
         },
       });
       // Attempt gateway stream and prepend the notice if successful
-      const gatewayStreamForAction = await tryGatewayStream(modelId, enrichedMessages, systemPrompt, userId);
+      const gatewayStreamForAction = await tryGatewayStream(
+        modelId,
+        enrichedMessages,
+        systemPrompt,
+        userId,
+      );
       if (gatewayStreamForAction && gatewayStreamForAction.body) {
         const combined = new ReadableStream({
           async start(controller) {
@@ -572,19 +686,28 @@ export async function POST(req: Request) {
         });
         return new Response(combined, {
           headers: {
-            'Content-Type': 'text/plain; charset=utf-8',
-            'X-ACHEEVY-Intent': orchestratorClassification.intent,
-            'X-ACHEEVY-Fallback': 'dispatch-failed',
+            "Content-Type": "text/plain; charset=utf-8",
+            "X-ACHEEVY-Intent": orchestratorClassification.intent,
+            "X-ACHEEVY-Fallback": "dispatch-failed",
           },
         });
       }
     }
-    console.warn('[ACHEEVY Chat] Orchestrator unreachable, falling back to LLM stream');
-  const gatewayResponse = await tryGatewayStream(modelId, enrichedMessages, systemPrompt, userId);
+    console.warn(
+      "[ACHEEVY Chat] Orchestrator unreachable, falling back to LLM stream",
+    );
+    const gatewayResponse = await tryGatewayStream(
+      modelId,
+      enrichedMessages,
+      systemPrompt,
+      userId,
+    );
     if (gatewayResponse) return gatewayResponse;
 
     // Step 4: Last resort — gateway also unreachable → direct OpenRouter (unmetered)
-    console.warn('[ACHEEVY Chat] Gateway unreachable, falling back to direct OpenRouter');
+    console.warn(
+      "[ACHEEVY Chat] Gateway unreachable, falling back to direct OpenRouter",
+    );
     const result = await streamText({
       model: openrouter(modelId),
       system: systemPrompt,
@@ -593,11 +716,11 @@ export async function POST(req: Request) {
 
     return result.toTextStreamResponse();
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Chat API error';
-    console.error('[ACHEEVY Chat]', message);
+    const message = error instanceof Error ? error.message : "Chat API error";
+    console.error("[ACHEEVY Chat]", message);
     return new Response(JSON.stringify({ error: message }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { "Content-Type": "application/json" },
     });
   }
 }
