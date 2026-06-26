@@ -145,11 +145,12 @@ export class CloudflareClient {
     const fqdn = `${subdomain}.${domain}`;
 
     const records = await this.listDnsRecords(zoneId, fqdn);
-    for (const record of records) {
-      if (record.id) {
-        await this.deleteDnsRecord(zoneId, record.id);
-      }
-    }
+
+    // ⚡ Bolt: Batch DNS record deletions concurrently to eliminate sequential network latency bottlenecks
+    await Promise.all(
+      records.filter(r => r.id).map(record => this.deleteDnsRecord(zoneId, record.id!))
+    );
+
     return true;
   }
 
