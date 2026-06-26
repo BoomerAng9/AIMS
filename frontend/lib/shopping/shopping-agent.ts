@@ -109,10 +109,16 @@ export class ShoppingAgent {
     const findings: ProductFinding[] = [];
     const warnings: ScoutingWarning[] = [];
 
-    // Scout for each item in the task
-    for (const item of task.items) {
-      const itemFindings = await this.scoutItem(item);
+    // ⚡ Bolt Optimization: Use Promise.all to fetch item findings concurrently rather than sequentially
+    // Scout for each item in the task concurrently
+    const itemFindingsResults = await Promise.all(
+      task.items.map(async (item) => {
+        const itemFindings = await this.scoutItem(item);
+        return { item, itemFindings };
+      })
+    );
 
+    for (const { item, itemFindings } of itemFindingsResults) {
       if (itemFindings.length === 0) {
         warnings.push({
           type: 'no_results',
@@ -510,13 +516,19 @@ export class ShoppingAgent {
   async comparePrices(productName: string): Promise<ProductFinding[]> {
     const findings: ProductFinding[] = [];
 
-    for (const [, adapter] of Array.from(this.adapters.entries())) {
+    // ⚡ Bolt Optimization: Run adapter searches concurrently
+    const searchPromises = Array.from(this.adapters.entries()).map(async ([, adapter]) => {
       try {
-        const results = await adapter.search(productName, { maxResults: 3 });
-        findings.push(...results);
+        return await adapter.search(productName, { maxResults: 3 });
       } catch (error) {
         console.error(`[ShoppingAgent] Price comparison error:`, error);
+        return [];
       }
+    });
+
+    const resultsArray = await Promise.all(searchPromises);
+    for (const results of resultsArray) {
+      findings.push(...results);
     }
 
     return findings.sort((a, b) => (a.price || 0) - (b.price || 0));
