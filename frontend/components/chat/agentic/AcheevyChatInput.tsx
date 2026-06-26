@@ -36,6 +36,7 @@ import {
 } from 'lucide-react';
 import { transition } from '@/lib/motion/tokens';
 import type { ContextPackOption } from '@/lib/context-packs/contracts';
+import { useAudioLevel } from '@/hooks/useAudioLevel';
 
 interface VoicePingProps {
   audioLevel: number;
@@ -100,7 +101,6 @@ export interface AcheevyChatInputProps {
   voiceTranscript?: string;
   onSendVoiceTranscript?: () => void;
   onClearTranscript?: () => void;
-  audioLevel?: number;
   hasVoiceAgent?: boolean;
   voiceSessionActive?: boolean;
   voiceAgentStatus?: string;
@@ -130,17 +130,21 @@ export interface AcheevyChatInputProps {
 const VoiceInputBtn = memo(function VoiceInputBtn({
   isListening,
   isProcessing,
-  audioLevel,
+  stream,
   onStart,
   onStop,
 }: {
   isListening: boolean;
   isProcessing: boolean;
-  audioLevel: number;
+  stream: MediaStream | null;
   onStart: () => void;
   onStop: () => void;
 }) {
   const [elapsed, setElapsed] = React.useState(0);
+
+  // ⚡ Bolt Optimization: Moved high-frequency (60fps) useAudioLevel hook here
+  // to prevent the parent ChatInterface component from continuously re-rendering.
+  const audioLevel = useAudioLevel(stream, isListening);
 
   useEffect(() => {
     if (!isListening) {
@@ -207,7 +211,6 @@ export function AcheevyChatInput({
   voiceTranscript,
   onSendVoiceTranscript,
   onClearTranscript,
-  audioLevel = 0,
   hasVoiceAgent = false,
   voiceSessionActive = false,
   voiceAgentStatus,
@@ -342,7 +345,7 @@ export function AcheevyChatInput({
             <VoiceInputBtn
               isListening={voiceInput.isListening}
               isProcessing={voiceInput.isProcessing}
-              audioLevel={audioLevel}
+              stream={voiceInput.stream}
               onStart={voiceInput.startListening}
               onStop={voiceInput.stopListening}
             />
