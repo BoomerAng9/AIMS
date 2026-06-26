@@ -109,8 +109,12 @@ export class ShoppingAgent {
     const findings: ProductFinding[] = [];
     const warnings: ScoutingWarning[] = [];
 
-    // Scout for each item in the task
-    for (const item of task.items) {
+    // PERFORMANCE OPTIMIZATION (Bolt ⚡)
+    // What: Replaced sequential `for...of` loop with concurrent execution using `Promise.all` and `Array.prototype.map`.
+    // Why: `scoutItem` involves external adapter calls (I/O bound). Sequential execution blocked on each item's response.
+    // Impact: Reduces overall task execution latency from O(N * latency) to O(latency), where N is the number of items.
+    // Measurement: Execution time for N items should now be roughly equivalent to the slowest single item scout operation.
+    const itemPromises = task.items.map(async (item) => {
       const itemFindings = await this.scoutItem(item);
 
       if (itemFindings.length === 0) {
@@ -120,7 +124,7 @@ export class ShoppingAgent {
           message: `No results found for "${item.name || item.description}"`,
           severity: 'high',
         });
-        continue;
+        return [];
       }
 
       // Check price constraints
@@ -137,8 +141,11 @@ export class ShoppingAgent {
         });
       }
 
-      findings.push(...itemFindings);
-    }
+      return itemFindings;
+    });
+
+    const itemResults = await Promise.all(itemPromises);
+    findings.push(...itemResults.flat());
 
     // Build cart options from findings
     const cartOptions = await this.buildCartOptions(task.items, findings);
