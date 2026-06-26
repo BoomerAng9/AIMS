@@ -35,6 +35,10 @@ import {
   Package,
 } from 'lucide-react';
 
+// ⚡ Bolt Performance Optimization: Instantiate TextEncoder once outside component.
+// Using TextEncoder is significantly faster than creating Blobs for string byte length calculations.
+const textEncoder = new TextEncoder();
+
 // ─────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────
@@ -133,7 +137,9 @@ export function FileDownload({
 
   const resolvedFilename = filename || `aims-export.${format}`;
   const sizeKB = useMemo(
-    () => Math.round(new Blob([content]).size / 1024),
+    () => Math.round(
+      (typeof content === 'string' ? textEncoder.encode(content).length : new Blob([content]).size) / 1024
+    ),
     [content]
   );
   const lineCount = useMemo(
@@ -355,12 +361,17 @@ export function FileDownload({
 export function FileDownloadGroup({ files }: { files: FileDownloadProps[] }) {
   const [isExpanded, setIsExpanded] = useState(true);
 
-  if (files.length === 0) return null;
+  // ⚡ Bolt Performance Optimization: Memoize the O(N) calculation so it doesn't recalculate on every render
+  const totalSizeKB = useMemo(() => {
+    return files.reduce(
+      (sum, f) => sum + Math.round(
+        (typeof f.content === 'string' ? textEncoder.encode(f.content).length : new Blob([f.content]).size) / 1024
+      ),
+      0
+    );
+  }, [files]);
 
-  const totalSizeKB = files.reduce(
-    (sum, f) => sum + Math.round(new Blob([f.content]).size / 1024),
-    0
-  );
+  if (files.length === 0) return null;
 
   return (
     <motion.div
