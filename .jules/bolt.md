@@ -8,3 +8,6 @@
 ## 2024-05-18 - [Parallelize Evidence Locker GCS network calls]
 **Learning:** Sequential asynchronous network requests inside `for...of` loops are a hidden bottleneck for latency, especially when dealing with high-volume remote operations like fetching Google Cloud Storage metadata. Refactoring these loops to use `Promise.all` with `.map()` significantly cuts down total execution time by allowing concurrent requests.
 **Action:** Always scan for `for...of` loops that purely execute independent `await` calls and refactor them to use `Promise.all` mapping to reduce latency.
+## 2026-05-12 - Isolate high-frequency hooks in React
+**Learning:** Calling hooks that update rapidly (like `useAudioLevel` updating at 60fps) inside large parent components (like `ChatInterface`) causes the entire tree to re-render continuously, severely degrading UI responsiveness.
+**Action:** Always move high-frequency state management down to the lowest possible memoized leaf component (e.g., `VoiceInputBtn`), passing raw underlying references (like `MediaStream`) through props rather than the changing state values.
