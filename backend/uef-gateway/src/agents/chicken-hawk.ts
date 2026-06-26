@@ -115,17 +115,9 @@ async function createRun(input: AgentTaskInput, steps: string[]): Promise<AimsRu
   return run;
 }
 
-async function updateRunStep(run: AimsRun, stepIndex: number, update: Partial<RunStepResult>): Promise<void> {
+function updateRunStepInMemory(run: AimsRun, stepIndex: number, update: Partial<RunStepResult>): void {
   if (run.steps[stepIndex]) {
     Object.assign(run.steps[stepIndex], update);
-    try {
-      await shelfClient.update('runs', run.id, {
-        steps: run.steps,
-        updatedAt: new Date().toISOString(),
-      } as Partial<AimsRun>);
-    } catch {
-      // Non-blocking
-    }
   }
 }
 
@@ -146,6 +138,7 @@ async function completeRun(run: AimsRun, status: 'completed' | 'failed', totalTo
       artifacts: run.artifacts,
       completedAt: run.completedAt,
       totalDurationMs: run.totalDurationMs,
+      steps: run.steps, // Bolt: Aggregated step updates written in a single batch
     } as Partial<AimsRun>);
 
     // Record usage to LUC if linked
@@ -372,7 +365,7 @@ async function execute(input: AgentTaskInput): Promise<AgentTaskOutput> {
 
     // 5. Update Run record per step
     for (const stepResult of result.stepResults) {
-      await updateRunStep(run, stepResult.index, {
+      updateRunStepInMemory(run, stepResult.index, {
         status: stepResult.status === 'completed' ? 'completed' : 'failed',
         tokensUsed: stepResult.output?.cost.tokens || 0,
         costUsd: stepResult.output?.cost.usd || 0,
