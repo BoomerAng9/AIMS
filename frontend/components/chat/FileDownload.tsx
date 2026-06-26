@@ -58,6 +58,10 @@ interface FormatConfig {
 // Format configuration
 // ─────────────────────────────────────────────────────────────
 
+// ⚡ Bolt Optimization: Instantiate TextEncoder once at module scope
+// to prevent repeated memory allocation and re-instantiation on every render.
+const textEncoder = new TextEncoder();
+
 const FORMAT_CONFIG: Record<string, FormatConfig> = {
   md: {
     icon: FileText,
@@ -133,7 +137,9 @@ export function FileDownload({
 
   const resolvedFilename = filename || `aims-export.${format}`;
   const sizeKB = useMemo(
-    () => Math.round(new Blob([content]).size / 1024),
+    // ⚡ Bolt Optimization: Prefer textEncoder.encode over new Blob().size
+    // to avoid object instantiation overhead during string size calculation.
+    () => Math.round(textEncoder.encode(content).length / 1024),
     [content]
   );
   const lineCount = useMemo(
@@ -358,7 +364,9 @@ export function FileDownloadGroup({ files }: { files: FileDownloadProps[] }) {
   if (files.length === 0) return null;
 
   const totalSizeKB = files.reduce(
-    (sum, f) => sum + Math.round(new Blob([f.content]).size / 1024),
+    // ⚡ Bolt Optimization: Prefer textEncoder.encode over new Blob().size
+    // to avoid object instantiation overhead during string size calculation.
+    (sum, f) => sum + Math.round(textEncoder.encode(f.content).length / 1024),
     0
   );
 
