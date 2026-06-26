@@ -8,3 +8,6 @@
 ## 2024-05-18 - [Parallelize Evidence Locker GCS network calls]
 **Learning:** Sequential asynchronous network requests inside `for...of` loops are a hidden bottleneck for latency, especially when dealing with high-volume remote operations like fetching Google Cloud Storage metadata. Refactoring these loops to use `Promise.all` with `.map()` significantly cuts down total execution time by allowing concurrent requests.
 **Action:** Always scan for `for...of` loops that purely execute independent `await` calls and refactor them to use `Promise.all` mapping to reduce latency.
+## 2024-05-18 - [Parallelize Cloudflare DNS deletions]
+**Learning:** Sequential network calls in loops create a latency bottleneck, even for simple deletions like `this.deleteDnsRecord()`.
+**Action:** When a loop purely calls independent `await` operations and the API allows concurrent requests (or doesn’t strictly require sequential execution), refactor the code to execute those requests in parallel using `Promise.all` with `map()`. This effectively mitigates the network overhead.
