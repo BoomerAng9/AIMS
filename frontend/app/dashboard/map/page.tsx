@@ -48,7 +48,7 @@ const SECTIONS = [
       { label: "Plug Catalog", href: "/dashboard/plug-catalog", status: "live" as const, desc: "Browse and deploy AI tools" },
       { label: "Playground", href: "/dashboard/playground", status: "live" as const, desc: "Code, prompt, and agent sandboxes" },
       { label: "Custom Hawks", href: "/dashboard/custom-hawks", status: "live" as const, desc: "Create custom AI bots" },
-      { label: "Model Garden", href: "/dashboard/model-garden", status: "live" as const, desc: "Browse and compare AI models" },
+      { label: "The Lab", href: "/dashboard/the-lab", status: "live" as const, desc: "Browse and compare AI tools and models" },
       { label: "Chicken Hawk", href: "/dashboard/build", status: "live" as const, desc: "Autonomous build & execute" },
       { label: "Computer Control", href: null, status: "planned" as const, desc: "Sandboxed desktop control (coming soon)" },
     ],

@@ -30,7 +30,7 @@ const MODELS: Record<string, string> = {
   'gpt-4.1-mini': 'openai/gpt-4.1-mini',
 };
 
-const DEFAULT_MODEL = 'deepseek-v3';
+const DEFAULT_MODEL = 'gemini-flash';
 
 // ── System Prompt ──
 const SYSTEM_PROMPT = `You are an expert web developer. You create single-file web applications using HTML, CSS, and JavaScript.

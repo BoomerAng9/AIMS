@@ -25,7 +25,7 @@ const MODELS: Record<string, string> = {
   'gpt-4.1-mini': 'openai/gpt-4.1-mini',
 };
 
-const DEFAULT_MODEL = 'qwen3-coder';
+const DEFAULT_MODEL = 'gemini-flash';
 
 // ── React Native System Prompt ──
 const RN_SYSTEM_PROMPT = `You are an expert React Native developer. You create mobile app screens using React Native with Expo.

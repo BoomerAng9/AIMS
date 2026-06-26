@@ -11,7 +11,7 @@
  * to II-Agent, Chicken Hawk, or handle as conversation. No classification fork.
  *
  * Feature LLM: Claude Opus 4.6
- * Priority Models: Qwen, Minimax, GLM-5, Kimi, WAN, Nano Banana Pro
+ * Priority Models: Gemini 3.1 Flash (default), Minimax, GLM-5, Kimi, WAN, Nano Banana Pro
  */
 
 import { streamText } from 'ai';
@@ -39,7 +39,7 @@ const openrouter = createOpenAI({
 });
 
 // ── Feature LLM ─────────────────────────────────────────────
-const DEFAULT_MODEL = process.env.ACHEEVY_MODEL || process.env.OPENROUTER_MODEL || 'minimax/minimax-m1-80k';
+const DEFAULT_MODEL = process.env.ACHEEVY_MODEL || process.env.OPENROUTER_MODEL || 'google/gemini-3.1-flash';
 
 // ── Priority Model Roster (all accessible via OpenRouter) ───
 // Model IDs must match OpenRouter's catalog exactly (use dashes, not dots for versions)

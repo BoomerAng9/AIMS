@@ -28,7 +28,7 @@ const APP_NAV = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/chat", label: "Chat w/ACHEEVY" },
   { href: "/dashboard/circuit-box", label: "Circuit Box" },
-  { href: "/dashboard/model-garden", label: "Model Garden" },
+  { href: "/dashboard/the-lab", label: "The Lab" },
   { href: "/halalhub", label: "HalalHub" },
 ];
 

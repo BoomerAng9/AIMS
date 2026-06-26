@@ -63,7 +63,7 @@ const SEGMENT_LABELS: Record<string, string> = {
 
   // Tools
   playground: 'Playground',
-  'model-garden': 'Model Garden',
+  'the-lab': 'The Lab',
   'custom-hawks': 'Custom Hawks',
   research: 'Research',
   lab: 'Lab',

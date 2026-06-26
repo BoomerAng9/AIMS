@@ -310,7 +310,7 @@ export function Hero() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {[
                   { label: 'Voice I/O', desc: 'Speak and listen', icon: '🎙', href: '/workshop' },
-                  { label: 'Multi-Model', desc: 'Claude, Gemini, Qwen', icon: '🧠', href: '/dashboard/circuit-box?tab=model-garden' },
+                  { label: 'Multi-Model', desc: 'Claude, Gemini, Qwen', icon: '🧠', href: '/dashboard/circuit-box?tab=the-lab' },
                   { label: 'Auto-Deploy', desc: 'Docker + CI/CD', icon: '🚀', href: '/dashboard/deploy-dock' },
                   { label: 'Evidence-Based', desc: 'No proof, no done', icon: '📋', href: '/sandbox/perform' },
                 ].map(cap => (

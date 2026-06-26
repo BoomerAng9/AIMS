@@ -186,10 +186,10 @@ const NODES: MapNode[] = [
     description: "Create your own Lil_Hawks — custom AI bots",
   },
   {
-    id: "model-garden",
-    label: "Model Garden",
+    id: "the-lab",
+    label: "The Lab",
     icon: Cpu,
-    href: "/dashboard/model-garden",
+    href: "/dashboard/the-lab",
     status: "live",
     category: "tool",
     x: 8, y: 42,
@@ -374,7 +374,7 @@ const EDGES: MapEdge[] = [
   { from: "acheevy", to: "plug-catalog", label: "catalog" },
   { from: "plug-catalog", to: "playground" },
   { from: "plug-catalog", to: "custom-hawks" },
-  { from: "plug-catalog", to: "model-garden" },
+  { from: "plug-catalog", to: "the-lab" },
   { from: "deploy-dock", to: "build" },
 
   // Verticals branch

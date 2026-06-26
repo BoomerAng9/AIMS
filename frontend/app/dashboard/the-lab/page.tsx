@@ -1,10 +1,10 @@
 'use client';
 
 /**
- * A.I.M.S. Model Garden
+ * A.I.M.S. The Lab
  *
- * Browse and select AI models and tools to integrate into your app.
- * Similar to Firebase/Vertex AI model selection experience.
+ * Catalog of every tool, model, MCP, and service available.
+ * Filterable, sortable tile grid with cost and capability comparison.
  */
 
 import { useState, useEffect } from 'react';
@@ -790,7 +790,7 @@ function ConsumptionCard({ model }: { model: ConsumptionModel }) {
 // Main Component
 // ─────────────────────────────────────────────────────────────
 
-export default function ModelGardenPage() {
+export default function TheLabPage() {
   const [activeTab, setActiveTab] = useState<'models' | 'tools' | 'consumption'>('models');
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
@@ -865,7 +865,7 @@ export default function ModelGardenPage() {
             </div>
             <div>
               <h1 className="text-3xl font-bold" style={{ color: AIMS_CIRCUIT_COLORS.secondary }}>
-                Model Garden
+                The Lab
               </h1>
               <p className="text-gray-400">
                 Add AI capabilities to your business — just pick what you need
@@ -1064,9 +1064,9 @@ export default function ModelGardenPage() {
                     </div>
 
                     <div className="grid grid-cols-4 gap-4">
-                      {/* Model Garden */}
+                      {/* The Lab */}
                       <div className="space-y-2">
-                        <div className="text-sm font-medium" style={{ color: '#3b82f6' }}>Model Garden</div>
+                        <div className="text-sm font-medium" style={{ color: '#3b82f6' }}>The Lab</div>
                         {['OpenRouter Models', 'Partner Models', 'Open Source', 'Custom Models'].map((item) => (
                           <div
                             key={item}
