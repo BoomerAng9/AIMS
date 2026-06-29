@@ -8,3 +8,7 @@
 ## 2024-05-18 - [Parallelize Evidence Locker GCS network calls]
 **Learning:** Sequential asynchronous network requests inside `for...of` loops are a hidden bottleneck for latency, especially when dealing with high-volume remote operations like fetching Google Cloud Storage metadata. Refactoring these loops to use `Promise.all` with `.map()` significantly cuts down total execution time by allowing concurrent requests.
 **Action:** Always scan for `for...of` loops that purely execute independent `await` calls and refactor them to use `Promise.all` mapping to reduce latency.
+
+## 2024-11-09 - Parallelize File I/O operations for CDN Deployment
+**Learning:** Sequential asynchronous network requests and filesystem writes inside `for...of` loops act as a heavy latency bottleneck for static file deployments (like CDN hosting on GCS or Nginx static generation). Refactoring these to use concurrent `Promise.all` alongside `.map()` removes I/O wait times and improves deployment speed, specifically when handling high numbers of files in `backend/uef-gateway/src/plug-catalog/cdn-deploy.ts`.
+**Action:** Always refactor purely independent `for...of` file generation loops in static site deployment tools to `Promise.all` concurrency blocks, while remaining cautious of potential connection pool exhaustion on database queries as well as system file descriptor limits if payloads are unexpectedly massive.
