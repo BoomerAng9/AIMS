@@ -24,30 +24,50 @@ import { LUC_LEDGER_SCHEMA_SQL } from '../schema';
 import { SqliteLedgerAdapter, SqlDb } from '../sqlite-ledger';
 import { createLucRouter } from '../routes';
 
-function main(): void {
-  if (process.env.NODE_ENV === 'production') {
-    console.error('[dev-serve] refusing to run: NODE_ENV=production');
-    process.exit(1);
-  }
+/** Structural verdict of the dev-only guard rails — pure, testable. */
+export type DevServeGuardVerdict =
+  | { ok: true; dbPath: string; internalApiKey: string }
+  | { ok: false; reason: string };
 
-  const dbPath = process.env.LUC_DEV_DB;
+/**
+ * The guard rails as a PURE function over an environment, so the production
+ * refusal is provable by test rather than by reading main(). Refuses:
+ * NODE_ENV=production, a missing throwaway-db path, any path whose basename
+ * is aims.db in ANY case (Windows filesystems are case-insensitive — AIMS.DB
+ * IS the real store there), and a missing auth key.
+ */
+export function guardDevServe(env: NodeJS.ProcessEnv): DevServeGuardVerdict {
+  if (env.NODE_ENV === 'production') {
+    return { ok: false, reason: 'refusing to run: NODE_ENV=production' };
+  }
+  const dbPath = env.LUC_DEV_DB;
   if (!dbPath) {
-    console.error('[dev-serve] set LUC_DEV_DB to a THROWAWAY sqlite file path (never a real data file)');
-    process.exit(1);
-    return;
+    return {
+      ok: false,
+      reason: 'set LUC_DEV_DB to a THROWAWAY sqlite file path (never a real data file)',
+    };
   }
-  if (path.basename(dbPath) === 'aims.db') {
-    console.error('[dev-serve] refusing to touch aims.db — use a throwaway path');
-    process.exit(1);
-    return;
+  if (path.basename(dbPath).toLowerCase() === 'aims.db') {
+    return { ok: false, reason: 'refusing to touch aims.db — use a throwaway path' };
   }
-
-  const internalApiKey = process.env.LUC_INTERNAL_API_KEY;
+  const internalApiKey = env.LUC_INTERNAL_API_KEY;
   if (!internalApiKey) {
-    console.error('[dev-serve] set LUC_INTERNAL_API_KEY (dev-only value, e.g. devtest-internal)');
+    return {
+      ok: false,
+      reason: 'set LUC_INTERNAL_API_KEY (dev-only value, e.g. devtest-internal)',
+    };
+  }
+  return { ok: true, dbPath, internalApiKey };
+}
+
+function main(): void {
+  const guard = guardDevServe(process.env);
+  if (!guard.ok) {
+    console.error(`[dev-serve] ${guard.reason}`);
     process.exit(1);
     return;
   }
+  const { dbPath, internalApiKey } = guard;
 
   // node:sqlite is a Node 22.5+ builtin; same SQLite C engine as prod's
   // better-sqlite3, and the adapter only needs the structural SqlDb surface.
@@ -72,4 +92,8 @@ function main(): void {
   });
 }
 
-main();
+// Boot ONLY when executed directly. An import (production code, a test) gets
+// the guard function and nothing else — no server, no process.exit.
+if (require.main === module) {
+  main();
+}

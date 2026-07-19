@@ -34,23 +34,43 @@ const ACCOUNT_ID = 'acct_devtest';
 const TIER = 'medium';
 const CADENCE = '3mo';
 
-async function main(): Promise<void> {
-  if (process.env.NODE_ENV === 'production') {
-    console.error('[dev-wallet] refusing to run: NODE_ENV=production');
-    process.exit(1);
-  }
+/** Structural verdict of the dev-only guard rails — pure, testable. */
+export type DevWalletGuardVerdict =
+  | { ok: true; dbPath: string }
+  | { ok: false; reason: string };
 
-  const dbPath = process.env.LUC_DEV_DB;
+/**
+ * The guard rails as a PURE function over an environment, so the production
+ * refusal is provable by test rather than by reading main(). Refuses:
+ * NODE_ENV=production, a missing throwaway-db path, and any path whose
+ * basename is aims.db in ANY case (Windows filesystems are case-insensitive —
+ * AIMS.DB IS the real store there).
+ */
+export function guardDevWallet(env: NodeJS.ProcessEnv): DevWalletGuardVerdict {
+  if (env.NODE_ENV === 'production') {
+    return { ok: false, reason: 'refusing to run: NODE_ENV=production' };
+  }
+  const dbPath = env.LUC_DEV_DB;
   if (!dbPath) {
-    console.error('[dev-wallet] set LUC_DEV_DB to a THROWAWAY sqlite file path (never a real data file)');
+    return {
+      ok: false,
+      reason: 'set LUC_DEV_DB to a THROWAWAY sqlite file path (never a real data file)',
+    };
+  }
+  if (path.basename(dbPath).toLowerCase() === 'aims.db') {
+    return { ok: false, reason: 'refusing to touch aims.db — use a throwaway path' };
+  }
+  return { ok: true, dbPath };
+}
+
+async function main(): Promise<void> {
+  const guard = guardDevWallet(process.env);
+  if (!guard.ok) {
+    console.error(`[dev-wallet] ${guard.reason}`);
     process.exit(1);
     return;
   }
-  if (path.basename(dbPath) === 'aims.db') {
-    console.error('[dev-wallet] refusing to touch aims.db — use a throwaway path');
-    process.exit(1);
-    return;
-  }
+  const { dbPath } = guard;
 
   // node:sqlite is a Node 22.5+ builtin; same SQLite C engine as prod's
   // better-sqlite3, and the adapter only needs the structural SqlDb surface.
@@ -88,7 +108,11 @@ async function main(): Promise<void> {
   );
 }
 
-main().catch((err) => {
-  console.error('[dev-wallet] failed:', err);
-  process.exit(1);
-});
+// Boot ONLY when executed directly. An import (production code, a test) gets
+// the guard function and nothing else — no db open, no process.exit.
+if (require.main === module) {
+  main().catch((err) => {
+    console.error('[dev-wallet] failed:', err);
+    process.exit(1);
+  });
+}
