@@ -15,11 +15,12 @@
  * SqliteLedgerAdapter production runs.
  *
  * Guard rails: refuses to run when NODE_ENV=production, refuses to run without
- * an explicit LUC_DEV_DB path, and refuses any path named aims.db (the real
- * gateway store).
+ * an explicit LUC_DEV_DB path, refuses any path named aims.db (the real
+ * gateway store), and REQUIRES the db filename to contain "devtest" — the
+ * throwaway must be named as one, so no real data file can ever qualify.
  *
  * Usage:
- *   LUC_DEV_DB=/tmp/luc-dev.sqlite npx ts-node src/luc/scripts/dev-wallet.ts
+ *   LUC_DEV_DB=/tmp/luc-devtest.sqlite npx ts-node src/luc/scripts/dev-wallet.ts
  *
  * PROPRIETARY — A.I.M.S.
  */
@@ -42,9 +43,10 @@ export type DevWalletGuardVerdict =
 /**
  * The guard rails as a PURE function over an environment, so the production
  * refusal is provable by test rather than by reading main(). Refuses:
- * NODE_ENV=production, a missing throwaway-db path, and any path whose
- * basename is aims.db in ANY case (Windows filesystems are case-insensitive —
- * AIMS.DB IS the real store there).
+ * NODE_ENV=production, a missing throwaway-db path, any path whose basename
+ * is aims.db in ANY case (Windows filesystems are case-insensitive — AIMS.DB
+ * IS the real store there), and any db filename that does not contain
+ * "devtest" (positive proof of a throwaway, not just a denylist).
  */
 export function guardDevWallet(env: NodeJS.ProcessEnv): DevWalletGuardVerdict {
   if (env.NODE_ENV === 'production') {
@@ -59,6 +61,13 @@ export function guardDevWallet(env: NodeJS.ProcessEnv): DevWalletGuardVerdict {
   }
   if (path.basename(dbPath).toLowerCase() === 'aims.db') {
     return { ok: false, reason: 'refusing to touch aims.db — use a throwaway path' };
+  }
+  if (!path.basename(dbPath).toLowerCase().includes('devtest')) {
+    return {
+      ok: false,
+      reason:
+        'refusing LUC_DEV_DB whose filename does not contain "devtest" — name the throwaway explicitly (e.g. luc-devtest.sqlite)',
+    };
   }
   return { ok: true, dbPath };
 }

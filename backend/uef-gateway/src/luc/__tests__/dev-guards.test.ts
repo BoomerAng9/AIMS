@@ -11,6 +11,8 @@
  *   - any path whose basename is aims.db — in ANY case, at any depth — is
  *     refused (Windows filesystems are case-insensitive; AIMS.DB IS the real
  *     gateway store there);
+ *   - any db FILENAME that does not contain "devtest" is refused — the
+ *     throwaway must positively name itself one (denylist AND allowlist);
  *   - dev-serve additionally refuses to start without an explicit auth key
  *     (no default-open credential).
  *
@@ -26,13 +28,13 @@ import { guardDevWallet } from '../scripts/dev-wallet';
 
 const SERVE_OK = {
   NODE_ENV: 'test',
-  LUC_DEV_DB: '/tmp/luc-dev-throwaway.sqlite',
+  LUC_DEV_DB: '/tmp/luc-devtest-throwaway.sqlite',
   LUC_INTERNAL_API_KEY: 'devtest-internal',
 } as NodeJS.ProcessEnv;
 
 const WALLET_OK = {
   NODE_ENV: 'test',
-  LUC_DEV_DB: '/tmp/luc-dev-throwaway.sqlite',
+  LUC_DEV_DB: '/tmp/luc-devtest-throwaway.sqlite',
 } as NodeJS.ProcessEnv;
 
 describe('dev-serve guard rails (structural)', () => {
@@ -40,7 +42,7 @@ describe('dev-serve guard rails (structural)', () => {
     const v = guardDevServe(SERVE_OK);
     expect(v).toEqual({
       ok: true,
-      dbPath: '/tmp/luc-dev-throwaway.sqlite',
+      dbPath: '/tmp/luc-devtest-throwaway.sqlite',
       internalApiKey: 'devtest-internal',
     });
   });
@@ -66,6 +68,20 @@ describe('dev-serve guard rails (structural)', () => {
     }
   );
 
+  it.each(['/tmp/luc-dev.sqlite', 'C:\\tmp\\scratch.sqlite', '/var/data/production.db', '/tmp/devtest/other.sqlite'])(
+    'refuses any db filename without "devtest" in it: %s',
+    (dbPath) => {
+      const v = guardDevServe({ ...SERVE_OK, LUC_DEV_DB: dbPath });
+      expect(v.ok).toBe(false);
+      if (!v.ok) expect(v.reason).toMatch(/devtest/);
+    }
+  );
+
+  it('accepts "devtest" in the filename regardless of case', () => {
+    const v = guardDevServe({ ...SERVE_OK, LUC_DEV_DB: '/tmp/LUC-DEVTEST.sqlite' });
+    expect(v.ok).toBe(true);
+  });
+
   it('refuses to start without an explicit auth key (no default-open)', () => {
     const v = guardDevServe({ ...SERVE_OK, LUC_INTERNAL_API_KEY: undefined });
     expect(v.ok).toBe(false);
@@ -82,7 +98,7 @@ describe('dev-wallet guard rails (structural)', () => {
   it('accepts a well-formed throwaway environment', () => {
     expect(guardDevWallet(WALLET_OK)).toEqual({
       ok: true,
-      dbPath: '/tmp/luc-dev-throwaway.sqlite',
+      dbPath: '/tmp/luc-devtest-throwaway.sqlite',
     });
   });
 
@@ -102,6 +118,15 @@ describe('dev-wallet guard rails (structural)', () => {
     (dbPath) => {
       const v = guardDevWallet({ ...WALLET_OK, LUC_DEV_DB: dbPath });
       expect(v.ok).toBe(false);
+    }
+  );
+
+  it.each(['/tmp/luc-dev.sqlite', './data/ledger.sqlite', 'D:\\store\\backup.db'])(
+    'refuses any db filename without "devtest" in it: %s',
+    (dbPath) => {
+      const v = guardDevWallet({ ...WALLET_OK, LUC_DEV_DB: dbPath });
+      expect(v.ok).toBe(false);
+      if (!v.ok) expect(v.reason).toMatch(/devtest/);
     }
   );
 });

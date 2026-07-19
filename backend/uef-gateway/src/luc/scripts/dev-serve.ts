@@ -5,14 +5,15 @@
  * over a throwaway sqlite database, so the read API can be exercised
  * end-to-end without the rest of the gateway's env. Same guard rails as
  * dev-wallet.ts: refuses NODE_ENV=production, requires an explicit LUC_DEV_DB
- * throwaway path, refuses any path named aims.db (the real gateway store).
+ * throwaway path, refuses any path named aims.db (the real gateway store),
+ * and REQUIRES the db filename to contain "devtest".
  *
  * The auth key is NOT baked in: set LUC_INTERNAL_API_KEY (required — the
  * router fail-closes with 503 when unset, this script refuses to start
  * instead so a misconfigured run is loud). Binds 127.0.0.1 only.
  *
  * Usage:
- *   LUC_DEV_DB=/tmp/luc-dev.sqlite LUC_INTERNAL_API_KEY=devtest-internal \
+ *   LUC_DEV_DB=/tmp/luc-devtest.sqlite LUC_INTERNAL_API_KEY=devtest-internal \
  *     npx ts-node src/luc/scripts/dev-serve.ts
  *
  * PROPRIETARY — A.I.M.S.
@@ -34,7 +35,9 @@ export type DevServeGuardVerdict =
  * refusal is provable by test rather than by reading main(). Refuses:
  * NODE_ENV=production, a missing throwaway-db path, any path whose basename
  * is aims.db in ANY case (Windows filesystems are case-insensitive — AIMS.DB
- * IS the real store there), and a missing auth key.
+ * IS the real store there), any db filename that does not contain "devtest"
+ * (positive proof of a throwaway, not just a denylist), and a missing auth
+ * key.
  */
 export function guardDevServe(env: NodeJS.ProcessEnv): DevServeGuardVerdict {
   if (env.NODE_ENV === 'production') {
@@ -49,6 +52,13 @@ export function guardDevServe(env: NodeJS.ProcessEnv): DevServeGuardVerdict {
   }
   if (path.basename(dbPath).toLowerCase() === 'aims.db') {
     return { ok: false, reason: 'refusing to touch aims.db — use a throwaway path' };
+  }
+  if (!path.basename(dbPath).toLowerCase().includes('devtest')) {
+    return {
+      ok: false,
+      reason:
+        'refusing LUC_DEV_DB whose filename does not contain "devtest" — name the throwaway explicitly (e.g. luc-devtest.sqlite)',
+    };
   }
   const internalApiKey = env.LUC_INTERNAL_API_KEY;
   if (!internalApiKey) {
