@@ -11,6 +11,7 @@
  * PROPRIETARY — A.I.M.S.
  */
 
+import { createHash, timingSafeEqual } from 'node:crypto';
 import { Router, Request, Response, NextFunction } from 'express';
 import { LedgerAdapter, clampEntryLimit } from './ledger';
 import {
@@ -48,6 +49,18 @@ export interface LucRouterDeps {
   readApiKey?: string;
 }
 
+/**
+ * Constant-time key comparison. Both sides are SHA-256 digested first so the
+ * inputs always reach `timingSafeEqual` at equal length — a length mismatch
+ * neither throws nor leaks how many prefix bytes matched. A plain `===` here
+ * would let a caller probe the key byte-by-byte via response timing.
+ */
+export function timingSafeKeyEqual(provided: string, expected: string): boolean {
+  const a = createHash('sha256').update(provided).digest();
+  const b = createHash('sha256').update(expected).digest();
+  return timingSafeEqual(a, b);
+}
+
 function requireKey(internalKey?: string, readKey?: string) {
   return (req: Request, res: Response, next: NextFunction): void => {
     if (!internalKey) {
@@ -62,12 +75,12 @@ function requireKey(internalKey?: string, readKey?: string) {
       res.status(401).json({ error: 'unauthorized' });
       return;
     }
-    if (provided === internalKey) {
+    if (timingSafeKeyEqual(provided, internalKey)) {
       next();
       return;
     }
     // The read key opens GET (observation) routes only — never writes.
-    if (req.method === 'GET' && readKey && provided === readKey) {
+    if (req.method === 'GET' && readKey && timingSafeKeyEqual(provided, readKey)) {
       next();
       return;
     }
