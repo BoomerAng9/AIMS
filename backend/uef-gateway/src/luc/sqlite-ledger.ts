@@ -30,6 +30,10 @@ import {
   ReserveResult,
   SettleResult,
   WalletBalance,
+  LedgerEntryRecord,
+  OpenReservationRecord,
+  LedgerEntriesOpts,
+  clampEntryLimit,
 } from './ledger';
 
 const MICRO = 1_000_000;
@@ -151,9 +155,7 @@ export class SqliteLedgerAdapter implements LedgerAdapter {
     };
   }
 
-  async getWallet(walletId: string): Promise<WalletRecord | null> {
-    const w = this.readWallet(walletId);
-    if (!w) return null;
+  private rowToRecord(w: WalletRow): WalletRecord {
     return {
       id: w.id,
       accountId: w.account_id,
@@ -166,6 +168,12 @@ export class SqliteLedgerAdapter implements LedgerAdapter {
       cycleStart: new Date(w.cycle_start),
       cycleEnd: new Date(w.cycle_end),
     };
+  }
+
+  async getWallet(walletId: string): Promise<WalletRecord | null> {
+    const w = this.readWallet(walletId);
+    if (!w) return null;
+    return this.rowToRecord(w);
   }
 
   async reserve(walletId: string, estUsd: number): Promise<ReserveResult> {
@@ -289,5 +297,50 @@ export class SqliteLedgerAdapter implements LedgerAdapter {
     this.db
       .prepare(`UPDATE luc_wallets SET usd_budget_micro = usd_budget_micro + ?, updated_at = ? WHERE id = ?`)
       .run(toMicro(usd), new Date().toISOString(), walletId);
+  }
+
+  // --- Read side (GET-only, pure SELECTs — no writes, no money-moves) ---
+
+  async listWalletsByAccount(accountId: string): Promise<WalletRecord[]> {
+    const rows = this.db
+      .prepare('SELECT * FROM luc_wallets WHERE account_id = ? ORDER BY created_at, id')
+      .all(accountId) as WalletRow[];
+    return rows.map((w) => this.rowToRecord(w));
+  }
+
+  async ledgerEntries(walletId: string, opts?: LedgerEntriesOpts): Promise<LedgerEntryRecord[]> {
+    const limit = clampEntryLimit(opts?.limit);
+    // The `model` column is DELIBERATELY never selected: model identity is
+    // internal-only and must not cross the serialization boundary.
+    const base =
+      'SELECT id, reservation_id, est_micro, actual_micro, created_at FROM luc_ledger_entries WHERE wallet_id = ?';
+    const rows = (
+      opts?.beforeId !== undefined
+        ? this.db.prepare(`${base} AND id < ? ORDER BY id DESC LIMIT ?`).all(walletId, opts.beforeId, limit)
+        : this.db.prepare(`${base} ORDER BY id DESC LIMIT ?`).all(walletId, limit)
+    ) as Array<{
+      id: number;
+      reservation_id: string | null;
+      est_micro: number | null;
+      actual_micro: number;
+      created_at: string;
+    }>;
+    return rows.map((r) => ({
+      id: r.id,
+      reservationId: r.reservation_id,
+      estUsd: r.est_micro === null ? null : fromMicro(r.est_micro),
+      actualUsd: fromMicro(r.actual_micro),
+      createdAt: r.created_at,
+    }));
+  }
+
+  async openReservations(walletId: string): Promise<OpenReservationRecord[]> {
+    const rows = this.db
+      .prepare(
+        `SELECT id, est_micro, created_at FROM luc_reservations
+         WHERE wallet_id = ? AND status = 'open' ORDER BY created_at, id`
+      )
+      .all(walletId) as Array<{ id: string; est_micro: number; created_at: string }>;
+    return rows.map((r) => ({ id: r.id, estUsd: fromMicro(r.est_micro), createdAt: r.created_at }));
   }
 }
