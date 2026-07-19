@@ -6,8 +6,10 @@
  *     provisionPlan -> reserveForCall -> settleCall path (ML-3);
  *   - /luc/pricing is COMPUTED from pricing.ts at request time — every SKU
  *     equals a fresh planChargeUsd/planLuc recomputation (ML-5, one table);
- *   - SHAPE GUARDS: no `model` key/value, no floor-GM/margin field ever
- *     crosses the serialization boundary (Sacred Separation);
+ *   - SHAPE GUARDS: no `model` key/value, no floor-GM/margin field, no
+ *     wholesale COGS rate and no platformRateFactor ever crosses the
+ *     serialization boundary (Sacred Separation — internal economics stay
+ *     internal; the display surface is platform LUC rates + band ceilings);
  *   - auth split: fail-closed 503 when unconfigured; wrong key 401; the
  *     dedicated read key (LUC_READ_API_KEY) opens GETs ONLY — a read key on a
  *     POST is a 401 while the internal key still works everywhere.
@@ -22,7 +24,6 @@ import { createLucRouter } from '../routes';
 import { provisionPlan, reserveForCall, settleCall } from '../service';
 import {
   LUC_USD,
-  PLATFORM_RATE_FACTOR,
   LANES,
   TIERS,
   CADENCES,
@@ -63,14 +64,16 @@ function makeApp(
 const withKey = (t: request.Test) => t.set('Authorization', `Bearer ${KEY}`);
 const withReadKey = (t: request.Test) => t.set('Authorization', `Bearer ${READ_KEY}`);
 
-/** No internal-only value may cross the wire: model, floor GM, margins. */
+/** No internal-only value may cross the wire: model, floor GM, margins,
+ * wholesale COGS rates, the platform rate factor. */
 function expectCleanShape(body: unknown): void {
   const json = JSON.stringify(body);
   expect(json).not.toMatch(/model/i);
   expect(json).not.toMatch(/floorGm/i);
   expect(json).not.toMatch(/margin/i);
   expect(json).not.toMatch(/gmPct/i);
-  expect(json).not.toMatch(/wholesaleCogs/i);
+  expect(json).not.toMatch(/wholesale/i);
+  expect(json).not.toMatch(/platformRateFactor/);
 }
 
 describe.each([
@@ -191,15 +194,16 @@ describe('GET /luc/pricing (one table — computed, never re-typed)', () => {
     const p = res.body;
 
     expect(p.lucUsd).toBe(LUC_USD);
-    expect(p.platformRateFactor).toBe(PLATFORM_RATE_FACTOR);
+    // Internal economics NEVER serialize (stripped, not just untyped).
+    expect(p).not.toHaveProperty('platformRateFactor');
 
     expect(p.lanes).toHaveLength(4);
     for (const lane of p.lanes) {
       const src = LANES[lane.id as LaneId];
       expect(src).toBeDefined();
       expect(lane.maxOutputUsdPerM).toBe(Number.isFinite(src.maxOutputUsdPerM) ? src.maxOutputUsdPerM : null);
-      expect(lane.inWholesalePer1k).toBe(src.inWholesalePer1k);
-      expect(lane.outWholesalePer1k).toBe(src.outWholesalePer1k);
+      expect(lane).not.toHaveProperty('inWholesalePer1k');
+      expect(lane).not.toHaveProperty('outWholesalePer1k');
       expect(lane.inPlatformPer1k).toBe(src.inPlatformPer1k);
       expect(lane.outPlatformPer1k).toBe(src.outPlatformPer1k);
     }
@@ -234,7 +238,7 @@ describe('GET /luc/pricing (one table — computed, never re-typed)', () => {
     }
   });
 
-  it('SHAPE GUARD: serializes no model ids, no floor GM, no margin field', async () => {
+  it('SHAPE GUARD: serializes no model ids, no floor GM, no margin field, no wholesale rate, no platformRateFactor', async () => {
     const res = await withKey(request(app).get('/luc/pricing')).expect(200);
     expectCleanShape(res.body);
   });

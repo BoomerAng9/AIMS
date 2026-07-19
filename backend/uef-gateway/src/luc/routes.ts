@@ -26,7 +26,6 @@ import {
 } from './service';
 import {
   LUC_USD,
-  PLATFORM_RATE_FACTOR,
   LANES,
   TIERS,
   CADENCES,
@@ -223,8 +222,9 @@ export function createLucRouter(deps: LucRouterDeps): Router {
 
   // The public price table — COMPUTED from pricing.ts at request time (ML-5:
   // one price table; no constant re-typed). Internal-only values are excluded:
-  // floor GM, model ids, and any wholesale-COGS derivation beyond what LANES
-  // itself states.
+  // floor GM, model ids, the wholesale COGS rates (in/outWholesalePer1k) and
+  // the platform rate factor — internal economics never cross this wire. The
+  // display surface is the platform LUC rates + band ceilings only.
   router.get(
     '/pricing',
     h(async (_req, res) => {
@@ -267,12 +267,9 @@ function buildPricingPayload(): Record<string, unknown> {
 
   return {
     lucUsd: LUC_USD,
-    platformRateFactor: PLATFORM_RATE_FACTOR,
     lanes: LANE_IDS.map((id) => ({
       id: LANES[id].id,
       maxOutputUsdPerM: finiteOrNull(LANES[id].maxOutputUsdPerM),
-      inWholesalePer1k: LANES[id].inWholesalePer1k,
-      outWholesalePer1k: LANES[id].outWholesalePer1k,
       inPlatformPer1k: LANES[id].inPlatformPer1k,
       outPlatformPer1k: LANES[id].outPlatformPer1k,
     })),
