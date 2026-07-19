@@ -70,9 +70,40 @@ export interface WalletBalance {
 }
 
 /**
+ * A serialized (read-side) debit-log entry. Micro-USD converts to USD at THIS
+ * boundary. The ledger's internal `model` column is NEVER exposed here —
+ * model identity is internal-only (Sacred Separation).
+ */
+export interface LedgerEntryRecord {
+  id: number;
+  reservationId: string | null;
+  estUsd: number | null;
+  actualUsd: number;
+  createdAt: string;
+}
+
+/** A serialized open hold (reserve not yet settled/released). */
+export interface OpenReservationRecord {
+  id: string;
+  estUsd: number;
+  createdAt: string;
+}
+
+export interface LedgerEntriesOpts {
+  /** Max entries returned (newest first). Defaults to 100. */
+  limit?: number;
+  /** Cursor pagination: only entries with id < beforeId. */
+  beforeId?: number;
+}
+
+/**
  * Storage-agnostic ledger. reserve() MUST be atomic: it succeeds only when
  * estUsd <= available, and concurrent reserves must never collectively commit
  * more than the budget.
+ *
+ * The read-side methods (listWalletsByAccount / ledgerEntries /
+ * openReservations) serialize LEDGER state — never agent self-report (ML-3).
+ * They are pure reads: no writes, no money-moves.
  */
 export interface LedgerAdapter {
   createWallet(input: CreateWalletInput): Promise<WalletRecord>;
@@ -82,6 +113,16 @@ export interface LedgerAdapter {
   settle(reservationId: string, actualUsd: number): Promise<SettleResult>;
   release(reservationId: string): Promise<void>;
   credit(walletId: string, usd: number): Promise<void>;
+  // --- Read side (GET-only) ---
+  listWalletsByAccount(accountId: string): Promise<WalletRecord[]>;
+  ledgerEntries(walletId: string, opts?: LedgerEntriesOpts): Promise<LedgerEntryRecord[]>;
+  openReservations(walletId: string): Promise<OpenReservationRecord[]>;
+}
+
+/** Clamp a read limit to a sane positive bound (default 100). */
+export function clampEntryLimit(limit: number | undefined, fallback = 100): number {
+  if (limit === undefined || !Number.isFinite(limit)) return fallback;
+  return Math.max(1, Math.min(Math.floor(limit), fallback));
 }
 
 type ReservationStatus = 'open' | 'settled' | 'released';
@@ -104,6 +145,16 @@ interface ReservationInternal {
   walletId: string;
   estUsd: number;
   status: ReservationStatus;
+  createdAt: string;
+}
+
+interface LedgerEntryInternal {
+  id: number;
+  walletId: string;
+  reservationId: string;
+  estMicro: number;
+  actualMicro: number;
+  createdAt: string;
 }
 
 let _seq = 0;
@@ -117,6 +168,8 @@ function genId(prefix: string): string {
 export class InMemoryLedger implements LedgerAdapter {
   private wallets = new Map<string, WalletInternal>();
   private reservations = new Map<string, ReservationInternal>();
+  private entries: LedgerEntryInternal[] = [];
+  private entrySeq = 0;
 
   async createWallet(input: CreateWalletInput): Promise<WalletRecord> {
     const now = new Date();
@@ -178,7 +231,7 @@ export class InMemoryLedger implements LedgerAdapter {
     // Critical section: no `await` between the check above and this mutation.
     w.reservedMicro += estMicro;
     const id = genId('rsv');
-    this.reservations.set(id, { id, walletId, estUsd, status: 'open' });
+    this.reservations.set(id, { id, walletId, estUsd, status: 'open', createdAt: new Date().toISOString() });
     return {
       ok: true,
       reservationId: id,
@@ -205,6 +258,15 @@ export class InMemoryLedger implements LedgerAdapter {
     w.reservedMicro -= toMicro(r.estUsd);
     w.spentMicro += toMicro(actualUsd);
     r.status = 'settled';
+    this.entrySeq += 1;
+    this.entries.push({
+      id: this.entrySeq,
+      walletId: r.walletId,
+      reservationId: r.id,
+      estMicro: toMicro(r.estUsd),
+      actualMicro: toMicro(actualUsd),
+      createdAt: new Date().toISOString(),
+    });
     return {
       ok: true,
       actualUsd,
@@ -226,6 +288,42 @@ export class InMemoryLedger implements LedgerAdapter {
     const w = this.wallets.get(walletId);
     if (!w) return;
     w.budgetMicro += toMicro(usd);
+  }
+
+  // --- Read side (GET-only serialization of ledger state) ---
+
+  async listWalletsByAccount(accountId: string): Promise<WalletRecord[]> {
+    const out: WalletRecord[] = [];
+    for (const w of this.wallets.values()) {
+      if (w.accountId === accountId) out.push(this.toRecord(w));
+    }
+    return out;
+  }
+
+  async ledgerEntries(walletId: string, opts?: LedgerEntriesOpts): Promise<LedgerEntryRecord[]> {
+    const limit = clampEntryLimit(opts?.limit);
+    const beforeId = opts?.beforeId;
+    return this.entries
+      .filter((e) => e.walletId === walletId && (beforeId === undefined || e.id < beforeId))
+      .sort((a, b) => b.id - a.id)
+      .slice(0, limit)
+      .map((e) => ({
+        id: e.id,
+        reservationId: e.reservationId,
+        estUsd: fromMicro(e.estMicro),
+        actualUsd: fromMicro(e.actualMicro),
+        createdAt: e.createdAt,
+      }));
+  }
+
+  async openReservations(walletId: string): Promise<OpenReservationRecord[]> {
+    const out: OpenReservationRecord[] = [];
+    for (const r of this.reservations.values()) {
+      if (r.walletId === walletId && r.status === 'open') {
+        out.push({ id: r.id, estUsd: r.estUsd, createdAt: r.createdAt });
+      }
+    }
+    return out;
   }
 
   private toRecord(w: WalletInternal): WalletRecord {

@@ -20,6 +20,8 @@ import {
   ReserveResult,
   SettleResult,
   WalletBalance,
+  LedgerEntryRecord,
+  OpenReservationRecord,
 } from './ledger';
 import { evaluateModelAccess, AccessDecision } from './gate';
 import { estimateCostUsd } from './model-catalog';
@@ -95,6 +97,32 @@ export async function getBalance(
   { walletId }: { walletId: string }
 ): Promise<WalletBalance | null> {
   return ledger.balance(walletId);
+}
+
+// --- Read side (GET-only; the ledger is truth — ML-3) ---
+
+/** All wallets under an account, as stored in the ledger. */
+export async function listWallets(
+  ledger: LedgerAdapter,
+  { accountId }: { accountId: string }
+): Promise<WalletRecord[]> {
+  return ledger.listWalletsByAccount(accountId);
+}
+
+/** Settled debit-log entries for a wallet (newest first, paginated). */
+export async function getUsage(
+  ledger: LedgerAdapter,
+  { walletId, limit, beforeId }: { walletId: string; limit?: number; beforeId?: number }
+): Promise<LedgerEntryRecord[]> {
+  return ledger.ledgerEntries(walletId, { limit, beforeId });
+}
+
+/** Open (unsettled, unreleased) holds against a wallet. */
+export async function getReservations(
+  ledger: LedgerAdapter,
+  { walletId }: { walletId: string }
+): Promise<OpenReservationRecord[]> {
+  return ledger.openReservations(walletId);
 }
 
 export interface ModelAccessResult extends AccessDecision {
