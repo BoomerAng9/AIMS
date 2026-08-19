@@ -152,8 +152,10 @@
       "voicePerAudioSecond": 1.1
     },
     "seedSpeakingCharsPerSecond": {
-      "$comment": "Used ONLY to estimate audio duration from a script before the audio exists. MEASURED, not assumed — set from a real VibeVoice generation through the real dispatch path; see the measurement recorded in the OKF entry for this work. Superseded by real per-tenant history.",
-      "value": 14.7
+      "$comment": "Used ONLY to estimate audio duration from a script before the audio exists. NOT YET MEASURED on our own voice plane — an attempt was made during this work and the Voice & Sound lane returned a real upstream 502 (capability advertised implemented+configured by the proxy, but /v1/media/dispatch failed), so no honest measurement was possible. This value is therefore a DERIVED seed, stated openly: ~150 words/min of natural English speech x ~5.1 characters per word including the trailing space = 12.75 characters/second. It is superseded by this tenant's real measured history as soon as historyMinSamples real voice runs exist, so it stops mattering after the third successful generation. Tracked as GAP-LUC-003.",
+      "provenance": "derived-unverified",
+      "needsOwnerConfirmation": true,
+      "value": 12.75
     }
   }
 }

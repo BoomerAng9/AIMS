@@ -10,7 +10,7 @@ import { readFileSync } from 'fs';
 import path from 'path';
 
 const PINNED_SHA256 =
-  'fc89a1a90701b8265761c0ee677286b6bf7dff675227ef96d6604e08cea3e01c';
+  '76b3769fa86ab27ad4ded7b51b1f577d3908516e1a0f316baf609d57d803ac4e';
 
 describe('media-rate-card.json — cross-repo drift guard', () => {
   it('matches the pinned hash shared with broad-cast-app', () => {
