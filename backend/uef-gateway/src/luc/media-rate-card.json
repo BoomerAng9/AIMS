@@ -1,0 +1,159 @@
+{
+  "$comment": [
+    "LUC MEDIA RATE CARD — THE CUSTOMER PRICE, AND ONLY THE CUSTOMER PRICE.",
+    "",
+    "HARD RULE (owner-stated, 2026-08-18): this file states the price WE CHARGE per",
+    "generation. It must NEVER carry an underlying/wholesale/vendor cost, a margin, or",
+    "a rate factor. There is deliberately no `wholesale*`, no `cost*`, no `margin*`, no",
+    "`platformRateFactor` key here, and none may ever be added — lib/luc/no-leak.test.ts",
+    "(Broad|Cast) and media-ctg.leak.test.ts (AIMS) fail the build if one appears.",
+    "This mirrors the precedent already set in the AIMS repo by commit 2c305a68,",
+    "'strip internal economics from /luc/pricing — no wholesale rates, no",
+    "platformRateFactor', and by sqlite-ledger.ts::ledgerEntries(), which deliberately",
+    "never SELECTs the internal `model` column.",
+    "",
+    "UNIT: every rate is in LUC UNITS. 1 LUC Unit = $0.01 USD (AIMS",
+    "backend/uef-gateway/src/luc/pricing.ts, LUC_USD). Verified identical to the",
+    "'credits' unit of aims-tools/luc/luc.constants.ts SERVICE_CATALOG — see",
+    "provenance note `unit-identity` below.",
+    "",
+    "THIS FILE IS BYTE-IDENTICAL IN TWO REPOS:",
+    "  BoomerAng9/AIMS            backend/uef-gateway/src/luc/media-rate-card.json  (CANON)",
+    "  BoomerAng9/broad-cast-app  lib/luc/media-rate-card.json                      (MIRROR)",
+    "A sha256 drift test in each repo fails if they diverge."
+  ],
+  "version": "mctg-2026-08-18.1",
+  "lucUsd": 0.01,
+  "unitIdentity": {
+    "claim": "1 SERVICE_CATALOG credit == 1 LUC Unit == $0.01 USD",
+    "proof": [
+      "aims-tools/luc/luc.constants.ts SERVICE_CATALOG.llm_tokens_out.defaultRate = 0.003 credits/token.",
+      "backend/uef-gateway/src/luc/pricing.ts LANES.standard.outPlatformPer1k = 3.0 LUC per 1000 tokens = 0.003 LUC/token. Exact match.",
+      "SERVICE_CATALOG.llm_tokens_in.defaultRate = 0.001 credits/token; LANES.frontier.inPlatformPer1k = 1.0 LUC per 1000 tokens = 0.001 LUC/token. Exact match.",
+      "Both SERVICE_CATALOG LLM rows land exactly on an existing v6 platform-lane value, so the two tables share one unit. SERVICE_CATALOG is the lane-agnostic default table; pricing.ts is the lane-aware one."
+    ],
+    "verifiedBy": "media-ctg.unit-identity.test.ts (asserts the arithmetic against the real pricing.ts LANES table, not against a copied number)"
+  },
+  "reconciliationFlags": [
+    {
+      "key": "voice_chars",
+      "finding": "SERVICE_CATALOG.voice_chars.defaultRate = 0.00001 credits/char. At the verified 1 credit = $0.01 that is $0.0000001/char = $0.10 per MILLION characters — roughly three orders of magnitude below any real voice-synthesis reference. NOT adopted as the voice CTG rate.",
+      "action": "voice priced per delivered audio-second instead (voice.per_audio_second), which is also the unit the delivered artifact can actually be measured in."
+    },
+    {
+      "key": "container_hours_vs_node_runtime_seconds",
+      "finding": "SERVICE_CATALOG.container_hours = 0.05 credits/hour but node_runtime_seconds = 0.0001 credits/second = 0.36 credits/hour — 7.2x apart for two compute meters, and 0.05 credits/hour = $0.0005/hour is far below any real container cost. Neither is reconciled to the v6 Tesla Matrix.",
+      "action": "no infrastructure row from SERVICE_CATALOG is used as a media rate. compute.gpu_second is stated fresh and marked proposed."
+    },
+    {
+      "key": "llm_rows",
+      "finding": "SERVICE_CATALOG's two LLM rows ARE canon-aligned (see unitIdentity). Only the non-LLM rows are unreconciled.",
+      "action": "token line items on a media receipt are priced by the real canonical missionBurnLuc() from pricing.ts, never by a number stated here."
+    }
+  ],
+  "lanes": {
+    "stills": { "label": "Stills", "kind": "image" },
+    "motion": { "label": "Motion", "kind": "video" },
+    "voice": { "label": "Voice & Sound", "kind": "audio" },
+    "script": { "label": "Script", "kind": "llm" }
+  },
+  "tokenLanes": {
+    "$comment": [
+      "CANON. These are the PLATFORM (customer-price) columns of the v6 Tesla Matrix",
+      "burn table, copied verbatim from backend/uef-gateway/src/luc/pricing.ts LANES:",
+      "inPlatformPer1k -> inLucPer1k, outPlatformPer1k -> outLucPer1k.",
+      "The wholesale columns of that same table (inWholesalePer1k / outWholesalePer1k) and",
+      "PLATFORM_RATE_FACTOR are DELIBERATELY ABSENT and must never be added — this mirror",
+      "is structurally incapable of carrying our vendor economics.",
+      "media-ctg.canon.test.ts in the AIMS repo asserts these equal the real LANES table."
+    ],
+    "provenance": "canon",
+    "needsOwnerConfirmation": false,
+    "defaultScriptLane": "standard",
+    "lanes": {
+      "economy": { "inLucPer1k": 0.2, "outLucPer1k": 1.0 },
+      "standard": { "inLucPer1k": 0.6, "outLucPer1k": 3.0 },
+      "frontier": { "inLucPer1k": 1.0, "outLucPer1k": 6.0 },
+      "super": { "inLucPer1k": 2.0, "outLucPer1k": 10.0 }
+    }
+  },
+  "rates": [
+    {
+      "key": "compute.gpu_second",
+      "label": "Generation time",
+      "unit": "second",
+      "lucPerUnit": 0.25,
+      "provenance": "proposed",
+      "needsOwnerConfirmation": true,
+      "derivation": "0.25 LUC/s = $0.0025/s = $9.00 per generation-hour. Stated fresh rather than taken from SERVICE_CATALOG, whose two infrastructure rows contradict each other and are unreconciled to the v6 Tesla Matrix (see reconciliationFlags). Sized so that a real measured still on our own box (512x512, 4 steps, 2.6-8s wall — real range recorded in brain/okf/stargate/broadcast-media-wiring.md Part 5) lands near the stills.per_image + stills.per_megapixel unit price, so the time line and the unit line agree in order of magnitude instead of one swamping the other.",
+      "ownerQuestion": "Confirm $9.00/generation-hour as the retail rate for time on the self-hosted generation plane, or state the rate you want."
+    },
+    {
+      "key": "stills.per_image",
+      "label": "Still image",
+      "unit": "image",
+      "lucPerUnit": 2,
+      "provenance": "proposed",
+      "needsOwnerConfirmation": true,
+      "derivation": "Flat per-artifact component, 2 LUC = $0.02. Affordability check against canon (pricing.ts TIERS): the Medium tier is 2000 LUC/month, so a 512x512 4-step still at the full line-item total below (~7.4 LUC) is ~270 stills/month on Medium.",
+      "ownerQuestion": "Confirm ~270 stills/month on the $19.99 Medium tier is the intended generosity, or state the per-still price you want."
+    },
+    {
+      "key": "stills.per_megapixel",
+      "label": "Image resolution",
+      "unit": "megapixel",
+      "lucPerUnit": 4,
+      "provenance": "proposed",
+      "needsOwnerConfirmation": true,
+      "derivation": "Scales price with the real requested/delivered pixel area, which is the input that actually drives generation cost. 512x512 = 0.262 MP = 1.05 LUC; 1024x1024 = 1.049 MP = 4.19 LUC.",
+      "ownerQuestion": "Confirm resolution scaling is linear in pixel area at 4 LUC/MP."
+    },
+    {
+      "key": "stills.per_sampler_step",
+      "label": "Refinement passes",
+      "unit": "step",
+      "lucPerUnit": 0.1,
+      "provenance": "proposed",
+      "needsOwnerConfirmation": true,
+      "derivation": "Step count is the other real driver of generation time and is a real, user-visible quality control. 0.1 LUC/step; the proven default workflow uses 4 steps = 0.4 LUC.",
+      "ownerQuestion": "Confirm 0.1 LUC per refinement pass."
+    },
+    {
+      "key": "motion.per_output_second",
+      "label": "Motion",
+      "unit": "second of video",
+      "lucPerUnit": 40,
+      "provenance": "proposed",
+      "needsOwnerConfirmation": true,
+      "derivation": "40 LUC/s = $0.40 per delivered second of video. Video is by far the most expensive lane. Affordability check against canon: Medium (2000 LUC/mo) buys ~50 seconds/month; Superior (8000 LUC/mo) buys ~200 seconds/month.",
+      "ownerQuestion": "Confirm $0.40 per delivered video-second. NOTE: the Motion lane is NOT yet proven from this app (only Stills and Voice have real end-to-end proof) — this rate is priced but not yet exercised."
+    },
+    {
+      "key": "voice.per_audio_second",
+      "label": "Voice & Sound",
+      "unit": "second of audio",
+      "lucPerUnit": 0.5,
+      "provenance": "proposed",
+      "needsOwnerConfirmation": true,
+      "derivation": "0.5 LUC/s = $0.005 per delivered audio-second = $0.30 per audio-minute. Replaces SERVICE_CATALOG.voice_chars, which is implausible by ~3 orders of magnitude (see reconciliationFlags). Affordability check against canon: Medium (2000 LUC/mo) buys ~66 minutes of speech/month.",
+      "ownerQuestion": "Confirm $0.30 per delivered audio-minute."
+    }
+  ],
+  "estimationModel": {
+    "$comment": "Seed constants for the PRE-flight estimate only. Every one of these is replaced by a real rolling median from this tenant's own settled receipts as soon as enough real history exists (see historyMinSamples). They are seeds, not prices.",
+    "historyMinSamples": 3,
+    "historyWindow": 20,
+    "seedGpuSeconds": {
+      "$comment": "Seeded from the real measured range recorded in brain/okf/stargate/broadcast-media-wiring.md Part 5 (2.6-8s for a 512x512 4-step still on the real box) and from this task's own measured runs. Superseded by real per-tenant history.",
+      "stillsBase": 2.0,
+      "stillsPerMegapixelStep": 0.85,
+      "motionPerOutputSecond": 12.0,
+      "voiceBase": 3.0,
+      "voicePerAudioSecond": 1.1
+    },
+    "seedSpeakingCharsPerSecond": {
+      "$comment": "Used ONLY to estimate audio duration from a script before the audio exists. MEASURED, not assumed — set from a real VibeVoice generation through the real dispatch path; see the measurement recorded in the OKF entry for this work. Superseded by real per-tenant history.",
+      "value": 14.7
+    }
+  }
+}

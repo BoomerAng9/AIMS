@@ -37,3 +37,10 @@ Dockerfile text eol=lf
 *.pdf binary
 *.zip binary
 *.gz binary
+
+# LUC media rate card is sha256-pinned across two repos (see
+# backend/uef-gateway/src/luc/__tests__/media-ctg.drift.test.ts and, in
+# BoomerAng9/broad-cast-app, lib/luc/__tests__/rate-card-drift.test.ts).
+# The pin hashes literal bytes, so line endings must be identical on every
+# platform or the guard fails on Windows while passing in Linux CI.
+backend/uef-gateway/src/luc/media-rate-card.json -text eol=lf
