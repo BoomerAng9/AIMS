@@ -1,21 +1,21 @@
 /**
  * ACHEEVY Voice Configuration — "Smooth, cool-ass muhfukka" timbre presets.
  *
- * ElevenLabs primary, Deepgram fallback.
+ * Inworld primary (cloned voice only — owner directive 2026-08-19: "we're only pulling over cloned
+ * voices from Inworld"), Deepgram fallback. ElevenLabs is not used anywhere in ACHEEVY's voice path,
+ * not even as a fallback.
  * Consumed by the TTS API route and Circuit Box voice settings panel.
  */
 
 // ─────────────────────────────────────────────────────────────
-// ElevenLabs — "Velvet-Jet" Timbre Preset
+// Inworld — ACHEEVY's cloned Void-Caster voice (canonical)
 // ─────────────────────────────────────────────────────────────
 
-export const ELEVENLABS_ACHEEVY_PRESET = {
-  voiceId: 'pNInz6obpgDQGcFmaJgB', // Adam — deep, warm baseline
-  model: 'eleven_turbo_v2_5',
-  stability: 0.42,
-  similarity_boost: 0.78,
-  style: 0.65,
-  use_speaker_boost: true,
+export const INWORLD_ACHEEVY_PRESET = {
+  // real voiceId proven live against GET /tts/v1/voices (displayName "ACHEEVY-VoidCaster-canonical-v2",
+  // tags: acheevy, void-caster, canonical) — the actual API voiceId field, not the display name.
+  voiceId: 'default-4zhua1rhxjfl50z1dnkcba__acheevy-voidcaster-canonical-v2',
+  model: 'inworld-tts-2',
 } as const;
 
 // ─────────────────────────────────────────────────────────────
@@ -35,25 +35,25 @@ export const DEEPGRAM_ACHEEVY_PRESET = {
 export type PersonaMode = 'SMOOTH' | 'CORPORATE';
 
 export const VOICE_PRESETS: Record<PersonaMode, {
-  elevenlabs: { voiceId: string; model: string; stability: number; similarity_boost: number; style: number; use_speaker_boost: boolean };
+  inworld: { voiceId: string; model: string };
   deepgram: { model: string; tone: string; speed: number };
   greeting: string;
   microCopy: { acknowledge: string; sending: string; error: string };
 }> = {
   SMOOTH: {
-    elevenlabs: ELEVENLABS_ACHEEVY_PRESET,
+    inworld: INWORLD_ACHEEVY_PRESET,
     deepgram: DEEPGRAM_ACHEEVY_PRESET,
     greeting:
       "I'm ACHEEVY, at your service. What will we deploy today?",
     microCopy: {
       acknowledge: "Got it, let's move.",
-      sending: 'All good\u2014sending the container now.',
+      sending: 'All good—sending the container now.',
       error:
-        "Hmm. That repo threw shade. I'll re-attempt after a lint pass\u2014stay loose.",
+        "Hmm. That repo threw shade. I'll re-attempt after a lint pass—stay loose.",
     },
   },
   CORPORATE: {
-    elevenlabs: { ...ELEVENLABS_ACHEEVY_PRESET, stability: 0.6, style: 0.3 },
+    inworld: INWORLD_ACHEEVY_PRESET,
     deepgram: { ...DEEPGRAM_ACHEEVY_PRESET, speed: 1.0 },
     greeting:
       "I'm ACHEEVY, at your service. What will we deploy today?",
