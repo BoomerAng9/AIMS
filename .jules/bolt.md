@@ -8,3 +8,7 @@
 ## 2024-05-18 - [Parallelize Evidence Locker GCS network calls]
 **Learning:** Sequential asynchronous network requests inside `for...of` loops are a hidden bottleneck for latency, especially when dealing with high-volume remote operations like fetching Google Cloud Storage metadata. Refactoring these loops to use `Promise.all` with `.map()` significantly cuts down total execution time by allowing concurrent requests.
 **Action:** Always scan for `for...of` loops that purely execute independent `await` calls and refactor them to use `Promise.all` mapping to reduce latency.
+
+## 2024-05-25 - Avoid Blob allocation for string size
+**Learning:** Instantiating `new Blob([string]).size` just to determine the byte length of a string introduces unnecessary object allocation and garbage collection overhead, particularly for large strings or when called repeatedly in loops.
+**Action:** Replace `new Blob([string]).size` with `new TextEncoder().encode(string).length` when computing the byte size of string payloads in the browser. Always use a `typeof string` check to avoid corrupting actual binary data (like real Blobs).
