@@ -253,27 +253,33 @@ export class ShelfClient {
 
   async searchShelves(query: string, shelves?: ShelfName[]): Promise<Array<{ shelf: ShelfName; id: string; matchField: string; snippet: string }>> {
     const targetShelves = shelves || (['projects', 'luc_projects', 'plugs', 'boomer_angs', 'workflows', 'runs', 'assets'] as ShelfName[]);
-    const results: Array<{ shelf: ShelfName; id: string; matchField: string; snippet: string }> = [];
     const queryLower = query.toLowerCase();
 
-    for (const shelf of targetShelves) {
-      const items = await this.list<{ id: string } & Record<string, unknown>>(shelf, { limit: 100 });
-      for (const item of items) {
-        for (const [field, value] of Object.entries(item)) {
-          if (typeof value === 'string' && value.toLowerCase().includes(queryLower)) {
-            results.push({
-              shelf,
-              id: item.id,
-              matchField: field,
-              snippet: value.slice(0, 200),
-            });
-            break; // One match per document is enough
+    // ⚡ Bolt Optimization: Replacing sequential for...of loops with Promise.all to fetch shelves concurrently,
+    // reducing latency by avoiding waterfall requests.
+    const shelfResults = await Promise.all(
+      targetShelves.map(async (shelf) => {
+        const shelfMatches: Array<{ shelf: ShelfName; id: string; matchField: string; snippet: string }> = [];
+        const items = await this.list<{ id: string } & Record<string, unknown>>(shelf, { limit: 100 });
+
+        for (const item of items) {
+          for (const [field, value] of Object.entries(item)) {
+            if (typeof value === 'string' && value.toLowerCase().includes(queryLower)) {
+              shelfMatches.push({
+                shelf,
+                id: item.id,
+                matchField: field,
+                snippet: value.slice(0, 200),
+              });
+              break; // One match per document is enough
+            }
           }
         }
-      }
-    }
+        return shelfMatches;
+      })
+    );
 
-    return results;
+    return shelfResults.flat();
   }
 
   isConnected(): boolean {
