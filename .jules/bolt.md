@@ -8,3 +8,6 @@
 ## 2024-05-18 - [Parallelize Evidence Locker GCS network calls]
 **Learning:** Sequential asynchronous network requests inside `for...of` loops are a hidden bottleneck for latency, especially when dealing with high-volume remote operations like fetching Google Cloud Storage metadata. Refactoring these loops to use `Promise.all` with `.map()` significantly cuts down total execution time by allowing concurrent requests.
 **Action:** Always scan for `for...of` loops that purely execute independent `await` calls and refactor them to use `Promise.all` mapping to reduce latency.
+## 2026-06-22 - Sequential Node.js I/O inside for...of loops
+**Learning:** Sequential `await fs.readFile`, `await fs.writeFile`, and `await fetch` calls inside `for...of` loops act as significant performance bottlenecks, especially when processing numerous files (e.g., during CDN deployments or loading store data). Refactoring to `Promise.all` coupled with `Array.prototype.map` achieves high concurrency and drastically reduces total execution time without violating Node's single-threaded nature.
+**Action:** Always refactor sequential `for...of` I/O operations (file system or network) to run concurrently via `Promise.all` and `.map()`. Caution: Ensure the unbounded concurrency of `Promise.all` does not exceed OS file descriptor or socket limits for exceptionally massive arrays.
