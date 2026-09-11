@@ -241,18 +241,20 @@ export class CdnDeployEngine {
 
     try {
       // Upload each file to GCS bucket/<slug>/
-      for (const [path, content] of Object.entries(request.files)) {
-        const gcsPath = `${slug}/${path}`;
-        const res = await fetch(
-          `https://storage.googleapis.com/upload/storage/v1/b/${GCS_BUCKET}/o?uploadType=media&name=${encodeURIComponent(gcsPath)}`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': mimeType(path) },
-            body: content,
-          },
-        );
-        if (!res.ok) throw new Error(`GCS upload failed for ${path}`);
-      }
+      await Promise.all(
+        Object.entries(request.files).map(async ([path, content]) => {
+          const gcsPath = `${slug}/${path}`;
+          const res = await fetch(
+            `https://storage.googleapis.com/upload/storage/v1/b/${GCS_BUCKET}/o?uploadType=media&name=${encodeURIComponent(gcsPath)}`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': mimeType(path) },
+              body: content,
+            },
+          );
+          if (!res.ok) throw new Error(`GCS upload failed for ${path}`);
+        })
+      );
 
       const url = `https://storage.googleapis.com/${GCS_BUCKET}/${slug}/index.html`;
       return { deployId, slug, url, target: 'gcs', files: Object.keys(request.files).length, deployedAt: now };
@@ -284,12 +286,14 @@ export class CdnDeployEngine {
       await fs.mkdir(siteDir, { recursive: true });
 
       // Write all files
-      for (const [path, content] of Object.entries(request.files)) {
-        const filePath = join(siteDir, path);
-        const dir = join(filePath, '..');
-        await fs.mkdir(dir, { recursive: true });
-        await fs.writeFile(filePath, content, 'utf-8');
-      }
+      await Promise.all(
+        Object.entries(request.files).map(async ([path, content]) => {
+          const filePath = join(siteDir, path);
+          const dir = join(filePath, '..');
+          await fs.mkdir(dir, { recursive: true });
+          await fs.writeFile(filePath, content, 'utf-8');
+        })
+      );
 
       // Ensure index.html exists
       const hasIndex = Object.keys(request.files).some(f => f === 'index.html' || f.endsWith('/index.html'));
