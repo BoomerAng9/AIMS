@@ -157,21 +157,31 @@ export async function GET(req: NextRequest) {
 
                 if (stateCounts.length > 0) {
                     const stateData = [];
-                    for (const sc of stateCounts) {
-                        if (!sc.state) continue;
-                        const topProspect = await prisma.performProspect.findFirst({
-                            where: { state: sc.state },
-                            orderBy: { paiScore: 'desc' },
-                            select: { firstName: true, lastName: true, position: true, paiScore: true },
-                        });
+                    // Process in chunks of 10 to avoid connection pool exhaustion
+                    for (let i = 0; i < stateCounts.length; i += 10) {
+                        const chunk = stateCounts.slice(i, i + 10);
+                        const results = await Promise.all(
+                            chunk.map(async (sc) => {
+                                if (!sc.state) return null;
+                                const topProspect = await prisma.performProspect.findFirst({
+                                    where: { state: sc.state },
+                                    orderBy: { paiScore: 'desc' },
+                                    select: { firstName: true, lastName: true, position: true, paiScore: true },
+                                });
 
-                        stateData.push({
-                            code: sc.state,
-                            count: sc._count._all,
-                            topProducer: topProspect ? `${topProspect.firstName} ${topProspect.lastName}` : null,
-                            topPosition: topProspect?.position || null,
-                            topPai: topProspect?.paiScore || null,
-                        });
+                                return {
+                                    code: sc.state,
+                                    count: sc._count._all,
+                                    topProducer: topProspect ? `${topProspect.firstName} ${topProspect.lastName}` : null,
+                                    topPosition: topProspect?.position || null,
+                                    topPai: topProspect?.paiScore || null,
+                                };
+                            })
+                        );
+
+                        for (const r of results) {
+                            if (r) stateData.push(r);
+                        }
                     }
 
                     return NextResponse.json({
