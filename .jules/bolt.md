@@ -8,3 +8,6 @@
 ## 2024-05-18 - [Parallelize Evidence Locker GCS network calls]
 **Learning:** Sequential asynchronous network requests inside `for...of` loops are a hidden bottleneck for latency, especially when dealing with high-volume remote operations like fetching Google Cloud Storage metadata. Refactoring these loops to use `Promise.all` with `.map()` significantly cuts down total execution time by allowing concurrent requests.
 **Action:** Always scan for `for...of` loops that purely execute independent `await` calls and refactor them to use `Promise.all` mapping to reduce latency.
+## 2024-06-25 - [Batched sequential Prisma queries to prevent N+1 without exhausting pool]
+**Learning:** Sequential Prisma queries (N+1) inside long loops can become bottleneck for latency. On the flip side, refactoring them to use `Promise.all` with `.map()` completely unbounded might exhaust the Prisma connection pool and cause timeouts, especially on large data structures.
+**Action:** When optimizing N+1 database queries via concurrency, always process the iterations in batches (e.g. chunks of 10) instead of unbounded concurrency using `Promise.all` to balance throughput while keeping database connections under limits.

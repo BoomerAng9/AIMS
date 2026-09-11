@@ -157,21 +157,31 @@ export async function GET(req: NextRequest) {
 
                 if (stateCounts.length > 0) {
                     const stateData = [];
-                    for (const sc of stateCounts) {
-                        if (!sc.state) continue;
-                        const topProspect = await prisma.performProspect.findFirst({
-                            where: { state: sc.state },
-                            orderBy: { paiScore: 'desc' },
-                            select: { firstName: true, lastName: true, position: true, paiScore: true },
-                        });
+                    const batchSize = 10;
 
-                        stateData.push({
-                            code: sc.state,
-                            count: sc._count._all,
-                            topProducer: topProspect ? `${topProspect.firstName} ${topProspect.lastName}` : null,
-                            topPosition: topProspect?.position || null,
-                            topPai: topProspect?.paiScore || null,
-                        });
+                    for (let i = 0; i < stateCounts.length; i += batchSize) {
+                        const batch = stateCounts.slice(i, i + batchSize);
+
+                        const batchResults = await Promise.all(
+                            batch.map(async (sc) => {
+                                if (!sc.state) return null;
+                                const topProspect = await prisma.performProspect.findFirst({
+                                    where: { state: sc.state },
+                                    orderBy: { paiScore: 'desc' },
+                                    select: { firstName: true, lastName: true, position: true, paiScore: true },
+                                });
+
+                                return {
+                                    code: sc.state,
+                                    count: sc._count._all,
+                                    topProducer: topProspect ? `${topProspect.firstName} ${topProspect.lastName}` : null,
+                                    topPosition: topProspect?.position || null,
+                                    topPai: topProspect?.paiScore || null,
+                                };
+                            })
+                        );
+
+                        stateData.push(...batchResults.filter((r): r is NonNullable<typeof r> => r !== null));
                     }
 
                     return NextResponse.json({
