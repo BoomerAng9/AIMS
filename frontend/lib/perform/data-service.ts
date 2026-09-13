@@ -268,11 +268,11 @@ export async function enrichProspectViaBrave(prospectId: string): Promise<{
     `${name} football recruit 247sports rivals on3 ranking`,
   ];
 
-  const allResults: BraveResult[] = [];
-  for (const q of queries) {
-    const results = await braveSearch(q, 5);
-    allResults.push(...results);
-  }
+  // ⚡ Bolt Optimization: Use Promise.all to execute independent Brave Search queries concurrently.
+  // This eliminates sequential waiting and significantly reduces the total latency of the enrichment process.
+  const allResults: BraveResult[] = (await Promise.all(
+    queries.map(q => braveSearch(q, 5))
+  )).flat();
 
   // Deduplicate by URL
   const seen = new Set<string>();
