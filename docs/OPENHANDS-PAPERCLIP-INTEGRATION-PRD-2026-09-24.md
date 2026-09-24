@@ -1,8 +1,8 @@
 # A.I.M.S. Internal OpenHands Execution Bridge — Phase 1 PRD
 
-Date: 2026-09-24  
-Status: draft for owner review; no implementation or deployment authorization is inferred from this document.  
-Owning product repository: `BoomerAng9/AIMS`  
+Date: 2026-09-24
+Status: draft for owner review; no implementation or deployment authorization is inferred from this document.
+Owning product repository: `BoomerAng9/AIMS`
 Current isolated review branch: `codex/openhands-paperclip-adapter-main`, based on `origin/main` at `d57387b5401cbbbbedfd04bc216fa5c5d492842e`.
 
 ## 1. Product summary
