@@ -2,8 +2,15 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import type { AdapterExecutionContext } from '@paperclipai/adapter-utils';
 import { executeWithDependencies } from './execute.js';
+import { resolveTimeoutMs } from './endpoint.js';
 
-function context(authToken = 'paperclip-run-token'): AdapterExecutionContext {
+function runJwt(): string {
+  const header = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64url');
+  const claims = Buffer.from(JSON.stringify({ sub: 'agent-1', company_id: 'company-1', run_id: 'run-123' })).toString('base64url');
+  return `${header}.${claims}.test-signature`;
+}
+
+function context(authToken = runJwt()): AdapterExecutionContext {
   return {
     runId: 'run-123',
     agent: { id: 'agent-1', companyId: 'company-1', name: 'ACHEEVY', adapterType: 'aims_openhands', adapterConfig: {} },
@@ -45,7 +52,7 @@ test('forwards only the assigned run identity and uses Paperclip token plus idem
     },
   });
   assert.equal(capturedUrl, 'https://aims.example.test/api/integrations/paperclip/openhands/runs');
-  assert.equal(capturedHeaders?.get('authorization'), 'Bearer paperclip-run-token');
+  assert.equal(capturedHeaders?.get('authorization'), `Bearer ${runJwt()}`);
   assert.equal(capturedHeaders?.get('idempotency-key'), 'run-123');
   assert.equal(capturedHeaders?.get('x-paperclip-run-id'), 'run-123');
   assert.equal(capturedBody?.agentId, 'agent-1');
@@ -72,4 +79,36 @@ test('does not mark a non-terminal broker result complete', async () => {
   });
   assert.equal(result.exitCode, null);
   assert.match(result.errorMessage ?? '', /review-required/);
+});
+
+test('returns a structured failure when broker fetch rejects', async () => {
+  const result = await executeWithDependencies(context(), {
+    env,
+    fetchImpl: async () => { throw new TypeError('private host detail should not escape'); },
+  });
+  assert.equal(result.exitCode, 1);
+  assert.equal(result.timedOut, false);
+  assert.equal(result.errorCode, 'aims_broker_unreachable');
+  assert.doesNotMatch(result.errorMessage ?? '', /private host detail/);
+});
+
+test('reports broker timeout without claiming completion', async () => {
+  const timeout = new Error('deadline');
+  timeout.name = 'TimeoutError';
+  const result = await executeWithDependencies(context(), {
+    env,
+    fetchImpl: async () => { throw timeout; },
+  });
+  assert.equal(result.exitCode, 1);
+  assert.equal(result.timedOut, true);
+  assert.equal(result.errorCode, 'aims_broker_timeout');
+});
+
+test('rejects broker deadlines shorter than the gateway execution budget', () => {
+  assert.equal(resolveTimeoutMs({} as NodeJS.ProcessEnv), 300_000);
+  assert.equal(resolveTimeoutMs({ AIMS_OPENHANDS_BROKER_TIMEOUT_MS: '300000' } as NodeJS.ProcessEnv), 300_000);
+  assert.throws(
+    () => resolveTimeoutMs({ AIMS_OPENHANDS_BROKER_TIMEOUT_MS: '299999' } as NodeJS.ProcessEnv),
+    /300000 to 900000/,
+  );
 });

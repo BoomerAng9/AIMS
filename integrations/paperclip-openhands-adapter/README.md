@@ -12,10 +12,12 @@ and return a terminal receipt before this adapter reports success.
 - `AIMS_OPENHANDS_BROKER_URL`: private HTTPS URL for the A.I.M.S. UEF broker.
 - `AIMS_OPENHANDS_BROKER_TIMEOUT_MS`: optional integer from 1000 to 900000; default 300000.
 
-The agent/run bearer token comes from Paperclip's execution context. It is sent
-only to the configured A.I.M.S. HTTPS broker and is never logged. The broker
-must verify the token through `GET /api/agents/me`; it must not trust the agent
-or company IDs in the request body as proof of identity.
+Only Paperclip's signed, short-lived agent-run JWT is accepted. Long-lived agent
+API keys are rejected. The broker checks that the JWT's `sub`, `company_id`,
+and `run_id` claims match the request, then sends the token and matching
+`X-Paperclip-Run-Id` to `GET /api/agents/me`; Paperclip must verify the JWT
+signature and live run. The local claim check is only a precheck, not signature
+verification. The broker must not trust request-body IDs as proof of identity.
 
 ## Adapter routes expected from the broker
 
@@ -73,8 +75,8 @@ per-agent binding; a successful source build alone does not connect that agent.
 
 ```sh
 npm install --ignore-scripts
-npm test
 npm run build
+npm test
 ```
 
 This package alone does not establish a live connection. Paperclip instance

@@ -44,8 +44,18 @@ export async function executeWithDependencies(
   ctx: AdapterExecutionContext,
   dependencies: ExecuteDependencies,
 ): Promise<AdapterExecutionResult> {
-  const endpoint = resolveBrokerEndpoint(dependencies.env);
-  const timeoutMs = resolveTimeoutMs(dependencies.env);
+  let endpoint: URL;
+  let timeoutMs: number;
+  try {
+    endpoint = resolveBrokerEndpoint(dependencies.env);
+    timeoutMs = resolveTimeoutMs(dependencies.env);
+  } catch {
+    return {
+      exitCode: 1, signal: null, timedOut: false,
+      errorCode: 'aims_broker_configuration_invalid',
+      errorMessage: 'The A.I.M.S. broker configuration is missing or invalid; no harness dispatch occurred.',
+    };
+  }
   if (!ctx.authToken?.trim()) {
     return {
       exitCode: 1, signal: null, timedOut: false,
@@ -63,28 +73,40 @@ export async function executeWithDependencies(
     };
   }
 
-  const response = await (dependencies.fetchImpl ?? fetch)(new URL('/api/integrations/paperclip/openhands/runs', endpoint), {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${ctx.authToken}`,
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-      'Idempotency-Key': ctx.runId,
-      'X-Paperclip-Run-Id': ctx.runId,
-    },
-    body: JSON.stringify({
-      runId: ctx.runId,
-      agentId: ctx.agent.id,
-      companyId: ctx.agent.companyId,
-      task: prompt.slice(0, 40_000),
-      sessionParams: ctx.runtime.sessionParams,
-      sessionDisplayId: ctx.runtime.sessionDisplayId,
-      taskKey: ctx.runtime.taskKey,
-    }),
-    redirect: 'error',
-    cache: 'no-store',
-    signal: AbortSignal.timeout(timeoutMs),
-  });
+  let response: Response;
+  try {
+    response = await (dependencies.fetchImpl ?? fetch)(new URL('/api/integrations/paperclip/openhands/runs', endpoint), {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${ctx.authToken}`,
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        'Idempotency-Key': ctx.runId,
+        'X-Paperclip-Run-Id': ctx.runId,
+      },
+      body: JSON.stringify({
+        runId: ctx.runId,
+        agentId: ctx.agent.id,
+        companyId: ctx.agent.companyId,
+        task: prompt.slice(0, 40_000),
+        sessionParams: ctx.runtime.sessionParams,
+        sessionDisplayId: ctx.runtime.sessionDisplayId,
+        taskKey: ctx.runtime.taskKey,
+      }),
+      redirect: 'error',
+      cache: 'no-store',
+      signal: AbortSignal.timeout(timeoutMs),
+    });
+  } catch (error) {
+    const timedOut = error instanceof Error && (error.name === 'TimeoutError' || error.name === 'AbortError');
+    return {
+      exitCode: 1, signal: null, timedOut,
+      errorCode: timedOut ? 'aims_broker_timeout' : 'aims_broker_unreachable',
+      errorMessage: timedOut
+        ? 'The A.I.M.S. broker did not return before its execution deadline; inspect the Paperclip run and Canvas conversation before retrying.'
+        : 'The A.I.M.S. broker could not be reached; inspect service health before retrying.',
+    };
+  }
 
   if (!response.ok) {
     const code = response.status === 401 || response.status === 403

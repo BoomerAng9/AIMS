@@ -16,8 +16,8 @@ export function resolveTimeoutMs(env: NodeJS.ProcessEnv = process.env): number {
   const configured = env.AIMS_OPENHANDS_BROKER_TIMEOUT_MS?.trim();
   if (!configured) return DEFAULT_TIMEOUT_MS;
   const timeout = Number(configured);
-  if (!Number.isSafeInteger(timeout) || timeout < 1_000 || timeout > 900_000) {
-    throw new TypeError('AIMS_OPENHANDS_BROKER_TIMEOUT_MS must be an integer from 1000 to 900000.');
+  if (!Number.isSafeInteger(timeout) || timeout < 300_000 || timeout > 900_000) {
+    throw new TypeError('AIMS_OPENHANDS_BROKER_TIMEOUT_MS must be an integer from 300000 to 900000.');
   }
   return timeout;
 }

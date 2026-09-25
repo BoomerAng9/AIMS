@@ -20,6 +20,15 @@ const configuredEnv = {
   PAPERCLIP_OPENHANDS_BINDINGS_JSON: JSON.stringify([binding]),
 } as NodeJS.ProcessEnv;
 
+function runJwt(overrides: Record<string, unknown> = {}): string {
+  const header = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64url');
+  const claims = Buffer.from(JSON.stringify({
+    sub: 'agent-a', company_id: 'company-a', run_id: 'run-123', exp: Math.floor(Date.now() / 1000) + 60,
+    ...overrides,
+  })).toString('base64url');
+  return `${header}.${claims}.test-signature`;
+}
+
 function appFor(fetchImpl: typeof fetch, env = configuredEnv) {
   const app = express();
   app.use(express.json());
@@ -43,7 +52,7 @@ describe('Paperclip to OpenHands bridge', () => {
       const url = String(input);
       calls.push({ url, init });
       if (url.endsWith('/api/agents/me')) {
-        expect(new Headers(init?.headers).get('Authorization')).toBe('Bearer paperclip-run-token');
+        expect(new Headers(init?.headers).get('Authorization')).toBe(`Bearer ${runJwt()}`);
         expect(new Headers(init?.headers).get('X-Paperclip-Run-Id')).toBe('run-123');
         return Response.json({ id: 'agent-a', companyId: 'company-a' });
       }
@@ -64,7 +73,7 @@ describe('Paperclip to OpenHands bridge', () => {
 
     const response = await request(appFor(fetchImpl))
       .post('/api/integrations/paperclip/openhands/runs')
-      .set('Authorization', 'Bearer paperclip-run-token')
+      .set('Authorization', `Bearer ${runJwt()}`)
       .set('X-Paperclip-Run-Id', 'run-123')
       .send({ runId: 'run-123', agentId: 'agent-a', companyId: 'company-a', task: 'Create a small test file.' });
 
@@ -78,12 +87,36 @@ describe('Paperclip to OpenHands bridge', () => {
     const fetchImpl = jest.fn(async () => Response.json({ id: 'other-agent', companyId: 'company-a' })) as unknown as typeof fetch;
     const response = await request(appFor(fetchImpl))
       .post('/api/integrations/paperclip/openhands/runs')
-      .set('Authorization', 'Bearer paperclip-run-token')
+      .set('Authorization', `Bearer ${runJwt()}`)
       .set('X-Paperclip-Run-Id', 'run-123')
       .send({ runId: 'run-123', agentId: 'agent-a', companyId: 'company-a', task: 'Do work.' });
     expect(response.status).toBe(403);
     expect(response.body.errorCode).toBe('paperclip_run_identity_mismatch');
     expect(fetchImpl).toHaveBeenCalledTimes(1);
+  });
+
+  test('rejects a long-lived agent API key before Paperclip identity lookup or Canvas dispatch', async () => {
+    const fetchImpl = jest.fn() as unknown as typeof fetch;
+    const response = await request(appFor(fetchImpl))
+      .post('/api/integrations/paperclip/openhands/runs')
+      .set('Authorization', 'Bearer pcp_agent_long_lived_key')
+      .set('X-Paperclip-Run-Id', 'run-123')
+      .send({ runId: 'run-123', agentId: 'agent-a', companyId: 'company-a', task: 'Do work.' });
+    expect(response.status).toBe(401);
+    expect(response.body.errorCode).toBe('paperclip_run_token_not_run_bound');
+    expect(fetchImpl).not.toHaveBeenCalled();
+  });
+
+  test('rejects JWT claims for another run before identity lookup', async () => {
+    const fetchImpl = jest.fn() as unknown as typeof fetch;
+    const response = await request(appFor(fetchImpl))
+      .post('/api/integrations/paperclip/openhands/runs')
+      .set('Authorization', `Bearer ${runJwt({ run_id: 'different-run' })}`)
+      .set('X-Paperclip-Run-Id', 'run-123')
+      .send({ runId: 'run-123', agentId: 'agent-a', companyId: 'company-a', task: 'Do work.' });
+    expect(response.status).toBe(401);
+    expect(response.body.errorCode).toBe('paperclip_run_token_not_run_bound');
+    expect(fetchImpl).not.toHaveBeenCalled();
   });
 
   test('rejects path traversal and duplicate agent bindings at configuration load', async () => {

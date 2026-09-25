@@ -85,6 +85,19 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
 }
 
+function hasMatchingRunJwtClaims(token: string, runId: string, agentId: string, companyId: string): boolean {
+  const parts = token.split('.');
+  if (parts.length !== 3 || !parts[0] || !parts[1] || !parts[2]) return false;
+  try {
+    const header: unknown = JSON.parse(Buffer.from(parts[0], 'base64url').toString('utf8'));
+    const claims: unknown = JSON.parse(Buffer.from(parts[1], 'base64url').toString('utf8'));
+    return isRecord(header) && typeof header.alg === 'string' && header.alg !== 'none' &&
+      isRecord(claims) && claims.run_id === runId && claims.sub === agentId && claims.company_id === companyId;
+  } catch {
+    return false;
+  }
+}
+
 function stableConversationId(runId: string): string {
   const digest = createHash('sha1').update(`aims-paperclip-openhands:${runId}`).digest('hex').slice(0, 32).split('');
   digest[12] = '5';
@@ -128,6 +141,13 @@ export function createPaperclipOpenHandsRouter(dependencies: BridgeDependencies 
     const body = req.body as Record<string, unknown> | undefined;
     if (!token || !runId || !isRecord(body) || body.runId !== runId || typeof body.agentId !== 'string' || typeof body.companyId !== 'string' || typeof body.task !== 'string' || !body.task.trim() || body.task.length > 40_000) {
       res.status(400).json({ status: 'unknown', errorCode: 'paperclip_run_request_invalid' });
+      return;
+    }
+    // This is only a shape/claim precheck. Paperclip remains the signature and live-run authority:
+    // its agent-JWT middleware verifies the bearer signature and that X-Paperclip-Run-Id matches run_id.
+    // A long-lived agent API key must never authorize a caller-selected run ID.
+    if (!hasMatchingRunJwtClaims(token, runId, body.agentId, body.companyId)) {
+      res.status(401).json({ status: 'unknown', errorCode: 'paperclip_run_token_not_run_bound' });
       return;
     }
 
