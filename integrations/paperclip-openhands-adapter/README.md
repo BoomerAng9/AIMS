@@ -41,6 +41,12 @@ public prompt or a committed environment file):
   have one unique `{companyId, agentId}` entry with its owner, tenant, Canvas
   Agent Profile UUID, workspace root, relative working directory, and `enabled: true`.
 
+The deployment templates `infra/.env.example` and
+`infra/.env.production.example` name these settings but leave them commented out.
+Keep the binding list empty until the live Paperclip API, private Canvas network
+path, and exact agent/profile/workspace IDs have been verified. Store the Canvas
+session key in the deployment's secret store; do not commit a populated env file.
+
 Example shape with placeholders (not usable credentials or IDs):
 
 ```json
