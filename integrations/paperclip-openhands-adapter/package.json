@@ -1,0 +1,25 @@
+{
+  "name": "@aims/paperclip-openhands-adapter",
+  "version": "0.1.0",
+  "private": true,
+  "license": "PROPRIETARY",
+  "type": "module",
+  "engines": {
+    "node": ">=24.11.0"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "node --test dist/server/execute.test.js"
+  },
+  "dependencies": {
+    "@paperclipai/adapter-utils": "2026.831.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "5.3.3"
+  },
+  "exports": {
+    ".": "./dist/index.js",
+    "./server": "./dist/server/index.js"
+  }
+}

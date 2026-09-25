@@ -96,6 +96,7 @@ import type { RememberInput, RecallQuery, MemoryFeedback } from './memory';
 import { getTwelveLabsClient } from './twelve-labs';
 import { runScoutVerify } from './perform/scout-verify';
 import type { ScoutVerifyInput } from './perform/scout-verify';
+import { createPaperclipOpenHandsRouter } from './paperclip-openhands/router';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -223,6 +224,11 @@ app.get('/health', (_req, res) => {
 // A2A Discovery — /.well-known/agent.json is public per A2A spec
 // --------------------------------------------------------------------------
 app.use(a2aRouter);
+
+// Paperclip external-adapter ingress authenticates each request against
+// Paperclip's agent-scoped run token; it must be mounted before the shared
+// INTERNAL_API_KEY middleware and never trusts caller-supplied tenant IDs.
+app.use(createPaperclipOpenHandsRouter());
 
 // --------------------------------------------------------------------------
 // Cloudflare — LLM.txt, AI Index, and markdown-for-agents (public)
