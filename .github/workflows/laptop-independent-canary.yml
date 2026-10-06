@@ -1,0 +1,28 @@
+{
+  "name": "Laptop-independent canary",
+  "on": {
+    "push": {
+      "branches": [
+        "canary/laptop-independent-execution"
+      ],
+      "paths": [
+        ".github/workflows/laptop-independent-canary.yml"
+      ]
+    }
+  },
+  "permissions": {},
+  "jobs": {
+    "canary": {
+      "runs-on": "ubuntu-latest",
+      "timeout-minutes": 5,
+      "permissions": {},
+      "steps": [
+        {
+          "name": "Build and verify isolated receipt across 120 seconds",
+          "shell": "bash",
+          "run": "set -euo pipefail\nwork=\"$(mktemp -d)\"\nimage=\"aims-laptop-independence-canary:${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}\"\ncontainer=\"aims-canary-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}\"\ntrap 'docker rm -f \"$container\" >/dev/null 2>&1 || true' EXIT\nprintf 'run_id=%s\\nrun_attempt=%s\\ncommit_sha=%s\\nstarted_utc=%s\\n' \"$GITHUB_RUN_ID\" \"$GITHUB_RUN_ATTEMPT\" \"$GITHUB_SHA\" \"$(date -u +%FT%TZ)\" > \"$work/receipt.txt\"\nprintf 'FROM scratch\\nCOPY receipt.txt /receipt.txt\\n' > \"$work/Dockerfile\"\ndocker build --network=none --pull=false --no-cache --tag \"$image\" \"$work\"\nimage_before=\"$(docker image inspect --format '{{.Id}}' \"$image\")\"\ndocker create --name \"$container\" \"$image\" /never-executed >/dev/null\ndocker cp \"$container:/receipt.txt\" \"$work/receipt-extracted.txt\"\ncmp \"$work/receipt.txt\" \"$work/receipt-extracted.txt\"\nbefore=\"$(sha256sum \"$work/receipt.txt\" | cut -d \" \" -f 1)\"\nprintf 'CANARY_STARTED image_id=%s receipt_sha256=%s\\n' \"$image_before\" \"$before\"\ncat \"$work/receipt.txt\"\nsleep 120\ndocker cp \"$container:/receipt.txt\" \"$work/receipt-after.txt\"\ncmp \"$work/receipt.txt\" \"$work/receipt-after.txt\"\nafter=\"$(sha256sum \"$work/receipt-after.txt\" | cut -d \" \" -f 1)\"\nimage_after=\"$(docker image inspect --format '{{.Id}}' \"$image\")\"\ntest \"$before\" = \"$after\"\ntest \"$image_before\" = \"$image_after\"\nprintf 'CANARY_PASS run_id=%s commit_sha=%s image_id=%s receipt_sha256=%s finished_utc=%s\\n' \"$GITHUB_RUN_ID\" \"$GITHUB_SHA\" \"$image_after\" \"$after\" \"$(date -u +%FT%TZ)\""
+        }
+      ]
+    }
+  }
+}
