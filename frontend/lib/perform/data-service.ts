@@ -268,11 +268,10 @@ export async function enrichProspectViaBrave(prospectId: string): Promise<{
     `${name} football recruit 247sports rivals on3 ranking`,
   ];
 
-  const allResults: BraveResult[] = [];
-  for (const q of queries) {
-    const results = await braveSearch(q, 5);
-    allResults.push(...results);
-  }
+  // ⚡ Bolt Performance Optimization: Execute Brave searches concurrently instead of sequentially
+  // Reduces overall search latency by resolving all queries in parallel.
+  const resultsArrays = await Promise.all(queries.map(q => braveSearch(q, 5)));
+  const allResults: BraveResult[] = resultsArrays.flat();
 
   // Deduplicate by URL
   const seen = new Set<string>();
