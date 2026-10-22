@@ -115,20 +115,6 @@ async function createRun(input: AgentTaskInput, steps: string[]): Promise<AimsRu
   return run;
 }
 
-async function updateRunStep(run: AimsRun, stepIndex: number, update: Partial<RunStepResult>): Promise<void> {
-  if (run.steps[stepIndex]) {
-    Object.assign(run.steps[stepIndex], update);
-    try {
-      await shelfClient.update('runs', run.id, {
-        steps: run.steps,
-        updatedAt: new Date().toISOString(),
-      } as Partial<AimsRun>);
-    } catch {
-      // Non-blocking
-    }
-  }
-}
-
 async function completeRun(run: AimsRun, status: 'completed' | 'failed', totalTokens: number, totalUsd: number, artifacts: string[]): Promise<void> {
   const now = new Date().toISOString();
   run.status = status;
@@ -144,6 +130,7 @@ async function completeRun(run: AimsRun, status: 'completed' | 'failed', totalTo
       totalTokensUsed: run.totalTokensUsed,
       totalCostUsd: run.totalCostUsd,
       artifacts: run.artifacts,
+      steps: run.steps,
       completedAt: run.completedAt,
       totalDurationMs: run.totalDurationMs,
     } as Partial<AimsRun>);
@@ -370,14 +357,16 @@ async function execute(input: AgentTaskInput): Promise<AgentTaskOutput> {
     // 4. Execute pipeline
     const result = await executePipeline(enrichedInput, steps);
 
-    // 5. Update Run record per step
+    // 5. Update Run record per step in memory
     for (const stepResult of result.stepResults) {
-      await updateRunStep(run, stepResult.index, {
-        status: stepResult.status === 'completed' ? 'completed' : 'failed',
-        tokensUsed: stepResult.output?.cost.tokens || 0,
-        costUsd: stepResult.output?.cost.usd || 0,
-        completedAt: new Date().toISOString(),
-      });
+      if (run.steps[stepResult.index]) {
+        Object.assign(run.steps[stepResult.index], {
+          status: stepResult.status === 'completed' ? 'completed' : 'failed',
+          tokensUsed: stepResult.output?.cost.tokens || 0,
+          costUsd: stepResult.output?.cost.usd || 0,
+          completedAt: new Date().toISOString(),
+        });
+      }
     }
 
     const completedSteps = result.stepResults.filter(s => s.status === 'completed').length;

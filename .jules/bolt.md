@@ -8,3 +8,6 @@
 ## 2024-05-18 - [Parallelize Evidence Locker GCS network calls]
 **Learning:** Sequential asynchronous network requests inside `for...of` loops are a hidden bottleneck for latency, especially when dealing with high-volume remote operations like fetching Google Cloud Storage metadata. Refactoring these loops to use `Promise.all` with `.map()` significantly cuts down total execution time by allowing concurrent requests.
 **Action:** Always scan for `for...of` loops that purely execute independent `await` calls and refactor them to use `Promise.all` mapping to reduce latency.
+## 2024-05-24 - Firestore N+1 Batch Updates
+**Learning:** Sequential individual `update` calls to Firestore inside loops (like updating `run.steps` in `chicken-hawk.ts`) introduce severe N+1 latency bottlenecks and risk race conditions when modifying the same array.
+**Action:** When updating a complex array on a single document, mutate the array locally in-memory inside the loop, and dispatch a single `update` call with the modified array after the loop completes.
