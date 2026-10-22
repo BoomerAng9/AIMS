@@ -150,14 +150,29 @@ export async function getNilPlayerRankings(filters?: {
 }
 
 export async function getNilStats(season: number) {
-  const deals = await prisma.nilDeal.findMany({ where: { season } });
-  const totalValue = deals.reduce((sum, d) => sum + (d.estimatedValue || 0), 0);
-  const avgDeal = deals.length > 0 ? totalValue / deals.length : 0;
+  // ⚡ Bolt Optimization: Use Prisma aggregations instead of loading all deals into memory.
+  // This pushes computation to the DB, turning O(n) memory/network usage into O(1)
+  // and executes concurrently to minimize latency.
+  const [stats, activeDealCount] = await Promise.all([
+    prisma.nilDeal.aggregate({
+      _count: { _all: true },
+      _sum: { estimatedValue: true },
+      where: { season },
+    }),
+    prisma.nilDeal.count({
+      where: { season, status: 'ACTIVE' },
+    }),
+  ]);
+
+  const totalDeals = stats._count._all;
+  const totalValue = stats._sum.estimatedValue || 0;
+  const avgDealValue = totalDeals > 0 ? totalValue / totalDeals : 0;
+
   return {
-    totalDeals: deals.length,
+    totalDeals,
     totalValue,
-    avgDealValue: avgDeal,
-    activeDealCount: deals.filter(d => d.status === 'ACTIVE').length,
+    avgDealValue,
+    activeDealCount,
   };
 }
 
