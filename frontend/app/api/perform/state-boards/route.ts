@@ -157,21 +157,34 @@ export async function GET(req: NextRequest) {
 
                 if (stateCounts.length > 0) {
                     const stateData = [];
-                    for (const sc of stateCounts) {
-                        if (!sc.state) continue;
-                        const topProspect = await prisma.performProspect.findFirst({
-                            where: { state: sc.state },
-                            orderBy: { paiScore: 'desc' },
-                            select: { firstName: true, lastName: true, position: true, paiScore: true },
+                    const validCounts = stateCounts.filter(sc => sc.state);
+
+                    // Optimization: Batch database queries concurrently using Promise.all
+                    // Why: Replaced sequential iteration (O(N) latency) with concurrent batches to reduce total blocking time
+                    // while using chunks of 10 to prevent Prisma connection pool exhaustion.
+                    // Expected Impact: Reduces database query latency linearly, up to 10x faster execution for 50 states.
+                    const CHUNK_SIZE = 10;
+
+                    for (let i = 0; i < validCounts.length; i += CHUNK_SIZE) {
+                        const chunk = validCounts.slice(i, i + CHUNK_SIZE);
+                        const promises = chunk.map(async (sc) => {
+                            const topProspect = await prisma.performProspect.findFirst({
+                                where: { state: sc.state! },
+                                orderBy: { paiScore: 'desc' },
+                                select: { firstName: true, lastName: true, position: true, paiScore: true },
+                            });
+
+                            return {
+                                code: sc.state,
+                                count: sc._count._all,
+                                topProducer: topProspect ? `${topProspect.firstName} ${topProspect.lastName}` : null,
+                                topPosition: topProspect?.position || null,
+                                topPai: topProspect?.paiScore || null,
+                            };
                         });
 
-                        stateData.push({
-                            code: sc.state,
-                            count: sc._count._all,
-                            topProducer: topProspect ? `${topProspect.firstName} ${topProspect.lastName}` : null,
-                            topPosition: topProspect?.position || null,
-                            topPai: topProspect?.paiScore || null,
-                        });
+                        const chunkResults = await Promise.all(promises);
+                        stateData.push(...chunkResults);
                     }
 
                     return NextResponse.json({
